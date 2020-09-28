@@ -1,8 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from multipledispatch import dispatch
-from .gp import Prior, Posterior
-from .types import InputData
+from .types import Prior, Posterior
 
 
 @dispatch(Prior, np.ndarray, int)
