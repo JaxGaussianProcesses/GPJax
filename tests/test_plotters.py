@@ -6,7 +6,7 @@ from gpblocks.mean_functions import Zero
 import matplotlib.pyplot as plt
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     kern = SquaredExponential()
     mean_func = Zero()
     gp = Prior(mean_func, kern)

@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+from .kernel
 
 
 def marginal_log_likelihood(model, X, y):
