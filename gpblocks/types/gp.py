@@ -1,7 +1,7 @@
-from gpflow.models.model import Module
+import haiku as hk
 
 
-class Prior(Module):
+class Prior:
     def __init__(self, mean_function, kernel):
         super().__init__()
         self.mean_func = mean_function
@@ -11,7 +11,7 @@ class Prior(Module):
         return Posterior(self, other)
 
 
-class Posterior(Module):
+class Posterior:
     def __init__(self, prior, likelihood):
         super().__init__()
         self.prior = prior

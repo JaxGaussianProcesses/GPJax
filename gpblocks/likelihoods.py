@@ -1,12 +1,8 @@
-from gpflow.base import Parameter, Module
+import jax.numpy as jnp
+import jax.scipy as jsp
 
 
-class Likelihood(Module):
-    def __init__(self, name=None):
-        super().__init__(name=name)
+def gaussian(x, noise):
+    lls = jsp.stats.norm.logpdf(x, loc=0.0, scale=noise)
+    return jnp.sum(lls)
 
-
-class Gaussian(Likelihood):
-    def __init__(self, observation_noise=1.0, name='Gaussian'):
-        super().__init__(name=name)
-        self.obs_noise = Parameter(observation_noise)

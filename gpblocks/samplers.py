@@ -5,7 +5,7 @@ from .types import Prior, Posterior
 
 
 @dispatch(Prior, np.ndarray, int)
-def sample(gp: Prior, X: np.ndarray, n_samples:int, jitter_amount:float=1e-6):
+def sample(gp: Prior, X: np.ndarray, n_samples:int, jitter_amount: float = 1e-6):
     """
     Draw samples from the GP prior i.e.
 

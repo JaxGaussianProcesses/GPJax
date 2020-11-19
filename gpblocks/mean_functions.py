@@ -1,4 +1,4 @@
-import tensorflow as tf
+import jax.numpy as jnp
 
 
 class MeanFunction:
@@ -17,4 +17,4 @@ class Zero(MeanFunction):
         self.name = name 
     
     def compute_mu(self, X):
-        return tf.zeros_like(X)
+        return jnp.zeros_like(X)

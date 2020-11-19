@@ -1,6 +1,6 @@
-import tensorflow as tf
-import numpy as np
+import jax.numpy as jnp
 from .types import Posterior
+from .kernel import jitter_matrix, gram
 
 
 def marginal_log_likelihood(model: Posterior, X, y):
@@ -13,13 +13,11 @@ def marginal_log_likelihood(model: Posterior, X, y):
     :return: A floating point value of the current marginal log-likelihood
     """
     N = X.shape[0]
-    Kxx = model.prior.kernel(X, X, jitter_amount=model.likelihood.obs_noise)
-    L = tf.linalg.cholesky(Kxx)
-    diag_sum = tf.reduce_sum(tf.linalg.diag_part(L))
-    alpha = tf.linalg.triangular_solve(tf.transpose(L),
-                                       tf.linalg.triangular_solve(L, y))
-    return -0.5 * tf.squeeze(tf.matmul(
-        tf.transpose(y), alpha)) - diag_sum - 0.5 * N * tf.math.log(
-            2 * tf.cast(np.pi, dtype=tf.float64))
+    jitter = jitter_matrix(N, model.likelihood.obs_noise)
+    Kxx = gram(model.prior.kernel, X) + jitter
+    L = jnp.linalg.cholesky(Kxx)
+    diag_sum = jnp.sum(jnp.diag(L))
+    alpha = jnp.linalg.solve(jnp.transpose(L), jnp.linalg.solve(L, y))
+    return -0.5 * jnp.squeeze(jnp.matmul(jnp.transpose(y), alpha)) - diag_sum - 0.5 * N * jnp.log(2 * jnp.pi)
 
 
