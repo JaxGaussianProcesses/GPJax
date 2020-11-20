@@ -1,3 +1,4 @@
 from .gp import Prior, Posterior
-from .kernels import SquaredExponential, Kernel
-from .data import InputData
+from .kernels import Kernel, Stationary
+from .likelihoods import Likelihood
+from .mean_functions import MeanFunction, Zero

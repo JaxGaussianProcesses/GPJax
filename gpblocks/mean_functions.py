@@ -1,20 +1,8 @@
 import jax.numpy as jnp
+from multipledispatch import dispatch
+from .types import Zero
 
 
-class MeanFunction:
-    def __init__(self, name=None):
-        self.name = name 
-
-    def __call__(self, X):
-        return self.compute_mu(X)
-
-    def compute_mu(self, X):
-        raise NotImplementedError
-
-
-class Zero(MeanFunction):
-    def __init__(self, name="ZeroMean"):
-        self.name = name 
-    
-    def compute_mu(self, X):
-        return jnp.zeros_like(X)
+@dispatch(Zero, jnp.array)
+def mean(mean_function, x):
+    return jnp.zeros_like(x)

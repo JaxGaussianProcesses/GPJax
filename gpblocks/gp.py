@@ -1,9 +1,9 @@
 import jax.numpy as jnp
-from .types import Posterior
+from .types import Posterior, Prior
 from .kernel import jitter_matrix, gram
 
 
-def marginal_log_likelihood(model: Posterior, X, y):
+def marginal_log_likelihood(model: Posterior, X, y) -> jnp.array:
     """
     Compute the marginal log-likelihood of a GP with Gaussian likelihood
 
