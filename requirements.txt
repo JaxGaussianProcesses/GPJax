@@ -3,4 +3,5 @@ jaxlib==0.1.57
 numpy==1.18.5
 multipledispatch==0.6.0
 packaging==20.4
-flax==0.2.2
+objax==1.2.0
+

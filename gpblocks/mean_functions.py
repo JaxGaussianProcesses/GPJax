@@ -1,8 +1,16 @@
+from objax import Module, TrainVar
 import jax.numpy as jnp
-from multipledispatch import dispatch
-from .types import Zero
+from objax.random import normal
 
 
-@dispatch(Zero, jnp.array)
-def mean(mean_function, x):
-    return jnp.zeros_like(x)
+class MeanFunction(Module):
+    def __init__(self, name: str = "Mean Function"):
+        self.name = name
+
+
+class ZeroMean(MeanFunction):
+    def __init__(self, name: str = "Zero Mean"):
+        super().__init__(name=name)
+
+    def __call__(self, X: jnp.ndarray) -> jnp.ndarray:
+        return jnp.zeros(X.shape[-1], dtype=X.dtype)

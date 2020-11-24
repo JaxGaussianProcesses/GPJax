@@ -1,31 +1,106 @@
 import jax.numpy as jnp
-from jax import vmap
+from objax import TrainVar, Module
+from typing import Callable
+from jax import vmap, nn
 
 
-def gram(kernel, xs):
-    return vmap(lambda x: vmap(lambda y: kernel(x, y))(xs))(xs)
+class Kernel(Module):
+    def __init__(self, name: str = None):
+        self.name = name
+
+    @staticmethod
+    def covariance_matrix(func: Callable, x: jnp.ndarray,
+                          y: jnp.ndarray) -> jnp.ndarray:
+        mapx1 = vmap(lambda x, y: func(x=x, y=y),
+                     in_axes=(0, None),
+                     out_axes=0)
+        mapx2 = vmap(lambda x, y: mapx1(x, y), in_axes=(None, 0), out_axes=1)
+        return mapx2(x, y)
+
+    @staticmethod
+    def sqeuclidean_distance(x: jnp.array, y: jnp.array) -> float:
+        return jnp.sum((x - y)**2)
+
+    def __call__(self, x: jnp.ndarray, y: jnp.ndarray):
+        raise NotImplementedError
 
 
-# TODO: Only works for 1-dimensional inputs right now
-def rbf(lengthscale, variance):
-    def kernel(x, y):
-        tau = jnp.square(x-y)
-        return jnp.square(variance)*jnp.exp(-tau/(2*jnp.square(lengthscale)))
-    return kernel
+class Stationary(Kernel):
+    def __init__(self,
+                 lengthscale: jnp.ndarray = jnp.array([0.1]),
+                 variance: jnp.ndarray = jnp.array([1.]),
+                 name: str = "Stationary"):
+        super().__init__(name=name)
+        self.lengthscale = TrainVar(lengthscale)
+        self.variance = TrainVar(variance)
 
 
-def jitter_matrix(n: int, jitter_amount:float = 1e-6):
-    return jnp.eye(n)*jitter_amount
+class RBF(Stationary):
+    def __init__(self,
+                 lengthscale: jnp.ndarray = jnp.array([0.1]),
+                 variance: jnp.ndarray = jnp.array([1.]),
+                 name: str = "Stationary"):
+        super().__init__(lengthscale=lengthscale, variance=variance, name=name)
+
+    def feature_map(self, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+        ell = nn.softplus(self.lengthscale.value)
+        sigma = nn.softplus(self.variance.value)
+        x = x / ell
+        y = y / ell
+
+        # return the ard kernel
+        tau = self.sqeuclidean_distance(x, y)
+        return sigma * jnp.exp(-tau)
+
+    def __call__(self, X: jnp.ndarray, Y: jnp.ndarray) -> jnp.ndarray:
+        return self.covariance_matrix(self.feature_map, X, Y).squeeze()
 
 
-def stabilise(A, jitter_amount: float = 1e-6):
-    """
-    Sometimes the smaller eigenvalues of a kernels' Gram matrix can be very slightly negative. This
-    then leads to a non-invertible matrix. To account for this, we simply add a very small amount of
-    noise, or jitter, to the Gram matrix's diagonal to _stabilise_ the eigenvalues.
-
-    :param A: A, possibly non-invertible, Gram matrix
-    :param jitter_amount: A tiny amount of noise to be summed onto the Gram matrix's diagonal.
-    :return: A stabilised Gram matrix.
-    """
-    return A + jitter_matrix(A.shape[0], jitter_amount)
+#
+# def rbf_kernel(gamma: float, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+#     return jnp.exp(-gamma * sqeuclidean_distance(x, y))
+#
+#
+# class RBFKernel(Module):
+#     def __init__(self):
+#         self.gamma = TrainVar(jnp.array([0.1]))
+#
+#     def __call__(self, X: jnp.ndarray, Y: jnp.ndarray) -> jnp.ndarray:
+#         kernel_func = partial(rbf_kernel, gamma=self.gamma.value)
+#         return covariance_matrix(kernel_func, X, Y).squeeze()
+#
+#
+# class ARDKernel(Module):
+#     def __init__(self):
+#         self.length_scale = TrainVar(jnp.array([0.1]))
+#         self.amplitude = TrainVar(jnp.array([1.]))
+#
+#     def __call__(self, X: jnp.ndarray, Y: jnp.ndarray) -> jnp.ndarray:
+#         kernel_func = partial(ard_kernel,
+#                               length_scale=nn.softplus(
+#                                   self.length_scale.value),
+#                               amplitude=nn.softplus(self.amplitude.value))
+#         return covariance_matrix(kernel_func, X, Y).squeeze()
+#
+#
+# def covariance_matrix(
+#     func: Callable,
+#     x: jnp.ndarray,
+#     y: jnp.ndarray,
+# ) -> jnp.ndarray:
+#     mapx1 = vmap(lambda x, y: func(x=x, y=y), in_axes=(0, None), out_axes=0)
+#     mapx2 = vmap(lambda x, y: mapx1(x, y), in_axes=(None, 0), out_axes=1)
+#     return mapx2(x, y)
+#
+#
+# def ard_kernel(x: jnp.ndarray, y: jnp.ndarray, length_scale,
+#                amplitude) -> jnp.ndarray:
+#     x = x / length_scale
+#     y = y / length_scale
+#
+#     # return the ard kernel
+#     return amplitude * jnp.exp(-sqeuclidean_distance(x, y))
+#
+#
+# def sqeuclidean_distance(x: jnp.array, y: jnp.array) -> float:
+#     return jnp.sum((x - y)**2)
