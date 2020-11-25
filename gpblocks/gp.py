@@ -7,8 +7,8 @@ from objax import TrainVar, Module
 import jax.numpy as jnp
 from jax import nn
 from jax.scipy.linalg import cho_solve
-from tensorflow_probability.substrates import jax as tfp
-tfd = tfp.distributions
+import jax.random as jr
+from jax.scipy.stats import multivariate_normal
 
 
 class Prior(Module):
@@ -22,13 +22,14 @@ class Prior(Module):
         self.noise = TrainVar(observation_noise)
         self.jitter = jitter
 
-    def forward(self, X: jnp.ndarray) -> jnp.ndarray:
+    def sample(self, X: jnp.ndarray, key, n_samples: int = 1):
         Inn = jnp.eye(X.shape[0])
         mu = self.meanf(X)
         cov = self.kernel(X, X) + self.jitter * Inn
-        cov += nn.softplus(self.noise.value) * Inn
-        L = jnp.linalg.cholesky(cov)
-        return tfd.MultivariateNormalTriL(loc=mu, scale_tril=L)
+        return jr.multivariate_normal(key,
+                                      mu.squeeze(),
+                                      cov,
+                                      shape=(n_samples, ))
 
     def __mul__(self, other: Likelihood):
         return Posterior(self, other)
@@ -41,13 +42,15 @@ class Posterior(Module):
         self.likelihood = likelihood
         self.jitter = prior.jitter
 
-    def forward(self, X: jnp.ndarray) -> jnp.ndarray:
+    def forward(self, X: jnp.ndarray, y) -> jnp.ndarray:
         Inn = jnp.eye(X.shape[0])
         mu = self.meanf(X)
         cov = self.kernel(X, X) + self.jitter * Inn
         cov += nn.softplus(self.likelihood.noise.value) * Inn
-        L = jnp.linalg.cholesky(cov)
-        return tfd.MultivariateNormalTriL(loc=mu, scale_tril=L)
+        # L = jnp.linalg.cholesky(cov)
+        # TODO: Return the logpdf w.r.t. the Cholesky, not the full cov.
+        lpdf = multivariate_normal.logpdf(y.squeeze(), mu.squeeze(), cov)
+        return lpdf
 
     def predict(self, Xstar, X, y):
         sigma = nn.softplus(self.likelihood.noise.value)

@@ -19,17 +19,19 @@ y = jnp.sin(x) + jnr.normal(key, shape=x.shape)*0.05
 As can be seen, the latent function of interest here is a sinusoidal function. However, it has been perturbed by some zero-mean Gaussian noise with variance of 0.05. We can use a Gaussian process model to try and recover this latent function.
 
 ```python
-from gpblocks import Prior, rbf
+from gpblocks import Prior, RBF
 
-kernel = rbf(lengthscale=1.0, variance=1.0)
+kernel = RBF(lengthscale=1.0, variance=1.0)
 f = Prior(kernel)
 ```
  
 In the presence of a likelihood function which we'll here assume to be Gaussian, we can optimise the marginal log-likelihood of the Gaussian process prior multiplied by the likelihood to obtain a posterior distribution over the latent function.
 
 ```python
-for _ in range(100):
-    posterior = f*
+from gpblocks import Gaussian
+
+likelihood = Gaussian()
+posterior = f * likelihood
 ```
 
 ## Installation

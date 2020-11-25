@@ -1,6 +1,5 @@
 from objax import Module, TrainVar
 import jax.numpy as jnp
-from objax.random import normal
 
 
 class MeanFunction(Module):
@@ -13,4 +12,4 @@ class ZeroMean(MeanFunction):
         super().__init__(name=name)
 
     def __call__(self, X: jnp.ndarray) -> jnp.ndarray:
-        return jnp.zeros(X.shape[-1], dtype=X.dtype)
+        return jnp.zeros(X.shape, dtype=X.dtype)
