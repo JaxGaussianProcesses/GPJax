@@ -15,11 +15,9 @@ class Prior(Module):
     def __init__(self,
                  kernel: Kernel,
                  mean_function: MeanFunction = ZeroMean(),
-                 observation_noise: jnp.ndarray = jnp.array([0.1]),
                  jitter: float = 1e-6):
         self.meanf = mean_function
         self.kernel = kernel
-        self.noise = TrainVar(observation_noise)
         self.jitter = jitter
 
     def sample(self, X: jnp.ndarray, key, n_samples: int = 1):
@@ -42,7 +40,7 @@ class Posterior(Module):
         self.likelihood = likelihood
         self.jitter = prior.jitter
 
-    def forward(self, X: jnp.ndarray, y) -> jnp.ndarray:
+    def marginal_ll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
         Inn = jnp.eye(X.shape[0])
         mu = self.meanf(X)
         cov = self.kernel(X, X) + self.jitter * Inn
@@ -52,13 +50,15 @@ class Posterior(Module):
         lpdf = multivariate_normal.logpdf(y.squeeze(), mu.squeeze(), cov)
         return lpdf
 
+    def neg_mll(self, X: jnp.ndarray, y: jnp.ndarray):
+        return -self.marginal_ll(X, y)
+
     def predict(self, Xstar, X, y):
         sigma = nn.softplus(self.likelihood.noise.value)
         L, alpha = get_factorisations(X, y, sigma, self.kernel, self.meanf)
         Kfx = self.kernel(Xstar, X)
         mu = jnp.dot(Kfx, alpha)
         v = cho_solve(L, Kfx.T)
-        # Calculate kernel matrix for inputs
         Kxx = self.kernel(Xstar, Xstar)
         cov = Kxx - jnp.dot(Kfx, v)
         return mu, cov

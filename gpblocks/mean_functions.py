@@ -6,6 +6,8 @@ class MeanFunction(Module):
     def __init__(self, name: str = "Mean Function"):
         self.name = name
 
+    def __call__(self, X: jnp.ndarray):
+        raise NotImplementedError
 
 class ZeroMean(MeanFunction):
     def __init__(self, name: str = "Zero Mean"):

@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from gpblocks import Prior, RBF, Gaussian
 onp.set_printoptions(precision=3, suppress=True)
 
-
 if __name__ == '__main__':
     # Settings
     lr = 0.01  # learning rate
