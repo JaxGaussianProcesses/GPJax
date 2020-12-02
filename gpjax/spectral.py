@@ -6,7 +6,11 @@ from jax import nn
 from objax import TrainVar
 
 
+# TODO: Create a base spectral class. Inherited kernels will then just need the sampling distribution altered.
 class SpectralRBF(RBF):
+    """
+    Random Fourier feature approximation to the RBF kernel.
+    """
     def __init__(self,
                  num_basis: int,
                  lengthscale: jnp.ndarray = jnp.array([1.]),
