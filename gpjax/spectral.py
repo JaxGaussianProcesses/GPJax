@@ -40,8 +40,9 @@ class SpectralRBF(RBF):
             denom = self.lengthscale.value
         else:
             denom = jnp.ones_like(self.lengthscale.value)
-        omega = self.features.value/denom
-        cos_freqs = jnp.cos(X.dot(omega.T)) # TODO: Can possible do away with the tranpose
+        omega = self.features.value / denom
+        cos_freqs = jnp.cos(X.dot(
+            omega.T))  # TODO: Can possible do away with the tranpose
         sin_freqs = jnp.sin(X.dot(omega.T))
         phi = jnp.vstack((cos_freqs, sin_freqs))
         return phi

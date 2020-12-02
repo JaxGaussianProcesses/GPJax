@@ -77,12 +77,14 @@ class SpectralPosterior(Posterior):
         l_var = self.likelihood.noise.value
         k_var = self.kernel.variance.value
         phi = self.kernel(X, self.kernel.features.T)
-        A = (k_var/m)*jnp.matmul(phi, phi.T) + l_var*jnp.eye(m*2)
+        A = (k_var / m) * jnp.matmul(phi, phi.T) + l_var * jnp.eye(m * 2)
         Rt = jnp.linalg.cholesky(A)
         RtiPhit = solve_triangular(Rt, phi.T)
         RtiPhity = jnp.matmul(RtiPhit, y)
 
-        term1 = (jnp.sum(y**2)-jnp.sum(RtiPhity**2)*k_var/m)*0.5/l_var
-        term2 = jnp.sum(jnp.log(jnp.diag(Rt.T))) + (N*0.5-m)*jnp.log(l_var)+(N*0.5*jnp.log(2*jnp.pi))
-        return term1+term2
-    
+        term1 = (jnp.sum(y**2) -
+                 jnp.sum(RtiPhity**2) * k_var / m) * 0.5 / l_var
+        term2 = jnp.sum(jnp.log(jnp.diag(
+            Rt.T))) + (N * 0.5 - m) * jnp.log(l_var) + (N * 0.5 *
+                                                        jnp.log(2 * jnp.pi))
+        return term1 + term2
