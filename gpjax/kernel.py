@@ -11,6 +11,7 @@ class Kernel(Module):
         # TODO: Make the transformation a method of the parameter type.
         self.transform = parameter_transform
         self.name = name
+        self.spectral = False
 
     @staticmethod
     def gram(func: Callable, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
@@ -37,6 +38,9 @@ class Stationary(Kernel):
         super().__init__(parameter_transform=parameter_transform, name=name)
         self.lengthscale = TrainVar(lengthscale)
         self.variance = TrainVar(variance)
+
+    def __call__(self, *args, **kwargs):
+        raise NotImplementedError
 
 
 class RBF(Stationary):

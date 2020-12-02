@@ -27,16 +27,22 @@ class SpectralRBF(RBF):
         self.num_basis = num_basis
         self.features = TrainVar(
             jr.normal(key, shape=(self.num_basis, self.input_dim)))
+        self.spectral = True
 
-    def _compute_phi(self, X: jnp.ndarray):
+    def _compute_phi(self, X: jnp.ndarray, scale=False):
         """
         Takes an NxD matrix and returns a 2*NxM matrix
 
         :param X:
         :return:
         """
-        cos_freqs = jnp.cos(X.dot(self.features.T))
-        sin_freqs = jnp.sin(X.dot(self.features.T))
+        if scale:
+            denom = self.lengthscale.value
+        else:
+            denom = jnp.ones_like(self.lengthscale.value)
+        omega = self.features.value/denom
+        cos_freqs = jnp.cos(X.dot(omega.T)) # TODO: Can possible do away with the tranpose
+        sin_freqs = jnp.sin(X.dot(omega.T))
         phi = jnp.vstack((cos_freqs, sin_freqs))
         return phi
 

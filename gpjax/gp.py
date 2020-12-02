@@ -6,7 +6,7 @@ from .utils import get_factorisations
 from objax import TrainVar, Module
 import jax.numpy as jnp
 from jax import nn
-from jax.scipy.linalg import cho_solve
+from jax.scipy.linalg import cho_solve, solve_triangular
 import jax.random as jr
 from jax.scipy.stats import multivariate_normal
 
@@ -30,7 +30,10 @@ class Prior(Module):
                                       shape=(n_samples, ))
 
     def __mul__(self, other: Likelihood):
-        return Posterior(self, other)
+        if self.kernel.spectral is True:
+            return SpectralPosterior(self, other)
+        else:
+            return Posterior(self, other)
 
 
 class Posterior(Module):
@@ -62,3 +65,24 @@ class Posterior(Module):
         Kxx = self.kernel(Xstar, Xstar)
         cov = Kxx - jnp.dot(Kfx, v)
         return mu, cov
+
+
+class SpectralPosterior(Posterior):
+    def __init__(self, prior: Prior, likelihood: Gaussian):
+        super().__init__(prior, likelihood)
+
+    def marginal_ll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+        N = X.shape[0]
+        m = self.kernel.num_basis
+        l_var = self.likelihood.noise.value
+        k_var = self.kernel.variance.value
+        phi = self.kernel(X, self.kernel.features.T)
+        A = (k_var/m)*jnp.matmul(phi, phi.T) + l_var*jnp.eye(m*2)
+        Rt = jnp.linalg.cholesky(A)
+        RtiPhit = solve_triangular(Rt, phi.T)
+        RtiPhity = jnp.matmul(RtiPhit, y)
+
+        term1 = (jnp.sum(y**2)-jnp.sum(RtiPhity**2)*k_var/m)*0.5/l_var
+        term2 = jnp.sum(jnp.log(jnp.diag(Rt.T))) + (N*0.5-m)*jnp.log(l_var)+(N*0.5*jnp.log(2*jnp.pi))
+        return term1+term2
+    
