@@ -1,20 +1,17 @@
-import tensorflow as tf
+from objax import Module, TrainVar
+import jax.numpy as jnp
 
 
-class MeanFunction:
-    def __init__(self, name=None):
-        self.name = name 
+class MeanFunction(Module):
+    def __init__(self, name: str = "Mean Function"):
+        self.name = name
 
-    def __call__(self, X):
-        return self.compute_mu(X)
-
-    def compute_mu(self, X):
+    def __call__(self, X: jnp.ndarray):
         raise NotImplementedError
 
+class ZeroMean(MeanFunction):
+    def __init__(self, name: str = "Zero Mean"):
+        super().__init__(name=name)
 
-class Zero(MeanFunction):
-    def __init__(self, name="ZeroMean"):
-        self.name = name 
-    
-    def compute_mu(self, X):
-        return tf.zeros_like(X)
+    def __call__(self, X: jnp.ndarray) -> jnp.ndarray:
+        return jnp.zeros(X.shape, dtype=X.dtype)
