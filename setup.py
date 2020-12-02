@@ -8,11 +8,11 @@ def parse_requirements_file(filename):
 
 
 setup(
-    name='GPBlocks',
+    name='GPJax',
     version='0.1.0',
     author='Thomas Pinder',
     author_email='t.pinder2@lancaster.ac.uk',
-    packages=['gpblocks'],  #, 'package_name.test'],
+    packages=['gpjax'],  #, 'package_name.test'],
     # scripts=['bin/script1', 'bin/script2'],
     # url='http://pypi.python.org/pypi/PackageName/',
     license='LICENSE',
