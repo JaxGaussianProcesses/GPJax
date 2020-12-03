@@ -21,9 +21,11 @@ class Prior(Module):
         self.jitter = jitter
 
     def sample(self, X: jnp.ndarray, key, n_samples: int = 1):
-        Inn = jnp.eye(X.shape[0])
         mu = self.meanf(X)
-        cov = self.kernel(X, X) + self.jitter * Inn
+        cov = self.kernel(X, X)
+        if cov.shape[0] == cov.shape[1]:
+            Inn = jnp.eye(cov.shape[0])*self.jitter
+            cov += Inn
         return jr.multivariate_normal(key,
                                       mu.squeeze(),
                                       cov,
@@ -44,10 +46,12 @@ class Posterior(Module):
         self.jitter = prior.jitter
 
     def marginal_ll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
-        Inn = jnp.eye(X.shape[0])
         mu = self.meanf(X)
-        cov = self.kernel(X, X) + self.jitter * Inn
-        cov += nn.softplus(self.likelihood.noise.value) * Inn
+        cov = self.kernel(X, X)
+        if cov.shape[0] == cov.shape[1]:
+            Inn = jnp.eye(cov.shape[0])*self.jitter
+            cov += Inn
+            cov += nn.softplus(self.likelihood.noise.value) * Inn
         # L = jnp.linalg.cholesky(cov)
         # TODO: Return the logpdf w.r.t. the Cholesky, not the full cov.
         lpdf = multivariate_normal.logpdf(y.squeeze(), mu.squeeze(), cov)
