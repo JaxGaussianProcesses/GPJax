@@ -44,9 +44,9 @@ class SpectralRBF(RBF):
         cos_freqs = jnp.cos(X.dot(
             omega.T))  # TODO: Can possible do away with the tranpose
         sin_freqs = jnp.sin(X.dot(omega.T))
-        phi = jnp.vstack((cos_freqs, sin_freqs))
+        phi = jnp.hstack((cos_freqs, sin_freqs))
+        assert phi.shape == (X.shape[0], self.num_basis*2), "Phi matrix incorrectly computed."
         return phi
 
     def __call__(self, X: jnp.ndarray, Y: jnp.ndarray) -> jnp.ndarray:
-        phi_matrix = self._compute_phi(X)
-        return phi_matrix.dot(phi_matrix.T)
+        return self._compute_phi(X)
