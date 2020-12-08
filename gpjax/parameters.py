@@ -2,8 +2,8 @@ from objax import TrainVar
 from objax.typing import JaxArray
 from objax.variable import reduce_mean
 from typing import Optional, Callable
-from .utils import Transform, Identity
-import jax.numpy as jnp
+from jax.nn import softplus
+# from .utils import Transform, Identity
 
 
 class Parameter(TrainVar):
@@ -11,7 +11,7 @@ class Parameter(TrainVar):
                  tensor: JaxArray,
                  reduce: Optional[Callable[[JaxArray],
                                            JaxArray]] = reduce_mean,
-                 transform: Transform = Identity):
+                 transform: Callable = softplus):
         """
         An extension of Objax's TrainVar object with the ability to apply a bijective transform to a parameter
         Args:
@@ -19,10 +19,9 @@ class Parameter(TrainVar):
             reduce:
             transform:
         """
-        unconstrained = transform.forward(tensor)
-        super().__init__(unconstrained, reduce)
-        self.transform = transform
+        super().__init__(tensor, reduce)
+        self.fn = transform
 
     @property
-    def constrained_value(self):
-        return self.transform.reverse(self.value)
+    def transformed(self):
+        return self.fn(self.value)

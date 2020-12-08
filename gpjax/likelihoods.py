@@ -2,7 +2,7 @@ from objax import Module, TrainVar
 import jax.numpy as jnp
 from jax.scipy.linalg import solve_triangular
 from .parameters import Parameter
-from .utils import LogTransform
+# from .utils import LogTransform
 
 
 class Likelihood(Module):

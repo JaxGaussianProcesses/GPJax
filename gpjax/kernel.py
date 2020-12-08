@@ -3,15 +3,12 @@ from objax import Module
 from typing import Callable
 from jax import vmap, nn
 from .parameters import Parameter
-from .utils import LogTransform
 
 
 class Kernel(Module):
     def __init__(self,
-                 parameter_transform: Callable = nn.softplus,
                  name: str = None):
         # TODO: Make the transformation a method of the parameter type.
-        self.transform = parameter_transform
         self.name = name
         self.spectral = False
 
@@ -35,9 +32,8 @@ class Stationary(Kernel):
     def __init__(self,
                  lengthscale: jnp.ndarray = jnp.array([1.]),
                  variance: jnp.ndarray = jnp.array([1.]),
-                 parameter_transform: Callable = nn.softplus,
                  name: str = "Stationary"):
-        super().__init__(parameter_transform=parameter_transform, name=name)
+        super().__init__(name=name)
         self.lengthscale = Parameter(lengthscale)
         self.variance = Parameter(variance)
 
@@ -49,18 +45,16 @@ class RBF(Stationary):
     def __init__(self,
                  lengthscale: jnp.ndarray = jnp.array([1.]),
                  variance: jnp.ndarray = jnp.array([1.]),
-                 parameter_transform: Callable = nn.softplus,
                  name: str = "RBF"):
-        super().__init__(parameter_transform=parameter_transform,
-                         lengthscale=lengthscale,
+        super().__init__(lengthscale=lengthscale,
                          variance=variance,
                          name=name)
 
     def feature_map(self, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
-        ell = self.lengthscale.constrained_value
-        sigma = self.variance.constrained_value
+        ell = self.lengthscale.transformed
+        sigma = self.variance.transformed
         tau = self.dist(x, y)
-        return sigma * jnp.exp(-0.5*tau/ell**2)
+        return sigma * jnp.exp(-tau/ell)
 
     def __call__(self, X: jnp.ndarray, Y: jnp.ndarray) -> jnp.ndarray:
         return self.gram(self.feature_map, X, Y).squeeze()
