@@ -9,6 +9,8 @@ from jax import nn
 from jax.scipy.linalg import cho_solve, solve_triangular
 import jax.random as jr
 from jax.scipy.stats import multivariate_normal
+from tensorflow_probability.substrates import jax as tfp
+tfd = tfp.distributions
 
 
 class Prior(Module):
@@ -51,17 +53,19 @@ class Posterior(Module):
         if cov.shape[0] == cov.shape[1]:
             Inn = jnp.eye(cov.shape[0])*self.jitter
             cov += Inn
-            cov += nn.softplus(self.likelihood.noise.value) * Inn
-        # L = jnp.linalg.cholesky(cov)
+            cov += self.likelihood.noise.constrained_value * Inn
+        L = jnp.linalg.cholesky(cov)
         # TODO: Return the logpdf w.r.t. the Cholesky, not the full cov.
-        lpdf = multivariate_normal.logpdf(y.squeeze(), mu.squeeze(), cov)
-        return lpdf
+        # lpdf = multivariate_normal.logpdf(y.squeeze(), mu.squeeze(), cov)
+        # return lpdf
+        return tfd.MultivariateNormalTriL(loc=mu, scale_tril=L)
 
     def neg_mll(self, X: jnp.ndarray, y: jnp.ndarray):
-        return -self.marginal_ll(X, y)
+        rv = self.marginal_ll(X, y)
+        return -rv.log_prob(y.squeeze()).mean()
 
     def predict(self, Xstar, X, y):
-        sigma = nn.softplus(self.likelihood.noise.value)
+        sigma = self.likelihood.noise.constrained_value
         L, alpha = get_factorisations(X, y, sigma, self.kernel, self.meanf)
         Kfx = self.kernel(Xstar, X)
         mu = jnp.dot(Kfx, alpha)

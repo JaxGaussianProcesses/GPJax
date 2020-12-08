@@ -1,7 +1,9 @@
 import jax.numpy as jnp
-from objax import TrainVar, Module
+from objax import Module
 from typing import Callable
 from jax import vmap, nn
+from .parameters import Parameter
+from .utils import LogTransform
 
 
 class Kernel(Module):
@@ -36,8 +38,8 @@ class Stationary(Kernel):
                  parameter_transform: Callable = nn.softplus,
                  name: str = "Stationary"):
         super().__init__(parameter_transform=parameter_transform, name=name)
-        self.lengthscale = TrainVar(lengthscale)
-        self.variance = TrainVar(variance)
+        self.lengthscale = Parameter(lengthscale)
+        self.variance = Parameter(variance)
 
     def __call__(self, *args, **kwargs):
         raise NotImplementedError
@@ -55,10 +57,10 @@ class RBF(Stationary):
                          name=name)
 
     def feature_map(self, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
-        ell = self.transform(self.lengthscale.value)
-        sigma = self.transform(self.variance.value)
+        ell = self.lengthscale.constrained_value
+        sigma = self.variance.constrained_value
         tau = self.dist(x, y)
-        return sigma * jnp.exp(-tau / ell)
+        return sigma * jnp.exp(-0.5*tau/ell**2)
 
     def __call__(self, X: jnp.ndarray, Y: jnp.ndarray) -> jnp.ndarray:
         return self.gram(self.feature_map, X, Y).squeeze()
