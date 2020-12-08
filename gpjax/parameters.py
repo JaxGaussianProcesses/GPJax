@@ -1,13 +1,9 @@
-import tensorflow_probability as tfp
 from objax import TrainVar
 from objax.typing import JaxArray
 from objax.variable import reduce_mean
 from typing import Optional, Callable
-tfd = tfp.distributions
-
-
-def identity(x: JaxArray):
-    return x
+from jax.nn import softplus
+# from .utils import Transform, Identity
 
 
 class Parameter(TrainVar):
@@ -15,8 +11,17 @@ class Parameter(TrainVar):
                  tensor: JaxArray,
                  reduce: Optional[Callable[[JaxArray],
                                            JaxArray]] = reduce_mean,
-                 transform: Callable = identity,
-                 prior: tfp.distributions.Distribution = None):
+                 transform: Callable = softplus):
+        """
+        An extension of Objax's TrainVar object with the ability to apply a bijective transform to a parameter
+        Args:
+            tensor:
+            reduce:
+            transform:
+        """
         super().__init__(tensor, reduce)
-        self.transform = transform
-        self.prior = prior
+        self.fn = transform
+
+    @property
+    def transformed(self):
+        return self.fn(self.value)

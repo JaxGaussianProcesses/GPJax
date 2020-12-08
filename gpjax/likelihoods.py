@@ -1,6 +1,8 @@
 from objax import Module, TrainVar
 import jax.numpy as jnp
 from jax.scipy.linalg import solve_triangular
+from .parameters import Parameter
+# from .utils import LogTransform
 
 
 class Likelihood(Module):
@@ -11,7 +13,7 @@ class Likelihood(Module):
 class Gaussian(Likelihood):
     def __init__(self, noise: jnp.array = jnp.array([1.0]), name="Gaussian"):
         super().__init__(name=name)
-        self.noise = TrainVar(noise)
+        self.noise = Parameter(noise)
 
     def log_likelihood(self, x: jnp.ndarray, mu: jnp.ndarray, L: jnp.ndarray):
         delta = x - mu
