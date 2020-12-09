@@ -2,15 +2,26 @@ from objax import Module, TrainVar
 import jax.numpy as jnp
 from jax.scipy.linalg import solve_triangular
 from .parameters import Parameter
-# from .utils import LogTransform
+from typing import Optional
 
 
 class Likelihood(Module):
-    def __init__(self, name: str = "Likelihood"):
+    """
+    Base class for all likelihood functions. By inheriting the `Module` class from Objax, seamless interaction with model
+    parameters is provided.
+    """
+    def __init__(self, name: Optional[str] = "Likelihood"):
+        """
+        Args:
+            name: Optional naming of the likelihood.
+        """
         self.name = name
 
 
 class Gaussian(Likelihood):
+    """
+    Gaussian likelihood function 
+    """
     def __init__(self, noise: jnp.array = jnp.array([1.0]), name="Gaussian"):
         super().__init__(name=name)
         self.noise = Parameter(noise)
