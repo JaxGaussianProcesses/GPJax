@@ -12,8 +12,7 @@ def cholesky_factorisation(K: jnp.ndarray,
 
 
 def get_factorisations(
-        X: jnp.ndarray, Y: jnp.ndarray, likelihood_noise: float,
-        kernel,
+        X: jnp.ndarray, Y: jnp.ndarray, likelihood_noise: float, kernel,
         meanf: MeanFunction) -> Tuple[Tuple[jnp.ndarray, bool], jnp.ndarray]:
     Inn = jnp.eye(X.shape[0])
     mu_x = meanf(X)
@@ -22,4 +21,3 @@ def get_factorisations(
         Kxx + likelihood_noise * Inn,
         Y.reshape(-1, 1) - mu_x.reshape(-1, 1),
     )
-

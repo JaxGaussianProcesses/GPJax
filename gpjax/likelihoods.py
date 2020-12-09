@@ -1,4 +1,4 @@
-from objax import Module, TrainVar
+from objax import Module
 import jax.numpy as jnp
 from jax.scipy.linalg import solve_triangular
 from .parameters import Parameter
@@ -7,8 +7,8 @@ from typing import Optional
 
 class Likelihood(Module):
     """
-    Base class for all likelihood functions. By inheriting the `Module` class from Objax, seamless interaction with model
-    parameters is provided.
+    Base class for all likelihood functions. By inheriting the `Module` class from Objax, seamless interaction with
+    model parameters is provided.
     """
     def __init__(self, name: Optional[str] = "Likelihood"):
         """
@@ -16,6 +16,9 @@ class Likelihood(Module):
             name: Optional naming of the likelihood.
         """
         self.name = name
+
+    def __call__(self):
+        raise NotImplementedError
 
 
 class Gaussian(Likelihood):
@@ -35,3 +38,6 @@ class Gaussian(Likelihood):
         ll -= 0.5 * jnp.log(2 * jnp.pi)
         ll -= L_diag
         return ll
+
+    def __call__(self):
+        raise NotImplementedError

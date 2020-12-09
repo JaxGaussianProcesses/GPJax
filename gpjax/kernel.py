@@ -2,16 +2,14 @@ import jax.numpy as jnp
 from objax import Module
 from typing import Callable, Optional
 from jax import vmap, nn
-from .parameters import Parameter
+from parameters import Parameter
 
 
 class Kernel(Module):
     """
-    Base class for all kernel functions. By inheriting the `Module` class from Objax, seamless interaction with model
-    parameters is provided.
+    Base class for all kernel functions. By inheriting the `Module` class from Objax, seamless interaction with model parameters is provided.
     """
-    def __init__(self,
-                 name: Optional[str] = None):
+    def __init__(self, name: Optional[str] = None):
         """
         Args:
             name: Optional naming of the kernel.
@@ -23,6 +21,7 @@ class Kernel(Module):
     def gram(func: Callable, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
         """
         Compute the kernel's gram matrix given two, possibly identical, Jax arrays.
+
         Args:
             func: The kernel function to be called for any two values in x and y.
             x: An NxD vector of inputs.
@@ -41,6 +40,7 @@ class Kernel(Module):
     def dist(x: jnp.array, y: jnp.array) -> float:
         """
         Compute the squared distance matrix between two inputs.
+
         Args:
             x: A 1xN vector
             y: A 1xM vector
@@ -56,8 +56,7 @@ class Kernel(Module):
 
 class Stationary(Kernel):
     """
-    A base class for stationary kernels. That is, kernels whereby the Gram matrix's values are invariant to the value
-    of the inputs, and instead depend only on the distance between the inputs.
+    A base class for stationary kernels. That is, kernels whereby the Gram matrix's values are invariant to the value of the inputs, and instead depend only on the distance between the inputs.
     """
     def __init__(self,
                  lengthscale: Optional[jnp.ndarray] = jnp.array([1.]),
@@ -88,21 +87,20 @@ class RBF(Stationary):
         """
         Args:
             lengthscale: The initial value of the kernel's lengthscale value. The value of this parameter controls the horizontal magnitude of the kernel's resultant values.
-            variance: The inital value of the kernel's variance. This value controls the kernel's vertical amplitude.
+            variance: The initial value of the kernel's variance. This value controls the kernel's vertical amplitude.
             name: Optional argument to name the kernel.
         """
-        super().__init__(lengthscale=lengthscale,
-                         variance=variance,
-                         name=name)
+        super().__init__(lengthscale=lengthscale, variance=variance, name=name)
 
     def feature_map(self, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
         """
-        Compute the RBF specific function :math:`k(x, y) = \sigma^2 \exp(\frac{-0.5 \tau}{2\ell^2})` where  :math:`\tau = \lVert x-y \rVert_{2}^{2}`.
+        Compute the RBF specific function
         """
+        # :math:`k(x,y)=\sigma^2 \exp\left( \frac{-0.5 \tau}{2\ell^2}\right) ` where  :math:`\tau = \lVert x-y \rVert_{2}^{2}`.
         ell = self.lengthscale.transformed
         sigma = self.variance.transformed
         tau = self.dist(x, y)
-        return sigma * jnp.exp(-tau/ell)
+        return sigma * jnp.exp(-tau / ell)
 
     def __call__(self, X: jnp.ndarray, Y: jnp.ndarray) -> jnp.ndarray:
         return self.gram(self.feature_map, X, Y).squeeze()
