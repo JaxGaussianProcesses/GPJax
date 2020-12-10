@@ -100,7 +100,7 @@ class RBF(Stationary):
         ell = self.lengthscale.transformed
         sigma = self.variance.transformed
         tau = self.dist(x, y)
-        return sigma * jnp.exp(-tau / ell)
+        return sigma * jnp.exp(-0.5*tau / ell**2)
 
     def __call__(self, X: jnp.ndarray, Y: jnp.ndarray) -> jnp.ndarray:
         return self.gram(self.feature_map, X, Y).squeeze()
