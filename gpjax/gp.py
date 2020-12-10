@@ -2,11 +2,10 @@ from .likelihoods import Gaussian, Likelihood
 from .kernel import Kernel
 from .mean_functions import MeanFunction
 from .mean_functions import ZeroMean
-from .utils import get_factorisations
 from objax import Module
 import jax.numpy as jnp
 from jax import nn
-from jax.scipy.linalg import cho_solve, solve_triangular
+from jax.scipy.linalg import cho_solve, solve_triangular, cho_factor
 import jax.random as jr
 from tensorflow_probability.substrates import jax as tfp
 from typing import Optional
@@ -20,7 +19,6 @@ class Prior(Module):
     prior :math:`p(f)\sim\mathcal{GP}(m, k)` where :math:`m: X \rightarrow \mathbb{R}` is a mean function and kernel
     :math:`k: X \times X \rightarrow \mathbb{R}`.
     """
-
     def __init__(self,
                  kernel: Kernel,
                  mean_function: Optional[MeanFunction] = ZeroMean(),
@@ -35,7 +33,10 @@ class Prior(Module):
         self.kernel = kernel
         self.jitter = jitter
 
-    def sample(self, X: jnp.ndarray, key, n_samples: Optional[int] = 1) -> jnp.ndarray:
+    def sample(self,
+               X: jnp.ndarray,
+               key,
+               n_samples: Optional[int] = 1) -> jnp.ndarray:
         """
         Draw a set of n samples from the GP prior at a set of input points.
 
@@ -55,7 +56,7 @@ class Prior(Module):
         return jr.multivariate_normal(key,
                                       mu.squeeze(),
                                       cov,
-                                      shape=(n_samples,))
+                                      shape=(n_samples, ))
 
     def __mul__(self, other: Likelihood):
         """
@@ -98,9 +99,6 @@ class Posterior(Module):
         cov = self.kernel(X, X) + self.jitter * Inn
         cov += nn.softplus(self.likelihood.noise.value) * Inn
         L = jnp.linalg.cholesky(cov)
-        # TODO: Return the logpdf w.r.t. the Cholesky, not the full cov.
-        # lpdf = multivariate_normal.logpdf(y.squeeze(), mu.squeeze(), cov)
-        # return lpdf
         return tfd.MultivariateNormalTriL(loc=mu, scale_tril=L)
 
     def neg_mll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
@@ -127,12 +125,23 @@ class Posterior(Module):
         Returns: A predictive mean and predictive variance
 
         """
-        sigma = self.likelihood.noise.transformed
-        L, alpha = get_factorisations(X, y, sigma, self.kernel, self.meanf)
+        # Compute covariance matrices and jitter matrix
+        Kff = self.kernel(X, X)
         Kfx = self.kernel(Xstar, X)
-        mu = jnp.dot(Kfx, alpha)
-        v = cho_solve(L, Kfx.T)
         Kxx = self.kernel(Xstar, Xstar)
+        Inn = jnp.eye(X.shape[0])
+        # Compute prior mean
+        mu_f = self.meanf(X)
+        # Realise the current estimate of the observational noise
+        sigma = self.likelihood.noise.transformed
+        # Compute the lower Cholesky decomposition
+        L = cho_factor(Kff + Inn * sigma, lower=True)
+        err = y.reshape(-1, 1) - mu_f.reshape(-1, 1)
+        weights = cho_solve(L, err)
+        # Compute the predictive mean
+        mu = jnp.dot(Kfx, weights)
+        # Compute the predictive variance
+        v = cho_solve(L, Kfx.T)
         cov = Kxx - jnp.dot(Kfx, v)
         return mu, cov
 
@@ -153,8 +162,8 @@ class SpectralPosterior(Posterior):
         # assert RtiPhit.shape == (N, N)
         RtiPhity = jnp.matmul(RtiPhit, y)
         # assert RtiPhity.shape == y.shape
-        term1 = (jnp.sum(y ** 2) -
-                 jnp.sum(RtiPhity ** 2) * k_var / m) * 0.5 / l_var
+        term1 = (jnp.sum(y**2) -
+                 jnp.sum(RtiPhity**2) * k_var / m) * 0.5 / l_var
         term2 = jnp.sum(jnp.log(jnp.diag(
             Rt.T))) + (N * 0.5 - m) * jnp.log(l_var) + (N * 0.5 *
                                                         jnp.log(2 * jnp.pi))
