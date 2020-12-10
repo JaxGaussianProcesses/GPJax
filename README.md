@@ -10,8 +10,8 @@ import jax.numpy as jnp
 import jax.random as jr
 key = jr.PRNGKey(123)
 
-x = jnp.linspace(-2., 2., 100)
-y = jnp.sin(x) + jr.normal(key, shape=x.shape)*0.05
+X = jnp.linspace(-2., 2., 100)
+y = jnp.sin(x) + jr.normal(key, shape=X.shape)*0.05
 ```
 
 As can be seen, the latent function of interest here is a sinusoidal function. However, it has been perturbed by some zero-mean Gaussian noise with variance of 0.05. We can use a Gaussian process model to try and recover this latent function.
@@ -32,7 +32,46 @@ likelihood = Gaussian()
 posterior = f * likelihood
 ```
 
-# To do
+Equipped with the Gaussian process posterior, we can now optimise the model's hyperparameters (note, we need not optimise the latent function here due to the Gaussian conjugacy.). Through Objax, this procedure is straightforward, as we can access all of the GP's hyperparameters using the `.vars()` method. Using the Objax provided optimisers, we can then perform gradient-based optimisation on the marginal log-likelihood with respect to the hyperparameters.
+
+```python
+import objax
+hyperparameters = posterior.vars()
+opt = objax.optimizer.SGD(hyperparameters)
+gv = objax.GradValues(posterior.neg_mll, hyperparameters) 
+
+def train_op(x, label):
+    g, v = gv(x, label)
+    opt(0.01, g)
+    return v
+```
+
+We can also Jit compile our objective function to accelerate training. You'll notice that it is only now that we have incorporated any data into our GP. This is desirable, as this is exactly how model building works in principle too, where we first build our prior model, then observe some data and use this data to build a posterior. 
+
+```python
+nits = 100
+train_op = objax.Jit(train_op, gv.vars() + opt.vars())
+loss = [train_op(X, y.squeeze())[0].item() for _ in range(nits)]
+```
+
+With an optimised set of hyperparameters, we can now sample from the posterior predictive distribution to make predictions at a set of unseen test points.
+
+```python
+Xtest = jnp.linspace(X.min()-0.1, X.max()+0.1, 500)
+mu, cov = posterior.predict(Xtest, X, y.squeeze())
+```
+
+## Installation
+
+To install, the following steps should be followed. It is by no means compulsory, but we do advise that you do all of the below inside a virtual environment.
+
+```bash
+git clone https://github.com/thomaspinder/GPJax.git
+cd GPJax 
+python setup.py develop
+```
+
+## To do
 
 * Spectral kernels ([in progress](https://github.com/thomaspinder/GPJax/tree/spectral))
 * Inducing point schemes ([in progress](https://github.com/thomaspinder/GPJax/tree/inducing_points))
