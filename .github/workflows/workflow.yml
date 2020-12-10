@@ -28,7 +28,7 @@
 #        run: bash <(curl -s https://codecov.io/bash) -t "${{ secrets.CODECOV_TOKEN }}"
 
 
-name: Example workflow for Codecov
+name: Run unit tests
 on: [push]
 jobs:
   run:
@@ -50,7 +50,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         python setup.py install
-        pip install pytest==6.1.2
+        pip install pytest
         pip install pytest-cov
         pytest --cov=./ --cov-report=xml ./tests
     - name: Upload coverage to Codecov
@@ -58,7 +58,6 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: ./coverage.xml
-        files: ./coverage1.xml,./coverage2.xml
         directory: ./coverage/reports/
         flags: unittests
         env_vars: OS,PYTHON
