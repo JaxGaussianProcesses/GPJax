@@ -31,7 +31,6 @@ class Gaussian(Likelihood):
 
     def log_likelihood(self, x: jnp.ndarray, mu: jnp.ndarray, L: jnp.ndarray):
         delta = x - mu
-        n_dimension = delta.shape[0]
         alpha = solve_triangular(L, delta, lower=True)
         L_diag = jnp.sum(jnp.log(jnp.diag(L)))
         ll = -0.5 * jnp.sum(jnp.square(alpha), axis=0)

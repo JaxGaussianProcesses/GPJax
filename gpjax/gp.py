@@ -5,7 +5,7 @@ from .mean_functions import ZeroMean
 from objax import Module
 import jax.numpy as jnp
 from jax import nn
-from jax.scipy.linalg import cho_solve, solve_triangular, cho_factor
+from jax.scipy.linalg import cho_solve, cho_factor
 import jax.random as jr
 from tensorflow_probability.substrates import jax as tfp
 from typing import Optional
@@ -68,10 +68,7 @@ class Prior(Module):
 
         Returns: A Gaussian process posterior.
         """
-        if self.kernel.spectral is True:
-            return SpectralPosterior(self, other)
-        else:
-            return Posterior(self, other)
+        return Posterior(self, other)
 
 
 class Posterior(Module):
@@ -144,28 +141,3 @@ class Posterior(Module):
         v = cho_solve(L, Kfx.T)
         cov = Kxx - jnp.dot(Kfx, v)
         return mu, cov
-
-
-class SpectralPosterior(Posterior):
-    def __init__(self, prior: Prior, likelihood: Gaussian):
-        super().__init__(prior, likelihood)
-
-    def marginal_ll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
-        N = X.shape[0]
-        m = self.kernel.num_basis
-        l_var = self.likelihood.noise.value
-        k_var = self.kernel.variance.value
-        phi = self.kernel(X, self.kernel.features.value.T)
-        A = (k_var / m) * jnp.matmul(phi.T, phi) + l_var * jnp.eye(m * 2)
-        Rt = jnp.linalg.cholesky(A)
-        RtiPhit = solve_triangular(Rt, phi.T)
-        # assert RtiPhit.shape == (N, N)
-        RtiPhity = jnp.matmul(RtiPhit, y)
-        # assert RtiPhity.shape == y.shape
-        term1 = (jnp.sum(y**2) -
-                 jnp.sum(RtiPhity**2) * k_var / m) * 0.5 / l_var
-        term2 = jnp.sum(jnp.log(jnp.diag(
-            Rt.T))) + (N * 0.5 - m) * jnp.log(l_var) + (N * 0.5 *
-                                                        jnp.log(2 * jnp.pi))
-        tot = term1 + term2
-        return tot.reshape()

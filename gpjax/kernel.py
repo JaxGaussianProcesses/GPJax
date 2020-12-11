@@ -1,7 +1,7 @@
 import jax.numpy as jnp
 from objax import Module
 from typing import Callable, Optional
-from jax import vmap, nn
+from jax import vmap
 from .parameters import Parameter
 
 
