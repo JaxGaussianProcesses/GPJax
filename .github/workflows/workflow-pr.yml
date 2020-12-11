@@ -13,6 +13,7 @@ jobs:
           python-version: 3.8
       - name: Run unit tests
         run: |
+          pip install -r requirements.txt
           pip install -e .
           pip install pytest
 #          pip install pytest-cov
