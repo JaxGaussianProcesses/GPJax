@@ -14,7 +14,7 @@ tfd = tfp.distributions
 
 
 class Prior(Module):
-    """
+    r"""
     The base class for Gaussian process priors. Considering a set :math:`X` and  function :math:`f`, the GP induces the
     prior :math:`p(f)\sim\mathcal{GP}(m, k)` where :math:`m: X \rightarrow \mathbb{R}` is a mean function and kernel
     :math:`k: X \times X \rightarrow \mathbb{R}`.
@@ -82,7 +82,7 @@ class Posterior(Module):
         self.jitter = prior.jitter
 
     def marginal_ll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
-        """
+        r"""
         Here we compute :math:`\log p(y | x, \theta)
         Args:
             X: A set of N X M inputs
