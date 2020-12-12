@@ -94,7 +94,7 @@ class Posterior(Module):
         Inn = jnp.eye(X.shape[0])
         mu = self.meanf(X)
         cov = self.kernel(X, X) + self.jitter * Inn
-        cov += nn.softplus(self.likelihood.noise.value) * Inn
+        cov += self.likelihood.noise.transformed * Inn
         L = jnp.linalg.cholesky(cov)
         return tfd.MultivariateNormalTriL(loc=mu, scale_tril=L)
 

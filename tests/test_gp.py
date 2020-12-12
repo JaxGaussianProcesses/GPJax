@@ -2,7 +2,6 @@ from gpjax import Gaussian, Prior, RBF
 from gpjax.gp import Posterior
 import jax.numpy as jnp
 import jax.random as jr
-import numpy as np
 import pytest
 
 
@@ -28,5 +27,4 @@ def test_neg_ll():
     prior = Prior(RBF())
     post = prior*Gaussian()
     nmll = post.neg_mll(x, y)
-    assert np.testing.assert_almost_equal(nmll, np.array(-2.6), decimal= 2,
-                                          err_msg="Negative MLL does not equate to the true NMLL")
+    assert jnp.round(nmll, 2) == 2.60

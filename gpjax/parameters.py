@@ -3,6 +3,7 @@ from objax.typing import JaxArray
 from objax.variable import reduce_mean
 from typing import Optional, Callable
 from jax.nn import softplus
+from .transforms import Transform, Softplus
 
 
 class Parameter(TrainVar):
@@ -14,14 +15,14 @@ class Parameter(TrainVar):
                  tensor: JaxArray,
                  reduce: Optional[Callable[[JaxArray],
                                            JaxArray]] = reduce_mean,
-                 transform: Callable = softplus):
+                 transform: Transform = Softplus()):
         """
         Args:
             tensor: The initial value of the parameter
             reduce: A helper function for parallelisable calls.
             transform: The bijective transformation that should be applied to the parameter.
         """
-        super().__init__(tensor, reduce)
+        super().__init__(transform.forward(tensor), reduce)
         self.fn = transform
 
     @property
@@ -29,4 +30,4 @@ class Parameter(TrainVar):
         """
         Return the paramerter's transformed valued.
         """
-        return self.fn(self.value)
+        return self.fn.backward(self.value)
