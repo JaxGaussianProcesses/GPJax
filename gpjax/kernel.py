@@ -97,8 +97,8 @@ class RBF(Stationary):
         Compute the RBF specific function
         """
         # :math:`k(x,y)=\sigma^2 \exp\left( \frac{-0.5 \tau}{2\ell^2}\right) ` where  :math:`\tau = \lVert x-y \rVert_{2}^{2}`.
-        ell = self.lengthscale.transformed
-        sigma = self.variance.transformed
+        ell = self.lengthscale.untransform
+        sigma = self.variance.untransform
         tau = self.dist(x/ell, y/ell)
         return sigma * jnp.exp(-0.5*tau)
 

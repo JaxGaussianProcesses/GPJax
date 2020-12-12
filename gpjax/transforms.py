@@ -21,8 +21,8 @@ class Softplus(Transform):
 
     @staticmethod
     def forward(x: jnp.ndarray) -> jnp.ndarray:
-        return softplus(x)
+        return jnp.log(jnp.exp(x)-1.)
 
     @staticmethod
     def backward(x: jnp.ndarray) -> jnp.ndarray:
-        return jnp.log(jnp.exp(x)-1.)
+        return softplus(x)

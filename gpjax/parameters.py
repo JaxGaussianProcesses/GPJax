@@ -26,8 +26,8 @@ class Parameter(TrainVar):
         self.fn = transform
 
     @property
-    def transformed(self) -> JaxArray:
+    def untransform(self) -> JaxArray:
         """
-        Return the paramerter's transformed valued.
+        Return the paramerter's transformed valued that exists on constrained R.
         """
         return self.fn.backward(self.value)

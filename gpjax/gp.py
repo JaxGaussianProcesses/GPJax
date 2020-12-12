@@ -94,7 +94,7 @@ class Posterior(Module):
         Inn = jnp.eye(X.shape[0])
         mu = self.meanf(X)
         cov = self.kernel(X, X) + self.jitter * Inn
-        cov += self.likelihood.noise.transformed * Inn
+        cov += self.likelihood.noise.untransform * Inn
         L = jnp.linalg.cholesky(cov)
         return tfd.MultivariateNormalTriL(loc=mu, scale_tril=L)
 
@@ -130,7 +130,7 @@ class Posterior(Module):
         # Compute prior mean
         mu_f = self.meanf(X)
         # Realise the current estimate of the observational noise
-        sigma = self.likelihood.noise.transformed
+        sigma = self.likelihood.noise.untransform
         # Compute the lower Cholesky decomposition
         L = cho_factor(Kff + Inn * sigma, lower=True)
         err = y.reshape(-1, 1) - mu_f.reshape(-1, 1)
