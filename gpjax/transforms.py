@@ -21,8 +21,21 @@ class Softplus(Transform):
 
     @staticmethod
     def forward(x: jnp.ndarray) -> jnp.ndarray:
-        return jnp.log(jnp.exp(x)-1.)
+        return jnp.log(jnp.exp(x) - 1.)
 
     @staticmethod
     def backward(x: jnp.ndarray) -> jnp.ndarray:
         return softplus(x)
+
+
+class Identity(Transform):
+    def __init__(self):
+        super().__init__(name='Identity')
+
+    @staticmethod
+    def forward(x: jnp.ndarray) -> jnp.ndarray:
+        return x
+
+    @staticmethod
+    def backward(x: jnp.ndarray) -> jnp.ndarray:
+        return x
