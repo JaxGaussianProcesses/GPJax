@@ -41,6 +41,7 @@ class Parameter(TrainVar):
         Return the log prior density of the parameter's constrained parameter value.
         """
         if self.prior is None:
-            return jnp.zeros_like(self.value)
+            lpd = jnp.zeros_like(self.value)
         else:
-            return self.prior.log_prob(self.untransform)
+            lpd = self.prior.log_prob(self.untransform)
+        return lpd
