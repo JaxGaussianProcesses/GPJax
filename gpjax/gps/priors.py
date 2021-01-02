@@ -3,16 +3,13 @@ from typing import Optional
 import jax.numpy as jnp
 import jax.random as jr
 from objax import Module
-from tensorflow_probability.substrates import jax as tfp
+from tensorflow_probability.substrates.jax import distributions as tfd
 
-# from .utils import create_posterior
 from ..kernel import Kernel
 from ..likelihoods import Likelihood, Bernoulli, Gaussian
 from .posteriors import PosteriorExact, PosteriorApprox
 from multipledispatch import dispatch
 from ..mean_functions import MeanFunction, ZeroMean
-
-tfd = tfp.distributions
 
 
 class Prior(Module):
@@ -71,6 +68,12 @@ class Prior(Module):
         Returns: A Gaussian process posterior.
         """
         return create_posterior(self, other)
+
+    def __repr__(self):
+        return "Gaussian process prior with {} kernel and {} mean function.".format(self.kernel.name, self.meanf.name)
+
+    def __str__(self):
+        return "Gaussian process prior with {} kernel and {} mean function.".format(self.kernel.name, self.meanf.name)
 
 
 @dispatch(Prior, Gaussian)

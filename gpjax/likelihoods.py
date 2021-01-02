@@ -3,8 +3,7 @@ import jax.numpy as jnp
 from jax.scipy.linalg import solve_triangular
 from .parameters import Parameter
 from typing import Optional
-import tensorflow_probability.substrates.jax as tfp
-tfd = tfp.distributions
+from tensorflow_probability.substrates.jax import distributions as tfd
 
 
 class Likelihood(Module):
