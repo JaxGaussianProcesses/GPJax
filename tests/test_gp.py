@@ -1,5 +1,5 @@
 from gpjax import Gaussian, Prior, RBF
-from gpjax.gps.priors import Posterior
+from gpjax.gps.posteriors import Posterior
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
