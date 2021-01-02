@@ -140,3 +140,4 @@ cython_debug/
 # Extras
 .vscode/
 .idea/
+examples/_debug*

@@ -3,6 +3,8 @@ import jax.numpy as jnp
 from jax.scipy.linalg import solve_triangular
 from .parameters import Parameter
 from typing import Optional
+import tensorflow_probability.substrates.jax as tfp
+tfd = tfp.distributions
 
 
 class Likelihood(Module):
@@ -40,3 +42,13 @@ class Gaussian(Likelihood):
 
     def __call__(self):
         raise NotImplementedError
+
+
+class Bernoulli(Likelihood):
+    def __init__(self, n_datapoints: int):
+        super().__init__(name="Bernoulli")
+        self.random_variable = tfd.ProbitBernoulli
+        self.n = n_datapoints
+
+    def log_density(self, F, Y):
+        return self.random_variable(F).log_prob(Y)
