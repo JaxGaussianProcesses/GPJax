@@ -4,7 +4,7 @@ import typing
 import jax.numpy as jnp
 from jax.scipy.linalg import cho_solve, cho_factor, solve_triangular
 from objax import Module
-from tensorflow_probability.substrates import jax as tfp
+from tensorflow_probability.substrates.jax import distributions as tfd
 from typing import Tuple
 
 from ..likelihoods import Gaussian, Likelihood
@@ -13,7 +13,6 @@ from ..transforms import Identity
 
 if typing.TYPE_CHECKING:
     from .priors import Prior
-tfd = tfp.distributions
 
 
 class Posterior(Module):
@@ -71,7 +70,8 @@ class PosteriorExact(Posterior):
 
         """
         rv = self.marginal_ll(X, y)
-        return -rv.log_prob(y.squeeze()).mean()
+        log_prior_density = jnp.sum(jnp.array([v.log_density for k, v in self.vars().items()]))
+        return -(rv.log_prob(y.squeeze()).mean()+log_prior_density)
 
     def predict(self, Xstar, X, y):
         """

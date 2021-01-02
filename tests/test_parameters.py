@@ -8,7 +8,7 @@ ZeroDist = tfd.Uniform(low=0., high=0.)
 
 
 def hardcode_softplus(x: jnp.ndarray):
-    return jnp.log(jnp.exp(x)-1.0)
+    return jnp.log(jnp.exp(x) - 1.0)
 
 
 @pytest.mark.parametrize("val", [0.5, 1.0])
@@ -23,8 +23,13 @@ def test_transform(val):
 
 @pytest.mark.parametrize('transform', [Identity(), Softplus()])
 @pytest.mark.parametrize('val', [1e-4, 1., 5.])
-@pytest.mark.parametrize('dist', [ZeroDist, tfd.Normal(loc=0., scale=1.), tfd.Gamma(1.0, 1.0)])
+@pytest.mark.parametrize(
+    'dist',
+    [ZeroDist, tfd.Normal(loc=0., scale=1.),
+     tfd.Gamma(1.0, 1.0)])
 def test_prior(transform, val, dist):
     p = Parameter(tensor=jnp.array([val]), transform=transform, prior=dist)
-    truth = dist.log_prob(jnp.array([val])) # Value must be passed as an array as TF defaults to Float32, whereas GPJax uses double precision
+    truth = dist.log_prob(
+        jnp.array([val])
+    )  # Value must be passed as an array as TF defaults to Float32, whereas GPJax uses double precision
     assert_almost_equal(p.log_density, truth)

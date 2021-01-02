@@ -8,7 +8,7 @@ import pytest
 def test_conjugate_posterior():
     p = Prior(RBF())
     lik = Gaussian()
-    post = p*lik
+    post = p * lik
     assert isinstance(post, Posterior)
 
 
@@ -25,6 +25,6 @@ def test_neg_ll():
     x = jnp.array([0.5, 1.0]).reshape(-1, 1)
     y = jnp.sin(x)
     prior = Prior(RBF())
-    post = prior*Gaussian()
+    post = prior * Gaussian()
     nmll = post.neg_mll(x, y)
     assert jnp.round(nmll, 2) == 2.60

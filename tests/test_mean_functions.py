@@ -7,7 +7,7 @@ from gpjax import ZeroMean
 def test_shape(dim):
     x = jnp.linspace(-1., 1., num=10).reshape(-1, 1)
     if dim > 1:
-        x = jnp.hstack([x]*dim)
+        x = jnp.hstack([x] * dim)
     meanf = ZeroMean()
     mu = meanf(x)
     assert mu.shape[0] == x.shape[0]

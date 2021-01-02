@@ -3,9 +3,8 @@ from objax.typing import JaxArray
 from objax.variable import reduce_mean
 import jax.numpy as jnp
 from typing import Optional, Callable
-import tensorflow_probability.substrates.jax as tfp
 from .transforms import Transform, Softplus
-tfd = tfp.distributions
+from tensorflow_probability.substrates.jax import distributions as tfd
 
 
 class Parameter(TrainVar):
