@@ -1,9 +1,11 @@
 from objax import TrainVar
 from objax.typing import JaxArray
 from objax.variable import reduce_mean
+import jax.numpy as jnp
 from typing import Optional, Callable
-from jax.nn import softplus
+import tensorflow_probability.substrates.jax as tfp
 from .transforms import Transform, Softplus
+tfd = tfp.distributions
 
 
 class Parameter(TrainVar):
@@ -15,7 +17,8 @@ class Parameter(TrainVar):
                  tensor: JaxArray,
                  reduce: Optional[Callable[[JaxArray],
                                            JaxArray]] = reduce_mean,
-                 transform: Transform = Softplus()):
+                 transform: Transform = Softplus(),
+                 prior: tfd.Distribution = None):
         """
         Args:
             tensor: The initial value of the parameter
@@ -24,6 +27,7 @@ class Parameter(TrainVar):
         """
         super().__init__(transform.forward(tensor), reduce)
         self.fn = transform
+        self.prior = prior
 
     @property
     def untransform(self) -> JaxArray:
@@ -31,3 +35,13 @@ class Parameter(TrainVar):
         Return the paramerter's transformed valued that exists on constrained R.
         """
         return self.fn.backward(self.value)
+
+    @property
+    def log_density(self) -> JaxArray:
+        """
+        Return the log prior density of the parameter's constrained parameter value.
+        """
+        if self.prior is None:
+            return jnp.zeros_like(self.value)
+        else:
+            return self.prior.log_prob(self.untransform)
