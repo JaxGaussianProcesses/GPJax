@@ -58,7 +58,6 @@ class PosteriorExact(Posterior):
         cov = self.kernel(X, X) + self.jitter * Inn
         cov += self.likelihood.noise.untransform * Inn
         L = jnp.linalg.cholesky(cov)
-        # TODO: Move the below line into the Gaussian likelihood log-density fn.
         return tfd.MultivariateNormalTriL(loc=mu, scale_tril=L)
 
     def neg_mll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
@@ -71,7 +70,6 @@ class PosteriorExact(Posterior):
         Returns: A unary float array
 
         """
-        # TODO: Once the above issue re. tfd moved into Gaussian ll is resolved, then this below line can go
         rv = self.marginal_ll(X, y)
         return -rv.log_prob(y.squeeze()).mean()
 

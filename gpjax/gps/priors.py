@@ -78,7 +78,6 @@ def create_posterior(prior: Prior, likelihood: Gaussian):
     return PosteriorExact(prior, likelihood)
 
 
-# TODO: Extend this to be non-Gaussian, not specific likelihood functions
 @dispatch(Prior, Bernoulli)
 def create_posterior(prior: Prior, likelihood: Bernoulli):
     return PosteriorApprox(prior, likelihood)
