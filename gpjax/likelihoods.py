@@ -51,3 +51,6 @@ class Bernoulli(Likelihood):
 
     def log_density(self, F, Y):
         return self.random_variable(F).log_prob(Y)
+
+    def mean(self, probs):
+        return self.random_variable()

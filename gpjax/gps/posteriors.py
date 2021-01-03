@@ -109,7 +109,7 @@ class PosteriorApprox(Posterior):
     def __init__(self, prior: Prior, likelihood: Likelihood):
         super().__init__(prior=prior, likelihood=likelihood)
         self.n = likelihood.n
-        self.nu = Parameter(jnp.zeros(shape=(self.n, 1)), transform=Identity())
+        self.nu = Parameter(jnp.zeros(shape=(self.n, 1)), transform=Identity(), prior=tfd.Normal(loc=0., scale=1.))
 
     def marginal_ll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
         mu = self.meanf(X)
@@ -117,7 +117,12 @@ class PosteriorApprox(Posterior):
         Inn = jnp.eye(self.n) * self.jitter
         L = jnp.linalg.cholesky(Kxx + Inn)
         F = jnp.matmul(L, self.nu.untransform) + mu
-        return jnp.sum(self.likelihood.log_density(F, y))
+        ll = jnp.sum(self.likelihood.log_density(F, y))
+        lpd = 0
+        for k, v in self.vars().items():
+            lpd += jnp.sum(v.log_density).reshape()
+        # lpd = jnp.sum(jnp.array([v.log_density for k, v in self.vars().items()]))
+        return ll + lpd
 
     def neg_mll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
         return -self.marginal_ll(X, y)
