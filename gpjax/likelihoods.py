@@ -44,10 +44,12 @@ class Gaussian(Likelihood):
 
 
 class Bernoulli(Likelihood):
-    def __init__(self, n_datapoints: int):
+    def __init__(self):
         super().__init__(name="Bernoulli")
         self.random_variable = tfd.ProbitBernoulli
-        self.n = n_datapoints
 
     def log_density(self, F, Y):
         return self.random_variable(F).log_prob(Y)
+
+    def mean(self, probs):
+        return self.random_variable()

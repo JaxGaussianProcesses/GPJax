@@ -141,3 +141,5 @@ cython_debug/
 .vscode/
 .idea/
 examples/_debug*
+examples/testing/*
+examples/*.ipynb
