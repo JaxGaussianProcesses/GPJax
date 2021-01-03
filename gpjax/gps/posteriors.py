@@ -34,6 +34,9 @@ class Posterior(Module):
     def predict(self, Xstar, X, y):
         raise NotImplementedError
 
+    def __eq__(self, other: Posterior):
+        return list(self.vars().items()) == list(other.vars().items())
+
 
 class PosteriorExact(Posterior):
     """
@@ -108,10 +111,18 @@ class PosteriorExact(Posterior):
 class PosteriorApprox(Posterior):
     def __init__(self, prior: Prior, likelihood: Likelihood):
         super().__init__(prior=prior, likelihood=likelihood)
-        self.n = likelihood.n
+        self.n = None
+        self.nu = None
+        self.latent_init = False
+
+    def _initialise_latent_values(self, n):
+        self.n = n
         self.nu = Parameter(jnp.zeros(shape=(self.n, 1)), transform=Identity(), prior=tfd.Normal(loc=0., scale=1.))
+        self.latent_init = True
 
     def marginal_ll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+        if not self.latent_init:
+            self._initialise_latent_values(X.shape[0])
         mu = self.meanf(X)
         Kxx = self.kernel(X, X)
         Inn = jnp.eye(self.n) * self.jitter
@@ -128,6 +139,8 @@ class PosteriorApprox(Posterior):
         return -self.marginal_ll(X, y)
 
     def predict(self, Xstar: jnp.ndarray, X:jnp.ndarray, y:jnp.ndarray) -> Tuple[jnp.ndarray, jnp.ndarray]:
+        if not self.latent_init:
+            self._initialise_latent_values(X.shape[0])
         Inn = jnp.eye(X.shape[0])*self.jitter
         Kff = self.kernel(X, X) + Inn
         L = jnp.linalg.cholesky(Kff)
