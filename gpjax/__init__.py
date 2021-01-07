@@ -6,4 +6,4 @@ from .mean_functions import ZeroMean
 from .utilities import save, load
 
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"

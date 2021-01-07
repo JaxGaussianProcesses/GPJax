@@ -9,7 +9,7 @@ def parse_requirements_file(filename):
 
 setup(
     name='GPJax',
-    version='0.1.2',
+    version='0.1.3',
     author='Thomas Pinder',
     author_email='t.pinder2@lancaster.ac.uk',
     packages=['gpjax'],  #, 'package_name.test'],
