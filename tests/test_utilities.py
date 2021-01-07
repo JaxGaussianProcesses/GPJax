@@ -1,5 +1,6 @@
 import os
-from gpjax import save, load, RBF, Prior
+from gpjax import save, load, RBF
+from gpjax.gps import Prior
 from gpjax.likelihoods import Bernoulli
 
 
