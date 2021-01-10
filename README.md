@@ -66,7 +66,17 @@ mu, cov = posterior.predict(Xtest, X, y.squeeze())
 
 ## Installation
 
-To install, the following steps should be followed. It is by no means compulsory, but we do advise that you do all of the below inside a virtual environment.
+### Stable version
+
+To install the latest stable version of gpjax run
+```bash
+pip install gpjax
+```
+Note, this will require a Python version >= 3.7.
+
+### Development version
+
+To install the lastest, possibly unstable, version, the following steps should be followed. It is by no means compulsory, but we do advise that you do all of the below inside a virtual environment.
 
 ```bash
 git clone https://github.com/thomaspinder/GPJax.git
