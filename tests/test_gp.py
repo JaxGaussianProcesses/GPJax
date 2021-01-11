@@ -63,7 +63,7 @@ def test_non_conjugate_init(n, ntest):
     y = jnp.sign(x)
     xtest = jnp.linspace(-1., 1., ntest).reshape(-1, 1)
 
-    mll = posterior.marginal_ll(x, y)
+    mll = posterior.neg_mll(x, y)
     assert mll.shape == ()
     assert posterior.nu.untransform.shape == x.shape
     assert posterior.latent_init
