@@ -40,3 +40,33 @@ def test_neg_ll():
 def test_nvars():
     posterior = Prior(RBF()) * Gaussian()
     assert posterior.n_vars == 3
+
+
+# TODO: Why does this not work for n=1?
+def test_predict_shape(n = 10):
+    key = jr.PRNGKey(123)
+    x = jr.uniform(key, shape=(10, 1))
+    y = jnp.sin(x)
+    xtest = jnp.linspace(0., 1., n).reshape(-1, 1)
+    posterior = Prior(RBF()) * Gaussian()
+    mu, sigma = posterior.predict(xtest, x, y)
+    assert mu.shape == (n, 1)
+    assert sigma.shape == (n, n)
+
+
+@pytest.mark.parametrize('ntest', [10, 100])
+@pytest.mark.parametrize('n', [1, 10])
+def test_non_conjugate_init(n, ntest):
+    key = jr.PRNGKey(123)
+    posterior = Prior(RBF()) * Bernoulli()
+    x = jr.uniform(key = key, shape=(10, 1), minval=-1., maxval=1.)
+    y = jnp.sign(x)
+    xtest = jnp.linspace(-1., 1., ntest).reshape(-1, 1)
+
+    mll = posterior.marginal_ll(x, y)
+    assert mll.shape == ()
+    assert posterior.nu.untransform.shape == x.shape
+    assert posterior.latent_init
+    mu, cov = posterior.predict(xtest, x, y)
+    assert mu.shape == cov.shape
+    assert mu.shape == (ntest, )
