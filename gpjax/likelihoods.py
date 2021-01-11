@@ -1,6 +1,5 @@
 from objax import Module
 import jax.numpy as jnp
-from jax.scipy.linalg import solve_triangular
 from .parameters import Parameter
 from typing import Optional, Tuple
 from tensorflow_probability.substrates.jax import distributions as tfd
@@ -17,9 +16,6 @@ class Likelihood(Module):
             name: Optional naming of the likelihood.
         """
         self.name = name
-
-    def __call__(self):
-        raise NotImplementedError
 
     def log_density(self, F, Y) -> jnp.ndarray:
         raise NotImplementedError
@@ -46,26 +42,38 @@ class Gaussian(Likelihood):
     def __init__(self, noise: jnp.array = jnp.array([1.0]), name="Gaussian"):
         super().__init__(name=name)
         self.noise = Parameter(noise)
+        self.random_variable = tfd.Normal
 
-    def log_likelihood(self, x: jnp.ndarray, mu: jnp.ndarray, L: jnp.ndarray):
-        delta = x - mu
-        alpha = solve_triangular(L, delta, lower=True)
-        L_diag = jnp.sum(jnp.log(jnp.diag(L)))
-        ll = -0.5 * jnp.sum(jnp.square(alpha), axis=0)
-        ll -= 0.5 * jnp.log(2 * jnp.pi)
-        ll -= L_diag
-        return ll
+    def log_density(self, F, Y) -> jnp.ndarray:
+        raise NotImplementedError
 
-    def __call__(self):
+    def predictive_moments(self, latent_mean,
+                           latent_variance) -> Tuple[jnp.ndarray, jnp.ndarray]:
         raise NotImplementedError
 
 
 class Bernoulli(Likelihood):
+    """
+    Bernoulli likelihood that is used for observations that take values in {0, 1}.
+    """
     def __init__(self):
+        """
+        Initialiser for the Bernoulli likelihood class
+        """
         super().__init__(name="Bernoulli")
         self.random_variable = tfd.ProbitBernoulli
 
     def log_density(self, F, Y) -> jnp.ndarray:
+        """
+        Compute the log-density of a Bernoulli random variable parameterised by F w.r.t some observations Y
+
+        Args:
+            F: Latent process of the GP
+            Y: Observations Y
+
+        Returns:
+            An array of probability values
+        """
         return self.random_variable(F).log_prob(Y)
 
     def predictive_moments(self, latent_mean,

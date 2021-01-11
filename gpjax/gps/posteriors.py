@@ -64,8 +64,27 @@ class Posterior(Module):
         """
         raise NotImplementedError
 
-    def __eq__(self, other: Posterior):
+    def __eq__(self, other: Posterior) -> bool:
+        """
+        Compare if two Gaussian process posteriors are equal.
+
+        Args:
+            other: A second Gaussian process posterior
+
+        Returns: Boolean value
+
+        """
         return list(self.vars().items()) == list(other.vars().items())
+
+    @property
+    def n_vars(self) -> int:
+        """
+        Calculate the total number of parameters within a model.
+
+        Returns:
+            Integer value of the number of total number of parameters.
+        """
+        return sum([v.n_values for v in self.vars().values()])
 
 
 class PosteriorExact(Posterior):

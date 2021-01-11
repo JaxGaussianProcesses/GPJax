@@ -1,5 +1,10 @@
 coverage:
-  range: 70..90 
+  range: 70..90
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 5%
 
 fixes:
   - "/home/runner/work/gpjax/gpjax/::" # Correct paths

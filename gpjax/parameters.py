@@ -45,3 +45,7 @@ class Parameter(TrainVar):
         else:
             lpd = self.prior.log_prob(self.untransform)
         return lpd
+
+    @property
+    def n_values(self) -> int:
+        return self.value.shape[0]
