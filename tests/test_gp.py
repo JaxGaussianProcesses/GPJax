@@ -1,6 +1,7 @@
 from gpjax import Gaussian, RBF
+from gpjax.likelihoods import Bernoulli
 from gpjax.gps import Prior
-from gpjax.gps.posteriors import Posterior
+from gpjax.gps.posteriors import Posterior, PosteriorApprox
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
@@ -11,6 +12,11 @@ def test_conjugate_posterior():
     lik = Gaussian()
     post = p * lik
     assert isinstance(post, Posterior)
+
+
+def test_non_conjugate_poster():
+    posterior = Prior(RBF()) * Bernoulli()
+    assert isinstance(posterior, PosteriorApprox)
 
 
 @pytest.mark.parametrize('n', [1, 10])
@@ -29,3 +35,8 @@ def test_neg_ll():
     post = prior * Gaussian()
     nmll = post.neg_mll(x, y)
     assert jnp.round(nmll, 2) == 2.60
+
+
+def test_nvars():
+    posterior = Prior(RBF()) * Gaussian()
+    assert posterior.n_vars == 3

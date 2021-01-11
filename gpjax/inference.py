@@ -8,9 +8,9 @@ from objax.gradient import Grad
 
 class HMC(Module):
     def __init__(self,
-                 stepsize:Optional[float]=0.1,
+                 stepsize: Optional[float] = 0.1,
                  burn_in: Optional[int] = 1,
-                 thin_factor: Optional[int]=1,
+                 thin_factor: Optional[int] = 1,
                  leapfrog_steps: Optional[int] = 0,
                  leapfrog_range: Optional[Tuple[int, int]] = (5, 20),
                  name='HMC'):
@@ -28,7 +28,7 @@ class HMC(Module):
         self.burn_in = burn_in
         self.thin_factor = thin_factor
         self.leapfrog_steps = leapfrog_steps
-        self.leapfrog_random = True if leapfrog_steps < 1  else False
+        self.leapfrog_random = True if leapfrog_steps < 1 else False
         self.leapfrog_range = leapfrog_range
         self.name = name
 
@@ -37,8 +37,7 @@ class HMC(Module):
                key,
                grad_log_posterior: Grad,
                variables: VarCollection,
-               timer: Optional[bool] = False
-             ):
+               timer: Optional[bool] = False):
         """
         Sample from the log-posterior of the Gaussian process with respect to the supplied variables.
 
@@ -54,4 +53,3 @@ class HMC(Module):
         key, *subkeys = jr.split(key, n_samples)
         for idx, skey in enumerate(*subkeys):
             nu = jr.normal(skey, shape=(n_dims, ))
-            
