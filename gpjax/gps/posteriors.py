@@ -11,6 +11,7 @@ from ..likelihoods import Gaussian, Likelihood
 from ..parameters import Parameter
 from ..transforms import Identity
 
+
 if typing.TYPE_CHECKING:
     from .priors import Prior
 
@@ -26,12 +27,41 @@ class Posterior(Module):
         self.jitter = prior.jitter
 
     def marginal_ll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+        r"""
+        Here we compute :math:`\log p(y | x, \theta)
+        Args:
+            X: A set of N X M inputs
+            y: A set of N X 1 outputs
+
+        Returns: A multivariate normal distribution
+
+        """
         raise NotImplementedError
 
-    def neg_mll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+    def neg_mll(self, X: jnp.ndarray, y: jnp.ndarray) -> float:
+        """
+        In gradient based optimisation of the marginal log-likelihood (MLL), we minimise the negative MLL.
+        Args:
+            X: A set of N X M inputs
+            y: A set of N X 1 outputs
+
+        Returns: A unary float array
+        """
         raise NotImplementedError
 
-    def predict(self, Xstar, X, y):
+    def predict(self, Xstar: jnp.ndarray, X: jnp.ndarray, y: jnp.ndarray) -> Tuple[jnp.ndarray, jnp.ndarray]:
+        """
+        Given a set of test points Xstar, comute the predictive mean and variance of the GP here, conditional upon
+        the training data.
+
+        Args:
+            Xstar: The test point inputs
+            X: The training inputs
+            y: The training ouputs
+
+        Returns:
+            A tuple containing the predictive mean and predictive variance.
+        """
         raise NotImplementedError
 
     def __eq__(self, other: Posterior):
@@ -47,7 +77,7 @@ class PosteriorExact(Posterior):
 
     def marginal_ll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
         r"""
-        Here we compute :math:`\log p(y | x, \theta)
+        Here we compute :math:`\log p(y | x, \theta) for a conjugate, or exact, Gaussian process.
         Args:
             X: A set of N X M inputs
             y: A set of N X 1 outputs
@@ -62,7 +92,7 @@ class PosteriorExact(Posterior):
         L = jnp.linalg.cholesky(cov)
         return tfd.MultivariateNormalTriL(loc=mu, scale_tril=L)
 
-    def neg_mll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+    def neg_mll(self, X: jnp.ndarray, y: jnp.ndarray) -> float:
         """
         In gradient based optimisation of the marginal log-likelihood (MLL), we minimise the negative MLL.
         Args:
@@ -76,7 +106,7 @@ class PosteriorExact(Posterior):
         log_prior_density = jnp.sum(jnp.array([v.log_density for k, v in self.vars().items()]))
         return -(rv.log_prob(y.squeeze()).mean()+log_prior_density)
 
-    def predict(self, Xstar, X, y):
+    def predict(self, Xstar: jnp.ndarray, X: jnp.ndarray, y: jnp.ndarray) -> Tuple[jnp.ndarray, jnp.ndarray]:
         """
         Conditional upon the GP posterior, compute the predictive posterior given a set of new and unseen test points.
         Args:
@@ -109,18 +139,38 @@ class PosteriorExact(Posterior):
 
 
 class PosteriorApprox(Posterior):
+    """
+    A Gaussian process posterior for cases where the likelihood function of the data is non-Gaussian.
+    """
     def __init__(self, prior: Prior, likelihood: Likelihood):
         super().__init__(prior=prior, likelihood=likelihood)
         self.n = None
         self.nu = None
         self.latent_init = False
 
-    def _initialise_latent_values(self, n):
+    def _initialise_latent_values(self, n: int):
+        """
+        To facilitate the multiplie-dispatch style posterior computation, the latent values of the GP may only be
+        initialised once we've observed some data; a step which usually does not happen until optimisation commences.
+        Args:
+            n: The number of training points
+        """
         self.n = n
         self.nu = Parameter(jnp.zeros(shape=(self.n, 1)), transform=Identity(), prior=tfd.Normal(loc=0., scale=1.))
         self.latent_init = True
 
     def marginal_ll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+        """
+        Compute the marginal log-likelihood of the non-conjugate Gaussian process
+
+        Args:
+            X: Input training points
+            y: Output training points
+
+        Returns: A 1-dimensional array containing the marginal log-likelihood's value
+        """
+        # There is a slight issue here in that the full dataset must be realised before optimisation, otherwise the
+        # Objax optimiser does not correctly initialise nu due to the stochasticity of the optimisation.
         if not self.latent_init:
             self._initialise_latent_values(X.shape[0])
         mu = self.meanf(X)
@@ -136,17 +186,38 @@ class PosteriorApprox(Posterior):
         return ll + lpd
 
     def neg_mll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+        """
+        Return the negative marginal log-likelihood. This is only used for optimisation purposes where we minimise
+        the negative mll in order to actually maximise its value.
+
+        Args:
+            X: Input training points
+            y: Output training points
+
+        Returns: A 1-dimensional array containing the negative marginal log-likelihood's value
+        """
         return -self.marginal_ll(X, y)
 
     def predict(self, Xstar: jnp.ndarray, X:jnp.ndarray, y:jnp.ndarray) -> Tuple[jnp.ndarray, jnp.ndarray]:
+        """
+        Conditional upon the GP posterior, compute the predictive posterior given a set of new and unseen test points.
+        Args:
+            Xstar: The new inputs that correspond to the locations that we'd like to sample the GP predictive posterior at
+            X: A set of N X M inputs
+            y: A set of N X 1 outputs
+
+        Returns: A predictive mean and predictive variance
+
+        """
         if not self.latent_init:
             self._initialise_latent_values(X.shape[0])
         Inn = jnp.eye(X.shape[0])*self.jitter
         Kff = self.kernel(X, X) + Inn
-        L = jnp.linalg.cholesky(Kff)
         Kfx = self.kernel(X, Xstar)
-        Kxx = self.kernel(Xstar, Xstar)
-        A = solve_triangular(L, Kfx)
-        cov = Kxx - jnp.matmul(A.T, A)
-        mean = jnp.matmul(A.T, self.nu.untransform)
-        return mean, cov
+        Kxx = jnp.diag(self.kernel(Xstar, Xstar))
+        L = jnp.linalg.cholesky(Kff)
+        A = solve_triangular(L, Kfx, lower=True)
+        latent_var = Kxx - jnp.sum(jnp.square(A), -2)
+        latent_mean = jnp.matmul(A.T, self.nu.untransform)
+        mu, sigma = self.likelihood.predictive_moments(latent_mean, latent_var)
+        return mu, sigma
