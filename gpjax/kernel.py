@@ -37,7 +37,7 @@ class Kernel(Module):
         return mapx2(x, y)
 
     @staticmethod
-    def dist(x: jnp.array, y: jnp.array) -> float:
+    def dist(x: jnp.array, y: jnp.array, power: int) -> jnp.ndarray:
         """
         Compute the squared distance matrix between two inputs.
 
@@ -48,7 +48,7 @@ class Kernel(Module):
         Returns:
             A float value quantifying the distance between x and y.
         """
-        return jnp.sum((x - y)**2)
+        return jnp.sum((x - y)**power)
 
     def __call__(self, x: jnp.ndarray, y: jnp.ndarray):
         raise NotImplementedError
@@ -72,7 +72,15 @@ class Stationary(Kernel):
         self.lengthscale = Parameter(lengthscale)
         self.variance = Parameter(variance)
 
-    def __call__(self, *args, **kwargs):
+    def scaled_distance(self, x: jnp.ndarray, y: jnp.ndarray, power: int) -> jnp.ndarray:
+        ell = self.lengthscale.untransform
+        tau = self.dist(x / ell, y / ell, power=power)
+        return tau
+
+    def __call__(self, X: jnp.ndarray, Y: jnp.ndarray) -> jnp.ndarray:
+        return self.gram(self.kernel_func, X, Y).squeeze()
+
+    def kernel_func(self, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
         raise NotImplementedError
 
 
@@ -92,15 +100,85 @@ class RBF(Stationary):
         """
         super().__init__(lengthscale=lengthscale, variance=variance, name=name)
 
-    def feature_map(self, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+    def kernel_func(self, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+        r"""
+        Compute the RBF specific function :math:`k(x,y)=\sigma^2 \exp\left( \frac{-0.5 \tau}{2\ell^2}\right) ` where  :math:`\tau = \lVert x-y \rVert_{2}^{2}`.
         """
-        Compute the RBF specific function
-        """
-        # :math:`k(x,y)=\sigma^2 \exp\left( \frac{-0.5 \tau}{2\ell^2}\right) ` where  :math:`\tau = \lVert x-y \rVert_{2}^{2}`.
-        ell = self.lengthscale.untransform
         sigma = self.variance.untransform
-        tau = self.dist(x / ell, y / ell)
+        tau = self.scaled_distance(x, y, power=2)
         return sigma * jnp.exp(-0.5 * tau)
 
-    def __call__(self, X: jnp.ndarray, Y: jnp.ndarray) -> jnp.ndarray:
-        return self.gram(self.feature_map, X, Y).squeeze()
+
+class Matern12(Stationary):
+    """
+    The Matern kernel with a smoothness parameter of 1/2.
+    """
+    def __init__(self,
+                 lengthscale: jnp.ndarray = jnp.array([1.]),
+                 variance: jnp.ndarray = jnp.array([1.]),
+                 name: str = "Matern 1/2"):
+        """
+        Args:
+            lengthscale: The initial value of the kernel's lengthscale value. The value of this parameter controls the horizontal magnitude of the kernel's resultant values.
+            variance: The initial    value of the kernel's variance. This value controls the kernel's vertical amplitude.
+            name: Optional argument to name the kernel.
+        """
+        super().__init__(lengthscale=lengthscale, variance=variance, name=name)
+
+    def kernel_func(self, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+        r"""
+        Compute the Matern 1/2 specific function :math:`k(x,y)=\sigma^2 \exp\left( \frac{-\tau}{\ell}\right) ` where  :math:`\tau = \lvert x-y \rvert`.
+        """
+        sigma = self.variance.untransform
+        tau = self.scaled_distance(x, y, power=1)
+        return sigma * jnp.exp(-0.5 * tau)
+
+
+class Matern32(Stationary):
+    """
+    The Matern kernel with a smoothness parameter of 3/2.
+    """
+    def __init__(self,
+                 lengthscale: jnp.ndarray = jnp.array([1.]),
+                 variance: jnp.ndarray = jnp.array([1.]),
+                 name: str = "Matern 3/2"):
+        """
+        Args:
+            lengthscale: The initial value of the kernel's lengthscale value. The value of this parameter controls the horizontal magnitude of the kernel's resultant values.
+            variance: The initial    value of the kernel's variance. This value controls the kernel's vertical amplitude.
+            name: Optional argument to name the kernel.
+        """
+        super().__init__(lengthscale=lengthscale, variance=variance, name=name)
+
+    def kernel_func(self, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+        r"""
+        Compute the Matern 1/2 specific function :math:`k(x,y)=\sigma^2 (1 + \frac{\sqrt{3} \tau}{\ell}) \exp\left( \frac{\sqrt{3} \tau}{\ell}\right) ` where  :math:`\tau = \lvert x-y \rvert`.
+        """
+        sigma = self.variance.untransform
+        tau = self.scaled_distance(x, y, power=1)
+        return sigma*(1+(jnp.sqrt(3.)*tau))*jnp.exp(-jnp.sqrt(3.)*tau)
+
+
+# class Matern52(Stationary):
+#     """
+#     The Matern kernel with a smoothness parameter of 5/2.
+#     """
+#     def __init__(self,
+#                  lengthscale: jnp.ndarray = jnp.array([1.]),
+#                  variance: jnp.ndarray = jnp.array([1.]),
+#                  name: str = "Matern 5/2"):
+#         """
+#         Args:
+#             lengthscale: The initial value of the kernel's lengthscale value. The value of this parameter controls the horizontal magnitude of the kernel's resultant values.
+#             variance: The initial    value of the kernel's variance. This value controls the kernel's vertical amplitude.
+#             name: Optional argument to name the kernel.
+#         """
+#         super().__init__(lengthscale=lengthscale, variance=variance, name=name)
+#
+#     def kernel_func(self, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+#         r"""
+#         Compute the Matern 1/2 specific function :math:`k(x,y)=\sigma^2 (1 + \frac{\sqrt{5} \tau}{\ell} + \frac{2.5*\tau**2}{\ell**2}) \exp\left( \frac{\sqrt{5} \tau}{\ell}\right) ` where  :math:`\tau = \lvert x-y \rvert`.
+#         """
+#         sigma = self.variance.untransform
+#         tau = self.scaled_distance(x, y, power=1)
+#         return sigma*(1.0+jnp.sqrt(5.0)*tau + 5.0/3.0 * jnp.square(tau))*jnp.exp(-jnp.sqrt(5.0)*tau)
