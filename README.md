@@ -88,4 +88,3 @@ python setup.py develop
 
 * Spectral kernels ([in progress](https://github.com/thomaspinder/GPJax/tree/spectral))
 * Inducing point schemes ([in progress](https://github.com/thomaspinder/GPJax/tree/inducing_points))
-* Support for non-conjugate inference
