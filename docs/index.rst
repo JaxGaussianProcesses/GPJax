@@ -1,7 +1,7 @@
 Welcome to GPJax's documentation!
 =================================
 
-GPJax is a didactic Gaussian process with GPU acceleration and just-in-time compilation. The intention of GPJax is to provide a framework for researchers to rapidly prototype and develop new Gaussian process methods. We seek to provide this by providing an API that seeks to best represent the underlying mathematics of Gaussian processes.
+GPJax is a didactic Gaussian process that supports GPU acceleration and just-in-time compilation. The intention of GPJax is to provide a framework for researchers to rapidly prototype and develop new Gaussian process methods. We seek to provide this by providing an API that seeks to best represent the underlying mathematics of Gaussian processes.
 
 Gaussian process 'Hello World' example
 -----------------------------------------------------
@@ -23,37 +23,10 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
 
     posterior = f_prior * likelihood
 
-Contents
------------------------------------------------------
+
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :caption: Getting Started
 
-
-GP Priors
------------------------------------------------------
-
-.. toctree::
-   :maxdepth: 2
-
-   priors
-
-
-
-Kernels
------------------------------------------------------
-
-.. toctree::
-   :maxdepth: 2
-
-   kernels
-
-Parameters
------------------------------------------------------
-
-.. toctree::
-   :maxdepth: 2
-
-   parameters
-
+   installation
