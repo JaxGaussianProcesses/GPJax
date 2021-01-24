@@ -44,6 +44,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosectionlabel',
+    'sphinx_copybutton',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -70,6 +71,18 @@ autodoc_default_options = {
 # a list of builtin themes.
 #
 html_theme = 'furo'
+
+html_theme_options = {
+    "light_css_variables": {
+        "color-brand-primary": "#B5121B",
+        "color-brand-content": "#CC3333",
+        "color-admonition-background": "orange",
+    },
+}
+
+# pygments_style = "sphinx"
+# pygments_dark_style = "monokai"
+
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
