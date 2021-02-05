@@ -131,9 +131,9 @@ class Matern52(Kernel):
         sigma = self.variance.untransform
         tau = self.scaled_distance(x, y, power=1)
         sqrt5 = jnp.sqrt(5.0)
-        return sigma*(1.0+sqrt5*tau + (5.0/3.0) * jnp.square(tau))*jnp.exp(-sqrt5*tau)
+        return sigma*(sqrt5*tau + (5.0/3.0) * jnp.square(tau))*jnp.exp(-sqrt5*tau)
     def scaled_distance(self, x: jnp.ndarray, y: jnp.ndarray, power: int) -> jnp.ndarray:
-        ell = self.lengthscale.untransform
+        ell = jnp.power(self.lengthscale.untransform, 2)
         tau = self.dist(x / ell, y / ell, power=power)
         return tau
     def __call__(self, X: jnp.ndarray, Y: jnp.ndarray) -> jnp.ndarray:
