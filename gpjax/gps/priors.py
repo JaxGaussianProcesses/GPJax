@@ -4,12 +4,13 @@ import jax.numpy as jnp
 import jax.random as jr
 from objax import Module
 from tensorflow_probability.substrates.jax import distributions as tfd
+from objax.typing import JaxArray
 
-from ..kernel import Kernel
-from ..likelihoods import Likelihood, Bernoulli, Gaussian
-from .posteriors import PosteriorExact, PosteriorApprox
+from gpjax.kernel import Kernel
+from gpjax.likelihoods import Likelihood, Bernoulli, Gaussian
+from gpjax.gps.posteriors import PosteriorExact, PosteriorApprox
 from multipledispatch import dispatch
-from ..mean_functions import MeanFunction, ZeroMean
+from gpjax.mean_functions import MeanFunction, ZeroMean
 
 
 class Prior(Module):
@@ -33,9 +34,9 @@ class Prior(Module):
         self.jitter = jitter
 
     def sample(self,
-               X: jnp.ndarray,
+               X: JaxArray,
                key,
-               n_samples: Optional[int] = 1) -> jnp.ndarray:
+               n_samples: Optional[int] = 1) -> JaxArray:
         """
         Draw a set of n samples from the GP prior at a set of input points.
 

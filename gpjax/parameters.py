@@ -3,7 +3,7 @@ from objax.typing import JaxArray
 from objax.variable import reduce_mean
 import jax.numpy as jnp
 from typing import Optional, Callable
-from .transforms import Transform, Softplus
+from gpjax.transforms import Transform, Softplus
 from tensorflow_probability.substrates.jax import distributions as tfd
 
 

@@ -1,6 +1,6 @@
 import objax
-from .gps import Prior
-from .gps.posteriors import Posterior
+from gpjax.gps import Prior
+from gpjax.gps.posteriors import Posterior
 from typing import Union
 import jax.numpy as jnp
 GP = Union[Prior, Posterior]

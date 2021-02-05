@@ -2,7 +2,8 @@ import jax.numpy as jnp
 from objax import Module
 from typing import Callable, Optional
 from jax import vmap
-from .parameters import Parameter
+from gpjax.parameters import Parameter
+from objax.typing import JaxArray
 
 
 class Kernel(Module):
@@ -18,7 +19,7 @@ class Kernel(Module):
         self.spectral = False
 
     @staticmethod
-    def gram(func: Callable, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+    def gram(func: Callable, x: JaxArray, y: JaxArray) -> JaxArray:
         """
         Compute the kernel's gram matrix given two, possibly identical, Jax arrays.
 
@@ -50,7 +51,7 @@ class Kernel(Module):
         """
         return jnp.sum((x - y)**2)
 
-    def __call__(self, x: jnp.ndarray, y: jnp.ndarray):
+    def __call__(self, x: JaxArray, y: JaxArray):
         raise NotImplementedError
 
 
@@ -59,8 +60,8 @@ class Stationary(Kernel):
     A base class for stationary kernels. That is, kernels whereby the Gram matrix's values are invariant to the value of the inputs, and instead depend only on the distance between the inputs.
     """
     def __init__(self,
-                 lengthscale: Optional[jnp.ndarray] = jnp.array([1.]),
-                 variance: Optional[jnp.ndarray] = jnp.array([1.]),
+                 lengthscale: Optional[JaxArray] = jnp.array([1.]),
+                 variance: Optional[JaxArray] = jnp.array([1.]),
                  name: Optional[str] = "Stationary"):
         """
         Args:
@@ -81,8 +82,8 @@ class RBF(Stationary):
     The radial basis function kernel.
     """
     def __init__(self,
-                 lengthscale: jnp.ndarray = jnp.array([1.]),
-                 variance: jnp.ndarray = jnp.array([1.]),
+                 lengthscale: JaxArray = jnp.array([1.]),
+                 variance: JaxArray = jnp.array([1.]),
                  name: str = "RBF"):
         """
         Args:
@@ -92,7 +93,7 @@ class RBF(Stationary):
         """
         super().__init__(lengthscale=lengthscale, variance=variance, name=name)
 
-    def feature_map(self, x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+    def feature_map(self, x: JaxArray, y: JaxArray) -> JaxArray:
         """
         Compute the RBF specific function
         """
@@ -102,5 +103,5 @@ class RBF(Stationary):
         tau = self.dist(x / ell, y / ell)
         return sigma * jnp.exp(-0.5 * tau)
 
-    def __call__(self, X: jnp.ndarray, Y: jnp.ndarray) -> jnp.ndarray:
+    def __call__(self, X: JaxArray, Y: JaxArray) -> JaxArray:
         return self.gram(self.feature_map, X, Y).squeeze()

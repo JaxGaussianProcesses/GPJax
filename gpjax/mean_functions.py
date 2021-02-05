@@ -1,6 +1,7 @@
 from objax import Module
 import jax.numpy as jnp
-from .utilities import JaxArray
+from objax.typing import JaxArray
+
 
 class MeanFunction(Module):
     def __init__(self, name: str = "Mean Function"):

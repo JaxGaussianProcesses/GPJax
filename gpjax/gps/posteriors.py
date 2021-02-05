@@ -7,9 +7,10 @@ from objax import Module
 from tensorflow_probability.substrates.jax import distributions as tfd
 from typing import Tuple
 
-from ..likelihoods import Gaussian, Likelihood
-from ..parameters import Parameter
-from ..transforms import Identity
+from gpjax.likelihoods import Gaussian, Likelihood
+from gpjax.parameters import Parameter
+from gpjax.transforms import Identity
+from objax.typing import JaxArray
 
 
 if typing.TYPE_CHECKING:
@@ -26,7 +27,7 @@ class Posterior(Module):
         self.likelihood = likelihood
         self.jitter = prior.jitter
 
-    def marginal_ll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+    def marginal_ll(self, X: JaxArray, y: JaxArray) -> JaxArray:
         r"""
         Here we compute :math:`\log p(y | x, \theta)
         Args:
@@ -38,7 +39,7 @@ class Posterior(Module):
         """
         raise NotImplementedError
 
-    def neg_mll(self, X: jnp.ndarray, y: jnp.ndarray) -> float:
+    def neg_mll(self, X: JaxArray, y: JaxArray) -> float:
         """
         In gradient based optimisation of the marginal log-likelihood (MLL), we minimise the negative MLL.
         Args:
@@ -49,7 +50,7 @@ class Posterior(Module):
         """
         raise NotImplementedError
 
-    def predict(self, Xstar: jnp.ndarray, X: jnp.ndarray, y: jnp.ndarray) -> Tuple[jnp.ndarray, jnp.ndarray]:
+    def predict(self, Xstar: JaxArray, X: JaxArray, y: JaxArray) -> Tuple[JaxArray, JaxArray]:
         """
         Given a set of test points Xstar, comute the predictive mean and variance of the GP here, conditional upon
         the training data.
@@ -94,7 +95,7 @@ class PosteriorExact(Posterior):
     def __init__(self, prior: Prior, likelihood: Gaussian):
         super().__init__(prior, likelihood)
 
-    def marginal_ll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+    def marginal_ll(self, X: JaxArray, y: JaxArray) -> JaxArray:
         r"""
         Here we compute :math:`\log p(y | x, \theta) for a conjugate, or exact, Gaussian process.
         Args:
@@ -111,7 +112,7 @@ class PosteriorExact(Posterior):
         L = jnp.linalg.cholesky(cov)
         return tfd.MultivariateNormalTriL(loc=mu, scale_tril=L)
 
-    def neg_mll(self, X: jnp.ndarray, y: jnp.ndarray) -> float:
+    def neg_mll(self, X: JaxArray, y: JaxArray) -> float:
         """
         In gradient based optimisation of the marginal log-likelihood (MLL), we minimise the negative MLL.
         Args:
@@ -125,7 +126,7 @@ class PosteriorExact(Posterior):
         log_prior_density = jnp.sum(jnp.array([v.log_density for k, v in self.vars().items()]))
         return -(rv.log_prob(y.squeeze()).mean()+log_prior_density)
 
-    def predict(self, Xstar: jnp.ndarray, X: jnp.ndarray, y: jnp.ndarray) -> Tuple[jnp.ndarray, jnp.ndarray]:
+    def predict(self, Xstar: JaxArray, X: JaxArray, y: JaxArray) -> Tuple[JaxArray, JaxArray]:
         """
         Conditional upon the GP posterior, compute the predictive posterior given a set of new and unseen test points.
         Args:
@@ -178,7 +179,7 @@ class PosteriorApprox(Posterior):
         self.nu = Parameter(jnp.zeros(shape=(self.n, 1)), transform=Identity(), prior=tfd.Normal(loc=0., scale=1.))
         self.latent_init = True
 
-    def marginal_ll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+    def marginal_ll(self, X: JaxArray, y: JaxArray) -> JaxArray:
         """
         Compute the marginal log-likelihood of the non-conjugate Gaussian process
 
@@ -204,7 +205,7 @@ class PosteriorApprox(Posterior):
         # lpd = jnp.sum(jnp.array([v.log_density for k, v in self.vars().items()]))
         return ll + lpd
 
-    def neg_mll(self, X: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
+    def neg_mll(self, X: JaxArray, y: JaxArray) -> JaxArray:
         """
         Return the negative marginal log-likelihood. This is only used for optimisation purposes where we minimise
         the negative mll in order to actually maximise its value.
@@ -217,7 +218,7 @@ class PosteriorApprox(Posterior):
         """
         return -self.marginal_ll(X, y)
 
-    def predict(self, Xstar: jnp.ndarray, X:jnp.ndarray, y:jnp.ndarray) -> Tuple[jnp.ndarray, jnp.ndarray]:
+    def predict(self, Xstar: JaxArray, X:JaxArray, y:JaxArray) -> Tuple[JaxArray, JaxArray]:
         """
         Conditional upon the GP posterior, compute the predictive posterior given a set of new and unseen test points.
         Args:

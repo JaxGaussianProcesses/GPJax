@@ -1,8 +1,9 @@
 from objax import Module
 import jax.numpy as jnp
-from .parameters import Parameter
+from gpjax.parameters import Parameter
 from typing import Optional, Tuple
 from tensorflow_probability.substrates.jax import distributions as tfd
+from objax.typing import JaxArray
 
 
 class Likelihood(Module):
@@ -17,11 +18,11 @@ class Likelihood(Module):
         """
         self.name = name
 
-    def log_density(self, F, Y) -> jnp.ndarray:
+    def log_density(self, F, Y) -> JaxArray:
         raise NotImplementedError
 
     def predictive_moments(self, latent_mean,
-                           latent_variance) -> Tuple[jnp.ndarray, jnp.ndarray]:
+                           latent_variance) -> Tuple[JaxArray, JaxArray]:
         """
         Compute the predictive mean and predictive variance using the mean and variance of GP's latent function.
 
@@ -44,11 +45,11 @@ class Gaussian(Likelihood):
         self.noise = Parameter(noise)
         self.random_variable = tfd.Normal
 
-    def log_density(self, F, Y) -> jnp.ndarray:
+    def log_density(self, F, Y) -> JaxArray:
         raise NotImplementedError
 
     def predictive_moments(self, latent_mean,
-                           latent_variance) -> Tuple[jnp.ndarray, jnp.ndarray]:
+                           latent_variance) -> Tuple[JaxArray, JaxArray]:
         raise NotImplementedError
 
 
@@ -63,7 +64,7 @@ class Bernoulli(Likelihood):
         super().__init__(name="Bernoulli")
         self.random_variable = tfd.ProbitBernoulli
 
-    def log_density(self, F, Y) -> jnp.ndarray:
+    def log_density(self, F, Y) -> JaxArray:
         """
         Compute the log-density of a Bernoulli random variable parameterised by F w.r.t some observations Y
 
@@ -77,7 +78,7 @@ class Bernoulli(Likelihood):
         return self.random_variable(F).log_prob(Y)
 
     def predictive_moments(self, latent_mean,
-                           latent_variance) -> Tuple[jnp.ndarray, jnp.ndarray]:
+                           latent_variance) -> Tuple[JaxArray, JaxArray]:
         r"""
         Using the predictive mean and variance of the latent function :math:`f^{\star}`, we can analytically compute
         the averaged predictive probability (eq. 3.25 [Rasmussen and Williams (2006)]) as we've used the Probit link

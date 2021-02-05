@@ -1,6 +1,7 @@
 import jax.numpy as jnp
 from jax.nn import softplus
-from .utilities import JaxArray
+from objax.typing import JaxArray
+
 
 
 class Transform:
@@ -8,11 +9,11 @@ class Transform:
         self.name = name
 
     @staticmethod
-    def forward(x: jnp.ndarray) -> jnp.ndarray:
+    def forward(x: JaxArray) -> JaxArray:
         raise NotImplementedError
 
     @staticmethod
-    def backward(x: jnp.ndarray) -> jnp.ndarray:
+    def backward(x: JaxArray) -> JaxArray:
         raise NotImplementedError
 
 
@@ -25,7 +26,7 @@ class Softplus(Transform):
         return jnp.log(jnp.exp(x) - 1.)
 
     @staticmethod
-    def backward(x: jnp.ndarray) -> jnp.ndarray:
+    def backward(x: JaxArray) -> JaxArray:
         return softplus(x)
 
 
