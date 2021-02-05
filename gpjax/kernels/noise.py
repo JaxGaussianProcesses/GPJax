@@ -21,5 +21,7 @@ class WhiteNoise(Kernel):
         super().__init__(name=name)
         self.noise_level = Parameter(noise_level)
 
+    def diag(self, X: jnp.ndarray) -> jnp.ndarray:
+        return self.noise_level.untransform * jnp.eye(X.shape[0], dtyle=X.dtype)
     def __call__(self, X: jnp.ndarray, Y: jnp.ndarray) -> jnp.ndarray:
-        return self.noise_level.untransform * jnp.eye(X.shape[0],)
+        return jnp.zeros((X.shape[0], Y.shape[0]), dtype=X.dtype)
