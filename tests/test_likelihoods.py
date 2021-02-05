@@ -1,7 +1,8 @@
 import jax.numpy as jnp
 import jax.random as jr
-from gpjax.likelihoods import Bernoulli
 import pytest
+
+from gpjax.likelihoods import Bernoulli
 
 
 @pytest.mark.parametrize("n", [1, 10])

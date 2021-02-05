@@ -1,10 +1,11 @@
 import jax.numpy as jnp
-from gpjax.parameters import Parameter
-from gpjax.transforms import Softplus, Identity
-from tensorflow_probability.substrates.jax import distributions as tfd
 import pytest
-from objax.typing import JaxArray
 from numpy.testing import assert_almost_equal
+from objax.typing import JaxArray
+from tensorflow_probability.substrates.jax import distributions as tfd
+
+from gpjax.parameters import Parameter
+from gpjax.transforms import Identity, Softplus
 
 ZeroDist = tfd.Uniform(low=0.0, high=0.0)
 

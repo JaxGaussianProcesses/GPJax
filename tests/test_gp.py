@@ -1,10 +1,11 @@
-from gpjax import Gaussian, RBF
-from gpjax.likelihoods import Bernoulli
-from gpjax.gps import Prior
-from gpjax.gps.posteriors import Posterior, PosteriorApprox
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
+
+from gpjax import RBF, Gaussian
+from gpjax.gps import Prior
+from gpjax.gps.posteriors import Posterior, PosteriorApprox
+from gpjax.likelihoods import Bernoulli
 
 
 def test_conjugate_posterior():
