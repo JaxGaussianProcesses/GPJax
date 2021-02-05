@@ -3,11 +3,12 @@ from gpjax.parameters import Parameter
 from gpjax.transforms import Softplus, Identity
 from tensorflow_probability.substrates.jax import distributions as tfd
 import pytest
+from objax.typing import JaxArray
 from numpy.testing import assert_almost_equal
 ZeroDist = tfd.Uniform(low=0., high=0.)
 
 
-def hardcode_softplus(x: jnp.ndarray):
+def hardcode_softplus(x: JaxArray):
     return jnp.log(jnp.exp(x) - 1.0)
 
 
