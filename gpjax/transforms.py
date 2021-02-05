@@ -3,7 +3,6 @@ from jax.nn import softplus
 from objax.typing import JaxArray
 
 
-
 class Transform:
     def __init__(self, name="Transformation"):
         self.name = name
@@ -19,11 +18,11 @@ class Transform:
 
 class Softplus(Transform):
     def __init__(self):
-        super().__init__(name='Softplus')
+        super().__init__(name="Softplus")
 
     @staticmethod
     def forward(x: JaxArray) -> JaxArray:
-        return jnp.log(jnp.exp(x) - 1.)
+        return jnp.log(jnp.exp(x) - 1.0)
 
     @staticmethod
     def backward(x: JaxArray) -> JaxArray:
@@ -32,7 +31,7 @@ class Softplus(Transform):
 
 class Identity(Transform):
     def __init__(self):
-        super().__init__(name='Identity')
+        super().__init__(name="Identity")
 
     @staticmethod
     def forward(x: JaxArray) -> JaxArray:

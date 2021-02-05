@@ -3,12 +3,11 @@ from gpjax.gps import Prior
 from gpjax.gps.posteriors import Posterior
 from typing import Union
 import jax.numpy as jnp
+
 GP = Union[Prior, Posterior]
 
 
-
-
-def save(gp: GP, model_name: str, directory: str = './'):
+def save(gp: GP, model_name: str, directory: str = "./"):
     """
     Locally save the hyperparameters of a Gaussian process prior or posterior object.
 
@@ -17,11 +16,12 @@ def save(gp: GP, model_name: str, directory: str = './'):
         model_name: The name under which the object should be saved.
         directory: The location where the GP should be stored.
     """
-    if not model_name.endswith('.npz'):
-        model_name += '.npz'
-    objax.io.save_var_collection(f'{directory}{model_name}', gp.vars())
+    if not model_name.endswith(".npz"):
+        model_name += ".npz"
+    objax.io.save_var_collection(f"{directory}{model_name}", gp.vars())
     print(
-        f"Model successfully saved to {directory} under filename {model_name}")
+        f"Model successfully saved to {directory} under filename {model_name}"
+    )
 
 
 def load(gp: GP, location: str):
@@ -33,6 +33,7 @@ def load(gp: GP, location: str):
         location: The local filepath where the .npz file exists
     """
     assert location.endswith(
-        '.npz'), "Loaded variables should be under a .npz extension"
+        ".npz"
+    ), "Loaded variables should be under a .npz extension"
     objax.io.load_var_collection(location, gp.vars())
     return gp

@@ -1,4 +1,5 @@
 from jax.config import config
+
 config.update("jax_enable_x64", True)
 from . import gps
 from .kernel import RBF

@@ -19,10 +19,13 @@ class Prior(Module):
     prior :math:`p(f)\sim\mathcal{GP}(m, k)` where :math:`m: X \rightarrow \mathbb{R}` is a mean function and kernel
     :math:`k: X \times X \rightarrow \mathbb{R}`.
     """
-    def __init__(self,
-                 kernel: Kernel,
-                 mean_function: Optional[MeanFunction] = ZeroMean(),
-                 jitter: Optional[float] = 1e-6):
+
+    def __init__(
+        self,
+        kernel: Kernel,
+        mean_function: Optional[MeanFunction] = ZeroMean(),
+        jitter: Optional[float] = 1e-6,
+    ):
         """
         Args:
             kernel: The Gaussian process model's kernel, or covariance, function.
@@ -33,10 +36,9 @@ class Prior(Module):
         self.kernel = kernel
         self.jitter = jitter
 
-    def sample(self,
-               X: JaxArray,
-               key,
-               n_samples: Optional[int] = 1) -> JaxArray:
+    def sample(
+        self, X: JaxArray, key, n_samples: Optional[int] = 1
+    ) -> JaxArray:
         """
         Draw a set of n samples from the GP prior at a set of input points.
 
@@ -53,10 +55,9 @@ class Prior(Module):
         if cov.shape[0] == cov.shape[1]:
             Inn = jnp.eye(cov.shape[0]) * self.jitter
             cov += Inn
-        return jr.multivariate_normal(key,
-                                      mu.squeeze(),
-                                      cov,
-                                      shape=(n_samples, ))
+        return jr.multivariate_normal(
+            key, mu.squeeze(), cov, shape=(n_samples,)
+        )
 
     def __mul__(self, other: Likelihood):
         """
@@ -71,10 +72,14 @@ class Prior(Module):
         return create_posterior(self, other)
 
     def __repr__(self):
-        return "Gaussian process prior with {} kernel and {} mean function.".format(self.kernel.name, self.meanf.name)
+        return "Gaussian process prior with {} kernel and {} mean function.".format(
+            self.kernel.name, self.meanf.name
+        )
 
     def __str__(self):
-        return "Gaussian process prior with {} kernel and {} mean function.".format(self.kernel.name, self.meanf.name)
+        return "Gaussian process prior with {} kernel and {} mean function.".format(
+            self.kernel.name, self.meanf.name
+        )
 
 
 @dispatch(Prior, Gaussian)

@@ -21,6 +21,7 @@ class Posterior(Module):
     """
     A base class for GP posterior
     """
+
     def __init__(self, prior: Prior, likelihood: Likelihood):
         self.kernel = prior.kernel
         self.meanf = prior.meanf
@@ -50,7 +51,9 @@ class Posterior(Module):
         """
         raise NotImplementedError
 
-    def predict(self, Xstar: JaxArray, X: JaxArray, y: JaxArray) -> Tuple[JaxArray, JaxArray]:
+    def predict(
+        self, Xstar: JaxArray, X: JaxArray, y: JaxArray
+    ) -> Tuple[JaxArray, JaxArray]:
         """
         Given a set of test points Xstar, comute the predictive mean and variance of the GP here, conditional upon
         the training data.
@@ -92,6 +95,7 @@ class PosteriorExact(Posterior):
     """
     A Gaussian process posterior whereby the likelihood function is a Gaussian distribution.
     """
+
     def __init__(self, prior: Prior, likelihood: Gaussian):
         super().__init__(prior, likelihood)
 
@@ -123,10 +127,14 @@ class PosteriorExact(Posterior):
 
         """
         rv = self.marginal_ll(X, y)
-        log_prior_density = jnp.sum(jnp.array([v.log_density for k, v in self.vars().items()]))
-        return -(rv.log_prob(y.squeeze()).mean()+log_prior_density)
+        log_prior_density = jnp.sum(
+            jnp.array([v.log_density for k, v in self.vars().items()])
+        )
+        return -(rv.log_prob(y.squeeze()).mean() + log_prior_density)
 
-    def predict(self, Xstar: JaxArray, X: JaxArray, y: JaxArray) -> Tuple[JaxArray, JaxArray]:
+    def predict(
+        self, Xstar: JaxArray, X: JaxArray, y: JaxArray
+    ) -> Tuple[JaxArray, JaxArray]:
         """
         Conditional upon the GP posterior, compute the predictive posterior given a set of new and unseen test points.
         Args:
@@ -162,6 +170,7 @@ class PosteriorApprox(Posterior):
     """
     A Gaussian process posterior for cases where the likelihood function of the data is non-Gaussian.
     """
+
     def __init__(self, prior: Prior, likelihood: Likelihood):
         super().__init__(prior=prior, likelihood=likelihood)
         self.n = None
@@ -176,7 +185,11 @@ class PosteriorApprox(Posterior):
             n: The number of training points
         """
         self.n = n
-        self.nu = Parameter(jnp.zeros(shape=(self.n, 1)), transform=Identity(), prior=tfd.Normal(loc=0., scale=1.))
+        self.nu = Parameter(
+            jnp.zeros(shape=(self.n, 1)),
+            transform=Identity(),
+            prior=tfd.Normal(loc=0.0, scale=1.0),
+        )
         self.latent_init = True
 
     def marginal_ll(self, X: JaxArray, y: JaxArray) -> JaxArray:
@@ -218,7 +231,9 @@ class PosteriorApprox(Posterior):
         """
         return -self.marginal_ll(X, y)
 
-    def predict(self, Xstar: JaxArray, X:JaxArray, y:JaxArray) -> Tuple[JaxArray, JaxArray]:
+    def predict(
+        self, Xstar: JaxArray, X: JaxArray, y: JaxArray
+    ) -> Tuple[JaxArray, JaxArray]:
         """
         Conditional upon the GP posterior, compute the predictive posterior given a set of new and unseen test points.
         Args:
@@ -231,7 +246,7 @@ class PosteriorApprox(Posterior):
         """
         if not self.latent_init:
             self._initialise_latent_values(X.shape[0])
-        Inn = jnp.eye(X.shape[0])*self.jitter
+        Inn = jnp.eye(X.shape[0]) * self.jitter
         Kff = self.kernel(X, X) + Inn
         Kfx = self.kernel(X, Xstar)
         Kxx = jnp.diag(self.kernel(Xstar, Xstar))
