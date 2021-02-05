@@ -1,6 +1,6 @@
 import pytest
 import jax.numpy as jnp
-from gpjax.kernel import RBF, Matern12, Matern32
+from gpjax.kernels import RBF, Matern12, Matern32
 all_kernels = [RBF, Matern12, Matern32]
 
 
