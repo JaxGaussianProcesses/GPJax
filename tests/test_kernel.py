@@ -1,7 +1,7 @@
 import pytest
 import jax.numpy as jnp
-from gpjax.kernels import RBF, Matern12, Matern32
-all_kernels = [RBF, Matern12, Matern32]
+from gpjax.kernels import RBF, Matern12, Matern32, Matern52
+all_kernels = [RBF, Matern12, Matern32, Matern52]
 
 
 @pytest.mark.parametrize('kernel', all_kernels)
