@@ -1,5 +1,5 @@
-from objax import Module
 import jax.numpy as jnp
+from objax import Module
 from objax.typing import JaxArray
 
 

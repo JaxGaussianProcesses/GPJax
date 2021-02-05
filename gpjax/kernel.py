@@ -1,9 +1,11 @@
-import jax.numpy as jnp
-from objax import Module
 from typing import Callable, Optional
+
+import jax.numpy as jnp
 from jax import vmap
-from gpjax.parameters import Parameter
+from objax import Module
 from objax.typing import JaxArray
+
+from gpjax.parameters import Parameter
 
 
 class Kernel(Module):

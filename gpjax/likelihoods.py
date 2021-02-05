@@ -1,9 +1,11 @@
-from objax import Module
-import jax.numpy as jnp
-from gpjax.parameters import Parameter
 from typing import Optional, Tuple
-from tensorflow_probability.substrates.jax import distributions as tfd
+
+import jax.numpy as jnp
+from objax import Module
 from objax.typing import JaxArray
+from tensorflow_probability.substrates.jax import distributions as tfd
+
+from gpjax.parameters import Parameter
 
 
 class Likelihood(Module):

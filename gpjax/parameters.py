@@ -1,10 +1,12 @@
+from typing import Callable, Optional
+
+import jax.numpy as jnp
 from objax import TrainVar
 from objax.typing import JaxArray
 from objax.variable import reduce_mean
-import jax.numpy as jnp
-from typing import Optional, Callable
-from gpjax.transforms import Transform, Softplus
 from tensorflow_probability.substrates.jax import distributions as tfd
+
+from gpjax.transforms import Softplus, Transform
 
 
 class Parameter(TrainVar):

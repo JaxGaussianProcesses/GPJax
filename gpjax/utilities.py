@@ -1,8 +1,10 @@
+from typing import Union
+
+import jax.numpy as jnp
 import objax
+
 from gpjax.gps import Prior
 from gpjax.gps.posteriors import Posterior
-from typing import Union
-import jax.numpy as jnp
 
 GP = Union[Prior, Posterior]
 

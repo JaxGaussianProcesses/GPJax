@@ -2,14 +2,14 @@ from typing import Optional
 
 import jax.numpy as jnp
 import jax.random as jr
-from objax import Module
-from tensorflow_probability.substrates.jax import distributions as tfd
-from objax.typing import JaxArray
-
-from gpjax.kernel import Kernel
-from gpjax.likelihoods import Likelihood, Bernoulli, Gaussian
-from gpjax.gps.posteriors import PosteriorExact, PosteriorApprox
 from multipledispatch import dispatch
+from objax import Module
+from objax.typing import JaxArray
+from tensorflow_probability.substrates.jax import distributions as tfd
+
+from gpjax.gps.posteriors import PosteriorApprox, PosteriorExact
+from gpjax.kernel import Kernel
+from gpjax.likelihoods import Bernoulli, Gaussian, Likelihood
 from gpjax.mean_functions import MeanFunction, ZeroMean
 
 

@@ -1,17 +1,17 @@
 from __future__ import annotations
+
 import typing
+from typing import Tuple
 
 import jax.numpy as jnp
-from jax.scipy.linalg import cho_solve, cho_factor, solve_triangular
+from jax.scipy.linalg import cho_factor, cho_solve, solve_triangular
 from objax import Module
+from objax.typing import JaxArray
 from tensorflow_probability.substrates.jax import distributions as tfd
-from typing import Tuple
 
 from gpjax.likelihoods import Gaussian, Likelihood
 from gpjax.parameters import Parameter
 from gpjax.transforms import Identity
-from objax.typing import JaxArray
-
 
 if typing.TYPE_CHECKING:
     from .priors import Prior
