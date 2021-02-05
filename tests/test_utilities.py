@@ -1,5 +1,6 @@
 import os
-from gpjax import save, load, RBF
+
+from gpjax import RBF, load, save
 from gpjax.gps import Prior
 from gpjax.likelihoods import Bernoulli
 
@@ -9,9 +10,9 @@ def test_save_load():
     prior = Prior(kern)
 
     posterior = prior * Bernoulli()
-    save(posterior, 'test')
+    save(posterior, "test")
     assert os.path.exists("./test.npz")
     temp = Prior(kern) * Bernoulli()
-    load(temp, './test.npz')
+    load(temp, "./test.npz")
     assert temp == posterior
-    os.remove('./test.npz')
+    os.remove("./test.npz")

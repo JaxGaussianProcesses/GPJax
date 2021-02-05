@@ -1,10 +1,12 @@
+from typing import Callable, Optional
+
+import jax.numpy as jnp
 from objax import TrainVar
 from objax.typing import JaxArray
 from objax.variable import reduce_mean
-import jax.numpy as jnp
-from typing import Optional, Callable
-from .transforms import Transform, Softplus
 from tensorflow_probability.substrates.jax import distributions as tfd
+
+from gpjax.transforms import Softplus, Transform
 
 
 class Parameter(TrainVar):
@@ -12,12 +14,14 @@ class Parameter(TrainVar):
     Base parameter class. This is a simple extension of the `TrainVar` class in Objax that enables parameter transforms
     and, in the future, prior distributions to be placed on the parameter in question.
     """
-    def __init__(self,
-                 tensor: JaxArray,
-                 reduce: Optional[Callable[[JaxArray],
-                                           JaxArray]] = reduce_mean,
-                 transform: Transform = Softplus(),
-                 prior: tfd.Distribution = None):
+
+    def __init__(
+        self,
+        tensor: JaxArray,
+        reduce: Optional[Callable[[JaxArray], JaxArray]] = reduce_mean,
+        transform: Transform = Softplus(),
+        prior: tfd.Distribution = None,
+    ):
         """
         Args:
             tensor: The initial value of the parameter

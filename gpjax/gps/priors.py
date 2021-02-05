@@ -2,14 +2,15 @@ from typing import Optional
 
 import jax.numpy as jnp
 import jax.random as jr
+from multipledispatch import dispatch
 from objax import Module
+from objax.typing import JaxArray
 from tensorflow_probability.substrates.jax import distributions as tfd
 
-from ..kernel import Kernel
-from ..likelihoods import Likelihood, Bernoulli, Gaussian
-from .posteriors import PosteriorExact, PosteriorApprox
-from multipledispatch import dispatch
-from ..mean_functions import MeanFunction, ZeroMean
+from gpjax.gps.posteriors import PosteriorApprox, PosteriorExact
+from gpjax.kernel import Kernel
+from gpjax.likelihoods import Bernoulli, Gaussian, Likelihood
+from gpjax.mean_functions import MeanFunction, ZeroMean
 
 
 class Prior(Module):
@@ -18,10 +19,13 @@ class Prior(Module):
     prior :math:`p(f)\sim\mathcal{GP}(m, k)` where :math:`m: X \rightarrow \mathbb{R}` is a mean function and kernel
     :math:`k: X \times X \rightarrow \mathbb{R}`.
     """
-    def __init__(self,
-                 kernel: Kernel,
-                 mean_function: Optional[MeanFunction] = ZeroMean(),
-                 jitter: Optional[float] = 1e-6):
+
+    def __init__(
+        self,
+        kernel: Kernel,
+        mean_function: Optional[MeanFunction] = ZeroMean(),
+        jitter: Optional[float] = 1e-6,
+    ):
         """
         Args:
             kernel: The Gaussian process model's kernel, or covariance, function.
@@ -32,10 +36,9 @@ class Prior(Module):
         self.kernel = kernel
         self.jitter = jitter
 
-    def sample(self,
-               X: jnp.ndarray,
-               key,
-               n_samples: Optional[int] = 1) -> jnp.ndarray:
+    def sample(
+        self, X: JaxArray, key, n_samples: Optional[int] = 1
+    ) -> JaxArray:
         """
         Draw a set of n samples from the GP prior at a set of input points.
 
@@ -52,10 +55,9 @@ class Prior(Module):
         if cov.shape[0] == cov.shape[1]:
             Inn = jnp.eye(cov.shape[0]) * self.jitter
             cov += Inn
-        return jr.multivariate_normal(key,
-                                      mu.squeeze(),
-                                      cov,
-                                      shape=(n_samples, ))
+        return jr.multivariate_normal(
+            key, mu.squeeze(), cov, shape=(n_samples,)
+        )
 
     def __mul__(self, other: Likelihood):
         """
@@ -70,10 +72,14 @@ class Prior(Module):
         return create_posterior(self, other)
 
     def __repr__(self):
-        return "Gaussian process prior with {} kernel and {} mean function.".format(self.kernel.name, self.meanf.name)
+        return "Gaussian process prior with {} kernel and {} mean function.".format(
+            self.kernel.name, self.meanf.name
+        )
 
     def __str__(self):
-        return "Gaussian process prior with {} kernel and {} mean function.".format(self.kernel.name, self.meanf.name)
+        return "Gaussian process prior with {} kernel and {} mean function.".format(
+            self.kernel.name, self.meanf.name
+        )
 
 
 @dispatch(Prior, Gaussian)

@@ -1,10 +1,11 @@
-from gpjax import Gaussian, RBF
-from gpjax.likelihoods import Bernoulli
-from gpjax.gps import Prior
-from gpjax.gps.posteriors import Posterior, PosteriorApprox
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
+
+from gpjax import RBF, Gaussian
+from gpjax.gps import Prior
+from gpjax.gps.posteriors import Posterior, PosteriorApprox
+from gpjax.likelihoods import Bernoulli
 
 
 def test_conjugate_posterior():
@@ -19,9 +20,9 @@ def test_non_conjugate_poster():
     assert isinstance(posterior, PosteriorApprox)
 
 
-@pytest.mark.parametrize('n', [1, 10])
+@pytest.mark.parametrize("n", [1, 10])
 def test_prior_samples(n):
-    input_pts = jnp.linspace(-1., 1., 100).reshape(-1, 1)
+    input_pts = jnp.linspace(-1.0, 1.0, 100).reshape(-1, 1)
     key = jr.PRNGKey(123)
     p = Prior(RBF())
     samples = p.sample(input_pts, key=key, n_samples=n)
@@ -43,25 +44,25 @@ def test_nvars():
 
 
 # TODO: Why does this not work for n=1?
-def test_predict_shape(n = 10):
+def test_predict_shape(n=10):
     key = jr.PRNGKey(123)
     x = jr.uniform(key, shape=(10, 1))
     y = jnp.sin(x)
-    xtest = jnp.linspace(0., 1., n).reshape(-1, 1)
+    xtest = jnp.linspace(0.0, 1.0, n).reshape(-1, 1)
     posterior = Prior(RBF()) * Gaussian()
     mu, sigma = posterior.predict(xtest, x, y)
     assert mu.shape == (n, 1)
     assert sigma.shape == (n, n)
 
 
-@pytest.mark.parametrize('ntest', [10, 100])
-@pytest.mark.parametrize('n', [1, 10])
+@pytest.mark.parametrize("ntest", [10, 100])
+@pytest.mark.parametrize("n", [1, 10])
 def test_non_conjugate_init(n, ntest):
     key = jr.PRNGKey(123)
     posterior = Prior(RBF()) * Bernoulli()
-    x = jr.uniform(key = key, shape=(10, 1), minval=-1., maxval=1.)
+    x = jr.uniform(key=key, shape=(10, 1), minval=-1.0, maxval=1.0)
     y = jnp.sign(x)
-    xtest = jnp.linspace(-1., 1., ntest).reshape(-1, 1)
+    xtest = jnp.linspace(-1.0, 1.0, ntest).reshape(-1, 1)
 
     mll = posterior.neg_mll(x, y)
     assert mll.shape == ()
@@ -69,4 +70,4 @@ def test_non_conjugate_init(n, ntest):
     assert posterior.latent_init
     mu, cov = posterior.predict(xtest, x, y)
     assert mu.shape == cov.shape
-    assert mu.shape == (ntest, )
+    assert mu.shape == (ntest,)
