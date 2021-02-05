@@ -1,5 +1,6 @@
 import jax.numpy as jnp
 from jax.nn import softplus
+from .utilities import JaxArray
 
 
 class Transform:
@@ -20,7 +21,7 @@ class Softplus(Transform):
         super().__init__(name='Softplus')
 
     @staticmethod
-    def forward(x: jnp.ndarray) -> jnp.ndarray:
+    def forward(x: JaxArray) -> JaxArray:
         return jnp.log(jnp.exp(x) - 1.)
 
     @staticmethod
@@ -33,9 +34,9 @@ class Identity(Transform):
         super().__init__(name='Identity')
 
     @staticmethod
-    def forward(x: jnp.ndarray) -> jnp.ndarray:
+    def forward(x: JaxArray) -> JaxArray:
         return x
 
     @staticmethod
-    def backward(x: jnp.ndarray) -> jnp.ndarray:
+    def backward(x: JaxArray) -> JaxArray:
         return x
