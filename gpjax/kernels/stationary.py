@@ -103,4 +103,5 @@ class Matern52(Kernel):
         """
         sigma = self.variance.untransform
         tau = self.scaled_distance(x, y, power=1)
-        return sigma*(1.0+jnp.sqrt(5.0)*tau + 5.0/3.0 * jnp.square(tau))*jnp.exp(-jnp.sqrt(5.0)*tau)
+        sqrt5 = jnp.sqrt(5.0)
+        return sigma*(1.0+sqrt5*tau + (5.0/3.0) * jnp.square(tau))*jnp.exp(-sqrt5*tau)

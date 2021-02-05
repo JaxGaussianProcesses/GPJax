@@ -48,7 +48,7 @@ class Kernel(Module):
         Returns:
             A float value quantifying the distance between x and y.
         """
-        return jnp.sum((x - y)**power)
+        return jnp.sum(jnp.power((x - y), power))
 
     def __call__(self, x: jnp.ndarray, y: jnp.ndarray):
         raise NotImplementedError
