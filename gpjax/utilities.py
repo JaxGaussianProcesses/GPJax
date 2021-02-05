@@ -3,10 +3,6 @@ from .gps import Prior
 from .gps.posteriors import Posterior
 from typing import Union
 import jax.numpy as jnp
-from jax.interpreters.pxla import ShardedDeviceArray
-
-
-JaxArray = Union[jnp.ndarray, jnp.DeviceArray, ShardedDeviceArray]
 GP = Union[Prior, Posterior]
 
 
