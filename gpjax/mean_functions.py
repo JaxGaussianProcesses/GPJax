@@ -1,19 +1,20 @@
+from typing import Optional
 import jax.numpy as jnp
-from objax import Module
-from objax.typing import JaxArray
+from chex import dataclass
+from .types import Array
 
 
-class MeanFunction(Module):
-    def __init__(self, name: str = "Mean Function"):
-        self.name = name
+@dataclass
+class MeanFunction:
+    name: Optional[str] = 'Mean Function'
 
-    def __call__(self, X: JaxArray):
+    def __call__(self, x: Array) -> Array:
         raise NotImplementedError
 
 
-class ZeroMean(MeanFunction):
-    def __init__(self, name: str = "Zero Mean"):
-        super().__init__(name=name)
+@dataclass
+class Zero(MeanFunction):
+    name: Optional[str] = 'Zero mean'
 
-    def __call__(self, X: JaxArray) -> JaxArray:
-        return jnp.zeros((X.shape[0], 1), dtype=X.dtype)
+    def __call__(self, x: Array) -> Array:
+        return jnp.zeros_like(x)
