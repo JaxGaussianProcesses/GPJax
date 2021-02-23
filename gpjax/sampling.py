@@ -36,9 +36,9 @@ def random_variable(gp: ExactPosterior,
                                                 cov + I(n) * jitter_amount)
 
 
-@dispatch(jnp.DeviceArray, Prior, jnp.DeviceArray)
-def sample(key, gp, sample_points, n_samples=1) -> Array:
-    rv = random_variable(gp, sample_points)
+@dispatch(jnp.DeviceArray, Prior, dict, jnp.DeviceArray)
+def sample(key, gp, params, sample_points, n_samples=1) -> Array:
+    rv = random_variable(gp, params, sample_points)
     return rv.sample(sample_shape=(n_samples, ), seed=key)
 
 

@@ -9,10 +9,8 @@ from .gps import ExactPosterior
 from typing import Callable
 
 
-@dispatch(ExactPosterior, jnp.DeviceArray, jnp.DeviceArray)
+@dispatch(ExactPosterior)
 def marginal_ll(gp: ExactPosterior,
-                x: Array,
-                y: Array,
                 transformation: Transformation = SoftplusTransformation,
                 negative: bool = False) -> Callable:
     r"""
@@ -22,8 +20,8 @@ def marginal_ll(gp: ExactPosterior,
         y: A set of N X 1 outputs
     Returns: A multivariate normal distribution
     """
-    def mll(params: dict):
-        params = untransform(params, SoftplusTransformation)
+    def mll(params: dict, x: Array, y: Array):
+        params = untransform(params, transformation)
         mu = gp.prior.mean_function(x)
         gram_matrix = params['variance'] * gram(gp.prior.kernel,
                                                 x / params['lengthscale'])
