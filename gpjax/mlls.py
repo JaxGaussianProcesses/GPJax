@@ -5,12 +5,12 @@ from .kernel import gram
 from .utils import I
 from .transforms import Transformation, SoftplusTransformation, transform, untransform
 from tensorflow_probability.substrates.jax import distributions as tfd
-from .gps import ExactPosterior
+from .gps import ConjugatePosterior
 from typing import Callable
 
 
-@dispatch(ExactPosterior)
-def marginal_ll(gp: ExactPosterior,
+@dispatch(ConjugatePosterior)
+def marginal_ll(gp: ConjugatePosterior,
                 transformation: Transformation = SoftplusTransformation,
                 negative: bool = False) -> Callable:
     r"""

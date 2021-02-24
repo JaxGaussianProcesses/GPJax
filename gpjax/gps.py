@@ -12,7 +12,7 @@ class Prior:
     name: Optional[str] = "Prior"
 
     def __mul__(self, other: Likelihood):
-        return ExactPosterior(prior=self, likelihood=other)
+        return ConjugatePosterior(prior=self, likelihood=other)
 
 
 @dataclass
@@ -23,7 +23,16 @@ class Posterior:
 
 
 @dataclass
-class ExactPosterior:
+class ConjugatePosterior:
     prior: Prior
     likelihood: Gaussian
-    name: Optional[str] = 'ExactPosterior'
+    name: Optional[str] = 'ConjugatePosterior'
+
+
+@dataclass
+class NonconjugatePosterior:
+    prior: Prior
+    likelihood: Gaussian
+    name: Optional[str] = 'ConjugatePosterior'
+
+

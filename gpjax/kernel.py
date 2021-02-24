@@ -3,6 +3,7 @@ from typing import Optional
 from .types import Array
 import jax.numpy as jnp
 from jax import vmap
+from multipledispatch import dispatch
 
 
 @dataclass
@@ -23,6 +24,13 @@ class RBF(Kernel):
 
     def __call__(self, x: Array, y: Array) -> Array:
         return jnp.exp(-0.5 * squared_distance(x, y))
+
+
+@dispatch(RBF)
+def initialise(kernel: RBF):
+    return {'lengthscale': jnp.array([1.0]),
+            'variance': jnp.array([1.0])
+            }
 
 
 def squared_distance(x: Array, y: Array):

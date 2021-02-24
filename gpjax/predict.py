@@ -1,4 +1,4 @@
-from .gps import Prior, ExactPosterior
+from .gps import Prior, ConjugatePosterior
 from .kernel import gram, cross_covariance
 from .types import Array
 from .utils import I
@@ -8,9 +8,9 @@ from multipledispatch import dispatch
 from .types import Array
 
 
-@dispatch(ExactPosterior, dict, jnp.DeviceArray, jnp.DeviceArray,
+@dispatch(ConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray,
           jnp.DeviceArray)
-def mean(gp: ExactPosterior, param: dict, test_inputs: Array,
+def mean(gp: ConjugatePosterior, param: dict, test_inputs: Array,
          train_inputs: Array, train_outputs: Array):
     assert train_outputs.ndim == 2, f"2-dimensional training outputs are required. Current dimensional: {train_outputs.ndim}."
     ell, alpha = param['lengthscale'], param['variance']
@@ -29,9 +29,9 @@ def mean(gp: ExactPosterior, param: dict, test_inputs: Array,
     return jnp.dot(Kfx, weights)
 
 
-@dispatch(ExactPosterior, dict, jnp.DeviceArray, jnp.DeviceArray,
+@dispatch(ConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray,
           jnp.DeviceArray)
-def variance(gp: ExactPosterior, param: dict, test_inputs: Array,
+def variance(gp: ConjugatePosterior, param: dict, test_inputs: Array,
              train_inputs: Array, train_outputs: Array) -> Array:
     assert train_outputs.ndim == 2, f"2-dimensional training outputs are required. Current dimensional: {train_outputs.ndim}."
     ell, alpha = param['lengthscale'], param['variance']

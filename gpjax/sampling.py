@@ -1,5 +1,5 @@
 from .types import Array
-from .gps import Prior, ExactPosterior
+from .gps import Prior, ConjugatePosterior
 from .kernel import gram
 from .predict import mean, variance
 from .utils import I
@@ -12,7 +12,7 @@ import jax.numpy as jnp
 def random_variable(gp: Prior,
                     params: dict,
                     sample_points: Array,
-                    jitter_amount: float = 1e-8) -> tfd.Distribution:
+                    jitter_amount: float = 1e-6) -> tfd.Distribution:
     mu = gp.mean_function(sample_points)
     gram_matrix = params['variance']*gram(gp.kernel, sample_points/params['lengthscale'])
     jitter_matrix = I(sample_points.shape[0]) * jitter_amount
@@ -20,14 +20,14 @@ def random_variable(gp: Prior,
     return tfd.MultivariateNormalFullCovariance(mu.squeeze(), covariance)
 
 
-@dispatch(ExactPosterior, dict, jnp.DeviceArray, jnp.DeviceArray,
+@dispatch(ConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray,
           jnp.DeviceArray)
-def random_variable(gp: ExactPosterior,
+def random_variable(gp: ConjugatePosterior,
                     params: dict,
                     sample_points: Array,
                     train_inputs: Array,
                     train_outputs: Array,
-                    jitter_amount: float = 1e-8) -> tfd.Distribution:
+                    jitter_amount: float = 1e-6) -> tfd.Distribution:
     n = sample_points.shape[0]
     # TODO: Return kernel matrices here to avoid replicated computation.
     mu = mean(gp, params, sample_points, train_inputs, train_outputs)
