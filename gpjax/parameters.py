@@ -1,55 +1,35 @@
-from typing import Callable, Optional
-
+from .gps import ConjugatePosterior, NonConjugatePosterior, Posterior
+from .utils import concat_dictionaries, merge_dictionaries
+from .kernel import initialise, Kernel
+from .likelihoods import initialise, Likelihood
+from .mean_functions import initialise, MeanFunction
+from multipledispatch import dispatch
 import jax.numpy as jnp
-from objax import TrainVar
-from objax.typing import JaxArray
-from objax.variable import reduce_mean
-from tensorflow_probability.substrates.jax import distributions as tfd
-
-from gpjax.transforms import Softplus, Transform
 
 
-class Parameter(TrainVar):
-    """
-    Base parameter class. This is a simple extension of the `TrainVar` class in Objax that enables parameter transforms
-    and, in the future, prior distributions to be placed on the parameter in question.
-    """
+def _initialise_hyperparams(kernel: Kernel, meanf: MeanFunction) -> dict:
+    return concat_dictionaries(initialise(kernel), initialise(meanf))
 
-    def __init__(
-        self,
-        tensor: JaxArray,
-        reduce: Optional[Callable[[JaxArray], JaxArray]] = reduce_mean,
-        transform: Transform = Softplus(),
-        prior: tfd.Distribution = None,
-    ):
-        """
-        Args:
-            tensor: The initial value of the parameter
-            reduce: A helper function for parallelisable calls.
-            transform: The bijective transformation that should be applied to the parameter.
-        """
-        super().__init__(transform.forward(tensor), reduce)
-        self.fn = transform
-        self.prior = prior
 
-    @property
-    def untransform(self) -> JaxArray:
-        """
-        Return the paramerter's transformed valued that exists on constrained R.
-        """
-        return self.fn.backward(self.value)
+@dispatch(ConjugatePosterior)
+def initialise(gp: ConjugatePosterior) -> dict:
+    hyps = _initialise_hyperparams(gp.prior.kernel, gp.prior.mean_function)
+    return concat_dictionaries(hyps, initialise(gp.likelihood))
 
-    @property
-    def log_density(self) -> JaxArray:
-        """
-        Return the log prior density of the parameter's constrained parameter value.
-        """
-        if self.prior is None:
-            lpd = jnp.zeros_like(self.value)
-        else:
-            lpd = self.prior.log_prob(self.untransform)
-        return lpd
 
-    @property
-    def n_values(self) -> int:
-        return self.value.shape[0]
+@dispatch(ConjugatePosterior, object)
+def initialise(gp: ConjugatePosterior, n_data):
+    return initialise(gp)
+
+
+@dispatch(NonConjugatePosterior, int)
+def initialise(gp: NonConjugatePosterior, n_data: int) -> dict:
+    hyperparams = _initialise_hyperparams(gp.prior.kernel, gp.prior.mean_function)
+    likelihood = concat_dictionaries(hyperparams, initialise(gp.likelihood))
+    latent_process = {'latent': jnp.zeros(shape = (n_data, 1))}
+    return concat_dictionaries(likelihood, latent_process)
+
+
+def complete(params: dict, gp: Posterior, n_data: int=None) -> dict:
+    full_param_set = initialise(gp, n_data)
+    return merge_dictionaries(full_param_set, params)
