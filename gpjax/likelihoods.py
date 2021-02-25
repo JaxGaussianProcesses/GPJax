@@ -1,7 +1,8 @@
 from chex import dataclass
-from typing import Optional
+from typing import Optional, Union
 from multipledispatch import dispatch
 import jax.numpy as jnp
+
 
 @dataclass
 class Likelihood:
@@ -21,3 +22,12 @@ def initialise(likelihood: Gaussian):
 @dataclass
 class Bernoulli:
     name: Optional[str] = 'Bernoulli'
+
+
+@dataclass
+class Poisson:
+    name: Optional[str] = 'Poisson'
+
+
+NonConjugateLikelihoods = (Bernoulli, Poisson)
+NonConjugateLikelihoodType = Union[Bernoulli, Poisson]

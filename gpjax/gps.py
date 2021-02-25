@@ -1,8 +1,9 @@
 from chex import dataclass
 from .kernel import Kernel
 from .mean_functions import MeanFunction, Zero
-from .likelihoods import Likelihood, Gaussian
+from .likelihoods import Likelihood, Gaussian, NonConjugateLikelihoods, NonConjugateLikelihoodType
 from typing import Optional
+from multipledispatch import dispatch
 
 
 @dataclass
@@ -11,8 +12,13 @@ class Prior:
     mean_function: Optional[MeanFunction] = Zero()
     name: Optional[str] = "Prior"
 
-    def __mul__(self, other: Likelihood):
+    @dispatch(Gaussian)
+    def __mul__(self, other: Gaussian):
         return ConjugatePosterior(prior=self, likelihood=other)
+
+    @dispatch(NonConjugateLikelihoods)
+    def __mul__(self, other: NonConjugateLikelihoodType):
+        return NonconjugatePosterior(prior = self, likelihood = other)
 
 
 @dataclass
@@ -32,7 +38,7 @@ class ConjugatePosterior:
 @dataclass
 class NonconjugatePosterior:
     prior: Prior
-    likelihood: Gaussian
+    likelihood: NonConjugateLikelihoodType
     name: Optional[str] = 'ConjugatePosterior'
 
 
