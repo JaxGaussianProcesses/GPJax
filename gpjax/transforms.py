@@ -1,7 +1,7 @@
 import jax.numpy as jnp
 from .types import Array
 from chex import dataclass
-from typing import Callable
+from typing import Callable, List
 
 
 def softplus(x: Array) -> Array:
@@ -26,6 +26,10 @@ def inverse_softplus(x: Array) -> Array:
     return jnp.log(1.0 + jnp.exp(x))
 
 
+def identity(x: Array) -> Array:
+    return x
+
+
 @dataclass
 class Transformation:
     forward: Callable
@@ -38,15 +42,27 @@ class SoftplusTransformation(Transformation):
     backward: Callable = inverse_softplus
 
 
+@dataclass
+class IdentityTransformation(Transformation):
+    forward: Callable = identity
+    backward: Callable = identity
+
+
 def transform(params: dict, transformation: Transformation):
     transformed_params = {}
     for k, v in params.items():
-        transformed_params[k] = transformation.forward(v)
+        if k != 'latent':
+            transformed_params[k] = transformation.forward(v)
+        else:
+            transformed_params[k] = v
     return transformed_params
 
 
 def untransform(params: dict, transformation: Transformation):
     untransformed_params = {}
     for k, v in params.items():
-        untransformed_params[k] = transformation.backward(v)
+        if k != 'latent':
+            untransformed_params[k] = transformation.backward(v)
+        else:
+            untransformed_params[k] = v
     return untransformed_params

@@ -18,7 +18,7 @@ class Prior:
 
     @dispatch(NonConjugateLikelihoods)
     def __mul__(self, other: NonConjugateLikelihoodType):
-        return NonconjugatePosterior(prior = self, likelihood = other)
+        return NonConjugatePosterior(prior = self, likelihood = other)
 
 
 @dataclass
@@ -36,7 +36,7 @@ class ConjugatePosterior:
 
 
 @dataclass
-class NonconjugatePosterior:
+class NonConjugatePosterior:
     prior: Prior
     likelihood: NonConjugateLikelihoodType
     name: Optional[str] = 'ConjugatePosterior'
