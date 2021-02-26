@@ -1,7 +1,8 @@
-from typing import Union, Tuple
+from typing import Tuple, Union
+
 import jax.numpy as jnp
-from jax.interpreters.pxla import ShardedDeviceArray
 from chex import Array
+from jax.interpreters.pxla import ShardedDeviceArray
 
 # Array = Union[jnp.ndarray, ShardedDeviceArray, jnp.DeviceArray]  # Cannot currently dispatch on a Union type
 # Data = Tuple[Array, Array]

@@ -1,26 +1,33 @@
-from .gps import Prior, ConjugatePosterior, NonConjugatePosterior
-from .kernel import gram, cross_covariance
+import jax.numpy as jnp
+from jax.scipy.linalg import cho_factor, cho_solve, cholesky, solve_triangular
+from multipledispatch import dispatch
+
+from .gps import ConjugatePosterior, NonConjugatePosterior, Prior
+from .kernel import cross_covariance, gram
 from .likelihoods import predictive_moments
 from .types import Array
 from .utils import I
-import jax.numpy as jnp
-from jax.scipy.linalg import cho_solve, cho_factor, solve_triangular, cholesky
-from multipledispatch import dispatch
-from .types import Array
 
 
-@dispatch(ConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray,
-          jnp.DeviceArray)
-def mean(gp: ConjugatePosterior, param: dict, test_inputs: Array,
-         train_inputs: Array, train_outputs: Array):
-    assert train_outputs.ndim == 2, f"2-dimensional training outputs are required. Current dimensional: {train_outputs.ndim}."
-    ell, alpha = param['lengthscale'], param['variance']
-    sigma = param['obs_noise']
+@dispatch(ConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray)
+def mean(
+    gp: ConjugatePosterior,
+    param: dict,
+    test_inputs: Array,
+    train_inputs: Array,
+    train_outputs: Array,
+):
+    assert (
+        train_outputs.ndim == 2
+    ), f"2-dimensional training outputs are required. Current dimensional: {train_outputs.ndim}."
+    ell, alpha = param["lengthscale"], param["variance"]
+    sigma = param["obs_noise"]
     n_train = train_inputs.shape[0]
 
     Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
-    Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell,
-                                   test_inputs / ell)
+    Kfx = alpha * cross_covariance(
+        gp.prior.kernel, train_inputs / ell, test_inputs / ell
+    )
 
     prior_mean = gp.prior.mean_function(train_inputs)
     L = cho_factor(Kff + I(n_train) * sigma, lower=True)
@@ -30,19 +37,26 @@ def mean(gp: ConjugatePosterior, param: dict, test_inputs: Array,
     return jnp.dot(Kfx, weights)
 
 
-@dispatch(ConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray,
-          jnp.DeviceArray)
-def variance(gp: ConjugatePosterior, param: dict, test_inputs: Array,
-             train_inputs: Array, train_outputs: Array) -> Array:
-    assert train_outputs.ndim == 2, f"2-dimensional training outputs are required. Current dimensional: {train_outputs.ndim}."
-    ell, alpha = param['lengthscale'], param['variance']
-    sigma = param['obs_noise']
+@dispatch(ConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray)
+def variance(
+    gp: ConjugatePosterior,
+    param: dict,
+    test_inputs: Array,
+    train_inputs: Array,
+    train_outputs: Array,
+) -> Array:
+    assert (
+        train_outputs.ndim == 2
+    ), f"2-dimensional training outputs are required. Current dimensional: {train_outputs.ndim}."
+    ell, alpha = param["lengthscale"], param["variance"]
+    sigma = param["obs_noise"]
     n_train = train_inputs.shape[0]
     n_test = test_inputs.shape[0]
 
     Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
-    Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell,
-                                   test_inputs / ell)
+    Kfx = alpha * cross_covariance(
+        gp.prior.kernel, train_inputs / ell, test_inputs / ell
+    )
     Kxx = alpha * gram(gp.prior.kernel, test_inputs / ell)
 
     L = cho_factor(Kff + I(n_train) * sigma, lower=True)
@@ -50,14 +64,22 @@ def variance(gp: ConjugatePosterior, param: dict, test_inputs: Array,
     return Kxx - jnp.dot(Kfx, latents)
 
 
-@dispatch(NonConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray,
-          jnp.DeviceArray)
-def mean(gp: NonConjugatePosterior, param: dict, test_inputs: Array,
-         train_inputs: Array, train_outputs: Array):
-    ell, alpha, nu = param['lengthscale'], param['variance'], param['latent']
+@dispatch(
+    NonConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray
+)
+def mean(
+    gp: NonConjugatePosterior,
+    param: dict,
+    test_inputs: Array,
+    train_inputs: Array,
+    train_outputs: Array,
+):
+    ell, alpha, nu = param["lengthscale"], param["variance"], param["latent"]
     n_train = train_inputs.shape[0]
     Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
-    Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, test_inputs / ell)
+    Kfx = alpha * cross_covariance(
+        gp.prior.kernel, train_inputs / ell, test_inputs / ell
+    )
     Kxx = alpha * gram(gp.prior.kernel, test_inputs / ell)
     L = jnp.linalg.cholesky(Kff + jnp.eye(train_inputs.shape[0]) * 1e-6)
 
@@ -72,14 +94,22 @@ def mean(gp: NonConjugatePosterior, param: dict, test_inputs: Array,
     return pred_rv.mean()
 
 
-@dispatch(NonConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray,
-          jnp.DeviceArray)
-def variance(gp: NonConjugatePosterior, param: dict, test_inputs: Array,
-         train_inputs: Array, train_outputs: Array):
-    ell, alpha, nu = param['lengthscale'], param['variance'], param['latent']
+@dispatch(
+    NonConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray
+)
+def variance(
+    gp: NonConjugatePosterior,
+    param: dict,
+    test_inputs: Array,
+    train_inputs: Array,
+    train_outputs: Array,
+):
+    ell, alpha, nu = param["lengthscale"], param["variance"], param["latent"]
     n_train = train_inputs.shape[0]
     Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
-    Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, test_inputs / ell)
+    Kfx = alpha * cross_covariance(
+        gp.prior.kernel, train_inputs / ell, test_inputs / ell
+    )
     Kxx = alpha * gram(gp.prior.kernel, test_inputs / ell)
     L = jnp.linalg.cholesky(Kff + jnp.eye(train_inputs.shape[0]) * 1e-6)
 

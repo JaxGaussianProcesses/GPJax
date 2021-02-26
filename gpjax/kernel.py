@@ -1,16 +1,18 @@
-from chex import dataclass
 from typing import Optional
-from .types import Array
+
 import jax.numpy as jnp
+from chex import dataclass
 from jax import vmap
 from multipledispatch import dispatch
+
+from .types import Array
 
 
 @dataclass
 class Kernel:
     stationary: Optional[bool] = False
     spectral: Optional[bool] = False
-    name: Optional[str] = 'Kernel'
+    name: Optional[str] = "Kernel"
 
     def __call__(self, x: Array, y: Array) -> Array:
         raise NotImplementedError
@@ -20,7 +22,7 @@ class Kernel:
 class RBF(Kernel):
     stationary = True
     spectral = False
-    name = 'RBF'
+    name = "RBF"
 
     def __call__(self, x: Array, y: Array) -> Array:
         return jnp.exp(-0.5 * squared_distance(x, y))
@@ -28,13 +30,11 @@ class RBF(Kernel):
 
 @dispatch(RBF)
 def initialise(kernel: RBF):
-    return {'lengthscale': jnp.array([1.0]),
-            'variance': jnp.array([1.0])
-            }
+    return {"lengthscale": jnp.array([1.0]), "variance": jnp.array([1.0])}
 
 
 def squared_distance(x: Array, y: Array):
-    return jnp.sum((x - y)**2)
+    return jnp.sum((x - y) ** 2)
 
 
 def gram(kernel: Kernel, inputs: Array) -> Array:
