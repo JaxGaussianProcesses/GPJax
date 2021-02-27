@@ -52,5 +52,10 @@ class Poisson:
     name: Optional[str] = "Poisson"
 
 
+@dispatch(Poisson)
+def initialise(likelihood: Poisson) -> dict:
+    return {}
+
+
 NonConjugateLikelihoods = (Bernoulli, Poisson)
 NonConjugateLikelihoodType = Union[Bernoulli, Poisson]
