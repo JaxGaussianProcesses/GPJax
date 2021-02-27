@@ -20,7 +20,7 @@ def test_concat_dict():
 
 def test_merge_dicts():
     d1 = {'a': 1, 'b': 2}
-    d2 = {'b': 3, 'c': 4}
+    d2 = {'b': 3}
     d = merge_dictionaries(d1, d2)
     assert list(d.keys()) == ['a', 'b']
     assert list(d.values()) == [1, 3]
