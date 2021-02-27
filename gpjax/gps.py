@@ -3,13 +3,9 @@ from typing import Optional
 from chex import dataclass
 from multipledispatch import dispatch
 
-from .kernel import Kernel
-from .likelihoods import (
-    Gaussian,
-    Likelihood,
-    NonConjugateLikelihoods,
-    NonConjugateLikelihoodType,
-)
+from .kernels import Kernel
+from .likelihoods import (Gaussian, Likelihood, NonConjugateLikelihoods,
+                          NonConjugateLikelihoodType)
 from .mean_functions import MeanFunction, Zero
 
 

@@ -3,7 +3,7 @@ from jax.scipy.linalg import cho_factor, cho_solve, cholesky, solve_triangular
 from multipledispatch import dispatch
 
 from .gps import ConjugatePosterior, NonConjugatePosterior, Prior
-from .kernel import cross_covariance, gram
+from .kernels import cross_covariance, gram
 from .likelihoods import predictive_moments
 from .types import Array
 from .utils import I
@@ -25,9 +25,7 @@ def mean(
     n_train = train_inputs.shape[0]
 
     Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
-    Kfx = alpha * cross_covariance(
-        gp.prior.kernel, train_inputs / ell, test_inputs / ell
-    )
+    Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, test_inputs / ell)
 
     prior_mean = gp.prior.mean_function(train_inputs)
     L = cho_factor(Kff + I(n_train) * sigma, lower=True)
@@ -54,9 +52,7 @@ def variance(
     n_test = test_inputs.shape[0]
 
     Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
-    Kfx = alpha * cross_covariance(
-        gp.prior.kernel, train_inputs / ell, test_inputs / ell
-    )
+    Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, test_inputs / ell)
     Kxx = alpha * gram(gp.prior.kernel, test_inputs / ell)
 
     L = cho_factor(Kff + I(n_train) * sigma, lower=True)
@@ -65,7 +61,11 @@ def variance(
 
 
 @dispatch(
-    NonConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray
+    NonConjugatePosterior,
+    dict,
+    jnp.DeviceArray,
+    jnp.DeviceArray,
+    jnp.DeviceArray,
 )
 def mean(
     gp: NonConjugatePosterior,
@@ -77,9 +77,7 @@ def mean(
     ell, alpha, nu = param["lengthscale"], param["variance"], param["latent"]
     n_train = train_inputs.shape[0]
     Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
-    Kfx = alpha * cross_covariance(
-        gp.prior.kernel, train_inputs / ell, test_inputs / ell
-    )
+    Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, test_inputs / ell)
     Kxx = alpha * gram(gp.prior.kernel, test_inputs / ell)
     L = jnp.linalg.cholesky(Kff + jnp.eye(train_inputs.shape[0]) * 1e-6)
 
@@ -95,7 +93,11 @@ def mean(
 
 
 @dispatch(
-    NonConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray
+    NonConjugatePosterior,
+    dict,
+    jnp.DeviceArray,
+    jnp.DeviceArray,
+    jnp.DeviceArray,
 )
 def variance(
     gp: NonConjugatePosterior,
@@ -107,9 +109,7 @@ def variance(
     ell, alpha, nu = param["lengthscale"], param["variance"], param["latent"]
     n_train = train_inputs.shape[0]
     Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
-    Kfx = alpha * cross_covariance(
-        gp.prior.kernel, train_inputs / ell, test_inputs / ell
-    )
+    Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, test_inputs / ell)
     Kxx = alpha * gram(gp.prior.kernel, test_inputs / ell)
     L = jnp.linalg.cholesky(Kff + jnp.eye(train_inputs.shape[0]) * 1e-6)
 

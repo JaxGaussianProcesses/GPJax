@@ -3,7 +3,7 @@ from typing import Callable, List
 import jax.numpy as jnp
 from chex import dataclass
 
-from .types import Array
+from ..types import Array
 
 
 def softplus(x: Array) -> Array:

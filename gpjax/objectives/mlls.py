@@ -4,13 +4,14 @@ import jax.numpy as jnp
 from multipledispatch import dispatch
 from tensorflow_probability.substrates.jax import distributions as tfd
 
-from .gps import ConjugatePosterior, NonConjugatePosterior
-from .kernel import gram
-from .likelihoods import link_function
-from .prior_densities import log_density
-from .transforms import SoftplusTransformation, Transformation, transform, untransform
-from .types import Array
-from .utils import I
+from ..gps import ConjugatePosterior, NonConjugatePosterior
+from ..kernels import gram
+from ..likelihoods import link_function
+from ..parameters.prior_densities import log_density
+from ..parameters.transforms import (SoftplusTransformation, Transformation,
+                                     untransform)
+from ..types import Array
+from ..utils import I
 
 
 @dispatch(ConjugatePosterior)
@@ -30,9 +31,7 @@ def marginal_ll(
     def mll(params: dict, x: Array, y: Array):
         params = untransform(params, transformation)
         mu = gp.prior.mean_function(x)
-        gram_matrix = params["variance"] * gram(
-            gp.prior.kernel, x / params["lengthscale"]
-        )
+        gram_matrix = params["variance"] * gram(gp.prior.kernel, x / params["lengthscale"])
         gram_matrix += params["obs_noise"] * I(x.shape[0])
         L = jnp.linalg.cholesky(gram_matrix)
         random_variable = tfd.MultivariateNormalTriL(mu, L)
@@ -54,18 +53,14 @@ def marginal_ll(
         params = untransform(params, transformation)
         n = x.shape[0]
         link = link_function(gp.likelihood)
-        gram_matrix = params["variance"] * gram(
-            gp.prior.kernel, x / params["lengthscale"]
-        )
+        gram_matrix = params["variance"] * gram(gp.prior.kernel, x / params["lengthscale"])
         gram_matrix += I(n) * jitter
         L = jnp.linalg.cholesky(gram_matrix)
         F = jnp.matmul(L, params["latent"])
         rv = link(F)
         ll = jnp.sum(rv.log_prob(y))
         # TODO: Attach full log-prior density sum here
-        latent_prior = jnp.sum(
-            log_density(params["latent"], tfd.Normal(loc=0.0, scale=1.0))
-        )
+        latent_prior = jnp.sum(log_density(params["latent"], tfd.Normal(loc=0.0, scale=1.0)))
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
         return constant * (ll + latent_prior)
 
