@@ -38,4 +38,4 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
 
     nbs/regression
     nbs/classification
-    nbs/technical_details
+    nbs/spatial_modelling
