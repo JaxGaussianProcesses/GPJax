@@ -25,10 +25,13 @@ def test_cross_covariance(n1, n2):
     assert kernel_matrix.shape == (n1, n2)
 
 
+@pytest.mark.parametrize('dim', [1, 2, 5])
 @pytest.mark.parametrize("ell, sigma", [(0.1, 0.1), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
-def test_pos_def(ell, sigma):
-    n = 100
+def test_pos_def(dim, ell, sigma):
+    n = 30
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
+    if dim > 1:
+        x = jnp.hstack((x)*dim)
     kern = RBF()
     gram_matrix = sigma*gram(kern, x/ell)
     jitter_matrix = I(n) * 1e-6
@@ -37,7 +40,9 @@ def test_pos_def(ell, sigma):
     assert min_eig > 0
 
 
-def test_initialisation():
-    params = initialise(RBF())
+@pytest.mark.parametrize('dim', [1, 2, 5, 10])
+def test_initialisation(dim):
+    params = initialise(RBF(ndims=dim))
     assert list(params.keys()) == ['lengthscale', 'variance']
-    assert list(params.values()) == [1.0, 1.0]
+    assert all(params['lengthscale'] == jnp.array([1.0]*dim))
+    assert params['variance'] == jnp.array([1.0])

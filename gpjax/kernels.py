@@ -10,6 +10,7 @@ from .types import Array
 
 @dataclass
 class Kernel:
+    ndims: Optional[int] = 1
     stationary: Optional[bool] = False
     spectral: Optional[bool] = False
     name: Optional[str] = "Kernel"
@@ -17,9 +18,14 @@ class Kernel:
     def __call__(self, x: Array, y: Array) -> Array:
         raise NotImplementedError
 
+    @property
+    def ard(self):
+        return True if self.ndims > 1 else False
+
 
 @dataclass
 class RBF(Kernel):
+    ndims = 1
     stationary = True
     spectral = False
     name = "RBF"
@@ -30,7 +36,7 @@ class RBF(Kernel):
 
 @dispatch(RBF)
 def initialise(kernel: RBF):
-    return {"lengthscale": jnp.array([1.0]), "variance": jnp.array([1.0])}
+    return {"lengthscale": jnp.array([1.0]*kernel.ndims), "variance": jnp.array([1.0])}
 
 
 def squared_distance(x: Array, y: Array):
