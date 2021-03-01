@@ -8,9 +8,9 @@ Gaussian process 'Hello World' example
 
 To gain an intuition for the exposed API provided by GPJax, a simple example of that derives the Gaussian process posterior for regression can be represented by::
 
+    import gpjax
     import jax.numpy as jnp
     import jax.random as jr
-    import gpjax
     key = jr.PRNGKey(123)
 
     X = jnp.linspace(-2., 2., 100)
@@ -22,7 +22,6 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
     likelihood = gpjax.likelihoods.Gaussian()
 
     posterior = f_prior * likelihood
-
 
 
 .. toctree::
