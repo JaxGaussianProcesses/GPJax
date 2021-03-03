@@ -7,7 +7,7 @@ from tensorflow_probability.substrates.jax import distributions as tfd
 from ..gps import ConjugatePosterior, NonConjugatePosterior
 from ..kernels import gram
 from ..likelihoods import link_function
-from ..parameters.prior_densities import log_density
+from ..parameters.priors import evaluate_prior, prior_checks
 from ..parameters.transforms import (SoftplusTransformation, Transformation,
                                      untransform)
 from ..types import Array
@@ -28,17 +28,17 @@ def marginal_ll(
     Returns: A multivariate normal distribution
     """
 
-    def mll(params: dict, x: Array, y: Array):
+    def mll(params: dict, x: Array, y: Array, priors: dict = None):
         params = untransform(params, transformation)
         mu = gp.prior.mean_function(x)
         gram_matrix = params["variance"] * gram(gp.prior.kernel, x / params["lengthscale"])
         gram_matrix += params["obs_noise"] * I(x.shape[0])
         L = jnp.linalg.cholesky(gram_matrix)
         random_variable = tfd.MultivariateNormalTriL(mu, L)
-        # TODO: Attach log-prior density sum here
-        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-        return constant * random_variable.log_prob(y.squeeze()).mean()
 
+        log_prior_density = evaluate_prior(params, priors)
+        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
+        return constant * (random_variable.log_prob(y.squeeze()).mean() + log_prior_density)
     return mll
 
 
@@ -49,7 +49,7 @@ def marginal_ll(
     negative: bool = False,
     jitter: float = 1e-6,
 ) -> Callable:
-    def mll(params: dict, x: Array, y: Array):
+    def mll(params: dict, x: Array, y: Array, priors: dict = {'latent': tfd.Normal(loc=0., scale=1.)}):
         params = untransform(params, transformation)
         n = x.shape[0]
         link = link_function(gp.likelihood)
@@ -59,9 +59,10 @@ def marginal_ll(
         F = jnp.matmul(L, params["latent"])
         rv = link(F)
         ll = jnp.sum(rv.log_prob(y))
-        # TODO: Attach full log-prior density sum here
-        latent_prior = jnp.sum(log_density(params["latent"], tfd.Normal(loc=0.0, scale=1.0)))
+
+        priors = prior_checks(gp, priors)
+        log_prior_density = evaluate_prior(params, priors)
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-        return constant * (ll + latent_prior)
+        return constant * (ll + log_prior_density)
 
     return mll
