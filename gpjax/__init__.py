@@ -5,4 +5,4 @@ from .gps import Prior
 from .predict import mean, variance
 from .sampling import random_variable, sample
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"

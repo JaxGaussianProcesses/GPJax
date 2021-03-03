@@ -36,7 +36,7 @@ class RBF(Kernel):
 
 @dispatch(RBF)
 def initialise(kernel: RBF):
-    return {"lengthscale": jnp.array([1.0]*kernel.ndims), "variance": jnp.array([1.0])}
+    return {"lengthscale": jnp.array([1.0] * kernel.ndims), "variance": jnp.array([1.0])}
 
 
 def squared_distance(x: Array, y: Array):

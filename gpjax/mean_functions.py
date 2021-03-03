@@ -23,7 +23,7 @@ class Zero(MeanFunction):
 
     def __call__(self, x: Array) -> Array:
         out_shape = (x.shape[0], self.output_dim)
-        return jnp.zeros(shape = out_shape)
+        return jnp.zeros(shape=out_shape)
 
 
 @dispatch(Zero)

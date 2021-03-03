@@ -1,5 +1,6 @@
-import jax.numpy as jnp
 from typing import Tuple
+
+import jax.numpy as jnp
 from multipledispatch import dispatch
 
 from .types import Array
@@ -50,11 +51,13 @@ def standardise(x: jnp.DeviceArray) -> Tuple[jnp.DeviceArray, jnp.DeviceArray, j
     """
     xmean = jnp.mean(x, axis=0)
     xstd = jnp.std(x, axis=0)
-    return (x-xmean)/xstd, xmean, xstd
+    return (x - xmean) / xstd, xmean, xstd
 
 
 @dispatch(jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray)
-def standardise(x: jnp.DeviceArray, xmean: jnp.DeviceArray, xstd: jnp.DeviceArray) -> jnp.DeviceArray:
+def standardise(
+    x: jnp.DeviceArray, xmean: jnp.DeviceArray, xstd: jnp.DeviceArray
+) -> jnp.DeviceArray:
     """
     Standardise a given matrix with respect to a given mean and standard deviation. This is primarily designed for
     standardising a test set of data with respect to the training data.
@@ -64,11 +67,12 @@ def standardise(x: jnp.DeviceArray, xmean: jnp.DeviceArray, xstd: jnp.DeviceArra
     :param xstd: A precomputed standard deviation vector
     :return: A matrix of standardised values
     """
-    return (x-xmean)/xstd
+    return (x - xmean) / xstd
 
 
-
-def unstandardise(x: jnp.DeviceArray, xmean: jnp.DeviceArray, xstd: jnp.DeviceArray) -> jnp.DeviceArray:
+def unstandardise(
+    x: jnp.DeviceArray, xmean: jnp.DeviceArray, xstd: jnp.DeviceArray
+) -> jnp.DeviceArray:
     """
     Unstandardise a given matrix with respect to a previously computed mean and standard deviation. This is designed
     for remapping a matrix back onto its original scale.
@@ -78,4 +82,4 @@ def unstandardise(x: jnp.DeviceArray, xmean: jnp.DeviceArray, xstd: jnp.DeviceAr
     :param xstd: A standard deviation vector.
     :return: A matrix of unstandardised values.
     """
-    return (x*xstd) + xmean
+    return (x * xstd) + xmean

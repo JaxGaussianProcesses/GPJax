@@ -28,7 +28,7 @@ copyright = "2021, Thomas Pinder"
 author = "Thomas Pinder"
 
 # The full version, including alpha/beta/rc tags
-release = "0.2.0"
+release = "0.3"
 
 
 # -- General configuration ---------------------------------------------------

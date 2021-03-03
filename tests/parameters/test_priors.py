@@ -1,17 +1,18 @@
-from gpjax.parameters import log_density
-from gpjax.parameters.priors import evaluate_prior, prior_checks
+import jax.numpy as jnp
+import pytest
+from tensorflow_probability.substrates.jax import distributions as tfd
+
 from gpjax.gps import Prior
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli
-from tensorflow_probability.substrates.jax import distributions as tfd
-import pytest
-import jax.numpy as jnp
+from gpjax.parameters import log_density
+from gpjax.parameters.priors import evaluate_prior, prior_checks
 
 
-@pytest.mark.parametrize('x', [-1., 0., 1.])
+@pytest.mark.parametrize("x", [-1.0, 0.0, 1.0])
 def test_lpd(x):
     val = jnp.array(x)
-    dist = tfd.Normal(loc=0., scale=1.)
+    dist = tfd.Normal(loc=0.0, scale=1.0)
     lpd = log_density(val, dist)
     assert lpd is not None
 
@@ -22,9 +23,9 @@ def test_prior_evaluation():
     value.
     """
     params = {
-        "lengthscale": jnp.array([1.]),
-        "variance": jnp.array([1.]),
-        "obs_noise": jnp.array([1.]),
+        "lengthscale": jnp.array([1.0]),
+        "variance": jnp.array([1.0]),
+        "obs_noise": jnp.array([1.0]),
     }
     priors = {
         "lengthscale": tfd.Gamma(1.0, 1.0),
@@ -40,12 +41,12 @@ def test_none_prior():
     Test that multiple dispatch is working in the case of no priors.
     """
     params = {
-        "lengthscale": jnp.array([1.]),
-        "variance": jnp.array([1.]),
-        "obs_noise": jnp.array([1.]),
+        "lengthscale": jnp.array([1.0]),
+        "variance": jnp.array([1.0]),
+        "obs_noise": jnp.array([1.0]),
     }
     lpd = evaluate_prior(params, None)
-    assert lpd == 0.
+    assert lpd == 0.0
 
 
 def test_incomplete_priors():
@@ -53,9 +54,9 @@ def test_incomplete_priors():
     Test the case where a user specifies priors for some, but not all, parameters.
     """
     params = {
-        "lengthscale": jnp.array([1.]),
-        "variance": jnp.array([1.]),
-        "obs_noise": jnp.array([1.]),
+        "lengthscale": jnp.array([1.0]),
+        "variance": jnp.array([1.0]),
+        "obs_noise": jnp.array([1.0]),
     }
     priors = {
         "lengthscale": tfd.Gamma(1.0, 1.0),
@@ -66,11 +67,11 @@ def test_incomplete_priors():
 
 
 def test_checks():
-    incomplete_priors = {'lengthscale': jnp.array([1.])}
+    incomplete_priors = {"lengthscale": jnp.array([1.0])}
     posterior = Prior(kernel=RBF()) * Bernoulli()
     priors = prior_checks(posterior, incomplete_priors)
-    assert 'latent' in priors.keys()
-    assert 'variance' not in priors.keys()
+    assert "latent" in priors.keys()
+    assert "variance" not in priors.keys()
 
 
 def test_check_needless():
@@ -78,7 +79,7 @@ def test_check_needless():
         "lengthscale": tfd.Gamma(1.0, 1.0),
         "variance": tfd.Gamma(2.0, 2.0),
         "obs_noise": tfd.Gamma(3.0, 3.0),
-        "latent": tfd.Normal(loc=0., scale=1.)
+        "latent": tfd.Normal(loc=0.0, scale=1.0),
     }
     posterior = Prior(kernel=RBF()) * Bernoulli()
     priors = prior_checks(posterior, complete_prior)

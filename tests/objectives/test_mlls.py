@@ -1,36 +1,38 @@
-from gpjax.objectives import marginal_ll
-from gpjax import Prior
-from gpjax.likelihoods import Bernoulli, Gaussian
-from gpjax.kernels import RBF
-from gpjax.parameters import transform, SoftplusTransformation, initialise
+from typing import Callable
+
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
-from typing import Callable
 from tensorflow_probability.substrates.jax import distributions as tfd
+
+from gpjax import Prior
+from gpjax.kernels import RBF
+from gpjax.likelihoods import Bernoulli, Gaussian
+from gpjax.objectives import marginal_ll
+from gpjax.parameters import SoftplusTransformation, initialise, transform
 
 
 def test_conjugate():
-    posterior = Prior(kernel = RBF()) * Gaussian()
+    posterior = Prior(kernel=RBF()) * Gaussian()
     mll = marginal_ll(posterior)
     assert isinstance(mll, Callable)
     neg_mll = marginal_ll(posterior, negative=True)
-    x = jnp.linspace(-1., 1., 20).reshape(-1, 1)
+    x = jnp.linspace(-1.0, 1.0, 20).reshape(-1, 1)
     y = jnp.sin(x)
     params = transform(params=initialise(posterior), transformation=SoftplusTransformation)
-    assert neg_mll(params, x, y) == jnp.array(-1.)*mll(params, x, y)
+    assert neg_mll(params, x, y) == jnp.array(-1.0) * mll(params, x, y)
 
 
 def test_non_conjugate():
-    posterior = Prior(kernel = RBF()) * Bernoulli()
+    posterior = Prior(kernel=RBF()) * Bernoulli()
     mll = marginal_ll(posterior)
     assert isinstance(mll, Callable)
     neg_mll = marginal_ll(posterior, negative=True)
     n = 20
-    x = jnp.linspace(-1., 1., n).reshape(-1, 1)
+    x = jnp.linspace(-1.0, 1.0, n).reshape(-1, 1)
     y = jnp.sin(x)
     params = transform(params=initialise(posterior, n), transformation=SoftplusTransformation)
-    assert neg_mll(params, x, y) == jnp.array(-1.)*mll(params, x, y)
+    assert neg_mll(params, x, y) == jnp.array(-1.0) * mll(params, x, y)
 
 
 def test_prior_mll():

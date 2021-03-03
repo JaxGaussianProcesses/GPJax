@@ -39,6 +39,7 @@ def marginal_ll(
         log_prior_density = evaluate_prior(params, priors)
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
         return constant * (random_variable.log_prob(y.squeeze()).mean() + log_prior_density)
+
     return mll
 
 
@@ -49,7 +50,9 @@ def marginal_ll(
     negative: bool = False,
     jitter: float = 1e-6,
 ) -> Callable:
-    def mll(params: dict, x: Array, y: Array, priors: dict = {'latent': tfd.Normal(loc=0., scale=1.)}):
+    def mll(
+        params: dict, x: Array, y: Array, priors: dict = {"latent": tfd.Normal(loc=0.0, scale=1.0)}
+    ):
         params = untransform(params, transformation)
         n = x.shape[0]
         link = link_function(gp.likelihood)
