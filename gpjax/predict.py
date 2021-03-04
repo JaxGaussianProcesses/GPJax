@@ -49,7 +49,6 @@ def variance(
     ell, alpha = param["lengthscale"], param["variance"]
     sigma = param["obs_noise"]
     n_train = train_inputs.shape[0]
-    n_test = test_inputs.shape[0]
 
     Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
     Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, test_inputs / ell)
@@ -75,7 +74,6 @@ def mean(
     train_outputs: Array,
 ):
     ell, alpha, nu = param["lengthscale"], param["variance"], param["latent"]
-    n_train = train_inputs.shape[0]
     Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
     Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, test_inputs / ell)
     Kxx = alpha * gram(gp.prior.kernel, test_inputs / ell)
@@ -107,7 +105,6 @@ def variance(
     train_outputs: Array,
 ):
     ell, alpha, nu = param["lengthscale"], param["variance"], param["latent"]
-    n_train = train_inputs.shape[0]
     Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
     Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, test_inputs / ell)
     Kxx = alpha * gram(gp.prior.kernel, test_inputs / ell)
