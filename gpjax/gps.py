@@ -9,7 +9,7 @@ from .likelihoods import (Gaussian, Likelihood, NonConjugateLikelihoods,
 from .mean_functions import MeanFunction, Zero
 
 
-@dataclass
+@dataclass(repr=False)
 class Prior:
     kernel: Kernel
     mean_function: Optional[MeanFunction] = Zero()
@@ -37,9 +37,22 @@ class ConjugatePosterior:
     likelihood: Gaussian
     name: Optional[str] = "ConjugatePosterior"
 
+    def __repr__(self):
+        meanf_string = self.prior.mean_function.__repr__()
+        kernel_string = self.prior.kernel.__repr__()
+        likelihood_string = self.likelihood.__repr__()
+        return f"Conjugate Posterior\n{'-'*80}\n- {meanf_string}\n- {kernel_string}\n- {likelihood_string}"
+
 
 @dataclass
 class NonConjugatePosterior:
     prior: Prior
     likelihood: NonConjugateLikelihoodType
     name: Optional[str] = "ConjugatePosterior"
+
+    def __repr__(self):
+        meanf_string = self.prior.mean_function.__repr__()
+        kernel_string = self.prior.kernel.__repr__()
+        likelihood_string = self.likelihood.__repr__()
+        return f"Conjugate Posterior\n{'-'*80}\n- {meanf_string}\n- {kernel_string}\n- {likelihood_string}"
+

@@ -7,23 +7,27 @@ from multipledispatch import dispatch
 from .types import Array
 
 
-@dataclass
+@dataclass(repr=False)
 class MeanFunction:
     output_dim: Optional[int] = 1
-    name: Optional[str] = "Mean Function"
+    name: Optional[str] = "Mean function"
 
     def __call__(self, x: Array) -> Array:
         raise NotImplementedError
 
+    def __repr__(self):
+        return f"{self.name}\n\t Output dimension: {self.output_dim}"
 
-@dataclass
+
+@dataclass(repr=False)
 class Zero(MeanFunction):
     output_dim: Optional[int] = 1
-    name: Optional[str] = "Zero mean"
+    name: Optional[str] = "Zero mean function"
 
     def __call__(self, x: Array) -> Array:
         out_shape = (x.shape[0], self.output_dim)
         return jnp.zeros(shape=out_shape)
+
 
 
 @dispatch(Zero)

@@ -6,13 +6,16 @@ from multipledispatch import dispatch
 from tensorflow_probability.substrates.jax import distributions as tfd
 
 
-@dataclass
+@dataclass(repr=False)
 class Likelihood:
     name: Optional[str] = "Likelihood"
 
+    def __repr__(self):
+        return f"{self.name} likelihood function"
 
-@dataclass
-class Gaussian:
+
+@dataclass(repr=False)
+class Gaussian(Likelihood):
     name: Optional[str] = "Gaussian"
 
 
@@ -21,8 +24,8 @@ def initialise(likelihood: Gaussian) -> dict:
     return {"obs_noise": jnp.array([1.0])}
 
 
-@dataclass
-class Bernoulli:
+@dataclass(repr=False)
+class Bernoulli(Likelihood):
     name: Optional[str] = "Bernoulli"
 
 
@@ -47,8 +50,8 @@ def predictive_moments(likelihood: Bernoulli) -> Callable:
     return moments
 
 
-@dataclass
-class Poisson:
+@dataclass(repr=False)
+class Poisson(Likelihood):
     name: Optional[str] = "Poisson"
 
 
