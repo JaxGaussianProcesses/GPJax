@@ -3,7 +3,7 @@ import jax.random as jr
 import pytest
 
 from gpjax.utils import (I, concat_dictionaries, merge_dictionaries,
-                         standardise, unstandardise)
+                         standardise, unstandardise, sort_dictionary)
 
 
 @pytest.mark.parametrize("n", [1, 10, 100])
@@ -27,6 +27,13 @@ def test_merge_dicts():
     d = merge_dictionaries(d1, d2)
     assert list(d.keys()) == ["a", "b"]
     assert list(d.values()) == [1, 3]
+
+
+def test_sort_dict():
+    unsorted = {'b': 1, 'a': 2}
+    sorted_dict = sort_dictionary(unsorted)
+    assert list(sorted_dict.keys()) == ['a', 'b']
+    assert list(sorted_dict.values()) == [2, 1]
 
 
 def test_standardise():
