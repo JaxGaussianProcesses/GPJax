@@ -3,8 +3,8 @@ from jax.scipy.linalg import solve_triangular
 from multipledispatch import dispatch
 from tensorflow_probability.substrates.jax import distributions as tfd
 
-from .gps import ConjugatePosterior, Prior, NonConjugatePosterior
-from .kernels import gram, cross_covariance
+from .gps import ConjugatePosterior, NonConjugatePosterior, Prior
+from .kernels import cross_covariance, gram
 from .likelihoods import predictive_moments
 from .predict import mean, variance
 from .types import Array

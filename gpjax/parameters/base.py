@@ -18,6 +18,7 @@ def initialise(gp: ConjugatePosterior) -> dict:
     all_params = concat_dictionaries(hyps, initialise(gp.likelihood))
     return sort_dictionary(all_params)
 
+
 @dispatch(ConjugatePosterior, object)
 def initialise(gp: ConjugatePosterior, n_data):
     return sort_dictionary(initialise(gp))

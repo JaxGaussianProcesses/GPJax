@@ -1,7 +1,7 @@
 import warnings
-from chex import dataclass
 
 import jax.numpy as jnp
+from chex import dataclass
 from jax.interpreters.ad import JVPTracer
 from jax.interpreters.partial_eval import DynamicJaxprTracer
 from multipledispatch import dispatch

@@ -55,4 +55,3 @@ class NonConjugatePosterior:
         kernel_string = self.prior.kernel.__repr__()
         likelihood_string = self.likelihood.__repr__()
         return f"Conjugate Posterior\n{'-'*80}\n- {meanf_string}\n- {kernel_string}\n- {likelihood_string}"
-

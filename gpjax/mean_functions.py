@@ -29,7 +29,6 @@ class Zero(MeanFunction):
         return jnp.zeros(shape=out_shape)
 
 
-
 @dispatch(Zero)
 def initialise(meanf: Zero) -> dict:
     return {}
