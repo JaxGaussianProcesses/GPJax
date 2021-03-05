@@ -1,4 +1,5 @@
 import warnings
+from chex import dataclass
 
 import jax.numpy as jnp
 from jax.interpreters.ad import JVPTracer

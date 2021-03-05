@@ -40,6 +40,16 @@ def merge_dictionaries(base_dict: dict, in_dict: dict) -> dict:
     return base_dict
 
 
+def sort_dictionary(base_dict: dict) -> dict:
+    """
+    Sort a dictionary based on the dictionary's key values.
+
+    :param base_dict: The unsorted dictionary.
+    :return: A dictionary sorted alphabetically on the dictionary's keys.
+    """
+    return dict(sorted(base_dict.items()))
+
+
 @dispatch(jnp.DeviceArray)
 def standardise(x: jnp.DeviceArray) -> Tuple[jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray]:
     """
