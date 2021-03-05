@@ -23,7 +23,7 @@ EXTRAS = {
         "nbsphinx==0.8.1",
         "nb-black==1.0.7",
         "matplotlib==3.3.3",
-        "sphinx-copybutton==0.3.2",
+        "sphinx-copybutton==0.3.3",
     ],
 }
 
