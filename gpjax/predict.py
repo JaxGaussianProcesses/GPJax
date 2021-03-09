@@ -24,8 +24,8 @@ def mean(
     sigma = param["obs_noise"]
     n_train = train_inputs.shape[0]
 
-    Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
-    Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, test_inputs / ell)
+    Kff = gram(gp.prior.kernel, train_inputs, param)
+    Kfx = cross_covariance(gp.prior.kernel, train_inputs, test_inputs, param)
 
     prior_mean = gp.prior.mean_function(train_inputs)
     L = cho_factor(Kff + I(n_train) * sigma, lower=True)
@@ -50,9 +50,9 @@ def variance(
     sigma = param["obs_noise"]
     n_train = train_inputs.shape[0]
 
-    Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
-    Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, test_inputs / ell)
-    Kxx = alpha * gram(gp.prior.kernel, test_inputs / ell)
+    Kff = gram(gp.prior.kernel, train_inputs, param)
+    Kfx = cross_covariance(gp.prior.kernel, train_inputs, test_inputs, param)
+    Kxx = gram(gp.prior.kernel, test_inputs, param)
 
     L = cho_factor(Kff + I(n_train) * sigma, lower=True)
     latents = cho_solve(L, Kfx.T)
@@ -74,9 +74,9 @@ def mean(
     train_outputs: Array,
 ):
     ell, alpha, nu = param["lengthscale"], param["variance"], param["latent"]
-    Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
-    Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, test_inputs / ell)
-    Kxx = alpha * gram(gp.prior.kernel, test_inputs / ell)
+    Kff = gram(gp.prior.kernel, train_inputs, param)
+    Kfx = cross_covariance(gp.prior.kernel, train_inputs, test_inputs, param)
+    Kxx = gram(gp.prior.kernel, test_inputs, param)
     L = jnp.linalg.cholesky(Kff + jnp.eye(train_inputs.shape[0]) * 1e-6)
 
     A = solve_triangular(L, Kfx.T, lower=True)
@@ -105,9 +105,9 @@ def variance(
     train_outputs: Array,
 ):
     ell, alpha, nu = param["lengthscale"], param["variance"], param["latent"]
-    Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
-    Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, test_inputs / ell)
-    Kxx = alpha * gram(gp.prior.kernel, test_inputs / ell)
+    Kff = gram(gp.prior.kernel, train_inputs, param)
+    Kfx = cross_covariance(gp.prior.kernel, train_inputs, test_inputs, param)
+    Kxx = gram(gp.prior.kernel, test_inputs, param)
     L = jnp.linalg.cholesky(Kff + jnp.eye(train_inputs.shape[0]) * 1e-6)
 
     A = solve_triangular(L, Kfx.T, lower=True)

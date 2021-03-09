@@ -144,3 +144,4 @@ cython_debug/
 examples/_debug*
 examples/testing/*
 examples/*.ipynb
+_debug/

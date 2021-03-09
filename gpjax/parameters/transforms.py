@@ -6,6 +6,9 @@ from chex import dataclass
 from ..types import Array
 
 
+to_ignore = ["latent", "basis_fns"]
+
+
 def softplus(x: Array) -> Array:
     """
     Map an input value x from a constrained space into an unconstrained space using the softplus transformation
@@ -53,7 +56,7 @@ class IdentityTransformation(Transformation):
 def transform(params: dict, transformation: Transformation):
     transformed_params = {}
     for k, v in params.items():
-        if k != "latent":
+        if k not in to_ignore:
             transformed_params[k] = transformation.forward(v)
         else:
             transformed_params[k] = v

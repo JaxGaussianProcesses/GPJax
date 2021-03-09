@@ -3,7 +3,7 @@ import pytest
 
 from gpjax import Prior
 from gpjax.kernels import RBF
-from gpjax.likelihoods import Bernoulli, Gaussian
+from gpjax.likelihoods import Bernoulli, Gaussian, Poisson
 from gpjax.mean_functions import Zero
 from gpjax.parameters.base import _initialise_hyperparams, complete, initialise
 
@@ -32,3 +32,10 @@ def test_non_conjugate_initialise(n):
 def test_hyperparametr_initialise():
     params = _initialise_hyperparams(RBF(), Zero())
     assert list(params.keys()) == sorted(["lengthscale", "variance"])
+
+
+@pytest.mark.parametrize("lik", [Bernoulli, Poisson, Gaussian])
+def test_dtype(lik):
+    posterior = Prior(kernel=RBF()) * lik()
+    for k, v in initialise(posterior, 10).items():
+        assert v.dtype == jnp.float64

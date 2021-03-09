@@ -55,3 +55,16 @@ class NonConjugatePosterior:
         kernel_string = self.prior.kernel.__repr__()
         likelihood_string = self.likelihood.__repr__()
         return f"Conjugate Posterior\n{'-'*80}\n- {meanf_string}\n- {kernel_string}\n- {likelihood_string}"
+
+
+@dataclass
+class SpectralPosterior:
+    prior: Prior
+    likelihood: Gaussian
+    name: Optional[str] = "SpectralPosterior"
+
+    def __repr__(self):
+        meanf_string = self.prior.mean_function.__repr__()
+        kernel_string = self.prior.kernel.__repr__()
+        likelihood_string = self.likelihood.__repr__()
+        return f"Conjugate Posterior\n{'-'*80}\n- {meanf_string}\n- {kernel_string}\n- {likelihood_string}"

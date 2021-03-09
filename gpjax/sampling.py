@@ -16,7 +16,7 @@ def random_variable(
     gp: Prior, params: dict, sample_points: Array, jitter_amount: float = 1e-6
 ) -> tfd.Distribution:
     mu = gp.mean_function(sample_points)
-    gram_matrix = params["variance"] * gram(gp.kernel, sample_points / params["lengthscale"])
+    gram_matrix = gram(gp.kernel, sample_points, params)
     jitter_matrix = I(sample_points.shape[0]) * jitter_amount
     covariance = gram_matrix + jitter_matrix
     return tfd.MultivariateNormalFullCovariance(mu.squeeze(), covariance)
@@ -48,9 +48,9 @@ def random_variable(
 ) -> tfd.Distribution:
     ell, alpha, nu = params["lengthscale"], params["variance"], params["latent"]
     n_train = train_inputs.shape[0]
-    Kff = alpha * gram(gp.prior.kernel, train_inputs / ell)
-    Kfx = alpha * cross_covariance(gp.prior.kernel, train_inputs / ell, sample_points / ell)
-    Kxx = alpha * gram(gp.prior.kernel, sample_points / ell)
+    Kff = gram(gp.prior.kernel, train_inputs, params)
+    Kfx = cross_covariance(gp.prior.kernel, train_inputs, sample_points, params)
+    Kxx = gram(gp.prior.kernel, sample_points, params)
     L = jnp.linalg.cholesky(Kff + jnp.eye(train_inputs.shape[0]) * 1e-6)
 
     A = solve_triangular(L, Kfx.T, lower=True)

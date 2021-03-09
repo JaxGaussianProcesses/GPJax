@@ -31,7 +31,7 @@ def marginal_ll(
     def mll(params: dict, x: Array, y: Array, priors: dict = None):
         params = untransform(params, transformation)
         mu = gp.prior.mean_function(x)
-        gram_matrix = params["variance"] * gram(gp.prior.kernel, x / params["lengthscale"])
+        gram_matrix = gram(gp.prior.kernel, x, params)
         gram_matrix += params["obs_noise"] * I(x.shape[0])
         L = jnp.linalg.cholesky(gram_matrix)
         random_variable = tfd.MultivariateNormalTriL(mu, L)
@@ -56,7 +56,7 @@ def marginal_ll(
         params = untransform(params, transformation)
         n = x.shape[0]
         link = link_function(gp.likelihood)
-        gram_matrix = params["variance"] * gram(gp.prior.kernel, x / params["lengthscale"])
+        gram_matrix = gram(gp.prior.kernel, x, params)
         gram_matrix += I(n) * jitter
         L = jnp.linalg.cholesky(gram_matrix)
         F = jnp.matmul(L, params["latent"])

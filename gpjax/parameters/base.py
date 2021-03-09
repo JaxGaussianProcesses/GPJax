@@ -12,6 +12,14 @@ def _initialise_hyperparams(kernel: Kernel, meanf: MeanFunction) -> dict:
     return concat_dictionaries(initialise(kernel), initialise(meanf))
 
 
+@dispatch(jnp.DeviceArray, ConjugatePosterior)
+def initialise(key: jnp.DeviceArray, gp: ConjugatePosterior) -> dict:
+    meanf = initialise(gp.prior.mean_function)
+    kernel = concat_dictionaries(initialise(key, gp.prior.kernel), meanf)
+    all_params = concat_dictionaries(kernel, initialise(gp.likelihood))
+    return sort_dictionary(all_params)
+
+
 @dispatch(ConjugatePosterior)
 def initialise(gp: ConjugatePosterior) -> dict:
     hyps = _initialise_hyperparams(gp.prior.kernel, gp.prior.mean_function)
