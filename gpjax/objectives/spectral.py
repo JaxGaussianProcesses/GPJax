@@ -15,7 +15,8 @@ def marginal_ll(
 ) -> Callable:
     def mll(params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray, static_params: dict = None):
         params = untransform(params, transformation)
-        params = concat_dictionaries(params, static_params)
+        if static_params:
+            params = concat_dictionaries(params, static_params)
         m = gp.prior.kernel.num_basis
         phi = gp.prior.kernel._build_phi(x, params)
         A = (params['variance'] / m) * jnp.matmul(jnp.transpose(phi), phi) + params['obs_noise'] * I(2 * m)
