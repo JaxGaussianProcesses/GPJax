@@ -66,7 +66,7 @@ def transform(params: dict, transformation: Transformation):
 def untransform(params: dict, transformation: Transformation):
     untransformed_params = {}
     for k, v in params.items():
-        if k != "latent":
+        if k not in to_ignore:
             untransformed_params[k] = transformation.backward(v)
         else:
             untransformed_params[k] = v

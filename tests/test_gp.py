@@ -1,8 +1,8 @@
 import pytest
 
 from gpjax.gps import (ConjugatePosterior, NonConjugatePosterior, Posterior,
-                       Prior)
-from gpjax.kernels import RBF
+                       Prior, SpectralPosterior)
+from gpjax.kernels import RBF, to_spectral
 from gpjax.likelihoods import Gaussian, NonConjugateLikelihoods
 
 
@@ -17,3 +17,9 @@ def test_conjugate_posterior():
 def test_non_conjugate_poster(likelihood):
     posterior = Prior(kernel=RBF()) * likelihood()
     assert isinstance(posterior, NonConjugatePosterior)
+
+
+def test_spectral():
+    kernel = to_spectral(RBF(), 10)
+    posterior = Prior(kernel=kernel) * Gaussian()
+    assert isinstance(posterior, SpectralPosterior)

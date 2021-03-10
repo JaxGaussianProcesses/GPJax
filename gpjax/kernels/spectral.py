@@ -25,7 +25,6 @@ class SpectralRBF(Kernel, SpectralKernel):
 
     def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
         phi = self._build_phi(x, params)
-        # A = (params['variance'] / self.num_basis) * jnp.matmul(jnp.transpose(phi), phi) + params['obs_noise'] * I(2 * self.num_basis)
         return jnp.matmul(phi, jnp.transpose(phi))/self.num_basis
 
     def _build_phi(self, x: jnp.DeviceArray, params):
