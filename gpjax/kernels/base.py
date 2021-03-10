@@ -6,7 +6,8 @@ from jax import vmap
 from multipledispatch import dispatch
 
 from gpjax.types import Array
-from .utils import stretch, scale
+
+from .utils import scale, stretch
 
 
 @dataclass(repr=False)
@@ -35,9 +36,9 @@ class RBF(Kernel):
     name: Optional[str] = "Radial basis function kernel"
 
     def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
-        x = scale(x, params['lengthscale'])
-        y = scale(y, params['lengthscale'])
-        K = stretch(jnp.exp(-0.5 * squared_distance(x, y)), params['variance'])
+        x = scale(x, params["lengthscale"])
+        y = scale(y, params["lengthscale"])
+        K = stretch(jnp.exp(-0.5 * squared_distance(x, y)), params["variance"])
         return K.squeeze()
 
 

@@ -5,7 +5,6 @@ from chex import dataclass
 
 from ..types import Array
 
-
 to_ignore = ["latent", "basis_fns"]
 
 

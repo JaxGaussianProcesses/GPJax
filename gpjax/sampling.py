@@ -3,7 +3,8 @@ from jax.scipy.linalg import solve_triangular
 from multipledispatch import dispatch
 from tensorflow_probability.substrates.jax import distributions as tfd
 
-from .gps import ConjugatePosterior, NonConjugatePosterior, Prior, SpectralPosterior
+from .gps import (ConjugatePosterior, NonConjugatePosterior, Prior,
+                  SpectralPosterior)
 from .kernels import cross_covariance, gram
 from .likelihoods import predictive_moments
 from .predict import mean, variance
@@ -61,7 +62,6 @@ def random_variable(
     return moment_fn(latent_mean.ravel(), lvar)
 
 
-
 @dispatch(SpectralPosterior, dict, jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray)
 def random_variable(
     gp: SpectralPosterior,
@@ -69,14 +69,16 @@ def random_variable(
     train_inputs: Array,
     train_outputs: Array,
     test_inputs: Array,
-    static_params: dict = None
+    static_params: dict = None,
 ) -> tfd.Distribution:
     params = concat_dictionaries(params, static_params)
     m = gp.prior.kernel.num_basis
-    w = params['basis_fns']/params['lengthscale']
+    w = params["basis_fns"] / params["lengthscale"]
     phi = gp.prior.kernel._build_phi(train_inputs, params)
 
-    A = (params['variance'] / m) * jnp.matmul(jnp.transpose(phi), phi) + params['obs_noise'] * I(2 * m)
+    A = (params["variance"] / m) * jnp.matmul(jnp.transpose(phi), phi) + params["obs_noise"] * I(
+        2 * m
+    )
 
     RT = jnp.linalg.cholesky(A)
     R = jnp.transpose(RT)
@@ -85,7 +87,7 @@ def random_variable(
     # Rtiphity=RtiPhit*y_tr;
     Rtiphity = jnp.matmul(RtiPhit, train_outputs)
 
-    alpha = params['variance'] / m * solve_triangular(R, Rtiphity, lower=False)
+    alpha = params["variance"] / m * solve_triangular(R, Rtiphity, lower=False)
 
     phistar = jnp.matmul(test_inputs, jnp.transpose(w))
     # phistar = [cos(phistar) sin(phistar)];                              % test design matrix
@@ -96,7 +98,13 @@ def random_variable(
 
     RtiPhistart = solve_triangular(RT, jnp.transpose(phistar))
     PhiRistar = jnp.transpose(RtiPhistart)
-    cov = params['obs_noise'] * params['variance'] / m * jnp.matmul(PhiRistar, jnp.transpose(PhiRistar)) + I(test_inputs.shape[0]) * 1e-6
+    cov = (
+        params["obs_noise"]
+        * params["variance"]
+        / m
+        * jnp.matmul(PhiRistar, jnp.transpose(PhiRistar))
+        + I(test_inputs.shape[0]) * 1e-6
+    )
     return tfd.MultivariateNormalFullCovariance(mean.squeeze(), cov)
 
 

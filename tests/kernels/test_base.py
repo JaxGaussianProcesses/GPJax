@@ -35,9 +35,7 @@ def test_pos_def(dim, ell, sigma):
     if dim > 1:
         x = jnp.hstack((x) * dim)
     kern = RBF()
-    params = {'lengthscale': jnp.array([ell]),
-              'variance': jnp.array(sigma)
-              }
+    params = {"lengthscale": jnp.array([ell]), "variance": jnp.array(sigma)}
 
     gram_matrix = gram(kern, x, params)
     jitter_matrix = I(n) * 1e-6

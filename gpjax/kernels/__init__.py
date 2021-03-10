@@ -1,2 +1,3 @@
-from .base import Kernel, RBF, cross_covariance, gram, initialise
-from .spectral import spectral_density, sample_frequencies, initialise, to_spectral
+from .base import RBF, Kernel, cross_covariance, gram, initialise
+from .spectral import (initialise, sample_frequencies, spectral_density,
+                       to_spectral)

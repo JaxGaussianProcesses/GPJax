@@ -48,4 +48,4 @@ def test_spectral():
     posterior = Prior(kernel=kernel) * Gaussian()
     params = initialise(key, posterior)
     assert list(params.keys()) == sorted(["basis_fns", "obs_noise", "lengthscale", "variance"])
-    assert params['basis_fns'].shape == (10, 1)
+    assert params["basis_fns"].shape == (10, 1)

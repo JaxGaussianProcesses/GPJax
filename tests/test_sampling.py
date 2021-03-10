@@ -66,8 +66,6 @@ def test_spectral_sample():
     params = initialise(key, post)
     sparams = {"basis_fns": params["basis_fns"]}
     del params["basis_fns"]
-    posterior_rv = random_variable(
-        post, params, x, y, sample_points, static_params=sparams
-    )
+    posterior_rv = random_variable(post, params, x, y, sample_points, static_params=sparams)
     assert isinstance(posterior_rv, tfd.Distribution)
     assert isinstance(posterior_rv, tfd.MultivariateNormalFullCovariance)
