@@ -38,3 +38,10 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
     nbs/regression
     nbs/classification
     nbs/spatial_modelling
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Experimental
+
+    nbs/tfp_interface
+    nbs/spectral
