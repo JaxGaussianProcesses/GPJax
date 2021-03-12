@@ -9,29 +9,38 @@ from gpjax import Prior
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.objectives import marginal_ll
-from gpjax.parameters import SoftplusTransformation, initialise, transform
+from gpjax.parameters import build_unconstrain, initialise, build_all_transforms
+from gpjax.config import get_defaults
 
 
 def test_conjugate():
     posterior = Prior(kernel=RBF()) * Gaussian()
-    mll = marginal_ll(posterior)
-    assert isinstance(mll, Callable)
-    neg_mll = marginal_ll(posterior, negative=True)
+
+
     x = jnp.linspace(-1.0, 1.0, 20).reshape(-1, 1)
     y = jnp.sin(x)
-    params = transform(params=initialise(posterior), transformation=SoftplusTransformation)
+    params = initialise(posterior)
+    config = get_defaults()
+    unconstrainer, constrainer = build_all_transforms(params.keys(), config)
+    params = unconstrainer(params)
+    mll = marginal_ll(posterior, transform=constrainer)
+    assert isinstance(mll, Callable)
+    neg_mll = marginal_ll(posterior, transform=constrainer, negative=True)
     assert neg_mll(params, x, y) == jnp.array(-1.0) * mll(params, x, y)
 
 
 def test_non_conjugate():
     posterior = Prior(kernel=RBF()) * Bernoulli()
-    mll = marginal_ll(posterior)
-    assert isinstance(mll, Callable)
-    neg_mll = marginal_ll(posterior, negative=True)
     n = 20
     x = jnp.linspace(-1.0, 1.0, n).reshape(-1, 1)
     y = jnp.sin(x)
-    params = transform(params=initialise(posterior, n), transformation=SoftplusTransformation)
+    params = initialise(posterior, 20)
+    config = get_defaults()
+    unconstrainer, constrainer = build_all_transforms(params.keys(), config)
+    params = unconstrainer(params)
+    mll = marginal_ll(posterior, transform=constrainer)
+    assert isinstance(mll, Callable)
+    neg_mll = marginal_ll(posterior, transform=constrainer, negative=True)
     assert neg_mll(params, x, y) == jnp.array(-1.0) * mll(params, x, y)
 
 
@@ -44,7 +53,13 @@ def test_prior_mll():
     f = lambda x: jnp.sin(jnp.pi * x) / (jnp.pi * x)
     y = f(x) + jr.normal(key, shape=x.shape) * 0.1
     posterior = Prior(kernel=RBF()) * Gaussian()
-    mll = marginal_ll(posterior)
+
+    params = initialise(posterior)
+    config = get_defaults()
+    unconstrainer, constrainer = build_all_transforms(params.keys(), config)
+    params = unconstrainer(params)
+
+    mll = marginal_ll(posterior, transform=constrainer)
 
     params = initialise(posterior)
     priors = {

@@ -8,8 +8,6 @@ from ..gps import ConjugatePosterior, NonConjugatePosterior
 from ..kernels import gram
 from ..likelihoods import link_function
 from ..parameters.priors import evaluate_prior, prior_checks
-from ..parameters.transforms import (SoftplusTransformation, Transformation,
-                                     untransform)
 from ..types import Array
 from ..utils import I
 
@@ -17,7 +15,7 @@ from ..utils import I
 @dispatch(ConjugatePosterior)
 def marginal_ll(
     gp: ConjugatePosterior,
-    transformation: Transformation = SoftplusTransformation,
+    transform: Callable,
     negative: bool = False,
 ) -> Callable:
     r"""
@@ -29,7 +27,7 @@ def marginal_ll(
     """
 
     def mll(params: dict, x: Array, y: Array, priors: dict = None):
-        params = untransform(params, transformation)
+        params = transform(params)
         mu = gp.prior.mean_function(x)
         gram_matrix = gram(gp.prior.kernel, x, params)
         gram_matrix += params["obs_noise"] * I(x.shape[0])
@@ -46,14 +44,14 @@ def marginal_ll(
 @dispatch(NonConjugatePosterior)
 def marginal_ll(
     gp: NonConjugatePosterior,
-    transformation: Transformation = SoftplusTransformation,
+    transform: Callable,
     negative: bool = False,
     jitter: float = 1e-6,
 ) -> Callable:
     def mll(
         params: dict, x: Array, y: Array, priors: dict = {"latent": tfd.Normal(loc=0.0, scale=1.0)}
     ):
-        params = untransform(params, transformation)
+        params = transform(params)
         n = x.shape[0]
         link = link_function(gp.likelihood)
         gram_matrix = gram(gp.prior.kernel, x, params)

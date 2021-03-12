@@ -1,33 +1,67 @@
 import jax.numpy as jnp
 import pytest
+from typing import Callable
+from numpy.testing import assert_array_equal
 
-from gpjax.parameters.transforms import (IdentityTransformation,
-                                         SoftplusTransformation, transform,
-                                         untransform)
-
-
-@pytest.mark.parametrize("transformation", [IdentityTransformation, SoftplusTransformation])
-@pytest.mark.parametrize("x", [1e-5, 0.01, 0.5, 1.0, 5.0])
-def test_softplus(transformation, x):
-    xarray = jnp.array(x)
-    tr = transformation()
-    transformed = tr.forward(tr.backward(x))
-    assert pytest.approx(transformed, rel=1e-10) == xarray
+from gpjax.parameters import build_all_transforms, build_unconstrain, build_constrain, initialise
+from gpjax.config import get_defaults
+from gpjax.likelihoods import Bernoulli, Poisson, Gaussian
+from gpjax.kernels import RBF
+from gpjax import Prior
 
 
-@pytest.mark.parametrize("val", [0.01, 0.1, 1.0, 5.0])
-@pytest.mark.parametrize("transformation", [IdentityTransformation, SoftplusTransformation])
-def test_transform(transformation, val):
-    params = {
-        "lengthscale": jnp.array(val),
-        "variance": jnp.array(val),
-        "obs_noise": jnp.array(val),
-    }
-    transformed_params = transform(params, transformation())
-    assert len(transformed_params.keys()) == len(params.keys())
-    assert len(transformed_params.values()) == len(params.values())
-    for v, p in zip(transformed_params.values(), params.values()):
-        assert v == pytest.approx(transformation.forward(p), rel=1e-8)
-    untransformed = untransform(transformed_params, transformation())
-    for u, p in zip(untransformed.values(), params.values()):
-        assert pytest.approx(u, rel=1e-8) == p
+@pytest.mark.parametrize('transformation', [build_constrain, build_unconstrain])
+@pytest.mark.parametrize('likelihood', [Gaussian, Poisson, Bernoulli])
+def test_output(transformation, likelihood):
+    posterior = Prior(kernel = RBF()) * likelihood()
+    params = initialise(posterior, 10)
+    config = get_defaults()
+    transform_map = transformation(params.keys(), config)
+    assert isinstance(transform_map, Callable)
+
+
+@pytest.mark.parametrize('likelihood', [Gaussian, Poisson, Bernoulli])
+def test_constrain(likelihood):
+    posterior = Prior(kernel = RBF()) * likelihood()
+    params = initialise(posterior, 10)
+    config = get_defaults()
+    transform_map = build_constrain(params.keys(), config)
+    transformed_params = transform_map(params)
+    assert transformed_params.keys() == params.keys()
+    for u, v in zip(transformed_params.values(), params.values()):
+        assert u.dtype == v.dtype
+
+
+@pytest.mark.parametrize('likelihood', [Gaussian, Poisson, Bernoulli])
+def test_unconstrain(likelihood):
+    posterior = Prior(kernel = RBF()) * likelihood()
+    params = initialise(posterior, 10)
+    config = get_defaults()
+    constrain_map = build_constrain(params.keys(), config)
+    unconstrain_map = build_unconstrain(params.keys(), config)
+    transformed_params = unconstrain_map(constrain_map(params))
+    assert transformed_params.keys() == params.keys()
+    for u, v in zip(transformed_params.values(), params.values()):
+        assert_array_equal(u, v)
+        assert u.dtype == v.dtype
+
+
+@pytest.mark.parametrize('likelihood', [Gaussian, Poisson, Bernoulli])
+def test_build_all_transforms(likelihood):
+    posterior = Prior(kernel = RBF()) * likelihood()
+    params = initialise(posterior, 10)
+    config = get_defaults()
+    t1, t2 = build_all_transforms(params.keys(), config)
+    constrainer = build_constrain(params.keys(), config)
+    constrained = t1(params)
+    constrained2 = constrainer(params)
+    assert constrained2.keys() == constrained2.keys()
+    for u, v in zip(constrained.values(), constrained2.values()):
+        assert_array_equal(u, v)
+        assert u.dtype == v.dtype
+    unconstrained = t2(params)
+    unconstrainer = build_unconstrain(params.keys(), config)
+    unconstrained2 = unconstrainer(params)
+    for u, v in zip(unconstrained.values(), unconstrained2.values()):
+        assert_array_equal(u, v)
+        assert u.dtype == v.dtype
