@@ -5,19 +5,17 @@ from jax.scipy.linalg import solve_triangular
 from multipledispatch import dispatch
 
 from ..gps import SpectralPosterior
-from ..parameters.transforms import (SoftplusTransformation, Transformation,
-                                     untransform)
 from ..utils import I, concat_dictionaries
 
 
 @dispatch(SpectralPosterior)
 def marginal_ll(
     gp: SpectralPosterior,
-    transformation: Transformation = SoftplusTransformation,
+    transform: Callable,
     negative: bool = False,
 ) -> Callable:
     def mll(params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray, static_params: dict = None):
-        params = untransform(params, transformation)
+        params = transform(params)
         if static_params:
             params = concat_dictionaries(params, static_params)
         m = gp.prior.kernel.num_basis

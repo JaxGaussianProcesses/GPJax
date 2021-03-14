@@ -1,72 +1,52 @@
-from typing import Callable, List
+from collections.abc import KeysView
+from typing import Callable, Tuple
 
 import jax.numpy as jnp
-from chex import dataclass
-
-from ..types import Array
-
-to_ignore = ["latent", "basis_fns"]
+from ml_collections import ConfigDict
 
 
-def softplus(x: Array) -> Array:
+def build_unconstrain(keys: KeysView, config: ConfigDict) -> Callable:
     """
-    Map an input value x from a constrained space into an unconstrained space using the softplus transformation
-    :math:`\log(\exp(x)-1)`.
+    Build the transformation map the will transform a set of parameters such that each parameter is now defined on the
+    entire real line.
 
-    :param x: A constrained value that exists on the positive real line
-    :return: An unconstrained representation of x that exists on the entire real line
+    :param keys: A set of dictionary keys that represent parameters name-key.
+    :param config: A configuration dictionary that informs which transformation should be applied to which parameter.
+    :return: A callable that will apply the desired transformation(s).
     """
-    return jnp.log(jnp.exp(x) - 1.0)
+    transforms = {k: config.transformations[config.transformations[k]]() for k in keys}
+
+    def unconstrain(params: dict) -> dict:
+        return {k: jnp.array(transforms[k].inverse(v)) for k, v in params.items()}
+
+    return unconstrain
 
 
-def inverse_softplus(x: Array) -> Array:
+def build_constrain(keys: KeysView, config: ConfigDict) -> Callable:
     """
-    Reverse the softplus transformation such that the unconstrained representation now exists on the positive real
-    line again using  :math:`\log(1+\exp(x))`.
+    Build the transformation map the will transform a set of parameters such that each unconstrained parameter
+    representation is now defined on the parameter's original, possibly constrained, space.
 
-    :param x: An unconstrained representation of x that exists on the entire real line
-    :return: A constrained value that exists on the positive real line
+    :param keys: A set of dictionary keys that represent parameters name-key.
+    :param config: A configuration dictionary that informs which transformation should be applied to which parameter.
+    :return: A callable that will apply the desired transformation(s).
     """
-    return jnp.log(1.0 + jnp.exp(x))
+    transforms = {k: config.transformations[config.transformations[k]]() for k in keys}
+
+    def constrain(params: dict) -> dict:
+        return {k: jnp.array(transforms[k].forward(v)) for k, v in params.items()}
+
+    return constrain
 
 
-def identity(x: Array) -> Array:
-    return x
+def build_all_transforms(keys: KeysView, config: ConfigDict) -> Tuple[Callable, Callable]:
+    """
+    Build both the constraining and unconstraining function mappings.
 
-
-@dataclass
-class Transformation:
-    forward: Callable
-    backward: Callable
-
-
-@dataclass
-class SoftplusTransformation(Transformation):
-    forward: Callable = softplus
-    backward: Callable = inverse_softplus
-
-
-@dataclass
-class IdentityTransformation(Transformation):
-    forward: Callable = identity
-    backward: Callable = identity
-
-
-def transform(params: dict, transformation: Transformation):
-    transformed_params = {}
-    for k, v in params.items():
-        if k not in to_ignore:
-            transformed_params[k] = transformation.forward(v)
-        else:
-            transformed_params[k] = v
-    return transformed_params
-
-
-def untransform(params: dict, transformation: Transformation):
-    untransformed_params = {}
-    for k, v in params.items():
-        if k not in to_ignore:
-            untransformed_params[k] = transformation.backward(v)
-        else:
-            untransformed_params[k] = v
-    return untransformed_params
+    :param keys: A set of dictionary keys that represent parameters name-key.
+    :param config: A configuration dictionary that informs which transformation should be applied to which parameter.
+    :return: A tuple of callables that will apply the desired transformation(s) to both the original and the unconstrained parameter values, in this order.
+    """
+    unconstrain = build_unconstrain(keys, config)
+    constrain = build_constrain(keys, config)
+    return constrain, unconstrain
