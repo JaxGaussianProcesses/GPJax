@@ -1,5 +1,5 @@
-from ml_collections import ConfigDict
 import tensorflow_probability.substrates.jax.bijectors as tfb
+from ml_collections import ConfigDict
 
 
 def get_defaults():
@@ -11,9 +11,9 @@ def get_defaults():
     transformations.positive_transform = tfb.Softplus
     transformations.identity_transform = tfb.Identity
 
-    transformations.lengthscale = 'positive_transform'
-    transformations.variance = 'positive_transform'
-    transformations.obs_noise = 'positive_transform'
-    transformations.latent = 'identity_transform'
-    transformations.basis_fns = 'identity_transform'
+    transformations.lengthscale = "positive_transform"
+    transformations.variance = "positive_transform"
+    transformations.obs_noise = "positive_transform"
+    transformations.latent = "identity_transform"
+    transformations.basis_fns = "identity_transform"
     return config

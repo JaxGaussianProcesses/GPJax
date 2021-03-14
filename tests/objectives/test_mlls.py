@@ -6,16 +6,16 @@ import pytest
 from tensorflow_probability.substrates.jax import distributions as tfd
 
 from gpjax import Prior
+from gpjax.config import get_defaults
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.objectives import marginal_ll
-from gpjax.parameters import build_unconstrain, initialise, build_all_transforms
-from gpjax.config import get_defaults
+from gpjax.parameters import (build_all_transforms, build_unconstrain,
+                              initialise)
 
 
 def test_conjugate():
     posterior = Prior(kernel=RBF()) * Gaussian()
-
 
     x = jnp.linspace(-1.0, 1.0, 20).reshape(-1, 1)
     y = jnp.sin(x)
@@ -56,12 +56,12 @@ def test_prior_mll():
 
     params = initialise(posterior)
     config = get_defaults()
-    unconstrainer, constrainer = build_all_transforms(params.keys(), config)
+    constrainer, unconstrainer = build_all_transforms(params.keys(), config)
     params = unconstrainer(params)
+    print(params)
 
     mll = marginal_ll(posterior, transform=constrainer)
 
-    params = initialise(posterior)
     priors = {
         "lengthscale": tfd.Gamma(1.0, 1.0),
         "variance": tfd.Gamma(2.0, 2.0),
@@ -70,5 +70,5 @@ def test_prior_mll():
     mll_eval = mll(params, x, y)
     mll_eval_priors = mll(params, x, y, priors)
 
-    assert pytest.approx(mll_eval) == jnp.array(-115.72332969)
-    assert pytest.approx(mll_eval_priors) == jnp.array(-118.97202259)
+    assert pytest.approx(mll_eval) == jnp.array(-103.28180663)
+    assert pytest.approx(mll_eval_priors) == jnp.array(-105.509218857)

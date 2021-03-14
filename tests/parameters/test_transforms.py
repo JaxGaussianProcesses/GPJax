@@ -1,28 +1,30 @@
+from typing import Callable
+
 import jax.numpy as jnp
 import pytest
-from typing import Callable
 from numpy.testing import assert_array_equal
 
-from gpjax.parameters import build_all_transforms, build_unconstrain, build_constrain, initialise
-from gpjax.config import get_defaults
-from gpjax.likelihoods import Bernoulli, Poisson, Gaussian
-from gpjax.kernels import RBF
 from gpjax import Prior
+from gpjax.config import get_defaults
+from gpjax.kernels import RBF
+from gpjax.likelihoods import Bernoulli, Gaussian, Poisson
+from gpjax.parameters import (build_all_transforms, build_constrain,
+                              build_unconstrain, initialise)
 
 
-@pytest.mark.parametrize('transformation', [build_constrain, build_unconstrain])
-@pytest.mark.parametrize('likelihood', [Gaussian, Poisson, Bernoulli])
+@pytest.mark.parametrize("transformation", [build_constrain, build_unconstrain])
+@pytest.mark.parametrize("likelihood", [Gaussian, Poisson, Bernoulli])
 def test_output(transformation, likelihood):
-    posterior = Prior(kernel = RBF()) * likelihood()
+    posterior = Prior(kernel=RBF()) * likelihood()
     params = initialise(posterior, 10)
     config = get_defaults()
     transform_map = transformation(params.keys(), config)
     assert isinstance(transform_map, Callable)
 
 
-@pytest.mark.parametrize('likelihood', [Gaussian, Poisson, Bernoulli])
+@pytest.mark.parametrize("likelihood", [Gaussian, Poisson, Bernoulli])
 def test_constrain(likelihood):
-    posterior = Prior(kernel = RBF()) * likelihood()
+    posterior = Prior(kernel=RBF()) * likelihood()
     params = initialise(posterior, 10)
     config = get_defaults()
     transform_map = build_constrain(params.keys(), config)
@@ -32,9 +34,9 @@ def test_constrain(likelihood):
         assert u.dtype == v.dtype
 
 
-@pytest.mark.parametrize('likelihood', [Gaussian, Poisson, Bernoulli])
+@pytest.mark.parametrize("likelihood", [Gaussian, Poisson, Bernoulli])
 def test_unconstrain(likelihood):
-    posterior = Prior(kernel = RBF()) * likelihood()
+    posterior = Prior(kernel=RBF()) * likelihood()
     params = initialise(posterior, 10)
     config = get_defaults()
     constrain_map = build_constrain(params.keys(), config)
@@ -46,9 +48,9 @@ def test_unconstrain(likelihood):
         assert u.dtype == v.dtype
 
 
-@pytest.mark.parametrize('likelihood', [Gaussian, Poisson, Bernoulli])
+@pytest.mark.parametrize("likelihood", [Gaussian, Poisson, Bernoulli])
 def test_build_all_transforms(likelihood):
-    posterior = Prior(kernel = RBF()) * likelihood()
+    posterior = Prior(kernel=RBF()) * likelihood()
     params = initialise(posterior, 10)
     config = get_defaults()
     t1, t2 = build_all_transforms(params.keys(), config)

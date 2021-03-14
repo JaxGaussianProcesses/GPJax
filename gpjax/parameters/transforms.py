@@ -1,6 +1,7 @@
-import jax.numpy as jnp
-from typing import Callable, Tuple
 from collections.abc import KeysView
+from typing import Callable, Tuple
+
+import jax.numpy as jnp
 from ml_collections import ConfigDict
 
 
@@ -17,6 +18,7 @@ def build_unconstrain(keys: KeysView, config: ConfigDict) -> Callable:
 
     def unconstrain(params: dict) -> dict:
         return {k: jnp.array(transforms[k].inverse(v)) for k, v in params.items()}
+
     return unconstrain
 
 
@@ -33,6 +35,7 @@ def build_constrain(keys: KeysView, config: ConfigDict) -> Callable:
 
     def constrain(params: dict) -> dict:
         return {k: jnp.array(transforms[k].forward(v)) for k, v in params.items()}
+
     return constrain
 
 

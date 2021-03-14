@@ -6,11 +6,11 @@ import pytest
 from tensorflow_probability.substrates.jax import distributions as tfd
 
 from gpjax import Prior
+from gpjax.config import get_defaults
 from gpjax.kernels import RBF, to_spectral
 from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.objectives import marginal_ll
 from gpjax.parameters import build_all_transforms, initialise
-from gpjax.config import get_defaults
 
 
 def test_conjugate():
