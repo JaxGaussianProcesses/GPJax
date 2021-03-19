@@ -82,14 +82,6 @@ def numpyro_mle(gp: ConjugatePosterior, numpyro_params: dict) -> Callable:
     return mll
 
 
-def numpyro_dict_priors(params: dict) -> List:
-    """Function to go from standard dictionary to params"""
-    numpyro_params = {}
-    for ikey, iprior in params.items():
-        numpyro_params[ikey] = numpyro.sample(name=ikey, fn=iprior)
-    return numpyro_params
-
-
 @dispatch(ConjugatePosterior, dict)
 def numpyro_map(gp: ConjugatePosterior, numpyro_params: dict) -> Callable:
     def mll(x: Array, y: Array):
