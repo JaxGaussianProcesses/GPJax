@@ -11,7 +11,7 @@ from ..gps import NonConjugatePosterior
 from ..types import Array, NoneType
 
 
-@dispatch((jnp.DeviceArray, JVPTracer, DynamicJaxprTracer), tfd.Distribution)
+@dispatch(Array, tfd.Distribution)
 def log_density(param: jnp.DeviceArray, density: tfd.Distribution) -> Array:
     return density.log_prob(param)
 

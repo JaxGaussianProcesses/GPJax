@@ -2,6 +2,7 @@ from typing import Tuple
 
 import jax.numpy as jnp
 from multipledispatch import dispatch
+from jax.scipy.linalg import cho_solve, cho_factor
 
 from .types import Array
 
