@@ -1,6 +1,7 @@
 from jax.config import config
 
 config.update("jax_enable_x64", True)
+from .types import Dataset
 from .gps import Prior
 from .predict import mean, variance
 from .sampling import random_variable, sample

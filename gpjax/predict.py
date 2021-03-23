@@ -1,119 +1,111 @@
 import jax.numpy as jnp
 from jax.scipy.linalg import cho_factor, cho_solve, cholesky, solve_triangular
 from multipledispatch import dispatch
+from typing import Callable
 
 from .gps import ConjugatePosterior, NonConjugatePosterior, Prior
 from .kernels import cross_covariance, gram
 from .likelihoods import predictive_moments
-from .types import Array
+from .types import Array, Dataset
 from .utils import I
 
 
-@dispatch(ConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray)
+@dispatch(ConjugatePosterior, dict, Dataset)
 def mean(
-    gp: ConjugatePosterior,
-    param: dict,
-    test_inputs: Array,
-    train_inputs: Array,
-    train_outputs: Array,
-):
-    assert (
-        train_outputs.ndim == 2
-    ), f"2-dimensional training outputs are required. Current dimensional: {train_outputs.ndim}."
-    ell, alpha = param["lengthscale"], param["variance"]
+        gp: ConjugatePosterior,
+        param: dict,
+        training: Dataset
+) -> Callable:
+    X, y = training.X, training.y
     sigma = param["obs_noise"]
-    n_train = train_inputs.shape[0]
-
-    Kff = gram(gp.prior.kernel, train_inputs, param)
-    Kfx = cross_covariance(gp.prior.kernel, train_inputs, test_inputs, param)
-
-    prior_mean = gp.prior.mean_function(train_inputs)
+    n_train = training.n
+    # Precompute covariance matrices
+    Kff = gram(gp.prior.kernel, X, param)
+    prior_mean = gp.prior.mean_function(X)
     L = cho_factor(Kff + I(n_train) * sigma, lower=True)
 
-    prior_distance = train_outputs - prior_mean
+    prior_distance = y - prior_mean
     weights = cho_solve(L, prior_distance)
-    return jnp.dot(Kfx, weights)
 
+    def meanf(test_inputs: Array) -> Array:
+        Kfx = cross_covariance(gp.prior.kernel, X, test_inputs, param)
+        return jnp.dot(Kfx, weights)
+    return meanf
 
-@dispatch(ConjugatePosterior, dict, jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray)
+@dispatch(ConjugatePosterior, dict, Dataset)
 def variance(
     gp: ConjugatePosterior,
     param: dict,
-    test_inputs: Array,
-    train_inputs: Array,
-    train_outputs: Array,
-) -> Array:
-    assert (
-        train_outputs.ndim == 2
-    ), f"2-dimensional training outputs are required. Current dimensional: {train_outputs.ndim}."
-    ell, alpha = param["lengthscale"], param["variance"]
+    training: Dataset,
+) -> Callable:
+    X, y = training.X, training.y
     sigma = param["obs_noise"]
-    n_train = train_inputs.shape[0]
-
-    Kff = gram(gp.prior.kernel, train_inputs, param)
-    Kfx = cross_covariance(gp.prior.kernel, train_inputs, test_inputs, param)
-    Kxx = gram(gp.prior.kernel, test_inputs, param)
-
+    n_train = training.n
+    Kff = gram(gp.prior.kernel, X, param)
     L = cho_factor(Kff + I(n_train) * sigma, lower=True)
-    latents = cho_solve(L, Kfx.T)
-    return Kxx - jnp.dot(Kfx, latents)
 
+    def varf(test_inputs: Array) -> Array:
+        Kfx = cross_covariance(gp.prior.kernel, X, test_inputs, param)
+        Kxx = gram(gp.prior.kernel, test_inputs, param)
+        latents = cho_solve(L, Kfx.T)
+        return Kxx - jnp.dot(Kfx, latents)
+    return varf
 
 @dispatch(
     NonConjugatePosterior,
     dict,
-    jnp.DeviceArray,
-    jnp.DeviceArray,
-    jnp.DeviceArray,
+    Dataset
 )
 def mean(
     gp: NonConjugatePosterior,
     param: dict,
-    test_inputs: Array,
-    train_inputs: Array,
-    train_outputs: Array,
-):
+    training: Dataset
+) -> Array:
     ell, alpha, nu = param["lengthscale"], param["variance"], param["latent"]
-    Kff = gram(gp.prior.kernel, train_inputs, param)
-    Kfx = cross_covariance(gp.prior.kernel, train_inputs, test_inputs, param)
-    Kxx = gram(gp.prior.kernel, test_inputs, param)
-    L = jnp.linalg.cholesky(Kff + jnp.eye(train_inputs.shape[0]) * 1e-6)
+    X, y = training.X, training.y
+    N = training.n
+    Kff = gram(gp.prior.kernel, X, param)
+    L = jnp.linalg.cholesky(Kff + I(N) * 1e-6)
 
-    A = solve_triangular(L, Kfx.T, lower=True)
-    latent_var = Kxx - jnp.sum(jnp.square(A), -2)
-    latent_mean = jnp.matmul(A.T, nu)
+    def meanf(test_inputs: Array) -> Array:
+        Kfx = cross_covariance(gp.prior.kernel, X, test_inputs, param)
+        Kxx = gram(gp.prior.kernel, test_inputs, param)
+        A = solve_triangular(L, Kfx.T, lower=True)
+        latent_var = Kxx - jnp.sum(jnp.square(A), -2)
+        latent_mean = jnp.matmul(A.T, nu)
 
-    lvar = jnp.diag(latent_var)
+        lvar = jnp.diag(latent_var)
 
-    moment_fn = predictive_moments(gp.likelihood)
-    pred_rv = moment_fn(latent_mean.ravel(), lvar)
-    return pred_rv.mean()
+        moment_fn = predictive_moments(gp.likelihood)
+        pred_rv = moment_fn(latent_mean.ravel(), lvar)
+        return pred_rv.mean()
+    return meanf
 
 
 @dispatch(
     NonConjugatePosterior,
     dict,
-    jnp.DeviceArray,
-    jnp.DeviceArray,
-    jnp.DeviceArray,
+    Dataset
 )
 def variance(
     gp: NonConjugatePosterior,
     param: dict,
-    test_inputs: Array,
-    train_inputs: Array,
-    train_outputs: Array,
+        training: Dataset
 ):
+    X, y = training.X, training.y
+    N = training.n
     ell, alpha, nu = param["lengthscale"], param["variance"], param["latent"]
-    Kff = gram(gp.prior.kernel, train_inputs, param)
-    Kfx = cross_covariance(gp.prior.kernel, train_inputs, test_inputs, param)
-    Kxx = gram(gp.prior.kernel, test_inputs, param)
-    L = jnp.linalg.cholesky(Kff + jnp.eye(train_inputs.shape[0]) * 1e-6)
+    Kff = gram(gp.prior.kernel, X, param)
+    L = jnp.linalg.cholesky(Kff + I(N) * 1e-6)
 
-    A = solve_triangular(L, Kfx.T, lower=True)
-    latent_var = Kxx - jnp.sum(jnp.square(A), -2)
-    latent_mean = jnp.matmul(A.T, nu)
-    lvar = jnp.diag(latent_var)
-    moment_fn = predictive_moments(gp.likelihood)
-    pred_rv = moment_fn(latent_mean.ravel(), lvar)
-    return pred_rv.variance()
+    def variancef(test_inputs: Array) -> Array:
+        Kfx = cross_covariance(gp.prior.kernel, X, test_inputs, param)
+        Kxx = gram(gp.prior.kernel, test_inputs, param)
+        A = solve_triangular(L, Kfx.T, lower=True)
+        latent_var = Kxx - jnp.sum(jnp.square(A), -2)
+        latent_mean = jnp.matmul(A.T, nu)
+        lvar = jnp.diag(latent_var)
+        moment_fn = predictive_moments(gp.likelihood)
+        pred_rv = moment_fn(latent_mean.ravel(), lvar)
+        return pred_rv.variance()
+    return variancef
