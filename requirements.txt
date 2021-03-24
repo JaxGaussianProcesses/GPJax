@@ -3,6 +3,6 @@ jaxlib>=0.1.57
 numpy>=1.18.5
 multipledispatch==0.6.0
 packaging==20.4
-chex==0.0.4
+chex>=0.0.4
 tfp-nightly==0.12.0.dev20201123
 ml-collections==0.1.0
