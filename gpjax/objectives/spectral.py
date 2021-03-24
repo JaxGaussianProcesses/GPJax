@@ -5,6 +5,7 @@ from jax.scipy.linalg import solve_triangular
 from multipledispatch import dispatch
 
 from ..gps import SpectralPosterior
+from ..types import Dataset
 from ..utils import I, concat_dictionaries
 
 
@@ -14,8 +15,9 @@ def marginal_ll(
     transform: Callable,
     negative: bool = False,
 ) -> Callable:
-    def mll(params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray, static_params: dict = None):
+    def mll(params: dict, training: Dataset, static_params: dict = None):
         params = transform(params)
+        x, y = training.X, training.y
         if static_params:
             params = concat_dictionaries(params, static_params)
         m = gp.prior.kernel.num_basis

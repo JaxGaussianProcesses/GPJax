@@ -52,7 +52,10 @@ def marginal_ll(
     jitter: float = 1e-6,
 ) -> Callable:
     def mll(
-        params: dict, training: Dataset, priors: dict = {"latent": tfd.Normal(loc=0.0, scale=1.0)}, static_params: dict = None
+        params: dict,
+        training: Dataset,
+        priors: dict = {"latent": tfd.Normal(loc=0.0, scale=1.0)},
+        static_params: dict = None,
     ):
         x, y = training.X, training.y
         n = training.n

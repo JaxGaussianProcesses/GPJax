@@ -1,7 +1,8 @@
+from typing import Callable
+
 import jax.numpy as jnp
 from jax.scipy.linalg import cho_factor, cho_solve, cholesky, solve_triangular
 from multipledispatch import dispatch
-from typing import Callable
 
 from .gps import ConjugatePosterior, NonConjugatePosterior, Prior
 from .kernels import cross_covariance, gram
@@ -11,11 +12,7 @@ from .utils import I
 
 
 @dispatch(ConjugatePosterior, dict, Dataset)
-def mean(
-        gp: ConjugatePosterior,
-        param: dict,
-        training: Dataset
-) -> Callable:
+def mean(gp: ConjugatePosterior, param: dict, training: Dataset) -> Callable:
     X, y = training.X, training.y
     sigma = param["obs_noise"]
     n_train = training.n
@@ -30,7 +27,9 @@ def mean(
     def meanf(test_inputs: Array) -> Array:
         Kfx = cross_covariance(gp.prior.kernel, X, test_inputs, param)
         return jnp.dot(Kfx, weights)
+
     return meanf
+
 
 @dispatch(ConjugatePosterior, dict, Dataset)
 def variance(
@@ -49,18 +48,12 @@ def variance(
         Kxx = gram(gp.prior.kernel, test_inputs, param)
         latents = cho_solve(L, Kfx.T)
         return Kxx - jnp.dot(Kfx, latents)
+
     return varf
 
-@dispatch(
-    NonConjugatePosterior,
-    dict,
-    Dataset
-)
-def mean(
-    gp: NonConjugatePosterior,
-    param: dict,
-    training: Dataset
-) -> Array:
+
+@dispatch(NonConjugatePosterior, dict, Dataset)
+def mean(gp: NonConjugatePosterior, param: dict, training: Dataset) -> Array:
     ell, alpha, nu = param["lengthscale"], param["variance"], param["latent"]
     X, y = training.X, training.y
     N = training.n
@@ -79,19 +72,12 @@ def mean(
         moment_fn = predictive_moments(gp.likelihood)
         pred_rv = moment_fn(latent_mean.ravel(), lvar)
         return pred_rv.mean()
+
     return meanf
 
 
-@dispatch(
-    NonConjugatePosterior,
-    dict,
-    Dataset
-)
-def variance(
-    gp: NonConjugatePosterior,
-    param: dict,
-        training: Dataset
-):
+@dispatch(NonConjugatePosterior, dict, Dataset)
+def variance(gp: NonConjugatePosterior, param: dict, training: Dataset):
     X, y = training.X, training.y
     N = training.n
     ell, alpha, nu = param["lengthscale"], param["variance"], param["latent"]
@@ -108,4 +94,5 @@ def variance(
         moment_fn = predictive_moments(gp.likelihood)
         pred_rv = moment_fn(latent_mean.ravel(), lvar)
         return pred_rv.variance()
+
     return variancef

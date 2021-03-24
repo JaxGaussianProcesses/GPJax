@@ -1,3 +1,5 @@
+from typing import Callable
+
 import jax.numpy as jnp
 from jax.scipy.linalg import solve_triangular
 from multipledispatch import dispatch
@@ -25,55 +27,58 @@ def random_variable(
     return tfd.MultivariateNormalFullCovariance(mu.squeeze(), covariance)
 
 
-@dispatch(ConjugatePosterior, dict, jnp.DeviceArray, Dataset)
+@dispatch(ConjugatePosterior, dict, Dataset)
 def random_variable(
     gp: ConjugatePosterior,
     params: dict,
-    sample_points: Array,
     training: Dataset,
     jitter_amount: float = 1e-6,
-) -> tfd.Distribution:
-    n = sample_points.shape[0]
+) -> Callable:
     # TODO: Return kernel matrices here to avoid replicated computation.
     meanf = mean(gp, params, training)
     covf = variance(gp, params, training)
-    mu = meanf(sample_points)
-    cov = covf(sample_points)
-    return tfd.MultivariateNormalFullCovariance(mu.squeeze(), cov + I(n) * jitter_amount)
+
+    def build_rv(test_points: Array):
+        n = test_points.shape[0]
+        mu = meanf(test_points)
+        cov = covf(test_points)
+        return tfd.MultivariateNormalFullCovariance(mu.squeeze(), cov + I(n) * jitter_amount)
+
+    return build_rv
 
 
-@dispatch(NonConjugatePosterior, dict, jnp.DeviceArray, Dataset)
+@dispatch(NonConjugatePosterior, dict, Dataset)
 def random_variable(
     gp: NonConjugatePosterior,
     params: dict,
-    sample_points: Array,
     training: Dataset,
-) -> tfd.Distribution:
+) -> Callable:
     nu = params["latent"]
     N = training.n
     X, y = training.X, training.y
     Kff = gram(gp.prior.kernel, X, params)
-    Kfx = cross_covariance(gp.prior.kernel, X, sample_points, params)
-    Kxx = gram(gp.prior.kernel, sample_points, params)
     L = jnp.linalg.cholesky(Kff + jnp.eye(N) * 1e-6)
 
-    A = solve_triangular(L, Kfx.T, lower=True)
-    latent_var = Kxx - jnp.sum(jnp.square(A), -2)
-    latent_mean = jnp.matmul(A.T, nu)
-    lvar = jnp.diag(latent_var)
-    moment_fn = predictive_moments(gp.likelihood)
-    return moment_fn(latent_mean.ravel(), lvar)
+    def build_rv(test_points: Array):
+        Kfx = cross_covariance(gp.prior.kernel, X, test_points, params)
+        Kxx = gram(gp.prior.kernel, test_points, params)
+        A = solve_triangular(L, Kfx.T, lower=True)
+        latent_var = Kxx - jnp.sum(jnp.square(A), -2)
+        latent_mean = jnp.matmul(A.T, nu)
+        lvar = jnp.diag(latent_var)
+        moment_fn = predictive_moments(gp.likelihood)
+        return moment_fn(latent_mean.ravel(), lvar)
+
+    return build_rv
 
 
-@dispatch(SpectralPosterior, dict, jnp.DeviceArray, Dataset)
+@dispatch(SpectralPosterior, dict, Dataset)
 def random_variable(
     gp: SpectralPosterior,
     params: dict,
-    test_inputs: Array,
     training: Dataset,
     static_params: dict = None,
 ) -> tfd.Distribution:
-    N = training.n
     X, y = training.X, training.y
 
     params = concat_dictionaries(params, static_params)
@@ -89,36 +94,41 @@ def random_variable(
     R = jnp.transpose(RT)
 
     RtiPhit = solve_triangular(RT, jnp.transpose(phi))
-    # Rtiphity=RtiPhit*y_tr;
     Rtiphity = jnp.matmul(RtiPhit, y)
 
     alpha = params["variance"] / m * solve_triangular(R, Rtiphity, lower=False)
 
-    phistar = jnp.matmul(test_inputs, jnp.transpose(w))
-    phistar = jnp.hstack([jnp.cos(phistar), jnp.sin(phistar)])
-    mean = jnp.matmul(phistar, alpha)
+    def build_rv(test_points: Array):
+        N = test_points.shape[0]
+        phistar = jnp.matmul(test_points, jnp.transpose(w))
+        phistar = jnp.hstack([jnp.cos(phistar), jnp.sin(phistar)])
+        mean = jnp.matmul(phistar, alpha)
 
-    RtiPhistart = solve_triangular(RT, jnp.transpose(phistar))
-    PhiRistar = jnp.transpose(RtiPhistart)
-    cov = (
-        params["obs_noise"]
-        * params["variance"]
-        / m
-        * jnp.matmul(PhiRistar, jnp.transpose(PhiRistar))
-        + I(N) * 1e-6
-    )
-    return tfd.MultivariateNormalFullCovariance(mean.squeeze(), cov)
+        RtiPhistart = solve_triangular(RT, jnp.transpose(phistar))
+        PhiRistar = jnp.transpose(RtiPhistart)
+        cov = (
+            params["obs_noise"]
+            * params["variance"]
+            / m
+            * jnp.matmul(PhiRistar, jnp.transpose(PhiRistar))
+            + I(N) * 1e-6
+        )
+        return tfd.MultivariateNormalFullCovariance(mean.squeeze(), cov)
+
+    return build_rv
 
 
 @dispatch(jnp.DeviceArray, Prior, dict, Dataset)
-def sample(key: jnp.DeviceArray, gp: Prior, params: dict, training: Dataset, n_samples: int=1) -> Array:
+def sample(
+    key: jnp.DeviceArray, gp: Prior, params: dict, training: Dataset, n_samples: int = 1
+) -> Array:
     rv = random_variable(gp, params, training)
     return rv.sample(sample_shape=(n_samples,), seed=key)
 
 
 @dispatch(jnp.DeviceArray, Prior, dict, Array)
-def sample(key: jnp.DeviceArray, gp: Prior, params: dict, X: Array, n_samples: int=1) -> Array:
-    training = Dataset(X = X, y = jnp.ones_like(X))
+def sample(key: jnp.DeviceArray, gp: Prior, params: dict, X: Array, n_samples: int = 1) -> Array:
+    training = Dataset(X=X, y=jnp.ones_like(X))
     rv = random_variable(gp, params, training)
     return rv.sample(sample_shape=(n_samples,), seed=key)
 
