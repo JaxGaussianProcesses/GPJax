@@ -9,14 +9,19 @@ from gpjax.utils import I
 from gpjax.likelihoods import link_function
 from multipledispatch import dispatch
 from gpjax.gps import ConjugatePosterior, NonConjugatePosterior
-from typing import Callable, List
+from typing import Callable, List, Union
 import jax.numpy as jnp
 import numpyro.distributions as dist
 from numpyro import module
 from copy import deepcopy
 
+from tensorflow_probability.substrates.jax.distributions import (
+    Distribution as tfp_priors,
+)
+
 numpyro_constraint = numpyro.distributions.constraints.Constraint
 numpyro_priors = numpyro.distributions.Distribution
+tfp_numpyro_priors = Union[tfp_priors, numpyro_priors]
 
 
 def numpyro_dict_params(params: dict) -> List:
@@ -24,18 +29,22 @@ def numpyro_dict_params(params: dict) -> List:
     numpyro_params = {}
     for ikey, iparam in params.items():
 
-        if "prior" in iparam:
-
-            numpyro_params[ikey] = {
-                "param_type": "prior",
-                "prior": iparam,
-            }
-        else:
+        if isinstance(iparam, Array) or isinstance(iparam, float):
             numpyro_params[ikey] = {
                 "param_type": "param",
                 "init_value": iparam,
                 "constraint": dist.constraints.positive,
             }
+
+        elif isinstance(iparam, numpyro_priors) or isinstance(iparam, tfp_priors):
+            numpyro_params[ikey] = {
+                "param_type": "prior",
+                "prior": iparam,
+            }
+
+        else:
+            raise ValueError(f"Unrecognized param input: {iparam}")
+
     return numpyro_params
 
 
@@ -74,15 +83,15 @@ def add_priors(params: dict, priors: dict):
     return new_params
 
 
-@dispatch(dict, str, numpyro_priors)
-def add_priors(params: dict, variable: str, priors: numpyro_priors):
+@dispatch(dict, str, (numpyro_priors, tfp_priors))
+def add_priors(params: dict, variable: str, priors: tfp_numpyro_priors):
     new_params = deepcopy(params)
     new_params[variable] = {"param_type": "prior", "prior": priors}
     return new_params
 
 
-@dispatch(dict, numpyro_priors)
-def add_priors(params: dict, priors: numpyro_priors):
+@dispatch(dict, (numpyro_priors, tfp_priors))
+def add_priors(params: dict, priors: tfp_numpyro_priors):
     new_params = deepcopy(params)
     for ivariable in new_params.keys():
         new_params[ivariable] = {"param_type": "prior", "prior": priors}
