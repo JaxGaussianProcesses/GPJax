@@ -122,39 +122,3 @@ def numpyro_marginal_ll(gp: ConjugatePosterior, numpyro_params: dict) -> Callabl
         )
 
     return mll
-
-
-@dispatch(NonConjugatePosterior, dict, float)
-@dispatch(NonConjugatePosterior, dict)
-def numpyro_marginal_ll(
-    gp: NonConjugatePosterior, numpyro_params: dict, jitter: float = 1e-6
-) -> Callable:
-    def mll(x: Array, y: Array):
-
-        params = {}
-
-        for iname, iparam in numpyro_params.items():
-            if iparam["param_type"] == "prior":
-                params[iname] = numpyro.sample(name=iname, fn=iparam["prior"])
-            else:
-                params[iname] = numpyro.param(
-                    name=iname,
-                    init_value=iparam["init_value"],
-                    constraint=iparam["constraint"],
-                )
-
-        # covariance function
-        gram_matrix = gram(gp.prior.kernel, x, params)
-        gram_matrix += I(x.shape[0]) * jitter
-
-        # scale triangular matrix
-        L = jnp.linalg.cholesky(gram_matrix)
-        F = jnp.matmul(L, params["latent"])
-
-        # get likelihood function
-        link = link_function(gp.likelihood)
-        rv = link(F)
-
-        return numpyro.sample("y", rv, obs=y.squeeze())
-
-    return mll
