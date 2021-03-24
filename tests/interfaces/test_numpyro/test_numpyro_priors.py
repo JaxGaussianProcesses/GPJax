@@ -13,10 +13,10 @@ from gpjax.gps import Prior
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Gaussian
 from gpjax.parameters import initialise
-from tensorflow_probability.substrates.jax import distributions as tfd
+from numpyro.contrib.tfp import distributions as tfd
 
 # TODO: test conjugate posterior
-def get_conjugate_posterior_params() -> dict:
+def _get_conjugate_posterior_params() -> dict:
     kernel = RBF()
     prior = Prior(kernel=kernel)
     lik = Gaussian()
@@ -74,7 +74,7 @@ def test_numpyro_dict_priors_defaults_tfp():
 )
 def test_numpyro_add_priors_all(prior):
 
-    gpjax_params = get_conjugate_posterior_params()
+    gpjax_params = _get_conjugate_posterior_params()
     numpyro_params = numpyro_dict_params(gpjax_params)
 
     # add constraint
@@ -86,7 +86,7 @@ def test_numpyro_add_priors_all(prior):
         chex.assert_equal(iparams["prior"], prior)
 
     # check we didn't modify original dictionary
-    chex.assert_equal(gpjax_params, get_conjugate_posterior_params())
+    chex.assert_equal(gpjax_params, _get_conjugate_posterior_params())
 
 
 @pytest.mark.parametrize(
@@ -106,7 +106,7 @@ def test_numpyro_add_priors_all(prior):
 )
 def test_numpyro_add_priors_str(variable, prior):
 
-    gpjax_params = get_conjugate_posterior_params()
+    gpjax_params = _get_conjugate_posterior_params()
     numpyro_params = numpyro_dict_params(gpjax_params)
 
     # add constraint
@@ -117,7 +117,7 @@ def test_numpyro_add_priors_str(variable, prior):
     chex.assert_equal(new_numpyro_params[variable]["prior"], prior)
 
     # check we didn't modify original dictionary
-    chex.assert_equal(gpjax_params, get_conjugate_posterior_params())
+    chex.assert_equal(gpjax_params, _get_conjugate_posterior_params())
 
 
 @pytest.mark.parametrize(
@@ -137,7 +137,7 @@ def test_numpyro_add_priors_str(variable, prior):
 )
 def test_numpyro_add_priors_dict(variable, prior):
 
-    gpjax_params = get_conjugate_posterior_params()
+    gpjax_params = _get_conjugate_posterior_params()
     numpyro_params = numpyro_dict_params(gpjax_params)
 
     # create new dictionary
@@ -151,4 +151,4 @@ def test_numpyro_add_priors_dict(variable, prior):
     chex.assert_equal(new_numpyro_params[variable]["prior"], prior)
 
     # check we didn't modify original dictionary
-    chex.assert_equal(gpjax_params, get_conjugate_posterior_params())
+    chex.assert_equal(gpjax_params, _get_conjugate_posterior_params())

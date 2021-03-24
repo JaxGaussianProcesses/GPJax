@@ -12,6 +12,7 @@ import jax.random as jr
 import numpyro
 import numpyro.distributions as dist
 from numpyro.distributions import constraints
+from numpyro.contrib.tfp import distributions as tfd
 import chex
 
 from gpjax.gps import Prior
@@ -53,17 +54,6 @@ def get_numpyro_params() -> dict:
     }
 
     return params
-
-
-def get_numpyro_priors() -> dict:
-
-    hyperpriors = {
-        "lengthscale": dist.Gamma(1.0, 1.0),
-        "variance": dist.HalfCauchy(scale=1.0),
-        "obs_noise": dist.HalfCauchy(scale=5.0),
-    }
-
-    return hyperpriors
 
 
 def _gen_training_data(n_samples, n_features, n_latents):
@@ -171,7 +161,7 @@ def test_numpyro_marginal_ll_params_type(n_samples, n_features, n_latents, dtype
         chex.assert_equal(pred.dtype, y.dtype)
 
 
-def test_numpyro_marginal_ll_priors():
+def test_numpyro_marginal_ll_numpyro_priors():
 
     # create sample data
     X, y = _gen_training_data(10, 10, 2)
@@ -207,7 +197,7 @@ def test_numpyro_marginal_ll_priors():
     "n_latents",
     [1, 10, 100],
 )
-def test_numpyro_marginal_ll_priors_shape(n_samples, n_features, n_latents):
+def test_numpyro_marginal_ll_numpyro_priors_shape(n_samples, n_features, n_latents):
 
     # create sample data
     X, y = _gen_training_data(n_samples, n_features, n_latents)
@@ -250,7 +240,9 @@ def test_numpyro_marginal_ll_priors_shape(n_samples, n_features, n_latents):
         jnp.float64,
     ],
 )
-def test_numpyro_marginal_ll_priors_type(n_samples, n_features, n_latents, dtype):
+def test_numpyro_marginal_ll_numpyro_priors_type(
+    n_samples, n_features, n_latents, dtype
+):
 
     # create sample data
     X, y = _gen_training_data(n_samples, n_features, n_latents)
@@ -267,6 +259,53 @@ def test_numpyro_marginal_ll_priors_type(n_samples, n_features, n_latents, dtype
 
     # convert to priors
     numpyro_params = add_priors(numpyro_params, dist.LogNormal(0.0, 10.0))
+
+    # initialize numpyro-style GP model
+    npy_model = numpyro_marginal_ll(posterior, numpyro_params)
+
+    # do one forward pass with context
+    with numpyro.handlers.seed(rng_seed=KEY):
+        pred = npy_model(X.block_until_ready(), y.T.block_until_ready())
+
+        chex.assert_equal(pred.dtype, y.dtype)
+
+
+@pytest.mark.parametrize(
+    "n_samples",
+    [1, 10, 100],
+)
+@pytest.mark.parametrize(
+    "n_features",
+    [1, 10, 100],
+)
+@pytest.mark.parametrize(
+    "n_latents",
+    [1, 10, 100],
+)
+@pytest.mark.parametrize(
+    "dtype",
+    [
+        jnp.float32,
+        jnp.float64,
+    ],
+)
+def test_numpyro_marginal_ll_tfp_priors_type(n_samples, n_features, n_latents, dtype):
+
+    # create sample data
+    X, y = _gen_training_data(n_samples, n_features, n_latents)
+
+    # convert to tyle
+    X = X.astype(dtype)
+    y = y.astype(dtype)
+
+    # initialize parameters
+    params, posterior = _get_conjugate_posterior_params()
+
+    # convert to numpyro-style params
+    numpyro_params = numpyro_dict_params(params)
+
+    # convert to priors
+    numpyro_params = add_priors(numpyro_params, tfd.LogNormal(0.0, 10.0))
 
     # initialize numpyro-style GP model
     npy_model = numpyro_marginal_ll(posterior, numpyro_params)

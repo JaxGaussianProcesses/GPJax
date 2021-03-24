@@ -16,7 +16,7 @@ from gpjax.parameters import initialise
 
 
 # TODO: test conjugate posterior
-def get_conjugate_posterior_params() -> dict:
+def _get_conjugate_posterior_params() -> dict:
     kernel = RBF()
     prior = Prior(kernel=kernel)
     lik = Gaussian()
@@ -104,7 +104,7 @@ def test_numpyro_dict_params_defaults_float():
 )
 def test_numpyro_add_constraints_all(constraint):
 
-    gpjax_params = get_conjugate_posterior_params()
+    gpjax_params = _get_conjugate_posterior_params()
     numpyro_params = numpyro_dict_params(gpjax_params)
 
     # add constraint
@@ -115,7 +115,7 @@ def test_numpyro_add_constraints_all(constraint):
         chex.assert_equal(iparams["constraint"], constraint)
 
     # check we didn't modify original dictionary
-    chex.assert_equal(gpjax_params, get_conjugate_posterior_params())
+    chex.assert_equal(gpjax_params, _get_conjugate_posterior_params())
 
 
 @pytest.mark.parametrize(
@@ -133,7 +133,7 @@ def test_numpyro_add_constraints_all(constraint):
 )
 def test_numpyro_add_constraints_str(variable, constraint):
 
-    gpjax_params = get_conjugate_posterior_params()
+    gpjax_params = _get_conjugate_posterior_params()
     numpyro_params = numpyro_dict_params(gpjax_params)
 
     # add constraint
@@ -143,7 +143,7 @@ def test_numpyro_add_constraints_str(variable, constraint):
     chex.assert_equal(new_numpyro_params[variable]["constraint"], constraint)
 
     # check we didn't modify original dictionary
-    chex.assert_equal(gpjax_params, get_conjugate_posterior_params())
+    chex.assert_equal(gpjax_params, _get_conjugate_posterior_params())
 
 
 @pytest.mark.parametrize(
@@ -161,7 +161,7 @@ def test_numpyro_add_constraints_str(variable, constraint):
 )
 def test_numpyro_add_constraints_dict(variable, constraint):
 
-    gpjax_params = get_conjugate_posterior_params()
+    gpjax_params = _get_conjugate_posterior_params()
     numpyro_params = numpyro_dict_params(gpjax_params)
 
     # create new dictionary
@@ -174,4 +174,4 @@ def test_numpyro_add_constraints_dict(variable, constraint):
     chex.assert_equal(new_numpyro_params[variable]["constraint"], constraint)
 
     # check we didn't modify original dictionary
-    chex.assert_equal(gpjax_params, get_conjugate_posterior_params())
+    chex.assert_equal(gpjax_params, _get_conjugate_posterior_params())
