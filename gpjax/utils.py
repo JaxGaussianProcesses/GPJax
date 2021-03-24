@@ -1,6 +1,7 @@
 from typing import Tuple
 
 import jax.numpy as jnp
+from jax.scipy.linalg import cho_factor, cho_solve
 from multipledispatch import dispatch
 
 from .types import Array
