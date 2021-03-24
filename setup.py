@@ -23,13 +23,13 @@ EXTRAS = {
         "nbsphinx==0.8.1",
         "nb-black==1.0.7",
         "matplotlib==3.3.3",
-        "sphinx-copybutton==0.3.3",
+        "sphinx-copybutton==0.3.4",
     ],
 }
 
 setup(
     name="GPJax",
-    version="0.3.3",
+    version="0.3.4",
     author="Thomas Pinder",
     author_email="t.pinder2@lancaster.ac.uk",
     packages=find_packages(".", exclude=["tests"]),
