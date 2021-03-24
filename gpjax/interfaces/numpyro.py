@@ -118,7 +118,7 @@ def numpyro_marginal_ll(gp: ConjugatePosterior, numpyro_params: dict) -> Callabl
             dist.MultivariateNormal(loc=mu, scale_tril=L)
             .expand_by(y.shape[:-1])
             .to_event(y.ndim - 1),
-            obs=y.squeeze(),
+            obs=y,
         )
 
     return mll

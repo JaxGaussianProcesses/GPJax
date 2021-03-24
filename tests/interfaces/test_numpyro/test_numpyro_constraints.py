@@ -25,40 +25,6 @@ def get_conjugate_posterior_params() -> dict:
     return params
 
 
-def get_numpyro_params() -> dict:
-
-    params = {
-        "lengthscale": {
-            "param_type": "param",
-            "init_value": jnp.array(1.0),
-            "constraint": constraints.positive,
-        },
-        "variance": {
-            "param_type": "param",
-            "init_value": jnp.array(1.0),
-            "constraint": constraints.positive,
-        },
-        "obs_noise": {
-            "param_type": "param",
-            "init_value": jnp.array(1.0),
-            "constraint": constraints.positive,
-        },
-    }
-
-    return params
-
-
-def get_numpyro_priors() -> dict:
-
-    hyperpriors = {
-        "lengthscale": dist.Gamma(1.0, 1.0),
-        "variance": dist.HalfCauchy(scale=1.0),
-        "obs_noise": dist.HalfCauchy(scale=5.0),
-    }
-
-    return hyperpriors
-
-
 def test_numpyro_dict_params_defaults():
 
     gpjax_params = get_conjugate_posterior_params()
