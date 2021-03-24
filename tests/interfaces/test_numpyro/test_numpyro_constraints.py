@@ -1,6 +1,7 @@
 import chex
 import jax.numpy as jnp
 import jax.random as jr
+import numpy as np
 import numpyro
 import numpyro.distributions as dist
 import pytest
@@ -23,6 +24,26 @@ def _get_conjugate_posterior_params() -> dict:
     return params
 
 
+@pytest.mark.parametrize(
+    "input_types",
+    [
+        str(1.0),
+        np.array(1.0),
+        None,
+    ],
+)
+def test_numpyro_dict_params_defaults_nullcase(input_types):
+
+    demo_params = {
+        "lengthscale": input_types,
+        "variance": input_types,
+        "obs_noise": input_types,
+    }
+    with pytest.raises(ValueError):
+
+        numpyro_dict_params(demo_params)
+
+
 def test_numpyro_dict_params_defaults_array():
 
     demo_params = {
@@ -36,7 +57,9 @@ def test_numpyro_dict_params_defaults_array():
     assert set(numpyro_params) == set(demo_params.keys())
     for ikey, iparam in demo_params.items():
         # check keys exist for param
-        assert set(numpyro_params[ikey].keys()) == set(("init_value", "constraint", "param_type"))
+        assert set(numpyro_params[ikey].keys()) == set(
+            ("init_value", "constraint", "param_type")
+        )
         # check init value is the same as initial value
         chex.assert_equal(numpyro_params[ikey]["init_value"], iparam)
         # check default constraint is positive
@@ -68,7 +91,9 @@ def test_numpyro_dict_params_defaults_float():
     assert set(numpyro_params) == set(demo_params.keys())
     for ikey, iparam in demo_params.items():
         # check keys exist for param
-        assert set(numpyro_params[ikey].keys()) == set(("init_value", "constraint", "param_type"))
+        assert set(numpyro_params[ikey].keys()) == set(
+            ("init_value", "constraint", "param_type")
+        )
         # check init value is the same as initial value
         chex.assert_equal(numpyro_params[ikey]["init_value"], iparam)
         # check default constraint is positive

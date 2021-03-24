@@ -31,29 +31,6 @@ def _get_conjugate_posterior_params() -> dict:
     return params, posterior
 
 
-def get_numpyro_params() -> dict:
-
-    params = {
-        "lengthscale": {
-            "param_type": "param",
-            "init_value": jnp.array(1.0),
-            "constraint": constraints.positive,
-        },
-        "variance": {
-            "param_type": "param",
-            "init_value": jnp.array(1.0),
-            "constraint": constraints.positive,
-        },
-        "obs_noise": {
-            "param_type": "param",
-            "init_value": jnp.array(1.0),
-            "constraint": constraints.positive,
-        },
-    }
-
-    return params
-
-
 def _gen_training_data(n_samples, n_features, n_latents):
 
     x = jr.normal(key=KEY, shape=(n_samples, n_features))
@@ -238,7 +215,9 @@ def test_numpyro_marginal_ll_numpyro_priors_shape(n_samples, n_features, n_laten
         jnp.float64,
     ],
 )
-def test_numpyro_marginal_ll_numpyro_priors_type(n_samples, n_features, n_latents, dtype):
+def test_numpyro_marginal_ll_numpyro_priors_type(
+    n_samples, n_features, n_latents, dtype
+):
 
     # create sample data
     X, y = _gen_training_data(n_samples, n_features, n_latents)

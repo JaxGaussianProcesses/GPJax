@@ -25,7 +25,7 @@ def numpyro_dict_params(params: dict) -> List:
     numpyro_params = {}
     for ikey, iparam in params.items():
 
-        if isinstance(iparam, Array) or isinstance(iparam, float):
+        if isinstance(iparam, jnp.DeviceArray) or isinstance(iparam, float):
             numpyro_params[ikey] = {
                 "param_type": "param",
                 "init_value": iparam,
