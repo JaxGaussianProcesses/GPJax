@@ -1,15 +1,13 @@
-from gpjax.interfaces.numpyro import add_constraints, numpyro_dict_params
-import pytest
-
+import chex
 import jax.numpy as jnp
 import jax.random as jr
-
 import numpyro
 import numpyro.distributions as dist
+import pytest
 from numpyro.distributions import constraints
-import chex
 
 from gpjax.gps import Prior
+from gpjax.interfaces.numpyro import add_constraints, numpyro_dict_params
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Gaussian
 from gpjax.parameters import initialise

@@ -5,8 +5,12 @@ from multipledispatch import dispatch
 
 from .kernels import Kernel
 from .kernels.spectral import SpectralKernel
-from .likelihoods import (Gaussian, Likelihood, NonConjugateLikelihoods,
-                          NonConjugateLikelihoodType)
+from .likelihoods import (
+    Gaussian,
+    Likelihood,
+    NonConjugateLikelihoods,
+    NonConjugateLikelihoodType,
+)
 from .mean_functions import MeanFunction, Zero
 
 

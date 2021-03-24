@@ -2,8 +2,13 @@ import jax.numpy as jnp
 import jax.random as jr
 import pytest
 
-from gpjax.likelihoods import (Bernoulli, Gaussian, Poisson, initialise,
-                               predictive_moments)
+from gpjax.likelihoods import (
+    Bernoulli,
+    Gaussian,
+    Poisson,
+    initialise,
+    predictive_moments,
+)
 
 true_initialisation = {"Gaussian": ["obs_noise"], "Bernoulli": [], "Poisson": []}
 

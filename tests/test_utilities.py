@@ -2,8 +2,14 @@ import jax.numpy as jnp
 import jax.random as jr
 import pytest
 
-from gpjax.utils import (I, concat_dictionaries, merge_dictionaries,
-                         sort_dictionary, standardise, unstandardise)
+from gpjax.utils import (
+    I,
+    concat_dictionaries,
+    merge_dictionaries,
+    sort_dictionary,
+    standardise,
+    unstandardise,
+)
 
 
 @pytest.mark.parametrize("n", [1, 10, 100])

@@ -1,19 +1,20 @@
 # from typing import Iterable, Dict
 from collections import Iterable
-from jax.scipy.linalg import cholesky
-from chex import Array
+from copy import deepcopy
+from typing import Callable, List, Union
+
+import jax.numpy as jnp
 import numpyro
 import numpyro.distributions as dist
-from gpjax.kernels import gram
-from gpjax.utils import I
-from gpjax.likelihoods import link_function
+from chex import Array
+from jax.scipy.linalg import cholesky
 from multipledispatch import dispatch
-from gpjax.gps import ConjugatePosterior, NonConjugatePosterior
-from typing import Callable, List, Union
-import jax.numpy as jnp
-import numpyro.distributions as dist
 from numpyro import module
-from copy import deepcopy
+
+from gpjax.gps import ConjugatePosterior, NonConjugatePosterior
+from gpjax.kernels import gram
+from gpjax.likelihoods import link_function
+from gpjax.utils import I
 
 numpyro_constraint = numpyro.distributions.constraints.Constraint
 numpyro_priors = numpyro.distributions.Distribution

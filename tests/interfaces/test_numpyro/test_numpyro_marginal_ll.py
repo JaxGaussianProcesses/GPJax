@@ -1,21 +1,19 @@
+import chex
+import jax.numpy as jnp
+import jax.random as jr
+import numpyro
+import numpyro.distributions as dist
+import pytest
+from numpyro.contrib.tfp import distributions as tfd
+from numpyro.distributions import constraints
+
+from gpjax.gps import Prior
 from gpjax.interfaces.numpyro import (
     add_constraints,
     add_priors,
     numpyro_dict_params,
     numpyro_marginal_ll,
 )
-import pytest
-
-import jax.numpy as jnp
-import jax.random as jr
-
-import numpyro
-import numpyro.distributions as dist
-from numpyro.distributions import constraints
-from numpyro.contrib.tfp import distributions as tfd
-import chex
-
-from gpjax.gps import Prior
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Gaussian
 from gpjax.parameters import initialise
