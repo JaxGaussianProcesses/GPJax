@@ -1,8 +1,12 @@
 import jax.numpy as jnp
 from multipledispatch import dispatch
 
-from ..gps import (ConjugatePosterior, NonConjugatePosterior, Posterior,
-                   SpectralPosterior)
+from ..gps import (
+    ConjugatePosterior,
+    NonConjugatePosterior,
+    Posterior,
+    SpectralPosterior,
+)
 from ..kernels import Kernel, initialise
 from ..likelihoods import Likelihood, initialise
 from ..mean_functions import MeanFunction, initialise

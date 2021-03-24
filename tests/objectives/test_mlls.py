@@ -10,8 +10,7 @@ from gpjax.config import get_defaults
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.objectives import marginal_ll
-from gpjax.parameters import (build_all_transforms, build_unconstrain,
-                              initialise)
+from gpjax.parameters import build_all_transforms, build_unconstrain, initialise
 
 
 def test_conjugate():

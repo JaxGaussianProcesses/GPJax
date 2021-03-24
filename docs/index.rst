@@ -45,5 +45,6 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
     :maxdepth: 1
     :caption: Experimental
 
+    nbs/numpyro_interface
     nbs/tfp_interface
     nbs/spectral

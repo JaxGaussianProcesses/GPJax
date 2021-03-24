@@ -1,7 +1,12 @@
 import pytest
 
-from gpjax.gps import (ConjugatePosterior, NonConjugatePosterior, Posterior,
-                       Prior, SpectralPosterior)
+from gpjax.gps import (
+    ConjugatePosterior,
+    NonConjugatePosterior,
+    Posterior,
+    Prior,
+    SpectralPosterior,
+)
 from gpjax.kernels import RBF, to_spectral
 from gpjax.likelihoods import Gaussian, NonConjugateLikelihoods
 

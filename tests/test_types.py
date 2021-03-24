@@ -1,7 +1,7 @@
 import jax.numpy as jnp
 import pytest
 
-from gpjax.types import Dataset, NoneType
+from gpjax.types import Dataset, NoneType, verify_dataset
 
 
 def test_nonetype():
@@ -15,6 +15,7 @@ def test_dataset(n, outd, ind):
     x = jnp.ones((n, ind))
     y = jnp.ones((n, outd))
     d = Dataset(X=x, y=y)
+    verify_dataset(d)
     assert d.n == n
     assert d.in_dim == ind
     assert d.out_dim == outd
@@ -25,10 +26,12 @@ def test_dataset_assertions(nx, ny):
     x = jnp.ones((nx, 1))
     y = jnp.ones((ny, 1))
     with pytest.raises(AssertionError):
-        d = Dataset(X=x, y=y)
+        ds = Dataset(X=x, y=y)
+        verify_dataset(ds)
 
 
 def test_y_none():
     x = jnp.ones((10, 1))
     d = Dataset(X=x)
+    verify_dataset(d)
     assert d.y is None

@@ -4,9 +4,13 @@ import pytest
 from tensorflow_probability.substrates.jax import distributions as tfd
 
 from gpjax.kernels import RBF
-from gpjax.kernels.spectral import (SpectralRBF, initialise,
-                                    sample_frequencies, spectral_density,
-                                    to_spectral)
+from gpjax.kernels.spectral import (
+    SpectralRBF,
+    initialise,
+    sample_frequencies,
+    spectral_density,
+    to_spectral,
+)
 
 
 @pytest.mark.parametrize("n_basis", [1, 2, 10])
