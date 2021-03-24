@@ -81,6 +81,14 @@ def add_priors(params: dict, variable: str, priors: numpyro_priors):
     return new_params
 
 
+@dispatch(dict, numpyro_priors)
+def add_priors(params: dict, priors: numpyro_priors):
+    new_params = deepcopy(params)
+    for ivariable in new_params.keys():
+        new_params[ivariable] = {"param_type": "prior", "prior": priors}
+    return new_params
+
+
 @dispatch(ConjugatePosterior, dict)
 def numpyro_marginal_ll(gp: ConjugatePosterior, numpyro_params: dict) -> Callable:
     def mll(x: Array, y: Array):
