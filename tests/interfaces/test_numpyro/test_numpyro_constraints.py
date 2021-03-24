@@ -25,13 +25,18 @@ def get_conjugate_posterior_params() -> dict:
     return params
 
 
-def test_numpyro_dict_params_defaults():
+def test_numpyro_dict_params_defaults_array():
 
-    gpjax_params = get_conjugate_posterior_params()
-    numpyro_params = numpyro_dict_params(gpjax_params)
+    demo_params = {
+        "lengthscale": jnp.array(1.0),
+        "variance": jnp.array(1.0),
+        "obs_noise": jnp.array(1.0),
+    }
 
-    assert set(numpyro_params) == set(gpjax_params.keys())
-    for ikey, iparam in gpjax_params.items():
+    numpyro_params = numpyro_dict_params(demo_params)
+
+    assert set(numpyro_params) == set(demo_params.keys())
+    for ikey, iparam in demo_params.items():
         # check keys exist for param
         assert set(numpyro_params[ikey].keys()) == set(
             ("init_value", "constraint", "param_type")
@@ -44,7 +49,48 @@ def test_numpyro_dict_params_defaults():
         chex.assert_equal(numpyro_params[ikey]["param_type"], "param")
 
     # check we didn't modify original dictionary
-    chex.assert_equal(gpjax_params, get_conjugate_posterior_params())
+    chex.assert_equal(
+        demo_params,
+        {
+            "lengthscale": jnp.array(1.0),
+            "variance": jnp.array(1.0),
+            "obs_noise": jnp.array(1.0),
+        },
+    )
+
+
+def test_numpyro_dict_params_defaults_float():
+
+    demo_params = {
+        "lengthscale": 1.0,
+        "variance": 1.0,
+        "obs_noise": 1.0,
+    }
+
+    numpyro_params = numpyro_dict_params(demo_params)
+
+    assert set(numpyro_params) == set(demo_params.keys())
+    for ikey, iparam in demo_params.items():
+        # check keys exist for param
+        assert set(numpyro_params[ikey].keys()) == set(
+            ("init_value", "constraint", "param_type")
+        )
+        # check init value is the same as initial value
+        chex.assert_equal(numpyro_params[ikey]["init_value"], iparam)
+        # check default constraint is positive
+        chex.assert_equal(numpyro_params[ikey]["constraint"], constraints.positive)
+        # check if param type is param
+        chex.assert_equal(numpyro_params[ikey]["param_type"], "param")
+
+    # check we didn't modify original dictionary
+    chex.assert_equal(
+        demo_params,
+        {
+            "lengthscale": 1.0,
+            "variance": 1.0,
+            "obs_noise": 1.0,
+        },
+    )
 
 
 @pytest.mark.parametrize(

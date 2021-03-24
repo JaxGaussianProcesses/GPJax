@@ -13,7 +13,7 @@ from gpjax.gps import Prior
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Gaussian
 from gpjax.parameters import initialise
-
+from tensorflow_probability.substrates.jax import distributions as tfd
 
 # TODO: test conjugate posterior
 def get_conjugate_posterior_params() -> dict:
@@ -25,32 +25,40 @@ def get_conjugate_posterior_params() -> dict:
     return params
 
 
-def test_numpyro_dict_priors_defaults():
+def test_numpyro_dict_priors_defaults_numpyro():
 
-    demo_params = {
-        "lengthscale": {"prior": dist.LogNormal()},
-        "variance": {"prior": dist.LogNormal()},
-        "obs_noise": {"prior": dist.LogNormal()},
+    demo_priors = {
+        "lengthscale": dist.LogNormal(loc=0.0, scale=1.0),
+        "variance": dist.LogNormal(loc=0.0, scale=1.0),
+        "obs_noise": dist.LogNormal(loc=0.0, scale=1.0),
     }
 
-    numpyro_params = numpyro_dict_params(demo_params)
+    numpyro_params = numpyro_dict_params(demo_priors)
 
-    assert set(numpyro_params) == set(demo_params.keys())
-    for ikey, iparam in demo_params.items():
+    assert set(numpyro_params) == set(demo_priors.keys())
+    for ikey, iparam in demo_priors.items():
         # check keys exist for param
         assert set(numpyro_params[ikey].keys()) == set(("prior", "param_type"))
         # check init value is the same as initial value
-        chex.assert_equal(numpyro_params[ikey]["prior"], iparam["prior"])
+        chex.assert_equal(numpyro_params[ikey]["prior"], iparam)
 
-    # check we didn't modify original dictionary
-    chex.assert_equal(
-        demo_params,
-        {
-            "lengthscale": {"prior": dist.LogNormal()},
-            "variance": {"prior": dist.LogNormal()},
-            "obs_noise": {"prior": dist.LogNormal()},
-        },
-    )
+
+def test_numpyro_dict_priors_defaults_tfp():
+
+    demo_priors = {
+        "lengthscale": tfd.LogNormal(loc=0.0, scale=1.0),
+        "variance": tfd.LogNormal(loc=0.0, scale=1.0),
+        "obs_noise": tfd.LogNormal(loc=0.0, scale=1.0),
+    }
+
+    numpyro_params = numpyro_dict_params(demo_priors)
+
+    assert set(numpyro_params) == set(demo_priors.keys())
+    for ikey, iparam in demo_priors.items():
+        # check keys exist for param
+        assert set(numpyro_params[ikey].keys()) == set(("prior", "param_type"))
+        # check init value is the same as initial value
+        chex.assert_equal(numpyro_params[ikey]["prior"], iparam)
 
 
 @pytest.mark.parametrize(
@@ -59,6 +67,9 @@ def test_numpyro_dict_priors_defaults():
         dist.Gamma(concentration=1.0, rate=1.0),
         dist.HalfCauchy(scale=1.0),
         dist.LogNormal(loc=0.0, scale=1.0),
+        tfd.Gamma(concentration=1.0, rate=1.0),
+        tfd.HalfCauchy(loc=0.0, scale=1.0),
+        tfd.LogNormal(loc=0.0, scale=1.0),
     ],
 )
 def test_numpyro_add_priors_all(prior):
@@ -88,6 +99,9 @@ def test_numpyro_add_priors_all(prior):
         dist.Gamma(concentration=1.0, rate=1.0),
         dist.HalfCauchy(scale=1.0),
         dist.LogNormal(loc=0.0, scale=1.0),
+        tfd.Gamma(concentration=1.0, rate=1.0),
+        tfd.HalfCauchy(loc=0.0, scale=1.0),
+        tfd.LogNormal(loc=0.0, scale=1.0),
     ],
 )
 def test_numpyro_add_priors_str(variable, prior):
@@ -116,6 +130,9 @@ def test_numpyro_add_priors_str(variable, prior):
         dist.Gamma(concentration=1.0, rate=1.0),
         dist.HalfCauchy(scale=1.0),
         dist.LogNormal(loc=0.0, scale=1.0),
+        tfd.Gamma(concentration=1.0, rate=1.0),
+        tfd.HalfCauchy(loc=0.0, scale=1.0),
+        tfd.LogNormal(loc=0.0, scale=1.0),
     ],
 )
 def test_numpyro_add_priors_dict(variable, prior):
