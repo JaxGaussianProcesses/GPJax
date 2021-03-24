@@ -8,8 +8,8 @@ from ..gps import ConjugatePosterior, NonConjugatePosterior
 from ..kernels import gram
 from ..likelihoods import link_function
 from ..parameters.priors import evaluate_prior, prior_checks
-from ..types import Array
-from ..utils import I
+from ..types import Array, Dataset
+from ..utils import I, concat_dictionaries
 
 
 @dispatch(ConjugatePosterior)
@@ -26,8 +26,11 @@ def marginal_ll(
     Returns: A multivariate normal distribution
     """
 
-    def mll(params: dict, x: Array, y: Array, priors: dict = None):
+    def mll(params: dict, training: Dataset, priors: dict = None, static_params: dict = None):
+        x, y = training.X, training.y
         params = transform(params)
+        if static_params:
+            params = concat_dictionaries(params, transform(static_params))
         mu = gp.prior.mean_function(x)
         gram_matrix = gram(gp.prior.kernel, x, params)
         gram_matrix += params["obs_noise"] * I(x.shape[0])
@@ -49,10 +52,16 @@ def marginal_ll(
     jitter: float = 1e-6,
 ) -> Callable:
     def mll(
-        params: dict, x: Array, y: Array, priors: dict = {"latent": tfd.Normal(loc=0.0, scale=1.0)}
+        params: dict,
+        training: Dataset,
+        priors: dict = {"latent": tfd.Normal(loc=0.0, scale=1.0)},
+        static_params: dict = None,
     ):
+        x, y = training.X, training.y
+        n = training.n
         params = transform(params)
-        n = x.shape[0]
+        if static_params:
+            params = concat_dictionaries(params, transform(static_params))
         link = link_function(gp.likelihood)
         gram_matrix = gram(gp.prior.kernel, x, params)
         gram_matrix += I(n) * jitter
