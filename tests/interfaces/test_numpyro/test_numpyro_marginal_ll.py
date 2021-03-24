@@ -23,7 +23,7 @@ seed = 123
 KEY = jr.PRNGKey(seed)
 
 # TODO: test conjugate posterior
-def get_conjugate_posterior_params() -> dict:
+def _get_conjugate_posterior_params() -> dict:
     kernel = RBF()
     prior = Prior(kernel=kernel)
     lik = Gaussian()
@@ -66,7 +66,7 @@ def get_numpyro_priors() -> dict:
     return hyperpriors
 
 
-def gen_training_data(n_samples, n_features, n_latents):
+def _gen_training_data(n_samples, n_features, n_latents):
 
     x = jr.normal(key=KEY, shape=(n_samples, n_features))
     y = jr.normal(key=KEY, shape=(n_samples, n_latents))
@@ -76,10 +76,10 @@ def gen_training_data(n_samples, n_features, n_latents):
 def test_numpyro_marginal_ll_params():
 
     # create sample data
-    X, y = gen_training_data(10, 10, 2)
+    X, y = _gen_training_data(10, 10, 2)
 
     # initialize parameters
-    params, posterior = get_conjugate_posterior_params()
+    params, posterior = _get_conjugate_posterior_params()
 
     # convert to numpyro-style params
     numpyro_params = numpyro_dict_params(params)
@@ -109,10 +109,10 @@ def test_numpyro_marginal_ll_params():
 def test_numpyro_marginal_ll_params_shape(n_samples, n_features, n_latents):
 
     # create sample data
-    X, y = gen_training_data(n_samples, n_features, n_latents)
+    X, y = _gen_training_data(n_samples, n_features, n_latents)
 
     # initialize parameters
-    params, posterior = get_conjugate_posterior_params()
+    params, posterior = _get_conjugate_posterior_params()
 
     # convert to numpyro-style params
     numpyro_params = numpyro_dict_params(params)
@@ -149,14 +149,14 @@ def test_numpyro_marginal_ll_params_shape(n_samples, n_features, n_latents):
 def test_numpyro_marginal_ll_params_type(n_samples, n_features, n_latents, dtype):
 
     # create sample data
-    X, y = gen_training_data(n_samples, n_features, n_latents)
+    X, y = _gen_training_data(n_samples, n_features, n_latents)
 
     # convert to tyle
     X = X.astype(dtype)
     y = y.astype(dtype)
 
     # initialize parameters
-    params, posterior = get_conjugate_posterior_params()
+    params, posterior = _get_conjugate_posterior_params()
 
     # convert to numpyro-style params
     numpyro_params = numpyro_dict_params(params)
@@ -174,10 +174,10 @@ def test_numpyro_marginal_ll_params_type(n_samples, n_features, n_latents, dtype
 def test_numpyro_marginal_ll_priors():
 
     # create sample data
-    X, y = gen_training_data(10, 10, 2)
+    X, y = _gen_training_data(10, 10, 2)
 
     # initialize parameters
-    params, posterior = get_conjugate_posterior_params()
+    params, posterior = _get_conjugate_posterior_params()
 
     # convert to numpyro-style params
     numpyro_params = numpyro_dict_params(params)
@@ -210,10 +210,10 @@ def test_numpyro_marginal_ll_priors():
 def test_numpyro_marginal_ll_priors_shape(n_samples, n_features, n_latents):
 
     # create sample data
-    X, y = gen_training_data(n_samples, n_features, n_latents)
+    X, y = _gen_training_data(n_samples, n_features, n_latents)
 
     # initialize parameters
-    params, posterior = get_conjugate_posterior_params()
+    params, posterior = _get_conjugate_posterior_params()
 
     # convert to numpyro-style params
     numpyro_params = numpyro_dict_params(params)
@@ -253,14 +253,14 @@ def test_numpyro_marginal_ll_priors_shape(n_samples, n_features, n_latents):
 def test_numpyro_marginal_ll_priors_type(n_samples, n_features, n_latents, dtype):
 
     # create sample data
-    X, y = gen_training_data(n_samples, n_features, n_latents)
+    X, y = _gen_training_data(n_samples, n_features, n_latents)
 
     # convert to tyle
     X = X.astype(dtype)
     y = y.astype(dtype)
 
     # initialize parameters
-    params, posterior = get_conjugate_posterior_params()
+    params, posterior = _get_conjugate_posterior_params()
 
     # convert to numpyro-style params
     numpyro_params = numpyro_dict_params(params)
