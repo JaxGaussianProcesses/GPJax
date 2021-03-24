@@ -36,9 +36,7 @@ def test_numpyro_dict_params_defaults_array():
     assert set(numpyro_params) == set(demo_params.keys())
     for ikey, iparam in demo_params.items():
         # check keys exist for param
-        assert set(numpyro_params[ikey].keys()) == set(
-            ("init_value", "constraint", "param_type")
-        )
+        assert set(numpyro_params[ikey].keys()) == set(("init_value", "constraint", "param_type"))
         # check init value is the same as initial value
         chex.assert_equal(numpyro_params[ikey]["init_value"], iparam)
         # check default constraint is positive
@@ -70,9 +68,7 @@ def test_numpyro_dict_params_defaults_float():
     assert set(numpyro_params) == set(demo_params.keys())
     for ikey, iparam in demo_params.items():
         # check keys exist for param
-        assert set(numpyro_params[ikey].keys()) == set(
-            ("init_value", "constraint", "param_type")
-        )
+        assert set(numpyro_params[ikey].keys()) == set(("init_value", "constraint", "param_type"))
         # check init value is the same as initial value
         chex.assert_equal(numpyro_params[ikey]["init_value"], iparam)
         # check default constraint is positive
