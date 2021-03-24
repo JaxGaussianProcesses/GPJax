@@ -25,6 +25,34 @@ def get_conjugate_posterior_params() -> dict:
     return params
 
 
+def test_numpyro_dict_priors_defaults():
+
+    demo_params = {
+        "lengthscale": {"prior": dist.LogNormal()},
+        "variance": {"prior": dist.LogNormal()},
+        "obs_noise": {"prior": dist.LogNormal()},
+    }
+
+    numpyro_params = numpyro_dict_params(demo_params)
+
+    assert set(numpyro_params) == set(demo_params.keys())
+    for ikey, iparam in demo_params.items():
+        # check keys exist for param
+        assert set(numpyro_params[ikey].keys()) == set(("prior", "param_type"))
+        # check init value is the same as initial value
+        chex.assert_equal(numpyro_params[ikey]["prior"], iparam["prior"])
+
+    # check we didn't modify original dictionary
+    chex.assert_equal(
+        demo_params,
+        {
+            "lengthscale": {"prior": dist.LogNormal()},
+            "variance": {"prior": dist.LogNormal()},
+            "obs_noise": {"prior": dist.LogNormal()},
+        },
+    )
+
+
 @pytest.mark.parametrize(
     "prior",
     [
