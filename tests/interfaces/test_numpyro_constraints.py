@@ -72,8 +72,35 @@ def test_numpyro_dict_params_defaults():
         )
         # check init value is the same as initial value
         chex.assert_equal(numpyro_params[ikey]["init_value"], iparam)
+        # check default constraint is positive
         chex.assert_equal(numpyro_params[ikey]["constraint"], constraints.positive)
+        # check if param type is param
         chex.assert_equal(numpyro_params[ikey]["param_type"], "param")
+
+    # check we didn't modify original dictionary
+    chex.assert_equal(gpjax_params, get_conjugate_posterior_params())
+
+
+@pytest.mark.parametrize(
+    "constraint",
+    [
+        constraints.positive,
+        constraints.real,
+        constraints.softplus_positive,
+        constraints.softplus_lower_cholesky,
+    ],
+)
+def test_numpyro_add_constraints_all(constraint):
+
+    gpjax_params = get_conjugate_posterior_params()
+    numpyro_params = numpyro_dict_params(gpjax_params)
+
+    # add constraint
+    new_numpyro_params = add_constraints(numpyro_params, constraint)
+    for iparams in new_numpyro_params.values():
+
+        # check if constraint in new dictionary
+        chex.assert_equal(iparams["constraint"], constraint)
 
     # check we didn't modify original dictionary
     chex.assert_equal(gpjax_params, get_conjugate_posterior_params())
@@ -99,4 +126,40 @@ def test_numpyro_add_constraints_str(variable, constraint):
 
     # add constraint
     new_numpyro_params = add_constraints(numpyro_params, variable, constraint)
+
+    # check if constraint in new dictionary
     chex.assert_equal(new_numpyro_params[variable]["constraint"], constraint)
+
+    # check we didn't modify original dictionary
+    chex.assert_equal(gpjax_params, get_conjugate_posterior_params())
+
+
+@pytest.mark.parametrize(
+    "variable",
+    ["lengthscale", "obs_noise", "variance"],
+)
+@pytest.mark.parametrize(
+    "constraint",
+    [
+        constraints.positive,
+        constraints.real,
+        constraints.softplus_positive,
+        constraints.softplus_lower_cholesky,
+    ],
+)
+def test_numpyro_add_constraints_dict(variable, constraint):
+
+    gpjax_params = get_conjugate_posterior_params()
+    numpyro_params = numpyro_dict_params(gpjax_params)
+
+    # create new dictionary
+    new_param_dict = {str(variable): constraint}
+
+    # add constraint
+    new_numpyro_params = add_constraints(numpyro_params, new_param_dict)
+
+    # check if constraint in new dictionary
+    chex.assert_equal(new_numpyro_params[variable]["constraint"], constraint)
+
+    # check we didn't modify original dictionary
+    chex.assert_equal(gpjax_params, get_conjugate_posterior_params())
