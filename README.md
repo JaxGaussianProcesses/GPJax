@@ -10,6 +10,14 @@
 
 GPJax aims to provide a low-level interface to Gaussian process models. Code is written entirely in [Jax](https://github.com/google/jax) to enhance readability, and structured to allow researchers to easily extend the code to suit their own needs. When defining GP prior in GPJax, the user need only specify a mean and kernel function. A GP posterior can then be realised by computing the product of our prior with a likelihood function. The idea behind this is that the code should be as close as possible to the maths that we would write on paper when working with GP models.
 
+## Supported methods and interfaces
+
+* [__Conjugate Inference__](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)
+* [__Classification__](https://gpjax.readthedocs.io/en/latest/nbs/classification.html) through [__Hamiltonian Monte Carlo__](https://gpjax.readthedocs.io/en/latest/nbs/numpyro_interface.html#Hamiltonian-Monte-Carlo) or [__Variational Inference__](https://gpjax.readthedocs.io/en/latest/nbs/numpyro_interface.html#Approximate-Inference-with-Guides)
+* [__Spectral Kernels__](https://gpjax.readthedocs.io/en/latest/nbs/spectral.html)
+* [__NumPyro Integraion__](https://gpjax.readthedocs.io/en/latest/nbs/numpyro_interface.html#)
+* [__TensorFlow Probability Integration__](https://gpjax.readthedocs.io/en/latest/nbs/tfp_interface.html)
+
 ## Simple example
 
 After importing the necessary dependencies, we'll first simulate some data. 

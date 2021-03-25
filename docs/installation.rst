@@ -13,7 +13,7 @@ To install the latest stable release using :code:`pip` execute the following:
 GPU support
 ^^^^^^^^^^^^^^^^^^^
 
-GPU support is enabled through proper configuration of the underlying `Jax <https://github.com/google/jax>`_ and `ObJax <https://github.com/google/objax/>`_ installations. CPU enabled forms of both packages are installed as part of the GPJax installation. For GPU Jax support, the following command should be run
+GPU support is enabled through proper configuration of the underlying `Jax <https://github.com/google/jax>`_ installation. CPU enabled forms of both packages are installed as part of the GPJax installation. For GPU Jax support, the following command should be run
 
 .. code-block:: bash
 
