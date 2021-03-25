@@ -4,19 +4,26 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/thomaspinder/gpjax/badge)](https://www.codefactor.io/repository/github/thomaspinder/gpjax)
 [![Documentation Status](https://readthedocs.org/projects/gpjax/badge/?version=latest)](https://gpjax.readthedocs.io/en/latest/?badge=latest)
 
-GPJax aims to provide a low-level interface to Gaussian process models. Code is written entirely in Jax to enhance readability, and structured to allow researchers to easily extend the code to suit their own needs. When defining GP prior in GPJax, the user need only specify a mean and kernel function. A GP posterior can then be realised by computing the product of our prior with a likelihood function. The idea behind this is that the code should be as close as possible to the maths that we would write on paper when working with GP models.
+[**Quickstart**](#simple-example)
+| [**Install guide**](#installation)
+| [**Documentation**](https://gpjax.readthedocs.io/en/latest/)
+
+GPJax aims to provide a low-level interface to Gaussian process models. Code is written entirely in [Jax](https://github.com/google/jax) to enhance readability, and structured to allow researchers to easily extend the code to suit their own needs. When defining GP prior in GPJax, the user need only specify a mean and kernel function. A GP posterior can then be realised by computing the product of our prior with a likelihood function. The idea behind this is that the code should be as close as possible to the maths that we would write on paper when working with GP models.
 
 ## Simple example
 
 After importing the necessary dependencies, we'll first simulate some data. 
 ```python
 import gpjax
+from gpjax import Dataset
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 key = jr.PRNGKey(123)
 
 x = jr.uniform(key=key, minval=-3.0, maxval=3.0, shape=(50,)).sort().reshape(-1, 1)
 y = jnp.sin(x) + jr.normal(key, shape=x.shape)*0.05
+training = Dataset(X=x, y=y)
 ```
 
 As can be seen, the latent function of interest here is a sinusoidal function. However, it has been perturbed by some zero-mean Gaussian noise with variance of 0.05. We can use a Gaussian process model to try and recover this latent function.
@@ -40,9 +47,13 @@ posterior = f * likelihood
 Equipped with the Gaussian process posterior, we can now optimise the model's hyperparameters (note, we need not optimise the latent function here due to the Gaussian conjugacy.). To do this, we can either define our parameters by hand through a dictionary, or realise a set of default parameters through the `initialise` callable. For brevity, we'll do the latter here but see the [regression notebook](https://github.com/thomaspinder/GPJax/blob/master/docs/nbs/regression.ipynb) for a full discussion on parameter initialisation and transformation. 
 
 ```python
-from gpjax.parameters import initialise, transform, SoftplusTransformation
+from gpjax.parameters import initialise, build_all_transforms
+from gpjax.config import get_defaults
 
-params = transform(initialise(posterior), SoftplusTransformation)
+params = initialise(posterior)
+configs = get_defaults()
+constrainer, unconstrainer = build_all_transforms(params.keys(), configs)
+params = unconstrainer(params)
 ```
 
 With initial values defined, we can now optimise the hyperparameters' value by carrying out gradient-based optimisation with respect to the GP's marginal log-likelihood. We'll do this now using Jax's built in optimisers, namely the Adam optimiser with a step-size of 0.01. We can also Jit compile our objective function to accelerate training. You'll notice that it is only now that we have incorporated any data into our GP. This is desirable, as this is exactly how model building works in principle too, where we first build our prior model, then observe some data and use this data to build a posterior.
@@ -50,15 +61,14 @@ With initial values defined, we can now optimise the hyperparameters' value by c
 ```python
 from gpjax.objectives import marginal_ll
 from jax.experimental import optimizers
-import jax
 
-mll = jax.jit(marginal_ll(posterior, negative=True))
+mll = jit(marginal_ll(posterior, transform=constrainer, negative=True))
 
 opt_init, opt_update, get_params = optimizers.adam(step_size=0.01)
 opt_state = opt_init(params)
 def step(i, opt_state):
     p = get_params(opt_state)
-    g = jax.grad(mll)(p, x, y)
+    g = jax.grad(mll)(p, training)
     return opt_update(i, g, opt_state)
 
 
@@ -71,14 +81,14 @@ Our parameters are now optimised. We can retransfrom these back onto the paramet
 
 ```python
 from gpjax.predict import mean, variance
-from gpjax.parameters import untransform
 
-final_params = untransform(get_params(opt_state), SoftplusTransformation)
+
+final_params = constrainer(get_params(opt_state))
 
 xtest = jnp.linspace(-3., 3., 100).reshape(-1, 1)
 
-predictive_mean = mean(posterior, final_params, xtest, x, y)
-predictive_variance = variance(posterior, final_params, xtest, x, y)
+predictive_mean = mean(posterior, final_params, training)(xtest)
+predictive_variance = variance(posterior, final_params, training)(xtest)
 ```
 
 ## Installation
@@ -89,7 +99,6 @@ To install the latest stable version of gpjax run
 ```bash
 pip install gpjax
 ```
-Note, this will require a Python version >= 3.7.
 
 ### Development version
 
@@ -101,7 +110,9 @@ cd GPJax
 python setup.py develop
 ```
 
-## To do
+It is then recommended that you check your installation using the supplied unit tests
+```python
+python -m pytest tests/
+```
 
-* Spectral kernels ([in progress](https://github.com/thomaspinder/GPJax/tree/spectral))
-* Inducing point schemes ([in progress](https://github.com/thomaspinder/GPJax/tree/inducing_points))
+**Note that installing the latest version of GPJax on Apple M1 devices is currently unstable.**
