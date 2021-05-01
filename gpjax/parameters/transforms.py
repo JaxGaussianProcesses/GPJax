@@ -14,7 +14,7 @@ def build_unconstrain(keys: KeysView, config: ConfigDict) -> Callable:
     :param config: A configuration dictionary that informs which transformation should be applied to which parameter.
     :return: A callable that will apply the desired transformation(s).
     """
-    transforms = {k: config.transformations[config.transformations[k]]() for k in keys}
+    transforms = {k: config.transformations[config.transformations[k]] for k in keys}
 
     def unconstrain(params: dict) -> dict:
         return {k: jnp.array(transforms[k].inverse(v)) for k, v in params.items()}
@@ -31,7 +31,7 @@ def build_constrain(keys: KeysView, config: ConfigDict) -> Callable:
     :param config: A configuration dictionary that informs which transformation should be applied to which parameter.
     :return: A callable that will apply the desired transformation(s).
     """
-    transforms = {k: config.transformations[config.transformations[k]]() for k in keys}
+    transforms = {k: config.transformations[config.transformations[k]] for k in keys}
 
     def constrain(params: dict) -> dict:
         return {k: jnp.array(transforms[k].forward(v)) for k, v in params.items()}
