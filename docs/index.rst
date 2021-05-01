@@ -16,7 +16,7 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
     key = jr.PRNGKey(123)
 
     kernel = gpjax.kernels.RBF()
-    f_prior = gpjax.gps.Prior(kernel)
+    f_prior = gpjax.gps.Prior(kernel = kernel)
 
     likelihood = gpjax.likelihoods.Gaussian()
 
