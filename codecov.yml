@@ -12,3 +12,5 @@ fixes:
 ignore:
   - "setup.py"
   - "*/tests/.*"
+  - "gpjax/core.py"
+  - "__init__.py"

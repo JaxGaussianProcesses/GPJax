@@ -48,3 +48,13 @@ def test_sample_frequencies(n_freqs):
     assert (omegad == omega).all()
     assert omegad.dtype == jnp.float64
     assert omega.dtype == jnp.float64
+
+
+def test_call():
+    key = jr.PRNGKey(123)
+    kernel = SpectralRBF(num_basis=10)
+    params = initialise(key, kernel)
+    x, y = jnp.array([[1.]]), jnp.array([[0.5]])
+    point_corr = kernel(x, y, params)
+    assert isinstance(point_corr, jnp.DeviceArray)
+    assert point_corr.shape == (1, 1)

@@ -27,6 +27,15 @@ def test_cross_covariance(n1, n2):
     assert kernel_matrix.shape == (n1, n2)
 
 
+def test_call():
+    kernel = RBF()
+    params = initialise(kernel)
+    x, y = jnp.array([[1.]]), jnp.array([[0.5]])
+    point_corr = kernel(x, y, params)
+    assert isinstance(point_corr, jnp.DeviceArray)
+    assert point_corr.shape == ()
+
+
 @pytest.mark.parametrize("dim", [1, 2, 5])
 @pytest.mark.parametrize("ell, sigma", [(0.1, 0.1), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
 def test_pos_def(dim, ell, sigma):
