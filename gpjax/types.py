@@ -14,9 +14,7 @@ Array = (
     JVPTracer,
     DynamicJaxprTracer,
 )
-Arrays = Union[
-    jnp.ndarray, ShardedDeviceArray, jnp.DeviceArray, JVPTracer, DynamicJaxprTracer
-]
+Arrays = Union[jnp.ndarray, ShardedDeviceArray, jnp.DeviceArray, JVPTracer, DynamicJaxprTracer]
 
 
 @dataclass(repr=False)
@@ -25,9 +23,7 @@ class Dataset:
     y: Arrays = None
 
     def __repr__(self) -> str:
-        return (
-            f"- Number of datapoints: {self.X.shape[0]}\n- Dimension: {self.X.shape[1]}"
-        )
+        return f"- Number of datapoints: {self.X.shape[0]}\n- Dimension: {self.X.shape[1]}"
 
     @property
     def n(self) -> int:

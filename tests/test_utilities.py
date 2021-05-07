@@ -4,6 +4,7 @@ import pytest
 
 from gpjax.utils import (
     I,
+    as_constant,
     concat_dictionaries,
     merge_dictionaries,
     sort_dictionary,
@@ -54,3 +55,13 @@ def test_standardise():
     xuntr = unstandardise(xtr, xmean, xstd)
     diff = jnp.sum(jnp.abs(xuntr - x))
     assert pytest.approx(diff) == 0
+
+
+def test_as_constant():
+    base = {"a": 1, "b": 2, "c": 3}
+    b1, s1 = as_constant(base, ["a"])
+    b2, s2 = as_constant(base, ["a", "b"])
+    assert list(b1.keys()) == ["b", "c"]
+    assert list(s1.keys()) == ["a"]
+    assert list(b2.keys()) == ["c"]
+    assert list(s2.keys()) == ["a", "b"]

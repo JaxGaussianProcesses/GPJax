@@ -14,8 +14,8 @@ from numpyro import module
 from gpjax.gps import ConjugatePosterior, NonConjugatePosterior
 from gpjax.kernels import gram
 from gpjax.likelihoods import link_function
-from gpjax.utils import I
 from gpjax.types import Dataset
+from gpjax.utils import I
 
 numpyro_constraint = numpyro.distributions.constraints.Constraint
 numpyro_priors = numpyro.distributions.Distribution

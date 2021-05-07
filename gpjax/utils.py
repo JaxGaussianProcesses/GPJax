@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Tuple
 
 import jax.numpy as jnp
@@ -94,3 +95,12 @@ def unstandardise(
     :return: A matrix of unstandardised values.
     """
     return (x * xstd) + xmean
+
+
+def as_constant(parameter_set: dict, params: list) -> Tuple[dict, dict]:
+    base_params = deepcopy(parameter_set)
+    sparams = {}
+    for param in params:
+        sparams[param] = base_params[param]
+        del base_params[param]
+    return base_params, sparams

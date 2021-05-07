@@ -1,6 +1,7 @@
+from typing import Tuple
+
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from ml_collections import ConfigDict
-from typing import Tuple
 
 
 def get_defaults():

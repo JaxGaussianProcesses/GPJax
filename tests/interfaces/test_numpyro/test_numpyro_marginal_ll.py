@@ -225,9 +225,7 @@ def test_numpyro_marginal_ll_numpyro_priors_shape(n_samples, n_features, n_laten
         jnp.float64,
     ],
 )
-def test_numpyro_marginal_ll_numpyro_priors_type(
-    n_samples, n_features, n_latents, dtype
-):
+def test_numpyro_marginal_ll_numpyro_priors_type(n_samples, n_features, n_latents, dtype):
 
     # create sample data
     ds = _gen_training_data(n_samples, n_features, n_latents)

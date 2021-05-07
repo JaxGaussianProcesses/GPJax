@@ -12,11 +12,18 @@ GPJax aims to provide a low-level interface to Gaussian process models. Code is 
 
 ## Supported methods and interfaces
 
+### Examples
+
 * [__Conjugate Inference__](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)
 * [__Classification__](https://gpjax.readthedocs.io/en/latest/nbs/classification.html) through [__Hamiltonian Monte Carlo__](https://gpjax.readthedocs.io/en/latest/nbs/numpyro_interface.html#Hamiltonian-Monte-Carlo) or [__Variational Inference__](https://gpjax.readthedocs.io/en/latest/nbs/numpyro_interface.html#Approximate-Inference-with-Guides)
 * [__Spectral Kernels__](https://gpjax.readthedocs.io/en/latest/nbs/spectral.html)
 * [__NumPyro Integraion__](https://gpjax.readthedocs.io/en/latest/nbs/numpyro_interface.html#)
 * [__TensorFlow Probability Integration__](https://gpjax.readthedocs.io/en/latest/nbs/tfp_interface.html)
+* [__Inference on Non-Euclidean Spaces__](https://gpjax.readthedocs.io/en/latest/nbs/custom_kernel.html)
+
+### Guides for customisation
+
+* [__Custom Kernel Implementation__](https://gpjax.readthedocs.io/en/latest/nbs/custom_kernel.html)
 
 ## Simple example
 
