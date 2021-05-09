@@ -2,6 +2,7 @@ import jax.numpy as jnp
 from multipledispatch import dispatch
 
 from ..gps import (
+    Prior,
     ConjugatePosterior,
     NonConjugatePosterior,
     Posterior,
@@ -43,6 +44,12 @@ def initialise(gp: NonConjugatePosterior, n_data: int) -> dict:
     likelihood = concat_dictionaries(hyperparams, initialise(gp.likelihood))
     latent_process = {"latent": jnp.zeros(shape=(n_data, 1))}
     return sort_dictionary(concat_dictionaries(likelihood, latent_process))
+
+
+@dispatch(Prior)
+def initialise(gp: Prior) -> dict:
+    hyperparams = _initialise_hyperparams(gp.kernel, gp.mean_function)
+    return sort_dictionary(hyperparams)
 
 
 def complete(params: dict, gp: Posterior, n_data: int = None) -> dict:

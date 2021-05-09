@@ -29,7 +29,7 @@ EXTRAS = {
 
 setup(
     name="GPJax",
-    version="0.3.6",
+    version="0.3.7",
     author="Thomas Pinder",
     author_email="t.pinder2@lancaster.ac.uk",
     packages=find_packages(".", exclude=["tests"]),

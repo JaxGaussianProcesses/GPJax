@@ -49,3 +49,10 @@ def test_spectral():
     params = initialise(key, posterior)
     assert list(params.keys()) == sorted(["basis_fns", "obs_noise", "lengthscale", "variance"])
     assert params["basis_fns"].shape == (10, 1)
+
+
+def test_prior():
+    p = Prior(kernel = RBF())
+    params = initialise(p)
+    assert list(params.keys()) == sorted(['lengthscale', 'variance'])
+    assert isinstance(params, dict)
