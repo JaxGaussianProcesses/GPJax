@@ -6,4 +6,4 @@ from .predict import mean, variance
 from .sampling import random_variable, sample
 from .types import Dataset
 
-__version__ = "0.3.7"
+__version__ = "0.3.8"
