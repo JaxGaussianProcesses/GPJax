@@ -51,6 +51,7 @@ def random_variable(
     gp: NonConjugatePosterior,
     params: dict,
     training: Dataset,
+    jitter_amount: float = 1e-6,
 ) -> Callable:
     nu = params["latent"]
     N = training.n

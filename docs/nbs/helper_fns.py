@@ -36,17 +36,16 @@ def plot(key, rv, query_points, training_data, ax, n_samples=100):
     posterior_samples = sample(key, rv, n_samples=n_samples)
     plt.grid(color="#888888")  # Color the grid
     ax.spines["polar"].set_visible(False)  # Show or hide the plot spine
-    ax.plot(query_points, posterior_samples.T, color="tab:blue", alpha=0.1)
+    ax.plot(query_points, posterior_samples.T, alpha=0.1)
     ax.fill_between(
         query_points.squeeze(),
         mu - one_stddev,
         mu + one_stddev,
-        color="tab:blue",
         alpha=0.2,
         label=r"1 Posterior s.d.",
     )
-    ax.plot(query_points.squeeze(), mu - one_stddev, linestyle="--", color="tab:blue")
-    ax.plot(query_points.squeeze(), mu + one_stddev, linestyle="--", color="tab:blue")
-    ax.plot(query_points, mu, color="#b5121b", label='Posterior mean')
-    ax.scatter(training_data.X, training_data.y, color="tab:orange", alpha=1, label="observations")
+    ax.plot(query_points.squeeze(), mu - one_stddev, linestyle="--")
+    ax.plot(query_points.squeeze(), mu + one_stddev, linestyle="--")
+    ax.plot(query_points, mu, label='Posterior mean')
+    ax.scatter(training_data.X, training_data.y, alpha=1, label="observations")
     ax.legend()
