@@ -24,6 +24,7 @@ EXTRAS = {
         "nb-black==1.0.7",
         "matplotlib==3.3.3",
         "sphinx-copybutton==0.3.5",
+        "gpviz==0.0.1"
     ],
 }
 

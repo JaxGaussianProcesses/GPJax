@@ -51,6 +51,7 @@ def random_variable(
     gp: NonConjugatePosterior,
     params: dict,
     training: Dataset,
+    jitter_amount: float = 1e-6,
 ) -> Callable:
     nu = params["latent"]
     N = training.n
@@ -77,10 +78,12 @@ def random_variable(
     params: dict,
     training: Dataset,
     static_params: dict = None,
+    jitter_amount: float = 1e-6
 ) -> tfd.Distribution:
     X, y = training.X, training.y
+    if static_params:
+        params = concat_dictionaries(params, static_params)
 
-    params = concat_dictionaries(params, static_params)
     m = gp.prior.kernel.num_basis
     w = params["basis_fns"] / params["lengthscale"]
     phi = gp.prior.kernel._build_phi(X, params)
