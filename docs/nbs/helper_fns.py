@@ -41,11 +41,18 @@ def plot(key, rv, query_points, training_data, ax, n_samples=100):
         query_points.squeeze(),
         mu - one_stddev,
         mu + one_stddev,
-        alpha=0.2,
+        alpha=0.3,
         label=r"1 Posterior s.d.",
+        color="#B5121B"
     )
-    ax.plot(query_points.squeeze(), mu - one_stddev, linestyle="--")
-    ax.plot(query_points.squeeze(), mu + one_stddev, linestyle="--")
+    ax.fill_between(
+        query_points.squeeze(),
+        mu - 3*one_stddev,
+        mu + 3*one_stddev,
+        alpha=0.15,
+        label=r"3 Posterior s.d.",
+        color="#B5121B"
+    )
     ax.plot(query_points, mu, label='Posterior mean')
-    ax.scatter(training_data.X, training_data.y, alpha=1, label="observations")
+    ax.scatter(training_data.X, training_data.y, alpha=1, label="Observations")
     ax.legend()
