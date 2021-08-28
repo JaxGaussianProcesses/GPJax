@@ -25,8 +25,9 @@ def mean(gp: ConjugatePosterior, param: dict, training: Dataset) -> Callable:
     weights = cho_solve(L, prior_distance)
 
     def meanf(test_inputs: Array) -> Array:
+        prior_mean_at_test_inputs = gp.prior.mean_function(test_inputs)
         Kfx = cross_covariance(gp.prior.kernel, X, test_inputs, param)
-        return jnp.dot(Kfx, weights)
+        return prior_mean_at_test_inputs + jnp.dot(Kfx, weights)
 
     return meanf
 
