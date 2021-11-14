@@ -41,7 +41,9 @@ def random_variable(
         n = test_points.shape[0]
         mu = meanf(test_points)
         cov = covf(test_points)
-        return tfd.MultivariateNormalFullCovariance(mu.squeeze(), cov + I(n) * jitter_amount)
+        return tfd.MultivariateNormalFullCovariance(
+            mu.squeeze(), cov + I(n) * jitter_amount
+        )
 
     return build_rv
 
@@ -78,7 +80,7 @@ def random_variable(
     params: dict,
     training: Dataset,
     static_params: dict = None,
-    jitter_amount: float = 1e-6
+    jitter_amount: float = 1e-6,
 ) -> tfd.Distribution:
     X, y = training.X, training.y
     if static_params:
@@ -88,9 +90,9 @@ def random_variable(
     w = params["basis_fns"] / params["lengthscale"]
     phi = gp.prior.kernel._build_phi(X, params)
 
-    A = (params["variance"] / m) * jnp.matmul(jnp.transpose(phi), phi) + params["obs_noise"] * I(
-        2 * m
-    )
+    A = (params["variance"] / m) * jnp.matmul(jnp.transpose(phi), phi) + params[
+        "obs_noise"
+    ] * I(2 * m)
 
     RT = jnp.linalg.cholesky(A)
     R = jnp.transpose(RT)
@@ -129,12 +131,16 @@ def sample(
 
 
 @dispatch(jnp.DeviceArray, Prior, dict, Array)
-def sample(key: jnp.DeviceArray, gp: Prior, params: dict, X: Array, n_samples: int = 1) -> Array:
+def sample(
+    key: jnp.DeviceArray, gp: Prior, params: dict, X: Array, n_samples: int = 1
+) -> Array:
     training = Dataset(X=X, y=jnp.ones_like(X))
     rv = random_variable(gp, params, training)
     return rv.sample(sample_shape=(n_samples,), seed=key)
 
 
 @dispatch(jnp.DeviceArray, tfd.Distribution)
-def sample(key: jnp.DeviceArray, random_variable: tfd.Distribution, n_samples: int = 1) -> Array:
+def sample(
+    key: jnp.DeviceArray, random_variable: tfd.Distribution, n_samples: int = 1
+) -> Array:
     return random_variable.sample(sample_shape=(n_samples,), seed=key)

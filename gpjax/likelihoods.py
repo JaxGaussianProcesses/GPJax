@@ -4,6 +4,7 @@ import jax.numpy as jnp
 from chex import dataclass
 from multipledispatch import dispatch
 from tensorflow_probability.substrates.jax import distributions as tfd
+import abc
 
 
 @dataclass(repr=False)
@@ -13,51 +14,65 @@ class Likelihood:
     def __repr__(self):
         return f"{self.name} likelihood function"
 
+    @property
+    @abc.abstractmethod
+    def params(self) -> dict:
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def link_function(self) -> Callable:
+        raise NotImplementedError
+
 
 @dataclass(repr=False)
 class Gaussian(Likelihood):
     name: Optional[str] = "Gaussian"
 
+    @property
+    def params(self) -> dict:
+        return {"obs_noise": jnp.array([1.0])}
 
-@dispatch(Gaussian)
-def initialise(likelihood: Gaussian) -> dict:
-    return {"obs_noise": jnp.array([1.0])}
+    @property
+    def link_function(self) -> Callable:
+        def identity_fn(x):
+            return x
+
+        return identity_fn
 
 
 @dataclass(repr=False)
 class Bernoulli(Likelihood):
     name: Optional[str] = "Bernoulli"
 
+    @property
+    def params(self) -> dict:
+        return {}
 
-@dispatch(Bernoulli)
-def initialise(likelihood: Bernoulli) -> dict:
-    return {}
+    @property
+    def link_function(self) -> Callable:
+        return tfd.ProbitBernoulli.__call__
 
+    @property
+    def predictive_moment_fn(self) -> Callable:
+        def moment_fn(mean: jnp.DeviceArray, variance: jnp.DeviceArray):
+            rv = self.link_function(mean / jnp.sqrt(1 + variance))
+            return rv
 
-@dispatch(Bernoulli)
-def link_function(likelihood: Bernoulli):
-    return tfd.ProbitBernoulli
-
-
-@dispatch(Bernoulli)
-def predictive_moments(likelihood: Bernoulli) -> Callable:
-    link = link_function(likelihood)
-
-    def moments(mean: jnp.DeviceArray, variance: jnp.DeviceArray) -> tfd.Distribution:
-        rv = link(mean / jnp.sqrt(1 + variance))
-        return rv
-
-    return moments
+        return moment_fn
 
 
 @dataclass(repr=False)
 class Poisson(Likelihood):
     name: Optional[str] = "Poisson"
 
+    @property
+    def params(self) -> dict:
+        return {"rate": jnp.DeviceArray(1.0)}
 
-@dispatch(Poisson)
-def initialise(likelihood: Poisson) -> dict:
-    return {}
+    @property
+    def link_function(self) -> Callable:
+        return jnp.exp
 
 
 NonConjugateLikelihoods = (Bernoulli, Poisson)

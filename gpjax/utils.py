@@ -53,7 +53,9 @@ def sort_dictionary(base_dict: dict) -> dict:
 
 
 @dispatch(jnp.DeviceArray)
-def standardise(x: jnp.DeviceArray) -> Tuple[jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray]:
+def standardise(
+    x: jnp.DeviceArray,
+) -> Tuple[jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray]:
     """
     Standardise a given matrix such that values are distributed according to a unit normal random variable. This is
     primarily designed for standardising a training dataset.

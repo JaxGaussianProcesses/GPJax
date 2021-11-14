@@ -4,18 +4,23 @@ import jax.numpy as jnp
 from chex import dataclass
 from multipledispatch import dispatch
 from tensorflow_probability.substrates.jax import distributions as tfd
-
+import abc
 from gpjax.kernels import RBF
 
 from ..types import Array
 from ..utils import I, sort_dictionary
 from .base import Kernel
-from .utils import scale, stretch
+from ..config import get_defaults
 
 
 @dataclass(repr=False)
 class SpectralKernel:
     num_basis: int
+
+    @property
+    @abc.abstractmethod
+    def spectral_density(self) -> tfd.Distribution:
+        raise NotImplementedError
 
 
 @dataclass(repr=False)
@@ -31,41 +36,28 @@ class SpectralRBF(Kernel, SpectralKernel):
         return jnp.matmul(phi, jnp.transpose(phi)) / self.num_basis
 
     def _build_phi(self, x: jnp.DeviceArray, params):
-        scaled_freqs = scale(params["basis_fns"], params["lengthscale"])
+        scaled_freqs = params["basis_fns"]/ params["lengthscale"]
         phi = jnp.matmul(x, jnp.transpose(scaled_freqs))
         return jnp.hstack([jnp.cos(phi), jnp.sin(phi)])
 
+    @property
+    def spectral_density(self) -> tfd.Distribution:
+        return tfd.Normal(loc=jnp.array(0.0), scale=jnp.array(1.0))
 
-@dispatch(RBF, int)
+    @property
+    def params(self) -> dict:
+        default_config = get_defaults()
+        key = default_config.key
+        initial_frequencies = self.spectral_density.sample(sample_shape=(self.num_basis, self.input_dimension), seed = key)
+        return {
+            "basis_fns": initial_frequencies,
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+        }
+
+
 def to_spectral(kernel: RBF, num_basis: int):
-    return SpectralRBF(num_basis=num_basis)
-
-
-@dispatch(SpectralRBF)
-def spectral_density(kernel: SpectralRBF) -> tfd.Distribution:
-    return tfd.Normal(loc=jnp.array(0.0), scale=jnp.array(1.0))
-
-
-@dispatch(jnp.DeviceArray, tfd.Distribution, int, int)
-def sample_frequencies(
-    key, density: tfd.Distribution, n_frequencies: int, input_dimension: int
-) -> jnp.DeviceArray:
-    return density.sample(sample_shape=(n_frequencies, input_dimension), seed=key)
-
-
-@dispatch(jnp.DeviceArray, SpectralKernel, int, int)
-def sample_frequencies(
-    key, kernel: SpectralKernel, n_frequencies: int, input_dimension: int
-) -> jnp.DeviceArray:
-    density = spectral_density(kernel)
-    return density.sample(sample_shape=(n_frequencies, input_dimension), seed=key)
-
-
-@dispatch(jnp.DeviceArray, SpectralRBF)
-def initialise(key: jnp.DeviceArray, kernel: SpectralRBF):
-    basis_init = sample_frequencies(key, kernel, kernel.num_basis, kernel.ndims)
-    return {
-        "basis_fns": basis_init,
-        "lengthscale": jnp.array([1.0] * kernel.ndims),
-        "variance": jnp.array([1.0]),
-    }
+    if isinstance(kernel, RBF):
+        return SpectralRBF(num_basis=num_basis)
+    else:
+        raise NotImplementedError(f'No spectral kernel implemented for {kernel.name}')
