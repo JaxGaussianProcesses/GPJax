@@ -6,7 +6,9 @@ from chex import dataclass
 from multipledispatch import dispatch
 from jax.scipy.linalg import cho_factor, cho_solve, solve_triangular
 import jax.numpy as jnp
+import jax.random as jr
 
+from .config import get_defaults
 from .types import Dataset, Array
 from .kernels import Kernel, gram, cross_covariance
 from .kernels.spectral import SpectralKernel
@@ -164,6 +166,14 @@ class NonConjugatePosterior:
         kernel_string = self.prior.kernel.__repr__()
         likelihood_string = self.likelihood.__repr__()
         return f"Conjugate Posterior\n{'-'*80}\n- {meanf_string}\n- {kernel_string}\n- {likelihood_string}"
+
+    @property
+    def params(self) -> dict:
+        hyperparams = concat_dictionaries(
+            self.prior.params, {"likelihood": self.likelihood.params}
+        )
+        hyperparams["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
+        return hyperparams
 
 
 @dataclass

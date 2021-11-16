@@ -9,6 +9,7 @@ import abc
 
 @dataclass(repr=False)
 class Likelihood:
+    num_datapoints: int  # The number of datapoints that the likelihood factorises over
     name: Optional[str] = "Likelihood"
 
     def __repr__(self):
