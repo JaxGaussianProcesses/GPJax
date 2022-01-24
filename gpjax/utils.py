@@ -3,7 +3,6 @@ from typing import Tuple
 
 import jax.numpy as jnp
 from jax.scipy.linalg import cho_factor, cho_solve
-from multipledispatch import dispatch
 
 from .types import Array
 
@@ -52,9 +51,10 @@ def sort_dictionary(base_dict: dict) -> dict:
     return dict(sorted(base_dict.items()))
 
 
-@dispatch(jnp.DeviceArray)
 def standardise(
     x: jnp.DeviceArray,
+    xmean: jnp.DeviceArray = None,
+    xstd: jnp.DeviceArray = None,
 ) -> Tuple[jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray]:
     """
     Standardise a given matrix such that values are distributed according to a unit normal random variable. This is
@@ -63,25 +63,9 @@ def standardise(
     :param x: A matrix of unstandardised values
     :return: A matrix of standardised values
     """
-    xmean = jnp.mean(x, axis=0)
-    xstd = jnp.std(x, axis=0)
+    xmean = xmean if xmean else jnp.mean(x, axis=0)
+    xstd = xstd if xstd else jnp.std(x, axis=0)
     return (x - xmean) / xstd, xmean, xstd
-
-
-@dispatch(jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray)
-def standardise(
-    x: jnp.DeviceArray, xmean: jnp.DeviceArray, xstd: jnp.DeviceArray
-) -> jnp.DeviceArray:
-    """
-    Standardise a given matrix with respect to a given mean and standard deviation. This is primarily designed for
-    standardising a test set of data with respect to the training data.
-
-    :param x: A matrix of unstandardised values
-    :param xmean: A precomputed mean vector
-    :param xstd: A precomputed standard deviation vector
-    :return: A matrix of standardised values
-    """
-    return (x - xmean) / xstd
 
 
 def unstandardise(

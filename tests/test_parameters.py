@@ -1,0 +1,191 @@
+import jax.numpy as jnp
+import pytest
+from numpy.testing import assert_array_equal
+import typing as tp
+from tensorflow_probability.substrates.jax import distributions as tfd
+
+from gpjax.config import get_defaults
+from gpjax.gps import Prior
+from gpjax.kernels import RBF
+from gpjax.likelihoods import Bernoulli, Gaussian
+from gpjax.parameters import (
+    # build_all_transforms,
+    build_transforms,
+    evaluate_priors,
+    get_param_template,
+    initialise,
+    log_density,
+    prior_checks,
+    recursive_complete,
+    recursive_items,
+    transform,
+)
+from copy import deepcopy
+
+
+#########################
+# Test base functionality
+#########################
+@pytest.mark.parametrize("lik", [Gaussian])
+def test_initialise(lik):
+    posterior = Prior(kernel=RBF()) * lik(num_datapoints=10)
+    params, _, _ = initialise(posterior)
+    assert list(sorted(params.keys())) == [
+        "kernel",
+        "likelihood",
+        "mean_function",
+    ]
+
+
+def test_non_conjugate_initialise():
+    posterior = Prior(kernel=RBF()) * Bernoulli(num_datapoints=10)
+    params, _, _ = initialise(posterior)
+    assert list(sorted(params.keys())) == [
+        "kernel",
+        "latent",
+        "likelihood",
+        "mean_function",
+    ]
+
+
+#########################
+# Test priors
+#########################
+@pytest.mark.parametrize("x", [-1.0, 0.0, 1.0])
+def test_lpd(x):
+    val = jnp.array(x)
+    dist = tfd.Normal(loc=0.0, scale=1.0)
+    lpd = log_density(val, dist)
+    assert lpd is not None
+    assert log_density(val, None) == 0.0
+
+
+@pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
+def test_prior_template(lik):
+    posterior = Prior(kernel=RBF()) * lik(num_datapoints=10)
+    params, _, _ = initialise(posterior)
+    prior_container = get_param_template(params)
+    for (
+        k,
+        v1,
+        v2,
+    ) in recursive_items(params, prior_container):
+        assert v2 == None
+
+
+@pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
+def test_recursive_complete(lik):
+    posterior = Prior(kernel=RBF()) * lik(num_datapoints=10)
+    params, _, _ = initialise(posterior)
+    priors = {"kernel": {}}
+    priors["kernel"]["lengthscale"] = tfd.HalfNormal(scale=2.0)
+    container = get_param_template(params)
+    complete_priors = recursive_complete(container, priors)
+    for (
+        k,
+        v1,
+        v2,
+    ) in recursive_items(params, complete_priors):
+        if k == "lengthscale":
+            assert isinstance(v2, tfd.HalfNormal)
+        else:
+            assert v2 == None
+
+
+def test_prior_evaluation():
+    """
+    Test the regular setup that every parameter has a corresponding prior distribution attached to its unconstrained
+    value.
+    """
+    params = {
+        "kernel": {
+            "lengthscale": jnp.array([1.0]),
+            "variance": jnp.array([1.0]),
+        },
+        "likelihood": {"obs_noise": jnp.array([1.0])},
+    }
+    priors = {
+        "kernel": {
+            "lengthscale": tfd.Gamma(1.0, 1.0),
+            "variance": tfd.Gamma(2.0, 2.0),
+        },
+        "likelihood": {"obs_noise": tfd.Gamma(3.0, 3.0)},
+    }
+    lpd = evaluate_priors(params, priors)
+    assert pytest.approx(lpd) == -2.0110168
+
+
+def test_none_prior():
+    """
+    Test that multiple dispatch is working in the case of no priors.
+    """
+    params = {
+        "kernel": {
+            "lengthscale": jnp.array([1.0]),
+            "variance": jnp.array([1.0]),
+        },
+        "likelihood": {"obs_noise": jnp.array([1.0])},
+    }
+    priors = get_param_template(params)
+    lpd = evaluate_priors(params, priors)
+    assert lpd == 0.0
+
+
+def test_incomplete_priors():
+    """
+    Test the case where a user specifies priors for some, but not all, parameters.
+    """
+    params = {
+        "kernel": {
+            "lengthscale": jnp.array([1.0]),
+            "variance": jnp.array([1.0]),
+        },
+        "likelihood": {"obs_noise": jnp.array([1.0])},
+    }
+    priors = {
+        "kernel": {
+            "lengthscale": tfd.Gamma(1.0, 1.0),
+            "variance": tfd.Gamma(2.0, 2.0),
+        },
+    }
+    container = get_param_template(params)
+    complete_priors = recursive_complete(container, priors)
+    lpd = evaluate_priors(params, complete_priors)
+    assert pytest.approx(lpd) == -1.6137061
+
+
+@pytest.mark.parametrize("num_datapoints", [1, 10])
+def test_checks(num_datapoints):
+    incomplete_priors = {"lengthscale": jnp.array([1.0])}
+    posterior = Prior(kernel=RBF()) * Bernoulli(num_datapoints=num_datapoints)
+    priors = prior_checks(incomplete_priors)
+    assert "latent" in priors.keys()
+    assert "variance" not in priors.keys()
+    assert isinstance(priors["latent"], tfd.Normal)
+
+
+#########################
+# Test transforms
+#########################
+@pytest.mark.parametrize("num_datapoints", [1, 10])
+@pytest.mark.parametrize("likelihood", [Gaussian, Bernoulli])
+def test_output(num_datapoints, likelihood):
+    posterior = Prior(kernel=RBF()) * likelihood(num_datapoints=num_datapoints)
+    params, constrainer, unconstrainer = initialise(posterior)
+    assert isinstance(constrainer, dict)
+    assert isinstance(unconstrainer, dict)
+    for k, v1, v2 in recursive_items(constrainer, unconstrainer):
+        assert isinstance(v1, tp.Callable)
+        assert isinstance(v2, tp.Callable)
+
+    unconstrained_params = transform(params, unconstrainer)
+    assert (
+        unconstrained_params["kernel"]["lengthscale"]
+        != params["kernel"]["lengthscale"]
+    )
+    backconstrained_params = transform(unconstrained_params, constrainer)
+    for k, v1, v2 in recursive_items(params, unconstrained_params):
+        assert v1.dtype == v2.dtype
+
+    for k, v1, v2 in recursive_items(params, backconstrained_params):
+        assert all(v1 == v2)

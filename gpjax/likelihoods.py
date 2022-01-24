@@ -1,10 +1,9 @@
-from typing import Callable, Optional, Union
+import abc
+from typing import Callable, Optional
 
 import jax.numpy as jnp
 from chex import dataclass
-from multipledispatch import dispatch
 from tensorflow_probability.substrates.jax import distributions as tfd
-import abc
 
 
 @dataclass(repr=False)
@@ -63,18 +62,5 @@ class Bernoulli(Likelihood):
         return moment_fn
 
 
-@dataclass(repr=False)
-class Poisson(Likelihood):
-    name: Optional[str] = "Poisson"
-
-    @property
-    def params(self) -> dict:
-        return {"rate": jnp.DeviceArray(1.0)}
-
-    @property
-    def link_function(self) -> Callable:
-        return jnp.exp
-
-
-NonConjugateLikelihoods = (Bernoulli, Poisson)
-NonConjugateLikelihoodType = Union[Bernoulli, Poisson]
+NonConjugateLikelihoods = [Bernoulli]
+NonConjugateLikelihoodType = Bernoulli  # Union[Bernoulli]

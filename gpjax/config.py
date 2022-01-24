@@ -1,8 +1,8 @@
 from typing import Tuple
 
+import jax.random as jr
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from ml_collections import ConfigDict
-import jax.random as jr
 
 
 def get_defaults():

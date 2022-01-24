@@ -1,9 +1,9 @@
+import abc
 from typing import Optional
 
 import jax.numpy as jnp
 from chex import dataclass
 from jax import vmap
-import abc
 
 from gpjax.types import Array
 
@@ -20,7 +20,10 @@ class Kernel:
         raise NotImplementedError
 
     def __repr__(self):
-        return f"{self.name}:\n\t Stationary: {self.stationary}\n\t Spectral form: {self.spectral} \n\t ARD structure: {self.ard}"
+        return (
+            f"{self.name}:\n\t Stationary: {self.stationary}\n\t Spectral form:"
+            f" {self.spectral} \n\t ARD structure: {self.ard}"
+        )
 
     @property
     def ard(self):
@@ -47,7 +50,10 @@ class RBF(Kernel):
 
     @property
     def params(self) -> dict:
-        return {"lengthscale": jnp.array([1.0] * self.ndims), "variance": jnp.array([1.0])}
+        return {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+        }
 
 
 def squared_distance(x: Array, y: Array):

@@ -1,9 +1,8 @@
+import abc
 from typing import Dict, Optional
 
 import jax.numpy as jnp
-import abc
 from chex import dataclass
-from multipledispatch import dispatch
 
 from .types import Array
 
@@ -47,8 +46,8 @@ class Constant(MeanFunction):
 
     def __call__(self, x: Array, params: Dict) -> Array:
         out_shape = (x.shape[0], self.output_dim)
-        return jnp.ones(shape=out_shape) * params["mean_function"]["offset"]
+        return jnp.ones(shape=out_shape) * params["offset"]
 
     @property
     def params(self) -> dict:
-        return {"variance": jnp.array(1.0)}
+        return {"mean_function": {"variance": jnp.array(1.0)}}
