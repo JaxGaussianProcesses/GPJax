@@ -106,9 +106,7 @@ class ConjugatePosterior(Posterior):
     likelihood: Gaussian
     name: tp.Optional[str] = "ConjugatePosterior"
 
-    def mean(
-        self, training_data: Dataset, params: dict
-    ) -> tp.Callable[[Array], Array]:
+    def mean(self, training_data: Dataset, params: dict) -> tp.Callable[[Array], Array]:
         X, y = training_data.X, training_data.y
         sigma = params["likelihood"]["obs_noise"]
         n_train = training_data.n
@@ -124,9 +122,7 @@ class ConjugatePosterior(Posterior):
             prior_mean_at_test_inputs = self.prior.mean_function(
                 test_inputs, params["mean_function"]
             )
-            Kfx = cross_covariance(
-                self.prior.kernel, X, test_inputs, params["kernel"]
-            )
+            Kfx = cross_covariance(self.prior.kernel, X, test_inputs, params["kernel"])
             return prior_mean_at_test_inputs + jnp.dot(Kfx, weights)
 
         return mean_fn
@@ -143,9 +139,7 @@ class ConjugatePosterior(Posterior):
         L = cho_factor(Kff + I(n_train) * obs_noise, lower=True)
 
         def variance_fn(test_inputs: Array) -> Array:
-            Kfx = cross_covariance(
-                self.prior.kernel, X, test_inputs, params["kernel"]
-            )
+            Kfx = cross_covariance(self.prior.kernel, X, test_inputs, params["kernel"])
             Kxx = gram(self.prior.kernel, test_inputs, params["kernel"])
             latent_values = cho_solve(L, Kfx.T)
             return Kxx - jnp.dot(Kfx, latent_values)
@@ -203,9 +197,7 @@ class NonConjugatePosterior(Posterior):
         hyperparameters = concat_dictionaries(
             self.prior.params, {"likelihood": self.likelihood.params}
         )
-        hyperparameters["latent"] = jnp.zeros(
-            shape=(self.likelihood.num_datapoints, 1)
-        )
+        hyperparameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
         return hyperparameters
 
     def mean(
@@ -217,9 +209,7 @@ class NonConjugatePosterior(Posterior):
         L = jnp.linalg.cholesky(Kff + I(N) * 1e-6)
 
         def meanf(test_inputs: Array) -> Array:
-            Kfx = cross_covariance(
-                self.prior.kernel, X, test_inputs, params["kernel"]
-            )
+            Kfx = cross_covariance(self.prior.kernel, X, test_inputs, params["kernel"])
             Kxx = gram(self.prior.kernel, test_inputs, params["kernel"])
             A = solve_triangular(L, Kfx.T, lower=True)
             latent_var = Kxx - jnp.sum(jnp.square(A), -2)
@@ -242,9 +232,7 @@ class NonConjugatePosterior(Posterior):
         L = jnp.linalg.cholesky(Kff + I(N) * 1e-6)
 
         def variancef(test_inputs: Array) -> Array:
-            Kfx = cross_covariance(
-                self.prior.kernel, X, test_inputs, params["kernel"]
-            )
+            Kfx = cross_covariance(self.prior.kernel, X, test_inputs, params["kernel"])
             Kxx = gram(self.prior.kernel, test_inputs, params["kernel"])
             A = solve_triangular(L, Kfx.T, lower=True)
             latent_var = Kxx - jnp.sum(jnp.square(A), -2)

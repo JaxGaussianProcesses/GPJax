@@ -1,9 +1,10 @@
 import typing as tp
-import jax.numpy as jnp
-from numpy import isin
-import pytest
 
-from gpjax.mean_functions import Zero, Constant
+import jax.numpy as jnp
+import pytest
+from numpy import isin
+
+from gpjax.mean_functions import Constant, Zero
 from gpjax.parameters import initialise
 
 

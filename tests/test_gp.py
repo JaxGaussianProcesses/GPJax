@@ -1,22 +1,22 @@
-from turtle import pos
-from gpjax.parameters import initialise
-from gpjax import likelihoods
-from numpy import isin
-import pytest
 import typing as tp
+from turtle import pos
+
 import jax.numpy as jnp
 import jax.random as jr
+import pytest
+from numpy import isin
 
+from gpjax import Dataset, initialise, likelihoods, transform
 from gpjax.gps import (
-    ConjugatePosterior,
     GP,
+    ConjugatePosterior,
     NonConjugatePosterior,
     Prior,
     construct_posterior,
 )
-from gpjax import Dataset, initialise, transform
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian, NonConjugateLikelihoods
+from gpjax.parameters import initialise
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 10])
@@ -81,10 +81,7 @@ def test_nonconjugate_posterior(num_datapoints, likel):
         jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1)),
         axis=0,
     )
-    y = (
-        0.5 * jnp.sign(jnp.cos(3 * x + jr.normal(key, shape=x.shape) * 0.05))
-        + 0.5
-    )
+    y = 0.5 * jnp.sign(jnp.cos(3 * x + jr.normal(key, shape=x.shape) * 0.05)) + 0.5
     D = Dataset(X=x, y=y)
     # Initialisation
     p = Prior(kernel=RBF())

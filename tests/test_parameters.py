@@ -1,15 +1,16 @@
+import typing as tp
+from copy import deepcopy
+
 import jax.numpy as jnp
 import pytest
 from numpy.testing import assert_array_equal
-import typing as tp
 from tensorflow_probability.substrates.jax import distributions as tfd
 
 from gpjax.config import get_defaults
 from gpjax.gps import Prior
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian
-from gpjax.parameters import (
-    # build_all_transforms,
+from gpjax.parameters import (  # build_all_transforms,
     build_transforms,
     evaluate_priors,
     get_param_template,
@@ -21,7 +22,6 @@ from gpjax.parameters import (
     structure_priors,
     transform,
 )
-from copy import deepcopy
 
 
 #########################
@@ -235,8 +235,7 @@ def test_output(num_datapoints, likelihood):
 
     unconstrained_params = transform(params, unconstrainer)
     assert (
-        unconstrained_params["kernel"]["lengthscale"]
-        != params["kernel"]["lengthscale"]
+        unconstrained_params["kernel"]["lengthscale"] != params["kernel"]["lengthscale"]
     )
     backconstrained_params = transform(unconstrained_params, constrainer)
     for k, v1, v2 in recursive_items(params, unconstrained_params):

@@ -1,15 +1,12 @@
+import typing as tp
+
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
-
-from gpjax.likelihoods import (
-    Likelihood,
-    Bernoulli,
-    Gaussian,
-)
-from gpjax.parameters import initialise
-import typing as tp
 import tensorflow_probability.substrates.jax.distributions as tfd
+
+from gpjax.likelihoods import Bernoulli, Gaussian, Likelihood
+from gpjax.parameters import initialise
 
 true_initialisation = {
     "Gaussian": ["obs_noise"],

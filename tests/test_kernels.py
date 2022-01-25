@@ -1,7 +1,7 @@
-from gpjax import kernels
 import jax.numpy as jnp
 import pytest
 
+from gpjax import kernels
 from gpjax.kernels import RBF, cross_covariance, gram
 from gpjax.parameters import initialise
 from gpjax.utils import I
@@ -39,9 +39,7 @@ def test_call():
 
 
 @pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize(
-    "ell, sigma", [(0.1, 0.1), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)]
-)
+@pytest.mark.parametrize("ell, sigma", [(0.1, 0.1), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
 def test_pos_def(dim, ell, sigma):
     n = 30
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
