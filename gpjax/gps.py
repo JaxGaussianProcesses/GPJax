@@ -48,20 +48,17 @@ class Prior(GP):
     def __mul__(self, other: Gaussian):
         return construct_posterior(prior=self, likelihood=other)
 
-    def mean(self) -> tp.Callable[[Dataset], Array]:
-        def mean_fn(data: Dataset, params: dict):
-            X = data.X
-            mu = self.mean_function(X, params["mean_function"])
+    def mean(self, params: dict) -> tp.Callable[[Array], Array]:
+        def mean_fn(test_points: Array):
+            mu = self.mean_function(test_points, params["mean_function"])
             return mu
 
         return mean_fn
 
-    def variance(self) -> tp.Callable[[Dataset], Array]:
-        def variance_fn(data: Dataset, params: dict):
-            X = data.X
-            n_data = data.n
-            Kff = gram(self.kernel, X, params["kernel"])
-            jitter_matrix = I(n_data) * 1e-8
+    def variance(self, params: dict) -> tp.Callable[[Array], Array]:
+        def variance_fn(test_points: Array):
+            Kff = gram(self.kernel, test_points, params["kernel"])
+            jitter_matrix = I(test_points.shape[0]) * 1e-8
             covariance_matrix = Kff + jitter_matrix
             return covariance_matrix
 
@@ -232,7 +229,7 @@ class NonConjugatePosterior(Posterior):
 
             moment_fn = self.likelihood.predictive_moment_fn
             pred_rv = moment_fn(latent_mean.ravel(), lvar)
-            return pred_rv.mean()
+            return pred_rv.mean().reshape(-1, 1)
 
         return meanf
 
@@ -257,7 +254,7 @@ class NonConjugatePosterior(Posterior):
 
             moment_fn = self.likelihood.predictive_moment_fn
             pred_rv = moment_fn(latent_mean.ravel(), lvar)
-            return pred_rv.variance()
+            return jnp.diag(pred_rv.variance())
 
         return variancef
 
@@ -292,73 +289,6 @@ class NonConjugatePosterior(Posterior):
             return constant * (ll + log_prior_density)
 
         return mll
-
-
-# @dataclass
-# class SpectralPosterior:
-#     prior: Prior
-#     likelihood: Gaussian
-#     name: tp.Optional[str] = "SpectralPosterior"
-
-#     # def __repr__(self):
-#     #     meanf_string = self.prior.mean_function.__repr__()
-#     #     kernel_string = self.prior.kernel.__repr__()
-#     #     likelihood_string = self.likelihood.__repr__()
-#     #     return f"Sparse Spectral Posterior\n{'-'*80}\n- {meanf_string}\n- {kernel_string}\n- {likelihood_string}"
-
-#     def mean(
-#         self, training_data: Dataset, params: dict
-#     ) -> tp.Callable[[Dataset], Array]:
-#         X, y = training_data.X, training_data.y
-#         N = training_data.n
-#         Kff = gram(self.prior.kernel, X, params["kernel"])
-#         L = jnp.linalg.cholesky(Kff + I(N) * 1e-6)
-
-#         def mean_fn(test_inputs: Dataset) -> Array:
-#             x_test = test_inputs.X
-#             Kfx = cross_covariance(
-#                 self.prior.kernel, X, x_test, params["kernel"]
-#             )
-#             Kxx = gram(self.prior.kernel, x_test, params["kernel"])
-#             A = solve_triangular(L, Kfx.T, lower=True)
-#             latent_var = Kxx - jnp.sum(jnp.square(A), -2)
-#             latent_mean = jnp.matmul(A.T, self.latent_vals)
-
-#             lvar = jnp.diag(latent_var)
-
-#             pred_rv = self.likelihood.predictive_moment_fn(
-#                 latent_mean.ravel(), lvar
-#             )
-#             return pred_rv.mean()
-
-#         return mean_fn
-
-#     def variance(
-#         self, training_data: Dataset, params: dict
-#     ) -> tp.Callable[[Dataset], Array]:
-#         X, y = training_data.X, training_data.y
-#         N = training_data.n
-#         Kff = gram(self.prior.kernel, X, params["kernel"])
-#         L = jnp.linalg.cholesky(Kff + I(N) * 1e-8)
-
-#         def variance_fn(test_inputs: Dataset) -> Array:
-#             x_test = test_inputs.X
-#             Kfx = cross_covariance(
-#                 self.prior.kernel, X, x_test, params["kernel"]
-#             )
-#             Kxx = gram(self.prior.kernel, x_test, params["kernel"])
-#             A = solve_triangular(L, Kfx.T, lower=True)
-#             latent_var = Kxx - jnp.sum(jnp.square(A), -2)
-#             latent_mean = jnp.matmul(A.T, self.latent_vals)
-
-#             lvar = jnp.diag(latent_var)
-
-#             pred_rv = self.likelihood.predictive_moment_fn(
-#                 latent_mean.ravel(), lvar
-#             )
-#             return pred_rv.variance()
-
-#         return variance_fn
 
 
 def construct_posterior(prior: Prior, likelihood: Likelihood) -> Posterior:

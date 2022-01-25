@@ -51,7 +51,10 @@ class Bernoulli(Likelihood):
 
     @property
     def link_function(self) -> Callable:
-        return tfd.ProbitBernoulli.__call__
+        def link_fn(x):
+            return tfd.ProbitBernoulli(x)
+
+        return link_fn
 
     @property
     def predictive_moment_fn(self) -> Callable:

@@ -1,3 +1,4 @@
+from gpjax import kernels
 import jax.numpy as jnp
 import pytest
 
@@ -58,10 +59,15 @@ def test_pos_def(dim, ell, sigma):
 
 @pytest.mark.parametrize("dim", [1, 2, 5, 10])
 def test_initialisation(dim):
-    params, _, _ = initialise(RBF(ndims=dim))
+    kern = RBF(ndims=dim)
+    params, _, _ = initialise(kern)
     assert list(params.keys()) == ["lengthscale", "variance"]
     assert all(params["lengthscale"] == jnp.array([1.0] * dim))
     assert params["variance"] == jnp.array([1.0])
+    if dim > 1:
+        assert kern.ard
+    else:
+        assert not kern.ard
 
 
 def test_dtype():

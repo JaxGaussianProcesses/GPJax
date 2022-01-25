@@ -30,7 +30,7 @@ class Zero(MeanFunction):
     output_dim: Optional[int] = 1
     name: Optional[str] = "Zero mean function"
 
-    def __call__(self, x: Array, parmas: dict) -> Array:
+    def __call__(self, x: Array, params: dict) -> Array:
         out_shape = (x.shape[0], self.output_dim)
         return jnp.zeros(shape=out_shape)
 
@@ -46,8 +46,8 @@ class Constant(MeanFunction):
 
     def __call__(self, x: Array, params: Dict) -> Array:
         out_shape = (x.shape[0], self.output_dim)
-        return jnp.ones(shape=out_shape) * params["offset"]
+        return jnp.ones(shape=out_shape) * params["variance"]
 
     @property
     def params(self) -> dict:
-        return {"mean_function": {"variance": jnp.array(1.0)}}
+        return {"variance": jnp.array(1.0)}

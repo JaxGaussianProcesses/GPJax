@@ -41,11 +41,21 @@ def recursive_complete(d1, d2) -> dict:
     return d1
 
 
+# def recursive_fn(d1, d2, fn: tp.Callable[[tp.Any], tp.Any]):
+#     for key, value in d1.items():
+#         if type(value) is dict:
+#             yield from recursive_fn(value, d2[key], fn)
+#         else:
+#             yield fn(value, d2[key])
+
+
 ################################
 # Parameter transformation
 ################################
 def build_transforms(params, key=None) -> tp.Tuple[tp.Dict, tp.Dict]:
-    constrainer, unconstrainer = get_param_template(params), get_param_template(params)
+    constrainer, unconstrainer = get_param_template(params), get_param_template(
+        params
+    )
     config = get_defaults()
     transform_set = config["transformations"]
 
@@ -76,10 +86,14 @@ def build_transforms(params, key=None) -> tp.Tuple[tp.Dict, tp.Dict]:
 def transform(params: dict, transform_map: dict):
     transformed_params = get_param_template(params)
 
-    def apply_transform(untransformed_params, transformed_params, transform_map):
+    def apply_transform(
+        untransformed_params, transformed_params, transform_map
+    ):
         for key, value in untransformed_params.items():
             if type(value) is dict:
-                apply_transform(value, transformed_params[key], transform_map[key])
+                apply_transform(
+                    value, transformed_params[key], transform_map[key]
+                )
             else:
                 transformed_params[key] = transform_map[key](value)
         return transformed_params
@@ -144,13 +158,19 @@ def evaluate_priors(params: dict, priors: dict) -> dict:
 def prior_checks(priors: dict) -> dict:
     if "latent" in priors.keys():
         latent_prior = priors["latent"]
-        if latent_prior.name != "Normal":
+        if (
+            isinstance(latent_prior, tfd.Distribution)
+            and latent_prior.name != "Normal"
+        ):
             warnings.warn(
                 f"A {latent_prior.name} distribution prior has been placed on"
                 " the latent function. It is strongly advised that a"
                 " unit-Gaussian prior is used."
             )
-        return priors
+        else:
+            if not latent_prior:
+                priors["latent"] = tfd.Normal(loc=0.0, scale=1.0)
     else:
         priors["latent"] = tfd.Normal(loc=0.0, scale=1.0)
-        return priors
+
+    return priors

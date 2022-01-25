@@ -18,6 +18,7 @@ from gpjax.parameters import (
     prior_checks,
     recursive_complete,
     recursive_items,
+    structure_priors,
     transform,
 )
 from copy import deepcopy
@@ -162,6 +163,60 @@ def test_checks(num_datapoints):
     assert "latent" in priors.keys()
     assert "variance" not in priors.keys()
     assert isinstance(priors["latent"], tfd.Normal)
+
+
+def test_structure_priors():
+    posterior = Prior(kernel=RBF()) * Gaussian(num_datapoints=10)
+    params, _, _ = initialise(posterior)
+    priors = {
+        "kernel": {
+            "lengthscale": tfd.Gamma(1.0, 1.0),
+            "variance": tfd.Gamma(2.0, 2.0),
+        },
+    }
+    structured_priors = structure_priors(params, priors)
+
+    def recursive_fn(d1, d2, fn: tp.Callable[[tp.Any], tp.Any]):
+        for key, value in d1.items():
+            if type(value) is dict:
+                yield from recursive_fn(value, d2[key], fn)
+            else:
+                yield fn(key, key)
+
+    for v in recursive_fn(params, structured_priors, lambda k1, k2: k1 == k2):
+        assert v
+
+
+def test_prior_checks():
+    priors = {
+        "kernel": {"lengthscale": None, "variance": None},
+        "mean_function": {},
+        "liklelihood": {"variance": None},
+        "latent": None,
+    }
+    new_priors = prior_checks(priors)
+    assert "latent" in new_priors.keys()
+    assert new_priors["latent"].name == "Normal"
+
+    priors = {
+        "kernel": {"lengthscale": None, "variance": None},
+        "mean_function": {},
+        "liklelihood": {"variance": None},
+    }
+    new_priors = prior_checks(priors)
+    assert "latent" in new_priors.keys()
+    assert new_priors["latent"].name == "Normal"
+
+    priors = {
+        "kernel": {"lengthscale": None, "variance": None},
+        "mean_function": {},
+        "liklelihood": {"variance": None},
+        "latent": tfd.StudentT(df=5, loc=0.0, scale=1.0),
+    }
+    with pytest.warns(UserWarning):
+        new_priors = prior_checks(priors)
+    assert "latent" in new_priors.keys()
+    assert new_priors["latent"].name == "StudentT"
 
 
 #########################

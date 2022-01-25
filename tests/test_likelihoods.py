@@ -9,6 +9,7 @@ from gpjax.likelihoods import (
 )
 from gpjax.parameters import initialise
 import typing as tp
+import tensorflow_probability.substrates.jax.distributions as tfd
 
 true_initialisation = {
     "Gaussian": ["obs_noise"],
@@ -44,4 +45,11 @@ def test_predictive_moment(n):
 @pytest.mark.parametrize("n", [1, 10])
 def test_link_fns(lik: Likelihood, n: int):
     l = lik(num_datapoints=n)
-    assert isinstance(l.link_function, tp.Callable)
+    link_fn = l.link_function
+    assert isinstance(link_fn, tp.Callable)
+    x = jnp.linspace(-3.0, 3.0).reshape(-1, 1)
+    l_eval = link_fn(x)
+    if lik == Gaussian:
+        assert isinstance(l_eval, jnp.DeviceArray)
+    else:
+        assert isinstance(l_eval, tfd.Distribution)
