@@ -8,8 +8,6 @@ from gpjax.utils import (
     concat_dictionaries,
     merge_dictionaries,
     sort_dictionary,
-    standardise,
-    unstandardise,
 )
 
 
@@ -41,20 +39,6 @@ def test_sort_dict():
     sorted_dict = sort_dictionary(unsorted)
     assert list(sorted_dict.keys()) == ["a", "b"]
     assert list(sorted_dict.values()) == [2, 1]
-
-
-def test_standardise():
-    key = jr.PRNGKey(123)
-    x = jr.uniform(key, shape=(100, 1))
-    xtr, xmean, xstd = standardise(x)
-    assert pytest.approx(jnp.mean(xtr), rel=4) == 0.0
-
-    xtr2 = standardise(x, xmean, xstd)
-    assert pytest.approx(jnp.mean(xtr2), rel=4) == 0.0
-
-    xuntr = unstandardise(xtr, xmean, xstd)
-    diff = jnp.sum(jnp.abs(xuntr - x))
-    assert pytest.approx(diff) == 0
 
 
 def test_as_constant():

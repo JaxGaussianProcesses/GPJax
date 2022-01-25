@@ -51,38 +51,6 @@ def sort_dictionary(base_dict: dict) -> dict:
     return dict(sorted(base_dict.items()))
 
 
-def standardise(
-    x: jnp.DeviceArray,
-    xmean: jnp.DeviceArray = None,
-    xstd: jnp.DeviceArray = None,
-) -> Tuple[jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray]:
-    """
-    Standardise a given matrix such that values are distributed according to a unit normal random variable. This is
-    primarily designed for standardising a training dataset.
-
-    :param x: A matrix of unstandardised values
-    :return: A matrix of standardised values
-    """
-    xmean = xmean if xmean else jnp.mean(x, axis=0)
-    xstd = xstd if xstd else jnp.std(x, axis=0)
-    return (x - xmean) / xstd, xmean, xstd
-
-
-def unstandardise(
-    x: jnp.DeviceArray, xmean: jnp.DeviceArray, xstd: jnp.DeviceArray
-) -> jnp.DeviceArray:
-    """
-    Unstandardise a given matrix with respect to a previously computed mean and standard deviation. This is designed
-    for remapping a matrix back onto its original scale.
-
-    :param x: A standardised matrix.
-    :param xmean: A mean vector.
-    :param xstd: A standard deviation vector.
-    :return: A matrix of unstandardised values.
-    """
-    return (x * xstd) + xmean
-
-
 def as_constant(parameter_set: dict, params: list) -> Tuple[dict, dict]:
     base_params = deepcopy(parameter_set)
     sparams = {}
