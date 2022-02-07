@@ -270,7 +270,7 @@ class NonConjugatePosterior(Posterior):
         n = training.n
         jitter = get_defaults()["jitter"]
         if not priors:
-            priors = get_param_template(self.params)
+            priors = copy_dict_structure(self.params)
             priors["latent"] = tfd.Normal(loc=0.0, scale=1.0)
 
         def mll(params: dict):
