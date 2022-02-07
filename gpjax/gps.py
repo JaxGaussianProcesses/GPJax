@@ -71,6 +71,17 @@ class Prior(GP):
             "mean_function": self.mean_function.params,
         }
 
+    def random_variable(
+        self, test_points: Array, params: dict
+    ) -> tfd.Distribution:
+        n = test_points.shape[0]
+        mu = self.mean(params)(test_points)
+        sigma = self.variance(params)(test_points)
+        sigma += I(n) * 1e-8
+        return tfd.MultivariateNormalTriL(
+            mu.squeeze(), jnp.linalg.cholesky(sigma)
+        )
+
 
 #######################
 # GP Posteriors

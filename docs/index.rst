@@ -39,6 +39,12 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
 
 .. toctree::
     :maxdepth: 1
+    :caption: Guides
+
+    nbs/kernels
+
+.. toctree::
+    :maxdepth: 1
     :caption: Experimental
 
     nbs/tfp_integration
