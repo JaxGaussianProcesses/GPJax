@@ -13,7 +13,7 @@ from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.parameters import (  # build_all_transforms,
     build_transforms,
     evaluate_priors,
-    get_param_template,
+    copy_dict_structure,
     initialise,
     log_density,
     prior_checks,
@@ -65,7 +65,7 @@ def test_lpd(x):
 def test_prior_template(lik):
     posterior = Prior(kernel=RBF()) * lik(num_datapoints=10)
     params, _, _ = initialise(posterior)
-    prior_container = get_param_template(params)
+    prior_container = copy_dict_structure(params)
     for (
         k,
         v1,
@@ -80,7 +80,7 @@ def test_recursive_complete(lik):
     params, _, _ = initialise(posterior)
     priors = {"kernel": {}}
     priors["kernel"]["lengthscale"] = tfd.HalfNormal(scale=2.0)
-    container = get_param_template(params)
+    container = copy_dict_structure(params)
     complete_priors = recursive_complete(container, priors)
     for (
         k,
@@ -127,7 +127,7 @@ def test_none_prior():
         },
         "likelihood": {"obs_noise": jnp.array([1.0])},
     }
-    priors = get_param_template(params)
+    priors = copy_dict_structure(params)
     lpd = evaluate_priors(params, priors)
     assert lpd == 0.0
 
@@ -149,7 +149,7 @@ def test_incomplete_priors():
             "variance": tfd.Gamma(2.0, 2.0),
         },
     }
-    container = get_param_template(params)
+    container = copy_dict_structure(params)
     complete_priors = recursive_complete(container, priors)
     lpd = evaluate_priors(params, complete_priors)
     assert pytest.approx(lpd) == -1.6137061
@@ -235,7 +235,8 @@ def test_output(num_datapoints, likelihood):
 
     unconstrained_params = transform(params, unconstrainer)
     assert (
-        unconstrained_params["kernel"]["lengthscale"] != params["kernel"]["lengthscale"]
+        unconstrained_params["kernel"]["lengthscale"]
+        != params["kernel"]["lengthscale"]
     )
     backconstrained_params = transform(unconstrained_params, constrainer)
     for k, v1, v2 in recursive_items(params, unconstrained_params):

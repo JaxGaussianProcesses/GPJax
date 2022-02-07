@@ -53,7 +53,7 @@ def recursive_complete(d1, d2) -> dict:
 # Parameter transformation
 ################################
 def build_transforms(params, key=None) -> tp.Tuple[tp.Dict, tp.Dict]:
-    constrainer, unconstrainer = get_param_template(params), get_param_template(params)
+    constrainer, unconstrainer = copy_dict_structure(params), copy_dict_structure(params)
     config = get_defaults()
     transform_set = config["transformations"]
 
@@ -82,7 +82,7 @@ def build_transforms(params, key=None) -> tp.Tuple[tp.Dict, tp.Dict]:
 
 
 def transform(params: dict, transform_map: dict):
-    transformed_params = get_param_template(params)
+    transformed_params = copy_dict_structure(params)
 
     def apply_transform(untransformed_params, transformed_params, transform_map):
         for key, value in untransformed_params.items():
@@ -106,7 +106,7 @@ def log_density(param: jnp.DeviceArray, density: tfd.Distribution) -> Array:
     return log_prob
 
 
-def get_param_template(params: dict) -> dict:
+def copy_dict_structure(params: dict) -> dict:
     # Copy dictionary structure
     prior_container = deepcopy(params)
     # Set all values to zero
@@ -124,7 +124,7 @@ def structure_priors(params: dict, priors: dict) -> dict:
     Returns:
         dict: [description]
     """
-    prior_container = get_param_template(params)
+    prior_container = copy_dict_structure(params)
     # Where a prior has been supplied, override the None value by the prior distribution.
     complete_prior = recursive_complete(prior_container, priors)
     return complete_prior

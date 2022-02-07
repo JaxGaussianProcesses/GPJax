@@ -8,6 +8,7 @@ from gpjax.utils import (
     concat_dictionaries,
     merge_dictionaries,
     sort_dictionary,
+    dict_array_coercion,
 )
 
 
@@ -49,3 +50,19 @@ def test_as_constant():
     assert list(s1.keys()) == ["a"]
     assert list(b2.keys()) == ["c"]
     assert list(s2.keys()) == ["a", "b"]
+
+
+@pytest.mark.parametrize("d", [1, 2, 10])
+def test_array_coercion(d):
+    params = {
+        "kernel": {
+            "lengthscale": jnp.array([1.0] * d),
+            "variance": jnp.array([1.0]),
+        },
+        "likelihood": {"obs_noise": jnp.array([1.0])},
+        "mean_function": {},
+    }
+    dict_to_array, array_to_dict = dict_array_coercion(params)
+    assert array_to_dict(dict_to_array(params)) == params
+    assert isinstance(dict_to_array(params), list)
+    assert isinstance(array_to_dict(dict_to_array(params)), dict)

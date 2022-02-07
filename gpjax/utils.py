@@ -1,7 +1,8 @@
 from copy import deepcopy
-from typing import Tuple
+import typing as tp
 
 import jax.numpy as jnp
+import jax
 from jax.scipy.linalg import cho_factor, cho_solve
 
 from .types import Array
@@ -51,10 +52,24 @@ def sort_dictionary(base_dict: dict) -> dict:
     return dict(sorted(base_dict.items()))
 
 
-def as_constant(parameter_set: dict, params: list) -> Tuple[dict, dict]:
+def as_constant(parameter_set: dict, params: list) -> tp.Tuple[dict, dict]:
     base_params = deepcopy(parameter_set)
     sparams = {}
     for param in params:
         sparams[param] = base_params[param]
         del base_params[param]
     return base_params, sparams
+
+
+def dict_array_coercion(params) -> tp.Tuple[tp.Callable, tp.Callable]:
+    flattened_pytree = jax.tree_util.tree_flatten(params)
+
+    def dict_to_array(parameter_dict) -> jnp.DeviceArray:
+        return jax.tree_util.tree_flatten(parameter_dict)[0]
+
+    def array_to_dict(parameter_array) -> tp.Dict:
+        return jax.tree_util.tree_unflatten(
+            flattened_pytree[1], parameter_array
+        )
+
+    return dict_to_array, array_to_dict
