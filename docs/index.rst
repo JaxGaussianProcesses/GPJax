@@ -3,7 +3,7 @@ Welcome to GPJax's documentation!
 
 GPJax is a didactic Gaussian process that supports GPU acceleration and just-in-time compilation. The intention of GPJax is to provide a framework for researchers to rapidly prototype and develop new Gaussian process methods. We seek to provide this by providing an API that seeks to best represent the underlying mathematics of Gaussian processes.
 
-You can view the source code for GPJax `here on Github <https://github.com/thomaspinder/GPJax>`_ 
+You can view the source code for GPJax `here on Github <https://github.com/thomaspinder/GPJax>`_
 
 Gaussian process 'Hello World' example
 -----------------------------------------------------
@@ -36,18 +36,9 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
 
     nbs/regression
     nbs/classification
-    nbs/spatial_modelling
-    nbs/numpyro_interface
 
-.. toctree::
-    :maxdepth: 1
-    :caption: Guides
-
-    nbs/custom_kernel
-    
 .. toctree::
     :maxdepth: 1
     :caption: Experimental
 
-    nbs/tfp_interface
-    nbs/spectral
+    nbs/tfp_integration
