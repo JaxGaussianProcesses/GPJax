@@ -8,8 +8,7 @@ from gpjax.utils import (
     concat_dictionaries,
     merge_dictionaries,
     sort_dictionary,
-    standardise,
-    unstandardise,
+    dict_array_coercion,
 )
 
 
@@ -43,20 +42,6 @@ def test_sort_dict():
     assert list(sorted_dict.values()) == [2, 1]
 
 
-def test_standardise():
-    key = jr.PRNGKey(123)
-    x = jr.uniform(key, shape=(100, 1))
-    xtr, xmean, xstd = standardise(x)
-    assert pytest.approx(jnp.mean(xtr), rel=4) == 0.0
-
-    xtr2 = standardise(x, xmean, xstd)
-    assert pytest.approx(jnp.mean(xtr2), rel=4) == 0.0
-
-    xuntr = unstandardise(xtr, xmean, xstd)
-    diff = jnp.sum(jnp.abs(xuntr - x))
-    assert pytest.approx(diff) == 0
-
-
 def test_as_constant():
     base = {"a": 1, "b": 2, "c": 3}
     b1, s1 = as_constant(base, ["a"])
@@ -65,3 +50,19 @@ def test_as_constant():
     assert list(s1.keys()) == ["a"]
     assert list(b2.keys()) == ["c"]
     assert list(s2.keys()) == ["a", "b"]
+
+
+@pytest.mark.parametrize("d", [1, 2, 10])
+def test_array_coercion(d):
+    params = {
+        "kernel": {
+            "lengthscale": jnp.array([1.0] * d),
+            "variance": jnp.array([1.0]),
+        },
+        "likelihood": {"obs_noise": jnp.array([1.0])},
+        "mean_function": {},
+    }
+    dict_to_array, array_to_dict = dict_array_coercion(params)
+    assert array_to_dict(dict_to_array(params)) == params
+    assert isinstance(dict_to_array(params), list)
+    assert isinstance(array_to_dict(dict_to_array(params)), dict)

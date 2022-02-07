@@ -1,11 +1,13 @@
 from typing import Tuple
 
+import jax.random as jr
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from ml_collections import ConfigDict
 
 
 def get_defaults():
     config = ConfigDict()
+    config.key = jr.PRNGKey(123)
     # Covariance matrix stabilising jitter
     config.jitter = 1e-6
 
@@ -20,10 +22,13 @@ def get_defaults():
     transformations.obs_noise = "positive_transform"
     transformations.latent = "identity_transform"
     transformations.basis_fns = "identity_transform"
+    transformations.offset = "identity_transform"
     return config
 
 
-def add_parameter(config: ConfigDict, bijection_tuple: Tuple[str, tfb.Bijector]) -> ConfigDict:
+def add_parameter(
+    config: ConfigDict, bijection_tuple: Tuple[str, tfb.Bijector]
+) -> ConfigDict:
     param_name, bijection = bijection_tuple
     lookup_name = f"custom_{param_name}"
     config.transformations[lookup_name] = bijection

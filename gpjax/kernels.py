@@ -1,13 +1,11 @@
+import abc
 from typing import Optional
 
 import jax.numpy as jnp
 from chex import dataclass
 from jax import vmap
-from multipledispatch import dispatch
 
 from gpjax.types import Array
-
-from .utils import scale, stretch
 
 
 @dataclass(repr=False)
@@ -17,15 +15,24 @@ class Kernel:
     spectral: Optional[bool] = False
     name: Optional[str] = "Kernel"
 
+    @abc.abstractmethod
     def __call__(self, x: Array, y: Array, params: dict) -> Array:
         raise NotImplementedError
 
     def __repr__(self):
-        return f"{self.name}:\n\t Stationary: {self.stationary}\n\t Spectral form: {self.spectral} \n\t ARD structure: {self.ard}"
+        return (
+            f"{self.name}:\n\t Stationary: {self.stationary}\n\t Spectral form:"
+            f" {self.spectral} \n\t ARD structure: {self.ard}"
+        )
 
     @property
     def ard(self):
         return True if self.ndims > 1 else False
+
+    @property
+    @abc.abstractmethod
+    def params(self) -> dict:
+        raise NotImplementedError
 
 
 @dataclass(repr=False)
@@ -36,15 +43,17 @@ class RBF(Kernel):
     name: Optional[str] = "Radial basis function kernel"
 
     def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
-        x = scale(x, params["lengthscale"])
-        y = scale(y, params["lengthscale"])
-        K = stretch(jnp.exp(-0.5 * squared_distance(x, y)), params["variance"])
+        x /= params["lengthscale"]
+        y /= params["lengthscale"]
+        K = params["variance"] * jnp.exp(-0.5 * squared_distance(x, y))
         return K.squeeze()
 
-
-@dispatch(RBF)
-def initialise(kernel: RBF):
-    return {"lengthscale": jnp.array([1.0] * kernel.ndims), "variance": jnp.array([1.0])}
+    @property
+    def params(self) -> dict:
+        return {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+        }
 
 
 def squared_distance(x: Array, y: Array):

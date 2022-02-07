@@ -24,13 +24,13 @@ EXTRAS = {
         "nb-black==1.0.7",
         "matplotlib==3.3.3",
         "sphinx-copybutton==0.3.5",
-        "gpviz==0.0.1"
+        "gpviz==0.0.1",
     ],
 }
 
 setup(
     name="GPJax",
-    version="0.3.8",
+    version="0.3.9",
     author="Thomas Pinder",
     author_email="t.pinder2@lancaster.ac.uk",
     packages=find_packages(".", exclude=["tests"]),

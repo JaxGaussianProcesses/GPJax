@@ -1,7 +1,9 @@
 import jax.numpy as jnp
 import pytest
 
-from gpjax.kernels import RBF, cross_covariance, gram, initialise
+from gpjax import kernels
+from gpjax.kernels import RBF, cross_covariance, gram
+from gpjax.parameters import initialise
 from gpjax.utils import I
 
 
@@ -11,7 +13,7 @@ def test_gram(dim):
     if dim > 1:
         x = jnp.hstack([x] * dim)
     kern = RBF()
-    params = initialise(kern)
+    params, _, _ = initialise(kern)
     gram_matrix = gram(kern, x, params)
     assert gram_matrix.shape[0] == x.shape[0]
     assert gram_matrix.shape[0] == gram_matrix.shape[1]
@@ -22,15 +24,15 @@ def test_gram(dim):
 def test_cross_covariance(n1, n2):
     x1 = jnp.linspace(-1.0, 1.0, num=n1).reshape(-1, 1)
     x2 = jnp.linspace(-1.0, 1.0, num=n2).reshape(-1, 1)
-    params = initialise(RBF())
+    params, _, _ = initialise(RBF())
     kernel_matrix = cross_covariance(RBF(), x2, x1, params)
     assert kernel_matrix.shape == (n1, n2)
 
 
 def test_call():
     kernel = RBF()
-    params = initialise(kernel)
-    x, y = jnp.array([[1.]]), jnp.array([[0.5]])
+    params, _, _ = initialise(kernel)
+    x, y = jnp.array([[1.0]]), jnp.array([[0.5]])
     point_corr = kernel(x, y, params)
     assert isinstance(point_corr, jnp.DeviceArray)
     assert point_corr.shape == ()
@@ -55,13 +57,18 @@ def test_pos_def(dim, ell, sigma):
 
 @pytest.mark.parametrize("dim", [1, 2, 5, 10])
 def test_initialisation(dim):
-    params = initialise(RBF(ndims=dim))
+    kern = RBF(ndims=dim)
+    params, _, _ = initialise(kern)
     assert list(params.keys()) == ["lengthscale", "variance"]
     assert all(params["lengthscale"] == jnp.array([1.0] * dim))
     assert params["variance"] == jnp.array([1.0])
+    if dim > 1:
+        assert kern.ard
+    else:
+        assert not kern.ard
 
 
 def test_dtype():
-    params = initialise(RBF())
+    params, _, _ = initialise(RBF())
     for k, v in params.items():
         assert v.dtype == jnp.float64

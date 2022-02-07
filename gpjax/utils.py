@@ -1,9 +1,9 @@
 from copy import deepcopy
-from typing import Tuple
+import typing as tp
 
 import jax.numpy as jnp
+import jax
 from jax.scipy.linalg import cho_factor, cho_solve
-from multipledispatch import dispatch
 
 from .types import Array
 
@@ -52,55 +52,24 @@ def sort_dictionary(base_dict: dict) -> dict:
     return dict(sorted(base_dict.items()))
 
 
-@dispatch(jnp.DeviceArray)
-def standardise(x: jnp.DeviceArray) -> Tuple[jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray]:
-    """
-    Standardise a given matrix such that values are distributed according to a unit normal random variable. This is
-    primarily designed for standardising a training dataset.
-
-    :param x: A matrix of unstandardised values
-    :return: A matrix of standardised values
-    """
-    xmean = jnp.mean(x, axis=0)
-    xstd = jnp.std(x, axis=0)
-    return (x - xmean) / xstd, xmean, xstd
-
-
-@dispatch(jnp.DeviceArray, jnp.DeviceArray, jnp.DeviceArray)
-def standardise(
-    x: jnp.DeviceArray, xmean: jnp.DeviceArray, xstd: jnp.DeviceArray
-) -> jnp.DeviceArray:
-    """
-    Standardise a given matrix with respect to a given mean and standard deviation. This is primarily designed for
-    standardising a test set of data with respect to the training data.
-
-    :param x: A matrix of unstandardised values
-    :param xmean: A precomputed mean vector
-    :param xstd: A precomputed standard deviation vector
-    :return: A matrix of standardised values
-    """
-    return (x - xmean) / xstd
-
-
-def unstandardise(
-    x: jnp.DeviceArray, xmean: jnp.DeviceArray, xstd: jnp.DeviceArray
-) -> jnp.DeviceArray:
-    """
-    Unstandardise a given matrix with respect to a previously computed mean and standard deviation. This is designed
-    for remapping a matrix back onto its original scale.
-
-    :param x: A standardised matrix.
-    :param xmean: A mean vector.
-    :param xstd: A standard deviation vector.
-    :return: A matrix of unstandardised values.
-    """
-    return (x * xstd) + xmean
-
-
-def as_constant(parameter_set: dict, params: list) -> Tuple[dict, dict]:
+def as_constant(parameter_set: dict, params: list) -> tp.Tuple[dict, dict]:
     base_params = deepcopy(parameter_set)
     sparams = {}
     for param in params:
         sparams[param] = base_params[param]
         del base_params[param]
     return base_params, sparams
+
+
+def dict_array_coercion(params) -> tp.Tuple[tp.Callable, tp.Callable]:
+    flattened_pytree = jax.tree_util.tree_flatten(params)
+
+    def dict_to_array(parameter_dict) -> jnp.DeviceArray:
+        return jax.tree_util.tree_flatten(parameter_dict)[0]
+
+    def array_to_dict(parameter_array) -> tp.Dict:
+        return jax.tree_util.tree_unflatten(
+            flattened_pytree[1], parameter_array
+        )
+
+    return dict_to_array, array_to_dict
