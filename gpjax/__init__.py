@@ -13,4 +13,4 @@ from .mean_functions import Constant, Zero
 from .parameters import initialise, transform, copy_dict_structure
 from .types import Dataset
 
-__version__ = "0.3.8"
+__version__ = "0.4.0"
