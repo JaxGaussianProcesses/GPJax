@@ -1,5 +1,5 @@
-from argparse import _AppendConstAction
 import typing as tp
+from argparse import _AppendConstAction
 from copy import deepcopy
 
 import jax.numpy as jnp
@@ -13,8 +13,8 @@ from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.parameters import (  # build_all_transforms,
     build_transforms,
-    evaluate_priors,
     copy_dict_structure,
+    evaluate_priors,
     initialise,
     log_density,
     prior_checks,
@@ -237,8 +237,7 @@ def test_output(num_datapoints, likelihood):
 
     unconstrained_params = transform(params, unconstrainer)
     assert (
-        unconstrained_params["kernel"]["lengthscale"]
-        != params["kernel"]["lengthscale"]
+        unconstrained_params["kernel"]["lengthscale"] != params["kernel"]["lengthscale"]
     )
     backconstrained_params = transform(unconstrained_params, constrainer)
     for k, v1, v2 in recursive_items(params, unconstrained_params):

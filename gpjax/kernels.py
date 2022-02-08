@@ -1,6 +1,6 @@
 import abc
 from re import L
-from typing import Optional, List, Tuple, Dict, Callable
+from typing import Callable, Dict, List, Optional, Tuple
 from unicodedata import name
 
 import jax.numpy as jnp
@@ -80,9 +80,7 @@ class RBF(Kernel):
             "variance": jnp.array([1.0]),
         }
 
-    def __call__(
-        self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
-    ) -> Array:
+    def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
         K = params["variance"] * jnp.exp(-0.5 * squared_distance(x, y))
@@ -100,9 +98,7 @@ class Matern12(Kernel):
             "variance": jnp.array([1.0]),
         }
 
-    def __call__(
-        self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
-    ) -> Array:
+    def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
         K = params["variance"] * jnp.exp(-0.5 * euclidean_distance(x, y))
@@ -120,9 +116,7 @@ class Matern32(Kernel):
             "variance": jnp.array([1.0]),
         }
 
-    def __call__(
-        self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
-    ) -> Array:
+    def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
         tau = euclidean_distance(x, y)
@@ -145,9 +139,7 @@ class Matern52(Kernel):
             "variance": jnp.array([1.0]),
         }
 
-    def __call__(
-        self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
-    ) -> Array:
+    def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
         tau = euclidean_distance(x, y)
@@ -172,14 +164,10 @@ class Polynomial(Kernel):
         }
         self.name = f"Polynomial Degree: {self.degree}"
 
-    def __call__(
-        self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
-    ) -> Array:
+    def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
         x = self.slice_input(x).squeeze()
         y = self.slice_input(y).squeeze()
-        K = jnp.power(
-            params["shift"] + jnp.dot(x * params["variance"], y), self.degree
-        )
+        K = jnp.power(params["shift"] + jnp.dot(x * params["variance"], y), self.degree)
         return K.squeeze()
 
 
@@ -192,9 +180,7 @@ def euclidean_distance(x: Array, y: Array):
 
 
 def gram(kernel: Kernel, inputs: Array, params: dict) -> Array:
-    return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(
-        inputs
-    )
+    return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(inputs)
 
 
 def cross_covariance(kernel: Kernel, x: Array, y: Array, params: dict) -> Array:

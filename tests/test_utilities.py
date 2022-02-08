@@ -6,9 +6,9 @@ from gpjax.utils import (
     I,
     as_constant,
     concat_dictionaries,
+    dict_array_coercion,
     merge_dictionaries,
     sort_dictionary,
-    dict_array_coercion,
 )
 
 

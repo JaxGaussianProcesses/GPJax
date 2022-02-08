@@ -53,7 +53,9 @@ def recursive_complete(d1, d2) -> dict:
 # Parameter transformation
 ################################
 def build_transforms(params, key=None) -> tp.Tuple[tp.Dict, tp.Dict]:
-    constrainer, unconstrainer = copy_dict_structure(params), copy_dict_structure(params)
+    constrainer, unconstrainer = copy_dict_structure(params), copy_dict_structure(
+        params
+    )
     config = get_defaults()
     transform_set = config["transformations"]
 

@@ -1,8 +1,8 @@
-from copy import deepcopy
 import typing as tp
+from copy import deepcopy
 
-import jax.numpy as jnp
 import jax
+import jax.numpy as jnp
 from jax.scipy.linalg import cho_factor, cho_solve
 
 from .types import Array
@@ -68,8 +68,6 @@ def dict_array_coercion(params) -> tp.Tuple[tp.Callable, tp.Callable]:
         return jax.tree_util.tree_flatten(parameter_dict)[0]
 
     def array_to_dict(parameter_array) -> tp.Dict:
-        return jax.tree_util.tree_unflatten(
-            flattened_pytree[1], parameter_array
-        )
+        return jax.tree_util.tree_unflatten(flattened_pytree[1], parameter_array)
 
     return dict_to_array, array_to_dict

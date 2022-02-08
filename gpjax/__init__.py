@@ -13,12 +13,12 @@ from .kernels import (
     Matern32,
     Matern52,
     Polynomial,
-    SumKernel,
     ProductKernel,
+    SumKernel,
 )
 from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
-from .parameters import initialise, transform, copy_dict_structure
+from .parameters import copy_dict_structure, initialise, transform
 from .types import Dataset
 
 __version__ = "0.4.1"

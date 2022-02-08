@@ -4,7 +4,6 @@ import jax.random as jr
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from ml_collections import ConfigDict
 
-
 __config = None
 
 

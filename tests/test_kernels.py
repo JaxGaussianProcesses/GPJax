@@ -1,3 +1,5 @@
+from itertools import permutations
+
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
@@ -5,20 +7,19 @@ import pytest
 from gpjax import kernels
 from gpjax.kernels import (
     RBF,
-    Polynomial,
-    ProductKernel,
-    SumKernel,
     Kernel,
-    cross_covariance,
-    euclidean_distance,
-    gram,
     Matern12,
     Matern32,
     Matern52,
+    Polynomial,
+    ProductKernel,
+    SumKernel,
+    cross_covariance,
+    euclidean_distance,
+    gram,
 )
 from gpjax.parameters import initialise
 from gpjax.utils import I
-from itertools import permutations
 
 
 @pytest.mark.parametrize("kern", [RBF(), Matern12(), Matern32(), Matern52()])
@@ -55,9 +56,7 @@ def test_call(kernel):
 
 @pytest.mark.parametrize("kern", [RBF(), Matern12(), Matern32(), Matern52()])
 @pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize(
-    "ell, sigma", [(0.1, 0.1), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)]
-)
+@pytest.mark.parametrize("ell, sigma", [(0.1, 0.1), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
 def test_pos_def(kern, dim, ell, sigma):
     n = 30
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
@@ -145,9 +144,7 @@ def test_active_dim(kernel):
 
 
 @pytest.mark.parametrize("combination_type", [SumKernel, ProductKernel])
-@pytest.mark.parametrize(
-    "kernel", [RBF, Matern12, Matern32, Matern52, Polynomial]
-)
+@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52, Polynomial])
 @pytest.mark.parametrize("n_kerns", [2, 3, 4])
 def test_combination_kernel(combination_type, kernel, n_kerns):
     n = 20
@@ -194,9 +191,7 @@ def test_prod_kern_value(k1, k2):
     assert jnp.all(Kff == Kff_manual)
 
 
-@pytest.mark.parametrize(
-    "kernel", [RBF, Matern12, Matern32, Matern52, Polynomial]
-)
+@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52, Polynomial])
 def test_update_params(kernel):
     kern = kernel()
     params = kern.params

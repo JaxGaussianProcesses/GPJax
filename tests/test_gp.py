@@ -4,6 +4,7 @@ from turtle import pos
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
+import tensorflow_probability.substrates.jax as tfp
 from numpy import isin
 
 from gpjax import Dataset, initialise, likelihoods, transform
@@ -17,7 +18,6 @@ from gpjax.gps import (
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian, NonConjugateLikelihoods
 from gpjax.parameters import initialise
-import tensorflow_probability.substrates.jax as tfp
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 10])
@@ -85,10 +85,7 @@ def test_nonconjugate_posterior(num_datapoints, likel):
         jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1)),
         axis=0,
     )
-    y = (
-        0.5 * jnp.sign(jnp.cos(3 * x + jr.normal(key, shape=x.shape) * 0.05))
-        + 0.5
-    )
+    y = 0.5 * jnp.sign(jnp.cos(3 * x + jr.normal(key, shape=x.shape) * 0.05)) + 0.5
     D = Dataset(X=x, y=y)
     # Initialisation
     p = Prior(kernel=RBF())
