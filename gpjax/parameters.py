@@ -33,8 +33,8 @@ def recursive_complete(d1, d2) -> dict:
         if type(value) is dict:
             if key in d2.keys():
                 recursive_complete(value, d2[key])
-            else:
-                pass
+            # else:
+            #     pass
         else:
             if key in d2.keys():
                 d1[key] = d2[key]

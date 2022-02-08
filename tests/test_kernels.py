@@ -1,4 +1,5 @@
 import jax.numpy as jnp
+import jax.random as jr
 import pytest
 
 from gpjax import kernels
@@ -14,6 +15,7 @@ from gpjax.kernels import (
 )
 from gpjax.parameters import initialise
 from gpjax.utils import I
+from itertools import permutations
 
 
 @pytest.mark.parametrize("kern", [RBF(), Matern12(), Matern32(), Matern52()])
@@ -70,7 +72,7 @@ def test_pos_def(kern, dim, ell, sigma):
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
 @pytest.mark.parametrize("dim", [1, 2, 5, 10])
 def test_initialisation(kernel, dim):
-    kern = kernel(ndims=dim)
+    kern = kernel(active_dims=[i for i in range(dim)])
     params, _, _ = initialise(kern)
     assert list(params.keys()) == ["lengthscale", "variance"]
     assert all(params["lengthscale"] == jnp.array([1.0] * dim))
@@ -88,16 +90,18 @@ def test_dtype(kernel):
         assert v.dtype == jnp.float64
 
 
-@pytest.mark.parametrize("degree", [1, 2, 3, 4])
-@pytest.mark.parametrize("dim", [1, 2, 5, 10])
+@pytest.mark.parametrize("degree", [1, 2, 3])
+@pytest.mark.parametrize("dim", [1, 2, 5])
 @pytest.mark.parametrize("variance", [0.1, 1.0, 2.0])
 @pytest.mark.parametrize("shift", [1e-6, 0.1, 1.0])
 def test_polynomial(degree, dim, variance, shift):
     x = jnp.linspace(0.0, 1.0, num=20).reshape(-1, 1)
     if dim > 1:
-        x = jnp.hstack((x) * dim)
-    params = {"variance": jnp.array([variance]), "shift": jnp.array(shift)}
-    kern = Polynomial(degree=degree, ndims=dim)
+        x = jnp.hstack([x] * dim)
+    kern = Polynomial(degree=degree, active_dims=[i for i in range(dim)])
+    params = kern.params
+    params["shift"] * shift
+    params["variance"] * variance
     gram_matrix = gram(kern, x, params)
     assert kern.name == f"Polynomial Degree: {degree}"
     jitter_matrix = I(20) * 1e-6
@@ -106,8 +110,7 @@ def test_polynomial(degree, dim, variance, shift):
     assert min_eig > 0
     assert gram_matrix.shape[0] == x.shape[0]
     assert gram_matrix.shape[0] == gram_matrix.shape[1]
-    ps, _, _ = initialise(kern)
-    assert list(ps.keys()) == ["shift", "variance"]
+    assert list(params.keys()) == ["shift", "variance"]
 
 
 def test_euclidean_distance():
@@ -117,3 +120,22 @@ def test_euclidean_distance():
     x2vec = jnp.array((1, 1, 1))
     assert euclidean_distance(x1vec, x2vec) == 3.0
     assert euclidean_distance(x1, x2) == 5.0
+
+
+@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
+def test_active_dim(kernel):
+    dim_list = [0, 1, 2, 3]
+    perm_length = 2
+    dim_pairs = list(permutations(dim_list, r=perm_length))
+    n_dims = len(dim_list)
+    key = jr.PRNGKey(123)
+    X = jr.normal(key, shape=(20, n_dims))
+
+    for dp in dim_pairs:
+        Xslice = X[..., dp]
+        ad_kern = kernel(active_dims=dp)
+        manual_kern = kernel(active_dims=[i for i in range(perm_length)])
+
+        k1 = gram(ad_kern, X, ad_kern.params)
+        k2 = gram(manual_kern, Xslice, manual_kern.params)
+        assert jnp.all(k1 == k2)
