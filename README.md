@@ -28,51 +28,42 @@ GPJax aims to provide a low-level interface to Gaussian process models. Code is 
 After importing the necessary dependencies, we'll first simulate some data.
 
 ```python
-import gpjax
-from gpjax import Dataset
+import gpjax as gpx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
+from jax.experimental import optimizers
+
 key = jr.PRNGKey(123)
 
 x = jr.uniform(key=key, minval=-3.0, maxval=3.0, shape=(50,)).sort().reshape(-1, 1)
 y = jnp.sin(x) + jr.normal(key, shape=x.shape)*0.05
-training = Dataset(X=x, y=y)
+training = gpx.Dataset(X=x, y=y)
 ```
 
 As can be seen, the latent function of interest here is a sinusoidal function. However, it has been perturbed by some zero-mean Gaussian noise with variance of 0.05. We can use a Gaussian process model to try and recover this latent function.
 
 ```python
-from gpjax.kernels import RBF
-from gpjax.gps import Prior
-
-f = Prior(kernel = RBF())
+f = gpx.Prior(kernel = gpx.RBF())
 ```
 
 In the presence of a likelihood function which we'll here assume to be Gaussian, we can optimise the marginal log-likelihood of the Gaussian process prior multiplied by the likelihood to obtain a posterior distribution over the latent function.
 
 ```python
-from gpjax.likelihoods import Gaussian
-
-likelihood = Gaussian(num_datapoints = x.shape[0])
+likelihood = gpx.Gaussian(num_datapoints = x.shape[0])
 posterior = f * likelihood
 ```
 
 Equipped with the Gaussian process posterior, we can now optimise the model's hyperparameters (note, we need not optimise the latent function here due to the Gaussian conjugacy.). To do this, we can either define our parameters by hand through a dictionary, or realise a set of default parameters through the `initialise` callable. For brevity, we'll do the latter here but see the [regression notebook](https://github.com/thomaspinder/GPJax/blob/master/docs/nbs/regression.ipynb) for a full discussion on parameter initialisation and transformation.
 
 ```python
-from gpjax.parameters import initialise, transform
-
-params, constrainer, unconstrainer = initialise(posterior)
-params = transform(params, unconstrainer)
+params, constrainer, unconstrainer = gpx.initialise(posterior)
+params = gpx.transform(params, unconstrainer)
 ```
 
 With initial values defined, we can now optimise the hyperparameters' value by carrying out gradient-based optimisation with respect to the GP's marginal log-likelihood. We'll do this now using Jax's built in optimisers, namely the Adam optimiser with a step-size of 0.01. We can also Jit compile our objective function to accelerate training. You'll notice that it is only now that we have incorporated any data into our GP. This is desirable, as this is exactly how model building works in principle too, where we first build our prior model, then observe some data and use this data to build a posterior.
 
 ```python
-from gpjax.objectives import marginal_ll
-from jax.experimental import optimizers
-
 mll = jit(posterior.marginal_log_likelihood(training, constrainer, negative=True))
 
 opt_init, opt_update, get_params = optimizers.adam(step_size=0.01)
@@ -82,7 +73,6 @@ def step(i, opt_state):
     g = jax.grad(mll)(params)
     return opt_update(i, g, opt_state)
 
-
 for i in range(100):
     opt_state = step(i, opt_state)
 ```
@@ -90,7 +80,7 @@ for i in range(100):
 Our parameters are now optimised. We can retransfrom these back onto the parameter's original constrained space and, using this learned value, query the GP at a set of test points.
 
 ```python
-final_params = transform(get_params(opt_state), constrainer)
+final_params = gpx.transform(get_params(opt_state), constrainer)
 
 xtest = jnp.linspace(-3., 3., 100).reshape(-1, 1)
 
