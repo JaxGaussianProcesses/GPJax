@@ -1,11 +1,13 @@
 import abc
-from typing import Optional, List, Tuple
+from re import L
+from typing import Optional, List, Tuple, Dict
 
 import jax.numpy as jnp
 from chex import dataclass
 from jax import vmap
 
 from gpjax.types import Array
+from numpy import DataSource
 
 
 @dataclass(repr=False)
@@ -14,6 +16,7 @@ class Kernel:
     stationary: Optional[bool] = False
     spectral: Optional[bool] = False
     name: Optional[str] = "Kernel"
+    _params: Optional[Dict] = None
 
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
@@ -25,25 +28,65 @@ class Kernel:
     def slice_input(self, x: Array) -> Array:
         return x[..., self.active_dims]
 
-    def __repr__(self):
-        return (
-            f"{self.name}:\n\t Stationary: {self.stationary}\n\t Spectral form:"
-            f" {self.spectral} \n\t ARD structure: {self.ard}"
-        )
-
     @property
     def ard(self):
         return True if self.ndims > 1 else False
 
     @property
-    @abc.abstractmethod
     def params(self) -> dict:
-        raise NotImplementedError
+        return self._params
+
+    @params.setter
+    def params(self, value):
+        self._params = value
+
+    def __add__(self, other):
+        return SumKernel(kernel_set=[self, other])
+
+    def __mul__(self, other):
+        return ProductKernel(kernel_set=[self, other])
+
+
+@dataclass
+class SumKernel:
+    kernel_set: List[Kernel]
+    name: Optional[str] = "Sum kernel"
+
+    @property
+    def params(self) -> List[Dict]:
+        return [kernel.params for kernel in self.kernel_set]
+
+    def __call__(self, x: Array, y: Array, params: dict) -> Array:
+        return jnp.sum(
+            jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)])
+        )
+
+
+@dataclass
+class ProductKernel:
+    kernel_set: List[Kernel]
+    name: Optional[str] = "Product kernel"
+
+    @property
+    def params(self) -> List[Dict]:
+        return [kernel.params for kernel in self.kernel_set]
+
+    def __call__(self, x: Array, y: Array, params: dict) -> Array:
+        return jnp.prod(
+            jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)])
+        )
 
 
 @dataclass(repr=False)
 class RBF(Kernel):
     name: Optional[str] = "Radial basis function kernel"
+
+    def __post_init__(self):
+        self.ndims = 1 if not self.active_dims else len(self.active_dims)
+        self._params = {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+        }
 
     def __call__(
         self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
@@ -53,17 +96,17 @@ class RBF(Kernel):
         K = params["variance"] * jnp.exp(-0.5 * squared_distance(x, y))
         return K.squeeze()
 
-    @property
-    def params(self) -> dict:
-        return {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-        }
-
 
 @dataclass(repr=False)
 class Matern12(Kernel):
     name: Optional[str] = "Matern 1/2"
+
+    def __post_init__(self):
+        self.ndims = 1 if not self.active_dims else len(self.active_dims)
+        self._params = {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+        }
 
     def __call__(
         self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
@@ -73,17 +116,17 @@ class Matern12(Kernel):
         K = params["variance"] * jnp.exp(-0.5 * euclidean_distance(x, y))
         return K.squeeze()
 
-    @property
-    def params(self) -> dict:
-        return {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-        }
-
 
 @dataclass(repr=False)
 class Matern32(Kernel):
     name: Optional[str] = "Matern 3/2"
+
+    def __post_init__(self):
+        self.ndims = 1 if not self.active_dims else len(self.active_dims)
+        self._params = {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+        }
 
     def __call__(
         self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
@@ -98,17 +141,17 @@ class Matern32(Kernel):
         )
         return K.squeeze()
 
-    @property
-    def params(self) -> dict:
-        return {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-        }
-
 
 @dataclass(repr=False)
 class Matern52(Kernel):
     name: Optional[str] = "Matern 5/2"
+
+    def __post_init__(self):
+        self.ndims = 1 if not self.active_dims else len(self.active_dims)
+        self._params = {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+        }
 
     def __call__(
         self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
@@ -123,13 +166,6 @@ class Matern52(Kernel):
         )
         return K.squeeze()
 
-    @property
-    def params(self) -> dict:
-        return {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-        }
-
 
 @dataclass(repr=False)
 class Polynomial(Kernel):
@@ -138,6 +174,10 @@ class Polynomial(Kernel):
 
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
+        self._params = {
+            "shift": jnp.array([1.0]),
+            "variance": jnp.array([1.0] * self.ndims),
+        }
         self.name = f"Polynomial Degree: {self.degree}"
 
     def __call__(
@@ -149,13 +189,6 @@ class Polynomial(Kernel):
             params["shift"] + jnp.dot(x * params["variance"], y), self.degree
         )
         return K.squeeze()
-
-    @property
-    def params(self) -> dict:
-        return {
-            "shift": jnp.array([1.0]),
-            "variance": jnp.array([1.0] * self.ndims),
-        }
 
 
 def squared_distance(x: Array, y: Array):

@@ -7,7 +7,15 @@ config.update("jax_enable_x64", True)
 
 from .abstractions import fit, optax_fit
 from .gps import Prior, construct_posterior
-from .kernels import RBF, Matern12, Matern32, Matern52, Polynomial
+from .kernels import (
+    RBF,
+    Matern12,
+    Matern32,
+    Matern52,
+    Polynomial,
+    SumKernel,
+    ProductKernel,
+)
 from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
 from .parameters import initialise, transform, copy_dict_structure
