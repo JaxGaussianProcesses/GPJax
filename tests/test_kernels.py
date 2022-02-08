@@ -6,6 +6,9 @@ from gpjax import kernels
 from gpjax.kernels import (
     RBF,
     Polynomial,
+    ProductKernel,
+    SumKernel,
+    Kernel,
     cross_covariance,
     euclidean_distance,
     gram,
@@ -139,3 +142,65 @@ def test_active_dim(kernel):
         k1 = gram(ad_kern, X, ad_kern.params)
         k2 = gram(manual_kern, Xslice, manual_kern.params)
         assert jnp.all(k1 == k2)
+
+
+@pytest.mark.parametrize("combination_type", [SumKernel, ProductKernel])
+@pytest.mark.parametrize(
+    "kernel", [RBF, Matern12, Matern32, Matern52, Polynomial]
+)
+@pytest.mark.parametrize("n_kerns", [2, 3, 4])
+def test_combination_kernel(combination_type, kernel, n_kerns):
+    n = 20
+    kern_list = [kernel() for _ in range(n_kerns)]
+    c_kernel = combination_type(kernel_set=kern_list)
+    assert len(c_kernel.kernel_set) == n_kerns
+    assert len(c_kernel.params) == n_kerns
+    assert isinstance(c_kernel.kernel_set, list)
+    assert isinstance(c_kernel.kernel_set[0], Kernel)
+    assert isinstance(c_kernel.params[0], dict)
+    x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
+    Kff = gram(c_kernel, x, c_kernel.params)
+    assert Kff.shape[0] == Kff.shape[1]
+    assert Kff.shape[1] == n
+
+
+@pytest.mark.parametrize(
+    "k1", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
+)
+@pytest.mark.parametrize(
+    "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
+)
+def test_sum_kern_value(k1, k2):
+    n = 10
+    sum_kernel = SumKernel(kernel_set=[k1, k2])
+    x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
+    Kff = gram(sum_kernel, x, sum_kernel.params)
+    Kff_manual = gram(k1, x, k1.params) + gram(k2, x, k2.params)
+    assert jnp.all(Kff == Kff_manual)
+
+
+@pytest.mark.parametrize(
+    "k1", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
+)
+@pytest.mark.parametrize(
+    "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
+)
+def test_prod_kern_value(k1, k2):
+    n = 10
+    sum_kernel = ProductKernel(kernel_set=[k1, k2])
+    x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
+    Kff = gram(sum_kernel, x, sum_kernel.params)
+    Kff_manual = gram(k1, x, k1.params) * gram(k2, x, k2.params)
+    assert jnp.all(Kff == Kff_manual)
+
+
+@pytest.mark.parametrize(
+    "kernel", [RBF, Matern12, Matern32, Matern52, Polynomial]
+)
+def test_update_params(kernel):
+    kern = kernel()
+    params = kern.params
+    for k in params.keys():
+        params[k] = 100
+        kern._params = params
+        assert kern.params == params

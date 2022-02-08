@@ -1,13 +1,13 @@
 import abc
 from re import L
-from typing import Optional, List, Tuple, Dict
+from typing import Optional, List, Tuple, Dict, Callable
+from unicodedata import name
 
 import jax.numpy as jnp
 from chex import dataclass
 from jax import vmap
 
 from gpjax.types import Array
-from numpy import DataSource
 
 
 @dataclass(repr=False)
@@ -40,41 +40,33 @@ class Kernel:
     def params(self, value):
         self._params = value
 
-    def __add__(self, other):
-        return SumKernel(kernel_set=[self, other])
 
-    def __mul__(self, other):
-        return ProductKernel(kernel_set=[self, other])
+@dataclass
+class CombinationKernel:
+    kernel_set: List[Kernel]
+    name: Optional[str] = "Combination kernel"
+    combination_fn: Optional[Callable] = None
+
+    @property
+    def params(self) -> List[Dict]:
+        return [kernel.params for kernel in self.kernel_set]
+
+    def __call__(self, x: Array, y: Array, params: dict) -> Array:
+        return self.combination_fn(
+            jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)])
+        )
 
 
 @dataclass
-class SumKernel:
-    kernel_set: List[Kernel]
+class SumKernel(CombinationKernel):
     name: Optional[str] = "Sum kernel"
-
-    @property
-    def params(self) -> List[Dict]:
-        return [kernel.params for kernel in self.kernel_set]
-
-    def __call__(self, x: Array, y: Array, params: dict) -> Array:
-        return jnp.sum(
-            jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)])
-        )
+    combination_fn: Optional[Callable] = jnp.sum
 
 
 @dataclass
-class ProductKernel:
-    kernel_set: List[Kernel]
+class ProductKernel(CombinationKernel):
     name: Optional[str] = "Product kernel"
-
-    @property
-    def params(self) -> List[Dict]:
-        return [kernel.params for kernel in self.kernel_set]
-
-    def __call__(self, x: Array, y: Array, params: dict) -> Array:
-        return jnp.prod(
-            jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)])
-        )
+    combination_fn: Optional[Callable] = jnp.prod
 
 
 @dataclass(repr=False)
@@ -183,8 +175,8 @@ class Polynomial(Kernel):
     def __call__(
         self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
     ) -> Array:
-        x = self.slice_input(x)
-        y = self.slice_input(y)
+        x = self.slice_input(x).squeeze()
+        y = self.slice_input(y).squeeze()
         K = jnp.power(
             params["shift"] + jnp.dot(x * params["variance"], y), self.degree
         )
