@@ -1,6 +1,5 @@
 import abc
-from math import degrees
-from typing import Optional
+from typing import Optional, List, Tuple
 
 import jax.numpy as jnp
 from chex import dataclass
@@ -11,14 +10,20 @@ from gpjax.types import Array
 
 @dataclass(repr=False)
 class Kernel:
-    ndims: Optional[int] = 1
+    active_dims: Optional[List[int]] = None
     stationary: Optional[bool] = False
     spectral: Optional[bool] = False
     name: Optional[str] = "Kernel"
 
+    def __post_init__(self):
+        self.ndims = 1 if not self.active_dims else len(self.active_dims)
+
     @abc.abstractmethod
     def __call__(self, x: Array, y: Array, params: dict) -> Array:
         raise NotImplementedError
+
+    def slice_input(self, x: Array) -> Array:
+        return x[..., self.active_dims]
 
     def __repr__(self):
         return (
@@ -38,16 +43,13 @@ class Kernel:
 
 @dataclass(repr=False)
 class RBF(Kernel):
-    ndims: Optional[int] = 1
-    stationary: Optional[bool] = True
-    spectral: Optional[bool] = False
     name: Optional[str] = "Radial basis function kernel"
 
     def __call__(
         self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
     ) -> Array:
-        x /= params["lengthscale"]
-        y /= params["lengthscale"]
+        x = self.slice_input(x) / params["lengthscale"]
+        y = self.slice_input(y) / params["lengthscale"]
         K = params["variance"] * jnp.exp(-0.5 * squared_distance(x, y))
         return K.squeeze()
 
@@ -61,16 +63,13 @@ class RBF(Kernel):
 
 @dataclass(repr=False)
 class Matern12(Kernel):
-    ndims: Optional[int] = 1
-    stationary: Optional[bool] = True
-    spectral: Optional[bool] = False
     name: Optional[str] = "Matern 1/2"
 
     def __call__(
         self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
     ) -> Array:
-        x /= params["lengthscale"]
-        y /= params["lengthscale"]
+        x = self.slice_input(x) / params["lengthscale"]
+        y = self.slice_input(y) / params["lengthscale"]
         K = params["variance"] * jnp.exp(-0.5 * euclidean_distance(x, y))
         return K.squeeze()
 
@@ -84,16 +83,13 @@ class Matern12(Kernel):
 
 @dataclass(repr=False)
 class Matern32(Kernel):
-    ndims: Optional[int] = 1
-    stationary: Optional[bool] = True
-    spectral: Optional[bool] = False
     name: Optional[str] = "Matern 3/2"
 
     def __call__(
         self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
     ) -> Array:
-        x /= params["lengthscale"]
-        y /= params["lengthscale"]
+        x = self.slice_input(x) / params["lengthscale"]
+        y = self.slice_input(y) / params["lengthscale"]
         tau = euclidean_distance(x, y)
         K = (
             params["variance"]
@@ -112,16 +108,13 @@ class Matern32(Kernel):
 
 @dataclass(repr=False)
 class Matern52(Kernel):
-    ndims: Optional[int] = 1
-    stationary: Optional[bool] = True
-    spectral: Optional[bool] = False
     name: Optional[str] = "Matern 5/2"
 
     def __call__(
         self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
     ) -> Array:
-        x /= params["lengthscale"]
-        y /= params["lengthscale"]
+        x = self.slice_input(x) / params["lengthscale"]
+        y = self.slice_input(y) / params["lengthscale"]
         tau = euclidean_distance(x, y)
         K = (
             params["variance"]
@@ -140,21 +133,20 @@ class Matern52(Kernel):
 
 @dataclass(repr=False)
 class Polynomial(Kernel):
-    ndims: Optional[int] = 1
-    stationary: Optional[bool] = False
-    spectral: Optional[bool] = False
     name: Optional[str] = "Polynomial"
     degree: int = 1
 
     def __post_init__(self):
+        self.ndims = 1 if not self.active_dims else len(self.active_dims)
         self.name = f"Polynomial Degree: {self.degree}"
 
     def __call__(
         self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
     ) -> Array:
+        x = self.slice_input(x)
+        y = self.slice_input(y)
         K = jnp.power(
-            params["shift"] + jnp.dot(x * params["variance"], y),
-            self.degree,
+            params["shift"] + jnp.dot(x * params["variance"], y), self.degree
         )
         return K.squeeze()
 

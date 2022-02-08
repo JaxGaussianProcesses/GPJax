@@ -33,10 +33,8 @@ def get_defaults() -> ConfigDict:
     return __config
 
 
-def add_parameter(param_name: str, bijection: tfb.Bijector) -> ConfigDict:
+def add_parameter(param_name: str, bijection: tfb.Bijector) -> None:
     lookup_name = f"{param_name}_transform"
-    if not __config:
-        get_defaults()
+    get_defaults()
     __config.transformations[lookup_name] = bijection
     __config.transformations[param_name] = lookup_name
-    # return __config

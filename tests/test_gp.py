@@ -17,6 +17,7 @@ from gpjax.gps import (
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian, NonConjugateLikelihoods
 from gpjax.parameters import initialise
+import tensorflow_probability.substrates.jax as tfp
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 10])
@@ -34,6 +35,9 @@ def test_prior(num_datapoints):
     sigma = varf(x)
     assert mu.shape == (num_datapoints, 1)
     assert sigma.shape == (num_datapoints, num_datapoints)
+
+    rv = p.random_variable(x, params)
+    assert isinstance(rv, tfp.distributions.Distribution)
 
 
 @pytest.mark.parametrize("num_datapoints", [2, 10])
@@ -81,7 +85,10 @@ def test_nonconjugate_posterior(num_datapoints, likel):
         jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1)),
         axis=0,
     )
-    y = 0.5 * jnp.sign(jnp.cos(3 * x + jr.normal(key, shape=x.shape) * 0.05)) + 0.5
+    y = (
+        0.5 * jnp.sign(jnp.cos(3 * x + jr.normal(key, shape=x.shape) * 0.05))
+        + 0.5
+    )
     D = Dataset(X=x, y=y)
     # Initialisation
     p = Prior(kernel=RBF())

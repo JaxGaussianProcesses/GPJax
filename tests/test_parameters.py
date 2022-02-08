@@ -1,3 +1,4 @@
+from argparse import _AppendConstAction
 import typing as tp
 from copy import deepcopy
 
@@ -227,6 +228,7 @@ def test_prior_checks():
 def test_output(num_datapoints, likelihood):
     posterior = Prior(kernel=RBF()) * likelihood(num_datapoints=num_datapoints)
     params, constrainer, unconstrainer = initialise(posterior)
+
     assert isinstance(constrainer, dict)
     assert isinstance(unconstrainer, dict)
     for k, v1, v2 in recursive_items(constrainer, unconstrainer):
@@ -244,3 +246,11 @@ def test_output(num_datapoints, likelihood):
 
     for k, v1, v2 in recursive_items(params, backconstrained_params):
         assert all(v1 == v2)
+
+    augmented_params = params
+    augmented_params["test_param"] = jnp.array([1.0])
+    a_constrainers, a_unconstrainers = build_transforms(augmented_params)
+    assert "test_param" in list(a_constrainers.keys())
+    assert "test_param" in list(a_unconstrainers.keys())
+    assert a_constrainers["test_param"](1.0) == 1.0
+    assert a_unconstrainers["test_param"](1.0) == 1.0
