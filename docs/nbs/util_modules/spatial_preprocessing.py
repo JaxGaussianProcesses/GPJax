@@ -11,12 +11,7 @@ def slice_hour(df: pd.DataFrame, timestamp):
     """
     df = df[["latitude", "longitude", "date_utc", "no2_ugm3"]]
     df["timestamp"] = pd.to_datetime(df.date_utc)
-    return (
-        df[df["timestamp"] == timestamp]
-        .dropna()
-        .drop(["timestamp", "date_utc"], axis=1)
-        .reset_index(drop=True)
-    )
+    return df[df["timestamp"] == timestamp].dropna().drop(["timestamp", "date_utc"], axis=1).reset_index(drop=True)
 
 
 if __name__ == "__main__":

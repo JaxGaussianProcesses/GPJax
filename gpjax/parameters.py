@@ -53,9 +53,7 @@ def recursive_complete(d1, d2) -> dict:
 # Parameter transformation
 ################################
 def build_transforms(params, key=None) -> tp.Tuple[tp.Dict, tp.Dict]:
-    constrainer, unconstrainer = copy_dict_structure(params), copy_dict_structure(
-        params
-    )
+    constrainer, unconstrainer = copy_dict_structure(params), copy_dict_structure(params)
     config = get_defaults()
     transform_set = config["transformations"]
 
@@ -69,17 +67,12 @@ def build_transforms(params, key=None) -> tp.Tuple[tp.Dict, tp.Dict]:
                     bijector = transform_set[transform_type]
                 else:
                     bijector = tfp.bijectors.Identity()
-                    warnings.warn(
-                        f"Parameter {key} has no transform. Defaulting to"
-                        " identity transfom."
-                    )
+                    warnings.warn(f"Parameter {key} has no transform. Defaulting to" " identity transfom.")
                 cs[key] = bijector.forward
                 ucs[key] = bijector.inverse
         return cs, ucs
 
-    constrainers, unconstrainers = recursive_transforms(
-        params, constrainer, unconstrainer
-    )
+    constrainers, unconstrainers = recursive_transforms(params, constrainer, unconstrainer)
     return constrainers, unconstrainers
 
 

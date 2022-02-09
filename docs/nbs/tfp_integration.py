@@ -93,15 +93,9 @@ import tensorflow_probability.substrates.jax as tfp
 tfd = tfp.distributions
 
 priors = gpx.parameters.copy_dict_structure(params)
-priors["kernel"]["lengthscale"] = tfd.Gamma(
-    concentration=jnp.array(1.0), rate=jnp.array(1.0)
-)
-priors["kernel"]["variance"] = tfd.Gamma(
-    concentration=jnp.array(1.0), rate=jnp.array(1.0)
-)
-priors["likelihood"]["obs_noise"] = tfd.Gamma(
-    concentration=jnp.array(1.0), rate=jnp.array(1.0)
-)
+priors["kernel"]["lengthscale"] = tfd.Gamma(concentration=jnp.array(1.0), rate=jnp.array(1.0))
+priors["kernel"]["variance"] = tfd.Gamma(concentration=jnp.array(1.0), rate=jnp.array(1.0))
+priors["likelihood"]["obs_noise"] = tfd.Gamma(concentration=jnp.array(1.0), rate=jnp.array(1.0))
 
 # %% [markdown]
 # ### Defining our target function
@@ -109,9 +103,7 @@ priors["likelihood"]["obs_noise"] = tfd.Gamma(
 # We'll now define the target distribution that our MCMC sampler will sample from. For our GP, this is the marginal log-likelihood that we will specify in the following way.
 
 # %%
-mll = posterior.marginal_log_likelihood(
-    training, constrainers, priors=priors, negative=False
-)
+mll = posterior.marginal_log_likelihood(training, constrainers, priors=priors, negative=False)
 mll(params)
 
 

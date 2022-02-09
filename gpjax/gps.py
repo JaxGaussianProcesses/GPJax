@@ -89,22 +89,16 @@ class Posterior(GP):
     name: tp.Optional[str] = "GP Posterior"
 
     @abstractmethod
-    def mean(
-        self, training_data: Dataset, params: dict
-    ) -> tp.Callable[[Dataset], Array]:
+    def mean(self, training_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
         raise NotImplementedError
 
     @abstractmethod
-    def variance(
-        self, training_data: Dataset, params: dict
-    ) -> tp.Callable[[Dataset], Array]:
+    def variance(self, training_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
         raise NotImplementedError
 
     @property
     def params(self) -> dict:
-        return concat_dictionaries(
-            self.prior.params, {"likelihood": self.likelihood.params}
-        )
+        return concat_dictionaries(self.prior.params, {"likelihood": self.likelihood.params})
 
 
 @dataclass
@@ -126,17 +120,13 @@ class ConjugatePosterior(Posterior):
         weights = cho_solve(L, prior_distance)
 
         def mean_fn(test_inputs: Array) -> Array:
-            prior_mean_at_test_inputs = self.prior.mean_function(
-                test_inputs, params["mean_function"]
-            )
+            prior_mean_at_test_inputs = self.prior.mean_function(test_inputs, params["mean_function"])
             Kfx = cross_covariance(self.prior.kernel, X, test_inputs, params["kernel"])
             return prior_mean_at_test_inputs + jnp.dot(Kfx, weights)
 
         return mean_fn
 
-    def variance(
-        self, training_data: Dataset, params: dict
-    ) -> tp.Callable[[Array], Array]:
+    def variance(self, training_data: Dataset, params: dict) -> tp.Callable[[Array], Array]:
         X = training_data.X
         n_train = training_data.n
         obs_noise = params["likelihood"]["obs_noise"]
@@ -177,9 +167,7 @@ class ConjugatePosterior(Posterior):
 
             log_prior_density = evaluate_priors(params, priors)
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-            return constant * (
-                random_variable.log_prob(y.squeeze()).mean() + log_prior_density
-            )
+            return constant * (random_variable.log_prob(y.squeeze()).mean() + log_prior_density)
 
         return mll
 
@@ -194,22 +182,15 @@ class NonConjugatePosterior(Posterior):
         mean_fn_string = self.prior.mean_function.__repr__()
         kernel_string = self.prior.kernel.__repr__()
         likelihood_string = self.likelihood.__repr__()
-        return (
-            f"Conjugate Posterior\n{'-'*80}\n- {mean_fn_string}\n-"
-            f" {kernel_string}\n- {likelihood_string}"
-        )
+        return f"Conjugate Posterior\n{'-'*80}\n- {mean_fn_string}\n-" f" {kernel_string}\n- {likelihood_string}"
 
     @property
     def params(self) -> dict:
-        hyperparameters = concat_dictionaries(
-            self.prior.params, {"likelihood": self.likelihood.params}
-        )
+        hyperparameters = concat_dictionaries(self.prior.params, {"likelihood": self.likelihood.params})
         hyperparameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
         return hyperparameters
 
-    def mean(
-        self, training_data: Dataset, params: dict
-    ) -> tp.Callable[[Dataset], Array]:
+    def mean(self, training_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
         X, y = training_data.X, training_data.y
         N = training_data.n
         Kff = gram(self.prior.kernel, X, params["kernel"])
@@ -230,9 +211,7 @@ class NonConjugatePosterior(Posterior):
 
         return meanf
 
-    def variance(
-        self, training_data: Dataset, params: dict
-    ) -> tp.Callable[[Dataset], Array]:
+    def variance(self, training_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
         X, y = training_data.X, training_data.y
         N = training_data.n
         Kff = gram(self.prior.kernel, X, params["kernel"])
@@ -292,7 +271,5 @@ def construct_posterior(prior: Prior, likelihood: Likelihood) -> Posterior:
     elif any([isinstance(likelihood, l) for l in NonConjugateLikelihoods]):
         PosteriorGP = NonConjugatePosterior
     else:
-        raise NotImplementedError(
-            f"No posterior implemented for {likelihood.name} likelihood"
-        )
+        raise NotImplementedError(f"No posterior implemented for {likelihood.name} likelihood")
     return PosteriorGP(prior=prior, likelihood=likelihood)

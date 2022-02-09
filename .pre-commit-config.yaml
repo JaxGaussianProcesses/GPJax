@@ -8,3 +8,9 @@ repos:
     rev: 5.9.3
     hooks:
       - id: isort
+  - repo: https://github.com/mwouts/jupytext
+    rev: v1.11.0
+    hooks:
+      - id: jupytext
+        args: [--from, "py:percent", --to, ipynb]
+        files: "docs/nbs/*.py"

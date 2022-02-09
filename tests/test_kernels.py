@@ -161,12 +161,8 @@ def test_combination_kernel(combination_type, kernel, n_kerns):
     assert Kff.shape[1] == n
 
 
-@pytest.mark.parametrize(
-    "k1", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
-)
-@pytest.mark.parametrize(
-    "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
-)
+@pytest.mark.parametrize("k1", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()])
+@pytest.mark.parametrize("k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()])
 def test_sum_kern_value(k1, k2):
     n = 10
     sum_kernel = SumKernel(kernel_set=[k1, k2])
@@ -176,12 +172,8 @@ def test_sum_kern_value(k1, k2):
     assert jnp.all(Kff == Kff_manual)
 
 
-@pytest.mark.parametrize(
-    "k1", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
-)
-@pytest.mark.parametrize(
-    "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
-)
+@pytest.mark.parametrize("k1", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()])
+@pytest.mark.parametrize("k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()])
 def test_prod_kern_value(k1, k2):
     n = 10
     sum_kernel = ProductKernel(kernel_set=[k1, k2])

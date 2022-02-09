@@ -24,9 +24,7 @@ def fit(posterior, nits, data, configs):
 
     for i in range(nits):
         opt_state, mll_estimate = step(i, opt_state)
-    print(
-        f"{posterior.prior.kernel.name} GP's marginal log-likelihood: {mll_estimate: .2f}"
-    )
+    print(f"{posterior.prior.kernel.name} GP's marginal log-likelihood: {mll_estimate: .2f}")
 
     final_params = constrainer(get_params(opt_state))
     return final_params

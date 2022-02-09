@@ -236,9 +236,7 @@ def test_output(num_datapoints, likelihood):
         assert isinstance(v2, tp.Callable)
 
     unconstrained_params = transform(params, unconstrainer)
-    assert (
-        unconstrained_params["kernel"]["lengthscale"] != params["kernel"]["lengthscale"]
-    )
+    assert unconstrained_params["kernel"]["lengthscale"] != params["kernel"]["lengthscale"]
     backconstrained_params = transform(unconstrained_params, constrainer)
     for k, v1, v2 in recursive_items(params, unconstrained_params):
         assert v1.dtype == v2.dtype
