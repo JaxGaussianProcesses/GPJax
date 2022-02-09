@@ -18,15 +18,16 @@
 # %%
 # %load_ext lab_black
 
-# %% colab={"base_uri": "https://localhost:8080/"} id="RJvA91AKYj52" outputId="88048f85-742e-4163-8eda-4632bcc998f4"
-import gpjax
-import gpjax.core as gpx
 import gpviz as gpv
 import jax.numpy as jnp
 import jax.random as jr
-import tensorflow_probability.substrates.jax as tfp
 import matplotlib.pyplot as plt
+import tensorflow_probability.substrates.jax as tfp
 from jax import grad, jit
+
+# %% colab={"base_uri": "https://localhost:8080/"} id="RJvA91AKYj52" outputId="88048f85-742e-4163-8eda-4632bcc998f4"
+import gpjax
+import gpjax.core as gpx
 
 tfd = tfp.distributions
 key = jr.PRNGKey(123)

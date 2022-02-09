@@ -19,14 +19,15 @@
 # %%
 # %load_ext lab_black
 
-# %%
-import gpjax as gpx
 import jax
 import jax.numpy as jnp
-import matplotlib.pyplot as plt
 import jax.random as jr
-from jax.experimental import optimizers
+import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax as tfp
+from jax.experimental import optimizers
+
+# %%
+import gpjax as gpx
 
 key = jr.PRNGKey(123)
 tfd = tfp.distributions
@@ -80,18 +81,24 @@ optimised_params = gpx.transform(optimised_params, constrainer)
 
 # %%
 mu = posterior.mean(training, optimised_params)(xtest)
-sigma =jnp.sqrt(posterior.variance(training, optimised_params)(xtest))
+sigma = jnp.sqrt(posterior.variance(training, optimised_params)(xtest))
 
 # %% [markdown]
 # With the first and centralised second moment computed, we can plot these with the original data overlayed to confirm that our process has done a good job of recovering the latent function.
 
 # %%
 fig, ax = plt.subplots(figsize=(12, 5))
-ax.plot(x, y, 'o', label='Obs', color='tab:red')
-ax.plot(xtest, mu, label='pred', color='tab:blue')
-ax.fill_between(xtest.squeeze(), mu.squeeze()-sigma, mu.squeeze() + sigma, alpha=0.2, color='tab:blue')
-ax.plot(xtest, mu.squeeze()-sigma, color='tab:blue', linestyle='--', linewidth=1)
-ax.plot(xtest, mu.squeeze()+sigma, color='tab:blue', linestyle='--', linewidth=1)
+ax.plot(x, y, "o", label="Obs", color="tab:red")
+ax.plot(xtest, mu, label="pred", color="tab:blue")
+ax.fill_between(
+    xtest.squeeze(),
+    mu.squeeze() - sigma,
+    mu.squeeze() + sigma,
+    alpha=0.2,
+    color="tab:blue",
+)
+ax.plot(xtest, mu.squeeze() - sigma, color="tab:blue", linestyle="--", linewidth=1)
+ax.plot(xtest, mu.squeeze() + sigma, color="tab:blue", linestyle="--", linewidth=1)
 
 ax.legend()
 

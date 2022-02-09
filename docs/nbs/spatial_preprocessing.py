@@ -1,7 +1,8 @@
-import geopandas as gpd
-import pandas as pd
 import datetime as dt
+
+import geopandas as gpd
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 def slice_hour(df: pd.DataFrame, timestamp):

@@ -15,15 +15,18 @@
 # %% [markdown]
 # # TensorFlow Probability Integration
 
-# %%
-import gpjax as gpx
+from pprint import PrettyPrinter
+
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
+
+# %%
+import gpjax as gpx
 from gpjax.utils import dict_array_coercion
-from pprint import PrettyPrinter
-pp=PrettyPrinter(indent=4)
+
+pp = PrettyPrinter(indent=4)
 
 key = jr.PRNGKey(123)
 
@@ -42,7 +45,7 @@ x = jnp.sort(jr.uniform(key, minval=-5.0, maxval=5.0, shape=(N, 1)), axis=0)
 f = lambda x: jnp.sin(jnp.pi * x) / (jnp.pi * x)
 y = f(x) + jr.normal(key, shape=x.shape) * noise
 
-fig, ax  = plt.subplots(figsize=(12, 6))
+fig, ax = plt.subplots(figsize=(12, 6))
 ax.plot(x, f(x), label="Latent fn")
 ax.plot(x, y, "o", label="Observations", alpha=0.6)
 ax.legend(loc="best")
@@ -86,12 +89,19 @@ array_to_dict(parray) == params
 
 # %%
 import tensorflow_probability.substrates.jax as tfp
+
 tfd = tfp.distributions
 
 priors = gpx.parameters.copy_dict_structure(params)
-priors['kernel']['lengthscale'] = tfd.Gamma(concentration=jnp.array(1.), rate=jnp.array(1.))
-priors['kernel']['variance'] = tfd.Gamma(concentration=jnp.array(1.), rate=jnp.array(1.))
-priors['likelihood']['obs_noise'] = tfd.Gamma(concentration=jnp.array(1.), rate=jnp.array(1.))
+priors["kernel"]["lengthscale"] = tfd.Gamma(
+    concentration=jnp.array(1.0), rate=jnp.array(1.0)
+)
+priors["kernel"]["variance"] = tfd.Gamma(
+    concentration=jnp.array(1.0), rate=jnp.array(1.0)
+)
+priors["likelihood"]["obs_noise"] = tfd.Gamma(
+    concentration=jnp.array(1.0), rate=jnp.array(1.0)
+)
 
 # %% [markdown]
 # ### Defining our target function
@@ -99,19 +109,23 @@ priors['likelihood']['obs_noise'] = tfd.Gamma(concentration=jnp.array(1.), rate=
 # We'll now define the target distribution that our MCMC sampler will sample from. For our GP, this is the marginal log-likelihood that we will specify in the following way.
 
 # %%
-mll = posterior.marginal_log_likelihood(training, constrainers,priors=priors, negative=False)
+mll = posterior.marginal_log_likelihood(
+    training, constrainers, priors=priors, negative=False
+)
 mll(params)
 
 
 # %% [markdown]
-# As our model parameters are now an array, not a dictionary, we must define a small function that maps the array back to a dictionary and then evaluates the marginal log-likelihood. Using the second return of `dict_array_coercion` this is easy to do as follows. 
+# As our model parameters are now an array, not a dictionary, we must define a small function that maps the array back to a dictionary and then evaluates the marginal log-likelihood. Using the second return of `dict_array_coercion` this is easy to do as follows.
 
 # %%
 def build_log_pi(target, mapper_fn):
     def array_mll(parameter_array):
         parameter_dict = mapper_fn([jnp.array(i) for i in parameter_array])
         return target(parameter_dict)
+
     return array_mll
+
 
 mll_array_form = build_log_pi(mll, array_to_dict)
 
@@ -122,6 +136,7 @@ mll_array_form = build_log_pi(mll, array_to_dict)
 
 # %%
 n_samples = 2500
+
 
 def run_chain(key, state):
     kernel = tfp.mcmc.NoUTurnSampler(mll_array_form, 1e-1)
@@ -160,13 +175,13 @@ constrained_sample_list = dict_to_array(constrained_samples)
 
 # %%
 fig, axes = plt.subplots(figsize=(20, 10), ncols=n_params, nrows=2)
-titles = ['Lengthscale', 'Kernel Variance', 'Obs. Noise']
+titles = ["Lengthscale", "Kernel Variance", "Obs. Noise"]
 
 for i in range(n_params):
-    axes[0, i].plot(samples[i], alpha=0.5, color='tab:orange')
-    axes[1, i].plot(constrained_sample_list[i], alpha=0.5, color='tab:blue')
-    axes[0, i].axhline(y = jnp.mean(samples[i]), color='tab:orange')
-    axes[1, i].axhline(y = jnp.mean(constrained_sample_list[i]), color='tab:blue')
+    axes[0, i].plot(samples[i], alpha=0.5, color="tab:orange")
+    axes[1, i].plot(constrained_sample_list[i], alpha=0.5, color="tab:blue")
+    axes[0, i].axhline(y=jnp.mean(samples[i]), color="tab:orange")
+    axes[1, i].axhline(y=jnp.mean(constrained_sample_list[i]), color="tab:blue")
     axes[0, i].set_title(titles[i])
     axes[1, i].set_title(titles[i])
 
@@ -190,11 +205,17 @@ one_stddev = jnp.sqrt(jnp.diag(sigma))
 
 # %%
 fig, ax = plt.subplots(figsize=(12, 5))
-ax.plot(x, y, 'o', label='Obs', color='tab:red')
-ax.plot(xtest, mu, label='pred', color='tab:blue')
-ax.fill_between(xtest.squeeze(), mu.squeeze()-one_stddev, mu.squeeze() + one_stddev, alpha=0.2, color='tab:blue')
-ax.plot(xtest, mu.squeeze()-one_stddev, color='tab:blue', linestyle='--', linewidth=1)
-ax.plot(xtest, mu.squeeze()+one_stddev, color='tab:blue', linestyle='--', linewidth=1)
+ax.plot(x, y, "o", label="Obs", color="tab:red")
+ax.plot(xtest, mu, label="pred", color="tab:blue")
+ax.fill_between(
+    xtest.squeeze(),
+    mu.squeeze() - one_stddev,
+    mu.squeeze() + one_stddev,
+    alpha=0.2,
+    color="tab:blue",
+)
+ax.plot(xtest, mu.squeeze() - one_stddev, color="tab:blue", linestyle="--", linewidth=1)
+ax.plot(xtest, mu.squeeze() + one_stddev, color="tab:blue", linestyle="--", linewidth=1)
 
 ax.legend()
 
