@@ -145,4 +145,3 @@ examples/_debug*
 examples/testing/*
 examples/*.ipynb
 _debug/
-*.ipynb

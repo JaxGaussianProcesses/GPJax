@@ -159,9 +159,7 @@ class Polar(gpx.kernels.Kernel):
     def __post_init__(self):
         self.c = self.period / 2.0  # in [0, \pi]
 
-    def __call__(
-        self, x: gpx.types.Array, y: gpx.types.Array, params: dict
-    ) -> gpx.types.Array:
+    def __call__(self, x: gpx.types.Array, y: gpx.types.Array, params: dict) -> gpx.types.Array:
         tau = params["tau"]
         t = angular_distance(x, y, self.c)
         K = (1 + tau * t / self.c) * jnp.clip(1 - t / self.c, 0, jnp.inf) ** tau
@@ -210,9 +208,7 @@ circlular_posterior = gpx.Prior(kernel=PKern) * gpx.Gaussian(num_datapoints=n)
 params, constrainer, unconstrainer = gpx.initialise(circlular_posterior)
 
 # Optimise GP's marginal log-likelihood using Adam
-mll = jit(
-    circlular_posterior.marginal_log_likelihood(training, constrainer, negative=True)
-)
+mll = jit(circlular_posterior.marginal_log_likelihood(training, constrainer, negative=True))
 learned_params = gpx.optax_fit(mll, params, adam(learning_rate=0.05), n_iters=1000)
 
 # Untransform learned parameters
@@ -225,9 +221,7 @@ final_params = gpx.transform(learned_params, constrainer)
 
 # %%
 mu = circlular_posterior.mean(training, final_params)(angles).squeeze()
-one_sigma = jnp.sqrt(
-    jnp.diag(circlular_posterior.variance(training, final_params)(angles))
-)
+one_sigma = jnp.sqrt(jnp.diag(circlular_posterior.variance(training, final_params)(angles)))
 
 # %%
 fig = plt.figure(figsize=(10, 8))
