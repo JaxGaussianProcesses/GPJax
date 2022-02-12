@@ -20,8 +20,9 @@ def get_defaults() -> ConfigDict:
 
     # Default parameter transforms
     transformations.lengthscale = "positive_transform"
-    transformations.shift = "positive_transform"
     transformations.variance = "positive_transform"
+    transformations.smoothness = "positive_transform"
+    transformations.shift = "positive_transform"
     transformations.obs_noise = "positive_transform"
     transformations.latent = "identity_transform"
     transformations.basis_fns = "identity_transform"

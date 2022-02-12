@@ -12,6 +12,7 @@ from .kernels import (
     Matern12,
     Matern32,
     Matern52,
+    GraphKernel,
     Polynomial,
     ProductKernel,
     SumKernel,

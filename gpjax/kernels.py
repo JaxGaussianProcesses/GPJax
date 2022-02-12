@@ -1,4 +1,5 @@
 import abc
+from lib2to3.pgen2.token import OP
 from re import L
 from typing import Callable, Dict, List, Optional, Tuple
 from unicodedata import name
@@ -9,7 +10,9 @@ from jax import vmap
 
 from gpjax.types import Array
 
-
+##########################################
+# Abtract classes
+##########################################
 @dataclass(repr=False)
 class Kernel:
     active_dims: Optional[List[int]] = None
@@ -52,7 +55,9 @@ class CombinationKernel:
         return [kernel.params for kernel in self.kernel_set]
 
     def __call__(self, x: Array, y: Array, params: dict) -> Array:
-        return self.combination_fn(jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)]))
+        return self.combination_fn(
+            jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)])
+        )
 
 
 @dataclass
@@ -67,6 +72,9 @@ class ProductKernel(CombinationKernel):
     combination_fn: Optional[Callable] = jnp.prod
 
 
+##########################################
+# Euclidean kernels
+##########################################
 @dataclass(repr=False)
 class RBF(Kernel):
     name: Optional[str] = "Radial basis function kernel"
@@ -78,7 +86,9 @@ class RBF(Kernel):
             "variance": jnp.array([1.0]),
         }
 
-    def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
+    def __call__(
+        self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
+    ) -> Array:
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
         K = params["variance"] * jnp.exp(-0.5 * squared_distance(x, y))
@@ -96,7 +106,9 @@ class Matern12(Kernel):
             "variance": jnp.array([1.0]),
         }
 
-    def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
+    def __call__(
+        self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
+    ) -> Array:
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
         K = params["variance"] * jnp.exp(-0.5 * euclidean_distance(x, y))
@@ -114,11 +126,17 @@ class Matern32(Kernel):
             "variance": jnp.array([1.0]),
         }
 
-    def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
+    def __call__(
+        self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
+    ) -> Array:
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
         tau = euclidean_distance(x, y)
-        K = params["variance"] * (1.0 + jnp.sqrt(3.0) * tau) * jnp.exp(-jnp.sqrt(3.0) * tau)
+        K = (
+            params["variance"]
+            * (1.0 + jnp.sqrt(3.0) * tau)
+            * jnp.exp(-jnp.sqrt(3.0) * tau)
+        )
         return K.squeeze()
 
 
@@ -133,7 +151,9 @@ class Matern52(Kernel):
             "variance": jnp.array([1.0]),
         }
 
-    def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
+    def __call__(
+        self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
+    ) -> Array:
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
         tau = euclidean_distance(x, y)
@@ -158,11 +178,69 @@ class Polynomial(Kernel):
         }
         self.name = f"Polynomial Degree: {self.degree}"
 
-    def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
+    def __call__(
+        self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
+    ) -> Array:
         x = self.slice_input(x).squeeze()
         y = self.slice_input(y).squeeze()
-        K = jnp.power(params["shift"] + jnp.dot(x * params["variance"], y), self.degree)
+        K = jnp.power(
+            params["shift"] + jnp.dot(x * params["variance"], y), self.degree
+        )
         return K.squeeze()
+
+
+##########################################
+# Graph kernels
+##########################################
+@dataclass
+class GraphKernel:
+    laplacian: Array
+    name: Optional[str] = "Graph kernel"
+
+    def __post_init__(self):
+        self.ndims = 1
+        self._params = {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+            "smoothness": jnp.array([1.0]),
+        }
+        evals, self.evecs = jnp.linalg.eigh(self.laplacian)
+        self.evals = evals.reshape(-1, 1)
+        self.num_vertex = self.laplacian.shape[0]
+
+    def __call__(
+        self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
+    ) -> Array:
+        """Evaluate the graph kernel on a pair of vertices v_i, v_j.
+
+        Args:
+            x (jnp.DeviceArray): Index of the ith vertex
+            y (jnp.DeviceArray): Index of the jth vertex
+            params (dict): Parameter set for which the kernel should be evaluated on.
+
+        Returns:
+            Array: The value of k(v_i, v_j).
+        """
+        psi = jnp.power(
+            2 * params["smoothness"] / params["lengthscale"] ** 2 + self.evals,
+            -params["smoothness"],
+        )
+        psi *= self.num_vertex / jnp.sum(psi)
+        x_evec = self.evecs[x, :].T
+        y_evec = self.evecs[y, :].T
+        kxy = params["variance"] * jnp.sum(
+            jnp.prod(jnp.stack([psi, x_evec, y_evec]).squeeze(), axis=0)
+        )
+        # print(f"kxy shape: {kxy.shape}")
+        return kxy.squeeze()
+
+    @property
+    def params(self) -> dict:
+        return self._params
+
+    @params.setter
+    def params(self, value):
+        self._params = value
 
 
 def squared_distance(x: Array, y: Array):
@@ -174,7 +252,9 @@ def euclidean_distance(x: Array, y: Array):
 
 
 def gram(kernel: Kernel, inputs: Array, params: dict) -> Array:
-    return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(inputs)
+    return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(
+        inputs
+    )
 
 
 def cross_covariance(kernel: Kernel, x: Array, y: Array, params: dict) -> Array:
