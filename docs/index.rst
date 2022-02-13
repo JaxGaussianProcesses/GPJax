@@ -28,7 +28,6 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
     :caption: Getting Started
 
     installation
-    nbs/intro
 
 .. toctree::
     :maxdepth: 1
@@ -36,6 +35,7 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
 
     nbs/regression
     nbs/classification
+    nbs/graph_kernels
 
 .. toctree::
     :maxdepth: 1

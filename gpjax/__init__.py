@@ -9,10 +9,10 @@ from .abstractions import fit, optax_fit
 from .gps import Prior, construct_posterior
 from .kernels import (
     RBF,
+    GraphKernel,
     Matern12,
     Matern32,
     Matern52,
-    GraphKernel,
     Polynomial,
     ProductKernel,
     SumKernel,
