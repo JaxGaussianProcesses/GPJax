@@ -15,6 +15,7 @@
 # %% [markdown]
 # # TensorFlow Probability Integration
 
+# %%
 from pprint import PrettyPrinter
 import gpjax as gpx
 
@@ -33,7 +34,7 @@ key = jr.PRNGKey(123)
 #
 # In this tutorial we'll be trying to model the normalised sinc function
 # $$f(x) = \frac{\sin(\pi x)}{\pi x}$$
-# for $x\in\mathbb{R}$ where $x\neq 0 $.
+# for $x\in\mathbb{R}$ where $x \neq 0$.
 
 # %%
 N = 100
