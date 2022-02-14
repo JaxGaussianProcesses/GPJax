@@ -1,4 +1,5 @@
 import abc
+from lib2to3.pgen2.token import OP
 from re import L
 from typing import Callable, Dict, List, Optional, Tuple
 from unicodedata import name
@@ -10,6 +11,9 @@ from jax import vmap
 from gpjax.types import Array
 
 
+##########################################
+# Abtract classes
+##########################################
 @dataclass(repr=False)
 class Kernel:
     active_dims: Optional[List[int]] = None
@@ -67,6 +71,9 @@ class ProductKernel(CombinationKernel):
     combination_fn: Optional[Callable] = jnp.prod
 
 
+##########################################
+# Euclidean kernels
+##########################################
 @dataclass(repr=False)
 class RBF(Kernel):
     name: Optional[str] = "Radial basis function kernel"
@@ -163,6 +170,53 @@ class Polynomial(Kernel):
         y = self.slice_input(y).squeeze()
         K = jnp.power(params["shift"] + jnp.dot(x * params["variance"], y), self.degree)
         return K.squeeze()
+
+
+##########################################
+# Graph kernels
+##########################################
+@dataclass
+class _EigenKernel:
+    laplacian: Array
+
+
+@dataclass
+class GraphKernel(Kernel, _EigenKernel):
+    name: Optional[str] = "Graph kernel"
+
+    def __post_init__(self):
+        self.ndims = 1
+        self._params = {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+            "smoothness": jnp.array([1.0]),
+        }
+        evals, self.evecs = jnp.linalg.eigh(self.laplacian)
+        self.evals = evals.reshape(-1, 1)
+        self.num_vertex = self.laplacian.shape[0]
+
+    def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
+        """Evaluate the graph kernel on a pair of vertices v_i, v_j.
+
+        Args:
+            x (jnp.DeviceArray): Index of the ith vertex
+            y (jnp.DeviceArray): Index of the jth vertex
+            params (dict): Parameter set for which the kernel should be evaluated on.
+
+        Returns:
+            Array: The value of k(v_i, v_j).
+        """
+        psi = jnp.power(
+            2 * params["smoothness"] / params["lengthscale"] ** 2 + self.evals,
+            -params["smoothness"],
+        )
+        psi *= self.num_vertex / jnp.sum(psi)
+        x_evec = self.evecs[:, x]
+        y_evec = self.evecs[:, y]
+        kxy = params["variance"] * jnp.sum(
+            jnp.prod(jnp.stack([psi, x_evec, y_evec]).squeeze(), axis=0)
+        )
+        return kxy.squeeze()
 
 
 def squared_distance(x: Array, y: Array):

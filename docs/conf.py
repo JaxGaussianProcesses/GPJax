@@ -28,11 +28,10 @@ copyright = "2021, Thomas Pinder"
 author = "Thomas Pinder"
 
 # The full version, including alpha/beta/rc tags
-release = "0.3"
+release = "0.4"
 
 
 # -- General configuration ---------------------------------------------------
-
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
@@ -46,7 +45,16 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.autosectionlabel",
     "sphinx_copybutton",
+    "sphinxcontrib.bibtex",
 ]
+
+bibtex_bibfiles = ["refs.bib"]
+bibtex_style = "unsrt"
+bibtex_reference_style = "author_year"
+nbsphinx_allow_errors = True
+nbsphinx_custom_formats = {
+    ".py": ["jupytext.reads", {"fmt": "py:percent"}],
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
