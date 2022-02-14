@@ -13,12 +13,6 @@
 import os
 import sys
 
-# sys.path.insert(0, os.path.abspath('.'))
-# sys.path.insert(0, os.path.abspath('../'))
-# sys.path.insert(0, os.path.abspath('../../'))
-# sys.path.insert(0, os.path.abspath('../../gpjax'))
-# sys.path.insert(0, os.path.abspath('../../gpjax/gps'))
-
 sys.path.insert(0, os.path.abspath("../.."))
 
 # -- Project information -----------------------------------------------------
@@ -39,7 +33,6 @@ extensions = [
     "nbsphinx",
     "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
-    "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
@@ -88,9 +81,6 @@ html_theme_options = {
         "color-admonition-background": "orange",
     },
 }
-
-# pygments_style = "sphinx"
-# pygments_dark_style = "monokai"
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
