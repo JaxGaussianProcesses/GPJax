@@ -13,7 +13,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../.."))
+# sys.path.insert(0, os.path.abspath("../.."))
 
 # -- Project information -----------------------------------------------------
 
@@ -46,7 +46,7 @@ bibtex_style = "unsrt"
 bibtex_reference_style = "author_year"
 nbsphinx_allow_errors = True
 nbsphinx_custom_formats = {
-    ".py": ["jupytext.reads", {"fmt": "py:percent"}],
+    ".pct.py": ["jupytext.reads", {"fmt": "py:percent"}],
 }
 
 # Add any paths that contain templates here, relative to this directory.

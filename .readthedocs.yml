@@ -6,9 +6,9 @@ build:
   tools:
     python: "3.9"
 
-sphinx:
-  configuration: docs/conf.py
-  fail_on_warning: false
+# sphinx:
+#   configuration: docs/conf.py
+#   fail_on_warning: false
 
 python:
   install:

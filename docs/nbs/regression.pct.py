@@ -14,6 +14,7 @@
 
 # %% [markdown] pycharm={"name": "#%% md\n"}
 # # Regression
+# %%
 
 from pprint import PrettyPrinter
 import gpjax as gpx

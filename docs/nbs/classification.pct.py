@@ -16,6 +16,8 @@
 # # Classification
 #
 
+# %%
+
 import gpjax as gpx
 import jax
 import jax.numpy as jnp

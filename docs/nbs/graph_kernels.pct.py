@@ -18,7 +18,7 @@
 #
 # This notebook demonstrates how regression models can be constructed on the vertices of a graph using a Gaussian process. To achieve this, we'll use the Matérn kernel presented in  <strong data-cite="borovitskiy2021matern"></strong>.
 
-
+# %%
 import random
 
 import gpjax as gpx
