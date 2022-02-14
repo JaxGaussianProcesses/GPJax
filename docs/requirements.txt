@@ -8,5 +8,6 @@ pandoc
 sphinxcontrib.bibtex
 jupytext
 ipython
+ipykernel
 # Install GPJax istself
 .
