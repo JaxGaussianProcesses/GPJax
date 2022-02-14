@@ -2,12 +2,13 @@ furo==2020.12.30b24
 nbsphinx>=0.8.0
 nb-black==1.0.7
 matplotlib==3.3.3
-# sphinx-copybutton
+sphinx-copybutton
 networkx>=2.0.0
 pandoc
 sphinxcontrib.bibtex
 jupytext
 ipython
 ipykernel
+watermark
 # Install GPJax istself
 .
