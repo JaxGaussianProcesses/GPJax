@@ -4,3 +4,4 @@ nb-black==1.0.7
 matplotlib==3.3.3
 sphinx-copybutton==0.3.1
 networkx>=2.0.0
+sphinxcontrib.bibtex
