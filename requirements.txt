@@ -4,3 +4,7 @@ chex>=0.0.8
 tensorflow-probability==0.15.0
 tqdm
 ml-collections==0.1.0
+jupytext
+nbsphinx
+pandoc
+sphinxcontrib-bibtex

@@ -16,18 +16,13 @@
 # # Classification
 #
 
-# %%
-# %load_ext lab_black
-
+import gpjax as gpx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax as tfp
 from jax.experimental import optimizers
-
-# %%
-import gpjax as gpx
 
 key = jr.PRNGKey(123)
 tfd = tfp.distributions

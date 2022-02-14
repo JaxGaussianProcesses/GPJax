@@ -48,3 +48,11 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
     :caption: Experimental
 
     nbs/tfp_integration
+
+
+
+Bibliography
+-----------------------------
+
+.. bibliography::
+    :cited:

@@ -1,9 +1,11 @@
 from itertools import permutations
+from chex import assert_equal
 
 import jax.numpy as jnp
 import jax.random as jr
+from numpy import isin, sort
 import pytest
-
+import networkx as nx
 from gpjax import kernels
 from gpjax.kernels import (
     RBF,
@@ -14,6 +16,8 @@ from gpjax.kernels import (
     Polynomial,
     ProductKernel,
     SumKernel,
+    _EigenKernel,
+    GraphKernel,
     cross_covariance,
     euclidean_distance,
     gram,
@@ -191,3 +195,26 @@ def test_update_params(kernel):
         params[k] = 100
         kern._params = params
         assert kern.params == params
+
+
+def test_graph_kernel():
+    n_verticies = 20
+    n_edges = 40
+    G = nx.gnm_random_graph(n_verticies, n_edges, seed=123)
+    L = nx.laplacian_matrix(G).toarray() + jnp.eye(n_verticies) * 1e-12
+    kern = GraphKernel(laplacian=L)
+    assert isinstance(kern, GraphKernel)
+    assert isinstance(kern, _EigenKernel)
+
+    kern_params = kern.params
+    assert isinstance(kern_params, dict)
+    assert list(sorted(list(kern_params.keys()))) == ["lengthscale", "smoothness", "variance"]
+    x = jnp.arange(n_verticies).reshape(-1, 1)
+    Kxx = gram(kern, x, kern.params)
+    assert Kxx.shape == (n_verticies, n_verticies)
+    kevals, kevecs = jnp.linalg.eigh(Kxx + jnp.eye(n_verticies) * 1e-8)
+    assert all(kevals > 0)
+
+    assert kern.num_vertex == n_verticies
+    assert kern.evals.shape == (n_verticies, 1)
+    assert kern.evecs.shape == (n_verticies, n_verticies)

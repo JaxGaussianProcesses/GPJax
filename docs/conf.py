@@ -49,6 +49,8 @@ extensions = [
 ]
 
 bibtex_bibfiles = ["refs.bib"]
+bibtex_style = "unsrt"
+bibtex_reference_style = "author_year"
 nbsphinx_allow_errors = True
 nbsphinx_custom_formats = {
     ".py": ["jupytext.reads", {"fmt": "py:percent"}],

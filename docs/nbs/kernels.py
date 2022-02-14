@@ -18,13 +18,14 @@
 # In this notebook we'll expose the kernels available in GPJax and show how a custom polar kernel can be implemented.
 
 # %%
+import gpjax as gpx
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
+import tensorflow_probability.substrates.jax.bijectors as tfb
 from jax import jit
 from optax import adam
-import gpjax as gpx
-import tensorflow_probability.substrates.jax.bijectors as tfb
+
 
 key = jr.PRNGKey(123)
 
@@ -165,7 +166,6 @@ class Polar(gpx.kernels.Kernel):
         t = angular_distance(x, y, self.c)
         K = (1 + tau * t / self.c) * jnp.clip(1 - t / self.c, 0, jnp.inf) ** tau
         return K.squeeze()
-
 
 
 # %% [markdown]

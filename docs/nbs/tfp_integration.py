@@ -15,17 +15,17 @@
 # %% [markdown]
 # # TensorFlow Probability Integration
 
-# %%
-import gpjax as gpx
-from gpjax.utils import dict_array_coercion
 from pprint import PrettyPrinter
+import gpjax as gpx
 
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
-pp = PrettyPrinter(indent=4)
 
+from gpjax.utils import dict_array_coercion
+
+pp = PrettyPrinter(indent=4)
 key = jr.PRNGKey(123)
 
 # %% [markdown]
@@ -122,10 +122,10 @@ mll_array_form = build_log_pi(mll, array_to_dict)
 # %% [markdown]
 # ## Sample
 #
-# We now have all the necessary machinery in place to sample from our target distribution. We'll use TensorFlow's Hamiltonian Monte-Carlo sampler equipped with the No U-Turn Sampler kernel. We'll draw 2500 samples from our target distribution for illustrative purposes. In practice, you may wish to sample more though.
+# We now have all the necessary machinery in place to sample from our target distribution. We'll use TensorFlow's Hamiltonian Monte-Carlo sampler equipped with the No U-Turn Sampler kernel. We'll draw just 500 samples from our target distribution for illustrative purposes. In practice, you will likely want to sample more though.
 
 # %%
-n_samples = 2500
+n_samples = 500
 
 
 def run_chain(key, state):
@@ -148,11 +148,11 @@ states, log_probs = jax.jit(run_chain)(key, jnp.array(dict_to_array(params)))
 # %% [markdown]
 # ## Inspecting samples
 #
-# We'll now assess the quality of our chains. We'll discard the first 500 samples as the sampler may not have yet reached the stationary distribution. We'll also thin the chains by keeping every third sample. This reduces the autocorrelation present in the samples.
+# We'll now assess the quality of our chains. To illustrate the acts of burn-in and thinning, we'll discard the first 50 samples as burn in and thin the remaining samples by a factor of 2.
 
 # %%
-burn_in = 500
-thin_factor = 3
+burn_in = 50
+thin_factor = 2
 n_params = states.shape[1]
 
 samples = [states[burn_in:, i, :][::thin_factor] for i in range(n_params)]

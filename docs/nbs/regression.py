@@ -15,7 +15,7 @@
 # %% [markdown] pycharm={"name": "#%% md\n"}
 # # Regression
 
-# %%
+from pprint import PrettyPrinter
 import gpjax as gpx
 
 import jax
@@ -23,8 +23,6 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 from jax.experimental import optimizers
-from pprint import PrettyPrinter
-
 
 pp = PrettyPrinter(indent=4)
 key = jr.PRNGKey(123)
