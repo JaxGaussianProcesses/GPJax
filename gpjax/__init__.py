@@ -6,7 +6,7 @@ config.update("jax_enable_x64", True)
 # config.update("jax_numpy_rank_promotion", "warn")
 
 from .abstractions import fit, optax_fit
-from .gps import Prior, construct_posterior
+from .gps import Prior, construct_posterior, construct_VFE_posterior
 from .kernels import (
     RBF,
     GraphKernel,

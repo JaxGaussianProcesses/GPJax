@@ -1,11 +1,12 @@
 # ---
 # jupyter:
 #   jupytext:
+#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -27,6 +28,11 @@ from jax.experimental import optimizers
 
 pp = PrettyPrinter(indent=4)
 key = jr.PRNGKey(123)
+
+# %%
+import optax as ox
+
+type(ox.adam(0.01))
 
 # %% [markdown]
 # ## Synthetic datasets
@@ -117,6 +123,11 @@ mll(params)
 # ### Defining an optimiser
 #
 # We can now define an optimiser using one of the optimiser's supplied in Jax's `experimental` module. For this example we'll use the adam optimiser with a step-size of $0.01$.
+
+# %%
+opt_init, opt_update, get_params = optimizers.adam(step_size=0.01)
+
+type(opt_init)
 
 # %%
 from gpjax.abstractions import fit

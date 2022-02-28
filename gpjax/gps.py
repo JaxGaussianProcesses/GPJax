@@ -8,7 +8,7 @@ from jax.scipy.linalg import cho_factor, cho_solve, solve_triangular
 
 from gpjax.config import get_defaults
 
-from .kernels import Kernel, cross_covariance, gram
+from .kernels import Kernel, cross_covariance, gram, diagonal
 from .likelihoods import (
     Gaussian,
     Likelihood,
@@ -18,7 +18,8 @@ from .likelihoods import (
 from .mean_functions import MeanFunction, Zero
 from .parameters import copy_dict_structure, evaluate_priors, transform
 from .types import Array, Dataset
-from .utils import I, concat_dictionaries
+from .utils import I, concat_dictionaries, chol_solve
+from copy import deepcopy
 
 
 @dataclass
@@ -120,7 +121,9 @@ class ConjugatePosterior(Posterior):
         weights = cho_solve(L, prior_distance)
 
         def mean_fn(test_inputs: Array) -> Array:
-            prior_mean_at_test_inputs = self.prior.mean_function(test_inputs, params["mean_function"])
+            prior_mean_at_test_inputs = self.prior.mean_function(
+                test_inputs, params["mean_function"]
+            )
             Kfx = cross_covariance(self.prior.kernel, X, test_inputs, params["kernel"])
             return prior_mean_at_test_inputs + jnp.dot(Kfx, weights)
 
@@ -182,11 +185,16 @@ class NonConjugatePosterior(Posterior):
         mean_fn_string = self.prior.mean_function.__repr__()
         kernel_string = self.prior.kernel.__repr__()
         likelihood_string = self.likelihood.__repr__()
-        return f"Conjugate Posterior\n{'-'*80}\n- {mean_fn_string}\n-" f" {kernel_string}\n- {likelihood_string}"
+        return (
+            f"Conjugate Posterior\n{'-'*80}\n- {mean_fn_string}\n-"
+            f" {kernel_string}\n- {likelihood_string}"
+        )
 
     @property
     def params(self) -> dict:
-        hyperparameters = concat_dictionaries(self.prior.params, {"likelihood": self.likelihood.params})
+        hyperparameters = concat_dictionaries(
+            self.prior.params, {"likelihood": self.likelihood.params}
+        )
         hyperparameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
         return hyperparameters
 
@@ -263,6 +271,104 @@ class NonConjugatePosterior(Posterior):
             return constant * (ll + log_prior_density)
 
         return mll
+
+
+#######################
+# Sparse Approximations
+#######################
+@dataclass
+class _ApproximateProcess:
+    inducing_inputs: Array
+
+@dataclass
+class ApproximateGP(Posterior, _ApproximateProcess):
+
+    def __post_init__(self):
+        self.num_inducing = self.likelihood.num_datapoints
+
+    @property
+    def params(self) -> dict:
+        hyperparams = concat_dictionaries(self.prior.params, {"likelihood": self.likelihood.params})
+        hyperparams["inducing_inputs"] = deepcopy(self.inducing_inputs)
+        return hyperparams
+
+    # @abstractmethod
+    # def variational_dist(self
+
+    def elbo(
+        self,
+        training: Dataset,
+        transformations: tp.Dict,
+        priors: dict = None,
+        static_params: dict = None,
+        negative: bool = False,
+    ) -> tp.Callable[[Dataset], Array]:
+        x, y = training.X, training.y
+        n_obs = training.n
+        jitter = get_defaults()["jitter"]
+        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
+        n_inducing = self.num_inducing
+        constant = 0.5*n_obs*jnp.log(2*jnp.pi)
+
+        def elbo_fn(params: dict) -> Array:
+            params = transform(params=params, transform_map=transformations)
+            Z = params["inducing_inputs"]
+            beta = 1./params['likelihood']['obs_noise']
+
+            # Compute kernel matrices
+            Kmm = gram(self.prior.kernel, Z, params["kernel"]) + I(n_inducing) * jitter
+            Knm = cross_covariance(self.prior.kernel, x, Z, params["kernel"])
+            # Kmn = jnp.transpose(Knm)
+            Kff_diag = diagonal(self.prior.kernel, x, params['kernel'])
+
+            L = jnp.linalg.cholesky(Kmm)
+            A = solve_triangular(L, Knm, lower=True) * beta
+            AAT = A@jnp.transpose(A)
+            B = I(self.num_inducing) + AAT
+            LB = jnp.linalg.cholesky(B)
+
+            c = solve_triangular(LB, A.dot(y), lower=True) * beta
+
+            lb = -constant - jnp.sum(jnp.diag(LB))
+            lb -= n_obs/2 * jnp.log(params['likelihood']['obs_noise']**2)
+            lb -= 0.5*beta**2 *y.T.dot(y)
+            lb += 0.5*c.T.dot(c)
+            lb -= 0.5*beta**2 *jnp.sum(Kff_diag)
+            lb += 0.5 * jnp.trace(AAT)
+            return -lb.squeeze()
+        return elbo_fn
+
+    def mean(self, training_data: Dataset, params: dict) -> tp.Callable[[Array], Array]:
+        X, y = training_data.X, training_data.y
+        sigma = params["likelihood"]["obs_noise"]
+        Z = params["inducing_inputs"]
+        n_train = training_data.n
+
+        def mean_fn(test_inputs: Array) -> Array:
+            pass
+
+        return mean_fn
+
+    def variance(self, training_data: Dataset, params: dict) -> tp.Callable[[Array], Array]:
+        X = training_data.X
+        n_train = training_data.n
+        obs_noise = params["likelihood"]["obs_noise"]
+        n_train = training_data.n
+
+        def variance_fn(test_inputs: Array) -> Array:
+            pass
+
+        return variance_fn
+
+
+def construct_VFE_posterior(gp: ConjugatePosterior, Z: Array):
+    num_inducing_points = Z.shape[0]
+    assert isinstance(
+        gp.likelihood, Gaussian
+    ), "Variational free energy posterior is only defined for Gaussian likelihoods."
+    prior_copy = deepcopy(gp.prior)
+    likelihood = Gaussian(num_datapoints=num_inducing_points)
+    return ApproximateGP(prior=prior_copy, likelihood=likelihood, inducing_inputs=Z)
 
 
 def construct_posterior(prior: Prior, likelihood: Likelihood) -> Posterior:

@@ -1,6 +1,6 @@
 jax>=0.2.21
 optax>=0.1.0
 chex>=0.0.8
-tensorflow-probability==0.15.0
+tensorflow-probability==0.13.0
 tqdm
 ml-collections==0.1.0

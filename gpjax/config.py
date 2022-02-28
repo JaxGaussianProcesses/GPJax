@@ -8,6 +8,11 @@ __config = None
 
 
 def get_defaults() -> ConfigDict:
+    """Construct and globally register the config file used within GPJax.
+
+    Returns:
+        ConfigDict: A `ConfigDict` describing parameter transforms and default values.
+    """
     config = ConfigDict()
     config.key = jr.PRNGKey(123)
     # Covariance matrix stabilising jitter
@@ -27,6 +32,7 @@ def get_defaults() -> ConfigDict:
     transformations.latent = "identity_transform"
     transformations.basis_fns = "identity_transform"
     transformations.offset = "identity_transform"
+    transformations.inducing_inputs = "identity_transform"
     global __config
     if not __config:
         __config = config
@@ -34,6 +40,12 @@ def get_defaults() -> ConfigDict:
 
 
 def add_parameter(param_name: str, bijection: tfb.Bijector) -> None:
+    """Include a new parameter and its corresponding transform into the GPJax's Config file.
+
+    Args:
+        param_name (str): The name of the parameter that is to be added.
+        bijection (tfb.Bijector): The bijection that should be used to unconstrain the parameter's value
+    """
     lookup_name = f"{param_name}_transform"
     get_defaults()
     __config.transformations[lookup_name] = bijection

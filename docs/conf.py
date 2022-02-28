@@ -41,6 +41,19 @@ extensions = [
     "sphinxcontrib.bibtex",
 ]
 
+### Automatic API doc generation
+extensions.append("autoapi.extension")
+autoapi_dirs = ["../gpjax"]
+autoapi_add_toctree_entry = False
+autoapi_python_class_content = "both"
+autoapi_options = [
+    "members",
+    "private-members",
+    "special-members",
+    "imported-members",
+    "show-inheritance",
+]
+
 bibtex_bibfiles = ["refs.bib"]
 bibtex_style = "unsrt"
 bibtex_reference_style = "author_year"

@@ -1,8 +1,10 @@
-# GPJax
+<h1 align='center'>GPJax</h1>
+<h2 align='center'>Gaussian processes in Jax.</h2>
 
 [![codecov](https://codecov.io/gh/thomaspinder/gpjax/branch/master/graph/badge.svg?token=DM1DRDASU2)](https://codecov.io/gh/thomaspinder/gpjax)
 [![CodeFactor](https://www.codefactor.io/repository/github/thomaspinder/gpjax/badge)](https://www.codefactor.io/repository/github/thomaspinder/gpjax)
 [![Documentation Status](https://readthedocs.org/projects/gpjax/badge/?version=latest)](https://gpjax.readthedocs.io/en/latest/?badge=latest)
+[![Downloads](https://pepy.tech/badge/gpjax)](https://pepy.tech/project/gpjax)
 
 [**Quickstart**](#simple-example)
 | [**Install guide**](#installation)

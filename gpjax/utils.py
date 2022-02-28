@@ -3,9 +3,15 @@ from copy import deepcopy
 
 import jax
 import jax.numpy as jnp
-from jax.scipy.linalg import cho_factor, cho_solve
+from jax.scipy.linalg import cho_factor, cho_solve, solve_triangular
 
 from .types import Array
+
+
+def chol_solve(L, y):
+    lx = solve_triangular(L, y, lower=True)
+    x = solve_triangular(L, lx, lower=True, trans=1)
+    return x
 
 
 def I(n: int) -> Array:
