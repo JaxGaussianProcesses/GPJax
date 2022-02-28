@@ -280,9 +280,9 @@ class NonConjugatePosterior(Posterior):
 class _ApproximateProcess:
     inducing_inputs: Array
 
+
 @dataclass
 class ApproximateGP(Posterior, _ApproximateProcess):
-
     def __post_init__(self):
         self.num_inducing = self.likelihood.num_datapoints
 
@@ -308,34 +308,35 @@ class ApproximateGP(Posterior, _ApproximateProcess):
         jitter = get_defaults()["jitter"]
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
         n_inducing = self.num_inducing
-        constant = 0.5*n_obs*jnp.log(2*jnp.pi)
+        constant = 0.5 * n_obs * jnp.log(2 * jnp.pi)
 
         def elbo_fn(params: dict) -> Array:
             params = transform(params=params, transform_map=transformations)
             Z = params["inducing_inputs"]
-            beta = 1./params['likelihood']['obs_noise']
+            beta = 1.0 / params["likelihood"]["obs_noise"]
 
             # Compute kernel matrices
             Kmm = gram(self.prior.kernel, Z, params["kernel"]) + I(n_inducing) * jitter
             Knm = cross_covariance(self.prior.kernel, x, Z, params["kernel"])
             # Kmn = jnp.transpose(Knm)
-            Kff_diag = diagonal(self.prior.kernel, x, params['kernel'])
+            Kff_diag = diagonal(self.prior.kernel, x, params["kernel"])
 
             L = jnp.linalg.cholesky(Kmm)
             A = solve_triangular(L, Knm, lower=True) * beta
-            AAT = A@jnp.transpose(A)
+            AAT = A @ jnp.transpose(A)
             B = I(self.num_inducing) + AAT
             LB = jnp.linalg.cholesky(B)
 
             c = solve_triangular(LB, A.dot(y), lower=True) * beta
 
             lb = -constant - jnp.sum(jnp.diag(LB))
-            lb -= n_obs/2 * jnp.log(params['likelihood']['obs_noise']**2)
-            lb -= 0.5*beta**2 *y.T.dot(y)
-            lb += 0.5*c.T.dot(c)
-            lb -= 0.5*beta**2 *jnp.sum(Kff_diag)
+            lb -= n_obs / 2 * jnp.log(params["likelihood"]["obs_noise"] ** 2)
+            lb -= 0.5 * beta ** 2 * y.T.dot(y)
+            lb += 0.5 * c.T.dot(c)
+            lb -= 0.5 * beta ** 2 * jnp.sum(Kff_diag)
             lb += 0.5 * jnp.trace(AAT)
             return -lb.squeeze()
+
         return elbo_fn
 
     def mean(self, training_data: Dataset, params: dict) -> tp.Callable[[Array], Array]:
