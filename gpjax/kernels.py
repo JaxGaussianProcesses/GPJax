@@ -1,8 +1,5 @@
 import abc
-from lib2to3.pgen2.token import OP
-from re import L
-from typing import Callable, Dict, List, Optional, Tuple
-from unicodedata import name
+from typing import Callable, Dict, List, Optional, Sequence
 
 import jax.numpy as jnp
 from chex import dataclass
@@ -32,6 +29,12 @@ class Kernel:
     def slice_input(self, x: Array) -> Array:
         return x[..., self.active_dims]
 
+    def __add__(self, other: "Kernel") -> "Kernel":
+        return SumKernel(kernel_set=[self, other])
+    
+    def __mul__(self, other: "Kernel") -> "Kernel":
+        return ProductKernel(kernel_set=[self, other])
+
     @property
     def ard(self):
         return True if self.ndims > 1 else False
@@ -43,13 +46,34 @@ class Kernel:
     @params.setter
     def params(self, value):
         self._params = value
-
-
+        
 @dataclass
-class CombinationKernel:
+class _KernelSet:
     kernel_set: List[Kernel]
+        
+@dataclass
+class CombinationKernel(Kernel, _KernelSet):
     name: Optional[str] = "Combination kernel"
     combination_fn: Optional[Callable] = None
+
+    def __post_init__(self):
+        kernels = self.kernel_set
+        
+        if not all(isinstance(k, Kernel) for k in kernels):
+            raise TypeError("can only combine Kernel instances")  # pragma: no cover
+        
+        self.kernel_set: List[Kernel] = []
+        self._set_kernels(kernels)
+
+    def _set_kernels(self, kernels: Sequence[Kernel]) -> None:
+        # add kernels to a list, flattening out instances of this class therein
+        kernels_list: List[Kernel] = []
+        for k in kernels:
+            if isinstance(k, self.__class__):
+                kernels_list.extend(k.kernel_set)
+            else:
+                kernels_list.append(k)
+        self.kernel_set = kernels_list
 
     @property
     def params(self) -> List[Dict]:
@@ -224,12 +248,11 @@ def squared_distance(x: Array, y: Array):
 
 
 def euclidean_distance(x: Array, y: Array):
-    return jnp.sum(jnp.abs(x - y))
+    return jnp.sqrt(jnp.maximum(jnp.sum((x - y) ** 2), 1e-36))
 
 
 def gram(kernel: Kernel, inputs: Array, params: dict) -> Array:
     return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(inputs)
 
-
 def cross_covariance(kernel: Kernel, x: Array, y: Array, params: dict) -> Array:
-    return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(x))(y)
+    return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)

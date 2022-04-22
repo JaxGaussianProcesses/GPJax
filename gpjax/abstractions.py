@@ -5,10 +5,14 @@ import jax.numpy as jnp
 import optax
 from tqdm import trange
 
+import tensorflow.data as tfd
+
+from .types import Dataset
 
 def fit(
     objective,
     params: dict,
+    trainables: dict,
     opt_init,
     opt_update,
     get_params,
@@ -17,9 +21,15 @@ def fit(
 ) -> tp.Dict:
     opt_state = opt_init(params)
 
+    @jax.jit
+    def loss(params, batch):
+        params = stop_grads(params, trainables)
+        return objective(params, batch)
+
+    @jax.jit
     def step(i, opt_state):
         params = get_params(opt_state)
-        v, g = jax.value_and_grad(objective)(params)
+        v, g = jax.value_and_grad(loss)(params)
         return opt_update(i, g, opt_state), v
 
     tr = trange(n_iters)
@@ -33,15 +43,21 @@ def fit(
 def optax_fit(
     objective,
     params: dict,
+    trainables: dict,
     optax_optim,
     n_iters: int = 100,
     log_rate: int = 10,
 ) -> tp.Dict:
     opt_state = optax_optim.init(params)
-    ps = params
 
+    @jax.jit
+    def loss(params, batch):
+        params = stop_grads(params, trainables)
+        return objective(params, batch)
+
+    @jax.jit
     def step(params, opt_state):
-        v, g = jax.value_and_grad(objective)(params)
+        v, g = jax.value_and_grad(loss)(params)
         updates, opt_state = optax_optim.update(g, opt_state, params)
         params = optax.apply_updates(params, updates)
         return params, opt_state, v
@@ -52,3 +68,71 @@ def optax_fit(
         if i % log_rate == 0 or i == n_iters:
             tr.set_postfix({"Objective": jnp.round(val, 2)})
     return params
+
+# Mini-batcher:
+def mini_batcher(training: Dataset, 
+                       batch_size: tp.Optional[int] = 32,
+                       prefetch_buffer: tp.Optional[int] = 1,
+                      ) -> tp.Iterator:
+
+    X, y, n = training.X, training.y, training.n
+    
+    # Make dataloader, set batch size and prefetch buffer:
+    ds = tfd.Dataset.from_tensor_slices((X,y))
+    ds = ds.cache()
+    ds = ds.repeat()
+    ds = ds.shuffle(n)
+    ds = ds.batch(batch_size)
+    ds = ds.prefetch(prefetch_buffer)
+    
+    # Make iterator:
+    train_iter = iter(ds)
+    
+    # Batch loader:
+    def next_batch() -> Dataset:
+        x_batch, y_batch = train_iter.next()
+        return Dataset(X=x_batch.numpy(), y=y_batch.numpy())
+    
+    return next_batch
+
+
+from gpjax.parameters import  stop_grads
+
+# Mini-batch gradient descent:
+def fit_batches(objective, 
+          params: dict,
+          trainables: dict,
+          opt_init,
+          opt_update,
+          get_params,
+          get_batch,
+          n_iters: tp.Optional[int] = 100,
+          log_rate: tp.Optional[int] = 10,
+          history: tp.Optional[bool] = False
+        )-> tp.Dict:
+    opt_state = opt_init(params)
+    
+    @jax.jit
+    def loss(params, batch):
+        params = stop_grads(params, trainables)
+        return objective(params, batch)
+    
+    @jax.jit
+    def train_step(i, opt_state, batch):
+        params = get_params(opt_state)
+        v, g = jax.value_and_grad(loss)(params, batch)
+        return opt_update(i, g, opt_state), v
+    
+    hist = []
+    tr = trange(n_iters) 
+    for i in tr:
+        batch = get_batch()
+        opt_state, v = train_step(i, opt_state, batch)
+        hist.append(v)
+        if i % log_rate == 0 or i == n_iters:
+            tr.set_postfix({"Objective": jnp.round(v, 2)})
+    
+    if history is True:
+        return get_params(opt_state), hist
+    else:
+        return get_params(opt_state)

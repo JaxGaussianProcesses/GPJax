@@ -1,11 +1,11 @@
-from typing import Tuple
-
 import jax.random as jr
-import tensorflow_probability.substrates.jax.bijectors as tfb
+import distrax
 from ml_collections import ConfigDict
-
+import jax.numpy as jnp
 __config = None
 
+Identity = distrax.Lambda(lambda x: x)
+Softplus = distrax.Lambda(lambda x: jnp.log(1. + jnp.exp(x)) )
 
 def get_defaults() -> ConfigDict:
     config = ConfigDict()
@@ -15,8 +15,8 @@ def get_defaults() -> ConfigDict:
 
     # Default bijections
     config.transformations = transformations = ConfigDict()
-    transformations.positive_transform = tfb.Softplus()
-    transformations.identity_transform = tfb.Identity()
+    transformations.positive_transform = Softplus
+    transformations.identity_transform = Identity
 
     # Default parameter transforms
     transformations.lengthscale = "positive_transform"
@@ -33,7 +33,7 @@ def get_defaults() -> ConfigDict:
     return __config
 
 
-def add_parameter(param_name: str, bijection: tfb.Bijector) -> None:
+def add_parameter(param_name: str, bijection: distrax.Bijector) -> None:
     lookup_name = f"{param_name}_transform"
     get_defaults()
     __config.transformations[lookup_name] = bijection
