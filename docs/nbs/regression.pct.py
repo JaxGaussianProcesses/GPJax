@@ -29,11 +29,6 @@ from jax.experimental import optimizers
 pp = PrettyPrinter(indent=4)
 key = jr.PRNGKey(123)
 
-# %%
-import optax as ox
-
-type(ox.adam(0.01))
-
 # %% [markdown]
 # ## Synthetic datasets
 #
@@ -87,6 +82,7 @@ prior = gpx.Prior(kernel=kernel)
 # %%
 lik = gpx.Gaussian(num_datapoints=training.n)
 posterior = prior * lik
+print(type(posterior))
 
 # %% [markdown]
 # ### Stating parameters

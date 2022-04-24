@@ -45,7 +45,7 @@ def test_cross_covariance(kern, n1, n2):
     x1 = jnp.linspace(-1.0, 1.0, num=n1).reshape(-1, 1)
     x2 = jnp.linspace(-1.0, 1.0, num=n2).reshape(-1, 1)
     params, _, _ = initialise(kern)
-    kernel_matrix = cross_covariance(kern, x2, x1, params)
+    kernel_matrix = cross_covariance(kern, x1, x2, params)
     assert kernel_matrix.shape == (n1, n2)
 
 

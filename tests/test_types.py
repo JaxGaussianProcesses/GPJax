@@ -1,7 +1,7 @@
 import jax.numpy as jnp
 import pytest
 
-from gpjax.types import Dataset, NoneType, verify_dataset, SparseDataset
+from gpjax.types import Dataset, NoneType, verify_dataset
 
 
 def test_nonetype():

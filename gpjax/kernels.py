@@ -364,7 +364,7 @@ def cross_covariance(kernel: Kernel, x: Array, y: Array, params: dict) -> Array:
     Returns:
         Array: The computed square Gram matrix.
     """
-    return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(x))(y)
+    return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
 
 
 def diagonal(kernel: Kernel, inputs: Array, params: dict):
