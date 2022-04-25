@@ -38,7 +38,7 @@ class Gaussian(Likelihood):
 
     @property
     def link_function(self) -> Callable:
-        def link_fn(x, params: dict):
+        def link_fn(x, params: dict) -> dx.Distribution:
             return dx.Normal(loc=x, scale=params["obs_noise"])
 
         return link_fn
@@ -54,7 +54,7 @@ class Bernoulli(Likelihood):
 
     @property
     def link_function(self) -> Callable:
-        def link_fn(x, params: dict):
+        def link_fn(x, params: dict) -> dx.Distribution:
             return dx.Bernoulli(probs=inv_probit(x))
 
         return link_fn
