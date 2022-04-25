@@ -30,9 +30,13 @@ class Dataset:
 
 
 def verify_dataset(ds: Dataset) -> None:
-    assert ds.X.ndim == 2, "2-dimensional training inputs are required. Current dimension:" f" {ds.X.ndim}."
+    assert ds.X.ndim == 2, (
+        "2-dimensional training inputs are required. Current dimension:" f" {ds.X.ndim}."
+    )
     if ds.y is not None:
-        assert ds.y.ndim == 2, "2-dimensional training outputs are required. Current dimension:" f" {ds.y.ndim}."
+        assert ds.y.ndim == 2, (
+            "2-dimensional training outputs are required. Current dimension:" f" {ds.y.ndim}."
+        )
         assert ds.X.shape[0] == ds.y.shape[0], (
             "Number of inputs must equal the number of outputs. \nCurrent"
             f" counts:\n- X: {ds.X.shape[0]}\n- y: {ds.y.shape[0]}"

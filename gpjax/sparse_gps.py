@@ -1,21 +1,21 @@
+from typing import Callable, Dict, Optional
+
+import distrax as dx
 import jax.numpy as jnp
-from jax.numpy.linalg import cholesky
-from jax.scipy.linalg import solve_triangular
-from typing import Optional, Dict, Callable
 from chex import dataclass
 from jax import vmap
-
-import distrax
+from jax.numpy.linalg import cholesky
+from jax.scipy.linalg import solve_triangular
 
 from gpjax.config import get_defaults
 from gpjax.gps import Posterior
+from gpjax.kernels import cross_covariance, gram
+from gpjax.parameters import transform
 from gpjax.types import Array, Dataset
 from gpjax.utils import I, concat_dictionaries
-from gpjax.parameters import transform
-from gpjax.kernels import gram, cross_covariance
 
 from .quadrature import gauss_hermite_quadrature
-from .variational import VariationalGaussian, VariationalFamily, VariationalPosterior
+from .variational import VariationalFamily, VariationalGaussian, VariationalPosterior
 
 DEFAULT_JITTER = get_defaults()["jitter"]
 
@@ -55,7 +55,7 @@ class _SVGP(VariationalPosterior):
         sqrt = params["q"]["sqrt"]
         nz = self.num_inducing
 
-        qu = distrax.MultivariateNormalTri(mu.squeeze(), sqrt)
+        qu = dx.MultivariateNormalTri(mu.squeeze(), sqrt)
 
         if not self.q.whiten:
             z = params["q"]["inducing_inputs"]
@@ -63,10 +63,10 @@ class _SVGP(VariationalPosterior):
             Kzz = gram(self.prior.kernel, z, params["kernel"])
             Kzz += I(nz) * self.jitter
             Lz = cholesky(Kzz, lower=True)
-            pu = distrax.MultivariateNormalTri(mz.squeeze(), Lz)
+            pu = dx.MultivariateNormalTri(mz.squeeze(), Lz)
 
         else:
-            pu = distrax.MultivariateNormalDiag(jnp.zeros(nz))
+            pu = dx.MultivariateNormalDiag(jnp.zeros(nz))
 
         return qu.kl_divergence(pu)
 

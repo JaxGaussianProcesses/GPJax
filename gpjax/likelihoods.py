@@ -1,12 +1,12 @@
 import abc
 from typing import Callable, Optional
 
+import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
 from chex import dataclass
 
 from .types import Array
-import distrax
 
 
 @dataclass(repr=False)
@@ -35,11 +35,12 @@ class Gaussian(Likelihood):
     @property
     def params(self) -> dict:
         return {"obs_noise": jnp.array([1.0])}
-    
+
     @property
     def link_function(self) -> Callable:
         def link_fn(x, params: dict):
-            return distrax.Normal(loc=x, scale=params["obs_noise"])
+            return dx.Normal(loc=x, scale=params["obs_noise"])
+
         return link_fn
 
 
@@ -54,7 +55,8 @@ class Bernoulli(Likelihood):
     @property
     def link_function(self) -> Callable:
         def link_fn(x, params: dict):
-            return distrax.Bernoulli(probs=inv_probit(x))
+            return dx.Bernoulli(probs=inv_probit(x))
+
         return link_fn
 
     @property
@@ -68,7 +70,7 @@ class Bernoulli(Likelihood):
 
 def inv_probit(x):
     jitter = 1e-3  # ensures output is strictly between 0 and 1
-    return 0.5 * (1.0 + jsp.special.erf(x / jnp.sqrt(2.0))) * (1 - 2 * jitter) + jitter 
+    return 0.5 * (1.0 + jsp.special.erf(x / jnp.sqrt(2.0))) * (1 - 2 * jitter) + jitter
 
 
 NonConjugateLikelihoods = [Bernoulli]

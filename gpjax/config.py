@@ -1,11 +1,13 @@
-import jax.random as jr
 import distrax
-from ml_collections import ConfigDict
 import jax.numpy as jnp
+import jax.random as jr
+from ml_collections import ConfigDict
+
 __config = None
 
 Identity = distrax.Lambda(lambda x: x)
-Softplus = distrax.Lambda(lambda x: jnp.log(1. + jnp.exp(x)) )
+Softplus = distrax.Lambda(lambda x: jnp.log(1.0 + jnp.exp(x)))
+
 
 def get_defaults() -> ConfigDict:
     """Construct and globally register the config file used within GPJax.

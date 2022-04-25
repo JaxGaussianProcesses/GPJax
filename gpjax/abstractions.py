@@ -3,17 +3,16 @@ import typing as tp
 import jax
 import jax.numpy as jnp
 import optax
-from tqdm import trange
-
 import tensorflow.data as tfd
+from tqdm import trange
 
 from .types import Dataset
 
 
 def fit(
-    objective,
-    params: dict,
-    trainables: dict,
+    objective: tp.Callable,
+    params: tp.Dict,
+    trainables: tp.Dict,
     opt_init,
     opt_update,
     get_params,
@@ -35,16 +34,14 @@ def fit(
     """
     opt_state = opt_init(params)
 
-    @jax.jit
     def loss(params, batch):
         params = stop_grads(params, trainables)
         return objective(params, batch)
 
-    @jax.jit
     def step(i, opt_state):
         params = get_params(opt_state)
-        v, g = jax.value_and_grad(loss)(params)
-        return opt_update(i, g, opt_state), v
+        loss_val, loss_gradient = jax.value_and_grad(loss)(params)
+        return opt_update(i, loss_gradient, opt_state), loss_val
 
     tr = trange(n_iters)
     for i in tr:
@@ -55,9 +52,9 @@ def fit(
 
 
 def optax_fit(
-    objective,
-    params: dict,
-    trainables: dict,
+    objective: tp.Callable,
+    params: tp.Dict,
+    trainables: tp.Dict,
     optax_optim,
     n_iters: int = 100,
     log_rate: int = 10,
@@ -75,17 +72,15 @@ def optax_fit(
     """
     opt_state = optax_optim.init(params)
 
-    @jax.jit
     def loss(params, batch):
         params = stop_grads(params, trainables)
         return objective(params, batch)
 
-    @jax.jit
     def step(params, opt_state):
-        v, g = jax.value_and_grad(loss)(params)
-        updates, opt_state = optax_optim.update(g, opt_state, params)
+        loss_val, loss_gradient = jax.value_and_grad(loss)(params)
+        updates, opt_state = optax_optim.update(loss_gradient, opt_state, params)
         params = optax.apply_updates(params, updates)
-        return params, opt_state, v
+        return params, opt_state, loss_val
 
     tr = trange(n_iters)
     for i in tr:
@@ -125,11 +120,12 @@ def mini_batcher(
 
 from gpjax.parameters import stop_grads
 
+
 # Mini-batch gradient descent:
 def fit_batches(
-    objective,
-    params: dict,
-    trainables: dict,
+    objective: tp.Callable,
+    params: tp.Dict,
+    trainables: tp.Dict,
     opt_init,
     opt_update,
     get_params,
@@ -140,16 +136,14 @@ def fit_batches(
 ) -> tp.Dict:
     opt_state = opt_init(params)
 
-    @jax.jit
     def loss(params, batch):
         params = stop_grads(params, trainables)
         return objective(params, batch)
 
-    @jax.jit
     def train_step(i, opt_state, batch):
         params = get_params(opt_state)
-        v, g = jax.value_and_grad(loss)(params, batch)
-        return opt_update(i, g, opt_state), v
+        loss_val, loss_gradient = jax.value_and_grad(loss)(params, batch)
+        return opt_update(i, loss_gradient, opt_state), loss_val
 
     hist = []
     tr = trange(n_iters)

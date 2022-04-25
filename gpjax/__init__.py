@@ -5,10 +5,8 @@ config.update("jax_enable_x64", True)
 # Highlight any potentially unintended broadcasting rank promoting ops.
 # config.update("jax_numpy_rank_promotion", "warn")
 
-from .abstractions import fit, optax_fit, fit_batches, mini_batcher
+from .abstractions import fit, fit_batches, mini_batcher, optax_fit
 from .gps import Prior, construct_posterior
-from .sparse_gps import SVGP
-from .variational import VariationalGaussian, ELBO, VFE
 from .kernels import (
     RBF,
     GraphKernel,
@@ -22,6 +20,8 @@ from .kernels import (
 from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
 from .parameters import copy_dict_structure, initialise, transform
+from .sparse_gps import SVGP
 from .types import Dataset
+from .variational import ELBO, VFE, VariationalGaussian
 
 __version__ = "0.4.2"

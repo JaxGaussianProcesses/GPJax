@@ -1,21 +1,20 @@
 import abc
-from typing import Optional, Dict, Callable
+from typing import Callable, Dict, Optional
+
+import distrax as dx
 import jax.numpy as jnp
+import tensorflow_probability.substrates.jax.bijectors as tfb
 from chex import dataclass
 
-import tensorflow_probability.substrates.jax.bijectors as tfb
-
+from .config import Identity, Softplus, add_parameter
 from .gps import Posterior
 from .types import Array, Dataset
-from .config import add_parameter, Identity, Softplus
 from .utils import I, concat_dictionaries
 
-import distrax
+Diagonal = dx.Lambda(forward=lambda x: jnp.diagflat(x), inverse=lambda x: jnp.diagonal(x))
 
-Diagonal = distrax.Lambda(forward=lambda x: jnp.diagflat(x), inverse=lambda x: jnp.diagonal(x))
-
-FillDiagonal = distrax.Chain([Diagonal, Softplus])
-FillTriangular = distrax.Chain([tfb.FillTriangular()])
+FillDiagonal = dx.Chain([Diagonal, Softplus])
+FillTriangular = dx.Chain([tfb.FillTriangular()])
 
 
 @dataclass
@@ -78,13 +77,9 @@ class VariationalPosterior(Posterior):
         raise NotImplementedError
 
 
-from jax import jit
-
-
 def ELBO(
     model: VariationalPosterior, train_data: Dataset, transformations: Dict
 ) -> Callable[[Array], Array]:
-    @jit
     def elbo(*args, **kwargs):
         return model.elbo(train_data, transformations)(*args, **kwargs)
 
@@ -94,7 +89,6 @@ def ELBO(
 def VFE(
     model: VariationalPosterior, train_data: Dataset, transformations: Dict
 ) -> Callable[[Array], Array]:
-    @jit
     def vfe(*args, **kwargs):
         return -model.elbo(train_data, transformations)(*args, **kwargs)
 

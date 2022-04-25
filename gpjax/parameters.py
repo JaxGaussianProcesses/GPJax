@@ -2,16 +2,14 @@ import typing as tp
 import warnings
 from copy import deepcopy
 
+import distrax as dx
 import jax
 import jax.numpy as jnp
-import distrax
 
 from .config import get_defaults
 from .types import Array
 
-import distrax
-
-Identity = distrax.Lambda(lambda x: x)
+Identity = dx.Lambda(lambda x: x)
 
 
 ################################
@@ -20,7 +18,7 @@ Identity = distrax.Lambda(lambda x: x)
 def initialise(obj) -> tp.Tuple[tp.Dict, tp.Dict, tp.Dict]:
     params = obj.params
     constrainers, unconstrainers = build_transforms(params)
-    trainables =  build_trainables(params)
+    trainables = build_trainables(params)
     return params, trainables, constrainers, unconstrainers
 
 
@@ -59,14 +57,14 @@ def build_bijectors(params) -> tp.Dict:
     bijectors = copy_dict_structure(params)
     config = get_defaults()
     transform_set = config["transformations"]
-    
+
     def recursive_bijectors_list(ps, bs):
         return [recursive_bijectors(ps[i], bs[i]) for i in range(len(bs))]
 
     def recursive_bijectors(ps, bs) -> tp.Tuple[tp.Dict, tp.Dict]:
         if type(ps) is list:
-            bs =  recursive_bijectors_list(ps, bs)
-        
+            bs = recursive_bijectors_list(ps, bs)
+
         else:
             for key, value in ps.items():
                 if type(value) is dict:
@@ -79,10 +77,12 @@ def build_bijectors(params) -> tp.Dict:
                         bijector = transform_set[transform_type]
                     else:
                         bijector = Identity
-                        warnings.warn(f"Parameter {key} has no transform. Defaulting to" " identity transfom.")
+                        warnings.warn(
+                            f"Parameter {key} has no transform. Defaulting to identity transfom."
+                        )
                     bs[key] = bijector
         return bs
-    
+
     return recursive_bijectors(params, bijectors)
 
 
@@ -93,15 +93,15 @@ def build_transforms(params) -> tp.Tuple[tp.Dict, tp.Dict]:
 
     def inverse(bijector):
         return bijector.inverse
-    
+
     bijectors = build_bijectors(params)
-    
+
     constrainers = jax.tree_map(lambda _: forward, deepcopy(params))
     unconstrainers = jax.tree_map(lambda _: inverse, deepcopy(params))
-    
+
     constrainers = jax.tree_map(lambda f, b: f(b), constrainers, bijectors)
     unconstrainers = jax.tree_map(lambda f, b: f(b), unconstrainers, bijectors)
-    
+
     return constrainers, unconstrainers
 
 
@@ -112,7 +112,7 @@ def transform(params: dict, transform_map: dict) -> dict:
 ################################
 # Priors
 ################################
-def log_density(param: jnp.DeviceArray, density: distrax.Distribution) -> Array:
+def log_density(param: jnp.DeviceArray, density: dx.Distribution) -> Array:
     if type(density) == type(None):
         log_prob = jnp.array(0.0)
     else:
@@ -166,7 +166,7 @@ def evaluate_priors(params: dict, priors: dict) -> dict:
 def prior_checks(priors: dict) -> dict:
     if "latent" in priors.keys():
         latent_prior = priors["latent"]
-        if isinstance(latent_prior, distrax.Distribution) and latent_prior.name != "Normal":
+        if isinstance(latent_prior, dx.Distribution) and latent_prior.name != "Normal":
             warnings.warn(
                 f"A {latent_prior.name} distribution prior has been placed on"
                 " the latent function. It is strongly advised that a"
@@ -174,12 +174,11 @@ def prior_checks(priors: dict) -> dict:
             )
         else:
             if not latent_prior:
-                priors["latent"] = distrax.Normal(loc=0.0, scale=1.0)
+                priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
     else:
-        priors["latent"] = distrax.Normal(loc=0.0, scale=1.0)
+        priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
 
     return priors
-
 
 
 # Trainable parameter handlers:
@@ -190,9 +189,11 @@ def build_trainables(params: dict) -> dict:
     prior_container = jax.tree_map(lambda _: True, prior_container)
     return prior_container
 
+
 # Stop gradient of a single parameter in a pytree:
 def stop_grad(param, trainable):
     return jax.lax.cond(trainable, lambda x: x, jax.lax.stop_gradient, param)
+
 
 # Stop gradients of parameters whoose training is set to False.
 def stop_grads(params, trainables):

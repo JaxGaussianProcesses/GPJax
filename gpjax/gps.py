@@ -1,11 +1,12 @@
 import typing as tp
 from abc import abstractmethod, abstractproperty
 
+import distrax as dx
 import jax.numpy as jnp
 from chex import dataclass
 from jax.scipy.linalg import cho_factor, cho_solve, solve_triangular
-import distrax
 
+from .config import get_defaults
 from .kernels import Kernel, cross_covariance, gram
 from .likelihoods import (
     Gaussian,
@@ -18,44 +19,7 @@ from .parameters import copy_dict_structure, evaluate_priors, transform
 from .types import Array, Dataset
 from .utils import I, concat_dictionaries
 
-from .config import get_defaults
-
 DEFAULT_JITTER = get_defaults()["jitter"]
-
-########################################################
-### Gaussian process (GP) notation used in the code: ###
-########################################################
-
-#   - x     for the train inputs
-#   - y     for train labels
-#   - t     for test inputs
-
-#   - F     for the latent function modelled as a GP
-#   - Fx    for the latent function, F, at train inputs, x
-#   - Fmu   for the predictive mean of the latent function, F
-#   - Fcov  for the predictive covariance of the latent function, F
-#   - Fvar  for the predictive (diagonal) variance of the latent function, F
-
-#   - nx    for the number of train inputs, x
-#   - Kxx   for the kernel gram matrix at train inputs, x
-#   - Lx    for lower cholesky decomposition at train inputs, x
-#   - mx    for prior mean at train inputs, x
-
-#   - nt    for number of test inputs, t
-#   - Ktt   for gram matrix at train inputs, t
-#   - Lt    for lower cholesky decomposition at test inputs, t
-#   - mt    for prior mean at test inputs, t
-
-#   - Ktx   for cross covariance between test inputs, t, and train inputs, x
-
-# For sparse GPs:
-
-#   - u for the inducing outputs
-#   - z for inducing inputs
-#   - nz for number of inducing inputs, z
-#   - Kzz for gram matrix at inducing inputs, z
-#   - Lz for lower cholesky decomposition at inducing inputs, z
-#   - Kzx   for cross covariance between test inputs, z, and train inputs, x
 
 
 @dataclass
@@ -141,13 +105,13 @@ class Prior(GP):
             "mean_function": self.mean_function.params,
         }
 
-    def random_variable(self, test_inputs: Array, params: dict) -> distrax.Distribution:
+    def random_variable(self, test_inputs: Array, params: dict) -> dx.Distribution:
         """Using the GP's mean and covariance functions, we can also construct the multivariate normal random variable.
         Args:
             test_points (Array): The points at which we'd like to evaluate our mean and covariance function.
             params (dict): The parameterisation of the GP prior for which the random variable should be computed for.
         Returns:
-            distrax.Distribution: A Distrax Multivariate Normal distribution.
+            dx.Distribution: A Distrax Multivariate Normal distribution.
         """
         t = test_inputs
         nt = t.shape[0]
@@ -156,7 +120,7 @@ class Prior(GP):
         Ktt += I(nt) * self.jitter
         Lt = jnp.linalg.cholesky(Ktt)
 
-        return distrax.MultivariateNormalTri(mt.squeeze(), Lt)
+        return dx.MultivariateNormalTri(mt.squeeze(), Lt)
 
 
 #######################
@@ -192,14 +156,14 @@ class ConjugatePosterior(Posterior):
     jitter: tp.Optional[float] = DEFAULT_JITTER
 
     def mean(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], Array]:
-        x, y, nx = train_data.X, train_data.y, train_data.n
+        x, y, n_data = train_data.X, train_data.y, train_data.n
         obs_noise = params["likelihood"]["obs_noise"]
         mx = self.prior.mean_function(x, params["mean_function"])
 
         # Precompute covariance matrices
         Kxx = gram(self.prior.kernel, x, params["kernel"])
-        Kxx += I(nx) * self.jitter
-        Lx = cho_factor(Kxx + I(nx) * obs_noise, lower=True)
+        Kxx += I(n_data) * self.jitter
+        Lx = cho_factor(Kxx + I(n_data) * obs_noise, lower=True)
 
         weights = cho_solve(Lx, y - mx)
 
@@ -212,11 +176,11 @@ class ConjugatePosterior(Posterior):
         return mean_fn
 
     def variance(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], Array]:
-        x, nx = train_data.X, train_data.n
+        x, n_data = train_data.X, train_data.n
         obs_noise = params["likelihood"]["obs_noise"]
         Kxx = gram(self.prior.kernel, x, params["kernel"])
-        Kxx += I(nx) * self.jitter
-        Lx = cho_factor(Kxx + I(nx) * obs_noise, lower=True)
+        Kxx += I(n_data) * self.jitter
+        Lx = cho_factor(Kxx + I(n_data) * obs_noise, lower=True)
 
         def variance_fn(test_inputs: Array) -> Array:
             t = test_inputs
@@ -235,7 +199,7 @@ class ConjugatePosterior(Posterior):
         static_params: dict = None,
         negative: bool = False,
     ) -> tp.Callable[[Dataset], Array]:
-        x, y, nx = train_data.X, train_data.y, train_data.n
+        x, y, n_data = train_data.X, train_data.y, train_data.n
 
         def mll(
             params: dict,
@@ -248,10 +212,10 @@ class ConjugatePosterior(Posterior):
             obs_noise = params["likelihood"]["obs_noise"]
             mu = self.prior.mean_function(x, params)
             Kxx = gram(self.prior.kernel, x, params["kernel"])
-            Kxx += I(nx) * self.jitter
-            Lx = jnp.linalg.cholesky(Kxx + I(nx) * obs_noise)
+            Kxx += I(n_data) * self.jitter
+            Lx = jnp.linalg.cholesky(Kxx + I(n_data) * obs_noise)
 
-            random_variable = distrax.MultivariateNormalTri(mu.squeeze(), Lx)
+            random_variable = dx.MultivariateNormalTri(mu.squeeze(), Lx)
 
             log_prior_density = evaluate_priors(params, priors)
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
@@ -285,9 +249,9 @@ class NonConjugatePosterior(Posterior):
         return hyperparameters
 
     def mean(self, train_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
-        x, nx = train_data.X, train_data.n
+        x, n_data = train_data.X, train_data.n
         Kxx = gram(self.prior.kernel, x, params["kernel"])
-        Kxx += I(nx) * self.jitter
+        Kxx += I(n_data) * self.jitter
         Lx = jnp.linalg.cholesky(Kxx)
 
         def mean_fn(test_inputs: Array) -> Array:
@@ -307,9 +271,9 @@ class NonConjugatePosterior(Posterior):
         return mean_fn
 
     def variance(self, train_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
-        x, nx = train_data.X, train_data.n
+        x, n_data = train_data.X, train_data.n
         Kxx = gram(self.prior.kernel, x, params["kernel"])
-        Lx = jnp.linalg.cholesky(Kxx + I(nx) * self.jitter)
+        Lx = jnp.linalg.cholesky(Kxx + I(n_data) * self.jitter)
 
         def variance_fn(test_inputs: Array) -> Array:
             t = test_inputs
@@ -335,11 +299,11 @@ class NonConjugatePosterior(Posterior):
         static_params: dict = None,
         negative: bool = False,
     ) -> tp.Callable[[Dataset], Array]:
-        x, y, nx = train_data.X, train_data.y, train_data.n
+        x, y, n_data = train_data.X, train_data.y, train_data.n
 
         if not priors:
             priors = copy_dict_structure(self.params)
-            priors["latent"] = distrax.Normal(loc=0.0, scale=1.0)
+            priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
 
         def mll(params: dict):
             params = transform(params=params, transform_map=transformations)
@@ -347,7 +311,7 @@ class NonConjugatePosterior(Posterior):
                 # params = concat_dictionaries(params, transform(static_params))
                 raise NotImplementedError
             Kxx = gram(self.prior.kernel, x, params["kernel"])
-            Kxx += I(nx) * self.jitter
+            Kxx += I(n_data) * self.jitter
             Lx = jnp.linalg.cholesky(Kxx)
             Fx = jnp.matmul(Lx, params["latent"])
             rv = self.likelihood.link_function(Fx)
