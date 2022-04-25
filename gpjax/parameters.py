@@ -3,6 +3,7 @@ import warnings
 from copy import deepcopy
 
 import distrax as dx
+from tensorflow_probability.substrates.jax import distributions as tfd
 import jax
 import jax.numpy as jnp
 
@@ -171,6 +172,12 @@ def prior_checks(priors: dict) -> dict:
                 f"A {latent_prior.name} distribution prior has been placed on"
                 " the latent function. It is strongly advised that a"
                 " unit-Gaussian prior is used."
+            )
+        elif isinstance(latent_prior, tfd.Distribution) and latent_prior.name != "Normal":
+            warnings.warn(
+                f"A {latent_prior.name} distribution from Tensorflow Probability has been"
+                "placed on the latent function. We advise using a unit-Gaussian prior from"
+                " Distrax."
             )
         else:
             if not latent_prior:

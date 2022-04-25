@@ -4,6 +4,7 @@ from chex import assert_equal
 import jax.numpy as jnp
 import jax.random as jr
 from numpy import isin, sort
+import numpy as np
 import pytest
 import networkx as nx
 from gpjax import kernels
@@ -32,7 +33,7 @@ def test_gram(kern, dim):
     x = jnp.linspace(-1.0, 1.0, num=10).reshape(-1, 1)
     if dim > 1:
         x = jnp.hstack([x] * dim)
-    params, _, _ = initialise(kern)
+    params, _, _, _ = initialise(kern)
     gram_matrix = gram(kern, x, params)
     assert gram_matrix.shape[0] == x.shape[0]
     assert gram_matrix.shape[0] == gram_matrix.shape[1]
@@ -44,14 +45,14 @@ def test_gram(kern, dim):
 def test_cross_covariance(kern, n1, n2):
     x1 = jnp.linspace(-1.0, 1.0, num=n1).reshape(-1, 1)
     x2 = jnp.linspace(-1.0, 1.0, num=n2).reshape(-1, 1)
-    params, _, _ = initialise(kern)
-    kernel_matrix = cross_covariance(kern, x2, x1, params)
+    params, _, _, _ = initialise(kern)
+    kernel_matrix = cross_covariance(kern, x1, x2, params)
     assert kernel_matrix.shape == (n1, n2)
 
 
 @pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
 def test_call(kernel):
-    params, _, _ = initialise(kernel)
+    params, _, _, _ = initialise(kernel)
     x, y = jnp.array([[1.0]]), jnp.array([[0.5]])
     point_corr = kernel(x, y, params)
     assert isinstance(point_corr, jnp.DeviceArray)
@@ -79,7 +80,7 @@ def test_pos_def(kern, dim, ell, sigma):
 @pytest.mark.parametrize("dim", [1, 2, 5, 10])
 def test_initialisation(kernel, dim):
     kern = kernel(active_dims=[i for i in range(dim)])
-    params, _, _ = initialise(kern)
+    params, _, _, _ = initialise(kern)
     assert list(params.keys()) == ["lengthscale", "variance"]
     assert all(params["lengthscale"] == jnp.array([1.0] * dim))
     assert params["variance"] == jnp.array([1.0])
@@ -91,7 +92,7 @@ def test_initialisation(kernel, dim):
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
 def test_dtype(kernel):
-    params, _, _ = initialise(kernel())
+    params, _, _, _ = initialise(kernel())
     for k, v in params.items():
         assert v.dtype == jnp.float64
 
@@ -120,11 +121,11 @@ def test_polynomial(degree, dim, variance, shift):
 
 
 def test_euclidean_distance():
-    x1 = jnp.array(1.0)
-    x2 = jnp.array(-4.0)
+    x1 = jnp.array((1.0))
+    x2 = jnp.array((-4.0))
     x1vec = jnp.array((1, 2, 3))
     x2vec = jnp.array((1, 1, 1))
-    assert euclidean_distance(x1vec, x2vec) == 3.0
+    assert np.round(euclidean_distance(x1vec, x2vec), 3) == 2.236
     assert euclidean_distance(x1, x2) == 5.0
 
 

@@ -6,7 +6,7 @@ import jax.numpy as jnp
 import pytest
 from numpy.testing import assert_array_equal
 from tensorflow_probability.substrates.jax import distributions as tfd
-
+import distrax as dx
 from gpjax.config import get_defaults
 from gpjax.gps import Prior
 from gpjax.kernels import RBF
@@ -31,7 +31,7 @@ from gpjax.parameters import (  # build_all_transforms,
 @pytest.mark.parametrize("lik", [Gaussian])
 def test_initialise(lik):
     posterior = Prior(kernel=RBF()) * lik(num_datapoints=10)
-    params, _, _ = initialise(posterior)
+    params, _, _, _ = initialise(posterior)
     assert list(sorted(params.keys())) == [
         "kernel",
         "likelihood",
@@ -41,7 +41,7 @@ def test_initialise(lik):
 
 def test_non_conjugate_initialise():
     posterior = Prior(kernel=RBF()) * Bernoulli(num_datapoints=10)
-    params, _, _ = initialise(posterior)
+    params, _, _, _ = initialise(posterior)
     assert list(sorted(params.keys())) == [
         "kernel",
         "latent",
@@ -65,7 +65,7 @@ def test_lpd(x):
 @pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
 def test_prior_template(lik):
     posterior = Prior(kernel=RBF()) * lik(num_datapoints=10)
-    params, _, _ = initialise(posterior)
+    params, _, _, _ = initialise(posterior)
     prior_container = copy_dict_structure(params)
     for (
         k,
@@ -78,7 +78,7 @@ def test_prior_template(lik):
 @pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
 def test_recursive_complete(lik):
     posterior = Prior(kernel=RBF()) * lik(num_datapoints=10)
-    params, _, _ = initialise(posterior)
+    params, _, _, _ = initialise(posterior)
     priors = {"kernel": {}}
     priors["kernel"]["lengthscale"] = tfd.HalfNormal(scale=2.0)
     container = copy_dict_structure(params)
@@ -163,12 +163,12 @@ def test_checks(num_datapoints):
     priors = prior_checks(incomplete_priors)
     assert "latent" in priors.keys()
     assert "variance" not in priors.keys()
-    assert isinstance(priors["latent"], tfd.Normal)
+    assert isinstance(priors["latent"], dx.Normal)
 
 
 def test_structure_priors():
     posterior = Prior(kernel=RBF()) * Gaussian(num_datapoints=10)
-    params, _, _ = initialise(posterior)
+    params, _, _, _ = initialise(posterior)
     priors = {
         "kernel": {
             "lengthscale": tfd.Gamma(1.0, 1.0),
@@ -188,7 +188,8 @@ def test_structure_priors():
         assert v
 
 
-def test_prior_checks():
+@pytest.mark.parametrize("latent_prior", [dx.Laplace(0.0, 1.0), tfd.Laplace(0.0, 1.0)])
+def test_prior_checks(latent_prior):
     priors = {
         "kernel": {"lengthscale": None, "variance": None},
         "mean_function": {},
@@ -212,12 +213,12 @@ def test_prior_checks():
         "kernel": {"lengthscale": None, "variance": None},
         "mean_function": {},
         "liklelihood": {"variance": None},
-        "latent": tfd.StudentT(df=5, loc=0.0, scale=1.0),
+        "latent": latent_prior,
     }
     with pytest.warns(UserWarning):
         new_priors = prior_checks(priors)
     assert "latent" in new_priors.keys()
-    assert new_priors["latent"].name == "StudentT"
+    assert new_priors["latent"].name == "Laplace"
 
 
 #########################
@@ -227,7 +228,7 @@ def test_prior_checks():
 @pytest.mark.parametrize("likelihood", [Gaussian, Bernoulli])
 def test_output(num_datapoints, likelihood):
     posterior = Prior(kernel=RBF()) * likelihood(num_datapoints=num_datapoints)
-    params, constrainer, unconstrainer = initialise(posterior)
+    params, _, constrainer, unconstrainer = initialise(posterior)
 
     assert isinstance(constrainer, dict)
     assert isinstance(unconstrainer, dict)

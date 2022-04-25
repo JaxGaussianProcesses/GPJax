@@ -119,8 +119,7 @@ class Prior(GP):
         Ktt = self.variance(params)(t)
         Ktt += I(nt) * self.jitter
         Lt = jnp.linalg.cholesky(Ktt)
-
-        return dx.MultivariateNormalTri(mt.squeeze(), Lt)
+        return dx.MultivariateNormalTri(jnp.atleast_1d(mt.squeeze()), Lt)
 
 
 #######################
@@ -314,7 +313,7 @@ class NonConjugatePosterior(Posterior):
             Kxx += I(n_data) * self.jitter
             Lx = jnp.linalg.cholesky(Kxx)
             Fx = jnp.matmul(Lx, params["latent"])
-            rv = self.likelihood.link_function(Fx)
+            rv = self.likelihood.link_function(Fx, params)
             ll = jnp.sum(rv.log_prob(y))
 
             log_prior_density = evaluate_priors(params, priors)

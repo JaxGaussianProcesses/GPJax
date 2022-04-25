@@ -34,9 +34,9 @@ def fit(
     """
     opt_state = opt_init(params)
 
-    def loss(params, batch):
+    def loss(params):
         params = stop_grads(params, trainables)
-        return objective(params, batch)
+        return objective(params)
 
     def step(i, opt_state):
         params = get_params(opt_state)
@@ -72,9 +72,9 @@ def optax_fit(
     """
     opt_state = optax_optim.init(params)
 
-    def loss(params, batch):
+    def loss(params):
         params = stop_grads(params, trainables)
-        return objective(params, batch)
+        return objective(params)
 
     def step(params, opt_state):
         loss_val, loss_gradient = jax.value_and_grad(loss)(params)
