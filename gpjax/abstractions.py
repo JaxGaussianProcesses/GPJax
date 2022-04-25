@@ -9,6 +9,7 @@ import tensorflow.data as tfd
 
 from .types import Dataset
 
+
 def fit(
     objective,
     params: dict,
@@ -19,6 +20,19 @@ def fit(
     n_iters: int = 100,
     log_rate: int = 10,
 ) -> tp.Dict:
+    """Abstracted method for fitting a GP model with respect to a supplied objective function.
+    Optimisers used here should originate from Jax's experimental module.
+    Args:
+        objective (tp.Callable): The objective function that we are optimising with respect to.
+        params (dict): The parameters for which we would like to minimise our objective function wtih.
+        opt_init (tp.Callable): The supplied optimiser's initialisation function.
+        opt_update (tp.Callable): Optimiser's update method.
+        get_params (tp.Callable): Return the current parameter state set from the optimiser.
+        n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
+        log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
+    Returns:
+        tp.Dict: An optimised set of parameters.
+    """
     opt_state = opt_init(params)
 
     @jax.jit
@@ -48,6 +62,17 @@ def optax_fit(
     n_iters: int = 100,
     log_rate: int = 10,
 ) -> tp.Dict:
+    """Abstracted method for fitting a GP model with respect to a supplied objective function.
+    Optimisers used here should originate from Optax.
+    Args:
+        objective (tp.Callable): The objective function that we are optimising with respect to.
+        params (dict): The parameters for which we would like to minimise our objective function wtih.
+        optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
+        n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
+        log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
+    Returns:
+        tp.Dict: An optimised set of parameters.
+    """
     opt_state = optax_optim.init(params)
 
     @jax.jit
@@ -69,69 +94,72 @@ def optax_fit(
             tr.set_postfix({"Objective": jnp.round(val, 2)})
     return params
 
+
 # Mini-batcher:
-def mini_batcher(training: Dataset, 
-                       batch_size: tp.Optional[int] = 32,
-                       prefetch_buffer: tp.Optional[int] = 1,
-                      ) -> tp.Iterator:
+def mini_batcher(
+    training: Dataset,
+    batch_size: tp.Optional[int] = 32,
+    prefetch_buffer: tp.Optional[int] = 1,
+) -> tp.Iterator:
 
     X, y, n = training.X, training.y, training.n
-    
+
     # Make dataloader, set batch size and prefetch buffer:
-    ds = tfd.Dataset.from_tensor_slices((X,y))
+    ds = tfd.Dataset.from_tensor_slices((X, y))
     ds = ds.cache()
     ds = ds.repeat()
     ds = ds.shuffle(n)
     ds = ds.batch(batch_size)
     ds = ds.prefetch(prefetch_buffer)
-    
+
     # Make iterator:
     train_iter = iter(ds)
-    
+
     # Batch loader:
     def next_batch() -> Dataset:
         x_batch, y_batch = train_iter.next()
         return Dataset(X=x_batch.numpy(), y=y_batch.numpy())
-    
+
     return next_batch
 
 
-from gpjax.parameters import  stop_grads
+from gpjax.parameters import stop_grads
 
 # Mini-batch gradient descent:
-def fit_batches(objective, 
-          params: dict,
-          trainables: dict,
-          opt_init,
-          opt_update,
-          get_params,
-          get_batch,
-          n_iters: tp.Optional[int] = 100,
-          log_rate: tp.Optional[int] = 10,
-          history: tp.Optional[bool] = False
-        )-> tp.Dict:
+def fit_batches(
+    objective,
+    params: dict,
+    trainables: dict,
+    opt_init,
+    opt_update,
+    get_params,
+    get_batch,
+    n_iters: tp.Optional[int] = 100,
+    log_rate: tp.Optional[int] = 10,
+    history: tp.Optional[bool] = False,
+) -> tp.Dict:
     opt_state = opt_init(params)
-    
+
     @jax.jit
     def loss(params, batch):
         params = stop_grads(params, trainables)
         return objective(params, batch)
-    
+
     @jax.jit
     def train_step(i, opt_state, batch):
         params = get_params(opt_state)
         v, g = jax.value_and_grad(loss)(params, batch)
         return opt_update(i, g, opt_state), v
-    
+
     hist = []
-    tr = trange(n_iters) 
+    tr = trange(n_iters)
     for i in tr:
         batch = get_batch()
         opt_state, v = train_step(i, opt_state, batch)
         hist.append(v)
         if i % log_rate == 0 or i == n_iters:
             tr.set_postfix({"Objective": jnp.round(v, 2)})
-    
+
     if history is True:
         return get_params(opt_state), hist
     else:
