@@ -1,7 +1,6 @@
 import typing as tp
 
 import jax
-import jax.numpy as jnp
 import optax
 import tensorflow.data as tfd
 from tqdm import trange

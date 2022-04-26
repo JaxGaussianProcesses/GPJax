@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Optional
+from typing import Callable, Dict
 
 import distrax as dx
 import jax.numpy as jnp
@@ -7,37 +7,22 @@ from jax import vmap
 from jax.numpy.linalg import cholesky
 from jax.scipy.linalg import solve_triangular
 
-from gpjax.config import get_defaults
-from gpjax.gps import Posterior
+
 from gpjax.kernels import cross_covariance, gram
 from gpjax.parameters import transform
 from gpjax.types import Array, Dataset
-from gpjax.utils import I, concat_dictionaries
+from gpjax.utils import I
 
 from .quadrature import gauss_hermite_quadrature
-from .variational import VariationalFamily, VariationalGaussian, VariationalPosterior
-
-DEFAULT_JITTER = get_defaults()["jitter"]
-
-
-def SVGP(posterior: Posterior, variational_family: VariationalFamily) -> VariationalPosterior:
-    return _SVGP(likelihood=posterior.likelihood, prior=posterior.prior, q=variational_family)
-
+from .variational import VariationalPosterior
 
 @dataclass
-class _SVGP(VariationalPosterior):
-    q: VariationalFamily = VariationalGaussian
-    jitter: Optional[float] = DEFAULT_JITTER
+class SVGP(VariationalPosterior):
 
     def __post_init__(self):
-        self.num_inducing = self.q.num_inducing
-
-    @property
-    def params(self) -> Dict:
-        hyperparams = concat_dictionaries(
-            self.prior.params, {"likelihood": self.likelihood.params, "q": self.q.params}
-        )
-        return hyperparams
+        self.prior = self.posterior.prior
+        self.likelihood = self.posterior.likelihood
+        self.num_inducing = self.variational_family.num_inducing
 
     def elbo(self, train_data: Dataset, transformations: Dict) -> Callable[[Array], Array]:
         def elbo_fn(params: Dict, batch: Dataset) -> Array:
@@ -51,14 +36,14 @@ class _SVGP(VariationalPosterior):
 
     # Compute KL divergence at inducing points, KL[q(u)||p(u)]:
     def prior_kl(self, params: Dict) -> Array:
-        mu = params["q"]["mu"]
-        sqrt = params["q"]["sqrt"]
+        mu = params["variational_family"]["variational_mean"]
+        sqrt = params["variational_family"]["variational_root_covariance"]
         nz = self.num_inducing
 
         qu = dx.MultivariateNormalTri(mu.squeeze(), sqrt)
 
-        if not self.q.whiten:
-            z = params["q"]["inducing_inputs"]
+        if not self.variational_family.whiten:
+            z = params["variational_family"]["inducing_inputs"]
             mz = self.prior.mean_function(z, params["mean_function"])
             Kzz = gram(self.prior.kernel, z, params["kernel"])
             Kzz += I(nz) * self.jitter
@@ -84,11 +69,11 @@ class _SVGP(VariationalPosterior):
 
     # Computes predictive moments for Gauss-Hermite quadrature:
     def pred_moments(self, params: Dict, test_inputs: Array) -> Array:
-        mu = params["q"]["mu"]
-        sqrt = params["q"]["sqrt"]
+        mu = params["variational_family"]["variational_mean"]
+        sqrt = params["variational_family"]["variational_root_covariance"]
 
         # Cholesky decomposition at inducing inputs:
-        z = params["q"]["inducing_inputs"]
+        z = params["variational_family"]["inducing_inputs"]
         nz = self.num_inducing
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(nz) * self.jitter
@@ -101,7 +86,7 @@ class _SVGP(VariationalPosterior):
         M = solve_triangular(Lz, Kzt, lower=True)
         Fcov = Ktt - jnp.matmul(M.T, M)
 
-        if not self.q.whiten:
+        if not self.variational_family.whiten:
             M = solve_triangular(Lz.T, M, lower=False)
             mz = self.prior.mean(params)(z)
             mu -= mz
@@ -114,15 +99,15 @@ class _SVGP(VariationalPosterior):
 
     def mean(self, params: Dict) -> Callable[[Array], Array]:
         # Cholesky decomposition at inducing inputs:
-        z = params["q"]["inducing_inputs"]
+        z = params["variational_family"]["inducing_inputs"]
         nz = self.num_inducing
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(nz) * self.jitter
         Lz = cholesky(Kzz)
 
         # Variational mean:
-        mu = params["q"]["mu"]
-        if not self.q.whiten:
+        mu = params["variational_family"]["variational_mean"]
+        if not self.variational_family.whiten:
             mz = self.prior.mean(params)(z)
             mu -= mz
 
@@ -131,7 +116,7 @@ class _SVGP(VariationalPosterior):
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
             M = solve_triangular(Lz, Kzt, lower=True)
 
-            if not self.q.whiten:
+            if not self.variational_family.whiten:
                 M = solve_triangular(Lz.T, M, lower=False)
 
             mt = self.prior.mean(params)(t)
@@ -142,14 +127,14 @@ class _SVGP(VariationalPosterior):
 
     def variance(self, params: Dict) -> Callable[[Array], Array]:
         # Cholesky decomposition at inducing inputs:
-        z = params["q"]["inducing_inputs"]
+        z = params["variational_family"]["inducing_inputs"]
         nz = self.num_inducing
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(nz) * self.jitter
         Lz = cholesky(Kzz)
 
         # Variational sqrt cov:
-        sqrt = params["q"]["sqrt"]
+        sqrt = params["variational_family"]["variational_root_covariance"]
 
         def variance_fn(test_inputs: Array):
             t = test_inputs
@@ -158,7 +143,7 @@ class _SVGP(VariationalPosterior):
             M = solve_triangular(Lz, Kzt, lower=True)
             Fcov = Ktt - jnp.matmul(M.T, M)
 
-            if not self.q.whiten:
+            if not self.variational_family.whiten:
                 M = solve_triangular(Lz.T, M, lower=False)
             print(M.T.shape)
             print(sqrt.shape)

@@ -11,6 +11,9 @@ from .gps import Posterior
 from .types import Array, Dataset
 from .utils import I, concat_dictionaries
 
+from gpjax.config import get_defaults
+DEFAULT_JITTER = get_defaults()["jitter"]
+
 Diagonal = dx.Lambda(forward=lambda x: jnp.diagflat(x), inverse=lambda x: jnp.diagonal(x))
 
 FillDiagonal = dx.Chain([Diagonal, Softplus])
@@ -29,8 +32,8 @@ class VariationalFamily:
 class VariationalGaussian(VariationalFamily):
     inducing_inputs: Array
     name: str = "Gaussian"
-    mu: Optional[Array] = None
-    sqrt: Optional[Array] = None
+    variational_mean: Optional[Array] = None
+    variational_root_covariance: Optional[Array] = None
     diag: Optional[bool] = False
     whiten: Optional[bool] = True
 
@@ -41,25 +44,43 @@ class VariationalGaussian(VariationalFamily):
 
         nz = self.num_inducing
 
-        if self.mu is None:
-            self.mu = jnp.zeros((nz, 1))
-            add_parameter("mu", Identity)
+        if self.variational_mean is None:
+            self.variational_mean = jnp.zeros((nz, 1))
+            add_parameter("variational_mean", Identity)
 
-        if self.sqrt is None:
-            self.sqrt = I(nz)
+        if self.variational_root_covariance is None:
+            self.variational_root_covariance = I(nz)
             if self.diag:
-                add_parameter("sqrt", FillDiagonal)
+                add_parameter("variational_root_covariance", FillDiagonal)
             else:
-                add_parameter("sqrt", FillTriangular)
+                add_parameter("variational_root_covariance", FillTriangular)
 
     @property
     def params(self) -> Dict:
-        hyperparams = {"inducing_inputs": self.inducing_inputs, "mu": self.mu, "sqrt": self.sqrt}
+        hyperparams = {"inducing_inputs": self.inducing_inputs, 
+        "variational_mean": self.variational_mean, 
+        "variational_root_covariance": self.variational_root_covariance}
         return hyperparams
 
 
 @dataclass
-class VariationalPosterior(Posterior):
+class VariationalPosterior:
+    posterior: Posterior
+    variational_family: VariationalFamily
+    jitter: Optional[float] = DEFAULT_JITTER
+
+    def __post_init__(self):
+        self.prior = self.posterior.prior
+        self.likelihood = self.posterior.likelihood
+
+    @property
+    def params(self) -> Dict:
+        hyperparams = concat_dictionaries(
+            self.posterior.params, 
+            {"variational_family": self.variational_family.params}
+        )
+        return hyperparams
+
     @abc.abstractmethod
     def mean(self, train_data: Dataset, params: dict) -> Callable[[Dataset], Array]:
         raise NotImplementedError
@@ -67,10 +88,6 @@ class VariationalPosterior(Posterior):
     @abc.abstractmethod
     def variance(self, train_data: Dataset, params: dict) -> Callable[[Dataset], Array]:
         raise NotImplementedError
-
-    @property
-    def params(self) -> dict:
-        return concat_dictionaries(self.prior.params, {"likelihood": self.likelihood.params})
 
     @abc.abstractmethod
     def elbo(self, train_data: Dataset, transformations: Dict) -> Callable[[Array], Array]:
