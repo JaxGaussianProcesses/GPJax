@@ -10,6 +10,7 @@ import networkx as nx
 from gpjax import kernels
 from gpjax.kernels import (
     RBF,
+    CombinationKernel,
     Kernel,
     Matern12,
     Matern32,
@@ -219,3 +220,14 @@ def test_graph_kernel():
     assert kern.num_vertex == n_verticies
     assert kern.evals.shape == (n_verticies, 1)
     assert kern.evecs.shape == (n_verticies, n_verticies)
+
+
+@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52, Polynomial])
+def test_combination_kernel_type(kernel):
+    prod_kern = kernel() * kernel()
+    assert isinstance(prod_kern, ProductKernel)
+    assert isinstance(prod_kern, CombinationKernel)
+
+    add_kern = kernel() + kernel()
+    assert isinstance(add_kern, SumKernel)
+    assert isinstance(add_kern, CombinationKernel)

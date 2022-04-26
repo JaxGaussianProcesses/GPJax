@@ -160,7 +160,8 @@ class _SVGP(VariationalPosterior):
 
             if not self.q.whiten:
                 M = solve_triangular(Lz.T, M, lower=False)
-
+            print(M.T.shape)
+            print(sqrt.shape)
             V = jnp.matmul(M.T, sqrt)
             Fcov += jnp.matmul(V, V.T)
 

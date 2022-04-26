@@ -146,3 +146,4 @@ examples/testing/*
 examples/*.ipynb
 _debug/
 workspace.code-workspace
+*.ipynb

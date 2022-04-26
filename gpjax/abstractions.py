@@ -47,7 +47,7 @@ def fit(
     for i in tr:
         opt_state, val = step(i, opt_state)
         if i % log_rate == 0 or i == n_iters:
-            tr.set_postfix({"Objective": jnp.round(val, 2)})
+            tr.set_postfix({"Objective": f"{val: .2f}"})
     return get_params(opt_state)
 
 
@@ -86,7 +86,7 @@ def optax_fit(
     for i in tr:
         params, opt_state, val = step(params, opt_state)
         if i % log_rate == 0 or i == n_iters:
-            tr.set_postfix({"Objective": jnp.round(val, 2)})
+            tr.set_postfix({"Objective": f"{val: .2f}"})
     return params
 
 
@@ -98,6 +98,8 @@ def mini_batcher(
 ) -> tp.Iterator:
 
     X, y, n = training.X, training.y, training.n
+
+    batch_size = min(batch_size, n)
 
     # Make dataloader, set batch size and prefetch buffer:
     ds = tfd.Dataset.from_tensor_slices((X, y))
@@ -152,7 +154,7 @@ def fit_batches(
         opt_state, v = train_step(i, opt_state, batch)
         hist.append(v)
         if i % log_rate == 0 or i == n_iters:
-            tr.set_postfix({"Objective": jnp.round(v, 2)})
+            tr.set_postfix({"Objective": f"{v: .2f}"})
 
     if history is True:
         return get_params(opt_state), hist
