@@ -133,7 +133,6 @@ def fit_batches(
     get_batch,
     n_iters: tp.Optional[int] = 100,
     log_rate: tp.Optional[int] = 10,
-    history: tp.Optional[bool] = False,
 ) -> tp.Dict:
     opt_state = opt_init(params)
 
@@ -146,16 +145,10 @@ def fit_batches(
         loss_val, loss_gradient = jax.value_and_grad(loss)(params, batch)
         return opt_update(i, loss_gradient, opt_state), loss_val
 
-    hist = []
     tr = trange(n_iters)
     for i in tr:
         batch = get_batch()
-        opt_state, v = train_step(i, opt_state, batch)
-        hist.append(v)
+        opt_state, val = train_step(i, opt_state, batch)
         if i % log_rate == 0 or i == n_iters:
-            tr.set_postfix({"Objective": f"{v: .2f}"})
-
-    if history is True:
-        return get_params(opt_state), hist
-    else:
-        return get_params(opt_state)
+            tr.set_postfix({"Objective": f"{val: .2f}"})
+    return params

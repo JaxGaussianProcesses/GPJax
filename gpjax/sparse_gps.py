@@ -47,7 +47,7 @@ class SVGP(VariationalPosterior):
             mz = self.prior.mean_function(z, params["mean_function"])
             Kzz = gram(self.prior.kernel, z, params["kernel"])
             Kzz += I(nz) * self.jitter
-            Lz = cholesky(Kzz, lower=True)
+            Lz = cholesky(Kzz)
             pu = dx.MultivariateNormalTri(mz.squeeze(), Lz)
 
         else:
@@ -145,8 +145,7 @@ class SVGP(VariationalPosterior):
 
             if not self.variational_family.whiten:
                 M = solve_triangular(Lz.T, M, lower=False)
-            print(M.T.shape)
-            print(sqrt.shape)
+
             V = jnp.matmul(M.T, sqrt)
             Fcov += jnp.matmul(V, V.T)
 
