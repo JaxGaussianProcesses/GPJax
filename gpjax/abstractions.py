@@ -34,7 +34,7 @@ def fit(
     opt_state = opt_init(params)
 
     def loss(params):
-        params = stop_grads(params, trainables)
+        params = trainable_params(params, trainables)
         return objective(params)
 
     def step(i, opt_state):
@@ -72,7 +72,7 @@ def optax_fit(
     opt_state = optax_optim.init(params)
 
     def loss(params):
-        params = stop_grads(params, trainables)
+        params = trainable_params(params, trainables)
         return objective(params)
 
     def step(params, opt_state):
@@ -119,7 +119,7 @@ def mini_batcher(
     return next_batch
 
 
-from gpjax.parameters import stop_grads
+from gpjax.parameters import trainable_params
 
 
 # Mini-batch gradient descent:
@@ -137,7 +137,7 @@ def fit_batches(
     opt_state = opt_init(params)
 
     def loss(params, batch):
-        params = stop_grads(params, trainables)
+        params = trainable_params(params, trainables)
         return objective(params, batch)
 
     def train_step(i, opt_state, batch):

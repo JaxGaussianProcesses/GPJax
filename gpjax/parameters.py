@@ -203,5 +203,5 @@ def stop_grad(param, trainable):
 
 
 # Stop gradients of parameters whoose training is set to False.
-def stop_grads(params, trainables):
+def trainable_params(params, trainables):
     return jax.tree_map(lambda param, trainable: stop_grad(param, trainable), params, trainables)
