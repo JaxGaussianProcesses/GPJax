@@ -16,9 +16,9 @@ from gpjax.utils import I
 from .quadrature import gauss_hermite_quadrature
 from .variational import VariationalPosterior
 
+
 @dataclass
 class SVGP(VariationalPosterior):
-
     def __post_init__(self):
         self.prior = self.posterior.prior
         self.likelihood = self.posterior.likelihood

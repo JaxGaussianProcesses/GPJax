@@ -195,7 +195,6 @@ class ConjugatePosterior(Posterior):
         train_data: Dataset,
         transformations: tp.Dict,
         priors: dict = None,
-        static_params: dict = None,
         negative: bool = False,
     ) -> tp.Callable[[Dataset], Array]:
         x, y, n_data = train_data.X, train_data.y, train_data.n
@@ -204,9 +203,6 @@ class ConjugatePosterior(Posterior):
             params: dict,
         ):
             params = transform(params=params, transform_map=transformations)
-            if static_params:
-                # params = concat_dictionaries(params, transform(static_params))
-                raise NotImplementedError
 
             obs_noise = params["likelihood"]["obs_noise"]
             mu = self.prior.mean_function(x, params)
@@ -295,7 +291,6 @@ class NonConjugatePosterior(Posterior):
         train_data: Dataset,
         transformations: tp.Dict,
         priors: dict = None,
-        static_params: dict = None,
         negative: bool = False,
     ) -> tp.Callable[[Dataset], Array]:
         x, y, n_data = train_data.X, train_data.y, train_data.n
@@ -306,9 +301,6 @@ class NonConjugatePosterior(Posterior):
 
         def mll(params: dict):
             params = transform(params=params, transform_map=transformations)
-            if static_params:
-                # params = concat_dictionaries(params, transform(static_params))
-                raise NotImplementedError
             Kxx = gram(self.prior.kernel, x, params["kernel"])
             Kxx += I(n_data) * self.jitter
             Lx = jnp.linalg.cholesky(Kxx)

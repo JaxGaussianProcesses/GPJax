@@ -12,6 +12,7 @@ from .types import Array, Dataset
 from .utils import I, concat_dictionaries
 
 from gpjax.config import get_defaults
+
 DEFAULT_JITTER = get_defaults()["jitter"]
 
 Diagonal = dx.Lambda(forward=lambda x: jnp.diagflat(x), inverse=lambda x: jnp.diagonal(x))
@@ -57,10 +58,20 @@ class VariationalGaussian(VariationalFamily):
 
     @property
     def params(self) -> Dict:
-        hyperparams = {"inducing_inputs": self.inducing_inputs, 
-        "variational_mean": self.variational_mean, 
-        "variational_root_covariance": self.variational_root_covariance}
+        hyperparams = {
+            "inducing_inputs": self.inducing_inputs,
+            "variational_mean": self.variational_mean,
+            "variational_root_covariance": self.variational_root_covariance,
+        }
         return hyperparams
+
+
+# class WhitenedVariationalGaussian(VariationalGaussian):
+#     def __init__(self) -> None:
+#         super().__init__()
+
+#     def compute_m(self):
+#         return solve_triangular(Lz.T, M, lower=False)
 
 
 @dataclass
@@ -76,8 +87,7 @@ class VariationalPosterior:
     @property
     def params(self) -> Dict:
         hyperparams = concat_dictionaries(
-            self.posterior.params, 
-            {"variational_family": self.variational_family.params}
+            self.posterior.params, {"variational_family": self.variational_family.params}
         )
         return hyperparams
 

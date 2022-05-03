@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.13.4
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -38,7 +38,7 @@ x = jr.uniform(key=key, minval=-5.0, maxval=5.0, shape=(N,)).sort().reshape(-1, 
 f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
-xtest = jnp.linspace(-5.0, 5.0, 500).reshape(-1, 1)
+xtest = jnp.linspace(-6.0, 6.0, 500).reshape(-1, 1)
 
 # %%
 Z = jnp.linspace(-5.0, 5.0, 50).reshape(-1, 1)
@@ -59,7 +59,7 @@ true_process = gpx.Prior(kernel=gpx.RBF()) * gpx.Gaussian(num_datapoints=N)
 q = gpx.VariationalGaussian(inducing_inputs=Z)
 
 # %%
-svgp = gpx.SVGP(true_process, q)
+svgp = gpx.SVGP(posterior=true_process, variational_family=q)
 
 # %%
 params, trainables, constrainers, unconstrainers = gpx.initialise(svgp)
@@ -70,7 +70,7 @@ loss_fn = jit(gpx.VFE(svgp, D, constrainers))
 # %%
 opt_init, opt_update, get_params = optimizers.adam(step_size=0.01)
 
-batched_dataset = jit(gpx.abstractions.mini_batcher(D, batch_size=64, prefetch_buffer=1))
+batched_dataset = jit(gpx.abstractions.mini_batcher(D, batch_size=256, prefetch_buffer=1))
 
 learned_params = gpx.abstractions.fit_batches(
     loss_fn,
@@ -80,17 +80,23 @@ learned_params = gpx.abstractions.fit_batches(
     opt_update,
     get_params,
     get_batch=batched_dataset,
-    n_iters=750,
+    n_iters=2500,
+    jit_compile=True,
 )
 learned_params = gpx.transform(learned_params, constrainers)
 
 # %%
 meanf = svgp.mean(learned_params)(xtest)
-# varfs = svgp.variance(learned_params)(xtest)
+varfs = jnp.diag(svgp.variance(learned_params)(xtest))
+meanf = meanf.squeeze()
+varfs = varfs.squeeze()
 
 # %%
 fig, ax = plt.subplots(figsize=(12, 5))
-ax.plot(x, y, "o", alpha=0.3, label="Training Data", color="tab:gray")
+ax.plot(x, y, "o", alpha=0.15, label="Training Data", color="tab:gray")
 ax.plot(xtest, meanf, label="Posterior mean", color="tab:blue")
+ax.fill_between(xtest.flatten(), meanf - jnp.sqrt(varfs), meanf + jnp.sqrt(varfs), alpha=0.3)
+
+# %%
 
 # %%
