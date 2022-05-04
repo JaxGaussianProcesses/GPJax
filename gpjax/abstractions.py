@@ -1,3 +1,4 @@
+from ast import Raise
 import typing as tp
 
 import jax
@@ -6,7 +7,7 @@ import tensorflow.data as tfd
 from tqdm import trange
 
 from .types import Dataset
-
+from .parameters import trainable_params
 
 def fit(
     objective: tp.Callable,
@@ -17,17 +18,20 @@ def fit(
     get_params,
     n_iters: int = 100,
     log_rate: int = 10,
+    jit_compile: bool = False,
 ) -> tp.Dict:
     """Abstracted method for fitting a GP model with respect to a supplied objective function.
     Optimisers used here should originate from Jax's experimental module.
     Args:
         objective (tp.Callable): The objective function that we are optimising with respect to.
         params (dict): The parameters for which we would like to minimise our objective function wtih.
+        trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
         opt_init (tp.Callable): The supplied optimiser's initialisation function.
         opt_update (tp.Callable): Optimiser's update method.
         get_params (tp.Callable): Return the current parameter state set from the optimiser.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
+        jit_compile (bool,  optional): Jit compiles the loss function and training step within the training loop.
     Returns:
         tp.Dict: An optimised set of parameters.
     """
@@ -41,6 +45,10 @@ def fit(
         params = get_params(opt_state)
         loss_val, loss_gradient = jax.value_and_grad(loss)(params)
         return opt_update(i, loss_gradient, opt_state), loss_val
+    
+    if jit_compile:
+        loss = jax.jit(loss)
+        train_step = jax.jit(train_step)
 
     tr = trange(n_iters)
     for i in tr:
@@ -57,15 +65,18 @@ def optax_fit(
     optax_optim,
     n_iters: int = 100,
     log_rate: int = 10,
+    jit_compile: bool = False,
 ) -> tp.Dict:
     """Abstracted method for fitting a GP model with respect to a supplied objective function.
     Optimisers used here should originate from Optax.
     Args:
         objective (tp.Callable): The objective function that we are optimising with respect to.
         params (dict): The parameters for which we would like to minimise our objective function wtih.
+        trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
         optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
+        jit_compile (bool,  optional): Jit compiles the loss function and training step within the training loop.
     Returns:
         tp.Dict: An optimised set of parameters.
     """
@@ -81,6 +92,10 @@ def optax_fit(
         params = optax.apply_updates(params, updates)
         return params, opt_state, loss_val
 
+    if jit_compile:
+        loss = jax.jit(loss)
+        train_step = jax.jit(train_step)
+
     tr = trange(n_iters)
     for i in tr:
         params, opt_state, val = step(params, opt_state)
@@ -89,37 +104,25 @@ def optax_fit(
     return params
 
 
-# Mini-batcher:
-def mini_batcher(
-    training: Dataset,
-    batch_size: tp.Optional[int] = 32,
-    prefetch_buffer: tp.Optional[int] = 1,
-) -> tp.Iterator:
+# Mini-batch loader from a TensorFlow Dataset:
+def batch_loader(data: tfd.Dataset) -> callable[[None], Dataset]:
+    """Abstracted method for loading mini-batches from a TensorFlow Dataset as a GPJax Dataset.
+    Args:
+        dataset (tfd.Dataset): Training data as a TensorFlow Dataset.
+    Returns:
+        callable[[None], Dataset]: A function that produces mini-batches as a GPJax Dataset.
+    """
 
-    X, y, n = training.X, training.y, training.n
+    if type(data) is not tfd.Dataset:
+        raise TypeError
 
-    batch_size = min(batch_size, n)
+    dataset_iter = iter(data)
 
-    # Make dataloader, set batch size and prefetch buffer:
-    ds = tfd.Dataset.from_tensor_slices((X, y))
-    ds = ds.cache()
-    ds = ds.repeat()
-    ds = ds.shuffle(n)
-    ds = ds.batch(batch_size)
-    ds = ds.prefetch(prefetch_buffer)
-
-    # Make iterator:
-    train_iter = iter(ds)
-
-    # Batch loader:
     def next_batch() -> Dataset:
-        x_batch, y_batch = train_iter.next()
+        x_batch, y_batch = dataset_iter.next()
         return Dataset(X=x_batch.numpy(), y=y_batch.numpy())
 
     return next_batch
-
-
-from gpjax.parameters import trainable_params
 
 
 # Mini-batch gradient descent:
@@ -135,6 +138,22 @@ def fit_batches(
     log_rate: tp.Optional[int] = 10,
     jit_compile: bool = False,
 ) -> tp.Dict:
+    """Abstracted method for fitting a GP model with mini-batches respect to a supplied objective function.
+    Optimisers used here should originate from Jax's experimental module.
+    Args:
+        objective (tp.Callable): The objective function that we are optimising with respect to.
+        params (dict): The parameters for which we would like to minimise our objective function wtih.
+        trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
+        opt_init (tp.Callable): The supplied optimiser's initialisation function.
+        opt_update (tp.Callable): Optimiser's update method.
+        get_params (tp.Callable): Return the current parameter state set from the optimiser.
+        n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
+        log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
+        jit_compile (bool,  optional): Jit compiles the loss function and training step within the training loop.
+    Returns:
+        tp.Dict: An optimised set of parameters.
+    """
+
     opt_state = opt_init(params)
 
     def loss(params, batch):
