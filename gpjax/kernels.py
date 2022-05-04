@@ -98,6 +98,8 @@ class CombinationKernel(Kernel, _KernelSet):
         self._set_kernels(kernels)
 
     def _set_kernels(self, kernels: Sequence[Kernel]) -> None:
+        """Combine multiple kernels. Based on GPFlow's Combination kernel.
+        """
         # add kernels to a list, flattening out instances of this class therein
         kernels_list: List[Kernel] = []
         for k in kernels:
