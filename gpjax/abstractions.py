@@ -105,16 +105,13 @@ def optax_fit(
 
 
 # Mini-batch loader from a TensorFlow Dataset:
-def batch_loader(data: tfd.Dataset) -> callable[[None], Dataset]:
+def batch_loader(data: tfd.Dataset) -> tp.Callable[[None], Dataset]:
     """Abstracted method for loading mini-batches from a TensorFlow Dataset as a GPJax Dataset.
     Args:
         dataset (tfd.Dataset): Training data as a TensorFlow Dataset.
     Returns:
-        callable[[None], Dataset]: A function that produces mini-batches as a GPJax Dataset.
+        tp.Callable[[None], Dataset]: A function that produces mini-batches as a GPJax Dataset.
     """
-
-    if type(data) is not tfd.Dataset:
-        raise TypeError
 
     dataset_iter = iter(data)
 

@@ -5,7 +5,7 @@ config.update("jax_enable_x64", True)
 # Highlight any potentially unintended broadcasting rank promoting ops.
 # config.update("jax_numpy_rank_promotion", "warn")
 
-from .abstractions import fit, fit_batches, mini_batcher, optax_fit
+from .abstractions import fit, fit_batches, batch_loader, optax_fit
 from .gps import Prior, construct_posterior
 from .kernels import (
     RBF,
