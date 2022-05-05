@@ -4,10 +4,27 @@ import jax.random as jr
 import optax
 import pytest
 from jax.experimental import optimizers
+import tensorflow as tf
 import typing as tp
 
 from gpjax import RBF, Dataset, Gaussian, Prior, initialise, transform
-from gpjax.abstractions import fit, optax_fit, mini_batcher, fit_batches
+from gpjax.abstractions import fit, optax_fit, fit_batches, batch_loader
+
+tfd = tf.data
+
+def _dataset_to_tf(dataset, prefetch_buffer=1, batch_size=32):
+    X, y, n = dataset.X, dataset.y, dataset.n
+
+    batch_size = min(batch_size, n)
+
+    # Make dataloader, set batch size and prefetch buffer:
+    ds = tfd.Dataset.from_tensor_slices((X, y))
+    ds = ds.cache()
+    ds = ds.repeat()
+    ds = ds.shuffle(n)
+    ds = ds.batch(batch_size)
+    ds = ds.prefetch(prefetch_buffer)
+    return ds
 
 
 @pytest.mark.parametrize("n", [20])
@@ -69,7 +86,8 @@ def test_batcher(batch_size, n):
     x = jnp.linspace(-3.0, 3.0, num=n).reshape(-1, 1)
     y = jnp.sin(x)
     D = Dataset(X=x, y=y)
-    batcher = mini_batcher(training=D, batch_size=batch_size)
+    D = _dataset_to_tf(D, batch_size=batch_size)
+    batcher = batch_loader(data=D)
     Db = batcher()
     assert Db.X.shape[0] == batch_size
     assert Db.y.shape[0] == batch_size
@@ -89,7 +107,8 @@ def test_min_batch(nb, ndata):
     x = jnp.linspace(-3.0, 3.0, num=ndata).reshape(-1, 1)
     y = jnp.sin(x)
     D = Dataset(X=x, y=y)
-    batcher = mini_batcher(training=D, batch_size=nb)
+    D = _dataset_to_tf(D, batch_size=nb)
+    batcher = batch_loader(data=D)
 
     Db = batcher()
     assert Db.X.shape[0] == ndata
@@ -106,7 +125,8 @@ def batch_fitting(nb, ndata):
     p = Prior(kernel=RBF()) * Gaussian(num_datapoints=ndata)
     params, trainable_status, constrainer, unconstrainer = initialise(p)
     mll = p.marginal_log_likelihood(D, constrainer, negative=True)
-    batcher = mini_batcher(training=D, batch_size=nb)
+    D = _dataset_to_tf(dataset=D, batch_size=nb)
+    batcher = batch_loader(data=D)
     pre_mll_val = mll(params)
     opt_init, opt_update, get_params = optimizers.adam(step_size=0.1)
     optimised_params = fit_batches(

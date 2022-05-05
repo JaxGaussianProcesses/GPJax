@@ -44,7 +44,7 @@ def fit(
         params = get_params(opt_state)
         loss_val, loss_gradient = jax.value_and_grad(loss)(params)
         return opt_update(i, loss_gradient, opt_state), loss_val
-    
+
     if jit_compile:
         loss = jax.jit(loss)
         train_step = jax.jit(train_step)
