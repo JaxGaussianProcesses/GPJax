@@ -1,7 +1,8 @@
-jax>=0.2.21
+jax>=0.3.2
+jaxlib>=0.3.2
 optax>=0.1.0
-chex>=0.0.8
+chex>=0.1.0
 distrax>=0.1.2
-tensorflow >= 2.8.0	
-tqdm
+tensorflow >= 2.8.0
+tqdm>=4.0.0
 ml-collections==0.1.0
