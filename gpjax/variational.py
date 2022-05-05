@@ -65,15 +65,6 @@ class VariationalGaussian(VariationalFamily):
         }
         return hyperparams
 
-
-# class WhitenedVariationalGaussian(VariationalGaussian):
-#     def __init__(self) -> None:
-#         super().__init__()
-
-#     def compute_m(self):
-#         return solve_triangular(Lz.T, M, lower=False)
-
-
 @dataclass
 class VariationalPosterior:
     posterior: Posterior
