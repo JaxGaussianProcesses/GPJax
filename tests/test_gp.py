@@ -56,7 +56,7 @@ def test_conjugate_posterior(num_datapoints):
     assert isinstance(post, GP)
     assert isinstance(p, GP)
 
-    post2 = lik*p
+    post2 = lik * p
     assert isinstance(post2, ConjugatePosterior)
     assert isinstance(post2, GP)
 

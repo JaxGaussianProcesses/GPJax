@@ -1,11 +1,12 @@
 # ---
 # jupyter:
 #   jupytext:
+#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -16,15 +17,15 @@
 # # Classification
 #
 
-# %%
-
-import gpjax as gpx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax as tfp
-from jax.experimental import optimizers
+from jax.example_libraries import optimizers
+
+# %%
+import gpjax as gpx
 
 key = jr.PRNGKey(123)
 tfd = tfp.distributions
@@ -60,7 +61,7 @@ posterior = prior * gpx.Bernoulli(num_datapoints=training.n)
 print(type(posterior))
 
 # %%
-params, constrainer, unconstrainer = gpx.initialise(posterior)
+params, training_status, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 
 # %% [markdown]
@@ -73,7 +74,16 @@ mll = jax.jit(posterior.marginal_log_likelihood(training, constrainer, negative=
 from gpjax.abstractions import fit
 
 opt_init, opt_update, get_params = optimizers.adam(step_size=0.01)
-optimised_params = fit(mll, params, opt_init, opt_update, get_params, n_iters=1000)
+optimised_params = fit(
+    mll,
+    params,
+    training_status,
+    opt_init,
+    opt_update,
+    get_params,
+    n_iters=1000,
+    jit_compile=True,
+)
 optimised_params = gpx.transform(optimised_params, constrainer)
 
 # %%

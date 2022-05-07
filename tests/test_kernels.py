@@ -22,9 +22,9 @@ from gpjax.kernels import (
     SumKernel,
     _EigenKernel,
     cross_covariance,
+    diagonal,
     euclidean_distance,
     gram,
-    diagonal
 )
 from gpjax.parameters import initialise
 from gpjax.utils import I
@@ -32,7 +32,7 @@ from gpjax.utils import I
 
 @pytest.mark.parametrize("kern", [RBF(), Matern12(), Matern32(), Matern52()])
 @pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize('fn', [gram, diagonal])
+@pytest.mark.parametrize("fn", [gram, diagonal])
 def test_gram(kern, dim, fn):
     x = jnp.linspace(-1.0, 1.0, num=10).reshape(-1, 1)
     if dim > 1:

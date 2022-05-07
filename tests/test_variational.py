@@ -1,10 +1,11 @@
 from statistics import mode
+
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import numpy as np
-import pyexpat
 import py
+import pyexpat
 import pytest
 from chex import assert_max_traces
 

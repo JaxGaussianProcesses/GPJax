@@ -66,4 +66,3 @@ class VariationalGaussian(VariationalFamily):
             "variational_root_covariance": self.variational_root_covariance,
         }
         return hyperparams
-

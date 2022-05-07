@@ -1,5 +1,5 @@
-from typing import Callable, Dict, Tuple, Optional
 import abc
+from typing import Callable, Dict, Optional, Tuple
 
 import distrax as dx
 import jax.numpy as jnp
@@ -8,17 +8,14 @@ from jax import vmap
 from jax.numpy.linalg import cholesky
 from jax.scipy.linalg import solve_triangular
 
-
-from .kernels import cross_covariance, gram
 from .config import get_defaults
+from .gps import Posterior
+from .kernels import cross_covariance, gram
 from .parameters import transform
 from .quadrature import gauss_hermite_quadrature
-
-from .gps import Posterior
 from .types import Array, Dataset
 from .utils import I, concat_dictionaries
 from .variational import VariationalFamily
-
 
 DEFAULT_JITTER = get_defaults()["jitter"]
 
@@ -56,7 +53,6 @@ class VariationalPosterior:
         raise NotImplementedError
 
 
-
 @dataclass
 class SVGP(VariationalPosterior):
     def __post_init__(self):
@@ -65,14 +61,16 @@ class SVGP(VariationalPosterior):
         self.num_inducing = self.variational_family.num_inducing
 
     def elbo(
-        self, train_data: Dataset, transformations: Dict
+        self, train_data: Dataset, transformations: Dict, negative: bool = False
     ) -> Callable[[Array], Array]:
+        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
+
         def elbo_fn(params: Dict, batch: Dataset) -> Array:
             params = transform(params, transformations)
             kl = self.prior_kl(params)
             var_exp = self.variational_expectation(params, batch)
 
-            return jnp.sum(var_exp) * train_data.n / batch.n - kl
+            return constant * (jnp.sum(var_exp) * train_data.n / batch.n - kl)
 
         return elbo_fn
 

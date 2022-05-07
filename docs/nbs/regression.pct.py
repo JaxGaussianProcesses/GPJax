@@ -1,11 +1,12 @@
 # ---
 # jupyter:
 #   jupytext:
+#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -17,13 +18,14 @@
 # %%
 
 from pprint import PrettyPrinter
-import gpjax as gpx
 
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
-from jax.experimental import optimizers
+from jax.example_libraries import optimizers
+
+import gpjax as gpx
 
 pp = PrettyPrinter(indent=4)
 key = jr.PRNGKey(123)
@@ -88,7 +90,7 @@ posterior = prior * lik
 # To store our model's hyperparameters, we suggest using a dictionary. In this example, our kernel is parameterised by a lengthscale and variance parameter. Further, our likelihood functions controls the amount of observation noise; the final parameter that we must optimise. These three quantities should therefore be defined as
 
 # %%
-params, constrainer, unconstrainer = gpx.initialise(posterior)
+params, training_status, constrainer, unconstrainer = gpx.initialise(posterior)
 pp.pprint(params)
 
 # %% [markdown]
@@ -122,7 +124,16 @@ mll(params)
 from gpjax.abstractions import fit
 
 opt_init, opt_update, get_params = optimizers.adam(step_size=0.01)
-final_params = fit(mll, params, opt_init, opt_update, get_params, n_iters=500)
+final_params = fit(
+    mll,
+    params,
+    training_status,
+    opt_init,
+    opt_update,
+    get_params,
+    n_iters=500,
+    jit_compile=True,
+)
 
 # %% [markdown]
 # ## Learned parameters

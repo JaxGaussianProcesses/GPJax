@@ -1,8 +1,8 @@
 import typing as tp
 
+import jax
 import jax.numpy as jnp
 import jax.random as jr
-import jax
 import optax
 import pytest
 import tensorflow as tf
@@ -50,7 +50,7 @@ def test_fit(n):
 
 
 @pytest.mark.parametrize("n", [20])
-@pytest.mark.parametrize('jit_compile', [True, False])
+@pytest.mark.parametrize("jit_compile", [True, False])
 def test_optax_fit(n, jit_compile):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n, 1)), axis=0)
@@ -61,7 +61,9 @@ def test_optax_fit(n, jit_compile):
     mll = p.marginal_log_likelihood(D, constrainer, negative=True)
     pre_mll_val = mll(params)
     optimiser = optax.adam(learning_rate=0.1)
-    optimised_params = optax_fit(mll, params, trainable_status, optimiser, n_iters=10, jit_compile=jit_compile)
+    optimised_params = optax_fit(
+        mll, params, trainable_status, optimiser, n_iters=10, jit_compile=jit_compile
+    )
     optimised_params = transform(optimised_params, constrainer)
     assert isinstance(optimised_params, dict)
     assert mll(optimised_params) < pre_mll_val
@@ -121,14 +123,14 @@ def test_min_batch(nb, ndata):
 
 @pytest.mark.parametrize("nb", [20, 50])
 @pytest.mark.parametrize("ndata", [50])
-@pytest.mark.parametrize('jit_compile', [True, False])
+@pytest.mark.parametrize("jit_compile", [True, False])
 def test_batch_fitting(nb, ndata, jit_compile):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(ndata, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
     D = Dataset(X=x, y=y)
     p = Prior(kernel=RBF()) * Gaussian(num_datapoints=ndata)
-    Z = jnp.linspace(-2., 2., 10).reshape(-1, 1)
+    Z = jnp.linspace(-2.0, 2.0, 10).reshape(-1, 1)
     q = gpx.VariationalGaussian(inducing_inputs=Z)
 
     svgp = gpx.SVGP(posterior=p, variational_family=q)
