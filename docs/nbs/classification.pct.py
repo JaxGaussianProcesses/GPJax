@@ -17,6 +17,8 @@
 # # Classification
 #
 
+# %%
+
 import jax
 import jax.numpy as jnp
 import jax.random as jr
@@ -24,7 +26,6 @@ import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax as tfp
 from jax.example_libraries import optimizers
 
-# %%
 import gpjax as gpx
 
 key = jr.PRNGKey(123)

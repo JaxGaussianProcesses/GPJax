@@ -18,6 +18,7 @@
 #
 # In this notebook we'll expose the kernels available in GPJax and show how a custom polar kernel can be implemented.
 
+# %%
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
@@ -25,7 +26,6 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 from jax import jit
 from optax import adam
 
-# %%
 import gpjax as gpx
 
 key = jr.PRNGKey(123)

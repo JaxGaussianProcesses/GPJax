@@ -22,6 +22,8 @@
 #
 # In this notebook we'll demonstrate how the sparse variational Gaussian process model of <strong data-cite="hensman2013gaussian"></strong>. When seeking to model more than ~5000 data points and/or the assumed likelihood is non-Gaussian, the sparse Gaussian process presented here will be a tractable option. However, for models of less than 5000 data points and a Gaussian likelihood function, we would recommend using the marginal log-likelihood approach presented in the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html).
 
+# %%
+
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
@@ -29,7 +31,6 @@ import tensorflow as tf
 from jax import jit
 from jax.example_libraries import optimizers
 
-# %%
 import gpjax as gpx
 
 key = jr.PRNGKey(123)
