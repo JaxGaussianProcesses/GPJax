@@ -37,6 +37,7 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
     nbs/regression
     nbs/classification
     nbs/graph_kernels
+    nbs/spare_regression
 
 .. toctree::
     :maxdepth: 1
