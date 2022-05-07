@@ -24,4 +24,4 @@ from .sparse_gps import SVGP
 from .types import Dataset
 from .variational import VariationalGaussian
 
-__version__ = "0.4.2"
+__version__ = "0.4.3"
