@@ -94,7 +94,7 @@ def optax_fit(
 
     if jit_compile:
         loss = jax.jit(loss)
-        train_step = jax.jit(train_step)
+        step = jax.jit(step)
 
     tr = trange(n_iters)
     for i in tr:

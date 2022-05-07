@@ -24,6 +24,7 @@ from gpjax.kernels import (
     cross_covariance,
     euclidean_distance,
     gram,
+    diagonal
 )
 from gpjax.parameters import initialise
 from gpjax.utils import I
@@ -31,12 +32,13 @@ from gpjax.utils import I
 
 @pytest.mark.parametrize("kern", [RBF(), Matern12(), Matern32(), Matern52()])
 @pytest.mark.parametrize("dim", [1, 2, 5])
-def test_gram(kern, dim):
+@pytest.mark.parametrize('fn', [gram, diagonal])
+def test_gram(kern, dim, fn):
     x = jnp.linspace(-1.0, 1.0, num=10).reshape(-1, 1)
     if dim > 1:
         x = jnp.hstack([x] * dim)
     params, _, _, _ = initialise(kern)
-    gram_matrix = gram(kern, x, params)
+    gram_matrix = fn(kern, x, params)
     assert gram_matrix.shape[0] == x.shape[0]
     assert gram_matrix.shape[0] == gram_matrix.shape[1]
 
@@ -79,17 +81,21 @@ def test_pos_def(kern, dim, ell, sigma):
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
-@pytest.mark.parametrize("dim", [1, 2, 5, 10])
+@pytest.mark.parametrize("dim", [None, 1, 2, 5, 10])
 def test_initialisation(kernel, dim):
-    kern = kernel(active_dims=[i for i in range(dim)])
-    params, _, _, _ = initialise(kern)
-    assert list(params.keys()) == ["lengthscale", "variance"]
-    assert all(params["lengthscale"] == jnp.array([1.0] * dim))
-    assert params["variance"] == jnp.array([1.0])
-    if dim > 1:
-        assert kern.ard
+    if dim is None:
+        kern = kernel()
+        assert kern.ndims == 1
     else:
-        assert not kern.ard
+        kern = kernel(active_dims=[i for i in range(dim)])
+        params, _, _, _ = initialise(kern)
+        assert list(params.keys()) == ["lengthscale", "variance"]
+        assert all(params["lengthscale"] == jnp.array([1.0] * dim))
+        assert params["variance"] == jnp.array([1.0])
+        if dim > 1:
+            assert kern.ard
+        else:
+            assert not kern.ard
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
