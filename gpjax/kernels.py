@@ -98,8 +98,7 @@ class CombinationKernel(Kernel, _KernelSet):
         self._set_kernels(kernels)
 
     def _set_kernels(self, kernels: Sequence[Kernel]) -> None:
-        """Combine multiple kernels. Based on GPFlow's Combination kernel.
-        """
+        """Combine multiple kernels. Based on GPFlow's Combination kernel."""
         # add kernels to a list, flattening out instances of this class therein
         kernels_list: List[Kernel] = []
         for k in kernels:
@@ -115,7 +114,9 @@ class CombinationKernel(Kernel, _KernelSet):
         return [kernel.params for kernel in self.kernel_set]
 
     def __call__(self, x: Array, y: Array, params: dict) -> Array:
-        return self.combination_fn(jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)]))
+        return self.combination_fn(
+            jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)])
+        )
 
 
 @dataclass
@@ -228,7 +229,11 @@ class Matern32(Kernel):
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
         tau = euclidean_distance(x, y)
-        K = params["variance"] * (1.0 + jnp.sqrt(3.0) * tau) * jnp.exp(-jnp.sqrt(3.0) * tau)
+        K = (
+            params["variance"]
+            * (1.0 + jnp.sqrt(3.0) * tau)
+            * jnp.exp(-jnp.sqrt(3.0) * tau)
+        )
         return K.squeeze()
 
 

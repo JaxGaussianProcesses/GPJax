@@ -1,9 +1,9 @@
 import typing as tp
 
+import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
-import distrax as dx
 import tensorflow_probability.substrates.jax.distributions as tfd
 
 from gpjax.likelihoods import Bernoulli, Gaussian, Likelihood

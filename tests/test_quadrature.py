@@ -1,7 +1,8 @@
-import pytest
-from gpjax.quadrature import gauss_hermite_quadrature
-import jax.numpy as jnp
 import jax
+import jax.numpy as jnp
+import pytest
+
+from gpjax.quadrature import gauss_hermite_quadrature
 
 
 @pytest.mark.parametrize("jit", [True, False])

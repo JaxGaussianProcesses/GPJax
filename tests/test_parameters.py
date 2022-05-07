@@ -2,11 +2,12 @@ import typing as tp
 from argparse import _AppendConstAction
 from copy import deepcopy
 
+import distrax as dx
 import jax.numpy as jnp
 import pytest
 from numpy.testing import assert_array_equal
 from tensorflow_probability.substrates.jax import distributions as tfd
-import distrax as dx
+
 from gpjax.config import get_defaults
 from gpjax.gps import Prior
 from gpjax.kernels import RBF
@@ -237,7 +238,9 @@ def test_output(num_datapoints, likelihood):
         assert isinstance(v2, tp.Callable)
 
     unconstrained_params = transform(params, unconstrainer)
-    assert unconstrained_params["kernel"]["lengthscale"] != params["kernel"]["lengthscale"]
+    assert (
+        unconstrained_params["kernel"]["lengthscale"] != params["kernel"]["lengthscale"]
+    )
     backconstrained_params = transform(unconstrained_params, constrainer)
     for k, v1, v2 in recursive_items(params, unconstrained_params):
         assert v1.dtype == v2.dtype

@@ -6,16 +6,18 @@ import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from chex import dataclass
 
+from gpjax.config import get_defaults
+
 from .config import Identity, Softplus, add_parameter
 from .gps import Posterior
 from .types import Array, Dataset
 from .utils import I, concat_dictionaries
 
-from gpjax.config import get_defaults
-
 DEFAULT_JITTER = get_defaults()["jitter"]
 
-Diagonal = dx.Lambda(forward=lambda x: jnp.diagflat(x), inverse=lambda x: jnp.diagonal(x))
+Diagonal = dx.Lambda(
+    forward=lambda x: jnp.diagflat(x), inverse=lambda x: jnp.diagonal(x)
+)
 
 FillDiagonal = dx.Chain([Diagonal, Softplus])
 FillTriangular = dx.Chain([tfb.FillTriangular()])
@@ -65,6 +67,7 @@ class VariationalGaussian(VariationalFamily):
         }
         return hyperparams
 
+
 @dataclass
 class VariationalPosterior:
     posterior: Posterior
@@ -78,7 +81,8 @@ class VariationalPosterior:
     @property
     def params(self) -> Dict:
         hyperparams = concat_dictionaries(
-            self.posterior.params, {"variational_family": self.variational_family.params}
+            self.posterior.params,
+            {"variational_family": self.variational_family.params},
         )
         return hyperparams
 
@@ -91,7 +95,9 @@ class VariationalPosterior:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def elbo(self, train_data: Dataset, transformations: Dict) -> Callable[[Array], Array]:
+    def elbo(
+        self, train_data: Dataset, transformations: Dict
+    ) -> Callable[[Array], Array]:
         raise NotImplementedError
 
 

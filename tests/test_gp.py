@@ -1,10 +1,10 @@
 import typing as tp
 
+import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
 import tensorflow_probability.substrates.jax as tfp
-import distrax as dx
 
 from gpjax import Dataset, initialise, likelihoods, transform
 from gpjax.gps import (

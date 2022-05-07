@@ -139,12 +139,16 @@ class Posterior(GP):
         raise NotImplementedError
 
     @abstractmethod
-    def variance(self, train_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
+    def variance(
+        self, train_data: Dataset, params: dict
+    ) -> tp.Callable[[Dataset], Array]:
         raise NotImplementedError
 
     @property
     def params(self) -> dict:
-        return concat_dictionaries(self.prior.params, {"likelihood": self.likelihood.params})
+        return concat_dictionaries(
+            self.prior.params, {"likelihood": self.likelihood.params}
+        )
 
 
 @dataclass
@@ -174,7 +178,9 @@ class ConjugatePosterior(Posterior):
 
         return mean_fn
 
-    def variance(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], Array]:
+    def variance(
+        self, train_data: Dataset, params: dict
+    ) -> tp.Callable[[Array], Array]:
         x, n_data = train_data.X, train_data.n
         obs_noise = params["likelihood"]["obs_noise"]
         Kxx = gram(self.prior.kernel, x, params["kernel"])
@@ -214,7 +220,9 @@ class ConjugatePosterior(Posterior):
 
             log_prior_density = evaluate_priors(params, priors)
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-            return constant * (random_variable.log_prob(y.squeeze()).mean() + log_prior_density)
+            return constant * (
+                random_variable.log_prob(y.squeeze()).mean() + log_prior_density
+            )
 
         return mll
 
@@ -265,7 +273,9 @@ class NonConjugatePosterior(Posterior):
 
         return mean_fn
 
-    def variance(self, train_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
+    def variance(
+        self, train_data: Dataset, params: dict
+    ) -> tp.Callable[[Dataset], Array]:
         x, n_data = train_data.X, train_data.n
         Kxx = gram(self.prior.kernel, x, params["kernel"])
         Lx = jnp.linalg.cholesky(Kxx + I(n_data) * self.jitter)
@@ -321,5 +331,7 @@ def construct_posterior(prior: Prior, likelihood: Likelihood) -> Posterior:
     elif any([isinstance(likelihood, l) for l in NonConjugateLikelihoods]):
         PosteriorGP = NonConjugatePosterior
     else:
-        raise NotImplementedError(f"No posterior implemented for {likelihood.name} likelihood")
+        raise NotImplementedError(
+            f"No posterior implemented for {likelihood.name} likelihood"
+        )
     return PosteriorGP(prior=prior, likelihood=likelihood)

@@ -3,9 +3,9 @@ import warnings
 from copy import deepcopy
 
 import distrax as dx
-from tensorflow_probability.substrates.jax import distributions as tfd
 import jax
 import jax.numpy as jnp
+from tensorflow_probability.substrates.jax import distributions as tfd
 
 from .config import get_defaults
 from .types import Array
@@ -173,7 +173,9 @@ def prior_checks(priors: dict) -> dict:
                 " the latent function. It is strongly advised that a"
                 " unit-Gaussian prior is used."
             )
-        elif isinstance(latent_prior, tfd.Distribution) and latent_prior.name != "Normal":
+        elif (
+            isinstance(latent_prior, tfd.Distribution) and latent_prior.name != "Normal"
+        ):
             warnings.warn(
                 f"A {latent_prior.name} distribution from Tensorflow Probability has been"
                 "placed on the latent function. We advise using a unit-Gaussian prior from"
@@ -204,4 +206,6 @@ def stop_grad(param, trainable):
 
 # Stop gradients of parameters whoose training is set to False.
 def trainable_params(params, trainables):
-    return jax.tree_map(lambda param, trainable: stop_grad(param, trainable), params, trainables)
+    return jax.tree_map(
+        lambda param, trainable: stop_grad(param, trainable), params, trainables
+    )

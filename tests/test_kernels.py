@@ -1,16 +1,18 @@
 from itertools import permutations
-from chex import assert_equal
 
 import jax.numpy as jnp
 import jax.random as jr
-from numpy import isin, sort
+import networkx as nx
 import numpy as np
 import pytest
-import networkx as nx
+from chex import assert_equal
+from numpy import isin, sort
+
 from gpjax import kernels
 from gpjax.kernels import (
     RBF,
     CombinationKernel,
+    GraphKernel,
     Kernel,
     Matern12,
     Matern32,
@@ -19,7 +21,6 @@ from gpjax.kernels import (
     ProductKernel,
     SumKernel,
     _EigenKernel,
-    GraphKernel,
     cross_covariance,
     euclidean_distance,
     gram,
@@ -167,8 +168,12 @@ def test_combination_kernel(combination_type, kernel, n_kerns):
     assert Kff.shape[1] == n
 
 
-@pytest.mark.parametrize("k1", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()])
-@pytest.mark.parametrize("k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()])
+@pytest.mark.parametrize(
+    "k1", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
+)
+@pytest.mark.parametrize(
+    "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
+)
 def test_sum_kern_value(k1, k2):
     n = 10
     sum_kernel = SumKernel(kernel_set=[k1, k2])
@@ -178,8 +183,12 @@ def test_sum_kern_value(k1, k2):
     assert jnp.all(Kff == Kff_manual)
 
 
-@pytest.mark.parametrize("k1", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()])
-@pytest.mark.parametrize("k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()])
+@pytest.mark.parametrize(
+    "k1", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
+)
+@pytest.mark.parametrize(
+    "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
+)
 def test_prod_kern_value(k1, k2):
     n = 10
     sum_kernel = ProductKernel(kernel_set=[k1, k2])
@@ -210,7 +219,11 @@ def test_graph_kernel():
 
     kern_params = kern.params
     assert isinstance(kern_params, dict)
-    assert list(sorted(list(kern_params.keys()))) == ["lengthscale", "smoothness", "variance"]
+    assert list(sorted(list(kern_params.keys()))) == [
+        "lengthscale",
+        "smoothness",
+        "variance",
+    ]
     x = jnp.arange(n_verticies).reshape(-1, 1)
     Kxx = gram(kern, x, kern.params)
     assert Kxx.shape == (n_verticies, n_verticies)

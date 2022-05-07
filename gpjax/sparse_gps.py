@@ -1,4 +1,4 @@
-from typing import Callable, Dict
+from typing import Callable, Dict, Tuple
 
 import distrax as dx
 import jax.numpy as jnp
@@ -6,7 +6,6 @@ from chex import dataclass
 from jax import vmap
 from jax.numpy.linalg import cholesky
 from jax.scipy.linalg import solve_triangular
-
 
 from gpjax.kernels import cross_covariance, gram
 from gpjax.parameters import transform
@@ -24,7 +23,9 @@ class SVGP(VariationalPosterior):
         self.likelihood = self.posterior.likelihood
         self.num_inducing = self.variational_family.num_inducing
 
-    def elbo(self, train_data: Dataset, transformations: Dict) -> Callable[[Array], Array]:
+    def elbo(
+        self, train_data: Dataset, transformations: Dict
+    ) -> Callable[[Array], Array]:
         def elbo_fn(params: Dict, batch: Dataset) -> Array:
             params = transform(params, transformations)
             kl = self.prior_kl(params)
@@ -55,11 +56,12 @@ class SVGP(VariationalPosterior):
 
         return qu.kl_divergence(pu)
 
-    # Compute expectation, ∫ log(p(y|F)) q(F) dF, through Gauss-Hermite quadrature:
     def variational_expectation(self, params: Dict, batch: Dataset) -> Array:
         x, y = batch.X, batch.y
 
-        Fmu, Fvar = vmap(self.pred_moments, in_axes=(None, 0))(params, x[:, jnp.newaxis, :])
+        Fmu, Fvar = vmap(self.pred_moments, in_axes=(None, 0))(
+            params, x[:, jnp.newaxis, :]
+        )
 
         # Get log(p(y|F)) function for current likelihood parameter values:
         def log_prob(F, y):
@@ -68,7 +70,7 @@ class SVGP(VariationalPosterior):
         return gauss_hermite_quadrature(log_prob, Fmu.squeeze(1), Fvar.squeeze(1), y=y)
 
     # Computes predictive moments for Gauss-Hermite quadrature:
-    def pred_moments(self, params: Dict, test_inputs: Array) -> Array:
+    def pred_moments(self, params: Dict, test_inputs: Array) -> Tuple[Array, Array]:
         mu = params["variational_family"]["variational_mean"]
         sqrt = params["variational_family"]["variational_root_covariance"]
 

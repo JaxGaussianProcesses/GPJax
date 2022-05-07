@@ -1,16 +1,18 @@
+import typing as tp
 from hashlib import md5
+
 import jax.numpy as jnp
 import jax.random as jr
 import optax
 import pytest
-from jax.experimental import optimizers
 import tensorflow as tf
-import typing as tp
+from jax.experimental import optimizers
 
 from gpjax import RBF, Dataset, Gaussian, Prior, initialise, transform
-from gpjax.abstractions import fit, optax_fit, fit_batches, batch_loader
+from gpjax.abstractions import batch_loader, fit, fit_batches, optax_fit
 
 tfd = tf.data
+
 
 def _dataset_to_tf(dataset, prefetch_buffer=1, batch_size=32):
     X, y, n = dataset.X, dataset.y, dataset.n

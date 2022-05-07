@@ -5,8 +5,9 @@ import optax
 import tensorflow.data as tfd
 from tqdm import trange
 
-from .types import Dataset
 from .parameters import trainable_params
+from .types import Dataset
+
 
 def fit(
     objective: tp.Callable,
