@@ -1,11 +1,12 @@
 # ---
 # jupyter:
 #   jupytext:
+#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -17,8 +18,6 @@
 #
 # In this notebook we'll expose the kernels available in GPJax and show how a custom polar kernel can be implemented.
 
-# %%
-import gpjax as gpx
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
@@ -26,6 +25,8 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 from jax import jit
 from optax import adam
 
+# %%
+import gpjax as gpx
 
 key = jr.PRNGKey(123)
 
@@ -55,7 +56,7 @@ x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 
 for k, ax in zip(kernels, axes.ravel()):
     prior = gpx.Prior(kernel=k)
-    params, _, _ = gpx.initialise(prior)
+    params, _, _, _ = gpx.initialise(prior)
     rv = prior.random_variable(x, params)
     y = rv.sample(sample_shape=10, seed=key)
 
@@ -161,7 +162,9 @@ class Polar(gpx.kernels.Kernel):
         self.c = self.period / 2.0  # in [0, \pi]
         self._params = {"tau": jnp.array([4.0])}
 
-    def __call__(self, x: gpx.types.Array, y: gpx.types.Array, params: dict) -> gpx.types.Array:
+    def __call__(
+        self, x: gpx.types.Array, y: gpx.types.Array, params: dict
+    ) -> gpx.types.Array:
         tau = params["tau"]
         t = angular_distance(x, y, self.c)
         K = (1 + tau * t / self.c) * jnp.clip(1 - t / self.c, 0, jnp.inf) ** tau
@@ -203,11 +206,22 @@ PKern = Polar()
 circlular_posterior = gpx.Prior(kernel=PKern) * gpx.Gaussian(num_datapoints=n)
 
 # Initialise parameters and corresponding transformations
-params, constrainer, unconstrainer = gpx.initialise(circlular_posterior)
+params, training_status, constrainer, unconstrainer = gpx.initialise(
+    circlular_posterior
+)
 
 # Optimise GP's marginal log-likelihood using Adam
-mll = jit(circlular_posterior.marginal_log_likelihood(training, constrainer, negative=True))
-learned_params = gpx.optax_fit(mll, params, adam(learning_rate=0.05), n_iters=1000)
+mll = jit(
+    circlular_posterior.marginal_log_likelihood(training, constrainer, negative=True)
+)
+learned_params = gpx.optax_fit(
+    mll,
+    params,
+    training_status,
+    adam(learning_rate=0.05),
+    n_iters=1000,
+    jit_compile=True,
+)
 
 # Untransform learned parameters
 final_params = gpx.transform(learned_params, constrainer)
@@ -219,7 +233,9 @@ final_params = gpx.transform(learned_params, constrainer)
 
 # %%
 mu = circlular_posterior.mean(training, final_params)(angles).squeeze()
-one_sigma = jnp.sqrt(jnp.diag(circlular_posterior.variance(training, final_params)(angles)))
+one_sigma = jnp.sqrt(
+    jnp.diag(circlular_posterior.variance(training, final_params)(angles))
+)
 
 # %%
 fig = plt.figure(figsize=(10, 8))

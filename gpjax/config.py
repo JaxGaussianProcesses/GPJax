@@ -1,13 +1,20 @@
-from typing import Tuple
-
+import distrax
+import jax.numpy as jnp
 import jax.random as jr
-import tensorflow_probability.substrates.jax.bijectors as tfb
 from ml_collections import ConfigDict
 
 __config = None
 
+Identity = distrax.Lambda(lambda x: x)
+Softplus = distrax.Lambda(lambda x: jnp.log(1.0 + jnp.exp(x)))
+
 
 def get_defaults() -> ConfigDict:
+    """Construct and globally register the config file used within GPJax.
+
+    Returns:
+        ConfigDict: A `ConfigDict` describing parameter transforms and default values.
+    """
     config = ConfigDict()
     config.key = jr.PRNGKey(123)
     # Covariance matrix stabilising jitter
@@ -15,8 +22,8 @@ def get_defaults() -> ConfigDict:
 
     # Default bijections
     config.transformations = transformations = ConfigDict()
-    transformations.positive_transform = tfb.Softplus()
-    transformations.identity_transform = tfb.Identity()
+    transformations.positive_transform = Softplus
+    transformations.identity_transform = Identity
 
     # Default parameter transforms
     transformations.lengthscale = "positive_transform"
@@ -33,7 +40,13 @@ def get_defaults() -> ConfigDict:
     return __config
 
 
-def add_parameter(param_name: str, bijection: tfb.Bijector) -> None:
+def add_parameter(param_name: str, bijection: distrax.Bijector) -> None:
+    """Include a new parameter and its corresponding transform into the GPJax's Config file.
+
+    Args:
+        param_name (str): The name of the parameter that is to be added.
+        bijection (tfb.Bijector): The bijection that should be used to unconstrain the parameter's value
+    """
     lookup_name = f"{param_name}_transform"
     get_defaults()
     __config.transformations[lookup_name] = bijection

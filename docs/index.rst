@@ -28,6 +28,7 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
     :caption: Getting Started
 
     installation
+    design
 
 .. toctree::
     :maxdepth: 1

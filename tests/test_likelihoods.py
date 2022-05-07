@@ -1,5 +1,6 @@
 import typing as tp
 
+import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
@@ -18,7 +19,7 @@ true_initialisation = {
 @pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
 def test_initialisers(num_datapoints, lik):
     l = lik(num_datapoints=num_datapoints)
-    params, _, _ = initialise(l)
+    params, _, _, _ = initialise(l)
     assert list(params.keys()) == true_initialisation[l.name]
     assert len(list(params.values())) == len(true_initialisation[l.name])
 
@@ -42,11 +43,10 @@ def test_predictive_moment(n):
 @pytest.mark.parametrize("n", [1, 10])
 def test_link_fns(lik: Likelihood, n: int):
     l = lik(num_datapoints=n)
+    params, _, _, _ = initialise(l)
     link_fn = l.link_function
     assert isinstance(link_fn, tp.Callable)
     x = jnp.linspace(-3.0, 3.0).reshape(-1, 1)
-    l_eval = link_fn(x)
-    if lik == Gaussian:
-        assert isinstance(l_eval, jnp.DeviceArray)
-    else:
-        assert isinstance(l_eval, tfd.Distribution)
+    l_eval = link_fn(x, params)
+
+    assert isinstance(l_eval, dx.Distribution)

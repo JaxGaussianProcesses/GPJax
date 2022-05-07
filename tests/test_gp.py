@@ -1,11 +1,10 @@
 import typing as tp
-from turtle import pos
 
+import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
 import tensorflow_probability.substrates.jax as tfp
-from numpy import isin
 
 from gpjax import Dataset, initialise, likelihoods, transform
 from gpjax.gps import (
@@ -23,7 +22,7 @@ from gpjax.parameters import initialise
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 def test_prior(num_datapoints):
     p = Prior(kernel=RBF())
-    params, _, _ = initialise(p)
+    params, trainable_status, constrainer, unconstrainer = initialise(p)
     assert isinstance(p, Prior)
     assert isinstance(p, GP)
     meanf = p.mean(params)
@@ -37,7 +36,7 @@ def test_prior(num_datapoints):
     assert sigma.shape == (num_datapoints, num_datapoints)
 
     rv = p.random_variable(x, params)
-    assert isinstance(rv, tfp.distributions.Distribution)
+    assert isinstance(rv, dx.Distribution)
 
 
 @pytest.mark.parametrize("num_datapoints", [2, 10])
@@ -56,18 +55,23 @@ def test_conjugate_posterior(num_datapoints):
     assert isinstance(post, ConjugatePosterior)
     assert isinstance(post, GP)
     assert isinstance(p, GP)
-    params, constrainers, unconstrainer = initialise(post)
+
+    post2 = lik * p
+    assert isinstance(post2, ConjugatePosterior)
+    assert isinstance(post2, GP)
+
+    params, trainable_status, constrainer, unconstrainer = initialise(post)
     params = transform(params, unconstrainer)
 
     # Marginal likelihood
-    mll = post.marginal_log_likelihood(training=D, transformations=constrainers)
+    mll = post.marginal_log_likelihood(train_data=D, transformations=constrainer)
     objective_val = mll(params)
     assert isinstance(objective_val, jnp.DeviceArray)
     assert objective_val.shape == ()
 
     # Prediction
-    meanf = post.mean(training_data=D, params=params)
-    varf = post.variance(training_data=D, params=params)
+    meanf = post.mean(train_data=D, params=params)
+    varf = post.variance(train_data=D, params=params)
     assert isinstance(meanf, tp.Callable)
     assert isinstance(varf, tp.Callable)
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
@@ -94,18 +98,18 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     assert isinstance(post, NonConjugatePosterior)
     assert isinstance(post, GP)
     assert isinstance(p, GP)
-    params, constrainers, unconstrainer = initialise(post)
+    params, trainable_status, constrainer, unconstrainer = initialise(post)
     params = transform(params, unconstrainer)
 
     # Marginal likelihood
-    mll = post.marginal_log_likelihood(training=D, transformations=constrainers)
+    mll = post.marginal_log_likelihood(train_data=D, transformations=constrainer)
     objective_val = mll(params)
     assert isinstance(objective_val, jnp.DeviceArray)
     assert objective_val.shape == ()
 
     # Prediction
-    meanf = post.mean(training_data=D, params=params)
-    varf = post.variance(training_data=D, params=params)
+    meanf = post.mean(train_data=D, params=params)
+    varf = post.variance(train_data=D, params=params)
     assert isinstance(meanf, tp.Callable)
     assert isinstance(varf, tp.Callable)
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
@@ -119,7 +123,7 @@ def test_nonconjugate_posterior(num_datapoints, likel):
 @pytest.mark.parametrize("lik", [Bernoulli, Gaussian])
 def test_param_construction(num_datapoints, lik):
     p = Prior(kernel=RBF()) * lik(num_datapoints=num_datapoints)
-    params, _, _ = initialise(p)
+    params, trainable_status, constrainer, unconstrainer = initialise(p)
     if isinstance(lik, Bernoulli):
         assert sorted(list(params.keys())) == [
             "kernel",

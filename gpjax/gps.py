@@ -1,13 +1,12 @@
 import typing as tp
 from abc import abstractmethod, abstractproperty
 
+import distrax as dx
 import jax.numpy as jnp
-import tensorflow_probability.substrates.jax.distributions as tfd
 from chex import dataclass
 from jax.scipy.linalg import cho_factor, cho_solve, solve_triangular
 
-from gpjax.config import get_defaults
-
+from .config import get_defaults
 from .kernels import Kernel, cross_covariance, gram
 from .likelihoods import (
     Gaussian,
@@ -20,19 +19,26 @@ from .parameters import copy_dict_structure, evaluate_priors, transform
 from .types import Array, Dataset
 from .utils import I, concat_dictionaries
 
+DEFAULT_JITTER = get_defaults()["jitter"]
+
 
 @dataclass
 class GP:
+    """Abstract Gaussian process object."""
+
     @abstractmethod
     def mean(self) -> tp.Callable[[Dataset], Array]:
+        """Compute the GP's mean function."""
         raise NotImplementedError
 
     @abstractmethod
     def variance(self) -> tp.Callable[[Dataset], Array]:
+        """Compute the GP's variance function."""
         raise NotImplementedError
 
     @abstractproperty
     def params(self) -> tp.Dict:
+        """Initialise the GP's parameter set"""
         raise NotImplementedError
 
 
@@ -41,42 +47,79 @@ class GP:
 #######################
 @dataclass(repr=False)
 class Prior(GP):
+    """A Gaussian process prior object. The GP is parameterised by a mean and kernel function."""
+
     kernel: Kernel
     mean_function: tp.Optional[MeanFunction] = Zero()
     name: tp.Optional[str] = "Prior"
+    jitter: tp.Optional[float] = DEFAULT_JITTER
 
     def __mul__(self, other: Gaussian):
+        """The product of a prior and likelihood is proportional to the posterior distribution. By computing the product of a GP prior and a likelihood object, a posterior GP object will be returned.
+        Args:
+            other (Likelihood): The likelihood distribution of the observed dataset.
+        Returns:
+            Posterior: The relevant GP posterior for the given prior and likelihood. Special cases are accounted for where the model is conjugate.
+        """
         return construct_posterior(prior=self, likelihood=other)
 
+    def __rmul__(self, other: Gaussian):
+        """Reimplement the multiplication operator to allow for order-invariant product of a likelihood and a prior i.e., ."""
+        return self.__mul__(other)
+
     def mean(self, params: dict) -> tp.Callable[[Array], Array]:
-        def mean_fn(test_points: Array):
-            mu = self.mean_function(test_points, params["mean_function"])
-            return mu
+        """Compute the GP's prior mean function.
+        Args:
+            params (dict): The specific set of parameters for which the mean function should be defined for.
+        Returns:
+            tp.Callable[[Array], Array]: A mean function that accepts an input array for where the mean function should be evaluated at. The mean function's value at these points is then returned.
+        """
+
+        def mean_fn(test_inputs: Array):
+            t = test_inputs
+            mt = self.mean_function(t, params["mean_function"])
+            return mt
 
         return mean_fn
 
     def variance(self, params: dict) -> tp.Callable[[Array], Array]:
-        def variance_fn(test_points: Array):
-            Kff = gram(self.kernel, test_points, params["kernel"])
-            jitter_matrix = I(test_points.shape[0]) * 1e-8
-            covariance_matrix = Kff + jitter_matrix
-            return covariance_matrix
+        """Compute the GP's prior variance function.
+        Args:
+            params (dict): The specific set of parameters for which the variance function should be defined for.
+        Returns:
+            tp.Callable[[Array], Array]: A variance function that accepts an input array for where the variance function should be evaluated at. The variance function's value at these points is then returned as a covariance matrix.
+        """
+
+        def variance_fn(test_inputs: Array):
+            t = test_inputs
+            Ktt = gram(self.kernel, t, params["kernel"])
+            return Ktt
 
         return variance_fn
 
     @property
     def params(self) -> dict:
+        """Initialise the GP prior's parameter set"""
         return {
             "kernel": self.kernel.params,
             "mean_function": self.mean_function.params,
         }
 
-    def random_variable(self, test_points: Array, params: dict) -> tfd.Distribution:
-        n = test_points.shape[0]
-        mu = self.mean(params)(test_points)
-        sigma = self.variance(params)(test_points)
-        sigma += I(n) * 1e-8
-        return tfd.MultivariateNormalTriL(mu.squeeze(), jnp.linalg.cholesky(sigma))
+    def random_variable(self, test_inputs: Array, params: dict) -> dx.Distribution:
+        """Using the GP's mean and covariance functions, we can also construct the multivariate normal random variable.
+        Args:
+            test_points (Array): The points at which we'd like to evaluate our mean and covariance function.
+            params (dict): The parameterisation of the GP prior for which the random variable should be computed for.
+        Returns:
+            dx.Distribution: A Distrax Multivariate Normal distribution.
+        """
+        t = test_inputs
+        nt = t.shape[0]
+        mt = self.mean(params)(t)
+        Ktt = self.variance(params)(t)
+        Ktt += I(nt) * self.jitter
+        Lt = jnp.linalg.cholesky(Ktt)
+        return dx.MultivariateNormalTri(jnp.atleast_1d(mt.squeeze()), Lt)
 
 
 #######################
@@ -84,21 +127,28 @@ class Prior(GP):
 #######################
 @dataclass
 class Posterior(GP):
+    """The base GP posterior object conditioned on an observed dataset."""
+
     prior: Prior
     likelihood: Likelihood
     name: tp.Optional[str] = "GP Posterior"
+    jitter: tp.Optional[float] = DEFAULT_JITTER
 
     @abstractmethod
-    def mean(self, training_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
+    def mean(self, train_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
         raise NotImplementedError
 
     @abstractmethod
-    def variance(self, training_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
+    def variance(
+        self, train_data: Dataset, params: dict
+    ) -> tp.Callable[[Dataset], Array]:
         raise NotImplementedError
 
     @property
     def params(self) -> dict:
-        return concat_dictionaries(self.prior.params, {"likelihood": self.likelihood.params})
+        return concat_dictionaries(
+            self.prior.params, {"likelihood": self.likelihood.params}
+        )
 
 
 @dataclass
@@ -106,68 +156,73 @@ class ConjugatePosterior(Posterior):
     prior: Prior
     likelihood: Gaussian
     name: tp.Optional[str] = "ConjugatePosterior"
+    jitter: tp.Optional[float] = DEFAULT_JITTER
 
-    def mean(self, training_data: Dataset, params: dict) -> tp.Callable[[Array], Array]:
-        X, y = training_data.X, training_data.y
-        sigma = params["likelihood"]["obs_noise"]
-        n_train = training_data.n
+    def mean(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], Array]:
+        x, y, n_data = train_data.X, train_data.y, train_data.n
+        obs_noise = params["likelihood"]["obs_noise"]
+        mx = self.prior.mean_function(x, params["mean_function"])
+
         # Precompute covariance matrices
-        Kff = gram(self.prior.kernel, X, params["kernel"])
-        prior_mean = self.prior.mean_function(X, params["mean_function"])
-        L = cho_factor(Kff + I(n_train) * sigma, lower=True)
+        Kxx = gram(self.prior.kernel, x, params["kernel"])
+        Kxx += I(n_data) * self.jitter
+        Lx = cho_factor(Kxx + I(n_data) * obs_noise, lower=True)
 
-        prior_distance = y - prior_mean
-        weights = cho_solve(L, prior_distance)
+        weights = cho_solve(Lx, y - mx)
 
         def mean_fn(test_inputs: Array) -> Array:
-            prior_mean_at_test_inputs = self.prior.mean_function(test_inputs, params["mean_function"])
-            Kfx = cross_covariance(self.prior.kernel, X, test_inputs, params["kernel"])
-            return prior_mean_at_test_inputs + jnp.dot(Kfx, weights)
+            t = test_inputs
+            mt = self.prior.mean_function(t, params["mean_function"])
+            Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
+            return mt + jnp.dot(Ktx, weights)
 
         return mean_fn
 
-    def variance(self, training_data: Dataset, params: dict) -> tp.Callable[[Array], Array]:
-        X = training_data.X
-        n_train = training_data.n
+    def variance(
+        self, train_data: Dataset, params: dict
+    ) -> tp.Callable[[Array], Array]:
+        x, n_data = train_data.X, train_data.n
         obs_noise = params["likelihood"]["obs_noise"]
-        n_train = training_data.n
-        Kff = gram(self.prior.kernel, X, params["kernel"])
-        Kff += I(n_train) * 1e-8
-        L = cho_factor(Kff + I(n_train) * obs_noise, lower=True)
+        Kxx = gram(self.prior.kernel, x, params["kernel"])
+        Kxx += I(n_data) * self.jitter
+        Lx = cho_factor(Kxx + I(n_data) * obs_noise, lower=True)
 
         def variance_fn(test_inputs: Array) -> Array:
-            Kfx = cross_covariance(self.prior.kernel, X, test_inputs, params["kernel"])
-            Kxx = gram(self.prior.kernel, test_inputs, params["kernel"])
-            latent_values = cho_solve(L, Kfx.T)
-            return Kxx - jnp.dot(Kfx, latent_values)
+            t = test_inputs
+            Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
+            Ktt = gram(self.prior.kernel, t, params["kernel"])
+            latent_values = cho_solve(Lx, Ktx.T)
+            return Ktt - jnp.dot(Ktx, latent_values)
 
         return variance_fn
 
     def marginal_log_likelihood(
         self,
-        training: Dataset,
+        train_data: Dataset,
         transformations: tp.Dict,
         priors: dict = None,
-        static_params: dict = None,
         negative: bool = False,
     ) -> tp.Callable[[Dataset], Array]:
-        x, y = training.X, training.y
+        x, y, n_data = train_data.X, train_data.y, train_data.n
 
         def mll(
             params: dict,
         ):
             params = transform(params=params, transform_map=transformations)
-            if static_params:
-                params = concat_dictionaries(params, transform(static_params))
+
+            obs_noise = params["likelihood"]["obs_noise"]
             mu = self.prior.mean_function(x, params)
-            gram_matrix = gram(self.prior.kernel, x, params["kernel"])
-            gram_matrix += params["likelihood"]["obs_noise"] * I(x.shape[0])
-            L = jnp.linalg.cholesky(gram_matrix)
-            random_variable = tfd.MultivariateNormalTriL(mu, L)
+            Kxx = gram(self.prior.kernel, x, params["kernel"])
+            Kxx += I(n_data) * self.jitter
+            Lx = jnp.linalg.cholesky(Kxx + I(n_data) * obs_noise)
+
+            random_variable = dx.MultivariateNormalTri(mu.squeeze(), Lx)
 
             log_prior_density = evaluate_priors(params, priors)
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-            return constant * (random_variable.log_prob(y.squeeze()).mean() + log_prior_density)
+            return constant * (
+                random_variable.log_prob(y.squeeze()).mean() + log_prior_density
+            )
 
         return mll
 
@@ -177,30 +232,37 @@ class NonConjugatePosterior(Posterior):
     prior: Prior
     likelihood: NonConjugateLikelihoodType
     name: tp.Optional[str] = "Non-Conjugate Posterior"
+    jitter: tp.Optional[float] = DEFAULT_JITTER
 
     def __repr__(self):
         mean_fn_string = self.prior.mean_function.__repr__()
         kernel_string = self.prior.kernel.__repr__()
         likelihood_string = self.likelihood.__repr__()
-        return f"Conjugate Posterior\n{'-'*80}\n- {mean_fn_string}\n-" f" {kernel_string}\n- {likelihood_string}"
+        return (
+            f"Non-Conjugate Posterior\n{'-'*80}\n- {mean_fn_string}\n-"
+            f" {kernel_string}\n- {likelihood_string}"
+        )
 
     @property
     def params(self) -> dict:
-        hyperparameters = concat_dictionaries(self.prior.params, {"likelihood": self.likelihood.params})
+        hyperparameters = concat_dictionaries(
+            self.prior.params, {"likelihood": self.likelihood.params}
+        )
         hyperparameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
         return hyperparameters
 
-    def mean(self, training_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
-        X, y = training_data.X, training_data.y
-        N = training_data.n
-        Kff = gram(self.prior.kernel, X, params["kernel"])
-        L = jnp.linalg.cholesky(Kff + I(N) * 1e-6)
+    def mean(self, train_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
+        x, n_data = train_data.X, train_data.n
+        Kxx = gram(self.prior.kernel, x, params["kernel"])
+        Kxx += I(n_data) * self.jitter
+        Lx = jnp.linalg.cholesky(Kxx)
 
-        def meanf(test_inputs: Array) -> Array:
-            Kfx = cross_covariance(self.prior.kernel, X, test_inputs, params["kernel"])
-            Kxx = gram(self.prior.kernel, test_inputs, params["kernel"])
-            A = solve_triangular(L, Kfx.T, lower=True)
-            latent_var = Kxx - jnp.sum(jnp.square(A), -2)
+        def mean_fn(test_inputs: Array) -> Array:
+            t = test_inputs
+            Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
+            Ktt = gram(self.prior.kernel, t, params["kernel"])
+            A = solve_triangular(Lx, Ktx.T, lower=True)
+            latent_var = Ktt - jnp.sum(jnp.square(A), -2)
             latent_mean = jnp.matmul(A.T, params["latent"])
 
             lvar = jnp.diag(latent_var)
@@ -209,19 +271,21 @@ class NonConjugatePosterior(Posterior):
             pred_rv = moment_fn(latent_mean.ravel(), lvar)
             return pred_rv.mean().reshape(-1, 1)
 
-        return meanf
+        return mean_fn
 
-    def variance(self, training_data: Dataset, params: dict) -> tp.Callable[[Dataset], Array]:
-        X, y = training_data.X, training_data.y
-        N = training_data.n
-        Kff = gram(self.prior.kernel, X, params["kernel"])
-        L = jnp.linalg.cholesky(Kff + I(N) * 1e-6)
+    def variance(
+        self, train_data: Dataset, params: dict
+    ) -> tp.Callable[[Dataset], Array]:
+        x, n_data = train_data.X, train_data.n
+        Kxx = gram(self.prior.kernel, x, params["kernel"])
+        Lx = jnp.linalg.cholesky(Kxx + I(n_data) * self.jitter)
 
-        def variancef(test_inputs: Array) -> Array:
-            Kfx = cross_covariance(self.prior.kernel, X, test_inputs, params["kernel"])
-            Kxx = gram(self.prior.kernel, test_inputs, params["kernel"])
-            A = solve_triangular(L, Kfx.T, lower=True)
-            latent_var = Kxx - jnp.sum(jnp.square(A), -2)
+        def variance_fn(test_inputs: Array) -> Array:
+            t = test_inputs
+            Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
+            Ktt = gram(self.prior.kernel, t, params["kernel"])
+            A = solve_triangular(Lx, Ktx.T, lower=True)
+            latent_var = Ktt - jnp.sum(jnp.square(A), -2)
             latent_mean = jnp.matmul(A.T, params["latent"])
 
             lvar = jnp.diag(latent_var)
@@ -230,32 +294,28 @@ class NonConjugatePosterior(Posterior):
             pred_rv = moment_fn(latent_mean.ravel(), lvar)
             return jnp.diag(pred_rv.variance())
 
-        return variancef
+        return variance_fn
 
     def marginal_log_likelihood(
         self,
-        training: Dataset,
+        train_data: Dataset,
         transformations: tp.Dict,
         priors: dict = None,
-        static_params: dict = None,
         negative: bool = False,
     ) -> tp.Callable[[Dataset], Array]:
-        x, y = training.X, training.y
-        n = training.n
-        jitter = get_defaults()["jitter"]
+        x, y, n_data = train_data.X, train_data.y, train_data.n
+
         if not priors:
             priors = copy_dict_structure(self.params)
-            priors["latent"] = tfd.Normal(loc=0.0, scale=1.0)
+            priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
 
         def mll(params: dict):
             params = transform(params=params, transform_map=transformations)
-            if static_params:
-                params = concat_dictionaries(params, transform(static_params))
-            gram_matrix = gram(self.prior.kernel, x, params["kernel"])
-            gram_matrix += I(n) * jitter
-            L = jnp.linalg.cholesky(gram_matrix)
-            F = jnp.matmul(L, params["latent"])
-            rv = self.likelihood.link_function(F)
+            Kxx = gram(self.prior.kernel, x, params["kernel"])
+            Kxx += I(n_data) * self.jitter
+            Lx = jnp.linalg.cholesky(Kxx)
+            Fx = jnp.matmul(Lx, params["latent"])
+            rv = self.likelihood.link_function(Fx, params)
             ll = jnp.sum(rv.log_prob(y))
 
             log_prior_density = evaluate_priors(params, priors)
@@ -271,5 +331,7 @@ def construct_posterior(prior: Prior, likelihood: Likelihood) -> Posterior:
     elif any([isinstance(likelihood, l) for l in NonConjugateLikelihoods]):
         PosteriorGP = NonConjugatePosterior
     else:
-        raise NotImplementedError(f"No posterior implemented for {likelihood.name} likelihood")
+        raise NotImplementedError(
+            f"No posterior implemented for {likelihood.name} likelihood"
+        )
     return PosteriorGP(prior=prior, likelihood=likelihood)

@@ -2,11 +2,12 @@
 # ---
 # jupyter:
 #   jupytext:
+#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -21,13 +22,14 @@
 # %%
 import random
 
-import gpjax as gpx
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import networkx as nx
 import optax as ox
 from jax import jit
+
+import gpjax as gpx
 
 key = jr.PRNGKey(123)
 
@@ -91,7 +93,9 @@ D = gpx.Dataset(X=xs, y=y)
 nx.draw(G, pos, node_color=y, with_labels=False, alpha=0.5)
 
 vmin, vmax = y.min(), y.max()
-sm = plt.cm.ScalarMappable(cmap=plt.cm.viridis, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+sm = plt.cm.ScalarMappable(
+    cmap=plt.cm.viridis, norm=plt.Normalize(vmin=vmin, vmax=vmax)
+)
 sm.set_array([])
 cbar = plt.colorbar(sm)
 
@@ -103,14 +107,23 @@ cbar = plt.colorbar(sm)
 
 # %%
 posterior = f * gpx.Gaussian(num_datapoints=y.shape[0])
-params, constrainer, unconstrainer = gpx.initialise(posterior)
+params, training_status, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 
-mll = jit(posterior.marginal_log_likelihood(training=D, transformations=constrainer, negative=True))
+mll = jit(
+    posterior.marginal_log_likelihood(
+        train_data=D, transformations=constrainer, negative=True
+    )
+)
 
 opt = ox.adam(learning_rate=0.01)
 learned_params = gpx.abstractions.optax_fit(
-    objective=mll, params=params, optax_optim=opt, n_iters=1000
+    objective=mll,
+    params=params,
+    trainables=training_status,
+    optax_optim=opt,
+    n_iters=1000,
+    jit_compile=True,
 )
 learned_params = gpx.transform(learned_params, constrainer)
 
@@ -140,7 +153,9 @@ error = jnp.abs(learned_mean - y)
 nx.draw(G, pos, node_color=error, with_labels=False, alpha=0.5)
 
 vmin, vmax = error.min(), error.max()
-sm = plt.cm.ScalarMappable(cmap=plt.cm.viridis, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+sm = plt.cm.ScalarMappable(
+    cmap=plt.cm.viridis, norm=plt.Normalize(vmin=vmin, vmax=vmax)
+)
 sm.set_array([])
 cbar = plt.colorbar(sm)
 # %% [markdown]

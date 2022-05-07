@@ -1,11 +1,12 @@
 # ---
 # jupyter:
 #   jupytext:
+#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -17,13 +18,13 @@
 
 # %%
 from pprint import PrettyPrinter
-import gpjax as gpx
 
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 
+import gpjax as gpx
 from gpjax.utils import dict_array_coercion
 
 pp = PrettyPrinter(indent=4)
@@ -64,7 +65,7 @@ posterior = gpx.Prior(kernel=gpx.RBF()) * gpx.Gaussian(num_datapoints=training.n
 # All parameters in this model are constrained to be positive. Our MCMC sampler will therefore sample on the parameters' unconstrained space and the samples will then be back transformed onto the original positive real line. GPJax's `initialise` function makes this straightforward.
 
 # %%
-params, constrainers, unconstrainers = gpx.initialise(posterior)
+params, training_status, constrainers, unconstrainers = gpx.initialise(posterior)
 
 # %% [markdown]
 # #### Parameter type
@@ -92,9 +93,15 @@ import tensorflow_probability.substrates.jax as tfp
 tfd = tfp.distributions
 
 priors = gpx.parameters.copy_dict_structure(params)
-priors["kernel"]["lengthscale"] = tfd.Gamma(concentration=jnp.array(1.0), rate=jnp.array(1.0))
-priors["kernel"]["variance"] = tfd.Gamma(concentration=jnp.array(1.0), rate=jnp.array(1.0))
-priors["likelihood"]["obs_noise"] = tfd.Gamma(concentration=jnp.array(1.0), rate=jnp.array(1.0))
+priors["kernel"]["lengthscale"] = tfd.Gamma(
+    concentration=jnp.array(1.0), rate=jnp.array(1.0)
+)
+priors["kernel"]["variance"] = tfd.Gamma(
+    concentration=jnp.array(1.0), rate=jnp.array(1.0)
+)
+priors["likelihood"]["obs_noise"] = tfd.Gamma(
+    concentration=jnp.array(1.0), rate=jnp.array(1.0)
+)
 
 # %% [markdown]
 # ### Defining our target function
@@ -102,7 +109,9 @@ priors["likelihood"]["obs_noise"] = tfd.Gamma(concentration=jnp.array(1.0), rate
 # We'll now define the target distribution that our MCMC sampler will sample from. For our GP, this is the marginal log-likelihood that we will specify in the following way.
 
 # %%
-mll = posterior.marginal_log_likelihood(training, constrainers, priors=priors, negative=False)
+mll = posterior.marginal_log_likelihood(
+    training, constrainers, priors=priors, negative=False
+)
 mll(params)
 
 
