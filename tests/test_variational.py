@@ -1,8 +1,10 @@
+from statistics import mode
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import numpy as np
 import pyexpat
+import py
 import pytest
 from chex import assert_max_traces
 
@@ -68,3 +70,20 @@ def test_variational_gaussian_params(n_inducing):
 
     assert (variational_family.variational_root_covariance == jnp.eye(n_inducing)).all()
     assert (variational_family.variational_mean == jnp.zeros((n_inducing, 1))).all()
+
+
+# @pytest.mark.parametrize("n, n_inducing", [(10, 2), (50, 10)])
+# def test_variational_posterior(n, n_inducing):
+#     x = jnp.linspace(-5., 5., n).reshape(-1, 1)
+#     y = jnp.sin(x)
+#     D = gpx.Dataset(X=x, y=y)
+#     inducing_points = jnp.linspace(-3.0, 3.0, n_inducing).reshape(-1, 1)
+#     prior = gpx.Prior(kernel = gpx.RBF())
+#     lik =gpx.likelihoods.Gaussian(num_datapoints = n)
+#     p = prior  * lik
+#     q = gpx.variational.VariationalGaussian(inducing_inputs = inducing_points)
+
+#     model = gpx.variational.VariationalPosterior(p, q)
+
+#     assert model.posterior.prior == prior
+#     assert model.posterior.likelihood == lik

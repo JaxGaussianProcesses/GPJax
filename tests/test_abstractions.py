@@ -134,7 +134,7 @@ def test_batch_fitting(nb, ndata, jit_compile):
     svgp = gpx.SVGP(posterior=p, variational_family=q)
     params, trainable_status, constrainer, unconstrainer = initialise(svgp)
     params = gpx.transform(params, unconstrainer)
-    objective = gpx.VFE(svgp, D, constrainer)
+    objective = svgp.elbo(D, constrainer)
     D = _dataset_to_tf(dataset=D, batch_size=nb)
     batcher = batch_loader(data=D)
     pre_mll_val = objective(params, batcher())

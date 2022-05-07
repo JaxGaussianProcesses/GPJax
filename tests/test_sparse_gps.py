@@ -35,6 +35,9 @@ def test_svgp(n_datapoints, n_inducing_points, n_test, whiten, diag, jit_fns):
     )
     svgp = gpx.SVGP(posterior=post, variational_family=q)
 
+    assert svgp.posterior.prior == post.prior
+    assert svgp.posterior.likelihood == post.likelihood
+
     params, trainable_status, constrainer, unconstrainer = gpx.initialise(svgp)
     params = gpx.transform(params, unconstrainer)
 

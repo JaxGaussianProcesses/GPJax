@@ -1,4 +1,5 @@
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, Tuple, Optional
+import abc
 
 import distrax as dx
 import jax.numpy as jnp
@@ -7,13 +8,53 @@ from jax import vmap
 from jax.numpy.linalg import cholesky
 from jax.scipy.linalg import solve_triangular
 
-from gpjax.kernels import cross_covariance, gram
-from gpjax.parameters import transform
-from gpjax.types import Array, Dataset
-from gpjax.utils import I
 
+from .kernels import cross_covariance, gram
+from .config import get_defaults
+from .parameters import transform
 from .quadrature import gauss_hermite_quadrature
-from .variational import VariationalPosterior
+
+from .gps import Posterior
+from .types import Array, Dataset
+from .utils import I, concat_dictionaries
+from .variational import VariationalFamily
+
+
+DEFAULT_JITTER = get_defaults()["jitter"]
+
+
+@dataclass
+class VariationalPosterior:
+    posterior: Posterior
+    variational_family: VariationalFamily
+    jitter: Optional[float] = DEFAULT_JITTER
+
+    def __post_init__(self):
+        self.prior = self.posterior.prior
+        self.likelihood = self.posterior.likelihood
+
+    @property
+    def params(self) -> Dict:
+        hyperparams = concat_dictionaries(
+            self.posterior.params,
+            {"variational_family": self.variational_family.params},
+        )
+        return hyperparams
+
+    @abc.abstractmethod
+    def mean(self, train_data: Dataset, params: dict) -> Callable[[Dataset], Array]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def variance(self, train_data: Dataset, params: dict) -> Callable[[Dataset], Array]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def elbo(
+        self, train_data: Dataset, transformations: Dict
+    ) -> Callable[[Array], Array]:
+        raise NotImplementedError
+
 
 
 @dataclass
