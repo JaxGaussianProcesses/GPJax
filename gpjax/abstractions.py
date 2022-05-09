@@ -99,8 +99,9 @@ def optax_fit(
     tr = trange(n_iters)
     for i in tr:
         params, opt_state, val = step(params, opt_state)
-        if i % log_rate == 0 or i == n_iters:
-            tr.set_postfix({"Objective": f"{val: .2f}"})
+        if log_rate:
+            if i % log_rate == 0 or i == n_iters:
+                tr.set_postfix({"Objective": f"{val: .2f}"})
     return params
 
 
