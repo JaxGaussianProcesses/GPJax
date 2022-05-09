@@ -3,10 +3,11 @@ import typing as tp
 import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
+import numpy as np
 import pytest
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.likelihoods import Bernoulli, Gaussian, Likelihood
+from gpjax.likelihoods import AbstractLikelihood, Bernoulli, Gaussian
 from gpjax.parameters import initialise
 
 true_initialisation = {
@@ -41,7 +42,7 @@ def test_predictive_moment(n):
 
 @pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
 @pytest.mark.parametrize("n", [1, 10])
-def test_link_fns(lik: Likelihood, n: int):
+def test_link_fns(lik: AbstractLikelihood, n: int):
     l = lik(num_datapoints=n)
     params, _, _, _ = initialise(l)
     link_fn = l.link_function
@@ -50,3 +51,21 @@ def test_link_fns(lik: Likelihood, n: int):
     l_eval = link_fn(x, params)
 
     assert isinstance(l_eval, dx.Distribution)
+
+
+@pytest.mark.parametrize("noise", [0.1, 0.5, 1.0])
+def test_call(noise):
+    n = 10
+    l = Gaussian(num_datapoints=n)
+    dist = dx.MultivariateNormalFullCovariance(jnp.zeros(n), jnp.eye(n))
+    params = {"likelihood": {"obs_noise": noise}}
+
+    l_dist = l(dist, params)
+    assert (l_dist.mean() == jnp.zeros(n)).all()
+    noise_mat = jnp.diag(jnp.repeat(noise, n))
+    assert (l_dist.covariance() == jnp.eye(n) + noise_mat).all()
+
+    l_dist = l.predict(dist, params)
+    assert (l_dist.mean() == jnp.zeros(n)).all()
+    noise_mat = jnp.diag(jnp.repeat(noise, n))
+    assert (l_dist.covariance() == jnp.eye(n) + noise_mat).all()

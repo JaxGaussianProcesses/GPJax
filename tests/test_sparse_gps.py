@@ -1,9 +1,9 @@
 import typing as tp
 
+import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-import py
 import pytest
 
 import gpjax as gpx
@@ -24,7 +24,7 @@ def get_data_and_gp(n_datapoints):
 @pytest.mark.parametrize("n_test", [1, 10])
 @pytest.mark.parametrize("whiten", [True, False])
 @pytest.mark.parametrize("diag", [True, False])
-@pytest.mark.parametrize("jit_fns", [True, False])
+@pytest.mark.parametrize("jit_fns", [False, True])
 def test_svgp(n_datapoints, n_inducing_points, n_test, whiten, diag, jit_fns):
     D, post = get_data_and_gp(n_datapoints)
 
@@ -69,14 +69,16 @@ def test_svgp(n_datapoints, n_inducing_points, n_test, whiten, diag, jit_fns):
     assert latent_cov.shape == (n_test, n_test)
 
     # Test predictions
-    pred_mean_fn = svgp.mean(constrained_params)
-    pred_var_fn = svgp.variance(constrained_params)
-    mu = pred_mean_fn(test_inputs)
-    sigma = pred_var_fn(test_inputs)
+    predictive_dist_fn = svgp(constrained_params)
+    assert isinstance(predictive_dist_fn, tp.Callable)
 
-    assert isinstance(pred_mean_fn, tp.Callable)
-    assert isinstance(pred_var_fn, tp.Callable)
+    predictive_dist = predictive_dist_fn(test_inputs)
+    assert isinstance(predictive_dist, dx.Distribution)
+
+    mu = predictive_dist.mean()
+    sigma = predictive_dist.covariance()
+
     assert isinstance(mu, jnp.ndarray)
     assert isinstance(sigma, jnp.ndarray)
-    assert mu.shape == (n_test, 1)
+    assert mu.shape == (n_test,)
     assert sigma.shape == (n_test, n_test)

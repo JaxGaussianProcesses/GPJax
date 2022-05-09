@@ -1,5 +1,5 @@
 import abc
-from typing import Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, Optional, Tuple
 
 import distrax as dx
 import jax.numpy as jnp
@@ -9,7 +9,7 @@ from jax.numpy.linalg import cholesky
 from jax.scipy.linalg import solve_triangular
 
 from .config import get_defaults
-from .gps import Posterior
+from .gps import AbstractPosterior
 from .kernels import cross_covariance, gram
 from .parameters import transform
 from .quadrature import gauss_hermite_quadrature
@@ -22,13 +22,16 @@ DEFAULT_JITTER = get_defaults()["jitter"]
 
 @dataclass
 class VariationalPosterior:
-    posterior: Posterior
+    posterior: AbstractPosterior
     variational_family: VariationalFamily
     jitter: Optional[float] = DEFAULT_JITTER
 
     def __post_init__(self):
         self.prior = self.posterior.prior
         self.likelihood = self.posterior.likelihood
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        return self.predict(*args, **kwargs)
 
     @property
     def params(self) -> Dict:
@@ -39,11 +42,8 @@ class VariationalPosterior:
         return hyperparams
 
     @abc.abstractmethod
-    def mean(self, train_data: Dataset, params: dict) -> Callable[[Dataset], Array]:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def variance(self, train_data: Dataset, params: dict) -> Callable[[Dataset], Array]:
+    def predict(self, *args: Any, **kwargs: Any) -> dx.Distribution:
+        """Predict the GP's output given the input."""
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -129,16 +129,16 @@ class SVGP(VariationalPosterior):
 
         if not self.variational_family.whiten:
             M = solve_triangular(Lz.T, M, lower=False)
-            mz = self.prior.mean(params)(z)
+            mz = self.prior.mean(params)(z).reshape(-1, 1)
             mu -= mz
 
-        Fmu = self.prior.mean(params)(t) + jnp.matmul(M.T, mu)
+        Fmu = self.prior.mean(params)(t).reshape(-1, 1) + jnp.matmul(M.T, mu)
         V = jnp.matmul(M.T, sqrt)
         Fcov += jnp.matmul(V, V.T)
 
         return Fmu, Fcov
 
-    def mean(self, params: Dict) -> Callable[[Array], Array]:
+    def predict(self, params: dict) -> Callable[[Array], dx.Distribution]:
         # Cholesky decomposition at inducing inputs:
         z = params["variational_family"]["inducing_inputs"]
         nz = self.num_inducing
@@ -149,35 +149,13 @@ class SVGP(VariationalPosterior):
         # Variational mean:
         mu = params["variational_family"]["variational_mean"]
         if not self.variational_family.whiten:
-            mz = self.prior.mean(params)(z)
+            mz = self.prior.mean(params)(z).reshape(-1, 1)
             mu -= mz
-
-        def mean_fn(test_inputs: Array):
-            t = test_inputs
-            Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
-            M = solve_triangular(Lz, Kzt, lower=True)
-
-            if not self.variational_family.whiten:
-                M = solve_triangular(Lz.T, M, lower=False)
-
-            mt = self.prior.mean(params)(t)
-
-            return mt + jnp.matmul(M.T, mu)
-
-        return mean_fn
-
-    def variance(self, params: Dict) -> Callable[[Array], Array]:
-        # Cholesky decomposition at inducing inputs:
-        z = params["variational_family"]["inducing_inputs"]
-        nz = self.num_inducing
-        Kzz = gram(self.prior.kernel, z, params["kernel"])
-        Kzz += I(nz) * self.jitter
-        Lz = cholesky(Kzz)
 
         # Variational sqrt cov:
         sqrt = params["variational_family"]["variational_root_covariance"]
 
-        def variance_fn(test_inputs: Array):
+        def predict_fn(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
@@ -187,9 +165,14 @@ class SVGP(VariationalPosterior):
             if not self.variational_family.whiten:
                 M = solve_triangular(Lz.T, M, lower=False)
 
+            mt = self.prior.mean(params)(t).reshape(-1, 1)
+            mean = mt + jnp.matmul(M.T, mu)
+
             V = jnp.matmul(M.T, sqrt)
-            Fcov += jnp.matmul(V, V.T)
+            covariance = Fcov + jnp.matmul(V, V.T)
 
-            return Fcov
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance
+            )
 
-        return variance_fn
+        return predict_fn

@@ -1,5 +1,5 @@
 import abc
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 import distrax as dx
 import jax.numpy as jnp
@@ -7,15 +7,23 @@ import jax.scipy as jsp
 from chex import dataclass
 
 from .types import Array
+from .utils import I
 
 
 @dataclass(repr=False)
-class Likelihood:
+class AbstractLikelihood:
     num_datapoints: int  # The number of datapoints that the likelihood factorises over
     name: Optional[str] = "Likelihood"
 
     def __repr__(self):
         return f"{self.name} likelihood function"
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        return self.predict(*args, **kwargs)
+
+    @abc.abstractmethod
+    def predict(self, *args: Any, **kwargs: Any) -> Any:
+        raise NotImplementedError
 
     @property
     @abc.abstractmethod
@@ -29,7 +37,7 @@ class Likelihood:
 
 
 @dataclass(repr=False)
-class Gaussian(Likelihood):
+class Gaussian(AbstractLikelihood):
     name: Optional[str] = "Gaussian"
 
     @property
@@ -43,9 +51,14 @@ class Gaussian(Likelihood):
 
         return link_fn
 
+    def predict(self, dist: dx.Distribution, params: dict) -> dx.Distribution:
+        n_data = dist.event_shape[0]
+        noisy_cov = dist.covariance() + I(n_data) * params["likelihood"]["obs_noise"]
+        return dx.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
+
 
 @dataclass(repr=False)
-class Bernoulli(Likelihood):
+class Bernoulli(AbstractLikelihood):
     name: Optional[str] = "Bernoulli"
 
     @property
@@ -66,6 +79,11 @@ class Bernoulli(Likelihood):
             return rv
 
         return moment_fn
+
+    def predict(self, dist: dx.Distribution, params: dict) -> Any:
+        variance = jnp.diag(dist.covariance())
+        mean = dist.mean()
+        return self.predictive_moment_fn(mean.ravel(), variance)
 
 
 def inv_probit(x):
