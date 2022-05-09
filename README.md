@@ -35,6 +35,7 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 from jax.experimental import optimizers
+from jax import jit
 
 key = jr.PRNGKey(123)
 
@@ -46,20 +47,20 @@ training = gpx.Dataset(X=x, y=y)
 As can be seen, the latent function of interest here is a sinusoidal function. However, it has been perturbed by some zero-mean Gaussian noise with variance of 0.05. We can use a Gaussian process model to try and recover this latent function.
 
 ```python
-f = gpx.Prior(kernel = gpx.RBF())
+prior = gpx.Prior(kernel = gpx.RBF())
 ```
 
 In the presence of a likelihood function which we'll here assume to be Gaussian, we can optimise the marginal log-likelihood of the Gaussian process prior multiplied by the likelihood to obtain a posterior distribution over the latent function.
 
 ```python
 likelihood = gpx.Gaussian(num_datapoints = x.shape[0])
-posterior = f * likelihood
+posterior = prior * likelihood
 ```
 
 Equipped with the Gaussian process posterior, we can now optimise the model's hyperparameters (note, we need not optimise the latent function here due to the Gaussian conjugacy.). To do this, we can either define our parameters by hand through a dictionary, or realise a set of default parameters through the `initialise` callable. For brevity, we'll do the latter here but see the [regression notebook](https://github.com/thomaspinder/GPJax/blob/master/docs/nbs/regression.ipynb) for a full discussion on parameter initialisation and transformation.
 
 ```python
-params, constrainer, unconstrainer = gpx.initialise(posterior)
+params, training_status, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 ```
 
@@ -71,9 +72,9 @@ mll = jit(posterior.marginal_log_likelihood(training, constrainer, negative=True
 opt_init, opt_update, get_params = optimizers.adam(step_size=0.01)
 opt_state = opt_init(params)
 def step(i, opt_state):
-    p = get_params(opt_state)
-    g = jax.grad(mll)(params)
-    return opt_update(i, g, opt_state)
+    params = get_params(opt_state)
+    gradients = jax.grad(mll)(params)
+    return opt_update(i, gradients, opt_state)
 
 for i in range(100):
     opt_state = step(i, opt_state)
