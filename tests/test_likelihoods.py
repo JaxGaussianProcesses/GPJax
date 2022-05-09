@@ -64,3 +64,8 @@ def test_call(noise):
     assert (l_dist.mean() == jnp.zeros(n)).all()
     noise_mat = jnp.diag(jnp.repeat(noise, n))
     assert (l_dist.covariance() == jnp.eye(n) + noise_mat).all()
+
+    l_dist = l.predict(dist, params)
+    assert (l_dist.mean() == jnp.zeros(n)).all()
+    noise_mat = jnp.diag(jnp.repeat(noise, n))
+    assert (l_dist.covariance() == jnp.eye(n) + noise_mat).all()

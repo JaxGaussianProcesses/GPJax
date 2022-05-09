@@ -35,16 +35,6 @@ class AbstractGP:
         """Predict the GP's output given the input."""
         raise NotImplementedError
 
-    def mean(self, *args, **kwargs) -> Array:
-        """Compute the GP's variance function."""
-        mean, _ = self.predict(*args, **kwargs)
-        return mean
-
-    def variance(self, *args, **kwargs) -> Array:
-        """Compute the GP's variance function."""
-        _, variance = self.predict(*args, **kwargs)
-        return variance
-
     @abstractproperty
     def params(self) -> tp.Dict:
         """Initialise the GP's parameter set"""
@@ -89,9 +79,7 @@ class Prior(AbstractGP):
             mt = self.mean_function(t, params["mean_function"])
             Ktt = gram(self.kernel, t, params["kernel"])
             Ktt += I(t.shape[0]) * self.jitter
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mt.squeeze()), Ktt
-            )
+            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mt.squeeze()), Ktt)
 
         return predict_fn
 
@@ -130,9 +118,7 @@ class AbstractPosterior(AbstractGP):
 
     @property
     def params(self) -> dict:
-        return concat_dictionaries(
-            self.prior.params, {"likelihood": self.likelihood.params}
-        )
+        return concat_dictionaries(self.prior.params, {"likelihood": self.likelihood.params})
 
 
 @dataclass
@@ -142,9 +128,7 @@ class ConjugatePosterior(AbstractPosterior):
     name: tp.Optional[str] = "ConjugatePosterior"
     jitter: tp.Optional[float] = DEFAULT_JITTER
 
-    def predict(
-        self, train_data: Dataset, params: dict
-    ) -> tp.Callable[[Array], dx.Distribution]:
+    def predict(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], dx.Distribution]:
         x, y, n_data = train_data.X, train_data.y, train_data.n
         obs_noise = params["likelihood"]["obs_noise"]
         mx = self.prior.mean_function(x, params["mean_function"])
@@ -170,9 +154,7 @@ class ConjugatePosterior(AbstractPosterior):
             covariance = Ktt - jnp.dot(Ktx, latent_values)
             covariance += I(t.shape[0]) * self.jitter
 
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mean.squeeze()), covariance
-            )
+            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict
 
@@ -200,9 +182,7 @@ class ConjugatePosterior(AbstractPosterior):
 
             log_prior_density = evaluate_priors(params, priors)
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-            return constant * (
-                random_variable.log_prob(y.squeeze()).mean() + log_prior_density
-            )
+            return constant * (random_variable.log_prob(y.squeeze()).mean() + log_prior_density)
 
         return mll
 
@@ -231,9 +211,7 @@ class NonConjugatePosterior(AbstractPosterior):
         hyperparameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
         return hyperparameters
 
-    def predict(
-        self, train_data: Dataset, params: dict
-    ) -> tp.Callable[[Array], dx.Distribution]:
+    def predict(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], dx.Distribution]:
         x, n_data = train_data.X, train_data.n
         Kxx = gram(self.prior.kernel, x, params["kernel"])
         Kxx += I(n_data) * self.jitter
@@ -281,15 +259,11 @@ class NonConjugatePosterior(AbstractPosterior):
         return mll
 
 
-def construct_posterior(
-    prior: Prior, likelihood: AbstractLikelihood
-) -> AbstractPosterior:
+def construct_posterior(prior: Prior, likelihood: AbstractLikelihood) -> AbstractPosterior:
     if isinstance(likelihood, Gaussian):
         PosteriorGP = ConjugatePosterior
     elif any([isinstance(likelihood, l) for l in NonConjugateLikelihoods]):
         PosteriorGP = NonConjugatePosterior
     else:
-        raise NotImplementedError(
-            f"No posterior implemented for {likelihood.name} likelihood"
-        )
+        raise NotImplementedError(f"No posterior implemented for {likelihood.name} likelihood")
     return PosteriorGP(prior=prior, likelihood=likelihood)
