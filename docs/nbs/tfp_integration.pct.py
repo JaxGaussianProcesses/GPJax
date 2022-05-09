@@ -57,7 +57,8 @@ ax.legend(loc="best")
 
 # %%
 training = gpx.Dataset(X=x, y=y)
-posterior = gpx.Prior(kernel=gpx.RBF()) * gpx.Gaussian(num_datapoints=training.n)
+likelihood = gpx.Gaussian(num_datapoints=training.n)
+posterior = gpx.Prior(kernel=gpx.RBF()) * likelihood
 
 # %% [markdown]
 # ## Initialise parameters
@@ -196,9 +197,11 @@ plt.tight_layout()
 xtest = jnp.linspace(-5.2, 5.2, 500).reshape(-1, 1)
 learned_params = array_to_dict([jnp.mean(i) for i in constrained_sample_list])
 
-mu = posterior.mean(training, learned_params)(xtest)
-sigma = posterior.variance(training, learned_params)(xtest)
-one_stddev = jnp.sqrt(jnp.diag(sigma))
+# %%
+predictive_dist = likelihood(posterior(training, learned_params)(xtest), learned_params)
+
+mu = predictive_dist.mean()
+sigma = predictive_dist.stddev()
 
 # %% [markdown]
 # We'll now plot the learned posterior predictive distribution evaluated at the above defined test points.
@@ -209,13 +212,13 @@ ax.plot(x, y, "o", label="Obs", color="tab:red")
 ax.plot(xtest, mu, label="pred", color="tab:blue")
 ax.fill_between(
     xtest.squeeze(),
-    mu.squeeze() - one_stddev,
-    mu.squeeze() + one_stddev,
+    mu.squeeze() - sigma,
+    mu.squeeze() + sigma,
     alpha=0.2,
     color="tab:blue",
 )
-ax.plot(xtest, mu.squeeze() - one_stddev, color="tab:blue", linestyle="--", linewidth=1)
-ax.plot(xtest, mu.squeeze() + one_stddev, color="tab:blue", linestyle="--", linewidth=1)
+ax.plot(xtest, mu.squeeze() - sigma, color="tab:blue", linestyle="--", linewidth=1)
+ax.plot(xtest, mu.squeeze() + sigma, color="tab:blue", linestyle="--", linewidth=1)
 
 ax.legend()
 

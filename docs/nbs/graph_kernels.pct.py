@@ -81,7 +81,7 @@ true_params["kernel"] = {
     "smoothness": jnp.array(6.1),
 }
 
-rv = f.random_variable(xs, true_params)
+rv = f(true_params)(xs)
 y = rv.sample(seed=key).reshape(-1, 1)
 
 D = gpx.Dataset(X=xs, y=y)
@@ -106,7 +106,8 @@ cbar = plt.colorbar(sm)
 # With an observed dataset created, we can now proceed to define our posterior Gaussian process and optimise the model's hyperparameters. Whilst our underlying space is now the graph's vertex set and is therefore non-Euclidean, our likelihood is still Gaussian and the model is still conjugate. For this reason, we simply have to perform gradient descent on the GP's marginal log-likelihood term. We do this using the adam optimiser provided in `optax`.
 
 # %%
-posterior = f * gpx.Gaussian(num_datapoints=y.shape[0])
+likelihood = gpx.Gaussian(num_datapoints=y.shape[0])
+posterior = f * likelihood
 params, training_status, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 
@@ -133,12 +134,16 @@ learned_params = gpx.transform(learned_params, constrainer)
 #
 # With an optimised set of parameters, we can now make predictions on the graph. We haven't defined a training and testing dataset here, so we'll simply query the predictive posterior for the full graph, compute the root-mean-squared error (RMSE) for the model using the initialised parameters and the optimise set, and finally compare the RMSE values.
 # %%
-initial_mean = posterior.mean(D, params)(xs)
-learned_mean = posterior.mean(D, learned_params)(xs)
+initial_dist = likelihood(posterior(D, params)(xs), params)
+predictive_dist = likelihood(posterior(D, learned_params)(xs), learned_params)
+
+initial_mean = initial_dist.mean()
+learned_mean = predictive_dist.mean()
+
 rmse = lambda ytrue, ypred: jnp.sum(jnp.sqrt(jnp.square(ytrue - ypred)))
 
-initial_rmse = jnp.sum(jnp.sqrt(jnp.square(y - initial_mean)))
-learned_rmse = jnp.sum(jnp.sqrt(jnp.square(y - learned_mean)))
+initial_rmse = jnp.sum(jnp.sqrt(jnp.square(y.squeeze() - initial_mean)))
+learned_rmse = jnp.sum(jnp.sqrt(jnp.square(y.squeeze() - learned_mean)))
 print(
     f"RMSE with initial parameters: {initial_rmse: .2f}\nRMSE with learned parameters:"
     f" {learned_rmse: .2f}"
@@ -148,7 +153,7 @@ print(
 #
 # We can also plot the source of error in our model's predictions on the graph by the following.
 # %%
-error = jnp.abs(learned_mean - y)
+error = jnp.abs(learned_mean - y.squeeze())
 
 nx.draw(G, pos, node_color=error, with_labels=False, alpha=0.5)
 

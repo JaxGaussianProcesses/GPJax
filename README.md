@@ -86,8 +86,11 @@ final_params = gpx.transform(get_params(opt_state), constrainer)
 
 xtest = jnp.linspace(-3., 3., 100).reshape(-1, 1)
 
-predictive_mean = posterior.mean(training, final_params)(xtest)
-predictive_variance = jnp.diag(posterior.variance(training, final_params)(xtest))
+latent_distribution = posterior(training, final_params)(xtest)
+predictive_distribution = likelihood(latent_distribution, params)
+
+predictive_mean = predictive_distribution.mean()
+predictive_stddev = predictive_distribution.stddev()
 ```
 
 ## Installation

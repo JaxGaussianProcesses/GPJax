@@ -18,7 +18,6 @@
 #
 
 # %%
-
 import jax
 import jax.numpy as jnp
 import jax.random as jr
@@ -58,7 +57,8 @@ prior = gpx.Prior(kernel=kern)
 # Now we can proceed to define our likelihood function. In this example, our observations are binary, so we will select a Bernoulli likelihood. Using this likelihood function, we can compute the posterior through the product of our likelihood and prior.
 
 # %%
-posterior = prior * gpx.Bernoulli(num_datapoints=training.n)
+likelihood = gpx.Bernoulli(num_datapoints=training.n)
+posterior = prior * likelihood
 print(type(posterior))
 
 # %%
@@ -88,8 +88,10 @@ optimised_params = fit(
 optimised_params = gpx.transform(optimised_params, constrainer)
 
 # %%
-mu = posterior.mean(training, optimised_params)(xtest)
-sigma = jnp.sqrt(jnp.diag(posterior.variance(training, optimised_params)(xtest)))
+latent_dist = posterior.predict(training, optimised_params)(xtest)
+predictive_dist = likelihood(latent_dist, optimised_params)
+mu = predictive_dist.mean()
+sigma = predictive_dist.stddev()
 
 # %% [markdown]
 # With the first and centralised second moment computed, we can plot these with the original data overlayed to confirm that our process has done a good job of recovering the latent function.

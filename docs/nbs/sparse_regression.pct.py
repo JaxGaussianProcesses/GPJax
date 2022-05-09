@@ -76,7 +76,8 @@ plt.show()
 
 # %%
 D = gpx.Dataset(X=x, y=y)
-true_process = gpx.Prior(kernel=gpx.RBF()) * gpx.Gaussian(num_datapoints=N)
+likelihood = gpx.Gaussian(num_datapoints=N)
+true_process = gpx.Prior(kernel=gpx.RBF()) * likelihood
 
 q = gpx.VariationalGaussian(inducing_inputs=Z)
 
@@ -143,18 +144,18 @@ learned_params = gpx.transform(learned_params, constrainers)
 # With optimisation complete, we are free to use our inferred parameter set to make predictions on a test set of data. This can be achieve in an identical manner to all other GP models within GPJax.
 
 # %%
-meanf = svgp.mean(learned_params)(xtest)
-varfs = jnp.diag(svgp.variance(learned_params)(xtest))
-meanf = meanf.squeeze()
-varfs = varfs.squeeze() + learned_params["likelihood"]["obs_noise"]
+latent_dist = svgp(learned_params)(xtest)
+predictive_dist = likelihood(latent_dist, learned_params)
+
+# %%
+meanf = predictive_dist.mean()
+sigma = predictive_dist.stddev()
 
 # %%
 fig, ax = plt.subplots(figsize=(12, 5))
 ax.plot(x, y, "o", alpha=0.15, label="Training Data", color="tab:gray")
 ax.plot(xtest, meanf, label="Posterior mean", color="tab:blue")
-ax.fill_between(
-    xtest.flatten(), meanf - jnp.sqrt(varfs), meanf + jnp.sqrt(varfs), alpha=0.3
-)
+ax.fill_between(xtest.flatten(), meanf - sigma, meanf + sigma, alpha=0.3)
 [
     ax.axvline(x=z, color="black", alpha=0.3, linewidth=1)
     for z in learned_params["variational_family"]["inducing_inputs"]

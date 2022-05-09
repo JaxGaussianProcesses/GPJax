@@ -8,7 +8,7 @@ import tensorflow_probability.substrates.jax as tfp
 
 from gpjax import Dataset, initialise, likelihoods, transform
 from gpjax.gps import (
-    GP,
+    AbstractGP,
     ConjugatePosterior,
     NonConjugatePosterior,
     Prior,
@@ -24,19 +24,17 @@ def test_prior(num_datapoints):
     p = Prior(kernel=RBF())
     params, trainable_status, constrainer, unconstrainer = initialise(p)
     assert isinstance(p, Prior)
-    assert isinstance(p, GP)
-    meanf = p.mean(params)
-    varf = p.variance(params)
-    assert isinstance(meanf, tp.Callable)
-    assert isinstance(varf, tp.Callable)
-    x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
-    mu = meanf(x)
-    sigma = varf(x)
-    assert mu.shape == (num_datapoints, 1)
-    assert sigma.shape == (num_datapoints, num_datapoints)
+    assert isinstance(p, AbstractGP)
+    prior_rv_fn = p(params)
+    assert isinstance(prior_rv_fn, tp.Callable)
 
-    rv = p.random_variable(x, params)
-    assert isinstance(rv, dx.Distribution)
+    x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
+    predictive_dist = prior_rv_fn(x)
+    assert isinstance(predictive_dist, dx.Distribution)
+    mu = predictive_dist.mean()
+    sigma = predictive_dist.covariance()
+    assert mu.shape == (num_datapoints,)
+    assert sigma.shape == (num_datapoints, num_datapoints)
 
 
 @pytest.mark.parametrize("num_datapoints", [2, 10])
@@ -53,12 +51,12 @@ def test_conjugate_posterior(num_datapoints):
     lik = Gaussian(num_datapoints=num_datapoints)
     post = p * lik
     assert isinstance(post, ConjugatePosterior)
-    assert isinstance(post, GP)
-    assert isinstance(p, GP)
+    assert isinstance(post, AbstractGP)
+    assert isinstance(p, AbstractGP)
 
     post2 = lik * p
     assert isinstance(post2, ConjugatePosterior)
-    assert isinstance(post2, GP)
+    assert isinstance(post2, AbstractGP)
 
     params, trainable_status, constrainer, unconstrainer = initialise(post)
     params = transform(params, unconstrainer)
@@ -70,14 +68,16 @@ def test_conjugate_posterior(num_datapoints):
     assert objective_val.shape == ()
 
     # Prediction
-    meanf = post.mean(train_data=D, params=params)
-    varf = post.variance(train_data=D, params=params)
-    assert isinstance(meanf, tp.Callable)
-    assert isinstance(varf, tp.Callable)
+    predictive_dist_fn = post(D, params)
+    assert isinstance(predictive_dist_fn, tp.Callable)
+
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
-    mu = meanf(x)
-    sigma = varf(x)
-    assert mu.shape == (num_datapoints, 1)
+    predictive_dist = predictive_dist_fn(x)
+    assert isinstance(predictive_dist, dx.Distribution)
+
+    mu = predictive_dist.mean()
+    sigma = predictive_dist.covariance()
+    assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
 
 
@@ -96,8 +96,8 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     lik = likel(num_datapoints=num_datapoints)
     post = p * lik
     assert isinstance(post, NonConjugatePosterior)
-    assert isinstance(post, GP)
-    assert isinstance(p, GP)
+    assert isinstance(post, AbstractGP)
+    assert isinstance(p, AbstractGP)
     params, trainable_status, constrainer, unconstrainer = initialise(post)
     params = transform(params, unconstrainer)
 
@@ -108,14 +108,16 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     assert objective_val.shape == ()
 
     # Prediction
-    meanf = post.mean(train_data=D, params=params)
-    varf = post.variance(train_data=D, params=params)
-    assert isinstance(meanf, tp.Callable)
-    assert isinstance(varf, tp.Callable)
+    predictive_dist_fn = post(D, params)
+    assert isinstance(predictive_dist_fn, tp.Callable)
+
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
-    mu = meanf(x)
-    sigma = varf(x)
-    assert mu.shape == (num_datapoints, 1)
+    predictive_dist = predictive_dist_fn(x)
+    assert isinstance(predictive_dist, dx.Distribution)
+
+    mu = predictive_dist.mean()
+    sigma = predictive_dist.covariance()
+    assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
 
 

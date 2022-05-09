@@ -9,7 +9,7 @@ from chex import dataclass
 from gpjax.config import get_defaults
 
 from .config import Identity, Softplus, add_parameter
-from .gps import Posterior
+from .gps import AbstractPosterior
 from .types import Array, Dataset
 from .utils import I, concat_dictionaries
 

@@ -16,7 +16,6 @@
 # %% [markdown] pycharm={"name": "#%% md\n"}
 # # Regression
 # %%
-
 from pprint import PrettyPrinter
 
 import jax
@@ -41,7 +40,7 @@ key = jr.PRNGKey(123)
 
 # %%
 N = 50
-noise = 0.2
+noise = 0.3
 
 x = jr.uniform(key=key, minval=-3.0, maxval=3.0, shape=(N,)).sort().reshape(-1, 1)
 f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
@@ -76,13 +75,31 @@ kernel = gpx.RBF()
 prior = gpx.Prior(kernel=kernel)
 
 # %% [markdown]
+# ### Visualising the prior
+#
+# Each Gaussian process in GPJax can be represented by a [Distrax](https://github.com/deepmind/distrax) multivariate Gaussian distribution. Such functionality enables trivial sampling from the GP, mean and covariance evaluation of the GP.
+
+# %%
+params, trainable, constrainers, unconstrainers = gpx.initialise(prior)
+prior_dist = prior(params)(xtest)
+
+prior_mean = prior_dist.mean()
+prior_std = jnp.sqrt(prior_dist.covariance().diagonal())
+samples = prior_dist.sample(seed=key,sample_shape=20).T
+
+plt.plot(xtest, samples, color='tab:blue', alpha=0.5)
+plt.plot(xtest, prior_mean, color='tab:orange')
+plt.fill_between(xtest.flatten(), prior_mean - prior_std, prior_mean + prior_std, color='tab:orange', alpha=0.3)
+plt.show()
+
+# %% [markdown]
 # ## Computing the posterior
 #
 # The posterior distribution is proportional to the prior multiplied by a likelihood function. For this example we'll assume that the likelihood function is a Gaussian distribution. Using this, we can easily compute the posterior using the `*` operator.
 
 # %%
-lik = gpx.Gaussian(num_datapoints=training.n)
-posterior = prior * lik
+likelihood = gpx.Gaussian(num_datapoints=training.n)
+posterior = prior * likelihood
 
 # %% [markdown]
 # ### Stating parameters
@@ -152,26 +169,29 @@ pp.pprint(final_params)
 # Equipped with a posterior distribution and a set of optimised hyperparameter values defined on their original parameter space, we are now in a position to query our GP's predictive posterior distribution at a set of test points. To do this, we can either compute the process' expectation and variance directly using the following `mean` and `variance` functions.
 
 # %%
-mu = posterior.mean(training, final_params)(xtest)
-sigma = posterior.variance(training, final_params)(xtest)
-one_stddev = jnp.sqrt(jnp.diag(sigma))
+latent_dist = posterior(training, final_params)(xtest)
+predictive_dist = likelihood(latent_dist=latent_dist, params=final_params)
+
+predictive_mean = predictive_dist.mean()
+predictive_std = predictive_dist.stddev()
 
 # %% [markdown]
 # With the predictive mean and variance acquired, we can now visualise how well our GP does at explaining the original data.
 
 # %%
 fig, ax = plt.subplots(figsize=(12, 5))
-ax.plot(x, y, "o", label="Obs", color="tab:red")
-ax.plot(xtest, mu, label="pred", color="tab:blue")
+ax.plot(x, y, "o", label="Observations", color="tab:red")
+ax.plot(xtest, predictive_mean, label="Predictive mean", color="tab:blue")
 ax.fill_between(
     xtest.squeeze(),
-    mu.squeeze() - one_stddev,
-    mu.squeeze() + one_stddev,
+    predictive_mean - predictive_std,
+    predictive_mean + predictive_std,
     alpha=0.2,
     color="tab:blue",
+    label='Two sigma',
 )
-ax.plot(xtest, mu.squeeze() - one_stddev, color="tab:blue", linestyle="--", linewidth=1)
-ax.plot(xtest, mu.squeeze() + one_stddev, color="tab:blue", linestyle="--", linewidth=1)
+ax.plot(xtest, predictive_mean - predictive_std, color="tab:blue", linestyle="--", linewidth=1)
+ax.plot(xtest, predictive_mean + predictive_std, color="tab:blue", linestyle="--", linewidth=1)
 
 ax.legend()
 
