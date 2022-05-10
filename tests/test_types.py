@@ -71,7 +71,7 @@ def test_min_batch(nb, ndata):
     y = jnp.sin(x)
     D = Dataset(X=x, y=y)
     D = D.batch(batch_size=nb)
-    batcher = D.get_batches()
+    batcher = D.get_batcher()
 
     Db = batcher()
     assert Db.X.shape[0] == ndata
