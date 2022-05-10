@@ -113,7 +113,7 @@ class Dataset:
         self._tf_dataset = self._tf_dataset.prefetch(*args, **kwargs)
         return self
     
-    def get_batches(self) -> tp.Callable[[None], "Dataset"]:
+    def get_batcher(self) -> tp.Callable[[None], "Dataset"]:
         """Creates a data batching object, that loads data from the 
         tensorflow.data.Dataset object and returns it as a GPJax dataset.
 

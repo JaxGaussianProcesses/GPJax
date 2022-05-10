@@ -50,7 +50,7 @@ def test_batcher(batch_size, n):
     D = D.shuffle(D.n)
     D = D.batch(batch_size)
     D = D.prefetch(buffer_size=1)
-    batcher = D.get_batches()
+    batcher = D.get_batcher()
     Db = batcher()
     assert Db.X.shape[0] == batch_size
     assert Db.y.shape[0] == batch_size

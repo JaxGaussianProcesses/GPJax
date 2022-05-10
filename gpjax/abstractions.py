@@ -148,7 +148,7 @@ def fit_batches(
         loss = jax.jit(loss)
         train_step = jax.jit(train_step)
 
-    next_batch = train_data.get_batches()
+    next_batch = train_data.get_batcher()
     tr = trange(n_iters)
     for i in tr:
         opt_state, val = train_step(i, opt_state, next_batch())
