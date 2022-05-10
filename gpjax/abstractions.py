@@ -2,7 +2,6 @@ import typing as tp
 
 import jax
 import optax
-import tensorflow.data as tfd
 from tqdm import trange
 
 from .parameters import trainable_params
@@ -105,33 +104,15 @@ def optax_fit(
     return params
 
 
-# Mini-batch loader from a TensorFlow Dataset:
-def batch_loader(data: tfd.Dataset) -> tp.Callable[[None], Dataset]:
-    """Abstracted method for loading mini-batches from a TensorFlow Dataset as a GPJax Dataset.
-    Args:
-        dataset (tfd.Dataset): Training data as a TensorFlow Dataset.
-    Returns:
-        tp.Callable[[None], Dataset]: A function that produces mini-batches as a GPJax Dataset.
-    """
-
-    dataset_iter = iter(data)
-
-    def next_batch() -> Dataset:
-        x_batch, y_batch = dataset_iter.next()
-        return Dataset(X=x_batch.numpy(), y=y_batch.numpy())
-
-    return next_batch
-
-
 # Mini-batch gradient descent:
 def fit_batches(
     objective: tp.Callable,
     params: tp.Dict,
     trainables: tp.Dict,
+    train_data: Dataset,
     opt_init,
     opt_update,
     get_params,
-    get_batch,
     n_iters: tp.Optional[int] = 100,
     log_rate: tp.Optional[int] = 10,
     jit_compile: bool = False,
@@ -167,10 +148,10 @@ def fit_batches(
         loss = jax.jit(loss)
         train_step = jax.jit(train_step)
 
+    next_batch = train_data.get_batches()
     tr = trange(n_iters)
     for i in tr:
-        batch = get_batch()
-        opt_state, val = train_step(i, opt_state, batch)
+        opt_state, val = train_step(i, opt_state, next_batch())
         if i % log_rate == 0 or i == n_iters:
             tr.set_postfix({"Objective": f"{val: .2f}"})
     return get_params(opt_state)

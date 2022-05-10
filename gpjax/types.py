@@ -7,17 +7,21 @@ from chex import dataclass
 NoneType = type(None)
 Array = tp.Union[np.ndarray, jnp.ndarray]
 
+import tensorflow.data as tfd
 
-@dataclass(repr=False)
+
+@dataclass
 class Dataset:
+    """GPJax Dataset."""
+
     X: Array
     y: Array = None
+    _tf_dataset: tp.Optional[tfd.Dataset] = None
+    _get_batch_fn: tp.Callable[[None], "Dataset"] = None
+            
 
     def __repr__(self) -> str:
-        return (
-            f"- Number of datapoints: {self.X.shape[0]}\n- Dimension:"
-            f" {self.X.shape[1]}"
-        )
+        return f"- Number of datapoints: {self.X.shape[0]}\n- Dimension:" f" {self.X.shape[1]}"
 
     @property
     def n(self) -> int:
@@ -30,6 +34,46 @@ class Dataset:
     @property
     def out_dim(self) -> int:
         return self.y.shape[1]
+
+    def _make_tfd_if_none(self) -> None:
+        if self._tf_dataset is None:
+            self._tf_dataset = tfd.Dataset.from_tensor_slices((self.X, self.y))
+    
+    def cache(self, *args, **kwargs) -> "Dataset":
+        self._make_tfd_if_none()
+        self._tf_dataset = self._tf_dataset.cache(*args, **kwargs)
+        return self
+    
+    def repeat(self, *args, **kwargs) -> "Dataset":
+        self._make_tfd_if_none()
+        self._tf_dataset = self._tf_dataset.repeat(*args, **kwargs)
+        return self
+    
+    def shuffle(self, *args, **kwargs) -> "Dataset":
+        self._make_tfd_if_none()
+        self._tf_dataset = self._tf_dataset.shuffle(buffer_size=self.n, *args, **kwargs)
+        return self
+    
+    def batch(self, *args, **kwargs) -> "Dataset":
+        self._make_tfd_if_none()
+        self._tf_dataset = self._tf_dataset.batch(*args, **kwargs)
+        return self
+    
+    def prefetch(self, *args, **kwargs) -> "Dataset":
+        self._make_tfd_if_none()
+        self._tf_dataset = self._tf_dataset.prefetch(*args, **kwargs)
+        return self
+    
+    def get_batches(self) -> tp.Callable[[None], "Dataset"]:
+        self._make_tfd_if_none()
+        tfd_iter = iter(self._tf_dataset)
+
+        def next_batch() -> "Dataset":
+            X_batch, y_batch = next(tfd_iter)
+            
+            return Dataset(X=X_batch.numpy(), y=y_batch.numpy())
+       
+        return next_batch
 
 
 def verify_dataset(ds: Dataset) -> None:
