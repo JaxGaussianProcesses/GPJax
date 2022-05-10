@@ -49,6 +49,20 @@ nbsphinx_custom_formats = {
     ".pct.py": ["jupytext.reads", {"fmt": "py:percent"}],
 }
 
+# Latex commands
+latex_elements = {
+    # The paper size ('letterpaper' or 'a4paper').
+    # 'papersize': 'letterpaper',
+    # The font size ('10pt', '11pt' or '12pt').
+    # 'pointsize': '10pt',
+    # Additional stuff for the LaTeX preamble.
+    "preamble": r"""
+        \usepackage{amsmath}\usepackage{amsfonts}\usepackage{bm}
+        \DeclareMathOperator*{\argmax}{arg\,max}
+        \DeclareMathOperator*{\argmin}{arg\,min}
+        """
+}
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
