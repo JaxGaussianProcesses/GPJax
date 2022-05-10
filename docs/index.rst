@@ -56,17 +56,7 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
     :maxdepth: 1
     :caption: Package Reference
 
-    gps
-    kernels
-    likelihoods
-    mean_functions
-    sparse
-    variational
-    types
-    abstractions
-    utils
-    config
-    quadrature
+    api
 
 
 Indices and tables
