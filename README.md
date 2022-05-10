@@ -61,7 +61,7 @@ The posterior is then constructed by the product of our prior with our likelihoo
 posterior = prior * likelihood
 ```
 
-Equipped with the posterior, we proceed to train the model's hyperparameters through gradient-optimisation of model's marginal log-likelihood. 
+Equipped with the posterior, we proceed to train the model's hyperparameters through gradient-optimisation of the model's marginal log-likelihood. 
 
 We begin by defining a set of initial parameter values through the `initialise` callable. 
 ```python
