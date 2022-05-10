@@ -38,6 +38,7 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
     nbs/classification
     nbs/graph_kernels
     nbs/sparse_regression
+    nbs/barycentres
 
 .. toctree::
     :maxdepth: 1
