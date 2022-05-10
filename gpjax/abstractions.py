@@ -104,7 +104,6 @@ def optax_fit(
     return params
 
 
-# Mini-batch gradient descent:
 def fit_batches(
     objective: tp.Callable,
     params: tp.Dict,
@@ -123,6 +122,7 @@ def fit_batches(
         objective (tp.Callable): The objective function that we are optimising with respect to.
         params (dict): The parameters for which we would like to minimise our objective function wtih.
         trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
+        train_data (Dataset): The training dataset.
         opt_init (tp.Callable): The supplied optimiser's initialisation function.
         opt_update (tp.Callable): Optimiser's update method.
         get_params (tp.Callable): Return the current parameter state set from the optimiser.
