@@ -2,11 +2,12 @@
 # ---
 # jupyter:
 #   jupytext:
+#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -18,7 +19,7 @@
 #
 # In this notebook we'll give an implementation of <strong data-cite="mallasto2017learning"></strong>. In this work, the existence of a Wasserstein barycentre between a collection of Gaussian processes is proven.
 
-# %%
+# %% vscode={"languageId": "python"}
 import gpjax as gpx
 import jax
 import jax.numpy as jnp
@@ -58,7 +59,7 @@ key = jr.PRNGKey(123)
 #
 # We'll simulate five datasets over which we'll first learn a Gaussian process posterior, and then identify the Gaussian process barycentre at a set of test points. Each dataset will be a $\sin$ function, each with differing vertical shift, periodicity and noise amounts
 
-# %%
+# %% vscode={"languageId": "python"}
 n_data = 100
 n_test = 200
 n_datasets = 5
@@ -88,7 +89,7 @@ plt.show()
 #
 # We'll now learn a posterior distribution over each of the datasets using and independent Gaussian process. We won't spend ant time here discussing how a GP can be optimised or how a kernel can be fit. For advice on achieving this, see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for advice on optimsation and the [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for advice on selecting an appropriate kernel.
 
-# %%
+# %% vscode={"languageId": "python"}
 def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
     if y.ndim == 1:
         y = y.reshape(-1, 1)
@@ -122,7 +123,7 @@ posterior_preds = [fit_gp(x, i) for i in ys]
 #
 # In GPJax, the predictive distribution of a GP is given by a [Distrax](https://github.com/deepmind/distrax) distribution. This makes it straightforward to then extract the mean vector and covariance matrix of the GP that will be used for learning a barycentre. In the following cell we'll implement the fixed point scheme given in (3). We'll make use of Jax's `vmap` operator here and speed up potentially large matrix operations using broadcasting in `tensordot`.
 
-# %%
+# %% vscode={"languageId": "python"}
 def sqrtm(A: jnp.DeviceArray):
     return jnp.real(jsl.sqrtm(A))
 
@@ -145,7 +146,7 @@ def wasserstein_barycentres(distributions: tp.List[dx.Distribution], weights: jn
 # %% [markdown]
 # With a function defined that'll allow us to learn a Barycentre, we'll now compute it using Jax's `lax.scan` operator. This speeds up for loops in Jax and a nice introduction to this can be found in the [Jax documentation](https://jax.readthedocs.io/en/latest/_autosummary/jax.lax.scan.html). We'll run the iterative update 100 times where convergence is measured by the difference between the previous and current iteration. This can be validated by inspecting the `sequence` array in the following cell.
 
-# %%
+# %% vscode={"languageId": "python"}
 weights = jnp.ones((n_datasets,)) / n_datasets
 
 means = jnp.stack([d.mean() for d in posterior_preds])
@@ -165,7 +166,7 @@ barycentre_process = dx.MultivariateNormalFullCovariance(barycentre_mean, baryce
 #
 # With a barycentre learned, we can visualise the result. We can see that the result looks sensible as it follows the sinusoidal curve of all the inferred GPs and the uncertainty bands look sensible.
 
-# %%
+# %% vscode={"languageId": "python"}
 def plot(
     dist: dx.Distribution,
     ax,
@@ -185,8 +186,15 @@ fig, ax = plt.subplots(figsize=(16, 5))
 plot(barycentre_process, ax, color="tab:red", label="Barycentre", ci_alpha=0.4, linewidth=2)
 
 # %% [markdown]
+# ## Displacement Interpolation
+#
+# In the above example we assigned uniform weights to each of the posteriors within the barycentre. In practice though we may have some knowledge about which posterior is most likely to be the correct one. For example, we may have a priori knowledge that the first posterior is the correct one. Regardless of the weights we choose, barycentre will still be a Gaussian process and we can interpolate between a pair of posterior distributions $\mu_1$ and $\mu_2$ to visualise the corresponding barycentre $\bar{\mu}$.
+#
+# ![](figs/barycentre_gp.gif)
+
+# %% [markdown]
 # ## System Information
 
-# %%
+# %% vscode={"languageId": "python"}
 # %reload_ext watermark
 # %watermark -n -u -v -iv -w -a 'Thomas Pinder'

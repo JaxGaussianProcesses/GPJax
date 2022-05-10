@@ -74,7 +74,12 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinx_copybutton",
     "sphinxcontrib.bibtex",
+    "sphinxext.opengraph",
 ]
+
+
+todo_include_todos = True
+
 
 bibtex_bibfiles = ["refs.bib"]
 bibtex_style = "unsrt"
