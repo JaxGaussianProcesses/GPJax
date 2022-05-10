@@ -14,7 +14,7 @@
 # ---
 
 # %% [markdown]
-# # Barycentre of Gaussian Processes
+# # Gaussian Processes Barycentres
 #
 # In this notebook we'll give an implementation of <strong data-cite="mallasto2017learning"></strong>. In this work, the existence of a Wasserstein barycentre between a collection of Gaussian processes is proven.
 
@@ -36,18 +36,18 @@ key = jr.PRNGKey(123)
 #
 # ### Wasserstein distance
 #
-# The 2-Wasserstein distance metric between two probability measures $\mu$ and $\nu$ quantifies the minimal cost required to transport the unit mass from $\mu$ to $\nu$, or vice-versa. Typically, computing this metric requires the solution of a linear program. However, when $\mu$ and $\nu$ both belong to the family of multivariate Gaussian distributions, the solution is analytically given by
-# $$W_2^2(\mu, \nu) = \lVert m_1- m_2 \rVert^2_2 + \operatorname{Tr}(S_1 + S_2 - 2(S_1^{1/2}S_2S_1^{1/2})^{1/2})\tag{1}$$
+# The 2-Wasserstein distance metric between two probability measures $\mu$ and $\nu$ quantifies the minimal cost required to transport the unit mass from $\mu$ to $\nu$, or vice-versa. Typically, computing this metric requires solving a linear program. However, when $\mu$ and $\nu$ both belong to the family of multivariate Gaussian distributions, the solution is analytically given by
+# $$W_2^2(\mu, \nu) = \lVert m_1- m_2 \rVert^2_2 + \operatorname{Tr}(S_1 + S_2 - 2(S_1^{1/2}S_2S_1^{1/2})^{1/2})$$
 # where $\mu \sim \mathcal{N}(m_1, S_1)$ and $\nu\sim\mathcal{N}(m_2, S_2)$.
 #
 # ### Wasserstein barycentre
 #
 # For a collection of $T$ measures $\lbrace\mu_i\rbrace_{t=1}^T \in \mathcal{P}_2(\theta)$, the Wasserstein barycentre $\bar{\mu}$ is the measure that minimises the average Wasserstein distance to all other measures in the set. More formally, the Wasserstein barycentre is the Fréchet mean on a Wasserstein space that we can write as
-# $$\bar{\mu} = \argmin_{\mu\in\mathcal{P}_2(\theta)}\sum_{t=1}^T \alpha_t W_2^2(\mu, \mu_t)\tag{2}$$
-# where $\alpha\in\mathbb{R}^T$ is a weight vector that sums to 1.
+# $$\bar{\mu} = \operatorname{argmin}_{\mu\in\mathcal{P}_2(\theta)}\sum_{t=1}^T \alpha_t W_2^2(\mu, \mu_t)$$
+# where $\alpha\in\bbR^T$ is a weight vector that sums to 1.
 #
 # As with the Wasserstein distance, identifying the Wasserstein barycentre $\bar{\mu}$ is often an computationally demanding optimisation problem. However, when all the measures admit a multivariate Gaussian density, the barycentre $\bar{\mu} = \mathcal{N}(\bar{m}, \bar{S})$ has analytical solutions
-# $$\bar{m} = \sum_{t=1}^T \alpha_t m_t\,, \quad \bar{S}=\sum_{t=1}^T\alpha_t (\bar{S}^{1/2}S_t\bar{S}^{1/2})^{1/2}\,.\tag{3}$$
+# $$\bar{m} = \sum_{t=1}^T \alpha_t m_t\,, \quad \bar{S}=\sum_{t=1}^T\alpha_t (\bar{S}^{1/2}S_t\bar{S}^{1/2})^{1/2}\,.$$
 # Identifying $\bar{S}$ is achieved through a fixed-point iterative update.
 #
 # ## Barycentre of Gaussian processes
@@ -120,7 +120,7 @@ posterior_preds = [fit_gp(x, i) for i in ys]
 # %% [markdown]
 # ## Computing the barycentre
 #
-# In GPJax, the predictive distribution of a GP is given by a [Distrax](https://github.com/deepmind/distrax) distribution. This makes it straightforward to then extract the mean vector and covariance matrix of the GP that will be used for learning a barycentre. In the following cell, we'll implement the fixed point scheme given in (3). We'll make use of Jax's `vmap` operator here and speed up potentially large matrix operations using broadcasting in `tensordot`.
+# In GPJax, the predictive distribution of a GP is given by a [Distrax](https://github.com/deepmind/distrax) distribution. This makes it straightforward to then extract the mean vector and covariance matrix of the GP that will be used for learning a barycentre. In the following cell we'll implement the fixed point scheme given in (3). We'll make use of Jax's `vmap` operator here and speed up potentially large matrix operations using broadcasting in `tensordot`.
 
 # %%
 def sqrtm(A: jnp.DeviceArray):

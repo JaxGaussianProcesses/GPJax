@@ -19,7 +19,7 @@ EXTRAS = {
         "pytest",
     ],
     "docs": [
-        "furo==2020.12.30b24",
+        "furo",
     ],
 }
 

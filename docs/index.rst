@@ -36,8 +36,8 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
 
     nbs/regression
     nbs/classification
-    nbs/graph_kernels
     nbs/sparse_regression
+    nbs/graph_kernels
     nbs/barycentres
 
 .. toctree::
@@ -52,6 +52,29 @@ To gain an intuition for the exposed API provided by GPJax, a simple example of 
 
     nbs/tfp_integration
 
+.. toctree::
+    :maxdepth: 1
+    :caption: Package Reference
+
+    gps
+    kernels
+    likelihoods
+    mean_functions
+    sparse
+    variational
+    types
+    abstractions
+    utils
+    config
+    quadrature
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 
 
 Bibliography

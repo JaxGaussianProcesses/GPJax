@@ -12,8 +12,42 @@
 #
 import os
 import sys
+import re
+import io
+
+from importlib_metadata import version
 
 # sys.path.insert(0, os.path.abspath("../.."))
+
+
+def read(*names, **kwargs):
+    """Function to decode a read files. Credit GPyTorch."""
+    with io.open(
+        os.path.join(os.path.dirname(__file__), "..", *names),
+        encoding=kwargs.get("encoding", "utf8"),
+    ) as fp:
+        return fp.read()
+
+
+def find_version(*file_paths):
+    """Function to identify the library's current version. Credit GPyTorch."""
+    version_file = read(*file_paths)
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
+
+
+sys.path.append(
+    os.path.abspath(
+        os.path.join(
+            __file__,
+            "..",
+            "..",
+        )
+    )
+)
+
 
 # -- Project information -----------------------------------------------------
 
@@ -22,7 +56,8 @@ copyright = "2021, Thomas Pinder"
 author = "Thomas Pinder"
 
 # The full version, including alpha/beta/rc tags
-release = "0.4"
+version = find_version("gpjax", "__init__.py")
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -50,19 +85,46 @@ nbsphinx_custom_formats = {
 }
 
 # Latex commands
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    # 'papersize': 'letterpaper',
-    # The font size ('10pt', '11pt' or '12pt').
-    # 'pointsize': '10pt',
-    # Additional stuff for the LaTeX preamble.
-    "preamble": r"""
-        \usepackage{amsmath}\usepackage{amsfonts}\usepackage{bm}
-        \DeclareMathOperator*{\argmax}{arg\,max}
-        \DeclareMathOperator*{\argmin}{arg\,min}
-        """
-}
+# mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+mathjax3_config = {"tex": {"macros": {}}}
 
+with open("latex_symbols.tex", "r") as f:
+    for line in f:
+        macros = re.findall(r"\\newcommand{\\(.*?)}(\[(\d)\])?{(.+)}", line)
+        for macro in macros:
+            if len(macro[1]) == 0:
+                mathjax3_config["tex"]["macros"][macro[0]] = "{" + macro[3] + "}"
+            else:
+                mathjax3_config["tex"]["macros"][macro[0]] = ["{" + macro[3] + "}", int(macro[2])]
+
+latex_documents = [
+    ("contents", "gpjax.tex", "GPJax", "Thomas Pinder"),
+]
+
+latex_engine = "xelatex"  # or 'lualatex'
+
+latex_elements = {}
+latex_elements[
+    "preamble"
+] = r"""
+\\usepackage{amsmath,amsfonts,amssymb,amsthm}
+"""
+latex_appendices = []
+
+# If false, no module index is generated.
+latex_use_modindex = True
+texinfo_documents = [
+    (
+        "contents",
+        "gpjax",
+        "GPJax Documentation",
+        "ThomasPinder",
+        "GPJax",
+        "Jax Gaussian processes",
+        "Statistics",
+        1,
+    ),
+]
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
@@ -100,4 +162,4 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+# html_static_path = ["_static"]

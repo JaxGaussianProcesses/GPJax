@@ -114,9 +114,7 @@ class CombinationKernel(Kernel, _KernelSet):
         return [kernel.params for kernel in self.kernel_set]
 
     def __call__(self, x: Array, y: Array, params: dict) -> Array:
-        return self.combination_fn(
-            jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)])
-        )
+        return self.combination_fn(jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)]))
 
 
 @dataclass
@@ -151,7 +149,7 @@ class RBF(Kernel):
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma`
 
         .. math::
-            k(x, y) = \sigma^2 \exp \left( \frac{\lVert x - y \rVert^2_2}{2 \ell^2} \right)
+            k(x, y) = \\sigma^2 \\exp \\Bigg( \\frac{\\lVert x - y \\rVert^2_2}{2 \\ell^2} \\Bigg)
 
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.
@@ -184,7 +182,7 @@ class Matern12(Kernel):
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma`
 
         .. math::
-            k(x, y) = \sigma^2 \exp \left( -\frac{\lvert x-y \rvert}{\ell}  \right)
+            k(x, y) = \\sigma^2 \\exp \\Bigg( -\\frac{\\lvert x-y \\rvert}{\\ell}  \\Bigg)
 
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.
@@ -216,7 +214,7 @@ class Matern32(Kernel):
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma`
 
         .. math::
-            k(x, y) = \sigma^2 \exp \left(1+ \frac{\sqrt{3}\lvert x-y \rvert}{\ell}  \right)\exp\left(-\frac{\sqrt{3}\lvert x-y\rvert}{\ell} \right)
+            k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{3}\\lvert x-y \\rvert}{\\ell}  \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{3}\\lvert x-y\\rvert}{\\ell} \\Bigg)
 
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.
@@ -229,11 +227,7 @@ class Matern32(Kernel):
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
         tau = euclidean_distance(x, y)
-        K = (
-            params["variance"]
-            * (1.0 + jnp.sqrt(3.0) * tau)
-            * jnp.exp(-jnp.sqrt(3.0) * tau)
-        )
+        K = params["variance"] * (1.0 + jnp.sqrt(3.0) * tau) * jnp.exp(-jnp.sqrt(3.0) * tau)
         return K.squeeze()
 
 
@@ -254,7 +248,7 @@ class Matern52(Kernel):
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma`
 
         .. math::
-            k(x, y) = \sigma^2 \exp \left(1+ \frac{\sqrt{5}\lvert x-y \rvert}{\ell} + \frac{5\lvert x - y \rvert^2}{3\ell^2} \right)\exp\left(-\frac{\sqrt{5}\lvert x-y\rvert}{\ell} \right)
+            k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{5}\\lvert x-y \\rvert}{\\ell} + \\frac{5\\lvert x - y \\rvert^2}{3\\ell^2} \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{5}\\lvert x-y\\rvert}{\\ell} \\Bigg)
 
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.
@@ -294,7 +288,7 @@ class Polynomial(Kernel):
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\alpha` and variance :math:`\sigma` through
 
         .. math::
-            k(x, y) = \left( \alpha + \sigma^2 xy \right)^{d}
+            k(x, y) = \\Big( \\alpha + \\sigma^2 xy \\Big)^{d}
 
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.

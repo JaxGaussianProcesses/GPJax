@@ -1,4 +1,4 @@
-furo==2020.12.30b24
+furo
 jinja2<3.1
 nbsphinx>=0.8.0
 nb-black==1.0.7
