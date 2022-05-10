@@ -89,7 +89,7 @@ plt.show()
 # We'll now learn a posterior distribution over each of the datasets using and independent Gaussian process. We won't spend ant time here discussing how a GP can be optimised or how a kernel can be fit. For advice on achieving this, see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for advice on optimsation and the [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for advice on selecting an appropriate kernel.
 
 # %%
-def fit_gp(x, y):
+def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
     if y.ndim == 1:
         y = y.reshape(-1, 1)
     D = gpx.Dataset(X=x, y=y)
@@ -123,7 +123,7 @@ posterior_preds = [fit_gp(x, i) for i in ys]
 # In GPJax, the predictive distribution of a GP is given by a [Distrax](https://github.com/deepmind/distrax) distribution. This makes it straightforward to then extract the mean vector and covariance matrix of the GP that will be used for learning a barycentre. In the following cell, we'll implement the fixed point scheme given in (3). We'll make use of Jax's `vmap` operator here and speed up potentially large matrix operations using broadcasting in `tensordot`.
 
 # %%
-def sqrtm(A):
+def sqrtm(A: jnp.DeviceArray):
     return jnp.real(jsl.sqrtm(A))
 
 
@@ -132,7 +132,7 @@ def wasserstein_barycentres(distributions: tp.List[dx.Distribution], weights: jn
     cov_stack = jnp.stack(covariances)
     stack_sqrt = jax.vmap(sqrtm)(cov_stack)
 
-    def step(covariance_candidate, i):
+    def step(covariance_candidate: jnp.DeviceArray, i: jnp.DeviceArray):
         inner_term = jax.vmap(sqrtm)(
             jnp.matmul(jnp.matmul(stack_sqrt, covariance_candidate), stack_sqrt)
         )
@@ -166,7 +166,14 @@ barycentre_process = dx.MultivariateNormalFullCovariance(barycentre_mean, baryce
 # With a barycentre learned, we can visualise the result. We can see that the result looks sensible as it follows the sinusoidal curve of all the inferred GPs and the uncertainty bands look sensible.
 
 # %%
-def plot(dist, ax, color="tab:blue", label=None, ci_alpha: float = 0.2, linewidth: float = 1.0):
+def plot(
+    dist: dx.Distribution,
+    ax,
+    color: str = "tab:blue",
+    label: str = None,
+    ci_alpha: float = 0.2,
+    linewidth: float = 1.0,
+):
     mu = dist.mean()
     sigma = dist.stddev()
     ax.plot(xtest, dist.mean(), linewidth=linewidth, color=color, label=label)
