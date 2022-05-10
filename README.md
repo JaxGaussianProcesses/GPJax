@@ -21,7 +21,8 @@ GPJax aims to provide a low-level interface to Gaussian process models. Code is 
 - [**Sparse Variational Inference**](https://gpjax.readthedocs.io/en/latest/nbs/sparse_regression.html)
 - [**TensorFlow Probability Integration**](https://gpjax.readthedocs.io/en/latest/nbs/tfp_intergation.html)
 - [**Inference on Non-Euclidean Spaces**](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html#Custom-Kernel)
-- [**Inference on graphs**](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html)
+- [**Inference on Graphs**](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html)
+- [**Learning Gaussian Process Barycentres**](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html)
 
 ### Guides for customisation
 

@@ -143,7 +143,7 @@ def wasserstein_barycentres(distributions: tp.List[dx.Distribution], weights: jn
 
 
 # %% [markdown]
-# With a function defined that'll allow us to learn a Barycentre, we'll now compute it using Jax's `lax.scan` operator. This speeds up for loops in Jax and a nice introduction to this can be found in the [Jax documentation](https://jax.readthedocs.io/en/latest/_autosummary/jax.lax.scan.html).
+# With a function defined that'll allow us to learn a Barycentre, we'll now compute it using Jax's `lax.scan` operator. This speeds up for loops in Jax and a nice introduction to this can be found in the [Jax documentation](https://jax.readthedocs.io/en/latest/_autosummary/jax.lax.scan.html). We'll run the iterative update 100 times where convergence is measured by the difference between the previous and current iteration. This can be validated by inspecting the `sequence` array in the following cell.
 
 # %%
 weights = jnp.ones((n_datasets,)) / n_datasets
@@ -154,7 +154,7 @@ barycentre_mean = jnp.tensordot(weights, means, axes=1)
 step_fn = jax.jit(wasserstein_barycentres(posterior_preds, weights))
 initial_covariance = jnp.eye(n_test)
 
-barycentre_covariance, sequence = jax.lax.scan(step_fn, initial_covariance, jnp.arange(10))
+barycentre_covariance, sequence = jax.lax.scan(step_fn, initial_covariance, jnp.arange(100))
 
 
 barycentre_process = dx.MultivariateNormalFullCovariance(barycentre_mean, barycentre_covariance)
