@@ -147,3 +147,4 @@ examples/*.ipynb
 _debug/
 workspace.code-workspace
 *.ipynb
+scratch_nbs/
