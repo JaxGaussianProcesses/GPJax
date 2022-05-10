@@ -50,7 +50,7 @@ class Dataset:
     
     def shuffle(self, *args, **kwargs) -> "Dataset":
         self._make_tfd_if_none()
-        self._tf_dataset = self._tf_dataset.shuffle(buffer_size=self.n, *args, **kwargs)
+        self._tf_dataset = self._tf_dataset.shuffle( *args, **kwargs)
         return self
     
     def batch(self, *args, **kwargs) -> "Dataset":
