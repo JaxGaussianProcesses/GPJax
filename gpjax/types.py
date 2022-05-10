@@ -17,7 +17,6 @@ class Dataset:
     X: Array
     y: Array = None
     _tf_dataset: tp.Optional[tfd.Dataset] = None
-    _get_batch_fn: tp.Callable[[None], "Dataset"] = None
             
 
     def __repr__(self) -> str:
