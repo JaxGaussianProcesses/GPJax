@@ -16,15 +16,15 @@ def progress_bar_scan(n_iters, log_rate):
     tqdm_bars = {}
     remainder = n_iters % log_rate
 
-    def _define_tqdm(arg, transform):
+    def _define_tqdm(args, transform):
         tqdm_bars[0] = tqdm(range(n_iters))
 
-    def _update_tqdm(arg, transform):
-        value, cool = arg
-        tqdm_bars[0].update(cool)
-        tqdm_bars[0].set_postfix({"Objective": f"{value: .2f}"})
+    def _update_tqdm(args, transform):
+        loss_val, arg = args
+        tqdm_bars[0].update(arg)
+        tqdm_bars[0].set_postfix({"Objective": f"{loss_val: .2f}"})
 
-    def _update_progress_bar(value, i):
+    def _update_progress_bar(loss_val, i):
         "Updates tqdm progress bar of a JAX scan or loop"
         _ = lax.cond(
             i == 0,
@@ -36,7 +36,7 @@ def progress_bar_scan(n_iters, log_rate):
         _ = lax.cond(
             # update tqdm every multiple of `print_rate` except at the end
             (i % log_rate == 0) & (i != n_iters-remainder),
-            lambda _: host_callback.id_tap(_update_tqdm, (value, log_rate), result=i),
+            lambda _: host_callback.id_tap(_update_tqdm, (loss_val, log_rate), result=i),
             lambda _: i,
             operand=None,
         )
@@ -44,12 +44,12 @@ def progress_bar_scan(n_iters, log_rate):
         _ = lax.cond(
             # update tqdm by `remainder`
             i == n_iters-remainder,
-            lambda _: host_callback.id_tap(_update_tqdm, (value, remainder), result=i),
+            lambda _: host_callback.id_tap(_update_tqdm, (loss_val, remainder), result=i),
             lambda _: i,
             operand=None,
         )
 
-    def _close_tqdm(arg, transform):
+    def _close_tqdm(args, transform):
         tqdm_bars[0].close()
 
     def close_tqdm(result, i):
@@ -67,8 +67,8 @@ def progress_bar_scan(n_iters, log_rate):
         def wrapper_progress_bar(carry, x):
             i = x
             result = func(carry, x)
-            *_, value = result
-            _update_progress_bar(value, i)
+            *_, loss_val = result
+            _update_progress_bar(loss_val, i)
             return close_tqdm(result, i)
 
         return wrapper_progress_bar
@@ -85,8 +85,7 @@ def fit(
     opt_update,
     get_params,
     n_iters: int = 100,
-    log_rate: int = 10,
-    jit_compile: bool = False,
+    log_rate: int = 10
 ) -> tp.Dict:
     """Abstracted method for fitting a GP model with respect to a supplied objective function.
     Optimisers used here should originate from Jax's experimental module.
@@ -99,7 +98,6 @@ def fit(
         get_params (tp.Callable): Return the current parameter state set from the optimiser.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
-        jit_compile (bool,  optional): Jit compiles the loss function and training step within the training loop.
     Returns:
         tp.Dict: An optimised set of parameters.
     """
