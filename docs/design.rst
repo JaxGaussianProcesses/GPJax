@@ -29,10 +29,10 @@ Gaussian process notation
    * - :math:`\boldsymbol{t} = (t_1,\dotsc,t_{n_\boldsymbol{t}})`
      - t
      - Test inputs
-   * - :math:`\boldsymbol{F}`
+   * - :math:`f(\cdot)`
      - F
      - Latent function modelled as a GP
-   * - :math:`\boldsymbol{F}_{\boldsymbol{x}}`
+   * - :math:`f({\boldsymbol{x}})`
      - Fx 
      - Latent function at inputs :math:`\boldsymbol{x}`
    * - :math:`\boldsymbol{m}_{\boldsymbol{x}}`
