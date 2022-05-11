@@ -17,8 +17,9 @@ GPJax aims to provide a low-level interface to Gaussian process (GP) models in [
 ### Examples
 
 - [**Conjugate Inference**](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)
-- [**Classification**](https://gpjax.readthedocs.io/en/latest/nbs/classification.html)
+- [**Classification with MCMC**](https://gpjax.readthedocs.io/en/latest/nbs/classification.html)
 - [**Sparse Variational Inference**](https://gpjax.readthedocs.io/en/latest/nbs/sparse_regression.html)
+- [**BlackJax Integration**](https://gpjax.readthedocs.io/en/latest/nbs/classification.html)
 - [**TensorFlow Probability Integration**](https://gpjax.readthedocs.io/en/latest/nbs/tfp_intergation.html)
 - [**Inference on Non-Euclidean Spaces**](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html#Custom-Kernel)
 - [**Inference on Graphs**](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html)
@@ -29,6 +30,7 @@ GPJax aims to provide a low-level interface to Gaussian process (GP) models in [
 - [**Custom Kernel Implementation**](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html#Custom-Kernel)
 
 ## Simple example
+
 This simple regression example aims to illustrate the resemblance of GPJax's API with how we write the mathematics of Gaussian processes.
 
 After importing the necessary dependencies, we'll simulate some data.
@@ -51,25 +53,29 @@ training = gpx.Dataset(X=x, y=y)
 The function of interest here is sinusoidal, but our observations of it have been perturbed by independent zero-mean Gaussian noise. We aim to utilise a Gaussian process to try and recover this latent function.
 
 We begin by defining a zero-mean Gaussian process prior with a radial basis function kernel and assume the likelihood to be Gaussian.
+
 ```python
 prior = gpx.Prior(kernel = gpx.RBF())
 likelihood = gpx.Gaussian(num_datapoints = x.shape[0])
 ```
 
 The posterior is then constructed by the product of our prior with our likelihood.
+
 ```python
 posterior = prior * likelihood
 ```
 
-Equipped with the posterior, we proceed to train the model's hyperparameters through gradient-optimisation of the model's marginal log-likelihood. 
+Equipped with the posterior, we proceed to train the model's hyperparameters through gradient-optimisation of the model's marginal log-likelihood.
 
-We begin by defining a set of initial parameter values through the `initialise` callable. 
+We begin by defining a set of initial parameter values through the `initialise` callable.
+
 ```python
 params, training_status, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 ```
 
 Next, we define the marginal log-likelihood, and Jit compile this to accelerate training. Notice that it is only now that we have incorporated any data into our GP. This is desirable since model building works this way in principle too, where we first define our prior model, then observe some data and use this data to build a posterior.
+
 ```python
 mll = jit(posterior.marginal_log_likelihood(training, constrainer, negative=True))
 ```

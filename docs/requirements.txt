@@ -12,5 +12,6 @@ ipython
 ipykernel
 watermark
 sphinxext-opengraph
+blackjax
 # Install GPJax istself
 .
