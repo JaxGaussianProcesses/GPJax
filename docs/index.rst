@@ -6,7 +6,7 @@ Welcome to GPJax's documentation!
 
 GPJax is a didactic Gaussian process library that supports GPU acceleration and just-in-time compilation. We seek to provide a flexible API as close as possible to how the underlying mathematics is written on paper to enable researchers rapidly prototype and develop new ideas.
 
-You can view the source code for GPJax `here on Github <https://github.com/thomaspinder/GPJax>`_
+You can view the source code for GPJax `here on Github <https://github.com/thomaspinder/GPJax>`_.
 
 Gaussian process 'Hello World' example
 -----------------------------------------------------
