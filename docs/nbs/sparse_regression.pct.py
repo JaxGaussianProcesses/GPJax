@@ -122,7 +122,6 @@ learned_params = gpx.abstractions.fit_batches(
     opt_update = opt_update,
     get_params = get_params,
     n_iters=2500,
-    jit_compile=True,
 )
 learned_params = gpx.transform(learned_params, constrainers)
 

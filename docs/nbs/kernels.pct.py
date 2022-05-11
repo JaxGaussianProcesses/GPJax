@@ -162,9 +162,7 @@ class Polar(gpx.kernels.Kernel):
         self.c = self.period / 2.0  # in [0, \pi]
         self._params = {"tau": jnp.array([4.0])}
 
-    def __call__(
-        self, x: gpx.types.Array, y: gpx.types.Array, params: dict
-    ) -> gpx.types.Array:
+    def __call__(self, x: gpx.types.Array, y: gpx.types.Array, params: dict) -> gpx.types.Array:
         tau = params["tau"]
         t = angular_distance(x, y, self.c)
         K = (1 + tau * t / self.c) * jnp.clip(1 - t / self.c, 0, jnp.inf) ** tau
@@ -207,21 +205,16 @@ likelihood = gpx.Gaussian(num_datapoints=n)
 circlular_posterior = gpx.Prior(kernel=PKern) * likelihood
 
 # Initialise parameters and corresponding transformations
-params, training_status, constrainer, unconstrainer = gpx.initialise(
-    circlular_posterior
-)
+params, training_status, constrainer, unconstrainer = gpx.initialise(circlular_posterior)
 
 # Optimise GP's marginal log-likelihood using Adam
-mll = jit(
-    circlular_posterior.marginal_log_likelihood(training, constrainer, negative=True)
-)
+mll = jit(circlular_posterior.marginal_log_likelihood(training, constrainer, negative=True))
 learned_params = gpx.optax_fit(
     mll,
     params,
     training_status,
     adam(learning_rate=0.05),
     n_iters=1000,
-    jit_compile=True,
 )
 
 # Untransform learned parameters

@@ -108,8 +108,6 @@ def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
         params=params,
         optax_optim=opt,
         n_iters=1000,
-        jit_compile=True,
-        log_rate=None,
     )
     learned_params = gpx.transform(learned_params, constrainers)
     return likelihood(posterior(D, learned_params)(xtest), learned_params)

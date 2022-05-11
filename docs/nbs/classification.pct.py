@@ -173,5 +173,3 @@ ax.fill_between(xtest.flatten(), lower_ci.flatten(), upper_ci.flatten(), alpha=0
 # %%
 # %load_ext watermark
 # %watermark -n -u -v -iv -w -a "Thomas Pinder"
-
-# %%

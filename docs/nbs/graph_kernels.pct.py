@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -93,9 +93,7 @@ D = gpx.Dataset(X=xs, y=y)
 nx.draw(G, pos, node_color=y, with_labels=False, alpha=0.5)
 
 vmin, vmax = y.min(), y.max()
-sm = plt.cm.ScalarMappable(
-    cmap=plt.cm.viridis, norm=plt.Normalize(vmin=vmin, vmax=vmax)
-)
+sm = plt.cm.ScalarMappable(cmap=plt.cm.viridis, norm=plt.Normalize(vmin=vmin, vmax=vmax))
 sm.set_array([])
 cbar = plt.colorbar(sm)
 
@@ -112,9 +110,7 @@ params, training_status, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 
 mll = jit(
-    posterior.marginal_log_likelihood(
-        train_data=D, transformations=constrainer, negative=True
-    )
+    posterior.marginal_log_likelihood(train_data=D, transformations=constrainer, negative=True)
 )
 
 opt = ox.adam(learning_rate=0.01)
@@ -124,7 +120,6 @@ learned_params = gpx.abstractions.optax_fit(
     trainables=training_status,
     optax_optim=opt,
     n_iters=1000,
-    jit_compile=True,
 )
 learned_params = gpx.transform(learned_params, constrainer)
 
@@ -158,9 +153,7 @@ error = jnp.abs(learned_mean - y.squeeze())
 nx.draw(G, pos, node_color=error, with_labels=False, alpha=0.5)
 
 vmin, vmax = error.min(), error.max()
-sm = plt.cm.ScalarMappable(
-    cmap=plt.cm.viridis, norm=plt.Normalize(vmin=vmin, vmax=vmax)
-)
+sm = plt.cm.ScalarMappable(cmap=plt.cm.viridis, norm=plt.Normalize(vmin=vmin, vmax=vmax))
 sm.set_array([])
 cbar = plt.colorbar(sm)
 # %% [markdown]

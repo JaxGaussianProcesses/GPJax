@@ -10,9 +10,10 @@ from jax.experimental import host_callback
 from .parameters import trainable_params
 from .types import Dataset
 
+
 def progress_bar_scan(n_iters, log_rate):
     "Progress bar for a JAX scan -> adapted from https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/"
-    
+
     tqdm_bars = {}
     remainder = n_iters % log_rate
 
@@ -35,7 +36,7 @@ def progress_bar_scan(n_iters, log_rate):
 
         _ = lax.cond(
             # update tqdm every multiple of `print_rate` except at the end
-            (i % log_rate == 0) & (i != n_iters-remainder),
+            (i % log_rate == 0) & (i != n_iters - remainder),
             lambda _: host_callback.id_tap(_update_tqdm, (loss_val, log_rate), result=i),
             lambda _: i,
             operand=None,
@@ -43,7 +44,7 @@ def progress_bar_scan(n_iters, log_rate):
 
         _ = lax.cond(
             # update tqdm by `remainder`
-            i == n_iters-remainder,
+            i == n_iters - remainder,
             lambda _: host_callback.id_tap(_update_tqdm, (loss_val, remainder), result=i),
             lambda _: i,
             operand=None,
@@ -54,16 +55,15 @@ def progress_bar_scan(n_iters, log_rate):
 
     def close_tqdm(result, i):
         return lax.cond(
-            i == n_iters-1,
+            i == n_iters - 1,
             lambda _: host_callback.id_tap(_close_tqdm, None, result=result),
             lambda _: result,
             operand=None,
         )
 
-
     def _progress_bar_scan(func):
         """Decorator that adds a progress bar to `body_fun` used in `lax.scan`."""
-        
+
         def wrapper_progress_bar(carry, x):
             i = x
             result = func(carry, x)
@@ -76,7 +76,6 @@ def progress_bar_scan(n_iters, log_rate):
     return _progress_bar_scan
 
 
-
 def fit(
     objective: tp.Callable,
     params: tp.Dict,
@@ -85,7 +84,7 @@ def fit(
     opt_update,
     get_params,
     n_iters: int = 100,
-    log_rate: int = 10
+    log_rate: int = 10,
 ) -> tp.Dict:
     """Abstracted method for fitting a GP model with respect to a supplied objective function.
     Optimisers used here should originate from Jax's experimental module.
@@ -152,12 +151,11 @@ def optax_fit(
         params = optax.apply_updates(params, updates)
         params_opt_state = params, opt_state
         return params_opt_state, loss_val
-    
+
     (params, _), _ = jax.lax.scan(step, (params, opt_state), jnp.arange(n_iters))
     return params
 
 
-import typing as tp
 def fit_batches(
     objective: tp.Callable,
     params: tp.Dict,
@@ -198,7 +196,7 @@ def fit_batches(
         batch = next_batch()
         loss_val, loss_gradient = jax.value_and_grad(loss)(params, batch)
         return opt_update(i, loss_gradient, opt_state), loss_val
-    
+
     opt_state, _ = jax.lax.scan(step, opt_state, jnp.arange(n_iters))
-    
+
     return get_params(opt_state)
