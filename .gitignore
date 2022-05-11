@@ -148,3 +148,4 @@ _debug/
 workspace.code-workspace
 *.ipynb
 scratch_nbs/
+.DS_store
