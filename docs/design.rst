@@ -1,4 +1,4 @@
-Principles
+GPJax Principles
 ======================
 
 GPJax is designed to be a Gaussian process package that provides an accurate representation of the underlying maths. Variable names are designed to closely, if not exactly, match the notation in the :cite:t:`rasmussen2006gaussian`. We here list the notation used in GPJax with its corresponding mathematical quantity.
