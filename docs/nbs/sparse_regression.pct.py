@@ -29,7 +29,8 @@ import jax.random as jr
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from jax import jit
-from jax.example_libraries import optimizers
+# from jax.example_libraries import optimizers
+import optax as ox
 
 import gpjax as gpx
 
@@ -109,18 +110,17 @@ loss_fn = jit(svgp.elbo(D, constrainers, negative=True))
 # Despite introducing a set of inducing points into our model, inference can still be intractable when the observed dataset's size is very large. To circumvent this, optimisation can be done using stochastic mini-batches. The `Dataset` object given in GPJax can easily be batched using the `batch()` method. Further accelerations can be given using prefetching and cacheing in a manner similar to [TensorFlow's Dataset object](https://www.tensorflow.org/guide/data_performance).
 
 # %%
-opt_init, opt_update, get_params = optimizers.adam(step_size=0.01)
+Dbatched = D.cache().repeat().shuffle(D.n).batch(batch_size=128).prefetch(buffer_size=1)
 
-Dbatched = D.cache().repeat().shuffle(D.n).batch(batch_size=64).prefetch(buffer_size=1)
+# %%
+optimiser = ox.adam(learning_rate=0.01)
 
 learned_params = gpx.abstractions.fit_batches(
     objective = loss_fn,
     train_data = Dbatched, 
     params = params,
     trainables = trainables,
-    opt_init = opt_init,
-    opt_update = opt_update,
-    get_params = get_params,
+    optax_optim = optimiser,
     n_iters=2500,
 )
 learned_params = gpx.transform(learned_params, constrainers)

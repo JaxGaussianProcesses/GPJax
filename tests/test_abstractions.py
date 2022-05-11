@@ -42,9 +42,7 @@ def test_optax_fit(n):
     mll = p.marginal_log_likelihood(D, constrainer, negative=True)
     pre_mll_val = mll(params)
     optimiser = optax.adam(learning_rate=0.1)
-    optimised_params = optax_fit(
-        mll, params, trainable_status, optimiser, n_iters=10
-    )
+    optimised_params = optax_fit(mll, params, trainable_status, optimiser, n_iters=10)
     optimised_params = transform(optimised_params, constrainer)
     assert isinstance(optimised_params, dict)
     assert mll(optimised_params) < pre_mll_val
@@ -65,7 +63,6 @@ def test_stop_grads(optim_pkg):
         learned_params = optax_fit(loss_fn, params, trainables, optimiser, n_iters=1)
     assert learned_params["y"] == params["y"]
     assert learned_params["x"] != params["x"]
-
 
 
 @pytest.mark.parametrize("nb", [20, 50])
@@ -91,16 +88,8 @@ def test_batch_fitting(nb, ndata):
     D = D.batch(batch_size=32)
     D = D.prefetch(buffer_size=1)
 
-    opt_init, opt_update, get_params = optimizers.adam(step_size=0.1)
-    optimised_params = fit_batches(
-        objective,
-        params,
-        trainable_status,
-        D,
-        opt_init,
-        opt_update,
-        get_params,
-        n_iters=5
-    )
+    # opt_init, opt_update, get_params = optimizers.adam(step_size=0.1)
+    optimiser = optax.adam(learning_rate=0.1)
+    optimised_params = fit_batches(objective, params, trainable_status, D, optimiser, n_iters=5)
     optimised_params = transform(optimised_params, constrainer)
     assert isinstance(optimised_params, dict)

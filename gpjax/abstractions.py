@@ -161,9 +161,10 @@ def fit_batches(
     params: tp.Dict,
     trainables: tp.Dict,
     train_data: Dataset,
-    opt_init,
-    opt_update,
-    get_params,
+    optax_optim,
+    # opt_init,
+    # opt_update,
+    # get_params,
     n_iters: tp.Optional[int] = 100,
     log_rate: tp.Optional[int] = 10,
 ) -> tp.Dict:
@@ -183,7 +184,8 @@ def fit_batches(
         tp.Dict: An optimised set of parameters.
     """
 
-    opt_state = opt_init(params)
+    # opt_state = opt_init(params)
+    opt_state = optax_optim.init(params)
     next_batch = train_data.get_batcher()
 
     def loss(params, batch):
@@ -191,12 +193,15 @@ def fit_batches(
         return objective(params, batch)
 
     @progress_bar_scan(n_iters, log_rate)
-    def step(opt_state, i):
-        params = get_params(opt_state)
+    def step(params_opt_state, i):
+        params, opt_state = params_opt_state
         batch = next_batch()
         loss_val, loss_gradient = jax.value_and_grad(loss)(params, batch)
-        return opt_update(i, loss_gradient, opt_state), loss_val
+        updates, opt_state = optax_optim.update(loss_gradient, opt_state, params)
+        params = optax.apply_updates(params, updates)
+        params_opt_state = params, opt_state
+        return params_opt_state, loss_val
 
-    opt_state, _ = jax.lax.scan(step, opt_state, jnp.arange(n_iters))
+    (params, _), _ = jax.lax.scan(step, (params, opt_state), jnp.arange(n_iters))
 
-    return get_params(opt_state)
+    return params
