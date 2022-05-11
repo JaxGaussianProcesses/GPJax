@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 # ---
 # jupyter:
 #   jupytext:
+#     cell_metadata_filter: -all
 #     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
@@ -9,92 +9,54 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
 
-# %% [markdown]
-# # Gaussian Processes Barycentres
-#
-# In this notebook we'll give an implementation of <strong data-cite="mallasto2017learning"></strong>. In this work, the existence of a Wasserstein barycentre between a collection of Gaussian processes is proven.
-
-# %% vscode={"languageId": "python"}
+# %%
 import gpjax as gpx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
-import optax as ox
+import optax as ox 
 import distrax as dx
-import typing as tp
+import typing as tp 
 import jax.scipy.linalg as jsl
 
 key = jr.PRNGKey(123)
 
-# %% [markdown]
-# ## Background
-#
-# ### Wasserstein distance
-#
-# The 2-Wasserstein distance metric between two probability measures $\mu$ and $\nu$ quantifies the minimal cost required to transport the unit mass from $\mu$ to $\nu$, or vice-versa. Typically, computing this metric requires solving a linear program. However, when $\mu$ and $\nu$ both belong to the family of multivariate Gaussian distributions, the solution is analytically given by
-# $$W_2^2(\mu, \nu) = \lVert m_1- m_2 \rVert^2_2 + \operatorname{Tr}(S_1 + S_2 - 2(S_1^{1/2}S_2S_1^{1/2})^{1/2})$$
-# where $\mu \sim \mathcal{N}(m_1, S_1)$ and $\nu\sim\mathcal{N}(m_2, S_2)$.
-#
-# ### Wasserstein barycentre
-#
-# For a collection of $T$ measures $\lbrace\mu_i\rbrace_{t=1}^T \in \mathcal{P}_2(\theta)$, the Wasserstein barycentre $\bar{\mu}$ is the measure that minimises the average Wasserstein distance to all other measures in the set. More formally, the Wasserstein barycentre is the Fréchet mean on a Wasserstein space that we can write as
-# $$\bar{\mu} = \operatorname{argmin}_{\mu\in\mathcal{P}_2(\theta)}\sum_{t=1}^T \alpha_t W_2^2(\mu, \mu_t)$$
-# where $\alpha\in\bbR^T$ is a weight vector that sums to 1.
-#
-# As with the Wasserstein distance, identifying the Wasserstein barycentre $\bar{\mu}$ is often an computationally demanding optimisation problem. However, when all the measures admit a multivariate Gaussian density, the barycentre $\bar{\mu} = \mathcal{N}(\bar{m}, \bar{S})$ has analytical solutions
-# $$\bar{m} = \sum_{t=1}^T \alpha_t m_t\,, \quad \bar{S}=\sum_{t=1}^T\alpha_t (\bar{S}^{1/2}S_t\bar{S}^{1/2})^{1/2}\,.$$
-# Identifying $\bar{S}$ is achieved through a fixed-point iterative update.
-#
-# ## Barycentre of Gaussian processes
-#
-# It was shown in <strong data-cite="mallasto2017learning"></strong> that the barycentre $\bar{f}$ of a collection of Gaussian processes $\lbrace f_i\rbrace_{i=1}^T$ such that $f_i \sim \mathcal{GP}(m, K)$ can be found using the same solutions as in (3). In this notebook, we will demonstrate how this can be achieved in GPJax.
-#
-# ## Data
-#
-# We'll simulate five datasets over which we'll first learn a Gaussian process posterior, and then identify the Gaussian process barycentre at a set of test points. Each dataset will be a $\sin$ function, each with differing vertical shift, periodicity and noise amounts
 
-# %% vscode={"languageId": "python"}
-n_data = 100
-n_test = 200
-n_datasets = 5
+# %%
+def sqrtm(A):
+    return jnp.real(jsl.sqrtm(A))
 
-x = jnp.linspace(-5.0, 5.0, n_data).reshape(-1, 1)
-xtest = jnp.linspace(-5.5, 5.5, n_test).reshape(-1, 1)
-f = lambda x, a, b: a + jnp.sin(b * x)
-
-ys = []
-for i in range(n_datasets):
-    key, subkey = jr.split(key)
-    vertical_shift = jr.uniform(subkey, minval=0.0, maxval=2.0)
-    period = jr.uniform(subkey, minval=0.75, maxval=1.25)
-    noise_amount = jr.uniform(subkey, minval=0.01, maxval=0.5)
-    noise = jr.normal(subkey, shape=x.shape) * noise_amount
-    ys.append(f(x, vertical_shift, period) + noise)
-
-y = jnp.hstack(ys)
-
-fig, ax = plt.subplots(figsize=(16, 5))
-ax.plot(x, y, "o")
-plt.show()
+def wasserstein_distance(alpha: dx.MultivariateNormalFullCovariance, beta: dx.MultivariateNormalFullCovariance):
+    m0 = alpha.mean()
+    m1 = beta.mean()
+    K0 = alpha.covariance() + jnp.eye(n_test)*1e-8
+    K1 = beta.covariance() + jnp.eye(n_test)*1e-8
+    return jnp.linalg.norm(m0 - m1, ord=2) + jnp.sum(jnp.diag(K0 + K1)) - 2*jnp.sum(jnp.diag(sqrtm(sqrtm(K0)@K1@sqrtm(K0))))
 
 
-# %% [markdown]
-# ## Learning a posterior distribution
-#
-# We'll now learn a posterior distribution over each of the datasets using and independent Gaussian process. We won't spend ant time here discussing how a GP can be optimised or how a kernel can be fit. For advice on achieving this, see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for advice on optimsation and the [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for advice on selecting an appropriate kernel.
+def wasserstein_barycentres(distributions: tp.List[dx.Distribution], weights: jnp.DeviceArray):
+    covariances = [d.covariance() for d in distributions]
+    cov_stack = jnp.stack(covariances)
+    stack_sqrt = jax.vmap(sqrtm)(cov_stack)
+    
+    def step(covariance_candidate, i):
+        inner_term = jax.vmap(sqrtm)(jnp.matmul(jnp.matmul(stack_sqrt, covariance_candidate), stack_sqrt))
+        fixed_point = jnp.tensordot(weights, inner_term, axes=1)
+        return fixed_point, fixed_point
 
-# %% vscode={"languageId": "python"}
-def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
+    return step
+
+def fit_gp(x, y):
     if y.ndim == 1:
         y = y.reshape(-1, 1)
-    D = gpx.Dataset(X=x, y=y)
-    likelihood = gpx.Gaussian(num_datapoints=n_data)
+    D = gpx.Dataset(X = x, y=y)
+    likelihood = gpx.Gaussian(num_datapoints= n_data)
     posterior = gpx.Prior(kernel=gpx.RBF()) * likelihood
     params, trainables, constrainers, unconstrainers = gpx.initialise(posterior)
     params = gpx.transform(params, unconstrainers)
@@ -102,99 +64,132 @@ def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
     objective = jax.jit(posterior.marginal_log_likelihood(D, constrainers, negative=True))
 
     opt = ox.adam(learning_rate=0.01)
-    learned_params = gpx.optax_fit(
-        objective=objective,
-        trainables=trainables,
-        params=params,
-        optax_optim=opt,
-        n_iters=1000,
-        jit_compile=True,
-        log_rate=None,
-    )
+    learned_params = gpx.optax_fit(objective=objective, trainables=trainables, params=params, optax_optim=opt, n_iters=1000, jit_compile=True, log_rate=None)
     learned_params = gpx.transform(learned_params, constrainers)
     return likelihood(posterior(D, learned_params)(xtest), learned_params)
 
+def plot(dist, ax, color="tab:blue", label = None):
+    mu = dist.mean()
+    sigma = dist.stddev()
+    ax.plot(xtest, dist.mean(), linewidth=1, color=color, label=label)
+    ax.fill_between(xtest.squeeze(), mu-sigma, mu+sigma, alpha=0.2, color=color)
 
+
+
+# %% [markdown]
+# # Gaussian Process Barycentres
+#
+#
+
+# %%
+key = jr.PRNGKey(123)
+n_data = 100
+n_test = 200
+
+# f1 = lambda x: x**2
+# f2 = lambda x: 5.+ -0.15*x**4
+
+f1 = lambda x: jnp.sin(4*x) + 2.5*jnp.cos(5*x)
+f2 = lambda x: jnp.sin(2*x) + jnp.cos(6*x)
+
+x1 = jr.uniform(key, minval=-3., maxval=3., shape=(n_data, 1))
+key, subkey = jr.split(key)
+y1 = f1(x1) + jr.normal(key, shape=(n_data, 1))*0.2
+key, subkey = jr.split(subkey)
+x2 = jr.uniform(subkey, minval=-3., maxval=3., shape=(n_data, 1))
+key, subkey = jr.split(subkey)
+y2 = f2(x2) + jr.normal(subkey, shape=(n_data, 1))*0.35
+xtest = jnp.linspace(-3., 3., n_test).reshape(-1, 1)
+
+fig, ax = plt.subplots(figsize=(16, 5))
+ax.plot(x1, y1, 'o', color='tab:orange')
+ax.plot(x2, y2, 'o', color='tab:blue')
+
+
+# %%
+p1 = fit_gp(x1, y1)
+p2 = fit_gp(x2, y2)
+
+fig, ax = plt.subplots(figsize=(16, 5))
+ax.plot(x1, y1, 'o', color='tab:orange')
+ax.plot(x2, y2, 'o', color='tab:blue')
+plot(p1, ax, color="tab:orange")
+plot(p2, ax, color="tab:blue")
+
+# %%
+weight_idxs = [0.5] + jnp.linspace(0.5, 1., 10).tolist() + jnp.repeat(1., 5).tolist() + jnp.linspace(1., 0., 20).tolist()+ jnp.repeat(0., 5).tolist()+ jnp.linspace(0., 0.5, 10).tolist()
+for idx, i in enumerate(weight_idxs):
+    weights = jnp.array([i, 1-i])
+    step_fn = jax.jit(wasserstein_barycentres([p1, p2], weights))
+    initial_covariance = jnp.eye(n_test)
+
+    barycentre_covariance, sequence = jax.lax.scan(step_fn, initial_covariance, jnp.arange(10))
+
+    means = jnp.stack([d.mean() for d in [p1, p2]])
+    barycentre_mean = jnp.tensordot(weights, means, axes=1)
+    barycentre_process = dx.MultivariateNormalFullCovariance(barycentre_mean, barycentre_covariance)
+
+    fig, ax = plt.subplots(figsize=(16, 5), tight_layout=True)
+    plot(p1, ax, color="tab:green", label=r"$\mu_1$")
+    plot(p2, ax, color="tab:blue", label=r"$\mu_2$")
+    plot(barycentre_process, ax, color="tab:red", label=r"$\bar{\mu}$")
+    ax.legend(loc='lower center',fancybox=True,prop=dict(size=16))
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.set_xticks([])
+    ax.set_xticks([], minor=True)
+    ax.set_yticks([])
+    ax.set_yticks([], minor=True)
+    
+    plt.savefig(f'docs/nbs/barycentre_figs/{str(idx).zfill(2)}.png')
+    plt.close()
+
+# %%
+n_datasets = 5
+
+x = jnp.linspace(-5., 5., n_data).reshape(-1, 1)
+xtest = jnp.linspace(-5.5, 5.5, n_test).reshape(-1, 1)
+f = lambda x, a, b: a+jnp.sin(b*x) 
+
+ys = []
+for i in range(n_datasets):
+    key, subkey = jr.split(key)
+    vertical_shift = jr.uniform(subkey, minval=0., maxval=2.)
+    period = jr.uniform(subkey, minval=0.75, maxval=1.25)
+    noise_amount = jr.uniform(subkey, minval=0.01, maxval=0.5)
+    noise = jr.normal(subkey, shape = x.shape) * noise_amount
+    ys.append(f(x, vertical_shift, period) + noise)
+
+y = jnp.hstack(ys)
+
+fig, ax = plt.subplots(figsize=(16, 5))
+ax.plot(x, y, 'o')
+
+# %%
+
+# %%
 posterior_preds = [fit_gp(x, i) for i in ys]
 
-
-# %% [markdown]
-# ## Computing the barycentre
-#
-# In GPJax, the predictive distribution of a GP is given by a [Distrax](https://github.com/deepmind/distrax) distribution. This makes it straightforward to then extract the mean vector and covariance matrix of the GP that will be used for learning a barycentre. In the following cell we'll implement the fixed point scheme given in (3). We'll make use of Jax's `vmap` operator here and speed up potentially large matrix operations using broadcasting in `tensordot`.
-
-# %% vscode={"languageId": "python"}
-def sqrtm(A: jnp.DeviceArray):
-    return jnp.real(jsl.sqrtm(A))
-
-
-def wasserstein_barycentres(distributions: tp.List[dx.Distribution], weights: jnp.DeviceArray):
-    covariances = [d.covariance() for d in distributions]
-    cov_stack = jnp.stack(covariances)
-    stack_sqrt = jax.vmap(sqrtm)(cov_stack)
-
-    def step(covariance_candidate: jnp.DeviceArray, i: jnp.DeviceArray):
-        inner_term = jax.vmap(sqrtm)(
-            jnp.matmul(jnp.matmul(stack_sqrt, covariance_candidate), stack_sqrt)
-        )
-        fixed_point = jnp.tensordot(weights, inner_term, axes=1)
-        return fixed_point, fixed_point
-
-    return step
-
-
-# %% [markdown]
-# With a function defined that'll allow us to learn a Barycentre, we'll now compute it using Jax's `lax.scan` operator. This speeds up for loops in Jax and a nice introduction to this can be found in the [Jax documentation](https://jax.readthedocs.io/en/latest/_autosummary/jax.lax.scan.html). We'll run the iterative update 100 times where convergence is measured by the difference between the previous and current iteration. This can be validated by inspecting the `sequence` array in the following cell.
-
-# %% vscode={"languageId": "python"}
+# %%
 weights = jnp.ones((n_datasets,)) / n_datasets
+step_fn = jax.jit(wasserstein_barycentres(posterior_preds, weights))
+initial_covariance = jnp.eye(n_test)
+
+barycentre_covariance, sequence = jax.lax.scan(step_fn, initial_covariance, jnp.arange(10))
 
 means = jnp.stack([d.mean() for d in posterior_preds])
 barycentre_mean = jnp.tensordot(weights, means, axes=1)
 
-step_fn = jax.jit(wasserstein_barycentres(posterior_preds, weights))
-initial_covariance = jnp.eye(n_test)
-
-barycentre_covariance, sequence = jax.lax.scan(step_fn, initial_covariance, jnp.arange(100))
-
-
+# %%
 barycentre_process = dx.MultivariateNormalFullCovariance(barycentre_mean, barycentre_covariance)
 
-
-# %% [markdown]
-# ## Plotting the result
-#
-# With a barycentre learned, we can visualise the result. We can see that the result looks sensible as it follows the sinusoidal curve of all the inferred GPs and the uncertainty bands look sensible.
-
-# %% vscode={"languageId": "python"}
-def plot(
-    dist: dx.Distribution,
-    ax,
-    color: str = "tab:blue",
-    label: str = None,
-    ci_alpha: float = 0.2,
-    linewidth: float = 1.0,
-):
-    mu = dist.mean()
-    sigma = dist.stddev()
-    ax.plot(xtest, dist.mean(), linewidth=linewidth, color=color, label=label)
-    ax.fill_between(xtest.squeeze(), mu - sigma, mu + sigma, alpha=ci_alpha, color=color)
-
-
+# %%
 fig, ax = plt.subplots(figsize=(16, 5))
-[plot(d, ax, color="tab:blue", ci_alpha=0.1) for d in posterior_preds]
-plot(barycentre_process, ax, color="tab:red", label="Barycentre", ci_alpha=0.4, linewidth=2)
+[plot(d, ax) for d in posterior_preds]
+ax.plot(xtest, barycentre_process.mean(), linewidth=2, color='tab:red')
+ax.fill_between(xtest.squeeze(), barycentre_process.mean()-barycentre_process.stddev(), barycentre_process.mean()+barycentre_process.stddev(), alpha=0.2, color='tab:red')
 
-# %% [markdown]
-# ## Displacement Interpolation
-#
-# In the above example we assigned uniform weights to each of the posteriors within the barycentre. In practice though we may have some knowledge about which posterior is most likely to be the correct one. For example, we may have a priori knowledge that the first posterior is the correct one. Regardless of the weights we choose, barycentre will still be a Gaussian process and we can interpolate between a pair of posterior distributions $\mu_1$ and $\mu_2$ to visualise the corresponding barycentre $\bar{\mu}$.
-#
-# ![](figs/barycentre_gp.gif)
 
-# %% [markdown]
-# ## System Information
-
-# %% vscode={"languageId": "python"}
-# %reload_ext watermark
-# %watermark -n -u -v -iv -w -a 'Thomas Pinder'
+# %%

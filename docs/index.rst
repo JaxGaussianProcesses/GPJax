@@ -1,6 +1,4 @@
----
-hide-toc: true
----
+:hide-toc: true
 
 
 Welcome to GPJax's documentation!

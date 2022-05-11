@@ -8,7 +8,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -106,33 +106,21 @@ loss_fn = jit(svgp.elbo(D, constrainers, negative=True))
 # %% [markdown]
 # ### Mini-batching
 #
-# Despite introducing a set of inducing points into our model, inference can still be intractable when the observed dataset's size is very large. To circumvent this, optimisation can be done using stochastic mini-batches.
-#
-# Unfortunately, GPJax's `Dataset` object does not support mini batching. However, we can redefine our dataset as a TensorFlow dataset which unlocks batching.
+# Despite introducing a set of inducing points into our model, inference can still be intractable when the observed dataset's size is very large. To circumvent this, optimisation can be done using stochastic mini-batches. The `Dataset` object given in GPJax can easily be batched using the `batch()` method. Further accelerations can be given using prefetching and cacheing in a manner similar to [TensorFlow's Dataset object](https://www.tensorflow.org/guide/data_performance).
 
 # %%
 opt_init, opt_update, get_params = optimizers.adam(step_size=0.01)
 
-# Make dataloader, set batch size and prefetch buffer:
-ds = (
-    tf.data.Dataset.from_tensor_slices((D.X, D.y))
-    .cache()
-    .repeat()
-    .shuffle(D.n)
-    .batch(256)
-    .prefetch(1)
-)
-
-batched_dataset = jit(gpx.abstractions.batch_loader(ds))
+Dbatched = D.cache().repeat().shuffle(D.n).batch(batch_size=64).prefetch(buffer_size=1)
 
 learned_params = gpx.abstractions.fit_batches(
-    loss_fn,
-    params,
-    trainables,
-    opt_init,
-    opt_update,
-    get_params,
-    get_batch=batched_dataset,
+    objective = loss_fn,
+    train_data = Dbatched, 
+    params = params,
+    trainables = trainables,
+    opt_init = opt_init,
+    opt_update = opt_update,
+    get_params = get_params,
     n_iters=2500,
     jit_compile=True,
 )

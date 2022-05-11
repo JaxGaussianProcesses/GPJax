@@ -8,7 +8,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -57,7 +57,7 @@ x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 for k, ax in zip(kernels, axes.ravel()):
     prior = gpx.Prior(kernel=k)
     params, _, _, _ = gpx.initialise(prior)
-    rv = prior.random_variable(x, params)
+    rv = prior(params)(x)
     y = rv.sample(sample_shape=10, seed=key)
 
     ax.plot(x, y.T, alpha=0.7)
@@ -203,7 +203,8 @@ training = gpx.Dataset(X=X, y=y)
 
 # Define Polar Gaussian process
 PKern = Polar()
-circlular_posterior = gpx.Prior(kernel=PKern) * gpx.Gaussian(num_datapoints=n)
+likelihood = gpx.Gaussian(num_datapoints=n)
+circlular_posterior = gpx.Prior(kernel=PKern) * likelihood
 
 # Initialise parameters and corresponding transformations
 params, training_status, constrainer, unconstrainer = gpx.initialise(
@@ -232,10 +233,9 @@ final_params = gpx.transform(learned_params, constrainer)
 # We'll now query the GP's predictive posterior distribution at a linearly spaced set of test points and plot the results.
 
 # %%
-mu = circlular_posterior.mean(training, final_params)(angles).squeeze()
-one_sigma = jnp.sqrt(
-    jnp.diag(circlular_posterior.variance(training, final_params)(angles))
-)
+posterior_rv = likelihood(circlular_posterior(training, final_params)(angles), final_params)
+mu = posterior_rv.mean()
+one_sigma = posterior_rv.stddev()
 
 # %%
 fig = plt.figure(figsize=(10, 8))

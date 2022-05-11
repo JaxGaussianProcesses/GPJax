@@ -8,7 +8,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -170,7 +170,7 @@ pp.pprint(final_params)
 
 # %%
 latent_dist = posterior(training, final_params)(xtest)
-predictive_dist = likelihood(latent_dist=latent_dist, params=final_params)
+predictive_dist = likelihood(latent_dist, final_params)
 
 predictive_mean = predictive_dist.mean()
 predictive_std = predictive_dist.stddev()
