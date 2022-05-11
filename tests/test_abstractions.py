@@ -32,8 +32,7 @@ def test_fit(n):
 
 
 @pytest.mark.parametrize("n", [20])
-@pytest.mark.parametrize("jit_compile", [True, False])
-def test_optax_fit(n, jit_compile):
+def test_optax_fit(n):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
@@ -44,7 +43,7 @@ def test_optax_fit(n, jit_compile):
     pre_mll_val = mll(params)
     optimiser = optax.adam(learning_rate=0.1)
     optimised_params = optax_fit(
-        mll, params, trainable_status, optimiser, n_iters=10, jit_compile=jit_compile
+        mll, params, trainable_status, optimiser, n_iters=10
     )
     optimised_params = transform(optimised_params, constrainer)
     assert isinstance(optimised_params, dict)
@@ -71,8 +70,7 @@ def test_stop_grads(optim_pkg):
 
 @pytest.mark.parametrize("nb", [20, 50])
 @pytest.mark.parametrize("ndata", [50])
-@pytest.mark.parametrize("jit_compile", [True, False])
-def test_batch_fitting(nb, ndata, jit_compile):
+def test_batch_fitting(nb, ndata):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(ndata, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
@@ -102,8 +100,7 @@ def test_batch_fitting(nb, ndata, jit_compile):
         opt_init,
         opt_update,
         get_params,
-        n_iters=5,
-        jit_compile=jit_compile,
+        n_iters=5
     )
     optimised_params = transform(optimised_params, constrainer)
     assert isinstance(optimised_params, dict)
