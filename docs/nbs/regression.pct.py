@@ -32,13 +32,13 @@ key = jr.PRNGKey(123)
 # %% [markdown]
 # ## Dataset
 #
-# With the necessary modules imported, we simulate a dataset $\mathcal{D} = (\boldsymbol{x}, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{50}$ with inputs $\boldsymbol{x}$ sampled uniformly on $(-3., 3)$ and corresponding independent noisy outputs
+# With the necessary modules imported, we simulate a dataset $\mathcal{D} = (\boldsymbol{x}, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{100}$ with inputs $\boldsymbol{x}$ sampled uniformly on $(-3., 3)$ and corresponding independent noisy outputs
 #
 # $$\boldsymbol{y} \sim \mathcal{N} \left(\sin(4\boldsymbol{x}) + \cos(2 \boldsymbol{x}), \textbf{I} * 0.3^2 \right).$$
 #
 # We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs and labels for later.
 # %%
-N = 50
+N = 100
 noise = 0.3
 
 x = jr.uniform(key=key, minval=-3.0, maxval=3.0, shape=(N,)).sort().reshape(-1, 1)
@@ -52,7 +52,7 @@ xtest = jnp.linspace(-3.5, 3.5, 500).reshape(-1, 1)
 ytest = f(xtest)
 
 # %% [markdown]
-# To better understand the data that we have simulated, we plot both the underlying latent function and the observed data which is subject to Gaussian noise.
+# To better understand what we have simulated, we plot both the underlying latent function and the observed data that is subject to Gaussian noise.
 # %%
 fig, ax = plt.subplots(figsize=(10, 5))
 ax.plot(xtest, ytest, label="Latent function")
@@ -79,7 +79,7 @@ prior = gpx.Prior(kernel=kernel)
 # The above construction forms the foundation for GPJax's models. Moreover, the GP prior we have just defined can be represented by a [Distrax](https://github.com/deepmind/distrax) multivariate Gaussian distribution. Such functionality enables trivial sampling, and mean and covariance evaluation of the GP:
 
 # %%
-params, trainable, constrainers, unconstrainers = gpx.initialise(prior)
+params, trainable, constrainer, unconstrainer = gpx.initialise(prior)
 prior_dist = prior(params)(xtest)
 
 prior_mean = prior_dist.mean()
@@ -92,9 +92,9 @@ plt.fill_between(xtest.flatten(), prior_mean - prior_std, prior_mean + prior_std
 plt.show()
 
 # %% [markdown]
-# ## Computing the posterior
+# ## Constructing the posterior
 #
-# Having defined our GP prior, we proceed to define a model that describes our data $\mathcal{D}$ conditional on our knowledge of $f(\cdot)$ - this is exactly the notion of a likelihood function $p(\mathcal{D} | f(\cdot))$. While the choice of likelihood is an important aspect of Bayesian modelling, for simplicity we consider a Gaussian distribution, $p(\mathcal{D} | f(\cdot)) = \mathcal{N}(\boldsymbol{y}; f(\boldsymbol{x}), \textbf{I} \sigma^2)$, which is defined in GPJax by a `Gaussian` instance:
+# Having defined our GP prior, we proceed to define a model that describes our data $\mathcal{D}$ conditional on our knowledge of $f(\cdot)$ - this is exactly the notion of a likelihood function $p(\mathcal{D} | f(\cdot))$. While the choice of likelihood is an important aspect of Bayesian modelling, for simplicity we consider a Gaussian distribution, $p(\mathcal{D} | f(\cdot)) = \mathcal{N}(\boldsymbol{y}; f(\boldsymbol{x}), \textbf{I} \alpha^2)$, which is defined in GPJax by a `Gaussian` instance:
 # %%
 likelihood = gpx.Gaussian(num_datapoints=D.n)
 # %% [markdown]
@@ -102,61 +102,60 @@ likelihood = gpx.Gaussian(num_datapoints=D.n)
 #
 #   $$ p(f(\cdot) | \mathcal{D}) \propto p(f(\cdot)) * p(\mathcal{D} | f(\cdot)). $$
 # 
-# Mimicking this construct, a posterior is established in GPJax through the `*` operator:
+# Mimicking this construct, the posterior is established in GPJax through the `*` operator:
 
 # %%
 posterior = prior * likelihood
-
 # %% [markdown]
-# ### Stating parameters
+# ## Hyperparameter optimisation
 #
-# To store our model's hyperparameters, we suggest using a dictionary. In this example, our kernel is parameterised by a lengthscale and variance parameter. Further, our likelihood functions controls the amount of observation noise; the final parameter that we must optimise. These three quantities should therefore be defined as
-
+# %% [markdown]
+# We remommend using a dictionary to store the model's hyperparameters. In this example, our RBF kernel is parameterised by a lengthscale $\ell$ and variance parameter $\sigma^2$. Further, our likelihood functions controls the amount of observation noise $\alpha^2$; the final parameter that we must optimise. 
+# 
+# We begin by calling `initialise`
 # %%
-params, training_status, constrainer, unconstrainer = gpx.initialise(posterior)
+params, trainable, constrainer, unconstrainer = gpx.initialise(posterior)
 pp.pprint(params)
-
 # %% [markdown]
-# ### Parameter transformation
-#
-# The three parameters we defined earlier are all strictly positive. To ensure more stable optimisation, it is strongly advised to transform the parameters onto an unconstrained space first. Through the `transform` function and a given bijective transformation function this can be achieved as follows
+# This returns a tuple comprising four equivalently structured dictionaries:
+
+* `params` is a default dictionary of initial parameter values.
+* `trainable` is a boolean dictionary that deterimes the training status of parameters (`True` for being trained and `False` otherwise)
+* `constrainer` is a dictionary of transformations that map parameters from the unconstrained space back to their original space
+* `unconstrainer` is a dictionary of transformations that map parameters from their original space back to an unconstrained space for optimisation
+
+# To motivate the purpose of `constrainer` and `unconstrainer` more precisely, notice that our model hyperparameters $\{\sigma, \ell, \alpha\}$ are all strictly positive. To ensure more stable optimisation, it is strongly advised to transform the parameters onto an unconstrained space first via `transform`
 
 # %%
 params = gpx.transform(params, unconstrainer)
 
 # %% [markdown]
-# ## Optimisation
-#
-# To learn the optimal set of hyperparameters, we'll optimise the marginal log-likelihood of the posterior with respect to the hyperparameters. To realise this function, one can run the following.
+# To train our hyperparameters, we optimising the marginal log-likelihood of the posterior with respect to them. We define the marginal log-likelihood with `marginal_log_likelihood` on the posterior
 
 # %%
 from jax import jit
 
 mll = jit(posterior.marginal_log_likelihood(D, constrainer, negative=True))
 mll(params)
+# %% [markdown]
+# Since most optimisers (including here) minimise a given function, we have realised the negative marginal log-likelihood and JIT compiled this to accelerate training.
 
 # %% [markdown]
-# Note that most optimisers (including here) minimise a given function. Truly, we wish to maximise the marginal log-likelihood, so we instead realise the negative marginal log-likelihood so that the minimisation is equivalent to maximising the marginal log-likelihood.
-
-# %% [markdown]
-# ### Defining an optimiser
-#
-# We can now define an optimiser using one of the optimiser's supplied in Jax's `experimental` module. For this example we'll use the adam optimiser with a step-size of $0.01$.
+# We can now define an optimiser with `optax`. For this example we'll use the `adam` optimiser.
 
 # %%
 opt = ox.adam(learning_rate=0.01)
 final_params = gpx.abstractions.optax_fit(
     mll,
     params,
-    training_status,
+    trainable,
     opt,
     n_iters=500,
 )
 
 # %% [markdown]
-# ## Learned parameters
 #
-# The exact value of our learned parameters can often be useful in answering certain questions about the underlying process. To find these values, we should untransfom them so that they are redefined on the original constrained space.
+# The exact value of our learned parameters is often useful in answering certain questions about the underlying process. To obtain these values, we untransfom our trained unconstrained parameters back to their original constrained space with `transform` and `constrainer`.
 
 # %%
 final_params = gpx.transform(final_params, constrainer)
@@ -165,9 +164,7 @@ pp.pprint(final_params)
 # %% [markdown]
 # ## Prediction
 #
-# ### Direct prediction
-#
-# Equipped with a posterior distribution and a set of optimised hyperparameter values defined on their original parameter space, we are now in a position to query our GP's predictive posterior distribution at a set of test points. To do this, we can either compute the process' expectation and variance directly using the following `mean` and `variance` functions.
+# Equipped with the posterior and a set of optimised hyperparameter values, we are now in a position to query our GP's predictive distribution at novel test inputs. To do this, we use our defined `posterior` and `likelihood` at our test inputs to obtain the predictive distribution as a `Distrax` multivariate Gaussian upon which the methods `mean` and `stddev` can be used to extract the predictive mean and standard deviatation:
 
 # %%
 latent_dist = posterior(D, final_params)(xtest)
@@ -177,7 +174,7 @@ predictive_mean = predictive_dist.mean()
 predictive_std = predictive_dist.stddev()
 
 # %% [markdown]
-# With the predictive mean and variance acquired, we can now visualise how well our GP does at explaining the original data.
+# With the predictions and their uncertainty acquired, we illustrate the GP's performance at explaining the data $\mathcal{D}$ and recovering the underlying latent function of interest.
 
 # %%
 fig, ax = plt.subplots(figsize=(12, 5))
@@ -194,11 +191,15 @@ ax.fill_between(
 ax.plot(xtest, predictive_mean - predictive_std, color="tab:blue", linestyle="--", linewidth=1)
 ax.plot(xtest, predictive_mean + predictive_std, color="tab:blue", linestyle="--", linewidth=1)
 
+ax.plot(xtest, ytest, label="Latent function",color="black", linestyle="--", linewidth=1)
+
 ax.legend()
+
+
 
 # %% [markdown]
 # ## System information
 
 # %%
 # %reload_ext watermark
-# %watermark -n -u -v -iv -w -a 'Thomas Pinder'
+# %watermark -n -u -v -iv -w -a 'Thomas Pinder & Daniel Dodd'
