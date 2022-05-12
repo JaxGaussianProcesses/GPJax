@@ -29,45 +29,46 @@ import gpjax as gpx
 key = jr.PRNGKey(123)
 
 # %% [markdown]
-# ## Datasets
+# ## Dataset
 #
-# We'll simulate a binary dataset where our inputs $x$ are sampled according to $x_i \sim \mathcal{U}(-1., 1.)$ for $1 \leq i \leq 100$. Our corresponding outputs will be calculated according to
-# $$ y_i = 0.5*\operatorname{sign}(\cos(2*x + \epsilon_i) + 0.5, $$
-# where $\epsilon_i \sim \mathcal{N}(0, 0.01)$. Note, the multiplication and addition of 0.5 is simply to ensure that our outputs are in $\{0, 1\}$.
+# With the necessary modules imported, we simulate a dataset $\mathcal{D} = (\boldsymbol{x}, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{100}$ with inputs $\boldsymbol{x}$ sampled uniformly on $(-1., 1)$ and corresponding binary outputs
+#
+# $$\boldsymbol{y} = 0.5 * \text{sign}(\cos(2 * \boldsymbol{x} + \boldsymbol{\epsilon})) + 0.5, \quad \boldsymbol{\epsilon} \sim \mathcal{N} \left(\textbf{0}, \textbf{I} * (0.05)^{2} \right).$$
+#
+# We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs and labels for later.
 
 # %%
 x = jnp.sort(jr.uniform(key, shape=(100, 1), minval=-1.0, maxval=1.0), axis=0)
 y = 0.5 * jnp.sign(jnp.cos(3 * x + jr.normal(key, shape=x.shape) * 0.05)) + 0.5
+
+D = gpx.Dataset(X=x, y=y)
+
 xtest = jnp.linspace(-1., 1., 500).reshape(-1, 1)
 plt.plot(x, y, "o", markersize=8)
-
-# %%
-training = gpx.Dataset(X=x, y=y)
-
 # %% [markdown]
 # We can now define our prior Gaussian process such that an RBF kernel has been selected for the purpose of exposition. However, an alternative kernel may be a better choice.
 
 # %%
-kern = gpx.RBF()
-prior = gpx.Prior(kernel=kern)
+kernel = gpx.RBF()
+prior = gpx.Prior(kernel=kernel)
 
 # %% [markdown]
 # Now we can proceed to define our likelihood function. In this example, our observations are binary, so we will select a Bernoulli likelihood. Using this likelihood function, we can compute the posterior through the product of our likelihood and prior.
 
 # %%
-likelihood = gpx.Bernoulli(num_datapoints=training.n)
+likelihood = gpx.Bernoulli(num_datapoints=D.n)
 posterior = prior * likelihood
 print(type(posterior))
 
 # %%
-params, training_status, constrainer, unconstrainer = gpx.initialise(posterior)
+params, trainable, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 
 # %% [markdown]
 # With a posterior in place, we can estimate the maximum a posteriori using ObJax's optimisers. However, our Gaussian process is no longer conjugate, meaning that in addition to the kernel's hyperparameters, we are also tasked with learning the values of process' latent function.
 
 # %%
-mll = jax.jit(posterior.marginal_log_likelihood(training, constrainer, negative=False))
+mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=False))
 
 # %% [markdown]
 # ## Markov Chain Monte-Carlo Inference
@@ -148,7 +149,7 @@ for i in range(0, num_samples, thin_factor):
     ps['latent'] = states.position['latent'][i, :, :]
     ps = gpx.transform(ps, constrainer)
 
-    predictive_dist = likelihood(posterior(training, ps)(xtest), ps)
+    predictive_dist = likelihood(posterior(D, ps)(xtest), ps)
     samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
 
 samples = jnp.vstack(samples)
