@@ -40,7 +40,7 @@ key = jr.PRNGKey(123)
 # Modelling data with discontinuities is a challenging task for regular Gaussian process models. However, as shown in <strong data-cite="wilson2016deep"></strong>, transforming the inputs to our Gaussian process model's kernel through a neural network can offer a solution to this. To highlight this, we'll model a sawtooth function.
 
 # %%
-N = 200
+N = 500
 noise = 0.2
 
 x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(N,)).sort().reshape(-1, 1)
@@ -53,7 +53,7 @@ ytest = f(xtest)
 training = gpx.Dataset(X=x, y=y)
 
 fig, ax = plt.subplots(1, 1, figsize=(10, 5))
-ax.plot(x, y, "o", label="Training data")
+ax.plot(x, y, "o", label="Training data", alpha=0.5)
 ax.plot(xtest, ytest, label="True function")
 ax.legend(loc="best")
 
@@ -95,7 +95,7 @@ class DeepKernelFunction(Kernel, _DeepKernelFunction):
 # %% [markdown]
 # ### Defining a network
 #
-# With a deep kernel object now defined, we can define a network that will transform the inputs. For this notebook, we'll use a small multi-layer perceptron with two linear hidden layers and relu activation functions between the layes. The first hidden layer contains 16 units and the second layer contains 32 units. As we are doing 1D regression here, the final output layer of the network is a single unit.
+# With a deep kernel object now defined, we can define a network that will transform the inputs. For this notebook, we'll use a small multi-layer perceptron with two linear hidden layers and relu activation functions between the layes. The first hidden layer contains 32 units and the second layer contains 64 units. As we are doing 1D regression here, the final output layer of the network is a single unit.
 #
 # For more complex tasks, users may wish to define more complex network achitectures, the functionality for which is well supported in Haiku.
 
@@ -103,9 +103,9 @@ class DeepKernelFunction(Kernel, _DeepKernelFunction):
 def forward(x):
     mlp = hk.Sequential(
         [
-            hk.Linear(16),
-            jax.nn.relu,
             hk.Linear(32),
+            jax.nn.relu,
+            hk.Linear(64),
             jax.nn.relu,
             hk.Linear(1),
         ]
@@ -160,7 +160,7 @@ final_params = gpx.abstractions.optax_fit(
     params,
     training_status,
     opt,
-    n_iters=3000,
+    n_iters=5000,
 )
 final_params = gpx.transform(final_params, constrainers)
 
