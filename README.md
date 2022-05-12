@@ -75,7 +75,7 @@ params, training_status, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 ```
 
-Next, we define the marginal log-likelihood, and Jit compile this to accelerate training. Notice that it is only now that we have incorporated any data into our GP. This is desirable since model building works this way in principle too, where we first define our prior model, then observe some data and use this data to build a posterior.
+Next, we define the marginal log-likelihood, and just-in-time (JIT) compile this to accelerate training. Notice that it is only now that we have incorporated any data into our GP. This is desirable since model building works this way in principle too, where we first define our prior model, then observe some data and use this data to build a posterior.
 
 ```python
 mll = jit(posterior.marginal_log_likelihood(training, constrainer, negative=True))

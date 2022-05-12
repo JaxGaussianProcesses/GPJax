@@ -112,12 +112,12 @@ posterior = prior * likelihood
 # %% [markdown]
 # We remommend using a dictionary to store the model's hyperparameters. In this example, our RBF kernel is parameterised by a lengthscale $\ell$ and variance parameter $\sigma^2$. Further, our likelihood functions controls the amount of observation noise $\alpha^2$; the final parameter that we must optimise. 
 # 
-# We begin by calling `initialise`
+# We begin by calling `initialise` returns a tuple comprising four equivalently structured dictionaries
 # %%
 params, trainable, constrainer, unconstrainer = gpx.initialise(posterior)
 pp.pprint(params)
 # %% [markdown]
-# This returns a tuple comprising four equivalently structured dictionaries:
+# These dictionaries are as follows:
 
 * `params` is a default dictionary of initial parameter values.
 * `trainable` is a boolean dictionary that deterimes the training status of parameters (`True` for being trained and `False` otherwise)
@@ -138,7 +138,7 @@ from jax import jit
 mll = jit(posterior.marginal_log_likelihood(D, constrainer, negative=True))
 mll(params)
 # %% [markdown]
-# Since most optimisers (including here) minimise a given function, we have realised the negative marginal log-likelihood and JIT compiled this to accelerate training.
+# Since most optimisers (including here) minimise a given function, we have realised the negative marginal log-likelihood and just-in-time (JIT) compiled this to accelerate training.
 
 # %% [markdown]
 # We can now define an optimiser with `optax`. For this example we'll use the `adam` optimiser.
