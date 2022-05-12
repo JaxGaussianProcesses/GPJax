@@ -32,11 +32,11 @@ key = jr.PRNGKey(123)
 # %% [markdown]
 # ## Dataset
 #
-# With the necessary libraries and modules imported, we simulate a dataset comprising 50 datapoints with inputs $\boldsymbol{x}$ sampled uniformly on $(-3., 3)$ and corresponding independent noisy outputs
+# With the necessary modules imported, we simulate a dataset $\mathcal{D} = (\boldsymbol{x}, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{50}$ with inputs $\boldsymbol{x}$ sampled uniformly on $(-3., 3)$ and corresponding independent noisy outputs
 #
 # $$\boldsymbol{y} \sim \mathcal{N} \left(\sin(4\boldsymbol{x}) + \cos(2 \boldsymbol{x}), \textbf{I} * 0.3^2 \right).$$
 #
-# We store this data $\mathcal{D} = (\boldsymbol{x}, \boldsymbol{y}) = {(x_i, y_i)}_{i=1}^{50}$ as a GPJax `Dataset` and create test inputs and labels for later.
+# We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs and labels for later.
 # %%
 N = 50
 noise = 0.3
