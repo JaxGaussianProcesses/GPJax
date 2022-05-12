@@ -173,7 +173,7 @@ class ConjugatePosterior(AbstractPosterior):
             params = transform(params=params, transform_map=transformations)
 
             obs_noise = params["likelihood"]["obs_noise"]
-            mu = self.prior.mean_function(x, params)
+            mu = self.prior.mean_function(x, params["mean_function"])
             Kxx = gram(self.prior.kernel, x, params["kernel"])
             Kxx += I(n_data) * self.jitter
             Lx = jnp.linalg.cholesky(Kxx + I(n_data) * obs_noise)

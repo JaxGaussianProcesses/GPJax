@@ -42,6 +42,7 @@ For intuition of GPJax's exposed API, a simple example that derives the Gaussian
     nbs/sparse_regression
     nbs/graph_kernels
     nbs/barycentres
+    nbs/haiku
 
 .. toctree::
     :maxdepth: 1
