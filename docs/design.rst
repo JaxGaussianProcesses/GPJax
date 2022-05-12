@@ -38,13 +38,13 @@ Gaussian process notation
    * - :math:`\boldsymbol{m}_{\boldsymbol{x}}`
      - mx
      - Prior mean at inputs :math:`\boldsymbol{x}`
-   * - :math:`\boldsymbol{K}_{\boldsymbol{x}\boldsymbol{x}}`
+   * - :math:`\mathbf{K}_{\boldsymbol{x}\boldsymbol{x}}`
      - Kxx
      - Kernel Gram matrix at inputs :math:`\boldsymbol{x}`
-   * - :math:`\boldsymbol{L}_{\boldsymbol{x}}`
+   * - :math:`\mathbf{L}_{\boldsymbol{x}}`
      - Lx 
      - Lower Cholesky decomposition of :math:`\boldsymbol{K}_{\boldsymbol{x}\boldsymbol{x}}`
-   * - :math:`\boldsymbol{K}_{\boldsymbol{t}\boldsymbol{x}}`
+   * - :math:`\mathbf{K}_{\boldsymbol{t}\boldsymbol{x}}`
      - Ktx
      - Cross-covariance between inputs :math:`\boldsymbol{t}` and :math:`\boldsymbol{x}`
 
