@@ -37,7 +37,7 @@ key = jr.PRNGKey(123)
 # %% [markdown]
 # ## Data
 #
-# Modelling data with discontinuities is a challenging task for regular Gaussian process models. However, as show in <strong data-cite="wilson2016deep"></strong>, transforming the inputs to our Gaussian process model's kernel through a neural network can offer a solution to this. To highlight this, we'll model a sawtooth function.
+# Modelling data with discontinuities is a challenging task for regular Gaussian process models. However, as shown in <strong data-cite="wilson2016deep"></strong>, transforming the inputs to our Gaussian process model's kernel through a neural network can offer a solution to this. To highlight this, we'll model a sawtooth function.
 
 # %%
 N = 200
@@ -51,14 +51,18 @@ xtest = jnp.linspace(-2.0, 2.0, 500).reshape(-1, 1)
 ytest = f(xtest)
 
 training = gpx.Dataset(X=x, y=y)
-plt.plot(x, y, "o")
+
+fig, ax = plt.subplots(1, 1, figsize=(10, 5))
+ax.plot(x, y, "o", label="Training data")
+ax.plot(xtest, ytest, label="True function")
+ax.legend(loc="best")
 
 # %% [markdown]
 # ## Deep Kernels
 #
 # ### Details
 #
-# Typically when we evaluate a kernel $k$ on a pair of inputs $x, x'$, we would compute $k(x, x')$. However, deep kernel regression seeks to apply a transform $\phi(\cdot)$ to the inputs that seeks to project the inputs into a more meaningful representation. In deep kernel learning, $\phi$ is a neural network whose parameters are learned jointly with the GP model's hyperparameters.
+# Typically when we evaluate a kernel $k: \mathcal{X} \times \mathcal{X} \to \mathbb{R}$ on a pair of inputs $x, x' \in \mathcal{X}$, we would compute $k(x, x')$. However, deep kernel regression seeks to apply a transform $\phi: \mathcal{X} \to \mathcal{X}$ to the inputs that seeks to project the inputs into a more meaningful representation. In deep kernel learning, $\phi$ is a neural network whose parameters are learned jointly with the GP model's hyperparameters. The corresponding kernel then computed by $k(\phi(x), \phi(x'))$.
 #
 # ### Implementation
 #
