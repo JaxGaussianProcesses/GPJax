@@ -13,17 +13,12 @@
 #     name: python3
 # ---
 
-# %%
-# %load_ext autoreload
-# %autoreload 2
-
 # %% [markdown]
 # # Sparse Regression
 #
-# In this notebook we'll demonstrate how the sparse variational Gaussian process model of <strong data-cite="hensman2013gaussian"></strong>. When seeking to model more than ~5000 data points and/or the assumed likelihood is non-Gaussian, the sparse Gaussian process presented here will be a tractable option. However, for models of less than 5000 data points and a Gaussian likelihood function, we would recommend using the marginal log-likelihood approach presented in the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html).
+# In this notebook we demonstrate how to implement sparse variational Gaussian processes (SVGPs) of <strong data-cite="hensman2013gaussian"></strong>. When seeking to model more than ~5000 data points or/and the assumed likelihood is non-Gaussian, SVGPs are a tractable option. However, for models of less than 5000 data points and a Gaussian likelihood function, we recommend using the marginal log-likelihood approach presented in the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html).
 
 # %%
-
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
@@ -37,12 +32,13 @@ import gpjax as gpx
 key = jr.PRNGKey(123)
 
 # %% [markdown]
-# ## Data
+# ## Dataset
 #
-# We'll simulate 5000 observation inputs $X$ and simulate the corresponding output $y$ according to
-# $$y = \sin(4X) + \cos(2X)\,.$$
-# We'll perturb our observed responses through a sequence independent and identically distributed draws from $\mathcal{0, 0.2}$.
+# With the necessary modules imported, we simulate a dataset $\mathcal{D} = (\boldsymbol{x}, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{5000}$ with inputs $\boldsymbol{x}$ sampled uniformly on $(-5, 5)$ and corresponding binary outputs
 #
+# $$\boldsymbol{y} \sim \mathcal{N} \left(\sin(4 * \boldsymbol{x}) + \sin(2 * \boldsymbol{x}), \textbf{I} * (0.2)^{2} \right).$$
+#
+# We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs for later.
 
 # %%
 N = 5000
@@ -52,12 +48,23 @@ x = jr.uniform(key=key, minval=-5.0, maxval=5.0, shape=(N,)).sort().reshape(-1, 
 f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
+
+D = gpx.Dataset(X=x, y=y)
+
 xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 
 # %% [markdown]
-# ## Inducing points
+# ## Inducing inputs
 #
-# Tractability in a sparse Gaussian process is made possible through a set of inducing points $Z$. At a high-level, the set of inducing points acts as a pseudo-dataset that enables low-rank approximations $\mathbf{K}_{zz}$ of the true covariance matrix $\mathbf{K}_{xx}$ to be computed. More tricks involving a variational treatment of the model's marginal log-likelihood unlock the full power of sparse GPs, but more on that later. For now, we'll initialise a set of inducing points using a linear spaced grid across our observed data's support.
+# Despite the many elegant theoretical properties of GPs, their use is greatly hindered by analytic and computational intractabilities. In particular, GPs are burdened with cubic and quadratic costs for inference and memory requirements respectively in the number of data points $n$, making them prohibitive for large data sets. Low rank approximations via sparse GPs offer tractability through augmenting the model with a set of $m$ inducing inputs $\boldsymbol{z} = (z_1, \dotsc, z_m)$ that lie in the same space as $\boldsymbol{x}$. At a high level, these act as a pseudo-dataset, enabling low-rank approximations $\mathbf{K}_{\boldsymbol{z}\boldsymbol{z}}$ of the true covariance matrix $\mathbf{K}_{\boldsymbol{x}\boldsymbol{x}}$ to be computed at lower costs (Quinonero Candela and Rasmussen, 2005). Taking a variational approach, SVGPs reduce these costs further via mini-batching (Hensman et al., 2013) and address non-conjugacy (Hensman et al., 2015). A cost comparison is shown below where $b$ is the mini-batch size:
+#
+# |    | GPs | sparse GPs | SVGP |
+# | -- | -- | -- | -- | 
+# | Inference cost | $\mathcal{O}(n^3)$ | $\mathcal{O}(n m^2)$ | $\mathcal{O}(b m^2)$  | 
+# | Memory cost    | $\mathcal{O}(n^2)$ | $\mathcal{O}(n m)$ | $\mathcal{O}(n m)$ |
+
+
+# Initialisation of the inducing inputs is an important area of active research since this affects the algorithm's convergence. For simplicity, we consider a linear spaced grid of 50 points across our observed data's support.
 
 # %%
 Z = jnp.linspace(-5.0, 5.0, 50).reshape(-1, 1)
@@ -71,29 +78,26 @@ ax.scatter(Z, jnp.zeros_like(Z), marker="|", color="black")
 plt.show()
 
 # %% [markdown]
-# ## Defining processes
+# ## Defining the variational process
 #
-# Unlike regular GP regression, we won't ever acess the marginal log-likelihood of our true process. Instead, we'll introduce a variational approximation $q$ that is itself a Gaussian process. We'll then seek to minimise the Kullback-Leibler divergence $\operatorname{KL}(\cdot || \cdot)$ from our approximate process $q$ to the true process $p$ through the evidence lower bound.
+# Unlike regular GP regression, we do not acess the marginal log-likelihood of our true process. Instead, we introduce a variational approximation $q(f(\cdot))$ that is itself a Gaussian process. We then seek to minimise the Kullback-Leibler divergence $\operatorname{KL}(\cdot || \cdot)$ from our approximate process $q(f(\cdot))$ to the true process $p(f(\cdot)|\mathcal{D})$.
 
 # %%
-D = gpx.Dataset(X=x, y=y)
 likelihood = gpx.Gaussian(num_datapoints=N)
-true_process = gpx.Prior(kernel=gpx.RBF()) * likelihood
-
+p = gpx.Prior(kernel=gpx.RBF()) * likelihood
 q = gpx.VariationalGaussian(inducing_inputs=Z)
-
 # %% [markdown]
 # We collect our true and approximate posterior Gaussian processes up into an `SVGP` object. This object is simply there to define the variational strategy that we will adopt in the forthcoming inference.
 
 # %%
-svgp = gpx.SVGP(posterior=true_process, variational_family=q)
+svgp = gpx.SVGP(posterior=p, variational_family=q)
 
 # %% [markdown]
 # ## Inference
 #
 # ### Evidence lower bound
 #
-# With a model now defined, we will seek to infer the optimal model hyperparameters $\theta$ and the variational mean $\mathbf{m}$ and covariance $\mathbf{S}$ that define our approximate posterior. To achieve this, we will maximise the evidence lower bound with respect to $\{\theta, \mathbf{m}, \mathbf{S} \}$. This is a task that is equivalent to minimising the Kullback-Leibler divergence from the approximate posterior to the true posterior, up to a normalisation constant. For more details on this, see Sections 3.1 and 4.1 of the excellent review paper <strong data-cite="leibfried2020tutorial"></strong>.
+# With a model now defined, we will seek to infer the optimal model hyperparameters $\theta$ and the variational mean $\mathbf{m}$ and covariance $\mathbf{S}$ that define our approximate posterior. To achieve this, we maximise the evidence lower bound (ELBO) with respect to $\{\theta, \mathbf{m}, \mathbf{S} \}$. This is a task that is equivalent to minimising the Kullback-Leibler divergence from the approximate posterior to the true posterior, up to a normalisation constant. For more details on this, see Sections 3.1 and 4.1 of the excellent review paper <strong data-cite="leibfried2020tutorial"></strong>.
 #
 # As we wish to maximise the ELBO, we'll return it's negative so that minimisation of the negative is equivalent to maximisation of the true ELBO.
 #
@@ -128,7 +132,7 @@ learned_params = gpx.transform(learned_params, constrainers)
 # %% [markdown]
 # ## Predictions
 #
-# With optimisation complete, we are free to use our inferred parameter set to make predictions on a test set of data. This can be achieve in an identical manner to all other GP models within GPJax.
+# With optimisation complete, we are free to use our inferred parameter set to make predictions on a test set of data. This can be achieve in an identical manner to all other GP models within GPJax (see e.g., the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)).
 
 # %%
 latent_dist = svgp(learned_params)(xtest)
