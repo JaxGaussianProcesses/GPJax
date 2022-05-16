@@ -5,7 +5,6 @@ import distrax as dx
 import jax.numpy as jnp
 from chex import dataclass
 from jax.scipy.linalg import cho_factor, cho_solve, solve_triangular
-from pkg_resources import Distribution
 
 from .config import get_defaults
 from .kernels import Kernel, cross_covariance, gram

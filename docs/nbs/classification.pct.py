@@ -16,7 +16,7 @@
 # %% [markdown]
 # # Classification
 #
-# In this notebook we demonstate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and markov chain Monte-Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
+# In this notebook we demonstate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte-Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
 
 # %%
 import jax
@@ -49,7 +49,7 @@ plt.plot(x, y, "o", markersize=8)
 # %% [markdown]
 # ## MAP inference
 #
-# We begin by defining a Gaussian process prior with a radial basis function (RBF) kernel for the purpose of exposition. Since our observations are binary, we choose a Bernoulli likelihood with a probit link function.
+# We begin by defining a Gaussian process prior with a radial basis function (RBF) kernel, chosen for the purpose of exposition. Since our observations are binary, we choose a Bernoulli likelihood with a probit link function.
 # %%
 kernel = gpx.RBF()
 prior = gpx.Prior(kernel=kernel)
