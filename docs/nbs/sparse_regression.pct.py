@@ -66,11 +66,11 @@ xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 # 
 # On the other hand, sparse variational Gaussian processes (SVGPs) [approximate the posterior, not the model](https://www.secondmind.ai/labs/sparse-gps-approximate-the-posterior-not-the-model/). 
 # These provide a low-rank approximation scheme via variational inference. Here we posit a family of densities parameterised by “variational parameters”. 
-# We then find the closest distribution (family member) to the posterior by minimising the KL divergence over the variational parameters. 
+# We then seek to find the closest family member to the posterior by minimising the Kullback-Leibler divergence over the variational parameters. 
 # The fitted variational density then serves as a proxy for the exact posterior. 
 # This procedure makes variational methods efficiently solvable via off-the-shelf optimisation techniques whilst retaining the true-underlying model. 
 # Furthermore, SVGPs offer further cost reductions with mini-batch stochastic gradient descent  <strong data-cite="hensman2013gaussian"></strong> and address non-conjugacy <strong data-cite="hensman2015gaussian"></strong>. 
-# For completeness, we show a cost comparison between the approaches below. Here $b$ is the mini-batch size.
+# We show a cost comparison between the approaches below, where $b$ is the mini-batch size.
 #
 # 
 #
@@ -114,7 +114,7 @@ plt.show()
 # 
 # To measure the quality of the approximation, we consider the Kullback-Leibler divergence $\operatorname{KL}(\cdot || \cdot)$ from our approximate process $q(f(\cdot))$ to the true process $p(f(\cdot)|\mathcal{D})$. By parametrising $q(f(\boldsymbol{z}))$ over a family of distributions with paramters, we can optimise Kullback-Leibler divergence with respect to these parameters. Moreover, since inducing input locations $\boldsymbol{z}$ augment the model, they themselves can be treated as variational parameters without altering the true underlying model $p(f(\boldsymbol{z})|\mathcal{D})$. This is exactly what gives SVGPs great flexibility whilst retaining robustness to overfitting. 
 # 
-# Ellicting a Gaussian variational family $q(f(\boldsymbol{z})) = \mathcal{N}(f(\boldsymbol{z}); \mathbf{m}, \mathbf{S})$ is a popular choice. This provides conjugacy between $q(f(\boldsymbol{z}))$ and $p(f(\cdot)|f(\boldsymbol{z}))$ such that the resulting approximate process $q(f(\cdot))$ is a Gaussian process.
+# Ellicting a Gaussian variational family $q(f(\boldsymbol{z})) = \mathcal{N}(f(\boldsymbol{z}); \mathbf{m}, \mathbf{S})$ is popular. This provides conjugacy between $q(f(\boldsymbol{z}))$ and $p(f(\cdot)|f(\boldsymbol{z}))$ such that the resulting approximate process $q(f(\cdot))$ is a Gaussian process.
 #
 # The above objects can be constructed in GPJax by the following.
 # %%
