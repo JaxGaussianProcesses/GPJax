@@ -35,7 +35,7 @@ key = jr.PRNGKey(123)
 #
 # The following kernels are natively supported in GPJax.
 #
-# * Matern 1/2, 3/2 and 5/2.
+# * Matérn 1/2, 3/2 and 5/2.
 # * RBF (or squared exponential).
 # * Polynomial.
 #
@@ -146,7 +146,7 @@ prod_k = gpx.ProductKernel(kernel_set=[k1, k2, k3])
 #
 # ### Circular kernel
 #
-# When the underlying space is polar, typical Euclidean kernels such as Matern kernels are insufficient as the boundary. Circular kernels do not exhibit this behaviour and instead _wrap_ around the boundary points to create a smooth function. Such a kernel was given in [Padonou & Roustant (2015)](https://hal.inria.fr/hal-01119942v1) where any two angles $\theta$ and $\theta'$ are written as
+# When the underlying space is polar, typical Euclidean kernels such as Matérn kernels are insufficient as the boundary. Circular kernels do not exhibit this behaviour and instead _wrap_ around the boundary points to create a smooth function. Such a kernel was given in [Padonou & Roustant (2015)](https://hal.inria.fr/hal-01119942v1) where any two angles $\theta$ and $\theta'$ are written as
 # $$W_c(\theta, \theta') = \left\lvert \left(1 + \tau \frac{d(\theta, \theta')}{c} \right) \left(1 - \frac{d(\theta, \theta')}{c} \right)^{\tau} \right\rvert \quad \tau \geq 4 \tag{1}.$$
 #
 # Here the hyperparameter $\tau$ is analogous to a lengthscale for Euclidean stationary kernels, controlling the correlation between pairs of observations. While $d$ is an angular distance metric

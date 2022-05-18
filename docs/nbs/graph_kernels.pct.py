@@ -17,7 +17,7 @@
 # %% [markdown]
 # # Graph Kernels
 #
-# This notebook demonstrates how regression models can be constructed on the vertices of a graph using a Gaussian process. To achieve this, we'll use the Matérn kernel presented in  <strong data-cite="borovitskiy2021matern"></strong>.
+# This notebook demonstrates how regression models can be constructed on the vertices of a graph using a Gaussian process with a Matérn kernel presented in  <strong data-cite="borovitskiy2021matern"></strong>.
 
 # %%
 import random
@@ -36,9 +36,9 @@ key = jr.PRNGKey(123)
 # %% [markdown]
 # ## Graph construction
 #
-# Our graph $\mathcal{G}=\lbrace V, E \rbrace$ is comprised of set of vertices $V = \lbrace v_1, v_2, \ldots, v_n\rbrace$ and edges $E=\lbrace (v_i, v_j)\in V \ \text{such that} \ i \neq j\rbrace$. We will be considering the [Barbell graph](https://en.wikipedia.org/wiki/Barbell_graph) in this notebook that is an undirected graph containing two clusters of vertices with a single shared edge between the two clusters.
+# Our graph $\mathcal{G}=\lbrace V, E \rbrace$ comprises a set of vertices $V = \lbrace v_1, v_2, \ldots, v_n\rbrace$ and edges $E=\lbrace (v_i, v_j)\in V \ : \ i \neq j\rbrace$. In particular, we will consider a [barbell graph](https://en.wikipedia.org/wiki/Barbell_graph) that is an undirected graph containing two clusters of vertices with a single shared edge between the two clusters.
 #
-# Contrary to the typical barbell graph, we'll randomly remove a subset of 30 edges within each of the two clusters. Given the 40 vertices within the graph, this results in 351 edges. We can see this construction in the following cell.
+# Contrary to the typical barbell graph, we'll randomly remove a subset of 30 edges within each of the two clusters. Given the 40 vertices within the graph, this results in 351 edges as shown below.
 
 # %%
 vertex_per_side = 20
@@ -58,7 +58,9 @@ nx.draw(G, pos, node_color="tab:blue", with_labels=False, alpha=0.5)
 #
 # ### Computing the graph Laplacian
 #
-# Graph kernels use the _graph Laplacian_ matrix $L$ to quantify the smoothness of a signal, or function, on the graph. To calculate this, we compute $$L=D-A$$ where $D$ is the diagonal _degree matrix_ $D$ that contains the vertices' degree along the diagonal and the _adjacency matrix_ $A$ that has $(i,j)^{\text{th}}$ entry of 1 if $v_i, v_j$ are connected and 0 otherwise. Using `networkx` gives us an easy way to compute this.
+# Graph kernels use the _Laplacian matrix_ $L$ to quantify the smoothness of a signal (or function) on a graph 
+# $$L=D-A,$$ 
+# where $D$ is the diagonal _degree matrix_ containing each vertices' degree and $A$ is the _adjacency matrix_ that has an $(i,j)^{\text{th}}$ entry of 1 if $v_i, v_j$ are connected and 0 otherwise. [Networkx](https://networkx.org) gives us an easy way to compute this.
 
 # %%
 L = nx.laplacian_matrix(G).toarray()
@@ -67,9 +69,13 @@ L = nx.laplacian_matrix(G).toarray()
 #
 # ## Simulating a signal on the graph
 #
-# Our task is to construct a Gaussian process $f$ that maps from the graph's vertex set $V$ onto the real line $\mathbb{R}$. To that end, we must now simulate a signal on the graph's vertices that we will go on to try and predict. We use a single draw from a Gaussian process prior to simulate our response values $y$ where we hardcode parameter values. The correspodning input value set for this model, typically denoted $x$, is the index set of the graph's vertices.
+# Our task is to construct a Gaussian process $f(\cdot)$ that maps from the graph's vertex set $V$ onto the real line. 
+# To that end, we begin by simulating a signal on the graph's vertices that we will go on to try and predict. 
+# We use a single draw from a Gaussian process prior to draw our response values $\boldsymbol{y}$ where we hardcode parameter values. 
+# The correspodning input value set for this model, denoted $\boldsymbol{x}$, is the index set of the graph's vertices.
+
 # %%
-xs = jnp.arange(G.number_of_nodes()).reshape(-1, 1)
+x = jnp.arange(G.number_of_nodes()).reshape(-1, 1)
 
 kernel = gpx.GraphKernel(laplacian=L)
 f = gpx.Prior(kernel=kernel)
@@ -81,14 +87,14 @@ true_params["kernel"] = {
     "smoothness": jnp.array(6.1),
 }
 
-rv = f(true_params)(xs)
-y = rv.sample(seed=key).reshape(-1, 1)
+fx = f(true_params)(x)
+y = fx.sample(seed=key).reshape(-1, 1)
 
-D = gpx.Dataset(X=xs, y=y)
+D = gpx.Dataset(X=x, y=y)
 
 # %% [markdown]
 #
-# We can visualise this signal in the following cell
+# We can visualise this signal in the following cell.
 # %%
 nx.draw(G, pos, node_color=y, with_labels=False, alpha=0.5)
 
@@ -101,12 +107,14 @@ cbar = plt.colorbar(sm)
 #
 # ## Constructing a graph Gaussian process
 #
-# With an observed dataset created, we can now proceed to define our posterior Gaussian process and optimise the model's hyperparameters. Whilst our underlying space is now the graph's vertex set and is therefore non-Euclidean, our likelihood is still Gaussian and the model is still conjugate. For this reason, we simply have to perform gradient descent on the GP's marginal log-likelihood term. We do this using the adam optimiser provided in `optax`.
+# With our dataset created, we proceed to define our posterior Gaussian process and optimise the model's hyperparameters. 
+# Whilst our underlying space is the graph's vertex set and is therefore non-Euclidean, our likelihood is still Gaussian and the model is still conjugate. 
+# For this reason, we simply perform gradient descent on the GP's marginal log-likelihood term as in the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html). We do this using the Adam optimiser provided in `optax`.
 
 # %%
 likelihood = gpx.Gaussian(num_datapoints=y.shape[0])
 posterior = f * likelihood
-params, training_status, constrainer, unconstrainer = gpx.initialise(posterior)
+params, trainable, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 
 mll = jit(
@@ -117,7 +125,7 @@ opt = ox.adam(learning_rate=0.01)
 learned_params = gpx.abstractions.optax_fit(
     objective=mll,
     params=params,
-    trainables=training_status,
+    trainables=trainable,
     optax_optim=opt,
     n_iters=1000,
 )
@@ -127,10 +135,11 @@ learned_params = gpx.transform(learned_params, constrainer)
 #
 # ## Making predictions
 #
-# With an optimised set of parameters, we can now make predictions on the graph. We haven't defined a training and testing dataset here, so we'll simply query the predictive posterior for the full graph, compute the root-mean-squared error (RMSE) for the model using the initialised parameters and the optimise set, and finally compare the RMSE values.
+# Having optimised our hyperparameters, we can now make predictions on the graph. 
+# Though we haven't defined a training and testing dataset here, we'll simply query the predictive posterior for the full graph to compare the root-mean-squared error (RMSE) of the model for the initialised parameters vs the optimised set.
 # %%
-initial_dist = likelihood(posterior(D, params)(xs), params)
-predictive_dist = likelihood(posterior(D, learned_params)(xs), learned_params)
+initial_dist = likelihood(posterior(D, params)(x), params)
+predictive_dist = likelihood(posterior(D, learned_params)(x), learned_params)
 
 initial_mean = initial_dist.mean()
 learned_mean = predictive_dist.mean()
@@ -158,11 +167,11 @@ sm.set_array([])
 cbar = plt.colorbar(sm)
 # %% [markdown]
 #
-# Reassuringly, our model seems to be giving equally good predictions in each cluster.
+# Reassuringly, our model seems to provide equally good predictions in each cluster.
 
 # %% [markdown]
 # ## System configuration
 
 # %%
 # %reload_ext watermark
-# %watermark -n -u -v -iv -w -a 'Thomas Pinder'
+# %watermark -n -u -v -iv -w -a 'Thomas Pinder (edited by Daniel Dodd)'

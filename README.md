@@ -71,7 +71,7 @@ Equipped with the posterior, we proceed to train the model's hyperparameters thr
 We begin by defining a set of initial parameter values through the `initialise` callable.
 
 ```python
-params, training_status, constrainer, unconstrainer = gpx.initialise(posterior)
+params, _, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 ```
 
