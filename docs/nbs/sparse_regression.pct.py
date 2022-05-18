@@ -14,7 +14,7 @@
 # ---
 
 # %% [markdown]
-# # Sparse Variational GPs
+# # Sparse Variational Inference
 #
 # In this notebook we demonstrate how to implement sparse variational Gaussian processes (SVGPs) of <strong data-cite="hensman2013gaussian">Hensman et al. (2013)</strong>; <strong data-cite="hensman2015gaussian">Hensman et al. (2015)</strong>. In particular, this approximation framework provides a tractable option for working with non-conjugate Gaussian processes with more ~5000 data points. However, for conjugate models of less than 5000 data points, we recommend using the marginal log-likelihood approach presented in the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html).
 
