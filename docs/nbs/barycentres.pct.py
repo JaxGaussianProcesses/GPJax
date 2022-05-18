@@ -48,17 +48,16 @@ key = jr.PRNGKey(123)
 # where $\alpha\in\bbR^T$ is a weight vector that sums to 1.
 #
 # As with the Wasserstein distance, identifying the Wasserstein barycentre $\bar{\mu}$ is often an computationally demanding optimisation problem. However, when all the measures admit a multivariate Gaussian density, the barycentre $\bar{\mu} = \mathcal{N}(\bar{m}, \bar{S})$ has analytical solutions
-# $$\bar{m} = \sum_{t=1}^T \alpha_t m_t\,, \quad \bar{S}=\sum_{t=1}^T\alpha_t (\bar{S}^{1/2}S_t\bar{S}^{1/2})^{1/2}\,.$$
+# $$\bar{m} = \sum_{t=1}^T \alpha_t m_t\,, \quad \bar{S}=\sum_{t=1}^T\alpha_t (\bar{S}^{1/2}S_t\bar{S}^{1/2})^{1/2}\,. \qquad (\star)$$
 # Identifying $\bar{S}$ is achieved through a fixed-point iterative update.
 #
 # ## Barycentre of Gaussian processes
 #
-# It was shown in <strong data-cite="mallasto2017learning"></strong> that the barycentre $\bar{f}$ of a collection of Gaussian processes $\lbrace f_i\rbrace_{i=1}^T$ such that $f_i \sim \mathcal{GP}(m, K)$ can be found using the same solutions as in (3). In this notebook, we will demonstrate how this can be achieved in GPJax.
+# It was shown in <strong data-cite="mallasto2017learning"></strong> that the barycentre $\bar{f}$ of a collection of Gaussian processes $\lbrace f_i\rbrace_{i=1}^T$ such that $f_i \sim \mathcal{GP}(m_i, K_i)$ can be found using the same solutions as in $(\star)$. In this notebook, we will demonstrate how this can be achieved in GPJax.
 #
-# ## Data
+# ## Dataset
 #
-# We'll simulate five datasets over which we'll first learn a Gaussian process posterior, and then identify the Gaussian process barycentre at a set of test points. Each dataset will be a $\sin$ function, each with differing vertical shift, periodicity and noise amounts
-
+# We'll simulate five datasets and develop a Gaussian process posterior before identifying the Gaussian process barycentre at a set of test points. Each dataset will be a sine function with a different vertical shift, periodicity, and quantity of noise.
 # %% vscode={"languageId": "python"}
 n_data = 100
 n_test = 200
@@ -87,7 +86,7 @@ plt.show()
 # %% [markdown]
 # ## Learning a posterior distribution
 #
-# We'll now learn a posterior distribution over each of the datasets using and independent Gaussian process. We won't spend ant time here discussing how a GP can be optimised or how a kernel can be fit. For advice on achieving this, see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for advice on optimsation and the [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for advice on selecting an appropriate kernel.
+# We'll now independently learn Gaussian process posterior distributions for each dataset. We won't spend any time here discussing how GP hyperparameters are optimised. For advice on achieving this, see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for advice on optimisation and the [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for advice on selecting an appropriate kernel.
 
 # %% vscode={"languageId": "python"}
 def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
@@ -119,7 +118,7 @@ posterior_preds = [fit_gp(x, i) for i in ys]
 # %% [markdown]
 # ## Computing the barycentre
 #
-# In GPJax, the predictive distribution of a GP is given by a [Distrax](https://github.com/deepmind/distrax) distribution. This makes it straightforward to then extract the mean vector and covariance matrix of the GP that will be used for learning a barycentre. In the following cell we'll implement the fixed point scheme given in (3). We'll make use of Jax's `vmap` operator here and speed up potentially large matrix operations using broadcasting in `tensordot`.
+# In GPJax, the predictive distribution of a GP is given by a [Distrax](https://github.com/deepmind/distrax) distribution, making it straightforward to extract the mean vector and covariance matrix of each GP for learning a barycentre. We implement the fixed point scheme given in (3) in the following cell by utilising Jax's `vmap` operator to speed up large matrix operations using broadcasting in `tensordot`.
 
 # %% vscode={"languageId": "python"}
 def sqrtm(A: jnp.DeviceArray):
@@ -142,7 +141,7 @@ def wasserstein_barycentres(distributions: tp.List[dx.Distribution], weights: jn
 
 
 # %% [markdown]
-# With a function defined that'll allow us to learn a Barycentre, we'll now compute it using Jax's `lax.scan` operator. This speeds up for loops in Jax and a nice introduction to this can be found in the [Jax documentation](https://jax.readthedocs.io/en/latest/_autosummary/jax.lax.scan.html). We'll run the iterative update 100 times where convergence is measured by the difference between the previous and current iteration. This can be validated by inspecting the `sequence` array in the following cell.
+# With a function defined for learning a barycentre, we'll now compute it using the `lax.scan` operator that drastically speeds up for loops in Jax (see the [Jax documentation](https://jax.readthedocs.io/en/latest/_autosummary/jax.lax.scan.html)). The iterative update will be executed 100 times, with convergence measured by the difference between the previous and current iteration that we can confirm by inspecting the `sequence` array in the following cell.
 
 # %% vscode={"languageId": "python"}
 weights = jnp.ones((n_datasets,)) / n_datasets
@@ -162,7 +161,7 @@ barycentre_process = dx.MultivariateNormalFullCovariance(barycentre_mean, baryce
 # %% [markdown]
 # ## Plotting the result
 #
-# With a barycentre learned, we can visualise the result. We can see that the result looks sensible as it follows the sinusoidal curve of all the inferred GPs and the uncertainty bands look sensible.
+# With a barycentre learned, we can visualise the result. We can see that the result looks reasonable as it follows the sinusoidal curve of all the inferred GPs, and the uncertainty bands are sensible.
 
 # %% vscode={"languageId": "python"}
 def plot(
@@ -186,7 +185,7 @@ plot(barycentre_process, ax, color="tab:red", label="Barycentre", ci_alpha=0.4, 
 # %% [markdown]
 # ## Displacement interpolation
 #
-# In the above example we assigned uniform weights to each of the posteriors within the barycentre. In practice though we may have some knowledge about which posterior is most likely to be the correct one. For example, we may have a priori knowledge that the first posterior is the correct one. Regardless of the weights we choose, barycentre will still be a Gaussian process and we can interpolate between a pair of posterior distributions $\mu_1$ and $\mu_2$ to visualise the corresponding barycentre $\bar{\mu}$.
+# In the above example, we assigned uniform weights to each of the posteriors within the barycentre. In practice, we may have prior knowledge of which posterior is most likely to be the correct one. Regardless of the weights chosen, the barycentre remains a Gaussian process. We can interpolate between a pair of posterior distributions $\mu_1$ and $\mu_2$ to visualise the corresponding barycentre $\bar{\mu}$.
 #
 # ![](figs/barycentre_gp.gif)
 
@@ -195,4 +194,4 @@ plot(barycentre_process, ax, color="tab:red", label="Barycentre", ci_alpha=0.4, 
 
 # %% vscode={"languageId": "python"}
 # %reload_ext watermark
-# %watermark -n -u -v -iv -w -a 'Thomas Pinder'
+# %watermark -n -u -v -iv -w -a 'Thomas Pinder (edited by Daniel Dodd)'
