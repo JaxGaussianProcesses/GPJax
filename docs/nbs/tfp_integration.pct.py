@@ -226,7 +226,7 @@ ax.legend()
 # Things look good, so this concludes our tutorial on interfacing TensorFlow Probability with GPJax. There are a large number of samples present within TensorFlow probability and the workflow demonstrated here only just scratches the surface regarding the inference that is possible with TensorFlow probability.
 
 # %% [markdown]
-# ## System Configuration
+# ## System configuration
 
 # %%
 # %load_ext watermark

@@ -186,7 +186,7 @@ ax.fill_between(xtest.flatten(), meanf - sigma, meanf + sigma, alpha=0.3)
 plt.show()
 
 # %% [markdown]
-# ## System information
+# ## System configuration
 
 # %%
 # %reload_ext watermark

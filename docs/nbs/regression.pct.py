@@ -199,7 +199,7 @@ ax.legend()
 
 
 # %% [markdown]
-# ## System information
+# ## System configuration
 
 # %%
 # %reload_ext watermark

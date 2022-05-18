@@ -161,7 +161,7 @@ cbar = plt.colorbar(sm)
 # Reassuringly, our model seems to be giving equally good predictions in each cluster.
 
 # %% [markdown]
-# ## System Configuration
+# ## System configuration
 
 # %%
 # %reload_ext watermark

@@ -35,7 +35,7 @@ from scipy.signal import sawtooth
 key = jr.PRNGKey(123)
 
 # %% [markdown]
-# ## Data
+# ## Dataset
 #
 # Modelling data with discontinuities is a challenging task for regular Gaussian process models. However, as shown in <strong data-cite="wilson2016deep"></strong>, transforming the inputs to our Gaussian process model's kernel through a neural network can offer a solution to this. To highlight this, we'll model a sawtooth function.
 
@@ -59,7 +59,7 @@ ax.plot(xtest, ytest, label="True function")
 ax.legend(loc="best")
 
 # %% [markdown]
-# ## Deep Kernels
+# ## Deep kernels
 #
 # ### Details
 #
@@ -192,7 +192,7 @@ ax.plot(xtest, predictive_mean + predictive_std, color="tab:blue", linestyle="--
 ax.legend()
 
 # %% [markdown]
-# ## System information
+# ## System configuration
 
 # %%
 # %reload_ext watermark

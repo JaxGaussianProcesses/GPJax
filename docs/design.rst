@@ -12,7 +12,7 @@ Gaussian process notation
    :header-rows: 1
 
    * - On paper
-     - GPJax Code
+     - GPJax code
      - Description
    * - :math:`n_\boldsymbol{x}`
      - nx 
@@ -56,7 +56,7 @@ Sparse Gaussian process notation
    :header-rows: 1
 
    * - On paper
-     - GPJax Code
+     - GPJax code
      - Description
    * - :math:`n_\boldsymbol{z}`
      - nz

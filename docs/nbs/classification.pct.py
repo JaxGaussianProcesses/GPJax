@@ -176,7 +176,7 @@ ax.plot(xtest, expected_val, linewidth=2, color='tab:blue', label='Predicted mea
 ax.fill_between(xtest.flatten(), lower_ci.flatten(), upper_ci.flatten(), alpha=0.2, color='tab:blue', label='95% CI')
 
 # %% [markdown]
-# ## System Configuration
+# ## System configuration
 
 # %%
 # %load_ext watermark

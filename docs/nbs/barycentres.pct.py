@@ -184,14 +184,14 @@ fig, ax = plt.subplots(figsize=(16, 5))
 plot(barycentre_process, ax, color="tab:red", label="Barycentre", ci_alpha=0.4, linewidth=2)
 
 # %% [markdown]
-# ## Displacement Interpolation
+# ## Displacement interpolation
 #
 # In the above example we assigned uniform weights to each of the posteriors within the barycentre. In practice though we may have some knowledge about which posterior is most likely to be the correct one. For example, we may have a priori knowledge that the first posterior is the correct one. Regardless of the weights we choose, barycentre will still be a Gaussian process and we can interpolate between a pair of posterior distributions $\mu_1$ and $\mu_2$ to visualise the corresponding barycentre $\bar{\mu}$.
 #
 # ![](figs/barycentre_gp.gif)
 
 # %% [markdown]
-# ## System Information
+# ## System configuration
 
 # %% vscode={"languageId": "python"}
 # %reload_ext watermark
