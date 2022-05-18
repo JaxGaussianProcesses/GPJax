@@ -67,7 +67,7 @@ for k, ax in zip(kernels, axes.ravel()):
 # %% [markdown]
 # ### Active dimensions
 #
-# By default, kernels operate over every dimension of the supplied inputs. In some use cases, it is desirable to restrict kernels to specific dimensions of the input data. We can achieve this by the 'active dims' argument, which determines which input index values the kernel evaluates.
+# By default, kernels operate over every dimension of the supplied inputs. In some use cases, it is desirable to restrict kernels to specific dimensions of the input data. We can achieve this by the `active dims` argument, which determines which input index values the kernel evaluates.
 #
 # To see this, consider the following 5-dimensional dataset for which we would like our RBF kernel to act on the first, second and fourth dimensions.
 
