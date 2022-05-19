@@ -286,7 +286,7 @@ class NonConjugatePosterior(AbstractPosterior):
         Returns:
             tp.Callable[[dict], Array]: A functional representation of the mll that can be evaluated at a given parameter set.
         """
-        x, y, n_data = train_data.X, train_data.y, train_data.n
+        x, y, n = train_data.X, train_data.y, train_data.n
 
         if not priors:
             priors = copy_dict_structure(self.params)
