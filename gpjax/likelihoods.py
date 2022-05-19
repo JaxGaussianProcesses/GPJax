@@ -10,48 +10,61 @@ from .types import Array
 from .utils import I
 
 
-@dataclass(repr=False)
+@dataclass
 class AbstractLikelihood:
+    """Abstract base class for likelihoods."""
+
     num_datapoints: int  # The number of datapoints that the likelihood factorises over
     name: Optional[str] = "Likelihood"
 
-    def __repr__(self):
-        return f"{self.name} likelihood function"
-
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        """Evaluate the likelihood function at a given predictive distribution."""
         return self.predict(*args, **kwargs)
 
     @abc.abstractmethod
     def predict(self, *args: Any, **kwargs: Any) -> Any:
+        """Evaluate the likelihood function at a given predictive distribution."""
         raise NotImplementedError
 
     @property
     @abc.abstractmethod
     def params(self) -> dict:
+        """Return the parameters of the likelihood function."""
         raise NotImplementedError
 
     @property
     @abc.abstractmethod
     def link_function(self) -> Callable:
+        """Return the link function of the likelihood function."""
         raise NotImplementedError
 
 
 @dataclass(repr=False)
 class Gaussian(AbstractLikelihood):
+    """Gaussian likelihood object."""
+
     name: Optional[str] = "Gaussian"
 
     @property
     def params(self) -> dict:
+        """Return the variance parameter of the likelihood function."""
         return {"obs_noise": jnp.array([1.0])}
 
     @property
     def link_function(self) -> Callable:
+        """Return the link function of the Gaussian likelihood. Here, this is simply the identity function, but we include it for completeness.
+
+        Returns:
+            Callable: A link function that maps the predictive distribution to the likelihood function.
+        """
+
         def link_fn(x, params: dict) -> dx.Distribution:
             return dx.Normal(loc=x, scale=params["obs_noise"])
 
         return link_fn
 
     def predict(self, dist: dx.Distribution, params: dict) -> dx.Distribution:
+        """Evaluate the Gaussian likelihood function at a given predictive distribution. Computationally, this is equivalent to summing the observation noise term to the diagonal elements of the predicitve distribution's covariance matrix.."""
         n_data = dist.event_shape[0]
         noisy_cov = dist.covariance() + I(n_data) * params["likelihood"]["obs_noise"]
         return dx.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)

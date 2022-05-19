@@ -90,6 +90,8 @@ def test_batch_fitting(nb, ndata):
 
     # opt_init, opt_update, get_params = optimizers.adam(step_size=0.1)
     optimiser = optax.adam(learning_rate=0.1)
-    optimised_params = fit_batches(objective, params, trainable_status, D, optimiser, n_iters=5)
+    optimised_params = fit_batches(
+        objective, params, trainable_status, D, optimiser, n_iters=5
+    )
     optimised_params = transform(optimised_params, constrainer)
     assert isinstance(optimised_params, dict)

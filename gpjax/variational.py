@@ -25,14 +25,19 @@ FillTriangular = dx.Chain([tfb.FillTriangular()])
 
 @dataclass
 class VariationalFamily:
+    """Abstract base class used to represent families of distributions that can be used within variational inference."""
+
     @property
     @abc.abstractmethod
     def params(self) -> Dict:
+        """The parameters of the distribution. For example, the multivariate Gaussian would return a mean vector and covariance matrix."""
         raise NotImplementedError
 
 
 @dataclass
 class VariationalGaussian(VariationalFamily):
+    """The variational Gaussian family of probability distributions."""
+
     inducing_inputs: Array
     name: str = "Gaussian"
     variational_mean: Optional[Array] = None
@@ -41,7 +46,7 @@ class VariationalGaussian(VariationalFamily):
     whiten: Optional[bool] = True
 
     def __post_init__(self):
-        """Initialize the variational family."""
+        """Initialize the variational Gaussian distribution."""
         self.num_inducing = self.inducing_inputs.shape[0]
         add_parameter("inducing_inputs", Identity)
 
@@ -60,6 +65,7 @@ class VariationalGaussian(VariationalFamily):
 
     @property
     def params(self) -> Dict:
+        """Return the variational mean vector, variational root covariance matrix, and inducing input vecot that parameterise the variational Gaussian distribution."""
         hyperparams = {
             "inducing_inputs": self.inducing_inputs,
             "variational_mean": self.variational_mean,

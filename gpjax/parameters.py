@@ -17,13 +17,23 @@ Identity = dx.Lambda(lambda x: x)
 # Base operations
 ################################
 def initialise(obj) -> tp.Tuple[tp.Dict, tp.Dict, tp.Dict]:
+    """Initialise the stateful parameters of any GPJax object. This function also returns the trainability of each parameter and set of bijectors that allow parameters to be constrained and unconstrained."""
     params = obj.params
     constrainers, unconstrainers = build_transforms(params)
     trainables = build_trainables(params)
     return params, trainables, constrainers, unconstrainers
 
 
-def recursive_items(d1, d2):
+def recursive_items(d1: tp.Dict, d2: tp.Dict):
+    """Recursive loop over pair of dictionaries whereby the value of a given key in either dictionary can be itself a dictionary.
+
+    Args:
+        d1 (_type_): _description_
+        d2 (_type_): _description_
+
+    Yields:
+        _type_: _description_
+    """
     for key, value in d1.items():
         if type(value) is dict:
             yield from recursive_items(value, d2[key])
@@ -31,7 +41,16 @@ def recursive_items(d1, d2):
             yield (key, value, d2[key])
 
 
-def recursive_complete(d1, d2) -> dict:
+def recursive_complete(d1: tp.Dict, d2: tp.Dict) -> tp.Dict:
+    """Recursive loop over pair of dictionaries whereby the value of a given key in either dictionary can be itself a dictionary. If the value of the key in the second dictionary is None, the value of the key in the first dictionary is used.
+
+    Args:
+        d1 (tp.Dict): The reference dictionary.
+        d2 (tp.Dict): The potentially incomplete dictionary.
+
+    Returns:
+        tp.Dict: A completed form of the second dictionary.
+    """
     for key, value in d1.items():
         if type(value) is dict:
             if key in d2.keys():
@@ -54,7 +73,15 @@ def recursive_complete(d1, d2) -> dict:
 ################################
 # Parameter transformation
 ################################
-def build_bijectors(params) -> tp.Dict:
+def build_bijectors(params: tp.Dict) -> tp.Dict:
+    """For each parameter, build the bijection pair that allows the parameter to be constrained and unconstrained.
+
+    Args:
+        params (tp.Dict): _description_
+
+    Returns:
+        tp.Dict: A dictionary that maps each parameter to a bijection.
+    """
     bijectors = copy_dict_structure(params)
     config = get_defaults()
     transform_set = config["transformations"]
@@ -87,8 +114,16 @@ def build_bijectors(params) -> tp.Dict:
     return recursive_bijectors(params, bijectors)
 
 
-# Hacked this for now:
-def build_transforms(params) -> tp.Tuple[tp.Dict, tp.Dict]:
+def build_transforms(params: tp.Dict) -> tp.Tuple[tp.Dict, tp.Dict]:
+    """Using the bijector that is associated with each parameter, construct a pair of functions from the bijector that allow the parameter to be constrained and unconstrained.
+
+    Args:
+        params (tp.Dict): The parameter set for which transformations should be derived from.
+
+    Returns:
+        tp.Tuple[tp.Dict, tp.Dict]: A pair of dictionaries. The first dictionary maps each parameter to a function that constrains the parameter. The second dictionary maps each parameter to a function that unconstrains the parameter.
+    """
+
     def forward(bijector):
         return bijector.forward
 
@@ -106,7 +141,16 @@ def build_transforms(params) -> tp.Tuple[tp.Dict, tp.Dict]:
     return constrainers, unconstrainers
 
 
-def transform(params: dict, transform_map: dict) -> dict:
+def transform(params: tp.Dict, transform_map: tp.Dict) -> tp.Dict:
+    """Transform the parameters according to the constraining or unconstraining function dictionary.
+
+    Args:
+        params (tp.Dict): The parameters that are to be transformed.
+        transform_map (tp.Dict): The corresponding dictionary of transforms that should be applied to the parameter set.
+
+    Returns:
+        tp.Dict: A transformed parameter set.s The dictionary is equal in structure to the input params dictionary.
+    """
     return jax.tree_map(lambda param, trans: trans(param), params, transform_map)
 
 
@@ -165,6 +209,7 @@ def evaluate_priors(params: dict, priors: dict) -> dict:
 
 
 def prior_checks(priors: dict) -> dict:
+    """Run checks on th parameters' prior distributions. This checks that for Gaussian processes that are constructed with non-conjugate likelihoods, the prior distribution on the function's latent values is a unit Gaussian."""
     if "latent" in priors.keys():
         latent_prior = priors["latent"]
         if isinstance(latent_prior, dx.Distribution) and latent_prior.name != "Normal":
@@ -190,8 +235,15 @@ def prior_checks(priors: dict) -> dict:
     return priors
 
 
-# Trainable parameter handlers:
-def build_trainables(params: dict) -> dict:
+def build_trainables(params: tp.Dict) -> tp.Dict:
+    """Construct a dictionary of trainable statuses for each parameter. By default, every parameter within the model is trainable.
+
+    Args:
+        params (tp.Dict): The parameter set for which trainable statuses should be derived from.
+
+    Returns:
+        tp.Dict: A dictionary of boolean trainability statuses. The dictionary is equal in structure to the input params dictionary.
+    """
     # Copy dictionary structure
     prior_container = deepcopy(params)
     # Set all values to zero
@@ -199,13 +251,13 @@ def build_trainables(params: dict) -> dict:
     return prior_container
 
 
-# Stop gradient of a single parameter in a pytree:
-def stop_grad(param, trainable):
+def stop_grad(param: tp.Dict, trainable: tp.Dict):
+    """When taking a gradient, we want to stop the gradient from flowing through a parameter if it is not trainable. This is achieved using the model's dictionary of parameters and the corresponding trainability status."""
     return jax.lax.cond(trainable, lambda x: x, jax.lax.stop_gradient, param)
 
 
-# Stop gradients of parameters whoose training is set to False.
-def trainable_params(params, trainables):
+def trainable_params(params: tp.Dict, trainables: tp.Dict) -> tp.Dict:
+    """Stop the gradients flowing through parameters whose trainable status is False"""
     return jax.tree_map(
         lambda param, trainable: stop_grad(param, trainable), params, trainables
     )

@@ -15,7 +15,7 @@ from .likelihoods import (
     NonConjugateLikelihoods,
     NonConjugateLikelihoodType,
 )
-from .mean_functions import MeanFunction, Zero
+from .mean_functions import AbstractMeanFunction, Zero
 from .parameters import copy_dict_structure, evaluate_priors, transform
 from .types import Array, Dataset
 from .utils import I, concat_dictionaries
@@ -32,7 +32,7 @@ class AbstractGP:
 
     @abstractmethod
     def predict(self, *args: tp.Any, **kwargs: tp.Any) -> dx.Distribution:
-        """Predict the GP's output given the input."""
+        """Compute the latent function's multivariate normal distribution."""
         raise NotImplementedError
 
     @abstractproperty
@@ -49,7 +49,7 @@ class Prior(AbstractGP):
     """A Gaussian process prior object. The GP is parameterised by a mean and kernel function."""
 
     kernel: Kernel
-    mean_function: tp.Optional[MeanFunction] = Zero()
+    mean_function: tp.Optional[AbstractMeanFunction] = Zero()
     name: tp.Optional[str] = "Prior"
     jitter: tp.Optional[float] = DEFAULT_JITTER
 
@@ -79,7 +79,9 @@ class Prior(AbstractGP):
             mt = self.mean_function(t, params["mean_function"])
             Ktt = gram(self.kernel, t, params["kernel"])
             Ktt += I(t.shape[0]) * self.jitter
-            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mt.squeeze()), Ktt)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mt.squeeze()), Ktt
+            )
 
         return predict_fn
 
@@ -118,17 +120,32 @@ class AbstractPosterior(AbstractGP):
 
     @property
     def params(self) -> dict:
-        return concat_dictionaries(self.prior.params, {"likelihood": self.likelihood.params})
+        return concat_dictionaries(
+            self.prior.params, {"likelihood": self.likelihood.params}
+        )
 
 
 @dataclass
 class ConjugatePosterior(AbstractPosterior):
+    """Gaussian process posterior object for models where the likelihood is Gaussian."""
+
     prior: Prior
     likelihood: Gaussian
     name: tp.Optional[str] = "ConjugatePosterior"
     jitter: tp.Optional[float] = DEFAULT_JITTER
 
-    def predict(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], dx.Distribution]:
+    def predict(
+        self, train_data: Dataset, params: dict
+    ) -> tp.Callable[[Array], dx.Distribution]:
+        """Conditional on a set of training data, compute the GP's posterior predictive distriburion for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density..
+
+        Args:
+            train_data (Dataset): A `gpx.Dataset` object that contains the input and output data used for training dataset.
+            params (dict): A dictionary of parameters that should be used to compute the posterior.
+
+        Returns:
+            tp.Callable[[Array], dx.Distribution]: A function that accepts an input array and returns the predictive distribution as a `distrax.MultivariateNormalFullCovariance`.
+        """
         x, y, n_data = train_data.X, train_data.y, train_data.n
         obs_noise = params["likelihood"]["obs_noise"]
         mx = self.prior.mean_function(x, params["mean_function"])
@@ -154,7 +171,9 @@ class ConjugatePosterior(AbstractPosterior):
             covariance = Ktt - jnp.dot(Ktx, latent_values)
             covariance += I(t.shape[0]) * self.jitter
 
-            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance
+            )
 
         return predict
 
@@ -164,7 +183,18 @@ class ConjugatePosterior(AbstractPosterior):
         transformations: tp.Dict,
         priors: dict = None,
         negative: bool = False,
-    ) -> tp.Callable[[Dataset], Array]:
+    ) -> tp.Callable[[dict], Array]:
+        """Compute the marginal log likelihood function of the Gaussian process. The returned function can then be used for gradient based optimisation of the model's parameters or for model comparison. The implementation given here enables exact estimation of the Gaussian process' latent function values.
+
+        Args:
+            train_data (Dataset): The training dataset used to compute the marginal log likelihood.
+            transformations (tp.Dict): A dictionary of transformations that should be applied to the training dataset to unconstrain the parameters.
+            priors (dict, optional): _description_. Optional argument that contains the priors placed on the model's parameters. Defaults to None.
+            negative (bool, optional): Whether or not the returned function should be negative. For optimisation, the negative is useful as minimisation of the negative marginal log-likelihood is equivalent to maximisation of the marginal log-likelihood. Defaults to False.
+
+        Returns:
+            tp.Callable[[dict], Array]: A functional representation of the mll that can be evaluated at a given parameter set.
+        """
         x, y, n_data = train_data.X, train_data.y, train_data.n
 
         def mll(
@@ -182,26 +212,21 @@ class ConjugatePosterior(AbstractPosterior):
 
             log_prior_density = evaluate_priors(params, priors)
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-            return constant * (random_variable.log_prob(y.squeeze()).mean() + log_prior_density)
+            return constant * (
+                random_variable.log_prob(y.squeeze()).mean() + log_prior_density
+            )
 
         return mll
 
 
 @dataclass
 class NonConjugatePosterior(AbstractPosterior):
+    """Generic Gaussian process posterior object for models where the likelihood is non-Gaussian."""
+
     prior: Prior
     likelihood: NonConjugateLikelihoodType
     name: tp.Optional[str] = "Non-Conjugate Posterior"
     jitter: tp.Optional[float] = DEFAULT_JITTER
-
-    def __repr__(self):
-        mean_fn_string = self.prior.mean_function.__repr__()
-        kernel_string = self.prior.kernel.__repr__()
-        likelihood_string = self.likelihood.__repr__()
-        return (
-            f"Non-Conjugate Posterior\n{'-'*80}\n- {mean_fn_string}\n-"
-            f" {kernel_string}\n- {likelihood_string}"
-        )
 
     @property
     def params(self) -> dict:
@@ -211,7 +236,18 @@ class NonConjugatePosterior(AbstractPosterior):
         hyperparameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
         return hyperparameters
 
-    def predict(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], dx.Distribution]:
+    def predict(
+        self, train_data: Dataset, params: dict
+    ) -> tp.Callable[[Array], dx.Distribution]:
+        """Conditional on a set of training data, compute the GP's posterior predictive distriburion for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density. Note, to gain predictions on the scale of the original data, the returned distribution will need to be transformed through the likelihood function's inverse link function.
+
+        Args:
+            train_data (Dataset): A `gpx.Dataset` object that contains the input and output data used for training dataset.
+            params (dict): A dictionary of parameters that should be used to compute the posterior.
+
+        Returns:
+            tp.Callable[[Array], dx.Distribution]: A function that accepts an input array and returns the predictive distribution as a `distrax.MultivariateNormalFullCovariance`.
+        """
         x, n_data = train_data.X, train_data.n
         Kxx = gram(self.prior.kernel, x, params["kernel"])
         Kxx += I(n_data) * self.jitter
@@ -236,7 +272,18 @@ class NonConjugatePosterior(AbstractPosterior):
         transformations: tp.Dict,
         priors: dict = None,
         negative: bool = False,
-    ) -> tp.Callable[[Dataset], Array]:
+    ) -> tp.Callable[[dict], Array]:
+        """Compute the marginal log likelihood function of the Gaussian process. The returned function can then be used for gradient based optimisation of the model's parameters or for model comparison. The implementation given here is general and will work for any likelihood support by GPJax.
+
+        Args:
+            train_data (Dataset): The training dataset used to compute the marginal log likelihood.
+            transformations (tp.Dict): A dictionary of transformations that should be applied to the training dataset to unconstrain the parameters.
+            priors (dict, optional): _description_. Optional argument that contains the priors placed on the model's parameters. Defaults to None.
+            negative (bool, optional): Whether or not the returned function should be negative. For optimisation, the negative is useful as minimisation of the negative marginal log-likelihood is equivalent to maximisation of the marginal log-likelihood. Defaults to False.
+
+        Returns:
+            tp.Callable[[dict], Array]: A functional representation of the mll that can be evaluated at a given parameter set.
+        """
         x, y, n_data = train_data.X, train_data.y, train_data.n
 
         if not priors:
@@ -259,11 +306,15 @@ class NonConjugatePosterior(AbstractPosterior):
         return mll
 
 
-def construct_posterior(prior: Prior, likelihood: AbstractLikelihood) -> AbstractPosterior:
+def construct_posterior(
+    prior: Prior, likelihood: AbstractLikelihood
+) -> AbstractPosterior:
     if isinstance(likelihood, Gaussian):
         PosteriorGP = ConjugatePosterior
     elif any([isinstance(likelihood, l) for l in NonConjugateLikelihoods]):
         PosteriorGP = NonConjugatePosterior
     else:
-        raise NotImplementedError(f"No posterior implemented for {likelihood.name} likelihood")
+        raise NotImplementedError(
+            f"No posterior implemented for {likelihood.name} likelihood"
+        )
     return PosteriorGP(prior=prior, likelihood=likelihood)

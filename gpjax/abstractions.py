@@ -37,7 +37,9 @@ def progress_bar_scan(n_iters, log_rate):
         _ = lax.cond(
             # update tqdm every multiple of `print_rate` except at the end
             (i % log_rate == 0) & (i != n_iters - remainder),
-            lambda _: host_callback.id_tap(_update_tqdm, (loss_val, log_rate), result=i),
+            lambda _: host_callback.id_tap(
+                _update_tqdm, (loss_val, log_rate), result=i
+            ),
             lambda _: i,
             operand=None,
         )
@@ -45,7 +47,9 @@ def progress_bar_scan(n_iters, log_rate):
         _ = lax.cond(
             # update tqdm by `remainder`
             i == n_iters - remainder,
-            lambda _: host_callback.id_tap(_update_tqdm, (loss_val, remainder), result=i),
+            lambda _: host_callback.id_tap(
+                _update_tqdm, (loss_val, remainder), result=i
+            ),
             lambda _: i,
             operand=None,
         )
