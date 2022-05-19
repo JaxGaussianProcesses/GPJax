@@ -61,7 +61,15 @@ def as_constant(parameter_set: dict, params: list) -> tp.Tuple[dict, dict]:
     return base_params, sparams
 
 
-def dict_array_coercion(params) -> tp.Tuple[tp.Callable, tp.Callable]:
+def dict_array_coercion(params: tp.Dict) -> tp.Tuple[tp.Callable, tp.Callable]:
+    """Construct the logic required to map a dictionary of parameters to an array of parameters. The values of the dcitionary can themselves be dictionaries; the function should work recursively.
+
+    Args:
+        params (tp.Dict): The dictionary of parameters that we would like to map into an array.
+
+    Returns:
+        tp.Tuple[tp.Callable, tp.Callable]: A pair of functions, the first of which maps a dictionary to an array, and the second of which maps an array to a dictionary. The remapped dictionary is equal in structure to the original dictionary.
+    """
     flattened_pytree = jax.tree_util.tree_flatten(params)
 
     def dict_to_array(parameter_dict) -> jnp.DeviceArray:

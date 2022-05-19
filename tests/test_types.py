@@ -38,7 +38,6 @@ def test_y_none():
     assert d.y is None
 
 
-
 @pytest.mark.parametrize("batch_size", [1, 10])
 @pytest.mark.parametrize("n", [50, 100])
 def test_batcher(batch_size, n):

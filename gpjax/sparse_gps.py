@@ -22,6 +22,8 @@ DEFAULT_JITTER = get_defaults()["jitter"]
 
 @dataclass
 class VariationalPosterior:
+    """A variatioanl posterior object. With reference to some true posterior distribution :math:`p`, this can be used to minmise the KL-diverence between :math:`p` and a variational posterior :math:`q`."""
+
     posterior: AbstractPosterior
     variational_family: VariationalFamily
     jitter: Optional[float] = DEFAULT_JITTER
@@ -31,10 +33,12 @@ class VariationalPosterior:
         self.likelihood = self.posterior.likelihood
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        """For a given set of parameters, compute the latent function's prediction under the variational approximation."""
         return self.predict(*args, **kwargs)
 
     @property
     def params(self) -> Dict:
+        """Construct the parameter set used within the variational scheme adopted."""
         hyperparams = concat_dictionaries(
             self.posterior.params,
             {"variational_family": self.variational_family.params},
@@ -49,12 +53,23 @@ class VariationalPosterior:
     @abc.abstractmethod
     def elbo(
         self, train_data: Dataset, transformations: Dict
-    ) -> Callable[[Array], Array]:
+    ) -> Callable[[Dict], Array]:
+        """Placeholder method for computing the evidence lower bound function, given a training dataset and a set of transformations that map each parameter onto the entire real line.
+
+        Args:
+            train_data (Dataset): The training dataset for which the ELBO is to be computed.
+            transformations (Dict): A set of functions that unconstrain each parameter.
+
+        Returns:
+            Callable[[Array], Array]: A function that computes the ELBO given a set of parameters.
+        """
         raise NotImplementedError
 
 
 @dataclass
 class SVGP(VariationalPosterior):
+    """The Sparse Variational Gaussian Process (SVGP) variational posterior. The key reference is Henman et. al., (2013) - Gaussian processes for big data."""
+
     def __post_init__(self):
         self.prior = self.posterior.prior
         self.likelihood = self.posterior.likelihood
@@ -63,6 +78,16 @@ class SVGP(VariationalPosterior):
     def elbo(
         self, train_data: Dataset, transformations: Dict, negative: bool = False
     ) -> Callable[[Array], Array]:
+        """Compute the evidence lower bound under this model. In short, this requires evaluating the expectation of the model's log-likelihood under the variational approximation. To this, we sum the KL diverence from the variational posterior to the prior. When batching occurs, the result is scaled by the batch size relative to the full dataset size.
+
+        Args:
+            train_data (Dataset): The training data for which we should maximise the ELBO with respect to.
+            transformations (Dict): The transformation set that unconstrains each parameter.
+            negative (bool, optional): Whether or not the resultant elbo function should be negative. For gradient descent where we minimise our objective function this argument should be true as minimisation of the negative corresponds to maximiation of the ELBO. Defaults to False.
+
+        Returns:
+            Callable[[Dict, Dataset], Array]: A callable function that accepts a current parameter estimate and batch of data for which gradients should be computed.
+        """
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
 
         def elbo_fn(params: Dict, batch: Dataset) -> Array:
@@ -76,6 +101,14 @@ class SVGP(VariationalPosterior):
 
     # Compute KL divergence at inducing points, KL[q(u)||p(u)]:
     def prior_kl(self, params: Dict) -> Array:
+        """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
+
+        Args:
+            params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
+
+        Returns:
+            Array: The KL-divergence between our variational approximation and the GP prior.
+        """
         mu = params["variational_family"]["variational_mean"]
         sqrt = params["variational_family"]["variational_root_covariance"]
         m = self.num_inducing
@@ -96,6 +129,15 @@ class SVGP(VariationalPosterior):
         return qu.kl_divergence(pu)
 
     def variational_expectation(self, params: Dict, batch: Dataset) -> Array:
+        """Compute the expectation of our model's log-likelihood under our variational distribution. Batching can be done here to speed up computation.
+
+        Args:
+            params (Dict): The set of parameters that induce our variational approximation.
+            batch (Dataset): The data batch for which the expectation should be computed for.
+
+        Returns:
+            Array: The expectation of the model's log-likelihood under our variational distribution.
+        """
         x, y = batch.X, batch.y
 
         mean, variance = vmap(self.pred_moments, in_axes=(None, 0))(
@@ -110,6 +152,15 @@ class SVGP(VariationalPosterior):
 
     # Computes predictive moments for Gauss-Hermite quadrature:
     def pred_moments(self, params: Dict, test_inputs: Array) -> Tuple[Array, Array]:
+        """Compute the predictive mean and variance of the GP at the test inputs. A series of 1-dimensional Gaussian-Hermite quadrature schemes are used for this.
+
+        Args:
+            params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
+            test_inputs (Array): The test inputs at which the predictive mean and variance should be computed.
+
+        Returns:
+            Tuple[Array, Array]: The predictive mean and variance of the GP at the test inputs.
+        """
         mu = params["variational_family"]["variational_mean"]
         sqrt = params["variational_family"]["variational_root_covariance"]
 
@@ -139,7 +190,14 @@ class SVGP(VariationalPosterior):
         return mean, covariance
 
     def predict(self, params: dict) -> Callable[[Array], dx.Distribution]:
-        # Cholesky decomposition at inducing inputs:
+        """Compute the predictive distribution of the GP at the test inputs.
+
+        Args:
+            params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
+
+        Returns:
+            Callable[[Array], dx.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
+        """
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
         Kzz = gram(self.prior.kernel, z, params["kernel"])

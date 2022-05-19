@@ -17,6 +17,17 @@ def gauss_hermite_quadrature(
     *args,
     **kwargs
 ) -> Array:
+    """Compute Gaussian-Hermite quadrature for a given function. The quadrature points are adjusted through the supplied mean and variance arrays.
+
+    Args:
+        fun (Callable): The function for which quadrature should be applied to.
+        mean (Array): The mean of the Gaussian distribution that is used to shift quadrature points.
+        var (Array): The variance of the Gaussian distribution that is used to scale quadrature points.
+        deg (int, optional): The number of quadrature points that are to be used. Defaults to 20.
+
+    Returns:
+        Array: The evaluated integrals value.
+    """
     gh_points, gh_weights = np.polynomial.hermite.hermgauss(deg)
     stdev = jnp.sqrt(var)
     X = mean + jnp.sqrt(2.0) * stdev * gh_points

@@ -114,17 +114,23 @@ class CombinationKernel(Kernel, _KernelSet):
         return [kernel.params for kernel in self.kernel_set]
 
     def __call__(self, x: Array, y: Array, params: dict) -> Array:
-        return self.combination_fn(jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)]))
+        return self.combination_fn(
+            jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)])
+        )
 
 
 @dataclass
 class SumKernel(CombinationKernel):
+    """A kernel that is the sum of a set of kernels."""
+
     name: Optional[str] = "Sum kernel"
     combination_fn: Optional[Callable] = jnp.sum
 
 
 @dataclass
 class ProductKernel(CombinationKernel):
+    """A kernel that is the product of a set of kernels."""
+
     name: Optional[str] = "Product kernel"
     combination_fn: Optional[Callable] = jnp.prod
 
@@ -227,7 +233,11 @@ class Matern32(Kernel):
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
         tau = euclidean_distance(x, y)
-        K = params["variance"] * (1.0 + jnp.sqrt(3.0) * tau) * jnp.exp(-jnp.sqrt(3.0) * tau)
+        K = (
+            params["variance"]
+            * (1.0 + jnp.sqrt(3.0) * tau)
+            * jnp.exp(-jnp.sqrt(3.0) * tau)
+        )
         return K.squeeze()
 
 
