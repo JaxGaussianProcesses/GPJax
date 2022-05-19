@@ -60,16 +60,16 @@ likelihood = gpx.Bernoulli(num_datapoints=D.n)
 posterior = prior * likelihood
 print(type(posterior))
 # %% [markdown]
-# Whilst the latent function is Gaussian, the posterior distribution is non-Gaussian since our generative model first samples the latent GP and propagates these samples through the likelihood function's inverse link function. Here, and in general, this step prevents us from being able to analytically integrate the latent function's values out of our posterior, and we must instead adopt alternative inference techniques. We begin with maximum a posteriori (MAP) estimation, a fast inference procedure to obtain point estimates for the latent function and the kernel's hyperparameters by maximising the marginal log-likelihood. 
+# Whilst the latent function is Gaussian, the posterior distribution is non-Gaussian since our generative model first samples the latent GP and propagates these samples through the likelihood function's inverse link function. This step prevents us from being able to analytically integrate the latent function's values out of our posterior, and we must instead adopt alternative inference techniques. We begin with maximum a posteriori (MAP) estimation, a fast inference procedure to obtain point estimates for the latent function and the kernel's hyperparameters by maximising the marginal log-likelihood. 
 # %% [markdown]
-# To begin we obtain a set of initial parameter values through the `initialise` callable, and transform these to the unconstrained space via `transform` (see the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)). We also define the negative marginal log-likelihood, and jit compile this to accelerate training.
+# To begin we obtain a set of initial parameter values through the `initialise` callable, and transform these to the unconstrained space via `transform` (see the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)). We also define the negative marginal log-likelihood, and JIT compile this to accelerate training.
 # %%
 params, trainable, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 
 mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=True))
 # %% [markdown]
-# We can obtain a MAP estimate by optimising the marginal log-likelihood with ObJax's optimisers.
+# We can obtain a MAP estimate by optimising the marginal log-likelihood with Obtax's optimisers.
 # %%
 opt = ox.adam(learning_rate=0.01)
 map_estimate = gpx.abstractions.optax_fit(
@@ -84,7 +84,7 @@ map_estimate = gpx.abstractions.optax_fit(
 # %% [markdown]
 # ## MCMC inference
 #
-# At the high level, an MCMC sampler works by starting at an initial position and drawing a sample from a cheap-to-simulate distribution known as the _proposal_. The next step is to determine whether this sample could be considered a draw from the posterior. We accomplish this using an _acceptance probability_ determined via the sampler's _transition kernel_ which depends on the current position and the unnormalised target posterior distribution. If the new sample is more _likely_, we accept it; otherwise, we reject it and stay in our current position. Repeating these steps results in a Markov chain (a random sequence that depends only on the last state) whose stationary distribution (the long-term empirical distribution of the states visited) is the posterior. For a gentle introduction, see the first chapter of [A Handbook of Markov Chain Monte Carlo](https://www.mcmchandbook.net/HandbookChapter1.pdf).
+# At the high level, an MCMC sampler works by starting at an initial position and drawing a sample from a cheap-to-simulate distribution known as the _proposal_. The next step is to determine whether this sample could be considered a draw from the posterior. We accomplish this using an _acceptance probability_ determined via the sampler's _transition kernel_ which depends on the current position and the unnormalised target posterior distribution. If the new sample is more _likely_, we accept it; otherwise, we reject it and stay in our current position. Repeating these steps results in a Markov chain (a random sequence that depends only on the last state) whose stationary distribution (the long-run empirical distribution of the states visited) is the posterior. For a gentle introduction, see the first chapter of [A Handbook of Markov Chain Monte Carlo](https://www.mcmchandbook.net/HandbookChapter1.pdf).
 #
 # ### MCMC through BlackJax
 #
@@ -92,7 +92,7 @@ map_estimate = gpx.abstractions.optax_fit(
 #
 # We'll use the No U-Turn Sampler (NUTS) implementation given in BlackJax for sampling. For the interested reader, NUTS is a Hamiltonian Monte Carlo sampling scheme where the number of leapfrog integration steps is computed at each step of the change according to the NUTS algorithm. In general, samplers constructed under this framework are very efficient.
 #
-# We begin by generating _sensible_ initial positions for our sampler before defining an inference loop and sampling 500 values from our Markov chain. In general, drawing more samples will be necessary.
+# We begin by generating _sensible_ initial positions for our sampler before defining an inference loop and sampling 500 values from our Markov chain. In practice, drawing more samples will be necessary.
 # %%
 # Adapted from BlackJax's introduction notebook.
 num_adapt = 1000
@@ -130,7 +130,7 @@ acceptance_rate = jnp.mean(infos.acceptance_probability)
 print(f"Acceptance rate: {acceptance_rate:.2f}")
 
 # %% [markdown]
-# The acceptance rate is slightly too large, prompting an examination of the chain's trace plots. A well-mixing chain will have very few (if any) flat spots in its trace plot whilst also not having too many steps in the same direction. In addition to the model's hyperparameters, there will be 500 samples for each of the 100 latent function values in the `states.position` dictionary. We depict the chains that correspond to the model hyperparameters and the first value of the latent function for brevity.
+# Our acceptance rate is slightly too large, prompting an examination of the chain's trace plots. A well-mixing chain will have very few (if any) flat spots in its trace plot whilst also not having too many steps in the same direction. In addition to the model's hyperparameters, there will be 500 samples for each of the 100 latent function values in the `states.position` dictionary. We depict the chains that correspond to the model hyperparameters and the first value of the latent function for brevity.
 # %%
 fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(15, 5), tight_layout=True)
 ax0.plot(states.position['kernel']['lengthscale'])
@@ -167,7 +167,7 @@ expected_val = jnp.mean(samples, axis=0)
 
 # %% [markdown]
 #
-# Finally, we plot the predictions obtained from our model against the observed data.
+# Finally, we end this tutorial by plotting the predictions obtained from our model against the observed data.
 
 # %%
 fig, ax = plt.subplots(figsize=(16, 5), tight_layout=True)
