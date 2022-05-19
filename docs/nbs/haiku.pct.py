@@ -40,10 +40,10 @@ key = jr.PRNGKey(123)
 # Modelling data with discontinuities is a challenging task for regular Gaussian process models. However, as shown in <strong data-cite="wilson2016deep"></strong>, transforming the inputs to our Gaussian process model's kernel through a neural network can offer a solution to this. To highlight this, we'll model a sawtooth function.
 
 # %%
-N = 500
+n = 500
 noise = 0.2
 
-x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(N,)).sort().reshape(-1, 1)
+x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n,)).sort().reshape(-1, 1)
 f = lambda x: jnp.asarray(sawtooth(2 * jnp.pi * x))
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise

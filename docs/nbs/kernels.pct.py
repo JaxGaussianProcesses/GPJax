@@ -38,6 +38,7 @@ key = jr.PRNGKey(123)
 # * Matérn 1/2, 3/2 and 5/2.
 # * RBF (or squared exponential).
 # * Polynomial.
+# * [Graph kernels](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html).
 #
 # While the syntax is consistent, each kernel’s type influences the characteristics of the sample paths drawn. We visualise this below with 10 function draws per kernel.
 

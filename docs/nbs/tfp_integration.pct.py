@@ -39,10 +39,10 @@ key = jr.PRNGKey(123)
 # through observations perturbed by Gaussian noise. We begin by simulating some data below.
 
 # %%
-N = 100
+n = 100
 noise = 0.1
 
-x = jnp.sort(jr.uniform(key, minval=-5.0, maxval=5.0, shape=(N, 1)), axis=0)
+x = jnp.sort(jr.uniform(key, minval=-5.0, maxval=5.0, shape=(n, 1)), axis=0)
 f = lambda x: jnp.sin(jnp.pi * x) / (jnp.pi * x)
 y = f(x) + jr.normal(key, shape=x.shape) * noise
 

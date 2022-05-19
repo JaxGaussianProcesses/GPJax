@@ -59,11 +59,11 @@ key = jr.PRNGKey(123)
 #
 # We'll simulate five datasets and develop a Gaussian process posterior before identifying the Gaussian process barycentre at a set of test points. Each dataset will be a sine function with a different vertical shift, periodicity, and quantity of noise.
 # %% vscode={"languageId": "python"}
-n_data = 100
+n = 100
 n_test = 200
 n_datasets = 5
 
-x = jnp.linspace(-5.0, 5.0, n_data).reshape(-1, 1)
+x = jnp.linspace(-5.0, 5.0, n).reshape(-1, 1)
 xtest = jnp.linspace(-5.5, 5.5, n_test).reshape(-1, 1)
 f = lambda x, a, b: a + jnp.sin(b * x)
 
@@ -93,7 +93,7 @@ def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
     if y.ndim == 1:
         y = y.reshape(-1, 1)
     D = gpx.Dataset(X=x, y=y)
-    likelihood = gpx.Gaussian(num_datapoints=n_data)
+    likelihood = gpx.Gaussian(num_datapoints=n)
     posterior = gpx.Prior(kernel=gpx.RBF()) * likelihood
     params, trainables, constrainers, unconstrainers = gpx.initialise(posterior)
     params = gpx.transform(params, unconstrainers)
