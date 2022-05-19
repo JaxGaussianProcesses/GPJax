@@ -166,14 +166,11 @@ def fit_batches(
     trainables: tp.Dict,
     train_data: Dataset,
     optax_optim,
-    # opt_init,
-    # opt_update,
-    # get_params,
     n_iters: tp.Optional[int] = 100,
     log_rate: tp.Optional[int] = 10,
 ) -> tp.Dict:
     """Abstracted method for fitting a GP model with mini-batches respect to a supplied objective function.
-    Optimisers used here should originate from Jax's experimental module.
+    Optimisers used here should originate from Optax.
     Args:
         objective (tp.Callable): The objective function that we are optimising with respect to.
         params (dict): The parameters for which we would like to minimise our objective function wtih.
@@ -187,8 +184,7 @@ def fit_batches(
     Returns:
         tp.Dict: An optimised set of parameters.
     """
-
-    # opt_state = opt_init(params)
+    
     opt_state = optax_optim.init(params)
     next_batch = train_data.get_batcher()
 

@@ -15,7 +15,7 @@
 
 # %% [markdown]
 # # TensorFlow Probability Integration
-
+# This notebook demonstrates how to perform Markov chain Monte Carlo (MCMC) inference for Gaussian process models using TensorFlow Probability.
 # %%
 from pprint import PrettyPrinter
 
@@ -31,17 +31,18 @@ pp = PrettyPrinter(indent=4)
 key = jr.PRNGKey(123)
 
 # %% [markdown]
-# ## Simulate some data
+# ## Dataset
 #
-# In this tutorial we'll be trying to model the normalised sinc function
-# $$f(x) = \frac{\sin(\pi x)}{\pi x}$$
-# for $x\in\mathbb{R}$ where $x \neq 0$.
+# In this tutorial we'll be trying to model a normalised sinc function
+# $$f(x) = \frac{\sin(\pi x)}{\pi x}, \qquad x\in\mathbb{R}\setminus\{0\}, $$
+#
+# through observations perturbed by Gaussian noise. We begin by simulating some data below.
 
 # %%
-N = 100
+n = 100
 noise = 0.1
 
-x = jnp.sort(jr.uniform(key, minval=-5.0, maxval=5.0, shape=(N, 1)), axis=0)
+x = jnp.sort(jr.uniform(key, minval=-5.0, maxval=5.0, shape=(n, 1)), axis=0)
 f = lambda x: jnp.sin(jnp.pi * x) / (jnp.pi * x)
 y = f(x) + jr.normal(key, shape=x.shape) * noise
 
@@ -53,25 +54,28 @@ ax.legend(loc="best")
 # %% [markdown]
 # ## Define GPJax objects
 #
-# We'll now wrap this pair of observed data arrays up into a `Dataset` object and define a 'GP' posterior object.
+# We'll wrap our pair of observed data arrays up into a `Dataset` object $\mathcal{D}$ and define a GP posterior.
 
 # %%
-training = gpx.Dataset(X=x, y=y)
-likelihood = gpx.Gaussian(num_datapoints=training.n)
+D = gpx.Dataset(X=x, y=y)
+likelihood = gpx.Gaussian(num_datapoints=D.n)
 posterior = gpx.Prior(kernel=gpx.RBF()) * likelihood
 
 # %% [markdown]
 # ## Initialise parameters
 #
-# All parameters in this model are constrained to be positive. Our MCMC sampler will therefore sample on the parameters' unconstrained space and the samples will then be back transformed onto the original positive real line. GPJax's `initialise` function makes this straightforward.
+# Since our model hyperparameters are positive, our MCMC sampler will sample on the parameters' unconstrained space and the samples will then be back-transformed onto the original positive real line. GPJax's `initialise` function makes this straightforward.
 
 # %%
-params, training_status, constrainers, unconstrainers = gpx.initialise(posterior)
+params, _, constrainers, unconstrainers = gpx.initialise(posterior)
 
 # %% [markdown]
 # #### Parameter type
 #
-# To use the MCMC samplers supplied with TensorFlow probability we must supply our parameters as an array. This is at odds with GPJax where parameters are stored in dictionaries. We therefore use the `dict_array_coercion` function that returns two functions: one that maps from an array to a dictionary, and a second that maps back to an array given a dictionary. These functions are order preserving.
+# MCMC samplers supplied with TensorFlow probability require us to supply our parameters as an array. 
+# This is at odds with GPJax where our parameters are stored as dictionaries.
+# To resolve this, we use the `dict_array_coercion` callable that returns two functions; one that maps from an array to a dictionary and a second that maps back to an array given a dictionary.
+# These functions are order preserving.
 
 # %%
 dict_to_array, array_to_dict = dict_array_coercion(params)
@@ -86,7 +90,7 @@ array_to_dict(parray) == params
 # %% [markdown]
 # ### Specifying priors
 #
-# We'll now place Gamma priors down on our parameters. In GPJax, this is done using TensorFlow Probability's `Distributions` module.
+# We can define Gamma priors on our hyperparameters through TensorFlow Probability's `Distributions` module.
 
 # %%
 import tensorflow_probability.substrates.jax as tfp
@@ -107,17 +111,17 @@ priors["likelihood"]["obs_noise"] = tfd.Gamma(
 # %% [markdown]
 # ### Defining our target function
 #
-# We'll now define the target distribution that our MCMC sampler will sample from. For our GP, this is the marginal log-likelihood that we will specify in the following way.
+# We now define the target distribution that our MCMC sampler will sample from. For our GP, this is the marginal log-likelihood that we specify below.
 
 # %%
 mll = posterior.marginal_log_likelihood(
-    training, constrainers, priors=priors, negative=False
+    D, constrainers, priors=priors, negative=False
 )
 mll(params)
 
 
 # %% [markdown]
-# As our model parameters are now an array, not a dictionary, we must define a small function that maps the array back to a dictionary and then evaluates the marginal log-likelihood. Using the second return of `dict_array_coercion` this is easy to do as follows.
+# Since our model parameters are now an array, not a dictionary, we must define a function that maps the array back to a dictionary and then evaluates the marginal log-likelihood. Using the second return of `dict_array_coercion` this is straightforward as follows.
 
 # %%
 def build_log_pi(target, mapper_fn):
@@ -133,7 +137,7 @@ mll_array_form = build_log_pi(mll, array_to_dict)
 # %% [markdown]
 # ## Sample
 #
-# We now have all the necessary machinery in place to sample from our target distribution. We'll use TensorFlow's Hamiltonian Monte-Carlo sampler equipped with the No U-Turn Sampler kernel. We'll draw just 500 samples from our target distribution for illustrative purposes. In practice, you will likely want to sample more though.
+# We now have all the necessary machinery in place. To sample from our target distribution, we'll use TensorFlow's Hamiltonian Monte-Carlo sampler equipped with the No U-Turn Sampler kernel to draw 500 samples for illustrative purposes (you will likely need more in practice).
 
 # %%
 n_samples = 500
@@ -151,7 +155,7 @@ def run_chain(key, state):
 
 
 # %% [markdown]
-# Everything is pure Jax, so we are free to JIT compile our sampling function and go.
+# Since everything is pure Jax, we are free to JIT compile our sampling function and go.
 
 # %%
 states, log_probs = jax.jit(run_chain)(key, jnp.array(dict_to_array(params)))
@@ -159,7 +163,7 @@ states, log_probs = jax.jit(run_chain)(key, jnp.array(dict_to_array(params)))
 # %% [markdown]
 # ## Inspecting samples
 #
-# We'll now assess the quality of our chains. To illustrate the acts of burn-in and thinning, we'll discard the first 50 samples as burn in and thin the remaining samples by a factor of 2.
+# We now assess the quality of our chains. To illustrate the acts of burn-in and thinning, we discard the first 50 samples as burn-in and thin the remaining samples by a factor of 2.
 
 # %%
 burn_in = 50
@@ -172,7 +176,7 @@ constrained_samples = gpx.transform(sample_dict, constrainers)
 constrained_sample_list = dict_to_array(constrained_samples)
 
 # %% [markdown]
-# We'll now plot our samples
+# We observe reasonable performance for our chains as shown in the traceplots below.
 
 # %%
 fig, axes = plt.subplots(figsize=(20, 10), ncols=n_params, nrows=2)
@@ -191,20 +195,19 @@ plt.tight_layout()
 # %% [markdown]
 # ## Making predictions
 #
-# We'll now use the samples for prediction. For now, we'll just use the expected parameter value for prediction but you may wish to draw a few samples from the GP posterior for each sample collected during the MCMC sampling phase.
+# We’ll now use our MCMC samples to make predictions. For simplicity, we’ll take the average of the samples to give point estimate parameter values for prediction. However, you may wish to draw from the GP posterior for each sample collected during the MCMC phase.
 
 # %%
 xtest = jnp.linspace(-5.2, 5.2, 500).reshape(-1, 1)
 learned_params = array_to_dict([jnp.mean(i) for i in constrained_sample_list])
 
-# %%
-predictive_dist = likelihood(posterior(training, learned_params)(xtest), learned_params)
+predictive_dist = likelihood(posterior(D, learned_params)(xtest), learned_params)
 
 mu = predictive_dist.mean()
 sigma = predictive_dist.stddev()
 
 # %% [markdown]
-# We'll now plot the learned posterior predictive distribution evaluated at the above defined test points.
+# Finally, we plot the learned posterior predictive distribution evaluated at the test points defined above.
 
 # %%
 fig, ax = plt.subplots(figsize=(12, 5))
@@ -223,11 +226,12 @@ ax.plot(xtest, mu.squeeze() + sigma, color="tab:blue", linestyle="--", linewidth
 ax.legend()
 
 # %% [markdown]
-# Things look good, so this concludes our tutorial on interfacing TensorFlow Probability with GPJax. There are a large number of samples present within TensorFlow probability and the workflow demonstrated here only just scratches the surface regarding the inference that is possible with TensorFlow probability.
+# Since things look good, this concludes our tutorial on interfacing TensorFlow Probability with GPJax. 
+# The workflow demonstrated here only scratches the surface regarding the inference possible with a large number of samplers available in TensorFlow probability.
 
 # %% [markdown]
-# ## System Configuration
+# ## System configuration
 
 # %%
 # %load_ext watermark
-# %watermark -n -u -v -iv -w -a "Thomas Pinder"
+# %watermark -n -u -v -iv -w -a "Thomas Pinder (edited by Daniel Dodd)"

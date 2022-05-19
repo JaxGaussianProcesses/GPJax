@@ -1,17 +1,14 @@
 import abc
-from typing import Callable, Dict, Optional
+from typing import Dict, Optional
 
 import distrax as dx
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from chex import dataclass
 
-from gpjax.config import get_defaults
-
-from .config import Identity, Softplus, add_parameter
-from .gps import AbstractPosterior
-from .types import Array, Dataset
-from .utils import I, concat_dictionaries
+from .config import Identity, Softplus, add_parameter, get_defaults
+from .types import Array
+from .utils import I
 
 DEFAULT_JITTER = get_defaults()["jitter"]
 
@@ -50,14 +47,14 @@ class VariationalGaussian(VariationalFamily):
         self.num_inducing = self.inducing_inputs.shape[0]
         add_parameter("inducing_inputs", Identity)
 
-        nz = self.num_inducing
+        m = self.num_inducing
 
         if self.variational_mean is None:
-            self.variational_mean = jnp.zeros((nz, 1))
+            self.variational_mean = jnp.zeros((m, 1))
             add_parameter("variational_mean", Identity)
 
         if self.variational_root_covariance is None:
-            self.variational_root_covariance = I(nz)
+            self.variational_root_covariance = I(m)
             if self.diag:
                 add_parameter("variational_root_covariance", FillDiagonal)
             else:

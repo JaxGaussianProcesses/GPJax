@@ -111,20 +111,20 @@ class SVGP(VariationalPosterior):
         """
         mu = params["variational_family"]["variational_mean"]
         sqrt = params["variational_family"]["variational_root_covariance"]
-        nz = self.num_inducing
+        m = self.num_inducing
 
         qu = dx.MultivariateNormalTri(mu.squeeze(), sqrt)
 
         if not self.variational_family.whiten:
             z = params["variational_family"]["inducing_inputs"]
-            mz = self.prior.mean_function(z, params["mean_function"])
+            μz = self.prior.mean_function(z, params["mean_function"])
             Kzz = gram(self.prior.kernel, z, params["kernel"])
-            Kzz += I(nz) * self.jitter
+            Kzz += I(m) * self.jitter
             Lz = cholesky(Kzz)
-            pu = dx.MultivariateNormalTri(mz.squeeze(), Lz)
+            pu = dx.MultivariateNormalTri(μz.squeeze(), Lz)
 
         else:
-            pu = dx.MultivariateNormalDiag(jnp.zeros(nz))
+            pu = dx.MultivariateNormalDiag(jnp.zeros(m))
 
         return qu.kl_divergence(pu)
 
@@ -140,7 +140,7 @@ class SVGP(VariationalPosterior):
         """
         x, y = batch.X, batch.y
 
-        Fmu, Fvar = vmap(self.pred_moments, in_axes=(None, 0))(
+        mean, variance = vmap(self.pred_moments, in_axes=(None, 0))(
             params, x[:, jnp.newaxis, :]
         )
 
@@ -148,7 +148,7 @@ class SVGP(VariationalPosterior):
         def log_prob(F, y):
             return self.likelihood.link_function(F, params["likelihood"]).log_prob(y)
 
-        return gauss_hermite_quadrature(log_prob, Fmu.squeeze(1), Fvar.squeeze(1), y=y)
+        return gauss_hermite_quadrature(log_prob, mean.squeeze(1), variance.squeeze(1), y=y)
 
     # Computes predictive moments for Gauss-Hermite quadrature:
     def pred_moments(self, params: Dict, test_inputs: Array) -> Tuple[Array, Array]:
@@ -166,9 +166,9 @@ class SVGP(VariationalPosterior):
 
         # Cholesky decomposition at inducing inputs:
         z = params["variational_family"]["inducing_inputs"]
-        nz = self.num_inducing
+        m = self.num_inducing
         Kzz = gram(self.prior.kernel, z, params["kernel"])
-        Kzz += I(nz) * self.jitter
+        Kzz += I(m) * self.jitter
         Lz = cholesky(Kzz)
 
         # Compute predictive moments:
@@ -176,18 +176,18 @@ class SVGP(VariationalPosterior):
         Ktt = gram(self.prior.kernel, t, params["kernel"])
         Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
         M = solve_triangular(Lz, Kzt, lower=True)
-        Fcov = Ktt - jnp.matmul(M.T, M)
+        covariance = Ktt - jnp.matmul(M.T, M)
 
         if not self.variational_family.whiten:
             M = solve_triangular(Lz.T, M, lower=False)
-            mz = self.prior.mean(params)(z).reshape(-1, 1)
-            mu -= mz
+            μz = self.prior.mean(params)(z).reshape(-1, 1)
+            mu -= μz
 
-        Fmu = self.prior.mean(params)(t).reshape(-1, 1) + jnp.matmul(M.T, mu)
+        mean = self.prior.mean(params)(t).reshape(-1, 1) + jnp.matmul(M.T, mu)
         V = jnp.matmul(M.T, sqrt)
-        Fcov += jnp.matmul(V, V.T)
+        covariance += jnp.matmul(V, V.T)
 
-        return Fmu, Fcov
+        return mean, covariance
 
     def predict(self, params: dict) -> Callable[[Array], dx.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs.
@@ -199,16 +199,16 @@ class SVGP(VariationalPosterior):
             Callable[[Array], dx.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
         z = params["variational_family"]["inducing_inputs"]
-        nz = self.num_inducing
+        m = self.num_inducing
         Kzz = gram(self.prior.kernel, z, params["kernel"])
-        Kzz += I(nz) * self.jitter
+        Kzz += I(m) * self.jitter
         Lz = cholesky(Kzz)
 
         # Variational mean:
         mu = params["variational_family"]["variational_mean"]
         if not self.variational_family.whiten:
-            mz = self.prior.mean(params)(z).reshape(-1, 1)
-            mu -= mz
+            μz = self.prior.mean(params)(z).reshape(-1, 1)
+            mu -= μz
 
         # Variational sqrt cov:
         sqrt = params["variational_family"]["variational_root_covariance"]
@@ -218,16 +218,16 @@ class SVGP(VariationalPosterior):
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
             M = solve_triangular(Lz, Kzt, lower=True)
-            Fcov = Ktt - jnp.matmul(M.T, M)
+            covariance = Ktt - jnp.matmul(M.T, M)
 
             if not self.variational_family.whiten:
                 M = solve_triangular(Lz.T, M, lower=False)
 
-            mt = self.prior.mean(params)(t).reshape(-1, 1)
-            mean = mt + jnp.matmul(M.T, mu)
+            μt = self.prior.mean(params)(t).reshape(-1, 1)
+            mean = μt + jnp.matmul(M.T, mu)
 
             V = jnp.matmul(M.T, sqrt)
-            covariance = Fcov + jnp.matmul(V, V.T)
+            covariance += jnp.matmul(V, V.T)
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance

@@ -5,7 +5,6 @@ import distrax as dx
 import jax.numpy as jnp
 from chex import dataclass
 from jax.scipy.linalg import cho_factor, cho_solve, solve_triangular
-from pkg_resources import Distribution
 
 from .config import get_defaults
 from .kernels import Kernel, cross_covariance, gram
@@ -76,11 +75,12 @@ class Prior(AbstractGP):
 
         def predict_fn(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
-            mt = self.mean_function(t, params["mean_function"])
+            μt = self.mean_function(t, params["mean_function"])
             Ktt = gram(self.kernel, t, params["kernel"])
             Ktt += I(t.shape[0]) * self.jitter
+
             return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mt.squeeze()), Ktt
+                jnp.atleast_1d(μt.squeeze()), Ktt
             )
 
         return predict_fn
@@ -146,24 +146,25 @@ class ConjugatePosterior(AbstractPosterior):
         Returns:
             tp.Callable[[Array], dx.Distribution]: A function that accepts an input array and returns the predictive distribution as a `distrax.MultivariateNormalFullCovariance`.
         """
-        x, y, n_data = train_data.X, train_data.y, train_data.n
+        x, y, n = train_data.X, train_data.y, train_data.n
+
         obs_noise = params["likelihood"]["obs_noise"]
-        mx = self.prior.mean_function(x, params["mean_function"])
+        μx = self.prior.mean_function(x, params["mean_function"])
 
         # Precompute covariance matrices
         Kxx = gram(self.prior.kernel, x, params["kernel"])
-        Kxx += I(n_data) * self.jitter
-        Lx = cho_factor(Kxx + I(n_data) * obs_noise, lower=True)
+        Kxx += I(n) * self.jitter
+        Lx = cho_factor(Kxx + I(n) * obs_noise, lower=True)
 
-        weights = cho_solve(Lx, y - mx)
+        weights = cho_solve(Lx, y - μx)
 
         def predict(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
 
             # Compute the mean
-            mt = self.prior.mean_function(t, params["mean_function"])
+            μt = self.prior.mean_function(t, params["mean_function"])
             Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
-            mean = mt + jnp.dot(Ktx, weights)
+            mean = μt + jnp.dot(Ktx, weights)
 
             # Compute the covariance
             Ktt = gram(self.prior.kernel, t, params["kernel"])
@@ -195,7 +196,7 @@ class ConjugatePosterior(AbstractPosterior):
         Returns:
             tp.Callable[[dict], Array]: A functional representation of the mll that can be evaluated at a given parameter set.
         """
-        x, y, n_data = train_data.X, train_data.y, train_data.n
+        x, y, n = train_data.X, train_data.y, train_data.n
 
         def mll(
             params: dict,
@@ -205,8 +206,8 @@ class ConjugatePosterior(AbstractPosterior):
             obs_noise = params["likelihood"]["obs_noise"]
             mu = self.prior.mean_function(x, params["mean_function"])
             Kxx = gram(self.prior.kernel, x, params["kernel"])
-            Kxx += I(n_data) * self.jitter
-            Lx = jnp.linalg.cholesky(Kxx + I(n_data) * obs_noise)
+            Kxx += I(n) * self.jitter
+            Lx = jnp.linalg.cholesky(Kxx + I(n) * obs_noise)
 
             random_variable = dx.MultivariateNormalTri(mu.squeeze(), Lx)
 
@@ -248,9 +249,10 @@ class NonConjugatePosterior(AbstractPosterior):
         Returns:
             tp.Callable[[Array], dx.Distribution]: A function that accepts an input array and returns the predictive distribution as a `distrax.MultivariateNormalFullCovariance`.
         """
-        x, n_data = train_data.X, train_data.n
+        x, n = train_data.X, train_data.n
+
         Kxx = gram(self.prior.kernel, x, params["kernel"])
-        Kxx += I(n_data) * self.jitter
+        Kxx += I(n) * self.jitter
         Lx = jnp.linalg.cholesky(Kxx)
 
         def predict_fn(test_inputs: Array) -> dx.Distribution:
@@ -284,7 +286,7 @@ class NonConjugatePosterior(AbstractPosterior):
         Returns:
             tp.Callable[[dict], Array]: A functional representation of the mll that can be evaluated at a given parameter set.
         """
-        x, y, n_data = train_data.X, train_data.y, train_data.n
+        x, y, n = train_data.X, train_data.y, train_data.n
 
         if not priors:
             priors = copy_dict_structure(self.params)
@@ -293,10 +295,10 @@ class NonConjugatePosterior(AbstractPosterior):
         def mll(params: dict):
             params = transform(params=params, transform_map=transformations)
             Kxx = gram(self.prior.kernel, x, params["kernel"])
-            Kxx += I(n_data) * self.jitter
+            Kxx += I(n) * self.jitter
             Lx = jnp.linalg.cholesky(Kxx)
-            Fx = jnp.matmul(Lx, params["latent"])
-            rv = self.likelihood.link_function(Fx, params)
+            fx = jnp.matmul(Lx, params["latent"])
+            rv = self.likelihood.link_function(fx, params)
             ll = jnp.sum(rv.log_prob(y))
 
             log_prior_density = evaluate_priors(params, priors)

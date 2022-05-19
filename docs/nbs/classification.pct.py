@@ -16,7 +16,7 @@
 # %% [markdown]
 # # Classification
 #
-# In this notebook we show how inference can be done using Markov Chain Monte-Carlo for Gaussian process models with a non-Gaussian likelihood function. We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
+# In this notebook we demonstate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
 
 # %%
 import jax
@@ -25,6 +25,7 @@ import jax.random as jr
 import matplotlib.pyplot as plt
 import blackjax
 import gpjax as gpx
+import optax as ox
 
 key = jr.PRNGKey(123)
 
@@ -35,7 +36,7 @@ key = jr.PRNGKey(123)
 #
 # $$\boldsymbol{y} = 0.5 * \text{sign}(\cos(2 * \boldsymbol{x} + \boldsymbol{\epsilon})) + 0.5, \quad \boldsymbol{\epsilon} \sim \mathcal{N} \left(\textbf{0}, \textbf{I} * (0.05)^{2} \right).$$
 #
-# We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs and labels for later.
+# We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs for later.
 
 # %%
 x = jnp.sort(jr.uniform(key, shape=(100, 1), minval=-1.0, maxval=1.0), axis=0)
@@ -46,48 +47,58 @@ D = gpx.Dataset(X=x, y=y)
 xtest = jnp.linspace(-1., 1., 500).reshape(-1, 1)
 plt.plot(x, y, "o", markersize=8)
 # %% [markdown]
-# We can now define our prior Gaussian process such that an RBF kernel has been selected for the purpose of exposition. However, an alternative kernel may be a better choice.
-
+# ## MAP inference
+#
+# We begin by defining a Gaussian process prior with a radial basis function (RBF) kernel, chosen for the purpose of exposition. Since our observations are binary, we choose a Bernoulli likelihood with a probit link function.
 # %%
 kernel = gpx.RBF()
 prior = gpx.Prior(kernel=kernel)
-
-# %% [markdown]
-# Now we can proceed to define our likelihood function. In this example, our observations are binary, so we will select a Bernoulli likelihood. Using this likelihood function, we can compute the posterior through the product of our likelihood and prior.
-
-# %%
 likelihood = gpx.Bernoulli(num_datapoints=D.n)
+# %% [markdown]
+# We construct the posterior through the product of our prior and likelihood.
+# %%
 posterior = prior * likelihood
 print(type(posterior))
-
+# %% [markdown]
+# Whilst the latent function is Gaussian, the posterior distribution is non-Gaussian since our generative model first samples the latent GP and propagates these samples through the likelihood function's inverse link function. Here, and in general, this step prevents us from being able to analytically integrate the latent function's values out of our posterior, and we must instead adopt alternative inference techniques. We begin with maximum a posteriori (MAP) estimation, a fast inference procedure to obtain point estimates for the latent function and the kernel's hyperparameters by maximising the marginal log-likelihood. 
+# %% [markdown]
+# To begin we obtain a set of initial parameter values through the `initialise` callable, and transform these to the unconstrained space via `transform` (see the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)). We also define the negative marginal log-likelihood, and jit compile this to accelerate training.
 # %%
 params, trainable, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 
+mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=True))
 # %% [markdown]
-# With a posterior in place, we can estimate the maximum a posteriori using ObJax's optimisers. However, our Gaussian process is no longer conjugate, meaning that in addition to the kernel's hyperparameters, we are also tasked with learning the values of process' latent function.
-
+# We can obtain a MAP estimate by optimising the marginal log-likelihood with ObJax's optimisers.
 # %%
-mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=False))
-
+opt = ox.adam(learning_rate=0.01)
+map_estimate = gpx.abstractions.optax_fit(
+    mll,
+    params,
+    trainable,
+    opt,
+    n_iters=500,
+)
 # %% [markdown]
-# ## Markov Chain Monte-Carlo Inference
+# However, as a point estimate, MAP estimation is severely limited for uncertainty quantification, providing only a single piece of information about the posterior. On the other hand, through approximate sampling, MCMC methods allow us to learn all information about the posterior distribution.
+# %% [markdown]
+# ## MCMC inference
 #
-# Whilst the latent function is Gaussian, the posterior distribution is now non-Gaussian. This is because our generative model first samples from the latent function, then propogates these samples through the likelihood function's inverse link function. In general, this step prevents us from being able to analytically integrate the latent function's values out of our posterior, and we must instead use inference technicques such as Markov Chain Monte-Carlo (MCMC). 
-#
-# At a very high level, MCMC works by first sampling from the posterior distribution before calculating an accpetance probability according to the sampler's transition kernel. If the new sample is more _likely_ according to the target posterior distribution, then we accept the sample, otherwise we reject the sample and stay in our current position. For a gentle introduction, see the first chapter of [A  Handbook of Markov Chain Monte Carlo](https://www.mcmchandbook.net/HandbookChapter1.pdf).
+# At the high level, an MCMC sampler works by starting at an initial position and drawing a sample from a cheap-to-simulate distribution known as the _proposal_. The next step is to determine whether this sample could be considered a draw from the posterior. We accomplish this using an _acceptance probability_ determined via the sampler's _transition kernel_ which depends on the current position and the unnormalised target posterior distribution. If the new sample is more _likely_, we accept it; otherwise, we reject it and stay in our current position. Repeating these steps results in a Markov chain (a random sequence that depends only on the last state) whose stationary distribution (the long-term empirical distribution of the states visited) is the posterior. For a gentle introduction, see the first chapter of [A Handbook of Markov Chain Monte Carlo](https://www.mcmchandbook.net/HandbookChapter1.pdf).
 #
 # ### MCMC through BlackJax
 #
-# Rather than implementing a suite of MCMC samplers, GPJax relies on MCMC-specific libraries for sampling functionality. In this notebook we'll focus on [BlackJax](https://github.com/blackjax-devs/blackjax/) and would, in general, advise using BlackJax for MCMC sampling. However, we also support TensorFlow Probability for sampling, as demonstrated in the [TensorFlow Probability Integration notebook](https://gpjax.readthedocs.io/en/latest/nbs/tfp_integration.html).
+# Rather than implementing a suite of MCMC samplers, GPJax relies on MCMC-specific libraries for sampling functionality. We focus on [BlackJax](https://github.com/blackjax-devs/blackjax/) in this notebook, which we recommend adopting for general applications. However, we also support TensorFlow Probability as demonstrated in the [TensorFlow Probability Integration notebook](https://gpjax.readthedocs.io/en/latest/nbs/tfp_integration.html).
 #
-# We'll use the No U-Turn Sampler (NUTS) implementation given in BlackJax for sampling. For the interested reader, NUTS is a Hamiltonian Monte-Carlo sampling scheme where the number of leapfrog integration steps is computed at each step of the change according to the NUTS algorithm. In general, samplers constructed under this framework are very efficient.
+# We'll use the No U-Turn Sampler (NUTS) implementation given in BlackJax for sampling. For the interested reader, NUTS is a Hamiltonian Monte Carlo sampling scheme where the number of leapfrog integration steps is computed at each step of the change according to the NUTS algorithm. In general, samplers constructed under this framework are very efficient.
 #
-# In the following cell, we'll first generate _sensible_ initial positions for our sampler before defining an inference loop and sampling 500 values from our Markov chain. In general, drawing more samples will be necessary. The following cell is adapted from BlackJax's introduction notebook.
-
+# We begin by generating _sensible_ initial positions for our sampler before defining an inference loop and sampling 500 values from our Markov chain. In general, drawing more samples will be necessary.
 # %%
+# Adapted from BlackJax's introduction notebook.
 num_adapt = 1000
 num_samples = 1000
+
+mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=False))
 
 adapt = blackjax.window_adaptation(
     blackjax.nuts, mll, num_adapt, target_acceptance_rate=0.65
@@ -113,15 +124,13 @@ states, infos = inference_loop(key, kernel, last_state, num_samples)
 # %% [markdown]
 # ### Sampler efficiency
 #
-# BlackJax gives us easy access to our sampler's efficiency through metrics such as the sampler's acceptance probability. Simply put, this the number of times that our chain accepted a proposed sample, divided by the total number of steps run by the chain. For NUTS and Hamiltonian Monte-Carlo sampling, we typically seek an acceptance rate of 60-70% as this strikes the right balance between having a chain which is _stuck_ and rarely moves, versus a chain that is too jumpy and makes too frequent small steps.
-
+# BlackJax gives us easy access to our sampler's efficiency through metrics such as the sampler's _acceptance probability_ (the number of times that our chain accepted a proposed sample, divided by the total number of steps run by the chain). For NUTS and Hamiltonian Monte Carlo sampling, we typically seek an acceptance rate of 60-70% to strike the right balance between having a chain which is _stuck_ and rarely moves versus a chain that is too jumpy with frequent small steps.
 # %%
 acceptance_rate = jnp.mean(infos.acceptance_probability)
 print(f"Acceptance rate: {acceptance_rate:.2f}")
 
 # %% [markdown]
-# In this example, we see that the acceptance rate is slightly too large, so a useful next step would be to inspect the trace plots of the chain's samples. A well mixing chain will have very few, if any, flat spots in its trace plot whilst also not having too many steps in the same direction. In addition to the model's hyperparameters, there will be 500 samples for each of the 100 latent function values in the `states.position` dictionary. For brevity, we will just plot the chains that correspond to the model hyperparameters and the first latent function's value.
-
+# The acceptance rate is slightly too large, prompting an examination of the chain's trace plots. A well-mixing chain will have very few (if any) flat spots in its trace plot whilst also not having too many steps in the same direction. In addition to the model's hyperparameters, there will be 500 samples for each of the 100 latent function values in the `states.position` dictionary. We depict the chains that correspond to the model hyperparameters and the first value of the latent function for brevity.
 # %%
 fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(15, 5), tight_layout=True)
 ax0.plot(states.position['kernel']['lengthscale'])
@@ -134,10 +143,9 @@ ax2.set_title("Latent Function (index = 1)")
 # %% [markdown]
 # ## Prediction
 #
-# With posterior samples now obtained, we'll draw 10 samples from our model's predictive distribution per MCMC sample. Using these draws, we will be able to compute credible values and expected values under our posterior distribution. 
+# Having obtained samples from the posterior, we draw ten instances from our model's predictive distribution per MCMC sample. Using these draws, we will be able to compute credible values and expected values under our posterior distribution. 
 #
-# In an ideal Markov chain, each sample would be completely uncorrelated with its neighbouring samples. However, in practice this is not the case and correlations exist within our chain's sample set. A commonly used technique to try and reduce this correlation is called thinning whereby we simply select every $n$-th sample where $n$ is a lag-length at which we believe our samples will be uncorrelated. For demonstratory purposes, I'll use a thin factor of 10 here. In practice, further investigation of the chain's autocorrelation will be necessary to determine optimal thin factors.
-
+# An ideal Markov chain would have samples completely uncorrelated with their neighbours after a single lag. However, in practice, correlations often exist within our chain's sample set. A commonly used technique to try and reduce this correlation is _thinning_ whereby we select every $n$th sample where $n$ is the minimum lag length at which we believe the samples are uncorrelated. Although further analysis of the chain's autocorrelation is required to find appropriate thinning factors, we employ a thin factor of 10 for demonstration purposes.
 # %%
 thin_factor = 10
 samples = []
@@ -158,9 +166,8 @@ lower_ci, upper_ci = jnp.percentile(samples, jnp.array([2.5, 97.5]), axis=0)
 expected_val = jnp.mean(samples, axis=0)
 
 # %% [markdown]
-# ### Plotting
 #
-# We can now plot the predictions obtained from our model and assess its performance relative to the observed dataset that we fit to.
+# Finally, we plot the predictions obtained from our model against the observed data.
 
 # %%
 fig, ax = plt.subplots(figsize=(16, 5), tight_layout=True)
@@ -169,8 +176,8 @@ ax.plot(xtest, expected_val, linewidth=2, color='tab:blue', label='Predicted mea
 ax.fill_between(xtest.flatten(), lower_ci.flatten(), upper_ci.flatten(), alpha=0.2, color='tab:blue', label='95% CI')
 
 # %% [markdown]
-# ## System Configuration
+# ## System configuration
 
 # %%
 # %load_ext watermark
-# %watermark -n -u -v -iv -w -a "Thomas Pinder"
+# %watermark -n -u -v -iv -w -a "Thomas Pinder (edited by Daniel Dodd)"

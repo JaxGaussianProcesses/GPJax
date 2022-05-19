@@ -35,22 +35,23 @@ from scipy.signal import sawtooth
 key = jr.PRNGKey(123)
 
 # %% [markdown]
-# ## Data
+# ## Dataset
 #
 # Modelling data with discontinuities is a challenging task for regular Gaussian process models. However, as shown in <strong data-cite="wilson2016deep"></strong>, transforming the inputs to our Gaussian process model's kernel through a neural network can offer a solution to this. To highlight this, we'll model a sawtooth function.
 
 # %%
-N = 500
+n = 500
 noise = 0.2
 
-x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(N,)).sort().reshape(-1, 1)
+x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n,)).sort().reshape(-1, 1)
 f = lambda x: jnp.asarray(sawtooth(2 * jnp.pi * x))
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
+
+D = gpx.Dataset(X=x, y=y)
+
 xtest = jnp.linspace(-2.0, 2.0, 500).reshape(-1, 1)
 ytest = f(xtest)
-
-training = gpx.Dataset(X=x, y=y)
 
 fig, ax = plt.subplots(1, 1, figsize=(10, 5))
 ax.plot(x, y, "o", label="Training data", alpha=0.5)
@@ -58,15 +59,15 @@ ax.plot(xtest, ytest, label="True function")
 ax.legend(loc="best")
 
 # %% [markdown]
-# ## Deep Kernels
+# ## Deep kernels
 #
 # ### Details
 #
-# Typically when we evaluate a kernel $k: \mathcal{X} \times \mathcal{X} \to \mathbb{R}$ on a pair of inputs $x, x' \in \mathcal{X}$, we would compute $k(x, x')$. However, deep kernel regression seeks to apply a transform $\phi: \mathcal{X} \to \mathcal{X}$ to the inputs that seeks to project the inputs into a more meaningful representation. In deep kernel learning, $\phi$ is a neural network whose parameters are learned jointly with the GP model's hyperparameters. The corresponding kernel then computed by $k(\phi(x), \phi(x'))$.
+# Instead of applying a kernel $k(\cdot, \cdot')$ directly on some data, we seek to apply a _feature map_ $\phi(\cdot)$ that projects the data to learn more meaningful representations beforehand. In deep kernel learning, $\phi$ is a neural network whose parameters are learned jointly with the GP model's hyperparameters. The corresponding kernel is then computed by $k(\phi(\cdot), \phi(\cdot'))$. Here $k(\cdot,\cdot')$ is referred to as the _base kernel_.
 #
 # ### Implementation
-#
-# Deep kernels are not natively supported in GPJax right now. However, defining one is a straightforward task that we demonstrate in the following cell. Using the base `Kernel` object given in GPJax, we'll provide a mixin class named `_DeepKernelFunction` that requires the user to supply a neural network and base kernel. The neural network is responsible for transforming the inputs which will then be consumed by the base kernel. Kernel matrices are then computed using the regular `gram` and `cross_covariance` functions.
+# 
+# Although deep kernels are not currently supported natively in GPJax, defining one is straightforward as we now demonstrate. Using the base `Kernel` object given in GPJax, we provide a mixin class named `_DeepKernelFunction` to facilitate the user supplying the neural network and base kernel of their choice. Kernel matrices are then computed using the regular `gram` and `cross_covariance` functions.
 
 # %%
 @dataclass
@@ -95,9 +96,8 @@ class DeepKernelFunction(Kernel, _DeepKernelFunction):
 # %% [markdown]
 # ### Defining a network
 #
-# With a deep kernel object now defined, we can define a network that will transform the inputs. For this notebook, we'll use a small multi-layer perceptron with two linear hidden layers and relu activation functions between the layes. The first hidden layer contains 32 units and the second layer contains 64 units. As we are doing 1D regression here, the final output layer of the network is a single unit.
-#
-# For more complex tasks, users may wish to define more complex network achitectures, the functionality for which is well supported in Haiku.
+# With a deep kernel object created, we proceed to define a neural network. Here we consider a small multi-layer perceptron with two linear hidden layers and ReLU activation functions between the layers. The first hidden layer contains 32 units, while the second layer contains 64 units. As we are doing one-dimensional regression here, the final output layer of the network is a single unit.
+# Users may wish to design more intricate network structures for more complex tasks, which functionality is supported well in Haiku.
 
 # %%
 def forward(x):
@@ -119,27 +119,27 @@ forward_linear1 = hk.without_apply_rng(forward_linear1)
 # %% [markdown]
 # ## Defining a model
 #
-# Now we have defined the feature extraction network that is to be used within our deep kernel, we can now define a Gaussian process that is parameterised by this kernel. We'll use a third-order Matérn kernel as our base kernel and assume a Gaussian likelihood function. Parameters, trainability status and transformations are initialised in the usual manner.
+# Having characterised the feature extraction network, we move to define a Gaussian process parameterised by this deep kernel. We consider a third-order Matérn base kernel and assume a Gaussian likelihood. Parameters, trainability status and transformations are initialised in the usual manner.
 
 # %%
 base_kernel = gpx.Matern52()
 kernel = DeepKernelFunction(network=forward_linear1, base_kernel=base_kernel)
 kernel.initialise(x, key)
 prior = gpx.Prior(kernel=kernel)
-likelihood = gpx.Gaussian(num_datapoints=training.n)
+likelihood = gpx.Gaussian(num_datapoints=D.n)
 posterior = prior * likelihood
 
-params, training_status, constrainers, unconstrainers = gpx.initialise(posterior)
+params, trainables, constrainers, unconstrainers = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainers)
 
 # %% [markdown]
 # ### Optimisation
 #
-# We train our model using maximum likelihood estimation of the marginal log-likelihood. The parameters of our neural network are learned jointly with the model's hyperparameter set.
+# We train our model via maximum likelihood estimation of the marginal log-likelihood. The parameters of our neural network are learned jointly with the model's hyperparameter set.
 #
-# With the inclusion of a neural network, we take this opportunity to highlight the additional benefits that can be gleaned from using [Optax](https://optax.readthedocs.io/en/latest/) for optimisation. In particular, we showcase here the ability to use a learning rate scheduler that decays the optimiser's learning rate throughout the inference. In the following cell, the learning rate is decayed over 1000 iterations according to a half-cosine curve. This provides us with large step-sizes early on in the optimisation procedure before decreasing the learning rate to a more conservative value that ensures we do not step too far. A linear warmup is also used which simply means that over 50 steps we increase the learning rate from 0. to 1. to find a sensible intial learning rate value.
+# With the inclusion of a neural network, we take this opportunity to highlight the additional benefits gleaned from using [Optax](https://optax.readthedocs.io/en/latest/) for optimisation. In particular, we showcase the ability to use a learning rate scheduler that decays the optimiser's learning rate throughout the inference. We decrease the learning rate according to a half-cosine curve over 1000 iterations, providing us with large step sizes early in the optimisation procedure before approaching more conservative values, ensuring we do not step too far. We also consider a linear warmup, where the learning rate is increased from 0 to 1 over 50 steps to get a reasonable initial learning rate value.
 # %%
-mll = jax.jit(posterior.marginal_log_likelihood(training, constrainers, negative=True))
+mll = jax.jit(posterior.marginal_log_likelihood(D, constrainers, negative=True))
 mll(params)
 
 schedule = ox.warmup_cosine_decay_schedule(
@@ -158,7 +158,7 @@ opt = ox.chain(
 final_params = gpx.abstractions.optax_fit(
     mll,
     params,
-    training_status,
+    trainables,
     opt,
     n_iters=5000,
 )
@@ -170,7 +170,7 @@ final_params = gpx.transform(final_params, constrainers)
 # With a set of learned parameters, the only remaining task is to predict the output of the model. We can do this by simply applying the model to a test data set.
 
 # %%
-latent_dist = posterior(training, final_params)(xtest)
+latent_dist = posterior(D, final_params)(xtest)
 predictive_dist = likelihood(latent_dist, final_params)
 
 predictive_mean = predictive_dist.mean()
@@ -192,8 +192,8 @@ ax.plot(xtest, predictive_mean + predictive_std, color="tab:blue", linestyle="--
 ax.legend()
 
 # %% [markdown]
-# ## System information
+# ## System configuration
 
 # %%
 # %reload_ext watermark
-# %watermark -n -u -v -iv -w -a 'Thomas Pinder'
+# %watermark -n -u -v -iv -w -a 'Thomas Pinder (edited by Daniel Dodd)'

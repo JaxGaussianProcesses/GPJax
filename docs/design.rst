@@ -12,31 +12,28 @@ Gaussian process notation
    :header-rows: 1
 
    * - On paper
-     - GPJax Code
+     - GPJax code
      - Description
-   * - :math:`n_\boldsymbol{x}`
-     - nx 
+   * - :math:`n`
+     - n 
      - Number of train inputs
-   * - :math:`n_\boldsymbol{t}`
-     - nt 
-     - Number of test inputs
-   * - :math:`\boldsymbol{x} = (x_1,\dotsc,x_{n_\boldsymbol{x}})`
+   * - :math:`\boldsymbol{x} = (x_1,\dotsc,x_{n})`
      - x
      - Train inputs
-   * - :math:`\boldsymbol{y} = (y_1,\dotsc,y_{n_\boldsymbol{x}})`
+   * - :math:`\boldsymbol{y} = (y_1,\dotsc,y_{n})`
      - y
      - Train labels
-   * - :math:`\boldsymbol{t} = (t_1,\dotsc,t_{n_\boldsymbol{t}})`
+   * - :math:`\boldsymbol{t}`
      - t
      - Test inputs
    * - :math:`f(\cdot)`
-     - F
+     - f
      - Latent function modelled as a GP
    * - :math:`f({\boldsymbol{x}})`
-     - Fx 
+     - fx
      - Latent function at inputs :math:`\boldsymbol{x}`
-   * - :math:`\boldsymbol{m}_{\boldsymbol{x}}`
-     - mx
+   * - :math:`\boldsymbol{\mu}_{\boldsymbol{x}}`
+     - μx
      - Prior mean at inputs :math:`\boldsymbol{x}`
    * - :math:`\mathbf{K}_{\boldsymbol{x}\boldsymbol{x}}`
      - Kxx
@@ -56,14 +53,14 @@ Sparse Gaussian process notation
    :header-rows: 1
 
    * - On paper
-     - GPJax Code
+     - GPJax code
      - Description
-   * - :math:`n_\boldsymbol{z}`
-     - nz
+   * - :math:`m`
+     - m
      - Number of inducing inputs
-   * - :math:`\boldsymbol{z} = (z_1,\dotsc,z_{n_\boldsymbol{z}})`
+   * - :math:`\boldsymbol{z} = (z_1,\dotsc,z_{m})`
      - z
      - Inducing inputs
-   * - :math:`\boldsymbol{u} = (u_1,\dotsc,u_{n_\boldsymbol{z}})`
+   * - :math:`\boldsymbol{u} = (u_1,\dotsc,u_{m})`
      - u
      - Inducing outputs

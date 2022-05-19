@@ -66,16 +66,16 @@ The posterior is then constructed by the product of our prior with our likelihoo
 posterior = prior * likelihood
 ```
 
-Equipped with the posterior, we proceed to train the model's hyperparameters through gradient-optimisation of the model's marginal log-likelihood.
+Equipped with the posterior, we proceed to train the model's hyperparameters through gradient-optimisation of the marginal log-likelihood.
 
 We begin by defining a set of initial parameter values through the `initialise` callable.
 
 ```python
-params, training_status, constrainer, unconstrainer = gpx.initialise(posterior)
+params, _, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 ```
 
-Next, we define the marginal log-likelihood, and just-in-time (JIT) compile this to accelerate training. Notice that it is only now that we have incorporated any data into our GP. This is desirable since model building works this way in principle too, where we first define our prior model, then observe some data and use this data to build a posterior.
+Next, we define the marginal log-likelihood, adding Jax's just-in-time (JIT) compilation to accelerate training. Notice that this is the first instance of incorporating data into our model. Model building works this way in principle too, where we first define our prior model, then observe some data and use this data to build a posterior.
 
 ```python
 mll = jit(posterior.marginal_log_likelihood(training, constrainer, negative=True))
@@ -96,7 +96,7 @@ for i in range(100):
     opt_state = step(i, opt_state)
 ```
 
-Now that our parameters are optimised, we transform these back to their original constrained space. Using their learned values, we can obtain the posterior distribution of the latent function at a set of novel test points.
+Now that our parameters are optimised, we transform these back to their original constrained space. Using their learned values, we can obtain the posterior distribution of the latent function at novel test points.
 
 ```python
 final_params = gpx.transform(get_params(opt_state), constrainer)
@@ -114,7 +114,7 @@ predictive_stddev = predictive_distribution.stddev()
 
 ### Stable version
 
-To install the latest stable version of gpjax run
+To install the latest stable version of GPJax run
 
 ```bash
 pip install gpjax
@@ -130,7 +130,7 @@ cd GPJax
 python setup.py develop
 ```
 
-It is then recommended that you check your installation using the supplied unit tests
+We then recommend you check your installation using the supplied unit tests.
 
 ```python
 python -m pytest tests/
