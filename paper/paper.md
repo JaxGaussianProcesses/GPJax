@@ -32,6 +32,17 @@ GPJax has been written using Jax [@jax2018github]. This design choice enables al
 
 In GPJax, we seek to build computational abstractions of GPs such that the code closely, if not exactly, mimics the underlying maths that one would write on paper. To see this, consider the canonical example
 
+```python
+import gpjax as gpx
+
+kernel = gpx.RBF()
+prior = gpx.Prior(kernel = kernel)
+
+likelihood = gpx.Gaussian(num_datapoints=100)
+
+posterior = prior * likelihood
+```
+
 # Wider Software Ecosystem
 
 Within the Python community, the two most popular packages for GP modelling are GPFlow [@matthews2017gpflow] and GPyTorch [@gardner2018gpytorch].
