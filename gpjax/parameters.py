@@ -17,7 +17,7 @@ Identity = dx.Lambda(lambda x: x)
 # Base operations
 ################################
 def initialise(obj) -> tp.Tuple[tp.Dict, tp.Dict, tp.Dict]:
-    """Initialise the stateful parameters of any GPJax object. This function also returns the trainability of each parameter and set of bijectors that allow parameters to be constrained and unconstrained."""
+    """Initialise the stateful parameters of any GPJax object. This function also returns the trainability status of each parameter and set of bijectors that allow parameters to be constrained and unconstrained."""
     params = obj.params
     constrainers, unconstrainers = build_transforms(params)
     trainables = build_trainables(params)

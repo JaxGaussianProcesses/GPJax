@@ -1,9 +1,7 @@
 import typing as tp
 from copy import deepcopy
-
 import jax
 import jax.numpy as jnp
-from jax.scipy.linalg import cho_factor, cho_solve
 
 from .types import Array
 
@@ -62,7 +60,7 @@ def as_constant(parameter_set: dict, params: list) -> tp.Tuple[dict, dict]:
 
 
 def dict_array_coercion(params: tp.Dict) -> tp.Tuple[tp.Callable, tp.Callable]:
-    """Construct the logic required to map a dictionary of parameters to an array of parameters. The values of the dcitionary can themselves be dictionaries; the function should work recursively.
+    """Construct the logic required to map a dictionary of parameters to an array of parameters. The values of the dictionary can themselves be dictionaries; the function should work recursively.
 
     Args:
         params (tp.Dict): The dictionary of parameters that we would like to map into an array.

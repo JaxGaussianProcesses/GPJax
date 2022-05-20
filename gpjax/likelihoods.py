@@ -64,7 +64,7 @@ class Gaussian(AbstractLikelihood):
         return link_fn
 
     def predict(self, dist: dx.Distribution, params: dict) -> dx.Distribution:
-        """Evaluate the Gaussian likelihood function at a given predictive distribution. Computationally, this is equivalent to summing the observation noise term to the diagonal elements of the predicitve distribution's covariance matrix.."""
+        """Evaluate the Gaussian likelihood function at a given predictive distribution. Computationally, this is equivalent to summing the observation noise term to the diagonal elements of the predictive distribution's covariance matrix.."""
         n_data = dist.event_shape[0]
         noisy_cov = dist.covariance() + I(n_data) * params["likelihood"]["obs_noise"]
         return dx.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)

@@ -22,7 +22,7 @@ DEFAULT_JITTER = get_defaults()["jitter"]
 
 @dataclass
 class VariationalPosterior:
-    """A variatioanl posterior object. With reference to some true posterior distribution :math:`p`, this can be used to minmise the KL-diverence between :math:`p` and a variational posterior :math:`q`."""
+    """A variational posterior object. With reference to some true posterior distribution :math:`p`, this can be used to minimise the KL-divergence between :math:`p` and a variational posterior :math:`q`."""
 
     posterior: AbstractPosterior
     variational_family: VariationalFamily
@@ -54,7 +54,7 @@ class VariationalPosterior:
     def elbo(
         self, train_data: Dataset, transformations: Dict
     ) -> Callable[[Dict], Array]:
-        """Placeholder method for computing the evidence lower bound function, given a training dataset and a set of transformations that map each parameter onto the entire real line.
+        """Placeholder method for computing the evidence lower bound function (ELBO), given a training dataset and a set of transformations that map each parameter onto the entire real line.
 
         Args:
             train_data (Dataset): The training dataset for which the ELBO is to be computed.
@@ -68,7 +68,7 @@ class VariationalPosterior:
 
 @dataclass
 class SVGP(VariationalPosterior):
-    """The Sparse Variational Gaussian Process (SVGP) variational posterior. The key reference is Henman et. al., (2013) - Gaussian processes for big data."""
+    """The Sparse Variational Gaussian Process (SVGP) variational posterior. The key reference is Hensman et. al., (2013) - Gaussian processes for big data."""
 
     def __post_init__(self):
         self.prior = self.posterior.prior
@@ -78,12 +78,12 @@ class SVGP(VariationalPosterior):
     def elbo(
         self, train_data: Dataset, transformations: Dict, negative: bool = False
     ) -> Callable[[Array], Array]:
-        """Compute the evidence lower bound under this model. In short, this requires evaluating the expectation of the model's log-likelihood under the variational approximation. To this, we sum the KL diverence from the variational posterior to the prior. When batching occurs, the result is scaled by the batch size relative to the full dataset size.
+        """Compute the evidence lower bound under this model. In short, this requires evaluating the expectation of the model's log-likelihood under the variational approximation. To this, we sum the KL divergence from the variational posterior to the prior. When batching occurs, the result is scaled by the batch size relative to the full dataset size.
 
         Args:
             train_data (Dataset): The training data for which we should maximise the ELBO with respect to.
             transformations (Dict): The transformation set that unconstrains each parameter.
-            negative (bool, optional): Whether or not the resultant elbo function should be negative. For gradient descent where we minimise our objective function this argument should be true as minimisation of the negative corresponds to maximiation of the ELBO. Defaults to False.
+            negative (bool, optional): Whether or not the resultant elbo function should be negative. For gradient descent where we minimise our objective function this argument should be true as minimisation of the negative corresponds to maximisation of the ELBO. Defaults to False.
 
         Returns:
             Callable[[Dict, Dataset], Array]: A callable function that accepts a current parameter estimate and batch of data for which gradients should be computed.

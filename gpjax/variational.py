@@ -43,7 +43,7 @@ class VariationalGaussian(VariationalFamily):
     whiten: Optional[bool] = True
 
     def __post_init__(self):
-        """Initialize the variational Gaussian distribution."""
+        """Initialise the variational Gaussian distribution."""
         self.num_inducing = self.inducing_inputs.shape[0]
         add_parameter("inducing_inputs", Identity)
 
@@ -62,7 +62,7 @@ class VariationalGaussian(VariationalFamily):
 
     @property
     def params(self) -> Dict:
-        """Return the variational mean vector, variational root covariance matrix, and inducing input vecot that parameterise the variational Gaussian distribution."""
+        """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
         hyperparams = {
             "inducing_inputs": self.inducing_inputs,
             "variational_mean": self.variational_mean,

@@ -62,7 +62,7 @@ class Prior(AbstractGP):
         return construct_posterior(prior=self, likelihood=other)
 
     def __rmul__(self, other: AbstractLikelihood):
-        """Reimplement the multiplication operator to allow for order-invariant product of a likelihood and a prior i.e., ."""
+        """Reimplement the multiplication operator to allow for order-invariant product of a likelihood and a prior i.e., likelihood * prior."""
         return self.__mul__(other)
 
     def predict(self, params: dict) -> tp.Callable[[Array], dx.Distribution]:
@@ -137,7 +137,7 @@ class ConjugatePosterior(AbstractPosterior):
     def predict(
         self, train_data: Dataset, params: dict
     ) -> tp.Callable[[Array], dx.Distribution]:
-        """Conditional on a set of training data, compute the GP's posterior predictive distriburion for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density..
+        """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density.
 
         Args:
             train_data (Dataset): A `gpx.Dataset` object that contains the input and output data used for training dataset.
@@ -185,16 +185,16 @@ class ConjugatePosterior(AbstractPosterior):
         priors: dict = None,
         negative: bool = False,
     ) -> tp.Callable[[dict], Array]:
-        """Compute the marginal log likelihood function of the Gaussian process. The returned function can then be used for gradient based optimisation of the model's parameters or for model comparison. The implementation given here enables exact estimation of the Gaussian process' latent function values.
+        """Compute the marginal log-likelihood function of the Gaussian process. The returned function can then be used for gradient based optimisation of the model's parameters or for model comparison. The implementation given here enables exact estimation of the Gaussian process' latent function values.
 
         Args:
-            train_data (Dataset): The training dataset used to compute the marginal log likelihood.
+            train_data (Dataset): The training dataset used to compute the marginal log-likelihood.
             transformations (tp.Dict): A dictionary of transformations that should be applied to the training dataset to unconstrain the parameters.
             priors (dict, optional): _description_. Optional argument that contains the priors placed on the model's parameters. Defaults to None.
             negative (bool, optional): Whether or not the returned function should be negative. For optimisation, the negative is useful as minimisation of the negative marginal log-likelihood is equivalent to maximisation of the marginal log-likelihood. Defaults to False.
 
         Returns:
-            tp.Callable[[dict], Array]: A functional representation of the mll that can be evaluated at a given parameter set.
+            tp.Callable[[dict], Array]: A functional representation of the marginal log-likelihood that can be evaluated at a given parameter set.
         """
         x, y, n = train_data.X, train_data.y, train_data.n
 
@@ -240,7 +240,7 @@ class NonConjugatePosterior(AbstractPosterior):
     def predict(
         self, train_data: Dataset, params: dict
     ) -> tp.Callable[[Array], dx.Distribution]:
-        """Conditional on a set of training data, compute the GP's posterior predictive distriburion for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density. Note, to gain predictions on the scale of the original data, the returned distribution will need to be transformed through the likelihood function's inverse link function.
+        """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density. Note, to gain predictions on the scale of the original data, the returned distribution will need to be transformed through the likelihood function's inverse link function.
 
         Args:
             train_data (Dataset): A `gpx.Dataset` object that contains the input and output data used for training dataset.
@@ -275,16 +275,16 @@ class NonConjugatePosterior(AbstractPosterior):
         priors: dict = None,
         negative: bool = False,
     ) -> tp.Callable[[dict], Array]:
-        """Compute the marginal log likelihood function of the Gaussian process. The returned function can then be used for gradient based optimisation of the model's parameters or for model comparison. The implementation given here is general and will work for any likelihood support by GPJax.
+        """Compute the marginal log-likelihood function of the Gaussian process. The returned function can then be used for gradient based optimisation of the model's parameters or for model comparison. The implementation given here is general and will work for any likelihood support by GPJax.
 
         Args:
-            train_data (Dataset): The training dataset used to compute the marginal log likelihood.
+            train_data (Dataset): The training dataset used to compute the marginal log-likelihood.
             transformations (tp.Dict): A dictionary of transformations that should be applied to the training dataset to unconstrain the parameters.
             priors (dict, optional): _description_. Optional argument that contains the priors placed on the model's parameters. Defaults to None.
             negative (bool, optional): Whether or not the returned function should be negative. For optimisation, the negative is useful as minimisation of the negative marginal log-likelihood is equivalent to maximisation of the marginal log-likelihood. Defaults to False.
 
         Returns:
-            tp.Callable[[dict], Array]: A functional representation of the mll that can be evaluated at a given parameter set.
+            tp.Callable[[dict], Array]: A functional representation of the marginal log-likelihood that can be evaluated at a given parameter set.
         """
         x, y, n = train_data.X, train_data.y, train_data.n
 
