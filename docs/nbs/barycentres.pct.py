@@ -101,7 +101,7 @@ def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
     objective = jax.jit(posterior.marginal_log_likelihood(D, constrainers, negative=True))
 
     opt = ox.adam(learning_rate=0.01)
-    learned_params = gpx.optax_fit(
+    learned_params = gpx.fit(
         objective=objective,
         trainables=trainables,
         params=params,

@@ -72,7 +72,7 @@ L = nx.laplacian_matrix(G).toarray()
 # Our task is to construct a Gaussian process $f(\cdot)$ that maps from the graph's vertex set $V$ onto the real line. 
 # To that end, we begin by simulating a signal on the graph's vertices that we will go on to try and predict. 
 # We use a single draw from a Gaussian process prior to draw our response values $\boldsymbol{y}$ where we hardcode parameter values. 
-# The correspodning input value set for this model, denoted $\boldsymbol{x}$, is the index set of the graph's vertices.
+# The corresponding input value set for this model, denoted $\boldsymbol{x}$, is the index set of the graph's vertices.
 
 # %%
 x = jnp.arange(G.number_of_nodes()).reshape(-1, 1)
@@ -122,7 +122,7 @@ mll = jit(
 )
 
 opt = ox.adam(learning_rate=0.01)
-learned_params = gpx.abstractions.optax_fit(
+learned_params = gpx.fit(
     objective=mll,
     params=params,
     trainables=trainable,
