@@ -22,6 +22,6 @@ from .mean_functions import Constant, Zero
 from .parameters import copy_dict_structure, initialise, transform
 from .sparse_gps import SVGP
 from .types import Dataset
-from .variational import VariationalGaussian
+from .variational import VariationalGaussian, WhitenedVariationalGaussian
 
 __version__ = "0.4.4"
