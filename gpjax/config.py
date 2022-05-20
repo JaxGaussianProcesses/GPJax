@@ -1,12 +1,12 @@
-import distrax
+import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 from ml_collections import ConfigDict
 
 __config = None
 
-Identity = distrax.Lambda(lambda x: x)
-Softplus = distrax.Lambda(lambda x: jnp.log(1.0 + jnp.exp(x)))
+Identity = dx.Lambda(lambda x: x)
+Softplus = dx.Lambda(lambda x: jnp.log(1.0 + jnp.exp(x)))
 
 
 def get_defaults() -> ConfigDict:
@@ -40,12 +40,12 @@ def get_defaults() -> ConfigDict:
     return __config
 
 
-def add_parameter(param_name: str, bijection: distrax.Bijector) -> None:
-    """Include a new parameter and its corresponding transform into the GPJax's Config file.
+def add_parameter(param_name: str, bijection: dx.Bijector) -> None:
+    """Add a parameter and its corresponding transform to GPJax's config file.
 
     Args:
         param_name (str): The name of the parameter that is to be added.
-        bijection (tfb.Bijector): The bijection that should be used to unconstrain the parameter's value
+        bijection (tfb.Bijector): The bijection that should be used to unconstrain the parameter's value.
     """
     lookup_name = f"{param_name}_transform"
     get_defaults()

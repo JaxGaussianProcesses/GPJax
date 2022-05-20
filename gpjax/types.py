@@ -39,7 +39,7 @@ class Dataset:
         return self.y.shape[1]
 
     def _make_tfd_if_none(self) -> None:
-        """Creates tensorflow dataset to facilate data batching operations."""
+        """Creates TensorFlow Dataset to facilitate data batching operations."""
         if self._tf_dataset is None:
             self._tf_dataset = tfd.Dataset.from_tensor_slices((self.X, self.y))
 
@@ -59,7 +59,7 @@ class Dataset:
         """Repeats dataset so each original value is seen `count` times (same syntax as tensorflow.data.Dataset).
         Args:
             count: (Optional[int]) An integer, representing the
-            number of times the dataset should be repeated. The default behavior (if
+            number of times the dataset should be repeated. The default behaviour (if
              `count` is `None` or `-1`) is for the dataset be repeated indefinitely.
         Returns:
             Dataset: A GPJax Dataset.
@@ -91,7 +91,7 @@ class Dataset:
             batch_size: (int) An integer representing the number of consecutive elements to combine in a single batch.
             drop_remainder: (Optional[bool]) A boolean, representing
                 whether the last batch should be dropped in the case it has fewer than
-                `batch_size` elements; the default behavior is not to drop the smaller
+                `batch_size` elements; the default behaviour is not to drop the smaller
                 batch.
             num_parallel_calls: (Optional[int]) An integer representing the number of batches to
                 compute asynchronously in parallel.

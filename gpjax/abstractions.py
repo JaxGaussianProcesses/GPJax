@@ -12,7 +12,7 @@ from .types import Dataset
 
 
 def progress_bar_scan(n_iters, log_rate):
-    "Progress bar for a JAX scan -> adapted from https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/"
+    """Progress bar for Jax.lax scans (adapted from https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/)."""
 
     tqdm_bars = {}
     remainder = n_iters % log_rate
@@ -26,7 +26,7 @@ def progress_bar_scan(n_iters, log_rate):
         tqdm_bars[0].set_postfix({"Objective": f"{loss_val: .2f}"})
 
     def _update_progress_bar(loss_val, i):
-        "Updates tqdm progress bar of a JAX scan or loop"
+        """Updates tqdm progress bar of a JAX scan or loop."""
         _ = lax.cond(
             i == 0,
             lambda _: host_callback.id_tap(_define_tqdm, None, result=i),
@@ -94,7 +94,7 @@ def fit(
     Optimisers used here should originate from Jax's experimental module.
     Args:
         objective (tp.Callable): The objective function that we are optimising with respect to.
-        params (dict): The parameters for which we would like to minimise our objective function wtih.
+        params (dict): The parameters for which we would like to minimise our objective function with.
         trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
         opt_init (tp.Callable): The supplied optimiser's initialisation function.
         opt_update (tp.Callable): Optimiser's update method.
@@ -133,7 +133,7 @@ def optax_fit(
     Optimisers used here should originate from Optax.
     Args:
         objective (tp.Callable): The objective function that we are optimising with respect to.
-        params (dict): The parameters for which we would like to minimise our objective function wtih.
+        params (dict): The parameters for which we would like to minimise our objective function with.
         trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
         optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
@@ -173,7 +173,7 @@ def fit_batches(
     Optimisers used here should originate from Optax.
     Args:
         objective (tp.Callable): The objective function that we are optimising with respect to.
-        params (dict): The parameters for which we would like to minimise our objective function wtih.
+        params (dict): The parameters for which we would like to minimise our objective function with.
         trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
         train_data (Dataset): The training dataset.
         opt_init (tp.Callable): The supplied optimiser's initialisation function.
