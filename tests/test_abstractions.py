@@ -28,20 +28,12 @@ def test_fit(n):
     assert isinstance(optimised_params, dict)
     assert mll(optimised_params) < pre_mll_val
 
-
-@pytest.mark.parametrize("optim_pkg", ["jax", "optax"])
-def test_stop_grads(optim_pkg):
+def test_stop_grads():
     params = {"x": jnp.array(3.0), "y": jnp.array(4.0)}
     trainables = {"x": True, "y": False}
     loss_fn = lambda params: params["x"] ** 2 + params["y"] ** 2
-    if optim_pkg == "jax":
-        opt_init, opt_update, get_params = optimizers.adam(step_size=0.1)
-        learned_params = fit(
-            loss_fn, params, trainables, opt_init, opt_update, get_params, n_iters=1
-        )
-    elif optim_pkg == "optax":
-        optimiser = optax.adam(learning_rate=0.1)
-        learned_params = fit(loss_fn, params, trainables, optimiser, n_iters=1)
+    optimiser = optax.adam(learning_rate=0.1)
+    learned_params = fit(loss_fn, params, trainables, optimiser, n_iters=1)
     assert learned_params["y"] == params["y"]
     assert learned_params["x"] != params["x"]
 
