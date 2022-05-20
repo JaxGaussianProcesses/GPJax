@@ -16,7 +16,7 @@
 # %% [markdown]
 # # Classification
 #
-# In this notebook we demonstate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
+# In this notebook we demonstrate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
 
 # %%
 import jax
@@ -72,7 +72,7 @@ mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=True))
 # We can obtain a MAP estimate by optimising the marginal log-likelihood with Obtax's optimisers.
 # %%
 opt = ox.adam(learning_rate=0.01)
-map_estimate = gpx.abstractions.optax_fit(
+map_estimate = gpx.fit(
     mll,
     params,
     trainable,

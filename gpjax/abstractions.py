@@ -84,47 +84,6 @@ def fit(
     objective: tp.Callable,
     params: tp.Dict,
     trainables: tp.Dict,
-    opt_init,
-    opt_update,
-    get_params,
-    n_iters: int = 100,
-    log_rate: int = 10,
-) -> tp.Dict:
-    """Abstracted method for fitting a GP model with respect to a supplied objective function.
-    Optimisers used here should originate from Jax's experimental module.
-    Args:
-        objective (tp.Callable): The objective function that we are optimising with respect to.
-        params (dict): The parameters for which we would like to minimise our objective function with.
-        trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
-        opt_init (tp.Callable): The supplied optimiser's initialisation function.
-        opt_update (tp.Callable): Optimiser's update method.
-        get_params (tp.Callable): Return the current parameter state set from the optimiser.
-        n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
-        log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
-    Returns:
-        tp.Dict: An optimised set of parameters.
-    """
-    opt_state = opt_init(params)
-
-    def loss(params):
-        params = trainable_params(params, trainables)
-        return objective(params)
-
-    @progress_bar_scan(n_iters, log_rate)
-    def step(opt_state, i):
-        params = get_params(opt_state)
-        loss_val, loss_gradient = jax.value_and_grad(loss)(params)
-        return opt_update(i, loss_gradient, opt_state), loss_val
-
-    opt_state, _ = jax.lax.scan(step, opt_state, jnp.arange(n_iters))
-
-    return get_params(opt_state)
-
-
-def optax_fit(
-    objective: tp.Callable,
-    params: tp.Dict,
-    trainables: tp.Dict,
     optax_optim,
     n_iters: int = 100,
     log_rate: int = 10,

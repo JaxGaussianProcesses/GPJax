@@ -219,7 +219,7 @@ params, trainable, constrainer, unconstrainer = gpx.initialise(circlular_posteri
 
 # Optimise GP's marginal log-likelihood using Adam
 mll = jit(circlular_posterior.marginal_log_likelihood(D, constrainer, negative=True))
-learned_params = gpx.optax_fit(
+learned_params = gpx.fit(
     mll,
     params,
     trainable,

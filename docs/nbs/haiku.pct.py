@@ -155,7 +155,7 @@ opt = ox.chain(
     ox.adamw(learning_rate=schedule),
 )
 
-final_params = gpx.abstractions.optax_fit(
+final_params = gpx.fit(
     mll,
     params,
     trainables,

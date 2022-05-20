@@ -80,7 +80,7 @@ xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 # | Memory cost    | $\mathcal{O}(n^2)$ | $\mathcal{O}(n m)$ | $\mathcal{O}(b m)$ |
 
 
-# To apply SVGP inference to our dataset, we begin by initialising $m = 50$ eqaully spaced inducing inputs $\boldsymbol{z}$ across our observed data's support. These are depicted below via horizontal black lines.
+# To apply SVGP inference to our dataset, we begin by initialising $m = 50$ equally spaced inducing inputs $\boldsymbol{z}$ across our observed data's support. These are depicted below via horizontal black lines.
 
 # %%
 z = jnp.linspace(-5.0, 5.0, 50).reshape(-1, 1)
@@ -91,7 +91,7 @@ ax.plot(xtest, f(xtest))
 [ax.axvline(x=z_i, color="black", alpha=0.3, linewidth=1) for z_i in z]
 plt.show()
 # %% [markdown]
-# The inducing inputs will summarise our dataset, and since they are treated as variaitonal parameters, their locations will be optimised. The next step to SVGP is to define a variational family.
+# The inducing inputs will summarise our dataset, and since they are treated as variational parameters, their locations will be optimised. The next step to SVGP is to define a variational family.
 
 # %% [markdown]
 # ## Defining the variational process
@@ -102,7 +102,7 @@ plt.show()
 # p(f(\cdot) | \mathcal{D}) = \int p(f(\cdot)|f(\boldsymbol{x})) p(f(\boldsymbol{x})|\mathcal{D}) \text{d}f(\boldsymbol{x}). \qquad (\dagger) 
 # \end{align}
 #
-# To arrive at an approximation framework, we assume some redundacy in the data. Instead of predicting $f(\cdot)$ with function values at the datapoints $f(\boldsymbol{x})$, we assume this can be achieved with only function values at $m$ inducing inputs $\boldsymbol{z}$
+# To arrive at an approximation framework, we assume some redundancy in the data. Instead of predicting $f(\cdot)$ with function values at the datapoints $f(\boldsymbol{x})$, we assume this can be achieved with only function values at $m$ inducing inputs $\boldsymbol{z}$
 #
 # $$ p(f(\cdot) | \mathcal{D}) \approx \int p(f(\cdot)|f(\boldsymbol{z})) p(f(\boldsymbol{z})|\mathcal{D}) \text{d}f(\boldsymbol{z}). \qquad (\star) $$
 #
@@ -115,7 +115,7 @@ plt.show()
 # 
 # To measure the quality of the approximation, we consider the Kullback-Leibler divergence $\operatorname{KL}(\cdot || \cdot)$ from our approximate process $q(f(\cdot))$ to the true process $p(f(\cdot)|\mathcal{D})$. By parametrising $q(f(\boldsymbol{z}))$ over a variational family of distributions, we can optimise Kullback-Leibler divergence with respect to the variational parameters. Moreover, since inducing input locations $\boldsymbol{z}$ augment the model, they themselves can be treated as variational parameters without altering the true underlying model $p(f(\boldsymbol{z})|\mathcal{D})$. This is exactly what gives SVGPs great flexibility whilst retaining robustness to overfitting. 
 # 
-# It is popular to elect a Gaussian variational family $q(f(\boldsymbol{z})) = \mathcal{N}(f(\boldsymbol{z}); \mathbf{m}, \mathbf{S})$ with parameters $\{\boldsymbol{z}, \mathbf{m}, \mathbf{S}\}$, since conjugacy is provided between $q(f(\boldsymbol{z}))$ and $p(f(\cdot)|f(\boldsymbol{z}))$ so that the resulting variational process $q(f(\cdot))$ is a GP. We can impliment this in GPJax by the following.
+# It is popular to elect a Gaussian variational family $q(f(\boldsymbol{z})) = \mathcal{N}(f(\boldsymbol{z}); \mathbf{m}, \mathbf{S})$ with parameters $\{\boldsymbol{z}, \mathbf{m}, \mathbf{S}\}$, since conjugacy is provided between $q(f(\boldsymbol{z}))$ and $p(f(\cdot)|f(\boldsymbol{z}))$ so that the resulting variational process $q(f(\cdot))$ is a GP. We can implement this in GPJax by the following.
 # %%
 likelihood = gpx.Gaussian(num_datapoints=n)
 p = gpx.Prior(kernel=gpx.RBF()) * likelihood

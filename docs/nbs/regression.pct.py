@@ -116,7 +116,7 @@ posterior = prior * likelihood
 # ## Hyperparameter optimisation
 #
 # %% [markdown]
-# Our kernel is parameterised by a lengthscale $\ell^2$ and variance parameter $\sigma^2$, while our likelihood controls the observation noise with $\alpha^2$. To optimise these hyperparameters, we begin by calling `initialise`.
+# Our kernel is parameterised by a length-scale $\ell^2$ and variance parameter $\sigma^2$, while our likelihood controls the observation noise with $\alpha^2$. To optimise these hyperparameters, we begin by calling `initialise`.
 # %%
 params, trainable, constrainer, unconstrainer = gpx.initialise(posterior)
 pp.pprint(params)
@@ -149,7 +149,7 @@ mll(params)
 
 # %%
 opt = ox.adam(learning_rate=0.01)
-final_params = gpx.abstractions.optax_fit(
+final_params = gpx.fit(
     mll,
     params,
     trainable,
