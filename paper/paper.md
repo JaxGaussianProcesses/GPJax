@@ -24,7 +24,13 @@ bibliography: paper.bib
 
 # Summary
 
+GPJax is a didactic Gaussian process (GP) library written in Jax that is targetted at enabling researchers to more easily develop their own GP models. The scope of GPJax is to provide users with the core objects used for constructing GP models in a composable manner. Code is purposefully written in a manner that is easy to extend and adapt to a user's own unique needs.
+
+GPJax has been written using Jax [@jax2018github]. This design choice enables all code to be run on CPUs, GPUs or TPUs through efficient compilation to XLA. In addition to this, automatic differentiation and vectorised operations are natively supported in GPJax through its Jax underpinning.
+
 # Statement of Need
+
+In GPJax, we seek to build computational abstractions of GPs such that the code closely, if not exactly, mimics the underlying maths that one would write on paper. To see this, consider the canonical example
 
 # Wider Software Ecosystem
 
