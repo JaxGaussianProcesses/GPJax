@@ -17,7 +17,7 @@ def get_data_and_gp(n_datapoints):
     p = gpx.Prior(kernel=gpx.RBF())
     lik = gpx.Gaussian(num_datapoints=n_datapoints)
     post = p * lik
-    return D, post
+    return D, post, p
 
 
 @pytest.mark.parametrize("n_datapoints, n_inducing_points", [(10, 2), (100, 10)])
@@ -26,19 +26,25 @@ def get_data_and_gp(n_datapoints):
 @pytest.mark.parametrize("diag", [True, False])
 @pytest.mark.parametrize("jit_fns", [False, True])
 def test_svgp(n_datapoints, n_inducing_points, n_test, whiten, diag, jit_fns):
-    D, post = get_data_and_gp(n_datapoints)
-
+    D, post, prior = get_data_and_gp(n_datapoints)
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing_points).reshape(-1, 1)
     test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
-    q = gpx.VariationalGaussian(
-        inducing_inputs=inducing_inputs, whiten=whiten, diag=diag
-    )
+
+    if whiten is True:
+        q = gpx.WhitenedVariationalGaussian(prior = prior,
+        inducing_inputs=inducing_inputs, diag=diag
+        )
+    else:
+        q = gpx.VariationalGaussian(prior = prior,
+        inducing_inputs=inducing_inputs, diag=diag
+        )
+
     svgp = gpx.SVGP(posterior=post, variational_family=q)
 
     assert svgp.posterior.prior == post.prior
     assert svgp.posterior.likelihood == post.likelihood
 
-    params, trainable_status, constrainer, unconstrainer = gpx.initialise(svgp)
+    params, _, constrainer, unconstrainer = gpx.initialise(svgp)
     params = gpx.transform(params, unconstrainer)
 
     assert svgp.prior == post.prior
@@ -59,17 +65,17 @@ def test_svgp(n_datapoints, n_inducing_points, n_test, whiten, diag, jit_fns):
     assert len(grads) == len(params)
 
     constrained_params = gpx.transform(params, constrainer)
-    kl_q_p = svgp.prior_kl(constrained_params)
+    kl_q_p = q.prior_kl(constrained_params)
     assert isinstance(kl_q_p, jnp.ndarray)
 
-    latent_mean, latent_cov = svgp.pred_moments(constrained_params, test_inputs)
+    latent_mean, latent_cov = q.pred_moments(constrained_params, test_inputs)
     assert isinstance(latent_mean, jnp.ndarray)
     assert isinstance(latent_cov, jnp.ndarray)
     assert latent_mean.shape == (n_test, 1)
     assert latent_cov.shape == (n_test, n_test)
 
     # Test predictions
-    predictive_dist_fn = svgp(constrained_params)
+    predictive_dist_fn = q(constrained_params)
     assert isinstance(predictive_dist_fn, tp.Callable)
 
     predictive_dist = predictive_dist_fn(test_inputs)
