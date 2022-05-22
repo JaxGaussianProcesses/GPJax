@@ -46,10 +46,10 @@ def test_batch_fitting(nb, ndata):
     D = Dataset(X=x, y=y)
     prior = Prior(kernel=RBF())
     likelihood = Gaussian(num_datapoints=ndata)
-    p =  prior * likelihood
+    p = prior * likelihood
     z = jnp.linspace(-2.0, 2.0, 10).reshape(-1, 1)
 
-    q  = gpx.VariationalGaussian(prior=prior, inducing_inputs=z)
+    q = gpx.VariationalGaussian(prior=prior, inducing_inputs=z)
 
     svgp = gpx.SVGP(posterior=p, variational_family=q)
     params, trainable_status, constrainer, unconstrainer = initialise(svgp)
