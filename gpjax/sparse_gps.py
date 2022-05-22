@@ -180,10 +180,10 @@ class SVGP(VariationalPosterior):
 
         if not self.variational_family.whiten:
             M = solve_triangular(Lz.T, M, lower=False)
-            μz = self.prior.mean(params)(z).reshape(-1, 1)
+            μz = self.prior.mean_function(z, params["mean_function"])
             mu -= μz
 
-        mean = self.prior.mean(params)(t).reshape(-1, 1) + jnp.matmul(M.T, mu)
+        mean = self.prior.mean_function(t, params["mean_function"]) + jnp.matmul(M.T, mu)
         V = jnp.matmul(M.T, sqrt)
         covariance += jnp.matmul(V, V.T)
 
@@ -207,7 +207,7 @@ class SVGP(VariationalPosterior):
         # Variational mean:
         mu = params["variational_family"]["variational_mean"]
         if not self.variational_family.whiten:
-            μz = self.prior.mean(params)(z).reshape(-1, 1)
+            μz = self.prior.mean_function(z, params["mean_function"])
             mu -= μz
 
         # Variational sqrt cov:
@@ -223,7 +223,7 @@ class SVGP(VariationalPosterior):
             if not self.variational_family.whiten:
                 M = solve_triangular(Lz.T, M, lower=False)
 
-            μt = self.prior.mean(params)(t).reshape(-1, 1)
+            μt = self.prior.mean_function(t, params["mean_function"])
             mean = μt + jnp.matmul(M.T, mu)
 
             V = jnp.matmul(M.T, sqrt)
