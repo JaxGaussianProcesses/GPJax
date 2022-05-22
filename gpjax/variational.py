@@ -127,13 +127,13 @@ class VariationalGaussian(VariationalFamily):
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(m) * self.jitter
         Lz = jnp.linalg.cholesky(Kzz)
-        μz = self.prior.mean(params)(z).reshape(-1, 1)
+        μz = self.prior.mean_function(z, params["mean_function"])
 
         # Compute predictive moments:
         t = test_inputs
         Ktt = gram(self.prior.kernel, t, params["kernel"])
         Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
-        μt = self.prior.mean(params)(t).reshape(-1, 1)
+        μt = self.prior.mean_function(t, params["mean_function"])
         A = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
         B = jsp.linalg.solve_triangular(Lz.T, A, lower=False)
         V = jnp.matmul(B.T, sqrt)
@@ -160,13 +160,13 @@ class VariationalGaussian(VariationalFamily):
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(m) * self.jitter
         Lz = jnp.linalg.cholesky(Kzz)
-        μz = self.prior.mean(params)(z).reshape(-1, 1)
+        μz = self.prior.mean_function(z, params["mean_function"])
 
         def predict_fn(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
-            μt = self.prior.mean(params)(t).reshape(-1, 1)
+            μt = self.prior.mean_function(t, params["mean_function"])
             A = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
             B = jsp.linalg.solve_triangular(Lz.T, A, lower=False)
             V = jnp.matmul(B.T, sqrt)
@@ -228,7 +228,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         t = test_inputs
         Ktt = gram(self.prior.kernel, t, params["kernel"])
         Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
-        μt = self.prior.mean(params)(t).reshape(-1, 1)
+        μt = self.prior.mean_function(t, params["mean_function"])
         A = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
         V = jnp.matmul(A.T, sqrt)
 
@@ -259,7 +259,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             t = test_inputs
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
-            μt = self.prior.mean(params)(t).reshape(-1, 1)
+            μt = self.prior.mean_function(t, params["mean_function"])
 
             A = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
             V = jnp.matmul(A.T, sqrt)
