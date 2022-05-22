@@ -259,9 +259,10 @@ class NonConjugatePosterior(AbstractPosterior):
             t = test_inputs
             Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
             Ktt = gram(self.prior.kernel, t, params["kernel"])
+            μt = self.prior.mean(params)(t).reshape(-1, 1)
             A = solve_triangular(Lx, Ktx.T, lower=True)
             latent_var = Ktt - jnp.sum(jnp.square(A), -2)
-            latent_mean = jnp.matmul(A.T, params["latent"])
+            latent_mean = μt + jnp.matmul(A.T, params["latent"])
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(latent_mean.squeeze()), latent_var
             )
@@ -297,7 +298,8 @@ class NonConjugatePosterior(AbstractPosterior):
             Kxx = gram(self.prior.kernel, x, params["kernel"])
             Kxx += I(n) * self.jitter
             Lx = jnp.linalg.cholesky(Kxx)
-            fx = jnp.matmul(Lx, params["latent"])
+            μx = self.prior.mean(params)(x).reshape(-1, 1)
+            fx = jnp.matmul(Lx, params["latent"]) + μx
             rv = self.likelihood.link_function(fx, params)
             ll = jnp.sum(rv.log_prob(y))
 
