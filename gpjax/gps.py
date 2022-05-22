@@ -85,13 +85,6 @@ class Prior(AbstractGP):
 
         return predict_fn
 
-    def mean(self, params: dict) -> tp.Callable[[Array], Array]:
-        def mean_fn(test_inputs: Array) -> Array:
-            predictive_dist = self.predict(params)
-            return predictive_dist(test_inputs).mean()
-
-        return mean_fn
-
     @property
     def params(self) -> dict:
         """Initialise the GP prior's parameter set"""
@@ -204,12 +197,12 @@ class ConjugatePosterior(AbstractPosterior):
             params = transform(params=params, transform_map=transformations)
 
             obs_noise = params["likelihood"]["obs_noise"]
-            mu = self.prior.mean_function(x, params["mean_function"])
+            μx = self.prior.mean_function(x, params["mean_function"])
             Kxx = gram(self.prior.kernel, x, params["kernel"])
             Kxx += I(n) * self.jitter
             Lx = jnp.linalg.cholesky(Kxx + I(n) * obs_noise)
 
-            random_variable = dx.MultivariateNormalTri(mu.squeeze(), Lx)
+            random_variable = dx.MultivariateNormalTri(μx.squeeze(), Lx)
 
             log_prior_density = evaluate_priors(params, priors)
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
@@ -259,9 +252,10 @@ class NonConjugatePosterior(AbstractPosterior):
             t = test_inputs
             Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
             Ktt = gram(self.prior.kernel, t, params["kernel"])
+            μt = self.prior.mean_function(t, params["mean_function"])
             A = solve_triangular(Lx, Ktx.T, lower=True)
             latent_var = Ktt - jnp.sum(jnp.square(A), -2)
-            latent_mean = jnp.matmul(A.T, params["latent"])
+            latent_mean = μt + jnp.matmul(A.T, params["latent"])
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(latent_mean.squeeze()), latent_var
             )
@@ -297,7 +291,8 @@ class NonConjugatePosterior(AbstractPosterior):
             Kxx = gram(self.prior.kernel, x, params["kernel"])
             Kxx += I(n) * self.jitter
             Lx = jnp.linalg.cholesky(Kxx)
-            fx = jnp.matmul(Lx, params["latent"])
+            μx = self.prior.mean_function(x, params["mean_function"])
+            fx = jnp.matmul(Lx, params["latent"]) + μx
             rv = self.likelihood.link_function(fx, params)
             ll = jnp.sum(rv.log_prob(y))
 

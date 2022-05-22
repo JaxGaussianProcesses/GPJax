@@ -103,5 +103,3 @@ class SVGP(VariationalPosterior):
             return self.likelihood.link_function(F, params["likelihood"]).log_prob(y)
 
         return gauss_hermite_quadrature(log_prob, mean.squeeze(1), variance.squeeze(1), y=y)
-
-    
