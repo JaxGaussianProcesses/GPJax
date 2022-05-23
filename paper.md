@@ -38,7 +38,7 @@ The intimacy between GPJax and the underlying maths also makes GPJax an excellen
 
 # Wider Software Ecosystem
 
-From both an applied and methodological perspective, GP models have been a widely used tool in the statistics and machine learning community. Much of this success can be attributed to range of high-quality software packages that faciliate GP modelling. Within the Python community, the three most popular packages for GP modelling are GPFlow [@matthews2017gpflow], GPyTorch [@gardner2018gpytorch], and GPy [@gpy2014]. Despite each of these packages being indispensible tools for the community, none of them support integration with a Jax-based workflow. GPJax seeks to resolve this issue.
+From both an applied and methodological perspective, GP models are a widely used tool in the statistics and machine learning community. Much of this success can be attributed to range of high-quality software packages that faciliate GP modelling. Within the Python community, the three most popular packages for GP modelling are GPFlow [@matthews2017gpflow], GPyTorch [@gardner2018gpytorch], and GPy [@gpy2014]. Despite each of these packages being indispensible tools for the community, none of them support integration with a Jax-based workflow. GPJax seeks to resolve this issue.
 
 For completeness, packages written for languages other than Python include GPML [@rasmussen2010gaussian] in Matlab, GaussianProcesses.jl [@fairbrother2022gaussianprocesses], AugmentedGaussianProcesses.jl [@fajou20a] and Stheno [@stheno2022tebbutt] all in Julia.
 
@@ -48,6 +48,6 @@ The graph kernel functionality supported by GPJax has been used within two recen
 
 # Funding Statement
 
-TP is supported by the Data Science for the Natural Environment project (EPSRC grant number EP/R01860X/1). DD is supported by
+TP is supported by the Data Science for the Natural Environment project (EPSRC grant number EP/R01860X/1). DD is supported by the EPSRC funded STOR-i centre for doctoral training (EP/S022252/1) and the ARC Research Hub for Transforming Energy Infrastructure through Digital Engineering (IH200100009).
 
 # References
