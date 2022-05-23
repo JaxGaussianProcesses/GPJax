@@ -30,7 +30,11 @@ GPJax has been written using Jax [@jax2018github]. This design choice enables al
 
 # Statement of Need
 
-In GPJax, we seek to build computational abstractions of GPs such that the code closely, if not exactly, mimics the underlying maths that one would write on paper.
+GPs are a widely used model in the machine learning and statistics community. In GPJax, we seek to build computational abstractions of GPs such that the code closely, if not exactly, mimics the underlying maths that one would write on paper. The result of this is that GPJax provides a modern GP package that can easily be tailored and extended to meet the individual needs of researchers and scientists wishing to develop their own GP methodology.
+
+The design of GPJax has been carefully tailored to enable easy integration with other packages in the Jax ecosystem. Currently, Markov Chain Monte-Carlo can be conducted using either BlackJax [@blackjax2021] or TensorFlow [@abadi2016tensorflow]. Seamless integration with Optax [@deepmind2020jax] provides a suite of gradient based optimisers and learning rate schedulers. GPJax relies on Distrax [@deepmind2020jax] and TensorFlow Probability [@abadi2016tensorflow] for efficient probability distributions and their corresponding operations to be implemented. To combine GP methods with deep learning methods, GPJax integrates with Haiku [@deepmind2020jax]. Each of these integrations is documented with example usage in GPJax's documentation.
+
+The intimacy between GPJax and the underlying maths also makes GPJax an excellent package for people new to GP modelling. Having the ability to easily cross-reference the contents of a textbook with the code that one is writing is an invaluable asset when one is trying to first build an intuition for a new statistical method.
 
 # Wider Software Ecosystem
 
@@ -44,6 +48,6 @@ The graph kernel functionality supported by GPJax has been used within two recen
 
 # Funding Statement
 
-TP is supported by the Data Science for the Natural Environment project (EPSRC grant number EP/R01860X/1).
+TP is supported by the Data Science for the Natural Environment project (EPSRC grant number EP/R01860X/1). DD is supported by
 
 # References
