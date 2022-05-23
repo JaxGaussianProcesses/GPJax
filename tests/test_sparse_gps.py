@@ -68,12 +68,6 @@ def test_svgp(n_datapoints, n_inducing_points, n_test, whiten, diag, jit_fns):
     kl_q_p = q.prior_kl(constrained_params)
     assert isinstance(kl_q_p, jnp.ndarray)
 
-    latent_mean, latent_cov = q.pred_moments(constrained_params, test_inputs)
-    assert isinstance(latent_mean, jnp.ndarray)
-    assert isinstance(latent_cov, jnp.ndarray)
-    assert latent_mean.shape == (n_test, 1)
-    assert latent_cov.shape == (n_test, n_test)
-
     # Test predictions
     predictive_dist_fn = q(constrained_params)
     assert isinstance(predictive_dist_fn, tp.Callable)

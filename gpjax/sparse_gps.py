@@ -1,5 +1,7 @@
 import abc
-from typing import Any, Callable, Dict
+from cmath import log
+from statistics import variance
+from typing import Callable, Dict
 
 import jax.numpy as jnp
 from chex import dataclass
@@ -94,12 +96,11 @@ class SVGP(VariationalPosterior):
         """
         x, y = batch.X, batch.y
 
-        mean, variance = vmap(self.variational_family.pred_moments, in_axes=(None, 0))(
-            params, x[:, jnp.newaxis, :]
-        )
+        predictive_dist =  vmap(self.variational_family.predict(params))(x)
+        mean = predictive_dist.mean().val.reshape(-1,1)
+        variance = predictive_dist.variance().val.reshape(-1,1)
 
-        # Get log(p(y|F)) function for current likelihood parameter values:
-        def log_prob(F, y):
-            return self.likelihood.link_function(F, params["likelihood"]).log_prob(y)
+        # log(p(y|f)):
+        log_prob = vmap(lambda f, y: self.likelihood.link_function(f, params["likelihood"]).log_prob(y))
 
-        return gauss_hermite_quadrature(log_prob, mean.squeeze(1), variance.squeeze(1), y=y)
+        return gauss_hermite_quadrature(log_prob, mean, variance, y=y)

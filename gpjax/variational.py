@@ -108,41 +108,6 @@ class VariationalGaussian(VariationalFamily):
 
         return qu.kl_divergence(pu)
 
-    # Computes predictive moments for Gauss-Hermite quadrature:
-    def pred_moments(self, params: Dict, test_inputs: Array) -> Tuple[Array, Array]:
-        """Compute the predictive mean and variance of the GP at the test inputs. A series of 1-dimensional Gaussian-Hermite quadrature schemes are used for this.
-
-        Args:
-            params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
-            test_inputs (Array): The test inputs at which the predictive mean and variance should be computed.
-
-        Returns:
-            Tuple[Array, Array]: The predictive mean and variance of the GP at the test inputs.
-        """
-        mu = params["variational_family"]["variational_mean"]
-        sqrt = params["variational_family"]["variational_root_covariance"]
-        z = params["variational_family"]["inducing_inputs"]
-        m = self.num_inducing
-
-        Kzz = gram(self.prior.kernel, z, params["kernel"])
-        Kzz += I(m) * self.jitter
-        Lz = jnp.linalg.cholesky(Kzz)
-        μz = self.prior.mean_function(z, params["mean_function"])
-
-        # Compute predictive moments:
-        t = test_inputs
-        Ktt = gram(self.prior.kernel, t, params["kernel"])
-        Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
-        μt = self.prior.mean_function(t, params["mean_function"])
-        A = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
-        B = jsp.linalg.solve_triangular(Lz.T, A, lower=False)
-        V = jnp.matmul(B.T, sqrt)
-
-        mean = μt + jnp.matmul(B.T, mu - μz)
-        covariance = Ktt - jnp.matmul(A.T, A) + jnp.matmul(V, V.T)
-
-        return mean, covariance
-
     def predict(self, params: dict) -> Callable[[Array], dx.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs.
 
@@ -203,39 +168,6 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         pu = dx.MultivariateNormalDiag(jnp.zeros(m))
 
         return qu.kl_divergence(pu)
-
-    # Computes predictive moments for Gauss-Hermite quadrature:
-    def pred_moments(self, params: Dict, test_inputs: Array) -> Tuple[Array, Array]:
-        """Compute the predictive mean and variance of the GP at the test inputs. A series of 1-dimensional Gaussian-Hermite quadrature schemes are used for this.
-
-        Args:
-            params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
-            test_inputs (Array): The test inputs at which the predictive mean and variance should be computed.
-
-        Returns:
-            Tuple[Array, Array]: The predictive mean and variance of the GP at the test inputs.
-        """
-        mu = params["variational_family"]["variational_mean"]
-        sqrt = params["variational_family"]["variational_root_covariance"]
-        z = params["variational_family"]["inducing_inputs"]
-        m = self.num_inducing
-
-        Kzz = gram(self.prior.kernel, z, params["kernel"])
-        Kzz += I(m) * self.jitter
-        Lz = jnp.linalg.cholesky(Kzz)
-
-        # Compute predictive moments:
-        t = test_inputs
-        Ktt = gram(self.prior.kernel, t, params["kernel"])
-        Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
-        μt = self.prior.mean_function(t, params["mean_function"])
-        A = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
-        V = jnp.matmul(A.T, sqrt)
-
-        mean = μt + jnp.matmul(A.T, mu)
-        covariance = Ktt - jnp.matmul(A.T, A) + jnp.matmul(V, V.T)
-
-        return mean, covariance
 
     def predict(self, params: dict) -> Callable[[Array], dx.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs.
