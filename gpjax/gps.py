@@ -13,6 +13,8 @@ from .likelihoods import (
     Gaussian,
     NonConjugateLikelihoods,
     NonConjugateLikelihoodType,
+    Conjugate,
+    NonConjugate,
 )
 from .mean_functions import AbstractMeanFunction, Zero
 from .parameters import copy_dict_structure, evaluate_priors, transform
@@ -79,9 +81,7 @@ class Prior(AbstractGP):
             Ktt = gram(self.kernel, t, params["kernel"])
             Ktt += I(t.shape[0]) * self.jitter
 
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(μt.squeeze()), Ktt
-            )
+            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(μt.squeeze()), Ktt)
 
         return predict_fn
 
@@ -113,9 +113,7 @@ class AbstractPosterior(AbstractGP):
 
     @property
     def params(self) -> dict:
-        return concat_dictionaries(
-            self.prior.params, {"likelihood": self.likelihood.params}
-        )
+        return concat_dictionaries(self.prior.params, {"likelihood": self.likelihood.params})
 
 
 @dataclass
@@ -127,9 +125,7 @@ class ConjugatePosterior(AbstractPosterior):
     name: tp.Optional[str] = "ConjugatePosterior"
     jitter: tp.Optional[float] = DEFAULT_JITTER
 
-    def predict(
-        self, train_data: Dataset, params: dict
-    ) -> tp.Callable[[Array], dx.Distribution]:
+    def predict(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], dx.Distribution]:
         """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density.
 
         Args:
@@ -165,9 +161,7 @@ class ConjugatePosterior(AbstractPosterior):
             covariance = Ktt - jnp.dot(Ktx, latent_values)
             covariance += I(t.shape[0]) * self.jitter
 
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mean.squeeze()), covariance
-            )
+            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict
 
@@ -206,9 +200,7 @@ class ConjugatePosterior(AbstractPosterior):
 
             log_prior_density = evaluate_priors(params, priors)
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-            return constant * (
-                random_variable.log_prob(y.squeeze()).mean() + log_prior_density
-            )
+            return constant * (random_variable.log_prob(y.squeeze()).mean() + log_prior_density)
 
         return mll
 
@@ -230,9 +222,7 @@ class NonConjugatePosterior(AbstractPosterior):
         hyperparameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
         return hyperparameters
 
-    def predict(
-        self, train_data: Dataset, params: dict
-    ) -> tp.Callable[[Array], dx.Distribution]:
+    def predict(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], dx.Distribution]:
         """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density. Note, to gain predictions on the scale of the original data, the returned distribution will need to be transformed through the likelihood function's inverse link function.
 
         Args:
@@ -303,15 +293,11 @@ class NonConjugatePosterior(AbstractPosterior):
         return mll
 
 
-def construct_posterior(
-    prior: Prior, likelihood: AbstractLikelihood
-) -> AbstractPosterior:
-    if isinstance(likelihood, Gaussian):
+def construct_posterior(prior: Prior, likelihood: AbstractLikelihood) -> AbstractPosterior:
+    if isinstance(likelihood, Conjugate):
         PosteriorGP = ConjugatePosterior
-    elif any([isinstance(likelihood, l) for l in NonConjugateLikelihoods]):
+    elif isinstance(likelihood, NonConjugate):
         PosteriorGP = NonConjugatePosterior
     else:
-        raise NotImplementedError(
-            f"No posterior implemented for {likelihood.name} likelihood"
-        )
+        raise NotImplementedError(f"No posterior implemented for {likelihood.name} likelihood")
     return PosteriorGP(prior=prior, likelihood=likelihood)

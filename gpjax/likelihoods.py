@@ -39,8 +39,18 @@ class AbstractLikelihood:
         raise NotImplementedError
 
 
-@dataclass(repr=False)
-class Gaussian(AbstractLikelihood):
+@dataclass
+class Conjugate:
+    """Conjugate likelihood."""
+
+
+@dataclass
+class NonConjugate:
+    """Conjugate likelihood."""
+
+
+@dataclass
+class Gaussian(AbstractLikelihood, Conjugate):
     """Gaussian likelihood object."""
 
     name: Optional[str] = "Gaussian"
@@ -70,8 +80,8 @@ class Gaussian(AbstractLikelihood):
         return dx.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
 
 
-@dataclass(repr=False)
-class Bernoulli(AbstractLikelihood):
+@dataclass
+class Bernoulli(AbstractLikelihood, NonConjugate):
     name: Optional[str] = "Bernoulli"
 
     @property

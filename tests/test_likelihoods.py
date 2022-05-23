@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.likelihoods import AbstractLikelihood, Bernoulli, Gaussian
+from gpjax.likelihoods import AbstractLikelihood, Bernoulli, Gaussian, Conjugate, NonConjugate
 from gpjax.parameters import initialise
 
 true_initialisation = {
@@ -69,3 +69,12 @@ def test_call(noise):
     assert (l_dist.mean() == jnp.zeros(n)).all()
     noise_mat = jnp.diag(jnp.repeat(noise, n))
     assert (l_dist.covariance() == jnp.eye(n) + noise_mat).all()
+
+
+@pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
+def test_conjugacy(lik):
+    likelihood = lik(num_datapoints=10)
+    if isinstance(likelihood, Gaussian):
+        assert isinstance(likelihood, Conjugate)
+    elif isinstance(likelihood, Bernoulli):
+        assert isinstance(likelihood, NonConjugate)
