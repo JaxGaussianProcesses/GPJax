@@ -296,6 +296,7 @@ class NonConjugatePosterior(AbstractPosterior):
 def construct_posterior(prior: Prior, likelihood: AbstractLikelihood) -> AbstractPosterior:
     if isinstance(likelihood, Conjugate):
         PosteriorGP = ConjugatePosterior
+
     elif isinstance(likelihood, NonConjugate):
         PosteriorGP = NonConjugatePosterior
     else:

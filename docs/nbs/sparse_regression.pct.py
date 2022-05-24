@@ -16,7 +16,7 @@
 # %% [markdown]
 # # Sparse Variational Inference
 #
-# In this notebook we demonstrate how to implement sparse variational Gaussian processes (SVGPs) of <strong data-cite="hensman2013gaussian">Hensman et al. (2013)</strong>; <strong data-cite="hensman2015gaussian">Hensman et al. (2015)</strong>. In particular, this approximation framework provides a tractable option for working with non-conjugate Gaussian processes with more ~5000 data points. However, for conjugate models of less than 5000 data points, we recommend using the marginal log-likelihood approach presented in the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html).
+# In this notebook we demonstrate how to implement sparse variational Gaussian processes (SVGPs) of <strong data-cite="hensman2013gaussian">Hensman et al. (2013)</strong>; <strong data-cite="hensman2015gaussian">Hensman et al. (2015)</strong>. In particular, this approximation framework provides a tractable option for working with non-conjugate Gaussian processes with more than ~5000 data points. However, for conjugate models of less than 5000 data points, we recommend using the marginal log-likelihood approach presented in the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html). Though we illustrate SVGPs here with a conjugate regression example, the same GPJax code works for general likelihoods, such as a Bernoulli for classification.
 
 # %%
 import jax.numpy as jnp
@@ -52,7 +52,6 @@ y = signal + jr.normal(key, shape=signal.shape) * noise
 D = gpx.Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
-
 # %% [markdown]
 # ## Sparse GPs via inducing inputs
 #
@@ -111,15 +110,18 @@ plt.show()
 #
 # Notice this is simply obtained by substituting $\boldsymbol{z}$ into $(\dagger)$, but we arrive back at square one with computing the expensive integral. To side-step this, we consider replacing $p(f(\boldsymbol{z})|\mathcal{D})$ in $(\star)$ with a cheap-to-compute approximate distribution $q(f(\boldsymbol{z}))$
 # 
-#   $$ q(f(\cdot)) = \int p(f(\cdot)|f(\boldsymbol{z})) q(f(\boldsymbol{z})) \text{d}f(\boldsymbol{z}).$$
+#   $$ q(f(\cdot)) = \int p(f(\cdot)|f(\boldsymbol{z})) q(f(\boldsymbol{z})) \text{d}f(\boldsymbol{z}). \qquad (\times) $$
 # 
 # To measure the quality of the approximation, we consider the Kullback-Leibler divergence $\operatorname{KL}(\cdot || \cdot)$ from our approximate process $q(f(\cdot))$ to the true process $p(f(\cdot)|\mathcal{D})$. By parametrising $q(f(\boldsymbol{z}))$ over a variational family of distributions, we can optimise Kullback-Leibler divergence with respect to the variational parameters. Moreover, since inducing input locations $\boldsymbol{z}$ augment the model, they themselves can be treated as variational parameters without altering the true underlying model $p(f(\boldsymbol{z})|\mathcal{D})$. This is exactly what gives SVGPs great flexibility whilst retaining robustness to overfitting. 
 # 
-# It is popular to elect a Gaussian variational family $q(f(\boldsymbol{z})) = \mathcal{N}(f(\boldsymbol{z}); \mathbf{m}, \mathbf{S})$ with parameters $\{\boldsymbol{z}, \mathbf{m}, \mathbf{S}\}$, since conjugacy is provided between $q(f(\boldsymbol{z}))$ and $p(f(\cdot)|f(\boldsymbol{z}))$ so that the resulting variational process $q(f(\cdot))$ is a GP. We can implement this in GPJax by the following.
+# It is popular to elect a Gaussian variational distribution $q(f(\boldsymbol{z})) = \mathcal{N}(f(\boldsymbol{z}); \mathbf{m}, \mathbf{S})$ with parameters $\{\boldsymbol{z}, \mathbf{m}, \mathbf{S}\}$, since conjugacy is provided between $q(f(\boldsymbol{z}))$ and $p(f(\cdot)|f(\boldsymbol{z}))$ so that the resulting variational process $q(f(\cdot))$ is a GP. We can implement this in GPJax by the following.
 # %%
 likelihood = gpx.Gaussian(num_datapoints=n)
-p = gpx.Prior(kernel=gpx.RBF()) * likelihood
-q = gpx.VariationalGaussian(inducing_inputs=z)
+prior = gpx.Prior(kernel=gpx.RBF())
+p =  prior * likelihood
+q = gpx.VariationalGaussian(prior=prior, inducing_inputs=z)
+# %% [markdown]
+# Here, the variational process $q(\cdot)$ depends on the prior through $p(f(\cdot)|f(\boldsymbol{z}))$ in $(\times)$.
 # %% [markdown]
 # 
 # We combine our true and approximate posterior Gaussian processes into an `SVGP` object to define the variational strategy that we will adopt in the forthcoming inference.
@@ -151,23 +153,23 @@ Dbatched = D.cache().repeat().shuffle(D.n).batch(batch_size=128).prefetch(buffer
 
 optimiser = ox.adam(learning_rate=0.01)
 
-learned_params = gpx.abstractions.fit_batches(
+learned_params = gpx.fit_batches(
     objective = loss_fn,
     params = params,
     trainables = trainables,
     train_data = Dbatched, 
     optax_optim = optimiser,
-    n_iters=2500,
+    n_iters=4000,
 )
 learned_params = gpx.transform(learned_params, constrainers)
 # %% [markdown]
 # ## Predictions
 #
 # With optimisation complete, we can use our inferred parameter set to make predictions at novel inputs akin 
-# to all other models within GPJax (for example, see the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)).
+# to all other models within GPJax on our variational process object $q(\cdot)$ (for example, see the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)).
 
 # %%
-latent_dist = svgp(learned_params)(xtest)
+latent_dist = q(learned_params)(xtest)
 predictive_dist = likelihood(latent_dist, learned_params)
 
 meanf = predictive_dist.mean()
