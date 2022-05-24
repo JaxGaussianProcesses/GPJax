@@ -24,7 +24,7 @@ bibliography: paper.bib
 
 # Summary
 
-Gaussian processes (GPs) [@rasmussen2006gaussian] are Bayesian non-parametric models that have been successfully used in applications such as geostatistics [@matheron1963principles], Bayesian optimisation [@mockus1978application], and reinforcement learning [@deisenroth2011pilco]. In `GPJax`, we seek to build computational abstractions of GPs that closely resemble the underlying maths that one would write on paper. Consequently, `GPJax` provides a modern GP package that can easily be tailored and extended to meet the individual needs of researchers and scientists wishing to develop their GP methodology.
+Gaussian processes (GPs) [@rasmussen2006gaussian] are Bayesian nonparametric models that have been successfully used in applications such as geostatistics [@matheron1963principles], Bayesian optimisation [@mockus1978application], and reinforcement learning [@deisenroth2011pilco]. In `GPJax`, we seek to build computational abstractions of GPs that closely resemble the underlying maths that one would write on paper. Consequently, `GPJax` provides a modern GP package that can easily be tailored and extended to meet the individual needs of researchers and scientists wishing to develop their GP methodology.
 
 `GPJax` is a didactic GP library targeted at researchers who wish to develop novel GP methodology. The scope of `GPJax` is to provide users with a set of composable objects for constructing GP models, written in a manner that is easy to extend and adapt to a user's own unique needs through an interleaved design with other libraries.
 
