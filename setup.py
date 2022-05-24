@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 def parse_requirements_file(filename):
     with open(filename, encoding="utf-8") as fid:
-        requires = [l.strip() for l in fid.readlines() if l]
+        requires = [line.strip() for line in fid.readlines() if line]
     return requires
 
 
