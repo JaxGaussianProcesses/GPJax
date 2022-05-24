@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -17,9 +17,9 @@
 # %% [markdown]
 # # Gaussian Processes Barycentres
 #
-# In this notebook we'll give an implementation of <strong data-cite="mallasto2017learning"></strong>. In this work, the existence of a Wasserstein barycentre between a collection of Gaussian processes is proven.
+# In this notebook we'll give an implementation of <strong data-cite="mallasto2017learning"></strong>. In this work, the existence of a Wasserstein barycentre between a collection of Gaussian processes is proven. When faced with trying to _average_ a set of probability distributions, the Wasserstein barycentre is an attractive choice as it enables uncertainty amongst the individual distributions to be incorporated into the averaged distribution. When compared to a naive _mean of means_ and _mean of variances_ approach to computing the average probability distributions, it can be seen that Wasserstein barycentres offer significantly more favourable uncertainty estimation.
 
-# %% vscode={"languageId": "python"}
+# %%
 import gpjax as gpx
 import jax
 import jax.numpy as jnp
@@ -53,12 +53,14 @@ key = jr.PRNGKey(123)
 #
 # ## Barycentre of Gaussian processes
 #
-# It was shown in <strong data-cite="mallasto2017learning"></strong> that the barycentre $\bar{f}$ of a collection of Gaussian processes $\lbrace f_i\rbrace_{i=1}^T$ such that $f_i \sim \mathcal{GP}(m_i, K_i)$ can be found using the same solutions as in $(\star)$. In this notebook, we will demonstrate how this can be achieved in GPJax.
+# It was shown in <strong data-cite="mallasto2017learning"></strong> that the barycentre $\bar{f}$ of a collection of Gaussian processes $\lbrace f_i\rbrace_{i=1}^T$ such that $f_i \sim \mathcal{GP}(m_i, K_i)$ can be found using the same solutions as in $(\star)$. For a full theoretical understanding, we recommend reading the original paper. However, the central argument to this result is that one can first show that the barycentre GP $\bar{f}\sim\mathcal{GP}(\bar{m}, \bar{S})$ is non-degenerate for any finite set of GPs $\lbrace f_t\rbrace_{t=1}^T$ i.e., $T<\infty$. With this established, one can show that for a $n$-dimensional finite Gaussian distribution $f_{i,n}$, the Wasserstein metric between any two Gaussian distributions $f_{i, n}, f_{j, n}$ converges to the Wasserstein metric between GPs as $n\to\infty$.
+#
+# In this notebook, we will demonstrate how this can be achieved in GPJax.
 #
 # ## Dataset
 #
 # We'll simulate five datasets and develop a Gaussian process posterior before identifying the Gaussian process barycentre at a set of test points. Each dataset will be a sine function with a different vertical shift, periodicity, and quantity of noise.
-# %% vscode={"languageId": "python"}
+# %%
 n = 100
 n_test = 200
 n_datasets = 5
@@ -88,7 +90,7 @@ plt.show()
 #
 # We'll now independently learn Gaussian process posterior distributions for each dataset. We won't spend any time here discussing how GP hyperparameters are optimised. For advice on achieving this, see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for advice on optimisation and the [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for advice on selecting an appropriate kernel.
 
-# %% vscode={"languageId": "python"}
+# %%
 def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
     if y.ndim == 1:
         y = y.reshape(-1, 1)
@@ -120,7 +122,7 @@ posterior_preds = [fit_gp(x, i) for i in ys]
 #
 # In GPJax, the predictive distribution of a GP is given by a [Distrax](https://github.com/deepmind/distrax) distribution, making it straightforward to extract the mean vector and covariance matrix of each GP for learning a barycentre. We implement the fixed point scheme given in (3) in the following cell by utilising Jax's `vmap` operator to speed up large matrix operations using broadcasting in `tensordot`.
 
-# %% vscode={"languageId": "python"}
+# %%
 def sqrtm(A: jnp.DeviceArray):
     return jnp.real(jsl.sqrtm(A))
 
@@ -143,7 +145,7 @@ def wasserstein_barycentres(distributions: tp.List[dx.Distribution], weights: jn
 # %% [markdown]
 # With a function defined for learning a barycentre, we'll now compute it using the `lax.scan` operator that drastically speeds up for loops in Jax (see the [Jax documentation](https://jax.readthedocs.io/en/latest/_autosummary/jax.lax.scan.html)). The iterative update will be executed 100 times, with convergence measured by the difference between the previous and current iteration that we can confirm by inspecting the `sequence` array in the following cell.
 
-# %% vscode={"languageId": "python"}
+# %%
 weights = jnp.ones((n_datasets,)) / n_datasets
 
 means = jnp.stack([d.mean() for d in posterior_preds])
@@ -163,7 +165,7 @@ barycentre_process = dx.MultivariateNormalFullCovariance(barycentre_mean, baryce
 #
 # With a barycentre learned, we can visualise the result. We can see that the result looks reasonable as it follows the sinusoidal curve of all the inferred GPs, and the uncertainty bands are sensible.
 
-# %% vscode={"languageId": "python"}
+# %%
 def plot(
     dist: dx.Distribution,
     ax,
@@ -192,6 +194,6 @@ plot(barycentre_process, ax, color="tab:red", label="Barycentre", ci_alpha=0.4, 
 # %% [markdown]
 # ## System configuration
 
-# %% vscode={"languageId": "python"}
+# %%
 # %reload_ext watermark
 # %watermark -n -u -v -iv -w -a 'Thomas Pinder (edited by Daniel Dodd)'

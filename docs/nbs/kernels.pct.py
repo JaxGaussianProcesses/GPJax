@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # ---
 # jupyter:
 #   jupytext:
@@ -24,7 +25,9 @@ import jax.random as jr
 import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from jax import jit
+import jax
 from optax import adam
+import distrax as dx
 
 import gpjax as gpx
 
@@ -147,7 +150,7 @@ prod_k = gpx.ProductKernel(kernel_set=[k1, k2, k3])
 #
 # ### Circular kernel
 #
-# When the underlying space is polar, typical Euclidean kernels such as Matérn kernels are insufficient as the boundary. Circular kernels do not exhibit this behaviour and instead _wrap_ around the boundary points to create a smooth function. Such a kernel was given in [Padonou & Roustant (2015)](https://hal.inria.fr/hal-01119942v1) where any two angles $\theta$ and $\theta'$ are written as
+# When the underlying space is polar, typical Euclidean kernels such as Matérn kernels are insufficient at the boundary as discontinuities will be present. This is due to the fact that for a polar space $\lvert 0, 2\pi\rvert=0$ i.e., the space wraps. Euclidean kernels have no mechanism in them to represent this logic and will instead treat $0$ and $2\pi$ and elements far apart. Circular kernels do not exhibit this behaviour and instead _wrap_ around the boundary points to create a smooth function. Such a kernel was given in [Padonou & Roustant (2015)](https://hal.inria.fr/hal-01119942v1) where any two angles $\theta$ and $\theta'$ are written as
 # $$W_c(\theta, \theta') = \left\lvert \left(1 + \tau \frac{d(\theta, \theta')}{c} \right) \left(1 - \frac{d(\theta, \theta')}{c} \right)^{\tau} \right\rvert \quad \tau \geq 4 \tag{1}.$$
 #
 # Here the hyperparameter $\tau$ is analogous to a lengthscale for Euclidean stationary kernels, controlling the correlation between pairs of observations. While $d$ is an angular distance metric
@@ -164,7 +167,7 @@ def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
 
 
-@dataclass(repr=False)
+@dataclass
 class Polar(gpx.kernels.Kernel):
     period: float = 2 * jnp.pi
 
@@ -182,15 +185,32 @@ class Polar(gpx.kernels.Kernel):
 # %% [markdown]
 # We unpack this now to make better sense of it. In the kernel's `__init__` function we simply specify the length of a single period. As the underlying domain is a circle, this is $2\pi$. Next we define the kernel's `__call__` function which is a direct implementation of Equation (1). Finally, we define the Kernel's parameter property which contains just one value $\tau$ that we initialise to 4 in the kernel's `__post_init__`.
 #
+# #### Aside on dataclasses
+#
+# One can see in the above definition of a `Polar` kernel that we decorated the class with a `@dataclass` command. Dataclasses are simply regular classs objects in Python, however, much of the boilerplate code has been removed. For example, without a `@dataclass` decorator, the instantiation of the above `Polar` kernel would be done through
+# ```python
+# class Polar(gpx.kernels.Kernel):
+#     def __init__(self, period: float = 2*jnp.pi):
+#         super().__init__()
+#         self.period = period
+# ```
+# As objects become increasingly large and complex, the conciseness of a dataclass becomes increasingly attractive. To ensure full compatability with Jax, it is crucial that the dataclass decorator is imported from Chex, not base Python's `dataclass` module. Functionally, the two objects are identical. However, unlike regular Python dataclasses, it is possilbe to apply operations such as`jit`, `vmap` and `grad` to the dataclasses given by Chex as they are registrered PyTrees. 
+#
+#
 # ### Custom Parameter Bijection
 #
 # The constraint on $\tau$ makes optimisation challenging with gradient descent. It would be much easier if we could instead parameterise $\tau$ to be on the real line. Fortunately, this can be taken care of with GPJax's `add parameter` function, only requiring us to define the parameter's name and matching bijection (either a Distrax of TensorFlow probability bijector). Under the hood, calling this function updates a configuration object to register this parameter and its corresponding transform.
+#
+# To define a bijector here we'll make use of the `Lambda` operator given in Distrax. This lets us convert any regular Jax function into a bijection. Given that we require $\tau$ to be strictly greater than $4.$, we'll apply a [softplus transformation](https://jax.readthedocs.io/en/latest/_autosummary/jax.nn.softplus.html) where the lower bound is shifted by $4.$.
 
 
 # %%
 from gpjax.config import add_parameter
 
-add_parameter("tau", tfb.Softplus(low=jnp.array(4.0)))
+bij_fn = lambda x: jax.nn.softplus(x+jnp.array(4.))
+bij = dx.Lambda(bij_fn)
+
+add_parameter("tau", bij)
 
 # %% [markdown]
 # ### Using our polar kernel
@@ -245,8 +265,6 @@ fig = plt.figure(figsize=(10, 8))
 gridspec = fig.add_gridspec(1, 1)
 ax = plt.subplot(gridspec[0], polar=True)
 
-ax.grid(color="#888888")  # Color the grid
-ax.spines["polar"].set_visible(False)  # Show or hide the plot spine
 ax.fill_between(
     angles.squeeze(),
     mu - one_sigma,

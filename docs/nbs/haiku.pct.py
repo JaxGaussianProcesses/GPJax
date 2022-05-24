@@ -16,7 +16,7 @@
 # %% [markdown]
 # # Deep Kernel Learning
 #
-# In this notebook we demonstrate how GPJax can be used in conjunction with [Haiku](https://github.com/deepmind/dm-haiku) to build deep kernel Gaussian processes <strong data-cite="wilson2016deep"></strong>.
+# In this notebook we demonstrate how GPJax can be used in conjunction with [Haiku](https://github.com/deepmind/dm-haiku) to build deep kernel Gaussian processes. Modelling data with discontinuities is a challenging task for regular Gaussian process models. However, as shown in <strong data-cite="wilson2016deep"></strong>, transforming the inputs to our Gaussian process model's kernel through a neural network can offer a solution to this.
 
 # %%
 import gpjax as gpx
@@ -37,7 +37,7 @@ key = jr.PRNGKey(123)
 # %% [markdown]
 # ## Dataset
 #
-# Modelling data with discontinuities is a challenging task for regular Gaussian process models. However, as shown in <strong data-cite="wilson2016deep"></strong>, transforming the inputs to our Gaussian process model's kernel through a neural network can offer a solution to this. To highlight this, we'll model a sawtooth function.
+# As previously mentioned, deep kernels are particularly useful when the data has discontinuities. To highlight this, we will use a sawtooth function as our data.
 
 # %%
 n = 500
@@ -66,7 +66,7 @@ ax.legend(loc="best")
 # Instead of applying a kernel $k(\cdot, \cdot')$ directly on some data, we seek to apply a _feature map_ $\phi(\cdot)$ that projects the data to learn more meaningful representations beforehand. In deep kernel learning, $\phi$ is a neural network whose parameters are learned jointly with the GP model's hyperparameters. The corresponding kernel is then computed by $k(\phi(\cdot), \phi(\cdot'))$. Here $k(\cdot,\cdot')$ is referred to as the _base kernel_.
 #
 # ### Implementation
-# 
+#
 # Although deep kernels are not currently supported natively in GPJax, defining one is straightforward as we now demonstrate. Using the base `Kernel` object given in GPJax, we provide a mixin class named `_DeepKernelFunction` to facilitate the user supplying the neural network and base kernel of their choice. Kernel matrices are then computed using the regular `gram` and `cross_covariance` functions.
 
 # %%
@@ -96,7 +96,7 @@ class DeepKernelFunction(Kernel, _DeepKernelFunction):
 # %% [markdown]
 # ### Defining a network
 #
-# With a deep kernel object created, we proceed to define a neural network. Here we consider a small multi-layer perceptron with two linear hidden layers and ReLU activation functions between the layers. The first hidden layer contains 32 units, while the second layer contains 64 units. As we are doing one-dimensional regression here, the final output layer of the network is a single unit.
+# With a deep kernel object created, we proceed to define a neural network. Here we consider a small multi-layer perceptron with two linear hidden layers and ReLU activation functions between the layers. The first hidden layer contains 32 units, while the second layer contains 64 units. Finally, we'll make the output of our network a single unit. However, it would be possible to project our data into a $d-$dimensional space for $d>1$. In these instances, making the [base kernel ARD](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html#Active-dimensions) would be sensible.
 # Users may wish to design more intricate network structures for more complex tasks, which functionality is supported well in Haiku.
 
 # %%
