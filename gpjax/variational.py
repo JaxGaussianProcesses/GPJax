@@ -1,5 +1,5 @@
 import abc
-from typing import Callable, Dict, Optional, Tuple, Any
+from typing import Callable, Dict, Optional, Any
 import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
@@ -8,7 +8,7 @@ from chex import dataclass
 
 from .config import Identity, Softplus, add_parameter, get_defaults
 from .types import Array
-from .utils import I
+from .utils import I, concat_dictionaries
 from .kernels import cross_covariance, gram
 from .gps import Prior
 
@@ -74,15 +74,14 @@ class VariationalGaussian(VariationalFamily):
     @property
     def params(self) -> Dict:
         """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
-        return {
-            "kernel": self.prior.kernel.params,
-            "mean_function": self.prior.mean_function.params,
+        return  concat_dictionaries(
+            self.prior.params, {
             "variational_family": {
-            "inducing_inputs": self.inducing_inputs,
-            "variational_mean": self.variational_mean,
-            "variational_root_covariance": self.variational_root_covariance,
-            }
-        }
+                "inducing_inputs": self.inducing_inputs,
+                "variational_mean": self.variational_mean,
+                "variational_root_covariance": self.variational_root_covariance}
+                }
+        )
 
     # Compute KL divergence at inducing points, KL[q(u)||p(u)]:
     def prior_kl(self, params: Dict) -> Array:
