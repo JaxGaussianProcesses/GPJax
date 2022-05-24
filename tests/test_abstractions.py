@@ -3,7 +3,6 @@ import jax.random as jr
 import optax
 import pytest
 import tensorflow as tf
-from jax.experimental import optimizers
 
 import gpjax as gpx
 from gpjax import RBF, Dataset, Gaussian, Prior, initialise, transform
@@ -38,16 +37,19 @@ def test_stop_grads():
     assert learned_params["x"] != params["x"]
 
 
-@pytest.mark.parametrize("nb", [20, 50])
+@pytest.mark.parametrize("nb", [1, 20, 50])
 @pytest.mark.parametrize("ndata", [50])
 def test_batch_fitting(nb, ndata):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(ndata, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
     D = Dataset(X=x, y=y)
-    p = Prior(kernel=RBF()) * Gaussian(num_datapoints=ndata)
-    Z = jnp.linspace(-2.0, 2.0, 10).reshape(-1, 1)
-    q = gpx.VariationalGaussian(inducing_inputs=Z)
+    prior = Prior(kernel=RBF())
+    likelihood = Gaussian(num_datapoints=ndata)
+    p = prior * likelihood
+    z = jnp.linspace(-2.0, 2.0, 10).reshape(-1, 1)
+
+    q = gpx.VariationalGaussian(prior=prior, inducing_inputs=z)
 
     svgp = gpx.SVGP(posterior=p, variational_family=q)
     params, trainable_status, constrainer, unconstrainer = initialise(svgp)
@@ -58,10 +60,9 @@ def test_batch_fitting(nb, ndata):
     D = D.cache()
     D = D.repeat()
     D = D.shuffle(D.n)
-    D = D.batch(batch_size=32)
+    D = D.batch(batch_size=nb)
     D = D.prefetch(buffer_size=1)
 
-    # opt_init, opt_update, get_params = optimizers.adam(step_size=0.1)
     optimiser = optax.adam(learning_rate=0.1)
     optimised_params = fit_batches(
         objective, params, trainable_status, D, optimiser, n_iters=5

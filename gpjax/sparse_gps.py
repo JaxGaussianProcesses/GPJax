@@ -1,23 +1,16 @@
 import abc
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Callable, Dict
 
-import distrax as dx
 import jax.numpy as jnp
 from chex import dataclass
 from jax import vmap
-from jax.numpy.linalg import cholesky
-from jax.scipy.linalg import solve_triangular
 
-from .config import get_defaults
 from .gps import AbstractPosterior
-from .kernels import cross_covariance, gram
 from .parameters import transform
 from .quadrature import gauss_hermite_quadrature
 from .types import Array, Dataset
-from .utils import I, concat_dictionaries
+from .utils import concat_dictionaries
 from .variational import VariationalFamily
-
-DEFAULT_JITTER = get_defaults()["jitter"]
 
 
 @dataclass
@@ -26,29 +19,19 @@ class VariationalPosterior:
 
     posterior: AbstractPosterior
     variational_family: VariationalFamily
-    jitter: Optional[float] = DEFAULT_JITTER
 
     def __post_init__(self):
         self.prior = self.posterior.prior
         self.likelihood = self.posterior.likelihood
 
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        """For a given set of parameters, compute the latent function's prediction under the variational approximation."""
-        return self.predict(*args, **kwargs)
-
     @property
     def params(self) -> Dict:
         """Construct the parameter set used within the variational scheme adopted."""
         hyperparams = concat_dictionaries(
-            self.posterior.params,
-            {"variational_family": self.variational_family.params},
+            {"likelihood": self.posterior.likelihood.params}, 
+            self.variational_family.params,
         )
         return hyperparams
-
-    @abc.abstractmethod
-    def predict(self, *args: Any, **kwargs: Any) -> dx.Distribution:
-        """Predict the GP's output given the input."""
-        raise NotImplementedError
 
     @abc.abstractmethod
     def elbo(
@@ -68,7 +51,7 @@ class VariationalPosterior:
 
 @dataclass
 class SVGP(VariationalPosterior):
-    """The Sparse Variational Gaussian Process (SVGP) variational posterior. The key reference is Hensman et. al., (2013) - Gaussian processes for big data."""
+    """Sparse Variational Gaussian Process (SVGP) training module. The key reference is Hensman et. al., (2013) - Gaussian processes for big data."""
 
     def __post_init__(self):
         self.prior = self.posterior.prior
@@ -92,41 +75,12 @@ class SVGP(VariationalPosterior):
 
         def elbo_fn(params: Dict, batch: Dataset) -> Array:
             params = transform(params, transformations)
-            kl = self.prior_kl(params)
+            kl = self.variational_family.prior_kl(params)
             var_exp = self.variational_expectation(params, batch)
 
             return constant * (jnp.sum(var_exp) * train_data.n / batch.n - kl)
 
         return elbo_fn
-
-    # Compute KL divergence at inducing points, KL[q(u)||p(u)]:
-    def prior_kl(self, params: Dict) -> Array:
-        """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
-
-        Args:
-            params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
-
-        Returns:
-            Array: The KL-divergence between our variational approximation and the GP prior.
-        """
-        mu = params["variational_family"]["variational_mean"]
-        sqrt = params["variational_family"]["variational_root_covariance"]
-        m = self.num_inducing
-
-        qu = dx.MultivariateNormalTri(mu.squeeze(), sqrt)
-
-        if not self.variational_family.whiten:
-            z = params["variational_family"]["inducing_inputs"]
-            μz = self.prior.mean_function(z, params["mean_function"])
-            Kzz = gram(self.prior.kernel, z, params["kernel"])
-            Kzz += I(m) * self.jitter
-            Lz = cholesky(Kzz)
-            pu = dx.MultivariateNormalTri(μz.squeeze(), Lz)
-
-        else:
-            pu = dx.MultivariateNormalDiag(jnp.zeros(m))
-
-        return qu.kl_divergence(pu)
 
     def variational_expectation(self, params: Dict, batch: Dataset) -> Array:
         """Compute the expectation of our model's log-likelihood under our variational distribution. Batching can be done here to speed up computation.
@@ -140,97 +94,15 @@ class SVGP(VariationalPosterior):
         """
         x, y = batch.X, batch.y
 
-        mean, variance = vmap(self.pred_moments, in_axes=(None, 0))(
-            params, x[:, jnp.newaxis, :]
-        )
+        # q(f(x))
+        predictive_dist = vmap(self.variational_family.predict(params))(x)
+        mean = predictive_dist.mean().val.reshape(-1,1)
+        variance = predictive_dist.variance().val.reshape(-1,1)
 
-        # Get log(p(y|F)) function for current likelihood parameter values:
-        def log_prob(F, y):
-            return self.likelihood.link_function(F, params["likelihood"]).log_prob(y)
+        # log(p(y|f(x)))
+        log_prob = vmap(lambda f, y: self.likelihood.link_function(f, params["likelihood"]).log_prob(y))
 
-        return gauss_hermite_quadrature(log_prob, mean.squeeze(1), variance.squeeze(1), y=y)
+        # ≈ ∫[log(p(y|f(x))).q(f(x))] df(x)
+        expectation = gauss_hermite_quadrature(log_prob, mean, variance, y=y)
 
-    # Computes predictive moments for Gauss-Hermite quadrature:
-    def pred_moments(self, params: Dict, test_inputs: Array) -> Tuple[Array, Array]:
-        """Compute the predictive mean and variance of the GP at the test inputs. A series of 1-dimensional Gaussian-Hermite quadrature schemes are used for this.
-
-        Args:
-            params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
-            test_inputs (Array): The test inputs at which the predictive mean and variance should be computed.
-
-        Returns:
-            Tuple[Array, Array]: The predictive mean and variance of the GP at the test inputs.
-        """
-        mu = params["variational_family"]["variational_mean"]
-        sqrt = params["variational_family"]["variational_root_covariance"]
-
-        # Cholesky decomposition at inducing inputs:
-        z = params["variational_family"]["inducing_inputs"]
-        m = self.num_inducing
-        Kzz = gram(self.prior.kernel, z, params["kernel"])
-        Kzz += I(m) * self.jitter
-        Lz = cholesky(Kzz)
-
-        # Compute predictive moments:
-        t = test_inputs
-        Ktt = gram(self.prior.kernel, t, params["kernel"])
-        Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
-        M = solve_triangular(Lz, Kzt, lower=True)
-        covariance = Ktt - jnp.matmul(M.T, M)
-
-        if not self.variational_family.whiten:
-            M = solve_triangular(Lz.T, M, lower=False)
-            μz = self.prior.mean_function(z, params["mean_function"])
-            mu -= μz
-
-        mean = self.prior.mean_function(t, params["mean_function"]) + jnp.matmul(M.T, mu)
-        V = jnp.matmul(M.T, sqrt)
-        covariance += jnp.matmul(V, V.T)
-
-        return mean, covariance
-
-    def predict(self, params: dict) -> Callable[[Array], dx.Distribution]:
-        """Compute the predictive distribution of the GP at the test inputs.
-
-        Args:
-            params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
-
-        Returns:
-            Callable[[Array], dx.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
-        """
-        z = params["variational_family"]["inducing_inputs"]
-        m = self.num_inducing
-        Kzz = gram(self.prior.kernel, z, params["kernel"])
-        Kzz += I(m) * self.jitter
-        Lz = cholesky(Kzz)
-
-        # Variational mean:
-        mu = params["variational_family"]["variational_mean"]
-        if not self.variational_family.whiten:
-            μz = self.prior.mean_function(z, params["mean_function"])
-            mu -= μz
-
-        # Variational sqrt cov:
-        sqrt = params["variational_family"]["variational_root_covariance"]
-
-        def predict_fn(test_inputs: Array) -> dx.Distribution:
-            t = test_inputs
-            Ktt = gram(self.prior.kernel, t, params["kernel"])
-            Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
-            M = solve_triangular(Lz, Kzt, lower=True)
-            covariance = Ktt - jnp.matmul(M.T, M)
-
-            if not self.variational_family.whiten:
-                M = solve_triangular(Lz.T, M, lower=False)
-
-            μt = self.prior.mean_function(t, params["mean_function"])
-            mean = μt + jnp.matmul(M.T, mu)
-
-            V = jnp.matmul(M.T, sqrt)
-            covariance += jnp.matmul(V, V.T)
-
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mean.squeeze()), covariance
-            )
-
-        return predict_fn
+        return expectation

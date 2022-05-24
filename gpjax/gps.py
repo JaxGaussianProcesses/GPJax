@@ -308,7 +308,7 @@ def construct_posterior(
 ) -> AbstractPosterior:
     if isinstance(likelihood, Gaussian):
         PosteriorGP = ConjugatePosterior
-    elif any([isinstance(likelihood, l) for l in NonConjugateLikelihoods]):
+    elif any([isinstance(likelihood, lik) for lik in NonConjugateLikelihoods]):
         PosteriorGP = NonConjugatePosterior
     else:
         raise NotImplementedError(
