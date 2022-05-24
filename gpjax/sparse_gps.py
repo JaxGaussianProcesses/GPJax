@@ -1,6 +1,4 @@
 import abc
-from cmath import log
-from statistics import variance
 from typing import Callable, Dict
 
 import jax.numpy as jnp
@@ -53,7 +51,7 @@ class VariationalPosterior:
 
 @dataclass
 class SVGP(VariationalPosterior):
-    """The Sparse Variational Gaussian Process (SVGP) variational posterior. The key reference is Hensman et. al., (2013) - Gaussian processes for big data."""
+    """Sparse Variational Gaussian Process (SVGP) training module. The key reference is Hensman et. al., (2013) - Gaussian processes for big data."""
 
     def __post_init__(self):
         self.prior = self.posterior.prior
@@ -96,11 +94,15 @@ class SVGP(VariationalPosterior):
         """
         x, y = batch.X, batch.y
 
+        # q(f(x))
         predictive_dist = vmap(self.variational_family.predict(params))(x)
         mean = predictive_dist.mean().val.reshape(-1,1)
         variance = predictive_dist.variance().val.reshape(-1,1)
 
-        # log(p(y|f)):
+        # log(p(y|f(x)))
         log_prob = vmap(lambda f, y: self.likelihood.link_function(f, params["likelihood"]).log_prob(y))
 
-        return gauss_hermite_quadrature(log_prob, mean, variance, y=y)
+        # ≈ ∫[log(p(y|f(x))).q(f(x))] df(x)
+        expectation = gauss_hermite_quadrature(log_prob, mean, variance, y=y)
+
+        return expectation
