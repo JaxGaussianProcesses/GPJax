@@ -46,7 +46,7 @@ For completeness, packages written for languages other than Python include GPML 
 
 # External usage
 
-Two recent research papers [@pinder2021gaussian] and [@pinder2022street] use the graph kernel functionality provided in 'GPJax'.
+Two recent research papers [@pinder2021gaussian] and [@pinder2022street] use the graph kernel functionality provided in `GPJax`.
 
 # Funding Statement
 
