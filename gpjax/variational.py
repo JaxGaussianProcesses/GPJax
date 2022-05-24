@@ -74,7 +74,7 @@ class VariationalGaussian(VariationalFamily):
     @property
     def params(self) -> Dict:
         """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
-        return  concat_dictionaries(
+        return concat_dictionaries(
             self.prior.params, {
             "variational_family": {
                 "inducing_inputs": self.inducing_inputs,
