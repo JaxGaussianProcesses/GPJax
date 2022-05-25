@@ -1,4 +1,7 @@
 from setuptools import find_packages, setup
+import os
+import io
+import re
 
 
 def parse_requirements_file(filename):
@@ -23,11 +26,30 @@ EXTRAS = {
     ],
 }
 
+
+# Get version number (function from GPyTorch)
+def read(*names, **kwargs):
+    with io.open(
+        os.path.join(os.path.dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
+    ) as fp:
+        return fp.read()
+
+
+def find_version(*file_paths):
+    version_file = read(*file_paths)
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
+
+
+version = find_version("gpytorch", "__init__.py")
 readme = open("README.md").read()
+
 
 setup(
     name="GPJax",
-    version="0.4.5",
+    version=version,
     author="Thomas Pinder",
     author_email="t.pinder2@lancaster.ac.uk",
     packages=find_packages(".", exclude=["tests"]),
