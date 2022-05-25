@@ -23,6 +23,8 @@ EXTRAS = {
     ],
 }
 
+readme = open("README.md").read()
+
 setup(
     name="GPJax",
     version="0.4.5",
@@ -31,17 +33,12 @@ setup(
     packages=find_packages(".", exclude=["tests"]),
     license="LICENSE",
     description="Didactic Gaussian processes in Jax.",
-    long_description=(
-        "GPJax aims to provide a low-level interface to Gaussian process"
-        " models. Code is written entirely in Jax to enhance readability, and"
-        " structured so as to allow researchers to easily extend the code to"
-        " suit their own needs. When defining GP prior in GPJax, the user need"
-        " only specify a mean and kernel function. A GP posterior can then be"
-        " realised by computing the product of our prior with a likelihood"
-        " function. The idea behind this is that the code should be as close as"
-        " possible to the maths that we would write on paper when working with"
-        " GP models."
-    ),
+    long_description=readme,
+    long_description_content_type="text/markdown",
+    project_urls={
+        "Documentation": "https://gpjax.readthedocs.io/en/latest/",
+        "Source": "https://github.com/thomaspinder/GPJax",
+    },
     install_requires=parse_requirements_file("requirements.txt"),
     extras_require=EXTRAS,
     keywords=["gaussian-processes jax machine-learning bayesian"],
