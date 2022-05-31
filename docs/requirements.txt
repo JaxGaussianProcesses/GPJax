@@ -14,5 +14,6 @@ watermark
 sphinxext-opengraph
 blackjax
 dm-haiku
+ipywidgets
 # Install GPJax istself
 .

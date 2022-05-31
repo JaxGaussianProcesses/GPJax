@@ -44,7 +44,7 @@ y = 0.5 * jnp.sign(jnp.cos(3 * x + jr.normal(key, shape=x.shape) * 0.05)) + 0.5
 
 D = gpx.Dataset(X=x, y=y)
 
-xtest = jnp.linspace(-1., 1., 500).reshape(-1, 1)
+xtest = jnp.linspace(-1.0, 1.0, 500).reshape(-1, 1)
 plt.plot(x, y, "o", markersize=8)
 # %% [markdown]
 # ## MAP inference
@@ -60,7 +60,7 @@ likelihood = gpx.Bernoulli(num_datapoints=D.n)
 posterior = prior * likelihood
 print(type(posterior))
 # %% [markdown]
-# Whilst the latent function is Gaussian, the posterior distribution is non-Gaussian since our generative model first samples the latent GP and propagates these samples through the likelihood function's inverse link function. This step prevents us from being able to analytically integrate the latent function's values out of our posterior, and we must instead adopt alternative inference techniques. We begin with maximum a posteriori (MAP) estimation, a fast inference procedure to obtain point estimates for the latent function and the kernel's hyperparameters by maximising the marginal log-likelihood. 
+# Whilst the latent function is Gaussian, the posterior distribution is non-Gaussian since our generative model first samples the latent GP and propagates these samples through the likelihood function's inverse link function. This step prevents us from being able to analytically integrate the latent function's values out of our posterior, and we must instead adopt alternative inference techniques. We begin with maximum a posteriori (MAP) estimation, a fast inference procedure to obtain point estimates for the latent function and the kernel's hyperparameters by maximising the marginal log-likelihood.
 # %% [markdown]
 # To begin we obtain a set of initial parameter values through the `initialise` callable, and transform these to the unconstrained space via `transform` (see the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)). We also define the negative marginal log-likelihood, and JIT compile this to accelerate training.
 # %%
@@ -96,16 +96,15 @@ map_estimate = gpx.fit(
 # %%
 # Adapted from BlackJax's introduction notebook.
 num_adapt = 1000
-num_samples = 1000
+num_samples = 500
 
 mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=False))
 
-adapt = blackjax.window_adaptation(
-    blackjax.nuts, mll, num_adapt, target_acceptance_rate=0.65
-)
+adapt = blackjax.window_adaptation(blackjax.nuts, mll, num_adapt, target_acceptance_rate=0.65)
 
 # Initialise the chain
 last_state, kernel, _ = adapt.run(key, params)
+
 
 def inference_loop(rng_key, kernel, initial_state, num_samples):
     def one_step(state, rng_key):
@@ -133,9 +132,9 @@ print(f"Acceptance rate: {acceptance_rate:.2f}")
 # Our acceptance rate is slightly too large, prompting an examination of the chain's trace plots. A well-mixing chain will have very few (if any) flat spots in its trace plot whilst also not having too many steps in the same direction. In addition to the model's hyperparameters, there will be 500 samples for each of the 100 latent function values in the `states.position` dictionary. We depict the chains that correspond to the model hyperparameters and the first value of the latent function for brevity.
 # %%
 fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(15, 5), tight_layout=True)
-ax0.plot(states.position['kernel']['lengthscale'])
-ax1.plot(states.position['kernel']['variance'])
-ax2.plot(states.position['latent'][:, 0, :])
+ax0.plot(states.position["kernel"]["lengthscale"])
+ax1.plot(states.position["kernel"]["variance"])
+ax2.plot(states.position["latent"][:, 0, :])
 ax0.set_title("Kernel Lengthscale")
 ax1.set_title("Kernel Variance")
 ax2.set_title("Latent Function (index = 1)")
@@ -143,7 +142,7 @@ ax2.set_title("Latent Function (index = 1)")
 # %% [markdown]
 # ## Prediction
 #
-# Having obtained samples from the posterior, we draw ten instances from our model's predictive distribution per MCMC sample. Using these draws, we will be able to compute credible values and expected values under our posterior distribution. 
+# Having obtained samples from the posterior, we draw ten instances from our model's predictive distribution per MCMC sample. Using these draws, we will be able to compute credible values and expected values under our posterior distribution.
 #
 # An ideal Markov chain would have samples completely uncorrelated with their neighbours after a single lag. However, in practice, correlations often exist within our chain's sample set. A commonly used technique to try and reduce this correlation is _thinning_ whereby we select every $n$th sample where $n$ is the minimum lag length at which we believe the samples are uncorrelated. Although further analysis of the chain's autocorrelation is required to find appropriate thinning factors, we employ a thin factor of 10 for demonstration purposes.
 # %%
@@ -152,9 +151,9 @@ samples = []
 
 for i in range(0, num_samples, thin_factor):
     ps = gpx.parameters.copy_dict_structure(params)
-    ps['kernel']['lengthscale'] = states.position['kernel']['lengthscale'][i]
-    ps['kernel']['variance'] = states.position['kernel']['variance'][i]
-    ps['latent'] = states.position['latent'][i, :, :]
+    ps["kernel"]["lengthscale"] = states.position["kernel"]["lengthscale"][i]
+    ps["kernel"]["variance"] = states.position["kernel"]["variance"][i]
+    ps["latent"] = states.position["latent"][i, :, :]
     ps = gpx.transform(ps, constrainer)
 
     predictive_dist = likelihood(posterior(D, ps)(xtest), ps)
@@ -171,9 +170,16 @@ expected_val = jnp.mean(samples, axis=0)
 
 # %%
 fig, ax = plt.subplots(figsize=(16, 5), tight_layout=True)
-ax.plot(x, y, "o", markersize=5, color='tab:red', label='Observations', zorder=2, alpha=0.7)
-ax.plot(xtest, expected_val, linewidth=2, color='tab:blue', label='Predicted mean', zorder=1)
-ax.fill_between(xtest.flatten(), lower_ci.flatten(), upper_ci.flatten(), alpha=0.2, color='tab:blue', label='95% CI')
+ax.plot(x, y, "o", markersize=5, color="tab:red", label="Observations", zorder=2, alpha=0.7)
+ax.plot(xtest, expected_val, linewidth=2, color="tab:blue", label="Predicted mean", zorder=1)
+ax.fill_between(
+    xtest.flatten(),
+    lower_ci.flatten(),
+    upper_ci.flatten(),
+    alpha=0.2,
+    color="tab:blue",
+    label="95% CI",
+)
 
 # %% [markdown]
 # ## System configuration
