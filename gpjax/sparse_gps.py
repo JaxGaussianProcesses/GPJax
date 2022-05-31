@@ -95,7 +95,7 @@ class SVGP(VariationalPosterior):
         x, y = batch.X, batch.y
 
         # q(f(x))
-        predictive_dist = vmap(self.variational_family.predict(params))(x[None,:])
+        predictive_dist = vmap(self.variational_family.predict(params))(x[:, None])
         mean = predictive_dist.mean().val.reshape(-1,1)
         variance = predictive_dist.variance().val.reshape(-1,1)
 
