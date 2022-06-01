@@ -196,7 +196,7 @@ class ConjugatePosterior(AbstractPosterior):
             Kxx += I(n) * self.jitter
             Lx = jnp.linalg.cholesky(Kxx + I(n) * obs_noise)
 
-            random_variable = dx.MultivariateNormalTri(μx.squeeze(), Lx)
+            random_variable = dx.MultivariateNormalTri(jnp.atleast_1d(μx.squeeze()), Lx)
 
             log_prior_density = evaluate_priors(params, priors)
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)

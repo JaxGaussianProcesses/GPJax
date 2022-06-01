@@ -1,5 +1,4 @@
 import jax.numpy as jnp
-import jax.random as jr
 import pytest
 
 from gpjax.utils import (

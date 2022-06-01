@@ -3,9 +3,7 @@ import typing as tp
 import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
-import numpy as np
 import pytest
-import tensorflow_probability.substrates.jax.distributions as tfd
 
 from gpjax.likelihoods import AbstractLikelihood, Bernoulli, Gaussian, Conjugate, NonConjugate
 from gpjax.parameters import initialise

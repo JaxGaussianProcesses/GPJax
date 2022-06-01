@@ -102,8 +102,8 @@ class VariationalGaussian(AbstractVariationalFamily):
         Kzz += I(m) * self.jitter
         Lz = jnp.linalg.cholesky(Kzz)
 
-        qu = dx.MultivariateNormalTri(mu.squeeze(), sqrt)
-        pu = dx.MultivariateNormalTri(μz.squeeze(), Lz)
+        qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
+        pu = dx.MultivariateNormalTri(jnp.atleast_1d(μz.squeeze()), Lz)
 
         return qu.kl_divergence(pu)
 
@@ -163,7 +163,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         sqrt = params["variational_family"]["variational_root_covariance"]
         m = self.num_inducing
 
-        qu = dx.MultivariateNormalTri(mu.squeeze(), sqrt)
+        qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
         pu = dx.MultivariateNormalDiag(jnp.zeros(m))
 
         return qu.kl_divergence(pu)
