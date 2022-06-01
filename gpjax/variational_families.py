@@ -313,10 +313,13 @@ class NaturalVariationalGaussian(AbstractVariationalFamily):
         S_inv = -2 * natural_matrix
         S_inv += I(m) * self.jitter
         L_inv = jnp.linalg.cholesky(S_inv)
-        L = jsp.linalg.solve_triangular(L_inv, I(m), lower=True)
+        B = jsp.linalg.solve_triangular(L_inv, I(m), lower=True)
         
-        S = jnp.matmul(L, L.T)
+        S = jnp.matmul(B.T, B)
         mu = jnp.matmul(S, natural_vector)
+
+        S += I(m) * self.jitter
+        L = jnp.linalg.cholesky(S)
         
         μz = self.prior.mean_function(z, params["mean_function"])
         Kzz = gram(self.prior.kernel, z, params["kernel"])
@@ -345,11 +348,14 @@ class NaturalVariationalGaussian(AbstractVariationalFamily):
         S_inv = -2 * natural_matrix
         S_inv += I(m) * self.jitter
         L_inv = jnp.linalg.cholesky(S_inv)
-        L = jsp.linalg.solve_triangular(L_inv, I(m), lower=True)
+        B = jsp.linalg.solve_triangular(L_inv, I(m), lower=True)
         
-        S = jnp.matmul(L, L.T)
+        S = jnp.matmul(B.T, B)
         mu = jnp.matmul(S, natural_vector)
-        
+
+        S += I(m) * self.jitter
+        L = jnp.linalg.cholesky(S)
+
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(m) * self.jitter
         Lz = jnp.linalg.cholesky(Kzz)
