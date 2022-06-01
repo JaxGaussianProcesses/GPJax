@@ -143,7 +143,7 @@ def test_param_construction(num_datapoints, lik):
 @pytest.mark.parametrize("lik", [Bernoulli, Gaussian])
 def test_posterior_construct(lik):
     pr = Prior(kernel=RBF())
-    l = lik(num_datapoints=10)
-    p1 = pr * l
-    p2 = construct_posterior(prior=pr, likelihood=l)
+    likelihood = lik(num_datapoints=10)
+    p1 = pr * likelihood
+    p2 = construct_posterior(prior=pr, likelihood=likelihood)
     assert type(p1) == type(p2)
