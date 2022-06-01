@@ -14,7 +14,7 @@ import gpjax as gpx
 
 def test_abstract_variational_family():
     with pytest.raises(TypeError):
-        gpx.variational.VariationalFamily()
+        gpx.variational_families.AbstractVariationalFamily()
 
 
 @pytest.mark.parametrize("diag", [True, False])
@@ -22,7 +22,7 @@ def test_abstract_variational_family():
 def test_variational_gaussian_diag(diag, n_inducing):
     prior = gpx.Prior(kernel=gpx.RBF())
     inducing_points = jnp.linspace(-3.0, 3.0, n_inducing).reshape(-1, 1)
-    variational_family = gpx.variational.VariationalGaussian(
+    variational_family = gpx.variational_families.VariationalGaussian(
         prior=prior,
         inducing_inputs=inducing_points, 
         diag=diag
@@ -51,7 +51,7 @@ def test_variational_gaussian_diag(diag, n_inducing):
 def test_variational_gaussian_params(n_inducing):
     prior = gpx.Prior(kernel=gpx.RBF())
     inducing_points = jnp.linspace(-3.0, 3.0, n_inducing).reshape(-1, 1)
-    variational_family = gpx.variational.VariationalGaussian(
+    variational_family = gpx.variational_families.VariationalGaussian(
         prior=prior,
         inducing_inputs=inducing_points
     )
@@ -76,20 +76,3 @@ def test_variational_gaussian_params(n_inducing):
 
     assert (variational_family.variational_root_covariance == jnp.eye(n_inducing)).all()
     assert (variational_family.variational_mean == jnp.zeros((n_inducing, 1))).all()
-
-
-# @pytest.mark.parametrize("n, n_inducing", [(10, 2), (50, 10)])
-# def test_variational_posterior(n, n_inducing):
-#     x = jnp.linspace(-5., 5., n).reshape(-1, 1)
-#     y = jnp.sin(x)
-#     D = gpx.Dataset(X=x, y=y)
-#     inducing_points = jnp.linspace(-3.0, 3.0, n_inducing).reshape(-1, 1)
-#     prior = gpx.Prior(kernel = gpx.RBF())
-#     lik =gpx.likelihoods.Gaussian(num_datapoints = n)
-#     p = prior  * lik
-#     q = gpx.variational.VariationalGaussian(inducing_inputs = inducing_points)
-
-#     model = gpx.variational.VariationalPosterior(p, q)
-
-#     assert model.posterior.prior == prior
-#     assert model.posterior.likelihood == lik

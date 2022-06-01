@@ -23,7 +23,7 @@ FillTriangular = dx.Chain([tfb.FillTriangular()])
 
 
 @dataclass
-class VariationalFamily:
+class AbstractVariationalFamily:
     """Abstract base class used to represent families of distributions that can be used within variational inference."""
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
@@ -43,7 +43,7 @@ class VariationalFamily:
 
 
 @dataclass
-class VariationalGaussian(VariationalFamily):
+class VariationalGaussian(AbstractVariationalFamily):
     """The variational Gaussian family of probability distributions."""
     prior: Prior
     inducing_inputs: Array
@@ -203,4 +203,3 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             )
 
         return predict_fn
-    
