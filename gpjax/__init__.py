@@ -25,6 +25,8 @@ from .variational_families import (
     CollapsedVariationalGaussian,
     VariationalGaussian,
     WhitenedVariationalGaussian,
+    NaturalVariationalGaussian,
+    ExpectationVariationalGaussian,
 )
 from .variational_inference import CollapsedVI, StochasticVI
 

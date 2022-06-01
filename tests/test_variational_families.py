@@ -1,6 +1,7 @@
 import typing as tp
 
 import distrax as dx
+
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
@@ -163,3 +164,32 @@ def test_collapsed_variational_gaussian(n_test, n_inducing, n_datapoints, point_
     assert isinstance(sigma, jnp.ndarray)
     assert mu.shape == (n_test,)
     assert sigma.shape == (n_test, n_test)
+@pytest.mark.parametrize("n_inducing", [1, 10, 20])
+def test_natural_variational_gaussian_params(n_inducing):
+    prior = gpx.Prior(kernel=gpx.RBF())
+    inducing_points = jnp.linspace(-3.0, 3.0, n_inducing).reshape(-1, 1)
+    variational_family = gpx.variational_families.NaturalVariationalGaussian(
+        prior=prior,
+        inducing_inputs=inducing_points
+    )
+
+    params = variational_family.params
+    assert isinstance(params, dict)
+    assert "inducing_inputs" in params["variational_family"].keys()
+    assert "natural_vector" in params["variational_family"].keys()
+    assert "natural_matrix" in params["variational_family"].keys()
+
+    assert params["variational_family"]["inducing_inputs"].shape == (n_inducing, 1)
+    assert params["variational_family"]["natural_vector"].shape == (n_inducing, 1)
+    assert params["variational_family"]["natural_matrix"].shape == (n_inducing, n_inducing)
+
+    assert isinstance(params["variational_family"]["inducing_inputs"], jnp.DeviceArray)
+    assert isinstance(params["variational_family"]["natural_vector"], jnp.DeviceArray)
+    assert isinstance(params["variational_family"]["natural_matrix"], jnp.DeviceArray)
+   
+    params = gpx.config.get_defaults()
+    assert "natural_vector" in params["transformations"].keys()
+    assert "natural_matrix" in params["transformations"].keys()
+
+    assert (variational_family.natural_matrix == -.5 * jnp.eye(n_inducing)).all()
+    assert (variational_family.natural_vector == jnp.zeros((n_inducing, 1))).all()
