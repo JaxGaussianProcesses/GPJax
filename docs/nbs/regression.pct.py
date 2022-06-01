@@ -64,7 +64,7 @@ ax.legend(loc="best")
 # Our aim in this tutorial will be to reconstruct the latent function from our noisy observations $\mathcal{D}$ via Gaussian process regression. We begin by defining a Gaussian process prior in the next section.
 
 
- # %% [markdown]
+# %% [markdown]
 # ## Defining the prior
 #
 # A zero-mean Gaussian process (GP) places a prior distribution over real-valued functions $f(\cdot)$ where $f(\boldsymbol{x}) \sim \mathcal{N}(0, \mathbf{K}_{\boldsymbol{x}\boldsymbol{x}})$ for any finite collection of inputs $\boldsymbol{x}$. 
@@ -107,7 +107,7 @@ likelihood = gpx.Gaussian(num_datapoints=D.n)
 # The posterior is proportional to the prior multiplied by the likelihood, written as
 #
 #   $$ p(f(\cdot) | \mathcal{D}) \propto p(f(\cdot)) * p(\mathcal{D} | f(\cdot)). $$
-# 
+#
 # Mimicking this construct, the posterior is established in GPJax through the `*` operator.
 
 # %%
