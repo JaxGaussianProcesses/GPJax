@@ -313,9 +313,9 @@ class NaturalVariationalGaussian(AbstractVariationalFamily):
         S_inv = -2 * natural_matrix
         S_inv += I(m) * self.jitter
         L_inv = jnp.linalg.cholesky(S_inv)
-        B = jsp.linalg.solve_triangular(L_inv, I(m), lower=True)
+        C = jsp.linalg.solve_triangular(L_inv, I(m), lower=True)
         
-        S = jnp.matmul(B.T, B)
+        S = jnp.matmul(C.T, C)
         mu = jnp.matmul(S, natural_vector)
 
         S += I(m) * self.jitter
