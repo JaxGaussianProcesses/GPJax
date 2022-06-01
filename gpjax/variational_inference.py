@@ -10,7 +10,7 @@ from .parameters import transform
 from .quadrature import gauss_hermite_quadrature
 from .types import Array, Dataset
 from .utils import concat_dictionaries
-from .variational import VariationalFamily
+from .variational_families import AbstractVariationalFamily
 
 
 @dataclass
@@ -18,7 +18,7 @@ class AbstractVariationalInference:
     """A base class for inference and training of variational families against an extact posterior"""
 
     posterior: AbstractPosterior
-    variational_family: VariationalFamily
+    variational_family: AbstractVariationalFamily
 
     def __post_init__(self):
         self.prior = self.posterior.prior

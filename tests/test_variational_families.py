@@ -1,33 +1,37 @@
-from statistics import mode
+import typing as tp
 
-import jax
+import distrax as dx
 import jax.numpy as jnp
-import jax.random as jr
-import numpy as np
-import py
-import pyexpat
 import pytest
-from chex import assert_max_traces
 
 import gpjax as gpx
 
 
 def test_abstract_variational_family():
     with pytest.raises(TypeError):
-        gpx.variational.VariationalFamily()
+        gpx.variational_families.AbstractVariationalFamily()
 
 
 @pytest.mark.parametrize("diag", [True, False])
+@pytest.mark.parametrize("n_test", [1, 10])
+@pytest.mark.parametrize("whiten", [True, False])
 @pytest.mark.parametrize("n_inducing", [1, 10, 20])
-def test_variational_gaussian_diag(diag, n_inducing):
+def test_variational_gaussian(diag, n_inducing, n_test, whiten):
     prior = gpx.Prior(kernel=gpx.RBF())
-    inducing_points = jnp.linspace(-3.0, 3.0, n_inducing).reshape(-1, 1)
-    variational_family = gpx.variational.VariationalGaussian(
-        prior=prior,
-        inducing_inputs=inducing_points, 
-        diag=diag
-    )
 
+    inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
+    test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
+
+    if whiten is True:
+        variational_family = gpx.WhitenedVariationalGaussian(prior = prior,
+        inducing_inputs=inducing_inputs, diag=diag
+        )
+    else:
+        variational_family = gpx.VariationalGaussian(prior = prior,
+        inducing_inputs=inducing_inputs, diag=diag
+        )
+
+    # Test init
     assert variational_family.num_inducing == n_inducing
 
     assert jnp.sum(variational_family.variational_mean) == 0.0
@@ -46,16 +50,7 @@ def test_variational_gaussian_diag(diag, n_inducing):
     assert (variational_family.variational_root_covariance == jnp.eye(n_inducing)).all()
     assert (variational_family.variational_mean == jnp.zeros((n_inducing, 1))).all()
 
-
-@pytest.mark.parametrize("n_inducing", [1, 10, 20])
-def test_variational_gaussian_params(n_inducing):
-    prior = gpx.Prior(kernel=gpx.RBF())
-    inducing_points = jnp.linspace(-3.0, 3.0, n_inducing).reshape(-1, 1)
-    variational_family = gpx.variational.VariationalGaussian(
-        prior=prior,
-        inducing_inputs=inducing_points
-    )
-
+    #Test params
     params = variational_family.params
     assert isinstance(params, dict)
     assert "inducing_inputs" in params["variational_family"].keys()
@@ -76,20 +71,23 @@ def test_variational_gaussian_params(n_inducing):
 
     assert (variational_family.variational_root_covariance == jnp.eye(n_inducing)).all()
     assert (variational_family.variational_mean == jnp.zeros((n_inducing, 1))).all()
+    
+    #Test KL
+    params = variational_family.params
+    kl = variational_family.prior_kl(params)
+    assert isinstance(kl, jnp.ndarray)
 
+    # Test predictions
+    predictive_dist_fn = variational_family(params)
+    assert isinstance(predictive_dist_fn, tp.Callable)
 
-# @pytest.mark.parametrize("n, n_inducing", [(10, 2), (50, 10)])
-# def test_variational_posterior(n, n_inducing):
-#     x = jnp.linspace(-5., 5., n).reshape(-1, 1)
-#     y = jnp.sin(x)
-#     D = gpx.Dataset(X=x, y=y)
-#     inducing_points = jnp.linspace(-3.0, 3.0, n_inducing).reshape(-1, 1)
-#     prior = gpx.Prior(kernel = gpx.RBF())
-#     lik =gpx.likelihoods.Gaussian(num_datapoints = n)
-#     p = prior  * lik
-#     q = gpx.variational.VariationalGaussian(inducing_inputs = inducing_points)
+    predictive_dist = predictive_dist_fn(test_inputs)
+    assert isinstance(predictive_dist, dx.Distribution)
 
-#     model = gpx.variational.VariationalPosterior(p, q)
+    mu = predictive_dist.mean()
+    sigma = predictive_dist.covariance()
 
-#     assert model.posterior.prior == prior
-#     assert model.posterior.likelihood == lik
+    assert isinstance(mu, jnp.ndarray)
+    assert isinstance(sigma, jnp.ndarray)
+    assert mu.shape == (n_test,)
+    assert sigma.shape == (n_test, n_test)

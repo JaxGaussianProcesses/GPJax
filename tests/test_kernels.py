@@ -5,10 +5,7 @@ import jax.random as jr
 import networkx as nx
 import numpy as np
 import pytest
-from chex import assert_equal
-from numpy import isin, sort
 
-from gpjax import kernels
 from gpjax.kernels import (
     RBF,
     CombinationKernel,

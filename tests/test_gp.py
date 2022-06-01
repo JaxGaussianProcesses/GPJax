@@ -4,7 +4,6 @@ import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
-import tensorflow_probability.substrates.jax as tfp
 
 from gpjax import Dataset, initialise, likelihoods, transform
 from gpjax.gps import (
@@ -144,7 +143,7 @@ def test_param_construction(num_datapoints, lik):
 @pytest.mark.parametrize("lik", [Bernoulli, Gaussian])
 def test_posterior_construct(lik):
     pr = Prior(kernel=RBF())
-    l = lik(num_datapoints=10)
-    p1 = pr * l
-    p2 = construct_posterior(prior=pr, likelihood=l)
+    likelihood = lik(num_datapoints=10)
+    p1 = pr * likelihood
+    p2 = construct_posterior(prior=pr, likelihood=likelihood)
     assert type(p1) == type(p2)

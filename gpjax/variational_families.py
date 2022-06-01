@@ -23,7 +23,7 @@ FillTriangular = dx.Chain([tfb.FillTriangular()])
 
 
 @dataclass
-class VariationalFamily:
+class AbstractVariationalFamily:
     """Abstract base class used to represent families of distributions that can be used within variational inference."""
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
@@ -43,7 +43,7 @@ class VariationalFamily:
 
 
 @dataclass
-class VariationalGaussian(VariationalFamily):
+class VariationalGaussian(AbstractVariationalFamily):
     """The variational Gaussian family of probability distributions."""
     prior: Prior
     inducing_inputs: Array
@@ -102,8 +102,8 @@ class VariationalGaussian(VariationalFamily):
         Kzz += I(m) * self.jitter
         Lz = jnp.linalg.cholesky(Kzz)
 
-        qu = dx.MultivariateNormalTri(mu.squeeze(), sqrt)
-        pu = dx.MultivariateNormalTri(μz.squeeze(), Lz)
+        qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
+        pu = dx.MultivariateNormalTri(jnp.atleast_1d(μz.squeeze()), Lz)
 
         return qu.kl_divergence(pu)
 
@@ -163,7 +163,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         sqrt = params["variational_family"]["variational_root_covariance"]
         m = self.num_inducing
 
-        qu = dx.MultivariateNormalTri(mu.squeeze(), sqrt)
+        qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
         pu = dx.MultivariateNormalDiag(jnp.zeros(m))
 
         return qu.kl_divergence(pu)
@@ -203,4 +203,3 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             )
 
         return predict_fn
-    

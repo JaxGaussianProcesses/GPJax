@@ -1,14 +1,10 @@
 import typing as tp
-from argparse import _AppendConstAction
-from copy import deepcopy
 
 import distrax as dx
 import jax.numpy as jnp
 import pytest
-from numpy.testing import assert_array_equal
 from tensorflow_probability.substrates.jax import distributions as tfd
 
-from gpjax.config import get_defaults
 from gpjax.gps import Prior
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian

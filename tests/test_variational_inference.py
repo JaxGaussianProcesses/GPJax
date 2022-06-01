@@ -1,12 +1,14 @@
 import typing as tp
-
-import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
 
 import gpjax as gpx
+
+def test_abstract_variational_inference():
+    with pytest.raises(TypeError):
+        gpx.variational_inference.AbstractVariationalInference()
 
 
 def get_data_and_gp(n_datapoints):
@@ -25,10 +27,9 @@ def get_data_and_gp(n_datapoints):
 @pytest.mark.parametrize("whiten", [True, False])
 @pytest.mark.parametrize("diag", [True, False])
 @pytest.mark.parametrize("jit_fns", [False, True])
-def test_svgp(n_datapoints, n_inducing_points, n_test, whiten, diag, jit_fns):
+def test_stochastic_vi(n_datapoints, n_inducing_points, n_test, whiten, diag, jit_fns):
     D, post, prior = get_data_and_gp(n_datapoints)
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing_points).reshape(-1, 1)
-    test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
 
     if whiten is True:
         q = gpx.WhitenedVariationalGaussian(prior = prior,
@@ -40,7 +41,6 @@ def test_svgp(n_datapoints, n_inducing_points, n_test, whiten, diag, jit_fns):
         )
 
     svgp = gpx.StochasticVI(posterior=post, variational_family=q)
-
     assert svgp.posterior.prior == post.prior
     assert svgp.posterior.likelihood == post.likelihood
 
@@ -63,22 +63,3 @@ def test_svgp(n_datapoints, n_inducing_points, n_test, whiten, diag, jit_fns):
     grads = jax.grad(elbo_fn, argnums=0)(params, D)
     assert isinstance(grads, tp.Dict)
     assert len(grads) == len(params)
-
-    constrained_params = gpx.transform(params, constrainer)
-    kl_q_p = q.prior_kl(constrained_params)
-    assert isinstance(kl_q_p, jnp.ndarray)
-
-    # Test predictions
-    predictive_dist_fn = q(constrained_params)
-    assert isinstance(predictive_dist_fn, tp.Callable)
-
-    predictive_dist = predictive_dist_fn(test_inputs)
-    assert isinstance(predictive_dist, dx.Distribution)
-
-    mu = predictive_dist.mean()
-    sigma = predictive_dist.covariance()
-
-    assert isinstance(mu, jnp.ndarray)
-    assert isinstance(sigma, jnp.ndarray)
-    assert mu.shape == (n_test,)
-    assert sigma.shape == (n_test, n_test)
