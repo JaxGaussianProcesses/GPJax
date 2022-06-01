@@ -240,11 +240,12 @@ class NonConjugatePosterior(AbstractPosterior):
 
         def predict_fn(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
+            nt = t.shape[0]
             Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
-            Ktt = gram(self.prior.kernel, t, params["kernel"])
+            Ktt = gram(self.prior.kernel, t, params["kernel"]) + I(nt) * self.jitter
             μt = self.prior.mean_function(t, params["mean_function"])
             A = solve_triangular(Lx, Ktx.T, lower=True)
-            latent_var = Ktt - jnp.sum(jnp.square(A), -2)
+            latent_var = jnp.diag(jnp.diag(Ktt - jnp.sum(jnp.square(A), -2)))
             latent_mean = μt + jnp.matmul(A.T, params["latent"])
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(latent_mean.squeeze()), latent_var
