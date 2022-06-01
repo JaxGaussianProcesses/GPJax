@@ -306,11 +306,11 @@ class NaturalVariationalGaussian(AbstractVariationalFamily):
             Array: The KL-divergence between our variational approximation and the GP prior.
         """
         natural_vector = params["variational_family"]["natural_vector"]
-        natural_covariance = params["variational_family"]["natural_covariance"]
+        natural_matrix = params["variational_family"]["natural_matrix"]
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
         
-        S_inv = -2 * natural_covariance
+        S_inv = -2 * natural_matrix
         S_inv += I(m) * self.jitter
         L_inv = jnp.linalg.cholesky(S_inv)
         L = jsp.linalg.solve_triangular(L_inv, I(m), lower=True)
@@ -323,8 +323,8 @@ class NaturalVariationalGaussian(AbstractVariationalFamily):
         Kzz += I(m) * self.jitter
         Lz = jnp.linalg.cholesky(Kzz)
 
-        qu = dx.MultivariateNormalTri(mu.squeeze(), L)
-        pu = dx.MultivariateNormalTri(μz.squeeze(), Lz)
+        qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), L)
+        pu = dx.MultivariateNormalTri(jnp.atleast_1d(μz.squeeze()), Lz)
 
         return qu.kl_divergence(pu)
 
@@ -338,11 +338,11 @@ class NaturalVariationalGaussian(AbstractVariationalFamily):
             Callable[[Array], dx.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """        
         natural_vector = params["variational_family"]["natural_vector"]
-        natural_covariance = params["variational_family"]["natural_covariance"]
+        natural_matrix = params["variational_family"]["natural_matrix"]
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
         
-        S_inv = -2 * natural_covariance
+        S_inv = -2 * natural_matrix
         S_inv += I(m) * self.jitter
         L_inv = jnp.linalg.cholesky(S_inv)
         L = jsp.linalg.solve_triangular(L_inv, I(m), lower=True)
