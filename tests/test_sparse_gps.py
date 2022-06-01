@@ -39,7 +39,7 @@ def test_svgp(n_datapoints, n_inducing_points, n_test, whiten, diag, jit_fns):
         inducing_inputs=inducing_inputs, diag=diag
         )
 
-    svgp = gpx.SVGP(posterior=post, variational_family=q)
+    svgp = gpx.StochasticVI(posterior=post, variational_family=q)
 
     assert svgp.posterior.prior == post.prior
     assert svgp.posterior.likelihood == post.likelihood

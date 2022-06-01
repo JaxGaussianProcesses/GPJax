@@ -124,10 +124,10 @@ q = gpx.VariationalGaussian(prior=prior, inducing_inputs=z)
 # Here, the variational process $q(\cdot)$ depends on the prior through $p(f(\cdot)|f(\boldsymbol{z}))$ in $(\times)$.
 # %% [markdown]
 # 
-# We combine our true and approximate posterior Gaussian processes into an `SVGP` object to define the variational strategy that we will adopt in the forthcoming inference.
+# We combine our true and approximate posterior Gaussian processes into an `StochasticVI` object to define the variational strategy that we will adopt in the forthcoming inference.
 
 # %%
-svgp = gpx.SVGP(posterior=p, variational_family=q)
+svgp = gpx.StochasticVI(posterior=p, variational_family=q)
 
 # %% [markdown]
 # ## Inference

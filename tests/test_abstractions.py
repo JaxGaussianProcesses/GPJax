@@ -51,7 +51,7 @@ def test_batch_fitting(nb, ndata):
 
     q = gpx.VariationalGaussian(prior=prior, inducing_inputs=z)
 
-    svgp = gpx.SVGP(posterior=p, variational_family=q)
+    svgp = gpx.StochasticVI(posterior=p, variational_family=q)
     params, trainable_status, constrainer, unconstrainer = initialise(svgp)
     params = gpx.transform(params, unconstrainer)
     objective = svgp.elbo(D, constrainer)

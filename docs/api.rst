@@ -163,14 +163,14 @@ Sparse Frameworks
 Abstract Sparse Objects
 *********************************
 
-.. autoclass:: VariationalPosterior
+.. autoclass:: AbstractVariationalInference
    :members:
 
 
 Sparse Methods
 *********************************
 
-.. autoclass:: SVGP
+.. autoclass:: StochasticVI
    :members:
 
 

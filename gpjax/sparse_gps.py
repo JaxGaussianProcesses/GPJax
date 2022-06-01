@@ -14,8 +14,8 @@ from .variational import VariationalFamily
 
 
 @dataclass
-class VariationalPosterior:
-    """A variational posterior object. With reference to some true posterior distribution :math:`p`, this can be used to minimise the KL-divergence between :math:`p` and a variational posterior :math:`q`."""
+class AbstractVariationalInference:
+    """A base class for inference and training of variational families against an extact posterior"""
 
     posterior: AbstractPosterior
     variational_family: VariationalFamily
@@ -50,8 +50,8 @@ class VariationalPosterior:
 
 
 @dataclass
-class SVGP(VariationalPosterior):
-    """Sparse Variational Gaussian Process (SVGP) training module. The key reference is Hensman et. al., (2013) - Gaussian processes for big data."""
+class StochasticVI(AbstractVariationalInference):
+    """Stochastic Variational inference training module. The key reference is Hensman et. al., (2013) - Gaussian processes for big data."""
 
     def __post_init__(self):
         self.prior = self.posterior.prior
