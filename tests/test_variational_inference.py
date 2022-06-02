@@ -7,8 +7,15 @@ import pytest
 import gpjax as gpx
 
 def test_abstract_variational_inference():
+    prior = gpx.Prior(kernel=gpx.RBF())
+    lik = gpx.Gaussian(num_datapoints=20)
+    post = prior * lik
+    n_inducing_points = 10
+    inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing_points).reshape(-1, 1)
+    vartiational_family = gpx.VariationalGaussian(prior=prior, inducing_inputs=inducing_inputs)
+
     with pytest.raises(TypeError):
-        gpx.variational_inference.AbstractVariationalInference()
+        gpx.variational_inference.AbstractVariationalInference(posterior=post, vartiational_family=vartiational_family)
 
 
 def get_data_and_gp(n_datapoints):
