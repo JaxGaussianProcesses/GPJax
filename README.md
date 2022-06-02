@@ -42,7 +42,7 @@ import gpjax as gpx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-from jax.experimental import optimizers
+from jax.example_libraries import optimizers
 from jax import jit
 
 key = jr.PRNGKey(123)
