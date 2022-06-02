@@ -13,7 +13,6 @@ true_initialisation = {
     "Bernoulli": [],
 }
 
-
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 @pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
 def test_initialisers(num_datapoints, lik):
@@ -52,7 +51,7 @@ def test_link_fns(lik: AbstractLikelihood, n: int):
 
 
 @pytest.mark.parametrize("noise", [0.1, 0.5, 1.0])
-def test_call(noise):
+def test_call_gaussian(noise):
     n = 10
     lhood = Gaussian(num_datapoints=n)
     dist = dx.MultivariateNormalFullCovariance(jnp.zeros(n), jnp.eye(n))
@@ -67,6 +66,21 @@ def test_call(noise):
     assert (l_dist.mean() == jnp.zeros(n)).all()
     noise_mat = jnp.diag(jnp.repeat(noise, n))
     assert (l_dist.covariance() == jnp.eye(n) + noise_mat).all()
+
+
+def test_call_bernoulli():
+    n = 10
+    lhood = Bernoulli(num_datapoints=n)
+    dist = dx.MultivariateNormalFullCovariance(jnp.zeros(n), jnp.eye(n))
+    params = {"likelihood": {}}
+
+    l_dist = lhood(dist, params)
+    assert (l_dist.mean() == .5 * jnp.ones(n)).all()
+    assert (l_dist.variance() == .25 * jnp.ones(n)).all()
+
+    l_dist = lhood.predict(dist, params)
+    assert (l_dist.mean() == .5 * jnp.ones(n)).all()
+    assert (l_dist.variance() == .25 * jnp.ones(n)).all()
 
 
 @pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
