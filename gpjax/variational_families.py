@@ -117,9 +117,9 @@ class VariationalGaussian(AbstractVariationalFamily):
     def predict(self, params: dict) -> Callable[[Array], dx.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs t.
 
-        This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
-          
-            N[f(.); μt + Ktz Kzz^{-1} (μ - μz),  Ktt - Ktz Kzz^{-1} Kzt + Ktz Kzz^{-1} S Kzz^{-1} Kzt ].
+        This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as:
+
+            N[f(t); μt + Ktz Kzz^{-1} (μ - μz),  Ktt - Ktz Kzz^{-1} Kzt + Ktz Kzz^{-1} S Kzz^{-1} Kzt ].
 
         Args:
             params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
