@@ -399,7 +399,7 @@ class ExpectationVariationalGaussian(AbstractVariationalFamily):
     """The variational Gaussian family of probability distributions."""
     prior: Prior
     inducing_inputs: Array
-    name: str = "Natural Gaussian"
+    name: str = "Expectation Gaussian"
     expectation_vector: Optional[Array] = None
     expectation_matrix: Optional[Array] = None
     jitter: Optional[float] = DEFAULT_JITTER
@@ -413,21 +413,21 @@ class ExpectationVariationalGaussian(AbstractVariationalFamily):
 
         if self.expectation_vector is None:
             self.expectation_vector = jnp.zeros((m, 1))
-            add_parameter("natural_vector", Identity)
+            add_parameter("expectation_vector", Identity)
 
         if self.expectation_matrix is None:
             self.expectation_matrix = I(m)
-            add_parameter("natural_matrix", Identity)
+            add_parameter("expectation_matrix", Identity)
 
     @property
     def params(self) -> Dict:
-        """Return the natural vector and matrix, inducing inputs, and hyperparameters that parameterise the natural Gaussian distribution."""
+        """Return the expectation vector and matrix, inducing inputs, and hyperparameters that parameterise the expectation Gaussian distribution."""
         return concat_dictionaries(
             self.prior.params, {
             "variational_family": {
                 "inducing_inputs": self.inducing_inputs,
-                "natural_vector": self.natural_vector,
-                "natural_matrix": self.natural_matrix}
+                "expectation_vector": self.expectation_vector,
+                "expectation_matrix": self.expectation_matrix}
                 }
         )
 
@@ -440,13 +440,13 @@ class ExpectationVariationalGaussian(AbstractVariationalFamily):
         Returns:
             Array: The KL-divergence between our variational approximation and the GP prior.
         """
-        natural_vector = params["variational_family"]["natural_vector"]
-        natural_matrix = params["variational_family"]["natural_matrix"]
+        expectation_vector = params["variational_family"]["expectation_vector"]
+        expectation_matrix = params["variational_family"]["expectation_matrix"]
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
         
-        mu = natural_vector
-        S = natural_matrix - jnp.matmul(mu, mu.T)
+        mu = expectation_vector
+        S = expectation_matrix - jnp.matmul(mu, mu.T)
         S += I(m) * self.jitter
         sqrt = jnp.linalg.cholesky(S)
         
@@ -469,16 +469,16 @@ class ExpectationVariationalGaussian(AbstractVariationalFamily):
         Returns:
             Callable[[Array], dx.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """        
-        natural_vector = params["variational_family"]["natural_vector"]
-        natural_matrix = params["variational_family"]["natural_matrix"]
+        expectation_vector = params["variational_family"]["expectation_vector"]
+        expectation_matrix = params["variational_family"]["expectation_matrix"]
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
         
         # μ = η₁
-        mu = natural_vector
+        mu = expectation_vector
 
         # S = η₂ - η₁ η₁ᵀ
-        S = natural_matrix - jnp.matmul(mu, mu.T)
+        S = expectation_matrix - jnp.matmul(mu, mu.T)
         S += I(m) * self.jitter
 
         # S = sqrt sqrtᵀ
@@ -515,9 +515,6 @@ class ExpectationVariationalGaussian(AbstractVariationalFamily):
             )
 
         return predict_fn
-
-
-
 
 
 @dataclass
