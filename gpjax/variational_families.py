@@ -46,8 +46,8 @@ class AbstractVariationalFamily:
 class VariationalGaussian(AbstractVariationalFamily):
     """The variational Gaussian family of probability distributions.
     
-    The variational family is q(f(.)) = ∫ p(f(.)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
-    and the distribution over the inducing inputs is q(u) = N(μ, S). We parameterise this over μ and sqrt with S = sqrt sqrt^T.
+    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
+    and the distribution over the inducing inputs is q(u) = N(μ, S). We parameterise this over μ and sqrt with S = sqrt sqrtᵀ.
 
     """
     prior: Prior
@@ -91,7 +91,7 @@ class VariationalGaussian(AbstractVariationalFamily):
     def prior_kl(self, params: Dict) -> Array:
         """Compute the KL-divergence between our variational approximation and the Gaussian process prior.
 
-        For this variational family, we have KL[q(f(.))||p(.)] = KL[q(u)||p(u)] = KL[ N(μ, S) || N(μz, Kzz) ],
+        For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[ N(μ, S) || N(μz, Kzz) ],
         where u = f(z) and z are the inducing inputs. 
 
         Args:
@@ -119,7 +119,7 @@ class VariationalGaussian(AbstractVariationalFamily):
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as:
 
-            N[f(t); μt + Ktz Kzz^{-1} (μ - μz),  Ktt - Ktz Kzz^{-1} Kzt + Ktz Kzz^{-1} S Kzz^{-1} Kzt ].
+            N[f(t); μt + Ktz Kzz⁻¹ (μ - μz),  Ktt - Ktz Kzz⁻¹ Kzt + Ktz Kzz⁻¹ S Kzz⁻¹ Kzt ].
 
         Args:
             params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
@@ -143,19 +143,19 @@ class VariationalGaussian(AbstractVariationalFamily):
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
             μt = self.prior.mean_function(t, params["mean_function"])
 
-            # Lz^{-1} Kzt
+            # Lz⁻¹ Kzt
             Lz_inv_Kzt = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
 
-            # Kzz^{-1} Kzt
+            # Kzz⁻¹ Kzt
             Kzz_inv_Kzt = jsp.linalg.solve_triangular(Lz.T, Lz_inv_Kzt, lower=False)
 
-            # Ktz Kzz^{-1} sqrt
+            # Ktz Kzz⁻¹ sqrt
             Ktz_Kzz_inv_sqrt = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
             
-            # μt + Ktz Kzz^{-1} (μ - μz)
+            # μt + Ktz Kzz⁻¹ (μ - μz)
             mean = μt + jnp.matmul(Kzz_inv_Kzt.T, mu - μz)
 
-            # Ktt - Ktz Kzz^{-1} Kzt + Ktz Kzz^{-1} S Kzz^{-1} Kzt  [recall S = sqrt sqrt^T]
+            # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
             covariance = Ktt - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt) + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
 
             return dx.MultivariateNormalFullCovariance(
@@ -169,15 +169,15 @@ class VariationalGaussian(AbstractVariationalFamily):
 class WhitenedVariationalGaussian(VariationalGaussian):
     """The whitened variational Gaussian family of probability distributions.
 
-    The variational family is q(f(.)) = ∫ p(f(.)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
-    and the distribution over the inducing inputs is q(u) = N(Lzμ + mz, Lz S). We parameterise this over μ and sqrt with S = sqrt sqrt^{T}.
+    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
+    and the distribution over the inducing inputs is q(u) = N(Lz μ + mz, Lz S). We parameterise this over μ and sqrt with S = sqrt sqrtᵀ.
     
     """
 
     def prior_kl(self, params: Dict) -> Array:
         """Compute the KL-divergence between our variational approximation and the Gaussian process prior.
 
-        For this variational family, we have KL[q(f(.))||p(.)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(0, I)].
+        For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(0, I)].
 
         Args:
             params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
@@ -199,7 +199,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
           
-            N[f(t); μt + Ktz Lz^{-T} μ,  Ktt - Ktz Kzz^{-1} Kzt + Ktz Lz^{-T} S Lz^{-T} Kzt ].
+            N[f(t); μt  +  Ktz Lz⁻ᵀ μ,  Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻ᵀ S Lz⁻¹ Kzt].
 
         Args:
             params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
@@ -222,16 +222,16 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
             μt = self.prior.mean_function(t, params["mean_function"])
 
-            # Lz^{-1} Kzt
+            # Lz⁻¹ Kzt
             Lz_inv_Kzt = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
 
-            # Ktz Lz^{-T} sqrt
+            # Ktz Lz⁻ᵀ sqrt
             Ktz_Lz_invT_sqrt = jnp.matmul(Lz_inv_Kzt.T, sqrt)
             
-            # μt + Ktz Lz^{-T} μ
+            # μt  +  Ktz Lz⁻ᵀ μ
             mean = μt + jnp.matmul(Lz_inv_Kzt.T, mu)
 
-            # Ktt - Ktz Kzz^{-1} Kzt + Ktz Lz^{-T} S Lz^{-T} Kzt  [recall S = sqrt sqrt^T]
+           # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻ᵀ S Lz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
             covariance = Ktt - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt) + jnp.matmul(Ktz_Lz_invT_sqrt, Ktz_Lz_invT_sqrt.T)
 
             return dx.MultivariateNormalFullCovariance(

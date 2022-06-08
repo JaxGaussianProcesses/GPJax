@@ -4,7 +4,7 @@ from abc import abstractmethod, abstractproperty
 import distrax as dx
 import jax.numpy as jnp
 from chex import dataclass
-from jax.scipy.linalg import cho_factor, cho_solve, solve_triangular
+import jax.scipy as jsp
 
 from .config import get_defaults
 from .kernels import Kernel, cross_covariance, gram
@@ -137,29 +137,35 @@ class ConjugatePosterior(AbstractPosterior):
         """
         x, y, n = train_data.X, train_data.y, train_data.n
 
+        # Observation noise σ²
         obs_noise = params["likelihood"]["obs_noise"]
         μx = self.prior.mean_function(x, params["mean_function"])
 
         # Precompute covariance matrices
         Kxx = gram(self.prior.kernel, x, params["kernel"])
         Kxx += I(n) * self.jitter
-        Lx = cho_factor(Kxx + I(n) * obs_noise, lower=True)
 
-        weights = cho_solve(Lx, y - μx)
+        # Σ = (Kxx + Iσ²) = LLᵀ
+        Sigma = Kxx + I(n) * obs_noise
+        L = jnp.linalg.cholesky(Sigma)
 
         def predict(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
-
-            # Compute the mean
             μt = self.prior.mean_function(t, params["mean_function"])
-            Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
-            mean = μt + jnp.dot(Ktx, weights)
-
-            # Compute the covariance
             Ktt = gram(self.prior.kernel, t, params["kernel"])
-            latent_values = cho_solve(Lx, Ktx.T)
-            covariance = Ktt - jnp.dot(Ktx, latent_values)
-            covariance += I(t.shape[0]) * self.jitter
+            Kxt = cross_covariance(self.prior.kernel, x, t, params["kernel"])
+
+            # L⁻¹ Kxt
+            L_inv_Kxt = jsp.linalg.solve_triangular(L, Kxt, lower=True)
+
+            # Σ⁻¹ Kxt
+            Sigma_inv_Kxt = jsp.linalg.solve_triangular(L.T, L_inv_Kxt, lower=False)
+
+            # μt  +  Ktx (Kzz + Iσ²)⁻¹ (y  -  μx)
+            mean = μt + jnp.matmul(Sigma_inv_Kxt.T, y - μx)
+
+            # Ktt  -  Ktz (Kzz + Iσ²)⁻¹ Kxt  [recall (Kzz + Iσ²)⁻¹ = (LLᵀ)⁻¹ =  L⁻ᵀL⁻¹]
+            covariance = Ktt - jnp.matmul(L_inv_Kxt.T, L_inv_Kxt)
 
             return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
 
@@ -190,17 +196,24 @@ class ConjugatePosterior(AbstractPosterior):
         ):
             params = transform(params=params, transform_map=transformations)
 
+            # Observation noise σ²
             obs_noise = params["likelihood"]["obs_noise"]
             μx = self.prior.mean_function(x, params["mean_function"])
             Kxx = gram(self.prior.kernel, x, params["kernel"])
             Kxx += I(n) * self.jitter
-            Lx = jnp.linalg.cholesky(Kxx + I(n) * obs_noise)
 
-            random_variable = dx.MultivariateNormalTri(jnp.atleast_1d(μx.squeeze()), Lx)
+            # Σ = (Kxx + Iσ²) = LLᵀ
+            Sigma = Kxx + I(n) * obs_noise
+            L = jnp.linalg.cholesky(Sigma)
 
+            # p(y | x, θ), where θ are the model hyperparameters:
+            marginal_likelihood = dx.MultivariateNormalTri(jnp.atleast_1d(μx.squeeze()), L)
+
+            # log p(θ)
             log_prior_density = evaluate_priors(params, priors)
+
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-            return constant * (random_variable.log_prob(y.squeeze()).mean() + log_prior_density)
+            return constant * (marginal_likelihood.log_prob(y.squeeze()).squeeze() + log_prior_density)
 
         return mll
 
@@ -244,12 +257,18 @@ class NonConjugatePosterior(AbstractPosterior):
             Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
             Ktt = gram(self.prior.kernel, t, params["kernel"]) + I(nt) * self.jitter
             μt = self.prior.mean_function(t, params["mean_function"])
-            Lx_inv_Kxt = solve_triangular(Lx, Ktx.T, lower=True)
-            latent_var = jnp.diag(Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt))
-            latent_mean = μt + jnp.matmul(Lx_inv_Kxt.T, params["latent"])
 
+            # Lx⁻¹ Kxt
+            Lx_inv_Kxt = jsp.linalg.solve_triangular(Lx, Ktx.T, lower=True)
+
+            # μt + Ktx Lx⁻¹ latent
+            mean = μt + jnp.matmul(Lx_inv_Kxt.T, params["latent"])
+
+            # Ktt - Ktx Kxx⁻¹ Kxt
+            covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
+            
             return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(latent_mean.squeeze()), jnp.diag(latent_var)
+                jnp.atleast_1d(mean.squeeze()), covariance
             )
 
         return predict_fn
@@ -284,13 +303,18 @@ class NonConjugatePosterior(AbstractPosterior):
             Kxx += I(n) * self.jitter
             Lx = jnp.linalg.cholesky(Kxx)
             μx = self.prior.mean_function(x, params["mean_function"])
-            fx = jnp.matmul(Lx, params["latent"]) + μx
-            rv = self.likelihood.link_function(fx, params)
-            ll = jnp.sum(rv.log_prob(y))
 
+            # f(x) = μx  +  Lx latent
+            fx = μx + jnp.matmul(Lx, params["latent"])
+
+            # p(y | f(x), θ), where θ are the model hyperparameters:
+            likelihood = self.likelihood.link_function(fx, params)
+
+            # log p(θ)
             log_prior_density = evaluate_priors(params, priors)
+
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-            return constant * (ll + log_prior_density)
+            return constant * (likelihood.log_prob(y).sum() + log_prior_density)
 
         return mll
 
