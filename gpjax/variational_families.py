@@ -261,7 +261,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
 @dataclass
 class NaturalVariationalGaussian(AbstractVariationalFamily):
-    """The variational Gaussian family of probability distributions."""
+    """The natural variational Gaussian family of probability distributions."""
     prior: Prior
     inducing_inputs: Array
     name: str = "Natural Gaussian"
@@ -345,12 +345,20 @@ class NaturalVariationalGaussian(AbstractVariationalFamily):
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
         
+        # S⁻¹ = -2θ₂
         S_inv = -2 * natural_matrix
         S_inv += I(m) * self.jitter
-        L_inv = jnp.linalg.cholesky(S_inv)
-        C = jsp.linalg.solve_triangular(L_inv, I(m), lower=True)
+
+        # S⁻¹ = LLᵀ
+        L = jnp.linalg.cholesky(S_inv)
+
+        # C = L⁻¹I
+        C = jsp.linalg.solve_triangular(L, I(m), lower=True)
         
+        # S = CᵀC
         S = jnp.matmul(C.T, C)
+
+        # μ = Sθ₁
         mu = jnp.matmul(S, natural_vector)
 
         Kzz = gram(self.prior.kernel, z, params["kernel"])
@@ -363,12 +371,144 @@ class NaturalVariationalGaussian(AbstractVariationalFamily):
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
             μt = self.prior.mean_function(t, params["mean_function"])
-            A = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
-            B = jsp.linalg.solve_triangular(Lz.T, A, lower=False)
-            V = jnp.matmul(B.T, C.T)
+
+            # Lz⁻¹ Kzt
+            Lz_inv_Kzt = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
+
+            # Kzz⁻¹ Kzt
+            Kzz_inv_Kzt = jsp.linalg.solve_triangular(Lz.T, Lz_inv_Kzt, lower=False)
+
+            # Ktz Kzz⁻¹ Cᵀ
+            Ktz_Kzz_inv_CT = jnp.matmul(Kzz_inv_Kzt.T, C.T)
             
-            mean = μt + jnp.matmul(B.T, mu - μz)
-            covariance = Ktt - jnp.matmul(A.T, A) + jnp.matmul(V, V.T)
+            # μt  +  Ktz Kzz⁻¹ (μ  -  μz)
+            mean = μt + jnp.matmul(Kzz_inv_Kzt.T, mu - μz)
+
+            # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = CᵀC]
+            covariance = Ktt - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt) + jnp.matmul(Ktz_Kzz_inv_CT, Ktz_Kzz_inv_CT.T)
+
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance
+            )
+
+        return predict_fn
+
+
+@dataclass
+class ExpectationVariationalGaussian(AbstractVariationalFamily):
+    """The variational Gaussian family of probability distributions."""
+    prior: Prior
+    inducing_inputs: Array
+    name: str = "Natural Gaussian"
+    expectation_vector: Optional[Array] = None
+    expectation_matrix: Optional[Array] = None
+    jitter: Optional[float] = DEFAULT_JITTER
+
+    def __post_init__(self):
+        """Initialise the variational Gaussian distribution."""
+        self.num_inducing = self.inducing_inputs.shape[0]
+        add_parameter("inducing_inputs", Identity)
+
+        m = self.num_inducing
+
+        if self.expectation_vector is None:
+            self.expectation_vector = jnp.zeros((m, 1))
+            add_parameter("natural_vector", Identity)
+
+        if self.expectation_matrix is None:
+            self.expectation_matrix = I(m)
+            add_parameter("natural_matrix", Identity)
+
+    @property
+    def params(self) -> Dict:
+        """Return the natural vector and matrix, inducing inputs, and hyperparameters that parameterise the natural Gaussian distribution."""
+        return concat_dictionaries(
+            self.prior.params, {
+            "variational_family": {
+                "inducing_inputs": self.inducing_inputs,
+                "natural_vector": self.natural_vector,
+                "natural_matrix": self.natural_matrix}
+                }
+        )
+
+    def prior_kl(self, params: Dict) -> Array:
+        """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
+
+        Args:
+            params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
+
+        Returns:
+            Array: The KL-divergence between our variational approximation and the GP prior.
+        """
+        natural_vector = params["variational_family"]["natural_vector"]
+        natural_matrix = params["variational_family"]["natural_matrix"]
+        z = params["variational_family"]["inducing_inputs"]
+        m = self.num_inducing
+        
+        mu = natural_vector
+        S = natural_matrix - jnp.matmul(mu, mu.T)
+        S += I(m) * self.jitter
+        sqrt = jnp.linalg.cholesky(S)
+        
+        μz = self.prior.mean_function(z, params["mean_function"])
+        Kzz = gram(self.prior.kernel, z, params["kernel"])
+        Kzz += I(m) * self.jitter
+        Lz = jnp.linalg.cholesky(Kzz)
+
+        qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
+        pu = dx.MultivariateNormalTri(jnp.atleast_1d(μz.squeeze()), Lz)
+
+        return qu.kl_divergence(pu)
+
+    def predict(self, params: dict) -> Callable[[Array], dx.Distribution]:
+        """Compute the predictive distribution of the GP at the test inputs.
+
+        Args:
+            params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
+
+        Returns:
+            Callable[[Array], dx.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
+        """        
+        natural_vector = params["variational_family"]["natural_vector"]
+        natural_matrix = params["variational_family"]["natural_matrix"]
+        z = params["variational_family"]["inducing_inputs"]
+        m = self.num_inducing
+        
+        # μ = η₁
+        mu = natural_vector
+
+        # S = η₂ - η₁ η₁ᵀ
+        S = natural_matrix - jnp.matmul(mu, mu.T)
+        S += I(m) * self.jitter
+
+        # S = sqrt sqrtᵀ
+        sqrt = jnp.linalg.cholesky(S)
+
+        Kzz = gram(self.prior.kernel, z, params["kernel"])
+        Kzz += I(m) * self.jitter
+        Lz = jnp.linalg.cholesky(Kzz)
+        μz = self.prior.mean_function(z, params["mean_function"])
+
+        def predict_fn(test_inputs: Array) -> dx.Distribution:
+            t = test_inputs
+            Ktt = gram(self.prior.kernel, t, params["kernel"])
+            Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
+            μt = self.prior.mean_function(t, params["mean_function"])
+            
+            # Lz⁻¹ Kzt
+            Lz_inv_Kzt = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
+
+            # Kzz⁻¹ Kzt
+            Kzz_inv_Kzt = jsp.linalg.solve_triangular(Lz.T, Lz_inv_Kzt , lower=False)
+
+            # Ktz Kzz⁻¹ sqrt
+            Ktz_Kzz_inv_sqrt = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
+            
+            # μt  +  Ktz Kzz⁻¹ (μ  -  μz)
+            mean = μt + jnp.matmul(Kzz_inv_Kzt.T, mu - μz)
+
+            # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
+            covariance = Ktt - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt ) + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance
