@@ -149,6 +149,9 @@ class ConjugatePosterior(AbstractPosterior):
         Sigma = Kxx + I(n) * obs_noise
         L = jnp.linalg.cholesky(Sigma)
 
+        # w = L⁻¹ (y - μx)
+        w = jsp.linalg.solve_triangular(L, y - μx, lower=True)
+
         def predict(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
             μt = self.prior.mean_function(t, params["mean_function"])
@@ -158,11 +161,8 @@ class ConjugatePosterior(AbstractPosterior):
             # L⁻¹ Kxt
             L_inv_Kxt = jsp.linalg.solve_triangular(L, Kxt, lower=True)
 
-            # Σ⁻¹ Kxt
-            Sigma_inv_Kxt = jsp.linalg.solve_triangular(L.T, L_inv_Kxt, lower=False)
-
             # μt  +  Ktx (Kzz + Iσ²)⁻¹ (y  -  μx)
-            mean = μt + jnp.matmul(Sigma_inv_Kxt.T, y - μx)
+            mean = μt + jnp.matmul(L_inv_Kxt.T, w)
 
             # Ktt  -  Ktz (Kzz + Iσ²)⁻¹ Kxt  [recall (Kzz + Iσ²)⁻¹ = (LLᵀ)⁻¹ =  L⁻ᵀL⁻¹]
             covariance = Ktt - jnp.matmul(L_inv_Kxt.T, L_inv_Kxt)
