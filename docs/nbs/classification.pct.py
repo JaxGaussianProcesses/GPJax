@@ -68,6 +68,7 @@ params, trainable, constrainer, unconstrainer = gpx.initialise(posterior)
 params = gpx.transform(params, unconstrainer)
 
 mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=True))
+
 # %% [markdown]
 # We can obtain a MAP estimate by optimising the marginal log-likelihood with Obtax's optimisers.
 # %%
@@ -79,6 +80,9 @@ map_estimate = gpx.fit(
     opt,
     n_iters=500,
 )
+ps = gpx.transform(map_estimate, constrainer)
+latent_dist = posterior(D, ps)(xtest)
+predictive_dist = likelihood(latent_dist, ps)
 # %% [markdown]
 # However, as a point estimate, MAP estimation is severely limited for uncertainty quantification, providing only a single piece of information about the posterior. On the other hand, through approximate sampling, MCMC methods allow us to learn all information about the posterior distribution.
 # %% [markdown]
@@ -95,7 +99,7 @@ map_estimate = gpx.fit(
 # We begin by generating _sensible_ initial positions for our sampler before defining an inference loop and sampling 500 values from our Markov chain. In practice, drawing more samples will be necessary.
 # %%
 # Adapted from BlackJax's introduction notebook.
-num_adapt = 1000
+num_adapt = 500
 num_samples = 500
 
 mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=False))
@@ -156,7 +160,8 @@ for i in range(0, num_samples, thin_factor):
     ps["latent"] = states.position["latent"][i, :, :]
     ps = gpx.transform(ps, constrainer)
 
-    predictive_dist = likelihood(posterior(D, ps)(xtest), ps)
+    latent_dist = posterior(D, ps)(xtest)
+    predictive_dist = likelihood(latent_dist, ps)
     samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
 
 samples = jnp.vstack(samples)
