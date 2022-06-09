@@ -75,9 +75,14 @@ class StochasticVI(AbstractVariationalInference):
 
         def elbo_fn(params: Dict, batch: Dataset) -> Array:
             params = transform(params, transformations)
+
+            # KL[q(f(·)) || p(f(·))]
             kl = self.variational_family.prior_kl(params)
+
+            # ∫[log(p(y|f(x))) q(f(x))] df(x)
             var_exp = self.variational_expectation(params, batch)
 
+            # For batch size b, we compute  n/b * Σᵢ[ ∫log(p(y|f(xᵢ))) q(f(xᵢ)) df(xᵢ)] - KL[q(f(·)) || p(f(·))]
             return constant * (jnp.sum(var_exp) * train_data.n / batch.n - kl)
 
         return elbo_fn
@@ -102,7 +107,7 @@ class StochasticVI(AbstractVariationalInference):
         # log(p(y|f(x)))
         log_prob = vmap(lambda f, y: self.likelihood.link_function(f, params["likelihood"]).log_prob(y))
 
-        # ≈ ∫[log(p(y|f(x))).q(f(x))] df(x)
+        # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
         expectation = gauss_hermite_quadrature(log_prob, mean, variance, y=y)
 
         return expectation

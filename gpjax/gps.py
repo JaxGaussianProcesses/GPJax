@@ -4,7 +4,7 @@ from abc import abstractmethod, abstractproperty
 import distrax as dx
 import jax.numpy as jnp
 from chex import dataclass
-from jax.scipy.linalg import cho_factor, cho_solve, solve_triangular
+import jax.scipy as jsp
 
 from .config import get_defaults
 from .kernels import Kernel, cross_covariance, gram
@@ -77,9 +77,10 @@ class Prior(AbstractGP):
 
         def predict_fn(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
+            n_test = t.shape[0]
             μt = self.mean_function(t, params["mean_function"])
             Ktt = gram(self.kernel, t, params["kernel"])
-            Ktt += I(t.shape[0]) * self.jitter
+            Ktt += I(n_test) * self.jitter
 
             return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(μt.squeeze()), Ktt)
 
@@ -137,29 +138,37 @@ class ConjugatePosterior(AbstractPosterior):
         """
         x, y, n = train_data.X, train_data.y, train_data.n
 
+        # Observation noise σ²
         obs_noise = params["likelihood"]["obs_noise"]
         μx = self.prior.mean_function(x, params["mean_function"])
 
         # Precompute covariance matrices
         Kxx = gram(self.prior.kernel, x, params["kernel"])
         Kxx += I(n) * self.jitter
-        Lx = cho_factor(Kxx + I(n) * obs_noise, lower=True)
 
-        weights = cho_solve(Lx, y - μx)
+        # Σ = (Kxx + Iσ²) = LLᵀ
+        Sigma = Kxx + I(n) * obs_noise
+        L = jnp.linalg.cholesky(Sigma)
+
+        # w = L⁻¹ (y - μx)
+        w = jsp.linalg.solve_triangular(L, y - μx, lower=True)
 
         def predict(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
-
-            # Compute the mean
+            n_test = t.shape[0]
             μt = self.prior.mean_function(t, params["mean_function"])
-            Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
-            mean = μt + jnp.dot(Ktx, weights)
-
-            # Compute the covariance
             Ktt = gram(self.prior.kernel, t, params["kernel"])
-            latent_values = cho_solve(Lx, Ktx.T)
-            covariance = Ktt - jnp.dot(Ktx, latent_values)
-            covariance += I(t.shape[0]) * self.jitter
+            Kxt = cross_covariance(self.prior.kernel, x, t, params["kernel"])
+
+            # L⁻¹ Kxt
+            L_inv_Kxt = jsp.linalg.solve_triangular(L, Kxt, lower=True)
+
+            # μt  +  Ktx (Kzz + Iσ²)⁻¹ (y  -  μx)
+            mean = μt + jnp.matmul(L_inv_Kxt.T, w)
+
+            # Ktt  -  Ktz (Kzz + Iσ²)⁻¹ Kxt  [recall (Kzz + Iσ²)⁻¹ = (LLᵀ)⁻¹ =  L⁻ᵀL⁻¹]
+            covariance = Ktt - jnp.matmul(L_inv_Kxt.T, L_inv_Kxt)
+            covariance += I(n_test) * self.jitter
 
             return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
 
@@ -190,17 +199,24 @@ class ConjugatePosterior(AbstractPosterior):
         ):
             params = transform(params=params, transform_map=transformations)
 
+            # Observation noise σ²
             obs_noise = params["likelihood"]["obs_noise"]
             μx = self.prior.mean_function(x, params["mean_function"])
             Kxx = gram(self.prior.kernel, x, params["kernel"])
             Kxx += I(n) * self.jitter
-            Lx = jnp.linalg.cholesky(Kxx + I(n) * obs_noise)
 
-            random_variable = dx.MultivariateNormalTri(jnp.atleast_1d(μx.squeeze()), Lx)
+            # Σ = (Kxx + Iσ²) = LLᵀ
+            Sigma = Kxx + I(n) * obs_noise
+            L = jnp.linalg.cholesky(Sigma)
 
+            # p(y | x, θ), where θ are the model hyperparameters:
+            marginal_likelihood = dx.MultivariateNormalTri(jnp.atleast_1d(μx.squeeze()), L)
+
+            # log p(θ)
             log_prior_density = evaluate_priors(params, priors)
+
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-            return constant * (random_variable.log_prob(y.squeeze()).mean() + log_prior_density)
+            return constant * (marginal_likelihood.log_prob(y.squeeze()).squeeze() + log_prior_density)
 
         return mll
 
@@ -240,15 +256,23 @@ class NonConjugatePosterior(AbstractPosterior):
 
         def predict_fn(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
-            nt = t.shape[0]
+            n_test = t.shape[0]
             Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
-            Ktt = gram(self.prior.kernel, t, params["kernel"]) + I(nt) * self.jitter
+            Ktt = gram(self.prior.kernel, t, params["kernel"]) + I(n_test) * self.jitter
             μt = self.prior.mean_function(t, params["mean_function"])
-            A = solve_triangular(Lx, Ktx.T, lower=True)
-            latent_var = jnp.diag(jnp.diag(Ktt - jnp.sum(jnp.square(A), -2)))
-            latent_mean = μt + jnp.matmul(A.T, params["latent"])
+
+            # Lx⁻¹ Kxt
+            Lx_inv_Kxt = jsp.linalg.solve_triangular(Lx, Ktx.T, lower=True)
+
+            # μt + Ktx Lx⁻¹ latent
+            mean = μt + jnp.matmul(Lx_inv_Kxt.T, params["latent"])
+
+            # Ktt - Ktx Kxx⁻¹ Kxt
+            covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
+            covariance += I(n_test) * self.jitter
+            
             return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(latent_mean.squeeze()), latent_var
+                jnp.atleast_1d(mean.squeeze()), covariance
             )
 
         return predict_fn
@@ -283,13 +307,18 @@ class NonConjugatePosterior(AbstractPosterior):
             Kxx += I(n) * self.jitter
             Lx = jnp.linalg.cholesky(Kxx)
             μx = self.prior.mean_function(x, params["mean_function"])
-            fx = jnp.matmul(Lx, params["latent"]) + μx
-            rv = self.likelihood.link_function(fx, params)
-            ll = jnp.sum(rv.log_prob(y))
 
+            # f(x) = μx  +  Lx latent
+            fx = μx + jnp.matmul(Lx, params["latent"])
+
+            # p(y | f(x), θ), where θ are the model hyperparameters:
+            likelihood = self.likelihood.link_function(fx, params)
+
+            # log p(θ)
             log_prior_density = evaluate_priors(params, priors)
+
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-            return constant * (ll + log_prior_density)
+            return constant * (likelihood.log_prob(y).sum() + log_prior_density)
 
         return mll
 

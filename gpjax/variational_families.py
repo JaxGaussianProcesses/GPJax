@@ -44,7 +44,12 @@ class AbstractVariationalFamily:
 
 @dataclass
 class VariationalGaussian(AbstractVariationalFamily):
-    """The variational Gaussian family of probability distributions."""
+    """The variational Gaussian family of probability distributions.
+    
+    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
+    and the distribution over the inducing inputs is q(u) = N(μ, S). We parameterise this over μ and sqrt with S = sqrt sqrtᵀ.
+
+    """
     prior: Prior
     inducing_inputs: Array
     name: str = "Gaussian"
@@ -83,9 +88,11 @@ class VariationalGaussian(AbstractVariationalFamily):
                 }
         )
 
-    # Compute KL divergence at inducing points, KL[q(u)||p(u)]:
     def prior_kl(self, params: Dict) -> Array:
-        """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
+        """Compute the KL-divergence between our variational approximation and the Gaussian process prior.
+
+        For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[ N(μ, S) || N(μz, Kzz) ],
+        where u = f(z) and z are the inducing inputs. 
 
         Args:
             params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
@@ -108,7 +115,11 @@ class VariationalGaussian(AbstractVariationalFamily):
         return qu.kl_divergence(pu)
 
     def predict(self, params: dict) -> Callable[[Array], dx.Distribution]:
-        """Compute the predictive distribution of the GP at the test inputs.
+        """Compute the predictive distribution of the GP at the test inputs t.
+
+        This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as:
+
+            N[f(t); μt + Ktz Kzz⁻¹ (μ - μz),  Ktt - Ktz Kzz⁻¹ Kzt + Ktz Kzz⁻¹ S Kzz⁻¹ Kzt ].
 
         Args:
             params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
@@ -128,15 +139,26 @@ class VariationalGaussian(AbstractVariationalFamily):
 
         def predict_fn(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
+            n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
             μt = self.prior.mean_function(t, params["mean_function"])
-            A = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
-            B = jsp.linalg.solve_triangular(Lz.T, A, lower=False)
-            V = jnp.matmul(B.T, sqrt)
+
+            # Lz⁻¹ Kzt
+            Lz_inv_Kzt = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
+
+            # Kzz⁻¹ Kzt
+            Kzz_inv_Kzt = jsp.linalg.solve_triangular(Lz.T, Lz_inv_Kzt, lower=False)
+
+            # Ktz Kzz⁻¹ sqrt
+            Ktz_Kzz_inv_sqrt = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
             
-            mean = μt + jnp.matmul(B.T, mu - μz)
-            covariance = Ktt - jnp.matmul(A.T, A) + jnp.matmul(V, V.T)
+            # μt + Ktz Kzz⁻¹ (μ - μz)
+            mean = μt + jnp.matmul(Kzz_inv_Kzt.T, mu - μz)
+
+            # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
+            covariance = Ktt - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt) + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
+            covariance += I(n_test) * self.jitter
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance
@@ -147,11 +169,17 @@ class VariationalGaussian(AbstractVariationalFamily):
 
 @dataclass
 class WhitenedVariationalGaussian(VariationalGaussian):
-    """The variational Gaussian family of probability distributions."""
+    """The whitened variational Gaussian family of probability distributions.
 
-    # Compute KL divergence at inducing points, KL[q(u)||p(u)]:
+    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
+    and the distribution over the inducing inputs is q(u) = N(Lz μ + mz, Lz S). We parameterise this over μ and sqrt with S = sqrt sqrtᵀ.
+    
+    """
+
     def prior_kl(self, params: Dict) -> Array:
-        """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
+        """Compute the KL-divergence between our variational approximation and the Gaussian process prior.
+
+        For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(0, I)].
 
         Args:
             params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
@@ -169,7 +197,11 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         return qu.kl_divergence(pu)
 
     def predict(self, params: dict) -> Callable[[Array], dx.Distribution]:
-        """Compute the predictive distribution of the GP at the test inputs.
+        """Compute the predictive distribution of the GP at the test inputs t.
+
+        This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
+          
+            N[f(t); μt  +  Ktz Lz⁻ᵀ μ,  Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻ᵀ S Lz⁻¹ Kzt].
 
         Args:
             params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
@@ -188,15 +220,23 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
         def predict_fn(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
+            n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
             μt = self.prior.mean_function(t, params["mean_function"])
 
-            A = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
-            V = jnp.matmul(A.T, sqrt)
+            # Lz⁻¹ Kzt
+            Lz_inv_Kzt = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
+
+            # Ktz Lz⁻ᵀ sqrt
+            Ktz_Lz_invT_sqrt = jnp.matmul(Lz_inv_Kzt.T, sqrt)
             
-            mean = μt + jnp.matmul(A.T, mu)
-            covariance = Ktt - jnp.matmul(A.T, A) + jnp.matmul(V, V.T)
+            # μt  +  Ktz Lz⁻ᵀ μ
+            mean = μt + jnp.matmul(Lz_inv_Kzt.T, mu)
+
+           # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻ᵀ S Lz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
+            covariance = Ktt - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt) + jnp.matmul(Ktz_Lz_invT_sqrt, Ktz_Lz_invT_sqrt.T)
+            covariance += I(n_test) * self.jitter
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance
