@@ -77,9 +77,10 @@ class Prior(AbstractGP):
 
         def predict_fn(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
+            n_test = t.shape[0]
             μt = self.mean_function(t, params["mean_function"])
             Ktt = gram(self.kernel, t, params["kernel"])
-            Ktt += I(t.shape[0]) * self.jitter
+            Ktt += I(n_test) * self.jitter
 
             return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(μt.squeeze()), Ktt)
 
@@ -154,6 +155,7 @@ class ConjugatePosterior(AbstractPosterior):
 
         def predict(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
+            n_test = t.shape[0]
             μt = self.prior.mean_function(t, params["mean_function"])
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kxt = cross_covariance(self.prior.kernel, x, t, params["kernel"])
@@ -166,6 +168,7 @@ class ConjugatePosterior(AbstractPosterior):
 
             # Ktt  -  Ktz (Kzz + Iσ²)⁻¹ Kxt  [recall (Kzz + Iσ²)⁻¹ = (LLᵀ)⁻¹ =  L⁻ᵀL⁻¹]
             covariance = Ktt - jnp.matmul(L_inv_Kxt.T, L_inv_Kxt)
+            covariance += I(n_test) * self.jitter
 
             return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
 
@@ -253,9 +256,9 @@ class NonConjugatePosterior(AbstractPosterior):
 
         def predict_fn(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
-            nt = t.shape[0]
+            n_test = t.shape[0]
             Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
-            Ktt = gram(self.prior.kernel, t, params["kernel"]) + I(nt) * self.jitter
+            Ktt = gram(self.prior.kernel, t, params["kernel"]) + I(n_test) * self.jitter
             μt = self.prior.mean_function(t, params["mean_function"])
 
             # Lx⁻¹ Kxt
@@ -266,6 +269,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
             # Ktt - Ktx Kxx⁻¹ Kxt
             covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
+            covariance += I(n_test) * self.jitter
             
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance

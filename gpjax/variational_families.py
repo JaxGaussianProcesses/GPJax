@@ -139,6 +139,7 @@ class VariationalGaussian(AbstractVariationalFamily):
 
         def predict_fn(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
+            n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
             μt = self.prior.mean_function(t, params["mean_function"])
@@ -157,6 +158,7 @@ class VariationalGaussian(AbstractVariationalFamily):
 
             # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
             covariance = Ktt - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt) + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
+            covariance += I(n_test) * self.jitter
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance
@@ -218,6 +220,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
         def predict_fn(test_inputs: Array) -> dx.Distribution:
             t = test_inputs
+            n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
             μt = self.prior.mean_function(t, params["mean_function"])
@@ -233,6 +236,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
            # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻ᵀ S Lz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
             covariance = Ktt - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt) + jnp.matmul(Ktz_Lz_invT_sqrt, Ktz_Lz_invT_sqrt.T)
+            covariance += I(n_test) * self.jitter
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance
