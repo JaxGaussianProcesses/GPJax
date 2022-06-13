@@ -24,7 +24,7 @@ class Dataset:
         )
 
     def __add__(self, other: "Dataset") -> "Dataset":
-        """Combines two datasets into one."""
+        """Combines two datasets into one. The right-hand dataset is stacked beneath left."""
         x = jnp.concatenate((self.X, other.X))  
         y = jnp.concatenate((self.y, other.y))  
 
