@@ -40,6 +40,7 @@ For intuition of GPJax's exposed API, a simple example that derives the Gaussian
     nbs/regression
     nbs/classification
     nbs/sparse_regression
+    nbs/sgpr
     nbs/graph_kernels
     nbs/barycentres
     nbs/haiku
