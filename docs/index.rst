@@ -32,7 +32,6 @@ For intuition of GPJax's exposed API, a simple example that derives the Gaussian
 
     installation
     design
-    nbs/gotchas
 
 .. toctree::
     :maxdepth: 1
