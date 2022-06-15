@@ -43,23 +43,26 @@ class AbstractVariationalFamily:
         """Predict the GP's output given the input."""
         raise NotImplementedError
 
+@dataclass
+class AbstractVariationalGaussian(AbstractVariationalFamily):
+    """The variational Gaussian family of probability distributions."""
+    prior: Prior
+    inducing_inputs: Array
+    name: str = "Gaussian"
+    jitter: Optional[float] = DEFAULT_JITTER
 
 @dataclass
-class VariationalGaussian(AbstractVariationalFamily):
+class VariationalGaussian(AbstractVariationalGaussian):
     """The variational Gaussian family of probability distributions.
 
     The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
     and the distribution over the inducing inputs is q(u) = N(μ, S). We parameterise this over μ and sqrt with S = sqrt sqrtᵀ.
 
     """
-
-    prior: Prior
-    inducing_inputs: Float[Array, "M D"]
-    name: str = "Variational Gaussian"
-    variational_mean: Optional[Float[Array, "M Q"]] = None
-    variational_root_covariance: Optional[Float[Array, "M M"]] = None
+    variational_mean: Optional[Array] = None
+    variational_root_covariance: Optional[Array] = None
     diag: Optional[bool] = False
-    jitter: Optional[float] = DEFAULT_JITTER
+    
 
     def __post_init__(self):
         """Initialise the variational Gaussian distribution."""
@@ -259,14 +262,11 @@ class WhitenedVariationalGaussian(VariationalGaussian):
     
 
 @dataclass
-class NaturalVariationalGaussian(AbstractVariationalFamily):
+class NaturalVariationalGaussian(AbstractVariationalGaussian):
     """The natural variational Gaussian family of probability distributions."""
-    prior: Prior
-    inducing_inputs: Array
     name: str = "Natural Gaussian"
     natural_vector: Optional[Array] = None
     natural_matrix: Optional[Array] = None
-    jitter: Optional[float] = DEFAULT_JITTER
 
     def __post_init__(self):
         """Initialise the variational Gaussian distribution."""
@@ -396,14 +396,11 @@ class NaturalVariationalGaussian(AbstractVariationalFamily):
 
 
 @dataclass
-class ExpectationVariationalGaussian(AbstractVariationalFamily):
+class ExpectationVariationalGaussian(AbstractVariationalGaussian):
     """The variational Gaussian family of probability distributions."""
-    prior: Prior
-    inducing_inputs: Array
     name: str = "Expectation Gaussian"
     expectation_vector: Optional[Array] = None
     expectation_matrix: Optional[Array] = None
-    jitter: Optional[float] = DEFAULT_JITTER
 
     def __post_init__(self):
         """Initialise the variational Gaussian distribution."""
