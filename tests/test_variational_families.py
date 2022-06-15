@@ -2,6 +2,7 @@ import typing as tp
 
 import distrax as dx
 import jax.numpy as jnp
+import jax.random as jr
 import pytest
 
 import gpjax as gpx
@@ -79,6 +80,51 @@ def test_variational_gaussian(diag, n_inducing, n_test, whiten):
 
     # Test predictions
     predictive_dist_fn = variational_family(params)
+    assert isinstance(predictive_dist_fn, tp.Callable)
+
+    predictive_dist = predictive_dist_fn(test_inputs)
+    assert isinstance(predictive_dist, dx.Distribution)
+
+    mu = predictive_dist.mean()
+    sigma = predictive_dist.covariance()
+
+    assert isinstance(mu, jnp.ndarray)
+    assert isinstance(sigma, jnp.ndarray)
+    assert mu.shape == (n_test,)
+    assert sigma.shape == (n_test, n_test)
+
+@pytest.mark.parametrize("n_test", [1, 10])
+@pytest.mark.parametrize("n_datapoints", [1, 10])
+@pytest.mark.parametrize("n_inducing", [1, 10, 20])
+def test_collapsed_variational_gaussian(n_test, n_inducing, n_datapoints):
+    x = jnp.linspace(-5.0, 5.0, n_datapoints).reshape(-1, 1)
+    y = jnp.sin(x) + jr.normal(key=jr.PRNGKey(123), shape=x.shape) * 0.1
+    D = gpx.Dataset(X=x, y=y)
+
+    prior = gpx.Prior(kernel=gpx.RBF())
+
+    inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
+    test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
+
+    variational_family = gpx.variational_families.CollapsedVariationalGaussian(prior=prior, inducing_inputs = inducing_inputs)
+
+    # Test init
+    assert variational_family.num_inducing == n_inducing
+    params = gpx.config.get_defaults()
+    assert "inducing_inputs" in params["transformations"].keys()
+    assert (variational_family.inducing_inputs == inducing_inputs).all()
+
+    #Test params
+    params = variational_family.params
+    assert isinstance(params, dict)
+    assert "inducing_inputs" in params["variational_family"].keys()
+    assert params["variational_family"]["inducing_inputs"].shape == (n_inducing, 1)
+    assert isinstance(params["variational_family"]["inducing_inputs"], jnp.DeviceArray)
+
+    # Test predictions
+    params = variational_family.params
+    params["likelihood"] = {"obs_noise": 1.0}
+    predictive_dist_fn = variational_family(D, params)
     assert isinstance(predictive_dist_fn, tp.Callable)
 
     predictive_dist = predictive_dist_fn(test_inputs)
