@@ -7,7 +7,7 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 from chex import dataclass
 
 from .config import Identity, Softplus, add_parameter, get_defaults
-from .types import Array
+from .types import Array, Dataset
 from .utils import I, concat_dictionaries
 from .kernels import cross_covariance, gram
 from .gps import Prior
@@ -238,6 +238,100 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             covariance = Ktt - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt) + jnp.matmul(Ktz_Lz_invT_sqrt, Ktz_Lz_invT_sqrt.T)
             covariance += I(n_test) * self.jitter
 
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance
+            )
+
+        return predict_fn
+
+
+@dataclass
+class CollapsedVariationalGaussian(AbstractVariationalFamily):
+    """Collapsed variational Gaussian family of probability distributions.
+        The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes."""
+    prior: Prior
+    inducing_inputs: Array
+    name: str = "Gaussian"
+    diag: Optional[bool] = False
+    jitter: Optional[float] = DEFAULT_JITTER
+
+    def __post_init__(self):
+        """Initialise the variational Gaussian distribution."""
+        self.num_inducing = self.inducing_inputs.shape[0]
+        add_parameter("inducing_inputs", Identity)
+
+    @property
+    def params(self) -> Dict:
+        """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
+        return concat_dictionaries(
+            self.prior.params, {
+            "variational_family": {
+                "inducing_inputs": self.inducing_inputs,
+                }
+            }
+        )
+    
+    def predict(self, train_data:Dataset, params: dict) -> Callable[[Array], dx.Distribution]:
+        """Compute the predictive distribution of the GP at the test inputs.
+
+        Args:
+            params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
+
+        Returns:
+            Callable[[Array], dx.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
+        """
+        x, y = train_data.X, train_data.y
+        
+        noise = params["likelihood"]["obs_noise"]
+        z = params["variational_family"]["inducing_inputs"]
+        m = self.num_inducing
+        
+        Kzx = cross_covariance(self.prior.kernel, z, x, params["kernel"])
+        Kzz = gram(self.prior.kernel, z, params["kernel"])
+        Kzz += I(m) * self.jitter
+
+        # Lz Lzᵀ = Kzz
+        Lz = jnp.linalg.cholesky(Kzz)
+      
+        # Lz⁻¹ Kzx
+        Lz_inv_Kzx = jsp.linalg.solve_triangular(Lz, Kzx, lower=True)
+        
+        # A = Lz⁻¹ Kzt / σ
+        A = Lz_inv_Kzx / jnp.sqrt(noise)
+
+        # AAᵀ
+        AAT = jnp.matmul(A, A.T)
+
+        # LLᵀ = I + AAᵀ
+        L = jnp.linalg.cholesky(I(m) + AAT)
+        
+        μx = self.prior.mean_function(x, params["mean_function"])
+        diff = y - μx
+
+        # Lz⁻¹ Kzx (y - μx)
+        Lz_inv_Kzx_diff = jsp.linalg.cho_solve((L, True), jnp.matmul(Lz_inv_Kzx, diff))
+
+        # Kzz⁻¹ Kzx (y - μx)
+        Kzz_inv_Kzx_diff = jsp.linalg.solve_triangular(Lz.T, Lz_inv_Kzx_diff, lower=False)
+        
+        def predict_fn(test_inputs: Array) -> dx.Distribution:
+            t = test_inputs
+            Ktt = gram(self.prior.kernel, t, params["kernel"])
+            Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
+            μt = self.prior.mean_function(t, params["mean_function"])
+
+            # Lz⁻¹ Kzt
+            Lz_inv_Kzt = jsp.linalg.solve_triangular(Lz, Kzt, lower=True)
+
+            # L⁻¹ Lz⁻¹ Kzt
+            L_inv_Lz_inv_Kzt = jsp.linalg.solve_triangular(L, Lz_inv_Kzt, lower=True)
+        
+            # μt + 1/σ² Ktz Kzz⁻¹ Kzx (y - μx)
+            mean = μt + jnp.matmul(Kzt.T / noise, Kzz_inv_Kzx_diff)
+
+            # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻¹ (I + AAᵀ)⁻¹ Lz⁻¹ Kzt
+            covariance = Ktt - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt) + jnp.matmul(L_inv_Lz_inv_Kzt.T, L_inv_Lz_inv_Kzt)
+            
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance
             )
