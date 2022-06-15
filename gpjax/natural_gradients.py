@@ -4,6 +4,7 @@ import jax.scipy as jsp
 from jax import jacobian
 import distrax as dx
 from jax import lax
+import jax
 
 from .config import get_defaults
 from .variational_families import AbstractVariationalFamily, ExpectationVariationalGaussian
@@ -75,15 +76,17 @@ def _expectation_elbo(posterior: AbstractPosterior,
     return svgp.elbo(train_data, build_identity(svgp.params))
 
 
+
+#DOES NOT WORK YET.
 def natural_gradients(
     posterior: AbstractPosterior,
     variational_family: AbstractVariationalFamily,
     train_data: Dataset,
     params: dict,
     transformations: dict,
-    nat_to_moments: dx.Bijector,
     batch,
-) -> dict:
+    nat_to_moments: tp.Optional[dx.Bijector] = Identity,
+    ) -> dict:
     """
     Computes natural gradients for a variational family.
     Args:
@@ -104,8 +107,9 @@ def natural_gradients(
 
     # TO DO -> CAN WE WRITE BELOW AS A ONE LINER?
     other_var_params = {k:v for k,v in params["variational_family"].items() if k!="moments"}
-    other_params = lax.stop_gradient({**{k:v for k,v in params.items() if k!="variational_family"}, **other_var_params})
-    
+    other_params = lax.stop_gradient({**{k:v for k,v in params.items() if k!="variational_family"}, **{"variational_family": other_var_params}})
+
+
     # Convert moments to natural parameterisation.
     natural_moments = nat_to_moments.inverse(moments)
 
@@ -120,12 +124,13 @@ def natural_gradients(
     expectation_params["variational_family"]["moments"] = expectation_moments
 
     # Compute ELBO.
-    expectation_elbo = _expectation_elbo(posterior, variational_family, train_data)(expectation_params, batch) 
+    expectation_elbo = _expectation_elbo(posterior, variational_family, train_data)
 
     # Compute gradient ∂L/∂η:
-    dL_dnat = jacobian(expectation_elbo)(expectation_params)
+    dL_dnat = jacobian(expectation_elbo)(expectation_params, batch)
     
     # Compute natural gradient:
-    nat_grads = jnp.matmul(dxi_dnat, dL_dnat.T) #<---- PSUEDO CODE - TO DO - Pytree operations needed here.
     
-    return nat_grads
+    nat_grads = jax.tree_multimap(lambda x, y: jnp.matmul(x.T, y), dxi_dnat, dL_dnat)
+    
+    return  nat_grads
