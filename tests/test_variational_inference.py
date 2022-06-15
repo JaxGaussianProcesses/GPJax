@@ -70,3 +70,35 @@ def test_stochastic_vi(n_datapoints, n_inducing_points, n_test, whiten, diag, ji
     grads = jax.grad(elbo_fn, argnums=0)(params, D)
     assert isinstance(grads, tp.Dict)
     assert len(grads) == len(params)
+
+@pytest.mark.parametrize("n_datapoints, n_inducing_points", [(10, 2), (100, 10)])
+@pytest.mark.parametrize("jit_fns", [False, True])
+def test_collapsed_vi(n_datapoints, n_inducing_points, jit_fns):
+    D, post, prior = get_data_and_gp(n_datapoints)
+    inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing_points).reshape(-1, 1)
+
+    q = gpx.variational_families.CollapsedVariationalGaussian(prior=prior, inducing_inputs=inducing_inputs)
+
+    sgpr = gpx.variational_inference.CollapsedVI(posterior=post, variational_family=q)
+    assert sgpr.posterior.prior == post.prior
+    assert sgpr.posterior.likelihood == post.likelihood
+
+    params, _, constrainer, unconstrainer = gpx.initialise(sgpr)
+    params = gpx.transform(params, unconstrainer)
+
+    assert sgpr.prior == post.prior
+    assert sgpr.likelihood == post.likelihood
+    assert sgpr.num_inducing == n_inducing_points
+
+    if jit_fns:
+        elbo_fn = jax.jit(sgpr.elbo(D, constrainer))
+    else:
+        elbo_fn = sgpr.elbo(D, constrainer)
+    assert isinstance(elbo_fn, tp.Callable)
+    elbo_value = elbo_fn(params)
+    assert isinstance(elbo_value, jnp.ndarray)
+
+    # Test gradients
+    grads = jax.grad(elbo_fn)(params)
+    assert isinstance(grads, tp.Dict)
+    assert len(grads) == len(params)
