@@ -102,6 +102,7 @@ def natural_gradients(
     # Get moments and stop gradients for non-moment parameters.
     moments = params["variational_family"]["moments"]
 
+    # TO DO -> CAN WE WRITE BELOW AS A ONE LINER?
     other_var_params = {k:v for k,v in params["variational_family"].items() if k!="moments"}
     other_params = lax.stop_gradient({**{k:v for k,v in params.items() if k!="variational_family"}, **other_var_params})
     
