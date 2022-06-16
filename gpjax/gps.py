@@ -29,6 +29,11 @@ class AbstractGP:
     """Abstract Gaussian process object."""
 
     def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> dx.Distribution:
+        """Evaluate the Gaussian process at the given points.
+
+        Returns:
+            dx.Distribution: A multivariate normal random variable representation of the Gaussian process.
+        """
         return self.predict(*args, **kwargs)
 
     @abstractmethod
@@ -216,7 +221,9 @@ class ConjugatePosterior(AbstractPosterior):
             log_prior_density = evaluate_priors(params, priors)
 
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-            return constant * (marginal_likelihood.log_prob(y.squeeze()).squeeze() + log_prior_density)
+            return constant * (
+                marginal_likelihood.log_prob(y.squeeze()).squeeze() + log_prior_density
+            )
 
         return mll
 
@@ -270,10 +277,8 @@ class NonConjugatePosterior(AbstractPosterior):
             # Ktt - Ktx Kxx⁻¹ Kxt
             covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
             covariance += I(n_test) * self.jitter
-            
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mean.squeeze()), covariance
-            )
+
+            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict_fn
 
