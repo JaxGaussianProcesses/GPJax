@@ -43,18 +43,13 @@ For intuition of GPJax's exposed API, a simple example that derives the Gaussian
     nbs/graph_kernels
     nbs/barycentres
     nbs/haiku
+    nbs/tfp_integration
 
 .. toctree::
     :maxdepth: 1
     :caption: Guides
 
     nbs/kernels
-
-.. toctree::
-    :maxdepth: 1
-    :caption: Experimental
-
-    nbs/tfp_integration
 
 .. toctree::
     :maxdepth: 1
