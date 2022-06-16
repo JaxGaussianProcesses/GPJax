@@ -1,4 +1,5 @@
 from copy import deepcopy
+from this import d
 import typing as tp
 import jax.numpy as jnp
 import jax.scipy as jsp
@@ -167,7 +168,14 @@ def natural_gradients(
 
             value, dL_dnat = value_and_grad(loss_fn)(expectation_params, batch)
 
-            return value, dL_dnat
+            
+
+            # This is a renaming of the gradient components to match the natural parameterisation pytree.
+            nat_grad = dL_dnat 
+            nat_grad["variational_family"]["moments"] = {"natural_vector": dL_dnat["variational_family"]["moments"]["expectation_vector"],
+            "natural_matrix": dL_dnat["variational_family"]["moments"]["expectation_matrix"]}
+
+            return value, nat_grad
 
     else:
         #To Do: (DD) add general parameterisation case. 
