@@ -27,6 +27,7 @@ We would be delighted to review pull requests (PRs) from new contributors. Befor
 - [**Classification with MCMC**](https://gpjax.readthedocs.io/en/latest/nbs/classification.html)
 - [**Sparse Variational Inference**](https://gpjax.readthedocs.io/en/latest/nbs/sparse_regression.html)
 - [**BlackJax Integration**](https://gpjax.readthedocs.io/en/latest/nbs/classification.html)
+- [**Laplace Approximations**](https://gpjax.readthedocs.io/en/latest/nbs/classification.html#Laplace-approximation)
 - [**TensorFlow Probability Integration**](https://gpjax.readthedocs.io/en/latest/nbs/tfp_intergation.html)
 - [**Inference on Non-Euclidean Spaces**](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html#Custom-Kernel)
 - [**Inference on Graphs**](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html)
