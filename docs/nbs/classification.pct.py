@@ -26,6 +26,9 @@ import matplotlib.pyplot as plt
 import blackjax
 import gpjax as gpx
 import optax as ox
+import distrax as dx
+from gpjax.utils import I
+import jax.scipy as jsp
 
 key = jr.PRNGKey(123)
 
@@ -73,18 +76,146 @@ mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=True))
 # We can obtain a MAP estimate by optimising the marginal log-likelihood with Obtax's optimisers.
 # %%
 opt = ox.adam(learning_rate=0.01)
-map_estimate = gpx.fit(
+unconstrained_params = gpx.fit(
     mll,
     params,
     trainable,
     opt,
     n_iters=500,
 )
-ps = gpx.transform(map_estimate, constrainer)
-latent_dist = posterior(D, ps)(xtest)
-predictive_dist = likelihood(latent_dist, ps)
+
+negative_Hessian = jax.jacfwd(jax.jacrev(mll))(unconstrained_params)["latent"]["latent"][:,0,:,0]
+
+map_estimate = gpx.transform(unconstrained_params, constrainer)
 # %% [markdown]
-# However, as a point estimate, MAP estimation is severely limited for uncertainty quantification, providing only a single piece of information about the posterior. On the other hand, through approximate sampling, MCMC methods allow us to learn all information about the posterior distribution.
+# From which we can make predictions at novel inputs, as illustrated below.
+# %%
+latent_dist = posterior(D, map_estimate)(xtest)
+
+predictive_dist = likelihood(latent_dist, map_estimate)
+
+predictive_mean = predictive_dist.mean()
+predictive_std = predictive_dist.stddev()
+
+fig, ax = plt.subplots(figsize=(12, 5))
+ax.plot(x, y, "o", label="Observations", color="tab:red")
+ax.plot(xtest, predictive_mean, label="Predictive mean", color="tab:blue")
+ax.fill_between(
+    xtest.squeeze(),
+    predictive_mean - predictive_std,
+    predictive_mean + predictive_std,
+    alpha=0.2,
+    color="tab:blue",
+    label='Two sigma',
+)
+ax.plot(xtest, predictive_mean - predictive_std, color="tab:blue", linestyle="--", linewidth=1)
+ax.plot(xtest, predictive_mean + predictive_std, color="tab:blue", linestyle="--", linewidth=1)
+
+ax.legend()
+
+# %% [markdown]
+# However, as a point estimate, MAP estimation is severely limited for uncertainty quantification, providing only a single piece of information about the posterior.
+# %% [markdown]
+# ## Laplace approximation
+# The Laplace approximation improves uncertainty quantification by incorporating curvature induced by the marginal log-likelihood's Hessian to construct an approximate Gaussian distribution centered on the MAP estimate.
+# Since the negative Hessian is positive definite, we can use the Cholesky decomposition to obtain the covariance matrix of the Laplace approximation at the datapoints below.
+# %%
+f_map_estimate = posterior(D, map_estimate)(x).mean()
+
+jitter = 1e-6
+
+# LLᵀ = H
+L = jnp.linalg.cholesky(negative_Hessian + I(D.n) * jitter)
+
+# H⁻¹ = H⁻¹ I = (LLᵀ)⁻¹ I = L⁻ᵀL⁻¹ I
+L_inv = jsp.linalg.solve_triangular(L, I(D.n), lower=True)
+H_inv = jsp.linalg.solve_triangular(L.T, L_inv, lower=False)
+
+laplace_approximation = dx.MultivariateNormalFullCovariance(f_map_estimate, H_inv)
+
+# %% [markdown]
+# For novel inputs, we must interpolate the above distribution, which can be achived via the function defined below.
+# %%
+from gpjax.types import Array, Dataset
+from gpjax.kernels import gram, cross_covariance
+
+
+def predict(laplace_at_data: dx.Distribution, train_data: Dataset, test_inputs: Array, jitter: int = 1e-6) ->  dx.Distribution:
+    """Compute the predictive distribution of the Laplace approximation at novel inputs.
+
+    Args:
+        laplace_at_data (dict): The Laplace approximation at the datapoints.
+
+    Returns:
+        dx.Distribution: The Laplace approximation at novel inputs.
+    """
+    x, n = train_data.X, train_data.n
+
+    t = test_inputs
+    n_test = t.shape[0]
+
+    mu = laplace_at_data.mean().reshape(-1, 1)
+    cov = laplace_at_data.covariance()
+
+    Ktt = gram(prior.kernel, t, params["kernel"])
+    Kxx = gram(prior.kernel, x, params["kernel"])
+    Kxt = cross_covariance(prior.kernel, x, t, params["kernel"])
+    μt = prior.mean_function(t, params["mean_function"])
+    μx = prior.mean_function(x, params["mean_function"])
+
+    # Lx Lxᵀ = Kxx
+    Lx = jnp.linalg.cholesky(Kxx + I(n) * jitter)
+
+    # sqrt sqrtᵀ = Σ
+    sqrt = jnp.linalg.cholesky(cov + I(n) * jitter)
+
+    # Lz⁻¹ Kxt
+    Lx_inv_Kxt = jsp.linalg.solve_triangular(Lx, Kxt, lower=True)
+
+    # Kxx⁻¹ Kxt
+    Kxx_inv_Kxt = jsp.linalg.solve_triangular(Lx.T, Lx_inv_Kxt, lower=False)
+
+    # Ktx Kxx⁻¹ sqrt
+    Ktx_Kxx_inv_sqrt = jnp.matmul(Kxx_inv_Kxt.T, sqrt)
+    
+    # μt + Ktx Kxx⁻¹ (μ - μx)
+    mean = μt + jnp.matmul(Kxx_inv_Kxt.T, mu - μx)
+
+    # Ktt  -  Ktx Kxx⁻¹ Kxt  +  Ktx Kxx⁻¹ S Kxx⁻¹ Kxt
+    covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt) + jnp.matmul(Ktx_Kxx_inv_sqrt, Ktx_Kxx_inv_sqrt.T)
+    covariance += I(n_test) * jitter
+
+    return dx.MultivariateNormalFullCovariance(
+        jnp.atleast_1d(mean.squeeze()), covariance
+    )
+# %% [markdown]
+# From this we can construct the predictive distribution at the test points.
+# %%
+latent_dist = predict(laplace_approximation, D, xtest)
+
+predictive_dist = likelihood(latent_dist, map_estimate)
+
+predictive_mean = predictive_dist.mean()
+predictive_std = predictive_dist.stddev()
+
+fig, ax = plt.subplots(figsize=(12, 5))
+ax.plot(x, y, "o", label="Observations", color="tab:red")
+ax.plot(xtest, predictive_mean, label="Predictive mean", color="tab:blue")
+ax.fill_between(
+    xtest.squeeze(),
+    predictive_mean - predictive_std,
+    predictive_mean + predictive_std,
+    alpha=0.2,
+    color="tab:blue",
+    label='Two sigma',
+)
+ax.plot(xtest, predictive_mean - predictive_std, color="tab:blue", linestyle="--", linewidth=1)
+ax.plot(xtest, predictive_mean + predictive_std, color="tab:blue", linestyle="--", linewidth=1)
+
+ax.legend()
+# %% [markdown]
+# However, the Laplace approximation is still limited by considering information about the posterior at a single location. On the other hand, through approximate sampling, MCMC methods allow us to learn all information about the posterior distribution.
+
 # %% [markdown]
 # ## MCMC inference
 #
@@ -191,4 +322,4 @@ ax.fill_between(
 
 # %%
 # %load_ext watermark
-# %watermark -n -u -v -iv -w -a "Thomas Pinder (edited by Daniel Dodd)"
+# %watermark -n -u -v -iv -w -a "Thomas Pinder & Daniel Dodd"

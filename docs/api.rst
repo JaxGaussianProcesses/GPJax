@@ -139,7 +139,7 @@ Mean Functions
 Abstract Mean Functions
 *********************************
 
-.. autoclass:: MeanFunction
+.. autoclass:: AbstractMeanFunction
    :members:
 
 
@@ -156,8 +156,8 @@ Mean Functions
 Sparse Frameworks
 #################################
 
-.. automodule:: gpjax.sparse_gps
-.. currentmodule:: gpjax.sparse_gps
+.. automodule:: gpjax.variational_inference
+.. currentmodule:: gpjax.variational_inference
 
 
 Abstract Sparse Objects
@@ -177,13 +177,13 @@ Sparse Methods
 Variational Families
 #################################
 
-.. automodule:: gpjax.variational
-.. currentmodule:: gpjax.variational
+.. automodule:: gpjax.variational_families
+.. currentmodule:: gpjax.variational_families
 
 Abstract Variational Objects
 *********************************
 
-.. autoclass:: VariationalFamily
+.. autoclass:: AbstractVariationalFamily
    :members:
 
 
@@ -216,8 +216,6 @@ Asbtractions
 
 
 .. autofunction:: fit
-
-.. autofunction:: optax_fit
 
 .. autofunction:: fit_batches
 

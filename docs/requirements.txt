@@ -12,7 +12,8 @@ ipython
 ipykernel
 watermark
 sphinxext-opengraph
-blackjax==0.7.0
+blackjax>=0.8.2
+jaxopt
 dm-haiku
 ipywidgets
 # Install GPJax istself
