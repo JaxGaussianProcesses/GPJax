@@ -1,5 +1,4 @@
 from copy import deepcopy
-from multiprocessing.dummy import Array
 import typing as tp
 import jax.numpy as jnp
 import jax.scipy as jsp
@@ -11,8 +10,8 @@ from .variational_families import AbstractVariationalFamily, ExpectationVariatio
 from .variational_inference import StochasticVI
 from .utils import I
 from .gps import AbstractPosterior
-from .types import Dataset
-from .parameters import Identity, build_identity, transform, build_trainables_false, build_trainables_true, trainable_params
+from .types import Dataset, Array
+from .parameters import build_identity, transform, build_trainables_false, build_trainables_true, trainable_params
 
 DEFAULT_JITTER = get_defaults()["jitter"]
 
@@ -134,6 +133,12 @@ def natural_gradients(
         def nat_grads_fn(params: dict, trainables: dict, batch: Dataset) -> dict:
             """
             Computes the natural gradients of the ELBO.
+            Args:
+                params: A dictionary of parameters.
+                trainables: A dictionary of trainables. 
+                batch: A Dataset.
+            Returns:
+                dict: A dictionary of natural gradients.
             """
             # Transform parameters to constrained space.
             params = transform(params, transformations)
@@ -151,8 +156,9 @@ def natural_gradients(
             # Compute gradient ∂L/∂η:
             def loss_fn(params: dict, batch: Dataset) -> Array:
                 # Determine hyperparameters that should be trained.
-                trainables["variational_family"]["moments"] = build_trainables_true(params["variational_family"]["moments"])
-                params = trainable_params(params, trainables)
+                trains = deepcopy(trainables)
+                trains["variational_family"]["moments"] = build_trainables_true(params["variational_family"]["moments"])
+                params = trainable_params(params, trains) 
             
                 # Stop gradients for non-moment parameters.
                 params = _stop_gradients_nonmoments(params)
@@ -208,6 +214,17 @@ def natural_gradients(
         #     return value, nat_grads
 
     def hyper_grads_fn(params: dict,  trainables: dict, batch: Dataset) -> dict:
+        """
+        Computes the hyperparameter gradients of the ELBO.
+        Args:
+            params: A dictionary of parameters.
+            trainables: A dictionary of trainables. 
+            batch: A Dataset.
+        Returns:
+            dict: A dictionary of hyperparameter gradients.
+        """
+        # Transform parameters to constrained space.
+        params = transform(params, transformations)
 
         def loss_fn(params: dict, batch: Dataset) -> Array:
             # Determine hyperparameters that should be trained.

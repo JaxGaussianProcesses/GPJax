@@ -5,7 +5,6 @@ from ml_collections import ConfigDict
 
 __config = None
 
-Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 Softplus = dx.Lambda(
     forward=lambda x: jnp.log(1 + jnp.exp(x)),
     inverse=lambda x: jnp.log(jnp.exp(x) - 1.0),
@@ -30,6 +29,8 @@ Softplus = dx.Lambda(
 #         x = jnp.log(jnp.exp(y) - 1.0)
 #         logdet = 1 / (1 - jnp.exp(-y))
 #         return x, logdet
+
+Identity = dx.Lambda(forward = lambda x: x, inverse = lambda x: x)
 
 
 def get_defaults() -> ConfigDict:
