@@ -51,7 +51,6 @@ def initialise(model, key: PRNGKeyType = None, **kwargs) -> ParameterState:
     )
     return state
 
-
 def _validate_kwargs(kwargs, params):
     for k, v in kwargs.items():
         if k not in params.keys():
@@ -262,7 +261,7 @@ def prior_checks(priors: dict) -> dict:
     return priors
 
 
-def build_trainables(params: tp.Dict) -> tp.Dict:
+def build_trainables_true(params: tp.Dict) -> tp.Dict:
     """Construct a dictionary of trainable statuses for each parameter. By default, every parameter within the model is trainable.
 
     Args:
@@ -275,6 +274,22 @@ def build_trainables(params: tp.Dict) -> tp.Dict:
     prior_container = deepcopy(params)
     # Set all values to zero
     prior_container = jax.tree_util.tree_map(lambda _: True, prior_container)
+    return prior_container
+
+
+def build_trainables_false(params: tp.Dict) -> tp.Dict:
+    """Construct a dictionary of trainable statuses for each parameter. By default, every parameter within the model is NOT trainable.
+
+    Args:
+        params (tp.Dict): The parameter set for which trainable statuses should be derived from.
+
+    Returns:
+        tp.Dict: A dictionary of boolean trainability statuses. The dictionary is equal in structure to the input params dictionary.
+    """
+    # Copy dictionary structure
+    prior_container = deepcopy(params)
+    # Set all values to zero
+    prior_container = jax.tree_map(lambda _: False, prior_container)
     return prior_container
 
 

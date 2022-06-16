@@ -1,23 +1,23 @@
+from copy import deepcopy
+from multiprocessing.dummy import Array
 import typing as tp
 import jax.numpy as jnp
 import jax.scipy as jsp
-from jax import jacobian
 import distrax as dx
-from jax import lax
-import jax
+from jax import lax, value_and_grad
 
 from .config import get_defaults
-from .variational_families import AbstractVariationalFamily, ExpectationVariationalGaussian
+from .variational_families import AbstractVariationalFamily, ExpectationVariationalGaussian, NaturalVariationalGaussian
 from .variational_inference import StochasticVI
 from .utils import I
 from .gps import AbstractPosterior
 from .types import Dataset
-from .parameters import build_identity, transform
+from .parameters import Identity, build_identity, transform, build_trainables_false, build_trainables_true, trainable_params
 
 DEFAULT_JITTER = get_defaults()["jitter"]
 
 
-def natural_to_expectation(natural_moments: dict, jitter: float = DEFAULT_JITTER):
+def natural_to_expectation(natural_moments: dict, jitter: float = DEFAULT_JITTER) -> dict:
     """
     Converts natural parameters to expectation parameters.
     Args:
@@ -59,7 +59,7 @@ def natural_to_expectation(natural_moments: dict, jitter: float = DEFAULT_JITTER
 def _expectation_elbo(posterior: AbstractPosterior,
             variational_family: AbstractVariationalFamily,
             train_data: Dataset,
-            ):
+            ) -> tp.Callable[[dict, Dataset], float]:
     """
     Construct evidence lower bound (ELBO) for varational Gaussian under the expectation parameterisation.
     Args:
@@ -76,61 +76,150 @@ def _expectation_elbo(posterior: AbstractPosterior,
     return svgp.elbo(train_data, build_identity(svgp.params))
 
 
-
-#DOES NOT WORK YET.
-def natural_gradients(
-    posterior: AbstractPosterior,
-    variational_family: AbstractVariationalFamily,
-    train_data: Dataset,
-    params: dict,
-    transformations: dict,
-    batch,
-    nat_to_moments: tp.Optional[dx.Bijector] = Identity,
-    ) -> dict:
+def _stop_gradients_nonmoments(params: tp.Dict) -> tp.Dict:
     """
-    Computes natural gradients for a variational family.
+    Stops gradients for non-moment parameters.
     Args:
-        posterior (AbstractPosterior): An instance of AbstractPosterior.
-        variational_family(AbstractVariationalFamily): An instance of AbstractVariationalFamily.
-        train_data (Dataset): Training Dataset.
-        params (tp.Dict): A dictionary of model parameters.
-        transformations (tp.Dict): A dictionary of parameter transformations.
-        nat_to_moments (dx.Bijector): A bijector between natural and the chosen parameterisations of the Gaussian variational moments.
+        params: A dictionary of parameters.
     Returns:
-        tp.Dict: Dictionary of natural gradients.
+        tp.Dict: A dictionary of parameters with stopped gradients.
     """
-    # Transform the parameters.
-    params = transform(params, transformations)
+    trainables = build_trainables_false(params)
+    moment_trainables = build_trainables_true(params["variational_family"]["moments"])
+    trainables["variational_family"]["moments"] = moment_trainables
+    params = trainable_params(params, trainables)
+    return params
 
-    # Get moments and stop gradients for non-moment parameters.
-    moments = params["variational_family"]["moments"]
+def _stop_gradients_moments(params: tp.Dict) -> tp.Dict:
+    """
+    Stops gradients for moment parameters.
+    Args:
+        params: A dictionary of parameters.
+    Returns:
+        tp.Dict: A dictionary of parameters with stopped gradients.
+    """
+    trainables = build_trainables_true(params)
+    moment_trainables = build_trainables_false(params["variational_family"]["moments"])
+    trainables["variational_family"]["moments"] = moment_trainables
+    params = trainable_params(params, trainables)
+    return params
 
-    # TO DO -> CAN WE WRITE BELOW AS A ONE LINER?
-    other_var_params = {k:v for k,v in params["variational_family"].items() if k!="moments"}
-    other_params = lax.stop_gradient({**{k:v for k,v in params.items() if k!="variational_family"}, **{"variational_family": other_var_params}})
 
+def natural_gradients(
+    stochastic_vi: StochasticVI,
+    train_data: Dataset,
+    transformations: dict,
+    #bijector = tp.Optional[dx.Bijector] = Identity, #bijector: A bijector to convert between the user chosen parameterisation and the natural parameters.
+ ) -> tp.Tuple[tp.Callable[[dict, Dataset], dict]]:
+    """
+    Computes natural gradients for variational Gaussian.
+    Args:
+        posterior: An instance of AbstractPosterior.
+        variational_family: An instance of AbstractVariationalFamily.
+        train_data: A Dataset.
+        transformations: A dictionary of transformations.
+    Returns:
+        Tuple[tp.Callable[[dict, Dataset], dict]]: Functions that compute natural gradients and hyperparameter gradients respectively.
+    """
+    posterior = stochastic_vi.posterior
+    variational_family = stochastic_vi.variational_family
 
-    # Convert moments to natural parameterisation.
-    natural_moments = nat_to_moments.inverse(moments)
-
-    # Gradient function ∂ξ/∂θ:
-    dxi_dnat = jacobian(nat_to_moments.forward)(natural_moments)
-
-    # Convert natural moments to expectation moments.
-    expectation_moments = natural_to_expectation(natural_moments)
-
-    # Create dictionary of all parameters for the ELBO under the expectation parameterisation.
-    expectation_params = other_params
-    expectation_params["variational_family"]["moments"] = expectation_moments
-
-    # Compute ELBO.
+    # The ELBO under the user chosen parameterisation xi.
+    xi_elbo = stochastic_vi.elbo(train_data, transformations)
+    
+    # The ELBO under the expectation parameterisation, L(η).
     expectation_elbo = _expectation_elbo(posterior, variational_family, train_data)
 
-    # Compute gradient ∂L/∂η:
-    dL_dnat = jacobian(expectation_elbo)(expectation_params, batch)
-    
-    # Compute natural gradient:
-    
-    nat_grads = jax.tree_multimap(lambda x, y: jnp.matmul(x.T, y), dxi_dnat, dL_dnat)
-    
-    return  nat_grads
+    if isinstance(variational_family, NaturalVariationalGaussian):
+        def nat_grads_fn(params: dict, trainables: dict, batch: Dataset) -> dict:
+            """
+            Computes the natural gradients of the ELBO.
+            """
+            # Transform parameters to constrained space.
+            params = transform(params, transformations)
+            
+            # Get natural moments θ.
+            natural_moments = params["variational_family"]["moments"]
+
+            # Get expectation moments η.
+            expectation_moments = natural_to_expectation(natural_moments)
+
+            # Full params with expectation moments.
+            expectation_params = deepcopy(params)
+            expectation_params["variational_family"]["moments"] = expectation_moments
+
+            # Compute gradient ∂L/∂η:
+            def loss_fn(params: dict, batch: Dataset) -> Array:
+                # Determine hyperparameters that should be trained.
+                trainables["variational_family"]["moments"] = build_trainables_true(params["variational_family"]["moments"])
+                params = trainable_params(params, trainables)
+            
+                # Stop gradients for non-moment parameters.
+                params = _stop_gradients_nonmoments(params)
+
+                return expectation_elbo(params, batch)
+
+            value, dL_dnat = value_and_grad(loss_fn)(expectation_params, batch)
+
+            return value, dL_dnat
+
+    else:
+        #To Do: (DD) add general parameterisation case. 
+        raise NotImplementedError
+
+        # BELOW is (almost working) PSUEDO CODE of what this will look like.
+        
+        # def nat_grads_fn(params: dict, batch: Dataset) -> dict:
+        #     # Transform parameters to constrained space.
+        #     params = transform(params, transformations)
+
+        #     # Stop gradients for non-moment parameters.
+        #     params = _stop_gradients_nonmoments(params)
+
+        #     # Get natural moments θ.
+        #     natural_moments = bijector.inverse(params["variational_family"]["moments"])
+
+        #     # Get expectation moments η.
+        #     expectation_moments = natural_to_expectation(natural_moments)
+
+        #     # Gradient function ∂ξ/∂θ:
+        #     #### NEED TO STOP GRADIENTS FOR NON MOMENTS HERE!####
+        #     dxi_dnat = jacobian(nat_to_moments.forward)(natural_moments)
+
+        #     # Full params with expectation moments.
+        #     expectation_params = deepcopy(params)
+        #     expectation_params["variational_family"]["moments"] = expectation_moments
+
+        #     # Compute gradient ∂L/∂η:
+        #     def loss_fn(params: dict, batch: Dataset) -> Array:
+        #       # Determine hyperparameters that should be trained.
+        #       params = trainable_params(params, trainables)
+
+        #       # Stop gradients for non-moment parameters.
+        #       params = _stop_gradients_nonmoments(params)
+
+        #       return expectation_elbo(expectation_params, batch)
+
+        #     value, dL_dnat = value_and_grad(loss_fn)(expectation_params, batch)
+
+        #     # ∂ξ/∂θ ∂L/∂η
+        #     nat_grads = jax.tree_multimap(lambda x, y: jnp.matmul(x.T, y), dxi_dnat, dL_dnat)
+
+        #     return value, nat_grads
+
+    def hyper_grads_fn(params: dict,  trainables: dict, batch: Dataset) -> dict:
+
+        def loss_fn(params: dict, batch: Dataset) -> Array:
+            # Determine hyperparameters that should be trained.
+            params = trainable_params(params, trainables)
+
+            # Stop gradients for the moment parameters.
+            params = _stop_gradients_moments(params)
+
+            return xi_elbo(params, batch)
+
+        value, dL_dhyper  =  value_and_grad(loss_fn)(params, batch)
+
+        return  value, dL_dhyper
+
+    return nat_grads_fn, hyper_grads_fn
