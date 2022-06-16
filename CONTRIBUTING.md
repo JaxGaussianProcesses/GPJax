@@ -19,7 +19,7 @@ You can ask a question or start a discussion in the [Discussion section](https:/
 
 Please submit patches via pull requests.
 
-The preferred workflow for contributing is to fork the [GitHub repository](https://github.com/thomaspinder/GPJax), clone it to your local machine, and develop on a feature branch.
+The preferred workflow for contributing is to fork the [GitHub repository](https://github.com/thomaspinder/GPJax), clone it to your local machine, and develop on a feature branch. Once you are ready to commit your changes, install the pre-commit hooks with `pre-commit install` and the commit and push your code as usual.
 
 ## Steps:
 
