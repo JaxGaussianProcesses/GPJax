@@ -37,24 +37,8 @@ For intuition of GPJax's exposed API, a simple example that derives the Gaussian
     :maxdepth: 1
     :caption: Examples
 
-    nbs/regression
-    nbs/classification
-    nbs/sparse_regression
-    nbs/graph_kernels
     nbs/barycentres
-    nbs/haiku
 
-.. toctree::
-    :maxdepth: 1
-    :caption: Guides
-
-    nbs/kernels
-
-.. toctree::
-    :maxdepth: 1
-    :caption: Experimental
-
-    nbs/tfp_integration
 
 .. toctree::
     :maxdepth: 1

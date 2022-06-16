@@ -6,14 +6,15 @@
 
 # -- Path setup --------------------------------------------------------------
 
+import io
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sys
 import re
-import io
+import sys
 
 from importlib_metadata import version
 
@@ -85,9 +86,6 @@ bibtex_bibfiles = ["refs.bib"]
 bibtex_style = "unsrt"
 bibtex_reference_style = "author_year"
 nbsphinx_allow_errors = True
-nbsphinx_custom_formats = {
-    ".pct.py": ["jupytext.reads", {"fmt": "py:percent"}],
-}
 
 # Latex commands
 # mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -100,7 +98,10 @@ with open("latex_symbols.tex", "r") as f:
             if len(macro[1]) == 0:
                 mathjax3_config["tex"]["macros"][macro[0]] = "{" + macro[3] + "}"
             else:
-                mathjax3_config["tex"]["macros"][macro[0]] = ["{" + macro[3] + "}", int(macro[2])]
+                mathjax3_config["tex"]["macros"][macro[0]] = [
+                    "{" + macro[3] + "}",
+                    int(macro[2]),
+                ]
 
 latex_documents = [
     ("contents", "gpjax.tex", "GPJax", "Thomas Pinder"),
