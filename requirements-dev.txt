@@ -1,3 +1,4 @@
 pytest
 networkx
 pytest-cov
+pre-commit
