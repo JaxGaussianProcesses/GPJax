@@ -50,7 +50,7 @@ def natural_to_expectation(natural_moments: dict, jitter: float = DEFAULT_JITTER
     # η₁ = μ
     expectation_vector = mu
     
-    # η₂ = S + η₁ η₁ᵀ
+    # η₂ = S + μ μᵀ
     expectation_matrix = S + jnp.matmul(mu, mu.T)
     
     return {"expectation_vector": expectation_vector, "expectation_matrix": expectation_matrix}
@@ -73,7 +73,7 @@ def _expectation_elbo(posterior: AbstractPosterior,
                                         )
     svgp = StochasticVI(posterior=posterior, variational_family=evg)
 
-    return svgp.elbo(train_data, build_identity(svgp.params))
+    return svgp.elbo(train_data, build_identity(svgp.params), negative=True)
 
 
 def _stop_gradients_nonmoments(params: tp.Dict) -> tp.Dict:
@@ -125,7 +125,7 @@ def natural_gradients(
     variational_family = stochastic_vi.variational_family
 
     # The ELBO under the user chosen parameterisation xi.
-    xi_elbo = stochastic_vi.elbo(train_data, transformations)
+    xi_elbo = stochastic_vi.elbo(train_data, transformations, negative=True)
     
     # The ELBO under the expectation parameterisation, L(η).
     expectation_elbo = _expectation_elbo(posterior, variational_family, train_data)
@@ -248,3 +248,56 @@ def natural_gradients(
         return  value, dL_dhyper
 
     return nat_grads_fn, hyper_grads_fn
+
+
+from gpjax.abstractions import progress_bar_scan
+import optax as ox
+import jax
+
+adam = ox.adam(1e-3)
+sgd = ox.sgd(1.)
+
+def fit_natgrads(
+    stochastic_vi: StochasticVI,
+    params: tp.Dict,
+    trainables: tp.Dict,
+    transformations: tp.Dict,
+    train_data: Dataset,
+    moment_opt = ox.sgd(1e-3),
+    hyper_opt = ox.adam(1e-3),
+    n_iters: tp.Optional[int] = 100,
+    log_rate: tp.Optional[int] = 10,
+) -> tp.Dict:
+
+    hyper_state = hyper_opt.init(params)
+    moment_state = moment_opt.init(params)
+
+    nat_grads_fn, hyper_grads_fn = natural_gradients(stochastic_vi, train_data, transformations)
+
+    next_batch = train_data.get_batcher()
+
+    @progress_bar_scan(n_iters, log_rate)
+    def step(params_opt_state, i):
+        params, moment_state, hyper_state = params_opt_state
+        batch = next_batch()
+        
+        # Natural gradients update:
+        loss_val, loss_gradient = nat_grads_fn(params, trainables, batch)
+        updates, moment_state = moment_opt.update(loss_gradient, moment_state, params)
+        params = ox.apply_updates(params, updates)
+        
+        
+        # Hyper-parameters update:
+        loss_val, loss_gradient = hyper_grads_fn(params, trainables, batch)
+        updates, hyper_state = hyper_opt.update(loss_gradient, hyper_state, params)
+        params = ox.apply_updates(params, updates)
+        
+        
+        params_opt_state = params, moment_state, hyper_state
+        
+        
+        return params_opt_state, loss_val
+
+    (params, _, _), _ = jax.lax.scan(step, (params, moment_state, hyper_state), jnp.arange(n_iters))
+
+    return params
