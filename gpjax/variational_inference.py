@@ -7,14 +7,17 @@ from chex import dataclass
 from jax import vmap
 
 from .gps import AbstractPosterior
+from .kernels import cross_covariance, diagonal, gram
+from .likelihoods import Gaussian
 from .parameters import transform
 from .quadrature import gauss_hermite_quadrature
 from .types import Array, Dataset
-from .utils import concat_dictionaries, I
-from .variational_families import AbstractVariationalFamily
-from .kernels import cross_covariance, diagonal, gram
-from .likelihoods import Gaussian
-from .variational_families import CollapsedVariationalGaussian
+from .utils import I, concat_dictionaries
+from .variational_families import (
+    AbstractVariationalFamily,
+    CollapsedVariationalGaussian,
+)
+
 
 @dataclass
 class AbstractVariationalInference:
@@ -31,7 +34,7 @@ class AbstractVariationalInference:
     def params(self) -> Dict:
         """Construct the parameter set used within the variational scheme adopted."""
         hyperparams = concat_dictionaries(
-            {"likelihood": self.posterior.likelihood.params}, 
+            {"likelihood": self.posterior.likelihood.params},
             self.variational_family.params,
         )
         return hyperparams
@@ -104,11 +107,15 @@ class StochasticVI(AbstractVariationalInference):
 
         # q(f(x))
         predictive_dist = vmap(self.variational_family.predict(params))(x[:, None])
-        mean = predictive_dist.mean().val.reshape(-1,1)
-        variance = predictive_dist.variance().val.reshape(-1,1)
+        mean = predictive_dist.mean().val.reshape(-1, 1)
+        variance = predictive_dist.variance().val.reshape(-1, 1)
 
         # log(p(y|f(x)))
-        log_prob = vmap(lambda f, y: self.likelihood.link_function(f, params["likelihood"]).log_prob(y))
+        log_prob = vmap(
+            lambda f, y: self.likelihood.link_function(
+                f, params["likelihood"]
+            ).log_prob(y)
+        )
 
         # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
         expectation = gauss_hermite_quadrature(log_prob, mean, variance, y=y)
@@ -118,17 +125,17 @@ class StochasticVI(AbstractVariationalInference):
 
 @dataclass
 class CollapsedVI(AbstractVariationalInference):
-    """Collapsed variational inference for a sparse Gaussian process regression model. 
+    """Collapsed variational inference for a sparse Gaussian process regression model.
     The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes."""
 
     def __post_init__(self):
         self.prior = self.posterior.prior
         self.likelihood = self.posterior.likelihood
         self.num_inducing = self.variational_family.num_inducing
-        
+
         if not isinstance(self.likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")
-            
+
         if not isinstance(self.variational_family, CollapsedVariationalGaussian):
             raise TypeError("Variational family must be CollapsedVariationalGaussian.")
 
@@ -146,11 +153,10 @@ class CollapsedVI(AbstractVariationalInference):
             Callable[[Dict, Dataset], Array]: A callable function that accepts a current parameter estimate for which gradients should be computed.
         """
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-        
+
         x, y, n = train_data.X, train_data.y, train_data.n
-        
+
         m = self.num_inducing
-       
 
         def elbo_fn(params: Dict) -> Array:
             params = transform(params, transformations)
@@ -161,10 +167,10 @@ class CollapsedVI(AbstractVariationalInference):
             Kzx = cross_covariance(self.prior.kernel, z, x, params["kernel"])
             Kxx_diag = diagonal(self.prior.kernel, x, params["kernel"])
             μx = self.prior.mean_function(x, params["mean_function"])
-            
+
             Lz = jnp.linalg.cholesky(Kzz)
 
-            # A = Lz⁻¹ Kzt / σ
+            # A = Lz⁻¹ Kzx / σ
             A = jsp.linalg.solve_triangular(Lz, Kzx, lower=True) / jnp.sqrt(noise)
 
             # AAᵀ
@@ -177,22 +183,28 @@ class CollapsedVI(AbstractVariationalInference):
             L = jnp.linalg.cholesky(B)
 
             # log|B| = 2 trace(log|L|) = 2 Σᵢ log Lᵢᵢ  [since |B| = |LLᵀ| = |L|²  => log|B| = 2 log|L|, and |L| = Πᵢ Lᵢᵢ]
-            log_det_B = 2. * jnp.sum(jnp.log(jnp.diagonal(L)))
+            log_det_B = 2.0 * jnp.sum(jnp.log(jnp.diagonal(L)))
 
-            diff =  y - μx
+            diff = y - μx
 
             # L⁻¹ A (y - μx)
-            L_inv_A_diff = jsp.linalg.solve_triangular(L, jnp.matmul(A, diff), lower=True)
+            L_inv_A_diff = jsp.linalg.solve_triangular(
+                L, jnp.matmul(A, diff), lower=True
+            )
 
-            #  - 1/2 (y - μx)ᵀ (Bσ²)⁻¹ (y - μx) 
-            quad = (jnp.sum(L_inv_A_diff ** 2) - jnp.sum((y - μx) ** 2)) / (2. * noise)
-            
+            #  - 1/2 (y - μx)ᵀ (Bσ²)⁻¹ (y - μx)
+            quad = (jnp.sum(L_inv_A_diff**2) - jnp.sum(diff**2)) / (2.0 * noise)
+
             # log N(y; μx, Bσ²) = -nπ - n/2 log(σ²) - 1/2 log|B| - 1/2 (y - μx)ᵀ (Bσ²)⁻¹ (y - μx)
-            log_prob = - n / 2. * (jnp.log(2. * jnp.pi) + jnp.log(noise)) - log_det_B/2. + quad
+            log_prob = (
+                -n / 2.0 * (jnp.log(2.0 * jnp.pi) + jnp.log(noise))
+                - log_det_B / 2.0
+                + quad
+            )
 
             # 1/2 trace(Kxx - AAᵀ)
-            trace = (jnp.sum(Kxx_diag) / noise - jnp.trace(AAT)) / 2   
-            
+            trace = (jnp.sum(Kxx_diag) / noise - jnp.sum(jnp.diag(AAT))) / 2.0
+
             # log N(y; μx, Bσ²) - 1/2 trace(Kxx - AAᵀ)
             return constant * (log_prob - trace).squeeze()
 
