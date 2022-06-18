@@ -170,7 +170,30 @@ class CollapsedVI(AbstractVariationalInference):
 
             Lz = jnp.linalg.cholesky(Kzz)
 
-            # A = Lz⁻¹ Kzx / σ
+            # Notation and derivation:
+            #
+            # Let Q = KxzKzz⁻¹Kzx, we must compute the log normal pdf:
+            #
+            #   log N(y; μx, σ²I + Q) = -nπ - n/2 log|σ²I + Q| - 1/2 (y - μx)ᵀ (σ²I + Q)⁻¹ (y - μx).
+            #
+            # The log determinant |σ²I + Q| is computed via applying the matrix determinant lemma
+            #
+            #   |σ²I + Q| = log|σ²I| + log|I + Lz⁻¹ Kzx (σ²I)⁻¹ Kxz Lz⁻¹| = log(σ²) +  log|B|,
+            #
+            #   with B = I + AAᵀ and A = Lz⁻¹ Kzx / σ.
+            #
+            # Similary we apply matrix inversion lemma to invert σ²I + Q
+            #
+            #   (σ²I + Q)⁻¹ = (Iσ²)⁻¹ - (Iσ²)⁻¹ Kxz Lz⁻ᵀ (I + Lz⁻¹ Kzx (Iσ²)⁻¹ Kxz Lz⁻ᵀ )⁻¹ Lz⁻¹ Kzx (Iσ²)⁻¹
+            #               = (Iσ²)⁻¹ - (Iσ²)⁻¹ σAᵀ (I + σA (Iσ²)⁻¹ σAᵀ)⁻¹ σA (Iσ²)⁻¹
+            #               = I/σ² - Aᵀ B⁻¹ A/σ²,
+            #
+            # giving the quadratic term as
+            #
+            #   (y - μx)ᵀ (σ²I + Q)⁻¹ (y - μx) = [(y - μx)ᵀ(y - µx)  - (y - μx)ᵀ Aᵀ B⁻¹ A (y - μx)]/σ²,
+            #
+            #   with A and B defined as above.
+
             A = jsp.linalg.solve_triangular(Lz, Kzx, lower=True) / jnp.sqrt(noise)
 
             # AAᵀ
@@ -192,20 +215,20 @@ class CollapsedVI(AbstractVariationalInference):
                 L, jnp.matmul(A, diff), lower=True
             )
 
-            #  - 1/2 (y - μx)ᵀ (Bσ²)⁻¹ (y - μx)
+            #  - 1/2 (y - μx)ᵀ (Iσ² + Q)⁻¹ (y - μx)
             quad = (jnp.sum(L_inv_A_diff**2) - jnp.sum(diff**2)) / (2.0 * noise)
 
-            # log N(y; μx, Bσ²) = -nπ - n/2 log(σ²) - 1/2 log|B| - 1/2 (y - μx)ᵀ (Bσ²)⁻¹ (y - μx)
+            # log N(y; μx, Iσ² + Q)
             log_prob = (
                 -n / 2.0 * (jnp.log(2.0 * jnp.pi) + jnp.log(noise))
                 - log_det_B / 2.0
                 + quad
             )
 
-            # 1/2 trace(Kxx - AAᵀ)
+            # 1/2σ² tr(Kxx - Q) [Trace law tr(AB) = tr(BA) => tr(KxzKzz⁻¹Kzx) = tr(KxzLz⁻ᵀLz⁻¹Kzx) = tr(Lz⁻¹Kzx KxzLz⁻ᵀ) = trace(σ²AAᵀ)]
             trace = (jnp.sum(Kxx_diag) / noise - jnp.sum(jnp.diag(AAT))) / 2.0
 
-            # log N(y; μx, Bσ²) - 1/2 trace(Kxx - AAᵀ)
+            # log N(y; μx, Iσ² + KxzKzz⁻¹Kzx) - 1/2 tr(Kxx - KxzKzz⁻¹Kzx)
             return constant * (log_prob - trace).squeeze()
 
         return elbo_fn
