@@ -215,20 +215,16 @@ class CollapsedVI(AbstractVariationalInference):
                 L, jnp.matmul(A, diff), lower=True
             )
 
-            #  - 1/2 (y - μx)ᵀ (Iσ² + Q)⁻¹ (y - μx)
-            quad = (jnp.sum(L_inv_A_diff**2) - jnp.sum(diff**2)) / (2.0 * noise)
+            #  (y - μx)ᵀ (Iσ² + Q)⁻¹ (y - μx)
+            quad = (jnp.sum(diff**2) - jnp.sum(L_inv_A_diff**2)) / noise
 
-            # log N(y; μx, Iσ² + Q)
-            log_prob = (
-                -n / 2.0 * (jnp.log(2.0 * jnp.pi) + jnp.log(noise))
-                - log_det_B / 2.0
-                + quad
-            )
+            # 2 * log N(y; μx, Iσ² + Q)
+            two_log_prob = -n * jnp.log(2.0 * jnp.pi * noise) - log_det_B - quad
 
-            # 1/2σ² tr(Kxx - Q) [Trace law tr(AB) = tr(BA) => tr(KxzKzz⁻¹Kzx) = tr(KxzLz⁻ᵀLz⁻¹Kzx) = tr(Lz⁻¹Kzx KxzLz⁻ᵀ) = trace(σ²AAᵀ)]
-            trace = (jnp.sum(Kxx_diag) / noise - jnp.sum(jnp.diag(AAT))) / 2.0
+            # 1/σ² tr(Kxx - Q) [Trace law tr(AB) = tr(BA) => tr(KxzKzz⁻¹Kzx) = tr(KxzLz⁻ᵀLz⁻¹Kzx) = tr(Lz⁻¹Kzx KxzLz⁻ᵀ) = trace(σ²AAᵀ)]
+            two_trace = jnp.sum(Kxx_diag) / noise - jnp.sum(jnp.diagonal(AAT))
 
             # log N(y; μx, Iσ² + KxzKzz⁻¹Kzx) - 1/2 tr(Kxx - KxzKzz⁻¹Kzx)
-            return constant * (log_prob - trace).squeeze()
+            return constant * (two_log_prob - two_trace).squeeze() / 2.0
 
         return elbo_fn
