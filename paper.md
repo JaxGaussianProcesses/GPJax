@@ -44,7 +44,7 @@ From both an applied and methodological perspective, GPs are widely employed in 
 
 For completeness, packages written for languages other than Python include GPML [@rasmussen2010gaussian] and GPStuff [@vanhatalo2013gpstuff] in Matlab. An R port also exists for GPStuff. Within Julia, there exists GaussianProcesses.jl [@fairbrother2022gaussianprocesses], AugmentedGaussianProcesses.jl [@fajou20a] and Stheno.jl [@stheno2022tebbutt].
 
-Gaussian process implementations are available in a number of modern probabilistic programming languages such as NumPyro [@phan2019composable], Stan [@carpenter2017stan], and PyMC [@Salvatier2016].
+GP implementations are available in a number of modern probabilistic programming languages such as NumPyro [@phan2019composable], Stan [@carpenter2017stan], and PyMC [@Salvatier2016].
 
 # External usage
 
