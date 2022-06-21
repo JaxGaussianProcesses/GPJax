@@ -24,11 +24,11 @@ bibliography: paper.bib
 
 # Summary
 
-Gaussian processes (GPs) [@rasmussen2006gaussian] are Bayesian nonparametric models that have been successfully used in applications such as geostatistics [@matheron1963principles], Bayesian optimisation [@mockus1978application], and reinforcement learning [@deisenroth2011pilco]. In `GPJax`, we seek to build computational abstractions of GPs that closely resemble the underlying maths that one would write on paper. Consequently, `GPJax` provides a modern GP package that can easily be tailored and extended to meet the individual needs of researchers and scientists wishing to develop their GP methodology.
+Gaussian processes (GPs) [@rasmussen2006gaussian] are Bayesian nonparametric models that have been successfully used in applications such as geostatistics [@matheron1963principles], Bayesian optimisation [@mockus1978application], and reinforcement learning [@deisenroth2011pilco]. `GPJax` is a didactic GP library targeted at researchers who wish to develop novel GP methodology. The scope of `GPJax` is to provide users with a set of composable objects for constructing GP models that closely resemble the underlying maths that one would write on paper. Furthmore, by the virtue of being written in Jax [@jax2018github], `GPJax` natively supports CPUs, GPUs and TPUs through efficient compilation to XLA, automatic differentiation and vectorised operations. Consequently, `GPJax` provides a modern GP package that can effortlessly be tailored, extended and interleaved with other libraries to meet the individual needs of researchers and scientists.
 
-`GPJax` is a didactic GP library targeted at researchers who wish to develop novel GP methodology. The scope of `GPJax` is to provide users with a set of composable objects for constructing GP models, written in a manner that is easy to extend and adapt to a user's own unique needs through an interleaved design with other libraries.
 
-`GPJax` is written in Jax [@jax2018github] and it is possible to run all `GPJax` code on CPUs, GPUs or TPUs through efficient compilation to XLA. In addition to this, `GPJax` natively supports automatic differentiation and vectorised operations through its Jax underpinning.
+
+
 
 # Statement of Need
 
@@ -40,22 +40,22 @@ The intimacy between `GPJax` and the underlying maths also makes `GPJax` an exce
 
 # Wider Software Ecosystem
 
-From both an applied and methodological perspective, GPs are widely employed in the statistics and machine learning communities. High-quality software packages that promote GP modelling are accountable for much of their success. Within the Python community, the three most popular packages for GP modelling are GPFlow [@matthews2017gpflow], GPyTorch [@gardner2018gpytorch], and GPy [@gpy2014]. Despite these packages being indispensable tools for the community, none support integration with a Jax-based workflow. On the other hand, BayesNewton [@wilkinson2021bayesnewton] and TinyGP [@dfm2021tinygp] packages utilise a Jax backend. However, BayesNewton is designed on top of ObJax [@objax2020github], meaning that integration with the broader Jax ecosystem can be challenging. Meanwhile, TinyGP offers excellent integration with inference frameworks such as NumPyro [@phan2019composable] but does not yet support inducing points frameworks (e.g., [@hensman2013gaussian]). `GPJax` exists to resolve these issues. Furthermore, modern research from the GP literature, graph kernels [@borovitskiy2021matern] and Wasserstein barycentres for GPs [@mallasto2017learning], for example, are supported within `GPJax` but absent from these other packages. Finally, the Stheno package [@stheno2022bruinsma] supports a Jax backend along with TensorFlow, PyTorch and Numpy. Whilst this effortlessly integrates GPs into an extensive Jax workflow, GPJax has the advantage of being a pure Jax codebase, whereas Stheno requires using a custom linear algebra framework.
+From both an applied and methodological perspective, GPs are widely employed in the statistics and machine learning communities. High-quality software packages that promote GP modelling are accountable for much of their success. Within the Python community, the three most popular packages for GP modelling are GPFlow [@matthews2017gpflow], GPyTorch [@gardner2018gpytorch], and GPy [@gpy2014]. Despite these packages being indispensable tools for the community, none support integration with a Jax-based workflow. On the other hand, BayesNewton [@wilkinson2021bayesnewton] and TinyGP [@dfm2021tinygp] packages utilise a Jax backend. However, BayesNewton is designed on top of ObJax [@objax2020github], making integration with the broader Jax ecosystem challenging. Meanwhile, TinyGP offers excellent integration with inference frameworks such as NumPyro [@phan2019composable] but does not yet support inducing points frameworks (e.g., [@hensman2013gaussian]). `GPJax` exists to resolve these issues. Furthermore, modern research from the GP literature, graph kernels [@borovitskiy2021matern] and Wasserstein barycentres for GPs [@mallasto2017learning], for example, are supported within `GPJax` but absent from these packages. Finally, the Stheno package [@stheno2022bruinsma] supports a Jax backend along with TensorFlow, PyTorch and Numpy. Whilst this integrates GPs into an extensive Jax workflow, `GPJax` has the advantage of being a pure Jax codebase, whereas Stheno requires using a custom linear algebra framework.
 
-For completeness, packages written for languages other than Python include GPML [@rasmussen2010gaussian] and GPStuff [@vanhatalo2013gpstuff] in Matlab. An R port also exists for GPStuff. Within Julia, there exists GaussianProcesses.jl [@fairbrother2022gaussianprocesses], AugmentedGaussianProcesses.jl [@fajou20a] and Stheno.jl [@stheno2022tebbutt].
+For completeness, packages written for languages other than Python include GPML [@rasmussen2010gaussian] and GPStuff [@vanhatalo2013gpstuff] in MATLAB. An R port also exists for GPStuff. Within Julia, there exists GaussianProcesses.jl [@fairbrother2022gaussianprocesses], AugmentedGaussianProcesses.jl [@fajou20a] and Stheno.jl [@stheno2022tebbutt].
 
-GP implementations are available in a number of modern probabilistic programming languages such as NumPyro [@phan2019composable], Stan [@carpenter2017stan], and PyMC [@Salvatier2016].
+GP implementations are available in numerous modern probabilistic programming languages such as NumPyro [@phan2019composable], Stan [@carpenter2017stan], and PyMC [@Salvatier2016].
 
-# External usage
+# External Usage
 
-Two recent research papers [@pinder2021gaussian] and [@pinder2022street] use the graph kernel functionality provided in `GPJax`.
+Two recent research papers [@pinder2021gaussian] and [@pinder2022street] utilise the graph kernel functionality provided by `GPJax`.
 
 # Acknowledgments
 
-GPJax is an open-source project and has therefore benefitted from contributions from the wider community. In particular, the contributions by Juan Emmanuel Johnson and Erik Bodin have improved the package. Further, the thoughts and advice of the wider GP community have helped shape the package into what it is today.
+As an open-source project, `GPJax` has benefitted from contributions made by the wider community. We especially thank Juan Emmanuel Johnson and are grateful for the thoughts and advice from the wider GP community.
 
 # Funding Statement
 
-TP is supported by the Data Science for the Natural Environment project (EPSRC grant number EP/R01860X/1). DD is supported by the EPSRC funded STOR-i Centre for Doctoral Training (EP/S022252/1) and the ARC Research Hub for Transforming Energy Infrastructure through Digital Engineering (IH200100009).
+TP is supported by the Data Science for the Natural Environment project (EPSRC grant number EP/R01860X/1). DD is supported by the STOR-i Centre for Doctoral Training (EPSRC grant number EP/S022252/1) and the Research Hub for Transforming Energy Infrastructure through Digital Engineering (ARC grant number IH200100009).
 
 # References
