@@ -12,7 +12,7 @@ from .likelihoods import Gaussian
 from .parameters import transform
 from .quadrature import gauss_hermite_quadrature
 from .types import Array, Dataset
-from .utils import I, concat_dictionaries
+from .utils import I, concat_dictionaries, experimental
 from .variational_families import (
     AbstractVariationalFamily,
     CollapsedVariationalGaussian,
@@ -158,6 +158,7 @@ class CollapsedVI(AbstractVariationalInference):
 
         m = self.num_inducing
 
+        @experimental
         def elbo_fn(params: Dict) -> Array:
             params = transform(params, transformations)
             noise = params["likelihood"]["obs_noise"]

@@ -1,5 +1,7 @@
 import typing as tp
+import warnings
 from copy import deepcopy
+
 import jax
 import jax.numpy as jnp
 
@@ -77,3 +79,22 @@ def dict_array_coercion(params: tp.Dict) -> tp.Tuple[tp.Callable, tp.Callable]:
         return jax.tree_util.tree_unflatten(flattened_pytree[1], parameter_array)
 
     return dict_to_array, array_to_dict
+
+
+from functools import wraps
+
+
+def experimental(method):
+    """
+    This is a decorator that can be used to mark a function as experimental.
+    """
+
+    @wraps(method)
+    def wrapper(*args, **kwargs):
+        warnings.warn(
+            "This function is experimental and may give unstable results.",
+            category=UserWarning,
+        )
+        return method(*args, **kwargs)
+
+    return wrapper
