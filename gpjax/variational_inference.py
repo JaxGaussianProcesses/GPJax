@@ -166,7 +166,7 @@ class CollapsedVI(AbstractVariationalInference):
             Kzz = gram(self.prior.kernel, z, params["kernel"])
             Kzz += I(m) * self.variational_family.jitter
             Kzx = cross_covariance(self.prior.kernel, z, x, params["kernel"])
-            Kxx_diag = diagonal(self.prior.kernel, x, params["kernel"])
+            Kxx_diag = vmap(self.prior.kernel, in_axes=(0, 0, None))(x, x, params["kernel"])
             μx = self.prior.mean_function(x, params["mean_function"])
 
             Lz = jnp.linalg.cholesky(Kzz)
@@ -216,16 +216,16 @@ class CollapsedVI(AbstractVariationalInference):
                 L, jnp.matmul(A, diff), lower=True
             )
 
-            #  (y - μx)ᵀ (Iσ² + Q)⁻¹ (y - μx)
+            # (y - μx)ᵀ (Iσ² + Q)⁻¹ (y - μx)
             quad = (jnp.sum(diff**2) - jnp.sum(L_inv_A_diff**2)) / noise
 
             # 2 * log N(y; μx, Iσ² + Q)
             two_log_prob = -n * jnp.log(2.0 * jnp.pi * noise) - log_det_B - quad
 
             # 1/σ² tr(Kxx - Q) [Trace law tr(AB) = tr(BA) => tr(KxzKzz⁻¹Kzx) = tr(KxzLz⁻ᵀLz⁻¹Kzx) = tr(Lz⁻¹Kzx KxzLz⁻ᵀ) = trace(σ²AAᵀ)]
-            two_trace = jnp.sum(Kxx_diag) / noise - jnp.sum(jnp.diagonal(AAT))
+            two_trace = jnp.sum(Kxx_diag) / noise - jnp.trace(AAT)
 
-            # log N(y; μx, Iσ² + KxzKzz⁻¹Kzx) - 1/2 tr(Kxx - KxzKzz⁻¹Kzx)
+            # log N(y; μx, Iσ² + KxzKzz⁻¹Kzx) - 1/2σ² tr(Kxx - KxzKzz⁻¹Kzx)
             return constant * (two_log_prob - two_trace).squeeze() / 2.0
 
         return elbo_fn
