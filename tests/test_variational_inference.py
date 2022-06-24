@@ -108,9 +108,9 @@ def test_collapsed_vi(n_datapoints, n_inducing_points, jit_fns):
     # We should raise an error for non-Collapsed variational families:
     with pytest.raises(TypeError):
         q = gpx.variational_families.VariationalGaussian(prior=prior, inducing_inputs=inducing_inputs)
-        gpx.variational_inference.AbstractVariationalInference(posterior=post, vartiational_family=q)
+        gpx.variational_inference.CollapsedVariationalGaussian(posterior=post, vartiational_family=q)
 
         # We should raise an error for non-Gaussian lilkelihoods:
     with pytest.raises(TypeError):
         q = gpx.variational_families.CollapsedVariationalGaussian(prior=prior, inducing_inputs=inducing_inputs)
-        gpx.variational_inference.AbstractVariationalInference(posterior=prior * gpx.Bernoulli(D.n), vartiational_family=q)
+        gpx.variational_inference.CollapsedVariationalGaussian(posterior=prior * gpx.Bernoulli(D.n), vartiational_family=q)
