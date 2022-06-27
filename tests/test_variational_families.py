@@ -24,12 +24,12 @@ def test_variational_gaussian(diag, n_inducing, n_test, whiten):
     test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
 
     if whiten is True:
-        variational_family = gpx.WhitenedVariationalGaussian(prior = prior,
-        inducing_inputs=inducing_inputs, diag=diag
+        variational_family = gpx.WhitenedVariationalGaussian(
+            prior=prior, inducing_inputs=inducing_inputs, diag=diag
         )
     else:
-        variational_family = gpx.VariationalGaussian(prior = prior,
-        inducing_inputs=inducing_inputs, diag=diag
+        variational_family = gpx.VariationalGaussian(
+            prior=prior, inducing_inputs=inducing_inputs, diag=diag
         )
 
     # Test init
@@ -51,7 +51,7 @@ def test_variational_gaussian(diag, n_inducing, n_test, whiten):
     assert (variational_family.variational_root_covariance == jnp.eye(n_inducing)).all()
     assert (variational_family.variational_mean == jnp.zeros((n_inducing, 1))).all()
 
-    #Test params
+    # Test params
     params = variational_family.params
     assert isinstance(params, dict)
     assert "inducing_inputs" in params["variational_family"].keys()
@@ -60,11 +60,16 @@ def test_variational_gaussian(diag, n_inducing, n_test, whiten):
 
     assert params["variational_family"]["inducing_inputs"].shape == (n_inducing, 1)
     assert params["variational_family"]["variational_mean"].shape == (n_inducing, 1)
-    assert params["variational_family"]["variational_root_covariance"].shape == (n_inducing, n_inducing)
+    assert params["variational_family"]["variational_root_covariance"].shape == (
+        n_inducing,
+        n_inducing,
+    )
 
     assert isinstance(params["variational_family"]["inducing_inputs"], jnp.DeviceArray)
     assert isinstance(params["variational_family"]["variational_mean"], jnp.DeviceArray)
-    assert isinstance(params["variational_family"]["variational_root_covariance"], jnp.DeviceArray)
+    assert isinstance(
+        params["variational_family"]["variational_root_covariance"], jnp.DeviceArray
+    )
 
     params = gpx.config.get_defaults()
     assert "variational_root_covariance" in params["transformations"].keys()
@@ -72,8 +77,8 @@ def test_variational_gaussian(diag, n_inducing, n_test, whiten):
 
     assert (variational_family.variational_root_covariance == jnp.eye(n_inducing)).all()
     assert (variational_family.variational_mean == jnp.zeros((n_inducing, 1))).all()
-    
-    #Test KL
+
+    # Test KL
     params = variational_family.params
     kl = variational_family.prior_kl(params)
     assert isinstance(kl, jnp.ndarray)
@@ -93,6 +98,7 @@ def test_variational_gaussian(diag, n_inducing, n_test, whiten):
     assert mu.shape == (n_test,)
     assert sigma.shape == (n_test, n_test)
 
+
 @pytest.mark.parametrize("n_test", [1, 10])
 @pytest.mark.parametrize("n_datapoints", [1, 10])
 @pytest.mark.parametrize("n_inducing", [1, 10, 20])
@@ -106,7 +112,19 @@ def test_collapsed_variational_gaussian(n_test, n_inducing, n_datapoints):
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
     test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
 
-    variational_family = gpx.variational_families.CollapsedVariationalGaussian(prior=prior, inducing_inputs = inducing_inputs)
+    variational_family = gpx.variational_families.CollapsedVariationalGaussian(
+        prior=prior,
+        likelihood=gpx.Gaussian(num_datapoints=D.n),
+        inducing_inputs=inducing_inputs,
+    )
+
+    # We should raise an error for non-Gaussian likelihoods:
+    with pytest.raises(TypeError):
+        gpx.variational_families.CollapsedVariationalGaussian(
+            prior=prior,
+            likelihood=gpx.Bernoulli(num_datapoints=D.n),
+            inducing_inputs=inducing_inputs,
+        )
 
     # Test init
     assert variational_family.num_inducing == n_inducing
@@ -114,16 +132,17 @@ def test_collapsed_variational_gaussian(n_test, n_inducing, n_datapoints):
     assert "inducing_inputs" in params["transformations"].keys()
     assert (variational_family.inducing_inputs == inducing_inputs).all()
 
-    #Test params
+    # Test params
     params = variational_family.params
     assert isinstance(params, dict)
+    assert "likelihood" in params.keys()
+    assert "obs_noise" in params["likelihood"].keys()
     assert "inducing_inputs" in params["variational_family"].keys()
     assert params["variational_family"]["inducing_inputs"].shape == (n_inducing, 1)
     assert isinstance(params["variational_family"]["inducing_inputs"], jnp.DeviceArray)
 
     # Test predictions
     params = variational_family.params
-    params["likelihood"] = {"obs_noise": 1.0}
     predictive_dist_fn = variational_family(D, params)
     assert isinstance(predictive_dist_fn, tp.Callable)
 
