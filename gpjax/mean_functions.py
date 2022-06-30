@@ -86,9 +86,9 @@ class Constant(AbstractMeanFunction):
             Array: A vector of repeated constant values.
         """
         out_shape = (x.shape[0], self.output_dim)
-        return jnp.ones(shape=out_shape) * params["variance"]
+        return jnp.ones(shape=out_shape) * params["constant"]
 
     @property
     def params(self) -> dict:
         """The parameters of the mean function. For the constant-mean function, this is a dictionary with a single value."""
-        return {"variance": jnp.array(1.0)}
+        return {"constant": jnp.array([1.0])}
