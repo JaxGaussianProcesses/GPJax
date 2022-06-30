@@ -158,7 +158,6 @@ class CollapsedVI(AbstractVariationalInference):
 
         m = self.num_inducing
 
-        @experimental
         def elbo_fn(params: Dict) -> Array:
             params = transform(params, transformations)
             noise = params["likelihood"]["obs_noise"]
