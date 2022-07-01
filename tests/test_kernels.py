@@ -8,6 +8,8 @@ import pytest
 
 from gpjax.kernels import (
     RBF,
+    Linear,
+    RationalQuadratic,
     CombinationKernel,
     GraphKernel,
     Kernel,
@@ -18,6 +20,7 @@ from gpjax.kernels import (
     ProductKernel,
     SumKernel,
     _EigenKernel,
+    GeometricalAnisotropy,
     cross_covariance,
     diagonal,
     euclidean_distance,
@@ -27,7 +30,7 @@ from gpjax.parameters import initialise
 from gpjax.utils import I
 
 
-@pytest.mark.parametrize("kern", [RBF(), Matern12(), Matern32(), Matern52()])
+@pytest.mark.parametrize("kern", [RBF(), Linear(), RationalQuadratic() , Matern12(), Matern32(), Matern52()])
 @pytest.mark.parametrize("dim", [1, 2, 5])
 @pytest.mark.parametrize("fn", [gram, diagonal])
 def test_gram(kern, dim, fn):
@@ -40,7 +43,7 @@ def test_gram(kern, dim, fn):
     assert gram_matrix.shape[0] == gram_matrix.shape[1]
 
 
-@pytest.mark.parametrize("kern", [RBF(), Matern12(), Matern32(), Matern52()])
+@pytest.mark.parametrize("kern", [RBF(), Linear(), RationalQuadratic(), Matern12(), Matern32(), Matern52()])
 @pytest.mark.parametrize("n1", [3, 10, 20])
 @pytest.mark.parametrize("n2", [3, 10, 20])
 def test_cross_covariance(kern, n1, n2):
@@ -51,7 +54,7 @@ def test_cross_covariance(kern, n1, n2):
     assert kernel_matrix.shape == (n1, n2)
 
 
-@pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
+@pytest.mark.parametrize("kernel", [RBF(), Linear(), RationalQuadratic(), Matern12(), Matern32(), Matern52()])
 def test_call(kernel):
     params, _, _, _ = initialise(kernel)
     x, y = jnp.array([[1.0]]), jnp.array([[0.5]])
@@ -95,7 +98,7 @@ def test_initialisation(kernel, dim):
             assert not kern.ard
 
 
-@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
+@pytest.mark.parametrize("kernel", [RBF, Polynomial, Linear, RationalQuadratic, Matern12, Matern32, Matern52])
 def test_dtype(kernel):
     params, _, _, _ = initialise(kernel())
     for k, v in params.items():
@@ -134,7 +137,7 @@ def test_euclidean_distance():
     assert euclidean_distance(x1, x2) == 5.0
 
 
-@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
+@pytest.mark.parametrize("kernel", [RBF, RationalQuadratic, Linear, Matern12, Matern32, Matern52])
 def test_active_dim(kernel):
     dim_list = [0, 1, 2, 3]
     perm_length = 2
@@ -154,7 +157,7 @@ def test_active_dim(kernel):
 
 
 @pytest.mark.parametrize("combination_type", [SumKernel, ProductKernel])
-@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52, Polynomial])
+@pytest.mark.parametrize("kernel", [RBF, RationalQuadratic, Linear, Matern12, Matern32, Matern52, Polynomial])
 @pytest.mark.parametrize("n_kerns", [2, 3, 4])
 def test_combination_kernel(combination_type, kernel, n_kerns):
     n = 20
@@ -247,3 +250,28 @@ def test_combination_kernel_type(kernel):
     add_kern = kernel() + kernel()
     assert isinstance(add_kern, SumKernel)
     assert isinstance(add_kern, CombinationKernel)
+
+
+from gpjax.config import get_defaults
+
+@pytest.mark.parametrize("base", [RBF(active_dims=[0, 1]), Matern12(active_dims=[0, 1]), Matern32(active_dims=[0, 1]), Matern52(active_dims=[0, 1])])
+def test_geometrical_anisotropy(base):
+
+    base_params = base.params
+    anisotropy_params = {"theta": jnp.array([jnp.pi/2.]), "scale": jnp.array([1.])}
+  
+    kernel = GeometricalAnisotropy(base_kernel = base)
+
+    assert isinstance(kernel, Kernel)
+    
+
+    params = get_defaults()
+    assert "theta" in params["transformations"].keys()
+    assert "scale" in params["transformations"].keys()
+    assert kernel.params == {**anisotropy_params, **base_params}
+
+    params, _, _, _ = initialise(kernel)
+    x, y = jnp.array([[1.0, 2.0]]), jnp.array([[0.5, 1.0]])
+    point_corr = kernel(x, y, params)
+    assert isinstance(point_corr, jnp.DeviceArray)
+    assert point_corr.shape == ()
