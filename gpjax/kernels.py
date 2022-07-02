@@ -1,4 +1,5 @@
 import abc
+from logging import raiseExceptions
 from typing import Callable, Dict, List, Optional, Sequence
 
 import jax.numpy as jnp
@@ -410,27 +411,44 @@ class RationalQuadratic(Kernel):
         K = params["variance"] * (1 +  0.5 * squared_distance(x, y) / params["alpha"]) ** (-params["alpha"])
         return K.squeeze()
 
-
-
 @dataclass(repr=False)
-class _BaseKernel:
-    """A mixin class for kernels that are defined with a Base kernel."""
-    base_kernel: Kernel
+class Periodic(Kernel):
+    """The periodic kernel.
 
-@dataclass(repr=False)
-class Periodic(Kernel, _BaseKernel):
-    """The periodic kernel. Can be used to transform a stationary kernel into a periodic version. """
+    Key reference is MacKay 1998 - "Introduction to Gaussian processes".
+    """
 
     name: Optional[str] = "Periodic"
 
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
-        periodic_params = {"period": jnp.array([1.0] * self.ndims)}
-        self._params = {**periodic_params, **self.base_kernel.params}
+        self._params = {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+            "period": jnp.array([1.0] * self.ndims),
+        }
 
 
     def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
-        raise NotImplementedError
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
+
+        .. math::
+            k(x, y) = \\sigma^2 \\exp \\Bigg( -0.5 \\sum_{i=1}^{d} \\Bigg)
+
+        Args:
+            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
+            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            params (dict): Parameter set for which the kernel should be evaluated on.
+        Returns:
+            Array: The value of :math:`k(x, y)`
+        """
+        x = self.slice_input(x) 
+        y = self.slice_input(y)
+        sine_squared =  (jnp.sin(jnp.pi * (x - y) / params["period"]) / params["lengthscale"]) ** 2
+        K = params["variance"] * jnp.exp( - 0.5 * jnp.sum(sine_squared, axis=0))
+        return K.squeeze()
+
+
 
 
 #######################################
@@ -438,6 +456,11 @@ class Periodic(Kernel, _BaseKernel):
 #######################################
 from gpjax.config import add_parameter, Softplus
 import distrax as dx
+
+@dataclass(repr=False)
+class _BaseKernel:
+    """A mixin class for kernels that are defined with a Base kernel."""
+    base_kernel: Kernel
 
 @dataclass(repr=False)
 class GeometricalAnisotropy(Kernel, _BaseKernel):
