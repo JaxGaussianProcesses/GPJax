@@ -1,7 +1,8 @@
-from setuptools import find_packages, setup
-import os
 import io
+import os
 import re
+
+from setuptools import find_packages, setup
 
 
 def parse_requirements_file(filename):
@@ -17,20 +18,17 @@ EXTRAS = {
         "isort",
         "pylint",
         "flake8",
-    ],
-    "tests": [
         "pytest",
     ],
-    "docs": [
-        "furo",
-    ],
+    "cuda": ["jax[cuda]"],
 }
 
 
 # Get version number (function from GPyTorch)
 def read(*names, **kwargs):
     with io.open(
-        os.path.join(os.path.dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
+        os.path.join(os.path.dirname(__file__), *names),
+        encoding=kwargs.get("encoding", "utf8"),
     ) as fp:
         return fp.read()
 
