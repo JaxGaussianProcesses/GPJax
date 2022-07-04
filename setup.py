@@ -11,6 +11,20 @@ def parse_requirements_file(filename):
     return requires
 
 
+REQUIRES = [
+    "jax==0.3.2",
+    "jaxlib==0.3.2",
+    "optax>=0.1.0",
+    "chex==0.1.3",
+    "distrax>=0.1.2",
+    "tensorflow == 2.8.1",
+    "tensorflow-probability==0.16.0",
+    "tqdm>=4.0.0",
+    "ml-collections==0.1.0",
+    "protobuf==3.19.0",
+]
+
+
 # Optional Packages
 EXTRAS = {
     "dev": [
@@ -59,7 +73,7 @@ setup(
         "Documentation": "https://gpjax.readthedocs.io/en/latest/",
         "Source": "https://github.com/thomaspinder/GPJax",
     },
-    install_requires=parse_requirements_file("requirements.txt"),
+    install_requires=REQUIRES,  # parse_requirements_file("requirements.txt"),
     extras_require=EXTRAS,
     keywords=["gaussian-processes jax machine-learning bayesian"],
 )
