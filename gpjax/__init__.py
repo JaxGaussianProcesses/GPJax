@@ -21,7 +21,11 @@ from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
 from .parameters import copy_dict_structure, initialise, transform
 from .types import Dataset
-from .variational_inference import StochasticVI, CollapsedVI
-from .variational_families import VariationalGaussian, WhitenedVariationalGaussian, CollapsedVariationalGaussian
+from .variational_families import (
+    CollapsedVariationalGaussian,
+    VariationalGaussian,
+    WhitenedVariationalGaussian,
+)
+from .variational_inference import CollapsedVI, StochasticVI
 
-__version__ = "0.4.6"
+__version__ = "0.4.8"
