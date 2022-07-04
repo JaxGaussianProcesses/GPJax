@@ -52,7 +52,7 @@ jobs:
           path: dist/*
 
   upload_pypi:
-    needs: [tests, build]
+    needs: [codecov, build]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     steps:
