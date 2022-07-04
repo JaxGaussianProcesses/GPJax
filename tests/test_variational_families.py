@@ -117,8 +117,18 @@ def test_collapsed_variational_gaussian(n_test, n_inducing, n_datapoints, point_
     test_inputs = jnp.hstack([test_inputs] * point_dim)
 
     variational_family = gpx.variational_families.CollapsedVariationalGaussian(
-        prior=prior, inducing_inputs=inducing_inputs
+        prior=prior,
+        likelihood=gpx.Gaussian(num_datapoints=D.n),
+        inducing_inputs=inducing_inputs,
     )
+
+    # We should raise an error for non-Gaussian likelihoods:
+    with pytest.raises(TypeError):
+        gpx.variational_families.CollapsedVariationalGaussian(
+            prior=prior,
+            likelihood=gpx.Bernoulli(num_datapoints=D.n),
+            inducing_inputs=inducing_inputs,
+        )
 
     # Test init
     assert variational_family.num_inducing == n_inducing
@@ -129,6 +139,8 @@ def test_collapsed_variational_gaussian(n_test, n_inducing, n_datapoints, point_
     # Test params
     params = variational_family.params
     assert isinstance(params, dict)
+    assert "likelihood" in params.keys()
+    assert "obs_noise" in params["likelihood"].keys()
     assert "inducing_inputs" in params["variational_family"].keys()
     assert params["variational_family"]["inducing_inputs"].shape == (
         n_inducing,
@@ -138,7 +150,6 @@ def test_collapsed_variational_gaussian(n_test, n_inducing, n_datapoints, point_
 
     # Test predictions
     params = variational_family.params
-    params["likelihood"] = {"obs_noise": 1.0}
     predictive_dist_fn = variational_family(D, params)
     assert isinstance(predictive_dist_fn, tp.Callable)
 

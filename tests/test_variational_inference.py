@@ -88,11 +88,13 @@ def test_stochastic_vi(
 @pytest.mark.parametrize("point_dim", [1, 2])
 def test_collapsed_vi(n_datapoints, n_inducing_points, jit_fns, point_dim):
     D, post, prior = get_data_and_gp(n_datapoints, point_dim)
+    likelihood = gpx.Gaussian(num_datapoints=n_datapoints)
+
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing_points).reshape(-1, 1)
     inducing_inputs = jnp.hstack([inducing_inputs] * point_dim)
 
     q = gpx.variational_families.CollapsedVariationalGaussian(
-        prior=prior, inducing_inputs=inducing_inputs
+        prior=prior, likelihood=likelihood, inducing_inputs=inducing_inputs
     )
 
     sgpr = gpx.variational_inference.CollapsedVI(posterior=post, variational_family=q)
@@ -126,11 +128,11 @@ def test_collapsed_vi(n_datapoints, n_inducing_points, jit_fns, point_dim):
         )
         gpx.variational_inference.CollapsedVI(posterior=post, variational_family=q)
 
-        # We should raise an error for non-Gaussian lilkelihoods:
+    # We should raise an error for non-Gaussian likelihoods:
     with pytest.raises(TypeError):
         q = gpx.variational_families.CollapsedVariationalGaussian(
-            prior=prior, inducing_inputs=inducing_inputs
+            prior=prior, likelihood=likelihood, inducing_inputs=inducing_inputs
         )
         gpx.variational_inference.CollapsedVI(
-            posterior=prior * gpx.Bernoulli(D.n), variational_family=q
+            posterior=prior * gpx.Bernoulli(num_datapoints=D.n), variational_family=q
         )
