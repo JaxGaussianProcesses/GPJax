@@ -56,7 +56,7 @@ class Prior(AbstractGP):
 
     kernel: Kernel
     mean_function: tp.Optional[AbstractMeanFunction] = Zero()
-    name: tp.Optional[str] = "Prior"
+    name: tp.Optional[str] = "GP prior"
     jitter: tp.Optional[float] = DEFAULT_JITTER
 
     def __mul__(self, other: AbstractLikelihood):
@@ -109,7 +109,7 @@ class AbstractPosterior(AbstractGP):
 
     prior: Prior
     likelihood: AbstractLikelihood
-    name: tp.Optional[str] = "GP Posterior"
+    name: tp.Optional[str] = "GP posterior"
     jitter: tp.Optional[float] = DEFAULT_JITTER
 
     @abstractmethod
@@ -128,7 +128,7 @@ class ConjugatePosterior(AbstractPosterior):
 
     prior: Prior
     likelihood: Gaussian
-    name: tp.Optional[str] = "ConjugatePosterior"
+    name: tp.Optional[str] = "Conjugate posterior"
     jitter: tp.Optional[float] = DEFAULT_JITTER
 
     def predict(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], dx.Distribution]:
@@ -234,16 +234,16 @@ class NonConjugatePosterior(AbstractPosterior):
 
     prior: Prior
     likelihood: NonConjugateLikelihoodType
-    name: tp.Optional[str] = "Non-Conjugate Posterior"
+    name: tp.Optional[str] = "Non-conjugate posterior"
     jitter: tp.Optional[float] = DEFAULT_JITTER
 
     @property
     def params(self) -> dict:
-        hyperparameters = concat_dictionaries(
+        parameters = concat_dictionaries(
             self.prior.params, {"likelihood": self.likelihood.params}
         )
-        hyperparameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
-        return hyperparameters
+        parameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
+        return parameters
 
     def predict(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], dx.Distribution]:
         """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density. Note, to gain predictions on the scale of the original data, the returned distribution will need to be transformed through the likelihood function's inverse link function.
