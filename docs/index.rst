@@ -11,19 +11,18 @@ You can view the source code for GPJax `here on Github <https://github.com/thoma
 Gaussian process 'Hello World' example
 -----------------------------------------------------
 
-For intuition of GPJax's exposed API, a simple example that derives the Gaussian process posterior for regression can be represented by::
+Defining a Gaussian process posterior is simple as typing the maths we would write on paper.::
 
-    import gpjax
-    import jax.numpy as jnp
-    import jax.random as jr
-    key = jr.PRNGKey(123)
+    import gpjax as gpx
 
-    kernel = gpjax.kernels.RBF()
-    prior = gpjax.gps.Prior(kernel = kernel)
+    kernel = gpx.kernels.RBF()
+    prior = gpx.gps.Prior(kernel = kernel)
 
-    likelihood = gpjax.likelihoods.Gaussian()
+    likelihood = gpx.likelihoods.Gaussian(num_datapoints = 1729)
 
     posterior = prior * likelihood
+
+To learn more, checkout the `regression notebook <https://gpjax.readthedocs.io/en/latest/nbs/regression.html>`_.
 
 
 .. toctree::
