@@ -11,14 +11,16 @@ You can view the source code for GPJax `here on Github <https://github.com/thoma
 Gaussian process 'Hello World' example
 -----------------------------------------------------
 
-Defining a Gaussian process posterior is simple as typing the maths we would write on paper.::
+Defining a Gaussian process posterior is simple as typing the maths we would write on paper.
+
+.. code-block:: python
 
     import gpjax as gpx
 
     kernel = gpx.kernels.RBF()
     prior = gpx.gps.Prior(kernel = kernel)
 
-    likelihood = gpx.likelihoods.Gaussian(num_datapoints = 1729)
+    likelihood = gpx.likelihoods.Gaussian(num_datapoints = 123)
 
     posterior = prior * likelihood
 
@@ -59,7 +61,7 @@ To learn more, checkout the `regression notebook <https://gpjax.readthedocs.io/e
 
 
 Indices and tables
-==================
+-------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
