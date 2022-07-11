@@ -3,15 +3,15 @@ import typing as tp
 import jax
 import jax.numpy as jnp
 import optax
-from tqdm.auto import tqdm
 from jax import lax
 from jax.experimental import host_callback
+from tqdm.auto import tqdm
 
 from .parameters import trainable_params
 from .types import Dataset
 
 
-def progress_bar_scan(n_iters, log_rate):
+def progress_bar_scan(n_iters: int, log_rate: int):
     """Progress bar for Jax.lax scans (adapted from https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/)."""
 
     tqdm_bars = {}
@@ -143,7 +143,7 @@ def fit_batches(
     Returns:
         tp.Dict: An optimised set of parameters.
     """
-    
+
     opt_state = optax_optim.init(params)
     next_batch = train_data.get_batcher()
 

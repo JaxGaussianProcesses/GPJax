@@ -5,8 +5,8 @@ import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
 from chex import dataclass
+from jaxtyping import f64
 
-from .types import Array
 from .utils import I
 
 
@@ -97,7 +97,7 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
 
     @property
     def predictive_moment_fn(self) -> Callable:
-        def moment_fn(mean: Array, variance: Array):
+        def moment_fn(mean: f64["N D"], variance: f64["N D"]):
             rv = self.link_function(mean / jnp.sqrt(1 + variance), self.params)
             return rv
 

@@ -3,9 +3,9 @@ import typing as tp
 import jax.numpy as jnp
 import numpy as np
 from chex import dataclass
+from jaxtyping import f64
 
 NoneType = type(None)
-Array = tp.Union[np.ndarray, jnp.ndarray]
 
 import tensorflow.data as tfd
 
@@ -14,8 +14,8 @@ import tensorflow.data as tfd
 class Dataset:
     """GPJax Dataset class. This supports batching through tensorflow.data with the '_tf_dataset' variable."""
 
-    X: Array
-    y: Array = None
+    X: f64["N D"]
+    y: f64["N 1"] = None
     _tf_dataset: tp.Optional[tfd.Dataset] = None
 
     def __repr__(self) -> str:
@@ -25,8 +25,8 @@ class Dataset:
 
     def __add__(self, other: "Dataset") -> "Dataset":
         """Combines two datasets into one. The right-hand dataset is stacked beneath left."""
-        x = jnp.concatenate((self.X, other.X))  
-        y = jnp.concatenate((self.y, other.y))  
+        x = jnp.concatenate((self.X, other.X))
+        y = jnp.concatenate((self.y, other.y))
 
         return Dataset(X=x, y=y)
 

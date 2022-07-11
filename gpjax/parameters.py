@@ -5,10 +5,10 @@ from copy import deepcopy
 import distrax as dx
 import jax
 import jax.numpy as jnp
+from jaxtyping import f64
 from tensorflow_probability.substrates.jax import distributions as tfd
 
 from .config import get_defaults
-from .types import Array
 
 Identity = dx.Lambda(lambda x: x)
 
@@ -62,13 +62,6 @@ def recursive_complete(d1: tp.Dict, d2: tp.Dict) -> tp.Dict:
                 d1[key] = d2[key]
     return d1
 
-
-# def recursive_fn(d1, d2, fn: tp.Callable[[tp.Any], tp.Any]):
-#     for key, value in d1.items():
-#         if type(value) is dict:
-#             yield from recursive_fn(value, d2[key], fn)
-#         else:
-#             yield fn(value, d2[key])
 
 ################################
 # Parameter transformation
@@ -157,7 +150,7 @@ def transform(params: tp.Dict, transform_map: tp.Dict) -> tp.Dict:
 ################################
 # Priors
 ################################
-def log_density(param: jnp.DeviceArray, density: dx.Distribution) -> Array:
+def log_density(param: f64["D"], density: dx.Distribution) -> f64["1"]:
     if type(density) == type(None):
         log_prob = jnp.array(0.0)
     else:

@@ -3,22 +3,23 @@ from abc import abstractmethod, abstractproperty
 
 import distrax as dx
 import jax.numpy as jnp
-from chex import dataclass
 import jax.scipy as jsp
+from chex import dataclass
+from jaxtyping import f64
 
 from .config import get_defaults
 from .kernels import Kernel, cross_covariance, gram
 from .likelihoods import (
     AbstractLikelihood,
+    Conjugate,
     Gaussian,
+    NonConjugate,
     NonConjugateLikelihoods,
     NonConjugateLikelihoodType,
-    Conjugate,
-    NonConjugate,
 )
 from .mean_functions import AbstractMeanFunction, Zero
 from .parameters import copy_dict_structure, evaluate_priors, transform
-from .types import Array, Dataset
+from .types import Dataset
 from .utils import I, concat_dictionaries
 
 DEFAULT_JITTER = get_defaults()["jitter"]
@@ -72,7 +73,7 @@ class Prior(AbstractGP):
         """Reimplement the multiplication operator to allow for order-invariant product of a likelihood and a prior i.e., likelihood * prior."""
         return self.__mul__(other)
 
-    def predict(self, params: dict) -> tp.Callable[[Array], dx.Distribution]:
+    def predict(self, params: dict) -> tp.Callable[[f64["N D"]], dx.Distribution]:
         """Compute the GP's prior mean and variance.
         Args:
             params (dict): The specific set of parameters for which the mean function should be defined for.
@@ -80,14 +81,16 @@ class Prior(AbstractGP):
             tp.Callable[[Array], Array]: A mean function that accepts an input array for where the mean function should be evaluated at. The mean function's value at these points is then returned.
         """
 
-        def predict_fn(test_inputs: Array) -> dx.Distribution:
+        def predict_fn(test_inputs: f64["N D"]) -> dx.Distribution:
             t = test_inputs
             n_test = t.shape[0]
             μt = self.mean_function(t, params["mean_function"])
             Ktt = gram(self.kernel, t, params["kernel"])
             Ktt += I(n_test) * self.jitter
 
-            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(μt.squeeze()), Ktt)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(μt.squeeze()), Ktt
+            )
 
         return predict_fn
 
@@ -119,7 +122,9 @@ class AbstractPosterior(AbstractGP):
 
     @property
     def params(self) -> dict:
-        return concat_dictionaries(self.prior.params, {"likelihood": self.likelihood.params})
+        return concat_dictionaries(
+            self.prior.params, {"likelihood": self.likelihood.params}
+        )
 
 
 @dataclass
@@ -131,7 +136,9 @@ class ConjugatePosterior(AbstractPosterior):
     name: tp.Optional[str] = "Conjugate posterior"
     jitter: tp.Optional[float] = DEFAULT_JITTER
 
-    def predict(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], dx.Distribution]:
+    def predict(
+        self, train_data: Dataset, params: dict
+    ) -> tp.Callable[[f64["N D"]], dx.Distribution]:
         """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density.
 
         Args:
@@ -158,7 +165,7 @@ class ConjugatePosterior(AbstractPosterior):
         # w = L⁻¹ (y - μx)
         w = jsp.linalg.solve_triangular(L, y - μx, lower=True)
 
-        def predict(test_inputs: Array) -> dx.Distribution:
+        def predict(test_inputs: f64["N D"]) -> dx.Distribution:
             t = test_inputs
             n_test = t.shape[0]
             μt = self.prior.mean_function(t, params["mean_function"])
@@ -175,7 +182,9 @@ class ConjugatePosterior(AbstractPosterior):
             covariance = Ktt - jnp.matmul(L_inv_Kxt.T, L_inv_Kxt)
             covariance += I(n_test) * self.jitter
 
-            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance
+            )
 
         return predict
 
@@ -185,7 +194,7 @@ class ConjugatePosterior(AbstractPosterior):
         transformations: tp.Dict,
         priors: dict = None,
         negative: bool = False,
-    ) -> tp.Callable[[dict], Array]:
+    ) -> tp.Callable[[dict], f64["1"]]:
         """Compute the marginal log-likelihood function of the Gaussian process. The returned function can then be used for gradient based optimisation of the model's parameters or for model comparison. The implementation given here enables exact estimation of the Gaussian process' latent function values.
 
         Args:
@@ -215,7 +224,9 @@ class ConjugatePosterior(AbstractPosterior):
             L = jnp.linalg.cholesky(Sigma)
 
             # p(y | x, θ), where θ are the model hyperparameters:
-            marginal_likelihood = dx.MultivariateNormalTri(jnp.atleast_1d(μx.squeeze()), L)
+            marginal_likelihood = dx.MultivariateNormalTri(
+                jnp.atleast_1d(μx.squeeze()), L
+            )
 
             # log p(θ)
             log_prior_density = evaluate_priors(params, priors)
@@ -245,7 +256,9 @@ class NonConjugatePosterior(AbstractPosterior):
         parameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
         return parameters
 
-    def predict(self, train_data: Dataset, params: dict) -> tp.Callable[[Array], dx.Distribution]:
+    def predict(
+        self, train_data: Dataset, params: dict
+    ) -> tp.Callable[[f64["N D"]], dx.Distribution]:
         """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density. Note, to gain predictions on the scale of the original data, the returned distribution will need to be transformed through the likelihood function's inverse link function.
 
         Args:
@@ -261,7 +274,7 @@ class NonConjugatePosterior(AbstractPosterior):
         Kxx += I(n) * self.jitter
         Lx = jnp.linalg.cholesky(Kxx)
 
-        def predict_fn(test_inputs: Array) -> dx.Distribution:
+        def predict_fn(test_inputs: f64["N D"]) -> dx.Distribution:
             t = test_inputs
             n_test = t.shape[0]
             Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
@@ -278,7 +291,9 @@ class NonConjugatePosterior(AbstractPosterior):
             covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
             covariance += I(n_test) * self.jitter
 
-            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance
+            )
 
         return predict_fn
 
@@ -288,7 +303,7 @@ class NonConjugatePosterior(AbstractPosterior):
         transformations: tp.Dict,
         priors: dict = None,
         negative: bool = False,
-    ) -> tp.Callable[[dict], Array]:
+    ) -> tp.Callable[[dict], f64["1"]]:
         """Compute the marginal log-likelihood function of the Gaussian process. The returned function can then be used for gradient based optimisation of the model's parameters or for model comparison. The implementation given here is general and will work for any likelihood support by GPJax.
 
         Args:
@@ -328,12 +343,16 @@ class NonConjugatePosterior(AbstractPosterior):
         return mll
 
 
-def construct_posterior(prior: Prior, likelihood: AbstractLikelihood) -> AbstractPosterior:
+def construct_posterior(
+    prior: Prior, likelihood: AbstractLikelihood
+) -> AbstractPosterior:
     if isinstance(likelihood, Conjugate):
         PosteriorGP = ConjugatePosterior
 
     elif isinstance(likelihood, NonConjugate):
         PosteriorGP = NonConjugatePosterior
     else:
-        raise NotImplementedError(f"No posterior implemented for {likelihood.name} likelihood")
+        raise NotImplementedError(
+            f"No posterior implemented for {likelihood.name} likelihood"
+        )
     return PosteriorGP(prior=prior, likelihood=likelihood)
