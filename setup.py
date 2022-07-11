@@ -12,8 +12,8 @@ def parse_requirements_file(filename):
 
 
 REQUIRES = [
-    "jax==0.3.4",
-    "jaxlib==0.3.4",
+    "jax==0.3.5",
+    "jaxlib==0.3.5",
     "optax>=0.1.0",
     "chex==0.1.3",
     "distrax>=0.1.2",
