@@ -22,6 +22,7 @@ REQUIRES = [
     "tqdm>=4.0.0",
     "ml-collections==0.1.0",
     "protobuf==3.19.0",
+    "jaxtyping",
 ]
 
 
