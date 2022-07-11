@@ -58,6 +58,7 @@ To learn more, checkout the `regression notebook <https://gpjax.readthedocs.io/e
     :hidden:
 
     nbs/kernels
+    nbs/yacht
 
 .. toctree::
     :maxdepth: 1
