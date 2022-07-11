@@ -55,7 +55,7 @@ class VariationalGaussian(AbstractVariationalFamily):
 
     prior: Prior
     inducing_inputs: Array
-    name: str = "Gaussian"
+    name: str = "Variational Gaussian"
     variational_mean: Optional[Array] = None
     variational_root_covariance: Optional[Array] = None
     diag: Optional[bool] = False
@@ -185,6 +185,8 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
     """
 
+    name: str = "Whitened variational Gaussian"
+
     def prior_kl(self, params: Dict) -> Array:
         """Compute the KL-divergence between our variational approximation and the Gaussian process prior.
 
@@ -266,7 +268,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
     prior: Prior
     likelihood: AbstractLikelihood
     inducing_inputs: Array
-    name: str = "Gaussian"
+    name: str = "Collapsed variational Gaussian"
     diag: Optional[bool] = False
     jitter: Optional[float] = DEFAULT_JITTER
 
