@@ -1,12 +1,13 @@
 import abc
-from logging import raiseExceptions
-from typing import Callable, Dict, List, Optional, Sequence
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
+import distrax as dx
 import jax.numpy as jnp
 from chex import dataclass
 from jax import vmap
 
-from gpjax.types import Array
+from .config import Softplus, add_parameter
+from .types import Array
 
 
 ##########################################
@@ -171,12 +172,13 @@ class RBF(Kernel):
         K = params["variance"] * jnp.exp(-0.5 * squared_distance(x, y))
         return K.squeeze()
 
+
 @dataclass(repr=False)
 class PoweredExponential(Kernel):
     """The powered exponential family of kernels.
 
     Key reference is Diggle and Ribeiro (2007) - "Model-based Geostatistics".
-    
+
     """
 
     name: Optional[str] = "Powered exponential"
@@ -217,13 +219,13 @@ class Linear(Kernel):
 
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
-        self._params = {"variance": jnp.array([1.0]), "bias": jnp.array([0.0])}
+        self._params = {"variance": jnp.array([1.0])}
 
     def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with bias parameter :math:`b` and variance :math:`\sigma`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\sigma`
 
         .. math::
-            k(x, y) = \\sigma^2 x^{T}y + b
+            k(x, y) = \\sigma^2 x^{T}y
 
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.
@@ -234,7 +236,7 @@ class Linear(Kernel):
         """
         x = self.slice_input(x)
         y = self.slice_input(y)
-        K = params["variance"] * jnp.matmul(x.T, y) + params["bias"]
+        K = params["variance"] * jnp.matmul(x.T, y)
         return K.squeeze()
 
 
@@ -380,6 +382,7 @@ class Polynomial(Kernel):
         K = jnp.power(params["shift"] + jnp.dot(x * params["variance"], y), self.degree)
         return K.squeeze()
 
+
 @dataclass(repr=False)
 class RationalQuadratic(Kernel):
 
@@ -408,8 +411,11 @@ class RationalQuadratic(Kernel):
         """
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
-        K = params["variance"] * (1 +  0.5 * squared_distance(x, y) / params["alpha"]) ** (-params["alpha"])
+        K = params["variance"] * (
+            1 + 0.5 * squared_distance(x, y) / params["alpha"]
+        ) ** (-params["alpha"])
         return K.squeeze()
+
 
 @dataclass(repr=False)
 class Periodic(Kernel):
@@ -428,7 +434,6 @@ class Periodic(Kernel):
             "period": jnp.array([1.0] * self.ndims),
         }
 
-
     def __call__(self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
 
@@ -442,71 +447,97 @@ class Periodic(Kernel):
         Returns:
             Array: The value of :math:`k(x, y)`
         """
-        x = self.slice_input(x) 
+        x = self.slice_input(x)
         y = self.slice_input(y)
-        sine_squared =  (jnp.sin(jnp.pi * (x - y) / params["period"]) / params["lengthscale"]) ** 2
-        K = params["variance"] * jnp.exp( - 0.5 * jnp.sum(sine_squared, axis=0))
+        sine_squared = (
+            jnp.sin(jnp.pi * (x - y) / params["period"]) / params["lengthscale"]
+        ) ** 2
+        K = params["variance"] * jnp.exp(-0.5 * jnp.sum(sine_squared, axis=0))
         return K.squeeze()
 
 
-
-
-#######################################
-# Two dimensional directional effects #
-#######################################
-from gpjax.config import add_parameter, Softplus
-import distrax as dx
-
 @dataclass(repr=False)
-class _BaseKernel:
-    """A mixin class for kernels that are defined with a Base kernel."""
+class Gibbs(Kernel):
+    pass
+
+
+########################
+# Directional effects #
+#######################
+@dataclass(repr=False)
+class _GeometricalAnisotropy:
+    """A mixin class for geometrical anisotropy kernels."""
+
     base_kernel: Kernel
+    aniso_dims: Optional[Tuple[int]] = None
+
+
+# TO DO (DD): 3 dimensional rotation case (current below only works for two dimensions).
+# TO DO (DD): Allow general function for the rotation & scale parameters.
+
 
 @dataclass(repr=False)
-class GeometricalAnisotropy(Kernel, _BaseKernel):
+class GeometricalAnisotropy(Kernel, _GeometricalAnisotropy):
     """Geometrical anisotropy kernel applies directional effects to any two dimensional kernel.
 
     Key reference is Diggle and Ribeiro (2007) - "Model-based Geostatistics".
     """
-    
+
     name: Optional[str] = "Geometrical anisotropy"
-    
+
     def __post_init__(self):
         self.ndims = 2
-        anisotropy_params = {
-            "theta": jnp.array([jnp.pi/2.]),
-            "scale": jnp.array([1.])
-        }
-        
-        if self.base_kernel.ndims != 2:
-            raise ValueError("GeometricalAnisotropy kernel requires a two dimensional base kernel.")
-        
+
+        if self.aniso_dims is None:
+            self.aniso_dims = (0, 1)
+
+        anisotropy_params = {"theta": jnp.array([0.0]), "scale": jnp.array([1.0])}
+
+        if self.base_kernel.ndims < 2:
+            raise ValueError(
+                "Geometric anisotropy kernel requires at least two dimensional base kernel."
+            )
+
         add_parameter("scale", Softplus)
-        add_parameter("theta", dx.Lambda(lambda x: (1. + jnp.tanh(x))*jnp.pi/2.))
-        
+        add_parameter("theta", dx.Lambda(lambda x: jnp.tanh(x) * jnp.pi))
+
         self._params = {**anisotropy_params, **self.base_kernel.params}
-    
+
     @property
     def params(self) -> dict:
         return self._params
 
     def __call__(self, x: Array, y: Array, params: dict) -> Array:
-        projection_matrix = self.projection(params=params)     
-        return self.base_kernel(jnp.matmul(x, projection_matrix), 
-                                jnp.matmul(y, projection_matrix), params=params)
-    
+
+        # Anisotropy projection matrix
+        proj = self.projection(params=params)
+
+        # Apply projection matrix to 'anisotropy dimensions'
+        x_proj = x.at[..., self.aniso_dims].set(
+            jnp.matmul(x[..., self.aniso_dims], proj)
+        )
+        y_proj = y.at[..., self.aniso_dims].set(
+            jnp.matmul(y[..., self.aniso_dims], proj)
+        )
+
+        return self.base_kernel(
+            x_proj,
+            y_proj,
+            params=params,
+        )
+
     def projection(self, params) -> Array:
         """Method to compute data transformation that gives directional effects."""
-        
+
         scale = params["scale"].squeeze()
-        cos_theta = jnp.cos(jnp.pi/2. - params["theta"]).squeeze()
-        sin_theta = jnp.sin(jnp.pi/2. - params["theta"]).squeeze()
-        
-        projection_matrix = jnp.array([[cos_theta, -scale * sin_theta],
-                                     [sin_theta, scale * cos_theta]])
+        cos_theta = jnp.cos(params["theta"]).squeeze()
+        sin_theta = jnp.sin(params["theta"]).squeeze()
+
+        projection_matrix = jnp.array(
+            [[cos_theta, -scale * sin_theta], [sin_theta, scale * cos_theta]]
+        )
 
         return projection_matrix
-
 
 
 ##########################################
