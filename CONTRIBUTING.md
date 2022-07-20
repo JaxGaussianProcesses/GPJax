@@ -43,14 +43,20 @@ The preferred workflow for contributing is to fork the [GitHub repository](https
 
 4. Project requirements are in `requirements.txt`.
 
-   We suggest using a [virtual environment](https://docs.python-guide.org/dev/virtualenvs/)) for development. Once the virtualenvironment is activated, run:
+   We suggest using a [virtual environment](https://docs.python-guide.org/dev/virtualenvs/) for development. Once the virtual environment is activated, run:
 
    ```bash
    $ pip install -e .
    $ pip install -r requirements-dev.txt
    ```
+   
+5. Install the pre-commit hooks. Please **ensure you do this before commiting any files**. This can be done by executing the following:
+   ```bash
+   $ pre-commit install
+   ```
+   If successful, this will print the following output `pre-commit installed at .git/hooks/pre-commit`.
 
-5. Develop the feature on your feature branch. Add changed files using `git add` and then `git commit` files:
+6. Develop the feature on your feature branch. Add changed files using `git add` and then `git commit` files:
 
    ```bash
    $ git add modified_files
@@ -71,7 +77,7 @@ The preferred workflow for contributing is to fork the [GitHub repository](https
    $ git push -u origin my-feature
    ```
 
-6. Go to the GitHub web page of your fork of the GPJax repo. Click the 'Pull request' button to send your changes to the project's maintainer for review.
+7. Go to the GitHub web page of your fork of the GPJax repo. Click the 'Pull request' button to send your changes to the project's maintainer for review.
 
 ## Pull request checklist
 
