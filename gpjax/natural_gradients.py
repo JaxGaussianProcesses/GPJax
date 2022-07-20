@@ -5,6 +5,7 @@ import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jax import lax, value_and_grad
+from jaxtyping import f64
 
 from .config import get_defaults
 from .gps import AbstractPosterior
@@ -15,7 +16,7 @@ from .parameters import (
     trainable_params,
     transform,
 )
-from .types import Array, Dataset
+from .types import Dataset
 from .utils import I
 from .variational_families import (
     AbstractVariationalFamily,
@@ -174,7 +175,7 @@ def natural_gradients(
             expectation_params["variational_family"]["moments"] = expectation_moments
 
             # Compute gradient ∂L/∂η:
-            def loss_fn(params: dict, batch: Dataset) -> Array:
+            def loss_fn(params: dict, batch: Dataset) -> f64["1"]:
                 # Determine hyperparameters that should be trained.
                 trains = deepcopy(trainables)
                 trains["variational_family"]["moments"] = build_trainables_true(
@@ -230,7 +231,7 @@ def natural_gradients(
         #     expectation_params["variational_family"]["moments"] = expectation_moments
 
         #     # Compute gradient ∂L/∂η:
-        #     def loss_fn(params: dict, batch: Dataset) -> Array:
+        #     def loss_fn(params: dict, batch: Dataset) -> f64["1"]:
         #       # Determine hyperparameters that should be trained.
         #       params = trainable_params(params, trainables)
 
@@ -257,7 +258,7 @@ def natural_gradients(
             dict: A dictionary of hyperparameter gradients.
         """
 
-        def loss_fn(params: dict, batch: Dataset) -> Array:
+        def loss_fn(params: dict, batch: Dataset) -> f64["1"]:
             # Determine hyperparameters that should be trained.
             params = trainable_params(params, trainables)
 

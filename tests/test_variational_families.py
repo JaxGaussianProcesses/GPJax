@@ -1,7 +1,6 @@
 import typing as tp
 
 import distrax as dx
-
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
@@ -57,15 +56,27 @@ def test_variational_gaussian(diag, n_inducing, n_test, whiten):
     assert isinstance(params, dict)
     assert "inducing_inputs" in params["variational_family"].keys()
     assert "variational_mean" in params["variational_family"]["moments"].keys()
-    assert "variational_root_covariance" in params["variational_family"]["moments"].keys()
+    assert (
+        "variational_root_covariance" in params["variational_family"]["moments"].keys()
+    )
 
     assert params["variational_family"]["inducing_inputs"].shape == (n_inducing, 1)
-    assert params["variational_family"]["moments"]["variational_mean"].shape == (n_inducing, 1)
-    assert params["variational_family"]["moments"]["variational_root_covariance"].shape == (n_inducing, n_inducing)
+    assert params["variational_family"]["moments"]["variational_mean"].shape == (
+        n_inducing,
+        1,
+    )
+    assert params["variational_family"]["moments"][
+        "variational_root_covariance"
+    ].shape == (n_inducing, n_inducing)
 
     assert isinstance(params["variational_family"]["inducing_inputs"], jnp.DeviceArray)
-    assert isinstance(params["variational_family"]["moments"]["variational_mean"], jnp.DeviceArray)
-    assert isinstance(params["variational_family"]["moments"]["variational_root_covariance"], jnp.DeviceArray)
+    assert isinstance(
+        params["variational_family"]["moments"]["variational_mean"], jnp.DeviceArray
+    )
+    assert isinstance(
+        params["variational_family"]["moments"]["variational_root_covariance"],
+        jnp.DeviceArray,
+    )
 
     params = gpx.config.get_defaults()
     assert "variational_root_covariance" in params["transformations"].keys()
@@ -159,17 +170,18 @@ def test_collapsed_variational_gaussian(n_test, n_inducing, n_datapoints, point_
     assert isinstance(sigma, jnp.ndarray)
     assert mu.shape == (n_test,)
     assert sigma.shape == (n_test, n_test)
+
+
+@pytest.mark.parametrize("n_test", [1, 10])
 @pytest.mark.parametrize("n_inducing", [1, 10, 20])
 def test_natural_variational_gaussian(n_inducing, n_test):
     prior = gpx.Prior(kernel=gpx.RBF())
-    
+
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
     test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
 
-
     variational_family = gpx.variational_families.NaturalVariationalGaussian(
-        prior=prior,
-        inducing_inputs=inducing_inputs
+        prior=prior, inducing_inputs=inducing_inputs
     )
 
     # Test init
@@ -182,13 +194,13 @@ def test_natural_variational_gaussian(n_inducing, n_test):
         n_inducing,
         n_inducing,
     )
-    assert jnp.all(jnp.diag(variational_family.natural_matrix) == -.5)
+    assert jnp.all(jnp.diag(variational_family.natural_matrix) == -0.5)
 
     params = gpx.config.get_defaults()
     assert "variational_root_covariance" in params["transformations"].keys()
     assert "variational_mean" in params["transformations"].keys()
 
-    assert (variational_family.natural_matrix == -.5 * jnp.eye(n_inducing)).all()
+    assert (variational_family.natural_matrix == -0.5 * jnp.eye(n_inducing)).all()
     assert (variational_family.natural_vector == jnp.zeros((n_inducing, 1))).all()
 
     # params
@@ -199,22 +211,31 @@ def test_natural_variational_gaussian(n_inducing, n_test):
     assert "natural_matrix" in params["variational_family"]["moments"].keys()
 
     assert params["variational_family"]["inducing_inputs"].shape == (n_inducing, 1)
-    assert params["variational_family"]["moments"]["natural_vector"].shape == (n_inducing, 1)
-    assert params["variational_family"]["moments"]["natural_matrix"].shape == (n_inducing, n_inducing)
+    assert params["variational_family"]["moments"]["natural_vector"].shape == (
+        n_inducing,
+        1,
+    )
+    assert params["variational_family"]["moments"]["natural_matrix"].shape == (
+        n_inducing,
+        n_inducing,
+    )
 
     assert isinstance(params["variational_family"]["inducing_inputs"], jnp.DeviceArray)
-    assert isinstance(params["variational_family"]["moments"]["natural_vector"], jnp.DeviceArray)
-    assert isinstance(params["variational_family"]["moments"]["natural_matrix"], jnp.DeviceArray)
-   
+    assert isinstance(
+        params["variational_family"]["moments"]["natural_vector"], jnp.DeviceArray
+    )
+    assert isinstance(
+        params["variational_family"]["moments"]["natural_matrix"], jnp.DeviceArray
+    )
+
     params = gpx.config.get_defaults()
     assert "natural_vector" in params["transformations"].keys()
     assert "natural_matrix" in params["transformations"].keys()
 
-    assert (variational_family.natural_matrix == -.5 * jnp.eye(n_inducing)).all()
+    assert (variational_family.natural_matrix == -0.5 * jnp.eye(n_inducing)).all()
     assert (variational_family.natural_vector == jnp.zeros((n_inducing, 1))).all()
 
-
-    #Test KL
+    # Test KL
     params = variational_family.params
     kl = variational_family.prior_kl(params)
     assert isinstance(kl, jnp.ndarray)
@@ -239,14 +260,12 @@ def test_natural_variational_gaussian(n_inducing, n_test):
 @pytest.mark.parametrize("n_inducing", [1, 10, 20])
 def test_expectation_variational_gaussian(n_inducing, n_test):
     prior = gpx.Prior(kernel=gpx.RBF())
-    
+
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
     test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
 
-
     variational_family = gpx.variational_families.ExpectationVariationalGaussian(
-        prior=prior,
-        inducing_inputs=inducing_inputs
+        prior=prior, inducing_inputs=inducing_inputs
     )
 
     # Test init
@@ -276,13 +295,23 @@ def test_expectation_variational_gaussian(n_inducing, n_test):
     assert "expectation_matrix" in params["variational_family"]["moments"].keys()
 
     assert params["variational_family"]["inducing_inputs"].shape == (n_inducing, 1)
-    assert params["variational_family"]["moments"]["expectation_vector"].shape == (n_inducing, 1)
-    assert params["variational_family"]["moments"]["expectation_matrix"].shape == (n_inducing, n_inducing)
+    assert params["variational_family"]["moments"]["expectation_vector"].shape == (
+        n_inducing,
+        1,
+    )
+    assert params["variational_family"]["moments"]["expectation_matrix"].shape == (
+        n_inducing,
+        n_inducing,
+    )
 
     assert isinstance(params["variational_family"]["inducing_inputs"], jnp.DeviceArray)
-    assert isinstance(params["variational_family"]["moments"]["expectation_vector"], jnp.DeviceArray)
-    assert isinstance(params["variational_family"]["moments"]["expectation_matrix"], jnp.DeviceArray)
-   
+    assert isinstance(
+        params["variational_family"]["moments"]["expectation_vector"], jnp.DeviceArray
+    )
+    assert isinstance(
+        params["variational_family"]["moments"]["expectation_matrix"], jnp.DeviceArray
+    )
+
     params = gpx.config.get_defaults()
     assert "expectation_vector" in params["transformations"].keys()
     assert "expectation_matrix" in params["transformations"].keys()
@@ -290,8 +319,7 @@ def test_expectation_variational_gaussian(n_inducing, n_test):
     assert (variational_family.expectation_matrix == jnp.eye(n_inducing)).all()
     assert (variational_family.expectation_vector == jnp.zeros((n_inducing, 1))).all()
 
-
-    #Test KL
+    # Test KL
     params = variational_family.params
     kl = variational_family.prior_kl(params)
     assert isinstance(kl, jnp.ndarray)
@@ -310,4 +338,3 @@ def test_expectation_variational_gaussian(n_inducing, n_test):
     assert isinstance(sigma, jnp.ndarray)
     assert mu.shape == (n_test,)
     assert sigma.shape == (n_test, n_test)
-
