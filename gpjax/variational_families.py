@@ -24,7 +24,6 @@ from jaxtyping import Array, Float
 
 from .config import get_defaults
 from .gps import Prior
-from .kernels import cross_covariance, gram
 from .likelihoods import AbstractLikelihood, Gaussian
 from .types import Dataset, PRNGKeyType
 from .utils import I, concat_dictionaries
@@ -133,6 +132,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         Returns:
              Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
         """
+        gram = self.prior.kernel.gram
         mu = params["variational_family"]["moments"]["variational_mean"]
         sqrt = params["variational_family"]["moments"]["variational_root_covariance"]
         m = self.num_inducing
@@ -164,6 +164,11 @@ class VariationalGaussian(AbstractVariationalGaussian):
         sqrt = params["variational_family"]["moments"]["variational_root_covariance"]
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
+
+        gram, cross_covariance = (
+            self.prior.kernel.gram,
+            self.prior.kernel.cross_covariance,
+        )
 
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(m) * self.jitter
@@ -252,6 +257,11 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         sqrt = params["variational_family"]["moments"]["variational_root_covariance"]
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
+
+        gram, cross_covariance = (
+            self.prior.kernel.gram,
+            self.prior.kernel.cross_covariance,
+        )
 
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(m) * self.jitter
@@ -627,6 +637,11 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             Callable[[Float[Array, "N D"]], dx.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
         x, y = train_data.X, train_data.y
+
+        gram, cross_covariance = (
+            self.prior.kernel.gram,
+            self.prior.kernel.cross_covariance,
+        )
 
         noise = params["likelihood"]["obs_noise"]
         z = params["variational_family"]["inducing_inputs"]

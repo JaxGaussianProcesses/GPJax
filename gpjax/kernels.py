@@ -84,6 +84,69 @@ class Kernel:
 
 
 @dataclass
+class AbstractKernelComputation:
+    @abc.abstractmethod
+    def gram():
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def diagonal():
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def cross_covariance():
+        raise NotImplementedError
+
+    def solve():
+        raise NotImplementedError
+
+
+class DenseKernelComputation(AbstractKernelComputation):
+    @staticmethod
+    def gram(kernel: Kernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
+        """For a given kernel, compute the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
+
+        Args:
+            kernel (Kernel): The kernel for which the Gram matrix should be computed for.
+            inputs (Array): The input matrix.
+            params (dict): The kernel's parameter set.
+
+        Returns:
+            Array: The computed square Gram matrix.
+        """
+        return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(inputs)
+
+    @staticmethod
+    def cross_covariance(
+        kernel: Kernel, x: f64["N D"], y: f64["M D"], params: dict
+    ) -> f64["N M"]:
+        """For a given kernel, compute the :math:`m \times n` gram matrix on an a pair of input matrices with shape :math:`m \times d`  and :math:`n \times d` for :math:`d\geq 1`.
+
+        Args:
+            kernel (Kernel): The kernel for which the cross-covariance matrix should be computed for.
+            x (Array): The first input matrix.
+            y (Array): The second input matrix.
+            params (dict): The kernel's parameter set.
+
+        Returns:
+            Array: The computed square Gram matrix.
+        """
+        return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
+
+    @staticmethod
+    def diagonal(kernel: Kernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
+        """For a given kernel, compute the elementwise diagonal of the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
+        Args:
+            kernel (Kernel): The kernel for which the variance vector should be computed for.
+            inputs (Array): The input matrix.
+            params (dict): The kernel's parameter set.
+        Returns:
+            Array: The computed diagonal variance matrix.
+        """
+        return jnp.diag(vmap(lambda x: kernel(x, x, params))(inputs))
+
+
+@dataclass
 class _KernelSet:
     kernel_set: List[Kernel]
 
@@ -144,11 +207,35 @@ class ProductKernel(CombinationKernel):
     combination_fn: Optional[Callable] = jnp.prod
 
 
+class KroneckerKernelComputation(AbstractKernelComputation):
+    @staticmethod
+    def gram(kernel: CombinationKernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
+        gram_matrices = []
+        for k in kernel.kernel_set:
+            gram_matrices.append(DenseKernelComputation.gram(k, inputs, params))
+
+
+@dataclass
+class KroneckerKernel(CombinationKernel):
+    name: Optional[str] = "Product kernel"
+    combination_fn: Optional[Callable] = jnp.kron
+
+
+#     # TODO - Implement this. Probably need a super class that acts on the kernel list.
+
+#     def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
+#         gram_matrices = []
+#         dense_gram_fn = DenseKernelComputation().gram
+#         for kernel in self.kernel_set:
+#             gram_matrices.append(dense_gram_fn(kernel, x, params))
+#         gram_matrics = [k(x, y, p) for k, p in zip(self.kernel_set, params)]
+
+
 ##########################################
 # Euclidean kernels
 ##########################################
 @dataclass(repr=False)
-class RBF(Kernel):
+class RBF(Kernel, DenseKernelComputation):
     """The Radial Basis Function (RBF) kernel."""
 
     name: Optional[str] = "Radial basis function kernel"
@@ -185,7 +272,7 @@ class RBF(Kernel):
 
 
 @dataclass(repr=False)
-class Matern12(Kernel):
+class Matern12(Kernel, DenseKernelComputation):
     """The Matérn kernel with smoothness parameter fixed at 0.5."""
 
     name: Optional[str] = "Matern 1/2"
@@ -221,7 +308,7 @@ class Matern12(Kernel):
 
 
 @dataclass(repr=False)
-class Matern32(Kernel):
+class Matern32(Kernel, DenseKernelComputation):
     """The Matérn kernel with smoothness parameter fixed at 1.5."""
 
     name: Optional[str] = "Matern 3/2"
@@ -263,7 +350,7 @@ class Matern32(Kernel):
 
 
 @dataclass(repr=False)
-class Matern52(Kernel):
+class Matern52(Kernel, DenseKernelComputation):
     """The Matérn kernel with smoothness parameter fixed at 2.5."""
 
     name: Optional[str] = "Matern 5/2"
@@ -305,7 +392,7 @@ class Matern52(Kernel):
 
 
 @dataclass(repr=False)
-class Polynomial(Kernel):
+class Polynomial(Kernel, DenseKernelComputation):
     """The Polynomial kernel with variable degree."""
 
     name: Optional[str] = "Polynomial"
@@ -352,7 +439,7 @@ class _EigenKernel:
 
 
 @dataclass
-class GraphKernel(Kernel, _EigenKernel):
+class GraphKernel(Kernel, _EigenKernel, DenseKernelComputation):
     name: Optional[str] = "Graph kernel"
 
     def __post_init__(self):
@@ -406,53 +493,6 @@ def euclidean_distance(
 ) -> Float[Array, "1"]:
     """Compute the l1 norm between a pair of inputs."""
     return jnp.sqrt(jnp.maximum(jnp.sum((x - y) ** 2), 1e-36))
-
-
-def gram(
-    kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
-) -> Float[Array, "N N"]:
-    """For a given kernel, compute the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
-
-    Args:
-        kernel (Kernel): The kernel for which the Gram matrix should be computed for.
-        inputs (Array): The input matrix.
-        params (Dict): The kernel's parameter set.
-
-    Returns:
-        Array: The computed square Gram matrix.
-    """
-    return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(inputs)
-
-
-def cross_covariance(
-    kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: Dict
-) -> Float[Array, "N M"]:
-    """For a given kernel, compute the :math:`m \times n` gram matrix on an a pair of input matrices with shape :math:`m \times d`  and :math:`n \times d` for :math:`d\geq 1`.
-
-    Args:
-        kernel (Kernel): The kernel for which the cross-covariance matrix should be computed for.
-        x (Array): The first input matrix.
-        y (Array): The second input matrix.
-        params (Dict): The kernel's parameter set.
-
-    Returns:
-        Array: The computed square Gram matrix.
-    """
-    return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
-
-
-def diagonal(
-    kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
-) -> Float[Array, "N N"]:
-    """For a given kernel, compute the elementwise diagonal of the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
-    Args:
-        kernel (Kernel): The kernel for which the variance vector should be computed for.
-        inputs (Array): The input matrix.
-        params (Dict): The kernel's parameter set.
-    Returns:
-        Array: The computed diagonal variance matrix.
-    """
-    return jnp.diag(vmap(lambda x: kernel(x, x, params))(inputs))
 
 
 __all__ = [

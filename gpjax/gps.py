@@ -119,6 +119,7 @@ class Prior(AbstractGP):
         Returns:
             Callable[[Float[Array, "N D"]], dx.Distribution]: A mean function that accepts an input array for where the mean function should be evaluated at. The mean function's value at these points is then returned.
         """
+        gram = self.kernel.gram
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
             t = test_inputs
@@ -210,6 +211,10 @@ class ConjugatePosterior(AbstractPosterior):
             Callable[[Float[Array, "N D"]], dx.Distribution]: A function that accepts an input array and returns the predictive distribution as a `distrax.MultivariateNormalFullCovariance`.
         """
         x, y, n = train_data.X, train_data.y, train_data.n
+        gram, cross_covariance = (
+            self.prior.kernel.gram,
+            self.prior.kernel.cross_covariance,
+        )
 
         # Observation noise σ²
         obs_noise = params["likelihood"]["obs_noise"]
@@ -266,6 +271,7 @@ class ConjugatePosterior(AbstractPosterior):
             Callable[[Dict], Float[Array, "1"]]: A functional representation of the marginal log-likelihood that can be evaluated at a given parameter set.
         """
         x, y, n = train_data.X, train_data.y, train_data.n
+        gram = self.prior.kernel.gram
 
         def mll(
             params: Dict,
@@ -328,6 +334,10 @@ class NonConjugatePosterior(AbstractPosterior):
             Callable[[Float[Array, "N D"]], dx.Distribution]: A function that accepts an input array and returns the predictive distribution as a `distrax.MultivariateNormalFullCovariance`.
         """
         x, n = train_data.X, train_data.n
+        gram, cross_covariance = (
+            self.prior.kernel.gram,
+            self.prior.kernel.cross_covariance,
+        )
 
         Kxx = gram(self.prior.kernel, x, params["kernel"])
         Kxx += I(n) * self.jitter
@@ -373,7 +383,7 @@ class NonConjugatePosterior(AbstractPosterior):
             Callable[[Dict], Float[Array, "1"]]: A functional representation of the marginal log-likelihood that can be evaluated at a given parameter set.
         """
         x, y, n = train_data.X, train_data.y, train_data.n
-
+        gram = self.prior.kernel.gram
         if not priors:
             priors = copy_dict_structure(self._initialise_params(jr.PRNGKey(0)))
             priors["latent"] = dx.Normal(loc=0.0, scale=1.0)

@@ -23,7 +23,6 @@ from jax import vmap
 from jaxtyping import Array, Float
 
 from .gps import AbstractPosterior
-from .kernels import cross_covariance, gram
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
 from .types import Dataset
@@ -169,6 +168,10 @@ class CollapsedVI(AbstractVariationalInference):
         x, y, n = train_data.X, train_data.y, train_data.n
 
         m = self.num_inducing
+        gram, cross_covariance = (
+            self.prior.kernel.gram,
+            self.prior.kernel.cross_covariance,
+        )
 
         def elbo_fn(params: Dict) -> Float[Array, "1"]:
             noise = params["likelihood"]["obs_noise"]
