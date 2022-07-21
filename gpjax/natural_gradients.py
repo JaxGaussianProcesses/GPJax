@@ -188,15 +188,15 @@ def natural_gradients(
 
                 return expectation_elbo(params, batch)
 
-            value, dL_dnat = value_and_grad(loss_fn)(expectation_params, batch)
+            value, dL_dexp = value_and_grad(loss_fn)(expectation_params, batch)
 
             # This is a renaming of the gradient components to match the natural parameterisation pytree.
-            nat_grad = dL_dnat
+            nat_grad = dL_dexp
             nat_grad["variational_family"]["moments"] = {
-                "natural_vector": dL_dnat["variational_family"]["moments"][
+                "natural_vector": dL_dexp["variational_family"]["moments"][
                     "expectation_vector"
                 ],
-                "natural_matrix": dL_dnat["variational_family"]["moments"][
+                "natural_matrix": dL_dexp["variational_family"]["moments"][
                     "expectation_matrix"
                 ],
             }
@@ -204,48 +204,7 @@ def natural_gradients(
             return value, nat_grad
 
     else:
-        # To Do: (DD) add general parameterisation case.
         raise NotImplementedError
-
-        # BELOW is (almost working) PSUEDO CODE of what this will look like.
-
-        # def nat_grads_fn(params: dict, batch: Dataset) -> dict:
-        #     # Transform parameters to constrained space.
-        #     params = transform(params, transformations)
-
-        #     # Stop gradients for non-moment parameters.
-        #     params = _stop_gradients_nonmoments(params)
-
-        #     # Get natural moments θ.
-        #     natural_moments = bijector.inverse(params["variational_family"]["moments"])
-
-        #     # Get expectation moments η.
-        #     expectation_moments = natural_to_expectation(natural_moments)
-
-        #     # Gradient function ∂ξ/∂θ:
-        #     #### NEED TO STOP GRADIENTS FOR NON MOMENTS HERE!####
-        #     dxi_dnat = jacobian(nat_to_moments.forward)(natural_moments)
-
-        #     # Full params with expectation moments.
-        #     expectation_params = deepcopy(params)
-        #     expectation_params["variational_family"]["moments"] = expectation_moments
-
-        #     # Compute gradient ∂L/∂η:
-        #     def loss_fn(params: dict, batch: Dataset) -> f64["1"]:
-        #       # Determine hyperparameters that should be trained.
-        #       params = trainable_params(params, trainables)
-
-        #       # Stop gradients for non-moment parameters.
-        #       params = _stop_gradients_nonmoments(params)
-
-        #       return expectation_elbo(expectation_params, batch)
-
-        #     value, dL_dnat = value_and_grad(loss_fn)(expectation_params, batch)
-
-        #     # ∂ξ/∂θ ∂L/∂η
-        #     nat_grads = jax.tree_multimap(lambda x, y: jnp.matmul(x.T, y), dxi_dnat, dL_dnat)
-
-        #     return value, nat_grads
 
     def hyper_grads_fn(params: dict, trainables: dict, batch: Dataset) -> dict:
         """
