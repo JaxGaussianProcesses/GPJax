@@ -5,6 +5,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/thomaspinder/gpjax/badge)](https://www.codefactor.io/repository/github/thomaspinder/gpjax)
 [![Documentation Status](https://readthedocs.org/projects/gpjax/badge/?version=latest)](https://gpjax.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/GPJax.svg)](https://badge.fury.io/py/GPJax)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6882220.svg)](https://doi.org/10.5281/zenodo.6882220)
 [![Downloads](https://pepy.tech/badge/gpjax)](https://pepy.tech/project/gpjax)
 
 [**Quickstart**](#simple-example)
