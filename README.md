@@ -1,8 +1,8 @@
 <h1 align='center'>GPJax</h1>
 <h2 align='center'>Gaussian processes in Jax.</h2>
-<div style="text-align:center">
-<img width="500" height="200" src="https://github.com/thomaspinder/GPJax/raw/master/docs/gpjax_logo.svg">
-</div>
+<p align="center">
+<img width="700" height="300" src="https://github.com/thomaspinder/GPJax/raw/master/docs/gpjax_logo.svg" alt="GPJax's logo">
+</p>
 
 
 [![codecov](https://codecov.io/gh/thomaspinder/gpjax/branch/master/graph/badge.svg?token=DM1DRDASU2)](https://codecov.io/gh/thomaspinder/gpjax)
