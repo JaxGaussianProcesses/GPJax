@@ -1,5 +1,5 @@
-<h1 align='center'>GPJax</h1>
-<h2 align='center'>Gaussian processes in Jax.</h2>
+<!-- <h1 align='center'>GPJax</h1>
+<h2 align='center'>Gaussian processes in Jax.</h2> -->
 <p align="center">
 <img width="700" height="300" src="https://github.com/thomaspinder/GPJax/raw/master/docs/gpjax_logo.svg" alt="GPJax's logo">
 </p>
