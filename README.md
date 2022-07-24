@@ -1,5 +1,6 @@
 <h1 align='center'>GPJax</h1>
 <h2 align='center'>Gaussian processes in Jax.</h2>
+![](https://github.com/thomaspinder/GPJax/raw/master/docs/gpjax_logo.pdf)
 
 [![codecov](https://codecov.io/gh/thomaspinder/gpjax/branch/master/graph/badge.svg?token=DM1DRDASU2)](https://codecov.io/gh/thomaspinder/gpjax)
 [![CodeFactor](https://www.codefactor.io/repository/github/thomaspinder/gpjax/badge)](https://www.codefactor.io/repository/github/thomaspinder/gpjax)
