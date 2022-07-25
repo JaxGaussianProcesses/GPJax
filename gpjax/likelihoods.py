@@ -86,10 +86,17 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
 
     @property
     def params(self) -> dict:
+        """Initialise the parameter set of a Bernoulli likelihood."""
         return {}
 
     @property
     def link_function(self) -> Callable:
+        """Return the probit link function of the Bernoulli likelihood.
+
+        Returns:
+            Callable: A probit link function that maps the predictive distribution to the likelihood function.
+        """
+
         def link_fn(x, params: dict) -> dx.Distribution:
             return dx.Bernoulli(probs=inv_probit(x))
 
@@ -97,6 +104,12 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
 
     @property
     def predictive_moment_fn(self) -> Callable:
+        """Instantiate the predictive moment function of the Bernoulli likelihood that is parameterised by a probit link function.
+
+        Returns:
+            Callable: A callable object that accepts a mean and variance term from which the predictive random variable is computed.
+        """
+
         def moment_fn(mean: f64["N D"], variance: f64["N D"]):
             rv = self.link_function(mean / jnp.sqrt(1 + variance), self.params)
             return rv

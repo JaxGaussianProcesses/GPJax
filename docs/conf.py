@@ -141,7 +141,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
 autosummary_generate = True
-napolean_use_rtype = False
+napoleon_use_rtype = False
 autodoc_default_options = {
     "member-order": "bysource",
     "special-members": "__init__, __call__",

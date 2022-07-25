@@ -122,6 +122,7 @@ class AbstractPosterior(AbstractGP):
 
     @property
     def params(self) -> dict:
+        """Initialise the parameter set of a GP posterior."""
         return concat_dictionaries(
             self.prior.params, {"likelihood": self.likelihood.params}
         )
@@ -250,6 +251,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
     @property
     def params(self) -> dict:
+        """Initialise the parameter set of a non-conjugate GP posterior."""
         parameters = concat_dictionaries(
             self.prior.params, {"likelihood": self.likelihood.params}
         )
