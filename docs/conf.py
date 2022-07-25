@@ -155,12 +155,17 @@ autodoc_default_options = {
 # a list of builtin themes.
 #
 html_theme = "furo"
-
+html_logo = "_static/gpjax_logo.svg"
+html_favicon = "_static/gpjax_logo.svg"
+html_title = f"v{version}"
 html_theme_options = {
     "light_css_variables": {
         "color-brand-primary": "#B5121B",
         "color-brand-content": "#CC3333",
         "color-admonition-background": "orange",
+        "source_repository": "https://github.com/thomaspinder/GPJax/",
+        "source_branch": "master",
+        "source_directory": "docs/",
     },
 }
 

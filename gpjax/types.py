@@ -76,7 +76,9 @@ class Dataset:
         return self
 
     def shuffle(self, *args, **kwargs) -> "Dataset":
-        """Randomly shuffles the elements of this dataset (same syntax as tensorflow.data.Dataset).
+        """
+        Randomly shuffles the elements of this dataset (same syntax as tensorflow.data.Dataset).
+
         Args:
             buffer_size: (Optional[int]) An integer, representing the number of
                 elements from this dataset from which the new dataset will sample.
@@ -93,7 +95,9 @@ class Dataset:
         return self
 
     def batch(self, *args, **kwargs) -> "Dataset":
-        """Combines consecutive dataset elements into batches (same syntax as tensorflow.data.Dataset).
+        """
+        Combines consecutive dataset elements into batches (same syntax as tensorflow.data.Dataset).
+
         Args:
             batch_size: (int) An integer representing the number of consecutive elements to combine in a single batch.
             drop_remainder: (Optional[bool]) A boolean, representing

@@ -5,7 +5,7 @@ GPJax is designed to be a Gaussian process package that provides an accurate rep
 
 
 Gaussian process notation
------------------
+----------------------------------
 
 .. list-table::
    :widths: 25 25 50
@@ -15,7 +15,7 @@ Gaussian process notation
      - GPJax code
      - Description
    * - :math:`n`
-     - n 
+     - n
      - Number of train inputs
    * - :math:`\boldsymbol{x} = (x_1,\dotsc,x_{n})`
      - x
@@ -39,14 +39,14 @@ Gaussian process notation
      - Kxx
      - Kernel Gram matrix at inputs :math:`\boldsymbol{x}`
    * - :math:`\mathbf{L}_{\boldsymbol{x}}`
-     - Lx 
+     - Lx
      - Lower Cholesky decomposition of :math:`\boldsymbol{K}_{\boldsymbol{x}\boldsymbol{x}}`
    * - :math:`\mathbf{K}_{\boldsymbol{t}\boldsymbol{x}}`
      - Ktx
      - Cross-covariance between inputs :math:`\boldsymbol{t}` and :math:`\boldsymbol{x}`
 
 Sparse Gaussian process notation
------------------
+----------------------------------
 
 .. list-table::
    :widths: 25 25 50
