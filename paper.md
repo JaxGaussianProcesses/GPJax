@@ -46,7 +46,7 @@ GP implementations are available in numerous modern probabilistic programming la
 
 # External Usage
 
-Two recent research papers [@pinder2021gaussian; @pinder2022street] utilise the graph kernel functionality provided by `GPJax`.
+Two recent research papers [@pinder2021gaussian; @pinder2022street] utilise the graph kernel functionality provided by `GPJax`. Furthermore, `GPJax` is being used to build probabilistic ensembles of climate models [@amos2022ensembles] and perform adaptive sampling in deep-sea environmental [@dodd2022ensembles].
 
 # Acknowledgments
 

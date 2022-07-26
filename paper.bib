@@ -3,7 +3,8 @@
   author    = {Rasmussen, Carl Edward and Williams, Christopher K},
   number    = {3},
   year      = {2006},
-  publisher = {MIT press Cambridge, MA}
+  publisher = {MIT press Cambridge, MA},
+  doi = {https://doi.org/10.7551/mitpress/3206.001.0001}
 }
 
 @article{matthews2017gpflow,
@@ -59,11 +60,12 @@
 @article{carpenter2017stan,
   title     = {Stan: A probabilistic programming language},
   author    = {Carpenter, Bob and Gelman, Andrew and Hoffman, Matthew D and Lee, Daniel and Goodrich, Ben and Betancourt, Michael and Brubaker, Marcus and Guo, Jiqiang and Li, Peter and Riddell, Allen},
-  journal   = {Journal of statistical software},
+  journal   = {Journal of Statistical Software},
   volume    = {76},
   number    = {1},
   year      = {2017},
-  publisher = {Columbia Univ., New York, NY (United States); Harvard Univ., Cambridge, MA~…}
+  publisher = {Columbia Univ., New York, NY (United States); Harvard Univ., Cambridge, MA~…},
+  doi = {10.18637/jss.v076.i01}
 }
 
 
@@ -88,12 +90,16 @@
 }
 
 @article{fairbrother2022gaussianprocesses,
-  title   = {{GaussianProcesses.jl}: A Nonparametric {Bayes} Package for the {Julia} Language},
-  author  = {Fairbrother, Jamie and Nemeth, Christopher and Rischard, Maxime and Brea, Johanni and Pinder, Thomas},
-  journal = {Journal of Statistical Software},
-  volume  = {102},
-  pages   = {1--36},
-  year    = {2022}
+  title={GaussianProcesses.jl: A Nonparametric Bayes Package for the Julia Language},
+  volume={102},
+  url={https://www.jstatsoft.org/index.php/jss/article/view/v102i01},
+  doi={10.18637/jss.v102.i01},
+  abstract={Gaussian processes are a class of flexible nonparametric Bayesian tools that are widely used across the sciences, and in industry, to model complex data sources. Key to applying Gaussian process models is the availability of well-developed open source software, which is available in many programming languages. In this paper, we present a tutorial of the GaussianProcesses.jl package that has been developed for the Julia programming language. GaussianProcesses.jl utilizes the inherent computational benefits of the Julia language, including multiple dispatch and just-in-time compilation, to produce a fast, flexible and user-friendly Gaussian processes package. The package provides many mean and kernel functions with supporting inference tools to fit exact Gaussian process models, as well as a range of alternative likelihood functions to handle non-Gaussian data (e.g., binary classification models) and sparse approximations for scalable Gaussian processes. The package makes efficient use of existing Julia packages to provide users with a range of optimization and plotting tools.},
+  number={1},
+  journal={Journal of Statistical Software},
+  author={Fairbrother, Jamie and Nemeth, Christopher and Rischard, Maxime and Brea, Johanni and Pinder, Thomas},
+  year={2022},
+  pages={1–36}
 }
 
 @article{vanhatalo2013gpstuff,
@@ -171,11 +177,18 @@
 }
 
 @article{hensman2013gaussian,
-  title   = {{G}aussian processes for big data},
-  author  = {Hensman, James and Fusi, Nicolo and Lawrence, Neil D},
-  journal = {arXiv preprint arXiv:1309.6835},
-  year    = {2013}
+  author    = {James Hensman and
+               Nicol{\'{o}} Fusi and
+               Neil D. Lawrence},
+  editor    = {Ann E. Nicholson and
+               Padhraic Smyth},
+  title     = {Gaussian Processes for Big Data},
+  booktitle = {Proceedings of the Twenty-Ninth Conference on Uncertainty in Artificial
+               Intelligence, {UAI} 2013, Bellevue, WA, USA, August 11-15, 2013},
+  publisher = {{AUAI} Press},
+  year      = {2013}
 }
+
 
 
 @article{rasmussen2010gaussian,
@@ -229,7 +242,8 @@
   number    = {8},
   pages     = {1246--1266},
   year      = {1963},
-  publisher = {Society of Economic Geologists}
+  publisher = {Society of Economic Geologists},
+  doi = {10.2113/gsecongeo.58.8.1246}
 }
 
 
@@ -240,7 +254,8 @@
   volume  = {2},
   number  = {117-129},
   pages   = {2},
-  year    = {1978}
+  year    = {1978},
+  doi = {10.1007/3-540-07165-2_55}
 }
 
 @inproceedings{deisenroth2011pilco,
@@ -252,3 +267,16 @@
   organization = {Citeseer}
 }
 
+@inproceedings{amos2022ensembles,
+  title        = {Probabilistic climate model projections, using {G}aussian Processes and Optimal Transport},
+  author       = {Amos, Matthew and Pinder, Thomas and Nemeth, Christopher and Leslie, David and Young, Paul},
+  booktitle    = {In preparation},
+  year         = {2022},
+}
+
+@inproceedings{dodd2022ensembles,
+  title        = {Bayesian adaptive sampling in a hostile deep-sea environment},
+  author       = {Dodd, Daniel and Cripps, Edward and Jonathan, Phil and Leslie, David},
+  booktitle    = {In preparation},
+  year         = {2022},
+}
