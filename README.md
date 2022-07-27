@@ -8,7 +8,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/thomaspinder/gpjax/badge)](https://www.codefactor.io/repository/github/thomaspinder/gpjax)
 [![Documentation Status](https://readthedocs.org/projects/gpjax/badge/?version=latest)](https://gpjax.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/GPJax.svg)](https://badge.fury.io/py/GPJax)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6882220.svg)](https://doi.org/10.5281/zenodo.6882220)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.04455/status.svg)](https://doi.org/10.21105/joss.04455)
 [![Downloads](https://pepy.tech/badge/gpjax)](https://pepy.tech/project/gpjax)
 
 [**Quickstart**](#simple-example)
@@ -146,4 +146,23 @@ We then recommend you check your installation using the supplied unit tests.
 
 ```python
 python -m pytest tests/
+```
+
+
+## Citing GPJax
+
+If you use GPJax in your research, please cite our [JOSS paper](https://joss.theoj.org/papers/10.21105/joss.04455#). A sample Bibtex file is
+```
+@article{Pinder2022,
+  doi = {10.21105/joss.04455},
+  url = {https://doi.org/10.21105/joss.04455},
+  year = {2022},
+  publisher = {The Open Journal},
+  volume = {7},
+  number = {75},
+  pages = {4455},
+  author = {Thomas Pinder and Daniel Dodd},
+  title = {GPJax: A Gaussian Process Framework in JAX},
+  journal = {Journal of Open Source Software}
+}
 ```
