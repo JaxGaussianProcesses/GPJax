@@ -10,10 +10,13 @@
 [![PyPI version](https://badge.fury.io/py/GPJax.svg)](https://badge.fury.io/py/GPJax)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.04455/status.svg)](https://doi.org/10.21105/joss.04455)
 [![Downloads](https://pepy.tech/badge/gpjax)](https://pepy.tech/project/gpjax)
+[![Slack Invite](https://img.shields.io/badge/Slack_Invite--blue?style=social&logo=slack)](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw)
+
 
 [**Quickstart**](#simple-example)
 | [**Install guide**](#installation)
 | [**Documentation**](https://gpjax.readthedocs.io/en/latest/)
+| [**Slack Community**](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw)
 
 GPJax aims to provide a low-level interface to Gaussian process (GP) models in [Jax](https://github.com/google/jax), structured to give researchers maximum flexibility in extending the code to suit their own needs. We define a GP prior in GPJax by specifying a mean and kernel function and multiply this by a likelihood function to construct the posterior. The idea is that the code should be as close as possible to the maths we write on paper when working with GP models.
 
@@ -22,6 +25,8 @@ GPJax aims to provide a low-level interface to Gaussian process (GP) models in [
 GPJax was created by [Thomas Pinder](https://github.com/thomaspinder). Today, the maintenance of GPJax is undertaken by Thomas and [Daniel Dodd](https://github.com/Daniel-Dodd).
 
 We would be delighted to review pull requests (PRs) from new contributors. Before contributing, please read our [guide for contributing](https://github.com/thomaspinder/GPJax/blob/master/CONTRIBUTING.md). If you do not have the capacity to open a PR, or you would like guidance on how best to structure a PR, then please [open an issue](https://github.com/thomaspinder/GPJax/issues/new/choose). For broader discussions on best practices for fitting GPs, technical questions surrounding the mathematics of GPs, or anything else that you feel doesn't quite constitue an issue, please start a discussion thread in our [discussion tracker](https://github.com/thomaspinder/GPJax/discussions).
+
+We have recently set up a Slack channel where we hope to facilitate discussions around the development of GPJax and broader support for Gaussian process modelling. If you'd like to join the channel, then please follow [this invitation link](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw) which will take you to the GPJax Slack community.
 
 ## Supported methods and interfaces
 
