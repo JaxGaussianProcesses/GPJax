@@ -143,4 +143,3 @@ guidelines before you submit a pull request:
       $ pytest tests --cov=./ --cov-report=html
 
 This guide was derived from `PyMC’s guide to contributing <https://github.com/pymc-devs/pymc/blob/main/CONTRIBUTING.md>`__
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
