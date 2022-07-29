@@ -13,6 +13,12 @@ order of difficulty or scope):
 -  Contributing or improving the `docs <https://github.com/thomaspinder/GPJax/tree/master/docs>`_ or `examples <https://github.com/thomaspinder/GPJax/tree/master/docs/nbs>`_.
 -  Submitting issues related to bugs or desired enhancements
 
+
+Code of conduct
+------------------------------------------
+
+As a contributor to GPJax, you can help us keep the community open and inclusive. Please read and follow our `Code of Conduct <https://github.com/thomaspinder/GPJax/blob/master/.github/CODE_OF_CONDUCT.md>`_.
+
 Opening issues and getting support
 ------------------------------------------
 

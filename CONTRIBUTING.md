@@ -9,6 +9,10 @@ There are 4 main ways of contributing to the library (in descending order of dif
 - Contributing or improving the documentation (`docs`) or examples (`gpjax/docs/nbs`)
 - Submitting issues related to bugs or desired enhancements
 
+## Code of conduct
+
+As a contributor to GPJax, you can help us keep the community open and inclusive. Please read and follow our [Code of Conduct](https://github.com/thomaspinder/GPJax/blob/master/.github/CODE_OF_CONDUCT.md).
+
 # Opening issues and getting support
 
 Please open issues on [Github Issue Tracker](https://github.com/thomaspinder/GPJax/issues/new/choose).
