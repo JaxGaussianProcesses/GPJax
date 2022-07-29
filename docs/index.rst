@@ -40,6 +40,7 @@ To learn more, checkout the `regression notebook <https://gpjax.readthedocs.io/e
 
     installation
     design
+    contributing
 
 .. toctree::
     :maxdepth: 1
