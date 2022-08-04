@@ -453,7 +453,9 @@ class KroneckerKernelComputation(AbstractKernelComputation):
         for k, params in zip(kernel.kernel_set, params):
 
             # Filter grid based on active dims.
-            _, indices = jnp.unique(inputs[..., k.active_dims], return_index=True)
+            _, indices = jnp.unique(
+                inputs[..., k.active_dims], return_index=True, axis=0
+            )
 
             gram_matrices.append(k.gram(k, inputs[indices], params))
         # ---
@@ -492,7 +494,9 @@ class KroneckerKernelComputation(AbstractKernelComputation):
         for k, params in zip(kernel.kernel_set, params):
 
             # Filter grid based on active dims.
-            _, indices = jnp.unique(inputs[..., k.active_dims], return_index=True)
+            _, indices = jnp.unique(
+                inputs[..., k.active_dims], return_index=True, axis=0
+            )
 
             gram_matrices.append(
                 k.gram_solve(k, inputs[indices], params, I(inputs.shape[0]))
