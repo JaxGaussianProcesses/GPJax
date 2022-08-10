@@ -5,7 +5,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import pytest
 
-from gpjax import Dataset, initialise, likelihoods, transform
+from gpjax import Dataset, initialise, transform
 from gpjax.gps import (
     AbstractGP,
     ConjugatePosterior,
@@ -36,7 +36,7 @@ def test_prior(num_datapoints):
     assert sigma.shape == (num_datapoints, num_datapoints)
 
 
-@pytest.mark.parametrize("num_datapoints", [2, 10])
+@pytest.mark.parametrize("num_datapoints", [1, 2, 10])
 def test_conjugate_posterior(num_datapoints):
     key = jr.PRNGKey(123)
     x = jnp.sort(
@@ -80,7 +80,7 @@ def test_conjugate_posterior(num_datapoints):
     assert sigma.shape == (num_datapoints, num_datapoints)
 
 
-@pytest.mark.parametrize("num_datapoints", [2, 10])
+@pytest.mark.parametrize("num_datapoints", [1, 2, 10])
 @pytest.mark.parametrize("likel", NonConjugateLikelihoods)
 def test_nonconjugate_posterior(num_datapoints, likel):
     key = jr.PRNGKey(123)
