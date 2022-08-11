@@ -234,7 +234,8 @@ class ConjugatePosterior(AbstractPosterior):
 
             constant = jnp.array(-1.0) if negative else jnp.array(1.0)
             return constant * (
-                marginal_likelihood.log_prob(y.squeeze()).squeeze() + log_prior_density
+                marginal_likelihood.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
+                + log_prior_density
             )
 
         return mll
