@@ -9,6 +9,7 @@ from tqdm.auto import tqdm
 
 from .parameters import trainable_params
 from .types import Dataset
+from jaxtyping import f64
 
 
 def progress_bar_scan(n_iters: int, log_rate: int):
@@ -87,7 +88,7 @@ def fit(
     optax_optim,
     n_iters: int = 100,
     log_rate: int = 10,
-) -> tp.Dict:
+) -> tp.Tuple[tp.Dict, f64["n_iters"]]:
     """Abstracted method for fitting a GP model with respect to a supplied objective function.
     Optimisers used here should originate from Optax.
     Args:
@@ -98,7 +99,7 @@ def fit(
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
     Returns:
-        tp.Dict: An optimised set of parameters.
+        tp.Tuple[tp.Dict, f64["n_iters"]]: A tuple comprising optimised parameters and training history respectively.
     """
     opt_state = optax_optim.init(params)
 
@@ -115,8 +116,9 @@ def fit(
         params_opt_state = params, opt_state
         return params_opt_state, loss_val
 
-    (params, _), _ = jax.lax.scan(step, (params, opt_state), jnp.arange(n_iters))
-    return params
+    (params, _), history = jax.lax.scan(step, (params, opt_state), jnp.arange(n_iters))
+    
+    return params, history
 
 
 def fit_batches(
@@ -127,7 +129,7 @@ def fit_batches(
     optax_optim,
     n_iters: tp.Optional[int] = 100,
     log_rate: tp.Optional[int] = 10,
-) -> tp.Dict:
+) -> tp.Tuple[tp.Dict, f64["n_iters"]]:
     """Abstracted method for fitting a GP model with mini-batches respect to a supplied objective function.
     Optimisers used here should originate from Optax.
     Args:
@@ -141,7 +143,7 @@ def fit_batches(
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
     Returns:
-        tp.Dict: An optimised set of parameters.
+        tp.Tuple[tp.Dict, f64["n_iters"]]: A tuple comprising optimised parameters and training history respectively.
     """
 
     opt_state = optax_optim.init(params)
@@ -161,6 +163,6 @@ def fit_batches(
         params_opt_state = params, opt_state
         return params_opt_state, loss_val
 
-    (params, _), _ = jax.lax.scan(step, (params, opt_state), jnp.arange(n_iters))
+    (params, _), history = jax.lax.scan(step, (params, opt_state), jnp.arange(n_iters))
 
-    return params
+    return params, history

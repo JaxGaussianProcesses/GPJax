@@ -11,8 +11,9 @@ from gpjax.abstractions import fit, fit_batches
 tfd = tf.data
 
 
+@pytest.mark.parametrize("n_iters", [10])
 @pytest.mark.parametrize("n", [1, 20])
-def test_fit(n):
+def test_fit(n_iters, n):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
@@ -22,10 +23,12 @@ def test_fit(n):
     mll = p.marginal_log_likelihood(D, constrainer, negative=True)
     pre_mll_val = mll(params)
     optimiser = optax.adam(learning_rate=0.1)
-    optimised_params = fit(mll, params, trainable_status, optimiser, n_iters=10)
+    optimised_params, history = fit(mll, params, trainable_status, optimiser, n_iters)
     optimised_params = transform(optimised_params, constrainer)
     assert isinstance(optimised_params, dict)
     assert mll(optimised_params) < pre_mll_val
+    assert isinstance(history, jnp.ndarray)
+    assert history.shape[0] == n_iters
 
 
 def test_stop_grads():
@@ -33,14 +36,15 @@ def test_stop_grads():
     trainables = {"x": True, "y": False}
     loss_fn = lambda params: params["x"] ** 2 + params["y"] ** 2
     optimiser = optax.adam(learning_rate=0.1)
-    learned_params = fit(loss_fn, params, trainables, optimiser, n_iters=1)
+    learned_params, _ = fit(loss_fn, params, trainables, optimiser, n_iters=1)
     assert learned_params["y"] == params["y"]
     assert learned_params["x"] != params["x"]
 
 
+@pytest.mark.parametrize("n_iters", [5])
 @pytest.mark.parametrize("nb", [1, 20, 50])
 @pytest.mark.parametrize("ndata", [50])
-def test_batch_fitting(nb, ndata):
+def test_batch_fitting(n_iters, nb, ndata):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(ndata, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
@@ -61,12 +65,13 @@ def test_batch_fitting(nb, ndata):
     D = D.cache()
     D = D.repeat()
     D = D.shuffle(D.n)
-    D = D.batch(batch_size=nb)
+    D = D.batch(batch_size=nb, drop_remainder=True)
     D = D.prefetch(buffer_size=1)
 
     optimiser = optax.adam(learning_rate=0.1)
-    optimised_params = fit_batches(
-        objective, params, trainable_status, D, optimiser, n_iters=5
-    )
+    optimised_params, history = fit_batches(
+        objective, params, trainable_status, D, optimiser, n_iters)
     optimised_params = transform(optimised_params, constrainer)
     assert isinstance(optimised_params, dict)
+    assert isinstance(history, jnp.ndarray)
+    assert history.shape[0] == n_iters

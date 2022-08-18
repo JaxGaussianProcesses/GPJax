@@ -1,13 +1,14 @@
 import typing as tp
-
 import jax.numpy as jnp
-import numpy as np
+import tensorflow as tf
+import tensorflow.data as tfd
+
+from jax.experimental import host_callback
+from jax import dlpack
 from chex import dataclass
 from jaxtyping import f64
 
 NoneType = type(None)
-
-import tensorflow.data as tfd
 
 
 @dataclass
@@ -133,17 +134,23 @@ class Dataset:
     def get_batcher(self) -> tp.Callable[[None], "Dataset"]:
         """Creates a data batching object, that loads data from the
         tensorflow.data.Dataset object and returns it as a GPJax dataset.
-
         Returns:
             tp.Callable[[None], "Dataset"]: A batch loader.
         """
         self._make_tfd_if_none()
         tfd_iter = iter(self._tf_dataset)
 
-        def next_batch() -> "Dataset":
-            X_batch, y_batch = next(tfd_iter)
+        def _tf_to_jax(arr: tf.Tensor) -> jnp.ndarray:
+            return dlpack.from_dlpack(tf.experimental.dlpack.to_dlpack(arr))
 
-            return Dataset(X=X_batch.numpy(), y=y_batch.numpy())
+        def _next(_)  -> jnp.ndarray:
+            x_batch, y_batch = next(tfd_iter)
+
+            return _tf_to_jax(x_batch), _tf_to_jax(y_batch)
+
+        def next_batch() -> "Dataset":
+            x_batch, y_batch = host_callback.call(_next, (), result_shape=_next(None))
+            return Dataset(X = x_batch, y = y_batch)
 
         return next_batch
 
