@@ -72,8 +72,10 @@ def test_batch_fitting(n_iters, nb, ndata):
     print(params)
     print("-" * 80)
     inference_state = fit_batches(
-        objective, params, trainable_status, D, optimiser, seed, nb, n_iters
-    )
+        objective, params, trainable_status, D, optimiser, seed, nb, n_iters)
+    key = jr.PRNGKey(42)
+    optimised_params, history = fit_batches(
+        objective, params, trainable_status, D, optimiser, key, nb, n_iters)
     optimised_params, history = inference_state.params, inference_state.history
     optimised_params = transform(optimised_params, constrainer)
     assert isinstance(inference_state, InferenceState)

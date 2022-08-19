@@ -5,6 +5,8 @@ from jaxtyping import f64
 
 NoneType = type(None)
 
+from chex import PRNGKey as PRNGKeyType
+
 
 @dataclass
 class Dataset:

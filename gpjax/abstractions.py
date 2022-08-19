@@ -4,15 +4,14 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 import optax
-from chex import PRNGKey, dataclass
+from chex import dataclass
 from jax import lax
 from jax.experimental import host_callback
 from jaxtyping import f64
 from tqdm.auto import tqdm
 
 from .parameters import trainable_params
-from .types import Dataset
-from .utils import convert_seed
+from .types import Dataset, PRNGKeyType
 
 
 @dataclass(frozen=True)
@@ -139,7 +138,7 @@ def fit_batches(
     trainables: tp.Dict,
     train_data: Dataset,
     optax_optim,
-    seed: tp.Union[int, PRNGKey],
+    key: PRNGKeyType,
     batch_size: int,
     n_iters: tp.Optional[int] = 100,
     log_rate: tp.Optional[int] = 10,
@@ -152,7 +151,7 @@ def fit_batches(
         trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
         train_data (Dataset): The training dataset.
         optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
-        seed (int): The random seed for the mini-batch sampling.
+        key (PRNGKeyType): The PRNG key for the mini-batch sampling.
         batch_size(int): The batch_size.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
@@ -162,8 +161,6 @@ def fit_batches(
 
     opt_state = optax_optim.init(params)
 
-    prng = convert_seed(seed)
-
     x, y, n = train_data.X, train_data.y, train_data.n
 
     def loss(params, batch):
@@ -172,9 +169,9 @@ def fit_batches(
 
     @progress_bar_scan(n_iters, log_rate)
     def step(carry, _):
-        params, opt_state, prng = carry
+        params, opt_state, current_key = carry
 
-        indicies = jr.choice(prng, n, (batch_size,), replace=True)
+        indicies = jr.choice(current_key, n, (batch_size,), replace=True)
 
         batch = Dataset(X=x[indicies], y=y[indicies])
 
@@ -182,13 +179,13 @@ def fit_batches(
         updates, opt_state = optax_optim.update(loss_gradient, opt_state, params)
         params = optax.apply_updates(params, updates)
 
-        prng, _ = jr.split(prng)
+        _, new_key = jr.split(current_key)
 
-        carry = params, opt_state, prng
+        carry = params, opt_state, new_key
         return carry, loss_val
 
     (params, _, _), history = jax.lax.scan(
-        step, (params, opt_state, prng), jnp.arange(n_iters)
+        step, (params, opt_state, key), jnp.arange(n_iters)
     )
     inf_state = InferenceState(params=params, history=history)
     return inf_state

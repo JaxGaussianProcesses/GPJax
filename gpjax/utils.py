@@ -79,14 +79,3 @@ def dict_array_coercion(params: tp.Dict) -> tp.Tuple[tp.Callable, tp.Callable]:
         return jax.tree_util.tree_unflatten(flattened_pytree[1], parameter_array)
 
     return dict_to_array, array_to_dict
-
-
-def convert_seed(seed: tp.Union[int, PRNGKey]) -> PRNGKey:
-    """Ensure that seeds type."""
-
-    if isinstance(seed, int):
-        rng = jr.PRNGKey(seed)
-    else:  # key is of type PRNGKey
-        rng = seed
-
-    return rng
