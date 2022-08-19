@@ -3,7 +3,6 @@ import typing as tp
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-import matplotlib.pyplot as plt
 import optax as ox
 import pytest
 import tensorflow as tf
