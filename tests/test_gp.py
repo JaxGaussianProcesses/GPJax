@@ -15,13 +15,14 @@ from gpjax.gps import (
 )
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian, NonConjugateLikelihoods
-from gpjax.parameters import initialise
+from gpjax.parameters import ParameterState
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 def test_prior(num_datapoints):
     p = Prior(kernel=RBF())
-    params, trainable_status, constrainer, unconstrainer = initialise(p)
+    parameter_state = initialise(p, jr.PRNGKey(123))
+    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
     assert isinstance(p, Prior)
     assert isinstance(p, AbstractGP)
     prior_rv_fn = p(params)
@@ -57,7 +58,8 @@ def test_conjugate_posterior(num_datapoints):
     assert isinstance(post2, ConjugatePosterior)
     assert isinstance(post2, AbstractGP)
 
-    params, trainable_status, constrainer, unconstrainer = initialise(post)
+    parameter_state = initialise(post, key)
+    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
     params = transform(params, unconstrainer)
 
     # Marginal likelihood
@@ -97,8 +99,11 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     assert isinstance(post, NonConjugatePosterior)
     assert isinstance(post, AbstractGP)
     assert isinstance(p, AbstractGP)
-    params, trainable_status, constrainer, unconstrainer = initialise(post)
+
+    parameter_state = initialise(post, key)
+    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
     params = transform(params, unconstrainer)
+    assert isinstance(parameter_state, ParameterState)
 
     # Marginal likelihood
     mll = post.marginal_log_likelihood(train_data=D, transformations=constrainer)
@@ -124,7 +129,9 @@ def test_nonconjugate_posterior(num_datapoints, likel):
 @pytest.mark.parametrize("lik", [Bernoulli, Gaussian])
 def test_param_construction(num_datapoints, lik):
     p = Prior(kernel=RBF()) * lik(num_datapoints=num_datapoints)
-    params, trainable_status, constrainer, unconstrainer = initialise(p)
+    parameter_state = initialise(p, jr.PRNGKey(123))
+    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
+
     if isinstance(lik, Bernoulli):
         assert sorted(list(params.keys())) == [
             "kernel",

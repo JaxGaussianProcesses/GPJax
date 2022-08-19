@@ -1,8 +1,10 @@
 import typing as tp
 from abc import abstractmethod, abstractproperty
+from typing import Dict
 
 import distrax as dx
 import jax.numpy as jnp
+import jax.random as jr
 import jax.scipy as jsp
 from chex import dataclass
 from jaxtyping import f64
@@ -42,8 +44,7 @@ class AbstractGP:
         """Compute the latent function's multivariate normal distribution."""
         raise NotImplementedError
 
-    @abstractproperty
-    def params(self) -> tp.Dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """Initialise the GP's parameter set"""
         raise NotImplementedError
 
@@ -94,12 +95,11 @@ class Prior(AbstractGP):
 
         return predict_fn
 
-    @property
-    def params(self) -> dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """Initialise the GP prior's parameter set"""
         return {
-            "kernel": self.kernel.params,
-            "mean_function": self.mean_function.params,
+            "kernel": self.kernel._initialise_params(key),
+            "mean_function": self.mean_function._initialise_params(key),
         }
 
 
@@ -120,11 +120,11 @@ class AbstractPosterior(AbstractGP):
         """Predict the GP's output given the input."""
         raise NotImplementedError
 
-    @property
-    def params(self) -> dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """Initialise the parameter set of a GP posterior."""
         return concat_dictionaries(
-            self.prior.params, {"likelihood": self.likelihood.params}
+            self.prior._initialise_params(key),
+            {"likelihood": self.likelihood._initialise_params(key)},
         )
 
 
@@ -192,7 +192,7 @@ class ConjugatePosterior(AbstractPosterior):
     def marginal_log_likelihood(
         self,
         train_data: Dataset,
-        transformations: tp.Dict,
+        transformations: Dict,
         priors: dict = None,
         negative: bool = False,
     ) -> tp.Callable[[dict], f64["1"]]:
@@ -200,7 +200,7 @@ class ConjugatePosterior(AbstractPosterior):
 
         Args:
             train_data (Dataset): The training dataset used to compute the marginal log-likelihood.
-            transformations (tp.Dict): A dictionary of transformations that should be applied to the training dataset to unconstrain the parameters.
+            transformations (Dict): A dictionary of transformations that should be applied to the training dataset to unconstrain the parameters.
             priors (dict, optional): _description_. Optional argument that contains the priors placed on the model's parameters. Defaults to None.
             negative (bool, optional): Whether or not the returned function should be negative. For optimisation, the negative is useful as minimisation of the negative marginal log-likelihood is equivalent to maximisation of the marginal log-likelihood. Defaults to False.
 
@@ -250,11 +250,11 @@ class NonConjugatePosterior(AbstractPosterior):
     name: tp.Optional[str] = "Non-conjugate posterior"
     jitter: tp.Optional[float] = DEFAULT_JITTER
 
-    @property
-    def params(self) -> dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """Initialise the parameter set of a non-conjugate GP posterior."""
         parameters = concat_dictionaries(
-            self.prior.params, {"likelihood": self.likelihood.params}
+            self.prior._initialise_params(key),
+            {"likelihood": self.likelihood._initialise_params(key)},
         )
         parameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
         return parameters
@@ -303,7 +303,7 @@ class NonConjugatePosterior(AbstractPosterior):
     def marginal_log_likelihood(
         self,
         train_data: Dataset,
-        transformations: tp.Dict,
+        transformations: Dict,
         priors: dict = None,
         negative: bool = False,
     ) -> tp.Callable[[dict], f64["1"]]:
@@ -311,7 +311,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
         Args:
             train_data (Dataset): The training dataset used to compute the marginal log-likelihood.
-            transformations (tp.Dict): A dictionary of transformations that should be applied to the training dataset to unconstrain the parameters.
+            transformations (Dict): A dictionary of transformations that should be applied to the training dataset to unconstrain the parameters.
             priors (dict, optional): _description_. Optional argument that contains the priors placed on the model's parameters. Defaults to None.
             negative (bool, optional): Whether or not the returned function should be negative. For optimisation, the negative is useful as minimisation of the negative marginal log-likelihood is equivalent to maximisation of the marginal log-likelihood. Defaults to False.
 
@@ -321,7 +321,7 @@ class NonConjugatePosterior(AbstractPosterior):
         x, y, n = train_data.X, train_data.y, train_data.n
 
         if not priors:
-            priors = copy_dict_structure(self.params)
+            priors = copy_dict_structure(self._initialise_params(jr.PRNGKey(0)))
             priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
 
         def mll(params: dict):

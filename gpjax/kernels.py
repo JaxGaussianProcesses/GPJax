@@ -59,19 +59,9 @@ class Kernel:
         """
         return True if self.ndims > 1 else False
 
-    @property
-    def params(self) -> dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """A template dictionary of the kernel's parameter set."""
         return self._params
-
-    @params.setter
-    def params(self, value):
-        """Override the kernel's initial parameter values.
-
-        Args:
-            value (dict): An alternative parameter dictionary that is to be used for initialisation.
-        """
-        self._params = value
 
 
 @dataclass
@@ -107,10 +97,9 @@ class CombinationKernel(Kernel, _KernelSet):
                 kernels_list.append(k)
         self.kernel_set = kernels_list
 
-    @property
-    def params(self) -> List[Dict]:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """A template dictionary of the kernel's parameter set."""
-        return [kernel.params for kernel in self.kernel_set]
+        return [kernel._initialise_params(key) for kernel in self.kernel_set]
 
     def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
         return self.combination_fn(

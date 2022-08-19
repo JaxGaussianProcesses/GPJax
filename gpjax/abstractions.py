@@ -4,7 +4,7 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 import optax
-from chex import PRNGKey
+from chex import PRNGKey, dataclass
 from jax import lax
 from jax.experimental import host_callback
 from jaxtyping import f64
@@ -13,6 +13,15 @@ from tqdm.auto import tqdm
 from .parameters import trainable_params
 from .types import Dataset
 from .utils import convert_seed
+
+
+@dataclass
+class InferenceState:
+    params: tp.Dict
+    history: f64["n_iters"]
+
+    def unpack(self):
+        return self.params, self.history
 
 
 def progress_bar_scan(n_iters: int, log_rate: int):
@@ -91,7 +100,7 @@ def fit(
     optax_optim,
     n_iters: int = 100,
     log_rate: int = 10,
-) -> tp.Tuple[tp.Dict, f64["n_iters"]]:
+) -> InferenceState:
     """Abstracted method for fitting a GP model with respect to a supplied objective function.
     Optimisers used here should originate from Optax.
     Args:
@@ -120,8 +129,8 @@ def fit(
         return carry, loss_val
 
     (params, _), history = jax.lax.scan(step, (params, opt_state), jnp.arange(n_iters))
-
-    return params, history
+    inf_state = InferenceState(params=params, history=history)
+    return inf_state
 
 
 def fit_batches(
@@ -134,7 +143,7 @@ def fit_batches(
     batch_size: int,
     n_iters: tp.Optional[int] = 100,
     log_rate: tp.Optional[int] = 10,
-) -> tp.Tuple[tp.Dict, f64["n_iters"]]:
+) -> InferenceState:
     """Abstracted method for fitting a GP model with mini-batches respect to a supplied objective function.
     Optimisers used here should originate from Optax.
     Args:
@@ -181,5 +190,5 @@ def fit_batches(
     (params, _, _), history = jax.lax.scan(
         step, (params, opt_state, prng), jnp.arange(n_iters)
     )
-
-    return params, history
+    inf_state = InferenceState(params=params, history=history)
+    return inf_state
