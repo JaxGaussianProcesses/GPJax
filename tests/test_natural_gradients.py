@@ -1,22 +1,27 @@
-import pytest
-import jax
-import jax.numpy as jnp
-from gpjax.natural_gradients import natural_to_expectation, _stop_gradients_nonmoments, _stop_gradients_moments, _expectation_elbo, natural_gradients
 import typing as tp
-import gpjax as gpx
-import jax.random as jr
-from gpjax.parameters import recursive_items
+
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
-from jax import jit
 import optax as ox
+import pytest
+import tensorflow as tf
+from jax import jit
 
 import gpjax as gpx
-import tensorflow as tf
+from gpjax.natural_gradients import (
+    _expectation_elbo,
+    _stop_gradients_moments,
+    _stop_gradients_nonmoments,
+    natural_gradients,
+    natural_to_expectation,
+)
+from gpjax.parameters import recursive_items
 
 tf.random.set_seed(42)
 key = jr.PRNGKey(123)
+
 
 @pytest.mark.parametrize("dim", [1, 2, 3])
 def test_natural_to_expectation(dim):
@@ -29,17 +34,26 @@ def test_natural_to_expectation(dim):
         tp.Dict: A dictionary of Gaussian moments under the expectation parameterisation.
     """
 
-    natural_matrix = -.5 * jnp.eye(dim)
+    natural_matrix = -0.5 * jnp.eye(dim)
     natural_vector = jnp.zeros((dim, 1))
-    
-    natural_moments = {"natural_matrix": natural_matrix, "natural_vector": natural_vector}
+
+    natural_moments = {
+        "natural_matrix": natural_matrix,
+        "natural_vector": natural_vector,
+    }
 
     expectation_moments = natural_to_expectation(natural_moments, jitter=1e-6)
 
     assert "expectation_vector" in expectation_moments.keys()
     assert "expectation_matrix" in expectation_moments.keys()
-    assert expectation_moments["expectation_vector"].shape == natural_moments["natural_vector"].shape
-    assert expectation_moments["expectation_matrix"].shape == natural_moments["natural_matrix"].shape
+    assert (
+        expectation_moments["expectation_vector"].shape
+        == natural_moments["natural_vector"].shape
+    )
+    assert (
+        expectation_moments["expectation_matrix"].shape
+        == natural_moments["natural_matrix"].shape
+    )
 
 
 def get_data_and_gp(n_datapoints):
@@ -52,15 +66,18 @@ def get_data_and_gp(n_datapoints):
     post = p * lik
     return D, post, p
 
+
 @pytest.mark.parametrize("jit_fns", [True, False])
 def test_expectation_elbo(jit_fns):
     """
     Tests the expectation ELBO.
     """
     D, posterior, prior = get_data_and_gp(10)
-    
+
     z = jnp.linspace(-5.0, 5.0, 5).reshape(-1, 1)
-    variational_family = gpx.variational_families.ExpectationVariationalGaussian(prior = prior, inducing_inputs=z)
+    variational_family = gpx.variational_families.ExpectationVariationalGaussian(
+        prior=prior, inducing_inputs=z
+    )
 
     svgp = gpx.StochasticVI(posterior=posterior, variational_family=variational_family)
 
@@ -83,23 +100,25 @@ def test_expectation_elbo(jit_fns):
     assert len(grads) == len(params)
 
 
-
 # def test_stop_gradients_nonmoments():
 #     pass
-    
+
 
 # def test_stop_gradients_moments():
 #     pass
+
 
 def test_natural_gradients():
     """
     Tests the expectation ELBO.
     """
     D, p, prior = get_data_and_gp(10)
-    
+
     z = jnp.linspace(-5.0, 5.0, 5).reshape(-1, 1)
 
-    Dbatched = D.cache().repeat().shuffle(D.n).batch(batch_size=128).prefetch(buffer_size=1)
+    Dbatched = (
+        D.cache().repeat().shuffle(D.n).batch(batch_size=128).prefetch(buffer_size=1)
+    )
 
     likelihood = gpx.Gaussian(num_datapoints=D.n)
     prior = gpx.Prior(kernel=gpx.RBF())
@@ -126,11 +145,15 @@ def test_natural_gradients():
     assert isinstance(hyper_grads, tp.Dict)
 
     # Need to check moments are zero in hyper_grads:
-    assert jnp.array([ (v == 0.).all() for v in hyper_grads["variational_family"]["moments"].values()]).all()
+    assert jnp.array(
+        [
+            (v == 0.0).all()
+            for v in hyper_grads["variational_family"]["moments"].values()
+        ]
+    ).all()
 
     # Check non-moments are zero in nat_grads:
-    d = jax.tree_map(lambda x: (x==0.).all(), nat_grads)
+    d = jax.tree_map(lambda x: (x == 0.0).all(), nat_grads)
     d["variational_family"]["moments"] = True
 
     assert jnp.array([v1 == True for k, v1, v2 in recursive_items(d, d)]).all()
-

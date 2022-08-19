@@ -1,10 +1,11 @@
 import typing as tp
 from copy import deepcopy
 
-import distrax as dx
 import jax.numpy as jnp
+import jax.random as jr
 import jax.scipy as jsp
-from jax import lax, value_and_grad
+from chex import PRNGKey
+from jax import value_and_grad
 from jaxtyping import f64
 
 from .config import get_defaults
@@ -245,42 +246,60 @@ def fit_natgrads(
     trainables: tp.Dict,
     transformations: tp.Dict,
     train_data: Dataset,
-    moment_opt=ox.sgd(1.0),
-    hyper_opt=ox.adam(1e-3),
+    batch_size: int,
+    moment_optim,
+    hyper_optim,
+    seed: tp.Union[int, PRNGKey],
     n_iters: tp.Optional[int] = 100,
     log_rate: tp.Optional[int] = 10,
 ) -> tp.Dict:
 
-    hyper_state = hyper_opt.init(params)
-    moment_state = moment_opt.init(params)
+    hyper_state = hyper_optim.init(params)
+    moment_state = moment_optim.init(params)
 
     nat_grads_fn, hyper_grads_fn = natural_gradients(
         stochastic_vi, train_data, transformations
     )
 
-    next_batch = train_data.get_batcher()
+    x, y, n = train_data.X, train_data.y, train_data.n
+
+    prng = convert_seed(seed)
 
     @progress_bar_scan(n_iters, log_rate)
-    def step(params_opt_state, i):
-        params, moment_state, hyper_state = params_opt_state
-        batch = next_batch()
+    def step(carry, _):
+        params, moment_state, hyper_state, prng = carry
 
-        # Natural gradients update:
-        loss_val, loss_gradient = nat_grads_fn(params, trainables, batch)
-        updates, moment_state = moment_opt.update(loss_gradient, moment_state, params)
-        params = ox.apply_updates(params, updates)
+        indicies = jr.choice(prng, n, (batch_size,), replace=True)
+
+        batch = Dataset(X=x[indicies], y=y[indicies])
 
         # Hyper-parameters update:
         loss_val, loss_gradient = hyper_grads_fn(params, trainables, batch)
-        updates, hyper_state = hyper_opt.update(loss_gradient, hyper_state, params)
+        updates, hyper_state = hyper_optim.update(loss_gradient, hyper_state, params)
         params = ox.apply_updates(params, updates)
 
-        params_opt_state = params, moment_state, hyper_state
+        # Natural gradients update:
+        loss_val, loss_gradient = nat_grads_fn(params, trainables, batch)
+        updates, moment_state = moment_optim.update(loss_gradient, moment_state, params)
+        params = ox.apply_updates(params, updates)
 
-        return params_opt_state, loss_val
+        prng, _ = jr.split(prng)
 
-    (params, _, _), _ = jax.lax.scan(
-        step, (params, moment_state, hyper_state), jnp.arange(n_iters)
+        carry = params, moment_state, hyper_state, prng
+        return carry, loss_val
+
+    (params, _, _, _), history = jax.lax.scan(
+        step, (params, moment_state, hyper_state, prng), jnp.arange(n_iters)
     )
+    return params, history
 
-    return params
+
+def convert_seed(seed: tp.Union[int, PRNGKey]) -> PRNGKey:
+    """Ensure that seeds type."""
+
+    if isinstance(seed, int):
+        rng = jr.PRNGKey(seed)
+    else:  # key is of type PRNGKey
+        rng = seed
+
+    return rng
