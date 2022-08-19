@@ -1,13 +1,15 @@
 import typing as tp
 from copy import deepcopy
 
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
-from chex import PRNGKey
+import optax as ox
 from jax import value_and_grad
 from jaxtyping import f64
 
+from .abstractions import progress_bar_scan
 from .config import get_defaults
 from .gps import AbstractPosterior
 from .parameters import (
@@ -17,7 +19,7 @@ from .parameters import (
     trainable_params,
     transform,
 )
-from .types import Dataset
+from .types import Dataset, PRNGKeyType
 from .utils import I
 from .variational_families import (
     AbstractVariationalFamily,
@@ -91,8 +93,9 @@ def _expectation_elbo(
         inducing_inputs=variational_family.inducing_inputs,
     )
     svgp = StochasticVI(posterior=posterior, variational_family=evg)
+    identity_transformation = build_identity(svgp.params)
 
-    return svgp.elbo(train_data, build_identity(svgp.params), negative=True)
+    return svgp.elbo(train_data, identity_transformation, negative=True)
 
 
 def _stop_gradients_nonmoments(params: tp.Dict) -> tp.Dict:
@@ -234,12 +237,6 @@ def natural_gradients(
     return nat_grads_fn, hyper_grads_fn
 
 
-import jax
-import optax as ox
-
-from gpjax.abstractions import progress_bar_scan
-
-
 def fit_natgrads(
     stochastic_vi: StochasticVI,
     params: tp.Dict,
@@ -249,7 +246,7 @@ def fit_natgrads(
     batch_size: int,
     moment_optim,
     hyper_optim,
-    seed: tp.Union[int, PRNGKey],
+    key: PRNGKeyType,
     n_iters: tp.Optional[int] = 100,
     log_rate: tp.Optional[int] = 10,
 ) -> tp.Dict:
@@ -263,13 +260,11 @@ def fit_natgrads(
 
     x, y, n = train_data.X, train_data.y, train_data.n
 
-    prng = convert_seed(seed)
-
     @progress_bar_scan(n_iters, log_rate)
     def step(carry, _):
-        params, moment_state, hyper_state, prng = carry
+        params, moment_state, hyper_state, current_key = carry
 
-        indicies = jr.choice(prng, n, (batch_size,), replace=True)
+        indicies = jr.choice(current_key, n, (batch_size,), replace=True)
 
         batch = Dataset(X=x[indicies], y=y[indicies])
 
@@ -283,23 +278,12 @@ def fit_natgrads(
         updates, moment_state = moment_optim.update(loss_gradient, moment_state, params)
         params = ox.apply_updates(params, updates)
 
-        prng, _ = jr.split(prng)
+        _, new_key = jr.split(current_key)
 
-        carry = params, moment_state, hyper_state, prng
+        carry = params, moment_state, hyper_state, new_key
         return carry, loss_val
 
     (params, _, _, _), history = jax.lax.scan(
-        step, (params, moment_state, hyper_state, prng), jnp.arange(n_iters)
+        step, (params, moment_state, hyper_state, key), jnp.arange(n_iters)
     )
     return params, history
-
-
-def convert_seed(seed: tp.Union[int, PRNGKey]) -> PRNGKey:
-    """Ensure that seeds type."""
-
-    if isinstance(seed, int):
-        rng = jr.PRNGKey(seed)
-    else:  # key is of type PRNGKey
-        rng = seed
-
-    return rng
