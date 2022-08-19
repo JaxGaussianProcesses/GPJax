@@ -2,13 +2,10 @@ import jax.numpy as jnp
 import jax.random as jr
 import optax
 import pytest
-import tensorflow as tf
 
 import gpjax as gpx
 from gpjax import RBF, Dataset, Gaussian, Prior, initialise, transform
 from gpjax.abstractions import fit, fit_batches
-
-tfd = tf.data
 
 
 @pytest.mark.parametrize("n_iters", [10])
@@ -62,15 +59,12 @@ def test_batch_fitting(n_iters, nb, ndata):
     objective = svgp.elbo(D, constrainer)
 
     D = Dataset(X=x, y=y)
-    D = D.cache()
-    D = D.repeat()
-    D = D.shuffle(D.n)
-    D = D.batch(batch_size=nb, drop_remainder=True)
-    D = D.prefetch(buffer_size=1)
 
     optimiser = optax.adam(learning_rate=0.1)
+    seed = 42
     optimised_params, history = fit_batches(
-        objective, params, trainable_status, D, optimiser, n_iters)
+        objective, params, trainable_status, D, optimiser, seed, nb, n_iters
+    )
     optimised_params = transform(optimised_params, constrainer)
     assert isinstance(optimised_params, dict)
     assert isinstance(history, jnp.ndarray)
