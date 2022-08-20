@@ -161,8 +161,6 @@ def fit_batches(
 
     opt_state = optax_optim.init(params)
 
-    x, y, n = train_data.X, train_data.y, train_data.n
-
     def loss(params, batch):
         params = trainable_params(params, trainables)
         return objective(params, batch)
@@ -171,15 +169,11 @@ def fit_batches(
     def step(carry, _):
         params, opt_state, current_key = carry
 
-        indicies = jr.choice(current_key, n, (batch_size,), replace=True)
-
-        batch = Dataset(X=x[indicies], y=y[indicies])
+        batch, new_key = get_batch_new_key(train_data, batch_size, current_key)
 
         loss_val, loss_gradient = jax.value_and_grad(loss)(params, batch)
         updates, opt_state = optax_optim.update(loss_gradient, opt_state, params)
         params = optax.apply_updates(params, updates)
-
-        _, new_key = jr.split(current_key)
 
         carry = params, opt_state, new_key
         return carry, loss_val
@@ -189,3 +183,22 @@ def fit_batches(
     )
     inf_state = InferenceState(params=params, history=history)
     return inf_state
+
+
+def get_batch_new_key(
+    train_data: Dataset, batch_size: int, key: PRNGKeyType
+) -> Dataset:
+    """Batch the data into mini-batches.
+    Args:
+        train_data (Dataset): The training dataset.
+        batch_size (int): The batch size.
+    Returns:
+        Dataset: The batched dataset.
+    """
+    x, y, n = train_data.X, train_data.y, train_data.n
+
+    indicies = jr.choice(key, n, (batch_size,), replace=True)
+
+    _, new_key = jr.split(key)
+
+    return Dataset(X=x[indicies], y=y[indicies]), new_key
