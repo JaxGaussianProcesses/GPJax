@@ -13,7 +13,7 @@ from gpjax.gps import (
     Prior,
     construct_posterior,
 )
-from gpjax.kernels import RBF
+from gpjax.kernels import RBF, Matern12, Matern32, Matern52
 from gpjax.likelihoods import Bernoulli, Gaussian, NonConjugateLikelihoods
 from gpjax.parameters import ParameterState
 
@@ -154,3 +154,20 @@ def test_posterior_construct(lik):
     p1 = pr * likelihood
     p2 = construct_posterior(prior=pr, likelihood=likelihood)
     assert type(p1) == type(p2)
+
+
+@pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
+def test_initialisation_override(kernel):
+    key = jr.PRNGKey(123)
+    override_params = {"lengthscale": jnp.array([0.5]), "variance": jnp.array([0.1])}
+    p = Prior(kernel=kernel) * Gaussian(num_datapoints=10)
+    parameter_state = initialise(p, key, kernel=override_params)
+    ds = parameter_state.unpack()
+    for d in ds:
+        assert "lengthscale" in d["kernel"].keys()
+        assert "variance" in d["kernel"].keys()
+    assert ds[0]["kernel"]["lengthscale"] == jnp.array([0.5])
+    assert ds[0]["kernel"]["variance"] == jnp.array([0.1])
+
+    with pytest.raises(ValueError):
+        parameter_state = initialise(p, key, keernel=override_params)

@@ -34,17 +34,6 @@ class AbstractMeanFunction:
         """
         raise NotImplementedError
 
-    def init(self, key: jnp.ndarray) -> Dict:
-        """Initialise the stateful parameters of the mean function. This method is required for all subclasses.
-
-        Args:
-            key (Array): The key used to initialise the stateful parameters.
-
-        Returns:
-            dict: The initialised stateful parameters of the mean function.
-        """
-        return self.params
-
 
 @dataclass(repr=False)
 class Zero(AbstractMeanFunction):

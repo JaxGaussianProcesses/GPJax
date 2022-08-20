@@ -37,10 +37,6 @@ class AbstractLikelihood:
         """Return the link function of the likelihood function."""
         raise NotImplementedError
 
-    def init(self, key: jnp.ndarray) -> Dict:
-        """Initialise the stateful parameters of the likelihood function."""
-        return self.params
-
 
 @dataclass
 class Conjugate:

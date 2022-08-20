@@ -15,7 +15,7 @@ from .types import Dataset
 from .utils import convert_seed
 
 
-@dataclass
+@dataclass(frozen=True)
 class InferenceState:
     params: tp.Dict
     history: f64["n_iters"]

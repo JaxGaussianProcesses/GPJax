@@ -35,8 +35,10 @@ class ParameterState:
 def initialise(model, key: jnp.DeviceArray, **kwargs) -> ParameterState:
     """Initialise the stateful parameters of any GPJax object. This function also returns the trainability status of each parameter and set of bijectors that allow parameters to be constrained and unconstrained."""
     params = model._initialise_params(key)
-    # for k, v in kwargs.items():
-    #     params[k] = merge_dictionaries(params[k], v)
+    if kwargs:
+        _validate_kwargs(kwargs, params)
+        for k, v in kwargs.items():
+            params[k] = merge_dictionaries(params[k], v)
     constrainers, unconstrainers = build_transforms(params)
     trainables = build_trainables(params)
     state = ParameterState(
@@ -46,6 +48,12 @@ def initialise(model, key: jnp.DeviceArray, **kwargs) -> ParameterState:
         unconstrainers=unconstrainers,
     )
     return state
+
+
+def _validate_kwargs(kwargs, params):
+    for k, v in kwargs.items():
+        if k not in params.keys():
+            raise ValueError(f"Parameter {k} is not a valid parameter.")
 
 
 def recursive_items(d1: tp.Dict, d2: tp.Dict):
