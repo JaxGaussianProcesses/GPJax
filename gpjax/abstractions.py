@@ -197,8 +197,8 @@ def get_batch_new_key(
     """
     x, y, n = train_data.X, train_data.y, train_data.n
 
-    indicies = jr.choice(key, n, (batch_size,), replace=True)
+    key, new_key = jr.split(key)
 
-    _, new_key = jr.split(key)
+    indicies = jr.choice(key, n, (batch_size,), replace=True)
 
     return Dataset(X=x[indicies], y=y[indicies]), new_key
