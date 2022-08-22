@@ -81,11 +81,14 @@ def progress_bar_scan(n_iters: int, log_rate: int):
         """Decorator that adds a progress bar to `body_fun` used in `lax.scan`."""
 
         def wrapper_progress_bar(carry, x):
-            i = x
+            if type(x) is tuple:
+                iter_num, *_ = x
+            else:
+                iter_num = x
             result = func(carry, x)
             *_, loss_val = result
-            _update_progress_bar(loss_val, i)
-            return close_tqdm(result, i)
+            _update_progress_bar(loss_val, iter_num)
+            return close_tqdm(result, iter_num)
 
         return wrapper_progress_bar
 
@@ -118,8 +121,10 @@ def fit(
         params = trainable_params(params, trainables)
         return objective(params)
 
+    iter_nums = jnp.arange(n_iters)
+
     @progress_bar_scan(n_iters, log_rate)
-    def step(carry, i):
+    def step(carry, iter_num):
         params, opt_state = carry
         loss_val, loss_gradient = jax.value_and_grad(loss)(params)
         updates, opt_state = optax_optim.update(loss_gradient, opt_state, params)
@@ -127,7 +132,7 @@ def fit(
         carry = params, opt_state
         return carry, loss_val
 
-    (params, _), history = jax.lax.scan(step, (params, opt_state), jnp.arange(n_iters))
+    (params, _), history = jax.lax.scan(step, (params, opt_state), iter_nums)
     inf_state = InferenceState(params=params, history=history)
     return inf_state
 
@@ -165,24 +170,24 @@ def fit_batches(
         params = trainable_params(params, trainables)
         return objective(params, batch)
 
+    keys = jax.random.split(key, n_iters)
+    iter_nums = jnp.arange(n_iters)
+
     @progress_bar_scan(n_iters, log_rate)
-    def step(carry, _):
-        params, opt_state, key = carry
+    def step(carry, iter_num__and__key):
+        iter_num, key = iter_num__and__key
+        params, opt_state = carry
 
-        key, subkey = jr.split(key)
-
-        batch = get_batch(train_data, batch_size, subkey)
+        batch = get_batch(train_data, batch_size, key)
 
         loss_val, loss_gradient = jax.value_and_grad(loss)(params, batch)
         updates, opt_state = optax_optim.update(loss_gradient, opt_state, params)
         params = optax.apply_updates(params, updates)
 
-        carry = params, opt_state, subkey
+        carry = params, opt_state
         return carry, loss_val
 
-    (params, _, _), history = jax.lax.scan(
-        step, (params, opt_state, key), jnp.arange(n_iters)
-    )
+    (params, _), history = jax.lax.scan(step, (params, opt_state), (iter_nums, keys))
     inf_state = InferenceState(params=params, history=history)
     return inf_state
 
