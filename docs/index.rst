@@ -41,6 +41,7 @@ To learn more, checkout the `regression notebook <https://gpjax.readthedocs.io/e
     installation
     design
     contributing
+    nbs/gotchas
 
 .. toctree::
     :maxdepth: 1
