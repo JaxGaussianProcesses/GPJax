@@ -1,4 +1,5 @@
 import jax.numpy as jnp
+from chex import PRNGKey as PRNGKeyType
 from chex import dataclass
 from jaxtyping import f64
 

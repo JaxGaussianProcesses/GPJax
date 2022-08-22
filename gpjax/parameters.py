@@ -13,6 +13,7 @@ from jaxtyping import f64
 from tensorflow_probability.substrates.jax import distributions as tfd
 
 from .config import get_defaults
+from .types import PRNGKeyType
 from .utils import merge_dictionaries
 
 Identity = dx.Lambda(lambda x: x)
@@ -34,7 +35,7 @@ class ParameterState:
         return self.params, self.trainables, self.constrainers, self.unconstrainers
 
 
-def initialise(model, key: jnp.DeviceArray = None, **kwargs) -> ParameterState:
+def initialise(model, key: PRNGKeyType = None, **kwargs) -> ParameterState:
     """Initialise the stateful parameters of any GPJax object. This function also returns the trainability status of each parameter and set of bijectors that allow parameters to be constrained and unconstrained."""
     if key is None:
         warn("No PRNGKey specified. Defaulting to seed 123.")
