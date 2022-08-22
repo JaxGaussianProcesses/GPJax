@@ -34,10 +34,10 @@ We have recently set up a Slack channel where we hope to facilitate discussions 
 
 - [**Conjugate Inference**](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)
 - [**Classification with MCMC**](https://gpjax.readthedocs.io/en/latest/nbs/classification.html)
-- [**Sparse Variational Inference**](https://gpjax.readthedocs.io/en/latest/nbs/sparse_regression.html)
+- [**Sparse Variational Inference**](https://gpjax.readthedocs.io/en/latest/nbs/uncollapsed_vi.html)
 - [**BlackJax Integration**](https://gpjax.readthedocs.io/en/latest/nbs/classification.html)
 - [**Laplace Approximations**](https://gpjax.readthedocs.io/en/latest/nbs/classification.html#Laplace-approximation)
-- [**TensorFlow Probability Integration**](https://gpjax.readthedocs.io/en/latest/nbs/tfp_intergation.html)
+- [**TensorFlow Probability Integration**](https://gpjax.readthedocs.io/en/latest/nbs/tfp_integration.html)
 - [**Inference on Non-Euclidean Spaces**](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html#Custom-Kernel)
 - [**Inference on Graphs**](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html)
 - [**Learning Gaussian Process Barycentres**](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html)
@@ -139,7 +139,7 @@ pip install gpjax
 
 ### Development version
 
-To install the latest, possibly unstable, version, the following steps should be followed. It is by no means compulsory, but we do advise that you do all of the below inside a virtual environment.
+To install the latest (possibly unstable) version, the following steps should be followed. It is by no means compulsory, but we do advise that you do all of the below inside a virtual environment.
 
 ```bash
 git clone https://github.com/thomaspinder/GPJax.git
@@ -156,7 +156,7 @@ python -m pytest tests/
 
 ## Citing GPJax
 
-If you use GPJax in your research, please cite our [JOSS paper](https://joss.theoj.org/papers/10.21105/joss.04455#). A sample Bibtex file is
+If you use GPJax in your research, please cite our [JOSS paper](https://joss.theoj.org/papers/10.21105/joss.04455#). Sample Bibtex is given below:
 ```
 @article{Pinder2022,
   doi = {10.21105/joss.04455},
