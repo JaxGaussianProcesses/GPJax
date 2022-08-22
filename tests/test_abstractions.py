@@ -67,15 +67,8 @@ def test_batch_fitting(n_iters, nb, ndata):
     D = Dataset(X=x, y=y)
 
     optimiser = optax.adam(learning_rate=0.1)
-    seed = 42
-    print("-" * 80)
-    print(params)
-    print("-" * 80)
-    inference_state = fit_batches(
-        objective, params, trainable_status, D, optimiser, seed, nb, n_iters
-    )
     key = jr.PRNGKey(42)
-    optimised_params, history = fit_batches(
+    inference_state = fit_batches(
         objective, params, trainable_status, D, optimiser, key, nb, n_iters
     )
     optimised_params, history = inference_state.params, inference_state.history
