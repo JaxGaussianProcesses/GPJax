@@ -52,7 +52,7 @@ def test_variational_gaussian(diag, n_inducing, n_test, whiten):
     assert (variational_family.variational_mean == jnp.zeros((n_inducing, 1))).all()
 
     # Test params
-    params = variational_family.params
+    params = variational_family._initialise_params(jr.PRNGKey(123))
     assert isinstance(params, dict)
     assert "inducing_inputs" in params["variational_family"].keys()
     assert "variational_mean" in params["variational_family"].keys()
@@ -79,7 +79,7 @@ def test_variational_gaussian(diag, n_inducing, n_test, whiten):
     assert (variational_family.variational_mean == jnp.zeros((n_inducing, 1))).all()
 
     # Test KL
-    params = variational_family.params
+    params = variational_family._initialise_params(jr.PRNGKey(123))
     kl = variational_family.prior_kl(params)
     assert isinstance(kl, jnp.ndarray)
 
@@ -137,7 +137,7 @@ def test_collapsed_variational_gaussian(n_test, n_inducing, n_datapoints, point_
     assert (variational_family.inducing_inputs == inducing_inputs).all()
 
     # Test params
-    params = variational_family.params
+    params = variational_family._initialise_params(jr.PRNGKey(123))
     assert isinstance(params, dict)
     assert "likelihood" in params.keys()
     assert "obs_noise" in params["likelihood"].keys()
@@ -149,7 +149,7 @@ def test_collapsed_variational_gaussian(n_test, n_inducing, n_datapoints, point_
     assert isinstance(params["variational_family"]["inducing_inputs"], jnp.DeviceArray)
 
     # Test predictions
-    params = variational_family.params
+    params = variational_family._initialise_params(jr.PRNGKey(123))
     predictive_dist_fn = variational_family(D, params)
     assert isinstance(predictive_dist_fn, tp.Callable)
 

@@ -31,12 +31,11 @@ class AbstractVariationalInference:
         self.prior = self.posterior.prior
         self.likelihood = self.posterior.likelihood
 
-    @property
-    def params(self) -> Dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """Construct the parameter set used within the variational scheme adopted."""
         hyperparams = concat_dictionaries(
-            {"likelihood": self.posterior.likelihood.params},
-            self.variational_family.params,
+            {"likelihood": self.posterior.likelihood._initialise_params(key)},
+            self.variational_family._initialise_params(key),
         )
         return hyperparams
 

@@ -31,10 +31,12 @@ from gpjax.utils import I
 @pytest.mark.parametrize("dim", [1, 2, 5])
 @pytest.mark.parametrize("fn", [gram, diagonal])
 def test_gram(kern, dim, fn):
+    key = jr.PRNGKey(123)
     x = jnp.linspace(-1.0, 1.0, num=10).reshape(-1, 1)
     if dim > 1:
         x = jnp.hstack([x] * dim)
-    params, _, _, _ = initialise(kern)
+    parameter_state = initialise(kern, key)
+    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
     gram_matrix = fn(kern, x, params)
     assert gram_matrix.shape[0] == x.shape[0]
     assert gram_matrix.shape[0] == gram_matrix.shape[1]
@@ -44,16 +46,20 @@ def test_gram(kern, dim, fn):
 @pytest.mark.parametrize("n1", [3, 10, 20])
 @pytest.mark.parametrize("n2", [3, 10, 20])
 def test_cross_covariance(kern, n1, n2):
+    key = jr.PRNGKey(123)
     x1 = jnp.linspace(-1.0, 1.0, num=n1).reshape(-1, 1)
     x2 = jnp.linspace(-1.0, 1.0, num=n2).reshape(-1, 1)
-    params, _, _, _ = initialise(kern)
+    parameter_state = initialise(kern, key)
+    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
     kernel_matrix = cross_covariance(kern, x1, x2, params)
     assert kernel_matrix.shape == (n1, n2)
 
 
 @pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
 def test_call(kernel):
-    params, _, _, _ = initialise(kernel)
+    key = jr.PRNGKey(123)
+    parameter_state = initialise(kernel, key)
+    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
     x, y = jnp.array([[1.0]]), jnp.array([[0.5]])
     point_corr = kernel(x, y, params)
     assert isinstance(point_corr, jnp.DeviceArray)
@@ -80,12 +86,14 @@ def test_pos_def(kern, dim, ell, sigma):
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
 @pytest.mark.parametrize("dim", [None, 1, 2, 5, 10])
 def test_initialisation(kernel, dim):
+    key = jr.PRNGKey(123)
     if dim is None:
         kern = kernel()
         assert kern.ndims == 1
     else:
         kern = kernel(active_dims=[i for i in range(dim)])
-        params, _, _, _ = initialise(kern)
+        parameter_state = initialise(kern, key)
+        params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
         assert list(params.keys()) == ["lengthscale", "variance"]
         assert all(params["lengthscale"] == jnp.array([1.0] * dim))
         assert params["variance"] == jnp.array([1.0])
@@ -97,7 +105,9 @@ def test_initialisation(kernel, dim):
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
 def test_dtype(kernel):
-    params, _, _, _ = initialise(kernel())
+    key = jr.PRNGKey(123)
+    parameter_state = initialise(kernel(), key)
+    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
     for k, v in params.items():
         assert v.dtype == jnp.float64
 
@@ -107,11 +117,12 @@ def test_dtype(kernel):
 @pytest.mark.parametrize("variance", [0.1, 1.0, 2.0])
 @pytest.mark.parametrize("shift", [1e-6, 0.1, 1.0])
 def test_polynomial(degree, dim, variance, shift):
+    key = jr.PRNGKey(123)
     x = jnp.linspace(0.0, 1.0, num=20).reshape(-1, 1)
     if dim > 1:
         x = jnp.hstack([x] * dim)
     kern = Polynomial(degree=degree, active_dims=[i for i in range(dim)])
-    params = kern.params
+    params = kern._initialise_params(key)
     params["shift"] * shift
     params["variance"] * variance
     gram_matrix = gram(kern, x, params)
@@ -148,8 +159,8 @@ def test_active_dim(kernel):
         ad_kern = kernel(active_dims=dp)
         manual_kern = kernel(active_dims=[i for i in range(perm_length)])
 
-        k1 = gram(ad_kern, X, ad_kern.params)
-        k2 = gram(manual_kern, Xslice, manual_kern.params)
+        k1 = gram(ad_kern, X, ad_kern._initialise_params(key))
+        k2 = gram(manual_kern, Xslice, manual_kern._initialise_params(key))
         assert jnp.all(k1 == k2)
 
 
@@ -157,16 +168,17 @@ def test_active_dim(kernel):
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52, Polynomial])
 @pytest.mark.parametrize("n_kerns", [2, 3, 4])
 def test_combination_kernel(combination_type, kernel, n_kerns):
+    key = jr.PRNGKey(123)
     n = 20
     kern_list = [kernel() for _ in range(n_kerns)]
     c_kernel = combination_type(kernel_set=kern_list)
     assert len(c_kernel.kernel_set) == n_kerns
-    assert len(c_kernel.params) == n_kerns
+    assert len(c_kernel._initialise_params(key)) == n_kerns
     assert isinstance(c_kernel.kernel_set, list)
     assert isinstance(c_kernel.kernel_set[0], Kernel)
-    assert isinstance(c_kernel.params[0], dict)
+    assert isinstance(c_kernel._initialise_params(key)[0], dict)
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
-    Kff = gram(c_kernel, x, c_kernel.params)
+    Kff = gram(c_kernel, x, c_kernel._initialise_params(key))
     assert Kff.shape[0] == Kff.shape[1]
     assert Kff.shape[1] == n
 
@@ -178,11 +190,14 @@ def test_combination_kernel(combination_type, kernel, n_kerns):
     "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
 )
 def test_sum_kern_value(k1, k2):
+    key = jr.PRNGKey(123)
     n = 10
     sum_kernel = SumKernel(kernel_set=[k1, k2])
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
-    Kff = gram(sum_kernel, x, sum_kernel.params)
-    Kff_manual = gram(k1, x, k1.params) + gram(k2, x, k2.params)
+    Kff = gram(sum_kernel, x, sum_kernel._initialise_params(key))
+    Kff_manual = gram(k1, x, k1._initialise_params(key)) + gram(
+        k2, x, k2._initialise_params(key)
+    )
     assert jnp.all(Kff == Kff_manual)
 
 
@@ -193,22 +208,15 @@ def test_sum_kern_value(k1, k2):
     "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
 )
 def test_prod_kern_value(k1, k2):
+    key = jr.PRNGKey(123)
     n = 10
     sum_kernel = ProductKernel(kernel_set=[k1, k2])
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
-    Kff = gram(sum_kernel, x, sum_kernel.params)
-    Kff_manual = gram(k1, x, k1.params) * gram(k2, x, k2.params)
+    Kff = gram(sum_kernel, x, sum_kernel._initialise_params(key))
+    Kff_manual = gram(k1, x, k1._initialise_params(key)) * gram(
+        k2, x, k2._initialise_params(key)
+    )
     assert jnp.all(Kff == Kff_manual)
-
-
-@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52, Polynomial])
-def test_update_params(kernel):
-    kern = kernel()
-    params = kern.params
-    for k in params.keys():
-        params[k] = 100
-        kern._params = params
-        assert kern.params == params
 
 
 def test_graph_kernel():
@@ -219,8 +227,9 @@ def test_graph_kernel():
     kern = GraphKernel(laplacian=L)
     assert isinstance(kern, GraphKernel)
     assert isinstance(kern, _EigenKernel)
+    key = jr.PRNGKey(123)
 
-    kern_params = kern.params
+    kern_params = kern._initialise_params(key)
     assert isinstance(kern_params, dict)
     assert list(sorted(list(kern_params.keys()))) == [
         "lengthscale",
@@ -228,7 +237,7 @@ def test_graph_kernel():
         "variance",
     ]
     x = jnp.arange(n_verticies).reshape(-1, 1)
-    Kxx = gram(kern, x, kern.params)
+    Kxx = gram(kern, x, kern._initialise_params(key))
     assert Kxx.shape == (n_verticies, n_verticies)
     kevals, kevecs = jnp.linalg.eigh(Kxx + jnp.eye(n_verticies) * 1e-8)
     assert all(kevals > 0)

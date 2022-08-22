@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Dict, Optional
 
 import distrax as dx
 import jax.numpy as jnp
@@ -26,9 +26,8 @@ class AbstractLikelihood:
         """Evaluate the likelihood function at a given predictive distribution."""
         raise NotImplementedError
 
-    @property
     @abc.abstractmethod
-    def params(self) -> dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """Return the parameters of the likelihood function."""
         raise NotImplementedError
 
@@ -55,8 +54,7 @@ class Gaussian(AbstractLikelihood, Conjugate):
 
     name: Optional[str] = "Gaussian"
 
-    @property
-    def params(self) -> dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """Return the variance parameter of the likelihood function."""
         return {"obs_noise": jnp.array([1.0])}
 
@@ -84,8 +82,7 @@ class Gaussian(AbstractLikelihood, Conjugate):
 class Bernoulli(AbstractLikelihood, NonConjugate):
     name: Optional[str] = "Bernoulli"
 
-    @property
-    def params(self) -> dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """Initialise the parameter set of a Bernoulli likelihood."""
         return {}
 
@@ -97,7 +94,7 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
             Callable: A probit link function that maps the predictive distribution to the likelihood function.
         """
 
-        def link_fn(x, params: dict) -> dx.Distribution:
+        def link_fn(x, params: Dict) -> dx.Distribution:
             return dx.Bernoulli(probs=inv_probit(x))
 
         return link_fn
@@ -110,8 +107,8 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
             Callable: A callable object that accepts a mean and variance term from which the predictive random variable is computed.
         """
 
-        def moment_fn(mean: f64["N D"], variance: f64["N D"]):
-            rv = self.link_function(mean / jnp.sqrt(1 + variance), self.params)
+        def moment_fn(mean: f64["N D"], variance: f64["N D"], params: Dict):
+            rv = self.link_function(mean / jnp.sqrt(1 + variance), params)
             return rv
 
         return moment_fn
@@ -119,7 +116,7 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
     def predict(self, dist: dx.Distribution, params: dict) -> Any:
         variance = jnp.diag(dist.covariance())
         mean = dist.mean()
-        return self.predictive_moment_fn(mean.ravel(), variance)
+        return self.predictive_moment_fn(mean.ravel(), variance, params)
 
 
 def inv_probit(x):

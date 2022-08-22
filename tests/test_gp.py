@@ -13,15 +13,16 @@ from gpjax.gps import (
     Prior,
     construct_posterior,
 )
-from gpjax.kernels import RBF
+from gpjax.kernels import RBF, Matern12, Matern32, Matern52
 from gpjax.likelihoods import Bernoulli, Gaussian, NonConjugateLikelihoods
-from gpjax.parameters import initialise
+from gpjax.parameters import ParameterState
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 def test_prior(num_datapoints):
     p = Prior(kernel=RBF())
-    params, trainable_status, constrainer, unconstrainer = initialise(p)
+    parameter_state = initialise(p, jr.PRNGKey(123))
+    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
     assert isinstance(p, Prior)
     assert isinstance(p, AbstractGP)
     prior_rv_fn = p(params)
@@ -57,7 +58,8 @@ def test_conjugate_posterior(num_datapoints):
     assert isinstance(post2, ConjugatePosterior)
     assert isinstance(post2, AbstractGP)
 
-    params, trainable_status, constrainer, unconstrainer = initialise(post)
+    parameter_state = initialise(post, key)
+    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
     params = transform(params, unconstrainer)
 
     # Marginal likelihood
@@ -97,8 +99,11 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     assert isinstance(post, NonConjugatePosterior)
     assert isinstance(post, AbstractGP)
     assert isinstance(p, AbstractGP)
-    params, trainable_status, constrainer, unconstrainer = initialise(post)
+
+    parameter_state = initialise(post, key)
+    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
     params = transform(params, unconstrainer)
+    assert isinstance(parameter_state, ParameterState)
 
     # Marginal likelihood
     mll = post.marginal_log_likelihood(train_data=D, transformations=constrainer)
@@ -124,7 +129,9 @@ def test_nonconjugate_posterior(num_datapoints, likel):
 @pytest.mark.parametrize("lik", [Bernoulli, Gaussian])
 def test_param_construction(num_datapoints, lik):
     p = Prior(kernel=RBF()) * lik(num_datapoints=num_datapoints)
-    params, trainable_status, constrainer, unconstrainer = initialise(p)
+    parameter_state = initialise(p, jr.PRNGKey(123))
+    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
+
     if isinstance(lik, Bernoulli):
         assert sorted(list(params.keys())) == [
             "kernel",
@@ -147,3 +154,20 @@ def test_posterior_construct(lik):
     p1 = pr * likelihood
     p2 = construct_posterior(prior=pr, likelihood=likelihood)
     assert type(p1) == type(p2)
+
+
+@pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
+def test_initialisation_override(kernel):
+    key = jr.PRNGKey(123)
+    override_params = {"lengthscale": jnp.array([0.5]), "variance": jnp.array([0.1])}
+    p = Prior(kernel=kernel) * Gaussian(num_datapoints=10)
+    parameter_state = initialise(p, key, kernel=override_params)
+    ds = parameter_state.unpack()
+    for d in ds:
+        assert "lengthscale" in d["kernel"].keys()
+        assert "variance" in d["kernel"].keys()
+    assert ds[0]["kernel"]["lengthscale"] == jnp.array([0.5])
+    assert ds[0]["kernel"]["variance"] == jnp.array([0.1])
+
+    with pytest.raises(ValueError):
+        parameter_state = initialise(p, key, keernel=override_params)

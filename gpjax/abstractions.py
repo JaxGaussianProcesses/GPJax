@@ -2,13 +2,26 @@ import typing as tp
 
 import jax
 import jax.numpy as jnp
+import jax.random as jr
 import optax
+from chex import PRNGKey, dataclass
 from jax import lax
 from jax.experimental import host_callback
+from jaxtyping import f64
 from tqdm.auto import tqdm
 
 from .parameters import trainable_params
 from .types import Dataset
+from .utils import convert_seed
+
+
+@dataclass(frozen=True)
+class InferenceState:
+    params: tp.Dict
+    history: f64["n_iters"]
+
+    def unpack(self):
+        return self.params, self.history
 
 
 def progress_bar_scan(n_iters: int, log_rate: int):
@@ -87,7 +100,7 @@ def fit(
     optax_optim,
     n_iters: int = 100,
     log_rate: int = 10,
-) -> tp.Dict:
+) -> InferenceState:
     """Abstracted method for fitting a GP model with respect to a supplied objective function.
     Optimisers used here should originate from Optax.
     Args:
@@ -98,7 +111,7 @@ def fit(
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
     Returns:
-        tp.Dict: An optimised set of parameters.
+        tp.Tuple[tp.Dict, f64["n_iters"]]: A tuple comprising optimised parameters and training history respectively.
     """
     opt_state = optax_optim.init(params)
 
@@ -107,16 +120,17 @@ def fit(
         return objective(params)
 
     @progress_bar_scan(n_iters, log_rate)
-    def step(params_opt_state, i):
-        params, opt_state = params_opt_state
+    def step(carry, i):
+        params, opt_state = carry
         loss_val, loss_gradient = jax.value_and_grad(loss)(params)
         updates, opt_state = optax_optim.update(loss_gradient, opt_state, params)
         params = optax.apply_updates(params, updates)
-        params_opt_state = params, opt_state
-        return params_opt_state, loss_val
+        carry = params, opt_state
+        return carry, loss_val
 
-    (params, _), _ = jax.lax.scan(step, (params, opt_state), jnp.arange(n_iters))
-    return params
+    (params, _), history = jax.lax.scan(step, (params, opt_state), jnp.arange(n_iters))
+    inf_state = InferenceState(params=params, history=history)
+    return inf_state
 
 
 def fit_batches(
@@ -125,9 +139,11 @@ def fit_batches(
     trainables: tp.Dict,
     train_data: Dataset,
     optax_optim,
+    seed: tp.Union[int, PRNGKey],
+    batch_size: int,
     n_iters: tp.Optional[int] = 100,
     log_rate: tp.Optional[int] = 10,
-) -> tp.Dict:
+) -> InferenceState:
     """Abstracted method for fitting a GP model with mini-batches respect to a supplied objective function.
     Optimisers used here should originate from Optax.
     Args:
@@ -135,32 +151,44 @@ def fit_batches(
         params (dict): The parameters for which we would like to minimise our objective function with.
         trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
         train_data (Dataset): The training dataset.
-        opt_init (tp.Callable): The supplied optimiser's initialisation function.
-        opt_update (tp.Callable): Optimiser's update method.
-        get_params (tp.Callable): Return the current parameter state set from the optimiser.
+        optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
+        seed (int): The random seed for the mini-batch sampling.
+        batch_size(int): The batch_size.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
     Returns:
-        tp.Dict: An optimised set of parameters.
+        tp.Tuple[tp.Dict, f64["n_iters"]]: A tuple comprising optimised parameters and training history respectively.
     """
 
     opt_state = optax_optim.init(params)
-    next_batch = train_data.get_batcher()
+
+    prng = convert_seed(seed)
+
+    x, y, n = train_data.X, train_data.y, train_data.n
 
     def loss(params, batch):
         params = trainable_params(params, trainables)
         return objective(params, batch)
 
     @progress_bar_scan(n_iters, log_rate)
-    def step(params_opt_state, i):
-        params, opt_state = params_opt_state
-        batch = next_batch()
+    def step(carry, _):
+        params, opt_state, prng = carry
+
+        indicies = jr.choice(prng, n, (batch_size,), replace=True)
+
+        batch = Dataset(X=x[indicies], y=y[indicies])
+
         loss_val, loss_gradient = jax.value_and_grad(loss)(params, batch)
         updates, opt_state = optax_optim.update(loss_gradient, opt_state, params)
         params = optax.apply_updates(params, updates)
-        params_opt_state = params, opt_state
-        return params_opt_state, loss_val
 
-    (params, _), _ = jax.lax.scan(step, (params, opt_state), jnp.arange(n_iters))
+        prng, _ = jr.split(prng)
 
-    return params
+        carry = params, opt_state, prng
+        return carry, loss_val
+
+    (params, _, _), history = jax.lax.scan(
+        step, (params, opt_state, prng), jnp.arange(n_iters)
+    )
+    inf_state = InferenceState(params=params, history=history)
+    return inf_state

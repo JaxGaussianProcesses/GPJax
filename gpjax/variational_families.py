@@ -33,9 +33,8 @@ class AbstractVariationalFamily:
         """For a given set of parameters, compute the latent function's prediction under the variational approximation."""
         return self.predict(*args, **kwargs)
 
-    @property
     @abc.abstractmethod
-    def params(self) -> Dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """The parameters of the distribution. For example, the multivariate Gaussian would return a mean vector and covariance matrix."""
         raise NotImplementedError
 
@@ -80,11 +79,10 @@ class VariationalGaussian(AbstractVariationalFamily):
             else:
                 add_parameter("variational_root_covariance", FillTriangular)
 
-    @property
-    def params(self) -> Dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
         return concat_dictionaries(
-            self.prior.params,
+            self.prior._initialise_params(key),
             {
                 "variational_family": {
                     "inducing_inputs": self.inducing_inputs,
@@ -281,14 +279,15 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
         if not isinstance(self.likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")
 
-    @property
-    def params(self) -> Dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
         return concat_dictionaries(
-            self.prior.params,
+            self.prior._initialise_params(key),
             {
                 "variational_family": {"inducing_inputs": self.inducing_inputs},
-                "likelihood": {"obs_noise": self.likelihood.params["obs_noise"]},
+                "likelihood": {
+                    "obs_noise": self.likelihood._initialise_params(key)["obs_noise"]
+                },
             },
         )
 

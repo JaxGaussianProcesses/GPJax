@@ -18,7 +18,6 @@ class Kernel:
     stationary: Optional[bool] = False
     spectral: Optional[bool] = False
     name: Optional[str] = "Kernel"
-    _params: Optional[Dict] = None
 
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
@@ -59,19 +58,10 @@ class Kernel:
         """
         return True if self.ndims > 1 else False
 
-    @property
-    def params(self) -> dict:
+    @abc.abstractmethod
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """A template dictionary of the kernel's parameter set."""
-        return self._params
-
-    @params.setter
-    def params(self, value):
-        """Override the kernel's initial parameter values.
-
-        Args:
-            value (dict): An alternative parameter dictionary that is to be used for initialisation.
-        """
-        self._params = value
+        raise NotImplementedError
 
 
 @dataclass
@@ -107,10 +97,9 @@ class CombinationKernel(Kernel, _KernelSet):
                 kernels_list.append(k)
         self.kernel_set = kernels_list
 
-    @property
-    def params(self) -> List[Dict]:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """A template dictionary of the kernel's parameter set."""
-        return [kernel.params for kernel in self.kernel_set]
+        return [kernel._initialise_params(key) for kernel in self.kernel_set]
 
     def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
         return self.combination_fn(
@@ -145,10 +134,6 @@ class RBF(Kernel):
 
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
-        self._params = {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-        }
 
     def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
@@ -169,6 +154,12 @@ class RBF(Kernel):
         K = params["variance"] * jnp.exp(-0.5 * squared_distance(x, y))
         return K.squeeze()
 
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+        return {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+        }
+
 
 @dataclass(repr=False)
 class Matern12(Kernel):
@@ -178,10 +169,6 @@ class Matern12(Kernel):
 
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
-        self._params = {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-        }
 
     def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
@@ -201,6 +188,12 @@ class Matern12(Kernel):
         K = params["variance"] * jnp.exp(-0.5 * euclidean_distance(x, y))
         return K.squeeze()
 
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+        return {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+        }
+
 
 @dataclass(repr=False)
 class Matern32(Kernel):
@@ -210,10 +203,6 @@ class Matern32(Kernel):
 
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
-        self._params = {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-        }
 
     def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma`
@@ -239,6 +228,12 @@ class Matern32(Kernel):
         )
         return K.squeeze()
 
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+        return {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+        }
+
 
 @dataclass(repr=False)
 class Matern52(Kernel):
@@ -248,10 +243,6 @@ class Matern52(Kernel):
 
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
-        self._params = {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-        }
 
     def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma`
@@ -277,6 +268,12 @@ class Matern52(Kernel):
         )
         return K.squeeze()
 
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+        return {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+        }
+
 
 @dataclass(repr=False)
 class Polynomial(Kernel):
@@ -287,10 +284,6 @@ class Polynomial(Kernel):
 
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
-        self._params = {
-            "shift": jnp.array([1.0]),
-            "variance": jnp.array([1.0] * self.ndims),
-        }
         self.name = f"Polynomial Degree: {self.degree}"
 
     def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
@@ -312,6 +305,12 @@ class Polynomial(Kernel):
         K = jnp.power(params["shift"] + jnp.dot(x * params["variance"], y), self.degree)
         return K.squeeze()
 
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+        return {
+            "shift": jnp.array([1.0]),
+            "variance": jnp.array([1.0] * self.ndims),
+        }
+
 
 ##########################################
 # Graph kernels
@@ -327,11 +326,6 @@ class GraphKernel(Kernel, _EigenKernel):
 
     def __post_init__(self):
         self.ndims = 1
-        self._params = {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-            "smoothness": jnp.array([1.0]),
-        }
         evals, self.evecs = jnp.linalg.eigh(self.laplacian)
         self.evals = evals.reshape(-1, 1)
         self.num_vertex = self.laplacian.shape[0]
@@ -358,6 +352,13 @@ class GraphKernel(Kernel, _EigenKernel):
             jnp.prod(jnp.stack([psi, x_evec, y_evec]).squeeze(), axis=0)
         )
         return kxy.squeeze()
+
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+        return {
+            "lengthscale": jnp.array([1.0] * self.ndims),
+            "variance": jnp.array([1.0]),
+            "smoothness": jnp.array([1.0]),
+        }
 
 
 def squared_distance(x: f64["1 D"], y: f64["1 D"]) -> f64["1"]:

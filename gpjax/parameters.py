@@ -1,14 +1,20 @@
 import typing as tp
 import warnings
+from collections import namedtuple
 from copy import deepcopy
+from warnings import warn
 
 import distrax as dx
 import jax
 import jax.numpy as jnp
+import jax.random as jr
+from chex import dataclass
 from jaxtyping import f64
 from tensorflow_probability.substrates.jax import distributions as tfd
 
 from .config import get_defaults
+from .types import PRNGKeyType
+from .utils import merge_dictionaries
 
 Identity = dx.Lambda(lambda x: x)
 
@@ -16,12 +22,44 @@ Identity = dx.Lambda(lambda x: x)
 ################################
 # Base operations
 ################################
-def initialise(obj) -> tp.Tuple[tp.Dict, tp.Dict, tp.Dict]:
+@dataclass
+class ParameterState:
+    """The state of the model. This includes the parameter set and the functions that allow parameters to be constrained and unconstrained."""
+
+    params: tp.Dict
+    trainables: tp.Dict
+    constrainers: tp.Dict
+    unconstrainers: tp.Dict
+
+    def unpack(self):
+        return self.params, self.trainables, self.constrainers, self.unconstrainers
+
+
+def initialise(model, key: PRNGKeyType = None, **kwargs) -> ParameterState:
     """Initialise the stateful parameters of any GPJax object. This function also returns the trainability status of each parameter and set of bijectors that allow parameters to be constrained and unconstrained."""
-    params = obj.params
+    if key is None:
+        warn("No PRNGKey specified. Defaulting to seed 123.")
+        key = jr.PRNGKey(123)
+    params = model._initialise_params(key)
+    if kwargs:
+        _validate_kwargs(kwargs, params)
+        for k, v in kwargs.items():
+            params[k] = merge_dictionaries(params[k], v)
     constrainers, unconstrainers = build_transforms(params)
     trainables = build_trainables(params)
-    return params, trainables, constrainers, unconstrainers
+    state = ParameterState(
+        params=params,
+        trainables=trainables,
+        constrainers=constrainers,
+        unconstrainers=unconstrainers,
+    )
+    return state
+
+
+def _validate_kwargs(kwargs, params):
+    for k, v in kwargs.items():
+        if k not in params.keys():
+            raise ValueError(f"Parameter {k} is not a valid parameter.")
 
 
 def recursive_items(d1: tp.Dict, d2: tp.Dict):

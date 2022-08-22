@@ -25,9 +25,8 @@ class AbstractMeanFunction:
         """
         raise NotImplementedError
 
-    @property
     @abc.abstractmethod
-    def params(self) -> dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """Return the parameters of the mean function. This method is required for all subclasses.
 
         Returns:
@@ -58,8 +57,7 @@ class Zero(AbstractMeanFunction):
         out_shape = (x.shape[0], self.output_dim)
         return jnp.zeros(shape=out_shape)
 
-    @property
-    def params(self) -> dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """The parameters of the mean function. For the zero-mean function, this is an empty dictionary."""
         return {}
 
@@ -87,7 +85,6 @@ class Constant(AbstractMeanFunction):
         out_shape = (x.shape[0], self.output_dim)
         return jnp.ones(shape=out_shape) * params["constant"]
 
-    @property
-    def params(self) -> dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
         """The parameters of the mean function. For the constant-mean function, this is a dictionary with a single value."""
         return {"constant": jnp.array([1.0])}

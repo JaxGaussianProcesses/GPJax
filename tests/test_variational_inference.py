@@ -62,7 +62,9 @@ def test_stochastic_vi(
     assert svgp.posterior.prior == post.prior
     assert svgp.posterior.likelihood == post.likelihood
 
-    params, _, constrainer, unconstrainer = gpx.initialise(svgp)
+    params, _, constrainer, unconstrainer = gpx.initialise(
+        svgp, jr.PRNGKey(123)
+    ).unpack()
     params = gpx.transform(params, unconstrainer)
 
     assert svgp.prior == post.prior
@@ -101,7 +103,9 @@ def test_collapsed_vi(n_datapoints, n_inducing_points, jit_fns, point_dim):
     assert sgpr.posterior.prior == post.prior
     assert sgpr.posterior.likelihood == post.likelihood
 
-    params, _, constrainer, unconstrainer = gpx.initialise(sgpr)
+    params, _, constrainer, unconstrainer = gpx.initialise(
+        sgpr, jr.PRNGKey(123)
+    ).unpack()
     params = gpx.transform(params, unconstrainer)
 
     assert sgpr.prior == post.prior

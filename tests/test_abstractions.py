@@ -2,30 +2,32 @@ import jax.numpy as jnp
 import jax.random as jr
 import optax
 import pytest
-import tensorflow as tf
 
 import gpjax as gpx
 from gpjax import RBF, Dataset, Gaussian, Prior, initialise, transform
-from gpjax.abstractions import fit, fit_batches
-
-tfd = tf.data
+from gpjax.abstractions import InferenceState, fit, fit_batches
 
 
+@pytest.mark.parametrize("n_iters", [10])
 @pytest.mark.parametrize("n", [1, 20])
-def test_fit(n):
+def test_fit(n_iters, n):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
     D = Dataset(X=x, y=y)
     p = Prior(kernel=RBF()) * Gaussian(num_datapoints=n)
-    params, trainable_status, constrainer, unconstrainer = initialise(p)
+    params, trainable_status, constrainer, unconstrainer = initialise(p, key).unpack()
     mll = p.marginal_log_likelihood(D, constrainer, negative=True)
     pre_mll_val = mll(params)
     optimiser = optax.adam(learning_rate=0.1)
-    optimised_params = fit(mll, params, trainable_status, optimiser, n_iters=10)
+    inference_state = fit(mll, params, trainable_status, optimiser, n_iters)
+    optimised_params, history = inference_state.params, inference_state.history
     optimised_params = transform(optimised_params, constrainer)
+    assert isinstance(inference_state, InferenceState)
     assert isinstance(optimised_params, dict)
     assert mll(optimised_params) < pre_mll_val
+    assert isinstance(history, jnp.ndarray)
+    assert history.shape[0] == n_iters
 
 
 def test_stop_grads():
@@ -33,14 +35,17 @@ def test_stop_grads():
     trainables = {"x": True, "y": False}
     loss_fn = lambda params: params["x"] ** 2 + params["y"] ** 2
     optimiser = optax.adam(learning_rate=0.1)
-    learned_params = fit(loss_fn, params, trainables, optimiser, n_iters=1)
+    inference_state = fit(loss_fn, params, trainables, optimiser, n_iters=1)
+    learned_params = inference_state.params
+    assert isinstance(inference_state, InferenceState)
     assert learned_params["y"] == params["y"]
     assert learned_params["x"] != params["x"]
 
 
+@pytest.mark.parametrize("n_iters", [5])
 @pytest.mark.parametrize("nb", [1, 20, 50])
 @pytest.mark.parametrize("ndata", [50])
-def test_batch_fitting(nb, ndata):
+def test_batch_fitting(n_iters, nb, ndata):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(ndata, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
@@ -53,20 +58,25 @@ def test_batch_fitting(nb, ndata):
     q = gpx.VariationalGaussian(prior=prior, inducing_inputs=z)
 
     svgp = gpx.StochasticVI(posterior=p, variational_family=q)
-    params, trainable_status, constrainer, unconstrainer = initialise(svgp)
+    params, trainable_status, constrainer, unconstrainer = initialise(
+        svgp, key
+    ).unpack()
     params = gpx.transform(params, unconstrainer)
     objective = svgp.elbo(D, constrainer)
 
     D = Dataset(X=x, y=y)
-    D = D.cache()
-    D = D.repeat()
-    D = D.shuffle(D.n)
-    D = D.batch(batch_size=nb)
-    D = D.prefetch(buffer_size=1)
 
     optimiser = optax.adam(learning_rate=0.1)
-    optimised_params = fit_batches(
-        objective, params, trainable_status, D, optimiser, n_iters=5
+    seed = 42
+    print("-" * 80)
+    print(params)
+    print("-" * 80)
+    inference_state = fit_batches(
+        objective, params, trainable_status, D, optimiser, seed, nb, n_iters
     )
+    optimised_params, history = inference_state.params, inference_state.history
     optimised_params = transform(optimised_params, constrainer)
+    assert isinstance(inference_state, InferenceState)
     assert isinstance(optimised_params, dict)
+    assert isinstance(history, jnp.ndarray)
+    assert history.shape[0] == n_iters
