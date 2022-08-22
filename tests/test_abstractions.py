@@ -5,7 +5,7 @@ import pytest
 
 import gpjax as gpx
 from gpjax import RBF, Dataset, Gaussian, Prior, initialise, transform
-from gpjax.abstractions import InferenceState, fit, fit_batches, get_batch_new_key
+from gpjax.abstractions import InferenceState, fit, fit_batches, get_batch
 
 
 @pytest.mark.parametrize("n_iters", [10])
@@ -83,20 +83,22 @@ def test_batch_fitting(n_iters, nb, ndata):
 @pytest.mark.parametrize("ndim", [1, 2, 3])
 @pytest.mark.parametrize("ndata", [50])
 @pytest.mark.parametrize("key", [jr.PRNGKey(123)])
-def test_get_batch_new_key(ndata, ndim, batch_size, key):
+def test_get_batch(ndata, ndim, batch_size, key):
     x = jnp.sort(
         jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(ndata, ndim)), axis=0
     )
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
     D = Dataset(X=x, y=y)
-    B, new_key = get_batch_new_key(D, batch_size, key)
+
+    B = get_batch(D, batch_size, key)
 
     assert B.n == batch_size
     assert B.X.shape[1:] == x.shape[1:]
     assert B.y.shape[1:] == y.shape[1:]
-    assert (new_key != key).all()
 
-    Bnew, _ = get_batch_new_key(D, batch_size, new_key)
+    # test no caching of batches:
+    key, subkey = jr.split(key)
+    Bnew = get_batch(D, batch_size, subkey)
     assert Bnew.n == batch_size
     assert Bnew.X.shape[1:] == x.shape[1:]
     assert Bnew.y.shape[1:] == y.shape[1:]

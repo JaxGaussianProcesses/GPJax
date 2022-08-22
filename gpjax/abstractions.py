@@ -167,15 +167,17 @@ def fit_batches(
 
     @progress_bar_scan(n_iters, log_rate)
     def step(carry, _):
-        params, opt_state, current_key = carry
+        params, opt_state, key = carry
 
-        batch, new_key = get_batch_new_key(train_data, batch_size, current_key)
+        key, subkey = jr.split(key)
+
+        batch = get_batch(train_data, batch_size, subkey)
 
         loss_val, loss_gradient = jax.value_and_grad(loss)(params, batch)
         updates, opt_state = optax_optim.update(loss_gradient, opt_state, params)
         params = optax.apply_updates(params, updates)
 
-        carry = params, opt_state, new_key
+        carry = params, opt_state, subkey
         return carry, loss_val
 
     (params, _, _), history = jax.lax.scan(
@@ -185,9 +187,7 @@ def fit_batches(
     return inf_state
 
 
-def get_batch_new_key(
-    train_data: Dataset, batch_size: int, key: PRNGKeyType
-) -> Dataset:
+def get_batch(train_data: Dataset, batch_size: int, key: PRNGKeyType) -> Dataset:
     """Batch the data into mini-batches.
     Args:
         train_data (Dataset): The training dataset.
@@ -197,8 +197,6 @@ def get_batch_new_key(
     """
     x, y, n = train_data.X, train_data.y, train_data.n
 
-    key, new_key = jr.split(key)
-
     indicies = jr.choice(key, n, (batch_size,), replace=True)
 
-    return Dataset(X=x[indicies], y=y[indicies]), new_key
+    return Dataset(X=x[indicies], y=y[indicies])
