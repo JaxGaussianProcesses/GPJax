@@ -1,13 +1,10 @@
 import jax.numpy as jnp
-import jax.random as jr
 import pytest
-from chex import PRNGKey
 
 from gpjax.utils import (
     I,
     as_constant,
     concat_dictionaries,
-    convert_seed,
     dict_array_coercion,
     merge_dictionaries,
     sort_dictionary,
@@ -68,8 +65,3 @@ def test_array_coercion(d):
     assert array_to_dict(dict_to_array(params)) == params
     assert isinstance(dict_to_array(params), list)
     assert isinstance(array_to_dict(dict_to_array(params)), dict)
-
-
-@pytest.mark.parametrize("seed", [1, 2, jr.PRNGKey(42)])
-def convert_seed(seed):
-    assert isinstance(convert_seed(seed), PRNGKey)
