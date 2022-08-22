@@ -2,10 +2,12 @@ import typing as tp
 import warnings
 from collections import namedtuple
 from copy import deepcopy
+from warnings import warn
 
 import distrax as dx
 import jax
 import jax.numpy as jnp
+import jax.random as jr
 from chex import dataclass
 from jaxtyping import f64
 from tensorflow_probability.substrates.jax import distributions as tfd
@@ -32,8 +34,11 @@ class ParameterState:
         return self.params, self.trainables, self.constrainers, self.unconstrainers
 
 
-def initialise(model, key: jnp.DeviceArray, **kwargs) -> ParameterState:
+def initialise(model, key: jnp.DeviceArray = None, **kwargs) -> ParameterState:
     """Initialise the stateful parameters of any GPJax object. This function also returns the trainability status of each parameter and set of bijectors that allow parameters to be constrained and unconstrained."""
+    if key is None:
+        warn("No PRNGKey specified. Defaulting to seed 123.")
+        key = jr.PRNGKey(123)
     params = model._initialise_params(key)
     if kwargs:
         _validate_kwargs(kwargs, params)
