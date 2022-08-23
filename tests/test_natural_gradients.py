@@ -6,6 +6,7 @@ import jax.random as jr
 import pytest
 
 import gpjax as gpx
+from gpjax.abstractions import get_batch
 from gpjax.natural_gradients import (
     _expectation_elbo,
     natural_gradients,
@@ -74,7 +75,9 @@ def test_expectation_elbo(jit_fns):
 
     svgp = gpx.StochasticVI(posterior=posterior, variational_family=variational_family)
 
-    params, _, constrainer, unconstrainer = gpx.initialise(svgp)
+    params, _, constrainer, unconstrainer = gpx.initialise(
+        svgp, jr.PRNGKey(123)
+    ).unpack()
 
     expectation_elbo = _expectation_elbo(posterior, variational_family, D)
 
@@ -103,27 +106,22 @@ def test_expectation_elbo(jit_fns):
 
 def test_natural_gradients():
     """
-    Tests the expectation ELBO.
+    Tests the natural gradient and hyperparameter gradients.
     """
     D, p, prior = get_data_and_gp(10)
 
     z = jnp.linspace(-5.0, 5.0, 5).reshape(-1, 1)
-
-    Dbatched = (
-        D.cache().repeat().shuffle(D.n).batch(batch_size=128).prefetch(buffer_size=1)
-    )
-
-    likelihood = gpx.Gaussian(num_datapoints=D.n)
     prior = gpx.Prior(kernel=gpx.RBF())
     q = gpx.NaturalVariationalGaussian(prior=prior, inducing_inputs=z)
 
     svgp = gpx.StochasticVI(posterior=p, variational_family=q)
 
-    params, trainables, constrainers, unconstrainers = gpx.initialise(svgp)
+    params, trainables, constrainers, unconstrainers = gpx.initialise(
+        svgp, jr.PRNGKey(123)
+    ).unpack()
     params = gpx.transform(params, unconstrainers)
 
-    batcher = Dbatched.get_batcher()
-    batch = batcher()
+    batch = get_batch(D, batch_size=10, key=jr.PRNGKey(42))
 
     nat_grads_fn, hyper_grads_fn = natural_gradients(svgp, D, constrainers)
 

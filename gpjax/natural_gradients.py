@@ -276,6 +276,7 @@ def fit_natgrads(
         # Natural gradients update:
         loss_val, loss_gradient = nat_grads_fn(params, trainables, batch)
         updates, moment_state = moment_optim.update(loss_gradient, moment_state, params)
+        params = ox.apply_updates(params, updates)
 
         carry = params, hyper_state, moment_state
         return carry, loss_val
