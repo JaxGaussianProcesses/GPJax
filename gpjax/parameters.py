@@ -14,7 +14,7 @@ from .config import get_defaults
 from .types import PRNGKeyType
 from .utils import merge_dictionaries
 
-Identity = dx.Lambda(forward = lambda x: x, inverse = lambda x: x)
+Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 
 
 ################################
@@ -50,6 +50,7 @@ def initialise(model, key: PRNGKeyType = None, **kwargs) -> ParameterState:
         bijectors=bijectors,
     )
     return state
+
 
 def _validate_kwargs(kwargs, params):
     for k, v in kwargs.items():
@@ -171,8 +172,9 @@ def unconstrain(params: tp.Dict, bijectors: tp.Dict) -> tp.Dict:
 
     return jax.tree_util.tree_map(map, params, bijectors)
 
+
 def build_identity(params: tp.Dict) -> tp.Dict:
-    """"
+    """ "
     Args:
         params (tp.Dict): The parameter set for which trainable statuses should be derived from.
 

@@ -3,22 +3,16 @@ import typing as tp
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-import optax as ox
 import pytest
-import tensorflow as tf
-from jax import jit
 
 import gpjax as gpx
 from gpjax.natural_gradients import (
     _expectation_elbo,
-    _stop_gradients_moments,
-    _stop_gradients_nonmoments,
     natural_gradients,
     natural_to_expectation,
 )
 from gpjax.parameters import recursive_items
 
-tf.random.set_seed(42)
 key = jr.PRNGKey(123)
 
 

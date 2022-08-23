@@ -9,7 +9,7 @@ import optax as ox
 from jax import value_and_grad
 from jaxtyping import f64
 
-from .abstractions import progress_bar_scan
+from .abstractions import InferenceState, get_batch, progress_bar_scan
 from .config import get_defaults
 from .gps import AbstractPosterior
 from .parameters import (
@@ -93,7 +93,7 @@ def _expectation_elbo(
         inducing_inputs=variational_family.inducing_inputs,
     )
     svgp = StochasticVI(posterior=posterior, variational_family=evg)
-    identity_transformation = build_identity(svgp.params)
+    identity_transformation = build_identity(svgp._initialise_params(jr.PRNGKey(123)))
 
     return svgp.elbo(train_data, identity_transformation, negative=True)
 
@@ -258,15 +258,15 @@ def fit_natgrads(
         stochastic_vi, train_data, transformations
     )
 
-    x, y, n = train_data.X, train_data.y, train_data.n
+    keys = jax.random.split(key, n_iters)
+    iter_nums = jnp.arange(n_iters)
 
     @progress_bar_scan(n_iters, log_rate)
-    def step(carry, _):
-        params, moment_state, hyper_state, current_key = carry
+    def step(carry, iter_num__and__key):
+        iter_num, key = iter_num__and__key
+        params, hyper_state, moment_state = carry
 
-        indicies = jr.choice(current_key, n, (batch_size,), replace=True)
-
-        batch = Dataset(X=x[indicies], y=y[indicies])
+        batch = get_batch(train_data, batch_size, key)
 
         # Hyper-parameters update:
         loss_val, loss_gradient = hyper_grads_fn(params, trainables, batch)
@@ -276,14 +276,12 @@ def fit_natgrads(
         # Natural gradients update:
         loss_val, loss_gradient = nat_grads_fn(params, trainables, batch)
         updates, moment_state = moment_optim.update(loss_gradient, moment_state, params)
-        params = ox.apply_updates(params, updates)
 
-        _, new_key = jr.split(current_key)
-
-        carry = params, moment_state, hyper_state, new_key
+        carry = params, hyper_state, moment_state
         return carry, loss_val
 
-    (params, _, _, _), history = jax.lax.scan(
-        step, (params, moment_state, hyper_state, key), jnp.arange(n_iters)
+    (params, _, _), history = jax.lax.scan(
+        step, (params, hyper_state, moment_state), (iter_nums, keys)
     )
-    return params, history
+    inf_state = InferenceState(params=params, history=history)
+    return inf_state

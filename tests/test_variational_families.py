@@ -204,7 +204,7 @@ def test_natural_variational_gaussian(n_inducing, n_test):
     assert (variational_family.natural_vector == jnp.zeros((n_inducing, 1))).all()
 
     # params
-    params = variational_family.params
+    params = variational_family._initialise_params(jr.PRNGKey(123))
     assert isinstance(params, dict)
     assert "inducing_inputs" in params["variational_family"].keys()
     assert "natural_vector" in params["variational_family"]["moments"].keys()
@@ -236,7 +236,7 @@ def test_natural_variational_gaussian(n_inducing, n_test):
     assert (variational_family.natural_vector == jnp.zeros((n_inducing, 1))).all()
 
     # Test KL
-    params = variational_family.params
+    params = variational_family._initialise_params(jr.PRNGKey(123))
     kl = variational_family.prior_kl(params)
     assert isinstance(kl, jnp.ndarray)
 
@@ -288,7 +288,7 @@ def test_expectation_variational_gaussian(n_inducing, n_test):
     assert (variational_family.expectation_vector == jnp.zeros((n_inducing, 1))).all()
 
     # params
-    params = variational_family.params
+    params = variational_family._initialise_params(jr.PRNGKey(123))
     assert isinstance(params, dict)
     assert "inducing_inputs" in params["variational_family"].keys()
     assert "expectation_vector" in params["variational_family"]["moments"].keys()
@@ -320,7 +320,7 @@ def test_expectation_variational_gaussian(n_inducing, n_test):
     assert (variational_family.expectation_vector == jnp.zeros((n_inducing, 1))).all()
 
     # Test KL
-    params = variational_family.params
+    params = variational_family._initialise_params(jr.PRNGKey(123))
     kl = variational_family.prior_kl(params)
     assert isinstance(kl, jnp.ndarray)
 

@@ -12,7 +12,7 @@ from .config import Identity, Softplus, add_parameter, get_defaults
 from .gps import Prior
 from .kernels import cross_covariance, gram
 from .likelihoods import AbstractLikelihood, Gaussian
-from .types import Dataset
+from .types import Dataset, PRNGKeyType
 from .utils import I, concat_dictionaries
 
 DEFAULT_JITTER = get_defaults()["jitter"]
@@ -34,7 +34,7 @@ class AbstractVariationalFamily:
         return self.predict(*args, **kwargs)
 
     @abc.abstractmethod
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """The parameters of the distribution. For example, the multivariate Gaussian would return a mean vector and covariance matrix."""
         raise NotImplementedError
 
@@ -85,7 +85,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
             else:
                 add_parameter("variational_root_covariance", FillTriangular)
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
         return concat_dictionaries(
             self.prior._initialise_params(key),
@@ -290,11 +290,10 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
             self.natural_matrix = -0.5 * I(m)
             add_parameter("natural_matrix", Identity)
 
-    @property
-    def params(self) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """Return the natural vector and matrix, inducing inputs, and hyperparameters that parameterise the natural Gaussian distribution."""
         return concat_dictionaries(
-            self.prior.params,
+            self.prior._initialise_params(key),
             {
                 "variational_family": {
                     "inducing_inputs": self.inducing_inputs,
@@ -431,11 +430,10 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
             self.expectation_matrix = I(m)
             add_parameter("expectation_matrix", Identity)
 
-    @property
-    def params(self) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """Return the expectation vector and matrix, inducing inputs, and hyperparameters that parameterise the expectation Gaussian distribution."""
         return concat_dictionaries(
-            self.prior.params,
+            self.prior._initialise_params(key),
             {
                 "variational_family": {
                     "inducing_inputs": self.inducing_inputs,
@@ -565,7 +563,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
         if not isinstance(self.likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
         return concat_dictionaries(
             self.prior._initialise_params(key),
