@@ -35,7 +35,20 @@ def natural_to_expectation(
     natural_moments: Dict, jitter: float = DEFAULT_JITTER
 ) -> Dict:
     """
-    Converts natural parameters to expectation parameters.
+    Translate natural parameters to expectation parameters.
+
+    In particular, in terms of the Gaussian mean μ and covariance matrix μ for the Gaussian variational family,
+
+        - the natural parameteristaion is θ = (S⁻¹μ, -S⁻¹/2)
+        - the expectation parameters are  η = (μ, S + μ μᵀ).
+
+    This function solves these eqautions in terms of μ and S to convert θ to η.
+
+    Writing θ = (θ₁, θ₂), we have that S⁻¹ = -2θ₂ . Taking the cholesky decomposition of the inverse covariance,
+    S⁻¹ = LLᵀ and defining C = L⁻¹, we have S = CᵀC and μ = Sθ₁ = CᵀC θ₁.
+
+    Now from here, using μ and S found from θ, we compute η as η₁ = μ, and  η₂ = S + μ μᵀ.
+
     Args:
         natural_moments: A dictionary of natural parameters.
         jitter (float): A small value to prevent numerical instability.
