@@ -253,5 +253,5 @@ def test_output(num_datapoints, likelihood):
     a_constrainers, a_unconstrainers = build_transforms(augmented_params)
     assert "test_param" in list(a_constrainers.keys())
     assert "test_param" in list(a_unconstrainers.keys())
-    assert a_constrainers["test_param"](1.0) == 1.0
-    assert a_unconstrainers["test_param"](1.0) == 1.0
+    assert a_constrainers["test_param"](jnp.array([1.0])) == 1.0
+    assert a_unconstrainers["test_param"](jnp.array([1.0])) == 1.0
