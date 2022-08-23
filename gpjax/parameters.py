@@ -10,13 +10,12 @@ import jax.numpy as jnp
 import jax.random as jr
 from chex import dataclass
 from jaxtyping import f64
-from tensorflow_probability.substrates.jax import distributions as tfd
 
 from .config import get_defaults
 from .types import PRNGKeyType
 from .utils import merge_dictionaries
 
-Identity = dx.Lambda(lambda x: x)
+Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 
 
 ################################
@@ -163,11 +162,13 @@ def build_transforms(params: tp.Dict) -> tp.Tuple[tp.Dict, tp.Dict]:
 
     bijectors = build_bijectors(params)
 
-    constrainers = jax.tree_map(lambda _: forward, deepcopy(params))
-    unconstrainers = jax.tree_map(lambda _: inverse, deepcopy(params))
+    constrainers = jax.tree_util.tree_map(lambda _: forward, deepcopy(params))
+    unconstrainers = jax.tree_util.tree_map(lambda _: inverse, deepcopy(params))
 
-    constrainers = jax.tree_map(lambda f, b: f(b), constrainers, bijectors)
-    unconstrainers = jax.tree_map(lambda f, b: f(b), unconstrainers, bijectors)
+    constrainers = jax.tree_util.tree_map(lambda f, b: f(b), constrainers, bijectors)
+    unconstrainers = jax.tree_util.tree_map(
+        lambda f, b: f(b), unconstrainers, bijectors
+    )
 
     return constrainers, unconstrainers
 
@@ -182,7 +183,9 @@ def transform(params: tp.Dict, transform_map: tp.Dict) -> tp.Dict:
     Returns:
         tp.Dict: A transformed parameter set.s The dictionary is equal in structure to the input params dictionary.
     """
-    return jax.tree_map(lambda param, trans: trans(param), params, transform_map)
+    return jax.tree_util.tree_map(
+        lambda param, trans: trans(param), params, transform_map
+    )
 
 
 ################################
@@ -200,7 +203,7 @@ def copy_dict_structure(params: dict) -> dict:
     # Copy dictionary structure
     prior_container = deepcopy(params)
     # Set all values to zero
-    prior_container = jax.tree_map(lambda _: None, prior_container)
+    prior_container = jax.tree_util.tree_map(lambda _: None, prior_container)
     return prior_container
 
 
@@ -243,23 +246,16 @@ def prior_checks(priors: dict) -> dict:
     """Run checks on th parameters' prior distributions. This checks that for Gaussian processes that are constructed with non-conjugate likelihoods, the prior distribution on the function's latent values is a unit Gaussian."""
     if "latent" in priors.keys():
         latent_prior = priors["latent"]
-        if isinstance(latent_prior, dx.Distribution) and latent_prior.name != "Normal":
-            warnings.warn(
-                f"A {latent_prior.name} distribution prior has been placed on"
-                " the latent function. It is strongly advised that a"
-                " unit-Gaussian prior is used."
-            )
-        elif (
-            isinstance(latent_prior, tfd.Distribution) and latent_prior.name != "Normal"
-        ):
-            warnings.warn(
-                f"A {latent_prior.name} distribution from Tensorflow Probability has been"
-                "placed on the latent function. We advise using a unit-Gaussian prior from"
-                " Distrax."
-            )
+        if latent_prior is not None:
+            if latent_prior.name != "Normal":
+                warnings.warn(
+                    f"A {latent_prior.name} distribution prior has been placed on"
+                    " the latent function. It is strongly advised that a"
+                    " unit Gaussian prior is used."
+                )
         else:
-            if not latent_prior:
-                priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
+            warnings.warn("Placing unit Gaussian prior on latent function.")
+            priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
     else:
         priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
 
@@ -278,7 +274,7 @@ def build_trainables(params: tp.Dict) -> tp.Dict:
     # Copy dictionary structure
     prior_container = deepcopy(params)
     # Set all values to zero
-    prior_container = jax.tree_map(lambda _: True, prior_container)
+    prior_container = jax.tree_util.tree_map(lambda _: True, prior_container)
     return prior_container
 
 
@@ -289,6 +285,6 @@ def stop_grad(param: tp.Dict, trainable: tp.Dict):
 
 def trainable_params(params: tp.Dict, trainables: tp.Dict) -> tp.Dict:
     """Stop the gradients flowing through parameters whose trainable status is False"""
-    return jax.tree_map(
+    return jax.tree_util.tree_map(
         lambda param, trainable: stop_grad(param, trainable), params, trainables
     )
