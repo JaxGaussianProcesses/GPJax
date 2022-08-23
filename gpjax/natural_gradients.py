@@ -1,5 +1,5 @@
-import typing as tp
 from copy import deepcopy
+from typing import Callable, Dict, Optional, Tuple
 
 import jax
 import jax.numpy as jnp
@@ -32,15 +32,15 @@ DEFAULT_JITTER = get_defaults()["jitter"]
 
 
 def natural_to_expectation(
-    natural_moments: dict, jitter: float = DEFAULT_JITTER
-) -> dict:
+    natural_moments: Dict, jitter: float = DEFAULT_JITTER
+) -> Dict:
     """
     Converts natural parameters to expectation parameters.
     Args:
         natural_moments: A dictionary of natural parameters.
         jitter (float): A small value to prevent numerical instability.
     Returns:
-        tp.Dict: A dictionary of Gaussian moments under the expectation parameterisation.
+        Dict: A dictionary of Gaussian moments under the expectation parameterisation.
     """
 
     natural_matrix = natural_moments["natural_matrix"]
@@ -79,7 +79,7 @@ def _expectation_elbo(
     posterior: AbstractPosterior,
     variational_family: AbstractVariationalFamily,
     train_data: Dataset,
-) -> tp.Callable[[dict, Dataset], float]:
+) -> Callable[[Dict, Dataset], float]:
     """
     Construct evidence lower bound (ELBO) for variational Gaussian under the expectation parameterisation.
     Args:
@@ -100,13 +100,13 @@ def _expectation_elbo(
     return svgp.elbo(train_data, identity_transformation, negative=True)
 
 
-def _stop_gradients_nonmoments(params: tp.Dict) -> tp.Dict:
+def _stop_gradients_nonmoments(params: Dict) -> Dict:
     """
     Stops gradients for non-moment parameters.
     Args:
         params: A dictionary of parameters.
     Returns:
-        tp.Dict: A dictionary of parameters with stopped gradients.
+        Dict: A dictionary of parameters with stopped gradients.
     """
     trainables = build_trainables_false(params)
     moment_trainables = build_trainables_true(params["variational_family"]["moments"])
@@ -115,13 +115,13 @@ def _stop_gradients_nonmoments(params: tp.Dict) -> tp.Dict:
     return params
 
 
-def _stop_gradients_moments(params: tp.Dict) -> tp.Dict:
+def _stop_gradients_moments(params: Dict) -> Dict:
     """
     Stops gradients for moment parameters.
     Args:
         params: A dictionary of parameters.
     Returns:
-        tp.Dict: A dictionary of parameters with stopped gradients.
+        Dict: A dictionary of parameters with stopped gradients.
     """
     trainables = build_trainables_true(params)
     moment_trainables = build_trainables_false(params["variational_family"]["moments"])
@@ -133,8 +133,8 @@ def _stop_gradients_moments(params: tp.Dict) -> tp.Dict:
 def natural_gradients(
     stochastic_vi: StochasticVI,
     train_data: Dataset,
-    transformations: dict,
-) -> tp.Tuple[tp.Callable[[dict, Dataset], dict]]:
+    transformations: Dict,
+) -> Tuple[Callable[[Dict, Dataset], Dict]]:
     """
     Computes the gradient with respect to the natural parameters. Currently only implemented for the natural variational Gaussian family.
     Args:
@@ -143,7 +143,7 @@ def natural_gradients(
         train_data: A Dataset.
         transformations: A dictionary of transformations.
     Returns:
-        Tuple[tp.Callable[[dict, Dataset], dict]]: Functions that compute natural gradients and hyperparameter gradients respectively.
+        Tuple[Callable[[Dict, Dataset], Dict]]: Functions that compute natural gradients and hyperparameter gradients respectively.
     """
     posterior = stochastic_vi.posterior
     variational_family = stochastic_vi.variational_family
@@ -156,7 +156,7 @@ def natural_gradients(
 
     if isinstance(variational_family, NaturalVariationalGaussian):
 
-        def nat_grads_fn(params: dict, trainables: dict, batch: Dataset) -> dict:
+        def nat_grads_fn(params: Dict, trainables: Dict, batch: Dataset) -> Dict:
             """
             Computes the natural gradients of the ELBO.
             Args:
@@ -164,7 +164,7 @@ def natural_gradients(
                 trainables: A dictionary of trainables.
                 batch: A Dataset.
             Returns:
-                dict: A dictionary of natural gradients.
+                Dict: A dictionary of natural gradients.
             """
             # Transform parameters to constrained space.
             params = transform(params, transformations)
@@ -180,7 +180,7 @@ def natural_gradients(
             expectation_params["variational_family"]["moments"] = expectation_moments
 
             # Compute gradient ∂L/∂η:
-            def loss_fn(params: dict, batch: Dataset) -> f64["1"]:
+            def loss_fn(params: Dict, batch: Dataset) -> f64["1"]:
                 # Determine hyperparameters that should be trained.
                 trains = deepcopy(trainables)
                 trains["variational_family"]["moments"] = build_trainables_true(
@@ -211,7 +211,7 @@ def natural_gradients(
     else:
         raise NotImplementedError
 
-    def hyper_grads_fn(params: dict, trainables: dict, batch: Dataset) -> dict:
+    def hyper_grads_fn(params: Dict, trainables: Dict, batch: Dataset) -> Dict:
         """
         Computes the hyperparameter gradients of the ELBO.
         Args:
@@ -219,10 +219,10 @@ def natural_gradients(
             trainables: A dictionary of trainables.
             batch: A Dataset.
         Returns:
-            dict: A dictionary of hyperparameter gradients.
+            Dict: A dictionary of hyperparameter gradients.
         """
 
-        def loss_fn(params: dict, batch: Dataset) -> f64["1"]:
+        def loss_fn(params: Dict, batch: Dataset) -> f64["1"]:
             # Determine hyperparameters that should be trained.
             params = trainable_params(params, trainables)
 
@@ -240,17 +240,17 @@ def natural_gradients(
 
 def fit_natgrads(
     stochastic_vi: StochasticVI,
-    params: tp.Dict,
-    trainables: tp.Dict,
-    transformations: tp.Dict,
+    params: Dict,
+    trainables: Dict,
+    transformations: Dict,
     train_data: Dataset,
     batch_size: int,
     moment_optim,
     hyper_optim,
     key: PRNGKeyType,
-    n_iters: tp.Optional[int] = 100,
-    log_rate: tp.Optional[int] = 10,
-) -> tp.Dict:
+    n_iters: Optional[int] = 100,
+    log_rate: Optional[int] = 10,
+) -> Dict:
 
     hyper_state = hyper_optim.init(params)
     moment_state = moment_optim.init(params)

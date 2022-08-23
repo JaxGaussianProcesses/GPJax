@@ -7,6 +7,7 @@ import jax.scipy as jsp
 from chex import dataclass
 from jaxtyping import Array, Float
 
+from .types import PRNGKeyType
 from .utils import I
 
 
@@ -27,7 +28,7 @@ class AbstractLikelihood:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """Return the parameters of the likelihood function."""
         raise NotImplementedError
 
@@ -54,7 +55,7 @@ class Gaussian(AbstractLikelihood, Conjugate):
 
     name: Optional[str] = "Gaussian"
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """Return the variance parameter of the likelihood function."""
         return {"obs_noise": jnp.array([1.0])}
 
@@ -66,12 +67,12 @@ class Gaussian(AbstractLikelihood, Conjugate):
             Callable: A link function that maps the predictive distribution to the likelihood function.
         """
 
-        def link_fn(x, params: dict) -> dx.Distribution:
+        def link_fn(x, params: Dict) -> dx.Distribution:
             return dx.Normal(loc=x, scale=params["obs_noise"])
 
         return link_fn
 
-    def predict(self, dist: dx.Distribution, params: dict) -> dx.Distribution:
+    def predict(self, dist: dx.Distribution, params: Dict) -> dx.Distribution:
         """Evaluate the Gaussian likelihood function at a given predictive distribution. Computationally, this is equivalent to summing the observation noise term to the diagonal elements of the predictive distribution's covariance matrix.."""
         n_data = dist.event_shape[0]
         noisy_cov = dist.covariance() + I(n_data) * params["likelihood"]["obs_noise"]
@@ -82,7 +83,7 @@ class Gaussian(AbstractLikelihood, Conjugate):
 class Bernoulli(AbstractLikelihood, NonConjugate):
     name: Optional[str] = "Bernoulli"
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """Initialise the parameter set of a Bernoulli likelihood."""
         return {}
 
@@ -115,7 +116,7 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
 
         return moment_fn
 
-    def predict(self, dist: dx.Distribution, params: dict) -> Any:
+    def predict(self, dist: dx.Distribution, params: Dict) -> Any:
         variance = jnp.diag(dist.covariance())
         mean = dist.mean()
         return self.predictive_moment_fn(mean.ravel(), variance, params)

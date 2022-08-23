@@ -1,4 +1,4 @@
-import typing as tp
+from typing import Callable, Dict, Optional
 
 import jax
 import jax.numpy as jnp
@@ -97,7 +97,7 @@ def progress_bar_scan(n_iters: int, log_rate: int):
 
 
 def fit(
-    objective: tp.Callable,
+    objective: Callable,
     parameter_state: ParameterState,
     optax_optim,
     n_iters: int = 100,
@@ -106,7 +106,7 @@ def fit(
     """Abstracted method for fitting a GP model with respect to a supplied objective function.
     Optimisers used here should originate from Optax.
     Args:
-        objective (tp.Callable): The objective function that we are optimising with respect to.
+        objective (Callable): The objective function that we are optimising with respect to.
         parameter_state (ParameterState): The initial parameter state.
         optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
@@ -149,19 +149,19 @@ def fit(
 
 
 def fit_batches(
-    objective: tp.Callable,
+    objective: Callable,
     parameter_state: ParameterState,
     train_data: Dataset,
     optax_optim,
     key: PRNGKeyType,
     batch_size: int,
-    n_iters: tp.Optional[int] = 100,
-    log_rate: tp.Optional[int] = 10,
+    n_iters: Optional[int] = 100,
+    log_rate: Optional[int] = 10,
 ) -> InferenceState:
     """Abstracted method for fitting a GP model with mini-batches respect to a supplied objective function.
     Optimisers used here should originate from Optax.
     Args:
-        objective (tp.Callable): The objective function that we are optimising with respect to.
+        objective (Callable): The objective function that we are optimising with respect to.
         parameter_state (ParameterState): The parameters for which we would like to minimise our objective function with.
         train_data (Dataset): The training dataset.
         optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.

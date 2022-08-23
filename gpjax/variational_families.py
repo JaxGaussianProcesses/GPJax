@@ -110,7 +110,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
             N[f(t); μt + Ktz Kzz⁻¹ (μ - μz),  Ktt - Ktz Kzz⁻¹ Kzt + Ktz Kzz⁻¹ S Kzz⁻¹ Kzt ].
 
         Args:
-            params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
+            params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
 
         Returns:
             Callable[[f64["N D"]], dx.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
@@ -198,7 +198,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             N[f(t); μt  +  Ktz Lz⁻ᵀ μ,  Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻ᵀ S Lz⁻¹ Kzt].
 
         Args:
-            params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
+            params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
 
         Returns:
             Callable[[f64["N D"]], dx.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
@@ -302,11 +302,11 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         return qu.kl_divergence(pu)
 
-    def predict(self, params: dict) -> Callable[[f64["N D"]], dx.Distribution]:
+    def predict(self, params: Dict) -> Callable[[f64["N D"]], dx.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs.
 
         Args:
-            params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
+            params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
 
         Returns:
             Callable[[f64["N D"]], dx.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
@@ -428,11 +428,11 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         return qu.kl_divergence(pu)
 
-    def predict(self, params: dict) -> Callable[[f64["N D"]], dx.Distribution]:
+    def predict(self, params: Dict) -> Callable[[f64["N D"]], dx.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs.
 
         Args:
-            params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
+            params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
 
         Returns:
             Callable[[f64["N D"]], dx.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
@@ -529,7 +529,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
     ) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs.
         Args:
-            params (dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
+            params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
         Returns:
             Callable[[f64["N D"]], dx.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """

@@ -6,6 +6,8 @@ from chex import dataclass
 from jax import vmap
 from jaxtyping import Array, Float
 
+from .types import PRNGKeyType
+
 
 ##########################################
 # Abtract classes
@@ -30,7 +32,7 @@ class Kernel:
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.
             y (jnp.DeviceArray): The right hand argument of the kernel function's call
-            params (dict): Parameter set for which the kernel should be evaluated on.
+            params (Dict): Parameter set for which the kernel should be evaluated on.
         Returns:
             Array: The value of :math:`k(x, y)`.
         """
@@ -61,7 +63,7 @@ class Kernel:
         return True if self.ndims > 1 else False
 
     @abc.abstractmethod
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """A template dictionary of the kernel's parameter set."""
         raise NotImplementedError
 
@@ -99,7 +101,7 @@ class CombinationKernel(Kernel, _KernelSet):
                 kernels_list.append(k)
         self.kernel_set = kernels_list
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """A template dictionary of the kernel's parameter set."""
         return [kernel._initialise_params(key) for kernel in self.kernel_set]
 
@@ -150,7 +152,7 @@ class RBF(Kernel):
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.
             y (jnp.DeviceArray): The right hand argument of the kernel function's call
-            params (dict): Parameter set for which the kernel should be evaluated on.
+            params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
             Array: The value of :math:`k(x, y)`
@@ -160,7 +162,7 @@ class RBF(Kernel):
         K = params["variance"] * jnp.exp(-0.5 * squared_distance(x, y))
         return K.squeeze()
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         return {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),
@@ -187,7 +189,7 @@ class Matern12(Kernel):
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.
             y (jnp.DeviceArray): The right hand argument of the kernel function's call
-            params (dict): Parameter set for which the kernel should be evaluated on.
+            params (Dict): Parameter set for which the kernel should be evaluated on.
         Returns:
             Array: The value of :math:`k(x, y)`
         """
@@ -196,7 +198,7 @@ class Matern12(Kernel):
         K = params["variance"] * jnp.exp(-0.5 * euclidean_distance(x, y))
         return K.squeeze()
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         return {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),
@@ -223,7 +225,7 @@ class Matern32(Kernel):
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.
             y (jnp.DeviceArray): The right hand argument of the kernel function's call
-            params (dict): Parameter set for which the kernel should be evaluated on.
+            params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
             Array: The value of :math:`k(x, y)`
@@ -238,7 +240,7 @@ class Matern32(Kernel):
         )
         return K.squeeze()
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         return {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),
@@ -265,7 +267,7 @@ class Matern52(Kernel):
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.
             y (jnp.DeviceArray): The right hand argument of the kernel function's call
-            params (dict): Parameter set for which the kernel should be evaluated on.
+            params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
             Array: The value of :math:`k(x, y)`
@@ -280,7 +282,7 @@ class Matern52(Kernel):
         )
         return K.squeeze()
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         return {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),
@@ -309,7 +311,7 @@ class Polynomial(Kernel):
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.
             y (jnp.DeviceArray): The right hand argument of the kernel function's call
-            params (dict): Parameter set for which the kernel should be evaluated on.
+            params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
             Array: The value of :math:`k(x, y)`
@@ -319,7 +321,7 @@ class Polynomial(Kernel):
         K = jnp.power(params["shift"] + jnp.dot(x * params["variance"], y), self.degree)
         return K.squeeze()
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         return {
             "shift": jnp.array([1.0]),
             "variance": jnp.array([1.0] * self.ndims),
@@ -352,7 +354,7 @@ class GraphKernel(Kernel, _EigenKernel):
         Args:
             x (jnp.DeviceArray): Index of the ith vertex
             y (jnp.DeviceArray): Index of the jth vertex
-            params (dict): Parameter set for which the kernel should be evaluated on.
+            params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
             Array: The value of k(v_i, v_j).
@@ -369,7 +371,7 @@ class GraphKernel(Kernel, _EigenKernel):
         )
         return kxy.squeeze()
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         return {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),
@@ -399,7 +401,7 @@ def gram(
     Args:
         kernel (Kernel): The kernel for which the Gram matrix should be computed for.
         inputs (Array): The input matrix.
-        params (dict): The kernel's parameter set.
+        params (Dict): The kernel's parameter set.
 
     Returns:
         Array: The computed square Gram matrix.
@@ -416,7 +418,7 @@ def cross_covariance(
         kernel (Kernel): The kernel for which the cross-covariance matrix should be computed for.
         x (Array): The first input matrix.
         y (Array): The second input matrix.
-        params (dict): The kernel's parameter set.
+        params (Dict): The kernel's parameter set.
 
     Returns:
         Array: The computed square Gram matrix.
@@ -431,7 +433,7 @@ def diagonal(
     Args:
         kernel (Kernel): The kernel for which the variance vector should be computed for.
         inputs (Array): The input matrix.
-        params (dict): The kernel's parameter set.
+        params (Dict): The kernel's parameter set.
     Returns:
         Array: The computed diagonal variance matrix.
     """
