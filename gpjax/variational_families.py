@@ -4,11 +4,10 @@ from typing import Any, Callable, Dict, Optional
 import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
-import tensorflow_probability.substrates.jax.bijectors as tfb
 from chex import dataclass
 from jaxtyping import Array, Float
 
-from .config import Identity, Softplus, add_parameter, get_defaults
+from .config import get_defaults
 from .gps import Prior
 from .kernels import cross_covariance, gram
 from .likelihoods import AbstractLikelihood, Gaussian
@@ -16,13 +15,6 @@ from .types import Dataset, PRNGKeyType
 from .utils import I, concat_dictionaries
 
 DEFAULT_JITTER = get_defaults()["jitter"]
-
-Diagonal = dx.Lambda(
-    forward=lambda x: jnp.diagflat(x), inverse=lambda x: jnp.diagonal(x)
-)
-
-FillDiagonal = dx.Chain([Diagonal, Softplus])
-FillTriangular = dx.Chain([tfb.FillTriangular()])
 
 
 @dataclass
@@ -53,6 +45,10 @@ class AbstractVariationalGaussian(AbstractVariationalFamily):
     name: str = "Gaussian"
     jitter: Optional[float] = DEFAULT_JITTER
 
+    def __post_init__(self):
+        """Initialise the variational Gaussian distribution."""
+        self.num_inducing = self.inducing_inputs.shape[0]
+
 
 @dataclass
 class VariationalGaussian(AbstractVariationalGaussian):
@@ -63,38 +59,18 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
     """
 
-    variational_mean: Optional[f64["N D"]] = None
-    variational_root_covariance: Optional[f64["N D"]] = None
-    diag: Optional[bool] = False
-
-    def __post_init__(self):
-        """Initialise the variational Gaussian distribution."""
-        self.num_inducing = self.inducing_inputs.shape[0]
-        add_parameter("inducing_inputs", Identity)
-
-        m = self.num_inducing
-
-        if self.variational_mean is None:
-            self.variational_mean = jnp.zeros((m, 1))
-            add_parameter("variational_mean", Identity)
-
-        if self.variational_root_covariance is None:
-            self.variational_root_covariance = I(m)
-            if self.diag:
-                add_parameter("variational_root_covariance", FillDiagonal)
-            else:
-                add_parameter("variational_root_covariance", FillTriangular)
-
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
+        m = self.num_inducing
+
         return concat_dictionaries(
             self.prior._initialise_params(key),
             {
                 "variational_family": {
                     "inducing_inputs": self.inducing_inputs,
                     "moments": {
-                        "variational_mean": self.variational_mean,
-                        "variational_root_covariance": self.variational_root_covariance,
+                        "variational_mean": jnp.zeros((m, 1)),
+                        "variational_root_covariance": I(m),
                     },
                 }
             },
@@ -272,34 +248,20 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
     """The natural variational Gaussian family of probability distributions."""
 
     name: str = "Natural Gaussian"
-    natural_vector: Optional[f64["N D"]] = None
-    natural_matrix: Optional[f64["N D"]] = None
-
-    def __post_init__(self):
-        """Initialise the variational Gaussian distribution."""
-        self.num_inducing = self.inducing_inputs.shape[0]
-        add_parameter("inducing_inputs", Identity)
-
-        m = self.num_inducing
-
-        if self.natural_vector is None:
-            self.natural_vector = jnp.zeros((m, 1))
-            add_parameter("natural_vector", Identity)
-
-        if self.natural_matrix is None:
-            self.natural_matrix = -0.5 * I(m)
-            add_parameter("natural_matrix", Identity)
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """Return the natural vector and matrix, inducing inputs, and hyperparameters that parameterise the natural Gaussian distribution."""
+
+        m = self.num_inducing
+
         return concat_dictionaries(
             self.prior._initialise_params(key),
             {
                 "variational_family": {
                     "inducing_inputs": self.inducing_inputs,
                     "moments": {
-                        "natural_vector": self.natural_vector,
-                        "natural_matrix": self.natural_matrix,
+                        "natural_vector": jnp.zeros((m, 1)),
+                        "natural_matrix": -0.5 * I(m),
                     },
                 }
             },
@@ -412,34 +374,22 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
     """The variational Gaussian family of probability distributions."""
 
     name: str = "Expectation Gaussian"
-    expectation_vector: Optional[f64["N D"]] = None
-    expectation_matrix: Optional[f64["N D"]] = None
-
-    def __post_init__(self):
-        """Initialise the variational Gaussian distribution."""
-        self.num_inducing = self.inducing_inputs.shape[0]
-        add_parameter("inducing_inputs", Identity)
-
-        m = self.num_inducing
-
-        if self.expectation_vector is None:
-            self.expectation_vector = jnp.zeros((m, 1))
-            add_parameter("expectation_vector", Identity)
-
-        if self.expectation_matrix is None:
-            self.expectation_matrix = I(m)
-            add_parameter("expectation_matrix", Identity)
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """Return the expectation vector and matrix, inducing inputs, and hyperparameters that parameterise the expectation Gaussian distribution."""
+
+        self.num_inducing = self.inducing_inputs.shape[0]
+
+        m = self.num_inducing
+
         return concat_dictionaries(
             self.prior._initialise_params(key),
             {
                 "variational_family": {
                     "inducing_inputs": self.inducing_inputs,
                     "moments": {
-                        "expectation_vector": self.expectation_vector,
-                        "expectation_matrix": self.expectation_matrix,
+                        "expectation_vector": jnp.zeros((m, 1)),
+                        "expectation_matrix": I(m),
                     },
                 }
             },
@@ -558,7 +508,6 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
     def __post_init__(self):
         """Initialise the variational Gaussian distribution."""
         self.num_inducing = self.inducing_inputs.shape[0]
-        add_parameter("inducing_inputs", Identity)
 
         if not isinstance(self.likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")

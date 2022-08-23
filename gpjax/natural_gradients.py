@@ -81,18 +81,20 @@ def _expectation_elbo(
     train_data: Dataset,
 ) -> tp.Callable[[dict, Dataset], float]:
     """
-    Construct evidence lower bound (ELBO) for varational Gaussian under the expectation parameterisation.
+    Construct evidence lower bound (ELBO) for variational Gaussian under the expectation parameterisation.
     Args:
         posterior: An instance of AbstractPosterior.
         variational_family: An instance of AbstractVariationalFamily.
     Returns:
-        Callable: A function that computes ELBO.
+        Callable: A function that computes the ELBO.
     """
-    evg = ExpectationVariationalGaussian(
+    expectation_vartiational_gaussian = ExpectationVariationalGaussian(
         prior=variational_family.prior,
         inducing_inputs=variational_family.inducing_inputs,
     )
-    svgp = StochasticVI(posterior=posterior, variational_family=evg)
+    svgp = StochasticVI(
+        posterior=posterior, variational_family=expectation_vartiational_gaussian
+    )
     identity_transformation = build_identity(svgp._initialise_params(jr.PRNGKey(123)))
 
     return svgp.elbo(train_data, identity_transformation, negative=True)
@@ -132,10 +134,9 @@ def natural_gradients(
     stochastic_vi: StochasticVI,
     train_data: Dataset,
     transformations: dict,
-    # bijector = tp.Optional[dx.Bijector] = Identity, #bijector: A bijector to convert between the user chosen parameterisation and the natural parameters.
 ) -> tp.Tuple[tp.Callable[[dict, Dataset], dict]]:
     """
-    Computes natural gradients for variational Gaussian.
+    Computes the gradient with respect to the natural parameters. Currently only implemented for the natural variational Gaussian family.
     Args:
         posterior: An instance of AbstractPosterior.
         variational_family: An instance of AbstractVariationalFamily.
