@@ -12,7 +12,6 @@
 [![Downloads](https://pepy.tech/badge/gpjax)](https://pepy.tech/project/gpjax)
 [![Slack Invite](https://img.shields.io/badge/Slack_Invite--blue?style=social&logo=slack)](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw)
 
-
 [**Quickstart**](#simple-example)
 | [**Install guide**](#installation)
 | [**Documentation**](https://gpjax.readthedocs.io/en/latest/)
@@ -55,11 +54,10 @@ After importing the necessary dependencies, we'll simulate some data.
 
 ```python
 import gpjax as gpx
-import jax
+from jax import grad, jit
 import jax.numpy as jnp
 import jax.random as jr
-from jax.example_libraries import optimizers
-from jax import jit
+import optax as ox
 
 key = jr.PRNGKey(123)
 
@@ -88,7 +86,8 @@ Equipped with the posterior, we proceed to train the model's hyperparameters thr
 We begin by defining a set of initial parameter values through the `initialise` callable.
 
 ```python
-params, _, constrainer, unconstrainer = gpx.initialise(posterior)
+parameter_state = gpx.initialise(posterior, key=key)
+params, trainables, constrainer, unconstrainer = parameter_state.unpack()
 params = gpx.transform(params, unconstrainer)
 ```
 
@@ -101,22 +100,19 @@ mll = jit(posterior.marginal_log_likelihood(training, constrainer, negative=True
 Finally, we utilise Jax's built-in Adam optimiser and run an optimisation loop.
 
 ```python
-opt_init, opt_update, get_params = optimizers.adam(step_size=0.01)
-opt_state = opt_init(params)
+opt = ox.adam(learning_rate=0.01)
+opt_state = opt.init(params)
 
-def step(i, opt_state):
-    params = get_params(opt_state)
-    gradients = jax.grad(mll)(params)
-    return opt_update(i, gradients, opt_state)
-
-for i in range(100):
-    opt_state = step(i, opt_state)
+for _ in range(100):
+  grads = grad(mll)(params)
+  updates, opt_state = opt.update(grads, opt_state)
+  params = ox.apply_updates(params, updates)
 ```
 
 Now that our parameters are optimised, we transform these back to their original constrained space. Using their learned values, we can obtain the posterior distribution of the latent function at novel test points.
 
 ```python
-final_params = gpx.transform(get_params(opt_state), constrainer)
+final_params = gpx.transform(params, constrainer)
 
 xtest = jnp.linspace(-3., 3., 100).reshape(-1, 1)
 
@@ -153,10 +149,10 @@ We then recommend you check your installation using the supplied unit tests.
 python -m pytest tests/
 ```
 
-
 ## Citing GPJax
 
 If you use GPJax in your research, please cite our [JOSS paper](https://joss.theoj.org/papers/10.21105/joss.04455#). Sample Bibtex is given below:
+
 ```
 @article{Pinder2022,
   doi = {10.21105/joss.04455},
