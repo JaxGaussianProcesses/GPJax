@@ -5,8 +5,31 @@ from ml_collections import ConfigDict
 
 __config = None
 
-Identity = dx.Lambda(lambda x: x)
-Softplus = dx.Lambda(lambda x: jnp.log(1.0 + jnp.exp(x)))
+Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
+Softplus = dx.Lambda(
+    forward=lambda x: jnp.log(1 + jnp.exp(x)),
+    inverse=lambda x: jnp.log(jnp.exp(x) - 1.0),
+)
+
+# class Softplus(dx.Bijector):
+#     def __init__(self):
+#         super().__init__(event_ndims_in=0)
+
+#     def forward_and_log_det(self, x):
+#         softplus = lambda xx: jnp.log(1 + jnp.exp(xx))
+#         y = softplus(x)
+#         logdet = softplus(-x)
+#         return y, logdet
+
+#     def inverse_and_log_det(self, y):
+#         """
+#         Y = Log[1 + exp{X}] ==> X = Log[exp{Y} - 1]
+#         ==> dX/dY = exp{Y} / (exp{Y} - 1)
+#                   = 1 / (1 - exp{-Y})
+#         """
+#         x = jnp.log(jnp.exp(y) - 1.0)
+#         logdet = 1 / (1 - jnp.exp(-y))
+#         return x, logdet
 
 
 def get_defaults() -> ConfigDict:
