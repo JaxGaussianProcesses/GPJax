@@ -15,7 +15,7 @@ from .config import get_defaults
 from .types import PRNGKeyType
 from .utils import merge_dictionaries
 
-Identity = dx.Lambda(lambda x: x)
+Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 
 
 ################################
@@ -246,15 +246,16 @@ def prior_checks(priors: dict) -> dict:
     """Run checks on th parameters' prior distributions. This checks that for Gaussian processes that are constructed with non-conjugate likelihoods, the prior distribution on the function's latent values is a unit Gaussian."""
     if "latent" in priors.keys():
         latent_prior = priors["latent"]
-        if latent_prior.name != "Normal":
-            warnings.warn(
-                f"A {latent_prior.name} distribution prior has been placed on"
-                " the latent function. It is strongly advised that a"
-                " unit-Gaussian prior is used."
-            )
+        if latent_prior is not None:
+            if latent_prior.name != "Normal":
+                warnings.warn(
+                    f"A {latent_prior.name} distribution prior has been placed on"
+                    " the latent function. It is strongly advised that a"
+                    " unit Gaussian prior is used."
+                )
         else:
-            if not latent_prior:
-                priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
+            warnings.warn("Placing unit Gaussian prior on latent function.")
+            priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
     else:
         priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
 
@@ -284,6 +285,6 @@ def stop_grad(param: tp.Dict, trainable: tp.Dict):
 
 def trainable_params(params: tp.Dict, trainables: tp.Dict) -> tp.Dict:
     """Stop the gradients flowing through parameters whose trainable status is False"""
-    return jax.tree_map(
+    return jax.tree_util.tree_map(
         lambda param, trainable: stop_grad(param, trainable), params, trainables
     )
