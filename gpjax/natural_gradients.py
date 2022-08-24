@@ -2,20 +2,13 @@ from copy import deepcopy
 from typing import Callable, Dict, Tuple
 
 import jax.numpy as jnp
-import jax.random as jr
 import jax.scipy as jsp
 from jax import value_and_grad
 from jaxtyping import f64
 
 from .config import get_defaults
 from .gps import AbstractPosterior
-from .parameters import (
-    build_identity,
-    build_trainables_false,
-    build_trainables_true,
-    trainable_params,
-    transform,
-)
+from .parameters import build_trainables, trainable_params, transform
 from .types import Dataset
 from .utils import I
 from .variational_families import (
@@ -105,9 +98,8 @@ def _expectation_elbo(
     svgp = StochasticVI(
         posterior=posterior, variational_family=expectation_vartiational_gaussian
     )
-    identity_transformation = build_identity(svgp._initialise_params(jr.PRNGKey(123)))
 
-    return svgp.elbo(train_data, identity_transformation, negative=True)
+    return svgp.elbo(train_data, transformations=None, negative=True)
 
 
 def _stop_gradients_nonmoments(params: Dict) -> Dict:
@@ -118,8 +110,8 @@ def _stop_gradients_nonmoments(params: Dict) -> Dict:
     Returns:
         Dict: A dictionary of parameters with stopped gradients.
     """
-    trainables = build_trainables_false(params)
-    moment_trainables = build_trainables_true(params["variational_family"]["moments"])
+    trainables = build_trainables(params, False)
+    moment_trainables = build_trainables(params["variational_family"]["moments"], True)
     trainables["variational_family"]["moments"] = moment_trainables
     params = trainable_params(params, trainables)
     return params
@@ -133,8 +125,8 @@ def _stop_gradients_moments(params: Dict) -> Dict:
     Returns:
         Dict: A dictionary of parameters with stopped gradients.
     """
-    trainables = build_trainables_true(params)
-    moment_trainables = build_trainables_false(params["variational_family"]["moments"])
+    trainables = build_trainables(params, True)
+    moment_trainables = build_trainables(params["variational_family"]["moments"], False)
     trainables["variational_family"]["moments"] = moment_trainables
     params = trainable_params(params, trainables)
     return params
@@ -193,8 +185,8 @@ def natural_gradients(
             def loss_fn(params: Dict, batch: Dataset) -> f64["1"]:
                 # Determine hyperparameters that should be trained.
                 trains = deepcopy(trainables)
-                trains["variational_family"]["moments"] = build_trainables_true(
-                    params["variational_family"]["moments"]
+                trains["variational_family"]["moments"] = build_trainables(
+                    params["variational_family"]["moments"], True
                 )
                 params = trainable_params(params, trains)
 

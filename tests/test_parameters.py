@@ -12,6 +12,8 @@ from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.parameters import (
     build_bijectors,
     constrain,
+    build_trainables,
+    build_transforms,
     copy_dict_structure,
     evaluate_priors,
     initialise,
