@@ -13,6 +13,7 @@ from tqdm.auto import tqdm
 from .parameters import ParameterState, constrain, trainable_params, unconstrain
 from .parameters import trainable_params, transform
 from .types import Dataset, PRNGKeyType
+from .variational_inference import StochasticVI
 
 
 @dataclass(frozen=True)
@@ -205,6 +206,80 @@ def fit_batches(
     params = constrain(params, bijectors)
     inf_state = InferenceState(params=params, history=history)
 
+    return inf_state
+
+
+def fit_natgrads(
+    stochastic_vi: StochasticVI,
+    params: Dict,
+    trainables: Dict,
+    transformations: Dict,
+    train_data: Dataset,
+    moment_optim,
+    hyper_optim,
+    key: PRNGKeyType,
+    batch_size: int,
+    n_iters: Optional[int] = 100,
+    log_rate: Optional[int] = 10,
+) -> Dict:
+    """This is a training loop for natural gradients. See Salimbeni et al. (2018) Natural Gradients in Practice: Non-Conjugate Variational Inference in Gaussian Process Models
+
+    We begin with an initalise natural gradient step to tighten the ELBO for hyperparameter optimisation. There after, each iteration comprises a hyperparameter gradient step followed by natural gradient step to avoid a stale posterior.
+
+    Args:
+        stochastic_vi (StochasticVI): The stochastic variational inference algorithm to be used for training.
+        params (Dict): The parameters for which we would like to minimise our objective function with.
+        trainables (Dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
+        transformations (Dict): The transformations to be applied to the parameters.
+        train_data (Dataset): The training dataset.
+        batch_size(int): The batch_size.
+        key (PRNGKeyType): The PRNG key for the mini-batch sampling.
+        n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
+        log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
+    Returns:
+        InferenceState: A dataclass comprising optimised parameters and training history.
+    """
+
+    hyper_state = hyper_optim.init(params)
+    moment_state = moment_optim.init(params)
+
+    nat_grads_fn, hyper_grads_fn = natural_gradients(
+        stochastic_vi, train_data, transformations
+    )
+
+    # Initial natural gradient step to improve bound for hyperparameters:
+    batch = get_batch(train_data, batch_size, key)
+    loss_val, loss_gradient = nat_grads_fn(params, trainables, batch)
+    updates, moment_state = moment_optim.update(loss_gradient, moment_state, params)
+    params = optax.apply_updates(params, updates)
+
+    keys = jax.random.split(key, n_iters)
+    iter_nums = jnp.arange(n_iters)
+
+    @progress_bar_scan(n_iters, log_rate)
+    def step(carry, iter_num__and__key):
+        iter_num, key = iter_num__and__key
+        params, hyper_state, moment_state = carry
+
+        batch = get_batch(train_data, batch_size, key)
+
+        # Hyper-parameters update:
+        loss_val, loss_gradient = hyper_grads_fn(params, trainables, batch)
+        updates, hyper_state = hyper_optim.update(loss_gradient, hyper_state, params)
+        params = optax.apply_updates(params, updates)
+
+        # Natural gradients update:
+        loss_val, loss_gradient = nat_grads_fn(params, trainables, batch)
+        updates, moment_state = moment_optim.update(loss_gradient, moment_state, params)
+        params = optax.apply_updates(params, updates)
+
+        carry = params, hyper_state, moment_state
+        return carry, loss_val
+
+    (params, _, _), history = jax.lax.scan(
+        step, (params, hyper_state, moment_state), (iter_nums, keys)
+    )
+    inf_state = InferenceState(params=params, history=history)
     return inf_state
 
 

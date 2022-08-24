@@ -5,7 +5,7 @@ config.update("jax_enable_x64", True)
 # Highlight any potentially unintended broadcasting rank promoting ops.
 # config.update("jax_numpy_rank_promotion", "warn")
 
-from .abstractions import fit, fit_batches
+from .abstractions import fit, fit_batches, fit_natgrads
 from .gps import Prior, construct_posterior
 from .kernels import (
     RBF,
@@ -23,10 +23,10 @@ from .parameters import constrain, copy_dict_structure, initialise, unconstrain
 from .types import Dataset
 from .variational_families import (
     CollapsedVariationalGaussian,
+    ExpectationVariationalGaussian,
+    NaturalVariationalGaussian,
     VariationalGaussian,
     WhitenedVariationalGaussian,
-    NaturalVariationalGaussian,
-    ExpectationVariationalGaussian,
 )
 from .variational_inference import CollapsedVI, StochasticVI
 

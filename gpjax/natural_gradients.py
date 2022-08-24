@@ -1,15 +1,12 @@
 from copy import deepcopy
-from typing import Callable, Dict, Optional, Tuple
+from typing import Callable, Dict, Tuple
 
-import jax
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
-import optax as ox
 from jax import value_and_grad
 from jaxtyping import f64
 
-from .abstractions import InferenceState, get_batch, progress_bar_scan
 from .config import get_defaults
 from .gps import AbstractPosterior
 from .parameters import (
@@ -19,7 +16,7 @@ from .parameters import (
     trainable_params,
     transform,
 )
-from .types import Dataset, PRNGKeyType
+from .types import Dataset
 from .utils import I
 from .variational_families import (
     AbstractVariationalFamily,
@@ -249,54 +246,3 @@ def natural_gradients(
         return value, dL_dhyper
 
     return nat_grads_fn, hyper_grads_fn
-
-
-def fit_natgrads(
-    stochastic_vi: StochasticVI,
-    params: Dict,
-    trainables: Dict,
-    transformations: Dict,
-    train_data: Dataset,
-    batch_size: int,
-    moment_optim,
-    hyper_optim,
-    key: PRNGKeyType,
-    n_iters: Optional[int] = 100,
-    log_rate: Optional[int] = 10,
-) -> Dict:
-
-    hyper_state = hyper_optim.init(params)
-    moment_state = moment_optim.init(params)
-
-    nat_grads_fn, hyper_grads_fn = natural_gradients(
-        stochastic_vi, train_data, transformations
-    )
-
-    keys = jax.random.split(key, n_iters)
-    iter_nums = jnp.arange(n_iters)
-
-    @progress_bar_scan(n_iters, log_rate)
-    def step(carry, iter_num__and__key):
-        iter_num, key = iter_num__and__key
-        params, hyper_state, moment_state = carry
-
-        batch = get_batch(train_data, batch_size, key)
-
-        # Hyper-parameters update:
-        loss_val, loss_gradient = hyper_grads_fn(params, trainables, batch)
-        updates, hyper_state = hyper_optim.update(loss_gradient, hyper_state, params)
-        params = ox.apply_updates(params, updates)
-
-        # Natural gradients update:
-        loss_val, loss_gradient = nat_grads_fn(params, trainables, batch)
-        updates, moment_state = moment_optim.update(loss_gradient, moment_state, params)
-        params = ox.apply_updates(params, updates)
-
-        carry = params, hyper_state, moment_state
-        return carry, loss_val
-
-    (params, _, _), history = jax.lax.scan(
-        step, (params, hyper_state, moment_state), (iter_nums, keys)
-    )
-    inf_state = InferenceState(params=params, history=history)
-    return inf_state
