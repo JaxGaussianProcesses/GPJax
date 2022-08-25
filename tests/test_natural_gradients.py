@@ -9,12 +9,25 @@ import gpjax as gpx
 from gpjax.abstractions import get_batch
 from gpjax.natural_gradients import (
     _expectation_elbo,
+    _rename_expectation_to_natural,
+    _rename_natural_to_expectation,
     natural_gradients,
     natural_to_expectation,
 )
 from gpjax.parameters import recursive_items
 
 key = jr.PRNGKey(123)
+
+
+def get_data_and_gp(n_datapoints):
+    x = jnp.linspace(-5.0, 5.0, n_datapoints).reshape(-1, 1)
+    y = jnp.sin(x) + jr.normal(key=jr.PRNGKey(123), shape=x.shape) * 0.1
+    D = gpx.Dataset(X=x, y=y)
+
+    p = gpx.Prior(kernel=gpx.RBF())
+    lik = gpx.Gaussian(num_datapoints=n_datapoints)
+    post = p * lik
+    return D, post, p
 
 
 @pytest.mark.parametrize("dim", [1, 2, 3])
@@ -28,37 +41,148 @@ def test_natural_to_expectation(dim):
         tp.Dict: A dictionary of Gaussian moments under the expectation parameterisation.
     """
 
-    natural_matrix = -0.5 * jnp.eye(dim)
-    natural_vector = jnp.zeros((dim, 1))
+    _, posterior, prior = get_data_and_gp(10)
 
-    natural_moments = {
-        "natural_matrix": natural_matrix,
-        "natural_vector": natural_vector,
-    }
-
-    expectation_moments = natural_to_expectation(natural_moments, jitter=1e-6)
-
-    assert "expectation_vector" in expectation_moments.keys()
-    assert "expectation_matrix" in expectation_moments.keys()
-    assert (
-        expectation_moments["expectation_vector"].shape
-        == natural_moments["natural_vector"].shape
-    )
-    assert (
-        expectation_moments["expectation_matrix"].shape
-        == natural_moments["natural_matrix"].shape
+    z = jnp.linspace(-5.0, 5.0, 5 * dim).reshape(-1, dim)
+    expectation_variational_family = (
+        gpx.variational_families.ExpectationVariationalGaussian(
+            prior=prior, inducing_inputs=z
+        )
     )
 
+    natural_variational_family = gpx.variational_families.NaturalVariationalGaussian(
+        prior=prior, inducing_inputs=z
+    )
 
-def get_data_and_gp(n_datapoints):
-    x = jnp.linspace(-5.0, 5.0, n_datapoints).reshape(-1, 1)
-    y = jnp.sin(x) + jr.normal(key=jr.PRNGKey(123), shape=x.shape) * 0.1
-    D = gpx.Dataset(X=x, y=y)
+    natural_svgp = gpx.StochasticVI(
+        posterior=posterior, variational_family=natural_variational_family
+    )
+    expectation_svgp = gpx.StochasticVI(
+        posterior=posterior, variational_family=expectation_variational_family
+    )
 
-    p = gpx.Prior(kernel=gpx.RBF())
-    lik = gpx.Gaussian(num_datapoints=n_datapoints)
-    post = p * lik
-    return D, post, p
+    key = jr.PRNGKey(123)
+    natural_params, *_ = gpx.initialise(natural_svgp, key).unpack()
+    expectation_params, *_ = gpx.initialise(expectation_svgp, key).unpack()
+
+    expectation_params_test = natural_to_expectation(natural_params, jitter=1e-6)
+
+    assert (
+        "expectation_vector"
+        in expectation_params_test["variational_family"]["moments"].keys()
+    )
+    assert (
+        "expectation_matrix"
+        in expectation_params_test["variational_family"]["moments"].keys()
+    )
+    assert (
+        expectation_params_test["variational_family"]["moments"][
+            "expectation_vector"
+        ].shape
+        == expectation_params["variational_family"]["moments"][
+            "expectation_vector"
+        ].shape
+    )
+    assert (
+        expectation_params_test["variational_family"]["moments"][
+            "expectation_matrix"
+        ].shape
+        == expectation_params["variational_family"]["moments"][
+            "expectation_matrix"
+        ].shape
+    )
+
+
+from copy import deepcopy
+
+
+def test_renaming():
+    """
+    Converts natural parameters to expectation parameters.
+    Args:
+        natural_moments: A dictionary of natural parameters.
+        jitter (float): A small value to prevent numerical instability.
+    Returns:
+        tp.Dict: A dictionary of Gaussian moments under the expectation parameterisation.
+    """
+
+    _, posterior, prior = get_data_and_gp(10)
+
+    z = jnp.linspace(-5.0, 5.0, 5).reshape(-1, 1)
+    expectation_variational_family = (
+        gpx.variational_families.ExpectationVariationalGaussian(
+            prior=prior, inducing_inputs=z
+        )
+    )
+
+    natural_variational_family = gpx.variational_families.NaturalVariationalGaussian(
+        prior=prior, inducing_inputs=z
+    )
+
+    natural_svgp = gpx.StochasticVI(
+        posterior=posterior, variational_family=natural_variational_family
+    )
+    expectation_svgp = gpx.StochasticVI(
+        posterior=posterior, variational_family=expectation_variational_family
+    )
+
+    key = jr.PRNGKey(123)
+    natural_params, *_ = gpx.initialise(natural_svgp, key).unpack()
+    expectation_params, *_ = gpx.initialise(expectation_svgp, key).unpack()
+
+    _nat = deepcopy(natural_params)
+    _exp = deepcopy(expectation_params)
+
+    rename_expectation_to_natural = _rename_expectation_to_natural(_exp)
+    rename_natural_to_expectation = _rename_natural_to_expectation(_nat)
+
+    # Check correct names are in the dictionaries:
+    assert (
+        "expectation_vector"
+        in rename_natural_to_expectation["variational_family"]["moments"].keys()
+    )
+    assert (
+        "expectation_matrix"
+        in rename_natural_to_expectation["variational_family"]["moments"].keys()
+    )
+    assert (
+        "natural_vector"
+        not in rename_natural_to_expectation["variational_family"]["moments"].keys()
+    )
+    assert (
+        "natural_matrix"
+        not in rename_natural_to_expectation["variational_family"]["moments"].keys()
+    )
+
+    assert (
+        "natural_vector"
+        in rename_expectation_to_natural["variational_family"]["moments"].keys()
+    )
+    assert (
+        "natural_matrix"
+        in rename_expectation_to_natural["variational_family"]["moments"].keys()
+    )
+    assert (
+        "expectation_vector"
+        not in rename_expectation_to_natural["variational_family"]["moments"].keys()
+    )
+    assert (
+        "expectation_matrix"
+        not in rename_expectation_to_natural["variational_family"]["moments"].keys()
+    )
+
+    # Check the values are unchanged:
+    for v1, v2 in zip(
+        rename_natural_to_expectation["variational_family"]["moments"].values(),
+        natural_params["variational_family"]["moments"].values(),
+    ):
+        assert jnp.all(v1 == v2)
+
+    for v1, v2 in zip(
+        rename_expectation_to_natural["variational_family"]["moments"].values(),
+        expectation_params["variational_family"]["moments"].values(),
+    ):
+        assert jnp.all(v1 == v2)
 
 
 @pytest.mark.parametrize("jit_fns", [True, False])
@@ -94,14 +218,6 @@ def test_expectation_elbo(jit_fns):
     grads = jax.grad(elbo_fn, argnums=0)(params, D)
     assert isinstance(grads, tp.Dict)
     assert len(grads) == len(params)
-
-
-# def test_stop_gradients_nonmoments():
-#     pass
-
-
-# def test_stop_gradients_moments():
-#     pass
 
 
 def test_natural_gradients():

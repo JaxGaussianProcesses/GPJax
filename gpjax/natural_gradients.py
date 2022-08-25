@@ -21,9 +21,7 @@ from .variational_inference import StochasticVI
 DEFAULT_JITTER = get_defaults()["jitter"]
 
 
-def natural_to_expectation(
-    natural_moments: Dict, jitter: float = DEFAULT_JITTER
-) -> Dict:
+def natural_to_expectation(params: Dict, jitter: float = DEFAULT_JITTER) -> Dict:
     """
     Translate natural parameters to expectation parameters.
 
@@ -40,14 +38,14 @@ def natural_to_expectation(
     Now from here, using μ and S found from θ, we compute η as η₁ = μ, and  η₂ = S + μ μᵀ.
 
     Args:
-        natural_moments: A dictionary of natural parameters.
+        params: A dictionary of variational Gaussian parameters under the natural parameterisation.
         jitter (float): A small value to prevent numerical instability.
     Returns:
         Dict: A dictionary of Gaussian moments under the expectation parameterisation.
     """
 
-    natural_matrix = natural_moments["natural_matrix"]
-    natural_vector = natural_moments["natural_vector"]
+    natural_matrix = params["variational_family"]["moments"]["natural_matrix"]
+    natural_vector = params["variational_family"]["moments"]["natural_vector"]
     m = natural_vector.shape[0]
 
     # S⁻¹ = -2θ₂
@@ -72,10 +70,12 @@ def natural_to_expectation(
     # η₂ = S + μ μᵀ
     expectation_matrix = S + jnp.matmul(mu, mu.T)
 
-    return {
+    params["variational_family"]["moments"] = {
         "expectation_vector": expectation_vector,
         "expectation_matrix": expectation_matrix,
     }
+
+    return params
 
 
 def _expectation_elbo(
@@ -132,6 +132,28 @@ def _stop_gradients_moments(params: Dict) -> Dict:
     return params
 
 
+# TODO: Write unit test:
+def _rename_expectation_to_natural(params: Dict) -> Dict:
+    """This function renames the gradient components (that have expectation parameterisation keys) to match the natural parameterisation pytree."""
+    params["variational_family"]["moments"] = {
+        "natural_vector": params["variational_family"]["moments"]["expectation_vector"],
+        "natural_matrix": params["variational_family"]["moments"]["expectation_matrix"],
+    }
+
+    return params
+
+
+# TODO: Write unit test:
+def _rename_natural_to_expectation(params: Dict) -> Dict:
+    """This function renames the gradient components (that have natural parameterisation keys) to match the expectation parameterisation pytree."""
+    params["variational_family"]["moments"] = {
+        "expectation_vector": params["variational_family"]["moments"]["natural_vector"],
+        "expectation_matrix": params["variational_family"]["moments"]["natural_matrix"],
+    }
+
+    return params
+
+
 def natural_gradients(
     stochastic_vi: StochasticVI,
     train_data: Dataset,
@@ -171,42 +193,23 @@ def natural_gradients(
             # Transform parameters to constrained space.
             params = transform(params, transformations)
 
-            # Get natural moments θ.
-            natural_moments = params["variational_family"]["moments"]
-
-            # Get expectation moments η.
-            expectation_moments = natural_to_expectation(natural_moments)
-
-            # Full params with expectation moments.
-            expectation_params = deepcopy(params)
-            expectation_params["variational_family"]["moments"] = expectation_moments
+            # Convert natural parameterisation θ to the expectation parametersation η.
+            expectation_params = natural_to_expectation(params)
 
             # Compute gradient ∂L/∂η:
             def loss_fn(params: Dict, batch: Dataset) -> f64["1"]:
-                # Determine hyperparameters that should be trained.
-                trains = deepcopy(trainables)
-                trains["variational_family"]["moments"] = build_trainables(
-                    params["variational_family"]["moments"], True
+                # Stop gradients for non-trainable and non-moment parameters.
+                expectation_trainables = _rename_natural_to_expectation(
+                    deepcopy(trainables)
                 )
-                params = trainable_params(params, trains)
-
-                # Stop gradients for non-moment parameters.
+                params = trainable_params(params, expectation_trainables)
                 params = _stop_gradients_nonmoments(params)
 
                 return expectation_elbo(params, batch)
 
             value, dL_dexp = value_and_grad(loss_fn)(expectation_params, batch)
 
-            # This is a renaming of the gradient components to match the natural parameterisation pytree.
-            nat_grad = dL_dexp
-            nat_grad["variational_family"]["moments"] = {
-                "natural_vector": dL_dexp["variational_family"]["moments"][
-                    "expectation_vector"
-                ],
-                "natural_matrix": dL_dexp["variational_family"]["moments"][
-                    "expectation_matrix"
-                ],
-            }
+            nat_grad = _rename_expectation_to_natural(dL_dexp)
 
             return value, nat_grad
 
@@ -225,10 +228,8 @@ def natural_gradients(
         """
 
         def loss_fn(params: Dict, batch: Dataset) -> f64["1"]:
-            # Determine hyperparameters that should be trained.
+            # Stop gradients for non-trainable and moment parameters.
             params = trainable_params(params, trainables)
-
-            # Stop gradients for the moment parameters.
             params = _stop_gradients_moments(params)
 
             return xi_elbo(params, batch)

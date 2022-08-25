@@ -224,7 +224,7 @@ def fit_natgrads(
 ) -> Dict:
     """This is a training loop for natural gradients. See Salimbeni et al. (2018) Natural Gradients in Practice: Non-Conjugate Variational Inference in Gaussian Process Models
 
-    We begin with an initalise natural gradient step to tighten the ELBO for hyperparameter optimisation. There after, each iteration comprises a hyperparameter gradient step followed by natural gradient step to avoid a stale posterior.
+    Each iteration comprises a hyperparameter gradient step followed by natural gradient step to avoid a stale posterior.
 
     Args:
         stochastic_vi (StochasticVI): The stochastic variational inference algorithm to be used for training.
@@ -246,12 +246,6 @@ def fit_natgrads(
     nat_grads_fn, hyper_grads_fn = natural_gradients(
         stochastic_vi, train_data, transformations
     )
-
-    # Initial natural gradient step to improve bound for hyperparameters:
-    batch = get_batch(train_data, batch_size, key)
-    loss_val, loss_gradient = nat_grads_fn(params, trainables, batch)
-    updates, moment_state = moment_optim.update(loss_gradient, moment_state, params)
-    params = optax.apply_updates(params, updates)
 
     keys = jax.random.split(key, n_iters)
     iter_nums = jnp.arange(n_iters)
