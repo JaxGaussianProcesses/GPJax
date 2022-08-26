@@ -177,10 +177,10 @@ class ConjugatePosterior(AbstractPosterior):
             # L⁻¹ Kxt
             L_inv_Kxt = jsp.linalg.solve_triangular(L, Kxt, lower=True)
 
-            # μt  +  Ktx (Kzz + Iσ²)⁻¹ (y  -  μx)
+            # μt  +  Ktx (Kxx + Iσ²)⁻¹ (y  -  μx)
             mean = μt + jnp.matmul(L_inv_Kxt.T, w)
 
-            # Ktt  -  Ktz (Kzz + Iσ²)⁻¹ Kxt  [recall (Kzz + Iσ²)⁻¹ = (LLᵀ)⁻¹ =  L⁻ᵀL⁻¹]
+            # Ktt  -  Ktx (Kxx + Iσ²)⁻¹ Kxt  [recall (Kxx + Iσ²)⁻¹ = (LLᵀ)⁻¹ =  L⁻ᵀL⁻¹]
             covariance = Ktt - jnp.matmul(L_inv_Kxt.T, L_inv_Kxt)
             covariance += I(n_test) * self.jitter
 

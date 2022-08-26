@@ -164,7 +164,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
     """The whitened variational Gaussian family of probability distributions.
 
     The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
-    and the distribution over the inducing inputs is q(u) = N(Lz μ + mz, Lz S). We parameterise this over μ and sqrt with S = sqrt sqrtᵀ.
+    and the distribution over the inducing inputs is q(u) = N(Lz μ + mz, Lz S Lzᵀ). We parameterise this over μ and sqrt with S = sqrt sqrtᵀ.
 
     """
 
@@ -245,7 +245,14 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
 @dataclass
 class NaturalVariationalGaussian(AbstractVariationalGaussian):
-    """The natural variational Gaussian family of probability distributions."""
+    """The natural variational Gaussian family of probability distributions.
+
+    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
+    and the distribution over the inducing inputs is q(u) = N(μ, S). Expressing the variational distribution, in the form of the
+    exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the natural paramerisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2), to perform
+    model inference, where T(u) = [u, uuᵀ] are the sufficient statistics.
+
+    """
 
     name: str = "Natural Gaussian"
 
@@ -269,6 +276,10 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
     def prior_kl(self, params: Dict) -> f64["1"]:
         """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
+
+        For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],
+
+        with μ and S computed from the natural paramerisation θ = (S⁻¹μ, -S⁻¹/2).
 
         Args:
             params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
@@ -303,7 +314,13 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         return qu.kl_divergence(pu)
 
     def predict(self, params: Dict) -> Callable[[f64["N D"]], dx.Distribution]:
-        """Compute the predictive distribution of the GP at the test inputs.
+        """Compute the predictive distribution of the GP at the test inputs t.
+
+        This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
+
+             N[f(t); μt + Ktz Kzz⁻¹ (μ - μz),  Ktt - Ktz Kzz⁻¹ Kzt + Ktz Kzz⁻¹ S Kzz⁻¹ Kzt ],
+
+        with μ and S computed from the natural paramerisation θ = (S⁻¹μ, -S⁻¹/2).
 
         Args:
             params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
@@ -371,7 +388,14 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
 @dataclass
 class ExpectationVariationalGaussian(AbstractVariationalGaussian):
-    """The variational Gaussian family of probability distributions."""
+    """The natural variational Gaussian family of probability distributions.
+
+    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
+    and the distribution over the inducing inputs is q(u) = N(μ, S). Expressing the variational distribution, in the form of the
+    exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the natural paramerisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2) and
+    sufficient stastics T(u) = [u, uuᵀ]. The expectation parameters are given by η = ∫ T(u) q(u) du. This gives a parameterisation,
+    η = (η₁, η₁) = (μ, S + uuᵀ) to perform model inference over.
+    """
 
     name: str = "Expectation Gaussian"
 
@@ -398,6 +422,10 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
     def prior_kl(self, params: Dict) -> f64["1"]:
         """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
 
+        For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],
+
+        with μ and S computed from the expectation paramerisation η = (μ, S + uuᵀ).
+
         Args:
             params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
 
@@ -413,9 +441,14 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
 
+        # μ = η₁
         mu = expectation_vector
-        S = expectation_matrix - jnp.matmul(mu, mu.T)
+
+        # S = η₂ - η₁ η₁ᵀ
+        S = expectation_matrix - jnp.outer(mu, mu)
         S += I(m) * self.jitter
+
+        # S = sqrt sqrtᵀ
         sqrt = jnp.linalg.cholesky(S)
 
         μz = self.prior.mean_function(z, params["mean_function"])
@@ -429,7 +462,13 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         return qu.kl_divergence(pu)
 
     def predict(self, params: Dict) -> Callable[[f64["N D"]], dx.Distribution]:
-        """Compute the predictive distribution of the GP at the test inputs.
+        """Compute the predictive distribution of the GP at the test inputs t.
+
+        This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
+
+             N[f(t); μt + Ktz Kzz⁻¹ (μ - μz),  Ktt - Ktz Kzz⁻¹ Kzt + Ktz Kzz⁻¹ S Kzz⁻¹ Kzt ],
+
+        with μ and S computed from the expectation paramerisation η = (μ, S + uuᵀ).
 
         Args:
             params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
