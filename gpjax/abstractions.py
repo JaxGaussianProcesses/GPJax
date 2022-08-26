@@ -244,7 +244,7 @@ def fit_natgrads(
     moment_state = moment_optim.init(params)
 
     nat_grads_fn, hyper_grads_fn = natural_gradients(
-        stochastic_vi, train_data, transformations
+        stochastic_vi, train_data, transformations, trainables
     )
 
     keys = jax.random.split(key, n_iters)
@@ -258,12 +258,12 @@ def fit_natgrads(
         batch = get_batch(train_data, batch_size, key)
 
         # Hyper-parameters update:
-        loss_val, loss_gradient = hyper_grads_fn(params, trainables, batch)
+        loss_val, loss_gradient = hyper_grads_fn(params, batch)
         updates, hyper_state = hyper_optim.update(loss_gradient, hyper_state, params)
         params = optax.apply_updates(params, updates)
 
         # Natural gradients update:
-        loss_val, loss_gradient = nat_grads_fn(params, trainables, batch)
+        loss_val, loss_gradient = nat_grads_fn(params, batch)
         updates, moment_state = moment_optim.update(loss_gradient, moment_state, params)
         params = optax.apply_updates(params, updates)
 

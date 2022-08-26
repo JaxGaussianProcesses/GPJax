@@ -239,13 +239,13 @@ def test_natural_gradients():
 
     batch = get_batch(D, batch_size=10, key=jr.PRNGKey(42))
 
-    nat_grads_fn, hyper_grads_fn = natural_gradients(svgp, D, constrainers)
+    nat_grads_fn, hyper_grads_fn = natural_gradients(svgp, D, constrainers, trainables)
 
     assert isinstance(nat_grads_fn, tp.Callable)
     assert isinstance(hyper_grads_fn, tp.Callable)
 
-    val, nat_grads = nat_grads_fn(params, trainables, batch)
-    val, hyper_grads = hyper_grads_fn(params, trainables, batch)
+    val, nat_grads = nat_grads_fn(params, batch)
+    val, hyper_grads = hyper_grads_fn(params, batch)
 
     assert isinstance(val, jnp.ndarray)
     assert isinstance(nat_grads, tp.Dict)

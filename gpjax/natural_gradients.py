@@ -2,6 +2,7 @@ from copy import deepcopy
 from typing import Callable, Dict, Tuple
 
 import jax.numpy as jnp
+import jax.random as jr
 import jax.scipy as jsp
 from jax import value_and_grad
 from jaxtyping import f64
@@ -102,37 +103,6 @@ def _expectation_elbo(
     return svgp.elbo(train_data, transformations=None, negative=True)
 
 
-def _stop_gradients_nonmoments(params: Dict) -> Dict:
-    """
-    Stops gradients for non-moment parameters.
-    Args:
-        params: A dictionary of parameters.
-    Returns:
-        Dict: A dictionary of parameters with stopped gradients.
-    """
-    trainables = build_trainables(params, False)
-    moment_trainables = build_trainables(params["variational_family"]["moments"], True)
-    trainables["variational_family"]["moments"] = moment_trainables
-    params = trainable_params(params, trainables)
-    return params
-
-
-def _stop_gradients_moments(params: Dict) -> Dict:
-    """
-    Stops gradients for moment parameters.
-    Args:
-        params: A dictionary of parameters.
-    Returns:
-        Dict: A dictionary of parameters with stopped gradients.
-    """
-    trainables = build_trainables(params, True)
-    moment_trainables = build_trainables(params["variational_family"]["moments"], False)
-    trainables["variational_family"]["moments"] = moment_trainables
-    params = trainable_params(params, trainables)
-    return params
-
-
-# TODO: Write unit test:
 def _rename_expectation_to_natural(params: Dict) -> Dict:
     """This function renames the gradient components (that have expectation parameterisation keys) to match the natural parameterisation pytree."""
     params["variational_family"]["moments"] = {
@@ -143,7 +113,6 @@ def _rename_expectation_to_natural(params: Dict) -> Dict:
     return params
 
 
-# TODO: Write unit test:
 def _rename_natural_to_expectation(params: Dict) -> Dict:
     """This function renames the gradient components (that have natural parameterisation keys) to match the expectation parameterisation pytree."""
     params["variational_family"]["moments"] = {
@@ -158,6 +127,7 @@ def natural_gradients(
     stochastic_vi: StochasticVI,
     train_data: Dataset,
     transformations: Dict,
+    trainables: Dict,
 ) -> Tuple[Callable[[Dict, Dataset], Dict]]:
     """
     Computes the gradient with respect to the natural parameters. Currently only implemented for the natural variational Gaussian family.
@@ -178,9 +148,22 @@ def natural_gradients(
     # The ELBO under the expectation parameterisation, L(η).
     expectation_elbo = _expectation_elbo(posterior, variational_family, train_data)
 
+    # Stop nonment params:
+    expectation_trainables = _rename_natural_to_expectation(deepcopy(trainables))
+    moment_trainables = build_trainables(expectation_trainables, False)
+    moment_trainables["variational_family"]["moments"] = expectation_trainables[
+        "variational_family"
+    ]["moments"]
+
+    # Stop moment params:
+    hyper_trainables = deepcopy(trainables)
+    hyper_trainables["variational_family"]["moments"] = build_trainables(
+        trainables["variational_family"]["moments"], False
+    )
+
     if isinstance(variational_family, NaturalVariationalGaussian):
 
-        def nat_grads_fn(params: Dict, trainables: Dict, batch: Dataset) -> Dict:
+        def nat_grads_fn(params: Dict, batch: Dataset) -> Dict:
             """
             Computes the natural gradients of the ELBO.
             Args:
@@ -199,11 +182,7 @@ def natural_gradients(
             # Compute gradient ∂L/∂η:
             def loss_fn(params: Dict, batch: Dataset) -> f64["1"]:
                 # Stop gradients for non-trainable and non-moment parameters.
-                expectation_trainables = _rename_natural_to_expectation(
-                    deepcopy(trainables)
-                )
-                params = trainable_params(params, expectation_trainables)
-                params = _stop_gradients_nonmoments(params)
+                params = trainable_params(params, moment_trainables)
 
                 return expectation_elbo(params, batch)
 
@@ -216,7 +195,7 @@ def natural_gradients(
     else:
         raise NotImplementedError
 
-    def hyper_grads_fn(params: Dict, trainables: Dict, batch: Dataset) -> Dict:
+    def hyper_grads_fn(params: Dict, batch: Dataset) -> Dict:
         """
         Computes the hyperparameter gradients of the ELBO.
         Args:
@@ -229,8 +208,7 @@ def natural_gradients(
 
         def loss_fn(params: Dict, batch: Dataset) -> f64["1"]:
             # Stop gradients for non-trainable and moment parameters.
-            params = trainable_params(params, trainables)
-            params = _stop_gradients_moments(params)
+            params = trainable_params(params, hyper_trainables)
 
             return xi_elbo(params, batch)
 
