@@ -1,6 +1,7 @@
 sphinx-book-theme
 myst-parser
 myst-nb
+linkify-it-py
 jinja2
 nbsphinx>=0.8.0
 nb-black==1.0.7
