@@ -1,5 +1,7 @@
-furo
-jinja2<3.1
+sphinx-book-theme
+myst-parser
+myst-nb
+jinja2
 nbsphinx>=0.8.0
 nb-black==1.0.7
 matplotlib==3.3.3
