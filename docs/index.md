@@ -30,10 +30,10 @@ For comparison, the corresponding model could be written as
 
 $$
 \begin{align}
-k(x, x') & = \sigma^2\exp\left(-\frac{\lVert x-x'\rVert_2^2}{2\ell^2}\right)\\
-p(f) & = \mathcal{GP}(\mathbf{0}, k) \\
-p(y\,|\, f) & = \mathcal{N}(y\,|\, f, \sigma_n^2) \\
-p(f \,|\, y) & \propto p(f)p(y\,|\, f)\,.
+k(\cdot, \cdot') & = \sigma^2\exp\left(-\frac{\lVert \cdot- \cdot'\rVert_2^2}{2\ell^2}\right)\\
+p(f(\cdot)) & = \mathcal{GP}(\mathbf{0}, k(\cdot, \cdot')) \\
+p(y\,|\, f(\cdot)) & = \mathcal{N}(y\,|\, f(\cdot), \sigma_n^2) \\
+p(f(\cdot) \,|\, y) & \propto p(f(\cdot))p(y\,|\, f(\cdot))\,.
 \end{align}
 $$
 

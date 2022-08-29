@@ -8,13 +8,13 @@ These guidelines help explain how you can contribute to the library
 There are 4 main ways of contributing to the library (in descending
 order of difficulty or scope):
 
--   Adding new or improved functionality to the existing codebase
--   Fixing outstanding issues (bugs) with the existing codebase. They
-    range from low-level software bugs to higher-level design problems.
--   Contributing or improving the
-    [docs](https://github.com/thomaspinder/GPJax/tree/master/docs) or
-    [examples](https://github.com/thomaspinder/GPJax/tree/master/docs/nbs).
--   Submitting issues related to bugs or desired enhancements
+- Adding new or improved functionality to the existing codebase
+- Fixing outstanding issues (bugs) with the existing codebase. They
+  range from low-level software bugs to higher-level design problems.
+- Contributing or improving the
+  [docs](https://github.com/thomaspinder/GPJax/tree/master/docs) or
+  [examples](https://github.com/thomaspinder/GPJax/tree/master/docs/nbs).
+- Submitting issues related to bugs or desired enhancements
 
 # Code of conduct
 
@@ -50,7 +50,7 @@ Steps:
 2.  Clone your fork of the GPJax repo from your GitHub account to your
     local disk, and add the base repository as a remote:
 
-    ``` {.bash}
+    ```bash
     $ git clone git@github.com:<your GitHub handle>/GPJax.git
     $ cd GPJax
     $ git remote add upstream git@github.com:GPJax.git
@@ -58,7 +58,7 @@ Steps:
 
 3.  Create a `feature` branch to hold your development changes:
 
-    ``` {.bash}
+    ```bash
     $ git checkout -b my-feature
     ```
 
@@ -71,7 +71,7 @@ Steps:
     environment](https://docs.python-guide.org/dev/virtualenvs/) for
     development. Once the virtual environment is activated, run:
 
-    ``` {.bash}
+    ```bash
     $ pip install -e .
     $ pip install -r requirements-dev.txt
     ```
@@ -79,7 +79,7 @@ Steps:
 5.  Install the pre-commit hooks. Please **ensure you do this before
     commiting any files**. This can be done by executing the following:
 
-    ``` {.bash}
+    ```bash
     $ pre-commit install
     ```
 
@@ -89,7 +89,7 @@ Steps:
 6.  Develop the feature on your feature branch. Add changed files using
     `git add` and then `git commit` files:
 
-    ``` {.bash}
+    ```bash
     $ git add modified_files
     $ git commit
     ```
@@ -98,14 +98,14 @@ Steps:
     to sync with the base repository in case there have been any
     changes:
 
-    ``` {.bash}
+    ```bash
     $ git fetch upstream
     $ git rebase upstream/main
     ```
 
     Then push the changes to your GitHub account with:
 
-    ``` {.bash}
+    ```bash
     $ git push -u origin my-feature
     ```
 
@@ -118,29 +118,29 @@ Steps:
 We recommended that your contribution complies with the following
 guidelines before you submit a pull request:
 
--   If your pull request addresses an issue, please use the pull request
-    title to describe the issue and mention the issue number in the pull
-    request description. This will make sure a link back to the original
-    issue is created.
+- If your pull request addresses an issue, please use the pull request
+  title to describe the issue and mention the issue number in the pull
+  request description. This will make sure a link back to the original
+  issue is created.
 
--   All public methods must have informative docstrings
+- All public methods must have informative docstrings
 
--   Please prefix the title of incomplete contributions with `[WIP]` (to
-    indicate a work in progress). WIPs may be useful to (1) indicate you
-    are working on something to avoid duplicated work, (2) request broad
-    review of functionality or API, or (3) seek collaborators.
+- Please prefix the title of incomplete contributions with `[WIP]` (to
+  indicate a work in progress). WIPs may be useful to (1) indicate you
+  are working on something to avoid duplicated work, (2) request broad
+  review of functionality or API, or (3) seek collaborators.
 
--   All other tests pass when everything is rebuilt from scratch.
+- All other tests pass when everything is rebuilt from scratch.
 
--   Documentation and high-coverage tests are necessary for enhancements
-    to be accepted.
+- Documentation and high-coverage tests are necessary for enhancements
+  to be accepted.
 
--   Code with good test, check with:
+- Code with good test, check with:
 
-    ``` {.bash}
-    $ pip install -r requirements-dev.txt
-    $ pytest tests --cov=./ --cov-report=html
-    ```
+  ```bash
+  $ pip install -r requirements-dev.txt
+  $ pytest tests --cov=./ --cov-report=html
+  ```
 
 This guide was derived from [PyMC's guide to
 contributing](https://github.com/pymc-devs/pymc/blob/main/CONTRIBUTING.md)
