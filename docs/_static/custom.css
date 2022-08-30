@@ -1,0 +1,9 @@
+@import "sphinx-book-theme.css";
+
+a {
+    color: #B5121B
+}
+
+.content-container a {
+    color: #B5121B
+}

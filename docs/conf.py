@@ -76,6 +76,24 @@ extensions = [
     "sphinx_copybutton",
     "sphinxcontrib.bibtex",
     "sphinxext.opengraph",
+    "myst_parser",
+]
+
+# MyST Config
+myst_enable_extensions = [
+    "amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "linkify",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
 ]
 
 
@@ -154,23 +172,34 @@ autodoc_default_options = {
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "furo"
+# html_theme = "furo"
+html_theme = "sphinx_book_theme"
 html_logo = "_static/gpjax_logo.svg"
 html_favicon = "_static/gpjax_logo.svg"
-html_title = f"v{version}"
 html_theme_options = {
-    "light_css_variables": {
-        "color-brand-primary": "#B5121B",
-        "color-brand-content": "#CC3333",
-        "color-admonition-background": "orange",
-        "source_repository": "https://github.com/thomaspinder/GPJax/",
-        "source_branch": "master",
-        "source_directory": "docs/",
-    },
+    "logo_only": True,
+    "show_toc_level": 2,
+    "repository_url": "https://github.com/thomaspinder/GPJax/",
+    "use_repository_button": True,
+    "use_sidenotes": True,  # Turns footnotes into sidenotes - https://sphinx-book-theme.readthedocs.io/en/stable/content-blocks.html
 }
+# html_title = f"v{version}"
+# html_theme_options = {
+#     "light_css_variables": {
+#         "color-brand-primary": "#B5121B",
+#         "color-brand-content": "#CC3333",
+#         "color-admonition-background": "orange",
+#         "source_repository": "https://github.com/thomaspinder/GPJax/",
+#         "source_branch": "master",
+#         "source_directory": "docs/",
+#     },
+# }
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ["_static"]
+
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
