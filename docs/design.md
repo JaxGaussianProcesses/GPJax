@@ -2,8 +2,7 @@
 
 GPJax is designed to be a Gaussian process package that provides an
 accurate representation of the underlying maths. Variable names are
-designed to closely, if not exactly, match the notation in
-<strong data-cite="rasmussen2006gaussian"></strong>.
+designed to closely, if not exactly, match the notation in {cite}`rasmussen2006gaussian`.
 We here list the notation used in GPJax with its corresponding mathematical quantity.
 
 ## Gaussian process notation
