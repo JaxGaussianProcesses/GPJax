@@ -4,8 +4,9 @@ import optax
 import pytest
 
 import gpjax as gpx
-from gpjax import RBF, Dataset, Gaussian, Prior, initialise, transform
+from gpjax import RBF, Dataset, Gaussian, Prior, initialise
 from gpjax.abstractions import InferenceState, fit, fit_batches, get_batch
+from gpjax.parameters import build_bijectors
 
 
 @pytest.mark.parametrize("n_iters", [10])
@@ -16,13 +17,12 @@ def test_fit(n_iters, n):
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
     D = Dataset(X=x, y=y)
     p = Prior(kernel=RBF()) * Gaussian(num_datapoints=n)
-    params, trainable_status, constrainer, unconstrainer = initialise(p, key).unpack()
-    mll = p.marginal_log_likelihood(D, constrainer, negative=True)
+    params, trainables, bijectors = initialise(p, key).unpack()
+    mll = p.marginal_log_likelihood(D, negative=True)
     pre_mll_val = mll(params)
     optimiser = optax.adam(learning_rate=0.1)
-    inference_state = fit(mll, params, trainable_status, optimiser, n_iters)
+    inference_state = fit(mll, params, trainables, bijectors, optimiser, n_iters)
     optimised_params, history = inference_state.params, inference_state.history
-    optimised_params = transform(optimised_params, constrainer)
     assert isinstance(inference_state, InferenceState)
     assert isinstance(optimised_params, dict)
     assert mll(optimised_params) < pre_mll_val
@@ -33,9 +33,10 @@ def test_fit(n_iters, n):
 def test_stop_grads():
     params = {"x": jnp.array(3.0), "y": jnp.array(4.0)}
     trainables = {"x": True, "y": False}
+    bijectors = build_bijectors(params)
     loss_fn = lambda params: params["x"] ** 2 + params["y"] ** 2
     optimiser = optax.adam(learning_rate=0.1)
-    inference_state = fit(loss_fn, params, trainables, optimiser, n_iters=1)
+    inference_state = fit(loss_fn, params, trainables, bijectors, optimiser, n_iters=1)
     learned_params = inference_state.params
     assert isinstance(inference_state, InferenceState)
     assert learned_params["y"] == params["y"]
@@ -58,23 +59,22 @@ def test_batch_fitting(n_iters, nb, ndata):
     q = gpx.VariationalGaussian(prior=prior, inducing_inputs=z)
 
     svgp = gpx.StochasticVI(posterior=p, variational_family=q)
-    params, trainable_status, constrainer, unconstrainer = initialise(
-        svgp, key
-    ).unpack()
-    params = gpx.transform(params, unconstrainer)
-    objective = svgp.elbo(D, constrainer)
+    params, trainables, bijectors = initialise(svgp, key).unpack()
+    objective = svgp.elbo(D)
+
+    pre_mll_val = objective(params, D)
 
     D = Dataset(X=x, y=y)
 
     optimiser = optax.adam(learning_rate=0.1)
     key = jr.PRNGKey(42)
     inference_state = fit_batches(
-        objective, params, trainable_status, D, optimiser, key, nb, n_iters
+        objective, params, trainables, bijectors, D, optimiser, key, nb, n_iters
     )
     optimised_params, history = inference_state.params, inference_state.history
-    optimised_params = transform(optimised_params, constrainer)
     assert isinstance(inference_state, InferenceState)
     assert isinstance(optimised_params, dict)
+    assert objective(optimised_params, D) < pre_mll_val
     assert isinstance(history, jnp.ndarray)
     assert history.shape[0] == n_iters
 

@@ -16,7 +16,7 @@ def test_shape(meanf, dim):
     x = jnp.linspace(-1.0, 1.0, num=10).reshape(-1, 1)
     if dim > 1:
         x = jnp.hstack([x] * dim)
-    params, _, _, _ = initialise(meanf, key).unpack()
+    params, _, _ = initialise(meanf, key).unpack()
     mu = meanf(x, params)
     assert mu.shape[0] == x.shape[0]
     assert mu.shape[1] == dim
@@ -25,5 +25,5 @@ def test_shape(meanf, dim):
 @pytest.mark.parametrize("meanf", [Zero, Constant])
 def test_initialisers(meanf):
     key = jr.PRNGKey(123)
-    params, _, _, _ = initialise(meanf(), key).unpack()
+    params, _, _ = initialise(meanf(), key).unpack()
     assert isinstance(params, tp.Dict)

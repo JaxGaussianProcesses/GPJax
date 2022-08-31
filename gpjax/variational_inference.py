@@ -10,7 +10,6 @@ from jaxtyping import Array, Float
 from .gps import AbstractPosterior
 from .kernels import cross_covariance, diagonal, gram
 from .likelihoods import Gaussian
-from .parameters import transform
 from .quadrature import gauss_hermite_quadrature
 from .types import Dataset
 from .utils import I, concat_dictionaries
@@ -41,13 +40,12 @@ class AbstractVariationalInference:
 
     @abc.abstractmethod
     def elbo(
-        self, train_data: Dataset, transformations: Dict
+        self, train_data: Dataset,
     ) -> Callable[[Dict], Float[Array, "1"]]:
         """Placeholder method for computing the evidence lower bound function (ELBO), given a training dataset and a set of transformations that map each parameter onto the entire real line.
 
         Args:
             train_data (Dataset): The training dataset for which the ELBO is to be computed.
-            transformations (Dict): A set of functions that unconstrain each parameter.
 
         Returns:
             Callable[[Array], Array]: A function that computes the ELBO given a set of parameters.
@@ -65,13 +63,12 @@ class StochasticVI(AbstractVariationalInference):
         self.num_inducing = self.variational_family.num_inducing
 
     def elbo(
-        self, train_data: Dataset, transformations: Dict, negative: bool = False
+        self, train_data: Dataset, negative: bool = False
     ) -> Callable[[Float[Array, "N D"]], Float[Array, "1"]]:
         """Compute the evidence lower bound under this model. In short, this requires evaluating the expectation of the model's log-likelihood under the variational approximation. To this, we sum the KL divergence from the variational posterior to the prior. When batching occurs, the result is scaled by the batch size relative to the full dataset size.
 
         Args:
             train_data (Dataset): The training data for which we should maximise the ELBO with respect to.
-            transformations (Dict): The transformation set that unconstrains each parameter.
             negative (bool, optional): Whether or not the resultant elbo function should be negative. For gradient descent where we minimise our objective function this argument should be true as minimisation of the negative corresponds to maximisation of the ELBO. Defaults to False.
 
         Returns:
@@ -80,8 +77,6 @@ class StochasticVI(AbstractVariationalInference):
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
 
         def elbo_fn(params: Dict, batch: Dataset) -> Float[Array, "1"]:
-            params = transform(params, transformations)
-
             # KL[q(f(·)) || p(f(·))]
             kl = self.variational_family.prior_kl(params)
 
@@ -142,13 +137,12 @@ class CollapsedVI(AbstractVariationalInference):
             raise TypeError("Variational family must be CollapsedVariationalGaussian.")
 
     def elbo(
-        self, train_data: Dataset, transformations: Dict, negative: bool = False
-    ) -> Callable[[dict], Float[Array, "1"]]:
+        self, train_data: Dataset, negative: bool = False
+    ) -> Callable[[dict],Float[Array, "1"]:]:
         """Compute the evidence lower bound under this model. In short, this requires evaluating the expectation of the model's log-likelihood under the variational approximation. To this, we sum the KL divergence from the variational posterior to the prior. When batching occurs, the result is scaled by the batch size relative to the full dataset size.
 
         Args:
             train_data (Dataset): The training data for which we should maximise the ELBO with respect to.
-            transformations (Dict): The transformation set that unconstrains each parameter.
             negative (bool, optional): Whether or not the resultant elbo function should be negative. For gradient descent where we minimise our objective function this argument should be true as minimisation of the negative corresponds to maximisation of the ELBO. Defaults to False.
 
         Returns:
@@ -161,7 +155,6 @@ class CollapsedVI(AbstractVariationalInference):
         m = self.num_inducing
 
         def elbo_fn(params: Dict) -> Float[Array, "1"]:
-            params = transform(params, transformations)
             noise = params["likelihood"]["obs_noise"]
             z = params["variational_family"]["inducing_inputs"]
             Kzz = gram(self.prior.kernel, z, params["kernel"])

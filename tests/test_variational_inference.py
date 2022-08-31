@@ -62,19 +62,16 @@ def test_stochastic_vi(
     assert svgp.posterior.prior == post.prior
     assert svgp.posterior.likelihood == post.likelihood
 
-    params, _, constrainer, unconstrainer = gpx.initialise(
-        svgp, jr.PRNGKey(123)
-    ).unpack()
-    params = gpx.transform(params, unconstrainer)
+    params, _, _ = gpx.initialise(svgp, jr.PRNGKey(123)).unpack()
 
     assert svgp.prior == post.prior
     assert svgp.likelihood == post.likelihood
     assert svgp.num_inducing == n_inducing_points
 
     if jit_fns:
-        elbo_fn = jax.jit(svgp.elbo(D, constrainer))
+        elbo_fn = jax.jit(svgp.elbo(D))
     else:
-        elbo_fn = svgp.elbo(D, constrainer)
+        elbo_fn = svgp.elbo(D)
     assert isinstance(elbo_fn, tp.Callable)
     elbo_value = elbo_fn(params, D)
     assert isinstance(elbo_value, jnp.ndarray)
@@ -103,19 +100,16 @@ def test_collapsed_vi(n_datapoints, n_inducing_points, jit_fns, point_dim):
     assert sgpr.posterior.prior == post.prior
     assert sgpr.posterior.likelihood == post.likelihood
 
-    params, _, constrainer, unconstrainer = gpx.initialise(
-        sgpr, jr.PRNGKey(123)
-    ).unpack()
-    params = gpx.transform(params, unconstrainer)
+    params, _, _ = gpx.initialise(sgpr, jr.PRNGKey(123)).unpack()
 
     assert sgpr.prior == post.prior
     assert sgpr.likelihood == post.likelihood
     assert sgpr.num_inducing == n_inducing_points
 
     if jit_fns:
-        elbo_fn = jax.jit(sgpr.elbo(D, constrainer))
+        elbo_fn = jax.jit(sgpr.elbo(D))
     else:
-        elbo_fn = sgpr.elbo(D, constrainer)
+        elbo_fn = sgpr.elbo(D)
     assert isinstance(elbo_fn, tp.Callable)
     elbo_value = elbo_fn(params)
     assert isinstance(elbo_value, jnp.ndarray)
