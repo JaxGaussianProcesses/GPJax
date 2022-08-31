@@ -11,6 +11,7 @@ from jaxtyping import Array, Float
 from tqdm.auto import tqdm
 
 from .parameters import ParameterState, constrain, trainable_params, unconstrain
+from .parameters import trainable_params, transform
 from .types import Dataset, PRNGKeyType
 
 
@@ -175,6 +176,7 @@ def fit_batches(
     params, trainables, bijectors = parameter_state.unpack()
 
     def loss(params, batch):
+        params = transform(params, bijectors, forward=True)
         params = trainable_params(params, trainables)
         params = constrain(params, bijectors)
         return objective(params, batch)
@@ -184,6 +186,9 @@ def fit_batches(
     opt_state = optax_optim.init(params)
     keys = jr.split(key, n_iters)
     iter_nums = jnp.arange(n_iters)
+
+    # Tranform params to unconstrained space:
+    params = transform(params, bijectors, forward=False)
 
     @progress_bar_scan(n_iters, log_rate)
     def step(carry, iter_num__and__key):
