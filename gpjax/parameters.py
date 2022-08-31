@@ -139,8 +139,8 @@ def build_bijectors(params: tp.Dict) -> tp.Dict:
     return recursive_bijectors(params, bijectors)
 
 
-def transform(params: tp.Dict, bijectors: tp.Dict, forward: bool) -> tp.Dict:
-    """Transform the parameters according to the constraining or unconstraining function dictionary.
+def constrain(params: tp.Dict, bijectors: tp.Dict) -> tp.Dict:
+    """Transform the parameters to the constrained space for corresponding bijectors.
 
     Args:
         params (tp.Dict): The parameters that are to be transformed.
@@ -151,10 +151,24 @@ def transform(params: tp.Dict, bijectors: tp.Dict, forward: bool) -> tp.Dict:
         tp.Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
     """
 
-    fwd = lambda param, trans: trans.forward(param)
-    inv = lambda param, trans: trans.inverse(param)
+    map = lambda param, trans: trans.forward(param)
 
-    map = fwd if forward else inv
+    return jax.tree_util.tree_map(map, params, bijectors)
+
+
+def unconstrain(params: tp.Dict, bijectors: tp.Dict) -> tp.Dict:
+    """Transform the parameters to the unconstrained space for corresponding bijectors.
+
+    Args:
+        params (tp.Dict): The parameters that are to be transformed.
+        transform_map (tp.Dict): The corresponding dictionary of transforms that should be applied to the parameter set.
+        foward (bool): Whether the parameters should be constrained (foward=True) or unconstrained (foward=False).
+
+    Returns:
+        tp.Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
+    """
+
+    map = lambda param, trans: trans.inverse(param)
 
     return jax.tree_util.tree_map(map, params, bijectors)
 

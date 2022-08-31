@@ -11,6 +11,7 @@ from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.parameters import (
     build_bijectors,
+    constrain,
     copy_dict_structure,
     evaluate_priors,
     initialise,
@@ -19,7 +20,7 @@ from gpjax.parameters import (
     recursive_complete,
     recursive_items,
     structure_priors,
-    transform,
+    unconstrain,
 )
 
 
@@ -234,11 +235,11 @@ def test_output(num_datapoints, likelihood):
         assert isinstance(v1.forward, tp.Callable)
         assert isinstance(v2.inverse, tp.Callable)
 
-    unconstrained_params = transform(params, bijectors, forward=False)
+    unconstrained_params = unconstrain(params, bijectors)
     assert (
         unconstrained_params["kernel"]["lengthscale"] != params["kernel"]["lengthscale"]
     )
-    backconstrained_params = transform(unconstrained_params, bijectors, forward=True)
+    backconstrained_params = constrain(unconstrained_params, bijectors)
     for k, v1, v2 in recursive_items(params, unconstrained_params):
         assert v1.dtype == v2.dtype
 

@@ -5,7 +5,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import pytest
 
-from gpjax import Dataset, initialise, transform
+from gpjax import Dataset, initialise
 from gpjax.gps import (
     AbstractGP,
     ConjugatePosterior,
@@ -60,7 +60,6 @@ def test_conjugate_posterior(num_datapoints):
 
     parameter_state = initialise(post, key)
     params, _, bijectors = parameter_state.unpack()
-    params = transform(params, bijectors, forward=False)
 
     # Marginal likelihood
     mll = post.marginal_log_likelihood(train_data=D)
@@ -101,8 +100,7 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     assert isinstance(p, AbstractGP)
 
     parameter_state = initialise(post, key)
-    params, _, bijectors = parameter_state.unpack()
-    params = transform(params, bijectors, forward=False)
+    params, _, _ = parameter_state.unpack()
     assert isinstance(parameter_state, ParameterState)
 
     # Marginal likelihood
