@@ -10,7 +10,7 @@ from jax.experimental import host_callback
 from jaxtyping import Array, Float
 from tqdm.auto import tqdm
 
-from .parameters import constrain, trainable_params, unconstrain
+from .parameters import ParameterState, constrain, trainable_params, unconstrain
 from .types import Dataset, PRNGKeyType
 
 
@@ -97,9 +97,7 @@ def progress_bar_scan(n_iters: int, log_rate: int):
 
 def fit(
     objective: tp.Callable,
-    params: tp.Dict,
-    trainables: tp.Dict,
-    bijectors: tp.Dict,
+    parameter_state: ParameterState,
     optax_optim,
     n_iters: int = 100,
     log_rate: int = 10,
@@ -108,15 +106,15 @@ def fit(
     Optimisers used here should originate from Optax.
     Args:
         objective (tp.Callable): The objective function that we are optimising with respect to.
-        params (dict): The parameters for which we would like to minimise our objective function with.
-        trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
-        bijectors (dict): Dictionary of bijectors for each parameter.
+        parameter_state (ParameterState): The initial parameter state.
         optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
     Returns:
         InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
     """
+
+    params, trainables, bijectors = parameter_state.unpack()
 
     def loss(params):
         params = trainable_params(params, trainables)
@@ -151,9 +149,7 @@ def fit(
 
 def fit_batches(
     objective: tp.Callable,
-    params: tp.Dict,
-    trainables: tp.Dict,
-    bijectors: tp.Dict,
+    parameter_state: ParameterState,
     train_data: Dataset,
     optax_optim,
     key: PRNGKeyType,
@@ -165,8 +161,7 @@ def fit_batches(
     Optimisers used here should originate from Optax.
     Args:
         objective (tp.Callable): The objective function that we are optimising with respect to.
-        params (dict): The parameters for which we would like to minimise our objective function with.
-        trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
+        parameter_state (ParameterState): The parameters for which we would like to minimise our objective function with.
         train_data (Dataset): The training dataset.
         optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
         key (PRNGKeyType): The PRNG key for the mini-batch sampling.
@@ -176,6 +171,8 @@ def fit_batches(
     Returns:
         InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
     """
+
+    params, trainables, bijectors = parameter_state.unpack()
 
     def loss(params, batch):
         params = trainable_params(params, trainables)

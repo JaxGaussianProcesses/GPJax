@@ -22,7 +22,7 @@ Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 ################################
 @dataclass
 class ParameterState:
-    """The state of the model. This includes the parameter set and the functions that allow parameters to be constrained and unconstrained."""
+    """The state of the model. This includes the parameter set, which parameters are to be trained and bijectors that allow parameters to be constrained and unconstrained."""
 
     params: tp.Dict
     trainables: tp.Dict
