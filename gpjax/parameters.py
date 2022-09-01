@@ -173,26 +173,6 @@ def unconstrain(params: tp.Dict, bijectors: tp.Dict) -> tp.Dict:
     return jax.tree_util.tree_map(map, params, bijectors)
 
 
-def transform_state(
-    state: ParameterState, projection_fn: tp.Callable[[tp.Dict, tp.Dict], tp.Dict]
-) -> ParameterState:
-    """Transfrom the parameters of a `ParameterState` object using the corresponding set of bijectors.
-    The projection function accepts the parameters and corresponding bijectors as a dictionary input and
-    returns a dictionary of transformed parameters.
-
-    Args:
-        state (ParameterState): The ParameterState object to be transformed.
-        projection_fn (tp.Callable[[tp.Dict, tp.Dict], tp.Dict]): The projection function that transforms the parameters.
-
-    Returns:
-        ParameterState: A transformed ParameterState object.
-    """
-    params = projection_fn(state.params, state.bijectors)
-    return ParameterState(
-        params=params, trainables=state.trainables, bijectors=state.bijectors
-    )
-
-
 ################################
 # Priors
 ################################
