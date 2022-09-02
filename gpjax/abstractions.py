@@ -115,18 +115,19 @@ def fit(
         InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
     """
 
+    params, trainables, bijectors = parameter_state.unpack()
+
     def loss(params):
-        parameter_state = trainable_params(parameter_state)
-        parameter_state = constrain(parameter_state)
-        params = parameter_state.params
+        params = trainable_params(params, trainables)
+        params = constrain(params, bijectors)
         return objective(params)
 
     iter_nums = jnp.arange(n_iters)
 
     # Tranform params to unconstrained space:
-    parameter_state = unconstrain(parameter_state)
+    params = unconstrain(params, bijectors)
 
-    opt_state = optax_optim.init(parameter_state.params)
+    opt_state = optax_optim.init(params)
 
     @progress_bar_scan(n_iters, log_rate)
     def step(carry, iter_num):
@@ -140,9 +141,9 @@ def fit(
     (params, _), history = jax.lax.scan(step, (params, opt_state), iter_nums)
 
     # Tranform params to constrained space:
-    parameter_state.params = params
-    params = constrain(parameter_state)
-    inf_state = InferenceState(params=parameter_state.params, history=history)
+    params = constrain(params, bijectors)
+
+    inf_state = InferenceState(params=params, history=history)
 
     return inf_state
 
@@ -172,14 +173,15 @@ def fit_batches(
         InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
     """
 
+    params, trainables, bijectors = parameter_state.unpack()
+
     def loss(params, batch):
-        parameter_state = trainable_params(parameter_state)
-        parameter_state = constrain(parameter_state)
-        params = parameter_state.params
+        params = trainable_params(params, trainables)
+        params = constrain(params, bijectors)
         return objective(params, batch)
 
-    parameter_state = unconstrain(parameter_state)
-    params = parameter_state.params
+    params = unconstrain(params, bijectors)
+
     opt_state = optax_optim.init(params)
     keys = jr.split(key, n_iters)
     iter_nums = jnp.arange(n_iters)
@@ -200,9 +202,8 @@ def fit_batches(
 
     (params, _), history = jax.lax.scan(step, (params, opt_state), (iter_nums, keys))
 
-    parameter_state.params = params
-    parameter_state = constrain(parameter_state)
-    inf_state = InferenceState(params=parameter_state.params, history=history)
+    params = constrain(params, bijectors)
+    inf_state = InferenceState(params=params, history=history)
 
     return inf_state
 
