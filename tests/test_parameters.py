@@ -228,21 +228,18 @@ def test_prior_checks(latent_prior):
 @pytest.mark.parametrize("likelihood", [Gaussian, Bernoulli])
 def test_output(num_datapoints, likelihood):
     posterior = Prior(kernel=RBF()) * likelihood(num_datapoints=num_datapoints)
-    state = initialise(posterior, jr.PRNGKey(123))
-    params, _, bijectors = state.unpack()
+    params, _, bijectors = initialise(posterior, jr.PRNGKey(123)).unpack()
 
     assert isinstance(bijectors, dict)
     for k, v1, v2 in recursive_items(bijectors, bijectors):
         assert isinstance(v1.forward, tp.Callable)
         assert isinstance(v2.inverse, tp.Callable)
 
-    unconstrained_state = unconstrain(state)
-    unconstrained_params = unconstrained_state.params
+    unconstrained_params = unconstrain(params, bijectors)
     assert (
         unconstrained_params["kernel"]["lengthscale"] != params["kernel"]["lengthscale"]
     )
-    backconstrained_state = constrain(unconstrained_state)
-    backconstrained_params = backconstrained_state.params
+    backconstrained_params = constrain(unconstrained_params, bijectors)
     for k, v1, v2 in recursive_items(params, unconstrained_params):
         assert v1.dtype == v2.dtype
 

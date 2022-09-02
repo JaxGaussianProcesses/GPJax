@@ -139,43 +139,38 @@ def build_bijectors(params: tp.Dict) -> tp.Dict:
     return recursive_bijectors(params, bijectors)
 
 
-def constrain(state: ParameterState) -> ParameterState:
-    """Transform the parameters to a constrained space using the corresponding set of bijectors.
+def constrain(params: tp.Dict, bijectors: tp.Dict) -> tp.Dict:
+    """Transform the parameters to the constrained space for corresponding bijectors.
 
     Args:
-        state (ParameterState): The state object containing the parameters and corresponding bijectors that are to be transformed.
+        params (tp.Dict): The parameters that are to be transformed.
+        transform_map (tp.Dict): The corresponding dictionary of transforms that should be applied to the parameter set.
+        foward (bool): Whether the parameters should be constrained (foward=True) or unconstrained (foward=False).
 
     Returns:
-        ParameterState: A transformed parameter set. The state object is equal in structure to the input state, the only difference being that the parameters have now been constrained.
+        tp.Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
     """
 
-    params, bijectors = state.params, state.bijectors
     map = lambda param, trans: trans.forward(param)
-    transformed_params = jax.tree_util.tree_map(map, params, bijectors)
-    return ParameterState(
-        params=transformed_params,
-        trainables=state.trainables,
-        bijectors=bijectors,
-    )
+
+    return jax.tree_util.tree_map(map, params, bijectors)
 
 
-def unconstrain(state: ParameterState) -> ParameterState:
-    """Transform the parameters to a unconstrained space using the corresponding set of  bijectors.
+def unconstrain(params: tp.Dict, bijectors: tp.Dict) -> tp.Dict:
+    """Transform the parameters to the unconstrained space for corresponding bijectors.
 
     Args:
-        state (ParameterState): The state object containing the parameters and corresponding bijectors that are to be transformed.
+        params (tp.Dict): The parameters that are to be transformed.
+        transform_map (tp.Dict): The corresponding dictionary of transforms that should be applied to the parameter set.
+        foward (bool): Whether the parameters should be constrained (foward=True) or unconstrained (foward=False).
 
     Returns:
-        ParameterState: A transformed parameter set. The state object is equal in structure to the input state, the only difference being that the parameters have now been unconstrained.
+        tp.Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
     """
-    params, bijectors = state.params, state.bijectors
+
     map = lambda param, trans: trans.inverse(param)
-    transformed_params = jax.tree_util.tree_map(map, params, bijectors)
-    return ParameterState(
-        params=transformed_params,
-        trainables=state.trainables,
-        bijectors=bijectors,
-    )
+
+    return jax.tree_util.tree_map(map, params, bijectors)
 
 
 ################################
@@ -275,12 +270,8 @@ def stop_grad(param: tp.Dict, trainable: tp.Dict):
     return jax.lax.cond(trainable, lambda x: x, jax.lax.stop_gradient, param)
 
 
-def trainable_params(state: ParameterState) -> ParameterState:
+def trainable_params(params: tp.Dict, trainables: tp.Dict) -> tp.Dict:
     """Stop the gradients flowing through parameters whose trainable status is False"""
-    params, trainables = state.params, state.trainables
-    trainable_params = jax.tree_util.tree_map(
+    return jax.tree_util.tree_map(
         lambda param, trainable: stop_grad(param, trainable), params, trainables
-    )
-    return ParameterState(
-        params=trainable_params, trainables=trainables, bijectors=state.bijectors
     )
