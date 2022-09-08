@@ -28,4 +28,4 @@ from .variational_families import (
 )
 from .variational_inference import CollapsedVI, StochasticVI
 
-__version__ = "0.4.12"
+__version__ = "0.4.13"
