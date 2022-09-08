@@ -6,7 +6,7 @@ import jax.numpy as jnp
 import jax.scipy as jsp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from chex import dataclass
-from jaxtyping import f64
+from jaxtyping import Array, Float
 
 from .config import Identity, Softplus, add_parameter, get_defaults
 from .gps import Prior
@@ -54,10 +54,10 @@ class VariationalGaussian(AbstractVariationalFamily):
     """
 
     prior: Prior
-    inducing_inputs: f64["M D"]
+    inducing_inputs: Float[Array, "M D"]
     name: str = "Variational Gaussian"
-    variational_mean: Optional[f64["M Q"]] = None
-    variational_root_covariance: Optional[f64["M M"]] = None
+    variational_mean: Optional[Float[Array, "M Q"]] = None
+    variational_root_covariance: Optional[Float[Array, "M M"]] = None
     diag: Optional[bool] = False
     jitter: Optional[float] = DEFAULT_JITTER
 
@@ -92,7 +92,7 @@ class VariationalGaussian(AbstractVariationalFamily):
             },
         )
 
-    def prior_kl(self, params: Dict) -> f64["1"]:
+    def prior_kl(self, params: Dict) -> Float[Array, "1"]:
         """Compute the KL-divergence between our variational approximation and the Gaussian process prior.
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[ N(μ, S) || N(μz, Kzz) ],
@@ -118,7 +118,7 @@ class VariationalGaussian(AbstractVariationalFamily):
 
         return qu.kl_divergence(pu)
 
-    def predict(self, params: dict) -> Callable[[f64["N D"]], dx.Distribution]:
+    def predict(self, params: dict) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as:
@@ -141,7 +141,7 @@ class VariationalGaussian(AbstractVariationalFamily):
         Lz = jnp.linalg.cholesky(Kzz)
         μz = self.prior.mean_function(z, params["mean_function"])
 
-        def predict_fn(test_inputs: f64["N D"]) -> dx.Distribution:
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
             t = test_inputs
             n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
@@ -186,7 +186,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
     name: str = "Whitened variational Gaussian"
 
-    def prior_kl(self, params: Dict) -> f64["1"]:
+    def prior_kl(self, params: Dict) -> Float[Array, "1"]:
         """Compute the KL-divergence between our variational approximation and the Gaussian process prior.
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(0, I)].
@@ -206,7 +206,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
         return qu.kl_divergence(pu)
 
-    def predict(self, params: dict) -> Callable[[f64["N D"]], dx.Distribution]:
+    def predict(self, params: dict) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
@@ -228,7 +228,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         Kzz += I(m) * self.jitter
         Lz = jnp.linalg.cholesky(Kzz)
 
-        def predict_fn(test_inputs: f64["N D"]) -> dx.Distribution:
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
             t = test_inputs
             n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
@@ -266,7 +266,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
 
     prior: Prior
     likelihood: AbstractLikelihood
-    inducing_inputs: f64["M D"]
+    inducing_inputs: Float[Array, "M D"]
     name: str = "Collapsed variational Gaussian"
     diag: Optional[bool] = False
     jitter: Optional[float] = DEFAULT_JITTER
@@ -293,7 +293,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
 
     def predict(
         self, train_data: Dataset, params: dict
-    ) -> Callable[[f64["N D"]], dx.Distribution]:
+    ) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs.
 
         Args:
@@ -338,7 +338,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             Lz.T, Lz_inv_Kzx_diff, lower=False
         )
 
-        def predict_fn(test_inputs: f64["N D"]) -> dx.Distribution:
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
             t = test_inputs
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])

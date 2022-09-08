@@ -2,7 +2,7 @@ from typing import Callable
 
 import jax.numpy as jnp
 import numpy as np
-from jaxtyping import f64
+from jaxtyping import Array, Float
 
 """The number of Gauss-Hermite points to use for quadrature"""
 DEFAULT_NUM_GAUSS_HERMITE_POINTS = 20
@@ -10,12 +10,12 @@ DEFAULT_NUM_GAUSS_HERMITE_POINTS = 20
 
 def gauss_hermite_quadrature(
     fun: Callable,
-    mean: f64["N D"],
-    var: f64["N D"],
+    mean: Float[Array, "N D"],
+    var: Float[Array, "N D"],
     deg: int = DEFAULT_NUM_GAUSS_HERMITE_POINTS,
     *args,
     **kwargs
-) -> f64["D"]:
+) -> Float[Array, "D"]:
     """Compute Gaussian-Hermite quadrature for a given function. The quadrature points are adjusted through the supplied mean and variance arrays.
 
     Args:

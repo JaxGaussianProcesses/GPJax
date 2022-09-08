@@ -9,7 +9,7 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 from chex import dataclass
-from jaxtyping import f64
+from jaxtyping import Array, Float
 
 from .config import get_defaults
 from .types import PRNGKeyType
@@ -197,7 +197,9 @@ def transform(params: tp.Dict, transform_map: tp.Dict) -> tp.Dict:
 ################################
 # Priors
 ################################
-def log_density(param: f64["D"], density: dx.Distribution) -> f64["1"]:
+def log_density(
+    param: Float[Array, "D"], density: dx.Distribution
+) -> Float[Array, "1"]:
     if type(density) == type(None):
         log_prob = jnp.array(0.0)
     else:

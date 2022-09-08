@@ -3,7 +3,7 @@ from typing import Dict, Optional
 
 import jax.numpy as jnp
 from chex import dataclass
-from jaxtyping import f64
+from jaxtyping import Array, Float
 
 
 @dataclass(repr=False)
@@ -14,7 +14,7 @@ class AbstractMeanFunction:
     name: Optional[str] = "Mean function"
 
     @abc.abstractmethod
-    def __call__(self, x: f64["N D"]) -> f64["N Q"]:
+    def __call__(self, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
         """Evaluate the mean function at the given points. This method is required for all subclasses.
 
         Args:
@@ -44,7 +44,7 @@ class Zero(AbstractMeanFunction):
     output_dim: Optional[int] = 1
     name: Optional[str] = "Zero mean function"
 
-    def __call__(self, x: f64["N D"], params: dict) -> f64["N Q"]:
+    def __call__(self, x: Float[Array, "N D"], params: dict) -> Float[Array, "N Q"]:
         """Evaluate the mean function at the given points.
 
         Args:
@@ -72,7 +72,7 @@ class Constant(AbstractMeanFunction):
     output_dim: Optional[int] = 1
     name: Optional[str] = "Constant mean function"
 
-    def __call__(self, x: f64["N D"], params: Dict) -> f64["N Q"]:
+    def __call__(self, x: Float[Array, "N D"], params: Dict) -> Float[Array, "N Q"]:
         """Evaluate the mean function at the given points.
 
         Args:

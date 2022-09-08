@@ -5,7 +5,7 @@ import jax.numpy as jnp
 import jax.scipy as jsp
 from chex import dataclass
 from jax import vmap
-from jaxtyping import f64
+from jaxtyping import Array, Float
 
 from .gps import AbstractPosterior
 from .kernels import cross_covariance, diagonal, gram
@@ -42,7 +42,7 @@ class AbstractVariationalInference:
     @abc.abstractmethod
     def elbo(
         self, train_data: Dataset, transformations: Dict
-    ) -> Callable[[Dict], f64["1"]]:
+    ) -> Callable[[Dict], Float[Array, "1"]]:
         """Placeholder method for computing the evidence lower bound function (ELBO), given a training dataset and a set of transformations that map each parameter onto the entire real line.
 
         Args:
@@ -66,7 +66,7 @@ class StochasticVI(AbstractVariationalInference):
 
     def elbo(
         self, train_data: Dataset, transformations: Dict, negative: bool = False
-    ) -> Callable[[f64["N D"]], f64["1"]]:
+    ) -> Callable[[Float[Array, "N D"]], Float[Array, "1"]]:
         """Compute the evidence lower bound under this model. In short, this requires evaluating the expectation of the model's log-likelihood under the variational approximation. To this, we sum the KL divergence from the variational posterior to the prior. When batching occurs, the result is scaled by the batch size relative to the full dataset size.
 
         Args:
@@ -79,7 +79,7 @@ class StochasticVI(AbstractVariationalInference):
         """
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
 
-        def elbo_fn(params: Dict, batch: Dataset) -> f64["1"]:
+        def elbo_fn(params: Dict, batch: Dataset) -> Float[Array, "1"]:
             params = transform(params, transformations)
 
             # KL[q(f(·)) || p(f(·))]
@@ -93,7 +93,9 @@ class StochasticVI(AbstractVariationalInference):
 
         return elbo_fn
 
-    def variational_expectation(self, params: Dict, batch: Dataset) -> f64["N 1"]:
+    def variational_expectation(
+        self, params: Dict, batch: Dataset
+    ) -> Float[Array, "N 1"]:
         """Compute the expectation of our model's log-likelihood under our variational distribution. Batching can be done here to speed up computation.
 
         Args:
@@ -141,7 +143,7 @@ class CollapsedVI(AbstractVariationalInference):
 
     def elbo(
         self, train_data: Dataset, transformations: Dict, negative: bool = False
-    ) -> Callable[[dict], f64["1"]]:
+    ) -> Callable[[dict], Float[Array, "1"]]:
         """Compute the evidence lower bound under this model. In short, this requires evaluating the expectation of the model's log-likelihood under the variational approximation. To this, we sum the KL divergence from the variational posterior to the prior. When batching occurs, the result is scaled by the batch size relative to the full dataset size.
 
         Args:
@@ -158,7 +160,7 @@ class CollapsedVI(AbstractVariationalInference):
 
         m = self.num_inducing
 
-        def elbo_fn(params: Dict) -> f64["1"]:
+        def elbo_fn(params: Dict) -> Float[Array, "1"]:
             params = transform(params, transformations)
             noise = params["likelihood"]["obs_noise"]
             z = params["variational_family"]["inducing_inputs"]

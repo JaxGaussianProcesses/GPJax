@@ -4,7 +4,7 @@ from typing import Callable, Dict, List, Optional, Sequence
 import jax.numpy as jnp
 from chex import dataclass
 from jax import vmap
-from jaxtyping import f64
+from jaxtyping import Array, Float
 
 
 ##########################################
@@ -23,7 +23,9 @@ class Kernel:
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     @abc.abstractmethod
-    def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
+    def __call__(
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+    ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs.
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.
@@ -34,7 +36,7 @@ class Kernel:
         """
         raise NotImplementedError
 
-    def slice_input(self, x: f64["N D"]) -> f64["N Q"]:
+    def slice_input(self, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
         """Select the relevant columns of the supplied matrix to be used within the kernel's evaluation.
         Args:
             x (Array): The matrix or vector that is to be sliced.
@@ -101,7 +103,9 @@ class CombinationKernel(Kernel, _KernelSet):
         """A template dictionary of the kernel's parameter set."""
         return [kernel._initialise_params(key) for kernel in self.kernel_set]
 
-    def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
+    def __call__(
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+    ) -> Float[Array, "1"]:
         return self.combination_fn(
             jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)])
         )
@@ -135,7 +139,9 @@ class RBF(Kernel):
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
-    def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
+    def __call__(
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+    ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
 
         .. math::
@@ -170,7 +176,9 @@ class Matern12(Kernel):
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
-    def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
+    def __call__(
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+    ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
 
         .. math::
@@ -204,7 +212,9 @@ class Matern32(Kernel):
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
-    def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
+    def __call__(
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+    ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma`
 
         .. math::
@@ -244,7 +254,9 @@ class Matern52(Kernel):
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
-    def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
+    def __call__(
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+    ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma`
 
         .. math::
@@ -286,7 +298,9 @@ class Polynomial(Kernel):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
         self.name = f"Polynomial Degree: {self.degree}"
 
-    def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
+    def __call__(
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+    ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\alpha` and variance :math:`\sigma` through
 
         .. math::
@@ -317,7 +331,7 @@ class Polynomial(Kernel):
 ##########################################
 @dataclass
 class _EigenKernel:
-    laplacian: f64["N N"]
+    laplacian: Float[Array, "N N"]
 
 
 @dataclass
@@ -330,7 +344,9 @@ class GraphKernel(Kernel, _EigenKernel):
         self.evals = evals.reshape(-1, 1)
         self.num_vertex = self.laplacian.shape[0]
 
-    def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
+    def __call__(
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+    ) -> Float[Array, "1"]:
         """Evaluate the graph kernel on a pair of vertices v_i, v_j.
 
         Args:
@@ -361,17 +377,23 @@ class GraphKernel(Kernel, _EigenKernel):
         }
 
 
-def squared_distance(x: f64["1 D"], y: f64["1 D"]) -> f64["1"]:
+def squared_distance(
+    x: Float[Array, "1 D"], y: Float[Array, "1 D"]
+) -> Float[Array, "1"]:
     """Compute the squared distance between a pair of inputs."""
     return jnp.sum((x - y) ** 2)
 
 
-def euclidean_distance(x: f64["1 D"], y: f64["1 D"]) -> f64["1"]:
+def euclidean_distance(
+    x: Float[Array, "1 D"], y: Float[Array, "1 D"]
+) -> Float[Array, "1"]:
     """Compute the l1 norm between a pair of inputs."""
     return jnp.sqrt(jnp.maximum(jnp.sum((x - y) ** 2), 1e-36))
 
 
-def gram(kernel: Kernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
+def gram(
+    kernel: Kernel, inputs: Float[Array, "N D"], params: dict
+) -> Float[Array, "N N"]:
     """For a given kernel, compute the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
 
     Args:
@@ -386,8 +408,8 @@ def gram(kernel: Kernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
 
 
 def cross_covariance(
-    kernel: Kernel, x: f64["N D"], y: f64["M D"], params: dict
-) -> f64["N M"]:
+    kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: dict
+) -> Float[Array, "N M"]:
     """For a given kernel, compute the :math:`m \times n` gram matrix on an a pair of input matrices with shape :math:`m \times d`  and :math:`n \times d` for :math:`d\geq 1`.
 
     Args:
@@ -402,7 +424,9 @@ def cross_covariance(
     return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
 
 
-def diagonal(kernel: Kernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
+def diagonal(
+    kernel: Kernel, inputs: Float[Array, "N D"], params: dict
+) -> Float[Array, "N N"]:
     """For a given kernel, compute the elementwise diagonal of the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
     Args:
         kernel (Kernel): The kernel for which the variance vector should be computed for.

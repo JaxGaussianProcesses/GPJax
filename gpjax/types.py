@@ -1,7 +1,7 @@
 import jax.numpy as jnp
 from chex import PRNGKey as PRNGKeyType
 from chex import dataclass
-from jaxtyping import f64
+from jaxtyping import Array, Float
 
 NoneType = type(None)
 
@@ -10,8 +10,8 @@ NoneType = type(None)
 class Dataset:
     """GPJax Dataset class."""
 
-    X: f64["N D"]
-    y: f64["N 1"] = None
+    X: Float[Array, "N D"]
+    y: Float[Array, "N 1"] = None
 
     def __repr__(self) -> str:
         return (

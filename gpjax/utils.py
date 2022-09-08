@@ -5,10 +5,10 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 from chex import PRNGKey
-from jaxtyping import f64
+from jaxtyping import Array, Float
 
 
-def I(n: int) -> f64["N N"]:
+def I(n: int) -> Float[Array, "N N"]:
     """
     Compute an n x n identity matrix.
     :param n: The size of of the matrix.

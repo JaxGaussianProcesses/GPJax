@@ -5,7 +5,7 @@ import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
 from chex import dataclass
-from jaxtyping import f64
+from jaxtyping import Array, Float
 
 from .utils import I
 
@@ -107,7 +107,9 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
             Callable: A callable object that accepts a mean and variance term from which the predictive random variable is computed.
         """
 
-        def moment_fn(mean: f64["N D"], variance: f64["N D"], params: Dict):
+        def moment_fn(
+            mean: Float[Array, "N D"], variance: Float[Array, "N D"], params: Dict
+        ):
             rv = self.link_function(mean / jnp.sqrt(1 + variance), params)
             return rv
 

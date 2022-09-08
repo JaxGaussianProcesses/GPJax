@@ -7,7 +7,7 @@ import optax
 from chex import dataclass
 from jax import lax
 from jax.experimental import host_callback
-from jaxtyping import f64
+from jaxtyping import Array, Float
 from tqdm.auto import tqdm
 
 from .parameters import trainable_params
@@ -17,7 +17,7 @@ from .types import Dataset, PRNGKeyType
 @dataclass(frozen=True)
 class InferenceState:
     params: tp.Dict
-    history: f64["n_iters"]
+    history: Float[Array, "n_iters"]
 
     def unpack(self):
         return self.params, self.history
@@ -113,7 +113,7 @@ def fit(
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
     Returns:
-        tp.Tuple[tp.Dict, f64["n_iters"]]: A tuple comprising optimised parameters and training history respectively.
+        InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
     """
     opt_state = optax_optim.init(params)
 
@@ -161,7 +161,7 @@ def fit_batches(
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
     Returns:
-        tp.Tuple[tp.Dict, f64["n_iters"]]: A tuple comprising optimised parameters and training history respectively.
+        InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
     """
 
     opt_state = optax_optim.init(params)
