@@ -37,7 +37,7 @@ class ParameterState:
 def initialise(model, key: PRNGKeyType = None, **kwargs) -> ParameterState:
     """Initialise the stateful parameters of any GPJax object. This function also returns the trainability status of each parameter and set of bijectors that allow parameters to be constrained and unconstrained."""
     if key is None:
-        warn("No PRNGKey specified. Defaulting to seed 123.")
+        warn("No PRNGKey specified. Defaulting to seed 123.", UserWarning, stacklevel=2)
         key = jr.PRNGKey(123)
     params = model._initialise_params(key)
     if kwargs:
@@ -183,6 +183,12 @@ def transform(params: tp.Dict, transform_map: tp.Dict) -> tp.Dict:
     Returns:
         tp.Dict: A transformed parameter set.s The dictionary is equal in structure to the input params dictionary.
     """
+    warn(
+        "`transform` will be deprecated in a future release. As of v0.5.0, please use `constrain`"
+        " or `unconstrain` instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     return jax.tree_util.tree_map(
         lambda param, trans: trans(param), params, transform_map
     )
