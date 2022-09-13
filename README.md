@@ -31,20 +31,20 @@ We have recently set up a Slack channel where we hope to facilitate discussions 
 
 ### Examples
 
-- [**Conjugate Inference**](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)
-- [**Classification with MCMC**](https://gpjax.readthedocs.io/en/latest/nbs/classification.html)
-- [**Sparse Variational Inference**](https://gpjax.readthedocs.io/en/latest/nbs/uncollapsed_vi.html)
-- [**BlackJax Integration**](https://gpjax.readthedocs.io/en/latest/nbs/classification.html)
-- [**Laplace Approximations**](https://gpjax.readthedocs.io/en/latest/nbs/classification.html#Laplace-approximation)
-- [**TensorFlow Probability Integration**](https://gpjax.readthedocs.io/en/latest/nbs/tfp_integration.html)
-- [**Inference on Non-Euclidean Spaces**](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html#Custom-Kernel)
-- [**Inference on Graphs**](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html)
-- [**Learning Gaussian Process Barycentres**](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html)
-- [**Deep Kernel Regression**](https://gpjax.readthedocs.io/en/latest/nbs/haiku.html)
+- [**Conjugate Inference**](https://gpjax.readthedocs.io/en/latest/examples/regression.html)
+- [**Classification with MCMC**](https://gpjax.readthedocs.io/en/latest/examples/classification.html)
+- [**Sparse Variational Inference**](https://gpjax.readthedocs.io/en/latest/examples/uncollapsed_vi.html)
+- [**BlackJax Integration**](https://gpjax.readthedocs.io/en/latest/examples/classification.html)
+- [**Laplace Approximations**](https://gpjax.readthedocs.io/en/latest/examples/classification.html#Laplace-approximation)
+- [**TensorFlow Probability Integration**](https://gpjax.readthedocs.io/en/latest/examples/tfp_integration.html)
+- [**Inference on Non-Euclidean Spaces**](https://gpjax.readthedocs.io/en/latest/examples/kernels.html#Custom-Kernel)
+- [**Inference on Graphs**](https://gpjax.readthedocs.io/en/latest/examples/graph_kernels.html)
+- [**Learning Gaussian Process Barycentres**](https://gpjax.readthedocs.io/en/latest/examples/barycentres.html)
+- [**Deep Kernel Regression**](https://gpjax.readthedocs.io/en/latest/examples/haiku.html)
 
 ### Guides for customisation
 
-- [**Custom Kernel Implementation**](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html#Custom-Kernel)
+- [**Custom Kernel Implementation**](https://gpjax.readthedocs.io/en/latest/examples/kernels.html#Custom-Kernel)
 
 ## Simple example
 
