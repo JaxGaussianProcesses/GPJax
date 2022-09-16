@@ -40,7 +40,8 @@ class AbstractVariationalInference:
 
     @abc.abstractmethod
     def elbo(
-        self, train_data: Dataset,
+        self,
+        train_data: Dataset,
     ) -> Callable[[Dict], Float[Array, "1"]]:
         """Placeholder method for computing the evidence lower bound function (ELBO), given a training dataset and a set of transformations that map each parameter onto the entire real line.
 
@@ -138,7 +139,7 @@ class CollapsedVI(AbstractVariationalInference):
 
     def elbo(
         self, train_data: Dataset, negative: bool = False
-    ) -> Callable[[dict],Float[Array, "1"]:]:
+    ) -> Callable[[dict], Float[Array, "1"]]:
         """Compute the evidence lower bound under this model. In short, this requires evaluating the expectation of the model's log-likelihood under the variational approximation. To this, we sum the KL divergence from the variational posterior to the prior. When batching occurs, the result is scaled by the batch size relative to the full dataset size.
 
         Args:
