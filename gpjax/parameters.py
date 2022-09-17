@@ -1,6 +1,5 @@
 import typing as tp
 import warnings
-from collections import namedtuple
 from copy import deepcopy
 from warnings import warn
 
@@ -23,15 +22,14 @@ Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 ################################
 @dataclass
 class ParameterState:
-    """The state of the model. This includes the parameter set and the functions that allow parameters to be constrained and unconstrained."""
+    """The state of the model. This includes the parameter set, which parameters are to be trained and bijectors that allow parameters to be constrained and unconstrained."""
 
     params: tp.Dict
     trainables: tp.Dict
-    constrainers: tp.Dict
-    unconstrainers: tp.Dict
+    bijectors: tp.Dict
 
     def unpack(self):
-        return self.params, self.trainables, self.constrainers, self.unconstrainers
+        return self.params, self.trainables, self.bijectors
 
 
 def initialise(model, key: PRNGKeyType = None, **kwargs) -> ParameterState:
@@ -44,13 +42,12 @@ def initialise(model, key: PRNGKeyType = None, **kwargs) -> ParameterState:
         _validate_kwargs(kwargs, params)
         for k, v in kwargs.items():
             params[k] = merge_dictionaries(params[k], v)
-    constrainers, unconstrainers = build_transforms(params)
+    bijectors = build_bijectors(params)
     trainables = build_trainables(params)
     state = ParameterState(
         params=params,
         trainables=trainables,
-        constrainers=constrainers,
-        unconstrainers=unconstrainers,
+        bijectors=bijectors,
     )
     return state
 
@@ -92,8 +89,6 @@ def recursive_complete(d1: tp.Dict, d2: tp.Dict) -> tp.Dict:
         if type(value) is dict:
             if key in d2.keys():
                 recursive_complete(value, d2[key])
-            # else:
-            #     pass
         else:
             if key in d2.keys():
                 d1[key] = d2[key]
@@ -144,54 +139,38 @@ def build_bijectors(params: tp.Dict) -> tp.Dict:
     return recursive_bijectors(params, bijectors)
 
 
-def build_transforms(params: tp.Dict) -> tp.Tuple[tp.Dict, tp.Dict]:
-    """Using the bijector that is associated with each parameter, construct a pair of functions from the bijector that allow the parameter to be constrained and unconstrained.
-
-    Args:
-        params (tp.Dict): The parameter set for which transformations should be derived from.
-
-    Returns:
-        tp.Tuple[tp.Dict, tp.Dict]: A pair of dictionaries. The first dictionary maps each parameter to a function that constrains the parameter. The second dictionary maps each parameter to a function that unconstrains the parameter.
-    """
-
-    def forward(bijector):
-        return bijector.forward
-
-    def inverse(bijector):
-        return bijector.inverse
-
-    bijectors = build_bijectors(params)
-
-    constrainers = jax.tree_util.tree_map(lambda _: forward, deepcopy(params))
-    unconstrainers = jax.tree_util.tree_map(lambda _: inverse, deepcopy(params))
-
-    constrainers = jax.tree_util.tree_map(lambda f, b: f(b), constrainers, bijectors)
-    unconstrainers = jax.tree_util.tree_map(
-        lambda f, b: f(b), unconstrainers, bijectors
-    )
-
-    return constrainers, unconstrainers
-
-
-def transform(params: tp.Dict, transform_map: tp.Dict) -> tp.Dict:
-    """Transform the parameters according to the constraining or unconstraining function dictionary.
+def constrain(params: tp.Dict, bijectors: tp.Dict) -> tp.Dict:
+    """Transform the parameters to the constrained space for corresponding bijectors.
 
     Args:
         params (tp.Dict): The parameters that are to be transformed.
         transform_map (tp.Dict): The corresponding dictionary of transforms that should be applied to the parameter set.
+        foward (bool): Whether the parameters should be constrained (foward=True) or unconstrained (foward=False).
 
     Returns:
-        tp.Dict: A transformed parameter set.s The dictionary is equal in structure to the input params dictionary.
+        tp.Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
     """
-    warn(
-        "`transform` will be deprecated in a future release. As of v0.5.0, please use `constrain`"
-        " or `unconstrain` instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return jax.tree_util.tree_map(
-        lambda param, trans: trans(param), params, transform_map
-    )
+
+    map = lambda param, trans: trans.forward(param)
+
+    return jax.tree_util.tree_map(map, params, bijectors)
+
+
+def unconstrain(params: tp.Dict, bijectors: tp.Dict) -> tp.Dict:
+    """Transform the parameters to the unconstrained space for corresponding bijectors.
+
+    Args:
+        params (tp.Dict): The parameters that are to be transformed.
+        transform_map (tp.Dict): The corresponding dictionary of transforms that should be applied to the parameter set.
+        foward (bool): Whether the parameters should be constrained (foward=True) or unconstrained (foward=False).
+
+    Returns:
+        tp.Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
+    """
+
+    map = lambda param, trans: trans.inverse(param)
+
+    return jax.tree_util.tree_map(map, params, bijectors)
 
 
 ################################

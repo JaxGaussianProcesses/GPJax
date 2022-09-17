@@ -10,7 +10,7 @@ from jax.experimental import host_callback
 from jaxtyping import Array, Float
 from tqdm.auto import tqdm
 
-from .parameters import trainable_params
+from .parameters import ParameterState, constrain, trainable_params, unconstrain
 from .types import Dataset, PRNGKeyType
 
 
@@ -97,8 +97,7 @@ def progress_bar_scan(n_iters: int, log_rate: int):
 
 def fit(
     objective: tp.Callable,
-    params: tp.Dict,
-    trainables: tp.Dict,
+    parameter_state: ParameterState,
     optax_optim,
     n_iters: int = 100,
     log_rate: int = 10,
@@ -107,21 +106,27 @@ def fit(
     Optimisers used here should originate from Optax.
     Args:
         objective (tp.Callable): The objective function that we are optimising with respect to.
-        params (dict): The parameters for which we would like to minimise our objective function with.
-        trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
+        parameter_state (ParameterState): The initial parameter state.
         optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
     Returns:
         InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
     """
-    opt_state = optax_optim.init(params)
+
+    params, trainables, bijectors = parameter_state.unpack()
 
     def loss(params):
         params = trainable_params(params, trainables)
+        params = constrain(params, bijectors)
         return objective(params)
 
     iter_nums = jnp.arange(n_iters)
+
+    # Tranform params to unconstrained space:
+    params = unconstrain(params, bijectors)
+
+    opt_state = optax_optim.init(params)
 
     @progress_bar_scan(n_iters, log_rate)
     def step(carry, iter_num):
@@ -133,14 +138,18 @@ def fit(
         return carry, loss_val
 
     (params, _), history = jax.lax.scan(step, (params, opt_state), iter_nums)
+
+    # Tranform params to constrained space:
+    params = constrain(params, bijectors)
+
     inf_state = InferenceState(params=params, history=history)
+
     return inf_state
 
 
 def fit_batches(
     objective: tp.Callable,
-    params: tp.Dict,
-    trainables: tp.Dict,
+    parameter_state: ParameterState,
     train_data: Dataset,
     optax_optim,
     key: PRNGKeyType,
@@ -152,8 +161,7 @@ def fit_batches(
     Optimisers used here should originate from Optax.
     Args:
         objective (tp.Callable): The objective function that we are optimising with respect to.
-        params (dict): The parameters for which we would like to minimise our objective function with.
-        trainables (dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
+        parameter_state (ParameterState): The parameters for which we would like to minimise our objective function with.
         train_data (Dataset): The training dataset.
         optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
         key (PRNGKeyType): The PRNG key for the mini-batch sampling.
@@ -164,13 +172,17 @@ def fit_batches(
         InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
     """
 
-    opt_state = optax_optim.init(params)
+    params, trainables, bijectors = parameter_state.unpack()
 
     def loss(params, batch):
         params = trainable_params(params, trainables)
+        params = constrain(params, bijectors)
         return objective(params, batch)
 
-    keys = jax.random.split(key, n_iters)
+    params = unconstrain(params, bijectors)
+
+    opt_state = optax_optim.init(params)
+    keys = jr.split(key, n_iters)
     iter_nums = jnp.arange(n_iters)
 
     @progress_bar_scan(n_iters, log_rate)
@@ -188,7 +200,10 @@ def fit_batches(
         return carry, loss_val
 
     (params, _), history = jax.lax.scan(step, (params, opt_state), (iter_nums, keys))
+
+    params = constrain(params, bijectors)
     inf_state = InferenceState(params=params, history=history)
+
     return inf_state
 
 

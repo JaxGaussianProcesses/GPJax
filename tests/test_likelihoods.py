@@ -25,7 +25,7 @@ true_initialisation = {
 def test_initialisers(num_datapoints, lik):
     key = jr.PRNGKey(123)
     lhood = lik(num_datapoints=num_datapoints)
-    params, _, _, _ = initialise(lhood, key).unpack()
+    params, _, _ = initialise(lhood, key).unpack()
     assert list(params.keys()) == true_initialisation[lhood.name]
     assert len(list(params.values())) == len(true_initialisation[lhood.name])
 
@@ -37,7 +37,7 @@ def test_predictive_moment(n):
     fmean = jr.uniform(key=key, shape=(n,)) * -1
     fvar = jr.uniform(key=key, shape=(n,))
     pred_mom_fn = lhood.predictive_moment_fn
-    params, _, _, _ = initialise(lhood, key).unpack()
+    params, _, _ = initialise(lhood, key).unpack()
     rv = pred_mom_fn(fmean, fvar, params)
     mu = rv.mean()
     sigma = rv.variance()
@@ -51,7 +51,7 @@ def test_predictive_moment(n):
 def test_link_fns(lik: AbstractLikelihood, n: int):
     key = jr.PRNGKey(123)
     lhood = lik(num_datapoints=n)
-    params, _, _, _ = initialise(lhood, key).unpack()
+    params, _, _ = initialise(lhood, key).unpack()
     link_fn = lhood.link_function
     assert isinstance(link_fn, tp.Callable)
     x = jnp.linspace(-3.0, 3.0).reshape(-1, 1)

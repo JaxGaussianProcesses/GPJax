@@ -20,7 +20,7 @@ from .likelihoods import (
     NonConjugateLikelihoodType,
 )
 from .mean_functions import AbstractMeanFunction, Zero
-from .parameters import copy_dict_structure, evaluate_priors, transform
+from .parameters import copy_dict_structure, evaluate_priors
 from .types import Dataset
 from .utils import I, concat_dictionaries
 
@@ -194,7 +194,6 @@ class ConjugatePosterior(AbstractPosterior):
     def marginal_log_likelihood(
         self,
         train_data: Dataset,
-        transformations: Dict,
         priors: dict = None,
         negative: bool = False,
     ) -> tp.Callable[[dict], Float[Array, "1"]]:
@@ -202,7 +201,6 @@ class ConjugatePosterior(AbstractPosterior):
 
         Args:
             train_data (Dataset): The training dataset used to compute the marginal log-likelihood.
-            transformations (Dict): A dictionary of transformations that should be applied to the training dataset to unconstrain the parameters.
             priors (dict, optional): _description_. Optional argument that contains the priors placed on the model's parameters. Defaults to None.
             negative (bool, optional): Whether or not the returned function should be negative. For optimisation, the negative is useful as minimisation of the negative marginal log-likelihood is equivalent to maximisation of the marginal log-likelihood. Defaults to False.
 
@@ -214,8 +212,6 @@ class ConjugatePosterior(AbstractPosterior):
         def mll(
             params: dict,
         ):
-            params = transform(params=params, transform_map=transformations)
-
             # Observation noise σ²
             obs_noise = params["likelihood"]["obs_noise"]
             μx = self.prior.mean_function(x, params["mean_function"])
@@ -305,7 +301,6 @@ class NonConjugatePosterior(AbstractPosterior):
     def marginal_log_likelihood(
         self,
         train_data: Dataset,
-        transformations: Dict,
         priors: dict = None,
         negative: bool = False,
     ) -> tp.Callable[[dict], Float[Array, "1"]]:
@@ -313,7 +308,6 @@ class NonConjugatePosterior(AbstractPosterior):
 
         Args:
             train_data (Dataset): The training dataset used to compute the marginal log-likelihood.
-            transformations (Dict): A dictionary of transformations that should be applied to the training dataset to unconstrain the parameters.
             priors (dict, optional): _description_. Optional argument that contains the priors placed on the model's parameters. Defaults to None.
             negative (bool, optional): Whether or not the returned function should be negative. For optimisation, the negative is useful as minimisation of the negative marginal log-likelihood is equivalent to maximisation of the marginal log-likelihood. Defaults to False.
 
@@ -327,7 +321,6 @@ class NonConjugatePosterior(AbstractPosterior):
             priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
 
         def mll(params: dict):
-            params = transform(params=params, transform_map=transformations)
             Kxx = gram(self.prior.kernel, x, params["kernel"])
             Kxx += I(n) * self.jitter
             Lx = jnp.linalg.cholesky(Kxx)

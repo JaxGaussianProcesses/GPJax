@@ -19,7 +19,7 @@ from .kernels import (
 )
 from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
-from .parameters import copy_dict_structure, initialise, transform
+from .parameters import constrain, copy_dict_structure, initialise, unconstrain
 from .types import Dataset
 from .variational_families import (
     CollapsedVariationalGaussian,

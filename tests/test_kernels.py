@@ -36,7 +36,7 @@ def test_gram(kern, dim, fn):
     if dim > 1:
         x = jnp.hstack([x] * dim)
     parameter_state = initialise(kern, key)
-    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
+    params, _, _ = parameter_state.unpack()
     gram_matrix = fn(kern, x, params)
     assert gram_matrix.shape[0] == x.shape[0]
     assert gram_matrix.shape[0] == gram_matrix.shape[1]
@@ -50,7 +50,7 @@ def test_cross_covariance(kern, n1, n2):
     x1 = jnp.linspace(-1.0, 1.0, num=n1).reshape(-1, 1)
     x2 = jnp.linspace(-1.0, 1.0, num=n2).reshape(-1, 1)
     parameter_state = initialise(kern, key)
-    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
+    params, _, _ = parameter_state.unpack()
     kernel_matrix = cross_covariance(kern, x1, x2, params)
     assert kernel_matrix.shape == (n1, n2)
 
@@ -59,7 +59,7 @@ def test_cross_covariance(kern, n1, n2):
 def test_call(kernel):
     key = jr.PRNGKey(123)
     parameter_state = initialise(kernel, key)
-    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
+    params, _, _ = parameter_state.unpack()
     x, y = jnp.array([[1.0]]), jnp.array([[0.5]])
     point_corr = kernel(x, y, params)
     assert isinstance(point_corr, jnp.DeviceArray)
@@ -93,7 +93,7 @@ def test_initialisation(kernel, dim):
     else:
         kern = kernel(active_dims=[i for i in range(dim)])
         parameter_state = initialise(kern, key)
-        params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
+        params, _, _ = parameter_state.unpack()
         assert list(params.keys()) == ["lengthscale", "variance"]
         assert all(params["lengthscale"] == jnp.array([1.0] * dim))
         assert params["variance"] == jnp.array([1.0])
@@ -107,7 +107,7 @@ def test_initialisation(kernel, dim):
 def test_dtype(kernel):
     key = jr.PRNGKey(123)
     parameter_state = initialise(kernel(), key)
-    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
+    params, _, _ = parameter_state.unpack()
     for k, v in params.items():
         assert v.dtype == jnp.float64
 
