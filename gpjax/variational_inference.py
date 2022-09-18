@@ -1,3 +1,18 @@
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import abc
 from typing import Callable, Dict
 
@@ -8,7 +23,7 @@ from jax import vmap
 from jaxtyping import Array, Float
 
 from .gps import AbstractPosterior
-from .kernels import cross_covariance, diagonal, gram
+from .kernels import cross_covariance, gram
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
 from .types import Dataset
@@ -139,7 +154,7 @@ class CollapsedVI(AbstractVariationalInference):
 
     def elbo(
         self, train_data: Dataset, negative: bool = False
-    ) -> Callable[[dict], Float[Array, "1"]]:
+    ) -> Callable[[Dict], Float[Array, "1"]]:
         """Compute the evidence lower bound under this model. In short, this requires evaluating the expectation of the model's log-likelihood under the variational approximation. To this, we sum the KL divergence from the variational posterior to the prior. When batching occurs, the result is scaled by the batch size relative to the full dataset size.
 
         Args:
@@ -226,3 +241,10 @@ class CollapsedVI(AbstractVariationalInference):
             return constant * (two_log_prob - two_trace).squeeze() / 2.0
 
         return elbo_fn
+
+
+__all__ = [
+    "AbstractVariationalInference",
+    "StochasticVI",
+    "CollapsedVI",
+]

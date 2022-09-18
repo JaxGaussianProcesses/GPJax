@@ -14,8 +14,10 @@ from gpjax.gps import (
     construct_posterior,
 )
 from gpjax.kernels import RBF, Matern12, Matern32, Matern52
-from gpjax.likelihoods import Bernoulli, Gaussian, NonConjugateLikelihoods
+from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.parameters import ParameterState
+
+NonConjugateLikelihoods = [Bernoulli]
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 10])

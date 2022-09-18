@@ -1,3 +1,18 @@
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import abc
 from typing import Callable, Dict, List, Optional, Sequence
 
@@ -26,7 +41,7 @@ class Kernel:
 
     @abc.abstractmethod
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs.
         Args:
@@ -106,7 +121,7 @@ class CombinationKernel(Kernel, _KernelSet):
         return [kernel._initialise_params(key) for kernel in self.kernel_set]
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
         return self.combination_fn(
             jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)])
@@ -142,7 +157,7 @@ class RBF(Kernel):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
 
@@ -179,7 +194,7 @@ class Matern12(Kernel):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
 
@@ -215,7 +230,7 @@ class Matern32(Kernel):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma`
 
@@ -257,7 +272,7 @@ class Matern52(Kernel):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma`
 
@@ -301,7 +316,7 @@ class Polynomial(Kernel):
         self.name = f"Polynomial Degree: {self.degree}"
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\alpha` and variance :math:`\sigma` through
 
@@ -347,7 +362,7 @@ class GraphKernel(Kernel, _EigenKernel):
         self.num_vertex = self.laplacian.shape[0]
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
         """Evaluate the graph kernel on a pair of vertices v_i, v_j.
 
@@ -394,7 +409,7 @@ def euclidean_distance(
 
 
 def gram(
-    kernel: Kernel, inputs: Float[Array, "N D"], params: dict
+    kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
 ) -> Float[Array, "N N"]:
     """For a given kernel, compute the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
 
@@ -410,7 +425,7 @@ def gram(
 
 
 def cross_covariance(
-    kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: dict
+    kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: Dict
 ) -> Float[Array, "N M"]:
     """For a given kernel, compute the :math:`m \times n` gram matrix on an a pair of input matrices with shape :math:`m \times d`  and :math:`n \times d` for :math:`d\geq 1`.
 
@@ -427,7 +442,7 @@ def cross_covariance(
 
 
 def diagonal(
-    kernel: Kernel, inputs: Float[Array, "N D"], params: dict
+    kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
 ) -> Float[Array, "N N"]:
     """For a given kernel, compute the elementwise diagonal of the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
     Args:
@@ -438,3 +453,21 @@ def diagonal(
         Array: The computed diagonal variance matrix.
     """
     return jnp.diag(vmap(lambda x: kernel(x, x, params))(inputs))
+
+
+__all__ = [
+    "Kernel",
+    "CombinationKernel",
+    "SumKernel",
+    "ProductKernel",
+    "RBF" "Matern12",
+    "Matern32",
+    "Matern52",
+    "Polynomial",
+    "GraphKernel",
+    "squared_distance",
+    "euclidean_distance",
+    "gram",
+    "cross_covariance",
+    "diagonal",
+]

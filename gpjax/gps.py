@@ -1,3 +1,18 @@
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 from abc import abstractmethod
 from typing import Any, Callable, Dict, Optional
 
@@ -10,14 +25,7 @@ from jaxtyping import Array, Float
 
 from .config import get_defaults
 from .kernels import Kernel, cross_covariance, gram
-from .likelihoods import (
-    AbstractLikelihood,
-    Conjugate,
-    Gaussian,
-    NonConjugate,
-    NonConjugateLikelihoods,
-    NonConjugateLikelihoodType,
-)
+from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
 from .parameters import copy_dict_structure, evaluate_priors
 from .types import Dataset, PRNGKeyType
@@ -33,6 +41,10 @@ class AbstractGP:
     def __call__(self, *args: Any, **kwargs: Any) -> dx.Distribution:
         """Evaluate the Gaussian process at the given points.
 
+        Args:
+            *args (Any): The arguments to pass to the GP's `predict` method.
+            **kwargs (Any): The keyword arguments to pass to the GP's `predict` method.
+
         Returns:
             dx.Distribution: A multivariate normal random variable representation of the Gaussian process.
         """
@@ -40,11 +52,26 @@ class AbstractGP:
 
     @abstractmethod
     def predict(self, *args: Any, **kwargs: Any) -> dx.Distribution:
-        """Compute the latent function's multivariate normal distribution."""
+        """Compute the latent function's multivariate normal distribution.
+
+        Args:
+            *args (Any): Arguments to the predict method.
+            **kwargs (Any): Keyword arguments to the predict method.
+
+        Returns:
+            dx.Distribution: A multivariate normal random variable representation of the Gaussian process.
+        """
         raise NotImplementedError
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
-        """Initialise the GP's parameter set"""
+        """Initialise the GP's parameter set.
+
+        Args:
+            key (PRNGKeyType): The PRNG key.
+
+        Returns:
+            Dict: The initialised parameter set.
+        """
         raise NotImplementedError
 
 
@@ -62,23 +89,34 @@ class Prior(AbstractGP):
 
     def __mul__(self, other: AbstractLikelihood):
         """The product of a prior and likelihood is proportional to the posterior distribution. By computing the product of a GP prior and a likelihood object, a posterior GP object will be returned.
+
         Args:
             other (Likelihood): The likelihood distribution of the observed dataset.
+
         Returns:
             Posterior: The relevant GP posterior for the given prior and likelihood. Special cases are accounted for where the model is conjugate.
         """
         return construct_posterior(prior=self, likelihood=other)
 
     def __rmul__(self, other: AbstractLikelihood):
-        """Reimplement the multiplication operator to allow for order-invariant product of a likelihood and a prior i.e., likelihood * prior."""
+        """Reimplement the multiplication operator to allow for order-invariant product of a likelihood and a prior i.e., likelihood * prior.
+
+        Args:
+            other (Likelihood): The likelihood distribution of the observed dataset.
+
+        Returns:
+            Posterior: The relevant GP posterior for the given prior and likelihood. Special cases are accounted for where the model is conjugate.
+        """
         return self.__mul__(other)
 
     def predict(self, params: Dict) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
         """Compute the GP's prior mean and variance.
+
         Args:
             params (Dict): The specific set of parameters for which the mean function should be defined for.
+
         Returns:
-            Callable[[Array], Array]: A mean function that accepts an input array for where the mean function should be evaluated at. The mean function's value at these points is then returned.
+            Callable[[Float[Array, "N D"]], dx.Distribution]: A mean function that accepts an input array for where the mean function should be evaluated at. The mean function's value at these points is then returned.
         """
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
@@ -95,7 +133,14 @@ class Prior(AbstractGP):
         return predict_fn
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
-        """Initialise the GP prior's parameter set"""
+        """Initialise the GP prior's parameter set.
+
+        Args:
+            key (PRNGKeyType): The PRNG key.
+
+        Returns:
+            Dict: The initialised parameter set.
+        """
         return {
             "kernel": self.kernel._initialise_params(key),
             "mean_function": self.mean_function._initialise_params(key),
@@ -116,11 +161,26 @@ class AbstractPosterior(AbstractGP):
 
     @abstractmethod
     def predict(self, *args: Any, **kwargs: Any) -> dx.Distribution:
-        """Predict the GP's output given the input."""
+        """Predict the GP's output given the input.
+
+        Args:
+            *args (Any): Arguments to the predict method.
+            **kwargs (Any): Keyword arguments to the predict method.
+
+        Returns:
+            dx.Distribution: A multivariate normal random variable representation of the Gaussian process.
+        """
         raise NotImplementedError
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
-        """Initialise the parameter set of a GP posterior."""
+        """Initialise the parameter set of a GP posterior.
+
+        Args:
+            key (PRNGKeyType): The PRNG key.
+
+        Returns:
+            Dict: The initialised parameter set.
+        """
         return concat_dictionaries(
             self.prior._initialise_params(key),
             {"likelihood": self.likelihood._initialise_params(key)},
@@ -146,7 +206,7 @@ class ConjugatePosterior(AbstractPosterior):
             params (Dict): A dictionary of parameters that should be used to compute the posterior.
 
         Returns:
-            Callable[[Array], dx.Distribution]: A function that accepts an input array and returns the predictive distribution as a `distrax.MultivariateNormalFullCovariance`.
+            Callable[[Float[Array, "N D"]], dx.Distribution]: A function that accepts an input array and returns the predictive distribution as a `distrax.MultivariateNormalFullCovariance`.
         """
         x, y, n = train_data.X, train_data.y, train_data.n
 
@@ -202,7 +262,7 @@ class ConjugatePosterior(AbstractPosterior):
             negative (bool, optional): Whether or not the returned function should be negative. For optimisation, the negative is useful as minimisation of the negative marginal log-likelihood is equivalent to maximisation of the marginal log-likelihood. Defaults to False.
 
         Returns:
-            Callable[[Dict], Array]: A functional representation of the marginal log-likelihood that can be evaluated at a given parameter set.
+            Callable[[Dict], Float[Array, "1"]]: A functional representation of the marginal log-likelihood that can be evaluated at a given parameter set.
         """
         x, y, n = train_data.X, train_data.y, train_data.n
 
@@ -241,7 +301,7 @@ class NonConjugatePosterior(AbstractPosterior):
     """Generic Gaussian process posterior object for models where the likelihood is non-Gaussian."""
 
     prior: Prior
-    likelihood: NonConjugateLikelihoodType
+    likelihood: AbstractLikelihood
     name: Optional[str] = "Non-conjugate posterior"
     jitter: Optional[float] = DEFAULT_JITTER
 
@@ -264,7 +324,7 @@ class NonConjugatePosterior(AbstractPosterior):
             params (Dict): A dictionary of parameters that should be used to compute the posterior.
 
         Returns:
-            Callable[[Array], dx.Distribution]: A function that accepts an input array and returns the predictive distribution as a `distrax.MultivariateNormalFullCovariance`.
+            Callable[[Float[Array, "N D"]], dx.Distribution]: A function that accepts an input array and returns the predictive distribution as a `distrax.MultivariateNormalFullCovariance`.
         """
         x, n = train_data.X, train_data.n
 
@@ -309,7 +369,7 @@ class NonConjugatePosterior(AbstractPosterior):
             negative (bool, optional): Whether or not the returned function should be negative. For optimisation, the negative is useful as minimisation of the negative marginal log-likelihood is equivalent to maximisation of the marginal log-likelihood. Defaults to False.
 
         Returns:
-            Callable[[Dict], Array]: A functional representation of the marginal log-likelihood that can be evaluated at a given parameter set.
+            Callable[[Dict], Float[Array, "1"]]: A functional representation of the marginal log-likelihood that can be evaluated at a given parameter set.
         """
         x, y, n = train_data.X, train_data.y, train_data.n
 
@@ -351,3 +411,13 @@ def construct_posterior(
             f"No posterior implemented for {likelihood.name} likelihood"
         )
     return PosteriorGP(prior=prior, likelihood=likelihood)
+
+
+__all__ = [
+    AbstractGP,
+    Prior,
+    AbstractPosterior,
+    ConjugatePosterior,
+    NonConjugatePosterior,
+    construct_posterior,
+]

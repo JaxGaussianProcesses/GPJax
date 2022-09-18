@@ -1,3 +1,18 @@
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import abc
 from typing import Any, Callable, Dict, Optional
 
@@ -21,18 +36,41 @@ DEFAULT_JITTER = get_defaults()["jitter"]
 class AbstractVariationalFamily:
     """Abstract base class used to represent families of distributions that can be used within variational inference."""
 
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        """For a given set of parameters, compute the latent function's prediction under the variational approximation."""
+    def __call__(self, *args: Any, **kwargs: Any) -> dx.Distribution:
+        """For a given set of parameters, compute the latent function's prediction under the variational approximation.
+
+        Args:
+            *args (Any): Arguments of the variational family's `predict` method.
+            **kwargs (Any): Keyword arguments of the variational family's `predict` method.
+
+        Returns:
+            Any: The output of the variational family's `predict` method.
+        """
         return self.predict(*args, **kwargs)
 
     @abc.abstractmethod
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
-        """The parameters of the distribution. For example, the multivariate Gaussian would return a mean vector and covariance matrix."""
+        """The parameters of the distribution. For example, the multivariate Gaussian would return a mean vector and covariance matrix.
+
+        Args:
+            key (PRNGKeyType): The PRNG key used to initialise the parameters.
+
+        Returns:
+            Dict: The parameters of the distribution.
+        """
         raise NotImplementedError
 
     @abc.abstractmethod
     def predict(self, *args: Any, **kwargs: Any) -> dx.Distribution:
-        """Predict the GP's output given the input."""
+        """Predict the GP's output given the input.
+
+        Args:
+            *args (Any): Arguments of the variational family's `predict` method.
+            **kwargs (Any): Keyword arguments of the variational family's `predict` method.
+
+        Returns:
+            Any: The output of the variational family's `predict` method.
+        """
         raise NotImplementedError
 
 
@@ -60,7 +98,14 @@ class VariationalGaussian(AbstractVariationalGaussian):
     """
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
-        """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
+        """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution.
+
+        Args:
+            key (PRNGKeyType): The PRNG key used to initialise the parameters.
+
+        Returns:
+            Dict: The parameters of the distribution.
+        """
         m = self.num_inducing
 
         return concat_dictionaries(
@@ -102,7 +147,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         return qu.kl_divergence(pu)
 
-    def predict(self, params: dict) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
+    def predict(self, params: Dict) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as:
@@ -190,7 +235,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
         return qu.kl_divergence(pu)
 
-    def predict(self, params: dict) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
+    def predict(self, params: Dict) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
@@ -564,7 +609,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
         )
 
     def predict(
-        self, train_data: Dataset, params: dict
+        self, train_data: Dataset, params: Dict
     ) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs.
         Args:
@@ -635,3 +680,14 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             )
 
         return predict_fn
+
+
+__all__ = [
+    "AbstractVariationalFamily",
+    "AbstractVariationalGaussian",
+    "VariationalGaussian",
+    "WhitenedVariationalGaussian",
+    "NaturalVariationalGaussian",
+    "ExpectationVariationalGaussian",
+    "CollapsedVariationalGaussian",
+]

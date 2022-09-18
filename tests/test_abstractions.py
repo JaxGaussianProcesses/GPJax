@@ -98,7 +98,7 @@ def test_natural_gradients(ndata, nb, n_iters):
     q = gpx.NaturalVariationalGaussian(prior=prior, inducing_inputs=z)
 
     svgp = gpx.StochasticVI(posterior=p, variational_family=q)
-    params, trainable_status, bijectors = initialise(svgp, key).unpack()
+    training_state = initialise(svgp, key)
 
     D = Dataset(X=x, y=y)
 
@@ -108,9 +108,7 @@ def test_natural_gradients(ndata, nb, n_iters):
     key = jr.PRNGKey(42)
     inference_state = fit_natgrads(
         svgp,
-        params,
-        trainable_status,
-        bijectors,
+        training_state,
         D,
         moment_optimiser,
         hyper_optimiser,

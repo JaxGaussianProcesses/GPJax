@@ -1,9 +1,24 @@
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 from typing import Callable, Dict, Optional
 
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-import optax
+import optax as ox
 from chex import dataclass
 from jax import lax
 from jax.experimental import host_callback
@@ -100,18 +115,20 @@ def progress_bar_scan(n_iters: int, log_rate: int):
 def fit(
     objective: Callable,
     parameter_state: ParameterState,
-    optax_optim,
-    n_iters: int = 100,
-    log_rate: int = 10,
+    optax_optim: ox.GradientTransformation,
+    n_iters: Optional[int] = 100,
+    log_rate: Optional[int] = 10,
 ) -> InferenceState:
     """Abstracted method for fitting a GP model with respect to a supplied objective function.
     Optimisers used here should originate from Optax.
+
     Args:
         objective (Callable): The objective function that we are optimising with respect to.
         parameter_state (ParameterState): The initial parameter state.
         optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
+
     Returns:
         InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
     """
@@ -135,7 +152,7 @@ def fit(
         params, opt_state = carry
         loss_val, loss_gradient = jax.value_and_grad(loss)(params)
         updates, opt_state = optax_optim.update(loss_gradient, opt_state, params)
-        params = optax.apply_updates(params, updates)
+        params = ox.apply_updates(params, updates)
         carry = params, opt_state
         return carry, loss_val
 
@@ -153,7 +170,7 @@ def fit_batches(
     objective: Callable,
     parameter_state: ParameterState,
     train_data: Dataset,
-    optax_optim,
+    optax_optim: ox.GradientTransformation,
     key: PRNGKeyType,
     batch_size: int,
     n_iters: Optional[int] = 100,
@@ -161,6 +178,7 @@ def fit_batches(
 ) -> InferenceState:
     """Abstracted method for fitting a GP model with mini-batches respect to a supplied objective function.
     Optimisers used here should originate from Optax.
+
     Args:
         objective (Callable): The objective function that we are optimising with respect to.
         parameter_state (ParameterState): The parameters for which we would like to minimise our objective function with.
@@ -170,6 +188,7 @@ def fit_batches(
         batch_size(int): The batch_size.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
+
     Returns:
         InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
     """
@@ -196,7 +215,7 @@ def fit_batches(
 
         loss_val, loss_gradient = jax.value_and_grad(loss)(params, batch)
         updates, opt_state = optax_optim.update(loss_gradient, opt_state, params)
-        params = optax.apply_updates(params, updates)
+        params = ox.apply_updates(params, updates)
 
         carry = params, opt_state
         return carry, loss_val
@@ -211,9 +230,11 @@ def fit_batches(
 
 def get_batch(train_data: Dataset, batch_size: int, key: PRNGKeyType) -> Dataset:
     """Batch the data into mini-batches.
+
     Args:
         train_data (Dataset): The training dataset.
         batch_size (int): The batch size.
+
     Returns:
         Dataset: The batched dataset.
     """
@@ -226,12 +247,10 @@ def get_batch(train_data: Dataset, batch_size: int, key: PRNGKeyType) -> Dataset
 
 def fit_natgrads(
     stochastic_vi: StochasticVI,
-    params: Dict,
-    trainables: Dict,
-    bijectors: Dict,
+    parameter_state: ParameterState,
     train_data: Dataset,
-    moment_optim,
-    hyper_optim,
+    moment_optim: ox.GradientTransformation,
+    hyper_optim: ox.GradientTransformation,
     key: PRNGKeyType,
     batch_size: int,
     n_iters: Optional[int] = 100,
@@ -239,19 +258,23 @@ def fit_natgrads(
 ) -> Dict:
     """This is a training loop for natural gradients. See Salimbeni et al. (2018) Natural Gradients in Practice: Non-Conjugate Variational Inference in Gaussian Process Models
     Each iteration comprises a hyperparameter gradient step followed by natural gradient step to avoid a stale posterior.
+
     Args:
         stochastic_vi (StochasticVI): The stochastic variational inference algorithm to be used for training.
-        params (Dict): The parameters for which we would like to minimise our objective function with.
-        trainables (Dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
-        bijectors (Dict): The bijectors to be applied to the parameters.
+        parameter_state (ParameterState): The initial parameter state.
         train_data (Dataset): The training dataset.
-        batch_size(int): The batch_size.
+        moment_optim (GradientTransformation): The Optax optimiser for the natural gradient updates on the moments.
+        hyper_optim (GradientTransformation): The Optax optimiser for gradient updates on the hyperparameters.
         key (PRNGKeyType): The PRNG key for the mini-batch sampling.
+        batch_size(int): The batch_size.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
+
     Returns:
         InferenceState: A dataclass comprising optimised parameters and training history.
     """
+
+    params, trainables, bijectors = parameter_state.unpack()
 
     params = unconstrain(params, bijectors)
 
@@ -275,12 +298,12 @@ def fit_natgrads(
         # Hyper-parameters update:
         loss_val, loss_gradient = hyper_grads_fn(params, batch)
         updates, hyper_state = hyper_optim.update(loss_gradient, hyper_state, params)
-        params = optax.apply_updates(params, updates)
+        params = ox.apply_updates(params, updates)
 
         # Natural gradients update:
         loss_val, loss_gradient = nat_grads_fn(params, batch)
         updates, moment_state = moment_optim.update(loss_gradient, moment_state, params)
-        params = optax.apply_updates(params, updates)
+        params = ox.apply_updates(params, updates)
 
         carry = params, hyper_state, moment_state
         return carry, loss_val
@@ -291,3 +314,12 @@ def fit_natgrads(
     params = constrain(params, bijectors)
     inf_state = InferenceState(params=params, history=history)
     return inf_state
+
+
+__all__ = [
+    "fit",
+    "fit_natgrads",
+    "get_batch",
+    "natural_gradients",
+    "progress_bar_scan",
+]
