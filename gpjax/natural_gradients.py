@@ -5,11 +5,11 @@ import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
 from jax import value_and_grad
-from jaxtyping import f64
+from jaxtyping import Array, Float
 
 from .config import get_defaults
 from .gps import AbstractPosterior
-from .parameters import build_trainables, trainable_params, transform
+from .parameters import build_trainables, constrain, trainable_params, unconstrain
 from .types import Dataset
 from .utils import I
 from .variational_families import (
@@ -100,7 +100,7 @@ def _expectation_elbo(
         posterior=posterior, variational_family=expectation_vartiational_gaussian
     )
 
-    return svgp.elbo(train_data, transformations=None, negative=True)
+    return svgp.elbo(train_data, negative=True)
 
 
 def _rename_expectation_to_natural(params: Dict) -> Dict:
@@ -126,7 +126,7 @@ def _rename_natural_to_expectation(params: Dict) -> Dict:
 def natural_gradients(
     stochastic_vi: StochasticVI,
     train_data: Dataset,
-    transformations: Dict,
+    bijectors: Dict,
     trainables: Dict,
 ) -> Tuple[Callable[[Dict, Dataset], Dict]]:
     """
@@ -135,7 +135,7 @@ def natural_gradients(
         posterior: An instance of AbstractPosterior.
         variational_family: An instance of AbstractVariationalFamily.
         train_data: A Dataset.
-        transformations: A dictionary of transformations.
+        bijectors: A dictionary of bijectors.
     Returns:
         Tuple[Callable[[Dict, Dataset], Dict]]: Functions that compute natural gradients and hyperparameter gradients respectively.
     """
@@ -143,7 +143,7 @@ def natural_gradients(
     variational_family = stochastic_vi.variational_family
 
     # The ELBO under the user chosen parameterisation xi.
-    xi_elbo = stochastic_vi.elbo(train_data, transformations, negative=True)
+    xi_elbo = stochastic_vi.elbo(train_data, negative=True)
 
     # The ELBO under the expectation parameterisation, L(η).
     expectation_elbo = _expectation_elbo(posterior, variational_family, train_data)
@@ -174,13 +174,13 @@ def natural_gradients(
                 Dict: A dictionary of natural gradients.
             """
             # Transform parameters to constrained space.
-            params = transform(params, transformations)
+            params = constrain(params, bijectors)
 
             # Convert natural parameterisation θ to the expectation parametersation η.
             expectation_params = natural_to_expectation(params)
 
             # Compute gradient ∂L/∂η:
-            def loss_fn(params: Dict, batch: Dataset) -> f64["1"]:
+            def loss_fn(params: Dict, batch: Dataset) -> Float[Array, "1"]:
                 # Stop gradients for non-trainable and non-moment parameters.
                 params = trainable_params(params, moment_trainables)
 
@@ -206,8 +206,9 @@ def natural_gradients(
             Dict: A dictionary of hyperparameter gradients.
         """
 
-        def loss_fn(params: Dict, batch: Dataset) -> f64["1"]:
+        def loss_fn(params: Dict, batch: Dataset) -> Float[Array, "1"]:
             # Stop gradients for non-trainable and moment parameters.
+            params = constrain(params, bijectors)
             params = trainable_params(params, hyper_trainables)
 
             return xi_elbo(params, batch)

@@ -32,14 +32,6 @@ def get_data_and_gp(n_datapoints):
 
 @pytest.mark.parametrize("dim", [1, 2, 3])
 def test_natural_to_expectation(dim):
-    """
-    Converts natural parameters to expectation parameters.
-    Args:
-        natural_moments: A dictionary of natural parameters.
-        jitter (float): A small value to prevent numerical instability.
-    Returns:
-        tp.Dict: A dictionary of Gaussian moments under the expectation parameterisation.
-    """
 
     _, posterior, prior = get_data_and_gp(10)
 
@@ -97,14 +89,6 @@ from copy import deepcopy
 
 
 def test_renaming():
-    """
-    Converts natural parameters to expectation parameters.
-    Args:
-        natural_moments: A dictionary of natural parameters.
-        jitter (float): A small value to prevent numerical instability.
-    Returns:
-        tp.Dict: A dictionary of Gaussian moments under the expectation parameterisation.
-    """
 
     _, posterior, prior = get_data_and_gp(10)
 
@@ -199,9 +183,7 @@ def test_expectation_elbo(jit_fns):
 
     svgp = gpx.StochasticVI(posterior=posterior, variational_family=variational_family)
 
-    params, _, constrainer, unconstrainer = gpx.initialise(
-        svgp, jr.PRNGKey(123)
-    ).unpack()
+    params, _, _ = gpx.initialise(svgp, jr.PRNGKey(123)).unpack()
 
     expectation_elbo = _expectation_elbo(posterior, variational_family, D)
 
@@ -232,14 +214,11 @@ def test_natural_gradients():
 
     svgp = gpx.StochasticVI(posterior=p, variational_family=q)
 
-    params, trainables, constrainers, unconstrainers = gpx.initialise(
-        svgp, jr.PRNGKey(123)
-    ).unpack()
-    params = gpx.transform(params, unconstrainers)
+    params, trainables, bijectors = gpx.initialise(svgp, jr.PRNGKey(123)).unpack()
 
     batch = get_batch(D, batch_size=10, key=jr.PRNGKey(42))
 
-    nat_grads_fn, hyper_grads_fn = natural_gradients(svgp, D, constrainers, trainables)
+    nat_grads_fn, hyper_grads_fn = natural_gradients(svgp, D, bijectors, trainables)
 
     assert isinstance(nat_grads_fn, tp.Callable)
     assert isinstance(hyper_grads_fn, tp.Callable)

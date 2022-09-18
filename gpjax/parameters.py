@@ -143,12 +143,12 @@ def constrain(params: Dict, bijectors: Dict) -> Dict:
     """Transform the parameters to the constrained space for corresponding bijectors.
 
     Args:
-        params (tp.Dict): The parameters that are to be transformed.
-        transform_map (tp.Dict): The corresponding dictionary of transforms that should be applied to the parameter set.
+        params (Dict): The parameters that are to be transformed.
+        transform_map (Dict): The corresponding dictionary of transforms that should be applied to the parameter set.
         foward (bool): Whether the parameters should be constrained (foward=True) or unconstrained (foward=False).
 
     Returns:
-        tp.Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
+        Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
     """
 
     map = lambda param, trans: trans.forward(param)
@@ -160,8 +160,8 @@ def unconstrain(params: Dict, bijectors: Dict) -> Dict:
     """Transform the parameters to the unconstrained space for corresponding bijectors.
 
     Args:
-        params (tp.Dict): The parameters that are to be transformed.
-        transform_map (tp.Dict): The corresponding dictionary of transforms that should be applied to the parameter set.
+        params (Dict): The parameters that are to be transformed.
+        transform_map (Dict): The corresponding dictionary of transforms that should be applied to the parameter set.
         foward (bool): Whether the parameters should be constrained (foward=True) or unconstrained (foward=False).
 
     Returns:

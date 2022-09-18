@@ -19,7 +19,7 @@ from .likelihoods import (
     NonConjugateLikelihoodType,
 )
 from .mean_functions import AbstractMeanFunction, Zero
-from .parameters import copy_dict_structure, evaluate_priors, transform
+from .parameters import copy_dict_structure, evaluate_priors
 from .types import Dataset, PRNGKeyType
 from .utils import I, concat_dictionaries
 
@@ -73,9 +73,7 @@ class Prior(AbstractGP):
         """Reimplement the multiplication operator to allow for order-invariant product of a likelihood and a prior i.e., likelihood * prior."""
         return self.__mul__(other)
 
-    def predict(
-        self, params: dict
-    ) -> tp.Callable[[Float[Array, "N D"]], dx.Distribution]:
+    def predict(self, params: Dict) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
         """Compute the GP's prior mean and variance.
         Args:
             params (Dict): The specific set of parameters for which the mean function should be defined for.
@@ -139,8 +137,8 @@ class ConjugatePosterior(AbstractPosterior):
     jitter: Optional[float] = DEFAULT_JITTER
 
     def predict(
-        self, train_data: Dataset, params: dict
-    ) -> tp.Callable[[Float[Array, "N D"]], dx.Distribution]:
+        self, train_data: Dataset, params: Dict
+    ) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
         """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density.
 
         Args:
@@ -195,7 +193,7 @@ class ConjugatePosterior(AbstractPosterior):
         train_data: Dataset,
         priors: Dict = None,
         negative: bool = False,
-    ) -> tp.Callable[[dict], Float[Array, "1"]]:
+    ) -> Callable[[Dict], Float[Array, "1"]]:
         """Compute the marginal log-likelihood function of the Gaussian process. The returned function can then be used for gradient based optimisation of the model's parameters or for model comparison. The implementation given here enables exact estimation of the Gaussian process' latent function values.
 
         Args:
@@ -257,8 +255,8 @@ class NonConjugatePosterior(AbstractPosterior):
         return parameters
 
     def predict(
-        self, train_data: Dataset, params: dict
-    ) -> tp.Callable[[Float[Array, "N D"]], dx.Distribution]:
+        self, train_data: Dataset, params: Dict
+    ) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
         """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density. Note, to gain predictions on the scale of the original data, the returned distribution will need to be transformed through the likelihood function's inverse link function.
 
         Args:
@@ -302,7 +300,7 @@ class NonConjugatePosterior(AbstractPosterior):
         train_data: Dataset,
         priors: Dict = None,
         negative: bool = False,
-    ) -> tp.Callable[[dict], Float[Array, "1"]]:
+    ) -> Callable[[Dict], Float[Array, "1"]]:
         """Compute the marginal log-likelihood function of the Gaussian process. The returned function can then be used for gradient based optimisation of the model's parameters or for model comparison. The implementation given here is general and will work for any likelihood support by GPJax.
 
         Args:

@@ -10,15 +10,15 @@ from jax.experimental import host_callback
 from jaxtyping import Array, Float
 from tqdm.auto import tqdm
 
+from .natural_gradients import natural_gradients
 from .parameters import ParameterState, constrain, trainable_params, unconstrain
-from .parameters import trainable_params, transform
 from .types import Dataset, PRNGKeyType
 from .variational_inference import StochasticVI
 
 
 @dataclass(frozen=True)
 class InferenceState:
-    params: tp.Dict
+    params: Dict
     history: Float[Array, "n_iters"]
 
     def unpack(self):
@@ -209,11 +209,26 @@ def fit_batches(
     return inf_state
 
 
+def get_batch(train_data: Dataset, batch_size: int, key: PRNGKeyType) -> Dataset:
+    """Batch the data into mini-batches.
+    Args:
+        train_data (Dataset): The training dataset.
+        batch_size (int): The batch size.
+    Returns:
+        Dataset: The batched dataset.
+    """
+    x, y, n = train_data.X, train_data.y, train_data.n
+
+    indicies = jr.choice(key, n, (batch_size,), replace=True)
+
+    return Dataset(X=x[indicies], y=y[indicies])
+
+
 def fit_natgrads(
     stochastic_vi: StochasticVI,
     params: Dict,
     trainables: Dict,
-    transformations: Dict,
+    bijectors: Dict,
     train_data: Dataset,
     moment_optim,
     hyper_optim,
@@ -223,14 +238,12 @@ def fit_natgrads(
     log_rate: Optional[int] = 10,
 ) -> Dict:
     """This is a training loop for natural gradients. See Salimbeni et al. (2018) Natural Gradients in Practice: Non-Conjugate Variational Inference in Gaussian Process Models
-
     Each iteration comprises a hyperparameter gradient step followed by natural gradient step to avoid a stale posterior.
-
     Args:
         stochastic_vi (StochasticVI): The stochastic variational inference algorithm to be used for training.
         params (Dict): The parameters for which we would like to minimise our objective function with.
         trainables (Dict): Boolean dictionary of same structure as 'params' that determines which parameters should be trained.
-        transformations (Dict): The transformations to be applied to the parameters.
+        bijectors (Dict): The bijectors to be applied to the parameters.
         train_data (Dataset): The training dataset.
         batch_size(int): The batch_size.
         key (PRNGKeyType): The PRNG key for the mini-batch sampling.
@@ -240,11 +253,13 @@ def fit_natgrads(
         InferenceState: A dataclass comprising optimised parameters and training history.
     """
 
+    params = unconstrain(params, bijectors)
+
     hyper_state = hyper_optim.init(params)
     moment_state = moment_optim.init(params)
 
     nat_grads_fn, hyper_grads_fn = natural_gradients(
-        stochastic_vi, train_data, transformations, trainables
+        stochastic_vi, train_data, bijectors, trainables
     )
 
     keys = jax.random.split(key, n_iters)
@@ -273,20 +288,6 @@ def fit_natgrads(
     (params, _, _), history = jax.lax.scan(
         step, (params, hyper_state, moment_state), (iter_nums, keys)
     )
+    params = constrain(params, bijectors)
     inf_state = InferenceState(params=params, history=history)
     return inf_state
-
-
-def get_batch(train_data: Dataset, batch_size: int, key: PRNGKeyType) -> Dataset:
-    """Batch the data into mini-batches.
-    Args:
-        train_data (Dataset): The training dataset.
-        batch_size (int): The batch size.
-    Returns:
-        Dataset: The batched dataset.
-    """
-    x, y, n = train_data.X, train_data.y, train_data.n
-
-    indicies = jr.choice(key, n, (batch_size,), replace=True)
-
-    return Dataset(X=x[indicies], y=y[indicies])

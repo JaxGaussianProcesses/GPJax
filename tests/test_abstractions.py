@@ -5,7 +5,7 @@ import pytest
 
 import gpjax as gpx
 from gpjax import RBF, Dataset, Gaussian, Prior, initialise
-from gpjax.abstractions import InferenceState, fit, fit_batches, get_batch
+from gpjax.abstractions import InferenceState, fit, fit_batches, fit_natgrads, get_batch
 from gpjax.parameters import ParameterState, build_bijectors
 
 
@@ -98,10 +98,7 @@ def test_natural_gradients(ndata, nb, n_iters):
     q = gpx.NaturalVariationalGaussian(prior=prior, inducing_inputs=z)
 
     svgp = gpx.StochasticVI(posterior=p, variational_family=q)
-    params, trainable_status, constrainer, unconstrainer = initialise(
-        svgp, key
-    ).unpack()
-    params = gpx.transform(params, unconstrainer)
+    params, trainable_status, bijectors = initialise(svgp, key).unpack()
 
     D = Dataset(X=x, y=y)
 
@@ -113,7 +110,7 @@ def test_natural_gradients(ndata, nb, n_iters):
         svgp,
         params,
         trainable_status,
-        constrainer,
+        bijectors,
         D,
         moment_optimiser,
         hyper_optimiser,
@@ -122,7 +119,6 @@ def test_natural_gradients(ndata, nb, n_iters):
         n_iters,
     )
     optimised_params, history = inference_state.params, inference_state.history
-    optimised_params = transform(optimised_params, constrainer)
     assert isinstance(inference_state, InferenceState)
     assert isinstance(optimised_params, dict)
     assert isinstance(history, jnp.ndarray)
