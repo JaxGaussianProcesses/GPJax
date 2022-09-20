@@ -337,16 +337,23 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
 
+        # S⁻¹ = -2θ₂
         S_inv = -2 * natural_matrix
         S_inv += I(m) * self.jitter
-        L_inv = jnp.linalg.cholesky(S_inv)
-        C = jsp.linalg.solve_triangular(L_inv, I(m), lower=True)
 
-        S = jnp.matmul(C.T, C)
+        # Compute L⁻¹, where LLᵀ = S, via a trick found in the NumPyro source code and https://nbviewer.org/gist/fehiepsi/5ef8e09e61604f10607380467eb82006#Precision-to-scale_tril:
+        sqrt_inv = jnp.swapaxes(
+            jnp.linalg.cholesky(S_inv[..., ::-1, ::-1])[..., ::-1, ::-1], -2, -1
+        )
+
+        # L = (L⁻¹)⁻¹I
+        sqrt = jsp.linalg.solve_triangular(sqrt_inv, I(m), lower=True)
+
+        # S = LLᵀ:
+        S = jnp.matmul(sqrt, sqrt.T)
+
+        # μ = Sθ₁
         mu = jnp.matmul(S, natural_vector)
-
-        S += I(m) * self.jitter
-        sqrt = jnp.linalg.cholesky(S)
 
         μz = self.prior.mean_function(z, params["mean_function"])
         Kzz = gram(self.prior.kernel, z, params["kernel"])
@@ -382,14 +389,16 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         S_inv = -2 * natural_matrix
         S_inv += I(m) * self.jitter
 
-        # S⁻¹ = LLᵀ
-        L = jnp.linalg.cholesky(S_inv)
+        # Compute L⁻¹, where LLᵀ = S, via a trick found in the NumPyro source code and https://nbviewer.org/gist/fehiepsi/5ef8e09e61604f10607380467eb82006#Precision-to-scale_tril:
+        sqrt_inv = jnp.swapaxes(
+            jnp.linalg.cholesky(S_inv[..., ::-1, ::-1])[..., ::-1, ::-1], -2, -1
+        )
 
-        # C = L⁻¹I
-        C = jsp.linalg.solve_triangular(L, I(m), lower=True)
+        # L = (L⁻¹)⁻¹I
+        sqrt = jsp.linalg.solve_triangular(sqrt_inv, I(m), lower=True)
 
-        # S = CᵀC
-        S = jnp.matmul(C.T, C)
+        # S = LLᵀ:
+        S = jnp.matmul(sqrt, sqrt.T)
 
         # μ = Sθ₁
         mu = jnp.matmul(S, natural_vector)
@@ -411,17 +420,17 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
             # Kzz⁻¹ Kzt
             Kzz_inv_Kzt = jsp.linalg.solve_triangular(Lz.T, Lz_inv_Kzt, lower=False)
 
-            # Ktz Kzz⁻¹ Cᵀ
-            Ktz_Kzz_inv_CT = jnp.matmul(Kzz_inv_Kzt.T, C.T)
+            # Ktz Kzz⁻¹ L
+            Ktz_Kzz_inv_L = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
 
             # μt  +  Ktz Kzz⁻¹ (μ  -  μz)
             mean = μt + jnp.matmul(Kzz_inv_Kzt.T, mu - μz)
 
-            # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = CᵀC]
+            # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = LLᵀ]
             covariance = (
                 Ktt
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
-                + jnp.matmul(Ktz_Kzz_inv_CT, Ktz_Kzz_inv_CT.T)
+                + jnp.matmul(Ktz_Kzz_inv_L, Ktz_Kzz_inv_L.T)
             )
 
             return dx.MultivariateNormalFullCovariance(
