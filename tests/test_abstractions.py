@@ -116,9 +116,10 @@ def test_natural_gradients(ndata, nb, n_iters):
         nb,
         n_iters,
     )
-    optimised_params, history = inference_state.params, inference_state.history
+    optimised_params, history = inference_state.unpack()
     assert isinstance(inference_state, InferenceState)
     assert isinstance(optimised_params, dict)
+    assert objective(optimised_params, D) < pre_mll_val
     assert isinstance(history, jnp.ndarray)
     assert history.shape[0] == n_iters
 

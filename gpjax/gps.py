@@ -28,6 +28,7 @@ from .kernels import Kernel, cross_covariance, gram
 from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
 from .parameters import copy_dict_structure, evaluate_priors
+
 from .types import Dataset, PRNGKeyType
 from .utils import I, concat_dictionaries
 
