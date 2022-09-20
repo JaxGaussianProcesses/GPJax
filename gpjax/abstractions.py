@@ -118,11 +118,6 @@ def fit(
     optax_optim: ox.GradientTransformation,
     n_iters: Optional[int] = 100,
     log_rate: Optional[int] = 10,
-    objective: tp.Callable,
-    parameter_state: ParameterState,
-    optax_optim,
-    n_iters: int = 100,
-    log_rate: int = 10,
 ) -> InferenceState:
     """Abstracted method for fitting a GP model with respect to a supplied objective function.
     Optimisers used here should originate from Optax.

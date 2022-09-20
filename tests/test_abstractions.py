@@ -63,7 +63,7 @@ def test_batch_fitting(n_iters, nb, ndata):
 
     svgp = gpx.StochasticVI(posterior=p, variational_family=q)
     parameter_state = initialise(svgp, key)
-    objective = svgp.elbo(D)
+    objective = svgp.elbo(D, negative=True)
 
     pre_mll_val = objective(parameter_state.params, D)
 
@@ -104,6 +104,10 @@ def test_natural_gradients(ndata, nb, n_iters):
 
     hyper_optimiser = optax.adam(learning_rate=0.1)
     moment_optimiser = optax.sgd(learning_rate=1.0)
+
+    objective = svgp.elbo(D, negative=True)
+    parameter_state = initialise(svgp, key)
+    pre_mll_val = objective(parameter_state.params, D)
 
     key = jr.PRNGKey(42)
     inference_state = fit_natgrads(
