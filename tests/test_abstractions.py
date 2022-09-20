@@ -9,9 +9,10 @@ from gpjax.abstractions import InferenceState, fit, fit_batches, fit_natgrads, g
 from gpjax.parameters import ParameterState, build_bijectors
 
 
-@pytest.mark.parametrize("n_iters", [10])
+@pytest.mark.parametrize("n_iters", [1, 5])
 @pytest.mark.parametrize("n", [1, 20])
-def test_fit(n_iters, n):
+@pytest.mark.parametrize("verbose", [True, False])
+def test_fit(n_iters, n, verbose):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
@@ -21,7 +22,7 @@ def test_fit(n_iters, n):
     mll = p.marginal_log_likelihood(D, negative=True)
     pre_mll_val = mll(parameter_state.params)
     optimiser = optax.adam(learning_rate=0.1)
-    inference_state = fit(mll, parameter_state, optimiser, n_iters)
+    inference_state = fit(mll, parameter_state, optimiser, n_iters, verbose=verbose)
     optimised_params, history = inference_state.unpack()
     assert isinstance(inference_state, InferenceState)
     assert isinstance(optimised_params, dict)
@@ -46,10 +47,11 @@ def test_stop_grads():
     assert learned_params["x"] != params["x"]
 
 
-@pytest.mark.parametrize("n_iters", [5])
+@pytest.mark.parametrize("n_iters", [1, 5])
 @pytest.mark.parametrize("nb", [1, 20, 50])
 @pytest.mark.parametrize("ndata", [50])
-def test_batch_fitting(n_iters, nb, ndata):
+@pytest.mark.parametrize("verbose", [True, False])
+def test_batch_fitting(n_iters, nb, ndata, verbose):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(ndata, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
@@ -72,7 +74,7 @@ def test_batch_fitting(n_iters, nb, ndata):
     optimiser = optax.adam(learning_rate=0.1)
     key = jr.PRNGKey(42)
     inference_state = fit_batches(
-        objective, parameter_state, D, optimiser, key, nb, n_iters
+        objective, parameter_state, D, optimiser, key, nb, n_iters, verbose=verbose
     )
     optimised_params, history = inference_state.unpack()
     assert isinstance(inference_state, InferenceState)
@@ -82,10 +84,11 @@ def test_batch_fitting(n_iters, nb, ndata):
     assert history.shape[0] == n_iters
 
 
-@pytest.mark.parametrize("n_iters", [5])
+@pytest.mark.parametrize("n_iters", [1, 5])
 @pytest.mark.parametrize("nb", [1, 20, 50])
 @pytest.mark.parametrize("ndata", [50])
-def test_natural_gradients(ndata, nb, n_iters):
+@pytest.mark.parametrize("verbose", [True, False])
+def test_natural_gradients(ndata, nb, n_iters, verbose):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(ndata, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
@@ -119,6 +122,7 @@ def test_natural_gradients(ndata, nb, n_iters):
         key,
         nb,
         n_iters,
+        verbose=verbose,
     )
     optimised_params, history = inference_state.unpack()
     assert isinstance(inference_state, InferenceState)
