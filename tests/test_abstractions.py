@@ -5,7 +5,7 @@ import pytest
 
 import gpjax as gpx
 from gpjax import RBF, Dataset, Gaussian, Prior, initialise
-from gpjax.abstractions import InferenceState, fit, fit_batches, get_batch
+from gpjax.abstractions import InferenceState, fit, fit_batches, fit_natgrads, get_batch
 from gpjax.parameters import ParameterState, build_bijectors
 
 
@@ -63,7 +63,7 @@ def test_batch_fitting(n_iters, nb, ndata):
 
     svgp = gpx.StochasticVI(posterior=p, variational_family=q)
     parameter_state = initialise(svgp, key)
-    objective = svgp.elbo(D)
+    objective = svgp.elbo(D, negative=True)
 
     pre_mll_val = objective(parameter_state.params, D)
 
@@ -73,6 +73,52 @@ def test_batch_fitting(n_iters, nb, ndata):
     key = jr.PRNGKey(42)
     inference_state = fit_batches(
         objective, parameter_state, D, optimiser, key, nb, n_iters
+    )
+    optimised_params, history = inference_state.unpack()
+    assert isinstance(inference_state, InferenceState)
+    assert isinstance(optimised_params, dict)
+    assert objective(optimised_params, D) < pre_mll_val
+    assert isinstance(history, jnp.ndarray)
+    assert history.shape[0] == n_iters
+
+
+@pytest.mark.parametrize("n_iters", [5])
+@pytest.mark.parametrize("nb", [1, 20, 50])
+@pytest.mark.parametrize("ndata", [50])
+def test_natural_gradients(ndata, nb, n_iters):
+    key = jr.PRNGKey(123)
+    x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(ndata, 1)), axis=0)
+    y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
+    D = Dataset(X=x, y=y)
+    prior = Prior(kernel=RBF())
+    likelihood = Gaussian(num_datapoints=ndata)
+    p = prior * likelihood
+    z = jnp.linspace(-2.0, 2.0, 10).reshape(-1, 1)
+
+    q = gpx.NaturalVariationalGaussian(prior=prior, inducing_inputs=z)
+
+    svgp = gpx.StochasticVI(posterior=p, variational_family=q)
+    training_state = initialise(svgp, key)
+
+    D = Dataset(X=x, y=y)
+
+    hyper_optimiser = optax.adam(learning_rate=0.1)
+    moment_optimiser = optax.sgd(learning_rate=1.0)
+
+    objective = svgp.elbo(D, negative=True)
+    parameter_state = initialise(svgp, key)
+    pre_mll_val = objective(parameter_state.params, D)
+
+    key = jr.PRNGKey(42)
+    inference_state = fit_natgrads(
+        svgp,
+        training_state,
+        D,
+        moment_optimiser,
+        hyper_optimiser,
+        key,
+        nb,
+        n_iters,
     )
     optimised_params, history = inference_state.unpack()
     assert isinstance(inference_state, InferenceState)

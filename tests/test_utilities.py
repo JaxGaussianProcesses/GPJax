@@ -3,7 +3,6 @@ import pytest
 
 from gpjax.utils import (
     I,
-    as_constant,
     concat_dictionaries,
     dict_array_coercion,
     merge_dictionaries,
@@ -39,16 +38,6 @@ def test_sort_dict():
     sorted_dict = sort_dictionary(unsorted)
     assert list(sorted_dict.keys()) == ["a", "b"]
     assert list(sorted_dict.values()) == [2, 1]
-
-
-def test_as_constant():
-    base = {"a": 1, "b": 2, "c": 3}
-    b1, s1 = as_constant(base, ["a"])
-    b2, s2 = as_constant(base, ["a", "b"])
-    assert list(b1.keys()) == ["b", "c"]
-    assert list(s1.keys()) == ["a"]
-    assert list(b2.keys()) == ["c"]
-    assert list(s2.keys()) == ["a", "b"]
 
 
 @pytest.mark.parametrize("d", [1, 2, 10])
