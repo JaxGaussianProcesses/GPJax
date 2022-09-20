@@ -14,19 +14,17 @@
 # ==============================================================================
 
 import abc
-from functools import reduce
 from typing import Callable, Dict, List, Optional, Sequence
 
 import jax.numpy as jnp
-import jax.scipy as jsp
 from chex import dataclass
 from jax import vmap
 from jaxtyping import Array, Float
+from tensorflow import linalg as tfl
 
 from .types import PRNGKeyType
 
 from .config import get_defaults
-from .utils import I
 
 JITTER = get_defaults()["jitter"]
 
@@ -94,253 +92,131 @@ class Kernel:
 
 @dataclass
 class AbstractKernelComputation:
-    @abc.abstractmethod
-    def gram():
+    """Abstract class for kernel computations."""
+
+    # @abc.abstractmethod
+    def gram(
+        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
+    ) -> Float[Array, "N N"]:
         raise NotImplementedError
 
-    @abc.abstractmethod
-    def diagonal():
+    # @abc.abstractmethod
+    def diagonal() -> tfl.LinearOperator:
         raise NotImplementedError
 
-    @abc.abstractmethod
-    def cross_covariance():
-        raise NotImplementedError
-
-    def solve():
-        raise NotImplementedError
-
-
-class DenseKernelComputation(AbstractKernelComputation):
-    @staticmethod
-    def gram(kernel: Kernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
-        """For a given kernel, compute the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
-
-        Args:
-            kernel (Kernel): The kernel for which the Gram matrix should be computed for.
-            inputs (Array): The input matrix.
-            params (dict): The kernel's parameter set.
-
-        Returns:
-            Array: The computed square Gram matrix.
-        """
-        return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(inputs)
-
-    @staticmethod
-    def cross_covariance(
-        kernel: Kernel, x: f64["N D"], y: f64["M D"], params: dict
-    ) -> f64["N M"]:
-        """For a given kernel, compute the :math:`m \times n` gram matrix on an a pair of input matrices with shape :math:`m \times d`  and :math:`n \times d` for :math:`d\geq 1`.
-
-        Args:
-            kernel (Kernel): The kernel for which the cross-covariance matrix should be computed for.
-            x (Array): The first input matrix.
-            y (Array): The second input matrix.
-            params (dict): The kernel's parameter set.
-
-        Returns:
-            Array: The computed square Gram matrix.
-        """
-        return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
-
-    @staticmethod
-    def diagonal(kernel: Kernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
-        """For a given kernel, compute the elementwise diagonal of the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
-        Args:
-            kernel (Kernel): The kernel for which the variance vector should be computed for.
-            inputs (Array): The input matrix.
-            params (dict): The kernel's parameter set.
-        Returns:
-            Array: The computed diagonal variance matrix.
-        """
-        return jnp.diag(vmap(lambda x: kernel(x, x, params))(inputs))
-
-
-@dataclass
-class AbstractKernelComputation:
-    @abc.abstractmethod
-    def gram():
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def diagonal():
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def cross_covariance():
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def gram_solve():
+    # @abc.abstractmethod
+    def cross_covariance() -> tfl.LinearOperator:
         raise NotImplementedError
 
 
 class DenseKernelComputation(AbstractKernelComputation):
+    """Dense kernel computation class. Operations with the kernel assume a dense gram matrix structure."""
+
     @staticmethod
-    def gram(kernel: Kernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
-        """For a given kernel, compute the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
+    def gram(
+        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
+    ) -> tfl.LinearOperator:
+        """For a given kernel, compute the NxN gram matrix on an input matrix of shape NxD.
 
         Args:
             kernel (Kernel): The kernel for which the Gram matrix should be computed for.
-            inputs (Array): The input matrix.
-            params (dict): The kernel's parameter set.
+            inputs (Float[Array,"N D"]): The input matrix.
+            params (Dict): The kernel's parameter set.
 
         Returns:
-            Array: The computed square Gram matrix.
+            tfl.LinearOperator: The computed square Gram matrix.
         """
-        return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(inputs)
-
-    @staticmethod
-    def gram_multiply(kernel, inputs, params: dict, array: f64["N"]):
-        """
-        Compute the matrix multiplication of the Gram matrix with an array.
-        """
-        pass
-
-    @staticmethod
-    def cross_covariance(
-        kernel: Kernel, x: f64["N D"], y: f64["M D"], params: dict
-    ) -> f64["N M"]:
-        """For a given kernel, compute the :math:`m \times n` gram matrix on an a pair of input matrices with shape :math:`m \times d`  and :math:`n \times d` for :math:`d\geq 1`.
-
-        Args:
-            kernel (Kernel): The kernel for which the cross-covariance matrix should be computed for.
-            x (Array): The first input matrix.
-            y (Array): The second input matrix.
-            params (dict): The kernel's parameter set.
-
-        Returns:
-            Array: The computed square Gram matrix.
-        """
-        return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
-
-    @staticmethod
-    def diagonal(kernel: Kernel, inputs: f64["N D"], params: dict) -> f64["N"]:
-        """For a given kernel, compute the elementwise diagonal of the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
-        Args:
-            kernel (Kernel): The kernel for which the variance vector should be computed for.
-            inputs (Array): The input matrix.
-            params (dict): The kernel's parameter set.
-        Returns:
-            Array: The computed diagonal variance entries.
-        """
-        return vmap(lambda x: kernel(x, x, params))(inputs)
-
-    @staticmethod
-    def gram_solve(
-        kernel: Kernel, inputs: f64["N D"], params: dict, array: f64["N"]
-    ) -> f64["N N"]:
-        """For a given kernel, compute the inverse :math:`m \times n` gram matrix on an a pair of input matrices with shape :math:`m \times d`  and :math:`n \times d` for :math:`d\geq 1`.
-
-        Args:
-            kernel (Kernel): The kernel for which the cross-covariance matrix should be computed for.
-            x (Array): The first input matrix.
-            y (Array): The second input matrix.
-            params (dict): The kernel's parameter set.
-
-        Returns:
-            Array: The computed inverse square Gram matrix.
-        """
-        L = kernel.gram_cholesky(kernel, inputs, params)
-
-        return jsp.linalg.solve_triangular(
-            L.T, jsp.linalg.solve_triangular(L, array, lower=True), lower=True
+        return tfl.LinearOperatorFullMatrix(
+            vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(inputs)
         )
 
     @staticmethod
-    def gram_cholesky(kernel: Kernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
-        """Compute the Cholesky decomposition of the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
+    def cross_covariance(
+        kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: Dict
+    ) -> tfl.LinearOperator:
+        """For a given kernel, compute the NxM gram matrix on an a pair of input matrices with shape NxD and MxD.
+
         Args:
-            kernel (Kernel): The kernel for which the Cholesky decomposition should be computed for.
-            inputs (Array): The input matrix.
-            params (dict): The kernel's parameter set.
+            kernel (Kernel): The kernel for which the cross-covariance matrix should be computed for.
+            x (Float[Array,"N D"]): The first input matrix.
+            y (Float[Array,"M D"]): The second input matrix.
+            params (Dict): The kernel's parameter set.
+
         Returns:
-            Array: The computed Cholesky decomposition.
+            tfl.LinearOperator: The computed square Gram matrix.
         """
-        n = inputs.shape[0]
-        Kxx = vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(inputs)
-        return jnp.linalg.cholesky(Kxx + I(n) * JITTER)
+        return tfl.LinearOperatorFullMatrix(
+            vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
+        )
+
+    @staticmethod
+    def diagonal(
+        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
+    ) -> tfl.LinearOperator:
+        """For a given kernel, compute the elementwise diagonal of the NxN gram matrix on an input matrix of shape NxD.
+        Args:
+            kernel (Kernel): The kernel for which the variance vector should be computed for.
+            inputs (Float[Array, "N D"]): The input matrix.
+            params (Dict): The kernel's parameter set.
+        Returns:
+            tfl.LinearOperator: The computed diagonal variance entries.
+        """
+        return tfl.LinearOperatorDiag(vmap(lambda x: kernel(x, x, params))(inputs))
 
 
 class DiagonalKernelComputation(AbstractKernelComputation):
     @staticmethod
-    def gram(kernel: Kernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
-        """For a given kernel, compute the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
+    def gram(
+        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
+    ) -> tfl.LinearOperator:
+        """For a kernel with diagonal structure, compute the NxN gram matrix on an input matrix of shape NxD.
 
         Args:
             kernel (Kernel): The kernel for which the Gram matrix should be computed for.
-            inputs (Array): The input matrix.
-            params (dict): The kernel's parameter set.
+            inputs (Float[Array, "N D"]): The input matrix.
+            params (Dict): The kernel's parameter set.
 
         Returns:
-            Array: The computed square Gram matrix.
+            tfl.LinearOperator: The computed square Gram matrix.
         """
-        return jnp.diag(vmap(lambda x: kernel(x, x, params))(inputs))
-
-    @staticmethod
-    def gram_multiply(kernel, inputs, params: dict, array: f64["N"]):
-        """
-        Compute the matrix multiplication of the Gram matrix with an array.
-        """
-        pass
+        return tfl.LinearOperatorDiag(vmap(lambda x: kernel(x, x, params))(inputs))
 
     @staticmethod
     def cross_covariance(
-        kernel: Kernel, x: f64["N D"], y: f64["M D"], params: dict
-    ) -> f64["N M"]:
-        """For a given kernel, compute the :math:`m \times n` gram matrix on an a pair of input matrices with shape :math:`m \times d`  and :math:`n \times d` for :math:`d\geq 1`.
+        kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: Dict
+    ) -> Float[Array, "N M"]:
+        """For a given kernel, compute the NxM gram matrix on an a pair of input matrices with shape NxD and MxD.
 
         Args:
             kernel (Kernel): The kernel for which the cross-covariance matrix should be computed for.
-            x (Array): The first input matrix.
-            y (Array): The second input matrix.
-            params (dict): The kernel's parameter set.
+            x (Float[Array, "N D"]): The first input matrix.
+            y (Float[Array, "M D"]): The second input matrix.
+            params (Dict): The kernel's parameter set.
 
         Returns:
             Array: The computed square Gram matrix.
         """
-        return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
+        return tfl.LinearOperatorFullMatrix(
+            vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
+        )
 
     @staticmethod
-    def diagonal(kernel: Kernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
-        """For a given kernel, compute the elementwise diagonal of the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
+    def diagonal(
+        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
+    ) -> tfl.LinearOperator:
+        """For a given kernel, compute the elementwise diagonal of the NxN gram matrix on an input matrix of shape NxD.
         Args:
             kernel (Kernel): The kernel for which the variance vector should be computed for.
-            inputs (Array): The input matrix.
-            params (dict): The kernel's parameter set.
+            inputs (Float[Array, "N D"]): The input matrix.
+            params (Dict): The kernel's parameter set.
         Returns:
-            Array: The computed diagonal variance matrix.
+            Array: The computed diagonal variance entries.
         """
-        return vmap(lambda x: kernel(x, x, params))(inputs)
+        return tfl.LinearOperatorDiag(vmap(lambda x: kernel(x, x, params))(inputs))
 
-    @staticmethod
-    def gram_solve(
-        kernel: Kernel, inputs: f64["N D"], params: dict, array: f64["N"]
-    ) -> f64["N"]:
-        """For a given kernel, compute the inverse :math:`m \times n` gram matrix on an a pair of input matrices with shape :math:`m \times d`  and :math:`n \times d` for :math:`d\geq 1`.
 
-        Args:
-            kernel (Kernel): The kernel for which the cross-covariance matrix should be computed for.
-            x (Array): The first input matrix.
-            y (Array): The second input matrix.
-            params (dict): The kernel's parameter set.
-
-        Returns:
-            Array: The computed inverse square Gram matrix.
-        """
-
-        return array / vmap(lambda x: kernel(x, x, params))(inputs)
-
-    @staticmethod
-    def gram_cholesky(kernel: Kernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
-        """Compute the Cholesky decomposition of the :math:`n \times n` gram matrix on an input matrix of shape :math:`n \times d` for :math:`d\geq 1`.
-        Args:
-            kernel (Kernel): The kernel for which the Cholesky decomposition should be computed for.
-            inputs (Array): The input matrix.
-            params (dict): The kernel's parameter set.
-        Returns:
-            Array: The computed Cholesky decomposition.
-        """
-        return jnp.diag(jnp.sqrt(kernel.diagonal(kernel, inputs, params)))
+class CombinationKernelComputation(AbstractKernelComputation):
+    pass
 
 
 @dataclass
@@ -349,7 +225,7 @@ class _KernelSet:
 
 
 @dataclass
-class CombinationKernel(Kernel, _KernelSet):
+class CombinationKernel(Kernel, _KernelSet, CombinationKernelComputation):
     """A base class for products or sums of kernels."""
 
     name: Optional[str] = "Combination kernel"
@@ -364,39 +240,6 @@ class CombinationKernel(Kernel, _KernelSet):
 
         self.kernel_set: List[Kernel] = []
         self._set_kernels(kernels)
-
-        # Temporary solution for promoting computation types in combination kernels (does not work in all cases!).
-        if all(list(map(lambda k: isinstance(k, DiagonalKernelComputation), kernels))):
-            computation = DiagonalKernelComputation()
-
-        else:
-            computation = DenseKernelComputation()
-
-        self._gram = computation.gram
-        self._cross_covariance = computation.cross_covariance
-        self._diagonal = computation.diagonal
-        self._gram_solve = computation.gram_solve
-        self._gram_cholesky = computation.gram_cholesky
-
-    @property
-    def gram(self) -> Callable:
-        return self._gram
-
-    @property
-    def cross_covariance(self) -> Callable:
-        return self._cross_covariance
-
-    @property
-    def diagonal(self) -> Callable:
-        return self._diagonal
-
-    @property
-    def gram_solve(self) -> Callable:
-        return self._gram_solve
-
-    @property
-    def gram_cholesky(self) -> Callable:
-        return self._gram_cholesky
 
     def _set_kernels(self, kernels: Sequence[Kernel]) -> None:
         """Combine multiple kernels. Based on GPFlow's Combination kernel."""
@@ -436,20 +279,12 @@ class ProductKernel(CombinationKernel):
     name: Optional[str] = "Product kernel"
     combination_fn: Optional[Callable] = jnp.prod
 
-    # TODO: Check active dims of the kernels - i.e., are they separable?
-    #       If so then we can use the cheaper Krocker computation backend.
-    # Obviously, this should be done on the main 'Kernel' class.
-    # On second thought, this would not be (currently) possible - since we need a grid design space.
-    # Could this perhaps be resolved via evaluating the kernel on a fake grid, introducing a matrix W,
-    # comprising a subsample of the indentity matrix and zeros at missing points -> compute W @ K @ W^{T} ?
-
 
 class KroneckerKernelComputation(AbstractKernelComputation):
     @staticmethod
     def gram(kernel, inputs, params: dict):
-        gram_matrices = []
+        gram_linear_operators = []
 
-        # --- TODO: rewrite (--- to ---) in a more JAX-friendly way!
         for k, params in zip(kernel.kernel_set, params):
 
             # Filter grid based on active dims.
@@ -457,65 +292,47 @@ class KroneckerKernelComputation(AbstractKernelComputation):
                 inputs[..., k.active_dims], return_index=True, axis=0
             )
 
-            gram_matrices.append(k.gram(k, inputs[indices], params))
-        # ---
+            gram_linear_operators.append(k.gram(k, inputs[indices], params))
 
-        return reduce(jnp.kron, gram_matrices)
-
-    @staticmethod
-    def gram_multiply(kernel, inputs, params: dict, array: f64["N"]):
-        """
-        Compute the matrix multiplication of the Gram matrix with an array.
-        """
-        pass
-
-    # TODO: Do we save anything for commputing the cross covariance with Kronecker kernels?
-    # @staticmethod
-    # def cross_covariance(kernel, inputs, params: dict):
-    #     pass
-
-    # TODO: Do we save anything for commputing the diaonal with Kronecker kernels?
-    # @staticmethod
-    # def diagonal(kernel: CombinationKernel, inputs: f64["N D"], params: dict) -> f64["N N"]:
-    #     pass
+        return tfl.LinearOperatorKronecker(gram_linear_operators)
 
     @staticmethod
-    def gram_solve(
-        kernel: CombinationKernel, inputs: f64["N D"], params: dict, array: f64["N"]
-    ) -> f64["N N"]:
+    def cross_covariance(
+        kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: Dict
+    ) -> Float[Array, "N M"]:
+        """For a given kernel, compute the NxM gram matrix on an a pair of input matrices with shape NxD and MxD.
 
-        # THIS IMPLIMENTATION IS NAIVE, WE CAN DO BETTER.
-        # - Firstly, we can take the array inside the kronecker product of inverse matrices in (*)
-        # - Secondly, we should be able to solve against something better than the identity matrix.
+        Args:
+            kernel (Kernel): The kernel for which the cross-covariance matrix should be computed for.
+            x (Float[Array, "N D"]): The first input matrix.
+            y (Float[Array, "M D"]): The second input matrix.
+            params (Dict): The kernel's parameter set.
 
-        gram_matrices = []
+        Returns:
+            Array: The computed square Gram matrix.
+        """
+        return tfl.LinearOperatorFullMatrix(
+            vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
+        )
 
-        # --- TODO: rewrite (--- to ---) in a more JAX-friendly way!
-        for k, params in zip(kernel.kernel_set, params):
-
-            # Filter grid based on active dims.
-            _, indices = jnp.unique(
-                inputs[..., k.active_dims], return_index=True, axis=0
-            )
-
-            gram_matrices.append(
-                k.gram_solve(k, inputs[indices], params, I(inputs.shape[0]))
-            )  # <- (*)
-        # ---
-
-        Kxx_inv = reduce(jnp.kron, gram_matrices)  # <- (*)
-
-        return jnp.matmul(Kxx_inv, array)
+    @staticmethod
+    def diagonal(
+        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
+    ) -> tfl.LinearOperator:
+        """For a given kernel, compute the elementwise diagonal of the NxN gram matrix on an input matrix of shape NxD.
+        Args:
+            kernel (Kernel): The kernel for which the variance vector should be computed for.
+            inputs (Float[Array, "N D"]): The input matrix.
+            params (Dict): The kernel's parameter set.
+        Returns:
+            Array: The computed diagonal variance entries.
+        """
+        return tfl.LinearOperatorDiag(vmap(lambda x: kernel(x, x, params))(inputs))
 
 
-# This just acts as a constructor for using the Kronecker backend.
-# This mathematically makes sense for 'ProductKernel'  - a kronecker product is a special case of a product kernel.
 @dataclass
-class KroneckerKernel(ProductKernel, KroneckerKernelComputation):
+class KroneckerKernel(CombinationKernel, KroneckerKernelComputation):
     name: Optional[str] = "Kronecker kernel"
-
-    def __post_int__(self):
-        self.kernel_set = [KroneckerKernelComputation]
 
 
 ##########################################
@@ -721,24 +538,36 @@ class Polynomial(Kernel, DenseKernelComputation):
 class White(Kernel, DiagonalKernelComputation):
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
-        self._params = {"variance": jnp.array([1.0])}
 
-    def __call__(self, x: f64["1 D"], y: f64["1 D"], params: dict) -> f64["1"]:
+    def __call__(
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
+    ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\sigma`
 
         .. math::
             k(x, y) = \\sigma^2 \delta(x-y)
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
-            params (dict): Parameter set for which the kernel should be evaluated on.
+            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
+            params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
             Array: The value of :math:`k(x, y)`
         """
         K = jnp.all(jnp.equal(x, y)) * params["variance"]  # <- pseudo code.
         return K.squeeze()
+
+    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+        """Initialise the kernel parameters.
+
+        Args:
+            key (jnp.DeviceArray): The key to initialise the parameters with.
+
+        Returns:
+            Dict: The initialised parameters.
+        """
+        return {"variance": jnp.array([1.0])}
 
 
 ##########################################
