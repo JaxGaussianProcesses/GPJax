@@ -53,7 +53,6 @@ hidden:
 installation
 design
 contributing
-intro_to_gps
 ```
 
 ```{toctree}
