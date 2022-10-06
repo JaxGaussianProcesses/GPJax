@@ -99,7 +99,7 @@ class CombinationKernel(Kernel, _KernelSet):
                 kernels_list.append(k)
         self.kernel_set = kernels_list
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: jnp.DeviceArray) -> List[Dict]:
         """A template dictionary of the kernel's parameter set."""
         return [kernel._initialise_params(key) for kernel in self.kernel_set]
 
@@ -193,7 +193,7 @@ class Matern12(Kernel):
         """
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
-        K = params["variance"] * jnp.exp(-0.5 * euclidean_distance(x, y))
+        K = params["variance"] * jnp.exp(-euclidean_distance(x, y))
         return K.squeeze()
 
     def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
