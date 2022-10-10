@@ -20,9 +20,13 @@ import jax.numpy as jnp
 from chex import dataclass
 from jax import vmap
 from jaxtyping import Array, Float
-from tensorflow import linalg as tfl
 
 from .config import get_defaults
+from .covariance_operator import (
+    CovarianceOperator,
+    DenseCovarianceOperator,
+    DiagonalCovarianceOperator,
+)
 from .types import PRNGKeyType
 
 JITTER = get_defaults()["jitter"]
@@ -101,9 +105,9 @@ class AbstractKernelComputation:
     @abc.abstractmethod
     def gram(
         kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
-    ) -> Float[Array, "N N"]:
+    ) -> CovarianceOperator:
 
-        """Compute the Gram matrix of the kernel function.
+        """Compute Gram covariance operator of the kernel function.
 
         Args:
             kernel (Kernel): The kernel function to be evaluated.
@@ -111,76 +115,15 @@ class AbstractKernelComputation:
             params (Dict): The parameters of the kernel function.
 
         Returns:
-            Float[Array, "N N"]: The Gram matrix of the kernel function.
+            Covariance: Gram covariance operator of the kernel function.
         """
 
         raise NotImplementedError
-
-    @staticmethod
-    @abc.abstractmethod
-    def cross_covariance(
-        kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: Dict
-    ) -> tfl.LinearOperator:
-
-        """Compute the cross covariance matrix of the kernel function.
-
-        Args:
-            kernel (Kernel): The kernel function to be evaluated.
-            x (Float[Array, "N D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "M D"]): The right hand argument of the kernel function's call
-            params (Dict): The parameters of the kernel function.
-
-        Returns:
-            Float[Array, "N M"]: The cross covariance matrix of the kernel function.
-        """
-
-        raise NotImplementedError
-
-    @staticmethod
-    @abc.abstractmethod
-    def diagonal(
-        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
-    ) -> tfl.LinearOperator:
-
-        """Compute the diagonal of the kernel function.
-
-        Args:
-            kernel (Kernel): The kernel function to be evaluated.
-            inputs (Float[Array, "N D"]): The inputs to the kernel function.
-            params (Dict): The parameters of the kernel function.
-
-        Returns:
-            Float[Array, "N"]: The diagonal of the kernel function.
-        """
-
-        raise NotImplementedError
-
-
-class DenseKernelComputation(AbstractKernelComputation):
-    """Dense kernel computation class. Operations with the kernel assume a dense gram matrix structure."""
-
-    @staticmethod
-    def gram(
-        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
-    ) -> tfl.LinearOperator:
-        """For a given kernel, compute the NxN gram matrix on an input matrix of shape NxD.
-
-        Args:
-            kernel (Kernel): The kernel for which the Gram matrix should be computed for.
-            inputs (Float[Array,"N D"]): The input matrix.
-            params (Dict): The kernel's parameter set.
-
-        Returns:
-            tfl.LinearOperator: The computed square Gram matrix.
-        """
-        return tfl.LinearOperatorFullMatrix(
-            vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(inputs)
-        )
 
     @staticmethod
     def cross_covariance(
         kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: Dict
-    ) -> tfl.LinearOperator:
+    ) -> Float[Array, "N M"]:
         """For a given kernel, compute the NxM gram matrix on an a pair of input matrices with shape NxD and MxD.
 
         Args:
@@ -190,16 +133,14 @@ class DenseKernelComputation(AbstractKernelComputation):
             params (Dict): The kernel's parameter set.
 
         Returns:
-            tfl.LinearOperator: The computed square Gram matrix.
+            Float[Array, "N M"]: The computed square Gram matrix.
         """
-        return tfl.LinearOperatorFullMatrix(
-            vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
-        )
+        return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
 
     @staticmethod
     def diagonal(
         kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
-    ) -> tfl.LinearOperator:
+    ) -> CovarianceOperator:
         """For a given kernel, compute the elementwise diagonal of the NxN gram matrix on an input matrix of shape NxD.
         Args:
             kernel (Kernel): The kernel for which the variance vector should be computed for.
@@ -208,14 +149,36 @@ class DenseKernelComputation(AbstractKernelComputation):
         Returns:
             tfl.LinearOperator: The computed diagonal variance entries.
         """
-        return tfl.LinearOperatorDiag(vmap(lambda x: kernel(x, x, params))(inputs))
+        return DiagonalCovarianceOperator(
+            diagonal=vmap(lambda x: kernel(x, x, params))(inputs)
+        )
+
+
+class DenseKernelComputation(AbstractKernelComputation):
+    """Dense kernel computation class. Operations with the kernel assume a dense gram matrix structure."""
+
+    @staticmethod
+    def gram(kernel: Kernel, inputs: Float[Array, "N D"], params: Dict) -> Covariance:
+        """For a given kernel, compute the NxN gram matrix on an input matrix of shape NxD.
+
+        Args:
+            kernel (Kernel): The kernel for which the Gram matrix should be computed for.
+            inputs (Float[Array,"N D"]): The input matrix.
+            params (Dict): The kernel's parameter set.
+
+        Returns:
+            Dense: The computed square Gram matrix.
+        """
+        return DenseCovarianceOperator(
+            matrix=vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(
+                inputs
+            )
+        )
 
 
 class DiagonalKernelComputation(AbstractKernelComputation):
     @staticmethod
-    def gram(
-        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
-    ) -> tfl.LinearOperator:
+    def gram(kernel: Kernel, inputs: Float[Array, "N D"], params: Dict) -> Covariance:
         """For a kernel with diagonal structure, compute the NxN gram matrix on an input matrix of shape NxD.
 
         Args:
@@ -226,40 +189,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
         Returns:
             tfl.LinearOperator: The computed square Gram matrix.
         """
-        return tfl.LinearOperatorDiag(vmap(lambda x: kernel(x, x, params))(inputs))
-
-    @staticmethod
-    def cross_covariance(
-        kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: Dict
-    ) -> tfl.LinearOperator:
-        """For a given kernel, compute the NxM gram matrix on an a pair of input matrices with shape NxD and MxD.
-
-        Args:
-            kernel (Kernel): The kernel for which the cross-covariance matrix should be computed for.
-            x (Float[Array, "N D"]): The first input matrix.
-            y (Float[Array, "M D"]): The second input matrix.
-            params (Dict): The kernel's parameter set.
-
-        Returns:
-            tfl.LinearOperator: The computed square Gram matrix.
-        """
-        return tfl.LinearOperatorFullMatrix(
-            vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
-        )
-
-    @staticmethod
-    def diagonal(
-        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
-    ) -> tfl.LinearOperator:
-        """For a given kernel, compute the elementwise diagonal of the NxN gram matrix on an input matrix of shape NxD.
-        Args:
-            kernel (Kernel): The kernel for which the variance vector should be computed for.
-            inputs (Float[Array, "N D"]): The input matrix.
-            params (Dict): The kernel's parameter set.
-        Returns:
-            tfl.LinearOperator: The computed diagonal variance entries.
-        """
-        return tfl.LinearOperatorDiag(vmap(lambda x: kernel(x, x, params))(inputs))
+        return DiagonalCovarianceOperator(vmap(lambda x: kernel(x, x, params))(inputs))
 
 
 @dataclass

@@ -1,14 +1,16 @@
-from ast import operator
 from itertools import permutations
 
-import jax.experimental.jax2tf.call_tf as jtf
 import jax.numpy as jnp
 import jax.random as jr
 import networkx as nx
 import numpy as np
 import pytest
-from tensorflow import linalg as tfl
 
+from gpjax.covariance_operator import (
+    CovarianceOperator,
+    DenseCovarianceOperator,
+    DiagonalCovarianceOperator,
+)
 from gpjax.kernels import (
     RBF,
     CombinationKernel,
@@ -40,11 +42,9 @@ def test_gram(kern, dim):
     parameter_state = initialise(kern, key)
     params, _, _ = parameter_state.unpack()
     gram_operator = op(kern, x, params)
-    assert isinstance(gram_operator, tfl.LinearOperator)
+    assert isinstance(gram_operator, CovarianceOperator)
 
-    dense = gram_operator.to_dense()
-
-    gram_matrix = jtf(dense)
+    gram_matrix = gram_operator.to_dense()
 
     assert gram_matrix.shape[0] == x.shape[0]
     assert gram_matrix.shape[0] == gram_matrix.shape[1]
@@ -64,11 +64,9 @@ def test_cross_covariance(kern, n1, n2):
     params, _, _ = parameter_state.unpack()
     operator = op(kern, x1, x2, params)
 
-    assert isinstance(operator, tfl.LinearOperator)
+    assert isinstance(operator, CovarianceOperator)
 
-    dense = operator.to_dense()
-
-    cross_covariance = jtf(dense)
+    cross_covariance = operator.to_dense()
 
     assert cross_covariance.shape == (n1, n2)
 
