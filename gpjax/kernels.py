@@ -22,9 +22,8 @@ from jax import vmap
 from jaxtyping import Array, Float
 from tensorflow import linalg as tfl
 
-from .types import PRNGKeyType
-
 from .config import get_defaults
+from .types import PRNGKeyType
 
 JITTER = get_defaults()["jitter"]
 
@@ -49,20 +48,20 @@ class Kernel:
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs.
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
             params (Dict): Parameter set for which the kernel should be evaluated on.
         Returns:
-            Array: The value of :math:`k(x, y)`.
+            Float[Array, "1"]: The value of :math:`k(x, y)`.
         """
         raise NotImplementedError
 
     def slice_input(self, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
         """Select the relevant columns of the supplied matrix to be used within the kernel's evaluation.
         Args:
-            x (Array): The matrix or vector that is to be sliced.
+            x (Float[Array, "N D"])): The matrix or vector that is to be sliced.
         Returns:
-            Array: A sliced form of the input matrix.
+            Float[Array, "N Q"]: A sliced form of the input matrix.
         """
         return x[..., self.active_dims]
 
@@ -71,9 +70,6 @@ class Kernel:
 
     def __mul__(self, other: "Kernel") -> "Kernel":
         return ProductKernel(kernel_set=[self, other])
-
-    def __matmul__(self, other: "Kernel") -> "Kernel":
-        return KroneckerKernel(kernel_set=[self, other])
 
     @property
     def ard(self):
@@ -86,7 +82,14 @@ class Kernel:
 
     @abc.abstractmethod
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
-        """A template dictionary of the kernel's parameter set."""
+        """A template dictionary of the kernel's parameter set.
+
+        Args:
+            key (PRNGKeyType): A PRNG key to be used for initialising the kernel's parameters.
+
+        Returns:
+            Dict: A dictionary of the kernel's parameters.
+        """
         raise NotImplementedError
 
 
@@ -94,18 +97,62 @@ class Kernel:
 class AbstractKernelComputation:
     """Abstract class for kernel computations."""
 
-    # @abc.abstractmethod
+    @staticmethod
+    @abc.abstractmethod
     def gram(
         kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
     ) -> Float[Array, "N N"]:
+
+        """Compute the Gram matrix of the kernel function.
+
+        Args:
+            kernel (Kernel): The kernel function to be evaluated.
+            inputs (Float[Array, "N N"]): The inputs to the kernel function.
+            params (Dict): The parameters of the kernel function.
+
+        Returns:
+            Float[Array, "N N"]: The Gram matrix of the kernel function.
+        """
+
         raise NotImplementedError
 
-    # @abc.abstractmethod
-    def diagonal() -> tfl.LinearOperator:
+    @staticmethod
+    @abc.abstractmethod
+    def cross_covariance(
+        kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: Dict
+    ) -> tfl.LinearOperator:
+
+        """Compute the cross covariance matrix of the kernel function.
+
+        Args:
+            kernel (Kernel): The kernel function to be evaluated.
+            x (Float[Array, "N D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "M D"]): The right hand argument of the kernel function's call
+            params (Dict): The parameters of the kernel function.
+
+        Returns:
+            Float[Array, "N M"]: The cross covariance matrix of the kernel function.
+        """
+
         raise NotImplementedError
 
-    # @abc.abstractmethod
-    def cross_covariance() -> tfl.LinearOperator:
+    @staticmethod
+    @abc.abstractmethod
+    def diagonal(
+        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
+    ) -> tfl.LinearOperator:
+
+        """Compute the diagonal of the kernel function.
+
+        Args:
+            kernel (Kernel): The kernel function to be evaluated.
+            inputs (Float[Array, "N D"]): The inputs to the kernel function.
+            params (Dict): The parameters of the kernel function.
+
+        Returns:
+            Float[Array, "N"]: The diagonal of the kernel function.
+        """
+
         raise NotImplementedError
 
 
@@ -184,7 +231,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
     @staticmethod
     def cross_covariance(
         kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: Dict
-    ) -> Float[Array, "N M"]:
+    ) -> tfl.LinearOperator:
         """For a given kernel, compute the NxM gram matrix on an a pair of input matrices with shape NxD and MxD.
 
         Args:
@@ -194,7 +241,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
             params (Dict): The kernel's parameter set.
 
         Returns:
-            Array: The computed square Gram matrix.
+            tfl.LinearOperator: The computed square Gram matrix.
         """
         return tfl.LinearOperatorFullMatrix(
             vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
@@ -210,13 +257,9 @@ class DiagonalKernelComputation(AbstractKernelComputation):
             inputs (Float[Array, "N D"]): The input matrix.
             params (Dict): The kernel's parameter set.
         Returns:
-            Array: The computed diagonal variance entries.
+            tfl.LinearOperator: The computed diagonal variance entries.
         """
         return tfl.LinearOperatorDiag(vmap(lambda x: kernel(x, x, params))(inputs))
-
-
-class CombinationKernelComputation(AbstractKernelComputation):
-    pass
 
 
 @dataclass
@@ -225,7 +268,7 @@ class _KernelSet:
 
 
 @dataclass
-class CombinationKernel(Kernel, _KernelSet, CombinationKernelComputation):
+class CombinationKernel(Kernel, _KernelSet, DenseKernelComputation):
     """A base class for products or sums of kernels."""
 
     name: Optional[str] = "Combination kernel"
@@ -280,61 +323,6 @@ class ProductKernel(CombinationKernel):
     combination_fn: Optional[Callable] = jnp.prod
 
 
-class KroneckerKernelComputation(AbstractKernelComputation):
-    @staticmethod
-    def gram(kernel, inputs, params: dict):
-        gram_linear_operators = []
-
-        for k, params in zip(kernel.kernel_set, params):
-
-            # Filter grid based on active dims.
-            _, indices = jnp.unique(
-                inputs[..., k.active_dims], return_index=True, axis=0
-            )
-
-            gram_linear_operators.append(k.gram(k, inputs[indices], params))
-
-        return tfl.LinearOperatorKronecker(gram_linear_operators)
-
-    @staticmethod
-    def cross_covariance(
-        kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: Dict
-    ) -> Float[Array, "N M"]:
-        """For a given kernel, compute the NxM gram matrix on an a pair of input matrices with shape NxD and MxD.
-
-        Args:
-            kernel (Kernel): The kernel for which the cross-covariance matrix should be computed for.
-            x (Float[Array, "N D"]): The first input matrix.
-            y (Float[Array, "M D"]): The second input matrix.
-            params (Dict): The kernel's parameter set.
-
-        Returns:
-            Array: The computed square Gram matrix.
-        """
-        return tfl.LinearOperatorFullMatrix(
-            vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
-        )
-
-    @staticmethod
-    def diagonal(
-        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
-    ) -> tfl.LinearOperator:
-        """For a given kernel, compute the elementwise diagonal of the NxN gram matrix on an input matrix of shape NxD.
-        Args:
-            kernel (Kernel): The kernel for which the variance vector should be computed for.
-            inputs (Float[Array, "N D"]): The input matrix.
-            params (Dict): The kernel's parameter set.
-        Returns:
-            Array: The computed diagonal variance entries.
-        """
-        return tfl.LinearOperatorDiag(vmap(lambda x: kernel(x, x, params))(inputs))
-
-
-@dataclass
-class KroneckerKernel(CombinationKernel, KroneckerKernelComputation):
-    name: Optional[str] = "Kronecker kernel"
-
-
 ##########################################
 # Euclidean kernels
 ##########################################
@@ -350,18 +338,18 @@ class RBF(Kernel, DenseKernelComputation):
     def __call__(
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( \\frac{\\lVert x - y \\rVert^2_2}{2 \\ell^2} \\Bigg)
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
             params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
-            Array: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The value of :math:`k(x, y)`
         """
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
@@ -387,21 +375,21 @@ class Matern12(Kernel, DenseKernelComputation):
     def __call__(
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( -\\frac{\\lvert x-y \\rvert}{\\ell}  \\Bigg)
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
             params (Dict): Parameter set for which the kernel should be evaluated on.
         Returns:
-            Array: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The value of :math:`k(x, y)`
         """
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
-        K = params["variance"] * jnp.exp(-0.5 * euclidean_distance(x, y))
+        K = params["variance"] * jnp.exp(euclidean_distance(x, y))
         return K.squeeze()
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
@@ -423,18 +411,18 @@ class Matern32(Kernel, DenseKernelComputation):
     def __call__(
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{3}\\lvert x-y \\rvert}{\\ell}  \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{3}\\lvert x-y\\rvert}{\\ell} \\Bigg)
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
             params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
-            Array: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The value of :math:`k(x, y)`
         """
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
@@ -465,18 +453,18 @@ class Matern52(Kernel, DenseKernelComputation):
     def __call__(
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{5}\\lvert x-y \\rvert}{\\ell} + \\frac{5\\lvert x - y \\rvert^2}{3\\ell^2} \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{5}\\lvert x-y\\rvert}{\\ell} \\Bigg)
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
             params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
-            Array: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The value of :math:`k(x, y)`
         """
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
@@ -509,18 +497,18 @@ class Polynomial(Kernel, DenseKernelComputation):
     def __call__(
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\alpha` and variance :math:`\sigma` through
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\\alpha` and variance :math:`\sigma^2` through
 
         .. math::
             k(x, y) = \\Big( \\alpha + \\sigma^2 xy \\Big)^{d}
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
             params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
-            Array: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The value of :math:`k(x, y)`
         """
         x = self.slice_input(x).squeeze()
         y = self.slice_input(y).squeeze()
@@ -553,16 +541,16 @@ class White(Kernel, DiagonalKernelComputation):
             params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
-            Array: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The value of :math:`k(x, y)`
         """
-        K = jnp.all(jnp.equal(x, y)) * params["variance"]  # <- pseudo code.
+        K = jnp.all(jnp.equal(x, y)) * params["variance"]
         return K.squeeze()
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: Float[Array, "1 D"]) -> Dict:
         """Initialise the kernel parameters.
 
         Args:
-            key (jnp.DeviceArray): The key to initialise the parameters with.
+            key (Float[Array, "1 D"]): The key to initialise the parameters with.
 
         Returns:
             Dict: The initialised parameters.
@@ -591,15 +579,15 @@ class GraphKernel(Kernel, _EigenKernel, DenseKernelComputation):
     def __call__(
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
-        """Evaluate the graph kernel on a pair of vertices v_i, v_j.
+        """Evaluate the graph kernel on a pair of vertices :math:`v_i, v_j`.
 
         Args:
-            x (jnp.DeviceArray): Index of the ith vertex
-            y (jnp.DeviceArray): Index of the jth vertex
+            x (Float[Array, "1 D"]): Index of the ith vertex
+            y (Float[Array, "1 D"]): Index of the jth vertex
             params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
-            Array: The value of k(v_i, v_j).
+            Float[Array, "1"]: The value of :math:`k(v_i, v_j)`.
         """
         psi = jnp.power(
             2 * params["smoothness"] / params["lengthscale"] ** 2 + self.evals,

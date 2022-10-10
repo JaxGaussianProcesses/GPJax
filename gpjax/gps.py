@@ -24,11 +24,10 @@ from chex import dataclass
 from jaxtyping import Array, Float
 
 from .config import get_defaults
-from .kernels import Kernel, cross_covariance, gram
+from .kernels import Kernel
 from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
 from .parameters import copy_dict_structure, evaluate_priors
-
 from .types import Dataset, PRNGKeyType
 from .utils import I, concat_dictionaries
 
@@ -119,7 +118,7 @@ class Prior(AbstractGP):
         Returns:
             Callable[[Float[Array, "N D"]], dx.Distribution]: A mean function that accepts an input array for where the mean function should be evaluated at. The mean function's value at these points is then returned.
         """
-        gram = self.kernel.gram
+        gram_operator = self.kernel.gram
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
             t = test_inputs
