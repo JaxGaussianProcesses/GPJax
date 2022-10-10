@@ -42,6 +42,8 @@ To learn more, checkout the [regression
 notebook](https://gpjax.readthedocs.io/en/latest/examples/regression.html).
 :::
 
+Are you rendering
+
 ---
 
 ```{toctree}
@@ -53,7 +55,7 @@ hidden:
 installation
 design
 contributing
-intro_to_gps
+examples/intro_to_gps
 ```
 
 ```{toctree}
