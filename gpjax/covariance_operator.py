@@ -73,11 +73,11 @@ class CovarianceOperator:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def cholesky(self) -> Float[Array, "N N"]:
-        """Compute Cholesky decomposition.
+    def tril(self) -> Float[Array, "N N"]:
+        """Compute lower triangular.
 
         Returns:
-            Float[Array, "N N"]: Cholesky decomposition of the covariance matrix.
+            Float[Array, "N N"]: Lower triangular of the covariance matrix.
         """
         raise NotImplementedError
 
@@ -87,8 +87,8 @@ class CovarianceOperator:
         Returns:
             Float[Array, "1"]: Log determinant of the covariance matrix.
         """
-        L = self.cholesky()
-        return 2.0 * jsp.sum(jnp.log(jnp.diag(L)))
+
+        return 2.0 * jsp.sum(jnp.log(jnp.diag(self.tril())))
 
     def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
         """Solve linear system.
@@ -99,7 +99,7 @@ class CovarianceOperator:
         Returns:
             Float[Array, "N M"]: Solution of the linear system.
         """
-        return jsp.linalg.cho_solve((self.cholesky(), True), rhs)
+        return jsp.linalg.cho_solve((self.tril(), True), rhs)
 
     def trace(self) -> Float[Array, "1"]:
         """Trace of the covariance matrix.
@@ -156,12 +156,12 @@ class DenseCovarianceOperator(CovarianceOperator):
 
         return jnp.matmul(self.matrix, x)
 
-    def cholesky(self) -> Float[Array, "N N"]:
+    def tril(self) -> Float[Array, "N N"]:
         """
-        Cholesky decomposition.
+        Computate lower triangular via the Cholesky decomposition.
 
         Returns:
-            Float[Array, "N N"]: Cholesky decomposition.
+            Float[Array, "N N"]: Lower triangular matrix.
         """
 
         return jnp.linalg.cholesky(self.matrix)
@@ -171,7 +171,7 @@ class DenseCovarianceOperator(CovarianceOperator):
 class DiagonalCovarianceOperator(CovarianceOperator):
     """Diagonal covariance operator."""
 
-    diagonal: Float[Array, "N"]
+    diag: Float[Array, "N"]
     name: str = "Diagonal covariance operator"
 
     @property
@@ -181,7 +181,7 @@ class DiagonalCovarianceOperator(CovarianceOperator):
         Returns:
             Tuple[int, int]: shape of the covariance operator.
         """
-        N = self.diagonal.shape[0]
+        N = self.diag.shape[0]
         return (N, N)
 
     def to_dense(self) -> Float[Array, "N N"]:
@@ -190,7 +190,7 @@ class DiagonalCovarianceOperator(CovarianceOperator):
         Returns:
             Float[Array, "N N"]: Dense covariance matrix.
         """
-        return jnp.diag(self.diagonal)
+        return jnp.diag(self.diag)
 
     def diagonal(self) -> Float[Array, "N"]:
         """
@@ -199,7 +199,7 @@ class DiagonalCovarianceOperator(CovarianceOperator):
         Returns:
             Float[Array, "N"]: The diagonal of the covariance operator.
         """
-        return self.diagonal
+        return self.diag
 
     def __matmul__(self, x: Float[Array, "N M"]) -> Float[Array, "N M"]:
         """Matrix multiplication.
@@ -210,25 +210,25 @@ class DiagonalCovarianceOperator(CovarianceOperator):
         Returns:
             Float[Array, "N M"]: Result of matrix multiplication.
         """
-        diag_mat = lax.expand_dims(self.diagonal(), -1)
+        diag_mat = lax.expand_dims(self.diag(), -1)
         return diag_mat * x
 
-    def cholesky(self) -> Float[Array, "N N"]:
+    def tril(self) -> Float[Array, "N N"]:
         """
-        Cholesky decomposition.
+        Lower triangular.
 
         Returns:
-            Float[Array, "N N"]: Cholesky decomposition.
+            Float[Array, "N N"]: Lower triangular matrix.
         """
-        return jnp.diag(jnp.sqrt(self.diagonal))
+        return jnp.diag(jnp.sqrt(self.diag))
 
     def log_det(self) -> Float[Array, "1"]:
-        """Log determinant of the covariance matrix.
+        """Log determinant.
 
         Returns:
             Float[Array, "1"]: Log determinant of the covariance matrix.
         """
-        return 2.0 * jnp.sum(jnp.log(self.diagonal))
+        return 2.0 * jnp.sum(jnp.log(self.diag))
 
     def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
         """Solve linear system.
@@ -239,7 +239,7 @@ class DiagonalCovarianceOperator(CovarianceOperator):
         Returns:
             Float[Array, "N M"]: Solution of the linear system.
         """
-        inv_diag_mat = lax.expand_dims(1.0 / self.diagonal(), -1)
+        inv_diag_mat = lax.expand_dims(1.0 / self.diag(), -1)
         return rhs * inv_diag_mat
 
 

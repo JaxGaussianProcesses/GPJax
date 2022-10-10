@@ -118,18 +118,15 @@ class Prior(AbstractGP):
         Returns:
             Callable[[Float[Array, "N D"]], dx.Distribution]: A mean function that accepts an input array for where the mean function should be evaluated at. The mean function's value at these points is then returned.
         """
-        gram_operator = self.kernel.gram
+        gram = self.kernel.gram
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
             t = test_inputs
-            n_test = t.shape[0]
             μt = self.mean_function(t, params["mean_function"])
             Ktt = gram(self.kernel, t, params["kernel"])
-            Ktt += I(n_test) * self.jitter
+            Lt = Ktt.tril()
 
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(μt.squeeze()), Ktt
-            )
+            return dx.MultivariateNormalTri(jnp.atleast_1d(μt.squeeze()), Lt)
 
         return predict_fn
 
@@ -221,7 +218,6 @@ class ConjugatePosterior(AbstractPosterior):
 
         # Precompute covariance matrices
         Kxx = gram(self.prior.kernel, x, params["kernel"])
-        Kxx += I(n) * self.jitter
 
         # Σ = (Kxx + Iσ²) = LLᵀ
         Sigma = Kxx + I(n) * obs_noise

@@ -63,7 +63,7 @@ class Kernel:
     def slice_input(self, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
         """Select the relevant columns of the supplied matrix to be used within the kernel's evaluation.
         Args:
-            x (Float[Array, "N D"])): The matrix or vector that is to be sliced.
+            x (Float[Array, "N D"]): The matrix or vector that is to be sliced.
         Returns:
             Float[Array, "N Q"]: A sliced form of the input matrix.
         """
@@ -150,7 +150,7 @@ class AbstractKernelComputation:
             tfl.LinearOperator: The computed diagonal variance entries.
         """
         return DiagonalCovarianceOperator(
-            diagonal=vmap(lambda x: kernel(x, x, params))(inputs)
+            diag=vmap(lambda x: kernel(x, x, params))(inputs)
         )
 
 
@@ -158,7 +158,9 @@ class DenseKernelComputation(AbstractKernelComputation):
     """Dense kernel computation class. Operations with the kernel assume a dense gram matrix structure."""
 
     @staticmethod
-    def gram(kernel: Kernel, inputs: Float[Array, "N D"], params: Dict) -> Covariance:
+    def gram(
+        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
+    ) -> CovarianceOperator:
         """For a given kernel, compute the NxN gram matrix on an input matrix of shape NxD.
 
         Args:
@@ -178,7 +180,9 @@ class DenseKernelComputation(AbstractKernelComputation):
 
 class DiagonalKernelComputation(AbstractKernelComputation):
     @staticmethod
-    def gram(kernel: Kernel, inputs: Float[Array, "N D"], params: Dict) -> Covariance:
+    def gram(
+        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
+    ) -> CovarianceOperator:
         """For a kernel with diagonal structure, compute the NxN gram matrix on an input matrix of shape NxD.
 
         Args:
@@ -189,7 +193,9 @@ class DiagonalKernelComputation(AbstractKernelComputation):
         Returns:
             tfl.LinearOperator: The computed square Gram matrix.
         """
-        return DiagonalCovarianceOperator(vmap(lambda x: kernel(x, x, params))(inputs))
+        return DiagonalCovarianceOperator(
+            diag=vmap(lambda x: kernel(x, x, params))(inputs)
+        )
 
 
 @dataclass
@@ -558,14 +564,16 @@ __all__ = [
     "CombinationKernel",
     "SumKernel",
     "ProductKernel",
-    "RBF" "Matern12",
+    "RBF",
+    "Matern12",
     "Matern32",
     "Matern52",
     "Polynomial",
+    "White",
     "GraphKernel",
     "squared_distance",
     "euclidean_distance",
-    "gram",
-    "cross_covariance",
-    "diagonal",
+    "AbstractKernelComputation",
+    "DenseKernelComputation",
+    "DiagonalKernelComputation",
 ]
