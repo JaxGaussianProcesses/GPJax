@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import abc
-from typing import Tuple
+from typing import Tuple, Callable
 
 import jax.numpy as jnp
 import jax.scipy as jsp
@@ -29,6 +29,7 @@ class CovarianceOperator:
 
     Inspired by TensorFlows' LinearOperator class.
     """
+
     jitter: float = 1e-6
     name: str = None
 
@@ -73,33 +74,52 @@ class CovarianceOperator:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def tril(self) -> Float[Array, "N N"]:
+    def tril(
+        self,
+        lhs_operator: Callable[[Float[Array, "N N"]], Float[Array, "N N"]] = None,
+    ) -> Float[Array, "N N"]:
         """Compute lower triangular.
 
+        Args:
+            lhs_operator: Callable[
+                    [Float[Array, "N N"]], Float[Array, "N N"]
+                ]: Optional function that is to be applied to the left hand side of the linear system before solving. The function should leave the shape of the matrix unchanged.
         Returns:
             Float[Array, "N N"]: Lower triangular of the covariance matrix.
         """
         raise NotImplementedError
 
-    def log_det(self) -> Float[Array, "1"]:
+    def log_det(
+        self, lhs_operator: Callable[[Float[Array, "N N"]], Float[Array, "N N"]] = None
+    ) -> Float[Array, "1"]:
         """Log determinant of the covariance matrix.
+        Args:
+            lhs_operator: Callable[
+                    [Float[Array, "N N"]], Float[Array, "N N"]
+                ]: Optional function that is to be applied to the left hand side of the linear system before solving. The function should leave the shape of the matrix unchanged.
 
         Returns:
             Float[Array, "1"]: Log determinant of the covariance matrix.
         """
 
-        return 2.0 * jsp.sum(jnp.log(jnp.diag(self.tril())))
+        return 2.0 * jsp.sum(jnp.log(jnp.diag(self.tril(lhs_operator))))
 
-    def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def solve(
+        self,
+        rhs: Float[Array, "N M"],
+        lhs_operator: Callable[[Float[Array, "N N"]], Float[Array, "N N"]] = None,
+    ) -> Float[Array, "N M"]:
         """Solve linear system.
 
         Args:
             rhs (Float[Array, "N M"]): Right hand side of the linear system.
-
+            lhs_operator: Callable[
+                        [Float[Array, "N N"]], Float[Array, "N N"]
+                    ]: Optional function that is to be applied to the left hand side of the linear system before solving. The function should leave the shape of the matrix unchanged.
         Returns:
             Float[Array, "N M"]: Solution of the linear system.
         """
-        return jsp.linalg.cho_solve((self.tril(), True), rhs)
+        return jsp.linalg.cho_solve((self.tril(lhs_operator), True), rhs)
 
     def trace(self) -> Float[Array, "1"]:
         """Trace of the covariance matrix.
@@ -113,7 +133,7 @@ class CovarianceOperator:
         """
         Stabilise the eigenvalues of the covariance matrix through a small amount of jitter applied to the diagonal.
         """
-        jitter_matrix = jnp.eye(matrix.shape[0])*self.jitter
+        jitter_matrix = jnp.eye(matrix.shape[0]) * self.jitter
         return matrix + jitter_matrix
 
 
@@ -163,15 +183,20 @@ class DenseCovarianceOperator(CovarianceOperator):
 
         return jnp.matmul(self.matrix, x)
 
-    def tril(self) -> Float[Array, "N N"]:
-        """
-        Computate lower triangular via the Cholesky decomposition.
+    def tril(self, lhs_operator: Callable = None) -> Float[Array, "N N"]:
+        """Compute lower triangular.
 
+        Args:
+            lhs_operator: Callable[
+                    [Float[Array, "N N"], Float[Array, "1"]], Float[Array, "N N"]
+                ]: Optional function that is to be applied to the left hand side of the linear system before solving. The function should leave the shape of the matrix unchanged.
         Returns:
-            Float[Array, "N N"]: Lower triangular matrix.
+            Float[Array, "N N"]: Lower triangular of the covariance matrix.
         """
-
-        return jnp.linalg.cholesky(self._stabilise(self.matrix))
+        if lhs_operator is None:
+            return jsp.linalg.cholesky(self._stabilise(self.matrix))
+        else:
+            return jsp.linalg.cholesky(lhs_operator(self.matrix, self.jitter))
 
 
 @dataclass
