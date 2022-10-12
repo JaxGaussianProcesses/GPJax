@@ -5,7 +5,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import pytest
 
-from gpjax import Dataset, initialise, transform
+from gpjax import Dataset, initialise
 from gpjax.gps import (
     AbstractGP,
     ConjugatePosterior,
@@ -14,15 +14,17 @@ from gpjax.gps import (
     construct_posterior,
 )
 from gpjax.kernels import RBF, Matern12, Matern32, Matern52
-from gpjax.likelihoods import Bernoulli, Gaussian, NonConjugateLikelihoods
+from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.parameters import ParameterState
+
+NonConjugateLikelihoods = [Bernoulli]
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 def test_prior(num_datapoints):
     p = Prior(kernel=RBF())
     parameter_state = initialise(p, jr.PRNGKey(123))
-    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
+    params, _, _ = parameter_state.unpack()
     assert isinstance(p, Prior)
     assert isinstance(p, AbstractGP)
     prior_rv_fn = p(params)
@@ -59,11 +61,10 @@ def test_conjugate_posterior(num_datapoints):
     assert isinstance(post2, AbstractGP)
 
     parameter_state = initialise(post, key)
-    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
-    params = transform(params, unconstrainer)
+    params, _, bijectors = parameter_state.unpack()
 
     # Marginal likelihood
-    mll = post.marginal_log_likelihood(train_data=D, transformations=constrainer)
+    mll = post.marginal_log_likelihood(train_data=D)
     objective_val = mll(params)
     assert isinstance(objective_val, jnp.DeviceArray)
     assert objective_val.shape == ()
@@ -101,12 +102,11 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     assert isinstance(p, AbstractGP)
 
     parameter_state = initialise(post, key)
-    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
-    params = transform(params, unconstrainer)
+    params, _, _ = parameter_state.unpack()
     assert isinstance(parameter_state, ParameterState)
 
     # Marginal likelihood
-    mll = post.marginal_log_likelihood(train_data=D, transformations=constrainer)
+    mll = post.marginal_log_likelihood(train_data=D)
     objective_val = mll(params)
     assert isinstance(objective_val, jnp.DeviceArray)
     assert objective_val.shape == ()
@@ -130,7 +130,7 @@ def test_nonconjugate_posterior(num_datapoints, likel):
 def test_param_construction(num_datapoints, lik):
     p = Prior(kernel=RBF()) * lik(num_datapoints=num_datapoints)
     parameter_state = initialise(p, jr.PRNGKey(123))
-    params, trainable_status, constrainer, unconstrainer = parameter_state.unpack()
+    params, _, _ = parameter_state.unpack()
 
     if isinstance(lik, Bernoulli):
         assert sorted(list(params.keys())) == [

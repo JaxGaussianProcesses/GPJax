@@ -6,6 +6,14 @@ import jax.random as jr
 import pytest
 
 import gpjax as gpx
+from gpjax import variational_inference
+from gpjax.variational_families import (
+    CollapsedVariationalGaussian,
+    ExpectationVariationalGaussian,
+    NaturalVariationalGaussian,
+    VariationalGaussian,
+    WhitenedVariationalGaussian,
+)
 
 
 def test_abstract_variational_inference():
@@ -37,44 +45,40 @@ def get_data_and_gp(n_datapoints, point_dim):
 
 
 @pytest.mark.parametrize("n_datapoints, n_inducing_points", [(10, 2), (100, 10)])
-@pytest.mark.parametrize("n_test", [1, 10])
-@pytest.mark.parametrize("whiten", [True, False])
-@pytest.mark.parametrize("diag", [True, False])
 @pytest.mark.parametrize("jit_fns", [False, True])
-@pytest.mark.parametrize("point_dim", [1, 2])
+@pytest.mark.parametrize("point_dim", [1, 2, 3])
+@pytest.mark.parametrize(
+    "variational_family",
+    [
+        VariationalGaussian,
+        WhitenedVariationalGaussian,
+        NaturalVariationalGaussian,
+        ExpectationVariationalGaussian,
+    ],
+)
 def test_stochastic_vi(
-    n_datapoints, n_inducing_points, n_test, whiten, diag, jit_fns, point_dim
+    n_datapoints, n_inducing_points, jit_fns, point_dim, variational_family
 ):
     D, post, prior = get_data_and_gp(n_datapoints, point_dim)
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing_points).reshape(-1, 1)
     inducing_inputs = jnp.hstack([inducing_inputs] * point_dim)
 
-    if whiten is True:
-        q = gpx.WhitenedVariationalGaussian(
-            prior=prior, inducing_inputs=inducing_inputs, diag=diag
-        )
-    else:
-        q = gpx.VariationalGaussian(
-            prior=prior, inducing_inputs=inducing_inputs, diag=diag
-        )
+    q = variational_family(prior=prior, inducing_inputs=inducing_inputs)
 
     svgp = gpx.StochasticVI(posterior=post, variational_family=q)
     assert svgp.posterior.prior == post.prior
     assert svgp.posterior.likelihood == post.likelihood
 
-    params, _, constrainer, unconstrainer = gpx.initialise(
-        svgp, jr.PRNGKey(123)
-    ).unpack()
-    params = gpx.transform(params, unconstrainer)
+    params, _, _ = gpx.initialise(svgp, jr.PRNGKey(123)).unpack()
 
     assert svgp.prior == post.prior
     assert svgp.likelihood == post.likelihood
     assert svgp.num_inducing == n_inducing_points
 
     if jit_fns:
-        elbo_fn = jax.jit(svgp.elbo(D, constrainer))
+        elbo_fn = jax.jit(svgp.elbo(D))
     else:
-        elbo_fn = svgp.elbo(D, constrainer)
+        elbo_fn = svgp.elbo(D)
     assert isinstance(elbo_fn, tp.Callable)
     elbo_value = elbo_fn(params, D)
     assert isinstance(elbo_value, jnp.ndarray)
@@ -95,7 +99,7 @@ def test_collapsed_vi(n_datapoints, n_inducing_points, jit_fns, point_dim):
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing_points).reshape(-1, 1)
     inducing_inputs = jnp.hstack([inducing_inputs] * point_dim)
 
-    q = gpx.variational_families.CollapsedVariationalGaussian(
+    q = CollapsedVariationalGaussian(
         prior=prior, likelihood=likelihood, inducing_inputs=inducing_inputs
     )
 
@@ -103,19 +107,16 @@ def test_collapsed_vi(n_datapoints, n_inducing_points, jit_fns, point_dim):
     assert sgpr.posterior.prior == post.prior
     assert sgpr.posterior.likelihood == post.likelihood
 
-    params, _, constrainer, unconstrainer = gpx.initialise(
-        sgpr, jr.PRNGKey(123)
-    ).unpack()
-    params = gpx.transform(params, unconstrainer)
+    params, _, _ = gpx.initialise(sgpr, jr.PRNGKey(123)).unpack()
 
     assert sgpr.prior == post.prior
     assert sgpr.likelihood == post.likelihood
     assert sgpr.num_inducing == n_inducing_points
 
     if jit_fns:
-        elbo_fn = jax.jit(sgpr.elbo(D, constrainer))
+        elbo_fn = jax.jit(sgpr.elbo(D))
     else:
-        elbo_fn = sgpr.elbo(D, constrainer)
+        elbo_fn = sgpr.elbo(D)
     assert isinstance(elbo_fn, tp.Callable)
     elbo_value = elbo_fn(params)
     assert isinstance(elbo_value, jnp.ndarray)
