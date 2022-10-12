@@ -118,6 +118,7 @@ def fit(
     optax_optim: ox.GradientTransformation,
     n_iters: Optional[int] = 100,
     log_rate: Optional[int] = 10,
+    verbose: Optional[bool] = True,
 ) -> InferenceState:
     """Abstracted method for fitting a GP model with respect to a supplied objective function.
     Optimisers used here should originate from Optax.
@@ -128,6 +129,7 @@ def fit(
         optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
+        verbose (bool, optional): Whether to print the training loading bar. Defaults to True.
 
     Returns:
         InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
@@ -144,10 +146,8 @@ def fit(
 
     # Tranform params to unconstrained space:
     params = unconstrain(params, bijectors)
-
     opt_state = optax_optim.init(params)
 
-    @progress_bar_scan(n_iters, log_rate)
     def step(carry, iter_num):
         params, opt_state = carry
         loss_val, loss_gradient = jax.value_and_grad(loss)(params)
@@ -155,6 +155,9 @@ def fit(
         params = ox.apply_updates(params, updates)
         carry = params, opt_state
         return carry, loss_val
+
+    if verbose:
+        step = progress_bar_scan(n_iters, log_rate)(step)
 
     (params, _), history = jax.lax.scan(step, (params, opt_state), iter_nums)
 
@@ -175,6 +178,7 @@ def fit_batches(
     batch_size: int,
     n_iters: Optional[int] = 100,
     log_rate: Optional[int] = 10,
+    verbose: Optional[bool] = True,
 ) -> InferenceState:
     """Abstracted method for fitting a GP model with mini-batches respect to a supplied objective function.
     Optimisers used here should originate from Optax.
@@ -188,6 +192,7 @@ def fit_batches(
         batch_size(int): The batch_size.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
+        verbose (bool, optional): Whether to print the training loading bar. Defaults to True.
 
     Returns:
         InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
@@ -206,7 +211,6 @@ def fit_batches(
     keys = jr.split(key, n_iters)
     iter_nums = jnp.arange(n_iters)
 
-    @progress_bar_scan(n_iters, log_rate)
     def step(carry, iter_num__and__key):
         iter_num, key = iter_num__and__key
         params, opt_state = carry
@@ -219,6 +223,9 @@ def fit_batches(
 
         carry = params, opt_state
         return carry, loss_val
+
+    if verbose:
+        step = progress_bar_scan(n_iters, log_rate)(step)
 
     (params, _), history = jax.lax.scan(step, (params, opt_state), (iter_nums, keys))
 
@@ -255,6 +262,7 @@ def fit_natgrads(
     batch_size: int,
     n_iters: Optional[int] = 100,
     log_rate: Optional[int] = 10,
+    verbose: Optional[bool] = True,
 ) -> Dict:
     """This is a training loop for natural gradients. See Salimbeni et al. (2018) Natural Gradients in Practice: Non-Conjugate Variational Inference in Gaussian Process Models
     Each iteration comprises a hyperparameter gradient step followed by natural gradient step to avoid a stale posterior.
@@ -269,6 +277,7 @@ def fit_natgrads(
         batch_size(int): The batch_size.
         n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
         log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
+        verbose (bool, optional): Whether to print the training loading bar. Defaults to True.
 
     Returns:
         InferenceState: A dataclass comprising optimised parameters and training history.
@@ -288,7 +297,6 @@ def fit_natgrads(
     keys = jax.random.split(key, n_iters)
     iter_nums = jnp.arange(n_iters)
 
-    @progress_bar_scan(n_iters, log_rate)
     def step(carry, iter_num__and__key):
         iter_num, key = iter_num__and__key
         params, hyper_state, moment_state = carry
@@ -307,6 +315,9 @@ def fit_natgrads(
 
         carry = params, hyper_state, moment_state
         return carry, loss_val
+
+    if verbose:
+        step = progress_bar_scan(n_iters, log_rate)(step)
 
     (params, _, _), history = jax.lax.scan(
         step, (params, hyper_state, moment_state), (iter_nums, keys)
