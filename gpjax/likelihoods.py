@@ -1,9 +1,9 @@
 import abc
 from typing import Any, Callable, Dict, Optional
 
-import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
+import numpyro.distributions as npd
 from chex import dataclass
 from jaxtyping import Array, Float
 
@@ -66,16 +66,18 @@ class Gaussian(AbstractLikelihood, Conjugate):
             Callable: A link function that maps the predictive distribution to the likelihood function.
         """
 
-        def link_fn(x, params: dict) -> dx.Distribution:
-            return dx.Normal(loc=x, scale=params["obs_noise"])
+        def link_fn(x, params: dict) -> npd.Distribution:
+            return npd.Normal(loc=x, scale=params["obs_noise"])
 
         return link_fn
 
-    def predict(self, dist: dx.Distribution, params: dict) -> dx.Distribution:
+    def predict(self, dist: npd.Distribution, params: dict) -> npd.Distribution:
         """Evaluate the Gaussian likelihood function at a given predictive distribution. Computationally, this is equivalent to summing the observation noise term to the diagonal elements of the predictive distribution's covariance matrix.."""
         n_data = dist.event_shape[0]
-        noisy_cov = dist.covariance() + I(n_data) * params["likelihood"]["obs_noise"]
-        return dx.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
+        noisy_cov = (
+            dist.covariance_matrix + I(n_data) * params["likelihood"]["obs_noise"]
+        )
+        return npd.MultivariateNormal(dist.mean, noisy_cov)
 
 
 @dataclass
@@ -94,8 +96,8 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
             Callable: A probit link function that maps the predictive distribution to the likelihood function.
         """
 
-        def link_fn(x, params: Dict) -> dx.Distribution:
-            return dx.Bernoulli(probs=inv_probit(x))
+        def link_fn(x, params: Dict) -> npd.Distribution:
+            return npd.Bernoulli(probs=inv_probit(x))
 
         return link_fn
 
@@ -115,9 +117,9 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
 
         return moment_fn
 
-    def predict(self, dist: dx.Distribution, params: dict) -> Any:
-        variance = jnp.diag(dist.covariance())
-        mean = dist.mean()
+    def predict(self, dist: npd.Distribution, params: dict) -> Any:
+        variance = jnp.diag(dist.covariance_matrix)
+        mean = dist.mean
         return self.predictive_moment_fn(mean.ravel(), variance, params)
 
 

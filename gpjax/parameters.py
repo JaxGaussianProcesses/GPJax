@@ -4,18 +4,16 @@ from collections import namedtuple
 from copy import deepcopy
 from warnings import warn
 
-import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
+import numpyro.distributions as npd
 from chex import dataclass
 from jaxtyping import Array, Float
 
 from .config import get_defaults
 from .types import PRNGKeyType
 from .utils import merge_dictionaries
-
-Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 
 
 ################################
@@ -134,7 +132,7 @@ def build_bijectors(params: tp.Dict) -> tp.Dict:
                         transform_type = transform_set[key]
                         bijector = transform_set[transform_type]
                     else:
-                        bijector = Identity
+                        bijector = npd.transforms.IdentityTransform()
                         warnings.warn(
                             f"Parameter {key} has no transform. Defaulting to identity transfom."
                         )
@@ -155,10 +153,10 @@ def build_transforms(params: tp.Dict) -> tp.Tuple[tp.Dict, tp.Dict]:
     """
 
     def forward(bijector):
-        return bijector.forward
+        return bijector.__call__
 
     def inverse(bijector):
-        return bijector.inverse
+        return bijector.inv
 
     bijectors = build_bijectors(params)
 
@@ -198,7 +196,7 @@ def transform(params: tp.Dict, transform_map: tp.Dict) -> tp.Dict:
 # Priors
 ################################
 def log_density(
-    param: Float[Array, "D"], density: dx.Distribution
+    param: Float[Array, "D"], density: npd.Distribution
 ) -> Float[Array, "1"]:
     if type(density) == type(None):
         log_prob = jnp.array(0.0)
@@ -263,9 +261,9 @@ def prior_checks(priors: dict) -> dict:
                 )
         else:
             warnings.warn("Placing unit Gaussian prior on latent function.")
-            priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
+            priors["latent"] = npd.Normal(loc=0.0, scale=1.0)
     else:
-        priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
+        priors["latent"] = npd.Normal(loc=0.0, scale=1.0)
 
     return priors
 

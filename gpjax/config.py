@@ -1,9 +1,10 @@
-import distrax as dx
-import jax.numpy as jnp
 import jax.random as jr
+import numpyro.distributions as npd
 from ml_collections import ConfigDict
 
 __config = None
+import distrax as dx
+import jax.numpy as jnp
 
 Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 Softplus = dx.Lambda(
@@ -45,8 +46,8 @@ def get_defaults() -> ConfigDict:
 
     # Default bijections
     config.transformations = transformations = ConfigDict()
-    transformations.positive_transform = Softplus
-    transformations.identity_transform = Identity
+    transformations.positive_transform = npd.transforms.SoftplusTransform()
+    transformations.identity_transform = npd.transforms.IdentityTransform()
 
     # Default parameter transforms
     transformations.lengthscale = "positive_transform"
@@ -63,7 +64,7 @@ def get_defaults() -> ConfigDict:
     return __config
 
 
-def add_parameter(param_name: str, bijection: dx.Bijector) -> None:
+def add_parameter(param_name: str, bijection: npd.transforms.Transform) -> None:
     """Add a parameter and its corresponding transform to GPJax's config file.
 
     Args:

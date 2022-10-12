@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.9.7 ('gpjax')
 #     language: python
@@ -19,6 +19,7 @@
 #
 # In this guide, we introduce the kernels available in GPJax and demonstrate how to create custom ones.
 
+# %%
 import distrax as dx
 import jax
 import jax.numpy as jnp
@@ -29,7 +30,6 @@ from jax import jit
 from jaxtyping import Array, Float
 from optax import adam
 
-# %%
 import gpjax as gpx
 
 key = jr.PRNGKey(123)
@@ -64,7 +64,7 @@ for k, ax in zip(kernels, axes.ravel()):
     prior = gpx.Prior(kernel=k)
     params, _, _, _ = gpx.initialise(prior, key).unpack()
     rv = prior(params)(x)
-    y = rv.sample(sample_shape=10, seed=key)
+    y = rv.sample(key, sample_shape=(10,))
 
     ax.plot(x, y.T, alpha=0.7)
     ax.set_title(k.name)
@@ -208,13 +208,12 @@ class Polar(gpx.kernels.Kernel):
 # To define a bijector here we'll make use of the `Lambda` operator given in Distrax. This lets us convert any regular Jax function into a bijection. Given that we require $\tau$ to be strictly greater than $4.$, we'll apply a [softplus transformation](https://jax.readthedocs.io/en/latest/_autosummary/jax.nn.softplus.html) where the lower bound is shifted by $4.$.
 
 
+import numpyro
+
 # %%
 from gpjax.config import add_parameter
 
-bij_fn = lambda x: jax.nn.softplus(x + jnp.array(4.0))
-bij = dx.Lambda(bij_fn)
-
-add_parameter("tau", bij)
+add_parameter("tau", numpyro.distributions.transforms.SoftplusTransform())
 
 # %% [markdown]
 # ### Using our polar kernel
@@ -263,8 +262,8 @@ final_params = gpx.transform(learned_params, constrainer)
 
 # %%
 posterior_rv = likelihood(circlular_posterior(D, final_params)(angles), final_params)
-mu = posterior_rv.mean()
-one_sigma = posterior_rv.stddev()
+mu = posterior_rv.mean
+one_sigma = jnp.sqrt(posterior_rv.variance)
 
 # %%
 fig = plt.figure(figsize=(10, 8))

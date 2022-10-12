@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.9.7 ('gpjax')
 #     language: python
@@ -86,9 +86,9 @@ prior = gpx.Prior(kernel=kernel)
 parameter_state = gpx.initialise(prior, key)
 prior_dist = prior(parameter_state.params)(xtest)
 
-prior_mean = prior_dist.mean()
-prior_std = jnp.sqrt(prior_dist.covariance().diagonal())
-samples = prior_dist.sample(seed=key, sample_shape=20).T
+prior_mean = prior_dist.mean
+prior_std = jnp.sqrt(prior_dist.covariance_matrix.diagonal())
+samples = prior_dist.sample(key, sample_shape=(20,)).T
 
 plt.plot(xtest, samples, color="tab:blue", alpha=0.5)
 plt.plot(xtest, prior_mean, color="tab:orange")
@@ -197,11 +197,14 @@ pp.pprint(final_params)
 # Equipped with the posterior and a set of optimised hyperparameter values, we are now in a position to query our GP's predictive distribution at novel test inputs. To do this, we use our defined `posterior` and `likelihood` at our test inputs to obtain the predictive distribution as a `Distrax` multivariate Gaussian upon which `mean` and `stddev` can be used to extract the predictive mean and standard deviatation.
 
 # %%
+latent_dist
+
+# %%
 latent_dist = posterior(D, final_params)(xtest)
 predictive_dist = likelihood(latent_dist, final_params)
 
-predictive_mean = predictive_dist.mean()
-predictive_std = predictive_dist.stddev()
+predictive_mean = predictive_dist.mean
+predictive_std = jnp.sqrt(predictive_dist.covariance_matrix.diagonal())
 
 # %% [markdown]
 # With the predictions and their uncertainty acquired, we illustrate the GP's performance at explaining the data $\mathcal{D}$ and recovering the underlying latent function of interest.

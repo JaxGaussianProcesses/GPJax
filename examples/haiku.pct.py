@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.9.7 ('gpjax')
 #     language: python
@@ -19,6 +19,7 @@
 #
 # In this notebook we demonstrate how GPJax can be used in conjunction with [Haiku](https://github.com/deepmind/dm-haiku) to build deep kernel Gaussian processes. Modelling data with discontinuities is a challenging task for regular Gaussian process models. However, as shown in <strong data-cite="wilson2016deep"></strong>, transforming the inputs to our Gaussian process model's kernel through a neural network can offer a solution to this.
 
+# %%
 import typing as tp
 
 import distrax as dx
@@ -31,7 +32,6 @@ import optax as ox
 from chex import dataclass
 from scipy.signal import sawtooth
 
-# %%
 import gpjax as gpx
 from gpjax.kernels import Kernel
 
@@ -179,8 +179,8 @@ final_params = gpx.transform(final_params, constrainers)
 latent_dist = posterior(D, final_params)(xtest)
 predictive_dist = likelihood(latent_dist, final_params)
 
-predictive_mean = predictive_dist.mean()
-predictive_std = predictive_dist.stddev()
+predictive_mean = predictive_dist.mean
+predictive_std = jnp.sqrt(predictive_dist.variance)
 
 fig, ax = plt.subplots(figsize=(12, 5))
 ax.plot(x, y, "o", label="Observations", color="tab:red")

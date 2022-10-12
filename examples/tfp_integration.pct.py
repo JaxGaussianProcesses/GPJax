@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.9.7 ('gpjax')
 #     language: python
@@ -202,8 +202,8 @@ learned_params = array_to_dict([jnp.mean(i) for i in constrained_sample_list])
 
 predictive_dist = likelihood(posterior(D, learned_params)(xtest), learned_params)
 
-mu = predictive_dist.mean()
-sigma = predictive_dist.stddev()
+mu = predictive_dist.mean
+sigma = jnp.sqrt(predictive_dist.variance)
 
 # %% [markdown]
 # Finally, we plot the learned posterior predictive distribution evaluated at the test points defined above.
