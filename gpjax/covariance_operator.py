@@ -29,7 +29,7 @@ class CovarianceOperator:
 
     Inspired by TensorFlows' LinearOperator class.
     """
-
+    jitter: float = 1e-6
     name: str = None
 
     @abc.abstractmethod
@@ -109,6 +109,13 @@ class CovarianceOperator:
         """
         return jnp.sum(self.diagonal())
 
+    def _stabilise(self, matrix: Float[Array, "N N"]) -> Float[Array, "N N"]:
+        """
+        Stabilise the eigenvalues of the covariance matrix through a small amount of jitter applied to the diagonal.
+        """
+        jitter_matrix = jnp.eye(matrix.shape[0])*self.jitter
+        return matrix + jitter_matrix
+
 
 @dataclass
 class DenseCovarianceOperator(CovarianceOperator):
@@ -164,7 +171,7 @@ class DenseCovarianceOperator(CovarianceOperator):
             Float[Array, "N N"]: Lower triangular matrix.
         """
 
-        return jnp.linalg.cholesky(self.matrix)
+        return jnp.linalg.cholesky(self._stabilise(self.matrix))
 
 
 @dataclass
