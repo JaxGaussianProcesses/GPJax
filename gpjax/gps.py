@@ -39,7 +39,7 @@ DEFAULT_JITTER = get_defaults()["jitter"]
 class AbstractGP:
     """Abstract Gaussian process object."""
 
-    def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> npd.Distribution:
+    def __call__(self, *args: Any, **kwargs: Any) -> npd.Distribution:
         """Evaluate the Gaussian process at the given points.
 
         Args:

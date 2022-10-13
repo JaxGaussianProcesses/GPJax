@@ -104,9 +104,7 @@ class StochasticVI(AbstractVariationalInference):
 
         return elbo_fn
 
-    def variational_expectation(
-        self, params: Dict, batch: Dataset
-    ) -> Float[Array, "N 1"]:
+    def variational_expectation(self, params: Dict, batch: Dataset) -> Float[Array, "N 1"]:
         """Compute the expectation of our model's log-likelihood under our variational distribution. Batching can be done here to speed up computation.
 
         Args:
@@ -119,15 +117,14 @@ class StochasticVI(AbstractVariationalInference):
         x, y = batch.X, batch.y
 
         # q(f(x))
+        print(self.variational_family.predict(params))
         predictive_dist = vmap(self.variational_family.predict(params))(x[:, None])
         mean = predictive_dist.mean().val.reshape(-1, 1)
         variance = predictive_dist.variance().val.reshape(-1, 1)
 
         # log(p(y|f(x)))
         log_prob = vmap(
-            lambda f, y: self.likelihood.link_function(
-                f, params["likelihood"]
-            ).log_prob(y)
+            lambda f, y: self.likelihood.link_function(f, params["likelihood"]).log_prob(y)
         )
 
         # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
@@ -176,9 +173,7 @@ class CollapsedVI(AbstractVariationalInference):
             Kzz = gram(self.prior.kernel, z, params["kernel"])
             Kzz += I(m) * self.variational_family.jitter
             Kzx = cross_covariance(self.prior.kernel, z, x, params["kernel"])
-            Kxx_diag = vmap(self.prior.kernel, in_axes=(0, 0, None))(
-                x, x, params["kernel"]
-            )
+            Kxx_diag = vmap(self.prior.kernel, in_axes=(0, 0, None))(x, x, params["kernel"])
             μx = self.prior.mean_function(x, params["mean_function"])
 
             Lz = jnp.linalg.cholesky(Kzz)
@@ -224,12 +219,10 @@ class CollapsedVI(AbstractVariationalInference):
             diff = y - μx
 
             # L⁻¹ A (y - μx)
-            L_inv_A_diff = jsp.linalg.solve_triangular(
-                L, jnp.matmul(A, diff), lower=True
-            )
+            L_inv_A_diff = jsp.linalg.solve_triangular(L, jnp.matmul(A, diff), lower=True)
 
             # (y - μx)ᵀ (Iσ² + Q)⁻¹ (y - μx)
-            quad = (jnp.sum(diff**2) - jnp.sum(L_inv_A_diff**2)) / noise
+            quad = (jnp.sum(diff ** 2) - jnp.sum(L_inv_A_diff ** 2)) / noise
 
             # 2 * log N(y; μx, Iσ² + Q)
             two_log_prob = -n * jnp.log(2.0 * jnp.pi * noise) - log_det_B - quad

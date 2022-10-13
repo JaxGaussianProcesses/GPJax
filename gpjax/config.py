@@ -6,16 +6,6 @@ __config = None
 import distrax as dx
 import jax.numpy as jnp
 
-Softplus = dx.Lambda(
-    forward=lambda x: jnp.log(1 + jnp.exp(x)),
-    inverse=lambda x: jnp.log(jnp.exp(x) - 1.0),
-)
-
-# TODO: Remove this once 'FillTriangular' is added to Distrax.
-FillTriangular = dx.Chain([tfb.FillTriangular()])
-
-Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
-
 
 def get_defaults() -> ConfigDict:
     """Construct and globally register the config file used within GPJax.

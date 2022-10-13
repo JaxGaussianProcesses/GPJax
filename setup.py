@@ -16,7 +16,7 @@ REQUIRES = [
     "jaxlib>=0.1.47",
     "optax",
     "chex",
-    "distrax>=0.1.2",
+    "numpyro",
     "tensorflow-probability>=0.16.0",
     "tqdm>=4.0.0",
     "ml-collections==0.1.0",

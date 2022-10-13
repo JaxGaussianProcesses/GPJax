@@ -100,24 +100,23 @@ def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
     D = gpx.Dataset(X=x, y=y)
     likelihood = gpx.Gaussian(num_datapoints=n)
     posterior = gpx.Prior(kernel=gpx.RBF()) * likelihood
-    params, trainables, constrainers, unconstrainers = gpx.initialise(
+    parameter_state = gpx.initialise(
         posterior, key
-    ).unpack()
-    params = gpx.transform(params, unconstrainers)
+    )
+    params, trainables, bijectors = parameter_state.unpack()
+    params = gpx.unconstrain(params, bijectors)
 
     objective = jax.jit(
-        posterior.marginal_log_likelihood(D, constrainers, negative=True)
+        posterior.marginal_log_likelihood(D, negative=True)
     )
 
     opt = ox.adam(learning_rate=0.01)
     learned_params, training_history = gpx.fit(
         objective=objective,
-        trainables=trainables,
-        params=params,
+        parameter_state=parameter_state,
         optax_optim=opt,
         n_iters=1000,
     ).unpack()
-    learned_params = gpx.transform(learned_params, constrainers)
     return likelihood(posterior(D, learned_params)(xtest), learned_params)
 
 
@@ -135,7 +134,7 @@ def sqrtm(A: jnp.DeviceArray):
 
 
 def wasserstein_barycentres(
-    distributions: tp.List[dx.Distribution], weights: jnp.DeviceArray
+    distributions: tp.List[numpyro.distributions.Distribution], weights: jnp.DeviceArray
 ):
     covariances = [d.covariance_matrix for d in distributions]
     cov_stack = jnp.stack(covariances)
@@ -180,7 +179,7 @@ barycentre_process = numpyro.distributions.MultivariateNormal(
 
 # %%
 def plot(
-    dist: dx.Distribution,
+    dist: numpyro.distributions.Distribution,
     ax,
     color: str = "tab:blue",
     label: str = None,

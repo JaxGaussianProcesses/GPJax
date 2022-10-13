@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.9.7 ('gpjax')
 #     language: python
@@ -86,22 +86,21 @@ sgpr = gpx.CollapsedVI(posterior=p, variational_family=q)
 # %% [markdown]
 # We now train our model akin to a Gaussian process regression model via the `fit` abstraction. Unlike the regression example given in the [conjugate regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html), the inducing locations that induce our variational posterior distribution are now part of the model's parameters. Using a gradient-based optimiser, we can then _optimise_ their location such that the evidence lower bound is maximised.
 # %%
-params, trainables, constrainers, unconstrainers = gpx.initialise(sgpr, key).unpack()
+parameter_state = gpx.initialise(sgpr, key)
+params, trainables, bijectors = parameter_state.unpack()
 
-loss_fn = jit(sgpr.elbo(D, constrainers, negative=True))
+loss_fn = jit(sgpr.elbo(D, negative=True))
 
 optimiser = ox.adam(learning_rate=0.005)
 
-params = gpx.transform(params, unconstrainers)
+params = gpx.unconstrain(params, bijectors)
 
 learned_params, training_history = gpx.fit(
     objective=loss_fn,
-    params=params,
-    trainables=trainables,
+    parameter_state=parameter_state,
     optax_optim=optimiser,
     n_iters=2000,
 ).unpack()
-learned_params = gpx.transform(learned_params, constrainers)
 
 # %% [markdown]
 # We show predictions of our model with the learned inducing points overlayed in grey.
@@ -109,10 +108,10 @@ learned_params = gpx.transform(learned_params, constrainers)
 latent_dist = q.predict(D, learned_params)(xtest)
 predictive_dist = likelihood(latent_dist, learned_params)
 
-samples = latent_dist.sample(seed=key, sample_shape=20)
+samples = latent_dist.sample(key, sample_shape=(20, ))
 
-predictive_mean = predictive_dist.mean()
-predictive_std = predictive_dist.stddev()
+predictive_mean = predictive_dist.mean
+predictive_std = jnp.sqrt(predictive_dist.variance)
 
 fig, ax = plt.subplots(figsize=(12, 5))
 
@@ -166,15 +165,15 @@ plt.show()
 
 # %%
 full_rank_model = gpx.Prior(kernel=gpx.RBF()) * gpx.Gaussian(num_datapoints=D.n)
-fr_params, fr_trainables, fr_constrainers, fr_unconstrainers = gpx.initialise(
+fr_params, fr_trainables, fr_bijectors = gpx.initialise(
     full_rank_model, key
 ).unpack()
-fr_params = gpx.transform(fr_params, fr_unconstrainers)
-mll = jit(full_rank_model.marginal_log_likelihood(D, fr_constrainers, negative=True))
+fr_params = gpx.unconstrain(fr_params, fr_bijectors)
+mll = jit(full_rank_model.marginal_log_likelihood(D, negative=True))
 # %timeit mll(fr_params).block_until_ready()
 
 # %%
-sparse_elbo = jit(sgpr.elbo(D, constrainers, negative=True))
+sparse_elbo = jit(sgpr.elbo(D, negative=True))
 # %timeit sparse_elbo(params).block_until_ready()
 
 # %% [markdown]

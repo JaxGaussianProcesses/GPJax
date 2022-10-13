@@ -19,8 +19,6 @@
 #
 # In this notebook we demonstrate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
 
-import blackjax
-
 # %%
 import jax
 import jax.numpy as jnp
@@ -30,7 +28,7 @@ import matplotlib.pyplot as plt
 import numpyro
 import optax as ox
 from jaxtyping import Array, Float
-
+import blackjax
 import gpjax as gpx
 from gpjax.utils import I
 
@@ -72,34 +70,31 @@ print(type(posterior))
 # To begin we obtain a set of initial parameter values through the `initialise` callable, and transform these to the unconstrained space via `transform` (see the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)). We also define the negative marginal log-likelihood, and JIT compile this to accelerate training.
 # %%
 parameter_state = gpx.initialise(posterior)
-params, trainable, constrainer, unconstrainer = parameter_state.unpack()
-params = gpx.transform(params, unconstrainer)
+params, trainable, bijectors = parameter_state.unpack()
+params = gpx.unconstrain(params, bijectors)
 
-mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=True))
+mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
 
 # %% [markdown]
 # We can obtain a MAP estimate by optimising the marginal log-likelihood with Obtax's optimisers.
 # %%
 opt = ox.adam(learning_rate=0.01)
-unconstrained_params, training_history = gpx.fit(
+learned_params, training_history = gpx.fit(
     mll,
-    params,
-    trainable,
+    parameter_state,
     opt,
     n_iters=500,
 ).unpack()
 
-negative_Hessian = jax.jacfwd(jax.jacrev(mll))(unconstrained_params)["latent"][
+negative_Hessian = jax.jacfwd(jax.jacrev(mll))(learned_params)["latent"][
     "latent"
 ][:, 0, :, 0]
-
-map_estimate = gpx.transform(unconstrained_params, constrainer)
 # %% [markdown]
 # From which we can make predictions at novel inputs, as illustrated below.
 # %%
-latent_dist = posterior(D, map_estimate)(xtest)
+latent_dist = posterior(D, learned_params)(xtest)
 
-predictive_dist = likelihood(latent_dist, map_estimate)
+predictive_dist = likelihood(latent_dist, learned_params)
 
 predictive_mean = predictive_dist.mean
 predictive_std = jnp.sqrt(predictive_dist.variance)
@@ -139,7 +134,7 @@ ax.legend()
 # The Laplace approximation improves uncertainty quantification by incorporating curvature induced by the marginal log-likelihood's Hessian to construct an approximate Gaussian distribution centered on the MAP estimate.
 # Since the negative Hessian is positive definite, we can use the Cholesky decomposition to obtain the covariance matrix of the Laplace approximation at the datapoints below.
 # %%
-f_map_estimate = posterior(D, map_estimate)(x).mean
+f_map_estimate = posterior(D, learned_params)(x).mean
 
 jitter = 1e-6
 
@@ -224,7 +219,7 @@ def predict(
 # %%
 latent_dist = predict(laplace_approximation, D, xtest)
 
-predictive_dist = likelihood(latent_dist, map_estimate)
+predictive_dist = likelihood(latent_dist, learned_params)
 
 predictive_mean = predictive_dist.mean
 predictive_std = predictive_dist.variance**0.5
@@ -276,7 +271,7 @@ ax.legend()
 num_adapt = 500
 num_samples = 200
 
-mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=False))
+mll = jax.jit(posterior.marginal_log_likelihood(D, negative=False))
 
 adapt = blackjax.window_adaptation(
     blackjax.nuts, mll, num_adapt, target_acceptance_rate=0.65
@@ -334,7 +329,6 @@ for i in range(0, num_samples, thin_factor):
     ps["kernel"]["lengthscale"] = states.position["kernel"]["lengthscale"][i]
     ps["kernel"]["variance"] = states.position["kernel"]["variance"][i]
     ps["latent"] = states.position["latent"][i, :, :]
-    ps = gpx.transform(ps, constrainer)
 
     latent_dist = posterior(D, ps)(xtest)
     predictive_dist = likelihood(latent_dist, ps)

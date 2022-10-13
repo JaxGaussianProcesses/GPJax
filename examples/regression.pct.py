@@ -146,20 +146,21 @@ print(type(parameter_state))
 # We can now unpack the `ParameterState` to receive each of the four components listed above.
 
 # %%
-params, trainable, constrainer, unconstrainer = parameter_state.unpack()
+params, trainable, bijectors = parameter_state.unpack()
 pp.pprint(params)
 
 # %% [markdown]
 # To motivate the purpose of `constrainer` and `unconstrainer` more precisely, notice that our model hyperparameters $\{\ell^2, \sigma^2, \alpha^2 \}$ are all strictly positive. To ensure more stable optimisation, it is strongly advised to transform the parameters onto an unconstrained space first via `transform`.
 
 # %%
-params = gpx.transform(params, unconstrainer)
+# params = gpx.constrain(params, bijectors)
+pp.pprint(params)
 
 # %% [markdown]
 # To train our hyperparameters, we optimising the marginal log-likelihood of the posterior with respect to them. We define the marginal log-likelihood with `marginal_log_likelihood` on the posterior.
 
 # %%
-mll = jit(posterior.marginal_log_likelihood(D, constrainer, negative=True))
+mll = jit(posterior.marginal_log_likelihood(D, negative=True))
 mll(params)
 # %% [markdown]
 # Since most optimisers (including here) minimise a given function, we have realised the negative marginal log-likelihood and just-in-time (JIT) compiled this to accelerate training.
@@ -170,10 +171,9 @@ mll(params)
 # %%
 opt = ox.adam(learning_rate=0.01)
 inference_state = gpx.fit(
-    mll,
-    params,
-    trainable,
-    opt,
+    objective = mll,
+    parameter_state = parameter_state,
+    optax_optim = opt,
     n_iters=500,
 )
 
@@ -182,22 +182,12 @@ inference_state = gpx.fit(
 
 # %%
 final_params, training_history = inference_state.unpack()
-
-# %% [markdown]
-#
-# The exact value of our learned parameters is often useful in answering certain questions about the underlying process. To obtain these values, we untransfom our trained unconstrained parameters back to their original constrained space with `transform` and `constrainer`.
-
-# %%
-final_params = gpx.transform(final_params, constrainer)
-pp.pprint(final_params)
+final_params
 
 # %% [markdown]
 # ## Prediction
 #
 # Equipped with the posterior and a set of optimised hyperparameter values, we are now in a position to query our GP's predictive distribution at novel test inputs. To do this, we use our defined `posterior` and `likelihood` at our test inputs to obtain the predictive distribution as a `Distrax` multivariate Gaussian upon which `mean` and `stddev` can be used to extract the predictive mean and standard deviatation.
-
-# %%
-latent_dist
 
 # %%
 latent_dist = posterior(D, final_params)(xtest)

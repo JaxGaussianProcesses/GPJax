@@ -33,7 +33,7 @@ class AbstractLikelihood:
     num_datapoints: int  # The number of datapoints that the likelihood factorises over.
     name: Optional[str] = "Likelihood"
 
-    def __call__(self, *args: Any, **kwargs: Any) -> dx.Distribution:
+    def __call__(self, *args: Any, **kwargs: Any) -> npd.Distribution:
         """Evaluate the likelihood function at a given predictive distribution.
 
         Args:
@@ -46,7 +46,7 @@ class AbstractLikelihood:
         return self.predict(*args, **kwargs)
 
     @abc.abstractmethod
-    def predict(self, *args: Any, **kwargs: Any) -> dx.Distribution:
+    def predict(self, *args: Any, **kwargs: Any) -> npd.Distribution:
         """Evaluate the likelihood function at a given predictive distribution.
 
         Args:
