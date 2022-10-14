@@ -18,9 +18,9 @@ from typing import Any, Callable, Dict, Optional
 
 import jax.numpy as jnp
 import jax.scipy as jsp
+import numpyro.distributions as npd
 from chex import dataclass
 from jaxtyping import Array, Float
-import numpyro.distributions as npd
 
 from .config import get_defaults
 from .gps import Prior
@@ -30,16 +30,6 @@ from .types import Dataset, PRNGKeyType
 from .utils import I, concat_dictionaries
 
 DEFAULT_JITTER = get_defaults()["jitter"]
-
-
-def kl_divergence(p, q):
-    N = p.mean.shape[0]
-    iS1 = jnp.linalg.inv(q.covariance_matrix)
-    diff = q.mean - p.mean
-    tr_term = jnp.trace(jnp.matmul(iS1, p.covariance_matrix))
-    det_term = jnp.log(jnp.linalg.det(q.covariance_matrix) / jnp.linalg.det(p.covariance_matrix))
-    quad_term = diff.T @ jnp.linalg.inv(q.covariance_matrix) @ diff
-    return 0.5 * (tr_term + det_term + quad_term - N)
 
 
 @dataclass
@@ -154,9 +144,11 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         qu = npd.MultivariateNormal(jnp.atleast_1d(mu.squeeze()), scale_tril=sqrt)
         pu = npd.MultivariateNormal(jnp.atleast_1d(μz.squeeze()), scale_tril=Lz)
-        return kl_divergence(qu, pu)
+        return kld_dense_dense(qu, pu)
 
-    def predict(self, params: Dict) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
+    def predict(
+        self, params: Dict
+    ) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as:
@@ -235,15 +227,13 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         """
         mu = params["variational_family"]["moments"]["variational_mean"]
         sqrt = params["variational_family"]["moments"]["variational_root_covariance"]
-        m = self.num_inducing
 
         qu = npd.MultivariateNormal(jnp.atleast_1d(mu.squeeze()), scale_tril=sqrt)
-        pu = npd.MultivariateNormal(
-            jnp.zeros(m), jnp.eye(m)
-        )  # TODO: Implement diagonal MVGaussian.
-        return kl_divergence(qu, pu)
+        return kld_dense_white(qu)
 
-    def predict(self, params: Dict) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
+    def predict(
+        self, params: Dict
+    ) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
@@ -369,9 +359,11 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         qu = npd.MultivariateNormal(jnp.atleast_1d(mu.squeeze()), scale_tril=sqrt)
         pu = npd.MultivariateNormal(jnp.atleast_1d(μz.squeeze()), scale_tril=Lz)
 
-        return kl_divergence(qu, pu)
+        return kld_dense_dense(qu, pu)
 
-    def predict(self, params: Dict) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
+    def predict(
+        self, params: Dict
+    ) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
@@ -490,8 +482,12 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         Returns:
             Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
         """
-        expectation_vector = params["variational_family"]["moments"]["expectation_vector"]
-        expectation_matrix = params["variational_family"]["moments"]["expectation_matrix"]
+        expectation_vector = params["variational_family"]["moments"][
+            "expectation_vector"
+        ]
+        expectation_matrix = params["variational_family"]["moments"][
+            "expectation_matrix"
+        ]
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
 
@@ -513,9 +509,11 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         qu = npd.MultivariateNormal(jnp.atleast_1d(mu.squeeze()), scale_tril=sqrt)
         pu = npd.MultivariateNormal(jnp.atleast_1d(μz.squeeze()), scale_tril=Lz)
 
-        return kl_divergence(qu, pu)
+        return kld_dense_dense(qu, pu)
 
-    def predict(self, params: Dict) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
+    def predict(
+        self, params: Dict
+    ) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
         """Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
@@ -530,8 +528,12 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         Returns:
             Callable[[Float[Array, "N D"]], npd.Distribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
-        expectation_vector = params["variational_family"]["moments"]["expectation_vector"]
-        expectation_matrix = params["variational_family"]["moments"]["expectation_matrix"]
+        expectation_vector = params["variational_family"]["moments"][
+            "expectation_vector"
+        ]
+        expectation_matrix = params["variational_family"]["moments"][
+            "expectation_matrix"
+        ]
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
 
@@ -605,7 +607,9 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             self.prior._initialise_params(key),
             {
                 "variational_family": {"inducing_inputs": self.inducing_inputs},
-                "likelihood": {"obs_noise": self.likelihood._initialise_params(key)["obs_noise"]},
+                "likelihood": {
+                    "obs_noise": self.likelihood._initialise_params(key)["obs_noise"]
+                },
             },
         )
 
@@ -650,7 +654,9 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
         Lz_inv_Kzx_diff = jsp.linalg.cho_solve((L, True), jnp.matmul(Lz_inv_Kzx, diff))
 
         # Kzz⁻¹ Kzx (y - μx)
-        Kzz_inv_Kzx_diff = jsp.linalg.solve_triangular(Lz.T, Lz_inv_Kzx_diff, lower=False)
+        Kzz_inv_Kzx_diff = jsp.linalg.solve_triangular(
+            Lz.T, Lz_inv_Kzx_diff, lower=False
+        )
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> npd.Distribution:
             t = test_inputs
@@ -677,6 +683,81 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             return npd.MultivariateNormal(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict_fn
+
+
+# TODO: Abstract these out to a KL divergence that accepts a linear operator to facilate structured covarainces other than dense.
+def kld_dense_dense(
+    q: npd.MultivariateNormal, p: npd.MultivariateNormal
+) -> Float[Array, "1"]:
+    """Kullback-Leibler divergence KL[q(x)||p(x)] between two dense covariance Gaussian distributions
+             q(x) = N(x; μq, Σq) and p(x) = N(x; μp, Σp).
+
+    Args:
+        q (npd.MultivariateNormal): A multivariate Gaussian distribution.
+        p (npd.MultivariateNormal): A multivariate Gaussian distribution.
+
+    Returns:
+        Float[Array, "1"]: The KL divergence between the two distributions.
+    """
+
+    q_mu = q.loc
+    q_sqrt = q.scale_tril
+    n = q_mu.shape[-1]
+
+    p_mu = p.loc
+    p_sqrt = p.scale_tril
+
+    diag = jnp.diag(q_sqrt)
+
+    # Trace term tr(Σp⁻¹ Σq), and alpha for Mahalanobis term
+    alpha = jsp.linalg.solve_triangular(p_sqrt, p_mu - q_mu, lower=True)
+    trace = jnp.sum(jnp.square(jsp.linalg.solve_triangular(p_sqrt, q_sqrt, lower=True)))
+
+    # Mahalanobis term: μqᵀ Σp⁻¹ μq
+    mahalanobis = jnp.sum(jnp.square(alpha))
+
+    # log|Σq|
+    logdet_qcov = jnp.sum(jnp.log(jnp.square(diag)))
+    two_kl = mahalanobis - n - logdet_qcov + trace
+
+    # log|Σp|
+    log_det_pcov = jnp.sum(jnp.log(jnp.square(jnp.diag(q_sqrt))))
+    two_kl += log_det_pcov
+
+    return two_kl / 2.0
+
+
+def kld_dense_white(q: npd.MultivariateNormal) -> Float[Array, "1"]:
+    """Kullback-Leibler divergence KL[q(x)||p(x)] between a dense covariance Gaussian distribution
+        q(x) = N(x; μq, Σq), and white indenity Gaussian p(x) = N(x; 0, I).
+
+        This is useful for variational inference with a whitened variational family.
+
+      Args:
+        q (npd.MultivariateNormal): A multivariate Gaussian distribution.
+
+    Returns:
+        Float[Array, "1"]: The KL divergence between the two distributions.
+    """
+
+    q_mu = q.loc
+    q_sqrt = q.scale_tril
+    n = q_mu.shape[-1]
+
+    diag = jnp.diag(q_sqrt)
+
+    # Trace term tr(Σp⁻¹ Σq), and alpha for Mahalanobis term:
+    alpha = q_mu
+    trace = jnp.sum(jnp.square(q_sqrt))
+
+    # Mahalanobis term: μqᵀ Σp⁻¹ μq
+    mahalanobis = jnp.sum(jnp.square(alpha))
+
+    # log|Σq| (no log|Σp| as this is just zero!)
+    logdet_qcov = jnp.sum(jnp.log(jnp.square(diag)))
+    two_kl = mahalanobis - n - logdet_qcov + trace
+
+    return two_kl / 2.0
 
 
 __all__ = [
