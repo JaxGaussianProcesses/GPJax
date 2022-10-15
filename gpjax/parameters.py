@@ -285,9 +285,9 @@ def prior_checks(priors: Dict) -> Dict:
     if "latent" in priors.keys():
         latent_prior = priors["latent"]
         if latent_prior is not None:
-            if latent_prior.name != "Normal":
+            if not isinstance(latent_prior, npd.Normal):
                 warnings.warn(
-                    f"A {latent_prior.name} distribution prior has been placed on"
+                    f"A {type(latent_prior)} distribution prior has been placed on"
                     " the latent function. It is strongly advised that a"
                     " unit Gaussian prior is used."
                 )

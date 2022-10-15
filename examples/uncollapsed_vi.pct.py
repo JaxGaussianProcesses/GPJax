@@ -139,8 +139,6 @@ svgp = gpx.StochasticVI(posterior=p, variational_family=q)
 # %%
 parameter_state = gpx.initialise(svgp, key)
 params, trainables, bijectors = parameter_state.unpack()
-params = gpx.unconstrain(params, bijectors)
-
 loss_fn = svgp.elbo(D, negative=True)
 
 # %%
@@ -165,7 +163,6 @@ inference_state = gpx.fit_batches(
     batch_size=128,
 )
 learned_params, training_history = inference_state.unpack()
-learned_params = gpx.transform(learned_params, constrainers)
 # %% [markdown]
 # ## Predictions
 #
@@ -176,8 +173,8 @@ learned_params = gpx.transform(learned_params, constrainers)
 latent_dist = q(learned_params)(xtest)
 predictive_dist = likelihood(latent_dist, learned_params)
 
-meanf = predictive_dist.mean()
-sigma = predictive_dist.stddev()
+meanf = predictive_dist.mean
+sigma = predictive_dist.variance ** 0.5
 
 fig, ax = plt.subplots(figsize=(12, 5))
 ax.plot(x, y, "o", alpha=0.15, label="Training Data", color="tab:gray")

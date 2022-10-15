@@ -1,7 +1,7 @@
 import typing as tp
 
-import distrax as dx
 import jax.numpy as jnp
+import numpyro.distributions as npd
 import jax.random as jr
 import pytest
 from tensorflow_probability.substrates.jax import distributions as tfd
@@ -164,7 +164,7 @@ def test_checks(num_datapoints):
     priors = prior_checks(incomplete_priors)
     assert "latent" in priors.keys()
     assert "variance" not in priors.keys()
-    assert isinstance(priors["latent"], dx.Normal)
+    assert isinstance(priors["latent"], npd.Normal)
 
 
 def test_structure_priors():
@@ -189,7 +189,7 @@ def test_structure_priors():
         assert v
 
 
-@pytest.mark.parametrize("latent_prior", [dx.Laplace(0.0, 1.0), tfd.Laplace(0.0, 1.0)])
+@pytest.mark.parametrize("latent_prior", [npd.Laplace(0.0, 1.0), npd.Laplace(0.0, 1.0)])
 def test_prior_checks(latent_prior):
     priors = {
         "kernel": {"lengthscale": None, "variance": None},
@@ -199,7 +199,7 @@ def test_prior_checks(latent_prior):
     }
     new_priors = prior_checks(priors)
     assert "latent" in new_priors.keys()
-    assert new_priors["latent"].name == "Normal"
+    assert isinstance(new_priors["latent"], npd.Normal)
 
     priors = {
         "kernel": {"lengthscale": None, "variance": None},
@@ -208,7 +208,7 @@ def test_prior_checks(latent_prior):
     }
     new_priors = prior_checks(priors)
     assert "latent" in new_priors.keys()
-    assert new_priors["latent"].name == "Normal"
+    assert isinstance(new_priors["latent"], npd.Normal)
 
     priors = {
         "kernel": {"lengthscale": None, "variance": None},
@@ -219,7 +219,7 @@ def test_prior_checks(latent_prior):
     with pytest.warns(UserWarning):
         new_priors = prior_checks(priors)
     assert "latent" in new_priors.keys()
-    assert new_priors["latent"].name == "Laplace"
+    assert isinstance(new_priors["latent"], npd.Laplace)
 
 
 #########################
@@ -233,8 +233,8 @@ def test_output(num_datapoints, likelihood):
 
     assert isinstance(bijectors, dict)
     for k, v1, v2 in recursive_items(bijectors, bijectors):
-        assert isinstance(v1.forward, tp.Callable)
-        assert isinstance(v2.inverse, tp.Callable)
+        assert isinstance(v1.__call__, tp.Callable)
+        assert isinstance(v2.inv, tp.Callable)
 
     unconstrained_params = unconstrain(params, bijectors)
     assert (
@@ -252,5 +252,5 @@ def test_output(num_datapoints, likelihood):
     a_bijectors = build_bijectors(augmented_params)
 
     assert "test_param" in list(a_bijectors.keys())
-    assert a_bijectors["test_param"].forward(jnp.array([1.0])) == 1.0
-    assert a_bijectors["test_param"].inverse(jnp.array([1.0])) == 1.0
+    assert a_bijectors["test_param"](jnp.array([1.0])) == 1.0
+    assert a_bijectors["test_param"].inv(jnp.array([1.0])) == 1.0
