@@ -3,8 +3,6 @@ import numpyro.distributions as npd
 from ml_collections import ConfigDict
 
 __config = None
-import distrax as dx
-import jax.numpy as jnp
 
 
 def get_defaults() -> ConfigDict:
