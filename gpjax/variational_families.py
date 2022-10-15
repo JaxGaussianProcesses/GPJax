@@ -709,11 +709,11 @@ def kld_dense_dense(
 
     diag = jnp.diag(q_sqrt)
 
-    # Trace term tr(Σp⁻¹ Σq), and alpha for Mahalanobis term
-    alpha = jsp.linalg.solve_triangular(p_sqrt, p_mu - q_mu, lower=True)
+    # Trace term tr(Σp⁻¹ Σq)
     trace = jnp.sum(jnp.square(jsp.linalg.solve_triangular(p_sqrt, q_sqrt, lower=True)))
 
     # Mahalanobis term: μqᵀ Σp⁻¹ μq
+    alpha = jsp.linalg.solve_triangular(p_sqrt, p_mu - q_mu, lower=True)
     mahalanobis = jnp.sum(jnp.square(alpha))
 
     # log|Σq|
@@ -721,7 +721,7 @@ def kld_dense_dense(
     two_kl = mahalanobis - n - logdet_qcov + trace
 
     # log|Σp|
-    log_det_pcov = jnp.sum(jnp.log(jnp.square(jnp.diag(q_sqrt))))
+    log_det_pcov = jnp.sum(jnp.log(jnp.square(jnp.diag(p_sqrt))))
     two_kl += log_det_pcov
 
     return two_kl / 2.0
