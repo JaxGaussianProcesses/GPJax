@@ -103,10 +103,12 @@ todo_include_todos = True
 bibtex_bibfiles = ["refs.bib"]
 bibtex_style = "unsrt"
 bibtex_reference_style = "author_year"
+nb_execution_mode = "auto"
 nbsphinx_allow_errors = True
 nbsphinx_custom_formats = {
     ".pct.py": ["jupytext.reads", {"fmt": "py:percent"}],
 }
+jupyter_execute_notebooks = "cache"
 
 # Latex commands
 # mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -183,6 +185,11 @@ html_theme_options = {
     "logo_only": True,
     "show_toc_level": 2,
     "repository_url": "https://github.com/thomaspinder/GPJax/",
+    "launch_buttons": {
+        "binderhub_url": "https://mybinder.org",
+        "colab_url": "https://colab.research.google.com",
+        "notebook_interface": "jupyterlab",
+    },
     "use_repository_button": True,
     "use_sidenotes": True,  # Turns footnotes into sidenotes - https://sphinx-book-theme.readthedocs.io/en/stable/content-blocks.html
 }
@@ -199,10 +206,10 @@ html_theme_options = {
 # }
 
 
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ["_static"]
-
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
