@@ -22,7 +22,6 @@
 # %%
 import typing as tp
 
-import distrax as dx
 import haiku as hk
 import jax
 import jax.numpy as jnp
