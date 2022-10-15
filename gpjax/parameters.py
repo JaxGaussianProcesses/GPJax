@@ -178,7 +178,7 @@ def constrain(params: Dict, bijectors: Dict) -> Dict:
     Returns:
         Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
     """
-    map = lambda param, trans: trans.__call__(param)
+    map = lambda param, trans: trans.inv(param)
 
     return jax.tree_util.tree_map(map, params, bijectors)
 
@@ -194,7 +194,7 @@ def unconstrain(params: Dict, bijectors: Dict) -> Dict:
         Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
     """
 
-    map = lambda param, trans: trans.inv(param)
+    map = lambda param, trans: trans.__call__(param)
 
     return jax.tree_util.tree_map(map, params, bijectors)
 
@@ -202,7 +202,9 @@ def unconstrain(params: Dict, bijectors: Dict) -> Dict:
 ################################
 # Priors
 ################################
-def log_density(param: Float[Array, "D"], density: npd.Distribution) -> Float[Array, "1"]:
+def log_density(
+    param: Float[Array, "D"], density: npd.Distribution
+) -> Float[Array, "1"]:
     """Compute the log density of a parameter given a distribution.
 
     Args:
