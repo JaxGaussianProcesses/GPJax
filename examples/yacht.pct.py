@@ -1,11 +1,12 @@
 # ---
 # jupyter:
 #   jupytext:
+#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.9.7 ('gpjax')
 #     language: python
@@ -17,13 +18,12 @@
 #
 # In this notebook we'll demonstrate the use of GPJax on a benchmark UCI regression problem. Such tasks are commonly used within the research community to benchmark and evaluate new techniques against those already present in the literature. Much of the code contained in this notebook can be adapted to applied problems concerning datasets other than the one presented here.
 
+# %%
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import numpy as np
 import optax as ox
-
-# %%
 import pandas as pd
 from jax import jit
 from sklearn.metrics import mean_squared_error, r2_score
@@ -153,8 +153,8 @@ learned_params = gpx.transform(learned_params, constrainers)
 latent_dist = posterior(training_data, learned_params)(scaled_Xte)
 predictive_dist = likelihood(latent_dist, learned_params)
 
-predictive_mean = predictive_dist.mean()
-predictive_stddev = predictive_dist.stddev()
+predictive_mean = predictive_dist.mean
+predictive_stddev = jnp.sqrt(predictive_dist.variance)
 
 # %% [markdown]
 # ## Evaluation

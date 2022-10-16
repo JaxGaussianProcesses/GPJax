@@ -7,9 +7,9 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.10.0 ('base')
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -137,10 +137,13 @@ svgp = gpx.StochasticVI(posterior=p, variational_family=q)
 #
 # Since Optax's optimisers work to minimise functions, to maximise the ELBO we return its negative.
 # %%
-params, trainables, constrainers, unconstrainers = gpx.initialise(svgp, key).unpack()
-params = gpx.transform(params, unconstrainers)
+parameter_state = gpx.initialise(svgp, key)
+params, trainables, bijectors = parameter_state.unpack()
+loss_fn = svgp.elbo(D, negative=True)
 
-loss_fn = jit(svgp.elbo(D, constrainers, negative=True))
+# %%
+b = gpx.abstractions.get_batch(D, 64, key)
+loss_fn(params, b)
 
 # %% [markdown]
 # ### Mini-batching
@@ -152,8 +155,7 @@ optimiser = ox.adam(learning_rate=0.01)
 
 inference_state = gpx.fit_batches(
     objective=loss_fn,
-    params=params,
-    trainables=trainables,
+    parameter_state=parameter_state,
     train_data=D,
     optax_optim=optimiser,
     n_iters=4000,
@@ -161,7 +163,6 @@ inference_state = gpx.fit_batches(
     batch_size=128,
 )
 learned_params, training_history = inference_state.unpack()
-learned_params = gpx.transform(learned_params, constrainers)
 # %% [markdown]
 # ## Predictions
 #
@@ -172,8 +173,8 @@ learned_params = gpx.transform(learned_params, constrainers)
 latent_dist = q(learned_params)(xtest)
 predictive_dist = likelihood(latent_dist, learned_params)
 
-meanf = predictive_dist.mean()
-sigma = predictive_dist.stddev()
+meanf = predictive_dist.mean
+sigma = predictive_dist.variance ** 0.5
 
 fig, ax = plt.subplots(figsize=(12, 5))
 ax.plot(x, y, "o", alpha=0.15, label="Training Data", color="tab:gray")

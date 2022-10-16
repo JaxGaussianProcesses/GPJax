@@ -1,9 +1,9 @@
 import typing as tp
 
-import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
+import numpyro.distributions as npd
 
 from gpjax import Dataset, initialise
 from gpjax.gps import (
@@ -32,9 +32,9 @@ def test_prior(num_datapoints):
 
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
     predictive_dist = prior_rv_fn(x)
-    assert isinstance(predictive_dist, dx.Distribution)
-    mu = predictive_dist.mean()
-    sigma = predictive_dist.covariance()
+    assert isinstance(predictive_dist, npd.Distribution)
+    mu = predictive_dist.mean
+    sigma = predictive_dist.covariance_matrix
     assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
 
@@ -75,10 +75,10 @@ def test_conjugate_posterior(num_datapoints):
 
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
     predictive_dist = predictive_dist_fn(x)
-    assert isinstance(predictive_dist, dx.Distribution)
+    assert isinstance(predictive_dist, npd.Distribution)
 
-    mu = predictive_dist.mean()
-    sigma = predictive_dist.covariance()
+    mu = predictive_dist.mean
+    sigma = predictive_dist.covariance_matrix
     assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
 
@@ -117,10 +117,10 @@ def test_nonconjugate_posterior(num_datapoints, likel):
 
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
     predictive_dist = predictive_dist_fn(x)
-    assert isinstance(predictive_dist, dx.Distribution)
+    assert isinstance(predictive_dist, npd.Distribution)
 
-    mu = predictive_dist.mean()
-    sigma = predictive_dist.covariance()
+    mu = predictive_dist.mean
+    sigma = predictive_dist.covariance_matrix
     assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
 

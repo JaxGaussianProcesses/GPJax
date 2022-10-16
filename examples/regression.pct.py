@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.9.7 ('gpjax')
 #     language: python
@@ -86,9 +86,9 @@ prior = gpx.Prior(kernel=kernel)
 parameter_state = gpx.initialise(prior, key)
 prior_dist = prior(parameter_state.params)(xtest)
 
-prior_mean = prior_dist.mean()
-prior_std = jnp.sqrt(prior_dist.covariance().diagonal())
-samples = prior_dist.sample(seed=key, sample_shape=20).T
+prior_mean = prior_dist.mean
+prior_std = jnp.sqrt(prior_dist.covariance_matrix.diagonal())
+samples = prior_dist.sample(key, sample_shape=(20,)).T
 
 plt.plot(xtest, samples, color="tab:blue", alpha=0.5)
 plt.plot(xtest, prior_mean, color="tab:orange")
@@ -146,20 +146,21 @@ print(type(parameter_state))
 # We can now unpack the `ParameterState` to receive each of the four components listed above.
 
 # %%
-params, trainable, constrainer, unconstrainer = parameter_state.unpack()
+params, trainable, bijectors = parameter_state.unpack()
 pp.pprint(params)
 
 # %% [markdown]
 # To motivate the purpose of `constrainer` and `unconstrainer` more precisely, notice that our model hyperparameters $\{\ell^2, \sigma^2, \alpha^2 \}$ are all strictly positive. To ensure more stable optimisation, it is strongly advised to transform the parameters onto an unconstrained space first via `transform`.
 
 # %%
-params = gpx.transform(params, unconstrainer)
+# params = gpx.constrain(params, bijectors)
+pp.pprint(params)
 
 # %% [markdown]
 # To train our hyperparameters, we optimising the marginal log-likelihood of the posterior with respect to them. We define the marginal log-likelihood with `marginal_log_likelihood` on the posterior.
 
 # %%
-mll = jit(posterior.marginal_log_likelihood(D, constrainer, negative=True))
+mll = jit(posterior.marginal_log_likelihood(D, negative=True))
 mll(params)
 # %% [markdown]
 # Since most optimisers (including here) minimise a given function, we have realised the negative marginal log-likelihood and just-in-time (JIT) compiled this to accelerate training.
@@ -170,10 +171,9 @@ mll(params)
 # %%
 opt = ox.adam(learning_rate=0.01)
 inference_state = gpx.fit(
-    mll,
-    params,
-    trainable,
-    opt,
+    objective = mll,
+    parameter_state = parameter_state,
+    optax_optim = opt,
     n_iters=500,
 )
 
@@ -182,14 +182,7 @@ inference_state = gpx.fit(
 
 # %%
 final_params, training_history = inference_state.unpack()
-
-# %% [markdown]
-#
-# The exact value of our learned parameters is often useful in answering certain questions about the underlying process. To obtain these values, we untransfom our trained unconstrained parameters back to their original constrained space with `transform` and `constrainer`.
-
-# %%
-final_params = gpx.transform(final_params, constrainer)
-pp.pprint(final_params)
+final_params
 
 # %% [markdown]
 # ## Prediction
@@ -200,8 +193,8 @@ pp.pprint(final_params)
 latent_dist = posterior(D, final_params)(xtest)
 predictive_dist = likelihood(latent_dist, final_params)
 
-predictive_mean = predictive_dist.mean()
-predictive_std = predictive_dist.stddev()
+predictive_mean = predictive_dist.mean
+predictive_std = jnp.sqrt(predictive_dist.covariance_matrix.diagonal())
 
 # %% [markdown]
 # With the predictions and their uncertainty acquired, we illustrate the GP's performance at explaining the data $\mathcal{D}$ and recovering the underlying latent function of interest.

@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.9.7 ('gpjax')
 #     language: python
@@ -19,18 +19,16 @@
 #
 # In this notebook we demonstrate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
 
-import blackjax
-import distrax as dx
-
 # %%
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
 import matplotlib.pyplot as plt
+import numpyro.distributions as npd
 import optax as ox
 from jaxtyping import Array, Float
-
+import blackjax
 import gpjax as gpx
 from gpjax.utils import I
 
@@ -72,37 +70,33 @@ print(type(posterior))
 # To begin we obtain a set of initial parameter values through the `initialise` callable, and transform these to the unconstrained space via `transform` (see the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)). We also define the negative marginal log-likelihood, and JIT compile this to accelerate training.
 # %%
 parameter_state = gpx.initialise(posterior)
-params, trainable, constrainer, unconstrainer = parameter_state.unpack()
-params = gpx.transform(params, unconstrainer)
+params, trainable, bijectors = parameter_state.unpack()
 
-mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=True))
+mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
 
 # %% [markdown]
 # We can obtain a MAP estimate by optimising the marginal log-likelihood with Obtax's optimisers.
 # %%
 opt = ox.adam(learning_rate=0.01)
-unconstrained_params, training_history = gpx.fit(
+learned_params, training_history = gpx.fit(
     mll,
-    params,
-    trainable,
+    parameter_state,
     opt,
     n_iters=500,
 ).unpack()
 
-negative_Hessian = jax.jacfwd(jax.jacrev(mll))(unconstrained_params)["latent"][
+negative_Hessian = jax.jacfwd(jax.jacrev(mll))(learned_params)["latent"][
     "latent"
 ][:, 0, :, 0]
-
-map_estimate = gpx.transform(unconstrained_params, constrainer)
 # %% [markdown]
 # From which we can make predictions at novel inputs, as illustrated below.
 # %%
-latent_dist = posterior(D, map_estimate)(xtest)
+latent_dist = posterior(D, learned_params)(xtest)
 
-predictive_dist = likelihood(latent_dist, map_estimate)
+predictive_dist = likelihood(latent_dist, learned_params)
 
-predictive_mean = predictive_dist.mean()
-predictive_std = predictive_dist.stddev()
+predictive_mean = predictive_dist.mean
+predictive_std = jnp.sqrt(predictive_dist.variance)
 
 fig, ax = plt.subplots(figsize=(12, 5))
 ax.plot(x, y, "o", label="Observations", color="tab:red")
@@ -139,7 +133,7 @@ ax.legend()
 # The Laplace approximation improves uncertainty quantification by incorporating curvature induced by the marginal log-likelihood's Hessian to construct an approximate Gaussian distribution centered on the MAP estimate.
 # Since the negative Hessian is positive definite, we can use the Cholesky decomposition to obtain the covariance matrix of the Laplace approximation at the datapoints below.
 # %%
-f_map_estimate = posterior(D, map_estimate)(x).mean()
+f_map_estimate = posterior(D, learned_params)(x).mean
 
 jitter = 1e-6
 
@@ -150,7 +144,7 @@ L = jnp.linalg.cholesky(negative_Hessian + I(D.n) * jitter)
 L_inv = jsp.linalg.solve_triangular(L, I(D.n), lower=True)
 H_inv = jsp.linalg.solve_triangular(L.T, L_inv, lower=False)
 
-laplace_approximation = dx.MultivariateNormalFullCovariance(f_map_estimate, H_inv)
+laplace_approximation = npd.MultivariateNormal(f_map_estimate, H_inv)
 
 from gpjax.kernels import cross_covariance, gram
 
@@ -161,26 +155,26 @@ from gpjax.types import Dataset
 
 
 def predict(
-    laplace_at_data: dx.Distribution,
+    laplace_at_data: npd.Distribution,
     train_data: Dataset,
     test_inputs: Float[Array, "N D"],
     jitter: int = 1e-6,
-) -> dx.Distribution:
+) -> npd.Distribution:
     """Compute the predictive distribution of the Laplace approximation at novel inputs.
 
     Args:
         laplace_at_data (dict): The Laplace approximation at the datapoints.
 
     Returns:
-        dx.Distribution: The Laplace approximation at novel inputs.
+        npd.Distribution: The Laplace approximation at novel inputs.
     """
     x, n = train_data.X, train_data.n
 
     t = test_inputs
     n_test = t.shape[0]
 
-    mu = laplace_at_data.mean().reshape(-1, 1)
-    cov = laplace_at_data.covariance()
+    mu = laplace_at_data.mean.reshape(-1, 1)
+    cov = laplace_at_data.covariance_matrix
 
     Ktt = gram(prior.kernel, t, params["kernel"])
     Kxx = gram(prior.kernel, x, params["kernel"])
@@ -214,7 +208,7 @@ def predict(
     )
     covariance += I(n_test) * jitter
 
-    return dx.MultivariateNormalFullCovariance(
+    return npd.MultivariateNormal(
         jnp.atleast_1d(mean.squeeze()), covariance
     )
 
@@ -224,10 +218,10 @@ def predict(
 # %%
 latent_dist = predict(laplace_approximation, D, xtest)
 
-predictive_dist = likelihood(latent_dist, map_estimate)
+predictive_dist = likelihood(latent_dist, learned_params)
 
-predictive_mean = predictive_dist.mean()
-predictive_std = predictive_dist.stddev()
+predictive_mean = predictive_dist.mean
+predictive_std = predictive_dist.variance**0.5
 
 fig, ax = plt.subplots(figsize=(12, 5))
 ax.plot(x, y, "o", label="Observations", color="tab:red")
@@ -274,9 +268,9 @@ ax.legend()
 # %%
 # Adapted from BlackJax's introduction notebook.
 num_adapt = 500
-num_samples = 500
+num_samples = 200
 
-mll = jax.jit(posterior.marginal_log_likelihood(D, constrainer, negative=False))
+mll = jax.jit(posterior.marginal_log_likelihood(D, negative=False))
 
 adapt = blackjax.window_adaptation(
     blackjax.nuts, mll, num_adapt, target_acceptance_rate=0.65
@@ -334,11 +328,10 @@ for i in range(0, num_samples, thin_factor):
     ps["kernel"]["lengthscale"] = states.position["kernel"]["lengthscale"][i]
     ps["kernel"]["variance"] = states.position["kernel"]["variance"][i]
     ps["latent"] = states.position["latent"][i, :, :]
-    ps = gpx.transform(ps, constrainer)
 
     latent_dist = posterior(D, ps)(xtest)
     predictive_dist = likelihood(latent_dist, ps)
-    samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
+    samples.append(predictive_dist.sample(key, sample_shape=(10,)))
 
 samples = jnp.vstack(samples)
 

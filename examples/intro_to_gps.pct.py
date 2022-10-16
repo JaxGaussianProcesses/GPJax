@@ -1,11 +1,12 @@
 # ---
 # jupyter:
 #   jupytext:
+#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.9.7 ('gpjax')
 #     language: python
@@ -105,15 +106,19 @@
 # $$
 # We can plot three different parameterisations of this density.
 
-import distrax as dx
-
 # %%
+import numpyro.distributions as npd
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
+from utils import confidence_ellipse
+import jax.random as jr
+import pandas as pd
+import seaborn as sns
 
-ud1 = dx.Normal(0.0, 1.0)
-ud2 = dx.Normal(-1.0, 0.5)
-ud3 = dx.Normal(0.25, 1.5)
+
+ud1 = npd.Normal(0.0, 1.0)
+ud2 = npd.Normal(-1.0, 0.5)
+ud3 = npd.Normal(0.25, 1.5)
 
 xs = jnp.linspace(-5.0, 5.0, 500)
 
@@ -121,10 +126,10 @@ fig, ax = plt.subplots(figsize=(7, 3))
 for d in [ud1, ud2, ud3]:
     ax.plot(
         xs,
-        d.prob(xs),
-        label=f"$\mathcal{{N}}({{{float(d.mean())}}},\  {{{float(d.stddev())}}}^2)$",
+        jnp.exp(d.log_prob(xs)),
+        label=f"$\mathcal{{N}}({{{float(d.mean)}}},\  {{{float(jnp.sqrt(d.variance))}}}^2)$",
     )
-    ax.fill_between(xs, jnp.zeros_like(xs), d.prob(xs), alpha=0.2)
+    ax.fill_between(xs, jnp.zeros_like(xs), jnp.exp(d.log_prob(xs)), alpha=0.2)
 ax.legend(loc="best")
 
 # %% [markdown]
@@ -151,19 +156,15 @@ ax.legend(loc="best")
 # $$
 # Three example parameterisations of this can be visualised below where $\rho$ determines the correlation of the multivariate Gaussian.
 
-import jax.random as jr
-
 # %%
-from utils import confidence_ellipse
-
 key = jr.PRNGKey(123)
 
-d1 = dx.MultivariateNormalDiag(jnp.zeros(2), scale_diag=jnp.array([1.0, 1.0]))
-d2 = dx.MultivariateNormalTri(
-    jnp.zeros(2), jnp.linalg.cholesky(jnp.array([[1.0, 0.9], [0.9, 1.0]]))
+d1 = npd.MultivariateNormal(jnp.zeros(2), jnp.eye(2))
+d2 = npd.MultivariateNormal(
+    jnp.zeros(2), scale_tril=jnp.linalg.cholesky(jnp.array([[1.0, 0.9], [0.9, 1.0]]))
 )
-d3 = dx.MultivariateNormalTri(
-    jnp.zeros(2), jnp.linalg.cholesky(jnp.array([[1.0, -0.5], [-0.5, 1.0]]))
+d3 = npd.MultivariateNormal(
+    jnp.zeros(2), scale_tril=jnp.linalg.cholesky(jnp.array([[1.0, -0.5], [-0.5, 1.0]]))
 )
 
 dists = [d1, d2, d3]
@@ -181,15 +182,15 @@ fig, (ax0, ax1, ax2) = plt.subplots(figsize=(10, 3), ncols=3, tight_layout=True)
 titles = [r"$\rho = 0$", r"$\rho = 0.9$", r"$\rho = -0.5$"]
 
 for a, t, d in zip([ax0, ax1, ax2], titles, dists):
-    d_prob = d.prob(jnp.hstack([xx.reshape(-1, 1), yy.reshape(-1, 1)])).reshape(
+    d_prob = jnp.exp(d.log_prob(jnp.hstack([xx.reshape(-1, 1), yy.reshape(-1, 1)])).reshape(
         xx.shape
-    )
-    cntf = a.contourf(xx, yy, d_prob, levels=20, antialiased=True, cmap="Reds")
+    ))
+    cntf = a.contourf(xx, yy, jnp.exp(d_prob), levels=20, antialiased=True, cmap="Reds")
     for c in cntf.collections:
         c.set_edgecolor("face")
     a.set_xlim(-2.75, 2.75)
     a.set_ylim(-2.75, 2.75)
-    samples = d.sample(seed=key, sample_shape=(5000,))
+    samples = d.sample(key, sample_shape=(5000,))
     xsample, ysample = samples[:, 0], samples[:, 1]
     confidence_ellipse(
         xsample, ysample, a, edgecolor="#3f3f3f", n_std=1.0, linestyle="--", alpha=0.8
@@ -236,19 +237,15 @@ for a, t, d in zip([ax0, ax1, ax2], titles, dists):
 # joint distribution $p(\mathbf{x}, \mathbf{y})$ quantifies the probability of two events, one
 # from $p(\mathbf{x})$ and another from $p(\mathbf{y})$, occurring at the same time. We visualise this idea below.
 
-import pandas as pd
-
 # %%
-import seaborn as sns
-
 n = 1000
-x = dx.Normal(loc=0.0, scale=1.0).sample(seed=key, sample_shape=(n,))
+x = npd.Normal(loc=0.0, scale=1.0).sample(key, sample_shape=(n,))
 key, subkey = jr.split(key)
-y = dx.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n,))
+y = npd.Normal(loc=0.25, scale=0.5).sample(subkey, sample_shape=(n,))
 key, subkey = jr.split(subkey)
-xfull = dx.Normal(loc=0.0, scale=1.0).sample(seed=subkey, sample_shape=(n * 10,))
+xfull = npd.Normal(loc=0.0, scale=1.0).sample(subkey, sample_shape=(n * 10,))
 key, subkey = jr.split(subkey)
-yfull = dx.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n * 10,))
+yfull = npd.Normal(loc=0.25, scale=0.5).sample(subkey, sample_shape=(n * 10,))
 key, subkey = jr.split(subkey)
 df = pd.DataFrame({"x": x, "y": y, "idx": jnp.ones(n)})
 

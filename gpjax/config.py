@@ -1,20 +1,8 @@
-import distrax as dx
-import jax.numpy as jnp
 import jax.random as jr
-import tensorflow_probability.substrates.jax.bijectors as tfb
+import numpyro.distributions as npd
 from ml_collections import ConfigDict
 
 __config = None
-
-Softplus = dx.Lambda(
-    forward=lambda x: jnp.log(1 + jnp.exp(x)),
-    inverse=lambda x: jnp.log(jnp.exp(x) - 1.0),
-)
-
-# TODO: Remove this once 'FillTriangular' is added to Distrax.
-FillTriangular = dx.Chain([tfb.FillTriangular()])
-
-Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 
 
 def get_defaults() -> ConfigDict:
@@ -31,9 +19,9 @@ def get_defaults() -> ConfigDict:
 
     # Default bijections
     config.transformations = transformations = ConfigDict()
-    transformations.positive_transform = Softplus
-    transformations.identity_transform = Identity
-    transformations.triangular_transform = FillTriangular
+    transformations.positive_transform = npd.transforms.SoftplusTransform()
+    transformations.identity_transform = npd.transforms.IdentityTransform()
+    transformations.triangular_transform = npd.transforms.CholeskyTransform()
 
     # Default parameter transforms
     transformations.lengthscale = "positive_transform"
@@ -58,7 +46,7 @@ def get_defaults() -> ConfigDict:
     return __config
 
 
-def add_parameter(param_name: str, bijection: dx.Bijector) -> None:
+def add_parameter(param_name: str, bijection: npd.transforms.Transform) -> None:
     """Add a parameter and its corresponding transform to GPJax's config file.
 
     Args:

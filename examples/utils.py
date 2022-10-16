@@ -1,7 +1,5 @@
 import matplotlib.transforms as transforms
 import numpy as np
-import tensorflow as tf
-import utils as ut
 from matplotlib.patches import Ellipse
 
 

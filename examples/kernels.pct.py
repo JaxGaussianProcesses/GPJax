@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.9.7 ('gpjax')
 #     language: python
@@ -19,17 +19,15 @@
 #
 # In this guide, we introduce the kernels available in GPJax and demonstrate how to create custom ones.
 
-import distrax as dx
-import jax
+# %%
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
-import tensorflow_probability.substrates.jax.bijectors as tfb
 from jax import jit
 from jaxtyping import Array, Float
 from optax import adam
+import numpyro.distributions as npd
 
-# %%
 import gpjax as gpx
 
 key = jr.PRNGKey(123)
@@ -62,9 +60,9 @@ x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 
 for k, ax in zip(kernels, axes.ravel()):
     prior = gpx.Prior(kernel=k)
-    params, _, _, _ = gpx.initialise(prior, key).unpack()
+    params, _, _ = gpx.initialise(prior, key).unpack()
     rv = prior(params)(x)
-    y = rv.sample(sample_shape=10, seed=key)
+    y = rv.sample(key, sample_shape=(10,))
 
     ax.plot(x, y.T, alpha=0.7)
     ax.set_title(k.name)
@@ -207,14 +205,31 @@ class Polar(gpx.kernels.Kernel):
 #
 # To define a bijector here we'll make use of the `Lambda` operator given in Distrax. This lets us convert any regular Jax function into a bijection. Given that we require $\tau$ to be strictly greater than $4.$, we'll apply a [softplus transformation](https://jax.readthedocs.io/en/latest/_autosummary/jax.nn.softplus.html) where the lower bound is shifted by $4.$.
 
-
 # %%
 from gpjax.config import add_parameter
+from jax.nn import softplus
 
-bij_fn = lambda x: jax.nn.softplus(x + jnp.array(4.0))
-bij = dx.Lambda(bij_fn)
 
-add_parameter("tau", bij)
+class ShiftSoftplus(npd.transforms.Transform):
+    domain = npd.constraints.real
+    codomain = npd.constraints.real
+    
+    def __init__(self, low: Float[Array, "1"]) -> None:
+        super().__init__()
+        self.low = jnp.array(low)
+    
+    def __call__(self, x):
+        x -= self.low
+        return softplus(x) + self.low
+
+    def _inverse(self, y):
+        return jnp.log(-jnp.expm1(-y)) + y
+
+    def log_abs_det_jacobian(self, x, y, intermediates=None):
+        return -softplus(-x)
+
+
+add_parameter("tau", ShiftSoftplus(4.))
 
 # %% [markdown]
 # ### Using our polar kernel
@@ -239,22 +254,17 @@ likelihood = gpx.Gaussian(num_datapoints=n)
 circlular_posterior = gpx.Prior(kernel=PKern) * likelihood
 
 # Initialise parameters and corresponding transformations
-params, trainable, constrainer, unconstrainer = gpx.initialise(
-    circlular_posterior, key
-).unpack()
+parameter_state = gpx.initialise(circlular_posterior, key)
 
 # Optimise GP's marginal log-likelihood using Adam
-mll = jit(circlular_posterior.marginal_log_likelihood(D, constrainer, negative=True))
+mll = jit(circlular_posterior.marginal_log_likelihood(D, negative=True))
+
 learned_params, training_history = gpx.fit(
     mll,
-    params,
-    trainable,
-    adam(learning_rate=0.05),
+    parameter_state,
+    adam(learning_rate=0.01),
     n_iters=1000,
 ).unpack()
-
-# Untransform learned parameters
-final_params = gpx.transform(learned_params, constrainer)
 
 # %% [markdown]
 # ### Prediction
@@ -262,9 +272,9 @@ final_params = gpx.transform(learned_params, constrainer)
 # We'll now query the GP's predictive posterior at linearly spaced novel inputs and illustrate the results.
 
 # %%
-posterior_rv = likelihood(circlular_posterior(D, final_params)(angles), final_params)
-mu = posterior_rv.mean()
-one_sigma = posterior_rv.stddev()
+posterior_rv = likelihood(circlular_posterior(D, learned_params)(angles), learned_params)
+mu = posterior_rv.mean
+one_sigma = jnp.sqrt(posterior_rv.variance)
 
 # %%
 fig = plt.figure(figsize=(10, 8))

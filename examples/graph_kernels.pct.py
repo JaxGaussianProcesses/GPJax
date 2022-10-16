@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.9.7 ('gpjax')
 #     language: python
@@ -88,7 +88,7 @@ true_params["kernel"] = {
 }
 
 fx = f(true_params)(x)
-y = fx.sample(seed=key).reshape(-1, 1)
+y = fx.sample(key).reshape(-1, 1)
 
 D = gpx.Dataset(X=x, y=y)
 
@@ -145,8 +145,8 @@ learned_params = gpx.transform(learned_params, constrainer)
 initial_dist = likelihood(posterior(D, params)(x), params)
 predictive_dist = likelihood(posterior(D, learned_params)(x), learned_params)
 
-initial_mean = initial_dist.mean()
-learned_mean = predictive_dist.mean()
+initial_mean = initial_dist.mean
+learned_mean = predictive_dist.mean
 
 rmse = lambda ytrue, ypred: jnp.sum(jnp.sqrt(jnp.square(ytrue - ypred)))
 

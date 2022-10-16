@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.9.7 ('gpjax')
 #     language: python
@@ -18,18 +18,19 @@
 # # Gaussian Processes Barycentres
 #
 # In this notebook we'll give an implementation of <strong data-cite="mallasto2017learning"></strong>. In this work, the existence of a Wasserstein barycentre between a collection of Gaussian processes is proven. When faced with trying to _average_ a set of probability distributions, the Wasserstein barycentre is an attractive choice as it enables uncertainty amongst the individual distributions to be incorporated into the averaged distribution. When compared to a naive _mean of means_ and _mean of variances_ approach to computing the average probability distributions, it can be seen that Wasserstein barycentres offer significantly more favourable uncertainty estimation.
+#
 
+# %%
 import typing as tp
 
-import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy.linalg as jsl
 import matplotlib.pyplot as plt
+import numpyro
 import optax as ox
 
-# %%
 import gpjax as gpx
 
 key = jr.PRNGKey(123)
@@ -99,24 +100,23 @@ def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
     D = gpx.Dataset(X=x, y=y)
     likelihood = gpx.Gaussian(num_datapoints=n)
     posterior = gpx.Prior(kernel=gpx.RBF()) * likelihood
-    params, trainables, constrainers, unconstrainers = gpx.initialise(
+    parameter_state = gpx.initialise(
         posterior, key
-    ).unpack()
-    params = gpx.transform(params, unconstrainers)
+    )
+    params, trainables, bijectors = parameter_state.unpack()
+    params = gpx.unconstrain(params, bijectors)
 
     objective = jax.jit(
-        posterior.marginal_log_likelihood(D, constrainers, negative=True)
+        posterior.marginal_log_likelihood(D, negative=True)
     )
 
     opt = ox.adam(learning_rate=0.01)
     learned_params, training_history = gpx.fit(
         objective=objective,
-        trainables=trainables,
-        params=params,
+        parameter_state=parameter_state,
         optax_optim=opt,
         n_iters=1000,
     ).unpack()
-    learned_params = gpx.transform(learned_params, constrainers)
     return likelihood(posterior(D, learned_params)(xtest), learned_params)
 
 
@@ -134,9 +134,9 @@ def sqrtm(A: jnp.DeviceArray):
 
 
 def wasserstein_barycentres(
-    distributions: tp.List[dx.Distribution], weights: jnp.DeviceArray
+    distributions: tp.List[numpyro.distributions.Distribution], weights: jnp.DeviceArray
 ):
-    covariances = [d.covariance() for d in distributions]
+    covariances = [d.covariance_matrix for d in distributions]
     cov_stack = jnp.stack(covariances)
     stack_sqrt = jax.vmap(sqrtm)(cov_stack)
 
@@ -156,7 +156,7 @@ def wasserstein_barycentres(
 # %%
 weights = jnp.ones((n_datasets,)) / n_datasets
 
-means = jnp.stack([d.mean() for d in posterior_preds])
+means = jnp.stack([d.mean for d in posterior_preds])
 barycentre_mean = jnp.tensordot(weights, means, axes=1)
 
 step_fn = jax.jit(wasserstein_barycentres(posterior_preds, weights))
@@ -167,7 +167,7 @@ barycentre_covariance, sequence = jax.lax.scan(
 )
 
 
-barycentre_process = dx.MultivariateNormalFullCovariance(
+barycentre_process = numpyro.distributions.MultivariateNormal(
     barycentre_mean, barycentre_covariance
 )
 
@@ -179,16 +179,16 @@ barycentre_process = dx.MultivariateNormalFullCovariance(
 
 # %%
 def plot(
-    dist: dx.Distribution,
+    dist: numpyro.distributions.Distribution,
     ax,
     color: str = "tab:blue",
     label: str = None,
     ci_alpha: float = 0.2,
     linewidth: float = 1.0,
 ):
-    mu = dist.mean()
-    sigma = dist.stddev()
-    ax.plot(xtest, dist.mean(), linewidth=linewidth, color=color, label=label)
+    mu = dist.mean
+    sigma = jnp.sqrt(dist.covariance_matrix.diagonal())
+    ax.plot(xtest, dist.mean, linewidth=linewidth, color=color, label=label)
     ax.fill_between(
         xtest.squeeze(), mu - sigma, mu + sigma, alpha=ci_alpha, color=color
     )
