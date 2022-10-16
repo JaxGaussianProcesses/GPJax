@@ -14,9 +14,9 @@
 # ---
 
 # %% [markdown]
-# # A Gentle Introduction to Gaussian Processes
+# # New to Gaussian Processes?
 #
-# In this notebook we provide the material required to understand Gaussian processes (GPs). No prior knowledge of Bayesian inference or GPs is assumed, and this notebook is self-contained. At a high level, we begin $\mathbf{y}$ introducing Bayes' theorem and its implications within probabilistic modelling. We then proceed to introduce the Gaussian random variable along with its multivariate form. We conclude $\mathbf{y}$ showing how this notion can be extended to GPs.
+# Fantastic that you're here! This notebook is designed to be a gentle introduction to the mathematics of Gaussian processes (GPs). No prior knowledge of Bayesian inference or GPs is assumed, and this notebook is self-contained. At a high level, we begin $\mathbf{y}$ introducing Bayes' theorem and its implications within probabilistic modelling. We then proceed to introduce the Gaussian random variable along with its multivariate form. We conclude $\mathbf{y}$ showing how this notion can be extended to GPs.
 #
 # ## Bayes' Theorem
 #

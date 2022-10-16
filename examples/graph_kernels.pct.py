@@ -78,23 +78,24 @@ L = nx.laplacian_matrix(G).toarray()
 x = jnp.arange(G.number_of_nodes()).reshape(-1, 1)
 
 kernel = gpx.GraphKernel(laplacian=L)
-f = gpx.Prior(kernel=kernel)
+prior = gpx.Prior(kernel=kernel)
 
-true_params = f._initialise_params(key)
+true_params = prior._initialise_params(key)
 true_params["kernel"] = {
     "lengthscale": jnp.array(2.3),
     "variance": jnp.array(3.2),
     "smoothness": jnp.array(6.1),
 }
 
-fx = f(true_params)(x)
-y = fx.sample(key).reshape(-1, 1)
+fx = prior(true_params)(x)
+y = fx.sample(seed=key).reshape(-1, 1)
 
 D = gpx.Dataset(X=x, y=y)
 
 # %% [markdown]
 #
 # We can visualise this signal in the following cell.
+
 # %%
 nx.draw(G, pos, node_color=y, with_labels=False, alpha=0.5)
 
@@ -115,25 +116,21 @@ cbar = plt.colorbar(sm)
 
 # %%
 likelihood = gpx.Gaussian(num_datapoints=y.shape[0])
-posterior = f * likelihood
-params, trainable, constrainer, unconstrainer = gpx.initialise(posterior, key).unpack()
-params = gpx.transform(params, unconstrainer)
+posterior = prior * likelihood
 
-mll = jit(
-    posterior.marginal_log_likelihood(
-        train_data=D, transformations=constrainer, negative=True
-    )
+
+parameter_state = gpx.initialise(posterior, key)
+negative_mll = jit(posterior.marginal_log_likelihood(train_data=D, negative=True))
+optimiser = ox.adam(learning_rate=0.01)
+
+inference_state = gpx.fit(
+    objective=negative_mll,
+    parameter_state=parameter_state,
+    optax_optim=optimiser,
+    n_iters=1000,
 )
 
-opt = ox.adam(learning_rate=0.01)
-learned_params, training_history = gpx.fit(
-    objective=mll,
-    params=params,
-    trainables=trainable,
-    optax_optim=opt,
-    n_iters=1000,
-).unpack()
-learned_params = gpx.transform(learned_params, constrainer)
+learned_params, training_history = inference_state.unpack()
 
 # %% [markdown]
 #
@@ -141,8 +138,10 @@ learned_params = gpx.transform(learned_params, constrainer)
 #
 # Having optimised our hyperparameters, we can now make predictions on the graph.
 # Though we haven't defined a training and testing dataset here, we'll simply query the predictive posterior for the full graph to compare the root-mean-squared error (RMSE) of the model for the initialised parameters vs the optimised set.
+
 # %%
-initial_dist = likelihood(posterior(D, params)(x), params)
+initial_params = parameter_state.params
+initial_dist = likelihood(posterior(D, initial_params)(x), initial_params)
 predictive_dist = likelihood(posterior(D, learned_params)(x), learned_params)
 
 initial_mean = initial_dist.mean
@@ -160,6 +159,7 @@ print(
 # %% [markdown]
 #
 # We can also plot the source of error in our model's predictions on the graph by the following.
+
 # %%
 error = jnp.abs(learned_mean - y.squeeze())
 
@@ -171,6 +171,7 @@ sm = plt.cm.ScalarMappable(
 )
 sm.set_array([])
 cbar = plt.colorbar(sm)
+
 # %% [markdown]
 #
 # Reassuringly, our model seems to provide equally good predictions in each cluster.

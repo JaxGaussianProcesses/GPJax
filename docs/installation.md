@@ -1,10 +1,8 @@
----
-title: Installation
----
+# Installation
 
-# Stable version
+## Stable version
 
-To install the latest stable release using `pip` execute the following:
+The latest stable release of `GPJax` can be installed via ``pip``:
 
 ```bash
 pip install gpjax
@@ -14,8 +12,8 @@ pip install gpjax
 
 GPU support is enabled through proper configuration of the underlying
 [Jax](https://github.com/google/jax) installation. CPU enabled forms of
-both packages are installed as part of the GPJax installation. For GPU
-Jax support, the following command should be run
+both packages are installed as part of the `GPJax` installation. For GPU
+Jax support, the following commands should be run:
 
 ```bash
 # Specify your installed CUDA version.
@@ -30,10 +28,9 @@ import jaxlib
 print(jaxlib.__version__)
 ```
 
-# Development version
+## Development version
 
-To install the latest development version of GPJax, run the following
-set of commands:
+The latest development version of `GPJax` can be installed via running following:
 
 ```bash
 git clone https://github.com/thomaspinder/GPJax.git

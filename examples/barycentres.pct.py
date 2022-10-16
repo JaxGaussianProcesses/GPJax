@@ -63,6 +63,7 @@ key = jr.PRNGKey(123)
 # ## Dataset
 #
 # We'll simulate five datasets and develop a Gaussian process posterior before identifying the Gaussian process barycentre at a set of test points. Each dataset will be a sine function with a different vertical shift, periodicity, and quantity of noise.
+
 # %%
 n = 100
 n_test = 200
@@ -87,7 +88,6 @@ fig, ax = plt.subplots(figsize=(16, 5))
 ax.plot(x, y, "o")
 plt.show()
 
-
 # %% [markdown]
 # ## Learning a posterior distribution
 #
@@ -98,30 +98,26 @@ def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
     if y.ndim == 1:
         y = y.reshape(-1, 1)
     D = gpx.Dataset(X=x, y=y)
+
     likelihood = gpx.Gaussian(num_datapoints=n)
     posterior = gpx.Prior(kernel=gpx.RBF()) * likelihood
-    parameter_state = gpx.initialise(
-        posterior, key
-    )
-    params, trainables, bijectors = parameter_state.unpack()
-    params = gpx.unconstrain(params, bijectors)
 
-    objective = jax.jit(
-        posterior.marginal_log_likelihood(D, negative=True)
-    )
+    parameter_state = gpx.initialise(posterior, key)
+    negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
+    optimiser = ox.adam(learning_rate=0.01)
 
-    opt = ox.adam(learning_rate=0.01)
-    learned_params, training_history = gpx.fit(
-        objective=objective,
+    inference_state = gpx.fit(
+        objective=negative_mll,
         parameter_state=parameter_state,
-        optax_optim=opt,
+        optax_optim=optimiser,
         n_iters=1000,
-    ).unpack()
+    )
+
+    learned_params, training_history = inference_state.unpack()
     return likelihood(posterior(D, learned_params)(xtest), learned_params)
 
 
 posterior_preds = [fit_gp(x, i) for i in ys]
-
 
 # %% [markdown]
 # ## Computing the barycentre
@@ -170,7 +166,6 @@ barycentre_covariance, sequence = jax.lax.scan(
 barycentre_process = numpyro.distributions.MultivariateNormal(
     barycentre_mean, barycentre_covariance
 )
-
 
 # %% [markdown]
 # ## Plotting the result

@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: base
 #     language: python
 #     name: python3
 # ---
@@ -37,9 +37,9 @@ key = jr.PRNGKey(123)
 # %% [markdown]
 # ## Dataset
 #
-# With the necessary modules imported, we simulate a dataset $\mathcal{D} = (\boldsymbol{x}, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{100}$ with inputs $\boldsymbol{x}$ sampled uniformly on $(-1., 1)$ and corresponding binary outputs
+# With the necessary modules imported, we simulate a dataset $\mathcal{D} = (, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{100}$ with inputs $\boldsymbol{x}$ sampled uniformly on $(-1., 1)$ and corresponding binary outputs
 #
-# $$\boldsymbol{y} = 0.5 * \text{sign}(\cos(2 * \boldsymbol{x} + \boldsymbol{\epsilon})) + 0.5, \quad \boldsymbol{\epsilon} \sim \mathcal{N} \left(\textbf{0}, \textbf{I} * (0.05)^{2} \right).$$
+# $$\boldsymbol{y} = 0.5 * \text{sign}(\cos(2 *  + \boldsymbol{\epsilon})) + 0.5, \quad \boldsymbol{\epsilon} \sim \mathcal{N} \left(\textbf{0}, \textbf{I} * (0.05)^{2} \right).$$
 #
 # We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs for later.
 
@@ -51,49 +51,55 @@ D = gpx.Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-1.0, 1.0, 500).reshape(-1, 1)
 plt.plot(x, y, "o", markersize=8)
+
 # %% [markdown]
 # ## MAP inference
 #
 # We begin by defining a Gaussian process prior with a radial basis function (RBF) kernel, chosen for the purpose of exposition. Since our observations are binary, we choose a Bernoulli likelihood with a probit link function.
+
 # %%
 kernel = gpx.RBF()
 prior = gpx.Prior(kernel=kernel)
 likelihood = gpx.Bernoulli(num_datapoints=D.n)
+
 # %% [markdown]
 # We construct the posterior through the product of our prior and likelihood.
+
 # %%
 posterior = prior * likelihood
 print(type(posterior))
+
 # %% [markdown]
 # Whilst the latent function is Gaussian, the posterior distribution is non-Gaussian since our generative model first samples the latent GP and propagates these samples through the likelihood function's inverse link function. This step prevents us from being able to analytically integrate the latent function's values out of our posterior, and we must instead adopt alternative inference techniques. We begin with maximum a posteriori (MAP) estimation, a fast inference procedure to obtain point estimates for the latent function and the kernel's hyperparameters by maximising the marginal log-likelihood.
+
 # %% [markdown]
-# To begin we obtain a set of initial parameter values through the `initialise` callable, and transform these to the unconstrained space via `transform` (see the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)). We also define the negative marginal log-likelihood, and JIT compile this to accelerate training.
+# To begin we obtain an initial parameter state through the `initialise` callable (see the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)). We can obtain a MAP estimate by optimising the marginal log-likelihood with Optax's optimisers.
+
 # %%
 parameter_state = gpx.initialise(posterior)
-params, trainable, bijectors = parameter_state.unpack()
+negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
 
-mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
+optimiser = ox.adam(learning_rate=0.01)
 
-# %% [markdown]
-# We can obtain a MAP estimate by optimising the marginal log-likelihood with Obtax's optimisers.
-# %%
-opt = ox.adam(learning_rate=0.01)
-learned_params, training_history = gpx.fit(
-    mll,
-    parameter_state,
-    opt,
-    n_iters=500,
-).unpack()
+inference_state = gpx.fit(
+    objective=negative_mll,
+    parameter_state=parameter_state,
+    optax_optim=optimiser,
+    n_iters=1000,
+)
 
-negative_Hessian = jax.jacfwd(jax.jacrev(mll))(learned_params)["latent"][
-    "latent"
-][:, 0, :, 0]
+map_estimate, training_history = inference_state.unpack()
+
 # %% [markdown]
 # From which we can make predictions at novel inputs, as illustrated below.
-# %%
-latent_dist = posterior(D, learned_params)(xtest)
 
-predictive_dist = likelihood(latent_dist, learned_params)
+# %%
+predictive_mean = predictive_dist.mean
+
+# %%
+map_latent_dist = posterior(D, map_estimate)(xtest)
+
+predictive_dist = likelihood(map_latent_dist, map_estimate)
 
 predictive_mean = predictive_dist.mean
 predictive_std = jnp.sqrt(predictive_dist.variance)
@@ -127,86 +133,90 @@ ax.plot(
 ax.legend()
 
 # %% [markdown]
+# Here we projected the map estimates $\hat{\boldsymbol{f}}$ for the function values $\boldsymbol{f}$ at the data points $\boldsymbol{x}$ to get predictions over the whole domain,
+#
+# \begin{align}
+# p(f(\cdot)| \mathcal{D})  \approx q_{map}(f(\cdot)) := \int p(f(\cdot)| \boldsymbol{f}) \delta(\boldsymbol{f} - \hat{\boldsymbol{f}}) d \boldsymbol{f} = \mathcal{N}(\mathbf{K}_{\boldsymbol{(\cdot)x}}  \mathbf{K}_{\boldsymbol{xx}}^{-1} \hat{\boldsymbol{f}},  \mathbf{K}_{\boldsymbol{(\cdot, \cdot)}} - \mathbf{K}_{\boldsymbol{(\cdot)\boldsymbol{x}}} \mathbf{K}_{\boldsymbol{xx}}^{-1} \mathbf{K}_{\boldsymbol{\boldsymbol{x}(\cdot)}}).
+# \end{align}
+
+# %% [markdown]
 # However, as a point estimate, MAP estimation is severely limited for uncertainty quantification, providing only a single piece of information about the posterior.
+
 # %% [markdown]
 # ## Laplace approximation
-# The Laplace approximation improves uncertainty quantification by incorporating curvature induced by the marginal log-likelihood's Hessian to construct an approximate Gaussian distribution centered on the MAP estimate.
-# Since the negative Hessian is positive definite, we can use the Cholesky decomposition to obtain the covariance matrix of the Laplace approximation at the datapoints below.
+# The Laplace approximation improves uncertainty quantification by incorporating curvature induced by the marginal log-likelihood's Hessian to construct an approximate Gaussian distribution centered on the MAP estimate. Writing $\tilde{p}(\boldsymbol{f}|\mathcal{D}) = p(\boldsymbol{y}|\boldsymbol{f}) p(\boldsymbol{f})$ as the unormalised posterior for function values $\boldsymbol{f}$ at the datapoints $\boldsymbol{x}$, we can expand the log of this about the posterior mode $\hat{\boldsymbol{f}}$ via a Taylor expansion. This gives:
+#
+# \begin{align}
+# \log\tilde{p}(\boldsymbol{f}|\mathcal{D}) = \log\tilde{p}(\hat{\boldsymbol{f}}|\mathcal{D}) + \left[\nabla \log\tilde{p}({\boldsymbol{f}}|\mathcal{D})|_{\hat{\boldsymbol{f}}}\right]^{T} (\boldsymbol{f}-\hat{\boldsymbol{f}}) + \frac{1}{2} (\boldsymbol{f}-\hat{\boldsymbol{f}})^{T} \left[\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} \right] (\boldsymbol{f}-\hat{\boldsymbol{f}}) + \mathcal{O}(\lVert \boldsymbol{f} - \hat{\boldsymbol{f}} \rVert^3).
+# \end{align}
+#
+# Now since $\nabla \log\tilde{p}({\boldsymbol{f}}|\mathcal{D})$ is zero at the mode, this suggests the following approximation
+# \begin{align}
+# \tilde{p}(\boldsymbol{f}|\mathcal{D}) \approx \log\tilde{p}(\hat{\boldsymbol{f}}|\mathcal{D}) \exp\left\{ \frac{1}{2} (\boldsymbol{f}-\hat{\boldsymbol{f}})^{T} \left[-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} \right] (\boldsymbol{f}-\hat{\boldsymbol{f}}) \right\}
+# \end{align},
+#
+# that we identify as a Gaussian distribution,  $p(\boldsymbol{f}| \mathcal{D}) \approx q(\boldsymbol{f}) := \mathcal{N}(\hat{\boldsymbol{f}}, [-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} ]^{-1} )$. Since the negative Hessian is positive definite, we can use the Cholesky decomposition to obtain the covariance matrix of the Laplace approximation at the datapoints below.
+
 # %%
-f_map_estimate = posterior(D, learned_params)(x).mean
+from gpjax.kernels import cross_covariance, gram
 
 jitter = 1e-6
 
+# Compute (latent) function value map estimates at training points:
+Kxx = gram(prior.kernel, x, map_estimate["kernel"])
+Kxx += I(D.n) * jitter
+Lx = jnp.linalg.cholesky(Kxx)
+f_hat = jnp.matmul(Lx, map_estimate["latent"])
+
+# Negative Hessian,  H = -∇²p_tilde(y|f):
+H = jax.jacfwd(jax.jacrev(negative_mll))(map_estimate)["latent"]["latent"][:, 0, :, 0]
+
 # LLᵀ = H
-L = jnp.linalg.cholesky(negative_Hessian + I(D.n) * jitter)
+L = jnp.linalg.cholesky(H + I(D.n) * jitter)
 
 # H⁻¹ = H⁻¹ I = (LLᵀ)⁻¹ I = L⁻ᵀL⁻¹ I
 L_inv = jsp.linalg.solve_triangular(L, I(D.n), lower=True)
 H_inv = jsp.linalg.solve_triangular(L.T, L_inv, lower=False)
 
-laplace_approximation = npd.MultivariateNormal(f_map_estimate, H_inv)
+# p(f|D) ≈ N(f_hat, H⁻¹)
+laplace_approximation = dx.MultivariateNormalFullCovariance(
+    jnp.atleast_1d(f_hat.squeeze()), H_inv
+)
 
-from gpjax.kernels import cross_covariance, gram
 
 # %% [markdown]
-# For novel inputs, we must interpolate the above distribution, which can be achived via the function defined below.
+# For novel inputs, we must project the above approximating distribution through the Gaussian conditional distribution $p(f(\cdot)| \boldsymbol{f})$,
+#
+# \begin{align}
+# p(f(\cdot)| \mathcal{D}) \approx q_{Laplace}(f(\cdot)) := \int p(f(\cdot)| \boldsymbol{f}) q(\boldsymbol{f}) d \boldsymbol{f} = \mathcal{N}(\mathbf{K}_{\boldsymbol{(\cdot)x}}  \mathbf{K}_{\boldsymbol{xx}}^{-1} \hat{\boldsymbol{f}},  \mathbf{K}_{\boldsymbol{(\cdot, \cdot)}} - \mathbf{K}_{\boldsymbol{(\cdot)\boldsymbol{x}}} \mathbf{K}_{\boldsymbol{xx}}^{-1} (\mathbf{K}_{\boldsymbol{xx}} - [-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} ]^{-1}) \mathbf{K}_{\boldsymbol{xx}}^{-1} \mathbf{K}_{\boldsymbol{\boldsymbol{x}(\cdot)}}).
+# \end{align}
+#
+# This is the same approximate distribution $q_{map}(f(\cdot))$, but we have pertubed the covariance by a curvature term of $\mathbf{K}_{\boldsymbol{(\cdot)\boldsymbol{x}}} \mathbf{K}_{\boldsymbol{xx}}^{-1} [-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} ]^{-1} \mathbf{K}_{\boldsymbol{xx}}^{-1} \mathbf{K}_{\boldsymbol{\boldsymbol{x}(\cdot)}}$. We take the latent distribution computed in the previous section and add this term to the covariance to construct $q_{Laplace}(f(\cdot))$.
+# >>>>>>> 4db65bd (Update documentation)
+
 # %%
-from gpjax.types import Dataset
+def construct_laplace(
+    test_inputs: Float[Array, "N D"]
+) -> dx.MultivariateNormalFullCovariance:
 
+    map_latent_dist = posterior(D, map_estimate)(test_inputs)
 
-def predict(
-    laplace_at_data: npd.Distribution,
-    train_data: Dataset,
-    test_inputs: Float[Array, "N D"],
-    jitter: int = 1e-6,
-) -> npd.Distribution:
-    """Compute the predictive distribution of the Laplace approximation at novel inputs.
+    Kxt = cross_covariance(prior.kernel, x, test_inputs, map_estimate["kernel"])
+    Kxx = gram(prior.kernel, x, map_estimate["kernel"])
+    Kxx += I(D.n) * jitter
+    Lx = jnp.linalg.cholesky(Kxx)
 
-    Args:
-        laplace_at_data (dict): The Laplace approximation at the datapoints.
-
-    Returns:
-        npd.Distribution: The Laplace approximation at novel inputs.
-    """
-    x, n = train_data.X, train_data.n
-
-    t = test_inputs
-    n_test = t.shape[0]
-
-    mu = laplace_at_data.mean.reshape(-1, 1)
-    cov = laplace_at_data.covariance_matrix
-
-    Ktt = gram(prior.kernel, t, params["kernel"])
-    Kxx = gram(prior.kernel, x, params["kernel"])
-    Kxt = cross_covariance(prior.kernel, x, t, params["kernel"])
-    μt = prior.mean_function(t, params["mean_function"])
-    μx = prior.mean_function(x, params["mean_function"])
-
-    # Lx Lxᵀ = Kxx
-    Lx = jnp.linalg.cholesky(Kxx + I(n) * jitter)
-
-    # sqrt sqrtᵀ = Σ
-    sqrt = jnp.linalg.cholesky(cov + I(n) * jitter)
-
-    # Lz⁻¹ Kxt
-    Lx_inv_Kxt = jsp.linalg.solve_triangular(Lx, Kxt, lower=True)
+    # Lx⁻¹ Kxt
+    Lx_inv_Ktx = jsp.linalg.solve_triangular(Lx, Kxt, lower=True)
 
     # Kxx⁻¹ Kxt
-    Kxx_inv_Kxt = jsp.linalg.solve_triangular(Lx.T, Lx_inv_Kxt, lower=False)
+    Kxx_inv_Ktx = jsp.linalg.solve_triangular(Lx.T, Lx_inv_Ktx, lower=False)
 
-    # Ktx Kxx⁻¹ sqrt
-    Ktx_Kxx_inv_sqrt = jnp.matmul(Kxx_inv_Kxt.T, sqrt)
+    # Ktx Kxx⁻¹[ H⁻¹ ] Kxx⁻¹ Kxt
+    laplace_cov_term = jnp.matmul(jnp.matmul(Kxx_inv_Ktx.T, H_inv), Kxx_inv_Ktx)
 
-    # μt + Ktx Kxx⁻¹ (μ - μx)
-    mean = μt + jnp.matmul(Kxx_inv_Kxt.T, mu - μx)
-
-    # Ktt  -  Ktx Kxx⁻¹ Kxt  +  Ktx Kxx⁻¹ S Kxx⁻¹ Kxt
-    covariance = (
-        Ktt
-        - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
-        + jnp.matmul(Ktx_Kxx_inv_sqrt, Ktx_Kxx_inv_sqrt.T)
-    )
-    covariance += I(n_test) * jitter
+    mean = map_latent_dist.mean()
+    covariance = map_latent_dist.covariance() + laplace_cov_term
 
     return npd.MultivariateNormal(
         jnp.atleast_1d(mean.squeeze()), covariance
@@ -215,10 +225,13 @@ def predict(
 
 # %% [markdown]
 # From this we can construct the predictive distribution at the test points.
+#
+# <<<<<<< HEAD
+# predictive_dist = likelihood(latent_dist, learned_params)
+# =======
 # %%
-latent_dist = predict(laplace_approximation, D, xtest)
-
-predictive_dist = likelihood(latent_dist, learned_params)
+laplace_latent_dist = construct_laplace(xtest)
+predictive_dist = likelihood(laplace_latent_dist, map_estimate)
 
 predictive_mean = predictive_dist.mean
 predictive_std = predictive_dist.variance**0.5
@@ -248,8 +261,8 @@ ax.plot(
     linestyle="--",
     linewidth=1,
 )
-
 ax.legend()
+
 # %% [markdown]
 # However, the Laplace approximation is still limited by considering information about the posterior at a single location. On the other hand, through approximate sampling, MCMC methods allow us to learn all information about the posterior distribution.
 
@@ -265,19 +278,26 @@ ax.legend()
 # We'll use the No U-Turn Sampler (NUTS) implementation given in BlackJax for sampling. For the interested reader, NUTS is a Hamiltonian Monte Carlo sampling scheme where the number of leapfrog integration steps is computed at each step of the change according to the NUTS algorithm. In general, samplers constructed under this framework are very efficient.
 #
 # We begin by generating _sensible_ initial positions for our sampler before defining an inference loop and sampling 500 values from our Markov chain. In practice, drawing more samples will be necessary.
+
+# %%
+params, trainables, bijectors = gpx.initialise(posterior, key).unpack()
+
 # %%
 # Adapted from BlackJax's introduction notebook.
 num_adapt = 500
 num_samples = 200
 
-mll = jax.jit(posterior.marginal_log_likelihood(D, negative=False))
+params, trainables, bijectors = gpx.initialise(posterior, key).unpack()
+mll = posterior.marginal_log_likelihood(D, negative=False)
+unconstrained_mll = jax.jit(lambda params: mll(gpx.constrain(params, bijectors)))
 
 adapt = blackjax.window_adaptation(
-    blackjax.nuts, mll, num_adapt, target_acceptance_rate=0.65
+    blackjax.nuts, unconstrained_mll, num_adapt, target_acceptance_rate=0.65
 )
 
 # Initialise the chain
-last_state, kernel, _ = adapt.run(key, params)
+unconstrained_params = gpx.unconstrain(params, bijectors)
+last_state, kernel, _ = adapt.run(key, unconstrained_params)
 
 
 def inference_loop(rng_key, kernel, initial_state, num_samples):
@@ -298,12 +318,14 @@ states, infos = inference_loop(key, kernel, last_state, num_samples)
 # ### Sampler efficiency
 #
 # BlackJax gives us easy access to our sampler's efficiency through metrics such as the sampler's _acceptance probability_ (the number of times that our chain accepted a proposed sample, divided by the total number of steps run by the chain). For NUTS and Hamiltonian Monte Carlo sampling, we typically seek an acceptance rate of 60-70% to strike the right balance between having a chain which is _stuck_ and rarely moves versus a chain that is too jumpy with frequent small steps.
+
 # %%
 acceptance_rate = jnp.mean(infos.acceptance_probability)
 print(f"Acceptance rate: {acceptance_rate:.2f}")
 
 # %% [markdown]
 # Our acceptance rate is slightly too large, prompting an examination of the chain's trace plots. A well-mixing chain will have very few (if any) flat spots in its trace plot whilst also not having too many steps in the same direction. In addition to the model's hyperparameters, there will be 500 samples for each of the 100 latent function values in the `states.position` dictionary. We depict the chains that correspond to the model hyperparameters and the first value of the latent function for brevity.
+
 # %%
 fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(15, 5), tight_layout=True)
 ax0.plot(states.position["kernel"]["lengthscale"])
@@ -319,6 +341,7 @@ ax2.set_title("Latent Function (index = 1)")
 # Having obtained samples from the posterior, we draw ten instances from our model's predictive distribution per MCMC sample. Using these draws, we will be able to compute credible values and expected values under our posterior distribution.
 #
 # An ideal Markov chain would have samples completely uncorrelated with their neighbours after a single lag. However, in practice, correlations often exist within our chain's sample set. A commonly used technique to try and reduce this correlation is _thinning_ whereby we select every $n$th sample where $n$ is the minimum lag length at which we believe the samples are uncorrelated. Although further analysis of the chain's autocorrelation is required to find appropriate thinning factors, we employ a thin factor of 10 for demonstration purposes.
+
 # %%
 thin_factor = 10
 samples = []
@@ -328,6 +351,7 @@ for i in range(0, num_samples, thin_factor):
     ps["kernel"]["lengthscale"] = states.position["kernel"]["lengthscale"][i]
     ps["kernel"]["variance"] = states.position["kernel"]["variance"][i]
     ps["latent"] = states.position["latent"][i, :, :]
+    ps = gpx.constrain(ps, bijectors)
 
     latent_dist = posterior(D, ps)(xtest)
     predictive_dist = likelihood(latent_dist, ps)

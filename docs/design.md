@@ -1,9 +1,8 @@
-# GPJax Principles
+# Design Principles
 
-GPJax is designed to be a Gaussian process package that provides an
-accurate representation of the underlying maths. Variable names are
-designed to closely, if not exactly, match the notation in {cite}`rasmussen2006gaussian`.
-We here list the notation used in GPJax with its corresponding mathematical quantity.
+`GPJax` is designed to be a Gaussian process package that provides an
+accurate representation of the underlying maths. Variable names are chosen to closely match the notation in {cite}`rasmussen2006gaussian`.
+We here list the notation used in `GPJax` with its corresponding mathematical quantity.
 
 ## Gaussian process notation
 
@@ -20,7 +19,7 @@ We here list the notation used in GPJax with its corresponding mathematical quan
 | $\mathbf{L}_{\boldsymbol{x}}$               | Lx         | Lower Cholesky decomposition of $\boldsymbol{K}_{\boldsymbol{x}\boldsymbol{x}}$ |
 | $\mathbf{K}_{\boldsymbol{t}\boldsymbol{x}}$ | Ktx        | Cross-covariance between inputs $\boldsymbol{t}$ and $\boldsymbol{x}$           |
 
-# Sparse Gaussian process notation
+## Sparse Gaussian process notation
 
 | On paper                              | GPJax code | Description               |
 | ------------------------------------- | ---------- | ------------------------- |
