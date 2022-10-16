@@ -110,7 +110,7 @@ class Prior(AbstractGP):
         """
         return self.__mul__(other)
 
-    def predict(self, params: dict) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
+    def predict(self, params: Dict) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
         """Compute the GP's prior mean and variance.
 
         Args:
@@ -195,7 +195,7 @@ class ConjugatePosterior(AbstractPosterior):
     jitter: Optional[float] = DEFAULT_JITTER
 
     def predict(
-        self, train_data: Dataset, params: dict
+        self, train_data: Dataset, params: Dict
     ) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
         """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density.
 
@@ -310,7 +310,7 @@ class NonConjugatePosterior(AbstractPosterior):
         return parameters
 
     def predict(
-        self, train_data: Dataset, params: dict
+        self, train_data: Dataset, params: Dict
     ) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
         """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density. Note, to gain predictions on the scale of the original data, the returned distribution will need to be transformed through the likelihood function's inverse link function.
 

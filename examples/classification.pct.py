@@ -25,7 +25,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
 import matplotlib.pyplot as plt
-import numpyro
+import numpyro.distributions as npd
 import optax as ox
 from jaxtyping import Array, Float
 import blackjax
@@ -71,7 +71,6 @@ print(type(posterior))
 # %%
 parameter_state = gpx.initialise(posterior)
 params, trainable, bijectors = parameter_state.unpack()
-params = gpx.unconstrain(params, bijectors)
 
 mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
 
@@ -145,7 +144,7 @@ L = jnp.linalg.cholesky(negative_Hessian + I(D.n) * jitter)
 L_inv = jsp.linalg.solve_triangular(L, I(D.n), lower=True)
 H_inv = jsp.linalg.solve_triangular(L.T, L_inv, lower=False)
 
-laplace_approximation = numpyro.distributions.MultivariateNormal(f_map_estimate, H_inv)
+laplace_approximation = npd.MultivariateNormal(f_map_estimate, H_inv)
 
 from gpjax.kernels import cross_covariance, gram
 
@@ -156,18 +155,18 @@ from gpjax.types import Dataset
 
 
 def predict(
-    laplace_at_data: numpyro.distributions.Distribution,
+    laplace_at_data: npd.Distribution,
     train_data: Dataset,
     test_inputs: Float[Array, "N D"],
     jitter: int = 1e-6,
-) -> numpyro.distributions.Distribution:
+) -> npd.Distribution:
     """Compute the predictive distribution of the Laplace approximation at novel inputs.
 
     Args:
         laplace_at_data (dict): The Laplace approximation at the datapoints.
 
     Returns:
-        numpyro.distributions.Distribution: The Laplace approximation at novel inputs.
+        npd.Distribution: The Laplace approximation at novel inputs.
     """
     x, n = train_data.X, train_data.n
 
@@ -209,7 +208,7 @@ def predict(
     )
     covariance += I(n_test) * jitter
 
-    return numpyro.distributions.MultivariateNormal(
+    return npd.MultivariateNormal(
         jnp.atleast_1d(mean.squeeze()), covariance
     )
 

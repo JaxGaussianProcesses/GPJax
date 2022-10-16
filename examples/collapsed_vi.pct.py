@@ -87,13 +87,10 @@ sgpr = gpx.CollapsedVI(posterior=p, variational_family=q)
 # We now train our model akin to a Gaussian process regression model via the `fit` abstraction. Unlike the regression example given in the [conjugate regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html), the inducing locations that induce our variational posterior distribution are now part of the model's parameters. Using a gradient-based optimiser, we can then _optimise_ their location such that the evidence lower bound is maximised.
 # %%
 parameter_state = gpx.initialise(sgpr, key)
-params, trainables, bijectors = parameter_state.unpack()
 
 loss_fn = jit(sgpr.elbo(D, negative=True))
 
 optimiser = ox.adam(learning_rate=0.005)
-
-params = gpx.unconstrain(params, bijectors)
 
 learned_params, training_history = gpx.fit(
     objective=loss_fn,
@@ -101,6 +98,9 @@ learned_params, training_history = gpx.fit(
     optax_optim=optimiser,
     n_iters=2000,
 ).unpack()
+
+# %%
+parameter_state.bijectors
 
 # %% [markdown]
 # We show predictions of our model with the learned inducing points overlayed in grey.
@@ -168,13 +168,12 @@ full_rank_model = gpx.Prior(kernel=gpx.RBF()) * gpx.Gaussian(num_datapoints=D.n)
 fr_params, fr_trainables, fr_bijectors = gpx.initialise(
     full_rank_model, key
 ).unpack()
-fr_params = gpx.unconstrain(fr_params, fr_bijectors)
 mll = jit(full_rank_model.marginal_log_likelihood(D, negative=True))
-# %timeit mll(fr_params).block_until_ready()
+%timeit mll(fr_params).block_until_ready()
 
 # %%
 sparse_elbo = jit(sgpr.elbo(D, negative=True))
-# %timeit sparse_elbo(params).block_until_ready()
+%timeit sparse_elbo(params).block_until_ready()
 
 # %% [markdown]
 # As we can see, the sparse approximation given here is around 50 times faster when compared against a full-rank model.

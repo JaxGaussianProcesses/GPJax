@@ -116,12 +116,12 @@ class Gaussian(AbstractLikelihood, Conjugate):
             Callable: A link function that maps the predictive distribution to the likelihood function.
         """
 
-        def link_fn(x, params: dict) -> npd.Distribution:
+        def link_fn(x, params: Dict) -> npd.Distribution:
             return npd.Normal(loc=x, scale=params["obs_noise"])
 
         return link_fn
 
-    def predict(self, dist: npd.Distribution, params: dict) -> npd.Distribution:
+    def predict(self, dist: npd.Distribution, params: Dict) -> npd.Distribution:
         """Evaluate the Gaussian likelihood function at a given predictive distribution. Computationally, this is equivalent to summing the observation noise term to the diagonal elements of the predictive distribution's covariance matrix.
 
         Args:
