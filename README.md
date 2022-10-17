@@ -17,7 +17,7 @@
 | [**Documentation**](https://gpjax.readthedocs.io/en/latest/)
 | [**Slack Community**](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw)
 
-`GPJax` aims to provide a low-level interface to Gaussian process (GP) models in [`Jax`](https://github.com/google/jax), structured to give researchers maximum flexibility in extending the code to suit their own needs. We define a GP prior in `GPJax` by specifying a mean and kernel function and multiply this by a likelihood function to construct the posterior. The idea is that the code should be as close as possible to the maths we write on paper when working with GP models.
+`GPJax` aims to provide a low-level interface to Gaussian process (GP) models in [`Jax`](https://github.com/google/jax), structured to give researchers maximum flexibility in extending the code to suit their own needs. The idea is that the code should be as close as possible to the maths we write on paper when working with GP models.
 
 # Package support
 
