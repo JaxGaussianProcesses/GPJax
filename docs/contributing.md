@@ -69,14 +69,14 @@ Before opening a pull request we recommend you check our [pull request checklist
     $ pip install -r requirements-dev.txt
     ```
 
-5.  Install the pre-commit hooks. Please **ensure you do this before
-    commiting any files**.
+5.  Install the pre-commit hooks.
 
     ```bash
     $ pre-commit install
     ```
-    :::{attention}
-    If successful, this will print the following output
+    :::{warning}
+    Please ensure you have done this before
+    commiting any files. If successful, this will print the following output
     `pre-commit installed at .git/hooks/pre-commit`.
     :::
 
