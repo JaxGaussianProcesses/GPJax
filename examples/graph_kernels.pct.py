@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: base
 #     language: python
 #     name: python3
 # ---
@@ -88,7 +88,7 @@ true_params["kernel"] = {
 }
 
 fx = prior(true_params)(x)
-y = fx.sample(seed=key).reshape(-1, 1)
+y = fx.sample(key).reshape(-1, 1)
 
 D = gpx.Dataset(X=x, y=y)
 

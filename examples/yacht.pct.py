@@ -8,11 +8,12 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: base
 #     language: python
 #     name: python3
 # ---
 
+# %%
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt

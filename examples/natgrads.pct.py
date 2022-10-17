@@ -7,9 +7,9 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.5
+#       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: base
 #     language: python
 #     name: python3
 # ---
@@ -87,8 +87,6 @@ parameter_state = gpx.initialise(natural_svgp)
 # Next, we can conduct natural gradients as follows:
 
 # %%
-
-
 inference_state = gpx.fit_natgrads(
     natural_svgp,
     parameter_state=parameter_state,
