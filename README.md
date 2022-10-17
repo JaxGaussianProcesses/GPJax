@@ -21,13 +21,11 @@
 
 # Package support
 
-`GPJax` was created by [Thomas Pinder](https://github.com/thomaspinder). Today, maintenance is undertaken by Thomas and [Daniel Dodd](https://github.com/Daniel-Dodd).
+`GPJax`'s maintainers are [Thomas Pinder](https://github.com/thomaspinder) (founder) and [Daniel Dodd](https://github.com/Daniel-Dodd).
 
-Anyone can contribute to `GPJax`, and we value everyone’s contributions. There are several ways to contribute, including:
+We would be delighted to receive contributions from interested individuals and groups. To learn how you can get involved, please read our [guide for contributing](https://github.com/thomaspinder/GPJax/blob/master/CONTRIBUTING.md). If you have any questions, we encourage you to [open an issue](https://github.com/thomaspinder/GPJax/issues/new/choose). For broader conversations, such as best GP fitting practices or questions about the mathematics of GPs, we invite you to [open a discussion](https://github.com/thomaspinder/GPJax/discussions).
 
-We welcome pull requests (PRs) from new contributors. Before contributing, please read our [guide for contributing](https://github.com/thomaspinder/GPJax/blob/master/CONTRIBUTING.md). If you have any questions, feel free to [open an issue](https://github.com/thomaspinder/GPJax/issues/new/choose). For broader discussions, such as best GP fitting practices, technical questions surrounding the mathematics of GPs, we encourage you to [open a discussion](https://github.com/thomaspinder/GPJax/discussions).
-
-Feel free to chat to us on [Slack](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw) where we can discuss the development of GPJax and broader support for Gaussian process modelling.
+Feel free to join our [Slack Channel](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw), where we can discuss the development of `GPJax` and broader support for Gaussian process modelling.
 
 # Supported methods and interfaces
 
