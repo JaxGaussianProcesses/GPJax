@@ -41,7 +41,7 @@ class AbstractLikelihood:
             **kwargs (Any): Keyword arguments to be passed to the likelihood's `predict` method.
 
         Returns:
-            dx.Distribution: The predictive distribution.
+            npd.Distribution: The predictive distribution.
         """
         return self.predict(*args, **kwargs)
 
@@ -54,7 +54,7 @@ class AbstractLikelihood:
             **kwargs (Any): Keyword arguments to be passed to the likelihood's `predict` method.
 
         Returns:
-            dx.Distribution: The predictive distribution.
+            npd.Distribution: The predictive distribution.
         """
         raise NotImplementedError
 
@@ -125,14 +125,16 @@ class Gaussian(AbstractLikelihood, Conjugate):
         """Evaluate the Gaussian likelihood function at a given predictive distribution. Computationally, this is equivalent to summing the observation noise term to the diagonal elements of the predictive distribution's covariance matrix.
 
         Args:
-            dist (numpyro.distributions.Distribution): The Gaussian process posterior, evaluated at a finite set of test points.
+            dist (npd.Distribution): The Gaussian process posterior, evaluated at a finite set of test points.
             params (Dict): The parameters of the likelihood function.
 
         Returns:
-            numpyro.distributions.Distribution: The predictive distribution.
+            npd.Distribution: The predictive distribution.
         """
         n_data = dist.event_shape[0]
-        noisy_cov = dist.covariance_matrix + I(n_data) * params["likelihood"]["obs_noise"]
+        noisy_cov = (
+            dist.covariance_matrix + I(n_data) * params["likelihood"]["obs_noise"]
+        )
         return npd.MultivariateNormal(dist.mean, noisy_cov)
 
 
@@ -172,7 +174,9 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
             Callable: A callable object that accepts a mean and variance term from which the predictive random variable is computed.
         """
 
-        def moment_fn(mean: Float[Array, "N D"], variance: Float[Array, "N D"], params: Dict):
+        def moment_fn(
+            mean: Float[Array, "N D"], variance: Float[Array, "N D"], params: Dict
+        ):
             rv = self.link_function(mean / jnp.sqrt(1 + variance), params)
             return rv
 

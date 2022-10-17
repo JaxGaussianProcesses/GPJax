@@ -19,6 +19,8 @@
 #
 # In this notebook we demonstrate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
 
+import blackjax
+
 # %%
 import jax
 import jax.numpy as jnp
@@ -28,7 +30,7 @@ import matplotlib.pyplot as plt
 import numpyro.distributions as npd
 import optax as ox
 from jaxtyping import Array, Float
-import blackjax
+
 import gpjax as gpx
 from gpjax.utils import I
 
@@ -92,9 +94,6 @@ map_estimate, training_history = inference_state.unpack()
 
 # %% [markdown]
 # From which we can make predictions at novel inputs, as illustrated below.
-
-# %%
-predictive_mean = predictive_dist.mean
 
 # %%
 map_latent_dist = posterior(D, map_estimate)(xtest)
@@ -178,10 +177,7 @@ L = jnp.linalg.cholesky(H + I(D.n) * jitter)
 L_inv = jsp.linalg.solve_triangular(L, I(D.n), lower=True)
 H_inv = jsp.linalg.solve_triangular(L.T, L_inv, lower=False)
 
-# p(f|D) ≈ N(f_hat, H⁻¹)
-laplace_approximation = dx.MultivariateNormalFullCovariance(
-    jnp.atleast_1d(f_hat.squeeze()), H_inv
-)
+laplace_approximation = npd.MultivariateNormal(f_hat, H_inv)
 
 
 # %% [markdown]
@@ -192,12 +188,9 @@ laplace_approximation = dx.MultivariateNormalFullCovariance(
 # \end{align}
 #
 # This is the same approximate distribution $q_{map}(f(\cdot))$, but we have pertubed the covariance by a curvature term of $\mathbf{K}_{\boldsymbol{(\cdot)\boldsymbol{x}}} \mathbf{K}_{\boldsymbol{xx}}^{-1} [-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} ]^{-1} \mathbf{K}_{\boldsymbol{xx}}^{-1} \mathbf{K}_{\boldsymbol{\boldsymbol{x}(\cdot)}}$. We take the latent distribution computed in the previous section and add this term to the covariance to construct $q_{Laplace}(f(\cdot))$.
-# >>>>>>> 4db65bd (Update documentation)
 
 # %%
-def construct_laplace(
-    test_inputs: Float[Array, "N D"]
-) -> dx.MultivariateNormalFullCovariance:
+def construct_laplace(test_inputs: Float[Array, "N D"]) -> npd.MultivariateNormal:
 
     map_latent_dist = posterior(D, map_estimate)(test_inputs)
 
@@ -215,20 +208,14 @@ def construct_laplace(
     # Ktx Kxx⁻¹[ H⁻¹ ] Kxx⁻¹ Kxt
     laplace_cov_term = jnp.matmul(jnp.matmul(Kxx_inv_Ktx.T, H_inv), Kxx_inv_Ktx)
 
-    mean = map_latent_dist.mean()
-    covariance = map_latent_dist.covariance() + laplace_cov_term
+    mean = map_latent_dist.mean
+    covariance = map_latent_dist.covariance_matrix + laplace_cov_term
 
-    return npd.MultivariateNormal(
-        jnp.atleast_1d(mean.squeeze()), covariance
-    )
+    return npd.MultivariateNormal(jnp.atleast_1d(mean.squeeze()), covariance)
 
 
 # %% [markdown]
 # From this we can construct the predictive distribution at the test points.
-#
-# <<<<<<< HEAD
-# predictive_dist = likelihood(latent_dist, learned_params)
-# =======
 # %%
 laplace_latent_dist = construct_laplace(xtest)
 predictive_dist = likelihood(laplace_latent_dist, map_estimate)
@@ -278,9 +265,6 @@ ax.legend()
 # We'll use the No U-Turn Sampler (NUTS) implementation given in BlackJax for sampling. For the interested reader, NUTS is a Hamiltonian Monte Carlo sampling scheme where the number of leapfrog integration steps is computed at each step of the change according to the NUTS algorithm. In general, samplers constructed under this framework are very efficient.
 #
 # We begin by generating _sensible_ initial positions for our sampler before defining an inference loop and sampling 500 values from our Markov chain. In practice, drawing more samples will be necessary.
-
-# %%
-params, trainables, bijectors = gpx.initialise(posterior, key).unpack()
 
 # %%
 # Adapted from BlackJax's introduction notebook.

@@ -44,10 +44,12 @@ class Kernel:
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs.
+
         Args:
             x (jnp.DeviceArray): The left hand argument of the kernel function's call.
             y (jnp.DeviceArray): The right hand argument of the kernel function's call
             params (Dict): Parameter set for which the kernel should be evaluated on.
+
         Returns:
             Array: The value of :math:`k(x, y)`.
         """
@@ -55,17 +57,34 @@ class Kernel:
 
     def slice_input(self, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
         """Select the relevant columns of the supplied matrix to be used within the kernel's evaluation.
+
         Args:
             x (Array): The matrix or vector that is to be sliced.
+
         Returns:
             Array: A sliced form of the input matrix.
         """
         return x[..., self.active_dims]
 
     def __add__(self, other: "Kernel") -> "Kernel":
+        """Add two kernels together.
+        Args:
+            other (Kernel): The kernel to be added to the current kernel.
+
+        Returns:
+            Kernel: A new kernel that is the sum of the two kernels.
+        """
         return SumKernel(kernel_set=[self, other])
 
     def __mul__(self, other: "Kernel") -> "Kernel":
+        """Multiply two kernels together.
+
+        Args:
+            other (Kernel): The kernel to be multiplied with the current kernel.
+
+        Returns:
+            Kernel: A new kernel that is the product of the two kernels.
+        """
         return ProductKernel(kernel_set=[self, other])
 
     @property

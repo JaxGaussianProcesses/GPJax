@@ -28,7 +28,6 @@ from .kernels import Kernel, cross_covariance, gram
 from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
 from .parameters import copy_dict_structure, evaluate_priors
-
 from .types import Dataset, PRNGKeyType
 from .utils import I, concat_dictionaries
 
@@ -60,7 +59,7 @@ class AbstractGP:
             **kwargs (Any): Keyword arguments to the predict method.
 
         Returns:
-            dx.Distribution: A multivariate normal random variable representation of the Gaussian process.
+            npd.Distribution: A multivariate normal random variable representation of the Gaussian process.
         """
         raise NotImplementedError
 
@@ -110,14 +109,16 @@ class Prior(AbstractGP):
         """
         return self.__mul__(other)
 
-    def predict(self, params: Dict) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
+    def predict(
+        self, params: Dict
+    ) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
         """Compute the GP's prior mean and variance.
 
         Args:
             params (Dict): The specific set of parameters for which the mean function should be defined for.
 
         Returns:
-            Callable[[Float[Array, "N D"]], dx.Distribution]: A mean function that accepts an input array for where the mean function should be evaluated at. The mean function's value at these points is then returned.
+            Callable[[Float[Array, "N D"]], npd.Distribution]: A mean function that accepts an input array for where the mean function should be evaluated at. The mean function's value at these points is then returned.
         """
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> npd.Distribution:
@@ -166,7 +167,7 @@ class AbstractPosterior(AbstractGP):
             **kwargs (Any): Keyword arguments to the predict method.
 
         Returns:
-            dx.Distribution: A multivariate normal random variable representation of the Gaussian process.
+            npd.Distribution: A multivariate normal random variable representation of the Gaussian process.
         """
         raise NotImplementedError
 
@@ -204,7 +205,7 @@ class ConjugatePosterior(AbstractPosterior):
             params (Dict): A dictionary of parameters that should be used to compute the posterior.
 
         Returns:
-            Callable[[Float[Array, "N D"]], dx.Distribution]: A function that accepts an input array and returns the predictive distribution as a `numpyro.distributions.MultivariateNormal`.
+            Callable[[Float[Array, "N D"]], npd.Distribution]: A function that accepts an input array and returns the predictive distribution as a `numpyro.distributions.MultivariateNormal`.
         """
         x, y, n = train_data.X, train_data.y, train_data.n
 
@@ -277,7 +278,9 @@ class ConjugatePosterior(AbstractPosterior):
 
             # p(y | x, θ), where θ are the model hyperparameters:
 
-            marginal_likelihood = npd.MultivariateNormal(jnp.atleast_1d(μx.squeeze()), scale_tril=L)
+            marginal_likelihood = npd.MultivariateNormal(
+                jnp.atleast_1d(μx.squeeze()), scale_tril=L
+            )
 
             # log p(θ)
             log_prior_density = evaluate_priors(params, priors)
@@ -301,7 +304,15 @@ class NonConjugatePosterior(AbstractPosterior):
     jitter: Optional[float] = DEFAULT_JITTER
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
-        """Initialise the parameter set of a non-conjugate GP posterior."""
+        """Initialise the parameter set of a non-conjugate GP posterior.
+
+        Args:
+            key (PRNGKeyType): A random number generator key.
+
+        Returns:
+            Dict: A dictionary of parameters that can be used to compute the posterior.
+        """
+
         parameters = concat_dictionaries(
             self.prior._initialise_params(key),
             {"likelihood": self.likelihood._initialise_params(key)},
@@ -314,13 +325,12 @@ class NonConjugatePosterior(AbstractPosterior):
     ) -> Callable[[Float[Array, "N D"]], npd.Distribution]:
         """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density. Note, to gain predictions on the scale of the original data, the returned distribution will need to be transformed through the likelihood function's inverse link function.
 
-                Args:
-                    train_data (Dataset): A `gpx.Dataset` object that contains the input and output data used for training dataset.
-                    params (Dict): A dictionary of parameters that should be used to compute the posterior.
+        Args:
+            train_data (Dataset): A `gpx.Dataset` object that contains the input and output data used for training dataset.
+            params (Dict): A dictionary of parameters that should be used to compute the posterior.
 
-                Returns:
-        <<<<<<< HEAD
-                    tp.Callable[[Array], npd.Distribution]: A function that accepts an input array and returns the predictive distribution as a `numpyro.distributions.MultivariateNormal`.
+        Returns:
+            Callable[[Array], npd.Distribution]: A function that accepts an input array and returns the predictive distribution as a `numpyro.distributions.MultivariateNormal`.
         """
         x, n = train_data.X, train_data.n
 
@@ -392,14 +402,29 @@ class NonConjugatePosterior(AbstractPosterior):
         return mll
 
 
-def construct_posterior(prior: Prior, likelihood: AbstractLikelihood) -> AbstractPosterior:
+def construct_posterior(
+    prior: Prior, likelihood: AbstractLikelihood
+) -> AbstractPosterior:
+    """Construct a posterior object for a given prior and likelihood.
+
+    Args:
+        prior (Prior): The prior object for the posterior.
+
+        likelihood (AbstractLikelihood): The likelihood object for the posterior.
+
+    Returns:
+
+        AbstractPosterior: A posterior object for the given prior and likelihood.
+    """
     if isinstance(likelihood, Conjugate):
         PosteriorGP = ConjugatePosterior
 
     elif isinstance(likelihood, NonConjugate):
         PosteriorGP = NonConjugatePosterior
     else:
-        raise NotImplementedError(f"No posterior implemented for {likelihood.name} likelihood")
+        raise NotImplementedError(
+            f"No posterior implemented for {likelihood.name} likelihood"
+        )
     return PosteriorGP(prior=prior, likelihood=likelihood)
 
 
