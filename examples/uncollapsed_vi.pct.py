@@ -51,6 +51,7 @@ y = signal + jr.normal(key, shape=signal.shape) * noise
 D = gpx.Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
+
 # %% [markdown]
 # ## Sparse GPs via inducing inputs
 #
@@ -88,6 +89,7 @@ ax.plot(x, y, "o", alpha=0.3)
 ax.plot(xtest, f(xtest))
 [ax.axvline(x=z_i, color="black", alpha=0.3, linewidth=1) for z_i in z]
 plt.show()
+
 # %% [markdown]
 # The inducing inputs will summarise our dataset, and since they are treated as variational parameters, their locations will be optimised. The next step to SVGP is to define a variational family.
 
@@ -114,13 +116,16 @@ plt.show()
 # To measure the quality of the approximation, we consider the Kullback-Leibler divergence $\operatorname{KL}(\cdot || \cdot)$ from our approximate process $q(f(\cdot))$ to the true process $p(f(\cdot)|\mathcal{D})$. By parametrising $q(f(\boldsymbol{z}))$ over a variational family of distributions, we can optimise Kullback-Leibler divergence with respect to the variational parameters. Moreover, since inducing input locations $\boldsymbol{z}$ augment the model, they themselves can be treated as variational parameters without altering the true underlying model $p(f(\boldsymbol{z})|\mathcal{D})$. This is exactly what gives SVGPs great flexibility whilst retaining robustness to overfitting.
 #
 # It is popular to elect a Gaussian variational distribution $q(f(\boldsymbol{z})) = \mathcal{N}(f(\boldsymbol{z}); \mathbf{m}, \mathbf{S})$ with parameters $\{\boldsymbol{z}, \mathbf{m}, \mathbf{S}\}$, since conjugacy is provided between $q(f(\boldsymbol{z}))$ and $p(f(\cdot)|f(\boldsymbol{z}))$ so that the resulting variational process $q(f(\cdot))$ is a GP. We can implement this in GPJax by the following.
+
 # %%
 likelihood = gpx.Gaussian(num_datapoints=n)
 prior = gpx.Prior(kernel=gpx.RBF())
 p = prior * likelihood
 q = gpx.VariationalGaussian(prior=prior, inducing_inputs=z)
+
 # %% [markdown]
 # Here, the variational process $q(\cdot)$ depends on the prior through $p(f(\cdot)|f(\boldsymbol{z}))$ in $(\times)$.
+
 # %% [markdown]
 #
 # We combine our true and approximate posterior Gaussian processes into an `StochasticVI` object to define the variational strategy that we will adopt in the forthcoming inference.
@@ -136,14 +141,9 @@ svgp = gpx.StochasticVI(posterior=p, variational_family=q)
 # With our model defined, we seek to infer the optimal inducing inputs $\boldsymbol{z}$, variational mean $\mathbf{m}$ and covariance $\mathbf{S}$ that define our approximate posterior. To achieve this, we maximise the evidence lower bound (ELBO) with respect to $\{\boldsymbol{z}, \mathbf{m}, \mathbf{S} \}$, a proxy for minimising the Kullback-Leibler divergence. Moreover, as hinted by its name, the ELBO is a lower bound to the marginal log-likelihood, providing a tractable objective to optimise the model's hyperparameters akin to the conjugate setting. For further details on this, see Sections 3.1 and 4.1 of the excellent review paper <strong data-cite="leibfried2020tutorial"></strong>.
 #
 # Since Optax's optimisers work to minimise functions, to maximise the ELBO we return its negative.
-# %%
-parameter_state = gpx.initialise(svgp, key)
-params, trainables, bijectors = parameter_state.unpack()
-loss_fn = svgp.elbo(D, negative=True)
 
 # %%
-b = gpx.abstractions.get_batch(D, 64, key)
-loss_fn(params, b)
+negative_elbo = jit(svgp.elbo(D, negative=True))
 
 # %% [markdown]
 # ### Mini-batching
@@ -151,10 +151,11 @@ loss_fn(params, b)
 # Despite introducing inducing inputs into our model, inference can still be intractable with large datasets. To circumvent this, optimisation can be done using stochastic mini-batches.
 
 # %%
+parameter_state = gpx.initialise(svgp, key)
 optimiser = ox.adam(learning_rate=0.01)
 
 inference_state = gpx.fit_batches(
-    objective=loss_fn,
+    objective=negative_elbo,
     parameter_state=parameter_state,
     train_data=D,
     optax_optim=optimiser,
@@ -162,6 +163,7 @@ inference_state = gpx.fit_batches(
     key=jr.PRNGKey(42),
     batch_size=128,
 )
+
 learned_params, training_history = inference_state.unpack()
 # %% [markdown]
 # ## Predictions

@@ -132,20 +132,18 @@ prior = gpx.Prior(kernel=kernel)
 likelihood = gpx.Gaussian(num_datapoints=D.n)
 posterior = prior * likelihood
 
-params, trainables, constrainers, unconstrainers = gpx.initialise(
-    posterior, key
-).unpack()
-params = gpx.transform(params, unconstrainers)
-
 # %% [markdown]
 # ### Optimisation
 #
 # We train our model via maximum likelihood estimation of the marginal log-likelihood. The parameters of our neural network are learned jointly with the model's hyperparameter set.
 #
 # With the inclusion of a neural network, we take this opportunity to highlight the additional benefits gleaned from using [Optax](https://optax.readthedocs.io/en/latest/) for optimisation. In particular, we showcase the ability to use a learning rate scheduler that decays the optimiser's learning rate throughout the inference. We decrease the learning rate according to a half-cosine curve over 1000 iterations, providing us with large step sizes early in the optimisation procedure before approaching more conservative values, ensuring we do not step too far. We also consider a linear warmup, where the learning rate is increased from 0 to 1 over 50 steps to get a reasonable initial learning rate value.
+
 # %%
-mll = jax.jit(posterior.marginal_log_likelihood(D, constrainers, negative=True))
-mll(params)
+parameter_state = gpx.initialise(posterior, key)
+
+negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
+negative_mll(parameter_state.params)
 
 schedule = ox.warmup_cosine_decay_schedule(
     init_value=0.0,
@@ -155,19 +153,19 @@ schedule = ox.warmup_cosine_decay_schedule(
     end_value=0.0,
 )
 
-opt = ox.chain(
+optimiser = ox.chain(
     ox.clip(1.0),
     ox.adamw(learning_rate=schedule),
 )
 
-final_params, training_history = gpx.fit(
-    mll,
-    params,
-    trainables,
-    opt,
+inference_state = gpx.fit(
+    objective=negative_mll,
+    parameter_state=parameter_state,
+    optax_optim=optimiser,
     n_iters=5000,
-).unpack()
-final_params = gpx.transform(final_params, constrainers)
+)
+
+learned_params, training_history = inference_state.unpack()
 
 # %% [markdown]
 # ## Prediction
@@ -175,8 +173,8 @@ final_params = gpx.transform(final_params, constrainers)
 # With a set of learned parameters, the only remaining task is to predict the output of the model. We can do this by simply applying the model to a test data set.
 
 # %%
-latent_dist = posterior(D, final_params)(xtest)
-predictive_dist = likelihood(latent_dist, final_params)
+latent_dist = posterior(D, learned_params)(xtest)
+predictive_dist = likelihood(latent_dist, learned_params)
 
 predictive_mean = predictive_dist.mean
 predictive_std = jnp.sqrt(predictive_dist.variance)

@@ -209,7 +209,7 @@ def log_density(
 
     Args:
         param (Float[Array, "D"]): The parameter that is to be evaluated.
-        density (dx.Distribution): The distribution that is to be evaluated.
+        density (npd.Distribution): The distribution that is to be evaluated.
 
     Returns:
         Float[Array, "1"]: The log density of the parameter.
