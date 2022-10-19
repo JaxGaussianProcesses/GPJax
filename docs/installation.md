@@ -1,6 +1,6 @@
 # Installation
 
-### Stable version
+## Stable version
 
 The latest stable release of `GPJax` can be installed via `pip`:
 
@@ -15,7 +15,7 @@ python -c 'import gpjax; print(gpjax.__version__)'
 ```
 :::
 
-### GPU support
+## GPU support
 
 GPU support is enabled through proper configuration of the underlying
 [Jax](https://github.com/google/jax) installation. CPU enabled forms of
@@ -35,7 +35,7 @@ import jaxlib
 print(jaxlib.__version__)
 ```
 
-### Development version
+## Development version
 
 :::{warning}
 This version is possibly unstable and may contain bugs.

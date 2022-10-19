@@ -17,20 +17,20 @@
 | [**Documentation**](https://gpjax.readthedocs.io/en/latest/)
 | [**Slack Community**](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw)
 
-`GPJax` aims to provide a low-level interface to Gaussian process (GP) models in [`Jax`](https://github.com/google/jax), structured to give researchers maximum flexibility in extending the code to suit their own needs. The idea is that the code should be as close as possible to the maths we write on paper when working with GP models.
+GPJax aims to provide a low-level interface to Gaussian process (GP) models in [Jax](https://github.com/google/jax), structured to give researchers maximum flexibility in extending the code to suit their own needs. The idea is that the code should be as close as possible to the maths we write on paper when working with GP models.
 
 # Package support
 
-`GPJax`'s maintainers are [Thomas Pinder](https://github.com/thomaspinder) (founder) and [Daniel Dodd](https://github.com/Daniel-Dodd).
+GPJax's was founded by [Thomas Pinder](https://github.com/thomaspinder). Today, the maintenance of GPJax is undertaken by [Thomas Pinder](https://github.com/thomaspinder) and [Daniel Dodd](https://github.com/Daniel-Dodd).
 
 We would be delighted to receive contributions from interested individuals and groups. To learn how you can get involved, please read our [guide for contributing](https://github.com/thomaspinder/GPJax/blob/master/CONTRIBUTING.md). If you have any questions, we encourage you to [open an issue](https://github.com/thomaspinder/GPJax/issues/new/choose). For broader conversations, such as best GP fitting practices or questions about the mathematics of GPs, we invite you to [open a discussion](https://github.com/thomaspinder/GPJax/discussions).
 
-Feel free to join our [Slack Channel](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw), where we can discuss the development of `GPJax` and broader support for Gaussian process modelling.
+Feel free to join our [Slack Channel](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw), where we can discuss the development of GPJax and broader support for Gaussian process modelling.
 
 # Supported methods and interfaces
 
-### Notebook examples
-> 
+## Notebook examples
+
 > - [**Conjugate Inference**](https://gpjax.readthedocs.io/en/latest/examples/regression.html)
 > - [**Classification with MCMC**](https://gpjax.readthedocs.io/en/latest/examples/classification.html)
 > - [**Sparse Variational Inference**](https://gpjax.readthedocs.io/en/latest/examples/uncollapsed_vi.html)
@@ -42,7 +42,7 @@ Feel free to join our [Slack Channel](https://join.slack.com/t/gpjax/shared_invi
 > - [**Learning Gaussian Process Barycentres**](https://gpjax.readthedocs.io/en/latest/examples/barycentres.html)
 > - [**Deep Kernel Regression**](https://gpjax.readthedocs.io/en/latest/examples/haiku.html)
 
-### Guides for customisation
+## Guides for customisation
 > 
 > - [**Custom kernels**](https://gpjax.readthedocs.io/en/latest/examples/kernels.html#Custom-Kernel)
 
@@ -69,7 +69,7 @@ D = gpx.Dataset(X=x, y=y)
 
 The function of interest here, $f(\cdot)$, is sinusoidal, but our observations of it have been perturbed by Gaussian noise. We aim to utilise a Gaussian process to try and recover this latent function.
 
-### 1. Constructing the prior and posterior
+## 1. Constructing the prior and posterior
 
 We begin by defining a zero-mean Gaussian process prior with a radial basis function kernel and assume the likelihood to be Gaussian.
 
@@ -84,7 +84,7 @@ Similar to how we would write on paper, the posterior is constructed by the prod
 posterior = prior * likelihood
 ```
 
-### 2. Learning hyperparameters
+## 2. Learning hyperparameters
 
 Equipped with the posterior, we seek to learn the model's hyperparameters through gradient-optimisation of the marginal log-likelihood. We this below, adding Jax's [just-in-time (JIT)](https://jax.readthedocs.io/en/latest/jax-101/02-jitting.html) compilation to accelerate training. 
 
@@ -109,7 +109,7 @@ Finally, we run an optimisation loop using the Adam optimiser via the `fit` call
 inference_state = gpx.fit(mll, parameter_state, opt, n_iters=500)
 ```
 
-### 3. Making predictions
+## 3. Making predictions
 
 Using our learned hyperparameters, we can obtain the posterior distribution of the latent function at novel test points.
 
@@ -126,9 +126,9 @@ predictive_cov = predictive_distribution.covariance_matrix
 
 # Installation
 
-### Stable version
+## Stable version
 
-The latest stable version of `GPJax` can be installed via [`pip`](https://pip.pypa.io/en/stable/):
+The latest stable version of GPJax can be installed via [`pip`](https://pip.pypa.io/en/stable/):
 
 ```bash
 pip install gpjax
@@ -143,7 +143,7 @@ pip install gpjax
 
 
 
-### Development version
+## Development version
 > **Warning**
 >
 > This version is possibly unstable and may contain bugs. 
@@ -171,7 +171,7 @@ python setup.py develop
 
 # Citing GPJax
 
-If you use `GPJax` in your research, please cite our [JOSS paper](https://joss.theoj.org/papers/10.21105/joss.04455#).
+If you use GPJax in your research, please cite our [JOSS paper](https://joss.theoj.org/papers/10.21105/joss.04455#).
 
 ```
 @article{Pinder2022,
