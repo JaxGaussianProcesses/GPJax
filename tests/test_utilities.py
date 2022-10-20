@@ -2,19 +2,11 @@ import jax.numpy as jnp
 import pytest
 
 from gpjax.utils import (
-    I,
     concat_dictionaries,
     dict_array_coercion,
     merge_dictionaries,
     sort_dictionary,
 )
-
-
-@pytest.mark.parametrize("n", [1, 10, 100])
-def test_identity(n):
-    identity = I(n)
-    assert identity.shape == (n, n)
-    assert (jnp.diag(identity) == jnp.ones(shape=(n,))).all()
 
 
 def test_concat_dict():

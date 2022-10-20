@@ -17,20 +17,6 @@ from typing import Callable, Dict, Tuple
 
 import jax
 import jax.numpy as jnp
-from jaxtyping import Array, Float
-
-
-def I(n: int) -> Float[Array, "N N"]:
-    """
-    Compute an n x n identity matrix.
-
-    Args:
-        n (int): The size of of the matrix.
-
-    Returns:
-        Float[Array, "N N"]: An n x n identity matrix.
-    """
-    return jnp.eye(n)
 
 
 def concat_dictionaries(a: Dict, b: Dict) -> Dict:
@@ -102,7 +88,6 @@ def dict_array_coercion(params: Dict) -> Tuple[Callable, Callable]:
 
 
 __all__ = [
-    "I",
     "concat_dictionaries",
     "merge_dictionaries",
     "sort_dictionary",

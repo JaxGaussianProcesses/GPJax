@@ -24,12 +24,13 @@ from chex import dataclass
 from jaxtyping import Array, Float
 
 from .config import get_defaults
+from .covariance_operator import I
 from .kernels import Kernel
 from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
 from .parameters import copy_dict_structure, evaluate_priors
 from .types import Dataset, PRNGKeyType
-from .utils import I, concat_dictionaries
+from .utils import concat_dictionaries
 
 DEFAULT_JITTER = get_defaults()["jitter"]
 
@@ -124,7 +125,7 @@ class Prior(AbstractGP):
             t = test_inputs
             μt = self.mean_function(t, params["mean_function"])
             Ktt = gram(self.kernel, t, params["kernel"])
-            Lt = Ktt.tril()
+            Lt = Ktt.triangular_lower()
 
             return dx.MultivariateNormalTri(jnp.atleast_1d(μt.squeeze()), Lt)
 
@@ -417,6 +418,21 @@ def construct_posterior(
             f"No posterior implemented for {likelihood.name} likelihood"
         )
     return PosteriorGP(prior=prior, likelihood=likelihood)
+
+
+def euclidean_distance(
+    x: Float[Array, "N D"], y: Float[Array, "N D"]
+) -> Float[Array, "N"]:
+    """Compute the Euclidean distance between two arrays of points.
+
+    Args:
+        x (Float[Array, "N D"]): An array of points.
+        y (Float[Array, "N D"]): An array of points.
+
+    Returns:
+        Float[Array, "N"]: An array of distances.
+    """
+    return jnp.linalg.norm(x[:, None, :] - y[None, :, :], axis=-1)
 
 
 __all__ = [

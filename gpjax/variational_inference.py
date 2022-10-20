@@ -26,7 +26,7 @@ from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
 from .types import Dataset
-from .utils import I, concat_dictionaries
+from .utils import concat_dictionaries
 from .variational_families import (
     AbstractVariationalFamily,
     CollapsedVariationalGaussian,
@@ -177,7 +177,7 @@ class CollapsedVI(AbstractVariationalInference):
             noise = params["likelihood"]["obs_noise"]
             z = params["variational_family"]["inducing_inputs"]
             Kzz = gram(self.prior.kernel, z, params["kernel"])
-            Kzz += I(m) * self.variational_family.jitter
+            Kzz += jnp.eye(m) * self.variational_family.jitter
             Kzx = cross_covariance(self.prior.kernel, z, x, params["kernel"])
             Kxx_diag = vmap(self.prior.kernel, in_axes=(0, 0, None))(
                 x, x, params["kernel"]
@@ -216,7 +216,7 @@ class CollapsedVI(AbstractVariationalInference):
             AAT = jnp.matmul(A, A.T)
 
             # B = I + AAᵀ
-            B = I(m) + AAT
+            B = jnp.eye(m) + AAT
 
             # LLᵀ = I + AAᵀ
             L = jnp.linalg.cholesky(B)

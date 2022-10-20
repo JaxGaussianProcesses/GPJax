@@ -25,7 +25,6 @@ from .config import get_defaults
 from .gps import AbstractPosterior
 from .parameters import build_trainables, constrain, trainable_params
 from .types import Dataset
-from .utils import I
 from .variational_families import (
     AbstractVariationalFamily,
     ExpectationVariationalGaussian,
@@ -72,7 +71,7 @@ def natural_to_expectation(params: Dict, jitter: float = DEFAULT_JITTER) -> Dict
     L = jnp.linalg.cholesky(S_inv)
 
     # C = L⁻¹I
-    C = jsp.linalg.solve_triangular(L, I(m), lower=True)
+    C = jsp.linalg.solve_triangular(L, jnp.eye(m), lower=True)
 
     # S = CᵀC
     S = jnp.matmul(C.T, C)

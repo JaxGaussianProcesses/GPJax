@@ -23,7 +23,6 @@ from chex import dataclass
 from jaxtyping import Array, Float
 
 from .types import PRNGKeyType
-from .utils import I
 
 
 @dataclass
@@ -91,6 +90,7 @@ class NonConjugate:
     """An abstract class for non-conjugate likelihoods with respect to a Gaussain process prior."""
 
 
+# TODO: revamp this will covariance operators.
 @dataclass
 class Gaussian(AbstractLikelihood, Conjugate):
     """Gaussian likelihood object."""
@@ -132,7 +132,9 @@ class Gaussian(AbstractLikelihood, Conjugate):
             dx.Distribution: The predictive distribution.
         """
         n_data = dist.event_shape[0]
-        noisy_cov = dist.covariance() + I(n_data) * params["likelihood"]["obs_noise"]
+        cov = dist.covariance()
+        noisy_cov = cov.at[jnp.diag_indices(n_data)].add(params["obs_noise"])
+
         return dx.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
 
 

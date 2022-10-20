@@ -26,7 +26,8 @@ from gpjax.kernels import (
     euclidean_distance,
 )
 from gpjax.parameters import initialise
-from gpjax.utils import I
+
+I = 1.0
 
 
 @pytest.mark.parametrize("kern", [RBF(), Matern12(), Matern32(), Matern52()])

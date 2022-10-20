@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import abc
-from typing import Tuple, Callable
+from typing import Callable, Optional, Tuple
 
 import jax.numpy as jnp
 import jax.scipy as jsp
@@ -30,8 +30,31 @@ class CovarianceOperator:
     Inspired by TensorFlows' LinearOperator class.
     """
 
-    jitter: float = 1e-6
-    name: str = None
+    name: Optional[str] = None
+
+    def __mul__(self, other: float) -> "CovarianceOperator":
+        """Multiply covariance operator by scalar.
+
+        Args:
+            other (CovarianceOperator): Scalar.
+
+        Returns:
+            CovarianceOperator: Covariance operator multiplied by scalar.
+        """
+
+        raise NotImplementedError
+
+    def __rmul__(self, other: float) -> "CovarianceOperator":
+        return self.__mul__(other)
+
+    @abc.abstractmethod
+    def _add_diagonal(
+        self, other: "DiagonalCovarianceOperator"
+    ) -> "CovarianceOperator":
+        """
+        Add diagonal matrix to a linear operator, useful for computing, Kxx + Iσ².
+        """
+        return NotImplementedError
 
     @abc.abstractmethod
     def __matmul__(self, x: Float[Array, "N M"]) -> Float[Array, "N M"]:
@@ -74,16 +97,14 @@ class CovarianceOperator:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def tril(
-        self,
-        lhs_operator: Callable[[Float[Array, "N N"]], Float[Array, "N N"]] = None,
-    ) -> Float[Array, "N N"]:
+    def triangular_lower(self, add_noise: Float[Array, "1"]) -> Float[Array, "N N"]:
         """Compute lower triangular.
 
         Args:
             lhs_operator: Callable[
                     [Float[Array, "N N"]], Float[Array, "N N"]
                 ]: Optional function that is to be applied to the left hand side of the linear system before solving. The function should leave the shape of the matrix unchanged.
+
         Returns:
             Float[Array, "N N"]: Lower triangular of the covariance matrix.
         """
@@ -93,6 +114,7 @@ class CovarianceOperator:
         self, lhs_operator: Callable[[Float[Array, "N N"]], Float[Array, "N N"]] = None
     ) -> Float[Array, "1"]:
         """Log determinant of the covariance matrix.
+
         Args:
             lhs_operator: Callable[
                     [Float[Array, "N N"]], Float[Array, "N N"]
@@ -102,7 +124,7 @@ class CovarianceOperator:
             Float[Array, "1"]: Log determinant of the covariance matrix.
         """
 
-        return 2.0 * jsp.sum(jnp.log(jnp.diag(self.tril(lhs_operator))))
+        return 2.0 * jsp.sum(jnp.log(jnp.diag(self.triangular_lower(lhs_operator))))
 
     def solve(
         self,
@@ -116,10 +138,11 @@ class CovarianceOperator:
             lhs_operator: Callable[
                         [Float[Array, "N N"]], Float[Array, "N N"]
                     ]: Optional function that is to be applied to the left hand side of the linear system before solving. The function should leave the shape of the matrix unchanged.
+
         Returns:
             Float[Array, "N M"]: Solution of the linear system.
         """
-        return jsp.linalg.cho_solve((self.tril(lhs_operator), True), rhs)
+        return jsp.linalg.cho_solve((self.triangular_lower(lhs_operator), True), rhs)
 
     def trace(self) -> Float[Array, "1"]:
         """Trace of the covariance matrix.
@@ -129,20 +152,33 @@ class CovarianceOperator:
         """
         return jnp.sum(self.diagonal())
 
-    def _stabilise(self, matrix: Float[Array, "N N"]) -> Float[Array, "N N"]:
-        """
-        Stabilise the eigenvalues of the covariance matrix through a small amount of jitter applied to the diagonal.
-        """
-        jitter_matrix = jnp.eye(matrix.shape[0]) * self.jitter
-        return matrix + jitter_matrix
+
+@dataclass
+class _DenseMatrix:
+    matrix: Float[Array, "N N"]
 
 
 @dataclass
-class DenseCovarianceOperator(CovarianceOperator):
+class DenseCovarianceOperator(CovarianceOperator, _DenseMatrix):
     """Dense covariance operator."""
 
-    matrix: Float[Array, "N N"]
-    name: str = "Dense covariance operator"
+    name: Optional[str] = "Dense covariance operator"
+
+    def _add_diagonal(self, other: "CovarianceOperator") -> "CovarianceOperator":
+        """Add diagonal matrix to a linear operator, useful for computing, Kxx + Iσ².
+
+        Args:
+            other (CovarianceOperator): Other covariance operator.
+
+        Returns:
+            CovarianceOperator: Sum of the two covariance operators.
+        """
+
+        n = self.shape[0]
+        diag_indices = jnp.diag_indices(n)
+        new_matrix = self.matrix.at[diag_indices].add(other.diagonal())
+
+        return DenseCovarianceOperator(matrix=new_matrix)
 
     @property
     def shape(self) -> Tuple[int, int]:
@@ -183,28 +219,83 @@ class DenseCovarianceOperator(CovarianceOperator):
 
         return jnp.matmul(self.matrix, x)
 
-    def tril(self, lhs_operator: Callable = None) -> Float[Array, "N N"]:
+    def triangular_lower(
+        self, lhs_operator: Callable = lambda x: x
+    ) -> Float[Array, "N N"]:
         """Compute lower triangular.
 
         Args:
             lhs_operator: Callable[
                     [Float[Array, "N N"], Float[Array, "1"]], Float[Array, "N N"]
                 ]: Optional function that is to be applied to the left hand side of the linear system before solving. The function should leave the shape of the matrix unchanged.
+
         Returns:
             Float[Array, "N N"]: Lower triangular of the covariance matrix.
         """
-        if lhs_operator is None:
-            return jsp.linalg.cholesky(self._stabilise(self.matrix))
-        else:
-            return jsp.linalg.cholesky(lhs_operator(self.matrix, self.jitter))
+
+        matrix = self._stabilise(self.matrix)
+
+        return jsp.linalg.cholesky(lhs_operator(matrix))
 
 
 @dataclass
-class DiagonalCovarianceOperator(CovarianceOperator):
+class _DiagonalMatrix:
+    diag: Float[Array, "N"]
+
+
+@dataclass
+class DiagonalCovarianceOperator(CovarianceOperator, _DiagonalMatrix):
     """Diagonal covariance operator."""
 
-    diag: Float[Array, "N"]
-    name: str = "Diagonal covariance operator"
+    name: Optional[str] = "Diagonal covariance operator"
+
+    # TODO: move to base CovarianceOperator class, and broaden to accept more LinearOperator additions than just diagonal:
+    def __add__(self, other: "CovarianceOperator") -> "CovarianceOperator":
+        """Add diagonal to another covariance operator.
+
+        Args:
+            other (CovarianceOperator): Other covariance operator.
+
+        Returns:
+            CovarianceOperator: Covariance operator plus the diagonal covariance operator.
+        """
+
+        return other._add_diagonal(self)
+
+    def __radd__(self, other: "CovarianceOperator") -> "CovarianceOperator":
+        """Reimplimentation of adding diagonal to another covariance operator.
+
+        Args:
+            other (CovarianceOperator): Other covariance operator.
+
+        Returns:
+            CovarianceOperator: Covariance operator plus the diagonal covariance operator..
+        """
+        return other._add_diagonal(self)
+
+    def __mul__(self, other: float) -> "CovarianceOperator":
+        """Multiply covariance operator by scalar.
+
+        Args:
+            other (CovarianceOperator): Scalar.
+
+        Returns:
+            CovarianceOperator: Covariance operator multiplied by a scalar.
+        """
+
+        return DiagonalCovarianceOperator(diag=self.diag * other)
+
+    def _add_diagonal(self, other: "CovarianceOperator") -> "CovarianceOperator":
+        """Add diagonal to the covariance operator,  useful for computing, Kxx + Iσ².
+
+        Args:
+            other (CovarianceOperator): Covariance operator to add to the diagonal.
+
+        Returns:
+            CovarianceOperator: Covariance operator with the diagonal added.
+        """
+
+        return DiagonalCovarianceOperator(diag=self.diag + other.diagonal())
 
     @property
     def shape(self) -> Tuple[int, int]:
@@ -245,7 +336,7 @@ class DiagonalCovarianceOperator(CovarianceOperator):
         diag_mat = lax.expand_dims(self.diag(), -1)
         return diag_mat * x
 
-    def tril(self) -> Float[Array, "N N"]:
+    def triangular_lower(self) -> Float[Array, "N N"]:
         """
         Lower triangular.
 
@@ -275,8 +366,27 @@ class DiagonalCovarianceOperator(CovarianceOperator):
         return rhs * inv_diag_mat
 
 
+def I(n: int) -> DiagonalCovarianceOperator:
+    """Identity matrix.
+
+    Args:
+        n (int): Size of the identity matrix.
+
+    Returns:
+        DiagonalCovarianceOperator: Identity matrix of shape nxn.
+    """
+
+    I = DiagonalCovarianceOperator(
+        diag=jnp.ones(n),
+        name="Identity matrix",
+    )
+
+    return I
+
+
 __all__ = [
     "CovarianceOperator",
     "DenseCoarianceOperator",
     "DiagonalCovarianceOperator",
+    "I",
 ]
