@@ -97,52 +97,33 @@ class CovarianceOperator:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def triangular_lower(self, add_noise: Float[Array, "1"]) -> Float[Array, "N N"]:
+    def triangular_lower(self) -> Float[Array, "N N"]:
         """Compute lower triangular.
-
-        Args:
-            lhs_operator: Callable[
-                    [Float[Array, "N N"]], Float[Array, "N N"]
-                ]: Optional function that is to be applied to the left hand side of the linear system before solving. The function should leave the shape of the matrix unchanged.
 
         Returns:
             Float[Array, "N N"]: Lower triangular of the covariance matrix.
         """
         raise NotImplementedError
 
-    def log_det(
-        self, lhs_operator: Callable[[Float[Array, "N N"]], Float[Array, "N N"]] = None
-    ) -> Float[Array, "1"]:
+    def log_det(self) -> Float[Array, "1"]:
         """Log determinant of the covariance matrix.
-
-        Args:
-            lhs_operator: Callable[
-                    [Float[Array, "N N"]], Float[Array, "N N"]
-                ]: Optional function that is to be applied to the left hand side of the linear system before solving. The function should leave the shape of the matrix unchanged.
 
         Returns:
             Float[Array, "1"]: Log determinant of the covariance matrix.
         """
 
-        return 2.0 * jsp.sum(jnp.log(jnp.diag(self.triangular_lower(lhs_operator))))
+        return 2.0 * jnp.sum(jnp.log(jnp.diag(self.triangular_lower())))
 
-    def solve(
-        self,
-        rhs: Float[Array, "N M"],
-        lhs_operator: Callable[[Float[Array, "N N"]], Float[Array, "N N"]] = None,
-    ) -> Float[Array, "N M"]:
+    def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
         """Solve linear system.
 
         Args:
             rhs (Float[Array, "N M"]): Right hand side of the linear system.
-            lhs_operator: Callable[
-                        [Float[Array, "N N"]], Float[Array, "N N"]
-                    ]: Optional function that is to be applied to the left hand side of the linear system before solving. The function should leave the shape of the matrix unchanged.
 
         Returns:
             Float[Array, "N M"]: Solution of the linear system.
         """
-        return jsp.linalg.cho_solve((self.triangular_lower(lhs_operator), True), rhs)
+        return jsp.linalg.cho_solve((self.triangular_lower(), True), rhs)
 
     def trace(self) -> Float[Array, "1"]:
         """Trace of the covariance matrix.
@@ -219,23 +200,13 @@ class DenseCovarianceOperator(CovarianceOperator, _DenseMatrix):
 
         return jnp.matmul(self.matrix, x)
 
-    def triangular_lower(
-        self, lhs_operator: Callable = lambda x: x
-    ) -> Float[Array, "N N"]:
+    def triangular_lower(self) -> Float[Array, "N N"]:
         """Compute lower triangular.
-
-        Args:
-            lhs_operator: Callable[
-                    [Float[Array, "N N"], Float[Array, "1"]], Float[Array, "N N"]
-                ]: Optional function that is to be applied to the left hand side of the linear system before solving. The function should leave the shape of the matrix unchanged.
 
         Returns:
             Float[Array, "N N"]: Lower triangular of the covariance matrix.
         """
-
-        matrix = self._stabilise(self.matrix)
-
-        return jsp.linalg.cholesky(lhs_operator(matrix))
+        return jnp.linalg.cholesky(self.matrix)
 
 
 @dataclass
@@ -333,7 +304,7 @@ class DiagonalCovarianceOperator(CovarianceOperator, _DiagonalMatrix):
         Returns:
             Float[Array, "N M"]: Result of matrix multiplication.
         """
-        diag_mat = lax.expand_dims(self.diag(), -1)
+        diag_mat = jnp.expand_dims(self.diag, -1)
         return diag_mat * x
 
     def triangular_lower(self) -> Float[Array, "N N"]:
@@ -362,7 +333,7 @@ class DiagonalCovarianceOperator(CovarianceOperator, _DiagonalMatrix):
         Returns:
             Float[Array, "N M"]: Solution of the linear system.
         """
-        inv_diag_mat = lax.expand_dims(1.0 / self.diag(), -1)
+        inv_diag_mat = jnp.expand_dims(1.0 / self.diag, -1)
         return rhs * inv_diag_mat
 
 

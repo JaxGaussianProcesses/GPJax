@@ -1,35 +1,100 @@
-# %%
 import jax.numpy as jnp
+import jax.random as jr
 import pytest
 
-# %%
 from gpjax.covariance_operator import (
     CovarianceOperator,
     DenseCovarianceOperator,
     DiagonalCovarianceOperator,
     I,
 )
+from gpjax.kernels import RBF, Matern12, Matern32, Matern52
 
 
-# %%
 def test_covariance_operator():
-
-    pass
-
-
-# %%
-def test_dense_covariance_operator():
-
-    pass
+    with pytest.raises(TypeError):
+        CovarianceOperator()
 
 
-# %%
-def test_diagonal_covariance_operator():
+@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
+@pytest.mark.parametrize("n", [1, 10, 100])
+def test_dense_covariance_operator(kernel, n):
 
-    pass
+    key = jr.PRNGKey(seed=42)
+    A = jr.normal(key, (n, n))
+    dense = A.T @ A  # Dense random matrix is positive definite.
+
+    cov = DenseCovarianceOperator(matrix=dense)
+
+    # Test shape:
+    assert cov.shape == (n, n)
+
+    # Test solve:
+    b = jr.normal(key, (n, 1))
+    x = cov.solve(b)
+    assert jnp.allclose(b, dense @ x)
+
+    # Test to_dense method:
+    assert jnp.allclose(dense, cov.to_dense())
+
+    # Test to_diag method:
+    assert jnp.allclose(jnp.diag(dense), cov.diagonal())
+
+    # Test log determinant:
+    assert jnp.allclose(jnp.linalg.slogdet(dense)[1], cov.log_det())
+
+    # Test trace:
+    assert jnp.allclose(jnp.trace(dense), cov.trace())
+
+    # Test lower triangular:
+    assert jnp.allclose(jnp.linalg.cholesky(dense), cov.triangular_lower())
+
+    # Test adding diagonal covariance operator to dense linear operator:
+    diag = DiagonalCovarianceOperator(diag=jnp.diag(dense))
+    cov = cov + (diag * jnp.pi)
+    assert jnp.allclose(dense + jnp.pi * jnp.diag(jnp.diag(dense)), cov.to_dense())
 
 
-# %%
+@pytest.mark.parametrize("constant", [1.0, 3.5])
+@pytest.mark.parametrize("n", [1, 10, 100])
+def test_diagonal_covariance_operator(n, constant):
+    diag = 1.0 + jnp.arange(n, dtype=jnp.float64)
+    diag_cov = DiagonalCovarianceOperator(diag=diag)
+
+    # Test shape:
+    assert diag_cov.shape == (n, n)
+
+    # Test trace:
+    assert jnp.allclose(jnp.sum(diag), diag_cov.trace())
+
+    # Test diagonal:
+    assert jnp.allclose(diag, diag_cov.diagonal())
+
+    # Test multiplying with scalar:
+    assert ((diag_cov * constant).diagonal() == constant * diag).all()
+
+    # Test solve:
+    assert (jnp.diagonal(diag_cov.solve(rhs=jnp.eye(n))) == 1.0 / diag).all()
+
+    # Test to_dense method:
+    dense = diag_cov.to_dense()
+    assert (dense - jnp.diag(diag) == 0.0).all()
+    assert dense.shape == (n, n)
+
+    # Test log determinant:
+    assert diag_cov.log_det() == 2.0 * jnp.sum(jnp.log(diag))
+
+    # Test lower triangular:
+    L = diag_cov.triangular_lower()
+    assert L.shape == (n, n)
+    assert (L == jnp.diag(jnp.sqrt(diag))).all()
+
+    # Test adding two diagonal covariance operators:
+    diag_other = 5.1 + 2 * jnp.arange(n, dtype=jnp.float64)
+    other = DiagonalCovarianceOperator(diag=diag_other)
+    assert ((diag_cov + other).diagonal() == diag + diag_other).all()
+
+
 @pytest.mark.parametrize("n", [1, 10, 100])
 def test_identity_covariance_operator(n):
 
