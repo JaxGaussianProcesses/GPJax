@@ -1,9 +1,10 @@
 import typing as tp
 
 import jax.numpy as jnp
+import numpy as np
 import jax.random as jr
-import numpyro.distributions as npd
 import pytest
+import distrax as dx
 
 from gpjax.likelihoods import (
     AbstractLikelihood,
@@ -39,8 +40,8 @@ def test_predictive_moment(n):
     pred_mom_fn = lhood.predictive_moment_fn
     params, _, _ = initialise(lhood, key).unpack()
     rv = pred_mom_fn(fmean, fvar, params)
-    mu = rv.mean
-    sigma = rv.variance
+    mu = rv.mean()
+    sigma = rv.variance()
     assert isinstance(lhood.predictive_moment_fn, tp.Callable)
     assert mu.shape == (n,)
     assert sigma.shape == (n,)
@@ -57,41 +58,40 @@ def test_link_fns(lik: AbstractLikelihood, n: int):
     x = jnp.linspace(-3.0, 3.0).reshape(-1, 1)
     l_eval = link_fn(x, params)
 
-    assert isinstance(l_eval, npd.Distribution)
+    assert isinstance(l_eval, dx.Distribution)
 
 
 @pytest.mark.parametrize("noise", [0.1, 0.5, 1.0])
-def test_call_gaussian(noise):
+@pytest.mark.parametrize("n", [1, 2, 10])
+def test_call_gaussian(noise, n):
     key = jr.PRNGKey(123)
-    n = 10
     lhood = Gaussian(num_datapoints=n)
-    dist = npd.MultivariateNormal(jnp.zeros(n), covariance_matrix=jnp.eye(n))
+    dist = dx.MultivariateNormalFullCovariance(jnp.zeros(n), jnp.eye(n))
     params = {"likelihood": {"obs_noise": noise}}
 
     l_dist = lhood(dist, params)
-    assert (l_dist.mean == jnp.zeros(n)).all()
+    assert (l_dist.mean() == jnp.zeros(n)).all()
     noise_mat = jnp.diag(jnp.repeat(noise, n))
-    assert (l_dist.covariance_matrix == jnp.eye(n) + noise_mat).all()
-
+    assert np.allclose(l_dist.scale_tri, jnp.linalg.cholesky(jnp.eye(n) + noise_mat))
     l_dist = lhood.predict(dist, params)
-    assert (l_dist.mean == jnp.zeros(n)).all()
+    assert (l_dist.mean() == jnp.zeros(n)).all()
     noise_mat = jnp.diag(jnp.repeat(noise, n))
-    assert (l_dist.covariance_matrix == jnp.eye(n) + noise_mat).all()
+    assert np.allclose(l_dist.scale_tri, jnp.linalg.cholesky(jnp.eye(n) + noise_mat))
 
 
 def test_call_bernoulli():
     n = 10
     lhood = Bernoulli(num_datapoints=n)
-    dist = npd.MultivariateNormal(jnp.zeros(n), covariance_matrix=jnp.eye(n))
+    dist = dx.MultivariateNormalFullCovariance(jnp.zeros(n), jnp.eye(n))
     params = {"likelihood": {}}
 
     l_dist = lhood(dist, params)
-    assert (l_dist.mean == 0.5 * jnp.ones(n)).all()
-    assert (l_dist.variance == 0.25 * jnp.ones(n)).all()
+    assert (l_dist.mean() == 0.5 * jnp.ones(n)).all()
+    assert (l_dist.variance() == 0.25 * jnp.ones(n)).all()
 
     l_dist = lhood.predict(dist, params)
-    assert (l_dist.mean == 0.5 * jnp.ones(n)).all()
-    assert (l_dist.variance == 0.25 * jnp.ones(n)).all()
+    assert (l_dist.mean() == 0.5 * jnp.ones(n)).all()
+    assert (l_dist.variance() == 0.25 * jnp.ones(n)).all()
 
 
 @pytest.mark.parametrize("lik", [Gaussian, Bernoulli])

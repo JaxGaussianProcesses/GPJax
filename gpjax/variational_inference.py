@@ -117,21 +117,18 @@ class StochasticVI(AbstractVariationalInference):
             Array: The expectation of the model's log-likelihood under our variational distribution.
         """
         x, y = batch.X, batch.y
-        link_fn = self.likelihood.link_function
 
-        # variational distribution q(f(.)) = N(f(.); μ(.), Σ(., .))
-        q = self.variational_family(params)
+        # q(f(x))
+        predictive_dist = vmap(self.variational_family.predict(params))(x[:, None])
+        mean = predictive_dist.mean().val.reshape(-1, 1)
+        variance = predictive_dist.variance().val.reshape(-1, 1)
 
-        # μ(x) and √diag(Σ(x, x))
-        (mean, sd), _ = vmap(lambda x_i: q(x_i).tree_flatten())(x[:, None])
 
         # log(p(y|f(x)))
-        log_prob = vmap(lambda f, y: link_fn(f, params["likelihood"]).log_prob(y))
+        log_prob = vmap(lambda f, y: self.likelihood.link_function(f, params["likelihood"]).log_prob(y))
 
         # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
-        expectation = gauss_hermite_quadrature(
-            log_prob, mean.reshape(-1, 1), sd.reshape(-1, 1), y=y
-        )
+        expectation = gauss_hermite_quadrature(log_prob, mean, variance, y=y)
 
         return expectation
 

@@ -1,7 +1,7 @@
 import typing as tp
 
 import jax.numpy as jnp
-import numpyro.distributions as npd
+import distrax as dx
 import jax.random as jr
 import pytest
 
@@ -56,7 +56,7 @@ def test_non_conjugate_initialise():
 @pytest.mark.parametrize("x", [-1.0, 0.0, 1.0])
 def test_lpd(x):
     val = jnp.array(x)
-    dist = npd.Normal(loc=0.0, scale=1.0)
+    dist = dx.Normal(loc=0.0, scale=1.0)
     lpd = log_density(val, dist)
     assert lpd is not None
     assert log_density(val, None) == 0.0
@@ -80,7 +80,7 @@ def test_recursive_complete(lik):
     posterior = Prior(kernel=RBF()) * lik(num_datapoints=10)
     params, _, _ = initialise(posterior, jr.PRNGKey(123)).unpack()
     priors = {"kernel": {}}
-    priors["kernel"]["lengthscale"] = npd.HalfNormal(scale=2.0)
+    priors["kernel"]["lengthscale"] = dx.Laplace(loc=0.0, scale=1.0)
     container = copy_dict_structure(params)
     complete_priors = recursive_complete(container, priors)
     for (
@@ -89,7 +89,7 @@ def test_recursive_complete(lik):
         v2,
     ) in recursive_items(params, complete_priors):
         if k == "lengthscale":
-            assert isinstance(v2, npd.HalfNormal)
+            assert isinstance(v2, dx.Laplace)
         else:
             assert v2 == None
 
@@ -108,10 +108,10 @@ def test_prior_evaluation():
     }
     priors = {
         "kernel": {
-            "lengthscale": npd.Gamma(1.0, 1.0),
-            "variance": npd.Gamma(2.0, 2.0),
+            "lengthscale": dx.Gamma(1.0, 1.0),
+            "variance": dx.Gamma(2.0, 2.0),
         },
-        "likelihood": {"obs_noise": npd.Gamma(3.0, 3.0)},
+        "likelihood": {"obs_noise": dx.Gamma(3.0, 3.0)},
     }
     lpd = evaluate_priors(params, priors)
     assert pytest.approx(lpd) == -2.0110168
@@ -146,8 +146,8 @@ def test_incomplete_priors():
     }
     priors = {
         "kernel": {
-            "lengthscale": npd.Gamma(1.0, 1.0),
-            "variance": npd.Gamma(2.0, 2.0),
+            "lengthscale": dx.Gamma(1.0, 1.0),
+            "variance": dx.Gamma(2.0, 2.0),
         },
     }
     container = copy_dict_structure(params)
@@ -163,7 +163,7 @@ def test_checks(num_datapoints):
     priors = prior_checks(incomplete_priors)
     assert "latent" in priors.keys()
     assert "variance" not in priors.keys()
-    assert isinstance(priors["latent"], npd.Normal)
+    assert isinstance(priors["latent"], dx.Normal)
 
 
 def test_structure_priors():
@@ -171,8 +171,8 @@ def test_structure_priors():
     params, _, _ = initialise(posterior, jr.PRNGKey(123)).unpack()
     priors = {
         "kernel": {
-            "lengthscale": npd.Gamma(1.0, 1.0),
-            "variance": npd.Gamma(2.0, 2.0),
+            "lengthscale": dx.Gamma(1.0, 1.0),
+            "variance": dx.Gamma(2.0, 2.0),
         },
     }
     structured_priors = structure_priors(params, priors)
@@ -188,7 +188,7 @@ def test_structure_priors():
         assert v
 
 
-@pytest.mark.parametrize("latent_prior", [npd.Laplace(0.0, 1.0), npd.Laplace(0.0, 1.0)])
+@pytest.mark.parametrize("latent_prior", [dx.Laplace(0.0, 1.0), dx.Laplace(0.0, 1.0)])
 def test_prior_checks(latent_prior):
     priors = {
         "kernel": {"lengthscale": None, "variance": None},
@@ -198,7 +198,7 @@ def test_prior_checks(latent_prior):
     }
     new_priors = prior_checks(priors)
     assert "latent" in new_priors.keys()
-    assert isinstance(new_priors["latent"], npd.Normal)
+    assert isinstance(new_priors["latent"], dx.Normal)
 
     priors = {
         "kernel": {"lengthscale": None, "variance": None},
@@ -207,7 +207,7 @@ def test_prior_checks(latent_prior):
     }
     new_priors = prior_checks(priors)
     assert "latent" in new_priors.keys()
-    assert isinstance(new_priors["latent"], npd.Normal)
+    assert isinstance(new_priors["latent"], dx.Normal)
 
     priors = {
         "kernel": {"lengthscale": None, "variance": None},
@@ -218,7 +218,7 @@ def test_prior_checks(latent_prior):
     with pytest.warns(UserWarning):
         new_priors = prior_checks(priors)
     assert "latent" in new_priors.keys()
-    assert isinstance(new_priors["latent"], npd.Laplace)
+    assert isinstance(new_priors["latent"], dx.Laplace)
 
 
 #########################
@@ -232,8 +232,8 @@ def test_output(num_datapoints, likelihood):
 
     assert isinstance(bijectors, dict)
     for k, v1, v2 in recursive_items(bijectors, bijectors):
-        assert isinstance(v1.__call__, tp.Callable)
-        assert isinstance(v2.inv, tp.Callable)
+        assert isinstance(v1.forward, tp.Callable)
+        assert isinstance(v2.inverse, tp.Callable)
 
     unconstrained_params = unconstrain(params, bijectors)
     assert (
@@ -251,5 +251,5 @@ def test_output(num_datapoints, likelihood):
     a_bijectors = build_bijectors(augmented_params)
 
     assert "test_param" in list(a_bijectors.keys())
-    assert a_bijectors["test_param"](jnp.array([1.0])) == 1.0
-    assert a_bijectors["test_param"].inv(jnp.array([1.0])) == 1.0
+    assert a_bijectors["test_param"].forward(jnp.array([1.0])) == 1.0
+    assert a_bijectors["test_param"].inverse(jnp.array([1.0])) == 1.0
