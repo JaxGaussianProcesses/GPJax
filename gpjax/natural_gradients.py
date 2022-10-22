@@ -65,7 +65,7 @@ def natural_to_expectation(params: Dict, jitter: float = DEFAULT_JITTER) -> Dict
 
     # S⁻¹ = -2θ₂
     S_inv = -2 * natural_matrix
-    S_inv += I(m) * jitter
+    S_inv += jnp.eye(m) * jitter
 
     # S⁻¹ = LLᵀ
     L = jnp.linalg.cholesky(S_inv)

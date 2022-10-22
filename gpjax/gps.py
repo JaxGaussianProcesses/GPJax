@@ -123,8 +123,10 @@ class Prior(AbstractGP):
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
             t = test_inputs
+            n_test = t.shape[0]
             μt = self.mean_function(t, params["mean_function"])
             Ktt = gram(self.kernel, t, params["kernel"])
+            Ktt += self.jitter * I(n_test)
             Lt = Ktt.triangular_lower()
 
             return dx.MultivariateNormalTri(jnp.atleast_1d(μt.squeeze()), Lt)
@@ -219,13 +221,10 @@ class ConjugatePosterior(AbstractPosterior):
 
         # Precompute covariance matrices
         Kxx = gram(self.prior.kernel, x, params["kernel"])
+        Kxx += I(n) * self.jitter
 
-        # Σ = (Kxx + Iσ²) = LLᵀ
+        # Σ = Kxx + Iσ²
         Sigma = Kxx + I(n) * obs_noise
-        L = jnp.linalg.cholesky(Sigma)
-
-        # w = L⁻¹ (y - μx)
-        w = jsp.linalg.solve_triangular(L, y - μx, lower=True)
 
         def predict(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
             t = test_inputs
@@ -234,15 +233,19 @@ class ConjugatePosterior(AbstractPosterior):
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kxt = cross_covariance(self.prior.kernel, x, t, params["kernel"])
 
-            # L⁻¹ Kxt
-            L_inv_Kxt = jsp.linalg.solve_triangular(L, Kxt, lower=True)
+            # TODO: Investigate lower triangular solves for general covariance operators
+            # this is more efficient than the full solve for dense matrices in the current implimentation.
+
+            # Σ⁻¹ Kxt
+            Sigma_inv_Kxt = Sigma.solve(Kxt)
 
             # μt  +  Ktx (Kxx + Iσ²)⁻¹ (y  -  μx)
-            mean = μt + jnp.matmul(L_inv_Kxt.T, w)
+            mean = μt + jnp.matmul(Sigma_inv_Kxt.T, y - μx)
 
-            # Ktt  -  Ktx (Kxx + Iσ²)⁻¹ Kxt  [recall (Kxx + Iσ²)⁻¹ = (LLᵀ)⁻¹ =  L⁻ᵀL⁻¹]
-            covariance = Ktt - jnp.matmul(L_inv_Kxt.T, L_inv_Kxt)
+            # Ktt  -  Ktx (Kxx + Iσ²)⁻¹ Kxt
+            covariance = Ktt
             covariance += I(n_test) * self.jitter
+            covariance = covariance.to_dense() - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance
@@ -278,9 +281,12 @@ class ConjugatePosterior(AbstractPosterior):
             Kxx = gram(self.prior.kernel, x, params["kernel"])
             Kxx += I(n) * self.jitter
 
+            # TODO: This implementation does not take advantage of the covariance operator structure.
+            # Future work concerns implementation of a custom Gaussian distribution / measure object that accepts a covariance operator.
+
             # Σ = (Kxx + Iσ²) = LLᵀ
             Sigma = Kxx + I(n) * obs_noise
-            L = jnp.linalg.cholesky(Sigma)
+            L = Sigma.triangular_lower()
 
             # p(y | x, θ), where θ are the model hyperparameters:
             marginal_likelihood = dx.MultivariateNormalTri(
@@ -337,7 +343,6 @@ class NonConjugatePosterior(AbstractPosterior):
 
         Kxx = gram(self.prior.kernel, x, params["kernel"])
         Kxx += I(n) * self.jitter
-        Lx = jnp.linalg.cholesky(Kxx)
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
             t = test_inputs
@@ -346,15 +351,18 @@ class NonConjugatePosterior(AbstractPosterior):
             Ktt = gram(self.prior.kernel, t, params["kernel"]) + I(n_test) * self.jitter
             μt = self.prior.mean_function(t, params["mean_function"])
 
+            Lx = Kxx.triangular_lower()
+
             # Lx⁻¹ Kxt
-            Lx_inv_Kxt = jsp.linalg.solve_triangular(Lx, Ktx.T, lower=True)
+            Lx_inv_Kxt = jsp.linalg.solve_triangular(Lx, Ktx, lower=True)
 
             # μt + Ktx Lx⁻¹ latent
             mean = μt + jnp.matmul(Lx_inv_Kxt.T, params["latent"])
 
             # Ktt - Ktx Kxx⁻¹ Kxt
-            covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
+            covariance = Ktt
             covariance += I(n_test) * self.jitter
+            covariance = covariance.to_dense() - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance
@@ -387,7 +395,7 @@ class NonConjugatePosterior(AbstractPosterior):
         def mll(params: Dict):
             Kxx = gram(self.prior.kernel, x, params["kernel"])
             Kxx += I(n) * self.jitter
-            Lx = jnp.linalg.cholesky(Kxx)
+            Lx = Kxx.triangular_lower()
             μx = self.prior.mean_function(x, params["mean_function"])
 
             # f(x) = μx  +  Lx latent

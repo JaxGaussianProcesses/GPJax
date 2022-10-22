@@ -22,6 +22,7 @@ from chex import dataclass
 from jax import vmap
 from jaxtyping import Array, Float
 
+from .covariance_operator import I
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
@@ -177,14 +178,14 @@ class CollapsedVI(AbstractVariationalInference):
             noise = params["likelihood"]["obs_noise"]
             z = params["variational_family"]["inducing_inputs"]
             Kzz = gram(self.prior.kernel, z, params["kernel"])
-            Kzz += jnp.eye(m) * self.variational_family.jitter
+            Kzz += I(m) * self.variational_family.jitter
             Kzx = cross_covariance(self.prior.kernel, z, x, params["kernel"])
             Kxx_diag = vmap(self.prior.kernel, in_axes=(0, 0, None))(
                 x, x, params["kernel"]
             )
             μx = self.prior.mean_function(x, params["mean_function"])
 
-            Lz = jnp.linalg.cholesky(Kzz)
+            Lz = Kzz.triangular_lower()
 
             # Notation and derivation:
             #

@@ -133,7 +133,9 @@ class Gaussian(AbstractLikelihood, Conjugate):
         """
         n_data = dist.event_shape[0]
         cov = dist.covariance()
-        noisy_cov = cov.at[jnp.diag_indices(n_data)].add(params["obs_noise"])
+        noisy_cov = cov.at[jnp.diag_indices(n_data)].add(
+            params["likelihood"]["obs_noise"]
+        )
 
         return dx.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
 

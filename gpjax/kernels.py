@@ -115,7 +115,7 @@ class AbstractKernelComputation:
             params (Dict): The parameters of the kernel function.
 
         Returns:
-            Covariance: Gram covariance operator of the kernel function.
+            CovarianceOperator: Gram covariance operator of the kernel function.
         """
 
         raise NotImplementedError
@@ -135,7 +135,10 @@ class AbstractKernelComputation:
         Returns:
             Float[Array, "N M"]: The computed square Gram matrix.
         """
-        return vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(y))(x)
+
+        cross_cov = vmap(lambda x: vmap(lambda y: kernel(x, y, params))(y))(x)
+
+        return cross_cov
 
     @staticmethod
     def diagonal(
@@ -147,11 +150,12 @@ class AbstractKernelComputation:
             inputs (Float[Array, "N D"]): The input matrix.
             params (Dict): The kernel's parameter set.
         Returns:
-            tfl.LinearOperator: The computed diagonal variance entries.
+            CovarianceOperator: The computed diagonal variance entries.
         """
-        return DiagonalCovarianceOperator(
-            diag=vmap(lambda x: kernel(x, x, params))(inputs)
-        )
+
+        diag = vmap(lambda x: kernel(x, x, params))(inputs)
+
+        return DiagonalCovarianceOperator(diag=diag)
 
 
 class DenseKernelComputation(AbstractKernelComputation):
@@ -169,13 +173,12 @@ class DenseKernelComputation(AbstractKernelComputation):
             params (Dict): The kernel's parameter set.
 
         Returns:
-            Dense: The computed square Gram matrix.
+            CovarianceOperator: The computed square Gram matrix.
         """
-        return DenseCovarianceOperator(
-            matrix=vmap(lambda x1: vmap(lambda y1: kernel(x1, y1, params))(inputs))(
-                inputs
-            )
-        )
+
+        matrix = vmap(lambda x: vmap(lambda y: kernel(x, y, params))(inputs))(inputs)
+
+        return DenseCovarianceOperator(matrix=matrix)
 
 
 class DiagonalKernelComputation(AbstractKernelComputation):
@@ -191,11 +194,12 @@ class DiagonalKernelComputation(AbstractKernelComputation):
             params (Dict): The kernel's parameter set.
 
         Returns:
-            tfl.LinearOperator: The computed square Gram matrix.
+            CovarianceOperator: The computed square Gram matrix.
         """
-        return DiagonalCovarianceOperator(
-            diag=vmap(lambda x: kernel(x, x, params))(inputs)
-        )
+
+        diag = vmap(lambda x: kernel(x, x, params))(inputs)
+
+        return DiagonalCovarianceOperator(diag=diag)
 
 
 @dataclass
@@ -548,15 +552,33 @@ class GraphKernel(Kernel, _EigenKernel, DenseKernelComputation):
 def squared_distance(
     x: Float[Array, "1 D"], y: Float[Array, "1 D"]
 ) -> Float[Array, "1"]:
-    """Compute the squared distance between a pair of inputs."""
+    """Compute the squared distance between a pair of inputs.
+
+    Args:
+        x (Float[Array, "1 D"]): First input.
+        y (Float[Array, "1 D"]): Second input.
+
+    Returns:
+        Float[Array, "1"]: The squared distance between the inputs.
+    """
+
     return jnp.sum((x - y) ** 2)
 
 
 def euclidean_distance(
     x: Float[Array, "1 D"], y: Float[Array, "1 D"]
 ) -> Float[Array, "1"]:
-    """Compute the l1 norm between a pair of inputs."""
-    return jnp.sqrt(jnp.maximum(jnp.sum((x - y) ** 2), 1e-36))
+    """Compute the euclidean distance between a pair of inputs.
+
+    Args:
+        x (Float[Array, "1 D"]): First input.
+        y (Float[Array, "1 D"]): Second input.
+
+    Returns:
+        Float[Array, "1"]: The euclidean distance between the inputs.
+    """
+
+    return jnp.sqrt(squared_distance(x, y))
 
 
 __all__ = [
