@@ -171,7 +171,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         Lz = jnp.linalg.cholesky(Kzz)
         μz = self.prior.mean_function(z, params["mean_function"])
 
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalFullCovariance:
             t = test_inputs
             n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
@@ -197,8 +197,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
                 + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
             )
             covariance += I(n_test) * self.jitter
-            L = jnp.linalg.cholesky(covariance)
-            return dx.MultivariateNormalTri(jnp.atleast_1d(mean.squeeze()), L)
+            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict_fn
 
@@ -233,7 +232,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
     def predict(
         self, params: Dict
-    ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]:
+    ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalFullCovariance]:
         """Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
@@ -255,7 +254,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         Kzz += I(m) * self.jitter
         Lz = jnp.linalg.cholesky(Kzz)
 
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalFullCovariance:
             t = test_inputs
             n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
@@ -280,7 +279,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             covariance += I(n_test) * self.jitter
             L = jnp.linalg.cholesky(covariance)
 
-            return dx.MultivariateNormalTri(jnp.atleast_1d(mean.squeeze()), L)
+            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict_fn
 
@@ -364,7 +363,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
     def predict(
         self, params: Dict
-    ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]:
+    ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalFullCovariance]:
         """Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
@@ -431,9 +430,8 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Kzz_inv_L, Ktz_Kzz_inv_L.T)
             )
-            L = jnp.linalg.cholesky(covariance)
 
-            return dx.MultivariateNormalTri(jnp.atleast_1d(mean.squeeze()), L)
+            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict_fn
 
@@ -515,7 +513,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
     def predict(
         self, params: Dict
-    ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]:
+    ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalFullCovariance]:
         """Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
@@ -554,7 +552,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         Lz = jnp.linalg.cholesky(Kzz)
         μz = self.prior.mean_function(z, params["mean_function"])
 
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalFullCovariance:
             t = test_inputs
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
@@ -579,7 +577,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
                 + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
             )
             L = jnp.linalg.cholesky(covariance + I(t.shape[0]) * self.jitter)
-            return dx.MultivariateNormalTri(jnp.atleast_1d(mean.squeeze()), L)
+            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict_fn
 
@@ -617,14 +615,14 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
 
     def predict(
         self, train_data: Dataset, params: Dict
-    ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]:
+    ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalFullCovariance]:
         """Compute the predictive distribution of the GP at the test inputs.
         Args:
             params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
         Returns:
             Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalFullCovariance:
             # TODO - can we cache some of this?
             x, y = train_data.X, train_data.y
 
@@ -681,8 +679,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(L_inv_Lz_inv_Kzt.T, L_inv_Lz_inv_Kzt)
             )
-            L = jnp.linalg.cholesky(covariance + I(t.shape[0]) * self.jitter)
-            return dx.MultivariateNormalTri(jnp.atleast_1d(mean.squeeze()), L)
+            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict_fn
 
