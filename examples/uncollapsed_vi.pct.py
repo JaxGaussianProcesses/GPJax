@@ -175,8 +175,8 @@ learned_params, training_history = inference_state.unpack()
 latent_dist = q(learned_params)(xtest)
 predictive_dist = likelihood(latent_dist, learned_params)
 
-meanf = predictive_dist.mean
-sigma = predictive_dist.variance ** 0.5
+meanf = predictive_dist.mean()
+sigma = predictive_dist.stddev()
 
 fig, ax = plt.subplots(figsize=(12, 5))
 ax.plot(x, y, "o", alpha=0.15, label="Training Data", color="tab:gray")

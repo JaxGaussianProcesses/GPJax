@@ -1,8 +1,18 @@
 import jax.random as jr
-import numpyro.distributions as npd
+import jax.numpy as jnp
+import distrax as dx
+import tensorflow_probability.substrates.jax.bijectors as tfb
 from ml_collections import ConfigDict
 
 __config = None
+
+FillTriangular = dx.Chain([tfb.FillTriangular()])
+Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
+Softplus = dx.Lambda(
+    forward=lambda x: jnp.log(1 + jnp.exp(x)),
+    inverse=lambda x: jnp.log(jnp.exp(x) - 1.0),
+)
+
 
 
 def get_defaults() -> ConfigDict:
@@ -11,7 +21,7 @@ def get_defaults() -> ConfigDict:
     Returns:
         ConfigDict: A `ConfigDict` describing parameter transforms and default values.
     """
-    config = ConfigDict()
+    config = ConfigDict(type_safe=False)
     config.key = jr.PRNGKey(123)
 
     # Covariance matrix stabilising jitter
@@ -19,9 +29,9 @@ def get_defaults() -> ConfigDict:
 
     # Default bijections
     config.transformations = transformations = ConfigDict()
-    transformations.positive_transform = npd.transforms.SoftplusTransform()
-    transformations.identity_transform = npd.transforms.IdentityTransform()
-    transformations.triangular_transform = npd.transforms.CholeskyTransform()
+    transformations.positive_transform = Softplus
+    transformations.identity_transform = Identity
+    transformations.triangular_transform =FillTriangular
 
     # Default parameter transforms
     transformations.lengthscale = "positive_transform"
@@ -46,7 +56,7 @@ def get_defaults() -> ConfigDict:
     return __config
 
 
-def add_parameter(param_name: str, bijection: npd.transforms.Transform) -> None:
+def add_parameter(param_name: str, bijection: dx.Bijector) -> None:
     """Add a parameter and its corresponding transform to GPJax's config file.
 
     Args:

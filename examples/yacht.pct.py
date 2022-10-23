@@ -8,7 +8,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -150,8 +150,8 @@ learned_params, training_history = inference_state.unpack()
 latent_dist = posterior(training_data, learned_params)(scaled_Xte)
 predictive_dist = likelihood(latent_dist, learned_params)
 
-predictive_mean = predictive_dist.mean
-predictive_stddev = jnp.sqrt(predictive_dist.variance)
+predictive_mean = predictive_dist.mean()
+predictive_stddev = predictive_dist.stddev()
 
 # %% [markdown]
 # ## Evaluation

@@ -90,9 +90,9 @@ prior = gpx.Prior(kernel=kernel)
 parameter_state = gpx.initialise(prior, key)
 prior_dist = prior(parameter_state.params)(xtest)
 
-prior_mean = prior_dist.mean
-prior_std = jnp.sqrt(prior_dist.covariance_matrix.diagonal())
-samples = prior_dist.sample(key, sample_shape=(20,)).T
+prior_mean = prior_dist.mean()
+prior_std = prior_dist.stddev()
+samples = prior_dist.sample(seed=key, sample_shape=(20,)).T
 
 plt.plot(xtest, samples, color="tab:blue", alpha=0.5)
 plt.plot(xtest, prior_mean, color="tab:orange")
@@ -200,8 +200,8 @@ pp.pprint(learned_params)
 latent_dist = posterior(D, learned_params)(xtest)
 predictive_dist = likelihood(latent_dist, learned_params)
 
-predictive_mean = predictive_dist.mean
-predictive_std = jnp.sqrt(predictive_dist.covariance_matrix.diagonal())
+predictive_mean = predictive_dist.mean()
+predictive_std = predictive_dist.stddev()
 
 # %% [markdown]
 # With the predictions and their uncertainty acquired, we illustrate the GP's performance at explaining the data $\mathcal{D}$ and recovering the underlying latent function of interest.

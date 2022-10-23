@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -19,15 +19,14 @@
 #
 # In this notebook we demonstrate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
 
-import blackjax
-
 # %%
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
 import matplotlib.pyplot as plt
-import numpyro.distributions as npd
+import distrax as dx
+import blackjax
 import optax as ox
 from jaxtyping import Array, Float
 
@@ -100,8 +99,8 @@ map_latent_dist = posterior(D, map_estimate)(xtest)
 
 predictive_dist = likelihood(map_latent_dist, map_estimate)
 
-predictive_mean = predictive_dist.mean
-predictive_std = jnp.sqrt(predictive_dist.variance)
+predictive_mean = predictive_dist.mean()
+predictive_std = predictive_dist.stddev()
 
 fig, ax = plt.subplots(figsize=(12, 5))
 ax.plot(x, y, "o", label="Observations", color="tab:red")
@@ -177,7 +176,7 @@ L = jnp.linalg.cholesky(H + I(D.n) * jitter)
 L_inv = jsp.linalg.solve_triangular(L, I(D.n), lower=True)
 H_inv = jsp.linalg.solve_triangular(L.T, L_inv, lower=False)
 
-laplace_approximation = npd.MultivariateNormal(f_hat, H_inv)
+laplace_approximation = dx.MultivariateNormalFullCovariance(f_hat.squeeze(), H_inv)
 
 
 # %% [markdown]
@@ -190,7 +189,7 @@ laplace_approximation = npd.MultivariateNormal(f_hat, H_inv)
 # This is the same approximate distribution $q_{map}(f(\cdot))$, but we have pertubed the covariance by a curvature term of $\mathbf{K}_{\boldsymbol{(\cdot)\boldsymbol{x}}} \mathbf{K}_{\boldsymbol{xx}}^{-1} [-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} ]^{-1} \mathbf{K}_{\boldsymbol{xx}}^{-1} \mathbf{K}_{\boldsymbol{\boldsymbol{x}(\cdot)}}$. We take the latent distribution computed in the previous section and add this term to the covariance to construct $q_{Laplace}(f(\cdot))$.
 
 # %%
-def construct_laplace(test_inputs: Float[Array, "N D"]) -> npd.MultivariateNormal:
+def construct_laplace(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
 
     map_latent_dist = posterior(D, map_estimate)(test_inputs)
 
@@ -208,10 +207,10 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> npd.MultivariateNorma
     # Ktx Kxx⁻¹[ H⁻¹ ] Kxx⁻¹ Kxt
     laplace_cov_term = jnp.matmul(jnp.matmul(Kxx_inv_Ktx.T, H_inv), Kxx_inv_Ktx)
 
-    mean = map_latent_dist.mean
-    covariance = map_latent_dist.covariance_matrix + laplace_cov_term
-
-    return npd.MultivariateNormal(jnp.atleast_1d(mean.squeeze()), covariance)
+    mean = map_latent_dist.mean()
+    covariance = map_latent_dist.covariance() + laplace_cov_term
+    L = jnp.linalg.cholesky(covariance)
+    return dx.MultivariateNormalTri(jnp.atleast_1d(mean.squeeze()), L)
 
 
 # %% [markdown]
@@ -220,8 +219,8 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> npd.MultivariateNorma
 laplace_latent_dist = construct_laplace(xtest)
 predictive_dist = likelihood(laplace_latent_dist, map_estimate)
 
-predictive_mean = predictive_dist.mean
-predictive_std = predictive_dist.variance**0.5
+predictive_mean = predictive_dist.mean()
+predictive_std = predictive_dist.stddev()
 
 fig, ax = plt.subplots(figsize=(12, 5))
 ax.plot(x, y, "o", label="Observations", color="tab:red")
@@ -269,7 +268,7 @@ ax.legend()
 # %%
 # Adapted from BlackJax's introduction notebook.
 num_adapt = 500
-num_samples = 200
+num_samples = 500
 
 params, trainables, bijectors = gpx.initialise(posterior, key).unpack()
 mll = posterior.marginal_log_likelihood(D, negative=False)
@@ -339,7 +338,7 @@ for i in range(0, num_samples, thin_factor):
 
     latent_dist = posterior(D, ps)(xtest)
     predictive_dist = likelihood(latent_dist, ps)
-    samples.append(predictive_dist.sample(key, sample_shape=(10,)))
+    samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
 
 samples = jnp.vstack(samples)
 

@@ -207,8 +207,8 @@ learned_params = array_to_dict([jnp.mean(i) for i in constrained_sample_list])
 
 predictive_dist = likelihood(posterior(D, learned_params)(xtest), learned_params)
 
-mu = predictive_dist.mean
-sigma = jnp.sqrt(predictive_dist.variance)
+mu = predictive_dist.mean()
+sigma = predictive_dist.stddev()
 
 # %% [markdown]
 # Finally, we plot the learned posterior predictive distribution evaluated at the test points defined above.

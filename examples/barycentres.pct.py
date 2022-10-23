@@ -28,7 +28,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy.linalg as jsl
 import matplotlib.pyplot as plt
-import numpyro
+import distrax as dx
 import optax as ox
 
 import gpjax as gpx
@@ -94,7 +94,7 @@ plt.show()
 # We'll now independently learn Gaussian process posterior distributions for each dataset. We won't spend any time here discussing how GP hyperparameters are optimised. For advice on achieving this, see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for advice on optimisation and the [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for advice on selecting an appropriate kernel.
 
 # %%
-def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
+def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray) -> dx.MultivariateNormalTri:
     if y.ndim == 1:
         y = y.reshape(-1, 1)
     D = gpx.Dataset(X=x, y=y)
@@ -130,9 +130,9 @@ def sqrtm(A: jnp.DeviceArray):
 
 
 def wasserstein_barycentres(
-    distributions: tp.List[numpyro.distributions.Distribution], weights: jnp.DeviceArray
+    distributions: tp.List[dx.MultivariateNormalTri], weights: jnp.DeviceArray
 ):
-    covariances = [d.covariance_matrix for d in distributions]
+    covariances = [d.covariance() for d in distributions]
     cov_stack = jnp.stack(covariances)
     stack_sqrt = jax.vmap(sqrtm)(cov_stack)
 
@@ -152,7 +152,7 @@ def wasserstein_barycentres(
 # %%
 weights = jnp.ones((n_datasets,)) / n_datasets
 
-means = jnp.stack([d.mean for d in posterior_preds])
+means = jnp.stack([d.mean() for d in posterior_preds])
 barycentre_mean = jnp.tensordot(weights, means, axes=1)
 
 step_fn = jax.jit(wasserstein_barycentres(posterior_preds, weights))
@@ -161,11 +161,9 @@ initial_covariance = jnp.eye(n_test)
 barycentre_covariance, sequence = jax.lax.scan(
     step_fn, initial_covariance, jnp.arange(100)
 )
+L = jnp.linalg.cholesky(barycentre_covariance)
 
-
-barycentre_process = numpyro.distributions.MultivariateNormal(
-    barycentre_mean, barycentre_covariance
-)
+barycentre_process = dx.MultivariateNormalTri(barycentre_mean, L)
 
 # %% [markdown]
 # ## Plotting the result
@@ -174,16 +172,16 @@ barycentre_process = numpyro.distributions.MultivariateNormal(
 
 # %%
 def plot(
-    dist: numpyro.distributions.Distribution,
+    dist: dx.MultivariateNormalTri,
     ax,
     color: str = "tab:blue",
     label: str = None,
     ci_alpha: float = 0.2,
     linewidth: float = 1.0,
 ):
-    mu = dist.mean
-    sigma = jnp.sqrt(dist.covariance_matrix.diagonal())
-    ax.plot(xtest, dist.mean, linewidth=linewidth, color=color, label=label)
+    mu = dist.mean()
+    sigma = dist.stddev()
+    ax.plot(xtest, mu, linewidth=linewidth, color=color, label=label)
     ax.fill_between(
         xtest.squeeze(), mu - sigma, mu + sigma, alpha=ci_alpha, color=color
     )

@@ -26,8 +26,7 @@ import matplotlib.pyplot as plt
 from jax import jit
 from jaxtyping import Array, Float
 from optax import adam
-import numpyro.distributions as npd
-
+import distrax as dx 
 import gpjax as gpx
 
 key = jr.PRNGKey(123)
@@ -62,7 +61,7 @@ for k, ax in zip(kernels, axes.ravel()):
     prior = gpx.Prior(kernel=k)
     params, *_ = gpx.initialise(prior, key).unpack()
     rv = prior(params)(x)
-    y = rv.sample(key, sample_shape=(10,))
+    y = rv.sample(seed=key, sample_shape=(10,))
 
     ax.plot(x, y.T, alpha=0.7)
     ax.set_title(k.name)
@@ -208,30 +207,30 @@ class Polar(gpx.kernels.Kernel):
 # To define a bijector here we'll make use of the `Lambda` operator given in Distrax. This lets us convert any regular Jax function into a bijection. Given that we require $\tau$ to be strictly greater than $4.$, we'll apply a [softplus transformation](https://jax.readthedocs.io/en/latest/_autosummary/jax.nn.softplus.html) where the lower bound is shifted by $4$.
 
 # %%
-from gpjax.config import add_parameter
+from gpjax.config import add_parameter, Softplus
 from jax.nn import softplus
 
+# class Softplus4p(dx.Bijector):
+#     def __init__(self):
+#         super().__init__(event_ndims_in=0)
+#         self._shift = 4.
+        
+#     def forward_and_log_det(self, x):
+#         y = softplus(x) + self._shift
+#         logdet = -softplus(-x)
+#         return y, logdet
 
-class ShiftSoftplus(npd.transforms.Transform):
-    domain = npd.constraints.real
-    codomain = npd.constraints.real
-    
-    def __init__(self, low: Float[Array, "1"]) -> None:
-        super().__init__()
-        self.low = jnp.array(low)
-    
-    def __call__(self, x):
-        x -= self.low
-        return softplus(x) + self.low
+#     def inverse_and_log_det(self, y):
+#         # Optional. Can be omitted if inverse methods are not needed.
+#         y = y - self._shift
+#         x = jnp.log(-jnp.expm1(-y)) + y
+#         logdet = -jnp.log(-jnp.expm1(-y))
+#         return x, logdet
 
-    def _inverse(self, y):
-        return jnp.log(-jnp.expm1(-y)) + y
+bij_fn = lambda x: softplus(x + jnp.array(4.0))
+bij = dx.Lambda(forward = bij_fn, inverse = lambda y: -jnp.log(-jnp.expm1(-y - 4.))+y-4.)
 
-    def log_abs_det_jacobian(self, x, y, intermediates=None):
-        return -softplus(-x)
-
-
-add_parameter("tau", ShiftSoftplus(4.))
+add_parameter("tau", bij)
 
 # %% [markdown]
 # ### Using our polar kernel
@@ -277,8 +276,8 @@ learned_params, training_history = inference_state.unpack()
 
 # %%
 posterior_rv = likelihood(circlular_posterior(D, learned_params)(angles), learned_params)
-mu = posterior_rv.mean
-one_sigma = jnp.sqrt(posterior_rv.variance)
+mu = posterior_rv.mean()
+one_sigma = posterior_rv.stddev()
 
 # %%
 fig = plt.figure(figsize=(10, 8))

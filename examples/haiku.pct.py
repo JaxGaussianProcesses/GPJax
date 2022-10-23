@@ -162,7 +162,7 @@ inference_state = gpx.fit(
     objective=negative_mll,
     parameter_state=parameter_state,
     optax_optim=optimiser,
-    n_iters=5000,
+    n_iters=2500,
 )
 
 learned_params, training_history = inference_state.unpack()
@@ -176,8 +176,8 @@ learned_params, training_history = inference_state.unpack()
 latent_dist = posterior(D, learned_params)(xtest)
 predictive_dist = likelihood(latent_dist, learned_params)
 
-predictive_mean = predictive_dist.mean
-predictive_std = jnp.sqrt(predictive_dist.variance)
+predictive_mean = predictive_dist.mean()
+predictive_std = predictive_dist.stddev()
 
 fig, ax = plt.subplots(figsize=(12, 5))
 ax.plot(x, y, "o", label="Observations", color="tab:red")
