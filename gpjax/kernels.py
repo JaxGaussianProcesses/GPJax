@@ -329,7 +329,7 @@ class Matern12(Kernel, DenseKernelComputation):
         """
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
-        K = params["variance"] * jnp.exp(euclidean_distance(x, y))
+        K = params["variance"] * jnp.exp(-euclidean_distance(x, y))
         return K.squeeze()
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
