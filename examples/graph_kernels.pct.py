@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -88,7 +88,7 @@ true_params["kernel"] = {
 }
 
 fx = prior(true_params)(x)
-y = fx.sample(key).reshape(-1, 1)
+y = fx.sample(seed=key).reshape(-1, 1)
 
 D = gpx.Dataset(X=x, y=y)
 
@@ -118,7 +118,6 @@ cbar = plt.colorbar(sm)
 likelihood = gpx.Gaussian(num_datapoints=y.shape[0])
 posterior = prior * likelihood
 
-
 parameter_state = gpx.initialise(posterior, key)
 negative_mll = jit(posterior.marginal_log_likelihood(train_data=D, negative=True))
 optimiser = ox.adam(learning_rate=0.01)
@@ -144,8 +143,8 @@ initial_params = parameter_state.params
 initial_dist = likelihood(posterior(D, initial_params)(x), initial_params)
 predictive_dist = likelihood(posterior(D, learned_params)(x), learned_params)
 
-initial_mean = initial_dist.mean
-learned_mean = predictive_dist.mean
+initial_mean = initial_dist.mean()
+learned_mean = predictive_dist.mean()
 
 rmse = lambda ytrue, ypred: jnp.sum(jnp.sqrt(jnp.square(ytrue - ypred)))
 

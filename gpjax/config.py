@@ -21,7 +21,7 @@ def get_defaults() -> ConfigDict:
     Returns:
         ConfigDict: A `ConfigDict` describing parameter transforms and default values.
     """
-    config = ConfigDict()
+    config = ConfigDict(type_safe=False)
     config.key = jr.PRNGKey(123)
 
     # Covariance matrix stabilising jitter

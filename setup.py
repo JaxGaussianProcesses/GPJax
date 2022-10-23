@@ -16,7 +16,7 @@ REQUIRES = [
     "jaxlib>=0.1.47",
     "optax",
     "chex",
-    "numpyro",
+    "distrax",
     "tqdm>=4.0.0",
     "ml-collections==0.1.0",
     "jaxtyping>=0.0.2",
