@@ -243,12 +243,11 @@ class ConjugatePosterior(AbstractPosterior):
             mean = μt + jnp.matmul(Sigma_inv_Kxt.T, y - μx)
 
             # Ktt  -  Ktx (Kxx + Iσ²)⁻¹ Kxt
-            covariance = Ktt
+            covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
             covariance += I(n_test) * self.jitter
-            covariance = covariance.to_dense() - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
 
             return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mean.squeeze()), covariance
+                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
             )
 
         return predict
