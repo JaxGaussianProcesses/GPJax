@@ -89,7 +89,8 @@ print(f"Lengthscales: {slice_kernel._initialise_params(key)['lengthscale']}")
 
 # %%
 x_matrix = jr.normal(key, shape=(50, 5))
-K = gpx.kernels.gram(slice_kernel, x_matrix, slice_kernel._initialise_params(key))
+gram_fn = slice_kernel.gram
+K = gram_fn(slice_kernel, x_matrix, slice_kernel._initialise_params(key))
 print(K.shape)
 
 # %% [markdown]
@@ -103,9 +104,9 @@ k2 = gpx.Polynomial()
 sum_k = k1 + k2
 
 fig, ax = plt.subplots(ncols=3, figsize=(20, 5))
-im0 = ax[0].matshow(gpx.kernels.gram(k1, x, k1._initialise_params(key)))
-im1 = ax[1].matshow(gpx.kernels.gram(k2, x, k2._initialise_params(key)))
-im2 = ax[2].matshow(gpx.kernels.gram(sum_k, x, sum_k._initialise_params(key)))
+im0 = ax[0].matshow(k1.gram(k1, x, k1._initialise_params(key)).to_dense())
+im1 = ax[1].matshow(k2.gram(k2, x, k2._initialise_params(key)).to_dense())
+im2 = ax[2].matshow(sum_k.gram(sum_k, x, sum_k._initialise_params(key)).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
@@ -120,10 +121,10 @@ k3 = gpx.Matern32()
 prod_k = k1 * k2 * k3
 
 fig, ax = plt.subplots(ncols=4, figsize=(20, 5))
-im0 = ax[0].matshow(gpx.kernels.gram(k1, x, k1._initialise_params(key)))
-im1 = ax[1].matshow(gpx.kernels.gram(k2, x, k2._initialise_params(key)))
-im2 = ax[2].matshow(gpx.kernels.gram(k3, x, k3._initialise_params(key)))
-im3 = ax[3].matshow(gpx.kernels.gram(prod_k, x, prod_k._initialise_params(key)))
+im0 = ax[0].matshow(k1.gram(k1, x, k1._initialise_params(key)).to_dense())
+im1 = ax[1].matshow(k2.gram(k2, x, k2._initialise_params(key)).to_dense())
+im2 = ax[2].matshow(k3.gram(k3, x, k3._initialise_params(key)).to_dense())
+im3 = ax[3].matshow(prod_k.gram(prod_k, x, prod_k._initialise_params(key)).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
@@ -167,7 +168,7 @@ def angular_distance(x, y, c):
 
 
 @dataclass
-class Polar(gpx.kernels.Kernel):
+class Polar(gpx.kernels.Kernel, gpx.kernels.DenseKernelComputation):
     period: float = 2 * jnp.pi
 
     def __post_init__(self):

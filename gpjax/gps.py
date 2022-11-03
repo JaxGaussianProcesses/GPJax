@@ -272,7 +272,10 @@ class ConjugatePosterior(AbstractPosterior):
             Callable[[Dict], Float[Array, "1"]]: A functional representation of the marginal log-likelihood that can be evaluated at a given parameter set.
         """
         x, y, n = train_data.X, train_data.y, train_data.n
-        gram = self.prior.kernel.gram
+        gram, cross_covariance = (
+            self.prior.kernel.gram,
+            self.prior.kernel.cross_covariance,
+        )
 
         def mll(
             params: Dict,

@@ -31,7 +31,6 @@ import optax as ox
 from jaxtyping import Array, Float
 
 import gpjax as gpx
-from gpjax.utils import I
 
 key = jr.PRNGKey(123)
 
