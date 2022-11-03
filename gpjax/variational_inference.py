@@ -22,12 +22,12 @@ from chex import dataclass
 from jax import vmap
 from jaxtyping import Array, Float
 
+from .covariance_operator import I
 from .gps import AbstractPosterior
-from .kernels import cross_covariance, gram
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
 from .types import Dataset
-from .utils import I, concat_dictionaries
+from .utils import concat_dictionaries
 from .variational_families import (
     AbstractVariationalFamily,
     CollapsedVariationalGaussian,
@@ -123,9 +123,12 @@ class StochasticVI(AbstractVariationalInference):
         mean = predictive_dist.mean().val.reshape(-1, 1)
         variance = predictive_dist.variance().val.reshape(-1, 1)
 
-
         # log(p(y|f(x)))
-        log_prob = vmap(lambda f, y: self.likelihood.link_function(f, params["likelihood"]).log_prob(y))
+        log_prob = vmap(
+            lambda f, y: self.likelihood.link_function(
+                f, params["likelihood"]
+            ).log_prob(y)
+        )
 
         # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
         expectation = gauss_hermite_quadrature(log_prob, mean, variance, y=y)
@@ -166,6 +169,10 @@ class CollapsedVI(AbstractVariationalInference):
         x, y, n = train_data.X, train_data.y, train_data.n
 
         m = self.num_inducing
+        gram, cross_covariance = (
+            self.prior.kernel.gram,
+            self.prior.kernel.cross_covariance,
+        )
 
         def elbo_fn(params: Dict) -> Float[Array, "1"]:
             noise = params["likelihood"]["obs_noise"]
@@ -178,7 +185,7 @@ class CollapsedVI(AbstractVariationalInference):
             )
             μx = self.prior.mean_function(x, params["mean_function"])
 
-            Lz = jnp.linalg.cholesky(Kzz)
+            Lz = Kzz.triangular_lower()
 
             # Notation and derivation:
             #
@@ -210,7 +217,7 @@ class CollapsedVI(AbstractVariationalInference):
             AAT = jnp.matmul(A, A.T)
 
             # B = I + AAᵀ
-            B = I(m) + AAT
+            B = jnp.eye(m) + AAT
 
             # LLᵀ = I + AAᵀ
             L = jnp.linalg.cholesky(B)

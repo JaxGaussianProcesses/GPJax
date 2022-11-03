@@ -16,17 +16,17 @@
 import abc
 from typing import Any, Callable, Dict, Optional
 
+import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
-import distrax as dx
 from chex import dataclass
 from jaxtyping import Array, Float
 
 from .config import get_defaults
 from .types import PRNGKeyType
-from .utils import I
 
 DEFAULT_JITTER = get_defaults()["jitter"]
+
 
 @dataclass
 class AbstractLikelihood:
@@ -93,6 +93,7 @@ class NonConjugate:
     """An abstract class for non-conjugate likelihoods with respect to a Gaussain process prior."""
 
 
+# TODO: revamp this will covariance operators.
 @dataclass
 class Gaussian(AbstractLikelihood, Conjugate):
     """Gaussian likelihood object."""
@@ -134,11 +135,12 @@ class Gaussian(AbstractLikelihood, Conjugate):
             dx.Distribution: The predictive distribution.
         """
         n_data = dist.event_shape[0]
-        noisy_cov = (
-            dist.covariance() + I(n_data) * params["likelihood"]["obs_noise"]
+        cov = dist.covariance()
+        noisy_cov = cov.at[jnp.diag_indices(n_data)].add(
+            params["likelihood"]["obs_noise"]
         )
-        L = jsp.linalg.cholesky(noisy_cov + DEFAULT_JITTER * I(n_data))
-        return dx.MultivariateNormalTri(dist.mean(), L)
+
+        return dx.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
 
 
 @dataclass

@@ -32,7 +32,7 @@ from chex import dataclass
 from scipy.signal import sawtooth
 
 import gpjax as gpx
-from gpjax.kernels import Kernel
+from gpjax.kernels import Kernel, DenseKernelComputation
 
 key = jr.PRNGKey(123)
 
@@ -79,7 +79,7 @@ class _DeepKernelFunction:
 
 
 @dataclass
-class DeepKernelFunction(Kernel, _DeepKernelFunction):
+class DeepKernelFunction(Kernel, DenseKernelComputation, _DeepKernelFunction):
     def __call__(
         self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
     ) -> jnp.ndarray:
@@ -125,7 +125,7 @@ forward_linear1 = hk.without_apply_rng(forward_linear1)
 # Having characterised the feature extraction network, we move to define a Gaussian process parameterised by this deep kernel. We consider a third-order Matérn base kernel and assume a Gaussian likelihood. Parameters, trainability status and transformations are initialised in the usual manner.
 
 # %%
-base_kernel = gpx.Matern52()
+base_kernel = gpx.RBF()
 kernel = DeepKernelFunction(network=forward_linear1, base_kernel=base_kernel)
 kernel.initialise(x, key)
 prior = gpx.Prior(kernel=kernel)
@@ -143,11 +143,16 @@ posterior = prior * likelihood
 parameter_state = gpx.initialise(posterior, key)
 
 negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
+
+# %%
+parameter_state = gpx.initialise(posterior, key)
+
+negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
 negative_mll(parameter_state.params)
 
 schedule = ox.warmup_cosine_decay_schedule(
     init_value=0.0,
-    peak_value=1.0,
+    peak_value=0.01,
     warmup_steps=50,
     decay_steps=1_000,
     end_value=0.0,

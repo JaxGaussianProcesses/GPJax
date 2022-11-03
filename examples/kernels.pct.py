@@ -19,6 +19,8 @@
 #
 # In this guide, we introduce the kernels available in GPJax and demonstrate how to create custom ones.
 
+import distrax as dx
+
 # %%
 import jax.numpy as jnp
 import jax.random as jr
@@ -26,7 +28,7 @@ import matplotlib.pyplot as plt
 from jax import jit
 from jaxtyping import Array, Float
 from optax import adam
-import distrax as dx 
+
 import gpjax as gpx
 
 key = jr.PRNGKey(123)
@@ -89,7 +91,8 @@ print(f"Lengthscales: {slice_kernel._initialise_params(key)['lengthscale']}")
 
 # %%
 x_matrix = jr.normal(key, shape=(50, 5))
-K = gpx.kernels.gram(slice_kernel, x_matrix, slice_kernel._initialise_params(key))
+gram_fn = slice_kernel.gram
+K = gram_fn(slice_kernel, x_matrix, slice_kernel._initialise_params(key))
 print(K.shape)
 
 # %% [markdown]
@@ -103,9 +106,9 @@ k2 = gpx.Polynomial()
 sum_k = k1 + k2
 
 fig, ax = plt.subplots(ncols=3, figsize=(20, 5))
-im0 = ax[0].matshow(gpx.kernels.gram(k1, x, k1._initialise_params(key)))
-im1 = ax[1].matshow(gpx.kernels.gram(k2, x, k2._initialise_params(key)))
-im2 = ax[2].matshow(gpx.kernels.gram(sum_k, x, sum_k._initialise_params(key)))
+im0 = ax[0].matshow(k1.gram(k1, x, k1._initialise_params(key)).to_dense())
+im1 = ax[1].matshow(k2.gram(k2, x, k2._initialise_params(key)).to_dense())
+im2 = ax[2].matshow(sum_k.gram(sum_k, x, sum_k._initialise_params(key)).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
@@ -120,10 +123,10 @@ k3 = gpx.Matern32()
 prod_k = k1 * k2 * k3
 
 fig, ax = plt.subplots(ncols=4, figsize=(20, 5))
-im0 = ax[0].matshow(gpx.kernels.gram(k1, x, k1._initialise_params(key)))
-im1 = ax[1].matshow(gpx.kernels.gram(k2, x, k2._initialise_params(key)))
-im2 = ax[2].matshow(gpx.kernels.gram(k3, x, k3._initialise_params(key)))
-im3 = ax[3].matshow(gpx.kernels.gram(prod_k, x, prod_k._initialise_params(key)))
+im0 = ax[0].matshow(k1.gram(k1, x, k1._initialise_params(key)).to_dense())
+im1 = ax[1].matshow(k2.gram(k2, x, k2._initialise_params(key)).to_dense())
+im2 = ax[2].matshow(k3.gram(k3, x, k3._initialise_params(key)).to_dense())
+im3 = ax[3].matshow(prod_k.gram(prod_k, x, prod_k._initialise_params(key)).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
@@ -167,7 +170,7 @@ def angular_distance(x, y, c):
 
 
 @dataclass
-class Polar(gpx.kernels.Kernel):
+class Polar(gpx.kernels.Kernel, gpx.kernels.DenseKernelComputation):
     period: float = 2 * jnp.pi
 
     def __post_init__(self):
@@ -206,29 +209,15 @@ class Polar(gpx.kernels.Kernel):
 #
 # To define a bijector here we'll make use of the `Lambda` operator given in Distrax. This lets us convert any regular Jax function into a bijection. Given that we require $\tau$ to be strictly greater than $4.$, we'll apply a [softplus transformation](https://jax.readthedocs.io/en/latest/_autosummary/jax.nn.softplus.html) where the lower bound is shifted by $4$.
 
-# %%
-from gpjax.config import add_parameter, Softplus
 from jax.nn import softplus
 
-# class Softplus4p(dx.Bijector):
-#     def __init__(self):
-#         super().__init__(event_ndims_in=0)
-#         self._shift = 4.
-        
-#     def forward_and_log_det(self, x):
-#         y = softplus(x) + self._shift
-#         logdet = -softplus(-x)
-#         return y, logdet
-
-#     def inverse_and_log_det(self, y):
-#         # Optional. Can be omitted if inverse methods are not needed.
-#         y = y - self._shift
-#         x = jnp.log(-jnp.expm1(-y)) + y
-#         logdet = -jnp.log(-jnp.expm1(-y))
-#         return x, logdet
+# %%
+from gpjax.config import Softplus, add_parameter
 
 bij_fn = lambda x: softplus(x + jnp.array(4.0))
-bij = dx.Lambda(forward = bij_fn, inverse = lambda y: -jnp.log(-jnp.expm1(-y - 4.))+y-4.)
+bij = dx.Lambda(
+    forward=bij_fn, inverse=lambda y: -jnp.log(-jnp.expm1(-y - 4.0)) + y - 4.0
+)
 
 add_parameter("tau", bij)
 
@@ -275,7 +264,9 @@ learned_params, training_history = inference_state.unpack()
 # We'll now query the GP's predictive posterior at linearly spaced novel inputs and illustrate the results.
 
 # %%
-posterior_rv = likelihood(circlular_posterior(D, learned_params)(angles), learned_params)
+posterior_rv = likelihood(
+    circlular_posterior(D, learned_params)(angles), learned_params
+)
 mu = posterior_rv.mean()
 one_sigma = posterior_rv.stddev()
 

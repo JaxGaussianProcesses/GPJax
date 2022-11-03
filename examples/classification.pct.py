@@ -20,19 +20,19 @@
 # In this notebook we demonstrate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
 
 # %%
+import blackjax
+import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
 import matplotlib.pyplot as plt
-import distrax as dx
-import blackjax
 import optax as ox
 from jaxtyping import Array, Float
 
 import gpjax as gpx
-from gpjax.utils import I
 
+I = jnp.eye
 key = jr.PRNGKey(123)
 
 # %% [markdown]
@@ -156,14 +156,13 @@ ax.legend()
 # that we identify as a Gaussian distribution,  $p(\boldsymbol{f}| \mathcal{D}) \approx q(\boldsymbol{f}) := \mathcal{N}(\hat{\boldsymbol{f}}, [-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} ]^{-1} )$. Since the negative Hessian is positive definite, we can use the Cholesky decomposition to obtain the covariance matrix of the Laplace approximation at the datapoints below.
 
 # %%
-from gpjax.kernels import cross_covariance, gram
-
+gram, cross_covariance = (prior.kernel.gram, prior.kernel.cross_covariance)
 jitter = 1e-6
 
 # Compute (latent) function value map estimates at training points:
 Kxx = gram(prior.kernel, x, map_estimate["kernel"])
 Kxx += I(D.n) * jitter
-Lx = jnp.linalg.cholesky(Kxx)
+Lx = Kxx.triangular_lower()
 f_hat = jnp.matmul(Lx, map_estimate["latent"])
 
 # Negative Hessian,  H = -∇²p_tilde(y|f):
@@ -196,7 +195,7 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormal
     Kxt = cross_covariance(prior.kernel, x, test_inputs, map_estimate["kernel"])
     Kxx = gram(prior.kernel, x, map_estimate["kernel"])
     Kxx += I(D.n) * jitter
-    Lx = jnp.linalg.cholesky(Kxx)
+    Lx = Kxx.triangular_lower()
 
     # Lx⁻¹ Kxt
     Lx_inv_Ktx = jsp.linalg.solve_triangular(Lx, Kxt, lower=True)

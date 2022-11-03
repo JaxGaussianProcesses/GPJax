@@ -16,18 +16,18 @@
 import abc
 from typing import Any, Callable, Dict, Optional
 
+import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
-import distrax as dx
 from chex import dataclass
 from jaxtyping import Array, Float
 
 from .config import get_defaults
+from .covariance_operator import I
 from .gps import Prior
-from .kernels import cross_covariance, gram
 from .likelihoods import AbstractLikelihood, Gaussian
 from .types import Dataset, PRNGKeyType
-from .utils import I, concat_dictionaries
+from .utils import concat_dictionaries
 
 DEFAULT_JITTER = get_defaults()["jitter"]
 
@@ -115,7 +115,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
                     "inducing_inputs": self.inducing_inputs,
                     "moments": {
                         "variational_mean": jnp.zeros((m, 1)),
-                        "variational_root_covariance": I(m),
+                        "variational_root_covariance": jnp.eye(m),
                     },
                 }
             },
@@ -133,6 +133,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         Returns:
              Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
         """
+        gram = self.prior.kernel.gram
         mu = params["variational_family"]["moments"]["variational_mean"]
         sqrt = params["variational_family"]["moments"]["variational_root_covariance"]
         m = self.num_inducing
@@ -140,7 +141,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         μz = self.prior.mean_function(z, params["mean_function"])
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(m) * self.jitter
-        Lz = jnp.linalg.cholesky(Kzz)
+        Lz = Kzz.triangular_lower()
 
         qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
         pu = dx.MultivariateNormalTri(jnp.atleast_1d(μz.squeeze()), Lz)
@@ -166,12 +167,19 @@ class VariationalGaussian(AbstractVariationalGaussian):
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
 
+        gram, cross_covariance = (
+            self.prior.kernel.gram,
+            self.prior.kernel.cross_covariance,
+        )
+
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(m) * self.jitter
-        Lz = jnp.linalg.cholesky(Kzz)
+        Lz = Kzz.triangular_lower()
         μz = self.prior.mean_function(z, params["mean_function"])
 
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalFullCovariance:
+        def predict_fn(
+            test_inputs: Float[Array, "N D"]
+        ) -> dx.MultivariateNormalFullCovariance:
             t = test_inputs
             n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
@@ -197,7 +205,10 @@ class VariationalGaussian(AbstractVariationalGaussian):
                 + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
             )
             covariance += I(n_test) * self.jitter
-            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
+
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
+            )
 
         return predict_fn
 
@@ -250,11 +261,18 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
 
+        gram, cross_covariance = (
+            self.prior.kernel.gram,
+            self.prior.kernel.cross_covariance,
+        )
+
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(m) * self.jitter
-        Lz = jnp.linalg.cholesky(Kzz)
+        Lz = Kzz.triangular_lower()
 
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalFullCovariance:
+        def predict_fn(
+            test_inputs: Float[Array, "N D"]
+        ) -> dx.MultivariateNormalFullCovariance:
             t = test_inputs
             n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
@@ -277,9 +295,9 @@ class WhitenedVariationalGaussian(VariationalGaussian):
                 + jnp.matmul(Ktz_Lz_invT_sqrt, Ktz_Lz_invT_sqrt.T)
             )
             covariance += I(n_test) * self.jitter
-            L = jnp.linalg.cholesky(covariance)
-
-            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
+            )
 
         return predict_fn
 
@@ -309,7 +327,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
                     "inducing_inputs": self.inducing_inputs,
                     "moments": {
                         "natural_vector": jnp.zeros((m, 1)),
-                        "natural_matrix": -0.5 * I(m),
+                        "natural_matrix": -0.5 * jnp.eye(m),
                     },
                 }
             },
@@ -332,10 +350,11 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         natural_matrix = params["variational_family"]["moments"]["natural_matrix"]
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
+        gram = self.prior.kernel.gram
 
         # S⁻¹ = -2θ₂
         S_inv = -2 * natural_matrix
-        S_inv += I(m) * self.jitter
+        S_inv += jnp.eye(m) * self.jitter
 
         # Compute L⁻¹, where LLᵀ = S, via a trick found in the NumPyro source code and https://nbviewer.org/gist/fehiepsi/5ef8e09e61604f10607380467eb82006#Precision-to-scale_tril:
         sqrt_inv = jnp.swapaxes(
@@ -343,7 +362,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         )
 
         # L = (L⁻¹)⁻¹I
-        sqrt = jsp.linalg.solve_triangular(sqrt_inv, I(m), lower=True)
+        sqrt = jsp.linalg.solve_triangular(sqrt_inv, jnp.eye(m), lower=True)
 
         # S = LLᵀ:
         S = jnp.matmul(sqrt, sqrt.T)
@@ -354,7 +373,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         μz = self.prior.mean_function(z, params["mean_function"])
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(m) * self.jitter
-        Lz = jnp.linalg.cholesky(Kzz)
+        Lz = Kzz.triangular_lower()
 
         qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
         pu = dx.MultivariateNormalTri(jnp.atleast_1d(μz.squeeze()), Lz)
@@ -383,9 +402,14 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
 
+        gram, cross_covariance = (
+            self.prior.kernel.gram,
+            self.prior.kernel.cross_covariance,
+        )
+
         # S⁻¹ = -2θ₂
         S_inv = -2 * natural_matrix
-        S_inv += I(m) * self.jitter
+        S_inv += jnp.eye(m) * self.jitter
 
         # Compute L⁻¹, where LLᵀ = S, via a trick found in the NumPyro source code and https://nbviewer.org/gist/fehiepsi/5ef8e09e61604f10607380467eb82006#Precision-to-scale_tril:
         sqrt_inv = jnp.swapaxes(
@@ -393,7 +417,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         )
 
         # L = (L⁻¹)⁻¹I
-        sqrt = jsp.linalg.solve_triangular(sqrt_inv, I(m), lower=True)
+        sqrt = jsp.linalg.solve_triangular(sqrt_inv, jnp.eye(m), lower=True)
 
         # S = LLᵀ:
         S = jnp.matmul(sqrt, sqrt.T)
@@ -403,11 +427,12 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(m) * self.jitter
-        Lz = jnp.linalg.cholesky(Kzz)
+        Lz = Kzz.triangular_lower()
         μz = self.prior.mean_function(z, params["mean_function"])
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
             t = test_inputs
+            n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
             μt = self.prior.mean_function(t, params["mean_function"])
@@ -430,8 +455,11 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Kzz_inv_L, Ktz_Kzz_inv_L.T)
             )
+            covariance += I(n_test) * self.jitter
 
-            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
+            )
 
         return predict_fn
 
@@ -463,7 +491,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
                     "inducing_inputs": self.inducing_inputs,
                     "moments": {
                         "expectation_vector": jnp.zeros((m, 1)),
-                        "expectation_matrix": I(m),
+                        "expectation_matrix": jnp.eye(m),
                     },
                 }
             },
@@ -490,13 +518,14 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         ]
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
+        gram = self.prior.kernel.gram
 
         # μ = η₁
         mu = expectation_vector
 
         # S = η₂ - η₁ η₁ᵀ
         S = expectation_matrix - jnp.outer(mu, mu)
-        S += I(m) * self.jitter
+        S += jnp.eye(m) * self.jitter
 
         # S = sqrt sqrtᵀ
         sqrt = jnp.linalg.cholesky(S)
@@ -504,7 +533,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         μz = self.prior.mean_function(z, params["mean_function"])
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(m) * self.jitter
-        Lz = jnp.linalg.cholesky(Kzz)
+        Lz = Kzz.triangular_lower()
 
         qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
         pu = dx.MultivariateNormalTri(jnp.atleast_1d(μz.squeeze()), Lz)
@@ -537,23 +566,31 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         z = params["variational_family"]["inducing_inputs"]
         m = self.num_inducing
 
+        gram, cross_covariance = (
+            self.prior.kernel.gram,
+            self.prior.kernel.cross_covariance,
+        )
+
         # μ = η₁
         mu = expectation_vector
 
         # S = η₂ - η₁ η₁ᵀ
         S = expectation_matrix - jnp.matmul(mu, mu.T)
-        S += I(m) * self.jitter
+        S += jnp.eye(m) * self.jitter
 
         # S = sqrt sqrtᵀ
         sqrt = jnp.linalg.cholesky(S)
 
         Kzz = gram(self.prior.kernel, z, params["kernel"])
         Kzz += I(m) * self.jitter
-        Lz = jnp.linalg.cholesky(Kzz)
+        Lz = Kzz.triangular_lower()
         μz = self.prior.mean_function(z, params["mean_function"])
 
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalFullCovariance:
+        def predict_fn(
+            test_inputs: Float[Array, "N D"]
+        ) -> dx.MultivariateNormalFullCovariance:
             t = test_inputs
+            n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
             μt = self.prior.mean_function(t, params["mean_function"])
@@ -576,8 +613,11 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
             )
-            L = jnp.linalg.cholesky(covariance + I(t.shape[0]) * self.jitter)
-            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
+            covariance += I(n_test) * self.jitter
+
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
+            )
 
         return predict_fn
 
@@ -622,9 +662,17 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
         Returns:
             Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalFullCovariance:
+
+        def predict_fn(
+            test_inputs: Float[Array, "N D"]
+        ) -> dx.MultivariateNormalFullCovariance:
             # TODO - can we cache some of this?
             x, y = train_data.X, train_data.y
+
+            gram, cross_covariance = (
+                self.prior.kernel.gram,
+                self.prior.kernel.cross_covariance,
+            )
 
             noise = params["likelihood"]["obs_noise"]
             z = params["variational_family"]["inducing_inputs"]
@@ -635,7 +683,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             Kzz += I(m) * self.jitter
 
             # Lz Lzᵀ = Kzz
-            Lz = jnp.linalg.cholesky(Kzz)
+            Lz = Kzz.triangular_lower()
 
             # Lz⁻¹ Kzx
             Lz_inv_Kzx = jsp.linalg.solve_triangular(Lz, Kzx, lower=True)
@@ -647,19 +695,22 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             AAT = jnp.matmul(A, A.T)
 
             # LLᵀ = I + AAᵀ
-            L = jnp.linalg.cholesky(I(m) + AAT)
+            L = jnp.linalg.cholesky(jnp.eye(m) + AAT)
 
             μx = self.prior.mean_function(x, params["mean_function"])
             diff = y - μx
 
             # Lz⁻¹ Kzx (y - μx)
-            Lz_inv_Kzx_diff = jsp.linalg.cho_solve((L, True), jnp.matmul(Lz_inv_Kzx, diff))
+            Lz_inv_Kzx_diff = jsp.linalg.cho_solve(
+                (L, True), jnp.matmul(Lz_inv_Kzx, diff)
+            )
 
             # Kzz⁻¹ Kzx (y - μx)
             Kzz_inv_Kzx_diff = jsp.linalg.solve_triangular(
                 Lz.T, Lz_inv_Kzx_diff, lower=False
             )
             t = test_inputs
+            n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
             Kzt = cross_covariance(self.prior.kernel, z, t, params["kernel"])
             μt = self.prior.mean_function(t, params["mean_function"])
@@ -679,7 +730,11 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(L_inv_Lz_inv_Kzt.T, L_inv_Lz_inv_Kzt)
             )
-            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
+            covariance += I(n_test) * self.jitter
+
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
+            )
 
         return predict_fn
 
