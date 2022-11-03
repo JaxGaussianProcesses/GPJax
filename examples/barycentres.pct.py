@@ -28,7 +28,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy.linalg as jsl
 import matplotlib.pyplot as plt
-import numpyro
+import distrax as dx
 import optax as ox
 
 import gpjax as gpx
@@ -63,6 +63,7 @@ key = jr.PRNGKey(123)
 # ## Dataset
 #
 # We'll simulate five datasets and develop a Gaussian process posterior before identifying the Gaussian process barycentre at a set of test points. Each dataset will be a sine function with a different vertical shift, periodicity, and quantity of noise.
+
 # %%
 n = 100
 n_test = 200
@@ -87,41 +88,36 @@ fig, ax = plt.subplots(figsize=(16, 5))
 ax.plot(x, y, "o")
 plt.show()
 
-
 # %% [markdown]
 # ## Learning a posterior distribution
 #
 # We'll now independently learn Gaussian process posterior distributions for each dataset. We won't spend any time here discussing how GP hyperparameters are optimised. For advice on achieving this, see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for advice on optimisation and the [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for advice on selecting an appropriate kernel.
 
 # %%
-def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray):
+def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray) -> dx.MultivariateNormalTri:
     if y.ndim == 1:
         y = y.reshape(-1, 1)
     D = gpx.Dataset(X=x, y=y)
+
     likelihood = gpx.Gaussian(num_datapoints=n)
     posterior = gpx.Prior(kernel=gpx.RBF()) * likelihood
-    parameter_state = gpx.initialise(
-        posterior, key
-    )
-    params, trainables, bijectors = parameter_state.unpack()
-    params = gpx.unconstrain(params, bijectors)
 
-    objective = jax.jit(
-        posterior.marginal_log_likelihood(D, negative=True)
-    )
+    parameter_state = gpx.initialise(posterior, key)
+    negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
+    optimiser = ox.adam(learning_rate=0.01)
 
-    opt = ox.adam(learning_rate=0.01)
-    learned_params, training_history = gpx.fit(
-        objective=objective,
+    inference_state = gpx.fit(
+        objective=negative_mll,
         parameter_state=parameter_state,
-        optax_optim=opt,
+        optax_optim=optimiser,
         n_iters=1000,
-    ).unpack()
+    )
+
+    learned_params, training_history = inference_state.unpack()
     return likelihood(posterior(D, learned_params)(xtest), learned_params)
 
 
 posterior_preds = [fit_gp(x, i) for i in ys]
-
 
 # %% [markdown]
 # ## Computing the barycentre
@@ -134,9 +130,9 @@ def sqrtm(A: jnp.DeviceArray):
 
 
 def wasserstein_barycentres(
-    distributions: tp.List[numpyro.distributions.Distribution], weights: jnp.DeviceArray
+    distributions: tp.List[dx.MultivariateNormalTri], weights: jnp.DeviceArray
 ):
-    covariances = [d.covariance_matrix for d in distributions]
+    covariances = [d.covariance() for d in distributions]
     cov_stack = jnp.stack(covariances)
     stack_sqrt = jax.vmap(sqrtm)(cov_stack)
 
@@ -156,7 +152,7 @@ def wasserstein_barycentres(
 # %%
 weights = jnp.ones((n_datasets,)) / n_datasets
 
-means = jnp.stack([d.mean for d in posterior_preds])
+means = jnp.stack([d.mean() for d in posterior_preds])
 barycentre_mean = jnp.tensordot(weights, means, axes=1)
 
 step_fn = jax.jit(wasserstein_barycentres(posterior_preds, weights))
@@ -165,12 +161,9 @@ initial_covariance = jnp.eye(n_test)
 barycentre_covariance, sequence = jax.lax.scan(
     step_fn, initial_covariance, jnp.arange(100)
 )
+L = jnp.linalg.cholesky(barycentre_covariance)
 
-
-barycentre_process = numpyro.distributions.MultivariateNormal(
-    barycentre_mean, barycentre_covariance
-)
-
+barycentre_process = dx.MultivariateNormalTri(barycentre_mean, L)
 
 # %% [markdown]
 # ## Plotting the result
@@ -179,16 +172,16 @@ barycentre_process = numpyro.distributions.MultivariateNormal(
 
 # %%
 def plot(
-    dist: numpyro.distributions.Distribution,
+    dist: dx.MultivariateNormalTri,
     ax,
     color: str = "tab:blue",
     label: str = None,
     ci_alpha: float = 0.2,
     linewidth: float = 1.0,
 ):
-    mu = dist.mean
-    sigma = jnp.sqrt(dist.covariance_matrix.diagonal())
-    ax.plot(xtest, dist.mean, linewidth=linewidth, color=color, label=label)
+    mu = dist.mean()
+    sigma = dist.stddev()
+    ax.plot(xtest, mu, linewidth=linewidth, color=color, label=label)
     ax.fill_between(
         xtest.squeeze(), mu - sigma, mu + sigma, alpha=ci_alpha, color=color
     )

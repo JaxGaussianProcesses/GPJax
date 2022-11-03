@@ -42,7 +42,6 @@ To learn more, checkout the [regression
 notebook](https://gpjax.readthedocs.io/en/latest/examples/regression.html).
 :::
 
-
 ---
 
 ```{toctree}
@@ -81,6 +80,15 @@ hidden:
 ---
 examples/kernels
 examples/yacht
+```
+
+```{toctree}
+---
+maxdepth: 1
+caption: Experimental
+hidden:
+---
+examples/natgrads
 ```
 
 ```{toctree}

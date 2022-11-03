@@ -13,17 +13,18 @@
 #     name: python3
 # ---
 
-# %% [markdown]
-# # UCI Data Benchmarking
-#
-# In this notebook we'll demonstrate the use of GPJax on a benchmark UCI regression problem. Such tasks are commonly used within the research community to benchmark and evaluate new techniques against those already present in the literature. Much of the code contained in this notebook can be adapted to applied problems concerning datasets other than the one presented here.
-
 # %%
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import numpy as np
 import optax as ox
+
+# %% [markdown]
+# # UCI Data Benchmarking
+#
+# In this notebook, we will show how to apply GPJax on a benchmark UCI regression problem. These kind of tasks are often used in the research community to benchmark and assess new techniques against those already in the literature. Much of the code contained in this notebook can be adapted to applied problems concerning datasets other than the one presented here.
+# %%
 import pandas as pd
 from jax import jit
 from sklearn.metrics import mean_squared_error, r2_score
@@ -37,7 +38,7 @@ key = jr.PRNGKey(123)
 # %% [markdown]
 # ## Data Loading
 #
-# We'll be using the [Yacht](https://archive.ics.uci.edu/ml/datasets/yacht+hydrodynamics) dataset from the UCI machine learning data repository. Each observation describes the hydrodynamic performance of a yacht through its resistance. The dataset contains 6 covariates and a single positive, real valued response variable. There are 308 observations in the dataset, so we can comfortably use a conjugate regression Gaussian process here (see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for more details on this.).
+# We'll be using the [Yacht](https://archive.ics.uci.edu/ml/datasets/yacht+hydrodynamics) dataset from the UCI machine learning data repository. Each observation describes the hydrodynamic performance of a yacht through its resistance. The dataset contains 6 covariates and a single positive, real valued response variable. There are 308 observations in the dataset, so we can comfortably use a conjugate regression Gaussian process here (for more more details, checkout the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)).
 
 # %%
 yacht = pd.read_fwf(
@@ -54,7 +55,7 @@ y = yacht[:, -1].reshape(-1, 1)
 #
 # ### Data Partitioning
 #
-# We'll first partition our data into a _training_ and _testing_ split. We'll fit our Gaussian process to the training data and evaluate its performance on the test data. The reason for this is that we can explore how well our Gaussian process generalises to out-of-sample datapoints and ensure that we are not overfitting. We'll hold 30% of our data back for testing purposes.
+# We'll first partition our data into a _training_ and _testing_ split. We'll fit our Gaussian process to the training data and evaluate its performance on the test data. This allows us to investigate how effectively our Gaussian process generalises to out-of-sample datapoints and ensure that we are not overfitting. We'll hold 30% of our data back for testing purposes.
 
 # %%
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=42)
@@ -62,7 +63,7 @@ Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=42)
 # %% [markdown]
 # ### Response Variable
 #
-# We'll now process our response variable $\mathbf{y}$. As the below plots show, the data has a very long tail and is certainly not Gaussian. However, we would like to model a Gaussian response variable so that we can adopt a Gaussian likelihood function and leverage the model's conjugacy. To achieve this, we'll first log-scale the data, this has the effect of bringing the long right tail in closer to the data's mean. We'll then standardise the data such that is distributed according to a unit normal distribution. Both of these transformations are invertible through the log-normal expectation and variance formulae and the the inverse standardisation identity, should we ever need our model's predictions to be back on the scale of the original dataset.
+# We'll now process our response variable $\mathbf{y}$. As the below plots show, the data has a very long tail and is certainly not Gaussian. However, we would like to model a Gaussian response variable so that we can adopt a Gaussian likelihood function and leverage the model's conjugacy. To achieve this, we'll first log-scale the data, to bring the long right tail in closer to the data's mean. We'll then standardise the data such that is distributed according to a unit normal distribution. Both of these transformations are invertible through the log-normal expectation and variance formulae and the the inverse standardisation identity, should we ever need our model's predictions to be back on the scale of the original dataset.
 #
 # For transforming both the input and response variable, all transformations will be done with respect to the training data where relevant.
 
@@ -116,11 +117,6 @@ likelihood = gpx.Gaussian(num_datapoints=n_train)
 
 posterior = prior * likelihood
 
-params, trainables, constrainers, unconstrainers = gpx.initialise(
-    posterior, key
-).unpack()
-params = gpx.transform(params, unconstrainers)
-
 # %% [markdown]
 # ### Model Optimisation
 #
@@ -129,20 +125,21 @@ params = gpx.transform(params, unconstrainers)
 # %%
 training_data = gpx.Dataset(X=scaled_Xtr, y=scaled_ytr)
 
-mll = jit(
-    posterior.marginal_log_likelihood(
-        train_data=training_data, transformations=constrainers, negative=True
-    )
+parameter_state = gpx.initialise(posterior, key)
+negative_mll = jit(
+    posterior.marginal_log_likelihood(train_data=training_data, negative=True)
 )
-learned_params, training_history = gpx.fit(
-    objective=mll,
-    params=params,
-    trainables=trainables,
-    optax_optim=ox.adam(0.05),
+optimiser = ox.adam(0.05)
+
+inference_state = gpx.fit(
+    objective=negative_mll,
+    parameter_state=parameter_state,
+    optax_optim=optimiser,
     n_iters=1000,
     log_rate=50,
-).unpack()
-learned_params = gpx.transform(learned_params, constrainers)
+)
+
+learned_params, training_history = inference_state.unpack()
 
 # %% [markdown]
 # ## Prediction
@@ -153,8 +150,8 @@ learned_params = gpx.transform(learned_params, constrainers)
 latent_dist = posterior(training_data, learned_params)(scaled_Xte)
 predictive_dist = likelihood(latent_dist, learned_params)
 
-predictive_mean = predictive_dist.mean
-predictive_stddev = jnp.sqrt(predictive_dist.variance)
+predictive_mean = predictive_dist.mean()
+predictive_stddev = predictive_dist.stddev()
 
 # %% [markdown]
 # ## Evaluation
@@ -175,11 +172,11 @@ print(f"Results:\n\tRMSE: {rmse: .4f}\n\tR2: {r2: .2f}")
 #
 # ### Diagnostic plots
 #
-# To accompany the above metrics, we can also produce residual plots to explore exactly where our model's shortcomings lie. If we define a residual as the true value minus the prediction, then we can produce three plots
+# To accompany the above metrics, we can also produce residual plots to explore exactly where our model's shortcomings lie. If we define a residual as the true value minus the prediction, then we can produce three plots:
 #
-# 1. Predictions vs. actuals
-# 2. Predictions vs. residuals
-# 3. Residual density
+# 1. Predictions vs. actuals.
+# 2. Predictions vs. residuals.
+# 3. Residual density.
 #
 # The first plot allows us to explore if our model struggles to predict well for larger or smaller values by observing where the model deviates more from the line $y=x$. In the second plot we can inspect whether or not there were outliers or structure within the errors of our model. A well-performing model would have predictions close to and symmetrically distributed either side of $y=0$. Such a plot can be useful for diagnosing heteroscedasticity. Finally, by plotting a histogram of our residuals we can observe whether or not there is any skew to our residuals.
 

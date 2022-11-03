@@ -26,8 +26,7 @@ import matplotlib.pyplot as plt
 from jax import jit
 from jaxtyping import Array, Float
 from optax import adam
-import numpyro.distributions as npd
-
+import distrax as dx 
 import gpjax as gpx
 
 key = jr.PRNGKey(123)
@@ -60,9 +59,9 @@ x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 
 for k, ax in zip(kernels, axes.ravel()):
     prior = gpx.Prior(kernel=k)
-    params, _, _ = gpx.initialise(prior, key).unpack()
+    params, *_ = gpx.initialise(prior, key).unpack()
     rv = prior(params)(x)
-    y = rv.sample(key, sample_shape=(10,))
+    y = rv.sample(seed=key, sample_shape=(10,))
 
     ax.plot(x, y.T, alpha=0.7)
     ax.set_title(k.name)
@@ -97,6 +96,7 @@ print(K.shape)
 # ## Kernel combinations
 #
 # The product or sum of two positive definite matrices yields a positive definite matrix. Consequently, summing or multiplying sets of kernels is a valid operation that can give rich kernel functions. In GPJax, sums of kernels can be created by applying the `+` operator as follows.
+
 # %%
 k1 = gpx.RBF()
 k2 = gpx.Polynomial()
@@ -132,6 +132,7 @@ fig.colorbar(im3, ax=ax[3])
 
 # %% [markdown]
 # Alternatively kernel sums and multiplications can be created by passing a list of kernels into the `SumKernel` `ProductKernel` objects respectively.
+
 # %%
 sum_k = gpx.SumKernel(kernel_set=[k1, k2])
 prod_k = gpx.ProductKernel(kernel_set=[k1, k2, k3])
@@ -196,46 +197,45 @@ class Polar(gpx.kernels.Kernel):
 #         super().__init__()
 #         self.period = period
 # ```
-# As objects become increasingly large and complex, the conciseness of a dataclass becomes increasingly attractive. To ensure full compatability with Jax, it is crucial that the dataclass decorator is imported from Chex, not base Python's `dataclass` module. Functionally, the two objects are identical. However, unlike regular Python dataclasses, it is possilbe to apply operations such as`jit`, `vmap` and `grad` to the dataclasses given by Chex as they are registrered PyTrees.
+# As objects become increasingly large and complex, the conciseness of a dataclass becomes increasingly attractive. To ensure full compatability with Jax, it is crucial that the dataclass decorator is imported from Chex, not base Python's `dataclass` module. Functionally, the two objects are identical. However, unlike regular Python dataclasses, it is possilbe to apply operations such as `jit`, `vmap` and `grad` to the dataclasses given by Chex as they are registrered PyTrees.
 #
 #
 # ### Custom Parameter Bijection
 #
 # The constraint on $\tau$ makes optimisation challenging with gradient descent. It would be much easier if we could instead parameterise $\tau$ to be on the real line. Fortunately, this can be taken care of with GPJax's `add parameter` function, only requiring us to define the parameter's name and matching bijection (either a Distrax of TensorFlow probability bijector). Under the hood, calling this function updates a configuration object to register this parameter and its corresponding transform.
 #
-# To define a bijector here we'll make use of the `Lambda` operator given in Distrax. This lets us convert any regular Jax function into a bijection. Given that we require $\tau$ to be strictly greater than $4.$, we'll apply a [softplus transformation](https://jax.readthedocs.io/en/latest/_autosummary/jax.nn.softplus.html) where the lower bound is shifted by $4.$.
+# To define a bijector here we'll make use of the `Lambda` operator given in Distrax. This lets us convert any regular Jax function into a bijection. Given that we require $\tau$ to be strictly greater than $4.$, we'll apply a [softplus transformation](https://jax.readthedocs.io/en/latest/_autosummary/jax.nn.softplus.html) where the lower bound is shifted by $4$.
 
 # %%
-from gpjax.config import add_parameter
+from gpjax.config import add_parameter, Softplus
 from jax.nn import softplus
 
+# class Softplus4p(dx.Bijector):
+#     def __init__(self):
+#         super().__init__(event_ndims_in=0)
+#         self._shift = 4.
+        
+#     def forward_and_log_det(self, x):
+#         y = softplus(x) + self._shift
+#         logdet = -softplus(-x)
+#         return y, logdet
 
-class ShiftSoftplus(npd.transforms.Transform):
-    domain = npd.constraints.real
-    codomain = npd.constraints.real
-    
-    def __init__(self, low: Float[Array, "1"]) -> None:
-        super().__init__()
-        self.low = jnp.array(low)
-    
-    def __call__(self, x):
-        x -= self.low
-        return softplus(x) + self.low
+#     def inverse_and_log_det(self, y):
+#         # Optional. Can be omitted if inverse methods are not needed.
+#         y = y - self._shift
+#         x = jnp.log(-jnp.expm1(-y)) + y
+#         logdet = -jnp.log(-jnp.expm1(-y))
+#         return x, logdet
 
-    def _inverse(self, y):
-        return jnp.log(-jnp.expm1(-y)) + y
+bij_fn = lambda x: softplus(x + jnp.array(4.0))
+bij = dx.Lambda(forward = bij_fn, inverse = lambda y: -jnp.log(-jnp.expm1(-y - 4.))+y-4.)
 
-    def log_abs_det_jacobian(self, x, y, intermediates=None):
-        return -softplus(-x)
-
-
-add_parameter("tau", ShiftSoftplus(4.))
+add_parameter("tau", bij)
 
 # %% [markdown]
 # ### Using our polar kernel
 #
 # We proceed to fit a GP with our custom circular kernel to a random sequence of points on a circle (see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for further details on this process).
-
 
 # %%
 # Simulate data
@@ -253,18 +253,21 @@ PKern = Polar()
 likelihood = gpx.Gaussian(num_datapoints=n)
 circlular_posterior = gpx.Prior(kernel=PKern) * likelihood
 
-# Initialise parameters and corresponding transformations
+# Initialise parameter state:
 parameter_state = gpx.initialise(circlular_posterior, key)
 
 # Optimise GP's marginal log-likelihood using Adam
-mll = jit(circlular_posterior.marginal_log_likelihood(D, negative=True))
+negative_mll = jit(circlular_posterior.marginal_log_likelihood(D, negative=True))
+optimiser = adam(learning_rate=0.05)
 
-learned_params, training_history = gpx.fit(
-    mll,
-    parameter_state,
-    adam(learning_rate=0.01),
+inference_state = gpx.fit(
+    objective=negative_mll,
+    parameter_state=parameter_state,
+    optax_optim=optimiser,
     n_iters=1000,
-).unpack()
+)
+
+learned_params, training_history = inference_state.unpack()
 
 # %% [markdown]
 # ### Prediction
@@ -273,8 +276,8 @@ learned_params, training_history = gpx.fit(
 
 # %%
 posterior_rv = likelihood(circlular_posterior(D, learned_params)(angles), learned_params)
-mu = posterior_rv.mean
-one_sigma = jnp.sqrt(posterior_rv.variance)
+mu = posterior_rv.mean()
+one_sigma = posterior_rv.stddev()
 
 # %%
 fig = plt.figure(figsize=(10, 8))

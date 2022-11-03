@@ -15,7 +15,7 @@
 
 import typing as tp
 
-import numpyro.distributions as npd
+import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
@@ -142,10 +142,10 @@ def test_variational_gaussians(
     assert isinstance(predictive_dist_fn, tp.Callable)
 
     predictive_dist = predictive_dist_fn(test_inputs)
-    assert isinstance(predictive_dist, npd.Distribution)
+    assert isinstance(predictive_dist, dx.Distribution)
 
-    mu = predictive_dist.mean
-    sigma = predictive_dist.covariance_matrix
+    mu = predictive_dist.mean()
+    sigma = predictive_dist.covariance()
 
     assert isinstance(mu, jnp.ndarray)
     assert isinstance(sigma, jnp.ndarray)
@@ -208,10 +208,10 @@ def test_collapsed_variational_gaussian(n_test, n_inducing, n_datapoints, point_
     assert isinstance(predictive_dist_fn, tp.Callable)
 
     predictive_dist = predictive_dist_fn(test_inputs)
-    assert isinstance(predictive_dist, npd.Distribution)
+    assert isinstance(predictive_dist, dx.Distribution)
 
-    mu = predictive_dist.mean
-    sigma = predictive_dist.covariance_matrix
+    mu = predictive_dist.mean()
+    sigma = predictive_dist.covariance()
 
     assert isinstance(mu, jnp.ndarray)
     assert isinstance(sigma, jnp.ndarray)

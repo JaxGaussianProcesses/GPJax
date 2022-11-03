@@ -17,6 +17,7 @@
 # %% [markdown]
 # # TensorFlow Probability Integration
 # This notebook demonstrates how to perform Markov chain Monte Carlo (MCMC) inference for Gaussian process models using TensorFlow Probability.
+
 # %%
 from pprint import PrettyPrinter
 
@@ -68,7 +69,7 @@ posterior = gpx.Prior(kernel=gpx.RBF()) * likelihood
 # Since our model hyperparameters are positive, our MCMC sampler will sample on the parameters' unconstrained space and the samples will then be back-transformed onto the original positive real line. GPJax's `initialise` function makes this straightforward.
 
 # %%
-params, _, constrainers, unconstrainers = gpx.initialise(posterior, key).unpack()
+params, _, bijectors = gpx.initialise(posterior, key).unpack()
 
 # %% [markdown]
 # #### Parameter type
@@ -115,9 +116,8 @@ priors["likelihood"]["obs_noise"] = tfd.Gamma(
 # We now define the target distribution that our MCMC sampler will sample from. For our GP, this is the marginal log-likelihood that we specify below.
 
 # %%
-mll = posterior.marginal_log_likelihood(D, constrainers, priors=priors, negative=False)
+mll = posterior.marginal_log_likelihood(D, priors=priors, negative=False)
 mll(params)
-
 
 # %% [markdown]
 # Since our model parameters are now an array, not a dictionary, we must define a function that maps the array back to a dictionary and then evaluates the marginal log-likelihood. Using the second return of `dict_array_coercion` this is straightforward as follows.
@@ -126,6 +126,7 @@ mll(params)
 def build_log_pi(target, mapper_fn):
     def array_mll(parameter_array):
         parameter_dict = mapper_fn([jnp.array(i) for i in parameter_array])
+        parameter_dict = gpx.constrain(parameter_dict, bijectors)
         return target(parameter_dict)
 
     return array_mll
@@ -157,6 +158,10 @@ def run_chain(key, state):
 # Since everything is pure Jax, we are free to JIT compile our sampling function and go.
 
 # %%
+unconstrained_params = gpx.unconstrain(params, bijectors)
+states, log_probs = jax.jit(run_chain)(
+    key, jnp.array(dict_to_array(unconstrained_params))
+)
 states, log_probs = jax.jit(run_chain)(key, jnp.array(dict_to_array(params)))
 
 # %% [markdown]
@@ -171,7 +176,7 @@ n_params = states.shape[1]
 
 samples = [states[burn_in:, i, :][::thin_factor] for i in range(n_params)]
 sample_dict = array_to_dict(samples)
-constrained_samples = gpx.transform(sample_dict, constrainers)
+constrained_samples = gpx.constrain(sample_dict, bijectors)
 constrained_sample_list = dict_to_array(constrained_samples)
 
 # %% [markdown]
@@ -202,8 +207,8 @@ learned_params = array_to_dict([jnp.mean(i) for i in constrained_sample_list])
 
 predictive_dist = likelihood(posterior(D, learned_params)(xtest), learned_params)
 
-mu = predictive_dist.mean
-sigma = jnp.sqrt(predictive_dist.variance)
+mu = predictive_dist.mean()
+sigma = predictive_dist.stddev()
 
 # %% [markdown]
 # Finally, we plot the learned posterior predictive distribution evaluated at the test points defined above.
@@ -225,7 +230,7 @@ ax.plot(xtest, mu.squeeze() + sigma, color="tab:blue", linestyle="--", linewidth
 ax.legend()
 
 # %% [markdown]
-# Since things look good, this concludes our tutorial on interfacing TensorFlow Probability with GPJax.
+# This concludes our tutorial on interfacing TensorFlow Probability with GPJax.
 # The workflow demonstrated here only scratches the surface regarding the inference possible with a large number of samplers available in TensorFlow probability.
 
 # %% [markdown]

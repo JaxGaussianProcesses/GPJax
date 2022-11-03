@@ -13,7 +13,7 @@
 #     name: python3
 # ---
 
-# %% [markdown] pycharm={"name": "#%% md\n"}
+# %% [markdown]
 # # Sparse Gaussian Process Regression
 #
 # In this notebook we consider sparse Gaussian process regression (SGPR) <strong data-cite="titsias2009">Titsias (2009)</strong>. This is a solution for medium- to large-scale conjugate regression problems.
@@ -30,7 +30,6 @@ import gpjax as gpx
 
 key = jr.PRNGKey(123)
 
-
 # %% [markdown]
 # ## Dataset
 #
@@ -39,6 +38,7 @@ key = jr.PRNGKey(123)
 # $$\boldsymbol{y} \sim \mathcal{N} \left(\sin(7\boldsymbol{x}) + x \cos(2 \boldsymbol{x}), \textbf{I} * 0.5^2 \right).$$
 #
 # We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs and labels for later.
+
 # %%
 n = 2500
 noise = 0.5
@@ -52,8 +52,10 @@ D = gpx.Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-3.1, 3.1, 500).reshape(-1, 1)
 ytest = f(xtest)
+
 # %% [markdown]
 # To better understand what we have simulated, we plot both the underlying latent function and the observed data that is subject to Gaussian noise. We also plot an initial set of inducing points over the space.
+
 # %%
 n_inducing = 50
 z = jnp.linspace(-3.0, 3.0, n_inducing).reshape(-1, 1)
@@ -64,15 +66,19 @@ ax.plot(x, y, "o", color="tab:orange", alpha=0.4, label="Observations", markersi
 [ax.axvline(x=z_i, color="tab:gray", alpha=0.3, linewidth=1) for z_i in z]
 ax.legend(loc="best")
 plt.show()
+
 # %% [markdown]
 # Next we define the posterior model for the data.
+
 # %%
 kernel = gpx.RBF()
 likelihood = gpx.Gaussian(num_datapoints=D.n)
 prior = gpx.Prior(kernel=kernel)
 p = prior * likelihood
+
 # %% [markdown]
 # We now define the SGPR model through `CollapsedVariationalGaussian`. Since the form of the collapsed optimal posterior depends on the Gaussian likelihood's observation noise, we pass this to the constructer.
+
 # %%
 q = gpx.CollapsedVariationalGaussian(
     prior=prior, likelihood=likelihood, inducing_inputs=z
@@ -80,38 +86,40 @@ q = gpx.CollapsedVariationalGaussian(
 
 # %% [markdown]
 # We define our variational inference algorithm through `CollapsedVI`. This defines the collapsed variational free energy bound considered in <strong data-cite="titsias2009">Titsias (2009)</strong>.
+
 # %%
 sgpr = gpx.CollapsedVI(posterior=p, variational_family=q)
 
 # %% [markdown]
 # We now train our model akin to a Gaussian process regression model via the `fit` abstraction. Unlike the regression example given in the [conjugate regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html), the inducing locations that induce our variational posterior distribution are now part of the model's parameters. Using a gradient-based optimiser, we can then _optimise_ their location such that the evidence lower bound is maximised.
+
 # %%
 parameter_state = gpx.initialise(sgpr, key)
 
-loss_fn = jit(sgpr.elbo(D, negative=True))
+negative_elbo = jit(sgpr.elbo(D, negative=True))
 
 optimiser = ox.adam(learning_rate=0.005)
 
-learned_params, training_history = gpx.fit(
-    objective=loss_fn,
+inference_state = gpx.fit(
+    objective=negative_elbo,
     parameter_state=parameter_state,
     optax_optim=optimiser,
     n_iters=2000,
-).unpack()
+)
 
-# %%
-parameter_state.bijectors
+learned_params, training_history = inference_state.unpack()
 
 # %% [markdown]
 # We show predictions of our model with the learned inducing points overlayed in grey.
+
 # %%
 latent_dist = q.predict(D, learned_params)(xtest)
 predictive_dist = likelihood(latent_dist, learned_params)
 
-samples = latent_dist.sample(key, sample_shape=(20, ))
+samples = latent_dist.sample(seed=key, sample_shape=(20, ))
 
-predictive_mean = predictive_dist.mean
-predictive_std = jnp.sqrt(predictive_dist.variance)
+predictive_mean = predictive_dist.mean()
+predictive_std = predictive_dist.stddev()
 
 fig, ax = plt.subplots(figsize=(12, 5))
 
@@ -165,15 +173,16 @@ plt.show()
 
 # %%
 full_rank_model = gpx.Prior(kernel=gpx.RBF()) * gpx.Gaussian(num_datapoints=D.n)
-fr_params, fr_trainables, fr_bijectors = gpx.initialise(
-    full_rank_model, key
-).unpack()
-mll = jit(full_rank_model.marginal_log_likelihood(D, negative=True))
-%timeit mll(fr_params).block_until_ready()
+fr_params, *_ = gpx.initialise(full_rank_model, key).unpack()
+negative_mll = jit(full_rank_model.marginal_log_likelihood(D, negative=True))
+
+# %timeit negative_mll(fr_params).block_until_ready()
 
 # %%
-sparse_elbo = jit(sgpr.elbo(D, negative=True))
-%timeit sparse_elbo(params).block_until_ready()
+params, *_ = gpx.initialise(sgpr, key).unpack()
+negative_elbo = jit(sgpr.elbo(D, negative=True))
+
+# %timeit negative_elbo(params).block_until_ready()
 
 # %% [markdown]
 # As we can see, the sparse approximation given here is around 50 times faster when compared against a full-rank model.

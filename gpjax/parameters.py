@@ -21,11 +21,11 @@ from warnings import warn
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-import numpyro.distributions as npd
+import distrax as dx
 from chex import dataclass
 from jaxtyping import Array, Float
 
-from .config import get_defaults
+from .config import get_defaults, Identity
 from .types import PRNGKeyType
 from .utils import merge_dictionaries
 
@@ -158,7 +158,7 @@ def build_bijectors(params: Dict) -> Dict:
                         transform_type = transform_set[key]
                         bijector = transform_set[transform_type]
                     else:
-                        bijector = npd.transforms.IdentityTransform()
+                        bijector = Identity
                         warnings.warn(
                             f"Parameter {key} has no transform. Defaulting to identity transfom."
                         )
@@ -178,7 +178,7 @@ def constrain(params: Dict, bijectors: Dict) -> Dict:
     Returns:
         Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
     """
-    map = lambda param, trans: trans.inv(param)
+    map = lambda param, trans: trans.forward(param)
 
     return jax.tree_util.tree_map(map, params, bijectors)
 
@@ -194,7 +194,7 @@ def unconstrain(params: Dict, bijectors: Dict) -> Dict:
         Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
     """
 
-    map = lambda param, trans: trans.__call__(param)
+    map = lambda param, trans: trans.inverse(param)
 
     return jax.tree_util.tree_map(map, params, bijectors)
 
@@ -203,7 +203,7 @@ def unconstrain(params: Dict, bijectors: Dict) -> Dict:
 # Priors
 ################################
 def log_density(
-    param: Float[Array, "D"], density: npd.Distribution
+    param: Float[Array, "D"], density: dx.Distribution
 ) -> Float[Array, "1"]:
     """Compute the log density of a parameter given a distribution.
 
@@ -285,7 +285,7 @@ def prior_checks(priors: Dict) -> Dict:
     if "latent" in priors.keys():
         latent_prior = priors["latent"]
         if latent_prior is not None:
-            if not isinstance(latent_prior, npd.Normal):
+            if not isinstance(latent_prior, dx.Normal):
                 warnings.warn(
                     f"A {type(latent_prior)} distribution prior has been placed on"
                     " the latent function. It is strongly advised that a"
@@ -293,9 +293,9 @@ def prior_checks(priors: Dict) -> Dict:
                 )
         else:
             warnings.warn("Placing unit Gaussian prior on latent function.")
-            priors["latent"] = npd.Normal(loc=0.0, scale=1.0)
+            priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
     else:
-        priors["latent"] = npd.Normal(loc=0.0, scale=1.0)
+        priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
 
     return priors
 
