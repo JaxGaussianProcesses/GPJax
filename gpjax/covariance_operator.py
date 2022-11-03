@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import abc
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple, Union
 
 import jax.numpy as jnp
 import jax.scipy as jsp
@@ -31,6 +31,70 @@ class CovarianceOperator:
     """
 
     name: Optional[str] = None
+
+    def __sub__(self, other: "CovarianceOperator") -> "CovarianceOperator":
+        """Subtract two covariance operators.
+
+        Args:
+            other (CovarianceOperator): Other covariance operator.
+
+        Returns:
+            CovarianceOperator: Difference of the two covariance operators.
+        """
+
+        return self + (other * -1)
+
+    def __rsub__(self, other: "CovarianceOperator") -> "CovarianceOperator":
+        """Reimplimentation of subtracting two covariance operators.
+
+        Args:
+            other (CovarianceOperator): Other covariance operator.
+
+        Returns:
+            CovarianceOperator: Difference of the two covariance operators.
+        """
+        return (self * -1) + other
+
+    def __add__(
+        self, other: Union["CovarianceOperator", Float[Array, "N N"]]
+    ) -> "CovarianceOperator":
+        """Add diagonal to another covariance operator.
+
+        Args:
+            other (Union["CovarianceOperator", Float[Array, "N N"]]): Other covariance operator. Dimension of both operators must match. If the other covariance operator is not a DiagonalCovarianceOperator, dense matrix addition is used.
+
+        Returns:
+            CovarianceOperator: Covariance operator plus the diagonal covariance operator.
+        """
+
+        # Check shapes:
+        if not (other.shape == self.shape):
+            raise ValueError(
+                f"Shape mismatch: {self.shape} and {other.shape} are not equal."
+            )
+
+        # If other is a JAX array, we convert it to a DenseCovarianceOperator
+        if isinstance(other, jnp.ndarray):
+            other = DenseCovarianceOperator(matrix=other)
+
+        # Matix addition:
+        if isinstance(other, DiagonalCovarianceOperator):
+            return self._add_diagonal(other)
+
+        if isinstance(self, DiagonalCovarianceOperator):
+            return other._add_diagonal(self)
+
+        elif isinstance(other, CovarianceOperator):
+
+            return DenseCovarianceOperator(matrix=self.to_dense() + other.to_dense())
+
+        else:
+            raise NotImplementedError
+
+    def __radd__(
+        self, other: Union["CovarianceOperator", Float[Array, "N N"]]
+    ) -> "CovarianceOperator":
+        return self.__add__(other)
 
     def __mul__(self, other: float) -> "CovarianceOperator":
         """Multiply covariance operator by scalar.
@@ -145,11 +209,25 @@ class DenseCovarianceOperator(CovarianceOperator, _DenseMatrix):
 
     name: Optional[str] = "Dense covariance operator"
 
-    def _add_diagonal(self, other: "CovarianceOperator") -> "CovarianceOperator":
-        """Add diagonal matrix to a linear operator, useful for computing, Kxx + Iσ².
+    def __mul__(self, other: float) -> "CovarianceOperator":
+        """Multiply covariance operator by scalar.
 
         Args:
-            other (CovarianceOperator): Other covariance operator.
+            other (CovarianceOperator): Scalar.
+
+        Returns:
+            CovarianceOperator: Covariance operator multiplied by a scalar.
+        """
+
+        return DenseCovarianceOperator(matrix=self.matrix * other)
+
+    def _add_diagonal(
+        self, other: "DiagonalCovarianceOperator"
+    ) -> "CovarianceOperator":
+        """Add diagonal to the covariance operator,  useful for computing, Kxx + Iσ².
+
+        Args:
+            other (DiagonalCovarianceOperator): Diagonal covariance operator to add to the covariance operator.
 
         Returns:
             CovarianceOperator: Sum of the two covariance operators.
@@ -220,30 +298,6 @@ class DiagonalCovarianceOperator(CovarianceOperator, _DiagonalMatrix):
 
     name: Optional[str] = "Diagonal covariance operator"
 
-    # TODO: move to base CovarianceOperator class, and broaden to accept more LinearOperator additions than just diagonal:
-    def __add__(self, other: "CovarianceOperator") -> "CovarianceOperator":
-        """Add diagonal to another covariance operator.
-
-        Args:
-            other (CovarianceOperator): Other covariance operator.
-
-        Returns:
-            CovarianceOperator: Covariance operator plus the diagonal covariance operator.
-        """
-
-        return other._add_diagonal(self)
-
-    def __radd__(self, other: "CovarianceOperator") -> "CovarianceOperator":
-        """Reimplimentation of adding diagonal to another covariance operator.
-
-        Args:
-            other (CovarianceOperator): Other covariance operator.
-
-        Returns:
-            CovarianceOperator: Covariance operator plus the diagonal covariance operator..
-        """
-        return other._add_diagonal(self)
-
     def __mul__(self, other: float) -> "CovarianceOperator":
         """Multiply covariance operator by scalar.
 
@@ -256,11 +310,13 @@ class DiagonalCovarianceOperator(CovarianceOperator, _DiagonalMatrix):
 
         return DiagonalCovarianceOperator(diag=self.diag * other)
 
-    def _add_diagonal(self, other: "CovarianceOperator") -> "CovarianceOperator":
+    def _add_diagonal(
+        self, other: "DiagonalCovarianceOperator"
+    ) -> "CovarianceOperator":
         """Add diagonal to the covariance operator,  useful for computing, Kxx + Iσ².
 
         Args:
-            other (CovarianceOperator): Covariance operator to add to the diagonal.
+            other (DiagonalCovarianceOperator): Diagonal covariance operator to add to the covariance operator.
 
         Returns:
             CovarianceOperator: Covariance operator with the diagonal added.

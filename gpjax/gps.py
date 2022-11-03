@@ -126,15 +126,10 @@ class Prior(AbstractGP):
             n_test = t.shape[0]
             μt = self.mean_function(t, params["mean_function"])
             Ktt = gram(self.kernel, t, params["kernel"])
-<<<<<<< HEAD
             Ktt += self.jitter * I(n_test)
             Lt = Ktt.triangular_lower()
 
             return dx.MultivariateNormalTri(jnp.atleast_1d(μt.squeeze()), Lt)
-=======
-            Ktt += I(n_test) * self.jitter
-            return npd.MultivariateNormal(jnp.atleast_1d(μt.squeeze()), Ktt)
->>>>>>> v0.5_update
 
         return predict_fn
 
@@ -248,11 +243,12 @@ class ConjugatePosterior(AbstractPosterior):
             mean = μt + jnp.matmul(Sigma_inv_Kxt.T, y - μx)
 
             # Ktt  -  Ktx (Kxx + Iσ²)⁻¹ Kxt
-            covariance = Ktt
+            covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
             covariance += I(n_test) * self.jitter
-            covariance = covariance.to_dense() - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
 
-            return npd.MultivariateNormal(jnp.atleast_1d(mean.squeeze()), covariance)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
+            )
 
         return predict
 

@@ -25,26 +25,54 @@ from gpjax.covariance_operator import (
     I,
 )
 
+_key = jr.PRNGKey(seed=42)
 
-def test_covariance_operator():
+
+def test_covariance_operator() -> None:
     with pytest.raises(TypeError):
         CovarianceOperator()
 
 
 @pytest.mark.parametrize("n", [1, 10, 100])
-def test_dense_covariance_operator(n):
+def test_adding_jax_arrays(n: int) -> None:
+    import jax.random as jr
 
-    key = jr.PRNGKey(seed=42)
-    A = jr.normal(key, (n, n))
-    dense = A.T @ A  # Dense random matrix is positive definite.
+    # Create PSD jax arrays matricies A and B:
+    key_a, key_b = jr.split(_key)
 
+    sqrt_A = jr.uniform(key_a, (n, n))
+    sqrt_B = jr.uniform(key_b, (n, n))
+
+    A = sqrt_A @ sqrt_A.T
+    B = sqrt_B @ sqrt_B.T
+
+    # Create corresponding covariance operators:
+    Dense_A = DenseCovarianceOperator(matrix=A)
+    Dense_B = DenseCovarianceOperator(matrix=B)
+
+    # Test addition:
+    assert jnp.all((Dense_A + B).to_dense() == A + B)
+    assert jnp.all((B + Dense_A).to_dense() == B + A)
+    assert jnp.all((Dense_A + Dense_B).to_dense() == A + B)
+
+    # Test subtraction:
+    assert jnp.all((Dense_A - Dense_B).to_dense() == A - B)
+    assert jnp.all((Dense_A - B).to_dense() == A - B)
+    assert jnp.all((B - Dense_A).to_dense() == B - A)
+
+
+@pytest.mark.parametrize("n", [1, 10, 100])
+def test_dense_covariance_operator(n: int) -> None:
+
+    sqrt = jr.normal(_key, (n, n))
+    dense = sqrt.T @ sqrt  # Dense random matrix is positive definite.
     cov = DenseCovarianceOperator(matrix=dense)
 
     # Test shape:
     assert cov.shape == (n, n)
 
     # Test solve:
-    b = jr.normal(key, (n, 1))
+    b = jr.normal(_key, (n, 1))
     x = cov.solve(b)
     assert jnp.allclose(b, dense @ x)
 
@@ -71,7 +99,7 @@ def test_dense_covariance_operator(n):
 
 @pytest.mark.parametrize("constant", [1.0, 3.5])
 @pytest.mark.parametrize("n", [1, 10, 100])
-def test_diagonal_covariance_operator(n, constant):
+def test_diagonal_covariance_operator(n: int, constant: float) -> None:
     diag = 1.0 + jnp.arange(n, dtype=jnp.float64)
     diag_cov = DiagonalCovarianceOperator(diag=diag)
 
@@ -110,7 +138,7 @@ def test_diagonal_covariance_operator(n, constant):
 
 
 @pytest.mark.parametrize("n", [1, 10, 100])
-def test_identity_covariance_operator(n):
+def test_identity_covariance_operator(n: int) -> None:
 
     # Create identity matrix of size nxn:
     Identity = I(n)

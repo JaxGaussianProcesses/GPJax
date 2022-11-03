@@ -197,15 +197,16 @@ class VariationalGaussian(AbstractVariationalGaussian):
             mean = μt + jnp.matmul(Kzz_inv_Kzt.T, mu - μz)
 
             # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
-            covariance = Ktt
-            covariance += I(n_test) * self.jitter
             covariance = (
-                Ktt.to_dense()
+                Ktt
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
             )
+            covariance += I(n_test) * self.jitter
 
-            return npd.MultivariateNormal(jnp.atleast_1d(mean.squeeze()), covariance)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
+            )
 
         return predict_fn
 
@@ -284,15 +285,16 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             mean = μt + jnp.matmul(Lz_inv_Kzt.T, mu)
 
             # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻ᵀ S Lz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
-            covariance = Ktt
-            covariance += I(n_test) * self.jitter
             covariance = (
-                covariance.to_dense()
+                Ktt
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Lz_invT_sqrt, Ktz_Lz_invT_sqrt.T)
             )
+            covariance += I(n_test) * self.jitter
 
-            return npd.MultivariateNormal(jnp.atleast_1d(mean.squeeze()), covariance)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
+            )
 
         return predict_fn
 
@@ -445,15 +447,16 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
             mean = μt + jnp.matmul(Kzz_inv_Kzt.T, mu - μz)
 
             # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = LLᵀ]
-            covariance = Ktt
-            covariance += I(n_test) * self.jitter
             covariance = (
-                covariance.to_dense()
+                Ktt
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Kzz_inv_L, Ktz_Kzz_inv_L.T)
             )
+            covariance += I(n_test) * self.jitter
 
-            return npd.MultivariateNormal(jnp.atleast_1d(mean.squeeze()), covariance)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
+            )
 
         return predict_fn
 
@@ -600,15 +603,16 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
             mean = μt + jnp.matmul(Kzz_inv_Kzt.T, mu - μz)
 
             # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
-            covariance = Ktt
-            covariance += I(n_test) * self.jitter
             covariance = (
-                covariance.to_dense()
+                Ktt
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
             )
+            covariance += I(n_test) * self.jitter
 
-            return npd.MultivariateNormal(jnp.atleast_1d(mean.squeeze()), covariance)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
+            )
 
         return predict_fn
 
@@ -711,15 +715,16 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             mean = μt + jnp.matmul(Kzt.T / noise, Kzz_inv_Kzx_diff)
 
             # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻¹ (I + AAᵀ)⁻¹ Lz⁻¹ Kzt
-            covariance = Ktt
-            covariance += I(n_test) * self.jitter
             covariance = (
-                covariance.to_dense()
+                Ktt
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(L_inv_Lz_inv_Kzt.T, L_inv_Lz_inv_Kzt)
             )
+            covariance += I(n_test) * self.jitter
 
-            return npd.MultivariateNormal(jnp.atleast_1d(mean.squeeze()), covariance)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
+            )
 
         return predict_fn
 
