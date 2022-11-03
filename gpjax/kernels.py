@@ -285,7 +285,7 @@ class ProductKernel(CombinationKernel):
 # Euclidean kernels
 ##########################################
 @dataclass(repr=False)
-class RBF(Kernel, DenseKernelComputation):
+class RBF(Kernel):
     """The Radial Basis Function (RBF) kernel."""
 
     name: Optional[str] = "Radial basis function kernel"
@@ -320,6 +320,9 @@ class RBF(Kernel, DenseKernelComputation):
             "variance": jnp.array([1.0]),
         }
 
+# @dataclass
+# class RBF(_RBF, DenseKernelComputation):
+#     pass
 
 @dataclass(repr=False)
 class Matern12(Kernel, DenseKernelComputation):

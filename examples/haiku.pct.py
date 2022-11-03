@@ -125,7 +125,7 @@ forward_linear1 = hk.without_apply_rng(forward_linear1)
 # Having characterised the feature extraction network, we move to define a Gaussian process parameterised by this deep kernel. We consider a third-order Matérn base kernel and assume a Gaussian likelihood. Parameters, trainability status and transformations are initialised in the usual manner.
 
 # %%
-base_kernel = gpx.Matern52()
+base_kernel = gpx.RBF()
 kernel = DeepKernelFunction(network=forward_linear1, base_kernel=base_kernel)
 kernel.initialise(x, key)
 prior = gpx.Prior(kernel=kernel)
@@ -142,9 +142,7 @@ posterior = prior * likelihood
 # %%
 parameter_state = gpx.initialise(posterior, key)
 
-negative_mll = posterior.marginal_log_likelihood(D, negative=True)
-from jax import grad
-grad(negative_mll)(parameter_state.params)
+negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
 
 # %%
 parameter_state = gpx.initialise(posterior, key)
