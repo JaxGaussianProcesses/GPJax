@@ -18,18 +18,16 @@ from copy import deepcopy
 from typing import Dict, Tuple
 from warnings import warn
 
-import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
+import numpyro.distributions as npd
 from chex import dataclass
 from jaxtyping import Array, Float
 
 from .config import get_defaults
 from .types import PRNGKeyType
 from .utils import merge_dictionaries
-
-Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 
 
 ################################
@@ -38,7 +36,6 @@ Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 @dataclass
 class ParameterState:
     """The state of the model. This includes the parameter set, which parameters are to be trained and bijectors that allow parameters to be constrained and unconstrained."""
-
 
     params: Dict
     trainables: Dict
@@ -161,7 +158,7 @@ def build_bijectors(params: Dict) -> Dict:
                         transform_type = transform_set[key]
                         bijector = transform_set[transform_type]
                     else:
-                        bijector = Identity
+                        bijector = npd.transforms.IdentityTransform()
                         warnings.warn(
                             f"Parameter {key} has no transform. Defaulting to identity transfom."
                         )
@@ -181,8 +178,7 @@ def constrain(params: Dict, bijectors: Dict) -> Dict:
     Returns:
         Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
     """
-
-    map = lambda param, trans: trans.forward(param)
+    map = lambda param, trans: trans.inv(param)
 
     return jax.tree_util.tree_map(map, params, bijectors)
 
@@ -198,7 +194,7 @@ def unconstrain(params: Dict, bijectors: Dict) -> Dict:
         Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
     """
 
-    map = lambda param, trans: trans.inverse(param)
+    map = lambda param, trans: trans.__call__(param)
 
     return jax.tree_util.tree_map(map, params, bijectors)
 
@@ -207,7 +203,7 @@ def unconstrain(params: Dict, bijectors: Dict) -> Dict:
 # Priors
 ################################
 def log_density(
-    param: Float[Array, "D"], density: dx.Distribution
+    param: Float[Array, "D"], density: npd.Distribution
 ) -> Float[Array, "1"]:
     """Compute the log density of a parameter given a distribution.
 
@@ -289,17 +285,17 @@ def prior_checks(priors: Dict) -> Dict:
     if "latent" in priors.keys():
         latent_prior = priors["latent"]
         if latent_prior is not None:
-            if latent_prior.name != "Normal":
+            if not isinstance(latent_prior, npd.Normal):
                 warnings.warn(
-                    f"A {latent_prior.name} distribution prior has been placed on"
+                    f"A {type(latent_prior)} distribution prior has been placed on"
                     " the latent function. It is strongly advised that a"
                     " unit Gaussian prior is used."
                 )
         else:
             warnings.warn("Placing unit Gaussian prior on latent function.")
-            priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
+            priors["latent"] = npd.Normal(loc=0.0, scale=1.0)
     else:
-        priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
+        priors["latent"] = npd.Normal(loc=0.0, scale=1.0)
 
     return priors
 

@@ -26,7 +26,7 @@ DEFAULT_NUM_GAUSS_HERMITE_POINTS = 20
 def gauss_hermite_quadrature(
     fun: Callable,
     mean: Float[Array, "N D"],
-    var: Float[Array, "N D"],
+    sd: Float[Array, "N D"],
     deg: Optional[int] = DEFAULT_NUM_GAUSS_HERMITE_POINTS,
     *args,
     **kwargs
@@ -36,15 +36,14 @@ def gauss_hermite_quadrature(
     Args:
         fun (Callable): The function for which quadrature should be applied to.
         mean (Float[Array, "N D"]): The mean of the Gaussian distribution that is used to shift quadrature points.
-        var (Float[Array, "N D"]): The variance of the Gaussian distribution that is used to scale quadrature points.
+        sd (Float[Array, "N D"]): The standard deviation of the Gaussian distribution that is used to scale quadrature points.
         deg (int, optional): The number of quadrature points that are to be used. Defaults to 20.
 
     Returns:
         Float[Array, "N"]: The evaluated integrals value.
     """
     gh_points, gh_weights = np.polynomial.hermite.hermgauss(deg)
-    stdev = jnp.sqrt(var)
-    X = mean + jnp.sqrt(2.0) * stdev * gh_points
+    X = mean + jnp.sqrt(2.0) * sd * gh_points
     W = gh_weights / jnp.sqrt(jnp.pi)
     return jnp.sum(fun(X, *args, **kwargs) * W, axis=1)
 

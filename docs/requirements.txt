@@ -6,6 +6,7 @@ jinja2
 nbsphinx>=0.8.0
 nb-black==1.0.7
 matplotlib==3.3.3
+tensorflow-probability>=0.16.0
 sphinx-copybutton
 networkx>=2.0.0
 pandoc
