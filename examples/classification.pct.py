@@ -19,10 +19,9 @@
 #
 # In this notebook we demonstrate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
 
+# %%
 import blackjax
 import distrax as dx
-
-# %%
 import jax
 import jax.numpy as jnp
 import jax.random as jr
