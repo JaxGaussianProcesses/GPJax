@@ -25,10 +25,13 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
+from jax.config import config
 
 import gpjax as gpx
 from gpjax.utils import dict_array_coercion
 
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 pp = PrettyPrinter(indent=4)
 key = jr.PRNGKey(123)
 

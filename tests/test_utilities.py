@@ -15,6 +15,7 @@
 
 import jax.numpy as jnp
 import pytest
+from jax.config import config
 
 from gpjax.utils import (
     concat_dictionaries,
@@ -22,6 +23,9 @@ from gpjax.utils import (
     merge_dictionaries,
     sort_dictionary,
 )
+
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 
 
 def test_concat_dict():

@@ -17,8 +17,12 @@
 import jax
 import jax.numpy as jnp
 import pytest
+from jax.config import config
 
 from gpjax.quadrature import gauss_hermite_quadrature
+
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 
 
 @pytest.mark.parametrize("jit", [True, False])

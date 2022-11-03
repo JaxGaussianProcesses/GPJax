@@ -22,6 +22,7 @@ import jax.random as jr
 import networkx as nx
 import numpy as np
 import pytest
+from jax.config import config
 from jaxtyping import Array, Float
 
 from gpjax.covariance_operator import (
@@ -47,6 +48,8 @@ from gpjax.kernels import (
 from gpjax.parameters import initialise
 from gpjax.types import PRNGKeyType
 
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 """Default values for tests"""
 _initialise_key = jr.PRNGKey(123)
 _jitter = 100

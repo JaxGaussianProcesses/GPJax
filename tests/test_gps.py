@@ -15,10 +15,11 @@
 
 import typing as tp
 
+import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
-import distrax as dx
 import pytest
+from jax.config import config
 
 from gpjax import Dataset, initialise
 from gpjax.gps import (
@@ -32,6 +33,8 @@ from gpjax.kernels import RBF, Matern12, Matern32, Matern52
 from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.parameters import ParameterState
 
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 NonConjugateLikelihoods = [Bernoulli]
 
 

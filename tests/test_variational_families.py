@@ -19,6 +19,7 @@ import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
+from jax.config import config
 
 import gpjax as gpx
 from gpjax.variational_families import (
@@ -29,6 +30,9 @@ from gpjax.variational_families import (
     VariationalGaussian,
     WhitenedVariationalGaussian,
 )
+
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 
 
 def test_abstract_variational_family():

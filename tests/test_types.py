@@ -15,8 +15,12 @@
 
 import jax.numpy as jnp
 import pytest
+from jax.config import config
 
 from gpjax.types import Dataset, NoneType, verify_dataset
+
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 
 
 def test_nonetype():

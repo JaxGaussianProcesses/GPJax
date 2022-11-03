@@ -29,11 +29,14 @@ import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
 from chex import dataclass
+from jax.config import config
 from scipy.signal import sawtooth
 
 import gpjax as gpx
-from gpjax.kernels import Kernel, DenseKernelComputation
+from gpjax.kernels import DenseKernelComputation, Kernel
 
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
 
 # %% [markdown]

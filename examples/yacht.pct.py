@@ -19,7 +19,10 @@ import jax.random as jr
 import matplotlib.pyplot as plt
 import numpy as np
 import optax as ox
+from jax.config import config
 
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 # %% [markdown]
 # # UCI Data Benchmarking
 #

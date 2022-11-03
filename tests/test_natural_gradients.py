@@ -19,6 +19,7 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
+from jax.config import config
 
 import gpjax as gpx
 from gpjax.abstractions import get_batch
@@ -31,6 +32,8 @@ from gpjax.natural_gradients import (
 )
 from gpjax.parameters import recursive_items
 
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
 
 

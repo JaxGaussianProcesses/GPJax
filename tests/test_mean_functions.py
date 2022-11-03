@@ -18,9 +18,13 @@ import typing as tp
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
+from jax.config import config
 
 from gpjax.mean_functions import Constant, Zero
 from gpjax.parameters import initialise
+
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 
 
 @pytest.mark.parametrize("meanf", [Zero, Constant])
