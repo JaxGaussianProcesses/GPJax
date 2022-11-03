@@ -360,7 +360,7 @@ class NonConjugatePosterior(AbstractPosterior):
             Lx = Kxx.triangular_lower()
 
             # Lx⁻¹ Kxt
-            Lx_inv_Kxt = jsp.linalg.solve_triangular(Lx, Ktx, lower=True)
+            Lx_inv_Kxt = jsp.linalg.solve_triangular(Lx, Ktx.T, lower=True)
 
             # μt + Ktx Lx⁻¹ latent
             mean = μt + jnp.matmul(Lx_inv_Kxt.T, params["latent"])
