@@ -16,9 +16,9 @@
 import abc
 from typing import Any, Callable, Dict, Optional
 
+import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
-import distrax as dx
 from chex import dataclass
 from jaxtyping import Array, Float
 
@@ -177,7 +177,9 @@ class VariationalGaussian(AbstractVariationalGaussian):
         Lz = Kzz.triangular_lower()
         μz = self.prior.mean_function(z, params["mean_function"])
 
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalFullCovariance:
+        def predict_fn(
+            test_inputs: Float[Array, "N D"]
+        ) -> dx.MultivariateNormalFullCovariance:
             t = test_inputs
             n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
@@ -268,7 +270,9 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         Kzz += I(m) * self.jitter
         Lz = Kzz.triangular_lower()
 
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalFullCovariance:
+        def predict_fn(
+            test_inputs: Float[Array, "N D"]
+        ) -> dx.MultivariateNormalFullCovariance:
             t = test_inputs
             n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
@@ -582,7 +586,9 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         Lz = Kzz.triangular_lower()
         μz = self.prior.mean_function(z, params["mean_function"])
 
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalFullCovariance:
+        def predict_fn(
+            test_inputs: Float[Array, "N D"]
+        ) -> dx.MultivariateNormalFullCovariance:
             t = test_inputs
             n_test = t.shape[0]
             Ktt = gram(self.prior.kernel, t, params["kernel"])
@@ -656,7 +662,10 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
         Returns:
             Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalFullCovariance:
+
+        def predict_fn(
+            test_inputs: Float[Array, "N D"]
+        ) -> dx.MultivariateNormalFullCovariance:
             # TODO - can we cache some of this?
             x, y = train_data.X, train_data.y
 
@@ -673,7 +682,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             Kzz = gram(self.prior.kernel, z, params["kernel"])
             Kzz += I(m) * self.jitter
 
-        # Lz Lzᵀ = Kzz
+            # Lz Lzᵀ = Kzz
             Lz = Kzz.triangular_lower()
 
             # Lz⁻¹ Kzx
@@ -692,7 +701,9 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             diff = y - μx
 
             # Lz⁻¹ Kzx (y - μx)
-            Lz_inv_Kzx_diff = jsp.linalg.cho_solve((L, True), jnp.matmul(Lz_inv_Kzx, diff))
+            Lz_inv_Kzx_diff = jsp.linalg.cho_solve(
+                (L, True), jnp.matmul(Lz_inv_Kzx, diff)
+            )
 
             # Kzz⁻¹ Kzx (y - μx)
             Kzz_inv_Kzx_diff = jsp.linalg.solve_triangular(

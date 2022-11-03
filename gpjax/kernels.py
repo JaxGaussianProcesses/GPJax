@@ -320,9 +320,11 @@ class RBF(Kernel):
             "variance": jnp.array([1.0]),
         }
 
+
 # @dataclass
 # class RBF(_RBF, DenseKernelComputation):
 #     pass
+
 
 @dataclass(repr=False)
 class Matern12(Kernel, DenseKernelComputation):

@@ -16,8 +16,6 @@
 import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
-import jax.numpy as jnp
-import distrax as dx
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from ml_collections import ConfigDict
 
@@ -29,7 +27,6 @@ Softplus = dx.Lambda(
     forward=lambda x: jnp.log(1 + jnp.exp(x)),
     inverse=lambda x: jnp.log(jnp.exp(x) - 1.0),
 )
-
 
 
 def get_defaults() -> ConfigDict:
@@ -48,7 +45,7 @@ def get_defaults() -> ConfigDict:
     config.transformations = transformations = ConfigDict()
     transformations.positive_transform = Softplus
     transformations.identity_transform = Identity
-    transformations.triangular_transform =FillTriangular
+    transformations.triangular_transform = FillTriangular
 
     # Default parameter transforms
     transformations.lengthscale = "positive_transform"

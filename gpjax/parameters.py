@@ -18,14 +18,14 @@ from copy import deepcopy
 from typing import Dict, Tuple
 from warnings import warn
 
+import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-import distrax as dx
 from chex import dataclass
 from jaxtyping import Array, Float
 
-from .config import get_defaults, Identity
+from .config import Identity, get_defaults
 from .types import PRNGKeyType
 from .utils import merge_dictionaries
 

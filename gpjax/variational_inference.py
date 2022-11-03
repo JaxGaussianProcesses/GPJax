@@ -123,9 +123,12 @@ class StochasticVI(AbstractVariationalInference):
         mean = predictive_dist.mean().val.reshape(-1, 1)
         variance = predictive_dist.variance().val.reshape(-1, 1)
 
-
         # log(p(y|f(x)))
-        log_prob = vmap(lambda f, y: self.likelihood.link_function(f, params["likelihood"]).log_prob(y))
+        log_prob = vmap(
+            lambda f, y: self.likelihood.link_function(
+                f, params["likelihood"]
+            ).log_prob(y)
+        )
 
         # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
         expectation = gauss_hermite_quadrature(log_prob, mean, variance, y=y)

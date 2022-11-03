@@ -16,9 +16,9 @@
 import abc
 from typing import Any, Callable, Dict, Optional
 
+import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
-import distrax as dx
 from chex import dataclass
 from jaxtyping import Array, Float
 
@@ -26,6 +26,7 @@ from .config import get_defaults
 from .types import PRNGKeyType
 
 DEFAULT_JITTER = get_defaults()["jitter"]
+
 
 @dataclass
 class AbstractLikelihood:

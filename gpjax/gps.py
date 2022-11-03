@@ -16,13 +16,12 @@
 from abc import abstractmethod
 from typing import Any, Callable, Dict, Optional
 
+import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
-import distrax as dx
 from chex import dataclass
 from jaxtyping import Array, Float
-import distrax as dx
 
 from .config import get_defaults
 from .covariance_operator import I
@@ -295,7 +294,9 @@ class ConjugatePosterior(AbstractPosterior):
 
             # p(y | x, θ), where θ are the model hyperparameters:
 
-            marginal_likelihood = dx.MultivariateNormalTri(jnp.atleast_1d(μx.squeeze()), L)
+            marginal_likelihood = dx.MultivariateNormalTri(
+                jnp.atleast_1d(μx.squeeze()), L
+            )
 
             # log p(θ)
             log_prior_density = evaluate_priors(params, priors)
@@ -369,7 +370,9 @@ class NonConjugatePosterior(AbstractPosterior):
             covariance += I(n_test) * self.jitter
             covariance = covariance.to_dense() - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
 
-            return dx.MultivariateNormalFullCovariance(jnp.atleast_1d(mean.squeeze()), covariance)
+            return dx.MultivariateNormalFullCovariance(
+                jnp.atleast_1d(mean.squeeze()), covariance
+            )
 
         return predict_fn
 
@@ -416,14 +419,18 @@ class NonConjugatePosterior(AbstractPosterior):
         return mll
 
 
-def construct_posterior(prior: Prior, likelihood: AbstractLikelihood) -> AbstractPosterior:
+def construct_posterior(
+    prior: Prior, likelihood: AbstractLikelihood
+) -> AbstractPosterior:
     if isinstance(likelihood, Conjugate):
         PosteriorGP = ConjugatePosterior
 
     elif isinstance(likelihood, NonConjugate):
         PosteriorGP = NonConjugatePosterior
     else:
-        raise NotImplementedError(f"No posterior implemented for {likelihood.name} likelihood")
+        raise NotImplementedError(
+            f"No posterior implemented for {likelihood.name} likelihood"
+        )
     return PosteriorGP(prior=prior, likelihood=likelihood)
 
 
