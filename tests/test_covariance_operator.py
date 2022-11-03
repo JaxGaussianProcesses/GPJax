@@ -17,7 +17,10 @@
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
+from jax.config import config
 
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 from gpjax.covariance_operator import (
     CovarianceOperator,
     DenseCovarianceOperator,

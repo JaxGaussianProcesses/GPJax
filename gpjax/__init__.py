@@ -13,11 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-from jax.config import config
-
-# Enable Float64 for more stable matrix inversions.
-config.update("jax_enable_x64", True)
-
 from .abstractions import fit, fit_batches, fit_natgrads
 from .gps import Prior, construct_posterior
 from .kernels import (

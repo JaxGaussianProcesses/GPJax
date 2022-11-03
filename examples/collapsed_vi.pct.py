@@ -25,9 +25,12 @@ import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
 from jax import jit
+from jax.config import config
 
 import gpjax as gpx
 
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
 
 # %% [markdown]
@@ -116,7 +119,7 @@ learned_params, training_history = inference_state.unpack()
 latent_dist = q.predict(D, learned_params)(xtest)
 predictive_dist = likelihood(latent_dist, learned_params)
 
-samples = latent_dist.sample(seed=key, sample_shape=(20, ))
+samples = latent_dist.sample(seed=key, sample_shape=(20,))
 
 predictive_mean = predictive_dist.mean()
 predictive_std = predictive_dist.stddev()

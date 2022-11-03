@@ -13,9 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-from ml_collections import ConfigDict
-from gpjax.config import add_parameter, get_defaults, Identity
 import distrax as dx
+from jax.config import config
+from ml_collections import ConfigDict
+
+from gpjax.config import Identity, add_parameter, get_defaults
+
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 
 
 def test_add_parameter():

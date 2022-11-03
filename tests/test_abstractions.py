@@ -17,11 +17,15 @@ import jax.numpy as jnp
 import jax.random as jr
 import optax
 import pytest
+from jax.config import config
 
 import gpjax as gpx
 from gpjax import RBF, Dataset, Gaussian, Prior, initialise
 from gpjax.abstractions import InferenceState, fit, fit_batches, fit_natgrads, get_batch
 from gpjax.parameters import ParameterState, build_bijectors
+
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 
 
 @pytest.mark.parametrize("n_iters", [1, 5])

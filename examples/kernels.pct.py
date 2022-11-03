@@ -26,11 +26,14 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 from jax import jit
+from jax.config import config
 from jaxtyping import Array, Float
 from optax import adam
 
 import gpjax as gpx
 
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
 
 # %% [markdown]

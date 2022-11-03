@@ -15,11 +15,12 @@
 
 import typing as tp
 
-import jax.numpy as jnp
-import numpy as np
-import jax.random as jr
-import pytest
 import distrax as dx
+import jax.numpy as jnp
+import jax.random as jr
+import numpy as np
+import pytest
+from jax.config import config
 
 from gpjax.likelihoods import (
     AbstractLikelihood,
@@ -30,6 +31,8 @@ from gpjax.likelihoods import (
 )
 from gpjax.parameters import initialise
 
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 true_initialisation = {
     "Gaussian": ["obs_noise"],
     "Bernoulli": [],

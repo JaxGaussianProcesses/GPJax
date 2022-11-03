@@ -28,10 +28,13 @@ import jax.random as jr
 import jax.scipy as jsp
 import matplotlib.pyplot as plt
 import optax as ox
+from jax.config import config
 from jaxtyping import Array, Float
 
 import gpjax as gpx
 
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 I = jnp.eye
 key = jr.PRNGKey(123)
 

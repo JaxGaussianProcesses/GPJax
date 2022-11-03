@@ -15,10 +15,11 @@
 
 import typing as tp
 
-import jax.numpy as jnp
 import distrax as dx
+import jax.numpy as jnp
 import jax.random as jr
 import pytest
+from jax.config import config
 
 from gpjax.gps import Prior
 from gpjax.kernels import RBF
@@ -38,6 +39,8 @@ from gpjax.parameters import (
     unconstrain,
 )
 
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 
 #########################
 # Test base functionality
