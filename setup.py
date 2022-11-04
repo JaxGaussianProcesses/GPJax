@@ -4,23 +4,15 @@ import re
 
 from setuptools import find_packages, setup
 
-
-def parse_requirements_file(filename):
-    with open(filename, encoding="utf-8") as fid:
-        requires = [line.strip() for line in fid.readlines() if line]
-    return requires
+_CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-REQUIRES = [
-    "jax>=0.1.67",
-    "jaxlib>=0.1.47",
-    "optax",
-    "chex",
-    "distrax",
-    "tqdm>=4.0.0",
-    "ml-collections==0.1.0",
-    "jaxtyping>=0.0.2",
-]
+def _parse_requirements(path):
+
+    with open(os.path.join(_CURRENT_DIR, path)) as f:
+        return [
+            line.rstrip() for line in f if not (line.isspace() or line.startswith("#"))
+        ]
 
 
 # Optional Packages
@@ -71,7 +63,12 @@ setup(
         "Documentation": "https://gpjax.readthedocs.io/en/latest/",
         "Source": "https://github.com/thomaspinder/GPJax",
     },
-    install_requires=REQUIRES,  # parse_requirements_file("requirements.txt"),
+    install_requires=_parse_requirements(
+        os.path.join(_CURRENT_DIR, "requirements", "requirements.txt")
+    ),
+    tests_require=_parse_requirements(
+        os.path.join(_CURRENT_DIR, "requirements", "requirements_tests.txt")
+    ),
     extras_require=EXTRAS,
     keywords=["gaussian-processes jax machine-learning bayesian"],
 )
