@@ -212,8 +212,8 @@ class Polar(gpx.kernels.Kernel, gpx.kernels.DenseKernelComputation):
 # The constraint on $\tau$ makes optimisation challenging with gradient descent. It would be much easier if we could instead parameterise $\tau$ to be on the real line. Fortunately, this can be taken care of with GPJax's `add parameter` function, only requiring us to define the parameter's name and matching bijection (either a Distrax of TensorFlow probability bijector). Under the hood, calling this function updates a configuration object to register this parameter and its corresponding transform.
 #
 # To define a bijector here we'll make use of the `Lambda` operator given in Distrax. This lets us convert any regular Jax function into a bijection. Given that we require $\tau$ to be strictly greater than $4.$, we'll apply a [softplus transformation](https://jax.readthedocs.io/en/latest/_autosummary/jax.nn.softplus.html) where the lower bound is shifted by $4$.
-
-from jax.nn import softplus
+#
+# from jax.nn import softplus
 
 # %%
 from gpjax.config import Softplus, add_parameter
