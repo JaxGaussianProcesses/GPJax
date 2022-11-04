@@ -64,10 +64,10 @@ setup(
         "Source": "https://github.com/thomaspinder/GPJax",
     },
     install_requires=_parse_requirements(
-        os.path.join(_CURRENT_DIR, "requirements", "requirements.txt")
+        os.path.join("requirements", "requirements.txt")
     ),
     tests_require=_parse_requirements(
-        os.path.join(_CURRENT_DIR, "requirements", "requirements_tests.txt")
+        os.path.join("requirements", "requirements_tests.txt")
     ),
     extras_require=EXTRAS,
     keywords=["gaussian-processes jax machine-learning bayesian"],
