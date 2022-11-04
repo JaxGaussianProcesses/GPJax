@@ -7,9 +7,10 @@ from setuptools import find_packages, setup
 _CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-def _parse_requirements(requirements_txt_path):
-    with open(requirements_txt_path) as fp:
-        return fp.read().splitlines()
+def parse_requirements_file(filename):
+    with open(filename, encoding="utf-8") as fid:
+        requires = [line.strip() for line in fid.readlines() if line]
+    return requires
 
 
 # Get version number (function from GPyTorch)
@@ -47,8 +48,8 @@ setup(
         "Documentation": "https://gpjax.readthedocs.io/en/latest/",
         "Source": "https://github.com/thomaspinder/GPJax",
     },
-    install_requires=_parse_requirements("requirements/requirements.txt"),
-    tests_require=_parse_requirements("requirements/requirements_tests.txt"),
+    install_requires=parse_requirements_file("requirements/requirements.txt"),
+    tests_require=parse_requirements_file("requirements/requirements_tests.txt"),
     extras_require=EXTRAS,
     keywords=["gaussian-processes jax machine-learning bayesian"],
 )
