@@ -12,5 +12,4 @@ build:
 
 python:
   install:
-    - requirements: requirements/requirements_docs.txt
-    - requirements: requirements/requirements.txt
+    - requirements: docs/requirements.txt
