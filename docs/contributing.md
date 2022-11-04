@@ -13,7 +13,6 @@ many ways to contibute, including:
 - Fixing outstanding [issues](https://github.com/thomaspinder/GPJax/issues)
   (bugs). 
 - Extending or improving our [codebase](https://github.com/thomaspinder/GPJax).
-- Submitting issues related to bugs or desired enhancements.
 
 
 # Code of conduct
@@ -44,7 +43,7 @@ install our `pre-commit hooks`, `commit` and `push` your code.
 you through every detail!
 
 :::{attention} Before opening a pull request we recommend you check our [pull
-request checklist](#pull-request-checklist). :::
+request checklist](#pull-request-checklist). 
 
 
 ## Step-by-step guide:
@@ -69,7 +68,7 @@ request checklist](#pull-request-checklist). :::
     ```
 
     :::{attention} Always use a `feature` branch. It's good practice to avoid
-    work on the ``main`` branch of any repository. :::
+    work on the ``main`` branch of any repository. 
 
 4.  Project requirements are in ``requirements.txt``. We suggest using a
     [virtual environment](https://docs.python-guide.org/dev/virtualenvs/) for
@@ -87,7 +86,7 @@ request checklist](#pull-request-checklist). :::
     ```
     :::{warning} Please ensure you have done this before commiting any files. If
     successful, this will print the following output `pre-commit installed at
-    .git/hooks/pre-commit`. :::
+    .git/hooks/pre-commit`. 
 
 6.  Add changed files using `git add` and then `git commit` files to record your
     changes locally:

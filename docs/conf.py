@@ -104,11 +104,11 @@ bibtex_bibfiles = ["refs.bib"]
 bibtex_style = "unsrt"
 bibtex_reference_style = "author_year"
 nb_execution_mode = "auto"
-nbsphinx_allow_errors = True
+nbsphinx_allow_errors = False
 nbsphinx_custom_formats = {
     ".pct.py": ["jupytext.reads", {"fmt": "py:percent"}],
 }
-jupyter_execute_notebooks = "cache"
+nbsphinx_execute_arguments = ["--InlineBackend.figure_formats={'svg', 'pdf'}"]
 
 # Latex commands
 # mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -204,7 +204,6 @@ html_theme_options = {
 #         "source_directory": "docs/",
 #     },
 # }
-
 
 
 # Add any paths that contain custom static files (such as style sheets) here,

@@ -99,18 +99,19 @@ array_to_dict(parray) == params
 
 # %%
 import tensorflow_probability.substrates.jax as tfp
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
 tfd = tfp.distributions
 
 priors = gpx.parameters.copy_dict_structure(params)
-priors["kernel"]["lengthscale"] = tfd.Gamma(
-    concentration=jnp.array(1.0), rate=jnp.array(1.0)
+priors["kernel"]["lengthscale"] = tfd.TransformedDistribution(
+    tfd.Gamma(concentration=jnp.array(1.0), rate=jnp.array(1.0)), tfb.Softplus()
 )
-priors["kernel"]["variance"] = tfd.Gamma(
-    concentration=jnp.array(1.0), rate=jnp.array(1.0)
+priors["kernel"]["variance"] = tfd.TransformedDistribution(
+    tfd.Gamma(concentration=jnp.array(1.0), rate=jnp.array(1.0)), tfb.Softplus()
 )
-priors["likelihood"]["obs_noise"] = tfd.Gamma(
-    concentration=jnp.array(1.0), rate=jnp.array(1.0)
+priors["likelihood"]["obs_noise"] = tfd.TransformedDistribution(
+    tfd.Gamma(concentration=jnp.array(1.0), rate=jnp.array(1.0)), tfb.Softplus()
 )
 
 # %% [markdown]
