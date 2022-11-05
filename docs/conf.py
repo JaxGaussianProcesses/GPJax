@@ -77,6 +77,7 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinxext.opengraph",
     "myst_parser",
+    "sphinx_tabs.tabs",
 ]
 
 # MyST Config

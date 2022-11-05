@@ -15,6 +15,10 @@ Github](https://github.com/thomaspinder/GPJax).
 Defining a Gaussian process posterior is simple as typing the maths we
 would write on paper.
 
+.. tabs::
+
+   .. tab:: Apples
+
 ```python
 import gpjax as gpx
 
@@ -26,7 +30,7 @@ likelihood = gpx.likelihoods.Gaussian(num_datapoints = 123)
 posterior = prior * likelihood
 ```
 
-For comparison, the corresponding model could be written as
+   .. tab:: Pears
 
 $$
 \begin{align}
@@ -36,6 +40,10 @@ p(y\,|\, f(\cdot)) & = \mathcal{N}(y\,|\, f(\cdot), \sigma_n^2) \\
 p(f(\cdot) \,|\, y) & \propto p(f(\cdot))p(y\,|\, f(\cdot))\,.
 \end{align}
 $$
+
+
+For comparison, the corresponding model could be written as
+
 
 :::{seealso}
 To learn more, checkout the [regression
