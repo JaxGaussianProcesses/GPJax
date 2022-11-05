@@ -255,7 +255,7 @@ Utilities
 
 .. autofunction:: sort_dictionary
 
-.. autofunction:: as_constant
+.. autofunction:: merge_dictionaries
 
 .. autofunction:: dict_array_coercion
 
