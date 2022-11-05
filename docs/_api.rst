@@ -202,6 +202,9 @@ Gaussian Families
 Natural Gradients
 *********************************
 
+.. automodule:: gpjax.natural_gradients
+.. currentmodule:: gpjax.natural_gradients
+
 .. autofunction:: natural_gradients
 
 .. autofunction:: natural_to_expectation
