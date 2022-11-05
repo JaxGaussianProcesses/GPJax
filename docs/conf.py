@@ -77,6 +77,7 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinxext.opengraph",
     "myst_parser",
+    "sphinx_tabs.tabs",
 ]
 
 # MyST Config
@@ -109,10 +110,18 @@ nbsphinx_custom_formats = {
     ".pct.py": ["jupytext.reads", {"fmt": "py:percent"}],
 }
 nbsphinx_execute_arguments = ["--InlineBackend.figure_formats={'svg', 'pdf'}"]
+# If window is narrower than this, input/output prompts are on separate lines:
+nbsphinx_responsive_width = "700px"
 
 # Latex commands
 # mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
-mathjax3_config = {"tex": {"macros": {}}}
+mathjax3_config = {
+    "tex": {
+        "equationNumbers": {"autoNumber": "AMS", "useLabelIds": True},
+        "macros": {},
+    },
+}
+
 
 with open("latex_symbols.tex", "r") as f:
     for line in f:

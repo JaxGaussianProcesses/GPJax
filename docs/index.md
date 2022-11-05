@@ -12,10 +12,11 @@ Github](https://github.com/thomaspinder/GPJax).
 
 ## \'Hello World\' example
 
-Defining a Gaussian process posterior is simple as typing the maths we
-would write on paper.
+Defining a Gaussian process posterior is as simple as typing the maths we
+would write on paper. To see this, consider the following example.
 
-```python
+````{tabs}
+```{code-tab} py
 import gpjax as gpx
 
 kernel = gpx.kernels.RBF()
@@ -24,10 +25,9 @@ prior = gpx.gps.Prior(kernel = kernel)
 likelihood = gpx.likelihoods.Gaussian(num_datapoints = 123)
 
 posterior = prior * likelihood
+
 ```
-
-For comparison, the corresponding model could be written as
-
+```{tab} Maths
 $$
 \begin{align}
 k(\cdot, \cdot') & = \sigma^2\exp\left(-\frac{\lVert \cdot- \cdot'\rVert_2^2}{2\ell^2}\right)\\
@@ -36,6 +36,12 @@ p(y\,|\, f(\cdot)) & = \mathcal{N}(y\,|\, f(\cdot), \sigma_n^2) \\
 p(f(\cdot) \,|\, y) & \propto p(f(\cdot))p(y\,|\, f(\cdot))\,.
 \end{align}
 $$
+```
+````
+
+:::{note}
+If you're new to Gaussian processes and want a gentle introduction, we have put together an introduction to GPs notebook that starts from Bayes' theorem and univariate Gaussian random variables. The notebook is linked [here](https://gpjax.readthedocs.io/en/latest/examples/intro_to_gps.html).
+:::
 
 :::{seealso}
 To learn more, checkout the [regression
