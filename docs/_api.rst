@@ -47,12 +47,6 @@ Kernels
 Kernel Functions
 *********************************
 
-.. autofunction:: gram
-
-.. autofunction:: cross_covariance
-
-.. autofunction:: diagonal
-
 .. autofunction:: euclidean_distance
 
 .. autofunction:: squared_distance
@@ -66,6 +60,8 @@ Abstract Kernels
 .. autoclass:: CombinationKernel
    :members:
 
+.. autoclass:: AbstractKernelComputation
+   :members:
 
 Stationary Kernels
 *********************************
@@ -104,6 +100,16 @@ Combination Kernels
 
 .. autoclass:: ProductKernel
    :members:
+
+Kernel Computations
+*********************************
+
+.. autoclass:: DenseKernelComputation
+   :members:
+
+.. autoclass:: DiagonalKernelComputation
+   :members:
+
 
 Likelihoods
 #################################
@@ -193,6 +199,22 @@ Gaussian Families
 .. autoclass:: VariationalGaussian
    :members:
 
+Natural Gradients
+*********************************
+
+.. autofunction:: natural_gradients
+
+.. autofunction:: natural_to_expectation
+
+.. autofunction:: _expectation_elbo
+
+.. autofunction:: _rename_expectation_to_natural
+
+.. autofunction:: _rename_natural_to_expectation
+
+.. autofunction:: _get_moment_trainables
+
+.. autofunction:: _get_hyperparameter_trainables
 
 Datasets
 #################################
