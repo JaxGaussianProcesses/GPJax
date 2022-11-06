@@ -307,11 +307,11 @@ class RBF(AbstractKernel, DenseKernelComputation):
 
         Args:
             x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
+            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
             params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The value of :math:`k(x, y)`.
         """
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
@@ -385,11 +385,11 @@ class Matern32(AbstractKernel, DenseKernelComputation):
 
         Args:
             x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
+            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
             params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The value of :math:`k(x, y)`.
         """
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
@@ -427,11 +427,11 @@ class Matern52(AbstractKernel, DenseKernelComputation):
 
         Args:
             x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
+            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
             params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The value of :math:`k(x, y)`.
         """
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
@@ -475,7 +475,7 @@ class Polynomial(AbstractKernel, DenseKernelComputation):
             params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The value of :math:`k(x, y)`.
         """
         x = self.slice_input(x).squeeze()
         y = self.slice_input(y).squeeze()
@@ -504,11 +504,11 @@ class White(AbstractKernel, DiagonalKernelComputation):
 
         Args:
             x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
+            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
             params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The value of :math:`k(x, y)`.
         """
         K = jnp.all(jnp.equal(x, y)) * params["variance"]
         return K.squeeze()
@@ -549,8 +549,8 @@ class GraphKernel(AbstractKernel, _EigenKernel, DenseKernelComputation):
         """Evaluate the graph kernel on a pair of vertices :math:`v_i, v_j`.
 
         Args:
-            x (Float[Array, "1 D"]): Index of the ith vertex
-            y (Float[Array, "1 D"]): Index of the jth vertex
+            x (Float[Array, "1 D"]): Index of the ith vertex.
+            y (Float[Array, "1 D"]): Index of the jth vertex.
             params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:

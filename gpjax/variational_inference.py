@@ -26,7 +26,7 @@ from .covariance_operator import I
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
-from .types import Dataset
+from .types import Dataset, PRNGKeyType
 from .utils import concat_dictionaries
 from .variational_families import (
     AbstractVariationalFamily,
@@ -45,7 +45,7 @@ class AbstractVariationalInference:
         self.prior = self.posterior.prior
         self.likelihood = self.posterior.likelihood
 
-    def _initialise_params(self, key: jnp.DeviceArray) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """Construct the parameter set used within the variational scheme adopted."""
         hyperparams = concat_dictionaries(
             {"likelihood": self.posterior.likelihood._initialise_params(key)},
@@ -90,13 +90,15 @@ class StochasticVI(AbstractVariationalInference):
         Returns:
             Callable[[Dict, Dataset], Array]: A callable function that accepts a current parameter estimate and batch of data for which gradients should be computed.
         """
+
+        # Constant for whether or not to negate the elbo for optimisation purposes
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
 
         def elbo_fn(params: Dict, batch: Dataset) -> Float[Array, "1"]:
             # KL[q(f(·)) || p(f(·))]
             kl = self.variational_family.prior_kl(params)
 
-            # ∫[log(p(y|f(x))) q(f(x))] df(x)
+            # ∫[log(p(y|f(·))) q(f(·))] df(·)
             var_exp = self.variational_expectation(params, batch)
 
             # For batch size b, we compute  n/b * Σᵢ[ ∫log(p(y|f(xᵢ))) q(f(xᵢ)) df(xᵢ)] - KL[q(f(·)) || p(f(·))]
@@ -116,19 +118,21 @@ class StochasticVI(AbstractVariationalInference):
         Returns:
             Array: The expectation of the model's log-likelihood under our variational distribution.
         """
+
+        # Unpack training batch
         x, y = batch.X, batch.y
 
-        # q(f(x))
-        predictive_dist = vmap(self.variational_family.predict(params))(x[:, None])
-        mean = predictive_dist.mean().val.reshape(-1, 1)
-        variance = predictive_dist.variance().val.reshape(-1, 1)
+        # Variational distribution q(f(·)) = N(f(·); μ(·), Σ(·, ·))
+        q = self.variational_family
+
+        # Compute variational mean, μ(x), and variance, √diag(Σ(x, x)), at training inputs, x
+        qx = vmap(q(params))(x[:, None])
+        mean = qx.mean().val.reshape(-1, 1)
+        variance = qx.variance().val.reshape(-1, 1)
 
         # log(p(y|f(x)))
-        log_prob = vmap(
-            lambda f, y: self.likelihood.link_function(
-                f, params["likelihood"]
-            ).log_prob(y)
-        )
+        link_function = self.likelihood.link_function
+        log_prob = vmap(lambda f, y: link_function(f, params["likelihood"]).log_prob(y))
 
         # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
         expectation = gauss_hermite_quadrature(log_prob, mean, variance, y=y)
@@ -164,26 +168,31 @@ class CollapsedVI(AbstractVariationalInference):
         Returns:
             Callable[[Dict, Dataset], Array]: A callable function that accepts a current parameter estimate for which gradients should be computed.
         """
-        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
 
+        # Unpack training data
         x, y, n = train_data.X, train_data.y, train_data.n
 
+        # Unpack mean function and kernel
+        mean_function = self.prior.mean_function
+        kernel = self.prior.kernel 
+
+        # Unpack kernel computation
+        gram, cross_covariance = kernel.gram, kernel.cross_covariance
+
         m = self.num_inducing
-        gram, cross_covariance = (
-            self.prior.kernel.gram,
-            self.prior.kernel.cross_covariance,
-        )
+        jitter = self.variational_family.jitter
+
+        # Constant for whether or not to negate the elbo for optimisation purposes
+        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
 
         def elbo_fn(params: Dict) -> Float[Array, "1"]:
             noise = params["likelihood"]["obs_noise"]
             z = params["variational_family"]["inducing_inputs"]
-            Kzz = gram(self.prior.kernel, z, params["kernel"])
-            Kzz += I(m) * self.variational_family.jitter
-            Kzx = cross_covariance(self.prior.kernel, z, x, params["kernel"])
-            Kxx_diag = vmap(self.prior.kernel, in_axes=(0, 0, None))(
-                x, x, params["kernel"]
-            )
-            μx = self.prior.mean_function(x, params["mean_function"])
+            Kzz = gram(kernel, z, params["kernel"])
+            Kzz += I(m) * jitter
+            Kzx = cross_covariance(kernel, z, x, params["kernel"])
+            Kxx_diag = vmap(kernel, in_axes=(0, 0, None))(x, x, params["kernel"])
+            μx = mean_function(x, params["mean_function"])
 
             Lz = Kzz.triangular_lower()
 

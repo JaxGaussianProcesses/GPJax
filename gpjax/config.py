@@ -21,7 +21,7 @@ from ml_collections import ConfigDict
 
 __config = None
 
-FillTriangular = dx.Chain([tfb.FillTriangular()])  # TODO: Dan to chain methods.
+FillTriangular = dx.Chain([tfb.FillTriangular(), ])  # TODO: Dan to chain methods.
 Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 Softplus = dx.Lambda(
     forward=lambda x: jnp.log(1 + jnp.exp(x)),
@@ -75,7 +75,7 @@ def add_parameter(param_name: str, bijection: dx.Bijector) -> None:
 
     Args:
         param_name (str): The name of the parameter that is to be added.
-        bijection (tfb.Bijector): The bijection that should be used to unconstrain the parameter's value.
+        bijection (dx.Bijector): The bijection that should be used to unconstrain the parameter's value.
     """
     lookup_name = f"{param_name}_transform"
     get_defaults()
