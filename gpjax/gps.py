@@ -522,9 +522,23 @@ class ConjugatePosterior(AbstractPosterior):
 
 @dataclass
 class NonConjugatePosterior(AbstractPosterior):
-    """Generic Gaussian process posterior object for models where the likelihood is non-Gaussian."""
+    """
+    A Gaussian process posterior object for models where the likelihood is
+    non-Gaussian. Unlike the ``ConjugatePosterior`` object, the
+    ``NonConjugatePosterior`` object does not provide an exact marginal
+    log-likelihood function. Instead, the ``NonConjugatePosterior`` object
+    represents the posterior distributions as a function of the model's
+    hyperparameters and the latent function. Markov chain Monte Carlo,
+    variational inference, or Laplace approximations can then be used to sample
+    from, or optimise an approximation to, the posterior distribution.
 
-    prior: Prior
+    Attributes:
+        prior (AbstractPrior): The Gaussian process prior distribution.
+        likelihood (AbstractLikelihood): The likelihood function that represents the data.
+        name (str): The name of the posterior object. Defaults to "Non-conjugate posterior".
+    """
+
+    prior: AbstractPrior
     likelihood: AbstractLikelihood
     name: Optional[str] = "Non-conjugate posterior"
 
@@ -540,7 +554,13 @@ class NonConjugatePosterior(AbstractPosterior):
     def predict(
         self, train_data: Dataset, params: Dict
     ) -> Callable[[Float[Array, "N D"]], dx.Distribution]:
-        """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density. Note, to gain predictions on the scale of the original data, the returned distribution will need to be transformed through the likelihood function's inverse link function.
+        """
+        Conditional on a set of training data, compute the GP's posterior
+        predictive distribution for a given set of parameters. The returned
+        function can be evaluated at a set of test inputs to compute the
+        corresponding predictive density. Note, to gain predictions on the scale
+        of the original data, the returned distribution will need to be
+        transformed through the likelihood function's inverse link function.
 
         Args:
             train_data (Dataset): A `gpx.Dataset` object that contains the input and output data used for training dataset.
@@ -592,6 +612,8 @@ class NonConjugatePosterior(AbstractPosterior):
         negative: bool = False,
     ) -> Callable[[Dict], Float[Array, "1"]]:
         """Compute the marginal log-likelihood function of the Gaussian process. The returned function can then be used for gradient based optimisation of the model's parameters or for model comparison. The implementation given here is general and will work for any likelihood support by GPJax.
+
+        Unlike the marginal_log_likelihood function of the ConjugatePosterior object, the marginal_log_likelihood function of the NonConjugatePosterior object does not provide an exact marginal log-likelihood function. Instead, the NonConjugatePosterior object represents the posterior distributions as a function of the model's hyperparameters and the latent function. Markov chain Monte Carlo, variational inference, or Laplace approximations can then be used to sample from, or optimise an approximation to, the posterior distribution.
 
         Args:
             train_data (Dataset): The training dataset used to compute the marginal log-likelihood.
