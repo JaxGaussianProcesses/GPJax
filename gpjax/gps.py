@@ -203,15 +203,24 @@ class Prior(AbstractPrior):
             should be evaluated at. The mean function's value at these points is
             then returned.
         """
-        gram = self.kernel.gram
         jitter = get_defaults()["jitter"]
 
+        # Unpack mean function and kernel
+        mean_function = self.mean_function
+        kernel = self.kernel
+
+        # Unpack kernel computation
+        gram = kernel.gram
+
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
-            t = test_inputs
-            n_test = t.shape[0]
-            μt = self.mean_function(t, params["mean_function"])
-            Ktt = gram(self.kernel, t, params["kernel"])
-            Ktt += jitter * I(n_test)
+
+            # Unpack test inputs
+            t = test_inputs 
+            n_test = test_inputs.shape[0]
+
+            μt = mean_function(t, params["mean_function"])
+            Ktt = gram(kernel, t, params["kernel"])
+            Ktt += I(n_test) * jitter
             Lt = Ktt.triangular_lower()
 
             return dx.MultivariateNormalTri(jnp.atleast_1d(μt.squeeze()), Lt)
@@ -375,29 +384,37 @@ class ConjugatePosterior(AbstractPosterior):
         """
         jitter = get_defaults()["jitter"]
 
+        # Unpack training data
         x, y, n = train_data.X, train_data.y, train_data.n
-        gram, cross_covariance = (
-            self.prior.kernel.gram,
-            self.prior.kernel.cross_covariance,
-        )
+
+        # Unpack mean function and kernel
+        mean_function = self.prior.mean_function
+        kernel = self.prior.kernel
+
+        # Unpack kernel computation
+        gram = kernel.gram
+        cross_covariance = kernel.cross_covariance
 
         # Observation noise σ²
         obs_noise = params["likelihood"]["obs_noise"]
-        μx = self.prior.mean_function(x, params["mean_function"])
+        μx = mean_function(x, params["mean_function"])
 
-        # Precompute covariance matrices
-        Kxx = gram(self.prior.kernel, x, params["kernel"])
+        # Precompute Gram matrix, Kxx, at training inputs, x
+        Kxx = gram(kernel, x, params["kernel"])
         Kxx += I(n) * jitter
 
         # Σ = Kxx + Iσ²
         Sigma = Kxx + I(n) * obs_noise
 
         def predict(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
-            t = test_inputs
-            n_test = t.shape[0]
-            μt = self.prior.mean_function(t, params["mean_function"])
-            Ktt = gram(self.prior.kernel, t, params["kernel"])
-            Kxt = cross_covariance(self.prior.kernel, x, t, params["kernel"])
+
+            # Unpack test inputs
+            t = test_inputs 
+            n_test = test_inputs.shape[0]
+
+            μt = mean_function(t, params["mean_function"])
+            Ktt = gram(kernel, t, params["kernel"])
+            Kxt = cross_covariance(kernel, x, t, params["kernel"])
 
             # TODO: Investigate lower triangular solves for general covariance operators
             # this is more efficient than the full solve for dense matrices in the current implimentation.
@@ -480,25 +497,33 @@ class ConjugatePosterior(AbstractPosterior):
             Callable[[Dict], Float[Array, "1"]]: A functional representation of the marginal log-likelihood that can be evaluated at a given parameter set.
         """
         jitter = get_defaults()["jitter"]
+
+        # Unpack training data
         x, y, n = train_data.X, train_data.y, train_data.n
-        gram, cross_covariance = (
-            self.prior.kernel.gram,
-            self.prior.kernel.cross_covariance,
-        )
+
+        # Unpack mean function and kernel
+        mean_function = self.prior.mean_function
+        kernel = self.prior.kernel
+
+        # Unpack kernel computation
+        gram = kernel.gram
+
+        # The sign of the marginal log-likelihood depends on whether we are maximising or minimising
+        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
 
         def mll(
             params: Dict,
         ):
             # Observation noise σ²
             obs_noise = params["likelihood"]["obs_noise"]
-            μx = self.prior.mean_function(x, params["mean_function"])
-            Kxx = gram(self.prior.kernel, x, params["kernel"])
-            Kxx += I(n) * jitter
+            μx = mean_function(x, params["mean_function"])
 
             # TODO: This implementation does not take advantage of the covariance operator structure.
             # Future work concerns implementation of a custom Gaussian distribution / measure object that accepts a covariance operator.
 
             # Σ = (Kxx + Iσ²) = LLᵀ
+            Kxx = gram(kernel, x, params["kernel"])
+            Kxx += I(n) * jitter
             Sigma = Kxx + I(n) * obs_noise
             L = Sigma.triangular_lower()
 
@@ -511,7 +536,6 @@ class ConjugatePosterior(AbstractPosterior):
             # log p(θ)
             log_prior_density = evaluate_priors(params, priors)
 
-            constant = jnp.array(-1.0) if negative else jnp.array(1.0)
             return constant * (
                 marginal_likelihood.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
                 + log_prior_density
@@ -543,7 +567,14 @@ class NonConjugatePosterior(AbstractPosterior):
     name: Optional[str] = "Non-conjugate posterior"
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
-        """Initialise the parameter set of a non-conjugate GP posterior."""
+        """Initialise the parameter set of a non-conjugate GP posterior.
+
+        Args:
+            key (PRNGKeyType): A PRNG key used to initialise the parameters.
+
+        Returns:
+            Dict: A dictionary containing the default parameter set.
+        """
         parameters = concat_dictionaries(
             self.prior._initialise_params(key),
             {"likelihood": self.likelihood._initialise_params(key)},
@@ -570,37 +601,48 @@ class NonConjugatePosterior(AbstractPosterior):
             tp.Callable[[Array], dx.Distribution]: A function that accepts an input array and returns the predictive distribution as a `dx.Distribution`.
         """
         jitter = get_defaults()["jitter"]
-        x, n = train_data.X, train_data.n
-        gram, cross_covariance = (
-            self.prior.kernel.gram,
-            self.prior.kernel.cross_covariance,
-        )
 
-        Kxx = gram(self.prior.kernel, x, params["kernel"])
+        # Unpack training data
+        x, n = train_data.X, train_data.n
+
+        # Unpack mean function and kernel
+        mean_function = self.prior.mean_function
+        kernel = self.prior.kernel
+
+        # Unpack kernel computation
+        gram = kernel.gram
+        cross_covariance = kernel.cross_covariance
+
+        # Precompute lower triangular of Gram matrix, Lx, at training inputs, x
+        Kxx = gram(kernel, x, params["kernel"])
         Kxx += I(n) * jitter
+        Lx = Kxx.triangular_lower()
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
-            t = test_inputs
-            n_test = t.shape[0]
-            Ktx = cross_covariance(self.prior.kernel, t, x, params["kernel"])
-            Ktt = gram(self.prior.kernel, t, params["kernel"]) + I(n_test) * jitter
-            μt = self.prior.mean_function(t, params["mean_function"])
 
-            Lx = Kxx.triangular_lower()
+            # Unpack test inputs
+            t, n_test = test_inputs, test_inputs.shape[0]
+
+            # Compute terms of the posterior predictive distribution
+            Ktx = cross_covariance(kernel, t, x, params["kernel"])
+            Ktt = gram(kernel, t, params["kernel"]) + I(n_test) * jitter
+            μt = mean_function(t, params["mean_function"])
 
             # Lx⁻¹ Kxt
             Lx_inv_Kxt = jsp.linalg.solve_triangular(Lx, Ktx.T, lower=True)
 
-            # μt + Ktx Lx⁻¹ latent
-            mean = μt + jnp.matmul(Lx_inv_Kxt.T, params["latent"])
+            # Whitened function values, wx, correponding to the inputs, x
+            wx = params["latent"]
+
+            # μt + Ktx Lx⁻¹ wx
+            mean = μt + jnp.matmul(Lx_inv_Kxt.T, wx)
 
             # Ktt - Ktx Kxx⁻¹ Kxt
-            covariance = Ktt
+            covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
             covariance += I(n_test) * jitter
-            covariance = covariance.to_dense() - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
 
             return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mean.squeeze()), covariance
+                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
             )
 
         return predict_fn
@@ -624,28 +666,50 @@ class NonConjugatePosterior(AbstractPosterior):
             Callable[[Dict], Float[Array, "1"]]: A functional representation of the marginal log-likelihood that can be evaluated at a given parameter set.
         """
         jitter = get_defaults()["jitter"]
+
+        # Unpack dataset
         x, y, n = train_data.X, train_data.y, train_data.n
-        gram = self.prior.kernel.gram
+
+        # Unpack mean function and kernel
+        mean_function = self.prior.mean_function
+        kernel = self.prior.kernel 
+
+        # Unpack kernel computation
+        gram = kernel.gram
+
+        # Link function of the likelihood
+        link_function = self.likelihood.link_function
+
+        # We induce whitened prior on the latent function
         if not priors:
             priors = copy_dict_structure(self._initialise_params(jr.PRNGKey(0)))
             priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
 
+        # The sign of the marginal log-likelihood depends on whether we are maximising or minimising
+        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
+
         def mll(params: Dict):
-            Kxx = gram(self.prior.kernel, x, params["kernel"])
+
+            # Compute lower triangular of the kernel Gram matrix
+            Kxx = gram(kernel, x, params["kernel"])
             Kxx += I(n) * jitter
             Lx = Kxx.triangular_lower()
-            μx = self.prior.mean_function(x, params["mean_function"])
 
-            # f(x) = μx  +  Lx latent
-            fx = μx + jnp.matmul(Lx, params["latent"])
+            # Compute the prior mean function
+            μx = mean_function(x, params["mean_function"])
 
-            # p(y | f(x), θ), where θ are the model hyperparameters:
-            likelihood = self.likelihood.link_function(fx, params)
+            # Whitened function values, wx, correponding to the inputs, x
+            wx = params["latent"]
+
+            # f(x) = μx  +  Lx wx
+            fx = μx + jnp.matmul(Lx, wx)
+
+            # p(y | f(x), θ), where θ are the model hyperparameters
+            likelihood = link_function(fx, params)
 
             # log p(θ)
             log_prior_density = evaluate_priors(params, priors)
 
-            constant = jnp.array(-1.0) if negative else jnp.array(1.0)
             return constant * (likelihood.log_prob(y).sum() + log_prior_density)
 
         return mll
@@ -670,26 +734,13 @@ def construct_posterior(
 
     elif isinstance(likelihood, NonConjugate):
         PosteriorGP = NonConjugatePosterior
+
     else:
         raise NotImplementedError(
             f"No posterior implemented for {likelihood.name} likelihood"
         )
+
     return PosteriorGP(prior=prior, likelihood=likelihood)
-
-
-def euclidean_distance(
-    x: Float[Array, "N D"], y: Float[Array, "N D"]
-) -> Float[Array, "N"]:
-    """Compute the Euclidean distance between two arrays of points.
-
-    Args:
-        x (Float[Array, "N D"]): An array of points.
-        y (Float[Array, "N D"]): An array of points.
-
-    Returns:
-        Float[Array, "N"]: An array of distances.
-    """
-    return jnp.linalg.norm(x[:, None, :] - y[None, :, :], axis=-1)
 
 
 __all__ = [
