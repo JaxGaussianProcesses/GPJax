@@ -1,6 +1,6 @@
 # Where to find the docs
 
-The FLAX documentation can be found here:
+The GPJax documentation can be found here:
 https://gpjax.readthedocs.io/en/latest/
 
 # How to build the docs
