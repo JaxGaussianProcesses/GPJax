@@ -35,13 +35,14 @@ JITTER = get_defaults()["jitter"]
 # Abtract classes
 ##########################################
 @dataclass(repr=False)
-class Kernel:
-    """Base kernel class"""
+class AbstractKernel:
+    """
+    Base kernel class"""
 
     active_dims: Optional[List[int]] = None
     stationary: Optional[bool] = False
     spectral: Optional[bool] = False
-    name: Optional[str] = "Kernel"
+    name: Optional[str] = "AbstractKernel"
 
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
@@ -72,24 +73,24 @@ class Kernel:
         """
         return x[..., self.active_dims]
 
-    def __add__(self, other: "Kernel") -> "Kernel":
+    def __add__(self, other: "AbstractKernel") -> "AbstractKernel":
         """Add two kernels together.
         Args:
-            other (Kernel): The kernel to be added to the current kernel.
+            other (AbstractKernel): The kernel to be added to the current kernel.
 
         Returns:
-            Kernel: A new kernel that is the sum of the two kernels.
+            AbstractKernel: A new kernel that is the sum of the two kernels.
         """
         return SumKernel(kernel_set=[self, other])
 
-    def __mul__(self, other: "Kernel") -> "Kernel":
+    def __mul__(self, other: "AbstractKernel") -> "AbstractKernel":
         """Multiply two kernels together.
 
         Args:
-            other (Kernel): The kernel to be multiplied with the current kernel.
+            other (AbstractKernel): The kernel to be multiplied with the current kernel.
 
         Returns:
-            Kernel: A new kernel that is the product of the two kernels.
+            AbstractKernel: A new kernel that is the product of the two kernels.
         """
         return ProductKernel(kernel_set=[self, other])
 
@@ -122,13 +123,13 @@ class AbstractKernelComputation:
     @staticmethod
     @abc.abstractmethod
     def gram(
-        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
+        kernel: AbstractKernel, inputs: Float[Array, "N D"], params: Dict
     ) -> CovarianceOperator:
 
         """Compute Gram covariance operator of the kernel function.
 
         Args:
-            kernel (Kernel): The kernel function to be evaluated.
+            kernel (AbstractKernel): The kernel function to be evaluated.
             inputs (Float[Array, "N N"]): The inputs to the kernel function.
             params (Dict): The parameters of the kernel function.
 
@@ -140,12 +141,15 @@ class AbstractKernelComputation:
 
     @staticmethod
     def cross_covariance(
-        kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"], params: Dict
+        kernel: AbstractKernel,
+        x: Float[Array, "N D"],
+        y: Float[Array, "M D"],
+        params: Dict,
     ) -> Float[Array, "N M"]:
         """For a given kernel, compute the NxM gram matrix on an a pair of input matrices with shape NxD and MxD.
 
         Args:
-            kernel (Kernel): The kernel for which the cross-covariance matrix should be computed for.
+            kernel (AbstractKernel): The kernel for which the cross-covariance matrix should be computed for.
             x (Float[Array,"N D"]): The first input matrix.
             y (Float[Array,"M D"]): The second input matrix.
             params (Dict): The kernel's parameter set.
@@ -160,11 +164,11 @@ class AbstractKernelComputation:
 
     @staticmethod
     def diagonal(
-        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
+        kernel: AbstractKernel, inputs: Float[Array, "N D"], params: Dict
     ) -> CovarianceOperator:
         """For a given kernel, compute the elementwise diagonal of the NxN gram matrix on an input matrix of shape NxD.
         Args:
-            kernel (Kernel): The kernel for which the variance vector should be computed for.
+            kernel (AbstractKernel): The kernel for which the variance vector should be computed for.
             inputs (Float[Array, "N D"]): The input matrix.
             params (Dict): The kernel's parameter set.
         Returns:
@@ -181,12 +185,12 @@ class DenseKernelComputation(AbstractKernelComputation):
 
     @staticmethod
     def gram(
-        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
+        kernel: AbstractKernel, inputs: Float[Array, "N D"], params: Dict
     ) -> CovarianceOperator:
         """For a given kernel, compute the NxN gram matrix on an input matrix of shape NxD.
 
         Args:
-            kernel (Kernel): The kernel for which the Gram matrix should be computed for.
+            kernel (AbstractKernel): The kernel for which the Gram matrix should be computed for.
             inputs (Float[Array,"N D"]): The input matrix.
             params (Dict): The kernel's parameter set.
 
@@ -202,12 +206,12 @@ class DenseKernelComputation(AbstractKernelComputation):
 class DiagonalKernelComputation(AbstractKernelComputation):
     @staticmethod
     def gram(
-        kernel: Kernel, inputs: Float[Array, "N D"], params: Dict
+        kernel: AbstractKernel, inputs: Float[Array, "N D"], params: Dict
     ) -> CovarianceOperator:
         """For a kernel with diagonal structure, compute the NxN gram matrix on an input matrix of shape NxD.
 
         Args:
-            kernel (Kernel): The kernel for which the Gram matrix should be computed for.
+            kernel (AbstractKernel): The kernel for which the Gram matrix should be computed for.
             inputs (Float[Array, "N D"]): The input matrix.
             params (Dict): The kernel's parameter set.
 
@@ -222,11 +226,11 @@ class DiagonalKernelComputation(AbstractKernelComputation):
 
 @dataclass
 class _KernelSet:
-    kernel_set: List[Kernel]
+    kernel_set: List[AbstractKernel]
 
 
 @dataclass
-class CombinationKernel(Kernel, _KernelSet, DenseKernelComputation):
+class CombinationKernel(AbstractKernel, _KernelSet, DenseKernelComputation):
     """A base class for products or sums of kernels."""
 
     name: Optional[str] = "Combination kernel"
@@ -236,16 +240,16 @@ class CombinationKernel(Kernel, _KernelSet, DenseKernelComputation):
         """Set the kernel set to the list of kernels passed to the constructor."""
         kernels = self.kernel_set
 
-        if not all(isinstance(k, Kernel) for k in kernels):
+        if not all(isinstance(k, AbstractKernel) for k in kernels):
             raise TypeError("can only combine Kernel instances")  # pragma: no cover
 
-        self.kernel_set: List[Kernel] = []
+        self.kernel_set: List[AbstractKernel] = []
         self._set_kernels(kernels)
 
-    def _set_kernels(self, kernels: Sequence[Kernel]) -> None:
+    def _set_kernels(self, kernels: Sequence[AbstractKernel]) -> None:
         """Combine multiple kernels. Based on GPFlow's Combination kernel."""
         # add kernels to a list, flattening out instances of this class therein
-        kernels_list: List[Kernel] = []
+        kernels_list: List[AbstractKernel] = []
         for k in kernels:
             if isinstance(k, self.__class__):
                 kernels_list.extend(k.kernel_set)
@@ -285,7 +289,7 @@ class ProductKernel(CombinationKernel):
 # Euclidean kernels
 ##########################################
 @dataclass(repr=False)
-class RBF(Kernel, DenseKernelComputation):
+class RBF(AbstractKernel, DenseKernelComputation):
     """The Radial Basis Function (RBF) kernel."""
 
     name: Optional[str] = "Radial basis function kernel"
@@ -327,7 +331,7 @@ class RBF(Kernel, DenseKernelComputation):
 
 
 @dataclass(repr=False)
-class Matern12(Kernel, DenseKernelComputation):
+class Matern12(AbstractKernel, DenseKernelComputation):
     """The Matérn kernel with smoothness parameter fixed at 0.5."""
 
     name: Optional[str] = "Matern 1/2"
@@ -363,7 +367,7 @@ class Matern12(Kernel, DenseKernelComputation):
 
 
 @dataclass(repr=False)
-class Matern32(Kernel, DenseKernelComputation):
+class Matern32(AbstractKernel, DenseKernelComputation):
     """The Matérn kernel with smoothness parameter fixed at 1.5."""
 
     name: Optional[str] = "Matern 3/2"
@@ -405,7 +409,7 @@ class Matern32(Kernel, DenseKernelComputation):
 
 
 @dataclass(repr=False)
-class Matern52(Kernel, DenseKernelComputation):
+class Matern52(AbstractKernel, DenseKernelComputation):
     """The Matérn kernel with smoothness parameter fixed at 2.5."""
 
     name: Optional[str] = "Matern 5/2"
@@ -447,7 +451,7 @@ class Matern52(Kernel, DenseKernelComputation):
 
 
 @dataclass(repr=False)
-class Polynomial(Kernel, DenseKernelComputation):
+class Polynomial(AbstractKernel, DenseKernelComputation):
     """The Polynomial kernel with variable degree."""
 
     name: Optional[str] = "Polynomial"
@@ -486,7 +490,7 @@ class Polynomial(Kernel, DenseKernelComputation):
 
 
 @dataclass(repr=False)
-class White(Kernel, DiagonalKernelComputation):
+class White(AbstractKernel, DiagonalKernelComputation):
     def __post_init__(self):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
@@ -530,7 +534,7 @@ class _EigenKernel:
 
 
 @dataclass
-class GraphKernel(Kernel, _EigenKernel, DenseKernelComputation):
+class GraphKernel(AbstractKernel, _EigenKernel, DenseKernelComputation):
     name: Optional[str] = "Graph kernel"
 
     def __post_init__(self):
@@ -605,7 +609,7 @@ def euclidean_distance(
 
 
 __all__ = [
-    "Kernel",
+    "AbstractKernel",
     "CombinationKernel",
     "SumKernel",
     "ProductKernel",

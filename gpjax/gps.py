@@ -25,7 +25,7 @@ from jaxtyping import Array, Float
 
 from .config import get_defaults
 from .covariance_operator import I
-from .kernels import Kernel
+from .kernels import AbstractKernel
 from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
 from .parameters import copy_dict_structure, evaluate_priors
@@ -122,12 +122,12 @@ class Prior(AbstractPrior):
         >>> prior = gpx.Prior(kernel = kernel)
 
     Attributes:
-        kernel (Kernel): The kernel function used to parameterise the prior.
+        kernel (AbstractKernel): The kernel function used to parameterise the prior.
         mean_function (MeanFunction): The mean function used to parameterise the prior. Defaults to zero.
         name (str): The name of the GP prior. Defaults to "GP prior".
     """
 
-    kernel: Kernel
+    kernel: AbstractKernel
     mean_function: Optional[AbstractMeanFunction] = Zero()
     name: Optional[str] = "GP prior"
 

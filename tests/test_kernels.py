@@ -35,7 +35,7 @@ from gpjax.kernels import (
     RBF,
     CombinationKernel,
     GraphKernel,
-    Kernel,
+    AbstractKernel,
     Matern12,
     Matern32,
     Matern52,
@@ -58,10 +58,10 @@ _jitter = 100
 def test_abstract_kernel():
     # Test initialising abstract kernel raises TypeError with unimplemented __call__ and _init_params methods:
     with pytest.raises(TypeError):
-        Kernel()
+        AbstractKernel()
 
     # Create a dummy kernel class with __call__ and _init_params methods implemented:
-    class DummyKernel(Kernel):
+    class DummyKernel(AbstractKernel):
         def __call__(
             self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
         ) -> Float[Array, "1"]:
@@ -99,7 +99,7 @@ def test_euclidean_distance(
 @pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
 @pytest.mark.parametrize("dim", [1, 2, 5])
 @pytest.mark.parametrize("n", [1, 2, 10])
-def test_gram(kernel: Kernel, dim: int, n: int) -> None:
+def test_gram(kernel: AbstractKernel, dim: int, n: int) -> None:
 
     # Gram constructor static method:
     gram = kernel.gram
@@ -120,7 +120,9 @@ def test_gram(kernel: Kernel, dim: int, n: int) -> None:
 @pytest.mark.parametrize("num_a", [1, 2, 5])
 @pytest.mark.parametrize("num_b", [1, 2, 5])
 @pytest.mark.parametrize("dim", [1, 2, 5])
-def test_cross_covariance(kernel: Kernel, num_a: int, num_b: int, dim: int) -> None:
+def test_cross_covariance(
+    kernel: AbstractKernel, num_a: int, num_b: int, dim: int
+) -> None:
 
     # Cross covariance constructor static method:
     cross_cov = kernel.cross_covariance
@@ -140,7 +142,7 @@ def test_cross_covariance(kernel: Kernel, num_a: int, num_b: int, dim: int) -> N
 
 @pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
 @pytest.mark.parametrize("dim", [1, 2, 5])
-def test_call(kernel: Kernel, dim: int) -> None:
+def test_call(kernel: AbstractKernel, dim: int) -> None:
 
     # Datapoint x and datapoint y:
     x = jnp.array([[1.0] * dim])
@@ -160,7 +162,9 @@ def test_call(kernel: Kernel, dim: int) -> None:
 @pytest.mark.parametrize("dim", [1, 2, 5])
 @pytest.mark.parametrize("ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
 @pytest.mark.parametrize("n", [1, 2, 5])
-def test_pos_def(kern: Kernel, dim: int, ell: float, sigma: float, n: int) -> None:
+def test_pos_def(
+    kern: AbstractKernel, dim: int, ell: float, sigma: float, n: int
+) -> None:
 
     # Gram constructor static method:
     gram = kern.gram
@@ -178,7 +182,7 @@ def test_pos_def(kern: Kernel, dim: int, ell: float, sigma: float, n: int) -> No
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
 @pytest.mark.parametrize("dim", [None, 1, 2, 5, 10])
-def test_initialisation(kernel: Kernel, dim: int) -> None:
+def test_initialisation(kernel: AbstractKernel, dim: int) -> None:
 
     if dim is None:
         kern = kernel()
@@ -199,7 +203,7 @@ def test_initialisation(kernel: Kernel, dim: int) -> None:
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
-def test_dtype(kernel: Kernel) -> None:
+def test_dtype(kernel: AbstractKernel) -> None:
 
     parameter_state = initialise(kernel(), _initialise_key)
     params, *_ = parameter_state.unpack()
@@ -238,7 +242,7 @@ def test_polynomial(
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
-def test_active_dim(kernel: Kernel) -> None:
+def test_active_dim(kernel: AbstractKernel) -> None:
     dim_list = [0, 1, 2, 3]
     perm_length = 2
     dim_pairs = list(permutations(dim_list, r=perm_length))
@@ -263,7 +267,7 @@ def test_active_dim(kernel: Kernel) -> None:
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52, Polynomial])
 @pytest.mark.parametrize("n_kerns", [2, 3, 4])
 def test_combination_kernel(
-    combination_type: CombinationKernel, kernel: Kernel, n_kerns: int
+    combination_type: CombinationKernel, kernel: AbstractKernel, n_kerns: int
 ) -> None:
 
     n = 20
@@ -272,7 +276,7 @@ def test_combination_kernel(
     assert len(c_kernel.kernel_set) == n_kerns
     assert len(c_kernel._initialise_params(_initialise_key)) == n_kerns
     assert isinstance(c_kernel.kernel_set, list)
-    assert isinstance(c_kernel.kernel_set[0], Kernel)
+    assert isinstance(c_kernel.kernel_set[0], AbstractKernel)
     assert isinstance(c_kernel._initialise_params(_initialise_key)[0], dict)
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
     Kff = c_kernel.gram(c_kernel, x, c_kernel._initialise_params(_initialise_key))
@@ -286,7 +290,7 @@ def test_combination_kernel(
 @pytest.mark.parametrize(
     "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
 )
-def test_sum_kern_value(k1: Kernel, k2: Kernel) -> None:
+def test_sum_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
     n = 10
     sum_kernel = SumKernel(kernel_set=[k1, k2])
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
@@ -306,7 +310,7 @@ def test_sum_kern_value(k1: Kernel, k2: Kernel) -> None:
 @pytest.mark.parametrize(
     "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
 )
-def test_prod_kern_value(k1: Kernel, k2: Kernel) -> None:
+def test_prod_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
     n = 10
     prod_kernel = ProductKernel(kernel_set=[k1, k2])
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
@@ -348,7 +352,7 @@ def test_graph_kernel():
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52, Polynomial])
-def test_combination_kernel_type(kernel: Kernel) -> None:
+def test_combination_kernel_type(kernel: AbstractKernel) -> None:
     prod_kern = kernel() * kernel()
     assert isinstance(prod_kern, ProductKernel)
     assert isinstance(prod_kern, CombinationKernel)

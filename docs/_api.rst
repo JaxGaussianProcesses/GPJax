@@ -83,7 +83,7 @@ Kernel Functions
 Abstract Kernels
 *********************************
 
-.. autoclass:: Kernel
+.. autoclass:: AbstractKernel
    :members:
 
 .. autoclass:: CombinationKernel
