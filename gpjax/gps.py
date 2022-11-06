@@ -332,7 +332,27 @@ class ConjugatePosterior(AbstractPosterior):
     def predict(
         self, train_data: Dataset, params: Dict
     ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]:
-        """Conditional on a set of training data, compute the GP's posterior predictive distribution for a given set of parameters. The returned function can be evaluated at a set of test inputs to compute the corresponding predictive density.
+        """Conditional on a training data set, compute the GP's posterior
+        predictive distribution for a given set of parameters. The returned
+        function can be evaluated at a set of test inputs to compute the
+        corresponding predictive density.
+
+        The conditioning set is a GPJax ``Dataset`` object, whilst predictions
+        are made on a regular Jax array.
+
+        £xample:
+            For a ``posterior`` distribution, the following code snippet will
+            evaluate the predictive distribution.
+
+            >>> import gpjax as gpx
+            >>>
+            >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
+            >>> ytrain = jnp.sin(xtrain)
+            >>> xtest = jnp.linspace(0, 1).reshape(-1, 1)
+            >>>
+            >>> params = gpx.initialise(posterior)
+            >>> predictive_dist = posterior.predict(gpx.Dataset(X=xtrain, y=ytrain), params)
+            >>> predictive_dist(xtest)
 
         Args:
             train_data (Dataset): A `gpx.Dataset` object that contains the input and output data used for training dataset.
@@ -555,6 +575,17 @@ class NonConjugatePosterior(AbstractPosterior):
 def construct_posterior(
     prior: Prior, likelihood: AbstractLikelihood
 ) -> AbstractPosterior:
+    """Utility function for constructing a posterior object from a prior and
+    likelihood. The function will automatically select the correct posterior
+    object based on the likelihood.
+
+    Args:
+        prior (Prior): The Prior distribution.
+        likelihood (AbstractLikelihood): The likelihood that represents our beliefs around the distribution of the data.
+
+    Returns:
+        AbstractPosterior: A posterior distribution. If the likelihood is Gaussian, then a ``ConjugatePosterior`` will be returned. Otherwise, a ``NonConjugatePosterior`` will be returned.
+    """
     if isinstance(likelihood, Conjugate):
         PosteriorGP = ConjugatePosterior
 
