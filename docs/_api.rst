@@ -48,6 +48,11 @@ Gaussian Process Priors
 Gaussian Process Posteriors
 *********************************
 
+There are two main classes of posterior Gaussian process objects within GPJax.
+The ``ConjugatePosterior`` class is used when the likelihood distribution is
+Gaussian whilst the ``NonConjugatePosterior`` class is used when the likelihood
+distribution is non-Gaussian.
+
 .. autoclass:: ConjugatePosterior
    :members:
    :special-members: __call__

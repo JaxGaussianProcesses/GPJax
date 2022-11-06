@@ -307,8 +307,8 @@ class ConjugatePosterior(AbstractPosterior):
 
     .. math::
 
-        \\boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left(k(\\mathbf{x}, \\mathbf{x})+\\sigma^2\\mathbf{I}_n\\right)^{-1}\\mathbf{y}  \\\\
-        \\boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\\mathbf{x}^{\\star}, \\mathbf{x}^{\\star}) -k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left( k(\\mathbf{x}, \\mathbf{x}) + \\sigma^2\\mathbf{I}_n \\right)^{-1}k(\\mathbf{x}, \\mathbf{x}^{\\star}).
+        \\boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left(k(\\mathbf{x}, \\mathbf{x}')+\\sigma^2\\mathbf{I}_n\\right)^{-1}\\mathbf{y}  \\\\
+        \\boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\\mathbf{x}^{\\star}, \\mathbf{x}^{\\star\\prime}) -k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left( k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_n \\right)^{-1}k(\\mathbf{x}, \\mathbf{x}^{\\star}).
 
     Example:
         >>> import gpjax as gpx
@@ -336,6 +336,18 @@ class ConjugatePosterior(AbstractPosterior):
         predictive distribution for a given set of parameters. The returned
         function can be evaluated at a set of test inputs to compute the
         corresponding predictive density.
+
+        The predictive distribution of a conjugate GP is given by
+        .. math::
+
+            p(\\mathbf{f}^{\\star}\mid \mathbf{y}) & = \\int p(\\mathbf{f}^{\\star} \\mathbf{f} \\mid \\mathbf{y})\\\\
+            & =\\mathcal{N}(\\mathbf{f}^{\\star} \\boldsymbol{\mu}_{\mid \mathbf{y}}, \\boldsymbol{\Sigma}_{\mid \mathbf{y}}
+        where
+
+        .. math::
+
+            \\boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left(k(\\mathbf{x}, \\mathbf{x}')+\\sigma^2\\mathbf{I}_n\\right)^{-1}\\mathbf{y}  \\\\
+            \\boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\\mathbf{x}^{\\star}, \\mathbf{x}^{\\star\\prime}) -k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left( k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_n \\right)^{-1}k(\\mathbf{x}, \\mathbf{x}^{\\star}).
 
         The conditioning set is a GPJax ``Dataset`` object, whilst predictions
         are made on a regular Jax array.
@@ -412,7 +424,52 @@ class ConjugatePosterior(AbstractPosterior):
         priors: Dict = None,
         negative: bool = False,
     ) -> Callable[[Dict], Float[Array, "1"]]:
-        """Compute the marginal log-likelihood function of the Gaussian process. The returned function can then be used for gradient based optimisation of the model's parameters or for model comparison. The implementation given here enables exact estimation of the Gaussian process' latent function values.
+        """Compute the marginal log-likelihood function of the Gaussian process.
+        The returned function can then be used for gradient based optimisation
+        of the model's parameters or for model comparison. The implementation
+        given here enables exact estimation of the Gaussian process' latent
+        function values.
+
+        For a training dataset :math:`\\{x_n, y_n\\}_{n=1}^N`, set of test
+        inputs :math:`\\mathbf{x}^{\\star}` the corresponding latent function
+        evaluations are given by :math:`\\mathbf{f} = f(\\mathbf{x})`
+        and :math:`\\mathbf{f}^{\\star} = f(\\mathbf{x}^{\\star})`, the marginal
+        log-likelihood is given by:
+
+        .. math::
+
+            \\log p(\\mathbf{y}) & = \\int p(\\mathbf{y}\\mid\\mathbf{f})p(\\mathbf{f}, \\mathbf{f}^{\\star}\\mathrm{d}\\mathbf{f}^{\\star}\\\\
+            &=0.5\\left(-\\mathbf{y}^{\\top}\\left(k(\\mathbf{x}, \\mathbf{x}') +\\sigma^2\\mathbf{I}_N  \\right)^{-1}\\mathbf{y}-\\log\\lvert k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_N\\rvert - n\\log 2\\pi \\right).
+
+        Example:
+
+        For a given ``ConjugatePosterior`` object, the following code snippet shows
+        how the marginal log-likelihood can be evaluated.
+
+        >>> import gpjax as gpx
+        >>>
+        >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
+        >>> ytrain = jnp.sin(xtrain)
+        >>> D = gpx.Dataset(X=xtrain, y=ytrain)
+        >>>
+        >>> params = gpx.initialise(posterior)
+        >>> mll = posterior.marginal_log_likelihood(train_data = D)
+        >>> mll(params)
+
+        Our goal is to maximise the marginal log-likelihood. Therefore, when
+        optimising the model's parameters with respect to the parameters, we
+        use the negative marginal log-likelihood. This can be realised through
+
+        >>> mll = posterior.marginal_log_likelihood(train_data = D, negative=True)
+
+        Further, prior distributions can be passed into the marginal log-likelihood
+
+        >>> mll = posterior.marginal_log_likelihood(train_data = D, priors=priors)
+
+        For optimal performance, the marginal log-likelihood should be ``jax.jit``
+        compiled.
+
+        >>> mll = jit(posterior.marginal_log_likelihood(train_data = D))
 
         Args:
             train_data (Dataset): The training dataset used to compute the marginal log-likelihood.
