@@ -8,18 +8,34 @@ Package Reference
 Gaussian Processes
 #################################
 
+The Gaussian process abstractions in GPJax can be segmented into two distinct
+types: prior and posterior objects. This makes for a clean separation of both
+code and mathematical concepts. Throught the multiplication of a
+`Prior <https://gpjax.readthedocs.io/en/latest/api.html#gaussian-process-priors>`_
+and `Likelihood <https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.likelihoods>`_,
+GPJax will then return the appropriate `Posterior <https://gpjax.readthedocs.io/en/latest/api.html#gaussian-process-posteriors>`_.
+
+
 .. automodule:: gpjax.gps
 .. currentmodule:: gpjax.gps
-
 
 Abstract GPs
 *********************************
 
-.. autoclass:: AbstractGP
+To ensure a consistent API, we subclass all Gaussian process objects from either
+``AbstractPrior`` or ``AbstractPosterior``. These classes are not intended to be
+used directly, but instead to provide a common interface for all downstream Gaussian
+process objects.
+
+.. autoclass:: AbstractPrior
    :members:
+   :special-members: __call__
+   :private-members: _initialise_params
+   :exclude-members: from_tuple, replace, to_tuple
 
 .. autoclass:: AbstractPosterior
    :members:
+   :special-members: __call__
 
 
 Gaussian Process Priors
@@ -27,15 +43,23 @@ Gaussian Process Priors
 
 .. autoclass:: Prior
    :members:
+   :special-members: __call__, __mul__
 
 Gaussian Process Posteriors
 *********************************
 
 .. autoclass:: ConjugatePosterior
    :members:
+   :special-members: __call__
 
 .. autoclass:: NonConjugatePosterior
    :members:
+   :special-members: __call__
+
+Posterior Constructors
+*********************************
+
+.. autofunction:: construct_posterior
 
 
 Kernels
