@@ -199,7 +199,7 @@ def angular_distance(x, y, c):
 
 
 @dataclass
-class Polar(gpx.kernels.Kernel, gpx.kernels.DenseKernelComputation):
+class Polar(gpx.kernels.AbstractKernel, gpx.kernels.DenseKernelComputation):
     period: float = 2 * jnp.pi
 
     def __post_init__(self):
@@ -233,7 +233,7 @@ class Polar(gpx.kernels.Kernel, gpx.kernels.DenseKernelComputation):
 # example, without a `@dataclass` decorator, the instantiation of the above
 # `Polar` kernel would be done through
 # ```python
-# class Polar(gpx.kernels.Kernel):
+# class Polar(gpx.kernels.AbstractKernel):
 #     def __init__(self, period: float = 2*jnp.pi):
 #         super().__init__()
 #         self.period = period

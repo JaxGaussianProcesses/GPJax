@@ -33,7 +33,7 @@ from jax.config import config
 from scipy.signal import sawtooth
 
 import gpjax as gpx
-from gpjax.kernels import DenseKernelComputation, Kernel
+from gpjax.kernels import DenseKernelComputation, AbstractKernel
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -72,17 +72,17 @@ ax.legend(loc="best")
 #
 # ### Implementation
 #
-# Although deep kernels are not currently supported natively in GPJax, defining one is straightforward as we now demonstrate. Using the base `Kernel` object given in GPJax, we provide a mixin class named `_DeepKernelFunction` to facilitate the user supplying the neural network and base kernel of their choice. Kernel matrices are then computed using the regular `gram` and `cross_covariance` functions.
+# Although deep kernels are not currently supported natively in GPJax, defining one is straightforward as we now demonstrate. Using the base `AbstractKernel` object given in GPJax, we provide a mixin class named `_DeepKernelFunction` to facilitate the user supplying the neural network and base kernel of their choice. Kernel matrices are then computed using the regular `gram` and `cross_covariance` functions.
 
 # %%
 @dataclass
 class _DeepKernelFunction:
     network: hk.Module
-    base_kernel: Kernel
+    base_kernel: AbstractKernel
 
 
 @dataclass
-class DeepKernelFunction(Kernel, DenseKernelComputation, _DeepKernelFunction):
+class DeepKernelFunction(AbstractKernel, DenseKernelComputation, _DeepKernelFunction):
     def __call__(
         self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
     ) -> jnp.ndarray:
