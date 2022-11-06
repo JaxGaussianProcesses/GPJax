@@ -23,7 +23,7 @@ from jax.config import config
 
 from gpjax import Dataset, initialise
 from gpjax.gps import (
-    AbstractGP,
+    AbstractPrior,
     ConjugatePosterior,
     NonConjugatePosterior,
     Prior,
@@ -44,7 +44,7 @@ def test_prior(num_datapoints):
     parameter_state = initialise(p, jr.PRNGKey(123))
     params, _, _ = parameter_state.unpack()
     assert isinstance(p, Prior)
-    assert isinstance(p, AbstractGP)
+    assert isinstance(p, AbstractPrior)
     prior_rv_fn = p(params)
     assert isinstance(prior_rv_fn, tp.Callable)
 
@@ -71,12 +71,12 @@ def test_conjugate_posterior(num_datapoints):
     lik = Gaussian(num_datapoints=num_datapoints)
     post = p * lik
     assert isinstance(post, ConjugatePosterior)
-    assert isinstance(post, AbstractGP)
-    assert isinstance(p, AbstractGP)
+    assert isinstance(post, AbstractPrior)
+    assert isinstance(p, AbstractPrior)
 
     post2 = lik * p
     assert isinstance(post2, ConjugatePosterior)
-    assert isinstance(post2, AbstractGP)
+    assert isinstance(post2, AbstractPrior)
 
     parameter_state = initialise(post, key)
     params, _, bijectors = parameter_state.unpack()
@@ -116,8 +116,8 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     lik = likel(num_datapoints=num_datapoints)
     post = p * lik
     assert isinstance(post, NonConjugatePosterior)
-    assert isinstance(post, AbstractGP)
-    assert isinstance(p, AbstractGP)
+    assert isinstance(post, AbstractPrior)
+    assert isinstance(p, AbstractPrior)
 
     parameter_state = initialise(post, key)
     params, _, _ = parameter_state.unpack()
