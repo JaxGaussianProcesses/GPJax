@@ -49,7 +49,10 @@ class AbstractKernel:
 
     @abc.abstractmethod
     def __call__(
-        self,params: Dict,  x: Float[Array, "1 D"], y: Float[Array, "1 D"], 
+        self,
+        params: Dict,
+        x: Float[Array, "1 D"],
+        y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs.
 
@@ -125,7 +128,7 @@ class AbstractKernelComputation:
     def gram(
         kernel: AbstractKernel,
         params: Dict,
-        inputs: Float[Array, "N D"], 
+        inputs: Float[Array, "N D"],
     ) -> CovarianceOperator:
 
         """Compute Gram covariance operator of the kernel function.
@@ -166,17 +169,17 @@ class AbstractKernelComputation:
 
     @staticmethod
     def diagonal(
-        kernel: AbstractKernel, 
+        kernel: AbstractKernel,
         params: Dict,
-        inputs: Float[Array, "N D"], 
+        inputs: Float[Array, "N D"],
     ) -> CovarianceOperator:
         """For a given kernel, compute the elementwise diagonal of the NxN gram matrix on an input matrix of shape NxD.
-        
+
         Args:
             kernel (AbstractKernel): The kernel for which the variance vector should be computed for.
             params (Dict): The kernel's parameter set.
             inputs (Float[Array, "N D"]): The input matrix.
-        
+
         Returns:
             CovarianceOperator: The computed diagonal variance entries.
         """
@@ -191,9 +194,9 @@ class DenseKernelComputation(AbstractKernelComputation):
 
     @staticmethod
     def gram(
-        kernel: AbstractKernel, 
-        params: Dict, 
-        inputs: Float[Array, "N D"], 
+        kernel: AbstractKernel,
+        params: Dict,
+        inputs: Float[Array, "N D"],
     ) -> CovarianceOperator:
         """For a given kernel, compute the NxN gram matrix on an input matrix of shape NxD.
 
@@ -214,9 +217,9 @@ class DenseKernelComputation(AbstractKernelComputation):
 class DiagonalKernelComputation(AbstractKernelComputation):
     @staticmethod
     def gram(
-        kernel: AbstractKernel, 
+        kernel: AbstractKernel,
         params: Dict,
-        inputs: Float[Array, "N D"], 
+        inputs: Float[Array, "N D"],
     ) -> CovarianceOperator:
         """For a kernel with diagonal structure, compute the NxN gram matrix on an input matrix of shape NxD.
 
@@ -237,6 +240,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
 @dataclass
 class _KernelSet:
     """A mixin class for storing a list of kernels. Useful for combination kernels."""
+
     kernel_set: List[AbstractKernel]
 
 
@@ -266,7 +270,7 @@ class CombinationKernel(AbstractKernel, _KernelSet, DenseKernelComputation):
                 kernels_list.extend(k.kernel_set)
             else:
                 kernels_list.append(k)
-        
+
         self.kernel_set = kernels_list
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
@@ -274,7 +278,10 @@ class CombinationKernel(AbstractKernel, _KernelSet, DenseKernelComputation):
         return [kernel._initialise_params(key) for kernel in self.kernel_set]
 
     def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"], 
+        self,
+        params: Dict,
+        x: Float[Array, "1 D"],
+        y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
         """Evaluate combination kernel on a pair of inputs.
 
@@ -320,7 +327,7 @@ class RBF(AbstractKernel, DenseKernelComputation):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"] 
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma^2`
 
@@ -357,7 +364,10 @@ class Matern12(AbstractKernel, DenseKernelComputation):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"], 
+        self,
+        params: Dict,
+        x: Float[Array, "1 D"],
+        y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma^2`
 
@@ -393,7 +403,10 @@ class Matern32(AbstractKernel, DenseKernelComputation):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"], 
+        self,
+        params: Dict,
+        x: Float[Array, "1 D"],
+        y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
 
@@ -435,7 +448,7 @@ class Matern52(AbstractKernel, DenseKernelComputation):
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"] 
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
 
@@ -561,7 +574,7 @@ class GraphKernel(AbstractKernel, _EigenKernel, DenseKernelComputation):
         self.num_vertex = self.laplacian.shape[0]
 
     def __call__(
-        self,  params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
         """Evaluate the graph kernel on a pair of vertices :math:`v_i, v_j`.
 
