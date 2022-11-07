@@ -8,7 +8,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: base
 #     language: python
 #     name: python3
 # ---
@@ -150,8 +150,8 @@ learned_params, training_history = inference_state.unpack()
 # With an optimal set of parameters learned, we can make predictions on the set of data that we held back right at the start. We'll do this in the usual way by first computing the latent function's distribution before computing the predictive posterior distribution.
 
 # %%
-latent_dist = posterior(training_data, learned_params)(scaled_Xte)
-predictive_dist = likelihood(latent_dist, learned_params)
+latent_dist = posterior(learned_params, training_data, )(scaled_Xte)
+predictive_dist = likelihood(learned_params, latent_dist)
 
 predictive_mean = predictive_dist.mean()
 predictive_stddev = predictive_dist.stddev()

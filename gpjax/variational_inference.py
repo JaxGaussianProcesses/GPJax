@@ -192,7 +192,7 @@ class CollapsedVI(AbstractVariationalInference):
             Kzz = gram(kernel, params["kernel"], z)
             Kzz += I(m) * jitter
             Kzx = cross_covariance(kernel, params["kernel"], z, x)
-            Kxx_diag = vmap(kernel, in_axes=(0, 0, None))(params["kernel"], x, x)
+            Kxx_diag = vmap(kernel, in_axes=(None, 0, 0))(params["kernel"], x, x)
             μx = mean_function(params["mean_function"], x)
 
             Lz = Kzz.triangular_lower()

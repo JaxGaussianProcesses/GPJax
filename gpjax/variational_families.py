@@ -716,11 +716,14 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
         )
 
     def predict(
-        self, train_data: Dataset, params: Dict
+        self, params: Dict, train_data: Dataset, 
     ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalFullCovariance]:
         """Compute the predictive distribution of the GP at the test inputs.
+        
         Args:
             params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
+            train_data (Dataset): The training data that was used to fit the GP.
+
         Returns:
             Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """

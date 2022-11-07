@@ -89,7 +89,7 @@ posterior = prior * likelihood
 Equipped with the posterior, we seek to learn the model's hyperparameters through gradient-optimisation of the marginal log-likelihood. We this below, adding Jax's [just-in-time (JIT)](https://jax.readthedocs.io/en/latest/jax-101/02-jitting.html) compilation to accelerate training. 
 
 ```python
-mll = jit(posterior.marginal_log_likelihood(training, negative=True))
+mll = jit(posterior.marginal_log_likelihood(D, negative=True))
 ```
 
 For purposes of optimisation, we'll use optax's Adam.
@@ -117,11 +117,11 @@ Using our learned hyperparameters, we can obtain the posterior distribution of t
 learned_params, _ = inference_state.unpack()
 xtest = jnp.linspace(-3., 3., 100).reshape(-1, 1)
 
-latent_distribution = posterior(training, learned_params)(xtest)
-predictive_distribution = likelihood(latent_distribution, params)
+latent_distribution = posterior(learned_params, D)(xtest)
+predictive_distribution = likelihood(params, latent_distribution)
 
 predictive_mean = predictive_distribution.mean
-predictive_cov = predictive_distribution.covariance_matrix
+predictive_cov = predictive_distribution.covariance
 ```
 
 # Installation

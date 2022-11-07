@@ -117,7 +117,7 @@ def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray) -> dx.MultivariateNormalTri:
     )
 
     learned_params, training_history = inference_state.unpack()
-    return likelihood(posterior(D, learned_params)(xtest), learned_params)
+    return likelihood(learned_params, posterior(learned_params, D)(xtest))
 
 
 posterior_preds = [fit_gp(x, i) for i in ys]

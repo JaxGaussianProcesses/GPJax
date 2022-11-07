@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: base
 #     language: python
 #     name: python3
 # ---
@@ -95,7 +95,7 @@ array_to_dict(parray) == params
 # %% [markdown]
 # ### Specifying priors
 #
-# We can define Gamma priors on our hyperparameters through TensorFlow Probability's `Distributions` module.
+# We can define Gamma priors on our hyperparameters through TensorFlow Probability's `Distributions` module. We transform these to the unconstained space via `tfd.TransformedDistribution`.
 
 # %%
 import tensorflow_probability.substrates.jax as tfp
@@ -209,7 +209,7 @@ plt.tight_layout()
 xtest = jnp.linspace(-5.2, 5.2, 500).reshape(-1, 1)
 learned_params = array_to_dict([jnp.mean(i) for i in constrained_sample_list])
 
-predictive_dist = likelihood(posterior(D, learned_params)(xtest), learned_params)
+predictive_dist = likelihood(learned_params, posterior(learned_params, D)(xtest))
 
 mu = predictive_dist.mean()
 sigma = predictive_dist.stddev()
