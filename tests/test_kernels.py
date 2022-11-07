@@ -27,10 +27,9 @@ from jaxtyping import Array, Float
 
 from gpjax.covariance_operator import (
     CovarianceOperator,
-    DenseCovarianceOperator,
-    DiagonalCovarianceOperator,
     I,
 )
+
 from gpjax.kernels import (
     RBF,
     CombinationKernel,
@@ -50,9 +49,8 @@ from gpjax.types import PRNGKeyType
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
-"""Default values for tests"""
 _initialise_key = jr.PRNGKey(123)
-_jitter = 100
+_jitter = 1e-6
 
 
 def test_abstract_kernel():
@@ -111,7 +109,7 @@ def test_gram(kernel: AbstractKernel, dim: int, n: int) -> None:
     params = kernel._initialise_params(_initialise_key)
 
     # Test gram matrix:
-    Kxx = gram(kernel, x, params)
+    Kxx = gram(kernel, params, x)
     assert isinstance(Kxx, CovarianceOperator)
     assert Kxx.shape == (n, n)
 
@@ -135,7 +133,7 @@ def test_cross_covariance(
     params = kernel._initialise_params(_initialise_key)
 
     # Test cross covariance, Kab:
-    Kab = cross_cov(kernel, a, b, params)
+    Kab = cross_cov(kernel, params, a, b)
     assert isinstance(Kab, jnp.ndarray)
     assert Kab.shape == (num_a, num_b)
 
@@ -152,7 +150,7 @@ def test_call(kernel: AbstractKernel, dim: int) -> None:
     params = kernel._initialise_params(_initialise_key)
 
     # Test calling gives an autocovariance value of no dimension between the inputs:
-    kxy = kernel(x, y, params)
+    kxy = kernel(params, x, y)
 
     assert isinstance(kxy, jnp.DeviceArray)
     assert kxy.shape == ()
@@ -174,7 +172,7 @@ def test_pos_def(
     params = {"lengthscale": jnp.array([ell]), "variance": jnp.array([sigma])}
 
     # Test gram matrix eigenvalues are positive:
-    Kxx = gram(kern, x, params)
+    Kxx = gram(kern, params, x)
     Kxx += I(n) * _jitter
     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
     assert (eigen_values > 0.0).all()
@@ -220,25 +218,37 @@ def test_polynomial(
     degree: int, dim: int, variance: float, shift: float, n: int
 ) -> None:
 
+    # Define inputs
     x = jnp.linspace(0.0, 1.0, n * dim).reshape(n, dim)
 
+    # Define kernel
     kern = Polynomial(degree=degree, active_dims=[i for i in range(dim)])
+
+    # Unpack kernel computation
+    gram = kern.gram
+    
+    # Check name
     assert kern.name == f"Polynomial Degree: {degree}"
 
+    # Initialise parameters
     params = kern._initialise_params(_initialise_key)
     params["shift"] * shift
     params["variance"] * variance
 
-    gram = kern.gram
+    # Check parameter keys
+    assert list(params.keys()) == ["shift", "variance"]
 
-    # Test positive definiteness:
-    Kxx = gram(kern, x, params)
-    Kxx += I(n) * _jitter
-    eigen_values, _ = jnp.linalg.eigh(Kxx.to_dense())
-    assert (eigen_values > 0).all()
+    # Compute gram matrix
+    Kxx = gram(kern, params, x)
+
+    # Check shapes
     assert Kxx.shape[0] == x.shape[0]
     assert Kxx.shape[0] == Kxx.shape[1]
-    assert list(params.keys()) == ["shift", "variance"]
+
+    # Test positive definiteness
+    Kxx += I(n) * _jitter
+    eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
+    assert (eigen_values > 0).all()
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
@@ -247,20 +257,32 @@ def test_active_dim(kernel: AbstractKernel) -> None:
     perm_length = 2
     dim_pairs = list(permutations(dim_list, r=perm_length))
     n_dims = len(dim_list)
-    key = jr.PRNGKey(123)
-    X = jr.normal(key, shape=(20, n_dims))
+ 
+    # Generate random inputs
+    x = jr.normal(_initialise_key, shape=(20, n_dims))
 
     for dp in dim_pairs:
-        Xslice = X[..., dp]
+        # Take slice of x
+        slice = x[..., dp]
+
+        # Define kernels
         ad_kern = kernel(active_dims=dp)
         manual_kern = kernel(active_dims=[i for i in range(perm_length)])
 
-        ad_default_params = ad_kern._initialise_params(key)
-        manual_default_params = manual_kern._initialise_params(key)
+        # Unpack kernel computation
+        ad_gram = ad_kern.gram
+        manual_gram = manual_kern.gram
 
-        k1 = ad_kern.gram(ad_kern, X, ad_default_params)
-        k2 = manual_kern.gram(manual_kern, Xslice, manual_default_params)
-        assert jnp.all(k1.to_dense() == k2.to_dense())
+        # Get initial parameters
+        ad_params = ad_kern._initialise_params(_initialise_key)
+        manual_params = manual_kern._initialise_params(_initialise_key)
+
+        # Compute gram matrices
+        ad_Kxx = ad_gram(ad_kern, ad_params, x)
+        manual_Kxx = manual_gram(manual_kern, manual_params, slice)
+
+        # Test gram matrices are equal
+        assert jnp.all(ad_Kxx.to_dense() == manual_Kxx.to_dense())
 
 
 @pytest.mark.parametrize("combination_type", [SumKernel, ProductKernel])
@@ -270,18 +292,44 @@ def test_combination_kernel(
     combination_type: CombinationKernel, kernel: AbstractKernel, n_kerns: int
 ) -> None:
 
+    # Create inputs
     n = 20
-    kern_list = [kernel() for _ in range(n_kerns)]
-    c_kernel = combination_type(kernel_set=kern_list)
-    assert len(c_kernel.kernel_set) == n_kerns
-    assert len(c_kernel._initialise_params(_initialise_key)) == n_kerns
-    assert isinstance(c_kernel.kernel_set, list)
-    assert isinstance(c_kernel.kernel_set[0], AbstractKernel)
-    assert isinstance(c_kernel._initialise_params(_initialise_key)[0], dict)
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
-    Kff = c_kernel.gram(c_kernel, x, c_kernel._initialise_params(_initialise_key))
-    assert Kff.shape[0] == Kff.shape[1]
-    assert Kff.shape[1] == n
+
+    # Create list of kernels
+    kernel_set = [kernel() for _ in range(n_kerns)]
+
+    # Create combination kernel
+    combination_kernel = combination_type(kernel_set=kernel_set)
+
+    # Unpack kernel computation
+    gram = combination_kernel.gram
+
+    # Initialise default parameters
+    params = combination_kernel._initialise_params(_initialise_key)
+
+    # Check params are a list of dictionaries
+    assert len(params) == n_kerns
+
+    for p in params:
+        assert isinstance(p, dict)
+
+    # Check combination kernel set
+    assert len(combination_kernel.kernel_set) == n_kerns
+    assert isinstance(combination_kernel.kernel_set, list)
+    assert isinstance(combination_kernel.kernel_set[0], AbstractKernel)
+    
+    # Compute gram matrix
+    Kxx = gram(combination_kernel, params, x)
+
+    # Check shapes
+    assert Kxx.shape[0] == Kxx.shape[1]
+    assert Kxx.shape[1] == n
+
+    # Check positive definiteness
+    Kxx += I(n) * _jitter
+    eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
+    assert (eigen_values > 0).all()
 
 
 @pytest.mark.parametrize(
@@ -291,17 +339,38 @@ def test_combination_kernel(
     "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
 )
 def test_sum_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
+    # Create inputs
     n = 10
-    sum_kernel = SumKernel(kernel_set=[k1, k2])
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
-    Kff = sum_kernel.gram(
-        sum_kernel, x, sum_kernel._initialise_params(_initialise_key)
-    ).to_dense()
-    Kff_manual = (
-        k1.gram(k1, x, k1._initialise_params(_initialise_key)).to_dense()
-        + k2.gram(k2, x, k2._initialise_params(_initialise_key)).to_dense()
-    )
-    assert jnp.all(Kff == Kff_manual)
+
+    # Create sum kernel
+    sum_kernel = SumKernel(kernel_set=[k1, k2])
+
+    # Unpack kernel computation
+    gram = sum_kernel.gram
+
+    # Initialise default parameters
+    params = sum_kernel._initialise_params(_initialise_key)
+
+    # Compute gram matrix
+    Kxx = gram(sum_kernel, params, x)
+
+    # NOW we do the same thing manually and check they are equal:
+
+    # Unpack kernel computation
+    k1_gram = k1.gram
+    k2_gram = k2.gram
+
+    # Initialise default parameters
+    k1_params = k1._initialise_params(_initialise_key)
+    k2_params = k2._initialise_params(_initialise_key)
+
+    # Compute gram matrix
+    Kxx_k1 = k1_gram(k1, k1_params, x)
+    Kxx_k2 = k2_gram(k2, k2_params, x)
+
+    # Check manual and automatic gram matrices are equal
+    assert jnp.all(Kxx.to_dense() == Kxx_k1.to_dense() + Kxx_k2.to_dense())
 
 
 @pytest.mark.parametrize(
@@ -311,44 +380,81 @@ def test_sum_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
     "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
 )
 def test_prod_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
+   
+   # Create inputs
     n = 10
-    prod_kernel = ProductKernel(kernel_set=[k1, k2])
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
-    Kff = prod_kernel.gram(
-        prod_kernel, x, prod_kernel._initialise_params(_initialise_key)
-    ).to_dense()
-    Kff_manual = (
-        k1.gram(k1, x, k1._initialise_params(_initialise_key)).to_dense()
-        * k2.gram(k2, x, k2._initialise_params(_initialise_key)).to_dense()
-    )
-    assert jnp.all(Kff == Kff_manual)
+    
+    # Create product kernel
+    prod_kernel = ProductKernel(kernel_set=[k1, k2])
+
+    # Unpack kernel computation
+    gram = prod_kernel.gram
+
+    # Initialise default parameters
+    params = prod_kernel._initialise_params(_initialise_key)
+
+    # Compute gram matrix
+    Kxx = gram(prod_kernel, params, x)
+
+    # NOW we do the same thing manually and check they are equal:
+
+    # Unpack kernel computation
+    k1_gram = k1.gram
+    k2_gram = k2.gram
+
+    # Initialise default parameters
+    k1_params = k1._initialise_params(_initialise_key)
+    k2_params = k2._initialise_params(_initialise_key)
+
+    # Compute gram matrix
+    Kxx_k1 = k1_gram(k1, k1_params, x)
+    Kxx_k2 = k2_gram(k2, k2_params, x)
+
+    # Check manual and automatic gram matrices are equal
+    assert jnp.all(Kxx.to_dense() == Kxx_k1.to_dense() * Kxx_k2.to_dense())
 
 
 def test_graph_kernel():
+
+    # Create a random graph, G, and verice labels, x,
     n_verticies = 20
     n_edges = 40
     G = nx.gnm_random_graph(n_verticies, n_edges, seed=123)
+    x = jnp.arange(n_verticies).reshape(-1, 1)
+    
+    # Compute graph laplacian
     L = nx.laplacian_matrix(G).toarray() + jnp.eye(n_verticies) * 1e-12
+    
+    # Create graph kernel
     kern = GraphKernel(laplacian=L)
     assert isinstance(kern, GraphKernel)
     assert isinstance(kern, _EigenKernel)
+    assert kern.num_vertex == n_verticies
+    assert kern.evals.shape == (n_verticies, 1)
+    assert kern.evecs.shape == (n_verticies, n_verticies)
 
-    kern_params = kern._initialise_params(_initialise_key)
-    assert isinstance(kern_params, dict)
-    assert list(sorted(list(kern_params.keys()))) == [
+    # Unpack kernel computation
+    gram = kern.gram
+
+    # Initialise default parameters
+    params = kern._initialise_params(_initialise_key)
+    assert isinstance(params, dict)
+    assert list(sorted(list(params.keys()))) == [
         "lengthscale",
         "smoothness",
         "variance",
     ]
-    x = jnp.arange(n_verticies).reshape(-1, 1)
-    Kxx = kern.gram(kern, x, kern._initialise_params(_initialise_key))
+    
+    # Compute gram matrix
+    Kxx = gram(kern, params, x)
     assert Kxx.shape == (n_verticies, n_verticies)
-    eigen_values, _ = jnp.linalg.eigh(Kxx.to_dense() + jnp.eye(n_verticies) * 1e-8)
-    assert all(eigen_values > 0)
 
-    assert kern.num_vertex == n_verticies
-    assert kern.evals.shape == (n_verticies, 1)
-    assert kern.evecs.shape == (n_verticies, n_verticies)
+    # Check positive definiteness
+    Kxx += I(n_verticies) * _jitter
+    eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
+    assert all(eigen_values > 0)
+   
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52, Polynomial])

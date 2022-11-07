@@ -22,6 +22,7 @@ from chex import dataclass
 from jax import vmap
 from jaxtyping import Array, Float
 
+from .config import get_defaults
 from .covariance_operator import I
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
@@ -132,7 +133,7 @@ class StochasticVI(AbstractVariationalInference):
 
         # log(p(y|f(x)))
         link_function = self.likelihood.link_function
-        log_prob = vmap(lambda f, y: link_function(f, params["likelihood"]).log_prob(y))
+        log_prob = vmap(lambda f, y: link_function(params["likelihood"], f).log_prob(y))
 
         # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
         expectation = gauss_hermite_quadrature(log_prob, mean, variance, y=y)
@@ -180,7 +181,7 @@ class CollapsedVI(AbstractVariationalInference):
         gram, cross_covariance = kernel.gram, kernel.cross_covariance
 
         m = self.num_inducing
-        jitter = self.variational_family.jitter
+        jitter = get_defaults()["jitter"]
 
         # Constant for whether or not to negate the elbo for optimisation purposes
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
@@ -188,11 +189,11 @@ class CollapsedVI(AbstractVariationalInference):
         def elbo_fn(params: Dict) -> Float[Array, "1"]:
             noise = params["likelihood"]["obs_noise"]
             z = params["variational_family"]["inducing_inputs"]
-            Kzz = gram(kernel, z, params["kernel"])
+            Kzz = gram(kernel, params["kernel"], z)
             Kzz += I(m) * jitter
-            Kzx = cross_covariance(kernel, z, x, params["kernel"])
-            Kxx_diag = vmap(kernel, in_axes=(0, 0, None))(x, x, params["kernel"])
-            μx = mean_function(x, params["mean_function"])
+            Kzx = cross_covariance(kernel, params["kernel"], z, x)
+            Kxx_diag = vmap(kernel, in_axes=(0, 0, None))(params["kernel"], x, x)
+            μx = mean_function(params["mean_function"], x)
 
             Lz = Kzz.triangular_lower()
 

@@ -31,12 +31,12 @@ class AbstractMeanFunction:
     name: Optional[str] = "Mean function"
 
     @abc.abstractmethod
-    def __call__(self, x: Float[Array, "N D"], params: Dict) -> Float[Array, "N Q"]:
+    def __call__(self, params: Dict, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
         """Evaluate the mean function at the given points. This method is required for all subclasses.
 
         Args:
-            x (Float[Array, "N D"]): The input points at which to evaluate the mean function.
             params (Dict): The parameters of the mean function.
+            x (Float[Array, "N D"]): The input points at which to evaluate the mean function.
 
         Returns:
             Float[Array, "N Q"]: The mean function evaluated point-wise on the inputs.
@@ -65,12 +65,12 @@ class Zero(AbstractMeanFunction):
     output_dim: Optional[int] = 1
     name: Optional[str] = "Zero mean function"
 
-    def __call__(self, x: Float[Array, "N D"], params: Dict) -> Float[Array, "N Q"]:
+    def __call__(self, params: Dict, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
         """Evaluate the mean function at the given points.
 
         Args:
-            x (Float[Array, "N D"]): The input points at which to evaluate the mean function.
             params (Dict): The parameters of the mean function.
+            x (Float[Array, "N D"]): The input points at which to evaluate the mean function.
 
         Returns:
             Float[Array, "N Q"]: A vector of zeros.
@@ -100,12 +100,12 @@ class Constant(AbstractMeanFunction):
     output_dim: Optional[int] = 1
     name: Optional[str] = "Constant mean function"
 
-    def __call__(self, x: Float[Array, "N D"], params: Dict) -> Float[Array, "N Q"]:
+    def __call__(self, params: Dict, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
         """Evaluate the mean function at the given points.
 
         Args:
-            x (Float[Array, "N D"]): The input points at which to evaluate the mean function.
             params (Dict): The parameters of the mean function.
+            x (Float[Array, "N D"]): The input points at which to evaluate the mean function.
 
         Returns:
             Float[Array, "N Q"]: A vector of repeated constant values.

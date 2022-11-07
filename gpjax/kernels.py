@@ -44,19 +44,19 @@ class AbstractKernel:
     spectral: Optional[bool] = False
     name: Optional[str] = "AbstractKernel"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     @abc.abstractmethod
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
+        self,params: Dict,  x: Float[Array, "1 D"], y: Float[Array, "1 D"], 
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs.
 
         Args:
+            params (Dict): Parameter set for which the kernel should be evaluated on.
             x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
-            params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`.
@@ -123,15 +123,17 @@ class AbstractKernelComputation:
     @staticmethod
     @abc.abstractmethod
     def gram(
-        kernel: AbstractKernel, inputs: Float[Array, "N D"], params: Dict
+        kernel: AbstractKernel,
+        params: Dict,
+        inputs: Float[Array, "N D"], 
     ) -> CovarianceOperator:
 
         """Compute Gram covariance operator of the kernel function.
 
         Args:
             kernel (AbstractKernel): The kernel function to be evaluated.
-            inputs (Float[Array, "N N"]): The inputs to the kernel function.
             params (Dict): The parameters of the kernel function.
+            inputs (Float[Array, "N N"]): The inputs to the kernel function.
 
         Returns:
             CovarianceOperator: Gram covariance operator of the kernel function.
@@ -142,40 +144,44 @@ class AbstractKernelComputation:
     @staticmethod
     def cross_covariance(
         kernel: AbstractKernel,
+        params: Dict,
         x: Float[Array, "N D"],
         y: Float[Array, "M D"],
-        params: Dict,
     ) -> Float[Array, "N M"]:
         """For a given kernel, compute the NxM gram matrix on an a pair of input matrices with shape NxD and MxD.
 
         Args:
             kernel (AbstractKernel): The kernel for which the cross-covariance matrix should be computed for.
+            params (Dict): The kernel's parameter set.
             x (Float[Array,"N D"]): The first input matrix.
             y (Float[Array,"M D"]): The second input matrix.
-            params (Dict): The kernel's parameter set.
 
         Returns:
             Float[Array, "N M"]: The computed square Gram matrix.
         """
 
-        cross_cov = vmap(lambda x: vmap(lambda y: kernel(x, y, params))(y))(x)
+        cross_cov = vmap(lambda x: vmap(lambda y: kernel(params, x, y))(y))(x)
 
         return cross_cov
 
     @staticmethod
     def diagonal(
-        kernel: AbstractKernel, inputs: Float[Array, "N D"], params: Dict
+        kernel: AbstractKernel, 
+        params: Dict,
+        inputs: Float[Array, "N D"], 
     ) -> CovarianceOperator:
         """For a given kernel, compute the elementwise diagonal of the NxN gram matrix on an input matrix of shape NxD.
+        
         Args:
             kernel (AbstractKernel): The kernel for which the variance vector should be computed for.
-            inputs (Float[Array, "N D"]): The input matrix.
             params (Dict): The kernel's parameter set.
+            inputs (Float[Array, "N D"]): The input matrix.
+        
         Returns:
             CovarianceOperator: The computed diagonal variance entries.
         """
 
-        diag = vmap(lambda x: kernel(x, x, params))(inputs)
+        diag = vmap(lambda x: kernel(params, x, x))(inputs)
 
         return DiagonalCovarianceOperator(diag=diag)
 
@@ -185,20 +191,22 @@ class DenseKernelComputation(AbstractKernelComputation):
 
     @staticmethod
     def gram(
-        kernel: AbstractKernel, inputs: Float[Array, "N D"], params: Dict
+        kernel: AbstractKernel, 
+        params: Dict, 
+        inputs: Float[Array, "N D"], 
     ) -> CovarianceOperator:
         """For a given kernel, compute the NxN gram matrix on an input matrix of shape NxD.
 
         Args:
             kernel (AbstractKernel): The kernel for which the Gram matrix should be computed for.
-            inputs (Float[Array,"N D"]): The input matrix.
             params (Dict): The kernel's parameter set.
+            inputs (Float[Array,"N D"]): The input matrix.
 
         Returns:
             CovarianceOperator: The computed square Gram matrix.
         """
 
-        matrix = vmap(lambda x: vmap(lambda y: kernel(x, y, params))(inputs))(inputs)
+        matrix = vmap(lambda x: vmap(lambda y: kernel(params, x, y))(inputs))(inputs)
 
         return DenseCovarianceOperator(matrix=matrix)
 
@@ -206,26 +214,29 @@ class DenseKernelComputation(AbstractKernelComputation):
 class DiagonalKernelComputation(AbstractKernelComputation):
     @staticmethod
     def gram(
-        kernel: AbstractKernel, inputs: Float[Array, "N D"], params: Dict
+        kernel: AbstractKernel, 
+        params: Dict,
+        inputs: Float[Array, "N D"], 
     ) -> CovarianceOperator:
         """For a kernel with diagonal structure, compute the NxN gram matrix on an input matrix of shape NxD.
 
         Args:
             kernel (AbstractKernel): The kernel for which the Gram matrix should be computed for.
-            inputs (Float[Array, "N D"]): The input matrix.
             params (Dict): The kernel's parameter set.
+            inputs (Float[Array, "N D"]): The input matrix.
 
         Returns:
             CovarianceOperator: The computed square Gram matrix.
         """
 
-        diag = vmap(lambda x: kernel(x, x, params))(inputs)
+        diag = vmap(lambda x: kernel(params, x, x))(inputs)
 
         return DiagonalCovarianceOperator(diag=diag)
 
 
 @dataclass
 class _KernelSet:
+    """A mixin class for storing a list of kernels. Useful for combination kernels."""
     kernel_set: List[AbstractKernel]
 
 
@@ -236,7 +247,7 @@ class CombinationKernel(AbstractKernel, _KernelSet, DenseKernelComputation):
     name: Optional[str] = "Combination kernel"
     combination_fn: Optional[Callable] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Set the kernel set to the list of kernels passed to the constructor."""
         kernels = self.kernel_set
 
@@ -255,6 +266,7 @@ class CombinationKernel(AbstractKernel, _KernelSet, DenseKernelComputation):
                 kernels_list.extend(k.kernel_set)
             else:
                 kernels_list.append(k)
+        
         self.kernel_set = kernels_list
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
@@ -262,10 +274,20 @@ class CombinationKernel(AbstractKernel, _KernelSet, DenseKernelComputation):
         return [kernel._initialise_params(key) for kernel in self.kernel_set]
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"], 
     ) -> Float[Array, "1"]:
+        """Evaluate combination kernel on a pair of inputs.
+
+        Args:
+            params (Dict): Parameter set for which the kernel should be evaluated on.
+            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
+
+        Returns:
+            Float[Array, "1"]: The value of :math:`k(x, y)`.
+        """
         return self.combination_fn(
-            jnp.stack([k(x, y, p) for k, p in zip(self.kernel_set, params)])
+            jnp.stack([k(p, x, y) for k, p in zip(self.kernel_set, params)])
         )
 
 
@@ -294,11 +316,11 @@ class RBF(AbstractKernel, DenseKernelComputation):
 
     name: Optional[str] = "Radial basis function kernel"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"] 
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma^2`
 
@@ -306,9 +328,9 @@ class RBF(AbstractKernel, DenseKernelComputation):
             k(x, y) = \\sigma^2 \\exp \\Bigg( \\frac{\\lVert x - y \\rVert^2_2}{2 \\ell^2} \\Bigg)
 
         Args:
+            params (Dict): Parameter set for which the kernel should be evaluated on.
             x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
-            params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`.
@@ -325,22 +347,17 @@ class RBF(AbstractKernel, DenseKernelComputation):
         }
 
 
-# @dataclass
-# class RBF(_RBF, DenseKernelComputation):
-#     pass
-
-
 @dataclass(repr=False)
 class Matern12(AbstractKernel, DenseKernelComputation):
     """The Matérn kernel with smoothness parameter fixed at 0.5."""
 
     name: Optional[str] = "Matern 1/2"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"], 
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma^2`
 
@@ -348,9 +365,9 @@ class Matern12(AbstractKernel, DenseKernelComputation):
             k(x, y) = \\sigma^2 \\exp \\Bigg( -\\frac{\\lvert x-y \\rvert}{\\ell}  \\Bigg)
 
         Args:
+            params (Dict): Parameter set for which the kernel should be evaluated on.
             x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
-            params (Dict): Parameter set for which the kernel should be evaluated on.
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`
         """
@@ -372,11 +389,11 @@ class Matern32(AbstractKernel, DenseKernelComputation):
 
     name: Optional[str] = "Matern 3/2"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"], 
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
 
@@ -384,9 +401,9 @@ class Matern32(AbstractKernel, DenseKernelComputation):
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{3}\\lvert x-y \\rvert}{\\ell}  \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{3}\\lvert x-y\\rvert}{\\ell} \\Bigg)
 
         Args:
+            params (Dict): Parameter set for which the kernel should be evaluated on.
             x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
-            params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`.
@@ -414,11 +431,11 @@ class Matern52(AbstractKernel, DenseKernelComputation):
 
     name: Optional[str] = "Matern 5/2"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"] 
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
 
@@ -426,9 +443,9 @@ class Matern52(AbstractKernel, DenseKernelComputation):
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{5}\\lvert x-y \\rvert}{\\ell} + \\frac{5\\lvert x - y \\rvert^2}{3\\ell^2} \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{5}\\lvert x-y\\rvert}{\\ell} \\Bigg)
 
         Args:
+            params (Dict): Parameter set for which the kernel should be evaluated on.
             x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
-            params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`.
@@ -457,12 +474,12 @@ class Polynomial(AbstractKernel, DenseKernelComputation):
     name: Optional[str] = "Polynomial"
     degree: int = 1
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
         self.name = f"Polynomial Degree: {self.degree}"
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\\alpha` and variance :math:`\sigma^2` through
 
@@ -470,9 +487,9 @@ class Polynomial(AbstractKernel, DenseKernelComputation):
             k(x, y) = \\Big( \\alpha + \\sigma^2 xy \\Big)^{d}
 
         Args:
+            params (Dict): Parameter set for which the kernel should be evaluated on.
             x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
-            params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`.
@@ -491,11 +508,11 @@ class Polynomial(AbstractKernel, DenseKernelComputation):
 
 @dataclass(repr=False)
 class White(AbstractKernel, DiagonalKernelComputation):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\sigma`
 
@@ -503,9 +520,9 @@ class White(AbstractKernel, DiagonalKernelComputation):
             k(x, y) = \\sigma^2 \delta(x-y)
 
         Args:
+            params (Dict): Parameter set for which the kernel should be evaluated on.
             x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
-            params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`.
@@ -537,21 +554,21 @@ class _EigenKernel:
 class GraphKernel(AbstractKernel, _EigenKernel, DenseKernelComputation):
     name: Optional[str] = "Graph kernel"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.ndims = 1
         evals, self.evecs = jnp.linalg.eigh(self.laplacian)
         self.evals = evals.reshape(-1, 1)
         self.num_vertex = self.laplacian.shape[0]
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
+        self,  params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
         """Evaluate the graph kernel on a pair of vertices :math:`v_i, v_j`.
 
         Args:
+            params (Dict): Parameter set for which the kernel should be evaluated on.
             x (Float[Array, "1 D"]): Index of the ith vertex.
             y (Float[Array, "1 D"]): Index of the jth vertex.
-            params (Dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(v_i, v_j)`.
