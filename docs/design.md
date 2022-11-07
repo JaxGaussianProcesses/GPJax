@@ -1,9 +1,8 @@
-# GPJax Principles
+# Design Principles
 
-GPJax is designed to be a Gaussian process package that provides an
-accurate representation of the underlying maths. Variable names are
-designed to closely, if not exactly, match the notation in {cite}`rasmussen2006gaussian`.
-We here list the notation used in GPJax with its corresponding mathematical quantity.
+`GPJax` is designed to be a Gaussian process package that provides an
+accurate representation of the underlying maths. Variable names are chosen to closely match the notation in {cite}`rasmussen2006gaussian`.
+We here list the notation used in `GPJax` with its corresponding mathematical quantity. 
 
 ## Gaussian process notation
 
@@ -20,10 +19,14 @@ We here list the notation used in GPJax with its corresponding mathematical quan
 | $\mathbf{L}_{\boldsymbol{x}}$               | Lx         | Lower Cholesky decomposition of $\boldsymbol{K}_{\boldsymbol{x}\boldsymbol{x}}$ |
 | $\mathbf{K}_{\boldsymbol{t}\boldsymbol{x}}$ | Ktx        | Cross-covariance between inputs $\boldsymbol{t}$ and $\boldsymbol{x}$           |
 
-# Sparse Gaussian process notation
+## Sparse Gaussian process notation
 
 | On paper                              | GPJax code | Description               |
 | ------------------------------------- | ---------- | ------------------------- |
 | $m$                                   | m          | Number of inducing inputs |
 | $\boldsymbol{z} = (z_1,\dotsc,z_{m})$ | z          | Inducing inputs           |
 | $\boldsymbol{u} = (u_1,\dotsc,u_{m})$ | u          | Inducing outputs          |
+
+## Package style
+
+Prior to building GPJax, the developers of GPJax have benefited greatly from the [GPFlow](https://github.com/GPflow/GPflow) and [GPyTorch](https://github.com/cornellius-gp/gpytorch) packages. As such, many of the design principles in GPJax are inspired by the excellent precursory pacakges. Documentation designs have been greatly inspired by the exceptional [Flax docs](https://flax.readthedocs.io/en/latest/index.html).

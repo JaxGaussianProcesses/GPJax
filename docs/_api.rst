@@ -8,18 +8,34 @@ Package Reference
 Gaussian Processes
 #################################
 
+The Gaussian process abstractions in GPJax can be segmented into two distinct
+types: prior and posterior objects. This makes for a clean separation of both
+code and mathematical concepts. Throught the multiplication of a
+`Prior <https://gpjax.readthedocs.io/en/latest/api.html#gaussian-process-priors>`_
+and `Likelihood <https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.likelihoods>`_,
+GPJax will then return the appropriate `Posterior <https://gpjax.readthedocs.io/en/latest/api.html#gaussian-process-posteriors>`_.
+
+
 .. automodule:: gpjax.gps
 .. currentmodule:: gpjax.gps
-
 
 Abstract GPs
 *********************************
 
-.. autoclass:: AbstractGP
+To ensure a consistent API, we subclass all Gaussian process objects from either
+``AbstractPrior`` or ``AbstractPosterior``. These classes are not intended to be
+used directly, but instead to provide a common interface for all downstream Gaussian
+process objects.
+
+.. autoclass:: AbstractPrior
    :members:
+   :special-members: __call__
+   :private-members: _initialise_params
+   :exclude-members: from_tuple, replace, to_tuple
 
 .. autoclass:: AbstractPosterior
    :members:
+   :special-members: __call__
 
 
 Gaussian Process Priors
@@ -27,15 +43,28 @@ Gaussian Process Priors
 
 .. autoclass:: Prior
    :members:
+   :special-members: __call__, __mul__
 
 Gaussian Process Posteriors
 *********************************
 
+There are two main classes of posterior Gaussian process objects within GPJax.
+The ``ConjugatePosterior`` class is used when the likelihood distribution is
+Gaussian whilst the ``NonConjugatePosterior`` class is used when the likelihood
+distribution is non-Gaussian.
+
 .. autoclass:: ConjugatePosterior
    :members:
+   :special-members: __call__
 
 .. autoclass:: NonConjugatePosterior
    :members:
+   :special-members: __call__
+
+Posterior Constructors
+*********************************
+
+.. autofunction:: construct_posterior
 
 
 Kernels
@@ -47,12 +76,6 @@ Kernels
 Kernel Functions
 *********************************
 
-.. autofunction:: gram
-
-.. autofunction:: cross_covariance
-
-.. autofunction:: diagonal
-
 .. autofunction:: euclidean_distance
 
 .. autofunction:: squared_distance
@@ -60,12 +83,14 @@ Kernel Functions
 Abstract Kernels
 *********************************
 
-.. autoclass:: Kernel
+.. autoclass:: AbstractKernel
    :members:
 
 .. autoclass:: CombinationKernel
    :members:
 
+.. autoclass:: AbstractKernelComputation
+   :members:
 
 Stationary Kernels
 *********************************
@@ -104,6 +129,16 @@ Combination Kernels
 
 .. autoclass:: ProductKernel
    :members:
+
+Kernel Computations
+*********************************
+
+.. autoclass:: DenseKernelComputation
+   :members:
+
+.. autoclass:: DiagonalKernelComputation
+   :members:
+
 
 Likelihoods
 #################################
@@ -193,6 +228,25 @@ Gaussian Families
 .. autoclass:: VariationalGaussian
    :members:
 
+Natural Gradients
+*********************************
+
+.. automodule:: gpjax.natural_gradients
+.. currentmodule:: gpjax.natural_gradients
+
+.. autofunction:: natural_gradients
+
+.. autofunction:: natural_to_expectation
+
+.. autofunction:: _expectation_elbo
+
+.. autofunction:: _rename_expectation_to_natural
+
+.. autofunction:: _rename_natural_to_expectation
+
+.. autofunction:: _get_moment_trainables
+
+.. autofunction:: _get_hyperparameter_trainables
 
 Datasets
 #################################
@@ -226,13 +280,11 @@ Utilities
 .. automodule:: gpjax.utils
 .. currentmodule:: gpjax.utils
 
-.. autofunction:: I
-
 .. autofunction:: concat_dictionaries
 
 .. autofunction:: sort_dictionary
 
-.. autofunction:: as_constant
+.. autofunction:: merge_dictionaries
 
 .. autofunction:: dict_array_coercion
 

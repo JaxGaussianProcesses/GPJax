@@ -1,21 +1,31 @@
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import jax.numpy as jnp
 import pytest
+from jax.config import config
 
 from gpjax.utils import (
-    I,
-    as_constant,
     concat_dictionaries,
     dict_array_coercion,
     merge_dictionaries,
     sort_dictionary,
 )
 
-
-@pytest.mark.parametrize("n", [1, 10, 100])
-def test_identity(n):
-    identity = I(n)
-    assert identity.shape == (n, n)
-    assert (jnp.diag(identity) == jnp.ones(shape=(n,))).all()
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 
 
 def test_concat_dict():
@@ -39,16 +49,6 @@ def test_sort_dict():
     sorted_dict = sort_dictionary(unsorted)
     assert list(sorted_dict.keys()) == ["a", "b"]
     assert list(sorted_dict.values()) == [2, 1]
-
-
-def test_as_constant():
-    base = {"a": 1, "b": 2, "c": 3}
-    b1, s1 = as_constant(base, ["a"])
-    b2, s2 = as_constant(base, ["a", "b"])
-    assert list(b1.keys()) == ["b", "c"]
-    assert list(s1.keys()) == ["a"]
-    assert list(b2.keys()) == ["c"]
-    assert list(s2.keys()) == ["a", "b"]
 
 
 @pytest.mark.parametrize("d", [1, 2, 10])
