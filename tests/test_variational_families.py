@@ -13,13 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-import typing as tp
+from typing import Callable, Dict, Optional, Tuple
 
 import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
 from jax.config import config
+from jaxtyping import Float, Array
 
 import gpjax as gpx
 from gpjax.variational_families import (
@@ -36,33 +37,46 @@ config.update("jax_enable_x64", True)
 
 
 def test_abstract_variational_family():
+    # Test that the abstract class cannot be instantiated.
     with pytest.raises(TypeError):
         AbstractVariationalFamily()
 
+    # Create a dummy variational family class with abstract methods implemented.
+    class DummyVariationalFamily(AbstractVariationalFamily):
+        def predict(self, params: Dict, x: Float[Array, "N D"]) -> dx.Distribution:
+            return dx.MultivariateNormalDiag(loc=x)
 
-def vector_shape(n_inducing):
+        def _initialise_params(self, key: jr.PRNGKey) -> dict:
+            return {}
+    
+    # Test that the dummy variational family can be instantiated.
+    dummy_variational_family = DummyVariationalFamily()
+    assert isinstance(dummy_variational_family, AbstractVariationalFamily)
+
+
+# Functions to test variational family parameter shapes upon initialisation.
+def vector_shape(n_inducing: int) -> Tuple[int, int]:
     """Shape of a vector with n_inducing rows and 1 column"""
     return (n_inducing, 1)
 
-
-def matrix_shape(n_inducing):
+def matrix_shape(n_inducing: int) -> Tuple[int, int]:
     """Shape of a matrix with n_inducing rows and 1 column"""
     return (n_inducing, n_inducing)
 
 
-def vector_val(val):
+# Functions to test variational parameter values upon initialisation.
+def vector_val(val: float) -> Callable[[int], Float[Array, "n_inducing 1"]]:
     """Vector of shape (n_inducing, 1) filled with val"""
 
-    def vector_val_fn(n_inducing):
+    def vector_val_fn(n_inducing: int):
         return val * jnp.ones(vector_shape(n_inducing))
 
     return vector_val_fn
 
-
-def diag_matrix_val(val):
+def diag_matrix_val(val: float) -> Callable[[int], Float[Array, "n_inducing n_inducing"]]:
     """Diagonal matrix of shape (n_inducing, n_inducing) filled with val"""
 
-    def diag_matrix_fn(n_inducing):
+    def diag_matrix_fn(n_inducing: int) -> Float[Array, "n_inducing n_inducing"]:
         return jnp.eye(n_inducing) * val
 
     return diag_matrix_fn
@@ -100,8 +114,13 @@ def diag_matrix_val(val):
     ],
 )
 def test_variational_gaussians(
-    n_test, n_inducing, variational_family, moment_names, shapes, values
-):
+    n_test: int, 
+    n_inducing: int, 
+    variational_family: AbstractVariationalFamily, 
+    moment_names: Tuple[str, str],
+    shapes: Tuple,
+    values: Tuple,
+) -> None:
 
     # Initialise variational family:
     prior = gpx.Prior(kernel=gpx.RBF())
@@ -143,7 +162,7 @@ def test_variational_gaussians(
 
     # Test predictions
     predictive_dist_fn = q(params)
-    assert isinstance(predictive_dist_fn, tp.Callable)
+    assert isinstance(predictive_dist_fn, Callable)
 
     predictive_dist = predictive_dist_fn(test_inputs)
     assert isinstance(predictive_dist, dx.Distribution)
@@ -161,7 +180,7 @@ def test_variational_gaussians(
 @pytest.mark.parametrize("n_datapoints", [1, 10])
 @pytest.mark.parametrize("n_inducing", [1, 10, 20])
 @pytest.mark.parametrize("point_dim", [1, 2])
-def test_collapsed_variational_gaussian(n_test, n_inducing, n_datapoints, point_dim):
+def test_collapsed_variational_gaussian(n_test: int, n_inducing: int, n_datapoints: int, point_dim: int) -> None:
     x = jnp.linspace(-5.0, 5.0, n_datapoints).reshape(-1, 1)
     y = jnp.sin(x) + jr.normal(key=jr.PRNGKey(123), shape=x.shape) * 0.1
     x = jnp.hstack([x] * point_dim)
@@ -208,8 +227,8 @@ def test_collapsed_variational_gaussian(n_test, n_inducing, n_datapoints, point_
 
     # Test predictions
     params = variational_family._initialise_params(jr.PRNGKey(123))
-    predictive_dist_fn = variational_family(D, params)
-    assert isinstance(predictive_dist_fn, tp.Callable)
+    predictive_dist_fn = variational_family(params, D)
+    assert isinstance(predictive_dist_fn, Callable)
 
     predictive_dist = predictive_dist_fn(test_inputs)
     assert isinstance(predictive_dist, dx.Distribution)

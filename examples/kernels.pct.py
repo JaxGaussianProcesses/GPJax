@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: base
 #     language: python
 #     name: python3
 # ---
@@ -30,6 +30,7 @@ from jax import jit
 from jax.config import config
 from jaxtyping import Array, Float
 from optax import adam
+from typing import Dict
 
 import gpjax as gpx
 
@@ -100,9 +101,17 @@ print(f"Lengthscales: {slice_kernel._initialise_params(key)['lengthscale']}")
 # We'll now simulate some data and evaluate the kernel on the previously selected input dimensions.
 
 # %%
+# Inputs
 x_matrix = jr.normal(key, shape=(50, 5))
+
+# Gram kernel computation
 gram_fn = slice_kernel.gram
-K = gram_fn(slice_kernel, x_matrix, slice_kernel._initialise_params(key))
+
+# Default parameter dictionary
+params = slice_kernel._initialise_params(key)
+
+# Compute the Gram matrix
+K = gram_fn(slice_kernel, params, x_matrix)
 print(K.shape)
 
 # %% [markdown]
@@ -119,9 +128,9 @@ k2 = gpx.Polynomial()
 sum_k = k1 + k2
 
 fig, ax = plt.subplots(ncols=3, figsize=(20, 5))
-im0 = ax[0].matshow(k1.gram(k1, x, k1._initialise_params(key)).to_dense())
-im1 = ax[1].matshow(k2.gram(k2, x, k2._initialise_params(key)).to_dense())
-im2 = ax[2].matshow(sum_k.gram(sum_k, x, sum_k._initialise_params(key)).to_dense())
+im0 = ax[0].matshow(k1.gram(k1, k1._initialise_params(key), x).to_dense())
+im1 = ax[1].matshow(k2.gram(k2, k2._initialise_params(key), x).to_dense())
+im2 = ax[2].matshow(sum_k.gram(sum_k, sum_k._initialise_params(key), x).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
@@ -136,10 +145,10 @@ k3 = gpx.Matern32()
 prod_k = k1 * k2 * k3
 
 fig, ax = plt.subplots(ncols=4, figsize=(20, 5))
-im0 = ax[0].matshow(k1.gram(k1, x, k1._initialise_params(key)).to_dense())
-im1 = ax[1].matshow(k2.gram(k2, x, k2._initialise_params(key)).to_dense())
-im2 = ax[2].matshow(k3.gram(k3, x, k3._initialise_params(key)).to_dense())
-im3 = ax[3].matshow(prod_k.gram(prod_k, x, prod_k._initialise_params(key)).to_dense())
+im0 = ax[0].matshow(k1.gram(k1, k1._initialise_params(key), x).to_dense())
+im1 = ax[1].matshow(k2.gram(k2, k2._initialise_params(key), x).to_dense())
+im2 = ax[2].matshow(k3.gram(k3, k3._initialise_params(key), x).to_dense())
+im3 = ax[3].matshow(prod_k.gram(prod_k, prod_k._initialise_params(key), x).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
@@ -206,7 +215,7 @@ class Polar(gpx.kernels.AbstractKernel, gpx.kernels.DenseKernelComputation):
         self.c = self.period / 2.0  # in [0, \pi]
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: dict
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"] 
     ) -> Float[Array, "1"]:
         tau = params["tau"]
         t = angular_distance(x, y, self.c)
@@ -248,7 +257,7 @@ class Polar(gpx.kernels.AbstractKernel, gpx.kernels.DenseKernelComputation):
 #
 #
 # ### Custom Parameter Bijection
-
+#
 # The constraint on $\tau$ makes optimisation challenging with gradient descent.
 # It would be much easier if we could instead parameterise $\tau$ to be on the
 # real line. Fortunately, this can be taken care of with GPJax's `add parameter`
@@ -256,7 +265,7 @@ class Polar(gpx.kernels.AbstractKernel, gpx.kernels.DenseKernelComputation):
 # bijection (either a Distrax of TensorFlow probability bijector). Under the
 # hood, calling this function updates a configuration object to register this
 # parameter and its corresponding transform.
-
+#
 # To define a bijector here we'll make use of the `Lambda` operator given in
 # Distrax. This lets us convert any regular Jax function into a bijection. Given
 # that we require $\tau$ to be strictly greater than $4.$, we'll apply a
@@ -321,7 +330,7 @@ learned_params, training_history = inference_state.unpack()
 
 # %%
 posterior_rv = likelihood(
-    circlular_posterior(D, learned_params)(angles), learned_params
+    learned_params, circlular_posterior(learned_params, D)(angles)
 )
 mu = posterior_rv.mean()
 one_sigma = posterior_rv.stddev()

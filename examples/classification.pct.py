@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: base
 #     language: python
 #     name: python3
 # ---
@@ -98,9 +98,9 @@ map_estimate, training_history = inference_state.unpack()
 # From which we can make predictions at novel inputs, as illustrated below.
 
 # %%
-map_latent_dist = posterior(D, map_estimate)(xtest)
+map_latent_dist = posterior(map_estimate, D)(xtest)
 
-predictive_dist = likelihood(map_latent_dist, map_estimate)
+predictive_dist = likelihood(map_estimate, map_latent_dist)
 
 predictive_mean = predictive_dist.mean()
 predictive_std = predictive_dist.stddev()
@@ -159,11 +159,11 @@ ax.legend()
 # that we identify as a Gaussian distribution,  $p(\boldsymbol{f}| \mathcal{D}) \approx q(\boldsymbol{f}) := \mathcal{N}(\hat{\boldsymbol{f}}, [-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} ]^{-1} )$. Since the negative Hessian is positive definite, we can use the Cholesky decomposition to obtain the covariance matrix of the Laplace approximation at the datapoints below.
 
 # %%
-gram, cross_covariance = (prior.kernel.gram, prior.kernel.cross_covariance)
+gram, cross_covariance = (kernel.gram, kernel.cross_covariance)
 jitter = 1e-6
 
 # Compute (latent) function value map estimates at training points:
-Kxx = gram(prior.kernel, x, map_estimate["kernel"])
+Kxx = gram(kernel, map_estimate["kernel"], x)
 Kxx += I(D.n) * jitter
 Lx = Kxx.triangular_lower()
 f_hat = jnp.matmul(Lx, map_estimate["latent"])
@@ -193,10 +193,10 @@ laplace_approximation = dx.MultivariateNormalFullCovariance(f_hat.squeeze(), H_i
 # %%
 def construct_laplace(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
 
-    map_latent_dist = posterior(D, map_estimate)(test_inputs)
+    map_latent_dist = posterior(map_estimate, D)(test_inputs)
 
-    Kxt = cross_covariance(prior.kernel, x, test_inputs, map_estimate["kernel"])
-    Kxx = gram(prior.kernel, x, map_estimate["kernel"])
+    Kxt = cross_covariance(kernel, map_estimate["kernel"], x, test_inputs)
+    Kxx = gram(kernel, map_estimate["kernel"], x)
     Kxx += I(D.n) * jitter
     Lx = Kxx.triangular_lower()
 
@@ -219,7 +219,7 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormal
 # From this we can construct the predictive distribution at the test points.
 # %%
 laplace_latent_dist = construct_laplace(xtest)
-predictive_dist = likelihood(laplace_latent_dist, map_estimate)
+predictive_dist = likelihood(map_estimate, laplace_latent_dist)
 
 predictive_mean = predictive_dist.mean()
 predictive_std = predictive_dist.stddev()
@@ -338,8 +338,8 @@ for i in range(0, num_samples, thin_factor):
     ps["latent"] = states.position["latent"][i, :, :]
     ps = gpx.constrain(ps, bijectors)
 
-    latent_dist = posterior(D, ps)(xtest)
-    predictive_dist = likelihood(latent_dist, ps)
+    latent_dist = posterior(ps, D)(xtest)
+    predictive_dist = likelihood(ps, latent_dist)
     samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
 
 samples = jnp.vstack(samples)

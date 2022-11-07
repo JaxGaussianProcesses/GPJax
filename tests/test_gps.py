@@ -79,7 +79,7 @@ def test_conjugate_posterior(num_datapoints):
     assert isinstance(post2, AbstractPrior)
 
     parameter_state = initialise(post, key)
-    params, _, bijectors = parameter_state.unpack()
+    params, *_ = parameter_state.unpack()
 
     # Marginal likelihood
     mll = post.marginal_log_likelihood(train_data=D)
@@ -88,7 +88,7 @@ def test_conjugate_posterior(num_datapoints):
     assert objective_val.shape == ()
 
     # Prediction
-    predictive_dist_fn = post(D, params)
+    predictive_dist_fn = post(params, D)
     assert isinstance(predictive_dist_fn, tp.Callable)
 
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
@@ -130,7 +130,7 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     assert objective_val.shape == ()
 
     # Prediction
-    predictive_dist_fn = post(D, params)
+    predictive_dist_fn = post(params, D)
     assert isinstance(predictive_dist_fn, tp.Callable)
 
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)

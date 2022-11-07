@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: base
 #     language: python
 #     name: python3
 # ---
@@ -31,9 +31,13 @@ import optax as ox
 from chex import dataclass
 from jax.config import config
 from scipy.signal import sawtooth
+from jaxtyping import Float, Array
+from typing import Dict
+
 
 import gpjax as gpx
 from gpjax.kernels import DenseKernelComputation, AbstractKernel
+from gpjax.types import PRNGKeyType
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -84,18 +88,18 @@ class _DeepKernelFunction:
 @dataclass
 class DeepKernelFunction(AbstractKernel, DenseKernelComputation, _DeepKernelFunction):
     def __call__(
-        self, x: jnp.DeviceArray, y: jnp.DeviceArray, params: dict
-    ) -> jnp.ndarray:
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"], 
+    ) -> Float[Array, "1"]:
         xt = self.network.apply(params=params, x=x)
         yt = self.network.apply(params=params, x=y)
-        return self.base_kernel(xt, yt, params=params)
+        return self.base_kernel(params, xt, yt)
 
-    def initialise(self, dummy_x, key):
+    def initialise(self, dummy_x: Float[Array, "1 D"], key: PRNGKeyType) -> None:
         nn_params = self.network.init(rng=key, x=dummy_x)
         base_kernel_params = self.base_kernel._initialise_params(key)
         self._params = {**nn_params, **base_kernel_params}
 
-    def _initialise_params(self, key):
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         return self._params
 
 
@@ -181,8 +185,8 @@ learned_params, training_history = inference_state.unpack()
 # With a set of learned parameters, the only remaining task is to predict the output of the model. We can do this by simply applying the model to a test data set.
 
 # %%
-latent_dist = posterior(D, learned_params)(xtest)
-predictive_dist = likelihood(latent_dist, learned_params)
+latent_dist = posterior(learned_params, D)(xtest)
+predictive_dist = likelihood(learned_params, latent_dist)
 
 predictive_mean = predictive_dist.mean()
 predictive_std = predictive_dist.stddev()

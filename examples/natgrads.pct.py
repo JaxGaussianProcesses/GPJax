@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: base
 #     language: python
 #     name: python3
 # ---
@@ -108,7 +108,7 @@ learned_params, training_history = inference_state.unpack()
 
 # %%
 latent_dist = natural_q(learned_params)(xtest)
-predictive_dist = likelihood(latent_dist, learned_params)
+predictive_dist = likelihood(learned_params, latent_dist)
 
 meanf = predictive_dist.mean()
 sigma = predictive_dist.stddev()
@@ -212,5 +212,3 @@ print(loss_val)
 # %%
 # %reload_ext watermark
 # %watermark -n -u -v -iv -w -a 'Daniel Dodd'
-
-# %%

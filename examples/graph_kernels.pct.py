@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: base
 #     language: python
 #     name: python3
 # ---
@@ -143,8 +143,8 @@ learned_params, training_history = inference_state.unpack()
 
 # %%
 initial_params = parameter_state.params
-initial_dist = likelihood(posterior(D, initial_params)(x), initial_params)
-predictive_dist = likelihood(posterior(D, learned_params)(x), learned_params)
+initial_dist = likelihood(initial_params, posterior(initial_params, D)(x))
+predictive_dist = likelihood(learned_params, posterior(learned_params, D)(x))
 
 initial_mean = initial_dist.mean()
 learned_mean = predictive_dist.mean()

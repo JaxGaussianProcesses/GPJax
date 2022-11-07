@@ -25,8 +25,6 @@ from jaxtyping import Array, Float
 from .config import get_defaults
 from .types import PRNGKeyType
 
-DEFAULT_JITTER = get_defaults()["jitter"]
-
 
 @dataclass
 class AbstractLikelihood:
@@ -112,24 +110,33 @@ class Gaussian(AbstractLikelihood, Conjugate):
         return {"obs_noise": jnp.array([1.0])}
 
     @property
-    def link_function(self) -> Callable:
+    def link_function(self) -> Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]:
         """Return the link function of the Gaussian likelihood. Here, this is simply the identity function, but we include it for completeness.
 
         Returns:
-            Callable: A link function that maps the predictive distribution to the likelihood function.
+            Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]: A link function that maps the predictive distribution to the likelihood function.
         """
 
-        def link_fn(x, params: Dict) -> dx.Normal:
-            return dx.Normal(loc=x, scale=params["obs_noise"])
+        def link_fn(params: Dict, f: Float[Array, "N 1"]) -> dx.Normal:
+            """The link function of the Gaussian likelihood.
+
+            Args:
+                params (Dict): The parameters of the likelihood function.
+                f (Float[Array, "N 1"]): Function values.
+
+            Returns:
+                dx.Normal: The likelihood function.
+            """
+            return dx.Normal(loc=f, scale=params["obs_noise"])
 
         return link_fn
 
-    def predict(self, dist: dx.MultivariateNormalTri, params: Dict) -> dx.Distribution:
+    def predict(self, params: Dict, dist: dx.MultivariateNormalTri) -> dx.Distribution:
         """Evaluate the Gaussian likelihood function at a given predictive distribution. Computationally, this is equivalent to summing the observation noise term to the diagonal elements of the predictive distribution's covariance matrix.
 
         Args:
-            dist (dx.Distribution): The Gaussian process posterior, evaluated at a finite set of test points.
             params (Dict): The parameters of the likelihood function.
+            dist (dx.Distribution): The Gaussian process posterior, evaluated at a finite set of test points.
 
         Returns:
             dx.Distribution: The predictive distribution.
@@ -159,20 +166,29 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
         return {}
 
     @property
-    def link_function(self) -> Callable:
+    def link_function(self) -> Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]:
         """Return the probit link function of the Bernoulli likelihood.
 
         Returns:
-            Callable: A probit link function that maps the predictive distribution to the likelihood function.
+            Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]: A probit link function that maps the predictive distribution to the likelihood function.
         """
 
-        def link_fn(x, params: Dict) -> dx.Distribution:
-            return dx.Bernoulli(probs=inv_probit(x))
+        def link_fn(params: Dict, f: Float[Array, "N 1"]) -> dx.Distribution:
+            """The probit link function of the Bernoulli likelihood.
+
+            Args:
+                params (Dict): The parameters of the likelihood function.
+                f (Float[Array, "N 1"]): Function values.
+            
+            Returns:
+                dx.Distribution: The likelihood function.
+            """
+            return dx.Bernoulli(probs=inv_probit(f))
 
         return link_fn
 
     @property
-    def predictive_moment_fn(self) -> Callable:
+    def predictive_moment_fn(self) -> Callable[[Dict, Float[Array, "N 1"]], Float[Array, "N 1"]]:
         """Instantiate the predictive moment function of the Bernoulli likelihood that is parameterised by a probit link function.
 
         Returns:
@@ -180,26 +196,36 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
         """
 
         def moment_fn(
-            mean: Float[Array, "N D"], variance: Float[Array, "N D"], params: Dict
+            params: Dict, mean: Float[Array, "N 1"], variance: Float[Array, "N 1"], 
         ):
-            rv = self.link_function(mean / jnp.sqrt(1 + variance), params)
+            """The predictive moment function of the Bernoulli likelihood.
+
+            Args:
+                params (Dict): The parameters of the likelihood function.
+                mean (Float[Array, "N 1"]): The mean of the latent function values.
+                variance (Float[Array, "N 1"]): The diagonal variance of the latent function values.
+            
+            Returns:
+                Float[Array, "N 1"]: The pointwise predictive distribution.
+            """
+            rv = self.link_function(params, mean / jnp.sqrt(1.0 + variance))
             return rv
 
         return moment_fn
 
-    def predict(self, dist: dx.Distribution, params: Dict) -> dx.Distribution:
+    def predict(self, params: Dict, dist: dx.Distribution) -> dx.Distribution:
         """Evaluate the pointwise predictive distribution, given a Gaussian process posterior and likelihood parameters.
 
         Args:
-            dist (dx.Distribution): The Gaussian process posterior, evaluated at a finite set of test points.
             params (Dict): The parameters of the likelihood function.
+            dist (dx.Distribution): The Gaussian process posterior, evaluated at a finite set of test points.
 
         Returns:
             dx.Distribution: The pointwise predictive distribution.
         """
         variance = jnp.diag(dist.covariance())
-        mean = dist.mean()
-        return self.predictive_moment_fn(mean.ravel(), variance, params)
+        mean = dist.mean().ravel()
+        return self.predictive_moment_fn(params, mean, variance)
 
 
 def inv_probit(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
@@ -211,7 +237,7 @@ def inv_probit(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
     Returns:
         Float[Array, "N 1"]: The inverse probit of the input vector.
     """
-    jitter = 1e-3  # ensures output is strictly between 0 and 1
+    jitter = 1e-3  # To ensure output is in interval (0, 1).
     return 0.5 * (1.0 + jsp.special.erf(x / jnp.sqrt(2.0))) * (1 - 2 * jitter) + jitter
 
 

@@ -8,7 +8,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: base
 #     language: python
 #     name: python3
 # ---
@@ -101,7 +101,7 @@ parameter_state = gpx.initialise(sgpr, key)
 
 negative_elbo = jit(sgpr.elbo(D, negative=True))
 
-optimiser = ox.adam(learning_rate=0.005)
+optimiser = ox.adam(learning_rate=5e-3)
 
 inference_state = gpx.fit(
     objective=negative_elbo,
@@ -116,8 +116,8 @@ learned_params, training_history = inference_state.unpack()
 # We show predictions of our model with the learned inducing points overlayed in grey.
 
 # %%
-latent_dist = q.predict(D, learned_params)(xtest)
-predictive_dist = likelihood(latent_dist, learned_params)
+latent_dist = q(learned_params, D)(xtest)
+predictive_dist = likelihood(learned_params, latent_dist)
 
 samples = latent_dist.sample(seed=key, sample_shape=(20,))
 
