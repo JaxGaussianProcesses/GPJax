@@ -32,14 +32,19 @@ from .utils import concat_dictionaries
 
 @dataclass
 class AbstractVariationalFamily:
-    """Abstract base class used to represent families of distributions that can be used within variational inference."""
+    """
+    Abstract base class used to represent families of distributions that can be
+    used within variational inference.
+    """
 
     def __call__(self, *args: Any, **kwargs: Any) -> dx.Distribution:
-        """For a given set of parameters, compute the latent function's prediction under the variational approximation.
+        """For a given set of parameters, compute the latent function's prediction
+        under the variational approximation.
 
         Args:
             *args (Any): Arguments of the variational family's `predict` method.
-            **kwargs (Any): Keyword arguments of the variational family's `predict` method.
+            **kwargs (Any): Keyword arguments of the variational family's `predict`
+                method.
 
         Returns:
             Any: The output of the variational family's `predict` method.
@@ -48,7 +53,9 @@ class AbstractVariationalFamily:
 
     @abc.abstractmethod
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
-        """The parameters of the distribution. For example, the multivariate Gaussian would return a mean vector and covariance matrix.
+        """
+        The parameters of the distribution. For example, the multivariate
+        Gaussian would return a mean vector and covariance matrix.
 
         Args:
             key (PRNGKeyType): The PRNG key used to initialise the parameters.
@@ -63,11 +70,13 @@ class AbstractVariationalFamily:
         """Predict the GP's output given the input.
 
         Args:
-            *args (Any): Arguments of the variational family's `predict` method.
-            **kwargs (Any): Keyword arguments of the variational family's `predict` method.
+            *args (Any): Arguments of the variational family's ``predict``
+            method.
+            **kwargs (Any): Keyword arguments of the variational family's
+            ``predict`` method.
 
         Returns:
-            Any: The output of the variational family's `predict` method.
+            Any: The output of the variational family's ``predict`` method.
         """
         raise NotImplementedError
 
@@ -89,13 +98,18 @@ class AbstractVariationalGaussian(AbstractVariationalFamily):
 class VariationalGaussian(AbstractVariationalGaussian):
     """The variational Gaussian family of probability distributions.
 
-    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
-    and the distribution over the inducing inputs is q(u) = N(μ, S). We parameterise this over μ and sqrt with S = sqrt sqrtᵀ.
-
+    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where
+    :math:`u = f(z)` are the function values at the inducing inputs z
+    and the distribution over the inducing inputs is
+    :math:`q(u) = \\mathcal{N}(\\mu, S)`.  We parameterise this over
+    :math:`\\mu` and sqrt with S = sqrt sqrtᵀ.
     """
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
-        """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution.
+        """
+        Return the variational mean vector, variational root covariance matrix,
+        and inducing input vector that parameterise the variational Gaussian
+        distribution.
 
         Args:
             key (PRNGKeyType): The PRNG key used to initialise the parameters.
@@ -119,16 +133,21 @@ class VariationalGaussian(AbstractVariationalGaussian):
         )
 
     def prior_kl(self, params: Dict) -> Float[Array, "1"]:
-        """Compute the KL-divergence between our variational approximation and the Gaussian process prior.
+        """
+        Compute the KL-divergence between our variational approximation and the
+        Gaussian process prior.
 
-        For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[ N(μ, S) || N(μz, Kzz) ],
-        where u = f(z) and z are the inducing inputs.
+        For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)]
+        = KL[ N(μ, S) || N(μz, Kzz) ], where u = f(z) and z are the inducing
+        inputs.
 
         Args:
-            params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
+            params (Dict): The parameters at which our variational distribution
+                and GP prior are to be evaluated.
 
         Returns:
-             Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
+             Float[Array, "1"]: The KL-divergence between our variational
+                approximation and the GP prior.
         """
 
         jitter = get_defaults()["jitter"]
@@ -141,7 +160,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         # Unpack mean function and kernel
         mean_function = self.prior.mean_function
-        kernel = self.prior.kernel 
+        kernel = self.prior.kernel
 
         # Unpack kernel computation
         gram = kernel.gram
@@ -159,17 +178,22 @@ class VariationalGaussian(AbstractVariationalGaussian):
     def predict(
         self, params: Dict
     ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]:
-        """Compute the predictive distribution of the GP at the test inputs t.
+        """
+        Compute the predictive distribution of the GP at the test inputs t.
 
-        This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as:
+        This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be
+        computed in closed form as:
 
             N[f(t); μt + Ktz Kzz⁻¹ (μ - μz),  Ktt - Ktz Kzz⁻¹ Kzt + Ktz Kzz⁻¹ S Kzz⁻¹ Kzt ].
 
         Args:
-            params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
+            params (Dict): The set of parameters that are to be used to
+                parameterise our variational approximation and GP.
 
         Returns:
-            Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]: A function that accepts a set of test points and will return the predictive distribution at those points.
+            Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]: A
+                function that accepts a set of test points and will return
+                the predictive distribution at those points.
         """
         jitter = get_defaults()["jitter"]
 
@@ -181,7 +205,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         # Unpack mean function and kernel
         mean_function = self.prior.mean_function
-        kernel = self.prior.kernel 
+        kernel = self.prior.kernel
 
         # Unpack kernel computation
         gram = kernel.gram
@@ -232,25 +256,31 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
 @dataclass
 class WhitenedVariationalGaussian(VariationalGaussian):
-    """The whitened variational Gaussian family of probability distributions.
+    """
+    The whitened variational Gaussian family of probability distributions.
 
-    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
-    and the distribution over the inducing inputs is q(u) = N(Lz μ + mz, Lz S Lzᵀ). We parameterise this over μ and sqrt with S = sqrt sqrtᵀ.
+    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z)
+    are the function values at the inducing inputs z and the distribution over
+    the inducing inputs is q(u) = N(Lz μ + mz, Lz S Lzᵀ). We parameterise this
+    over μ and sqrt with S = sqrt sqrtᵀ.
 
     """
 
     name: str = "Whitened variational Gaussian"
 
     def prior_kl(self, params: Dict) -> Float[Array, "1"]:
-        """Compute the KL-divergence between our variational approximation and the Gaussian process prior.
+        """Compute the KL-divergence between our variational approximation and
+        the Gaussian process prior.
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(0, I)].
 
         Args:
-            params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
+            params (Dict): The parameters at which our variational distribution
+                and GP prior are to be evaluated.
 
         Returns:
-            Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
+            Float[Array, "1"]: The KL-divergence between our variational
+                approximation and the GP prior.
         """
 
         # Unpack variational parameters
@@ -286,7 +316,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
         # Unpack mean function and kernel
         mean_function = self.prior.mean_function
-        kernel = self.prior.kernel 
+        kernel = self.prior.kernel
 
         # Unpack kernel computation
         gram = kernel.gram
@@ -385,7 +415,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         # Unpack mean function and kernel
         mean_function = self.prior.mean_function
-        kernel = self.prior.kernel 
+        kernel = self.prior.kernel
 
         # Unpack kernel computation
         gram = kernel.gram
@@ -445,7 +475,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         # Unpack mean function and kernel
         mean_function = self.prior.mean_function
-        kernel = self.prior.kernel 
+        kernel = self.prior.kernel
 
         # Unpack kernel computation
         gram = kernel.gram
@@ -570,7 +600,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         # Unpack mean function and kernel
         mean_function = self.prior.mean_function
-        kernel = self.prior.kernel 
+        kernel = self.prior.kernel
 
         # Unpack kernel compuation
         gram = kernel.gram
@@ -626,7 +656,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         # Unpack mean function and kernel
         mean_function = self.prior.mean_function
-        kernel = self.prior.kernel 
+        kernel = self.prior.kernel
 
         # Unpack kernel compuation
         gram = kernel.gram
@@ -716,10 +746,12 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
         )
 
     def predict(
-        self, params: Dict, train_data: Dataset, 
+        self,
+        params: Dict,
+        train_data: Dataset,
     ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalFullCovariance]:
         """Compute the predictive distribution of the GP at the test inputs.
-        
+
         Args:
             params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
             train_data (Dataset): The training data that was used to fit the GP.
@@ -747,7 +779,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
 
             # Unpack mean function and kernel
             mean_function = self.prior.mean_function
-            kernel = self.prior.kernel 
+            kernel = self.prior.kernel
 
             # Unpack kernel compuation
             gram = kernel.gram

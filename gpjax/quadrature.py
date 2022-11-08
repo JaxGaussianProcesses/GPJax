@@ -31,13 +31,18 @@ def gauss_hermite_quadrature(
     *args,
     **kwargs
 ) -> Float[Array, "N"]:
-    """Compute Gaussian-Hermite quadrature for a given function. The quadrature points are adjusted through the supplied mean and variance arrays.
+    """
+    Compute Gaussian-Hermite quadrature for a given function. The quadrature
+    points are adjusted through the supplied mean and variance arrays.
 
     Args:
         fun (Callable): The function for which quadrature should be applied to.
-        mean (Float[Array, "N D"]): The mean of the Gaussian distribution that is used to shift quadrature points.
-        sd (Float[Array, "N D"]): The standard deviation of the Gaussian distribution that is used to scale quadrature points.
-        deg (int, optional): The number of quadrature points that are to be used. Defaults to 20.
+        mean (Float[Array, "N D"]): The mean of the Gaussian distribution that
+            is used to shift quadrature points.
+        sd (Float[Array, "N D"]): The standard deviation of the Gaussian
+            distribution that is used to scale quadrature points.
+        deg (int, optional): The number of quadrature points that are to be used.
+            Defaults to 20.
 
     Returns:
         Float[Array, "N"]: The evaluated integrals value.

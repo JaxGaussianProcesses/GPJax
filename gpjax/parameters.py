@@ -35,7 +35,11 @@ from .utils import merge_dictionaries
 ################################
 @dataclass
 class ParameterState:
-    """The state of the model. This includes the parameter set, which parameters are to be trained and bijectors that allow parameters to be constrained and unconstrained."""
+    """
+    The state of the model. This includes the parameter set, which parameters
+    are to be trained and bijectors that allow parameters to be constrained and
+    unconstrained.
+    """
 
     params: Dict
     trainables: Dict
@@ -51,14 +55,20 @@ class ParameterState:
 
 
 def initialise(model, key: PRNGKeyType = None, **kwargs) -> ParameterState:
-    """Initialise the stateful parameters of any GPJax object. This function also returns the trainability status of each parameter and set of bijectors that allow parameters to be constrained and unconstrained.
+    """
+    Initialise the stateful parameters of any GPJax object. This function also
+    returns the trainability status of each parameter and set of bijectors that
+    allow parameters to be constrained and unconstrained.
 
     Args:
         model: The GPJax object that is to be initialised.
-        key (PRNGKeyType, optional): The random key that is to be used for initialisation. Defaults to None.
+        key (PRNGKeyType, optional): The random key that is to be used for
+            initialisation. Defaults to None.
 
     Returns:
-        ParameterState: The state of the model. This includes the parameter set, which parameters are to be trained and bijectors that allow parameters to be constrained and unconstrained.
+        ParameterState: The state of the model. This includes the parameter
+            set, which parameters are to be trained and bijectors that allow
+            parameters to be constrained and unconstrained.
     """
 
     if key is None:
@@ -88,7 +98,9 @@ def _validate_kwargs(kwargs, params):
 
 
 def recursive_items(d1: Dict, d2: Dict):
-    """Recursive loop over pair of dictionaries whereby the value of a given key in either dictionary can be itself a dictionary.
+    """
+    Recursive loop over pair of dictionaries whereby the value of a given key in
+    either dictionary can be itself a dictionary.
 
     Args:
         d1 (_type_): _description_
@@ -105,7 +117,11 @@ def recursive_items(d1: Dict, d2: Dict):
 
 
 def recursive_complete(d1: Dict, d2: Dict) -> Dict:
-    """Recursive loop over pair of dictionaries whereby the value of a given key in either dictionary can be itself a dictionary. If the value of the key in the second dictionary is None, the value of the key in the first dictionary is used.
+    """
+    Recursive loop over pair of dictionaries whereby the value of a given key in
+    either dictionary can be itself a dictionary. If the value of the key in the
+    second dictionary is None, the value of the key in the first dictionary is
+    used.
 
     Args:
         d1 (Dict): The reference dictionary.
@@ -128,7 +144,9 @@ def recursive_complete(d1: Dict, d2: Dict) -> Dict:
 # Parameter transformation
 ################################
 def build_bijectors(params: Dict) -> Dict:
-    """For each parameter, build the bijection pair that allows the parameter to be constrained and unconstrained.
+    """
+    For each parameter, build the bijection pair that allows the parameter to be
+    constrained and unconstrained.
 
     Args:
         params (Dict): _description_
@@ -169,14 +187,18 @@ def build_bijectors(params: Dict) -> Dict:
 
 
 def constrain(params: Dict, bijectors: Dict) -> Dict:
-    """Transform the parameters to the constrained space for corresponding bijectors.
+    """
+    Transform the parameters to the constrained space for corresponding
+    bijectors.
 
     Args:
         params (Dict): The parameters that are to be transformed.
-        bijectors (Dict): The bijectors that are to be used for transformation.
+        bijectors (Dict): The bijectors that are to be used for
+            transformation.
 
     Returns:
-        Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
+        Dict: A transformed parameter set. The dictionary is equal in
+            structure to the input params dictionary.
     """
     map = lambda param, trans: trans.forward(param)
 
@@ -184,14 +206,17 @@ def constrain(params: Dict, bijectors: Dict) -> Dict:
 
 
 def unconstrain(params: Dict, bijectors: Dict) -> Dict:
-    """Transform the parameters to the unconstrained space for corresponding bijectors.
+    """Transform the parameters to the unconstrained space for corresponding
+        bijectors.
 
     Args:
         params (Dict): The parameters that are to be transformed.
-        bijectors (Dict): The corresponding dictionary of transforms that should be applied to the parameter set.
+        bijectors (Dict): The corresponding dictionary of transforms that
+            should be applied to the parameter set.
 
     Returns:
-        Dict: A transformed parameter set. The dictionary is equal in structure to the input params dictionary.
+        Dict: A transformed parameter set. The dictionary is equal in
+            structure to the input params dictionary.
     """
 
     map = lambda param, trans: trans.inverse(param)
@@ -238,7 +263,8 @@ def copy_dict_structure(params: Dict) -> Dict:
 
 
 def structure_priors(params: Dict, priors: Dict) -> Dict:
-    """First create a dictionary with equal structure to the parameters. Then, for each supplied prior, overwrite the None value if it exists.
+    """First create a dictionary with equal structure to the parameters.
+    Then, for each supplied prior, overwrite the None value if it exists.
 
     Args:
         params (Dict): [description]
@@ -254,7 +280,8 @@ def structure_priors(params: Dict, priors: Dict) -> Dict:
 
 
 def evaluate_priors(params: Dict, priors: Dict) -> Dict:
-    """Recursive loop over pair of dictionaries that correspond to a parameter's
+    """
+    Recursive loop over pair of dictionaries that correspond to a parameter's
     current value and the parameter's respective prior distribution. For
     parameters where a prior distribution is specified, the log-prior density is
     evaluated at the parameter's current value.
@@ -274,7 +301,10 @@ def evaluate_priors(params: Dict, priors: Dict) -> Dict:
 
 
 def prior_checks(priors: Dict) -> Dict:
-    """Run checks on the parameters' prior distributions. This checks that for Gaussian processes that are constructed with non-conjugate likelihoods, the prior distribution on the function's latent values is a unit Gaussian.
+    """
+    Run checks on the parameters' prior distributions. This checks that for
+    Gaussian processes that are constructed with non-conjugate likelihoods, the
+    prior distribution on the function's latent values is a unit Gaussian.
 
     Args:
         priors (Dict): Dictionary specifying the parameters' prior distributions.
@@ -301,14 +331,18 @@ def prior_checks(priors: Dict) -> Dict:
 
 
 def build_trainables(params: Dict, status: bool = True) -> Dict:
-    """Construct a dictionary of trainable statuses for each parameter. By default, every parameter within the model is trainable.
+    """
+    Construct a dictionary of trainable statuses for each parameter. By default,
+    every parameter within the model is trainable.
 
     Args:
-        params (Dict): The parameter set for which trainable statuses should be derived from.
+        params (Dict): The parameter set for which trainable statuses should be
+            derived from.
         status (bool): The status of each parameter. Default is True.
 
     Returns:
-        Dict: A dictionary of boolean trainability statuses. The dictionary is equal in structure to the input params dictionary.
+        Dict: A dictionary of boolean trainability statuses. The dictionary is
+            equal in structure to the input params dictionary.
     """
     # Copy dictionary structure
     prior_container = deepcopy(params)
@@ -318,10 +352,14 @@ def build_trainables(params: Dict, status: bool = True) -> Dict:
 
 
 def _stop_grad(param: Dict, trainable: Dict) -> Dict:
-    """When taking a gradient, we want to stop the gradient from flowing through a parameter if it is not trainable. This is achieved using the model's dictionary of parameters and the corresponding trainability status.
+    """
+    When taking a gradient, we want to stop the gradient from flowing through a
+    parameter if it is not trainable. This is achieved using the model's
+    dictionary of parameters and the corresponding trainability status.
 
     Args:
-        param (Dict): The parameter set for which trainable statuses should be derived from.
+        param (Dict): The parameter set for which trainable statuses should be
+            derived from.
         trainable (Dict): A boolean value denoting the training status the `param`.
 
     Returns:
@@ -331,14 +369,19 @@ def _stop_grad(param: Dict, trainable: Dict) -> Dict:
 
 
 def trainable_params(params: Dict, trainables: Dict) -> Dict:
-    """Stop the gradients flowing through parameters whose trainable status is False.
+    """
+    Stop the gradients flowing through parameters whose trainable status is
+    False.
 
     Args:
-        params (Dict): The parameter set for which trainable statuses should be derived from.
-        trainables (Dict): A dictionary of boolean trainability statuses. The dictionary is equal in structure to the input params dictionary.
+        params (Dict): The parameter set for which trainable statuses should
+            be derived from.
+        trainables (Dict): A dictionary of boolean trainability statuses. The
+            dictionary is equal in structure to the input params dictionary.
 
     Returns:
-        Dict: A dictionary parameters. The dictionary is equal in structure to the input params dictionary.
+        Dict: A dictionary parameters. The dictionary is equal in structure to
+            the input params dictionary.
     """
     return jax.tree_util.tree_map(
         lambda param, trainable: _stop_grad(param, trainable), params, trainables

@@ -39,20 +39,23 @@ def natural_to_expectation(params: Dict, jitter: float = DEFAULT_JITTER) -> Dict
     """
     Translate natural parameters to expectation parameters.
 
-    In particular, in terms of the Gaussian mean μ and covariance matrix μ for the Gaussian variational family,
+    In particular, in terms of the Gaussian mean μ and covariance matrix μ for
+    the Gaussian variational family,
 
         - the natural parameteristaion is θ = (S⁻¹μ, -S⁻¹/2)
         - the expectation parameters are  η = (μ, S + μ μᵀ).
 
     This function solves these eqautions in terms of μ and S to convert θ to η.
 
-    Writing θ = (θ₁, θ₂), we have that S⁻¹ = -2θ₂ . Taking the cholesky decomposition of the inverse covariance,
-    S⁻¹ = LLᵀ and defining C = L⁻¹, we have S = CᵀC and μ = Sθ₁ = CᵀC θ₁.
+    Writing θ = (θ₁, θ₂), we have that S⁻¹ = -2θ₂ . Taking the cholesky
+    decomposition of the inverse covariance, S⁻¹ = LLᵀ and defining C = L⁻¹, we
+    have S = CᵀC and μ = Sθ₁ = CᵀC θ₁.
 
     Now from here, using μ and S found from θ, we compute η as η₁ = μ, and  η₂ = S + μ μᵀ.
 
     Args:
-        params: A dictionary of variational Gaussian parameters under the natural parameterisation.
+        params: A dictionary of variational Gaussian parameters under the natural
+            parameterisation.
         jitter (float): A small value to prevent numerical instability.
 
     Returns:
@@ -99,7 +102,8 @@ def _expectation_elbo(
     train_data: Dataset,
 ) -> Callable[[Dict, Dataset], float]:
     """
-    Construct evidence lower bound (ELBO) for variational Gaussian under the expectation parameterisation.
+    Construct evidence lower bound (ELBO) for variational Gaussian under the
+    expectation parameterisation.
 
     Args:
         posterior: An instance of AbstractPosterior.
@@ -120,13 +124,17 @@ def _expectation_elbo(
 
 
 def _rename_expectation_to_natural(params: Dict) -> Dict:
-    """This function renames the gradient components (that have expectation parameterisation keys) to match the natural parameterisation pytree.
+    """
+    This function renames the gradient components (that have expectation
+    parameterisation keys) to match the natural parameterisation pytree.
 
     Args:
-        params (Dict): A dictionary of variational Gaussian parameters under the expectation parameterisation moment names.
+        params (Dict): A dictionary of variational Gaussian parameters
+            under the expectation parameterisation moment names.
 
     Returns:
-        Dict: A dictionary of variational Gaussian parameters under the natural parameterisation moment names.
+        Dict: A dictionary of variational Gaussian parameters under the
+            natural parameterisation moment names.
     """
     params["variational_family"]["moments"] = {
         "natural_vector": params["variational_family"]["moments"]["expectation_vector"],
@@ -137,13 +145,17 @@ def _rename_expectation_to_natural(params: Dict) -> Dict:
 
 
 def _rename_natural_to_expectation(params: Dict) -> Dict:
-    """This function renames the gradient components (that have natural parameterisation keys) to match the expectation parameterisation pytree.
+    """
+    This function renames the gradient components (that have natural
+    parameterisation keys) to match the expectation parameterisation pytree.
 
     Args:
-        params (Dict): A dictionary of variational Gaussian parameters under the natural parameterisation moment names.
+        params (Dict): A dictionary of variational Gaussian parameters
+            under the natural parameterisation moment names.
 
     Returns:
-        Dict: A dictionary of variational Gaussian parameters under the expectation parameterisation moment names.
+        Dict: A dictionary of variational Gaussian parameters under
+            the expectation parameterisation moment names.
     """
     params["variational_family"]["moments"] = {
         "expectation_vector": params["variational_family"]["moments"]["natural_vector"],
@@ -154,7 +166,9 @@ def _rename_natural_to_expectation(params: Dict) -> Dict:
 
 
 def _get_moment_trainables(trainables: Dict) -> Dict:
-    """This function takes a trainbles dictionary, and sets non-moment parameter training to false for gradient stopping.
+    """
+    This function takes a trainbles dictionary, and sets non-moment parameter
+    training to false for gradient stopping.
 
     Args:
         trainables (Dict): A dictionary of trainables.
@@ -172,7 +186,9 @@ def _get_moment_trainables(trainables: Dict) -> Dict:
 
 
 def _get_hyperparameter_trainables(trainables: Dict) -> Dict:
-    """This function takes a trainbles dictionary, and sets moment parameter training to false for gradient stopping.
+    """
+    This function takes a trainbles dictionary, and sets moment parameter
+    training to false for gradient stopping.
 
     Args:
         trainables (Dict): A dictionary of trainables.
@@ -195,7 +211,8 @@ def natural_gradients(
     trainables: Dict,
 ) -> Tuple[Callable[[Dict, Dataset], Dict]]:
     """
-    Computes the gradient with respect to the natural parameters. Currently only implemented for the natural variational Gaussian family.
+    Computes the gradient with respect to the natural parameters. Currently only
+    implemented for the natural variational Gaussian family.
 
     Args:
         posterior: An instance of AbstractPosterior.
@@ -204,7 +221,8 @@ def natural_gradients(
         bijectors: A dictionary of bijectors.
 
     Returns:
-        Tuple[Callable[[Dict, Dataset], Dict]]: Functions that compute natural gradients and hyperparameter gradients respectively.
+        Tuple[Callable[[Dict, Dataset], Dict]]: Functions that compute natural
+            gradients and hyperparameter gradients respectively.
     """
     posterior = stochastic_vi.posterior
     variational_family = stochastic_vi.variational_family

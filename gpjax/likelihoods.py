@@ -111,10 +111,12 @@ class Gaussian(AbstractLikelihood, Conjugate):
 
     @property
     def link_function(self) -> Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]:
-        """Return the link function of the Gaussian likelihood. Here, this is simply the identity function, but we include it for completeness.
+        """Return the link function of the Gaussian likelihood. Here, this is
+        simply the identity function, but we include it for completeness.
 
         Returns:
-            Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]: A link function that maps the predictive distribution to the likelihood function.
+            Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]: A link
+            function that maps the predictive distribution to the likelihood function.
         """
 
         def link_fn(params: Dict, f: Float[Array, "N 1"]) -> dx.Normal:
@@ -132,11 +134,16 @@ class Gaussian(AbstractLikelihood, Conjugate):
         return link_fn
 
     def predict(self, params: Dict, dist: dx.MultivariateNormalTri) -> dx.Distribution:
-        """Evaluate the Gaussian likelihood function at a given predictive distribution. Computationally, this is equivalent to summing the observation noise term to the diagonal elements of the predictive distribution's covariance matrix.
+        """
+        Evaluate the Gaussian likelihood function at a given predictive
+        distribution. Computationally, this is equivalent to summing the
+        observation noise term to the diagonal elements of the predictive
+        distribution's covariance matrix.
 
         Args:
             params (Dict): The parameters of the likelihood function.
-            dist (dx.Distribution): The Gaussian process posterior, evaluated at a finite set of test points.
+            dist (dx.Distribution): The Gaussian process posterior,
+                evaluated at a finite set of test points.
 
         Returns:
             dx.Distribution: The predictive distribution.
@@ -170,7 +177,8 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
         """Return the probit link function of the Bernoulli likelihood.
 
         Returns:
-            Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]: A probit link function that maps the predictive distribution to the likelihood function.
+            Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]: A probit link
+                function that maps the predictive distribution to the likelihood function.
         """
 
         def link_fn(params: Dict, f: Float[Array, "N 1"]) -> dx.Distribution:
@@ -179,7 +187,7 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
             Args:
                 params (Dict): The parameters of the likelihood function.
                 f (Float[Array, "N 1"]): Function values.
-            
+
             Returns:
                 dx.Distribution: The likelihood function.
             """
@@ -188,15 +196,21 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
         return link_fn
 
     @property
-    def predictive_moment_fn(self) -> Callable[[Dict, Float[Array, "N 1"]], Float[Array, "N 1"]]:
-        """Instantiate the predictive moment function of the Bernoulli likelihood that is parameterised by a probit link function.
+    def predictive_moment_fn(
+        self,
+    ) -> Callable[[Dict, Float[Array, "N 1"]], Float[Array, "N 1"]]:
+        """Instantiate the predictive moment function of the Bernoulli likelihood
+        that is parameterised by a probit link function.
 
         Returns:
-            Callable: A callable object that accepts a mean and variance term from which the predictive random variable is computed.
+            Callable: A callable object that accepts a mean and variance term
+                from which the predictive random variable is computed.
         """
 
         def moment_fn(
-            params: Dict, mean: Float[Array, "N 1"], variance: Float[Array, "N 1"], 
+            params: Dict,
+            mean: Float[Array, "N 1"],
+            variance: Float[Array, "N 1"],
         ):
             """The predictive moment function of the Bernoulli likelihood.
 
@@ -204,7 +218,7 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
                 params (Dict): The parameters of the likelihood function.
                 mean (Float[Array, "N 1"]): The mean of the latent function values.
                 variance (Float[Array, "N 1"]): The diagonal variance of the latent function values.
-            
+
             Returns:
                 Float[Array, "N 1"]: The pointwise predictive distribution.
             """
@@ -214,11 +228,13 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
         return moment_fn
 
     def predict(self, params: Dict, dist: dx.Distribution) -> dx.Distribution:
-        """Evaluate the pointwise predictive distribution, given a Gaussian process posterior and likelihood parameters.
+        """Evaluate the pointwise predictive distribution, given a Gaussian
+        process posterior and likelihood parameters.
 
         Args:
             params (Dict): The parameters of the likelihood function.
-            dist (dx.Distribution): The Gaussian process posterior, evaluated at a finite set of test points.
+            dist (dx.Distribution): The Gaussian process posterior, evaluated
+                at a finite set of test points.
 
         Returns:
             dx.Distribution: The pointwise predictive distribution.

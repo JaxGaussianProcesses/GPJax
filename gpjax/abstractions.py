@@ -80,7 +80,7 @@ def fit(
 
     # Tranform params to unconstrained space
     params = unconstrain(params, bijectors)
-    
+
     # Initialise optimiser state
     opt_state = optax_optim.init(params)
 
@@ -120,7 +120,8 @@ def fit_batches(
     log_rate: Optional[int] = 10,
     verbose: Optional[bool] = True,
 ) -> InferenceState:
-    """Abstracted method for fitting a GP model with mini-batches respect to a supplied objective function.
+    """Abstracted method for fitting a GP model with mini-batches respect to a
+    supplied objective function.
     Optimisers used here should originate from Optax.
 
     Args:
@@ -151,7 +152,7 @@ def fit_batches(
 
     # Initialise optimiser state
     opt_state = optax_optim.init(params)
-    
+
     # Mini-batch random keys and iteration loop numbers to scan over
     keys = jr.split(key, n_iters)
     iter_nums = jnp.arange(n_iters)
@@ -213,8 +214,11 @@ def fit_natgrads(
     log_rate: Optional[int] = 10,
     verbose: Optional[bool] = True,
 ) -> Dict:
-    """This is a training loop for natural gradients. See Salimbeni et al. (2018) Natural Gradients in Practice: Non-Conjugate Variational Inference in Gaussian Process Models
-    Each iteration comprises a hyperparameter gradient step followed by natural gradient step to avoid a stale posterior.
+    """This is a training loop for natural gradients. See Salimbeni et al.
+    (2018) Natural Gradients in Practice: Non-Conjugate Variational Inference
+    in Gaussian Process Models
+    Each iteration comprises a hyperparameter gradient step followed by natural
+    gradient step to avoid a stale posterior.
 
     Args:
         stochastic_vi (StochasticVI): The stochastic variational inference algorithm to be used for training.
@@ -241,7 +245,7 @@ def fit_natgrads(
     hyper_state = hyper_optim.init(params)
     moment_state = moment_optim.init(params)
 
-    # Build natural and hyperparameter gradient functions 
+    # Build natural and hyperparameter gradient functions
     nat_grads_fn, hyper_grads_fn = natural_gradients(
         stochastic_vi, train_data, bijectors, trainables
     )
@@ -281,7 +285,7 @@ def fit_natgrads(
 
     # Tranform final params to constrained space
     params = constrain(params, bijectors)
-  
+
     return InferenceState(params=params, history=history)
 
 
@@ -294,7 +298,7 @@ def progress_bar_scan(n_iters: int, log_rate: int) -> Callable:
     def _define_tqdm(args: Any, transform: Any) -> None:
         """Define a tqdm progress bar."""
         tqdm_bars[0] = tqdm(range(n_iters))
-    
+
     def _update_tqdm(args: Any, transform: Any) -> None:
         """Update the tqdm progress bar with the latest objective value."""
         loss_val, arg = args
@@ -305,27 +309,28 @@ def progress_bar_scan(n_iters: int, log_rate: int) -> Callable:
         """Close the tqdm progress bar."""
         tqdm_bars[0].close()
 
-    def _callback(cond:bool, func: Callable, arg: Any) -> None:
-            """Callback a function for a given argument if a condition is true."""
-            dummy_result = 0
-            
-            def _do_callback(_) -> int:
-                """Perform the callback."""
-                return host_callback.id_tap(func, arg, result=dummy_result)
+    def _callback(cond: bool, func: Callable, arg: Any) -> None:
+        """Callback a function for a given argument if a condition is true."""
+        dummy_result = 0
 
-            def _not_callback(_) -> int:
-                """Do nothing."""
-                return dummy_result
+        def _do_callback(_) -> int:
+            """Perform the callback."""
+            return host_callback.id_tap(func, arg, result=dummy_result)
 
-            _ = lax.cond(cond, _do_callback, _not_callback, operand=None)
+        def _not_callback(_) -> int:
+            """Do nothing."""
+            return dummy_result
 
+        _ = lax.cond(cond, _do_callback, _not_callback, operand=None)
 
     def _update_progress_bar(loss_val: Float[Array, "1"], iter_num: int) -> None:
         """Updates tqdm progress bar of a JAX scan or loop."""
 
         # Conditions for iteration number
         is_first: bool = iter_num == 0
-        is_multiple: bool = (iter_num % log_rate == 0) & (iter_num != n_iters - remainder)
+        is_multiple: bool = (iter_num % log_rate == 0) & (
+            iter_num != n_iters - remainder
+        )
         is_remainder: bool = iter_num == n_iters - remainder
         is_last: bool = iter_num == n_iters - 1
 
@@ -341,27 +346,26 @@ def progress_bar_scan(n_iters: int, log_rate: int) -> Callable:
         # Close progress bar, if last iteration
         _callback(is_last, _close_tqdm, None)
 
-
     def _progress_bar_scan(body_fun: Callable) -> Callable:
         """Decorator that adds a progress bar to `body_fun` used in `lax.scan`."""
 
         def wrapper_progress_bar(carry: Any, x: Union[tuple, int]) -> Any:
-            
+
             # Get iteration number
             if type(x) is tuple:
                 iter_num, *_ = x
             else:
                 iter_num = x
-            
+
             # Compute iteration step
             result = body_fun(carry, x)
 
             # Get loss value
             *_, loss_val = result
-            
+
             # Update progress bar
             _update_progress_bar(loss_val, iter_num)
-            
+
             return result
 
         return wrapper_progress_bar

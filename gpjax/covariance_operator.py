@@ -61,7 +61,10 @@ class CovarianceOperator:
         """Add diagonal to another covariance operator.
 
         Args:
-            other (Union["CovarianceOperator", Float[Array, "N N"]]): Other covariance operator. Dimension of both operators must match. If the other covariance operator is not a DiagonalCovarianceOperator, dense matrix addition is used.
+            other (Union["CovarianceOperator", Float[Array, "N N"]]): Other
+                covariance operator. Dimension of both operators must match.
+                If the other covariance operator is not a
+                DiagonalCovarianceOperator, dense matrix addition is used.
 
         Returns:
             CovarianceOperator: Covariance operator plus the diagonal covariance operator.
@@ -224,10 +227,12 @@ class DenseCovarianceOperator(CovarianceOperator, _DenseMatrix):
     def _add_diagonal(
         self, other: "DiagonalCovarianceOperator"
     ) -> "CovarianceOperator":
-        """Add diagonal to the covariance operator,  useful for computing, Kxx + Iσ².
+        """Add diagonal to the covariance operator,  useful for
+        computing, :math:`\\mathbf{K}_{xx} + \\mathbf{I}\\sigma^2`.
 
         Args:
-            other (DiagonalCovarianceOperator): Diagonal covariance operator to add to the covariance operator.
+            other (DiagonalCovarianceOperator): Diagonal covariance
+            operator to add to the covariance operator.
 
         Returns:
             CovarianceOperator: Sum of the two covariance operators.
@@ -313,10 +318,12 @@ class DiagonalCovarianceOperator(CovarianceOperator, _DiagonalMatrix):
     def _add_diagonal(
         self, other: "DiagonalCovarianceOperator"
     ) -> "CovarianceOperator":
-        """Add diagonal to the covariance operator,  useful for computing, Kxx + Iσ².
+        """Add diagonal to the covariance operator,  useful for computing,
+        :math:`\\mathbf{K}_{xx} + \\mathbf{I}\\sigma^2`
 
         Args:
-            other (DiagonalCovarianceOperator): Diagonal covariance operator to add to the covariance operator.
+            other (DiagonalCovarianceOperator): Diagonal covariance
+            operator to add to the covariance operator.
 
         Returns:
             CovarianceOperator: Covariance operator with the diagonal added.

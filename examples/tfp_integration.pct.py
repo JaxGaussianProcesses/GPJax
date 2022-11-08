@@ -16,7 +16,7 @@
 
 # %% [markdown]
 # # TensorFlow Probability Integration
-# This notebook demonstrates how to perform Markov chain Monte Carlo (MCMC) inference for Gaussian process models using TensorFlow Probability.
+# This notebook demonstrates how to perform Markov chain Monte Carlo (MCMC) inference for Gaussian process models using TensorFlow Probability <strong data-cite="lao2020tfp">Lao et al. (2020)</strong>.
 
 # %%
 from pprint import PrettyPrinter

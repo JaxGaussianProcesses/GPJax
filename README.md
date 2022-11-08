@@ -41,10 +41,13 @@ Feel free to join our [Slack Channel](https://join.slack.com/t/gpjax/shared_invi
 > - [**Inference on Graphs**](https://gpjax.readthedocs.io/en/latest/examples/graph_kernels.html)
 > - [**Learning Gaussian Process Barycentres**](https://gpjax.readthedocs.io/en/latest/examples/barycentres.html)
 > - [**Deep Kernel Regression**](https://gpjax.readthedocs.io/en/latest/examples/haiku.html)
+> - [**Natural Gradients**](https://gpjax.readthedocs.io/en/latest/examples/natgrads.html)
 
 ## Guides for customisation
 > 
 > - [**Custom kernels**](https://gpjax.readthedocs.io/en/latest/examples/kernels.html#Custom-Kernel)
+> - [**UCI regression**](https://gpjax.readthedocs.io/en/latest/examples/yacht.html)
+
 
 # Simple example
 
@@ -118,7 +121,7 @@ learned_params, _ = inference_state.unpack()
 xtest = jnp.linspace(-3., 3., 100).reshape(-1, 1)
 
 latent_distribution = posterior(learned_params, D)(xtest)
-predictive_distribution = likelihood(params, latent_distribution)
+predictive_distribution = likelihood(learned_params, latent_distribution)
 
 predictive_mean = predictive_distribution.mean
 predictive_cov = predictive_distribution.covariance

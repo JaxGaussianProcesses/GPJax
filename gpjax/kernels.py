@@ -99,7 +99,8 @@ class AbstractKernel:
 
     @property
     def ard(self):
-        """Boolean property as to whether the kernel is isotropic or of automatic relevance determination form.
+        """Boolean property as to whether the kernel is isotropic or of
+        automatic relevance determination form.
 
         Returns:
             bool: True if the kernel is an ARD kernel.
@@ -111,7 +112,8 @@ class AbstractKernel:
         """A template dictionary of the kernel's parameter set.
 
         Args:
-            key (PRNGKeyType): A PRNG key to be used for initialising the kernel's parameters.
+            key (PRNGKeyType): A PRNG key to be used for initialising
+                the kernel's parameters.
 
         Returns:
             Dict: A dictionary of the kernel's parameters.
@@ -151,10 +153,12 @@ class AbstractKernelComputation:
         x: Float[Array, "N D"],
         y: Float[Array, "M D"],
     ) -> Float[Array, "N M"]:
-        """For a given kernel, compute the NxM gram matrix on an a pair of input matrices with shape NxD and MxD.
+        """For a given kernel, compute the NxM gram matrix on an a pair
+        of input matrices with shape NxD and MxD.
 
         Args:
-            kernel (AbstractKernel): The kernel for which the cross-covariance matrix should be computed for.
+            kernel (AbstractKernel): The kernel for which the cross-covariance
+                matrix should be computed for.
             params (Dict): The kernel's parameter set.
             x (Float[Array,"N D"]): The first input matrix.
             y (Float[Array,"M D"]): The second input matrix.
@@ -173,10 +177,12 @@ class AbstractKernelComputation:
         params: Dict,
         inputs: Float[Array, "N D"],
     ) -> CovarianceOperator:
-        """For a given kernel, compute the elementwise diagonal of the NxN gram matrix on an input matrix of shape NxD.
+        """For a given kernel, compute the elementwise diagonal of the
+        NxN gram matrix on an input matrix of shape NxD.
 
         Args:
-            kernel (AbstractKernel): The kernel for which the variance vector should be computed for.
+            kernel (AbstractKernel): The kernel for which the variance
+                vector should be computed for.
             params (Dict): The kernel's parameter set.
             inputs (Float[Array, "N D"]): The input matrix.
 
@@ -190,7 +196,9 @@ class AbstractKernelComputation:
 
 
 class DenseKernelComputation(AbstractKernelComputation):
-    """Dense kernel computation class. Operations with the kernel assume a dense gram matrix structure."""
+    """Dense kernel computation class. Operations with the kernel assume
+    a dense gram matrix structure.
+    """
 
     @staticmethod
     def gram(
@@ -198,10 +206,12 @@ class DenseKernelComputation(AbstractKernelComputation):
         params: Dict,
         inputs: Float[Array, "N D"],
     ) -> CovarianceOperator:
-        """For a given kernel, compute the NxN gram matrix on an input matrix of shape NxD.
+        """For a given kernel, compute the NxN gram matrix on an input
+        matrix of shape NxD.
 
         Args:
-            kernel (AbstractKernel): The kernel for which the Gram matrix should be computed for.
+            kernel (AbstractKernel): The kernel for which the Gram
+                matrix should be computed for.
             params (Dict): The kernel's parameter set.
             inputs (Float[Array,"N D"]): The input matrix.
 
@@ -221,10 +231,12 @@ class DiagonalKernelComputation(AbstractKernelComputation):
         params: Dict,
         inputs: Float[Array, "N D"],
     ) -> CovarianceOperator:
-        """For a kernel with diagonal structure, compute the NxN gram matrix on an input matrix of shape NxD.
+        """For a kernel with diagonal structure, compute the NxN gram matrix on
+        an input matrix of shape NxD.
 
         Args:
-            kernel (AbstractKernel): The kernel for which the Gram matrix should be computed for.
+            kernel (AbstractKernel): The kernel for which the Gram matrix
+                should be computed for.
             params (Dict): The kernel's parameter set.
             inputs (Float[Array, "N D"]): The input matrix.
 
@@ -329,7 +341,8 @@ class RBF(AbstractKernel, DenseKernelComputation):
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma^2`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
+        lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( \\frac{\\lVert x - y \\rVert^2_2}{2 \\ell^2} \\Bigg)
@@ -369,7 +382,8 @@ class Matern12(AbstractKernel, DenseKernelComputation):
         x: Float[Array, "1 D"],
         y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma^2`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
+        lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( -\\frac{\\lvert x-y \\rvert}{\\ell}  \\Bigg)
@@ -408,7 +422,8 @@ class Matern32(AbstractKernel, DenseKernelComputation):
         x: Float[Array, "1 D"],
         y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
+        lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{3}\\lvert x-y \\rvert}{\\ell}  \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{3}\\lvert x-y\\rvert}{\\ell} \\Bigg)
@@ -450,7 +465,8 @@ class Matern52(AbstractKernel, DenseKernelComputation):
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
+        lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{5}\\lvert x-y \\rvert}{\\ell} + \\frac{5\\lvert x - y \\rvert^2}{3\\ell^2} \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{5}\\lvert x-y\\rvert}{\\ell} \\Bigg)
