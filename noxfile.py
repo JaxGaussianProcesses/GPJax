@@ -22,7 +22,8 @@ def black(session):
 
 @nox.session(python=["3.7", "3.8", "3.9", "3.10"])
 def tests(session):
+    args = session.posargs or LOCATIONS
     session.install("pytest")
     session.install("pytest-cov")
     session.install(".")
-    session.run("pytest", "-n", "auto")
+    session.run("pytest", "-n", "auto", *args)
