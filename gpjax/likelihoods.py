@@ -22,8 +22,7 @@ import jax.scipy as jsp
 from chex import dataclass
 from jaxtyping import Array, Float
 
-from .config import get_defaults
-from .types import PRNGKeyType
+from chex import PRNGKey as PRNGKeyType
 
 
 @dataclass

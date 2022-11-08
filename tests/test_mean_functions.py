@@ -18,11 +18,11 @@ from typing import Dict
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
+from chex import PRNGKey as PRNGKeyType
 from jax.config import config
 from jaxtyping import Array, Float
 
 from gpjax.mean_functions import AbstractMeanFunction, Constant, Zero
-from gpjax.types import PRNGKeyType
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

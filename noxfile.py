@@ -4,27 +4,23 @@ import nox
 LOCATIONS = ["gpjax", "tests"]
 
 
-@nox.session
-def tests(session):
-    session.install(".")
-    session.run("pytest", "-n", "auto")
-
-
-@nox.session(python="3.8")
+@nox.session(python=["3.7", "3.8", "3.9", "3.10"])
 def lint(session):
     args = session.posargs or LOCATIONS
-    session.install(
-        "flake8",
-        "flake8-bandit",
-        "flake8-black",
-        "flake8-bugbear",
-        "flake8-import-order",
-    )
+    session.install("flake8")
     session.run("flake8", *args)
+    session.notify("black")
 
 
-@nox.session(python="3.8")
+@nox.session(python=["3.7", "3.8", "3.9", "3.10"])
 def black(session):
     args = session.posargs or LOCATIONS
     session.install("black")
     session.run("black", *args)
+    session.notify("tests")
+
+
+@nox.session(python=["3.7", "3.8", "3.9", "3.10"])
+def tests(session):
+    session.install(".")
+    session.run("pytest", "-n", "auto")

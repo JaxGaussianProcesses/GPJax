@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, Dict, Optional, Tuple
+from typing import Callable, Dict, Tuple
 
 import distrax as dx
 import jax.numpy as jnp

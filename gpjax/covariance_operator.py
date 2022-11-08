@@ -14,12 +14,11 @@
 # ==============================================================================
 
 import abc
-from typing import Callable, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import jax.numpy as jnp
 import jax.scipy as jsp
 from chex import dataclass
-from jax import lax
 from jaxtyping import Array, Float
 
 
@@ -400,7 +399,7 @@ class DiagonalCovarianceOperator(CovarianceOperator, _DiagonalMatrix):
         return rhs * inv_diag_mat
 
 
-def I(n: int) -> DiagonalCovarianceOperator:
+def identity(n: int) -> DiagonalCovarianceOperator:
     """Identity matrix.
 
     Args:
@@ -410,17 +409,17 @@ def I(n: int) -> DiagonalCovarianceOperator:
         DiagonalCovarianceOperator: Identity matrix of shape nxn.
     """
 
-    I = DiagonalCovarianceOperator(
+    identity_matrix = DiagonalCovarianceOperator(
         diag=jnp.ones(n),
         name="Identity matrix",
     )
 
-    return I
+    return identity_matrix
 
 
 __all__ = [
     "CovarianceOperator",
-    "DenseCoarianceOperator",
+    "DenseCovarianceOperator",
     "DiagonalCovarianceOperator",
-    "I",
+    "identity",
 ]

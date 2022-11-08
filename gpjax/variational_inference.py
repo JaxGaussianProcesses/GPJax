@@ -19,15 +19,16 @@ from typing import Callable, Dict
 import jax.numpy as jnp
 import jax.scipy as jsp
 from chex import dataclass
+from chex import PRNGKey as PRNGKeyType
 from jax import vmap
 from jaxtyping import Array, Float
 
 from .config import get_defaults
-from .covariance_operator import I
+from .covariance_operator import identity
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
-from .types import Dataset, PRNGKeyType
+from .types import Dataset
 from .utils import concat_dictionaries
 from .variational_families import (
     AbstractVariationalFamily,
@@ -190,7 +191,7 @@ class CollapsedVI(AbstractVariationalInference):
             noise = params["likelihood"]["obs_noise"]
             z = params["variational_family"]["inducing_inputs"]
             Kzz = gram(kernel, params["kernel"], z)
-            Kzz += I(m) * jitter
+            Kzz += identity(m) * jitter
             Kzx = cross_covariance(kernel, params["kernel"], z, x)
             Kxx_diag = vmap(kernel, in_axes=(None, 0, 0))(params["kernel"], x, x)
             μx = mean_function(params["mean_function"], x)

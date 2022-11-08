@@ -26,7 +26,7 @@ from chex import dataclass
 from jaxtyping import Array, Float
 
 from .config import Identity, get_defaults
-from .types import PRNGKeyType
+from chex import PRNGKey as PRNGKeyType
 from .utils import merge_dictionaries
 
 
@@ -200,9 +200,11 @@ def constrain(params: Dict, bijectors: Dict) -> Dict:
         Dict: A transformed parameter set. The dictionary is equal in
             structure to the input params dictionary.
     """
-    map = lambda param, trans: trans.forward(param)
 
-    return jax.tree_util.tree_map(map, params, bijectors)
+    def map_fn(param, trans):
+        return trans.forward(param)
+
+    return jax.tree_util.tree_map(map_fn, params, bijectors)
 
 
 def unconstrain(params: Dict, bijectors: Dict) -> Dict:
@@ -219,9 +221,10 @@ def unconstrain(params: Dict, bijectors: Dict) -> Dict:
             structure to the input params dictionary.
     """
 
-    map = lambda param, trans: trans.inverse(param)
+    def map_fn(param, trans):
+        return trans.inverse(param)
 
-    return jax.tree_util.tree_map(map, params, bijectors)
+    return jax.tree_util.tree_map(map_fn, params, bijectors)
 
 
 ################################
@@ -239,7 +242,7 @@ def log_density(
     Returns:
         Float[Array, "1"]: The log density of the parameter.
     """
-    if type(density) == type(None):
+    if isinstance(density, type(None)):
         log_prob = jnp.array(0.0)
     else:
         log_prob = jnp.sum(density.log_prob(param))

@@ -21,15 +21,17 @@ import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
 from chex import dataclass
+from chex import PRNGKey as PRNGKeyType
 from jaxtyping import Array, Float
 
 from .config import get_defaults
-from .covariance_operator import I
+from .covariance_operator import identity
 from .kernels import AbstractKernel
 from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
 from .parameters import copy_dict_structure, evaluate_priors
-from .types import Dataset, PRNGKeyType
+from .types import Dataset
+
 from .utils import concat_dictionaries
 
 
@@ -109,7 +111,7 @@ class Prior(AbstractPrior):
 
     .. math::
 
-        p(f(\\cdot)) = \mathcal{GP}(m(\\cdot), k(\\cdot, \\cdot)).
+        p(f(\\cdot)) = \\mathcal{GP}(m(\\cdot), k(\\cdot, \\cdot)).
 
     To invoke a ``Prior`` distribution, only a kernel function is required. By
     default, the mean function will be set to zero. In general, this assumption
@@ -227,7 +229,7 @@ class Prior(AbstractPrior):
 
             μt = mean_function(params["mean_function"], t)
             Ktt = gram(kernel, params["kernel"], t)
-            Ktt += I(n_test) * jitter
+            Ktt += identity(n_test) * jitter
             Lt = Ktt.triangular_lower()
 
             return dx.MultivariateNormalTri(jnp.atleast_1d(μt.squeeze()), Lt)
@@ -312,21 +314,21 @@ class ConjugatePosterior(AbstractPosterior):
     As such, many computational operations can be simplified; something we make use
     of in this object.
 
-    For a Gaussian process prior :math:`p(\mathbf{f})` and a Gaussian likelihood
-    :math:`p(y | \\mathbf{f}) = \\mathcal{N}(y\\mid \mathbf{f}, \\sigma^2))` where
-    :math:`\mathbf{f} = f(\\mathbf{x})`, the predictive posterior distribution at
+    For a Gaussian process prior :math:`p(\\mathbf{f})` and a Gaussian likelihood
+    :math:`p(y \\mid \\mathbf{f}) = \\mathcal{N}(y\\mid \\mathbf{f}, \\sigma^2))` where
+    :math:`\\mathbf{f} = f(\\mathbf{x})`, the predictive posterior distribution at
     a set of inputs :math:`\\mathbf{x}` is given by
 
     .. math::
 
-        p(\\mathbf{f}^{\\star}\mid \mathbf{y}) & = \\int p(\\mathbf{f}^{\\star} \\mathbf{f} \\mid \\mathbf{y})\\\\
-        & =\\mathcal{N}(\\mathbf{f}^{\\star} \\boldsymbol{\mu}_{\mid \mathbf{y}}, \\boldsymbol{\Sigma}_{\mid \mathbf{y}}
+        p(\\mathbf{f}^{\\star}\\mid \\mathbf{y}) & = \\int p(\\mathbf{f}^{\\star} \\mathbf{f} \\mid \\mathbf{y})\\\\
+        & =\\mathcal{N}(\\mathbf{f}^{\\star} \\boldsymbol{\\mu}_{\\mid \\mathbf{y}}, \\boldsymbol{\\Sigma}_{\\mid \\mathbf{y}}
     where
 
     .. math::
 
-        \\boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left(k(\\mathbf{x}, \\mathbf{x}')+\\sigma^2\\mathbf{I}_n\\right)^{-1}\\mathbf{y}  \\\\
-        \\boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\\mathbf{x}^{\\star}, \\mathbf{x}^{\\star\\prime}) -k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left( k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_n \\right)^{-1}k(\\mathbf{x}, \\mathbf{x}^{\\star}).
+        \\boldsymbol{\\mu}_{\\mid \\mathbf{y}} & = k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left(k(\\mathbf{x}, \\mathbf{x}')+\\sigma^2\\mathbf{I}_n\\right)^{-1}\\mathbf{y}  \\\\
+        \\boldsymbol{\\Sigma}_{\\mid \\mathbf{y}} & =k(\\mathbf{x}^{\\star}, \\mathbf{x}^{\\star\\prime}) -k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left( k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_n \\right)^{-1}k(\\mathbf{x}, \\mathbf{x}^{\\star}).
 
     Example:
         >>> import gpjax as gpx
@@ -360,14 +362,14 @@ class ConjugatePosterior(AbstractPosterior):
         The predictive distribution of a conjugate GP is given by
         .. math::
 
-            p(\\mathbf{f}^{\\star}\mid \mathbf{y}) & = \\int p(\\mathbf{f}^{\\star} \\mathbf{f} \\mid \\mathbf{y})\\\\
-            & =\\mathcal{N}(\\mathbf{f}^{\\star} \\boldsymbol{\mu}_{\mid \mathbf{y}}, \\boldsymbol{\Sigma}_{\mid \mathbf{y}}
+            p(\\mathbf{f}^{\\star}\\mid \\mathbf{y}) & = \\int p(\\mathbf{f}^{\\star} \\mathbf{f} \\mid \\mathbf{y})\\\\
+            & =\\mathcal{N}(\\mathbf{f}^{\\star} \\boldsymbol{\\mu}_{\\mid \\mathbf{y}}, \\boldsymbol{\\Sigma}_{\\mid \\mathbf{y}}
         where
 
         .. math::
 
-            \\boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left(k(\\mathbf{x}, \\mathbf{x}')+\\sigma^2\\mathbf{I}_n\\right)^{-1}\\mathbf{y}  \\\\
-            \\boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\\mathbf{x}^{\\star}, \\mathbf{x}^{\\star\\prime}) -k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left( k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_n \\right)^{-1}k(\\mathbf{x}, \\mathbf{x}^{\\star}).
+            \\boldsymbol{\\mu}_{\\mid \\mathbf{y}} & = k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left(k(\\mathbf{x}, \\mathbf{x}')+\\sigma^2\\mathbf{I}_n\\right)^{-1}\\mathbf{y}  \\\\
+            \\boldsymbol{\\Sigma}_{\\mid \\mathbf{y}} & =k(\\mathbf{x}^{\\star}, \\mathbf{x}^{\\star\\prime}) -k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left( k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_n \\right)^{-1}k(\\mathbf{x}, \\mathbf{x}^{\\star}).
 
         The conditioning set is a GPJax ``Dataset`` object, whilst predictions
         are made on a regular Jax array.
@@ -416,10 +418,10 @@ class ConjugatePosterior(AbstractPosterior):
 
         # Precompute Gram matrix, Kxx, at training inputs, x
         Kxx = gram(kernel, params["kernel"], x)
-        Kxx += I(n) * jitter
+        Kxx += identity(n) * jitter
 
         # Σ = Kxx + Iσ²
-        Sigma = Kxx + I(n) * obs_noise
+        Sigma = Kxx + identity(n) * obs_noise
 
         def predict(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
             """Compute the predictive distribution at a set of test inputs.
@@ -451,7 +453,7 @@ class ConjugatePosterior(AbstractPosterior):
 
             # Ktt  -  Ktx (Kxx + Iσ²)⁻¹ Kxt
             covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
-            covariance += I(n_test) * jitter
+            covariance += identity(n_test) * jitter
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
@@ -565,8 +567,8 @@ class ConjugatePosterior(AbstractPosterior):
 
             # Σ = (Kxx + Iσ²) = LLᵀ
             Kxx = gram(kernel, params["kernel"], x)
-            Kxx += I(n) * jitter
-            Sigma = Kxx + I(n) * obs_noise
+            Kxx += identity(n) * jitter
+            Sigma = Kxx + identity(n) * obs_noise
             L = Sigma.triangular_lower()
 
             # p(y | x, θ), where θ are the model hyperparameters:
@@ -665,7 +667,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
         # Precompute lower triangular of Gram matrix, Lx, at training inputs, x
         Kxx = gram(kernel, params["kernel"], x)
-        Kxx += I(n) * jitter
+        Kxx += identity(n) * jitter
         Lx = Kxx.triangular_lower()
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
@@ -683,7 +685,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
             # Compute terms of the posterior predictive distribution
             Ktx = cross_covariance(kernel, params["kernel"], t, x)
-            Ktt = gram(kernel, params["kernel"], t) + I(n_test) * jitter
+            Ktt = gram(kernel, params["kernel"], t) + identity(n_test) * jitter
             μt = mean_function(params["mean_function"], t)
 
             # Lx⁻¹ Kxt
@@ -697,7 +699,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
             # Ktt - Ktx Kxx⁻¹ Kxt
             covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
-            covariance += I(n_test) * jitter
+            covariance += identity(n_test) * jitter
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
@@ -779,7 +781,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
             # Compute lower triangular of the kernel Gram matrix
             Kxx = gram(kernel, params["kernel"], x)
-            Kxx += I(n) * jitter
+            Kxx += identity(n) * jitter
             Lx = Kxx.triangular_lower()
 
             # Compute the prior mean function

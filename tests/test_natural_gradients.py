@@ -21,6 +21,7 @@ import jax.random as jr
 import pytest
 from jax.config import config
 
+from copy import deepcopy
 import gpjax as gpx
 from gpjax.abstractions import get_batch
 from gpjax.natural_gradients import (
@@ -101,9 +102,6 @@ def test_natural_to_expectation(dim):
             "expectation_matrix"
         ].shape
     )
-
-
-from copy import deepcopy
 
 
 def test_renaming():
@@ -260,4 +258,5 @@ def test_natural_gradients():
     d = jax.tree_map(lambda x: (x == 0.0).all(), nat_grads)
     d["variational_family"]["moments"] = True
 
-    assert jnp.array([v1 == True for k, v1, v2 in recursive_items(d, d)]).all()
+    for k, v1, v2 in recursive_items(d, d):
+        assert v1

@@ -18,7 +18,6 @@ from chex import dataclass
 from jaxtyping import Array, Float
 
 NoneType = type(None)
-from chex import PRNGKey as PRNGKeyType
 
 
 @dataclass

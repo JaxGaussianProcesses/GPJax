@@ -27,9 +27,10 @@ from .covariance_operator import (
     DenseCovarianceOperator,
     DiagonalCovarianceOperator,
 )
-from .types import PRNGKeyType
+from chex import PRNGKey as PRNGKeyType
 
 JITTER = get_defaults()["jitter"]
+
 
 ##########################################
 # Abtract classes
@@ -342,7 +343,7 @@ class RBF(AbstractKernel, DenseKernelComputation):
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
+        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( \\frac{\\lVert x - y \\rVert^2_2}{2 \\ell^2} \\Bigg)
@@ -383,7 +384,7 @@ class Matern12(AbstractKernel, DenseKernelComputation):
         y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
+        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( -\\frac{\\lvert x-y \\rvert}{\\ell}  \\Bigg)
@@ -423,7 +424,7 @@ class Matern32(AbstractKernel, DenseKernelComputation):
         y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
+        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{3}\\lvert x-y \\rvert}{\\ell}  \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{3}\\lvert x-y\\rvert}{\\ell} \\Bigg)
@@ -466,7 +467,7 @@ class Matern52(AbstractKernel, DenseKernelComputation):
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
+        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{5}\\lvert x-y \\rvert}{\\ell} + \\frac{5\\lvert x - y \\rvert^2}{3\\ell^2} \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{5}\\lvert x-y\\rvert}{\\ell} \\Bigg)
@@ -510,7 +511,7 @@ class Polynomial(AbstractKernel, DenseKernelComputation):
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\\alpha` and variance :math:`\sigma^2` through
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\\alpha` and variance :math:`\\sigma^2` through
 
         .. math::
             k(x, y) = \\Big( \\alpha + \\sigma^2 xy \\Big)^{d}
@@ -543,10 +544,10 @@ class White(AbstractKernel, DiagonalKernelComputation):
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\sigma`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\\sigma`
 
         .. math::
-            k(x, y) = \\sigma^2 \delta(x-y)
+            k(x, y) = \\sigma^2 \\delta(x-y)
 
         Args:
             params (Dict): Parameter set for which the kernel should be evaluated on.

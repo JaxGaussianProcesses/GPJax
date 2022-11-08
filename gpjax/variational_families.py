@@ -20,13 +20,14 @@ import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
 from chex import dataclass
+from chex import PRNGKey as PRNGKeyType
 from jaxtyping import Array, Float
 
 from .config import get_defaults
-from .covariance_operator import I
+from .covariance_operator import identity
 from .gps import Prior
 from .likelihoods import AbstractLikelihood, Gaussian
-from .types import Dataset, PRNGKeyType
+from .types import Dataset
 from .utils import concat_dictionaries
 
 
@@ -167,7 +168,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         μz = mean_function(params["mean_function"], z)
         Kzz = gram(kernel, params["kernel"], z)
-        Kzz += I(m) * jitter
+        Kzz += identity(m) * jitter
         Lz = Kzz.triangular_lower()
 
         qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
@@ -212,7 +213,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         cross_covariance = kernel.cross_covariance
 
         Kzz = gram(kernel, params["kernel"], z)
-        Kzz += I(m) * jitter
+        Kzz += identity(m) * jitter
         Lz = Kzz.triangular_lower()
         μz = mean_function(params["mean_function"], z)
 
@@ -245,7 +246,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
             )
-            covariance += I(n_test) * jitter
+            covariance += identity(n_test) * jitter
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
@@ -323,7 +324,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         cross_covariance = kernel.cross_covariance
 
         Kzz = gram(kernel, params["kernel"], z)
-        Kzz += I(m) * jitter
+        Kzz += identity(m) * jitter
         Lz = Kzz.triangular_lower()
 
         def predict_fn(
@@ -352,7 +353,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Lz_invT_sqrt, Ktz_Lz_invT_sqrt.T)
             )
-            covariance += I(n_test) * jitter
+            covariance += identity(n_test) * jitter
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
@@ -440,7 +441,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         μz = mean_function(params["mean_function"], z)
         Kzz = gram(kernel, params["kernel"], z)
-        Kzz += I(m) * jitter
+        Kzz += identity(m) * jitter
         Lz = Kzz.triangular_lower()
 
         qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
@@ -500,7 +501,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         mu = jnp.matmul(S, natural_vector)
 
         Kzz = gram(kernel, params["kernel"], z)
-        Kzz += I(m) * jitter
+        Kzz += identity(m) * jitter
         Lz = Kzz.triangular_lower()
         μz = mean_function(params["mean_function"], z)
 
@@ -531,7 +532,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Kzz_inv_L, Ktz_Kzz_inv_L.T)
             )
-            covariance += I(n_test) * jitter
+            covariance += identity(n_test) * jitter
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
@@ -617,7 +618,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         μz = mean_function(params["mean_function"], z)
         Kzz = gram(kernel, params["kernel"], z)
-        Kzz += I(m) * jitter
+        Kzz += identity(m) * jitter
         Lz = Kzz.triangular_lower()
 
         qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
@@ -673,7 +674,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         sqrt = jnp.linalg.cholesky(S)
 
         Kzz = gram(kernel, params["kernel"], z)
-        Kzz += I(m) * jitter
+        Kzz += identity(m) * jitter
         Lz = Kzz.triangular_lower()
         μz = mean_function(params["mean_function"], z)
 
@@ -706,7 +707,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
             )
-            covariance += I(n_test) * jitter
+            covariance += identity(n_test) * jitter
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
@@ -787,7 +788,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
 
             Kzx = cross_covariance(kernel, params["kernel"], z, x)
             Kzz = gram(kernel, params["kernel"], z)
-            Kzz += I(m) * jitter
+            Kzz += identity(m) * jitter
 
             # Lz Lzᵀ = Kzz
             Lz = Kzz.triangular_lower()
@@ -836,7 +837,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(L_inv_Lz_inv_Kzt.T, L_inv_Lz_inv_Kzt)
             )
-            covariance += I(n_test) * jitter
+            covariance += identity(n_test) * jitter
 
             return dx.MultivariateNormalFullCovariance(
                 jnp.atleast_1d(mean.squeeze()), covariance.to_dense()

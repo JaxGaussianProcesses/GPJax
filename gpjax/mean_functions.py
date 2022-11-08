@@ -20,7 +20,7 @@ import jax.numpy as jnp
 from chex import dataclass
 from jaxtyping import Array, Float
 
-from .types import PRNGKeyType
+from chex import PRNGKey as PRNGKeyType
 
 
 @dataclass(repr=False)

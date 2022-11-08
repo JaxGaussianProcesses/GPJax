@@ -20,6 +20,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import optax as ox
 from chex import dataclass
+from chex import PRNGKey as PRNGKeyType
 from jax import lax
 from jax.experimental import host_callback
 from jaxtyping import Array, Float
@@ -27,7 +28,7 @@ from tqdm.auto import tqdm
 
 from .natural_gradients import natural_gradients
 from .parameters import ParameterState, constrain, trainable_params, unconstrain
-from .types import Dataset, PRNGKeyType
+from .types import Dataset
 from .variational_inference import StochasticVI
 
 

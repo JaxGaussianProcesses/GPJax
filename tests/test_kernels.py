@@ -14,20 +14,20 @@
 # ==============================================================================
 
 
+from chex import PRNGKey as PRNGKeyType
 from itertools import permutations
 from typing import Dict, List
 
 import jax.numpy as jnp
 import jax.random as jr
 import networkx as nx
-import numpy as np
 import pytest
 from jax.config import config
 from jaxtyping import Array, Float
 
 from gpjax.covariance_operator import (
     CovarianceOperator,
-    I,
+    identity,
 )
 
 from gpjax.kernels import (
@@ -45,7 +45,6 @@ from gpjax.kernels import (
     euclidean_distance,
 )
 from gpjax.parameters import initialise
-from gpjax.types import PRNGKeyType
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -173,7 +172,7 @@ def test_pos_def(
 
     # Test gram matrix eigenvalues are positive:
     Kxx = gram(kern, params, x)
-    Kxx += I(n) * _jitter
+    Kxx += identity(n) * _jitter
     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
     assert (eigen_values > 0.0).all()
 
@@ -246,7 +245,7 @@ def test_polynomial(
     assert Kxx.shape[0] == Kxx.shape[1]
 
     # Test positive definiteness
-    Kxx += I(n) * _jitter
+    Kxx += identity(n) * _jitter
     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
     assert (eigen_values > 0).all()
 
@@ -327,7 +326,7 @@ def test_combination_kernel(
     assert Kxx.shape[1] == n
 
     # Check positive definiteness
-    Kxx += I(n) * _jitter
+    Kxx += identity(n) * _jitter
     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
     assert (eigen_values > 0).all()
 
@@ -451,7 +450,7 @@ def test_graph_kernel():
     assert Kxx.shape == (n_verticies, n_verticies)
 
     # Check positive definiteness
-    Kxx += I(n_verticies) * _jitter
+    Kxx += identity(n_verticies) * _jitter
     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
     assert all(eigen_values > 0)
 

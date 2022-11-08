@@ -37,7 +37,7 @@ from typing import Dict
 
 import gpjax as gpx
 from gpjax.kernels import DenseKernelComputation, AbstractKernel
-from gpjax.types import PRNGKeyType
+from chex import PRNGKey as PRNGKeyType
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -88,7 +88,10 @@ class _DeepKernelFunction:
 @dataclass
 class DeepKernelFunction(AbstractKernel, DenseKernelComputation, _DeepKernelFunction):
     def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"], 
+        self,
+        params: Dict,
+        x: Float[Array, "1 D"],
+        y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
         xt = self.network.apply(params=params, x=x)
         yt = self.network.apply(params=params, x=y)

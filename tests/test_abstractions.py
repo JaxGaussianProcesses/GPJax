@@ -54,7 +54,10 @@ def test_stop_grads():
     params = {"x": jnp.array(3.0), "y": jnp.array(4.0)}
     trainables = {"x": True, "y": False}
     bijectors = build_bijectors(params)
-    loss_fn = lambda params: params["x"] ** 2 + params["y"] ** 2
+
+    def loss_fn(params):
+        return params["x"] ** 2 + params["y"] ** 2
+
     optimiser = optax.adam(learning_rate=0.1)
     parameter_state = ParameterState(
         params=params, trainables=trainables, bijectors=bijectors

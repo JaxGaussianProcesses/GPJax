@@ -12,22 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
-
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
 from jax.config import config
 
 # Enable Float64 for more stable matrix inversions.
-config.update("jax_enable_x64", True)
 from gpjax.covariance_operator import (
     CovarianceOperator,
     DenseCovarianceOperator,
     DiagonalCovarianceOperator,
-    I,
+    identity,
 )
 
+config.update("jax_enable_x64", True)
 _key = jr.PRNGKey(seed=42)
 
 
@@ -144,17 +142,17 @@ def test_diagonal_covariance_operator(n: int, constant: float) -> None:
 def test_identity_covariance_operator(n: int) -> None:
 
     # Create identity matrix of size nxn:
-    Identity = I(n)
+    identity_matrix = identity(n)
 
     # Check iniation:
-    assert Identity.diag.shape == (n,)
-    assert (Identity.diag == 1.0).all()
-    assert isinstance(Identity.diag, jnp.ndarray)
-    assert isinstance(Identity, DiagonalCovarianceOperator)
+    assert identity_matrix.diag.shape == (n,)
+    assert (identity_matrix.diag == 1.0).all()
+    assert isinstance(identity_matrix.diag, jnp.ndarray)
+    assert isinstance(identity_matrix, DiagonalCovarianceOperator)
 
     # Check iid covariance construction:
     noise = jnp.array([jnp.pi])
-    cov = Identity * noise
+    cov = identity_matrix * noise
     assert cov.diag.shape == (n,)
     assert (cov.diag == jnp.pi).all()
     assert isinstance(cov.diag, jnp.ndarray)
@@ -163,7 +161,7 @@ def test_identity_covariance_operator(n: int) -> None:
     # Check addition to diagonal covariance:
     diag = jnp.arange(n)
     diag_gram_matrix = DiagonalCovarianceOperator(diag=diag)
-    cov = diag_gram_matrix + Identity
+    cov = diag_gram_matrix + identity_matrix
     assert cov.diag.shape == (n,)
     assert (cov.diag == (1.0 + jnp.arange(n))).all()
     assert isinstance(cov.diag, jnp.ndarray)
@@ -172,7 +170,7 @@ def test_identity_covariance_operator(n: int) -> None:
     # Check addition to dense covariance:
     dense = jnp.arange(n**2, dtype=jnp.float64).reshape(n, n)
     dense_matrix = DenseCovarianceOperator(matrix=dense)
-    cov = dense_matrix + (Identity * noise)
+    cov = dense_matrix + (identity_matrix * noise)
     assert cov.matrix.shape == (n, n)
     assert (jnp.diag(cov.matrix) == jnp.diag((noise + dense))).all()
     assert isinstance(cov.matrix, jnp.ndarray)
