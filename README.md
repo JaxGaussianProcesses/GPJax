@@ -252,7 +252,7 @@ Clone a copy of the repository to your local machine and run the setup configura
 ```bash
 git clone https://github.com/Daniel-Dodd/jax_linear_operator.git
 cd jax_linear_operator
-python setup.py develop
+python -m setup develop
 ```
 
 > **Note**

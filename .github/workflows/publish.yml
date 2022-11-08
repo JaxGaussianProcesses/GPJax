@@ -1,0 +1,47 @@
+#follows https://packaging.python.org/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+name: Publish Python 🐍  distributions 📦 to PyPI and TestPyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      releasetype:
+        description: "Is this a 'release' or a 'test'?"
+        required: true
+        default: "test"
+
+jobs:
+  build-n-publish:
+    name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Display phase
+        run: echo "Deploying "${{github.event.inputs.releasetype}}" $INPUT_RELEASETYPE to PyPI"
+
+      - uses: actions/checkout@master
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: Build a test source tarball
+        if: github.event.inputs.releasetype == 'test'
+        run: PYTERRIER_VERSION_SUFFIX=".`date +%s`" python setup.py sdist
+
+      - name: Build a release source tarball
+        if: github.event.inputs.releasetype == 'release'
+        run: python setup.py sdist
+
+      - name: Publish distribution 📦 to Test PyPI
+        if: github.event.inputs.releasetype == 'test'
+        uses: pypa/gh-action-pypi-publish@v1.4.2
+        with:
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+
+      - name: Publish distribution 📦 to PyPI
+        if: github.event.inputs.releasetype == 'release'
+        uses: pypa/gh-action-pypi-publish@v1.4.2
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
