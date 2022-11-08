@@ -26,5 +26,6 @@ def tests(session):
     session.install("pytest")
     session.install("pytest-cov")
     session.install("pytest-xdist")
+    session.install("networkx")
     session.install(".")
     session.run("pytest", "-n", "auto", *args)
