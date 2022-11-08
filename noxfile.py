@@ -25,5 +25,6 @@ def tests(session):
     args = session.posargs or LOCATIONS
     session.install("pytest")
     session.install("pytest-cov")
+    session.install("pytest-xdist")
     session.install(".")
     session.run("pytest", "-n", "auto", *args)
