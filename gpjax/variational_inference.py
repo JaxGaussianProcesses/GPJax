@@ -175,7 +175,7 @@ class CollapsedVI(AbstractVariationalInference):
 
         # Unpack mean function and kernel
         mean_function = self.prior.mean_function
-        kernel = self.prior.kernel 
+        kernel = self.prior.kernel
 
         # Unpack kernel computation
         gram, cross_covariance = kernel.gram, kernel.cross_covariance

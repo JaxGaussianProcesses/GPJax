@@ -38,7 +38,17 @@ REQUIRES = [
 ]
 
 EXTRAS = {
-    "dev": ["black", "isort", "pylint", "flake8", "pytest", "networkx", "pytest-cov"],
+    "dev": [
+        "black",
+        "isort",
+        "pylint",
+        "flake8",
+        "pytest",
+        "networkx",
+        "pytest-cov",
+        "pydocstyle",
+        "xdoctest",
+    ],
     "cuda": ["jax[cuda]"],
 }
 

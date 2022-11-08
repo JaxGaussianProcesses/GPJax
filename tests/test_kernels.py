@@ -226,7 +226,7 @@ def test_polynomial(
 
     # Unpack kernel computation
     gram = kern.gram
-    
+
     # Check name
     assert kern.name == f"Polynomial Degree: {degree}"
 
@@ -257,7 +257,7 @@ def test_active_dim(kernel: AbstractKernel) -> None:
     perm_length = 2
     dim_pairs = list(permutations(dim_list, r=perm_length))
     n_dims = len(dim_list)
- 
+
     # Generate random inputs
     x = jr.normal(_initialise_key, shape=(20, n_dims))
 
@@ -318,7 +318,7 @@ def test_combination_kernel(
     assert len(combination_kernel.kernel_set) == n_kerns
     assert isinstance(combination_kernel.kernel_set, list)
     assert isinstance(combination_kernel.kernel_set[0], AbstractKernel)
-    
+
     # Compute gram matrix
     Kxx = gram(combination_kernel, params, x)
 
@@ -380,11 +380,11 @@ def test_sum_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
     "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
 )
 def test_prod_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
-   
-   # Create inputs
+
+    # Create inputs
     n = 10
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
-    
+
     # Create product kernel
     prod_kernel = ProductKernel(kernel_set=[k1, k2])
 
@@ -422,10 +422,10 @@ def test_graph_kernel():
     n_edges = 40
     G = nx.gnm_random_graph(n_verticies, n_edges, seed=123)
     x = jnp.arange(n_verticies).reshape(-1, 1)
-    
+
     # Compute graph laplacian
     L = nx.laplacian_matrix(G).toarray() + jnp.eye(n_verticies) * 1e-12
-    
+
     # Create graph kernel
     kern = GraphKernel(laplacian=L)
     assert isinstance(kern, GraphKernel)
@@ -445,7 +445,7 @@ def test_graph_kernel():
         "smoothness",
         "variance",
     ]
-    
+
     # Compute gram matrix
     Kxx = gram(kern, params, x)
     assert Kxx.shape == (n_verticies, n_verticies)
@@ -454,7 +454,6 @@ def test_graph_kernel():
     Kxx += I(n_verticies) * _jitter
     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
     assert all(eigen_values > 0)
-   
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52, Polynomial])

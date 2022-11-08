@@ -21,7 +21,11 @@ from ml_collections import ConfigDict
 
 __config = None
 
-FillTriangular = dx.Chain([tfb.FillTriangular(), ])  # TODO: Dan to chain methods.
+FillTriangular = dx.Chain(
+    [
+        tfb.FillTriangular(),
+    ]
+)  # TODO: Dan to chain methods.
 Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 Softplus = dx.Lambda(
     forward=lambda x: jnp.log(1 + jnp.exp(x)),
