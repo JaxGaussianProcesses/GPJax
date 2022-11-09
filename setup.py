@@ -48,6 +48,7 @@ EXTRAS = {
         "pytest-cov",
         "pydocstyle",
         "xdoctest",
+        "pytest-xdist",
     ],
     "cuda": ["jax[cuda]"],
 }
