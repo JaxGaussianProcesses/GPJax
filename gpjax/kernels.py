@@ -652,7 +652,7 @@ def euclidean_distance(
         Float[Array, "1"]: The euclidean distance between the inputs.
     """
 
-    return jnp.sqrt(squared_distance(x, y))
+    return jnp.sqrt(jnp.maximum(squared_distance(x, y), 1e-36))
 
 
 __all__ = [
