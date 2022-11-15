@@ -1,15 +1,33 @@
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import typing as tp
 
 import distrax as dx
 import jax.numpy as jnp
+import jax.random as jr
 import pytest
-from tensorflow_probability.substrates.jax import distributions as tfd
+from jax.config import config
 
 from gpjax.gps import Prior
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian
-from gpjax.parameters import (  # build_all_transforms,
-    build_transforms,
+from gpjax.parameters import (
+    build_bijectors,
+    build_trainables,
+    constrain,
     copy_dict_structure,
     evaluate_priors,
     initialise,
@@ -18,17 +36,20 @@ from gpjax.parameters import (  # build_all_transforms,
     recursive_complete,
     recursive_items,
     structure_priors,
-    transform,
+    unconstrain,
 )
 
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 
 #########################
 # Test base functionality
 #########################
 @pytest.mark.parametrize("lik", [Gaussian])
 def test_initialise(lik):
+    key = jr.PRNGKey(123)
     posterior = Prior(kernel=RBF()) * lik(num_datapoints=10)
-    params, _, _, _ = initialise(posterior)
+    params, _, _ = initialise(posterior, key).unpack()
     assert list(sorted(params.keys())) == [
         "kernel",
         "likelihood",
@@ -38,7 +59,7 @@ def test_initialise(lik):
 
 def test_non_conjugate_initialise():
     posterior = Prior(kernel=RBF()) * Bernoulli(num_datapoints=10)
-    params, _, _, _ = initialise(posterior)
+    params, _, _ = initialise(posterior, jr.PRNGKey(123)).unpack()
     assert list(sorted(params.keys())) == [
         "kernel",
         "latent",
@@ -53,7 +74,7 @@ def test_non_conjugate_initialise():
 @pytest.mark.parametrize("x", [-1.0, 0.0, 1.0])
 def test_lpd(x):
     val = jnp.array(x)
-    dist = tfd.Normal(loc=0.0, scale=1.0)
+    dist = dx.Normal(loc=0.0, scale=1.0)
     lpd = log_density(val, dist)
     assert lpd is not None
     assert log_density(val, None) == 0.0
@@ -62,7 +83,7 @@ def test_lpd(x):
 @pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
 def test_prior_template(lik):
     posterior = Prior(kernel=RBF()) * lik(num_datapoints=10)
-    params, _, _, _ = initialise(posterior)
+    params, _, _ = initialise(posterior, jr.PRNGKey(123)).unpack()
     prior_container = copy_dict_structure(params)
     for (
         k,
@@ -75,9 +96,9 @@ def test_prior_template(lik):
 @pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
 def test_recursive_complete(lik):
     posterior = Prior(kernel=RBF()) * lik(num_datapoints=10)
-    params, _, _, _ = initialise(posterior)
+    params, _, _ = initialise(posterior, jr.PRNGKey(123)).unpack()
     priors = {"kernel": {}}
-    priors["kernel"]["lengthscale"] = tfd.HalfNormal(scale=2.0)
+    priors["kernel"]["lengthscale"] = dx.Laplace(loc=0.0, scale=1.0)
     container = copy_dict_structure(params)
     complete_priors = recursive_complete(container, priors)
     for (
@@ -86,7 +107,7 @@ def test_recursive_complete(lik):
         v2,
     ) in recursive_items(params, complete_priors):
         if k == "lengthscale":
-            assert isinstance(v2, tfd.HalfNormal)
+            assert isinstance(v2, dx.Laplace)
         else:
             assert v2 == None
 
@@ -105,10 +126,10 @@ def test_prior_evaluation():
     }
     priors = {
         "kernel": {
-            "lengthscale": tfd.Gamma(1.0, 1.0),
-            "variance": tfd.Gamma(2.0, 2.0),
+            "lengthscale": dx.Gamma(1.0, 1.0),
+            "variance": dx.Gamma(2.0, 2.0),
         },
-        "likelihood": {"obs_noise": tfd.Gamma(3.0, 3.0)},
+        "likelihood": {"obs_noise": dx.Gamma(3.0, 3.0)},
     }
     lpd = evaluate_priors(params, priors)
     assert pytest.approx(lpd) == -2.0110168
@@ -143,8 +164,8 @@ def test_incomplete_priors():
     }
     priors = {
         "kernel": {
-            "lengthscale": tfd.Gamma(1.0, 1.0),
-            "variance": tfd.Gamma(2.0, 2.0),
+            "lengthscale": dx.Gamma(1.0, 1.0),
+            "variance": dx.Gamma(2.0, 2.0),
         },
     }
     container = copy_dict_structure(params)
@@ -165,11 +186,11 @@ def test_checks(num_datapoints):
 
 def test_structure_priors():
     posterior = Prior(kernel=RBF()) * Gaussian(num_datapoints=10)
-    params, _, _, _ = initialise(posterior)
+    params, _, _ = initialise(posterior, jr.PRNGKey(123)).unpack()
     priors = {
         "kernel": {
-            "lengthscale": tfd.Gamma(1.0, 1.0),
-            "variance": tfd.Gamma(2.0, 2.0),
+            "lengthscale": dx.Gamma(1.0, 1.0),
+            "variance": dx.Gamma(2.0, 2.0),
         },
     }
     structured_priors = structure_priors(params, priors)
@@ -185,7 +206,7 @@ def test_structure_priors():
         assert v
 
 
-@pytest.mark.parametrize("latent_prior", [dx.Laplace(0.0, 1.0), tfd.Laplace(0.0, 1.0)])
+@pytest.mark.parametrize("latent_prior", [dx.Laplace(0.0, 1.0), dx.Laplace(0.0, 1.0)])
 def test_prior_checks(latent_prior):
     priors = {
         "kernel": {"lengthscale": None, "variance": None},
@@ -195,7 +216,7 @@ def test_prior_checks(latent_prior):
     }
     new_priors = prior_checks(priors)
     assert "latent" in new_priors.keys()
-    assert new_priors["latent"].name == "Normal"
+    assert isinstance(new_priors["latent"], dx.Normal)
 
     priors = {
         "kernel": {"lengthscale": None, "variance": None},
@@ -204,7 +225,7 @@ def test_prior_checks(latent_prior):
     }
     new_priors = prior_checks(priors)
     assert "latent" in new_priors.keys()
-    assert new_priors["latent"].name == "Normal"
+    assert isinstance(new_priors["latent"], dx.Normal)
 
     priors = {
         "kernel": {"lengthscale": None, "variance": None},
@@ -215,7 +236,7 @@ def test_prior_checks(latent_prior):
     with pytest.warns(UserWarning):
         new_priors = prior_checks(priors)
     assert "latent" in new_priors.keys()
-    assert new_priors["latent"].name == "Laplace"
+    assert isinstance(new_priors["latent"], dx.Laplace)
 
 
 #########################
@@ -225,19 +246,18 @@ def test_prior_checks(latent_prior):
 @pytest.mark.parametrize("likelihood", [Gaussian, Bernoulli])
 def test_output(num_datapoints, likelihood):
     posterior = Prior(kernel=RBF()) * likelihood(num_datapoints=num_datapoints)
-    params, _, constrainer, unconstrainer = initialise(posterior)
+    params, _, bijectors = initialise(posterior, jr.PRNGKey(123)).unpack()
 
-    assert isinstance(constrainer, dict)
-    assert isinstance(unconstrainer, dict)
-    for k, v1, v2 in recursive_items(constrainer, unconstrainer):
-        assert isinstance(v1, tp.Callable)
-        assert isinstance(v2, tp.Callable)
+    assert isinstance(bijectors, dict)
+    for k, v1, v2 in recursive_items(bijectors, bijectors):
+        assert isinstance(v1.forward, tp.Callable)
+        assert isinstance(v2.inverse, tp.Callable)
 
-    unconstrained_params = transform(params, unconstrainer)
+    unconstrained_params = unconstrain(params, bijectors)
     assert (
         unconstrained_params["kernel"]["lengthscale"] != params["kernel"]["lengthscale"]
     )
-    backconstrained_params = transform(unconstrained_params, constrainer)
+    backconstrained_params = constrain(unconstrained_params, bijectors)
     for k, v1, v2 in recursive_items(params, unconstrained_params):
         assert v1.dtype == v2.dtype
 
@@ -246,8 +266,8 @@ def test_output(num_datapoints, likelihood):
 
     augmented_params = params
     augmented_params["test_param"] = jnp.array([1.0])
-    a_constrainers, a_unconstrainers = build_transforms(augmented_params)
-    assert "test_param" in list(a_constrainers.keys())
-    assert "test_param" in list(a_unconstrainers.keys())
-    assert a_constrainers["test_param"](1.0) == 1.0
-    assert a_unconstrainers["test_param"](1.0) == 1.0
+    a_bijectors = build_bijectors(augmented_params)
+
+    assert "test_param" in list(a_bijectors.keys())
+    assert a_bijectors["test_param"].forward(jnp.array([1.0])) == 1.0
+    assert a_bijectors["test_param"].inverse(jnp.array([1.0])) == 1.0

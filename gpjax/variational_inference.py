@@ -1,16 +1,38 @@
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import abc
 from typing import Callable, Dict
 
 import jax.numpy as jnp
+import jax.scipy as jsp
 from chex import dataclass
 from jax import vmap
+from jaxtyping import Array, Float
 
+from .config import get_defaults
+from .covariance_operator import I
 from .gps import AbstractPosterior
-from .parameters import transform
+from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
-from .types import Array, Dataset
+from .types import Dataset, PRNGKeyType
 from .utils import concat_dictionaries
-from .variational_families import AbstractVariationalFamily
+from .variational_families import (
+    AbstractVariationalFamily,
+    CollapsedVariationalGaussian,
+)
 
 
 @dataclass
@@ -24,24 +46,23 @@ class AbstractVariationalInference:
         self.prior = self.posterior.prior
         self.likelihood = self.posterior.likelihood
 
-    @property
-    def params(self) -> Dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """Construct the parameter set used within the variational scheme adopted."""
         hyperparams = concat_dictionaries(
-            {"likelihood": self.posterior.likelihood.params}, 
-            self.variational_family.params,
+            {"likelihood": self.posterior.likelihood._initialise_params(key)},
+            self.variational_family._initialise_params(key),
         )
         return hyperparams
 
     @abc.abstractmethod
     def elbo(
-        self, train_data: Dataset, transformations: Dict
-    ) -> Callable[[Dict], Array]:
+        self,
+        train_data: Dataset,
+    ) -> Callable[[Dict], Float[Array, "1"]]:
         """Placeholder method for computing the evidence lower bound function (ELBO), given a training dataset and a set of transformations that map each parameter onto the entire real line.
 
         Args:
             train_data (Dataset): The training dataset for which the ELBO is to be computed.
-            transformations (Dict): A set of functions that unconstrain each parameter.
 
         Returns:
             Callable[[Array], Array]: A function that computes the ELBO given a set of parameters.
@@ -59,27 +80,26 @@ class StochasticVI(AbstractVariationalInference):
         self.num_inducing = self.variational_family.num_inducing
 
     def elbo(
-        self, train_data: Dataset, transformations: Dict, negative: bool = False
-    ) -> Callable[[Array], Array]:
+        self, train_data: Dataset, negative: bool = False
+    ) -> Callable[[Float[Array, "N D"]], Float[Array, "1"]]:
         """Compute the evidence lower bound under this model. In short, this requires evaluating the expectation of the model's log-likelihood under the variational approximation. To this, we sum the KL divergence from the variational posterior to the prior. When batching occurs, the result is scaled by the batch size relative to the full dataset size.
 
         Args:
             train_data (Dataset): The training data for which we should maximise the ELBO with respect to.
-            transformations (Dict): The transformation set that unconstrains each parameter.
             negative (bool, optional): Whether or not the resultant elbo function should be negative. For gradient descent where we minimise our objective function this argument should be true as minimisation of the negative corresponds to maximisation of the ELBO. Defaults to False.
 
         Returns:
             Callable[[Dict, Dataset], Array]: A callable function that accepts a current parameter estimate and batch of data for which gradients should be computed.
         """
+
+        # Constant for whether or not to negate the elbo for optimisation purposes
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
 
-        def elbo_fn(params: Dict, batch: Dataset) -> Array:
-            params = transform(params, transformations)
-
+        def elbo_fn(params: Dict, batch: Dataset) -> Float[Array, "1"]:
             # KL[q(f(·)) || p(f(·))]
             kl = self.variational_family.prior_kl(params)
 
-            # ∫[log(p(y|f(x))) q(f(x))] df(x)
+            # ∫[log(p(y|f(·))) q(f(·))] df(·)
             var_exp = self.variational_expectation(params, batch)
 
             # For batch size b, we compute  n/b * Σᵢ[ ∫log(p(y|f(xᵢ))) q(f(xᵢ)) df(xᵢ)] - KL[q(f(·)) || p(f(·))]
@@ -87,7 +107,9 @@ class StochasticVI(AbstractVariationalInference):
 
         return elbo_fn
 
-    def variational_expectation(self, params: Dict, batch: Dataset) -> Array:
+    def variational_expectation(
+        self, params: Dict, batch: Dataset
+    ) -> Float[Array, "N 1"]:
         """Compute the expectation of our model's log-likelihood under our variational distribution. Batching can be done here to speed up computation.
 
         Args:
@@ -97,17 +119,146 @@ class StochasticVI(AbstractVariationalInference):
         Returns:
             Array: The expectation of the model's log-likelihood under our variational distribution.
         """
+
+        # Unpack training batch
         x, y = batch.X, batch.y
 
-        # q(f(x))
-        predictive_dist = vmap(self.variational_family.predict(params))(x[:, None])
-        mean = predictive_dist.mean().val.reshape(-1,1)
-        variance = predictive_dist.variance().val.reshape(-1,1)
+        # Variational distribution q(f(·)) = N(f(·); μ(·), Σ(·, ·))
+        q = self.variational_family
+
+        # Compute variational mean, μ(x), and variance, √diag(Σ(x, x)), at training inputs, x
+        qx = vmap(q(params))(x[:, None])
+        mean = qx.mean().val.reshape(-1, 1)
+        variance = qx.variance().val.reshape(-1, 1)
 
         # log(p(y|f(x)))
-        log_prob = vmap(lambda f, y: self.likelihood.link_function(f, params["likelihood"]).log_prob(y))
+        link_function = self.likelihood.link_function
+        log_prob = vmap(lambda f, y: link_function(params["likelihood"], f).log_prob(y))
 
         # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
         expectation = gauss_hermite_quadrature(log_prob, mean, variance, y=y)
 
         return expectation
+
+
+@dataclass
+class CollapsedVI(AbstractVariationalInference):
+    """Collapsed variational inference for a sparse Gaussian process regression model.
+    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes."""
+
+    def __post_init__(self):
+        self.prior = self.posterior.prior
+        self.likelihood = self.posterior.likelihood
+        self.num_inducing = self.variational_family.num_inducing
+
+        if not isinstance(self.likelihood, Gaussian):
+            raise TypeError("Likelihood must be Gaussian.")
+
+        if not isinstance(self.variational_family, CollapsedVariationalGaussian):
+            raise TypeError("Variational family must be CollapsedVariationalGaussian.")
+
+    def elbo(
+        self, train_data: Dataset, negative: bool = False
+    ) -> Callable[[Dict], Float[Array, "1"]]:
+        """Compute the evidence lower bound under this model. In short, this requires evaluating the expectation of the model's log-likelihood under the variational approximation. To this, we sum the KL divergence from the variational posterior to the prior. When batching occurs, the result is scaled by the batch size relative to the full dataset size.
+
+        Args:
+            train_data (Dataset): The training data for which we should maximise the ELBO with respect to.
+            negative (bool, optional): Whether or not the resultant elbo function should be negative. For gradient descent where we minimise our objective function this argument should be true as minimisation of the negative corresponds to maximisation of the ELBO. Defaults to False.
+
+        Returns:
+            Callable[[Dict, Dataset], Array]: A callable function that accepts a current parameter estimate for which gradients should be computed.
+        """
+
+        # Unpack training data
+        x, y, n = train_data.X, train_data.y, train_data.n
+
+        # Unpack mean function and kernel
+        mean_function = self.prior.mean_function
+        kernel = self.prior.kernel 
+
+        # Unpack kernel computation
+        gram, cross_covariance = kernel.gram, kernel.cross_covariance
+
+        m = self.num_inducing
+        jitter = get_defaults()["jitter"]
+
+        # Constant for whether or not to negate the elbo for optimisation purposes
+        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
+
+        def elbo_fn(params: Dict) -> Float[Array, "1"]:
+            noise = params["likelihood"]["obs_noise"]
+            z = params["variational_family"]["inducing_inputs"]
+            Kzz = gram(kernel, params["kernel"], z)
+            Kzz += I(m) * jitter
+            Kzx = cross_covariance(kernel, params["kernel"], z, x)
+            Kxx_diag = vmap(kernel, in_axes=(None, 0, 0))(params["kernel"], x, x)
+            μx = mean_function(params["mean_function"], x)
+
+            Lz = Kzz.triangular_lower()
+
+            # Notation and derivation:
+            #
+            # Let Q = KxzKzz⁻¹Kzx, we must compute the log normal pdf:
+            #
+            #   log N(y; μx, σ²I + Q) = -nπ - n/2 log|σ²I + Q| - 1/2 (y - μx)ᵀ (σ²I + Q)⁻¹ (y - μx).
+            #
+            # The log determinant |σ²I + Q| is computed via applying the matrix determinant lemma
+            #
+            #   |σ²I + Q| = log|σ²I| + log|I + Lz⁻¹ Kzx (σ²I)⁻¹ Kxz Lz⁻¹| = log(σ²) +  log|B|,
+            #
+            #   with B = I + AAᵀ and A = Lz⁻¹ Kzx / σ.
+            #
+            # Similary we apply matrix inversion lemma to invert σ²I + Q
+            #
+            #   (σ²I + Q)⁻¹ = (Iσ²)⁻¹ - (Iσ²)⁻¹ Kxz Lz⁻ᵀ (I + Lz⁻¹ Kzx (Iσ²)⁻¹ Kxz Lz⁻ᵀ )⁻¹ Lz⁻¹ Kzx (Iσ²)⁻¹
+            #               = (Iσ²)⁻¹ - (Iσ²)⁻¹ σAᵀ (I + σA (Iσ²)⁻¹ σAᵀ)⁻¹ σA (Iσ²)⁻¹
+            #               = I/σ² - Aᵀ B⁻¹ A/σ²,
+            #
+            # giving the quadratic term as
+            #
+            #   (y - μx)ᵀ (σ²I + Q)⁻¹ (y - μx) = [(y - μx)ᵀ(y - µx)  - (y - μx)ᵀ Aᵀ B⁻¹ A (y - μx)]/σ²,
+            #
+            #   with A and B defined as above.
+
+            A = jsp.linalg.solve_triangular(Lz, Kzx, lower=True) / jnp.sqrt(noise)
+
+            # AAᵀ
+            AAT = jnp.matmul(A, A.T)
+
+            # B = I + AAᵀ
+            B = jnp.eye(m) + AAT
+
+            # LLᵀ = I + AAᵀ
+            L = jnp.linalg.cholesky(B)
+
+            # log|B| = 2 trace(log|L|) = 2 Σᵢ log Lᵢᵢ  [since |B| = |LLᵀ| = |L|²  => log|B| = 2 log|L|, and |L| = Πᵢ Lᵢᵢ]
+            log_det_B = 2.0 * jnp.sum(jnp.log(jnp.diagonal(L)))
+
+            diff = y - μx
+
+            # L⁻¹ A (y - μx)
+            L_inv_A_diff = jsp.linalg.solve_triangular(
+                L, jnp.matmul(A, diff), lower=True
+            )
+
+            # (y - μx)ᵀ (Iσ² + Q)⁻¹ (y - μx)
+            quad = (jnp.sum(diff**2) - jnp.sum(L_inv_A_diff**2)) / noise
+
+            # 2 * log N(y; μx, Iσ² + Q)
+            two_log_prob = -n * jnp.log(2.0 * jnp.pi * noise) - log_det_B - quad
+
+            # 1/σ² tr(Kxx - Q) [Trace law tr(AB) = tr(BA) => tr(KxzKzz⁻¹Kzx) = tr(KxzLz⁻ᵀLz⁻¹Kzx) = tr(Lz⁻¹Kzx KxzLz⁻ᵀ) = trace(σ²AAᵀ)]
+            two_trace = jnp.sum(Kxx_diag) / noise - jnp.trace(AAT)
+
+            # log N(y; μx, Iσ² + KxzKzz⁻¹Kzx) - 1/2σ² tr(Kxx - KxzKzz⁻¹Kzx)
+            return constant * (two_log_prob - two_trace).squeeze() / 2.0
+
+        return elbo_fn
+
+
+__all__ = [
+    "AbstractVariationalInference",
+    "StochasticVI",
+    "CollapsedVI",
+]

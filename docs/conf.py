@@ -16,9 +16,11 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.abspath(".."))
+
 from importlib_metadata import version
 
-# sys.path.insert(0, os.path.abspath("../.."))
+import docs.conf_sphinx_patch
 
 
 def read(*names, **kwargs):
@@ -72,10 +74,31 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
-    "sphinx.ext.autosectionlabel",
     "sphinx_copybutton",
     "sphinxcontrib.bibtex",
     "sphinxext.opengraph",
+    "myst_parser",
+    "sphinx_tabs.tabs",
+]
+
+# Add any paths that contain templates here, relative to this directory.
+templates_path = ["_templates"]
+
+# MyST Config
+myst_enable_extensions = [
+    "amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "linkify",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
 ]
 
 
@@ -85,11 +108,24 @@ todo_include_todos = True
 bibtex_bibfiles = ["refs.bib"]
 bibtex_style = "unsrt"
 bibtex_reference_style = "author_year"
-nbsphinx_allow_errors = True
+nb_execution_mode = "auto"
+nbsphinx_allow_errors = False
+nbsphinx_custom_formats = {
+    ".pct.py": ["jupytext.reads", {"fmt": "py:percent"}],
+}
+nbsphinx_execute_arguments = ["--InlineBackend.figure_formats={'svg', 'pdf'}"]
+# If window is narrower than this, input/output prompts are on separate lines:
+nbsphinx_responsive_width = "700px"
 
 # Latex commands
 # mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
-mathjax3_config = {"tex": {"macros": {}}}
+mathjax3_config = {
+    "tex": {
+        "equationNumbers": {"autoNumber": "AMS", "useLabelIds": True},
+        "macros": {},
+    },
+}
+
 
 with open("latex_symbols.tex", "r") as f:
     for line in f:
@@ -133,6 +169,15 @@ texinfo_documents = [
 ]
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
+master_doc = "index"
+
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+# html_static_path = ["_static"]
+html_static_path = ["_static"]
+html_css_files = ["css/gpjax_theme.css"]
+
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -141,31 +186,34 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
 autosummary_generate = True
-napolean_use_rtype = False
+autodoc_typehints = "none"
+napoleon_use_rtype = False
 autodoc_default_options = {
     "member-order": "bysource",
     "special-members": "__init__, __call__",
-    "undoc-members": True,
-    "exclude-members": "__weakref__,_abc_impl",
+    "exclude-members": "__weakref__,_abc_impl,from_tuple,replace,to_tuple",
+    "autodoc-typehints": "none",
 }
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "furo"
-
+# html_theme = "furo"
+html_theme = "sphinx_book_theme"
+html_logo = "_static/gpjax_logo.svg"
+html_favicon = "_static/gpjax_logo.svg"
 html_theme_options = {
-    "light_css_variables": {
-        "color-brand-primary": "#B5121B",
-        "color-brand-content": "#CC3333",
-        "color-admonition-background": "orange",
+    "logo_only": True,
+    "show_toc_level": 2,
+    "repository_url": "https://github.com/thomaspinder/GPJax/",
+    "launch_buttons": {
+        "binderhub_url": "https://mybinder.org",
+        "colab_url": "https://colab.research.google.com",
+        "notebook_interface": "jupyterlab",
     },
+    "use_repository_button": True,
+    "use_sidenotes": True,  # Turns footnotes into sidenotes - https://sphinx-book-theme.readthedocs.io/en/stable/content-blocks.html
 }
 
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ["_static"]
+always_document_param_types = True

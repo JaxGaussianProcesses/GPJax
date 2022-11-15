@@ -1,10 +1,26 @@
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import abc
 from typing import Dict, Optional
 
 import jax.numpy as jnp
 from chex import dataclass
+from jaxtyping import Array, Float
 
-from .types import Array
+from .types import PRNGKeyType
 
 
 @dataclass(repr=False)
@@ -15,24 +31,27 @@ class AbstractMeanFunction:
     name: Optional[str] = "Mean function"
 
     @abc.abstractmethod
-    def __call__(self, x: Array) -> Array:
+    def __call__(self, params: Dict, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
         """Evaluate the mean function at the given points. This method is required for all subclasses.
 
         Args:
-            x (Array): The input points at which to evaluate the mean function.
+            params (Dict): The parameters of the mean function.
+            x (Float[Array, "N D"]): The input points at which to evaluate the mean function.
 
         Returns:
-            Array: The mean function evaluated point-wise on the inputs.
+            Float[Array, "N Q"]: The mean function evaluated point-wise on the inputs.
         """
         raise NotImplementedError
 
-    @property
     @abc.abstractmethod
-    def params(self) -> dict:
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
         """Return the parameters of the mean function. This method is required for all subclasses.
 
+        Args:
+            key (PRNGKeyType): The PRNG key to use for initialising the parameters.
+
         Returns:
-            dict: The parameters of the mean function.
+            Dict: The parameters of the mean function.
         """
         raise NotImplementedError
 
@@ -46,22 +65,28 @@ class Zero(AbstractMeanFunction):
     output_dim: Optional[int] = 1
     name: Optional[str] = "Zero mean function"
 
-    def __call__(self, x: Array, params: dict) -> Array:
+    def __call__(self, params: Dict, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
         """Evaluate the mean function at the given points.
 
         Args:
-            x (Array): The input points at which to evaluate the mean function.
-            params (dict): The parameters of the mean function.
+            params (Dict): The parameters of the mean function.
+            x (Float[Array, "N D"]): The input points at which to evaluate the mean function.
 
         Returns:
-            Array: A vector of zeros.
+            Float[Array, "N Q"]: A vector of zeros.
         """
         out_shape = (x.shape[0], self.output_dim)
         return jnp.zeros(shape=out_shape)
 
-    @property
-    def params(self) -> dict:
-        """The parameters of the mean function. For the zero-mean function, this is an empty dictionary."""
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+        """The parameters of the mean function. For the zero-mean function, this is an empty dictionary.
+
+        Args:
+            key (PRNGKeyType): The PRNG key to use for initialising the parameters.
+
+        Returns:
+            Dict: The parameters of the mean function.
+        """
         return {}
 
 
@@ -75,20 +100,33 @@ class Constant(AbstractMeanFunction):
     output_dim: Optional[int] = 1
     name: Optional[str] = "Constant mean function"
 
-    def __call__(self, x: Array, params: Dict) -> Array:
+    def __call__(self, params: Dict, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
         """Evaluate the mean function at the given points.
 
         Args:
-            x (Array): The input points at which to evaluate the mean function.
             params (Dict): The parameters of the mean function.
+            x (Float[Array, "N D"]): The input points at which to evaluate the mean function.
 
         Returns:
-            Array: A vector of repeated constant values.
+            Float[Array, "N Q"]: A vector of repeated constant values.
         """
         out_shape = (x.shape[0], self.output_dim)
         return jnp.ones(shape=out_shape) * params["constant"]
 
-    @property
-    def params(self) -> dict:
-        """The parameters of the mean function. For the constant-mean function, this is a dictionary with a single value."""
+    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+        """The parameters of the mean function. For the constant-mean function, this is a dictionary with a single value.
+
+        Args:
+            key (PRNGKeyType): The PRNG key to use for initialising the parameters.
+
+        Returns:
+            Dict: The parameters of the mean function.
+        """
         return {"constant": jnp.array([1.0])}
+
+
+__all__ = [
+    "AbstractMeanFunction",
+    "Zero",
+    "Constant",
+]

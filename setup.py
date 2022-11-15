@@ -1,36 +1,15 @@
-from setuptools import find_packages, setup
-import os
 import io
+import os
 import re
 
-
-def parse_requirements_file(filename):
-    with open(filename, encoding="utf-8") as fid:
-        requires = [line.strip() for line in fid.readlines() if line]
-    return requires
-
-
-# Optional Packages
-EXTRAS = {
-    "dev": [
-        "black",
-        "isort",
-        "pylint",
-        "flake8",
-    ],
-    "tests": [
-        "pytest",
-    ],
-    "docs": [
-        "furo",
-    ],
-}
+from setuptools import find_packages, setup
 
 
 # Get version number (function from GPyTorch)
 def read(*names, **kwargs):
     with io.open(
-        os.path.join(os.path.dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
+        os.path.join(os.path.dirname(__file__), *names),
+        encoding=kwargs.get("encoding", "utf8"),
     ) as fp:
         return fp.read()
 
@@ -47,6 +26,23 @@ version = find_version("gpjax", "__init__.py")
 readme = open("README.md").read()
 
 
+REQUIRES = [
+    "jax>=0.1.67",
+    "jaxlib>=0.1.47",
+    "optax",
+    "chex",
+    "distrax>=0.1.2",
+    "tqdm>=4.0.0",
+    "ml-collections==0.1.0",
+    "jaxtyping>=0.0.2",
+]
+
+EXTRAS = {
+    "dev": ["black", "isort", "pylint", "flake8", "pytest", "networkx", "pytest-cov"],
+    "cuda": ["jax[cuda]"],
+}
+
+
 setup(
     name="GPJax",
     version=version,
@@ -61,7 +57,8 @@ setup(
         "Documentation": "https://gpjax.readthedocs.io/en/latest/",
         "Source": "https://github.com/thomaspinder/GPJax",
     },
-    install_requires=parse_requirements_file("requirements.txt"),
+    install_requires=REQUIRES,
+    tests_require=EXTRAS["dev"],
     extras_require=EXTRAS,
     keywords=["gaussian-processes jax machine-learning bayesian"],
 )

@@ -5,11 +5,11 @@ on:
       - "master"
   pull_request:
     branches:
-      - "master"
+      - "*"
 jobs:
   codecov:
     name: Codecov Workflow
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v1
@@ -19,11 +19,8 @@ jobs:
           python-version: 3.9
       - name: Generate coverage report
         run: |
-          pip install -r requirements.txt
           pip install -e .
-          pip install pytest
-          pip install networkx
-          pip install pytest-cov
+          pip install -e .[dev]
           pytest --cov=./ --cov-report=xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
