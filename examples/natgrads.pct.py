@@ -30,7 +30,7 @@ from jax.config import config
 
 import gpjax as gpx
 
-# Enable Float64 for more stable matrix inversions.
+#Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
 
@@ -97,7 +97,7 @@ inference_state = gpx.fit_natgrads(
     n_iters=5000,
     batch_size=256,
     key=jr.PRNGKey(42),
-    moment_optim=ox.sgd(0.1),
+    moment_optim=ox.sgd(0.01),
     hyper_optim=ox.adam(1e-3),
 )
 

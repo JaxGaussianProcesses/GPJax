@@ -22,8 +22,7 @@ import jax.scipy as jsp
 from chex import dataclass
 from jaxtyping import Array, Float
 
-from .config import get_defaults
-from .types import PRNGKeyType
+from jax.random import KeyArray
 
 
 @dataclass
@@ -59,11 +58,11 @@ class AbstractLikelihood:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def _initialise_params(self, key: KeyArray) -> Dict:
         """Return the parameters of the likelihood function.
 
         Args:
-            key (PRNGKeyType): A PRNG key.
+            key (KeyArray): A PRNG key.
 
         Returns:
             Dict: The parameters of the likelihood function.
@@ -98,11 +97,11 @@ class Gaussian(AbstractLikelihood, Conjugate):
 
     name: Optional[str] = "Gaussian"
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def _initialise_params(self, key: KeyArray) -> Dict:
         """Return the variance parameter of the likelihood function.
 
         Args:
-            key (PRNGKeyType): A PRNG key.
+            key (KeyArray): A PRNG key.
 
         Returns:
             Dict: The parameters of the likelihood function.
@@ -149,7 +148,7 @@ class Gaussian(AbstractLikelihood, Conjugate):
             dx.Distribution: The predictive distribution.
         """
         n_data = dist.event_shape[0]
-        cov = dist.covariance()
+        cov = dist.covariance().to_dense()
         noisy_cov = cov.at[jnp.diag_indices(n_data)].add(
             params["likelihood"]["obs_noise"]
         )
@@ -161,11 +160,11 @@ class Gaussian(AbstractLikelihood, Conjugate):
 class Bernoulli(AbstractLikelihood, NonConjugate):
     name: Optional[str] = "Bernoulli"
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def _initialise_params(self, key: KeyArray) -> Dict:
         """Initialise the parameter set of a Bernoulli likelihood.
 
         Args:
-            key (PRNGKeyType): A PRNG key.
+            key (KeyArray): A PRNG key.
 
         Returns:
             Dict: The parameters of the likelihood function (empty for the Bernoulli likelihood).

@@ -25,8 +25,8 @@ import pytest
 from jax.config import config
 from jaxtyping import Array, Float
 
-from gpjax.covariance_operator import (
-    CovarianceOperator,
+from jax_linear_operator import (
+    LinearOperator,
     I,
 )
 
@@ -110,7 +110,7 @@ def test_gram(kernel: AbstractKernel, dim: int, n: int) -> None:
 
     # Test gram matrix:
     Kxx = gram(kernel, params, x)
-    assert isinstance(Kxx, CovarianceOperator)
+    assert isinstance(Kxx, LinearOperator)
     assert Kxx.shape == (n, n)
 
 

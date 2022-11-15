@@ -17,14 +17,17 @@ from abc import abstractmethod
 from typing import Any, Callable, Dict, Optional
 
 import distrax as dx
+import jax_linear_operator as jlo
+
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
 from chex import dataclass
 from jaxtyping import Array, Float
 
+from jax_linear_operator import I
+
 from .config import get_defaults
-from .covariance_operator import I
 from .kernels import AbstractKernel
 from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
@@ -181,7 +184,7 @@ class Prior(AbstractPrior):
 
     def predict(
         self, params: Dict
-    ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]:
+    ) -> Callable[[Float[Array, "N D"]], jlo.GaussianDistribution]:
         """Compute the predictive prior distribution for a given set of
         parameters. The output of this function is a function that computes
         a distrx distribution for a given set of inputs.
@@ -205,7 +208,7 @@ class Prior(AbstractPrior):
             function should be defined for.
 
         Returns:
-            Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]: A mean
+            Callable[[Float[Array, "N D"]], jlo.GaussianDistribution]: A mean
             function that accepts an input array for where the mean function
             should be evaluated at. The mean function's value at these points is
             then returned.
@@ -219,7 +222,7 @@ class Prior(AbstractPrior):
         # Unpack kernel computation
         gram = kernel.gram
 
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> jlo.GaussianDistribution:
 
             # Unpack test inputs
             t = test_inputs
@@ -228,9 +231,8 @@ class Prior(AbstractPrior):
             μt = mean_function(params["mean_function"], t)
             Ktt = gram(kernel, params["kernel"], t)
             Ktt += I(n_test) * jitter
-            Lt = Ktt.triangular_lower()
 
-            return dx.MultivariateNormalTri(jnp.atleast_1d(μt.squeeze()), Lt)
+            return jlo.GaussianDistribution(jnp.atleast_1d(μt.squeeze()), Ktt)
 
         return predict_fn
 
@@ -274,7 +276,7 @@ class AbstractPosterior(AbstractPrior):
     name: Optional[str] = "GP posterior"
 
     @abstractmethod
-    def predict(self, *args: Any, **kwargs: Any) -> dx.Distribution:
+    def predict(self, *args: Any, **kwargs: Any) -> jlo.GaussianDistribution:
         """Compute the predictive posterior distribution of the latent function
         for a given set of parameters. For any class inheriting the
         ``AbstractPosterior`` class, this method must be implemented.
@@ -284,7 +286,7 @@ class AbstractPosterior(AbstractPrior):
             Keyword arguments to the predict method.
 
         Returns:
-            dx.Distribution: A multivariate normal random variable
+            jlo.GaussianDistribution: A multivariate normal random variable
             representation of the Gaussian process.
         """
         raise NotImplementedError
@@ -351,7 +353,7 @@ class ConjugatePosterior(AbstractPosterior):
         self,
         params: Dict,
         train_data: Dataset,
-    ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalFullCovariance]:
+    ) -> Callable[[Float[Array, "N D"]], jlo.GaussianDistribution]:
         """Conditional on a training data set, compute the GP's posterior
         predictive distribution for a given set of parameters. The returned
         function can be evaluated at a set of test inputs to compute the
@@ -393,9 +395,9 @@ class ConjugatePosterior(AbstractPosterior):
                 input and output data used for training dataset.
 
         Returns:
-            Callable[[Float[Array, "N D"]], dx.MultivariateNormalFullCovariance]: A
+            Callable[[Float[Array, "N D"]], jlo.GaussianDistribution]: A
                 function that accepts an input array and returns the predictive
-                distribution as a ``dx.MultivariateNormalTri``.
+                distribution as a ``jlo.GaussianDistribution``.
         """
         jitter = get_defaults()["jitter"]
 
@@ -421,14 +423,14 @@ class ConjugatePosterior(AbstractPosterior):
         # Σ = Kxx + Iσ²
         Sigma = Kxx + I(n) * obs_noise
 
-        def predict(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
+        def predict(test_inputs: Float[Array, "N D"]) -> jlo.GaussianDistribution:
             """Compute the predictive distribution at a set of test inputs.
 
             Args:
                 test_inputs (Float[Array, "N D"]): A Jax array of test inputs.
 
             Returns:
-                dx.Distribution: A ``dx.MultivariateNormalFullCovariance``
+                jlo.GaussianDistribution: A ``jlo.GaussianDistribution``
                 object that represents the predictive distribution.
             """
 
@@ -440,22 +442,17 @@ class ConjugatePosterior(AbstractPosterior):
             Ktt = gram(kernel, params["kernel"], t)
             Kxt = cross_covariance(kernel, params["kernel"], x, t)
 
-            # TODO: Investigate lower triangular solves for general covariance operators
-            # this is more efficient than the full solve for dense matrices in the current implimentation.
-
             # Σ⁻¹ Kxt
             Sigma_inv_Kxt = Sigma.solve(Kxt)
 
             # μt  +  Ktx (Kxx + Iσ²)⁻¹ (y  -  μx)
             mean = μt + jnp.matmul(Sigma_inv_Kxt.T, y - μx)
 
-            # Ktt  -  Ktx (Kxx + Iσ²)⁻¹ Kxt
+            # Ktt  -  Ktx (Kxx + Iσ²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
             covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
             covariance += I(n_test) * jitter
 
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
-            )
+            return jlo.GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict
 
@@ -567,13 +564,9 @@ class ConjugatePosterior(AbstractPosterior):
             Kxx = gram(kernel, params["kernel"], x)
             Kxx += I(n) * jitter
             Sigma = Kxx + I(n) * obs_noise
-            L = Sigma.triangular_lower()
 
             # p(y | x, θ), where θ are the model hyperparameters:
-
-            marginal_likelihood = dx.MultivariateNormalTri(
-                jnp.atleast_1d(μx.squeeze()), L
-            )
+            marginal_likelihood = jlo.GaussianDistribution(jnp.atleast_1d(μx.squeeze()), Sigma)
 
             # log p(θ)
             log_prior_density = evaluate_priors(params, priors)
@@ -695,13 +688,11 @@ class NonConjugatePosterior(AbstractPosterior):
             # μt + Ktx Lx⁻¹ wx
             mean = μt + jnp.matmul(Lx_inv_Kxt.T, wx)
 
-            # Ktt - Ktx Kxx⁻¹ Kxt
+            # Ktt - Ktx Kxx⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
             covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
             covariance += I(n_test) * jitter
 
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
-            )
+            return jlo.GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict_fn
 

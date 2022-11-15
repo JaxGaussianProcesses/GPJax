@@ -22,8 +22,9 @@ from chex import dataclass
 from jax import vmap
 from jaxtyping import Array, Float
 
+from jax_linear_operator import I
+
 from .config import get_defaults
-from .covariance_operator import I
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature

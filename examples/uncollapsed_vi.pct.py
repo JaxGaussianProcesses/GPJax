@@ -154,6 +154,9 @@ negative_elbo = jit(svgp.elbo(D, negative=True))
 # Despite introducing inducing inputs into our model, inference can still be intractable with large datasets. To circumvent this, optimisation can be done using stochastic mini-batches.
 
 # %%
+parameter_state
+
+# %%
 parameter_state = gpx.initialise(svgp, key)
 optimiser = ox.adam(learning_rate=0.01)
 

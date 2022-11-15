@@ -22,8 +22,10 @@ import jax.scipy as jsp
 from chex import dataclass
 from jaxtyping import Array, Float
 
+from jax_linear_operator import I
+import jax_linear_operator as jlo
+
 from .config import get_defaults
-from .covariance_operator import I
 from .gps import Prior
 from .likelihoods import AbstractLikelihood, Gaussian
 from .types import Dataset, PRNGKeyType
@@ -37,7 +39,7 @@ class AbstractVariationalFamily:
     used within variational inference.
     """
 
-    def __call__(self, *args: Any, **kwargs: Any) -> dx.Distribution:
+    def __call__(self, *args: Any, **kwargs: Any) -> jlo.GaussianDistribution:
         """For a given set of parameters, compute the latent function's prediction
         under the variational approximation.
 
@@ -47,7 +49,7 @@ class AbstractVariationalFamily:
                 method.
 
         Returns:
-            Any: The output of the variational family's `predict` method.
+            jlo.GaussianDistribution: The output of the variational family's `predict` method.
         """
         return self.predict(*args, **kwargs)
 
@@ -66,7 +68,7 @@ class AbstractVariationalFamily:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def predict(self, *args: Any, **kwargs: Any) -> dx.Distribution:
+    def predict(self, *args: Any, **kwargs: Any) -> jlo.GaussianDistribution:
         """Predict the GP's output given the input.
 
         Args:
@@ -76,7 +78,7 @@ class AbstractVariationalFamily:
             ``predict`` method.
 
         Returns:
-            Any: The output of the variational family's ``predict`` method.
+            jlo.GaussianDistribution: The output of the variational family's ``predict`` method.
         """
         raise NotImplementedError
 
@@ -168,16 +170,15 @@ class VariationalGaussian(AbstractVariationalGaussian):
         μz = mean_function(params["mean_function"], z)
         Kzz = gram(kernel, params["kernel"], z)
         Kzz += I(m) * jitter
-        Lz = Kzz.triangular_lower()
 
-        qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
-        pu = dx.MultivariateNormalTri(jnp.atleast_1d(μz.squeeze()), Lz)
+        qu = jlo.GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale_tril=sqrt)
+        pu = jlo.GaussianDistribution(loc=jnp.atleast_1d(μz.squeeze()), scale=Kzz)
 
-        return kld_dense_dense(qu, pu)
+        return qu.kl_divergence(pu)
 
     def predict(
         self, params: Dict
-    ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]:
+    ) -> Callable[[Float[Array, "N D"]], jlo.GaussianDistribution]:
         """
         Compute the predictive distribution of the GP at the test inputs t.
 
@@ -218,7 +219,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         def predict_fn(
             test_inputs: Float[Array, "N D"]
-        ) -> dx.MultivariateNormalFullCovariance:
+        ) -> jlo.GaussianDistribution:
 
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
@@ -247,8 +248,8 @@ class VariationalGaussian(AbstractVariationalGaussian):
             )
             covariance += I(n_test) * jitter
 
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
+            return jlo.GaussianDistribution(
+                loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
             )
 
         return predict_fn
@@ -288,12 +289,13 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         sqrt = params["variational_family"]["moments"]["variational_root_covariance"]
 
         # Compute whitened KL divergence
-        qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
-        return kld_dense_white(qu)
+        qu = jlo.GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale_tril=sqrt)
+        pu = jlo.GaussianDistribution(loc=jnp.zeros_like(jnp.atleast_1d(mu.squeeze())))
+        return qu.kl_divergence(pu)
 
     def predict(
         self, params: Dict
-    ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalFullCovariance]:
+    ) -> Callable[[Float[Array, "N D"]], jlo.GaussianDistribution]:
         """Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as
@@ -328,7 +330,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
         def predict_fn(
             test_inputs: Float[Array, "N D"]
-        ) -> dx.MultivariateNormalFullCovariance:
+        ) -> jlo.GaussianDistribution:
 
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
@@ -354,9 +356,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             )
             covariance += I(n_test) * jitter
 
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
-            )
+            return jlo.GaussianDistribution(loc=jnp.atleast_1d(mean.squeeze()), scale=covariance)
 
         return predict_fn
 
@@ -441,12 +441,11 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         μz = mean_function(params["mean_function"], z)
         Kzz = gram(kernel, params["kernel"], z)
         Kzz += I(m) * jitter
-        Lz = Kzz.triangular_lower()
 
-        qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
-        pu = dx.MultivariateNormalTri(jnp.atleast_1d(μz.squeeze()), Lz)
+        qu = jlo.GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale_tril=sqrt)
+        pu = jlo.GaussianDistribution(loc=jnp.atleast_1d(μz.squeeze()), scale=Kzz)
 
-        return kld_dense_dense(qu, pu)
+        return qu.kl_divergence(pu)
 
     def predict(
         self, params: Dict
@@ -533,9 +532,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
             )
             covariance += I(n_test) * jitter
 
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
-            )
+            return jlo.GaussianDistribution(loc=jnp.atleast_1d(mean.squeeze()), scale=covariance)
 
         return predict_fn
 
@@ -618,12 +615,11 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         μz = mean_function(params["mean_function"], z)
         Kzz = gram(kernel, params["kernel"], z)
         Kzz += I(m) * jitter
-        Lz = Kzz.triangular_lower()
 
-        qu = dx.MultivariateNormalTri(jnp.atleast_1d(mu.squeeze()), sqrt)
-        pu = dx.MultivariateNormalTri(jnp.atleast_1d(μz.squeeze()), Lz)
+        qu = jlo.GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale_tril=sqrt)
+        pu = jlo.GaussianDistribution(loc=jnp.atleast_1d(μz.squeeze()), scale=Kzz)
 
-        return kld_dense_dense(qu, pu)
+        return qu.kl_divergence(pu)
 
     def predict(
         self, params: Dict
@@ -708,9 +704,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
             )
             covariance += I(n_test) * jitter
 
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
-            )
+            return jlo.GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict_fn
 
@@ -749,7 +743,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
         self,
         params: Dict,
         train_data: Dataset,
-    ) -> Callable[[Float[Array, "N D"]], dx.MultivariateNormalFullCovariance]:
+    ) -> Callable[[Float[Array, "N D"]], jlo.GaussianDistribution]:
         """Compute the predictive distribution of the GP at the test inputs.
 
         Args:
@@ -763,8 +757,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
 
         def predict_fn(
             test_inputs: Float[Array, "N D"]
-        ) -> dx.MultivariateNormalFullCovariance:
-            # TODO - can we cache some of this?
+        ) -> jlo.GaussianDistribution:
 
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
@@ -838,86 +831,10 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             )
             covariance += I(n_test) * jitter
 
-            return dx.MultivariateNormalFullCovariance(
-                jnp.atleast_1d(mean.squeeze()), covariance.to_dense()
-            )
+            return jlo.GaussianDistribution(loc=jnp.atleast_1d(mean.squeeze()), scale=covariance)
 
         return predict_fn
 
-
-# TODO: Abstract these out to a KL divergence that accepts a linear operator to facilate structured covarainces other than dense.
-def kld_dense_dense(
-    q: dx.MultivariateNormalTri, p: dx.MultivariateNormalTri
-) -> Float[Array, "1"]:
-    """Kullback-Leibler divergence KL[q(x)||p(x)] between two dense covariance Gaussian distributions
-             q(x) = N(x; μq, Σq) and p(x) = N(x; μp, Σp).
-
-    Args:
-        q (dx.MultivariateNormalTri): A multivariate Gaussian distribution.
-        p (dx.MultivariateNormalTri): A multivariate Gaussian distribution.
-
-    Returns:
-        Float[Array, "1"]: The KL divergence between the two distributions.
-    """
-
-    q_mu = q.loc
-    q_sqrt = q.scale_tri
-    n = q_mu.shape[-1]
-
-    p_mu = p.loc
-    p_sqrt = p.scale_tri
-
-    diag = jnp.diag(q_sqrt)
-
-    # Trace term tr(Σp⁻¹ Σq)
-    trace = jnp.sum(jnp.square(jsp.linalg.solve_triangular(p_sqrt, q_sqrt, lower=True)))
-
-    # Mahalanobis term: μqᵀ Σp⁻¹ μq
-    alpha = jsp.linalg.solve_triangular(p_sqrt, p_mu - q_mu, lower=True)
-    mahalanobis = jnp.sum(jnp.square(alpha))
-
-    # log|Σq|
-    logdet_qcov = jnp.sum(jnp.log(jnp.square(diag)))
-    two_kl = mahalanobis - n - logdet_qcov + trace
-
-    # log|Σp|
-    log_det_pcov = jnp.sum(jnp.log(jnp.square(jnp.diag(p_sqrt))))
-    two_kl += log_det_pcov
-
-    return two_kl / 2.0
-
-
-def kld_dense_white(q: dx.MultivariateNormalTri) -> Float[Array, "1"]:
-    """Kullback-Leibler divergence KL[q(x)||p(x)] between a dense covariance Gaussian distribution
-        q(x) = N(x; μq, Σq), and white indenity Gaussian p(x) = N(x; 0, I).
-
-        This is useful for variational inference with a whitened variational family.
-
-      Args:
-        q (dx.MultivariateNormalTri): A multivariate Gaussian distribution.
-
-    Returns:
-        Float[Array, "1"]: The KL divergence between the two distributions.
-    """
-
-    q_mu = q.loc
-    q_sqrt = q.scale_tri
-    n = q_mu.shape[-1]
-
-    diag = jnp.diag(q_sqrt)
-
-    # Trace term tr(Σp⁻¹ Σq), and alpha for Mahalanobis term:
-    alpha = q_mu
-    trace = jnp.sum(jnp.square(q_sqrt))
-
-    # Mahalanobis term: μqᵀ Σp⁻¹ μq
-    mahalanobis = jnp.sum(jnp.square(alpha))
-
-    # log|Σq| (no log|Σp| as this is just zero!)
-    logdet_qcov = jnp.sum(jnp.log(jnp.square(diag)))
-    two_kl = mahalanobis - n - logdet_qcov + trace
-
-    return two_kl / 2.0
 
 
 __all__ = [
