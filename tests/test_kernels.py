@@ -182,14 +182,14 @@ def test_call(kernel: AbstractKernel, dim: int) -> None:
     assert kxy.shape == ()
 
 
-@pytest.mark.parametrize("kern", [RBF(), Matern12(), Matern32(), Matern52()])
+@pytest.mark.parametrize("kern", [RBF, Matern12, Matern32, Matern52])
 @pytest.mark.parametrize("dim", [1, 2, 5])
 @pytest.mark.parametrize("ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_pos_def(
     kern: AbstractKernel, dim: int, ell: float, sigma: float, n: int
 ) -> None:
-
+    kern = kern(active_dims=list(range(dim)))
     # Gram constructor static method:
     gram = kern.gram
 
@@ -204,7 +204,7 @@ def test_pos_def(
     assert (eigen_values > 0.0).all()
 
 
-@pytest.mark.parametrize("kern", [Linear(), Polynomial()])
+@pytest.mark.parametrize("kern", [Linear, Polynomial])
 @pytest.mark.parametrize("dim", [1, 2, 5])
 @pytest.mark.parametrize("shift", [0.0, 0.5, 2.0])
 @pytest.mark.parametrize("sigma", [0.1, 0.2, 0.5])
@@ -212,7 +212,7 @@ def test_pos_def(
 def test_pos_def_lin_poly(
     kern: AbstractKernel, dim: int, shift: float, sigma: float, n: int
 ) -> None:
-
+    kern = kern(active_dims=list(range(dim)))
     # Gram constructor static method:
     gram = kern.gram
 
@@ -232,7 +232,7 @@ def test_pos_def_lin_poly(
 @pytest.mark.parametrize("alpha", [0.1, 0.5, 1.0])
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_pos_def_rq(dim: int, ell: float, sigma: float, alpha: float, n: int) -> None:
-    kern = RationalQuadratic()
+    kern = RationalQuadratic(active_dims=list(range(dim)))
     # Gram constructor static method:
     gram = kern.gram
 
@@ -258,7 +258,7 @@ def test_pos_def_rq(dim: int, ell: float, sigma: float, alpha: float, n: int) ->
 def test_pos_def_power_exp(
     dim: int, ell: float, sigma: float, power: float, n: int
 ) -> None:
-    kern = PoweredExponential()
+    kern = PoweredExponential(active_dims=list(range(dim)))
     # Gram constructor static method:
     gram = kern.gram
 
@@ -281,10 +281,10 @@ def test_pos_def_power_exp(
 @pytest.mark.parametrize("ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
 @pytest.mark.parametrize("period", [0.1, 0.5, 1.0])
 @pytest.mark.parametrize("n", [1, 2, 5])
-def test_pos_def_power_exp(
+def test_pos_def_periodic(
     dim: int, ell: float, sigma: float, period: float, n: int
 ) -> None:
-    kern = Periodic()
+    kern = Periodic(active_dims=list(range(dim)))
     # Gram constructor static method:
     gram = kern.gram
 
