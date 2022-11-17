@@ -1,7 +1,7 @@
 <!-- <h1 align='center'>GPJax</h1>
 <h2 align='center'>Gaussian processes in Jax.</h2> -->
 <p align="center">
-<img width="700" height="300" src="https://github.com/thomaspinder/GPJax/raw/master/docs/_static/gpjax_logo.svg" alt="GPJax's logo">
+<img width="700" height="300" src="https://github.com/JaxGaussianProcesses/GPJax/raw/master/docs/_static/gpjax_logo.svg" alt="GPJax's logo">
 </p>
 
 [![codecov](https://codecov.io/gh/JaxGaussianProcesses/GPJax/branch/master/graph/badge.svg?token=DM1DRDASU2)](https://codecov.io/gh/JaxGaussianProcesses/GPJax)
@@ -23,7 +23,7 @@ GPJax aims to provide a low-level interface to Gaussian process (GP) models in [
 
 GPJax was founded by [Thomas Pinder](https://github.com/thomaspinder). Today, the maintenance of GPJax is undertaken by [Thomas Pinder](https://github.com/thomaspinder) and [Daniel Dodd](https://github.com/Daniel-Dodd).
 
-We would be delighted to receive contributions from interested individuals and groups. To learn how you can get involved, please read our [guide for contributing](https://github.com/thomaspinder/GPJax/blob/master/CONTRIBUTING.md). If you have any questions, we encourage you to [open an issue](https://github.com/thomaspinder/GPJax/issues/new/choose). For broader conversations, such as best GP fitting practices or questions about the mathematics of GPs, we invite you to [open a discussion](https://github.com/thomaspinder/GPJax/discussions).
+We would be delighted to receive contributions from interested individuals and groups. To learn how you can get involved, please read our [guide for contributing](https://github.com/JaxGaussianProcesses/GPJax/blob/master/CONTRIBUTING.md). If you have any questions, we encourage you to [open an issue](https://github.com/JaxGaussianProcesses/GPJax/issues/new/choose). For broader conversations, such as best GP fitting practices or questions about the mathematics of GPs, we invite you to [open a discussion](https://github.com/JaxGaussianProcesses/GPJax/discussions).
 
 Feel free to join our [Slack Channel](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw), where we can discuss the development of GPJax and broader support for Gaussian process modelling.
 
@@ -153,7 +153,7 @@ pip install gpjax
 
 Clone a copy of the repository to your local machine and run the setup configuration in development mode.
 ```bash
-git clone https://github.com/thomaspinder/GPJax.git
+git clone https://github.com/JaxGaussianProcesses/GPJax.git
 cd GPJax
 python setup.py develop
 ```
