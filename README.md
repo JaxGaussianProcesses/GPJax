@@ -123,8 +123,8 @@ xtest = jnp.linspace(-3., 3., 100).reshape(-1, 1)
 latent_distribution = posterior(learned_params, D)(xtest)
 predictive_distribution = likelihood(learned_params, latent_distribution)
 
-predictive_mean = predictive_distribution.mean
-predictive_cov = predictive_distribution.covariance
+predictive_mean = predictive_distribution.mean()
+predictive_cov = predictive_distribution.covariance()
 ```
 
 # Installation
