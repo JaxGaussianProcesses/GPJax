@@ -1,3 +1,4 @@
+
 # Copyright 2022 The JaxLinOp Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,16 @@
 # limitations under the License.
 # ==============================================================================
 
-from jaxlinop.linear_operator import LinearOperator
+__version__ = "0.0.0"
+__authors__ = "Daniel Dodd, Thomas Pinder"
+__emails__ = "d.dodd1@lancaster.ac.uk, tompinder@live.co.uk"
+__license__ = "Apache 2.0"
+__uri__ = "https://github.com/JaxGaussianProcesses/JaxLinOp"
+__description__ = "A JAX linear operator library."
+__contributors__ = "https://github.com/JaxGaussianProcesses/JaxLinOp/graphs/contributors"
 
-def test_name() -> None:
-    operator = LinearOperator()
-    res = operator.name
-    actual = "LinearOperator"
-    assert res == actual
+from .linear_operator import LinearOperator
 
+__all__ = [
+    "LinearOperator",
+]

@@ -1,4 +1,3 @@
-
 # Copyright 2022 The Jax Linear Operator Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,20 +13,20 @@
 # limitations under the License.
 # ==============================================================================
 
-__version__ = "0.0.1"
-__authors__ = "Daniel Dodd, Thomas Pinder"
-__emails__ = "d.dodd1@lancaster.ac.uk, tompinder@live.co.uk"
-__license__ = "Apache 2.0"
-__uri__ = "https://github.com/Daniel-Dodd/jax_linear_operator"
-__description__ = "A JAX linear operator library."
-__contributors__ = "https://github.com/Daniel-Dodd/jax_linear_operator/graphs/contributors"
 
-from .linear_operator import LinearOperator
-from .dense_linear_operator import DenseLinearOperator
-from .diagonal_linear_operator import DiagonalLinearOperator
+class LinearOperator:
+    """Linear operator base class."""
+
+    @property
+    def name(self) -> str:
+        """Name of the linear operator.
+
+        Returns:
+            str: Name of the linear operator.
+        """
+        return self.__class__.__name__
+
 
 __all__ = [
     "LinearOperator",
-    "DenseLinearOperator",
-    "DiagonalLinearOperator",
 ]

@@ -205,22 +205,23 @@ If you use GPJax in your research, please cite our [JOSS paper](https://joss.the
   journal = {Journal of Open Source Software}
 }
 ```
+`JaxLinOp` will automatically reduce cost savings in matrix addition, multiplication, computing log-determinants and more, for other matrix stuctures too!
 
 # Custom Linear Operator
 
-***<example / guide>***
+The flexible design of `JaxLinOp` will allow users to impliment their own custom linear operators.
 
 ```python
-from jax_linear_operator import LinearOperator
+from jaxlinop import LinearOperator
 
-# This will possibly be a chex dataclass:
 class MyLinearOperator(LinearOperator):
   
   def __init__(self, ...)
     ...
 
-# There are a bare mininum number methods that need to be implimented, 
-# the user can add optional methods if they are more efficient than defaults given.
+# There will be a minimal number methods that users need to impliment for their custom operator. 
+# For optimal efficiency, we'll make it easy for the user to add optional methods to their operator, 
+# if they give better performance than the defaults.
 ```
 
 
@@ -228,17 +229,17 @@ class MyLinearOperator(LinearOperator):
 
 ## Stable version
 
-The latest stable version of `jax_linear_operator` can be installed via [`pip`](https://pip.pypa.io/en/stable/):
+The latest stable version of `jaxlinop` can be installed via [`pip`](https://pip.pypa.io/en/stable/):
 
 ```bash
-pip install jax_linear_operator
+pip install jaxlinop
 ```
 
 > **Note**
 >
 > We recommend you check your installation version:
 > ```python
-> python -c 'import jax_linear_operator; print(jax_linear_operator.__version__)'
+> python -c 'import jaxlinop; print(jaxlinop.__version__)'
 > ```
 
 
@@ -250,8 +251,8 @@ pip install jax_linear_operator
 
 Clone a copy of the repository to your local machine and run the setup configuration in development mode.
 ```bash
-git clone https://github.com/Daniel-Dodd/jax_linear_operator.git
-cd jax_linear_operator
+git clone https://github.com/JaxGaussianProcesses/JaxLinOp.git
+cd jaxlinop
 python -m setup develop
 ```
 
@@ -259,8 +260,8 @@ python -m setup develop
 >
 > We advise you create virtual environment before installing:
 > ```
-> conda create -n jax_lin_op_ex python=3.10.0
-> conda activate jax_lin_op_ex
+> conda create -n jaxlinop_ex python=3.10.0
+> conda activate jaxlinop_ex
 >  ```
 >
 > and recommend you check your installation passes the supplied unit tests:
