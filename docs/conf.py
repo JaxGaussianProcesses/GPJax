@@ -1,7 +1,7 @@
 """Sphinx configuration."""
 project = "JaxKern"
 author = "Thomas Pinder and Daniel Dodd"
-copyright = "202, Thomas Pinder and Daniel Dodd"
+copyright = "2022, Thomas Pinder and Daniel Dodd"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
