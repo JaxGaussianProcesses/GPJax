@@ -22,7 +22,7 @@ from chex import dataclass
 from jax import vmap
 from jaxtyping import Array, Float
 
-from jax_linear_operator import I
+from jaxlinop import identity as I
 
 from .config import get_defaults
 from .gps import AbstractPosterior
@@ -196,7 +196,7 @@ class CollapsedVI(AbstractVariationalInference):
             Kxx_diag = vmap(kernel, in_axes=(None, 0, 0))(params["kernel"], x, x)
             μx = mean_function(params["mean_function"], x)
 
-            Lz = Kzz.triangular_lower()
+            Lz = Kzz.to_root()
 
             # Notation and derivation:
             #
@@ -222,7 +222,7 @@ class CollapsedVI(AbstractVariationalInference):
             #
             #   with A and B defined as above.
 
-            A = jsp.linalg.solve_triangular(Lz, Kzx, lower=True) / jnp.sqrt(noise)
+            A = Lz.solve(Kzx) / jnp.sqrt(noise)
 
             # AAᵀ
             AAT = jnp.matmul(A, A.T)

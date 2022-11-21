@@ -25,9 +25,9 @@ import pytest
 from jax.config import config
 from jaxtyping import Array, Float
 
-from jax_linear_operator import (
+from jaxlinop import (
     LinearOperator,
-    I,
+    identity as I,
 )
 
 from gpjax.kernels import (

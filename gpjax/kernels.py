@@ -16,7 +16,7 @@
 import abc
 from typing import Callable, Dict, List, Optional, Sequence
 
-from jax_linear_operator import(
+from jaxlinop import(
     LinearOperator,
     DenseLinearOperator,
     DiagonalLinearOperator,
