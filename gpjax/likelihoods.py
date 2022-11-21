@@ -15,6 +15,7 @@
 
 import abc
 from typing import Any, Callable, Dict, Optional
+from jaxlinop.utils import to_dense
 
 import distrax as dx
 import jax.numpy as jnp
@@ -148,7 +149,7 @@ class Gaussian(AbstractLikelihood, Conjugate):
             dx.Distribution: The predictive distribution.
         """
         n_data = dist.event_shape[0]
-        cov = dist.covariance().to_dense()
+        cov = to_dense(dist.covariance())
         noisy_cov = cov.at[jnp.diag_indices(n_data)].add(
             params["likelihood"]["obs_noise"]
         )

@@ -100,10 +100,6 @@ class GaussianDistribution(dx.Distribution):
 
         self.loc = loc
         self.scale = scale
-
-    def scale_tril(self) -> LinearOperator:
-        """Returns the root operator scale matrix."""
-        return self.scale.root
     
     def mean(self) -> Float[Array, "N"]:
         """Calculates the mean."""
@@ -117,9 +113,9 @@ class GaussianDistribution(dx.Distribution):
         """Calculates the mode."""
         return self.loc
 
-    def covariance(self) -> LinearOperator:
+    def covariance(self) ->  Float[Array, "N N"]:
         """Calculates the covariance matrix."""
-        return self.scale
+        return self.scale.to_dense()
 
     def variance(self) -> Float[Array, "N"]:
         """Calculates the variance."""
@@ -167,7 +163,7 @@ class GaussianDistribution(dx.Distribution):
             Float[Array, "n N"]: The samples.
         """
         # Obtain covariance root.
-        L = self.scale.root
+        L = self.scale.to_root()
 
         # Gather n samples from standard normal distribution Z = [z₁, ..., zₙ]ᵀ.
         Z = jr.normal(key, shape=(n, *self.event_shape))
@@ -215,7 +211,7 @@ def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> Float[Ar
     diff = μp - μq
     
     # trace term, tr(Σp⁻¹ Σq)
-    trace = jnp.trace(Σp.inverse() @ Σq.to_dense()) # TODO: Need to improve this. This is not efficient.
+    trace = jnp.trace(Σp.solve(Σq.to_dense())) # TODO: Need to improve this. This is not efficient.
 
     # Mahalanobis term, (μp - μq)ᵀ Σp⁻¹ (μp - μq)
     mahalanobis = (diff).T @ Σp.solve(diff) # TODO: Need to improve this. Perhaps add a Mahalanobis method to LinearOperators.

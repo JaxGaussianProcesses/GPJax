@@ -30,7 +30,7 @@ from gpjax.gaussian_distribution import GaussianDistribution
 
 _key = jr.PRNGKey(seed=42)
 
-from distrax import MultivariateNormalTri, MultivariateNormalDiag, MultivariateNormalFullCovariance
+from distrax import MultivariateNormalDiag, MultivariateNormalFullCovariance
 
 def approx_equal(res: jnp.ndarray, actual: jnp.ndarray) -> bool:
     """Check if two arrays are approximately equal."""
@@ -43,13 +43,12 @@ def test_array_arguments(n: int) -> None:
     sqrt = jr.uniform(key_sqrt, shape=(n, n))
     covariance = sqrt @ sqrt.T
 
-    sqrt = jnp.linalg.cholesky(covariance + jnp.eye(n) * 1e-10)
-    dist = GaussianDistribution(loc=mean, scale=covariance)
+    dist = GaussianDistribution(loc=mean, scale=DenseLinearOperator(covariance))
 
     assert approx_equal(dist.mean(), mean)
     assert approx_equal(dist.variance(), covariance.diagonal())
     assert approx_equal(dist.stddev(), jnp.sqrt(covariance.diagonal()))
-    assert approx_equal(dist.covariance().to_dense(), covariance)
+    assert approx_equal(dist.covariance(), covariance)
 
     y = jr.uniform(_key, shape=(n,))
 
@@ -71,7 +70,7 @@ def test_diag_linear_operator(n: int) -> None:
     assert approx_equal(dist_diag.mean(), distrax_dist.mean())
     assert approx_equal(dist_diag.variance(), distrax_dist.variance())
     assert approx_equal(dist_diag.stddev(), distrax_dist.stddev())
-    assert approx_equal(dist_diag.covariance().to_dense(), distrax_dist.covariance())
+    assert approx_equal(dist_diag.covariance(), distrax_dist.covariance())
 
     assert approx_equal(dist_diag.sample(seed=_key, sample_shape=(10,)), distrax_dist.sample(seed=_key, sample_shape=(10,)))
 
@@ -99,7 +98,7 @@ def test_dense_linear_operator(n: int) -> None:
     assert approx_equal(dist_dense.mean(), distrax_dist.mean())
     assert approx_equal(dist_dense.variance(), distrax_dist.variance())
     assert approx_equal(dist_dense.stddev(), distrax_dist.stddev())
-    assert approx_equal(dist_dense.covariance().to_dense(), distrax_dist.covariance())
+    assert approx_equal(dist_dense.covariance(), distrax_dist.covariance())
 
     assert approx_equal(dist_dense.sample(seed=_key, sample_shape=(10,)), distrax_dist.sample(seed=_key, sample_shape=(10,)))
 
@@ -119,8 +118,9 @@ def test_kl_divergence(n: int) -> None:
     covariance_a = sqrt_a @ sqrt_a.T
     covariance_b = sqrt_b @ sqrt_b.T
 
-    dist_a = GaussianDistribution(loc=mean_a, scale=covariance_a)
-    dist_b = GaussianDistribution(loc=mean_b, scale=covariance_b)
+
+    dist_a = GaussianDistribution(loc=mean_a, scale=DenseLinearOperator(covariance_a))
+    dist_b = GaussianDistribution(loc=mean_b, scale=DenseLinearOperator(covariance_b))
 
     distrax_dist_a = MultivariateNormalFullCovariance(loc=mean_a, covariance_matrix=covariance_a)
     distrax_dist_b = MultivariateNormalFullCovariance(loc=mean_b, covariance_matrix=covariance_b)
