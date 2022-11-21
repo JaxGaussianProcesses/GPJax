@@ -44,34 +44,19 @@ def test_array_arguments(n: int) -> None:
     covariance = sqrt @ sqrt.T
 
     sqrt = jnp.linalg.cholesky(covariance + jnp.eye(n) * 1e-10)
+    dist = GaussianDistribution(loc=mean, scale=covariance)
 
-    dist_sqrt = GaussianDistribution(loc=mean, scale_tril=sqrt)
-    dist_cov = GaussianDistribution(loc=mean, scale=covariance)
-
-    assert approx_equal(dist_sqrt.mean(), dist_cov.mean())
-    assert approx_equal(dist_sqrt.variance(), dist_cov.variance())
-    assert approx_equal(dist_sqrt.stddev(), dist_cov.stddev())
-    assert approx_equal(dist_sqrt.covariance().to_dense(), dist_cov.covariance().to_dense())
-
- 
-    #assert approx_equal(dist_sqrt.scale_tril(), dist_cov.scale_tril())
-
-    assert approx_equal(dist_sqrt.sample(seed=_key, sample_shape=(10,)), dist_cov.sample(seed=_key, sample_shape=(10,)))
+    assert approx_equal(dist.mean(), mean)
+    assert approx_equal(dist.variance(), covariance.diagonal())
+    assert approx_equal(dist.stddev(), jnp.sqrt(covariance.diagonal()))
+    assert approx_equal(dist.covariance().to_dense(), covariance)
 
     y = jr.uniform(_key, shape=(n,))
 
-    #assert approx_equal(dist_sqrt.log_prob(y), dist_cov.log_prob(y))
+    distrax_dist = MultivariateNormalFullCovariance(loc=mean, covariance_matrix=covariance)
 
-    act_dist_sqrt = MultivariateNormalTri(loc=mean, scale_tri=sqrt)
-
-    assert approx_equal(dist_sqrt.log_prob(y), act_dist_sqrt.log_prob(y))
-
-    act_dist_cov = MultivariateNormalFullCovariance(loc=mean, covariance_matrix=covariance)
-
-    assert approx_equal(dist_cov.log_prob(y), act_dist_cov.log_prob(y))
-
-    assert approx_equal(dist_sqrt.kl_divergence(dist_sqrt), 0.0)
-    assert approx_equal(dist_cov.kl_divergence(dist_cov), 0.0)
+    assert approx_equal(dist.log_prob(y), distrax_dist.log_prob(y))
+    assert approx_equal(dist.kl_divergence(dist), 0.0)
 
 
 @pytest.mark.parametrize("n", [1, 2, 5, 100])

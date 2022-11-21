@@ -95,7 +95,7 @@ class GaussianDistribution(dx.Distribution):
             loc = jnp.zeros((num_dims,))
 
         # If not specified, set the scale to the identity matrix.
-        if scale is not None: 
+        if scale is None: 
             scale = IdentityLinearOperator(num_dims)
 
         self.loc = loc
@@ -123,11 +123,11 @@ class GaussianDistribution(dx.Distribution):
 
     def variance(self) -> Float[Array, "N"]:
         """Calculates the variance."""
-        return self.scale.diag
+        return self.scale.diagonal()
 
     def stddev(self) -> Float[Array, "N"]:
         """Calculates the standard deviation."""
-        return jnp.sqrt(self.scale.diag)
+        return jnp.sqrt(self.scale.diagonal())
 
     @property
     def event_shape(self) -> Tuple:
