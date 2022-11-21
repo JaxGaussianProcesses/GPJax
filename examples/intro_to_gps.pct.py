@@ -19,10 +19,10 @@
 # Fantastic that you're here! This notebook is designed to be a gentle
 # introduction to the mathematics of Gaussian processes (GPs). No prior
 # knowledge of Bayesian inference or GPs is assumed, and this notebook is
-# self-contained. At a high level, we begin $\mathbf{y}$ introducing Bayes'
-# theorem and its implications within probabilistic modelling. We then proceed
-# to introduce the Gaussian random variable along with its multivariate form. We
-# conclude $\mathbf{y}$ showing how this notion can be extended to GPs.
+# self-contained. At a high level, we begin by introducing Bayes' theorem and
+# its implications within probabilistic modelling. We then proceed to introduce
+# the Gaussian random variable along with its multivariate form. We conclude by
+# showing how this notion can be extended to GPs.
 #
 # ## Bayes' Theorem
 #
@@ -375,7 +375,7 @@ confidence_ellipse(
 # vector of data points, not a random variable as has been true up until now. To
 # distinguish between matrices and vectors, we use bold upper case characters
 # e.g., $\mathbf{X}$ for matrices, and bold lower case characters for vectors
-# e.g., $\mathbf{X}$.
+# e.g., $\mathbf{x}$.
 #
 # We are interested in modelling supervised learning problems, where we have $n$
 # observations $\mathbf{y}=\{y_1, y_2,\ldots ,y_n\}\subset\mathcal{Y}$ at
