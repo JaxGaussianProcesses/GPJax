@@ -78,7 +78,7 @@ class UpperTriangularLinearOperator(DenseLinearOperator):
         return super().__matmul__(other)
 
     def solve(self, rhs: Float[Array, "N"]) -> Float[Array, "N"]:
-        return jsp.linalg.solve_triangular(self.to_dense(), rhs, lower=True)
+        return jsp.linalg.solve_triangular(self.to_dense(), rhs, lower=False)
 
     @classmethod
     def from_root(cls, root: LinearOperator) -> None:
