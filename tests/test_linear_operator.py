@@ -13,11 +13,44 @@
 # limitations under the License.
 # ==============================================================================
 
+import pytest
 from jaxlinop.linear_operator import LinearOperator
 
-def test_name() -> None:
-    operator = LinearOperator()
-    res = operator.name
-    actual = "LinearOperator"
-    assert res == actual
 
+def test_covariance_operator() -> None:
+    with pytest.raises(TypeError):
+        LinearOperator()
+
+
+class DummyLinearOperator(LinearOperator):
+    def diagonal(self, *args, **kwargs):
+        pass
+
+    def shape(self, *args, **kwargs):
+        pass
+
+    def __mul__(self, *args, **kwargs):
+        """Multiply linear operator by scalar."""
+        pass
+
+    def _add_diagonal(self, *args, **kwargs):
+        pass
+
+    def __matmul__(self, *args, **kwargs):
+        """Matrix multiplication."""
+        pass
+
+    def to_dense(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def from_dense(self, *args, **kwargs):
+        pass
+
+
+def test_can_instantiate() -> None:
+    """Test if the covariance operator can be instantiated."""
+    res = DummyLinearOperator()
+
+    assert isinstance(res, DummyLinearOperator)
+    assert res.name == "DummyLinearOperator"

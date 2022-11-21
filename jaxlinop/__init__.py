@@ -1,4 +1,3 @@
-
 # Copyright 2022 The JaxLinOp Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +13,40 @@
 # limitations under the License.
 # ==============================================================================
 
-__version__ = "0.0.0"
+__version__ = "0.0.1"
 __authors__ = "Daniel Dodd, Thomas Pinder"
 __emails__ = "d.dodd1@lancaster.ac.uk, tompinder@live.co.uk"
 __license__ = "Apache 2.0"
-__uri__ = "https://github.com/JaxGaussianProcesses/JaxLinOp"
-__description__ = "A JAX linear operator library."
-__contributors__ = "https://github.com/JaxGaussianProcesses/JaxLinOp/graphs/contributors"
+__uri__ = "https://github.com/Daniel-Dodd/jax_linear_operator"
+__description__ = "A JaxLinOp library."
+__contributors__ = (
+    "https://github.com/Daniel-Dodd/jax_linear_operator/graphs/contributors"
+)
 
 from .linear_operator import LinearOperator
+from .dense_linear_operator import DenseLinearOperator
+from .diagonal_linear_operator import DiagonalLinearOperator
+from .constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
+from .identity_linear_operator import IdentityLinearOperator
+from .zero_linear_operator import ZeroLinearOperator
+from .triangular_linear_operator import (
+    LowerTriangularLinearOperator,
+    UpperTriangularLinearOperator,
+)
+from .utils import (
+    identity,
+    to_dense,
+)
 
 __all__ = [
     "LinearOperator",
+    "DenseLinearOperator",
+    "DiagonalLinearOperator",
+    "ConstantDiagonalLinearOperator",
+    "IdentityLinearOperator",
+    "ZeroLinearOperator",
+    "LowerTriangularLinearOperator",
+    "UpperTriangularLinearOperator",
+    "identity",
+    "to_dense",
 ]
