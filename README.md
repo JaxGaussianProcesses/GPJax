@@ -205,9 +205,9 @@ If you use GPJax in your research, please cite our [JOSS paper](https://joss.the
   journal = {Journal of Open Source Software}
 }
 ```
-`JaxLinOp` will automatically reduce cost savings in matrix addition, multiplication, computing log-determinants and more, for other matrix stuctures too!
+`JaxLinOp` is designed to automatically reduce cost savings in matrix addition, multiplication, computing log-determinants and more, for other matrix stuctures too!
 
-# Custom Linear Operator
+# Custom Linear Operator (details to come soon)
 
 The flexible design of `JaxLinOp` will allow users to impliment their own custom linear operators.
 
