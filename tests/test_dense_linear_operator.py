@@ -144,7 +144,9 @@ def test_mul(n: int) -> None:
 def test_matmul(n: int, m: int) -> None:
     array_left = jr.uniform(_PRNGKey, shape=(n, m))
     array_right = jr.uniform(_PRNGKey, shape=(m, n))
+
     values = jr.uniform(_PRNGKey, shape=(n, n))
+    values = values @ values.T
     dense = DenseLinearOperator(values)
 
     res_left = dense @ array_left
