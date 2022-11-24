@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: Python 3.10.0 ('base')
 #     language: python
 #     name: python3
 # ---
@@ -117,26 +117,37 @@ priors["likelihood"]["obs_noise"] = tfd.TransformedDistribution(
 # %% [markdown]
 # ### Defining our target function
 #
-# We now define the target distribution that our MCMC sampler will sample from. For our GP, this is the marginal log-likelihood that we specify below.
+# We now define the marginal likelihood for the target distribution that our MCMC sampler will sample from. For our GP, this is the marginal log-likelihood that we specify below.
 
 # %%
-mll = posterior.marginal_log_likelihood(D, priors=priors, negative=False)
-mll(params)
+log_mll = posterior.marginal_log_likelihood(D, negative=False)
+log_mll(params)
 
 # %% [markdown]
 # Since our model parameters are now an array, not a dictionary, we must define a function that maps the array back to a dictionary and then evaluates the marginal log-likelihood. Using the second return of `dict_array_coercion` this is straightforward as follows.
 
 # %%
-def build_log_pi(target, mapper_fn):
+from gpjax.parameters import evaluate_priors
+
+
+def build_log_pi(log_mll, unconstrained_priors, mapper_fn):
     def array_mll(parameter_array):
-        parameter_dict = mapper_fn([jnp.array(i) for i in parameter_array])
-        parameter_dict = gpx.constrain(parameter_dict, bijectors)
-        return target(parameter_dict)
+
+        # Convert parameter array to a dictionary:
+        params_dict = mapper_fn([jnp.array(i) for i in parameter_array])
+
+        # Evaluate the log prior, log p(θ):
+        log_hyper_prior_eval = evaluate_priors(params_dict, unconstrained_priors)
+
+        # Evaluate the log-likelihood probability kernel, log [p(y|f,  θ) p(f|  θ)]:
+        log_mll_eval = log_mll(gpx.constrain(params_dict, bijectors)) 
+        
+        return  log_mll_eval + log_hyper_prior_eval
 
     return array_mll
 
 
-mll_array_form = build_log_pi(mll, array_to_dict)
+mll_array_form = build_log_pi(log_mll, priors, array_to_dict)
 
 # %% [markdown]
 # ## Sample
