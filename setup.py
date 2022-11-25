@@ -35,7 +35,7 @@ REQUIRES = [
     "tqdm>=4.0.0",
     "ml-collections==0.1.0",
     "jaxtyping>=0.0.2",
-    "jaxlinop",
+    "jaxlinop>=0.0.2",
 ]
 
 EXTRAS = {
