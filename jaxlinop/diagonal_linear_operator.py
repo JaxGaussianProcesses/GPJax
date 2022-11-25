@@ -155,7 +155,7 @@ class DiagonalLinearOperator(LinearOperator):
         Returns:
             Float[Array, "1"]: Log determinant of the covariance matrix.
         """
-        return 2.0 * jnp.sum(jnp.log(self.diagonal()))
+        return jnp.sum(jnp.log(self.diagonal()))
 
     def inverse(self) -> DiagonalLinearOperator:
         """Inverse of the covariance operator.

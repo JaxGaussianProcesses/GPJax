@@ -201,7 +201,7 @@ def test_log_det(n: int) -> None:
     values = jr.uniform(_PRNGKey, shape=(n,))
     diag = DiagonalLinearOperator(values)
     res = diag.log_det()
-    actual = jnp.log(values).sum()
+    actual = jnp.linalg.slogdet(jnp.diag(values))[1]
 
     approx_equal(res, actual)
 
