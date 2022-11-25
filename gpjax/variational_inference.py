@@ -125,12 +125,14 @@ class StochasticVI(AbstractVariationalInference):
         x, y = batch.X, batch.y
 
         # Variational distribution q(f(·)) = N(f(·); μ(·), Σ(·, ·))
-        q = self.variational_family
+        q = self.variational_family(params)
 
         # Compute variational mean, μ(x), and variance, √diag(Σ(x, x)), at training inputs, x
-        qx = vmap(q(params))(x[:, None])
-        mean = qx.mean().val.reshape(-1, 1)
-        variance = qx.variance().val.reshape(-1, 1)
+        def q_moments(x):
+            qx = q(x)
+            return qx.mean(), qx.variance()
+
+        mean, variance = vmap(q_moments)(x[:, None])
 
         # log(p(y|f(x)))
         link_function = self.likelihood.link_function

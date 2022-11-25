@@ -348,7 +348,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             Lz_inv_Kzt = Lz.solve(Kzt)
 
             # Ktz Lz⁻ᵀ sqrt
-            Ktz_Lz_invT_sqrt = Lz.T.solve(Lz_inv_Kzt)
+            Ktz_Lz_invT_sqrt = jnp.matmul(Lz_inv_Kzt.T, sqrt)
 
             # μt  +  Ktz Lz⁻ᵀ μ
             mean = μt + jnp.matmul(Lz_inv_Kzt.T, mu)
@@ -811,9 +811,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             )
 
             # Kzz⁻¹ Kzx (y - μx)
-            Kzz_inv_Kzx_diff = jsp.linalg.solve_triangular(
-                Lz.T, Lz_inv_Kzx_diff, lower=False
-            )
+            Kzz_inv_Kzx_diff = Lz.T.solve(Lz_inv_Kzx_diff)
 
             Ktt = gram(kernel, params["kernel"], t)
             Kzt = cross_covariance(kernel, params["kernel"], z, t)
