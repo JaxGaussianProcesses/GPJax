@@ -19,7 +19,7 @@
 #
 # In this notebook we demonstrate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
 
-# %%
+# %% vscode={"languageId": "python"}
 import blackjax
 import distrax as dx
 import jax
@@ -47,7 +47,7 @@ key = jr.PRNGKey(123)
 #
 # We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs for later.
 
-# %%
+# %% vscode={"languageId": "python"}
 x = jnp.sort(jr.uniform(key, shape=(100, 1), minval=-1.0, maxval=1.0), axis=0)
 y = 0.5 * jnp.sign(jnp.cos(3 * x + jr.normal(key, shape=x.shape) * 0.05)) + 0.5
 
@@ -61,7 +61,7 @@ plt.plot(x, y, "o", markersize=8)
 #
 # We begin by defining a Gaussian process prior with a radial basis function (RBF) kernel, chosen for the purpose of exposition. Since our observations are binary, we choose a Bernoulli likelihood with a probit link function.
 
-# %%
+# %% vscode={"languageId": "python"}
 kernel = gpx.RBF()
 prior = gpx.Prior(kernel=kernel)
 likelihood = gpx.Bernoulli(num_datapoints=D.n)
@@ -69,7 +69,7 @@ likelihood = gpx.Bernoulli(num_datapoints=D.n)
 # %% [markdown]
 # We construct the posterior through the product of our prior and likelihood.
 
-# %%
+# %% vscode={"languageId": "python"}
 posterior = prior * likelihood
 print(type(posterior))
 
@@ -79,7 +79,7 @@ print(type(posterior))
 # %% [markdown]
 # To begin we obtain an initial parameter state through the `initialise` callable (see the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)). We can obtain a MAP estimate by optimising the marginal log-likelihood with Optax's optimisers.
 
-# %%
+# %% vscode={"languageId": "python"}
 parameter_state = gpx.initialise(posterior)
 negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
 
@@ -97,7 +97,7 @@ map_estimate, training_history = inference_state.unpack()
 # %% [markdown]
 # From which we can make predictions at novel inputs, as illustrated below.
 
-# %%
+# %% vscode={"languageId": "python"}
 map_latent_dist = posterior(map_estimate, D)(xtest)
 
 predictive_dist = likelihood(map_estimate, map_latent_dist)
@@ -158,7 +158,7 @@ ax.legend()
 #
 # that we identify as a Gaussian distribution,  $p(\boldsymbol{f}| \mathcal{D}) \approx q(\boldsymbol{f}) := \mathcal{N}(\hat{\boldsymbol{f}}, [-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} ]^{-1} )$. Since the negative Hessian is positive definite, we can use the Cholesky decomposition to obtain the covariance matrix of the Laplace approximation at the datapoints below.
 
-# %%
+# %% vscode={"languageId": "python"}
 gram, cross_covariance = (kernel.gram, kernel.cross_covariance)
 jitter = 1e-6
 
@@ -190,7 +190,7 @@ laplace_approximation = dx.MultivariateNormalFullCovariance(f_hat.squeeze(), H_i
 #
 # This is the same approximate distribution $q_{map}(f(\cdot))$, but we have pertubed the covariance by a curvature term of $\mathbf{K}_{\boldsymbol{(\cdot)\boldsymbol{x}}} \mathbf{K}_{\boldsymbol{xx}}^{-1} [-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} ]^{-1} \mathbf{K}_{\boldsymbol{xx}}^{-1} \mathbf{K}_{\boldsymbol{\boldsymbol{x}(\cdot)}}$. We take the latent distribution computed in the previous section and add this term to the covariance to construct $q_{Laplace}(f(\cdot))$.
 
-# %%
+# %% vscode={"languageId": "python"}
 def construct_laplace(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
 
     map_latent_dist = posterior(map_estimate, D)(test_inputs)
@@ -217,7 +217,7 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormal
 
 # %% [markdown]
 # From this we can construct the predictive distribution at the test points.
-# %%
+# %% vscode={"languageId": "python"}
 laplace_latent_dist = construct_laplace(xtest)
 predictive_dist = likelihood(map_estimate, laplace_latent_dist)
 
@@ -267,7 +267,7 @@ ax.legend()
 #
 # We begin by generating _sensible_ initial positions for our sampler before defining an inference loop and sampling 500 values from our Markov chain. In practice, drawing more samples will be necessary.
 
-# %%
+# %% vscode={"languageId": "python"}
 # Adapted from BlackJax's introduction notebook.
 num_adapt = 500
 num_samples = 500
@@ -304,14 +304,14 @@ states, infos = inference_loop(key, kernel, last_state, num_samples)
 #
 # BlackJax gives us easy access to our sampler's efficiency through metrics such as the sampler's _acceptance probability_ (the number of times that our chain accepted a proposed sample, divided by the total number of steps run by the chain). For NUTS and Hamiltonian Monte Carlo sampling, we typically seek an acceptance rate of 60-70% to strike the right balance between having a chain which is _stuck_ and rarely moves versus a chain that is too jumpy with frequent small steps.
 
-# %%
+# %% vscode={"languageId": "python"}
 acceptance_rate = jnp.mean(infos.acceptance_probability)
 print(f"Acceptance rate: {acceptance_rate:.2f}")
 
 # %% [markdown]
 # Our acceptance rate is slightly too large, prompting an examination of the chain's trace plots. A well-mixing chain will have very few (if any) flat spots in its trace plot whilst also not having too many steps in the same direction. In addition to the model's hyperparameters, there will be 500 samples for each of the 100 latent function values in the `states.position` dictionary. We depict the chains that correspond to the model hyperparameters and the first value of the latent function for brevity.
 
-# %%
+# %% vscode={"languageId": "python"}
 fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(15, 5), tight_layout=True)
 ax0.plot(states.position["kernel"]["lengthscale"])
 ax1.plot(states.position["kernel"]["variance"])
@@ -327,7 +327,7 @@ ax2.set_title("Latent Function (index = 1)")
 #
 # An ideal Markov chain would have samples completely uncorrelated with their neighbours after a single lag. However, in practice, correlations often exist within our chain's sample set. A commonly used technique to try and reduce this correlation is _thinning_ whereby we select every $n$th sample where $n$ is the minimum lag length at which we believe the samples are uncorrelated. Although further analysis of the chain's autocorrelation is required to find appropriate thinning factors, we employ a thin factor of 10 for demonstration purposes.
 
-# %%
+# %% vscode={"languageId": "python"}
 thin_factor = 10
 samples = []
 
@@ -351,7 +351,7 @@ expected_val = jnp.mean(samples, axis=0)
 #
 # Finally, we end this tutorial by plotting the predictions obtained from our model against the observed data.
 
-# %%
+# %% vscode={"languageId": "python"}
 fig, ax = plt.subplots(figsize=(16, 5), tight_layout=True)
 ax.plot(
     x, y, "o", markersize=5, color="tab:red", label="Observations", zorder=2, alpha=0.7
@@ -371,6 +371,6 @@ ax.fill_between(
 # %% [markdown]
 # ## System configuration
 
-# %%
+# %% vscode={"languageId": "python"}
 # %load_ext watermark
 # %watermark -n -u -v -iv -w -a "Thomas Pinder & Daniel Dodd"

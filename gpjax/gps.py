@@ -28,7 +28,6 @@ from .covariance_operator import I
 from .kernels import AbstractKernel
 from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
-from .parameters import copy_dict_structure, evaluate_priors
 from .types import Dataset, PRNGKeyType
 from .utils import concat_dictionaries
 
@@ -462,7 +461,6 @@ class ConjugatePosterior(AbstractPosterior):
     def marginal_log_likelihood(
         self,
         train_data: Dataset,
-        priors: Dict = None,
         negative: bool = False,
     ) -> Callable[[Dict], Float[Array, "1"]]:
         """Compute the marginal log-likelihood function of the Gaussian process.
@@ -505,7 +503,7 @@ class ConjugatePosterior(AbstractPosterior):
 
         Further, prior distributions can be passed into the marginal log-likelihood
 
-        >>> mll = posterior.marginal_log_likelihood(train_data = D, priors=priors)
+        >>> mll = posterior.marginal_log_likelihood(train_data = D)
 
         For optimal performance, the marginal log-likelihood should be ``jax.jit``
         compiled.
@@ -515,9 +513,6 @@ class ConjugatePosterior(AbstractPosterior):
         Args:
             train_data (Dataset): The training dataset used to compute the
                 marginal log-likelihood.
-            priors (Dict, optional): _description_. Optional argument that
-                contains the priors placed on the model's parameters.
-                Defaults to None.
             negative (bool, optional): Whether or not the returned function
                 should be negative. For optimisation, the negative is useful
                 as minimisation of the negative marginal log-likelihood is
@@ -575,12 +570,8 @@ class ConjugatePosterior(AbstractPosterior):
                 jnp.atleast_1d(μx.squeeze()), L
             )
 
-            # log p(θ)
-            log_prior_density = evaluate_priors(params, priors)
-
             return constant * (
                 marginal_likelihood.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
-                + log_prior_density
             )
 
         return mll
@@ -708,7 +699,6 @@ class NonConjugatePosterior(AbstractPosterior):
     def marginal_log_likelihood(
         self,
         train_data: Dataset,
-        priors: Dict = None,
         negative: bool = False,
     ) -> Callable[[Dict], Float[Array, "1"]]:
         """
@@ -730,9 +720,6 @@ class NonConjugatePosterior(AbstractPosterior):
         Args:
             train_data (Dataset): The training dataset used to compute the
                 marginal log-likelihood.
-            priors (Dict, optional): _description_. Optional argument that
-                contains the priors placed on the model's parameters. Defaults
-                to None.
             negative (bool, optional): Whether or not the returned function
                 should be negative. For optimisation, the negative is useful as
                 minimisation of the negative marginal log-likelihood is equivalent
@@ -757,11 +744,6 @@ class NonConjugatePosterior(AbstractPosterior):
 
         # Link function of the likelihood
         link_function = self.likelihood.link_function
-
-        # We induce whitened prior on the latent function
-        if not priors:
-            priors = copy_dict_structure(self._initialise_params(jr.PRNGKey(0)))
-            priors["latent"] = dx.Normal(loc=0.0, scale=1.0)
 
         # The sign of the marginal log-likelihood depends on whether we are maximising or minimising
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
@@ -794,10 +776,10 @@ class NonConjugatePosterior(AbstractPosterior):
             # p(y | f(x), θ), where θ are the model hyperparameters
             likelihood = link_function(params, fx)
 
-            # log p(θ)
-            log_prior_density = evaluate_priors(params, priors)
+            # Whitened latent function values prior, p(wx | θ) = N(0, I)
+            latent_prior = dx.Normal(loc=0.0, scale=1.0)
 
-            return constant * (likelihood.log_prob(y).sum() + log_prior_density)
+            return constant * (likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum())
 
         return mll
 
