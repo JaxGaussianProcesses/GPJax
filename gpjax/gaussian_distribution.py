@@ -57,7 +57,6 @@ def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
           f'`scale.shape = {scale.shape}`.')
 
 
-
 class GaussianDistribution(dx.Distribution):
     """Multivariate Gaussian distribution with a linear operator scale matrix.
 
@@ -188,8 +187,13 @@ def _check_and_return_dimension(q: GaussianDistribution, p: GaussianDistribution
     return q.event_shape[-1]
         
 
+def _frobeinius_norm_squared(matrix: Float[Array, "N N"]) -> Float[Array, "1"]:
+    """Calculates the squared Frobenius norm of a matrix."""
+    return jnp.sum(jnp.square(matrix))
+
+
 def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> Float[Array, "1"]:
-    """Computes the KL divergence, KL[q(x)||p(x)], between two multivariate Gaussian distributions
+    """Computes the KL divergence, KL[q||p], between two multivariate Gaussian distributions
         q(x) = N(x; μq, Σq) and p(x) = N(x; μp, Σp).
 
     Args:
@@ -200,26 +204,28 @@ def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> Float[Ar
         Float[Array, "1"]: The KL divergence between q and p.
     """
 
-    n = _check_and_return_dimension(q, p)
-
     μq = q.loc
     Σq = q.scale
     μp = p.loc
     Σp = p.scale
 
+    n = _check_and_return_dimension(q, p)
+
+    # Find covariance roots:
+    Lp = Σp.to_root()
+    Lq = Σq.to_root()
+
     # diff, μp - μq
     diff = μp - μq
     
-    # trace term, tr(Σp⁻¹ Σq)
-    trace = jnp.trace(Σp.solve(Σq.to_dense())) # TODO: Need to improve this. This is not efficient.
+    # trace term, tr[Σp⁻¹ Σq] = tr[(LpLpᵀ)⁻¹(LqLqᵀ)] = tr[(Lp⁻¹Lq)(Lp⁻¹Lq)ᵀ] = (fr[LqLp⁻¹])²
+    trace = _frobeinius_norm_squared(Lp.solve(Lq.to_dense())) # TODO: Not most efficient, given the `to_dense()` call (e.g., consider diagonal p and q). Need to abstract solving linear operator against another linear operator.
 
-    # Mahalanobis term, (μp - μq)ᵀ Σp⁻¹ (μp - μq)
-    mahalanobis = (diff).T @ Σp.solve(diff) # TODO: Need to improve this. Perhaps add a Mahalanobis method to LinearOperators.
+    # Mahalanobis term, (μp - μq)ᵀ Σp⁻¹ (μp - μq) = tr [(μp - μq)ᵀ [LpLpᵀ]⁻¹ (μp - μq)] = (fr[Lp⁻¹(μp - μq)])²
+    mahalanobis = _frobeinius_norm_squared(Lp.solve(diff)) #TODO: Need to improve this. Perhaps add a Mahalanobis method to LinearOperators.
 
-    two_kl = mahalanobis - n - Σq.log_det() + Σp.log_det() + trace
-
-
-    return two_kl / 2.0
+    # KL[q(x)||p(x)] = [ [(μp - μq)ᵀ Σp⁻¹ (μp - μq)] - n - log|Σq| + log|Σp| + tr[Σp⁻¹ Σq] ] / 2
+    return (mahalanobis - n - Σq.log_det() + Σp.log_det() + trace) / 2.0
 
 __all__ = [
     "GaussianDistribution",
