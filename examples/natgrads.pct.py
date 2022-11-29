@@ -25,7 +25,6 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
-from jax import jit, lax
 from jax.config import config
 
 import gpjax as gpx
@@ -97,7 +96,7 @@ inference_state = gpx.fit_natgrads(
     n_iters=5000,
     batch_size=256,
     key=jr.PRNGKey(42),
-    moment_optim=ox.sgd(0.1),
+    moment_optim=ox.sgd(0.01),
     hyper_optim=ox.adam(1e-3),
 )
 
