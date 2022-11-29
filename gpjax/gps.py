@@ -22,7 +22,7 @@ import jax.random as jr
 from chex import dataclass
 from jaxtyping import Array, Float
 
-from jaxlinop import identity as I
+from jaxlinop import identity
 
 from .config import get_defaults
 from .kernels import AbstractKernel
@@ -228,7 +228,7 @@ class Prior(AbstractPrior):
 
             μt = mean_function(params["mean_function"], t)
             Ktt = gram(kernel, params["kernel"], t)
-            Ktt += I(n_test) * jitter
+            Ktt += identity(n_test) * jitter
 
             return GaussianDistribution(jnp.atleast_1d(μt.squeeze()), Ktt)
 
@@ -416,10 +416,10 @@ class ConjugatePosterior(AbstractPosterior):
 
         # Precompute Gram matrix, Kxx, at training inputs, x
         Kxx = gram(kernel, params["kernel"], x)
-        Kxx += I(n) * jitter
+        Kxx += identity(n) * jitter
 
         # Σ = Kxx + Iσ²
-        Sigma = Kxx + I(n) * obs_noise
+        Sigma = Kxx + identity(n) * obs_noise
 
         def predict(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
             """Compute the predictive distribution at a set of test inputs.
@@ -448,7 +448,7 @@ class ConjugatePosterior(AbstractPosterior):
 
             # Ktt  -  Ktx (Kxx + Iσ²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
             covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
-            covariance += I(n_test) * jitter
+            covariance += identity(n_test) * jitter
 
             return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
@@ -560,11 +560,13 @@ class ConjugatePosterior(AbstractPosterior):
 
             # Σ = (Kxx + Iσ²) = LLᵀ
             Kxx = gram(kernel, params["kernel"], x)
-            Kxx += I(n) * jitter
-            Sigma = Kxx + I(n) * obs_noise
+            Kxx += identity(n) * jitter
+            Sigma = Kxx + identity(n) * obs_noise
 
             # p(y | x, θ), where θ are the model hyperparameters:
-            marginal_likelihood = GaussianDistribution(jnp.atleast_1d(μx.squeeze()), Sigma)
+            marginal_likelihood = GaussianDistribution(
+                jnp.atleast_1d(μx.squeeze()), Sigma
+            )
 
             # log p(θ)
             log_prior_density = evaluate_priors(params, priors)
@@ -656,7 +658,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
         # Precompute lower triangular of Gram matrix, Lx, at training inputs, x
         Kxx = gram(kernel, params["kernel"], x)
-        Kxx += I(n) * jitter
+        Kxx += identity(n) * jitter
         Lx = Kxx.to_root()
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
@@ -674,7 +676,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
             # Compute terms of the posterior predictive distribution
             Ktx = cross_covariance(kernel, params["kernel"], t, x)
-            Ktt = gram(kernel, params["kernel"], t) + I(n_test) * jitter
+            Ktt = gram(kernel, params["kernel"], t) + identity(n_test) * jitter
             μt = mean_function(params["mean_function"], t)
 
             # Lx⁻¹ Kxt
@@ -688,7 +690,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
             # Ktt - Ktx Kxx⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
             covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
-            covariance += I(n_test) * jitter
+            covariance += identity(n_test) * jitter
 
             return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
@@ -768,7 +770,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
             # Compute lower triangular of the kernel Gram matrix
             Kxx = gram(kernel, params["kernel"], x)
-            Kxx += I(n) * jitter
+            Kxx += identity(n) * jitter
             Lx = Kxx.to_root()
 
             # Compute the prior mean function

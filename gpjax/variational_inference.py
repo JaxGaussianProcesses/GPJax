@@ -22,7 +22,7 @@ from chex import dataclass
 from jax import vmap
 from jaxtyping import Array, Float
 
-from jaxlinop import identity as I
+from jaxlinop import identity
 
 from .config import get_defaults
 from .gps import AbstractPosterior
@@ -178,7 +178,7 @@ class CollapsedVI(AbstractVariationalInference):
 
         # Unpack mean function and kernel
         mean_function = self.prior.mean_function
-        kernel = self.prior.kernel 
+        kernel = self.prior.kernel
 
         # Unpack kernel computation
         gram, cross_covariance = kernel.gram, kernel.cross_covariance
@@ -193,7 +193,7 @@ class CollapsedVI(AbstractVariationalInference):
             noise = params["likelihood"]["obs_noise"]
             z = params["variational_family"]["inducing_inputs"]
             Kzz = gram(kernel, params["kernel"], z)
-            Kzz += I(m) * jitter
+            Kzz += identity(m) * jitter
             Kzx = cross_covariance(kernel, params["kernel"], z, x)
             Kxx_diag = vmap(kernel, in_axes=(None, 0, 0))(params["kernel"], x, x)
             μx = mean_function(params["mean_function"], x)
