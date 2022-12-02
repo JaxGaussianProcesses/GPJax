@@ -22,8 +22,9 @@ from chex import dataclass
 from jax import vmap
 from jaxtyping import Array, Float
 
+from jaxlinop import identity
+
 from .config import get_defaults
-from .covariance_operator import I
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
@@ -124,12 +125,14 @@ class StochasticVI(AbstractVariationalInference):
         x, y = batch.X, batch.y
 
         # Variational distribution q(f(·)) = N(f(·); μ(·), Σ(·, ·))
-        q = self.variational_family
+        q = self.variational_family(params)
 
         # Compute variational mean, μ(x), and variance, √diag(Σ(x, x)), at training inputs, x
-        qx = vmap(q(params))(x[:, None])
-        mean = qx.mean().val.reshape(-1, 1)
-        variance = qx.variance().val.reshape(-1, 1)
+        def q_moments(x):
+            qx = q(x)
+            return qx.mean(), qx.variance()
+
+        mean, variance = vmap(q_moments)(x[:, None])
 
         # log(p(y|f(x)))
         link_function = self.likelihood.link_function
@@ -175,7 +178,7 @@ class CollapsedVI(AbstractVariationalInference):
 
         # Unpack mean function and kernel
         mean_function = self.prior.mean_function
-        kernel = self.prior.kernel 
+        kernel = self.prior.kernel
 
         # Unpack kernel computation
         gram, cross_covariance = kernel.gram, kernel.cross_covariance
@@ -190,12 +193,12 @@ class CollapsedVI(AbstractVariationalInference):
             noise = params["likelihood"]["obs_noise"]
             z = params["variational_family"]["inducing_inputs"]
             Kzz = gram(kernel, params["kernel"], z)
-            Kzz += I(m) * jitter
+            Kzz += identity(m) * jitter
             Kzx = cross_covariance(kernel, params["kernel"], z, x)
             Kxx_diag = vmap(kernel, in_axes=(None, 0, 0))(params["kernel"], x, x)
             μx = mean_function(params["mean_function"], x)
 
-            Lz = Kzz.triangular_lower()
+            Lz = Kzz.to_root()
 
             # Notation and derivation:
             #
@@ -221,7 +224,7 @@ class CollapsedVI(AbstractVariationalInference):
             #
             #   with A and B defined as above.
 
-            A = jsp.linalg.solve_triangular(Lz, Kzx, lower=True) / jnp.sqrt(noise)
+            A = Lz.solve(Kzx) / jnp.sqrt(noise)
 
             # AAᵀ
             AAT = jnp.matmul(A, A.T)

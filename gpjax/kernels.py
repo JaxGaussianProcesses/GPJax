@@ -16,6 +16,13 @@
 import abc
 from typing import Callable, Dict, List, Optional, Sequence
 
+from jaxlinop import (
+    LinearOperator,
+    DenseLinearOperator,
+    DiagonalLinearOperator,
+    ConstantDiagonalLinearOperator,
+)
+
 import jax.numpy as jnp
 from chex import dataclass
 from jax import vmap
@@ -23,11 +30,6 @@ import jax
 from jaxtyping import Array, Float
 
 from .config import get_defaults
-from .covariance_operator import (
-    CovarianceOperator,
-    DenseCovarianceOperator,
-    DiagonalCovarianceOperator,
-)
 from .types import PRNGKeyType
 
 JITTER = get_defaults()["jitter"]
@@ -56,7 +58,7 @@ class AbstractKernelComputation:
         self,
         params: Dict,
         inputs: Float[Array, "N D"],
-    ) -> CovarianceOperator:
+    ) -> LinearOperator:
 
         """Compute Gram covariance operator of the kernel function.
 
@@ -66,7 +68,7 @@ class AbstractKernelComputation:
             inputs (Float[Array, "N N"]): The inputs to the kernel function.
 
         Returns:
-            CovarianceOperator: Gram covariance operator of the kernel function.
+            LinearOperator: Gram covariance operator of the kernel function.
         """
 
         raise NotImplementedError
@@ -97,7 +99,7 @@ class AbstractKernelComputation:
         self,
         params: Dict,
         inputs: Float[Array, "N D"],
-    ) -> CovarianceOperator:
+    ) -> DiagonalLinearOperator:
         """For a given kernel, compute the elementwise diagonal of the
         NxN gram matrix on an input matrix of shape NxD.
 
@@ -108,11 +110,11 @@ class AbstractKernelComputation:
             inputs (Float[Array, "N D"]): The input matrix.
 
         Returns:
-            CovarianceOperator: The computed diagonal variance entries.
+            LinearOperator: The computed diagonal variance entries.
         """
         diag = vmap(lambda x: self._kernel_fn(params, x, x))(inputs)
 
-        return DiagonalCovarianceOperator(diag=diag)
+        return DiagonalLinearOperator(diag=diag)
 
 
 @dataclass
@@ -125,7 +127,7 @@ class DenseKernelComputation(AbstractKernelComputation):
         self,
         params: Dict,
         inputs: Float[Array, "N D"],
-    ) -> CovarianceOperator:
+    ) -> DenseLinearOperator:
         """For a given kernel, compute the NxN gram matrix on an input
         matrix of shape NxD.
 
@@ -142,7 +144,7 @@ class DenseKernelComputation(AbstractKernelComputation):
             inputs
         )
 
-        return DenseCovarianceOperator(matrix=matrix)
+        return DenseLinearOperator(matrix=matrix)
 
 
 @dataclass
@@ -151,7 +153,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
         self,
         params: Dict,
         inputs: Float[Array, "N D"],
-    ) -> CovarianceOperator:
+    ) -> DiagonalLinearOperator:
         """For a kernel with diagonal structure, compute the NxN gram matrix on
         an input matrix of shape NxD.
 
@@ -167,7 +169,55 @@ class DiagonalKernelComputation(AbstractKernelComputation):
 
         diag = vmap(lambda x: self.kernel_fn(params, x, x))(inputs)
 
-        return DiagonalCovarianceOperator(diag=diag)
+        return DiagonalLinearOperator(diag=diag)
+
+
+class ConstantDiagonalKernelComputation(AbstractKernelComputation):
+    @staticmethod
+    def gram(
+        kernel: AbstractKernel,
+        params: Dict,
+        inputs: Float[Array, "N D"],
+    ) -> ConstantDiagonalLinearOperator:
+        """For a kernel with diagonal structure, compute the NxN gram matrix on
+        an input matrix of shape NxD.
+
+        Args:
+            kernel (AbstractKernel): The kernel for which the Gram matrix
+                should be computed for.
+            params (Dict): The kernel's parameter set.
+            inputs (Float[Array, "N D"]): The input matrix.
+
+        Returns:
+            CovarianceOperator: The computed square Gram matrix.
+        """
+
+        value = kernel(params, inputs[0], inputs[0])
+
+        return ConstantDiagonalLinearOperator(value=value, size=inputs.shape[0])
+
+    @staticmethod
+    def diagonal(
+        kernel: AbstractKernel,
+        params: Dict,
+        inputs: Float[Array, "N D"],
+    ) -> DiagonalLinearOperator:
+        """For a given kernel, compute the elementwise diagonal of the
+        NxN gram matrix on an input matrix of shape NxD.
+
+        Args:
+            kernel (AbstractKernel): The kernel for which the variance
+                vector should be computed for.
+            params (Dict): The kernel's parameter set.
+            inputs (Float[Array, "N D"]): The input matrix.
+
+        Returns:
+            LinearOperator: The computed diagonal variance entries.
+        """
+
+        diag = vmap(lambda x: kernel(params, x, x))(inputs)
+
+        return DiagonalLinearOperator(diag=diag)
 
 
 ##########################################
@@ -621,8 +671,8 @@ class Polynomial(AbstractKernel):
         }
 
 
-@dataclass
-class White(AbstractKernel, DiagonalKernelComputation):
+@dataclass(repr=False)
+class White(AbstractKernel, ConstantDiagonalKernelComputation):
     def __post_init__(self) -> None:
         super(White, self).__post_init__()
 

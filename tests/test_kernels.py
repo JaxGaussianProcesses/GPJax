@@ -24,9 +24,9 @@ import pytest
 from jax.config import config
 from jaxtyping import Array, Float
 
-from gpjax.covariance_operator import (
-    CovarianceOperator,
-    I,
+from jaxlinop import (
+    LinearOperator,
+    identity,
 )
 
 from gpjax.kernels import (
@@ -124,7 +124,7 @@ def test_gram(kernel: AbstractKernel, dim: int, n: int) -> None:
 
     # Test gram matrix:
     Kxx = gram(kernel, params, x)
-    assert isinstance(Kxx, CovarianceOperator)
+    assert isinstance(Kxx, LinearOperator)
     assert Kxx.shape == (n, n)
 
 
@@ -198,7 +198,7 @@ def test_pos_def(
 
     # Test gram matrix eigenvalues are positive:
     Kxx = gram(kern, params, x)
-    Kxx += I(n) * _jitter
+    Kxx += identity(n) * _jitter
     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
     assert (eigen_values > 0.0).all()
 
@@ -383,7 +383,7 @@ def test_polynomial(
     assert Kxx.shape[0] == Kxx.shape[1]
 
     # Test positive definiteness
-    Kxx += I(n) * _jitter
+    Kxx += identity(n) * _jitter
     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
     assert (eigen_values > 0).all()
 
@@ -468,7 +468,7 @@ def test_combination_kernel(
     assert Kxx.shape[1] == n
 
     # Check positive definiteness
-    Kxx += I(n) * _jitter
+    Kxx += identity(n) * _jitter
     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
     assert (eigen_values > 0).all()
 
@@ -611,7 +611,7 @@ def test_graph_kernel():
     assert Kxx.shape == (n_verticies, n_verticies)
 
     # Check positive definiteness
-    Kxx += I(n_verticies) * _jitter
+    Kxx += identity(n_verticies) * _jitter
     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
     assert all(eigen_values > 0)
 
