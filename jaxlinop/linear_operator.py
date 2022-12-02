@@ -16,7 +16,6 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from functools import cache
 
 if TYPE_CHECKING:
     from .diagonal_linear_operator import DiagonalLinearOperator
