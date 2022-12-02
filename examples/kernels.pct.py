@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -21,7 +21,6 @@
 
 
 # %%
-
 import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
@@ -58,20 +57,18 @@ kernels = [
     gpx.Matern32(),
     gpx.Matern52(),
     gpx.RBF(),
-    gpx.Polynomial(degree=1),
-    gpx.Polynomial(degree=2),
+    gpx.Polynomial(),
+    gpx.Polynomial(),
 ]
 fig, axes = plt.subplots(ncols=3, nrows=2, figsize=(20, 10))
 
 x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
-
 
 for k, ax in zip(kernels, axes.ravel()):
     prior = gpx.Prior(kernel=k)
     params, *_ = gpx.initialise(prior, key).unpack()
     rv = prior(params)(x)
     y = rv.sample(seed=key, sample_shape=(10,))
-
     ax.plot(x, y.T, alpha=0.7)
     ax.set_title(k.name)
 
@@ -215,7 +212,7 @@ class Polar(gpx.kernels.AbstractKernel, gpx.kernels.DenseKernelComputation):
         self.c = self.period / 2.0  # in [0, \pi]
 
     def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"] 
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
         tau = params["tau"]
         t = angular_distance(x, y, self.c)

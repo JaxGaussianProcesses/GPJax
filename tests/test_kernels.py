@@ -20,7 +20,6 @@ from typing import Dict, List
 import jax.numpy as jnp
 import jax.random as jr
 import networkx as nx
-import numpy as np
 import pytest
 from jax.config import config
 from jaxtyping import Array, Float
@@ -326,14 +325,25 @@ def test_initialisation(kernel: AbstractKernel, dim: int) -> None:
 
 
 @pytest.mark.parametrize(
-    "kernel", [RBF, Matern12, Matern32, Matern52, Linear, Polynomial, RationalQuadratic]
+    "kernel",
+    [
+        RBF,
+        Matern12,
+        Matern32,
+        Matern52,
+        Linear,
+        Polynomial,
+        RationalQuadratic,
+        PoweredExponential,
+        Periodic,
+    ],
 )
 def test_dtype(kernel: AbstractKernel) -> None:
-
     parameter_state = initialise(kernel(), _initialise_key)
     params, *_ = parameter_state.unpack()
     for k, v in params.items():
         assert v.dtype == jnp.float64
+        assert isinstance(k, str)
 
 
 @pytest.mark.parametrize("degree", [1, 2, 3])

@@ -226,7 +226,7 @@ class Prior(AbstractPrior):
             n_test = test_inputs.shape[0]
 
             μt = mean_function(params["mean_function"], t)
-            Ktt = gram(kernel, params["kernel"], t)
+            Ktt = gram(params["kernel"], t)
             Ktt += I(n_test) * jitter
             Lt = Ktt.triangular_lower()
 

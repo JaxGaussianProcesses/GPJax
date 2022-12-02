@@ -20,3 +20,11 @@ repos:
         args: [--py37-plus]
       - id: nbqa-flake8
         args: ['--ignore=E501,E203,E302,E402,E731,W503']
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.0.0
+    hooks:
+    -   id: autoflake
+        args: ["--in-place", "--remove-unused-variables", "--remove-all-unused-imports", "--recursive"]
+        name: AutoFlake
+        description: "Format with AutoFlake"
+        stages: [commit]
