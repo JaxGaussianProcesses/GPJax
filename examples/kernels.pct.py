@@ -58,7 +58,7 @@ kernels = [
     gpx.Matern52(),
     gpx.RBF(),
     gpx.Polynomial(),
-    gpx.Polynomial(),
+    gpx.Polynomial(degree=2),
 ]
 fig, axes = plt.subplots(ncols=3, nrows=2, figsize=(20, 10))
 
@@ -101,14 +101,11 @@ print(f"Lengthscales: {slice_kernel._initialise_params(key)['lengthscale']}")
 # Inputs
 x_matrix = jr.normal(key, shape=(50, 5))
 
-# Gram kernel computation
-gram_fn = slice_kernel.gram
-
 # Default parameter dictionary
 params = slice_kernel._initialise_params(key)
 
 # Compute the Gram matrix
-K = gram_fn(slice_kernel, params, x_matrix)
+K = slice_kernel.gram(params, x_matrix)
 print(K.shape)
 
 # %% [markdown]
@@ -125,9 +122,9 @@ k2 = gpx.Polynomial()
 sum_k = k1 + k2
 
 fig, ax = plt.subplots(ncols=3, figsize=(20, 5))
-im0 = ax[0].matshow(k1.gram(k1, k1._initialise_params(key), x).to_dense())
-im1 = ax[1].matshow(k2.gram(k2, k2._initialise_params(key), x).to_dense())
-im2 = ax[2].matshow(sum_k.gram(sum_k, sum_k._initialise_params(key), x).to_dense())
+im0 = ax[0].matshow(k1.gram(k1._initialise_params(key), x).to_dense())
+im1 = ax[1].matshow(k2.gram(k2._initialise_params(key), x).to_dense())
+im2 = ax[2].matshow(sum_k.gram(sum_k._initialise_params(key), x).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
@@ -142,10 +139,10 @@ k3 = gpx.Matern32()
 prod_k = k1 * k2 * k3
 
 fig, ax = plt.subplots(ncols=4, figsize=(20, 5))
-im0 = ax[0].matshow(k1.gram(k1, k1._initialise_params(key), x).to_dense())
-im1 = ax[1].matshow(k2.gram(k2, k2._initialise_params(key), x).to_dense())
-im2 = ax[2].matshow(k3.gram(k3, k3._initialise_params(key), x).to_dense())
-im3 = ax[3].matshow(prod_k.gram(prod_k, prod_k._initialise_params(key), x).to_dense())
+im0 = ax[0].matshow(k1.gram(k1._initialise_params(key), x).to_dense())
+im1 = ax[1].matshow(k2.gram(k2._initialise_params(key), x).to_dense())
+im2 = ax[2].matshow(k3.gram(k3._initialise_params(key), x).to_dense())
+im3 = ax[3].matshow(prod_k.gram(prod_k._initialise_params(key), x).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
@@ -158,6 +155,7 @@ fig.colorbar(im3, ax=ax[3])
 # %%
 sum_k = gpx.SumKernel(kernel_set=[k1, k2])
 prod_k = gpx.ProductKernel(kernel_set=[k1, k2, k3])
+
 
 # %% [markdown]
 # ## Custom kernel
@@ -197,18 +195,14 @@ prod_k = gpx.ProductKernel(kernel_set=[k1, k2, k3])
 # To implement this, one must write the following class.
 
 # %%
-from chex import dataclass
-
-
 def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
 
 
-@dataclass
-class Polar(gpx.kernels.AbstractKernel, gpx.kernels.DenseKernelComputation):
-    period: float = 2 * jnp.pi
-
-    def __post_init__(self):
+class Polar(gpx.kernels.AbstractKernel):
+    def __init__(self) -> None:
+        super().__init__()
+        self.period: float = 2 * jnp.pi
         self.c = self.period / 2.0  # in [0, \pi]
 
     def __call__(
@@ -271,7 +265,6 @@ class Polar(gpx.kernels.AbstractKernel, gpx.kernels.DenseKernelComputation):
 # where the lower bound is shifted by $4$.
 
 # %%
-
 from jax.nn import softplus
 from gpjax.config import add_parameter
 

@@ -24,22 +24,28 @@ from jaxlinop import (
 )
 
 import jax.numpy as jnp
-from chex import dataclass
 from jax import vmap
 import jax
 from jaxtyping import Array, Float
 
 from .config import get_defaults
-from .types import PRNGKeyType
+from chex import PRNGKey as PRNGKeyType
+from .pytree import Pytree
+
 
 JITTER = get_defaults()["jitter"]
 
 
-@dataclass
-class AbstractKernelComputation:
+class AbstractKernelComputation(Pytree):
     """Abstract class for kernel computations."""
 
-    _kernel_fn: Callable[[Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array] = None
+    def __init__(
+        self,
+        kernel_fn: Callable[
+            [Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array
+        ] = None,
+    ) -> None:
+        self._kernel_fn = kernel_fn
 
     @property
     def kernel_fn(
@@ -71,8 +77,11 @@ class AbstractKernelComputation:
             LinearOperator: Gram covariance operator of the kernel function.
         """
 
-        raise NotImplementedError
+        matrix = self.cross_covariance(params, inputs, inputs)
 
+        return DenseLinearOperator(matrix=matrix)
+
+    @abc.abstractmethod
     def cross_covariance(
         self,
         params: Dict,
@@ -92,8 +101,7 @@ class AbstractKernelComputation:
         Returns:
             Float[Array, "N M"]: The computed square Gram matrix.
         """
-        cross_cov = vmap(lambda x: vmap(lambda y: self.kernel_fn(params, x, y))(y))(x)
-        return cross_cov
+        raise NotImplementedError
 
     def diagonal(
         self,
@@ -117,38 +125,48 @@ class AbstractKernelComputation:
         return DiagonalLinearOperator(diag=diag)
 
 
-@dataclass
 class DenseKernelComputation(AbstractKernelComputation):
     """Dense kernel computation class. Operations with the kernel assume
     a dense gram matrix structure.
     """
 
-    def gram(
+    def __init__(
         self,
-        params: Dict,
-        inputs: Float[Array, "N D"],
-    ) -> DenseLinearOperator:
-        """For a given kernel, compute the NxN gram matrix on an input
-        matrix of shape NxD.
+        kernel_fn: Callable[
+            [Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array
+        ] = None,
+    ) -> None:
+        super().__init__(kernel_fn)
+
+    def cross_covariance(
+        self, params: Dict, x: Float[Array, "N D"], y: Float[Array, "M D"]
+    ) -> Float[Array, "N M"]:
+        """For a given kernel, compute the NxM covariance matrix on a pair of input
+        matrices of shape NxD and MxD.
 
         Args:
             kernel (AbstractKernel): The kernel for which the Gram
                 matrix should be computed for.
             params (Dict): The kernel's parameter set.
-            inputs (Float[Array,"N D"]): The input matrix.
+            x (Float[Array,"N D"]): The input matrix.
+            y (Float[Array,"M D"]): The input matrix.
 
         Returns:
             CovarianceOperator: The computed square Gram matrix.
         """
-        matrix = vmap(lambda x: vmap(lambda y: self.kernel_fn(params, x, y))(inputs))(
-            inputs
-        )
-
-        return DenseLinearOperator(matrix=matrix)
+        cross_cov = vmap(lambda x: vmap(lambda y: self.kernel_fn(params, x, y))(y))(x)
+        return cross_cov
 
 
-@dataclass
 class DiagonalKernelComputation(AbstractKernelComputation):
+    def __init__(
+        self,
+        kernel_fn: Callable[
+            [Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array
+        ] = None,
+    ) -> None:
+        super().__init__(kernel_fn)
+
     def gram(
         self,
         params: Dict,
@@ -171,11 +189,23 @@ class DiagonalKernelComputation(AbstractKernelComputation):
 
         return DiagonalLinearOperator(diag=diag)
 
+    def cross_covariance(
+        self, params: Dict, x: Float[Array, "N D"], y: Float[Array, "M D"]
+    ) -> Float[Array, "N M"]:
+        raise ValueError("Cross covariance not defined for diagonal kernels.")
+
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):
-    @staticmethod
+    def __init__(
+        self,
+        kernel_fn: Callable[
+            [Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array
+        ] = None,
+    ) -> None:
+        super().__init__(kernel_fn)
+
     def gram(
-        kernel: AbstractKernel,
+        self,
         params: Dict,
         inputs: Float[Array, "N D"],
     ) -> ConstantDiagonalLinearOperator:
@@ -192,13 +222,12 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
             CovarianceOperator: The computed square Gram matrix.
         """
 
-        value = kernel(params, inputs[0], inputs[0])
+        value = self.kernel_fn(params, inputs[0], inputs[0])
 
         return ConstantDiagonalLinearOperator(value=value, size=inputs.shape[0])
 
-    @staticmethod
     def diagonal(
-        kernel: AbstractKernel,
+        self,
         params: Dict,
         inputs: Float[Array, "N D"],
     ) -> DiagonalLinearOperator:
@@ -215,28 +244,38 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
             LinearOperator: The computed diagonal variance entries.
         """
 
-        diag = vmap(lambda x: kernel(params, x, x))(inputs)
+        diag = vmap(lambda x: self.kernel_fn(params, x, x))(inputs)
 
         return DiagonalLinearOperator(diag=diag)
+
+    def cross_covariance(
+        self, params: Dict, x: Float[Array, "N D"], y: Float[Array, "M D"]
+    ) -> Float[Array, "N M"]:
+        raise ValueError("Cross covariance not defined for constant diagonal kernels.")
 
 
 ##########################################
 # Abtract classes
 ##########################################
-@dataclass
-class AbstractKernel:
+class AbstractKernel(Pytree):
     """
     Base kernel class"""
 
-    compute_engine: AbstractKernelComputation = DenseKernelComputation
-    active_dims: Optional[List[int]] = None
-    stationary: Optional[bool] = False
-    spectral: Optional[bool] = False
-    name: Optional[str] = "AbstractKernel"
-
-    def __post_init__(self) -> None:
+    def __init__(
+        self,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "AbstractKernel",
+    ) -> None:
+        self.compute_engine = compute_engine
+        self.active_dims = active_dims
+        self.stationary = stationary
+        self.spectral = spectral
+        self.name = name
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
-        compute_engine = self.compute_engine(_kernel_fn=self.__call__)
+        compute_engine = self.compute_engine(kernel_fn=self.__call__)
         self.gram = compute_engine.gram
         self.cross_covariance = compute_engine.cross_covariance
 
@@ -314,29 +353,27 @@ class AbstractKernel:
         raise NotImplementedError
 
 
-@dataclass
-class _KernelSet:
-    """A mixin class for storing a list of kernels. Useful for combination kernels."""
-
-    kernel_set: List[AbstractKernel]
-
-
-@dataclass
-class CombinationKernel(AbstractKernel, _KernelSet):
+class CombinationKernel(AbstractKernel):
     """A base class for products or sums of kernels."""
 
-    name: Optional[str] = "Combination kernel"
-    combination_fn: Optional[Callable] = None
+    def __init__(
+        self,
+        kernel_set: List[AbstractKernel],
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "AbstractKernel",
+    ) -> None:
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
+        self.kernel_set = kernel_set
+        name: Optional[str] = "Combination kernel"
+        self.combination_fn: Optional[Callable] = None
 
-    def __post_init__(self) -> None:
-        """Set the kernel set to the list of kernels passed to the constructor."""
-        kernels = self.kernel_set
-
-        if not all(isinstance(k, AbstractKernel) for k in kernels):
+        if not all(isinstance(k, AbstractKernel) for k in self.kernel_set):
             raise TypeError("can only combine Kernel instances")  # pragma: no cover
 
-        self.kernel_set: List[AbstractKernel] = []
-        self._set_kernels(kernels)
+        self._set_kernels(self.kernel_set)
 
     def _set_kernels(self, kernels: Sequence[AbstractKernel]) -> None:
         """Combine multiple kernels. Based on GPFlow's Combination kernel."""
@@ -375,33 +412,57 @@ class CombinationKernel(AbstractKernel, _KernelSet):
         )
 
 
-@dataclass
 class SumKernel(CombinationKernel):
     """A kernel that is the sum of a set of kernels."""
 
-    name: Optional[str] = "Sum kernel"
-    combination_fn: Optional[Callable] = jnp.sum
+    def __init__(
+        self,
+        kernel_set: List[AbstractKernel],
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "Sum kernel",
+    ) -> None:
+        super().__init__(
+            kernel_set, compute_engine, active_dims, stationary, spectral, name
+        )
+        self.combination_fn: Optional[Callable] = jnp.sum
 
 
-@dataclass
 class ProductKernel(CombinationKernel):
     """A kernel that is the product of a set of kernels."""
 
-    name: Optional[str] = "Product kernel"
-    combination_fn: Optional[Callable] = jnp.prod
+    def __init__(
+        self,
+        kernel_set: List[AbstractKernel],
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "Product kernel",
+    ) -> None:
+        super().__init__(
+            kernel_set, compute_engine, active_dims, stationary, spectral, name
+        )
+        self.combination_fn: Optional[Callable] = jnp.prod
 
 
 ##########################################
 # Euclidean kernels
 ##########################################
-@dataclass
 class RBF(AbstractKernel):
     """The Radial Basis Function (RBF) kernel."""
 
-    name: Optional[str] = "Radial basis function kernel"
-
-    def __post_init__(self) -> None:
-        super(RBF, self).__post_init__()
+    def __init__(
+        self,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "Radial basis function kernel",
+    ) -> None:
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
@@ -433,14 +494,18 @@ class RBF(AbstractKernel):
         return jax.tree_util.tree_map(lambda x: jnp.atleast_1d(x), params)
 
 
-@dataclass
 class Matern12(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 0.5."""
 
-    name: Optional[str] = "Matern 1/2"
-
-    def __post_init__(self) -> None:
-        super(Matern12, self).__post_init__()
+    def __init__(
+        self,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "Matérn 1/2 kernel",
+    ) -> None:
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
     def __call__(
         self,
@@ -473,14 +538,18 @@ class Matern12(AbstractKernel):
         }
 
 
-@dataclass
 class Matern32(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 1.5."""
 
-    name: Optional[str] = "Matern 3/2"
-
-    def __post_init__(self) -> None:
-        super(Matern32, self).__post_init__()
+    def __init__(
+        self,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "Matern 3/2",
+    ) -> None:
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
     def __call__(
         self,
@@ -519,14 +588,18 @@ class Matern32(AbstractKernel):
         }
 
 
-@dataclass
 class Matern52(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 2.5."""
 
-    name: Optional[str] = "Matern 5/2"
-
-    def __post_init__(self) -> None:
-        super(Matern52, self).__post_init__()
+    def __init__(
+        self,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "Matern 5/2",
+    ) -> None:
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
@@ -562,7 +635,6 @@ class Matern52(AbstractKernel):
         }
 
 
-@dataclass
 class PoweredExponential(AbstractKernel):
     """The powered exponential family of kernels.
 
@@ -570,10 +642,15 @@ class PoweredExponential(AbstractKernel):
 
     """
 
-    name: Optional[str] = "Powered exponential"
-
-    def __post_init__(self) -> None:
-        super(PoweredExponential, self).__post_init__()
+    def __init__(
+        self,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "Powered exponential",
+    ) -> None:
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
     def __call__(self, params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell`, :math:`\sigma` and power :math:`\kappa`.
@@ -602,14 +679,18 @@ class PoweredExponential(AbstractKernel):
         }
 
 
-@dataclass
 class Linear(AbstractKernel):
     """The linear kernel."""
 
-    name: Optional[str] = "Linear"
-
-    def __post_init__(self) -> None:
-        super(Linear, self).__post_init__()
+    def __init__(
+        self,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "Linear",
+    ) -> None:
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
     def __call__(self, params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\sigma`
@@ -633,15 +714,21 @@ class Linear(AbstractKernel):
         return {"variance": jnp.array([1.0])}
 
 
-@dataclass
 class Polynomial(AbstractKernel):
     """The Polynomial kernel with variable degree."""
 
-    name: Optional[str] = "Polynomial"
-    degree: int = 1
-
-    def __post_init__(self) -> None:
-        super(Polynomial, self).__post_init__()
+    def __init__(
+        self,
+        degree: int = 1,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "Polynomial",
+    ) -> None:
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
+        self.degree = degree
+        self.name = f"Polynomial Degree: {self.degree}"
 
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
@@ -671,7 +758,6 @@ class Polynomial(AbstractKernel):
         }
 
 
-@dataclass(repr=False)
 class White(AbstractKernel, ConstantDiagonalKernelComputation):
     def __post_init__(self) -> None:
         super(White, self).__post_init__()
@@ -707,13 +793,16 @@ class White(AbstractKernel, ConstantDiagonalKernelComputation):
         return {"variance": jnp.array([1.0])}
 
 
-@dataclass
 class RationalQuadratic(AbstractKernel):
-
-    name: Optional[str] = "Rational Quadratic"
-
-    def __post_init__(self) -> None:
-        super(RationalQuadratic, self).__post_init__()
+    def __init__(
+        self,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "Rational Quadratic",
+    ) -> None:
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
     def __call__(self, params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
@@ -743,17 +832,21 @@ class RationalQuadratic(AbstractKernel):
         }
 
 
-@dataclass
 class Periodic(AbstractKernel):
     """The periodic kernel.
 
     Key reference is MacKay 1998 - "Introduction to Gaussian processes".
     """
 
-    name: Optional[str] = "Periodic"
-
-    def __post_init__(self) -> None:
-        super(Periodic, self).__post_init__()
+    def __init__(
+        self,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "Periodic",
+    ) -> None:
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
     def __call__(self, params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
@@ -787,37 +880,80 @@ class Periodic(AbstractKernel):
 ##########################################
 # Graph kernels
 ##########################################
-@dataclass
-class _EigenKernel:
-    laplacian: Float[Array, "N N"]
-
-
 class EigenKernelComputation(AbstractKernelComputation):
-    @staticmethod
-    def gram(
-        kernel: AbstractKernel,
-        params: Dict,
-        inputs: Float[Array, "N D"],
-    ) -> CovarianceOperator:
-        matrix = vmap(lambda x: vmap(lambda y: kernel(params, x, y))(inputs))(inputs)
-        return DenseCovarianceOperator(matrix=matrix)
+    def __init__(
+        self,
+        kernel_fn: Callable[
+            [Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array
+        ] = None,
+    ) -> None:
+        super().__init__(kernel_fn)
+        self._eigenvalues = None
+        self._eigenvectors = None
+        self._num_verticies = None
+
+    # Define an eigenvalue setter and getter property
+    @property
+    def eigensystem(self) -> Float[Array, "N"]:
+        return self._eigenvalues, self._eigenvectors, self._num_verticies
+
+    @eigensystem.setter
+    def eigensystem(
+        self, eigenvalues: Float[Array, "N"], eigenvectors: Float[Array, "N N"]
+    ) -> None:
+        self._eigenvalues = eigenvalues
+        self._eigenvectors = eigenvectors
+
+    @property
+    def num_vertex(self) -> int:
+        return self._num_verticies
+
+    @num_vertex.setter
+    def num_vertex(self, num_vertex: int) -> None:
+        self._num_verticies = num_vertex
+
+    def _compute_S(self, params):
+        evals, evecs = self.eigensystem
+        S = jnp.power(
+            evals
+            + 2 * params["smoothness"] / params["lengthscale"] / params["lengthscale"],
+            -params["smoothness"],
+        )
+        S = jnp.multiply(S, self.num_vertex / jnp.sum(S))
+        S = jnp.multiply(S, params["variance"])
+        return S
+
+    def cross_covariance(
+        self, params: Dict, x: Float[Array, "N D"], y: Float[Array, "M D"]
+    ) -> Float[Array, "N M"]:
+        S = self._compute_S(params=params)
+        matrix = self.kernel_fn(params, x, y, S=S)
+        return matrix
 
 
-@dataclass
-class GraphKernel(AbstractKernel, _EigenKernel):
-    name: Optional[str] = "Graph kernel"
-
-    def __post_init__(self) -> None:
-        self.ndims = 1 if not self.active_dims else len(self.active_dims)
-        self.compute_engine.kernel_fn = self.__call__
-        self.gram = self.compute_engine.gram
-        self.cross_covariance = self.compute_engine.cross_covariance
+class GraphKernel(AbstractKernel):
+    def __init__(
+        self,
+        laplacian: Float[Array, "N N"],
+        compute_engine: EigenKernelComputation = EigenKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "Graph kernel",
+    ) -> None:
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
+        self.laplacian = laplacian
         evals, self.evecs = jnp.linalg.eigh(self.laplacian)
         self.evals = evals.reshape(-1, 1)
-        self.num_vertex = self.laplacian.shape[0]
+        self.compute_engine.eigensystem = self.evals, self.evecs
+        self.compute_engine.num_vertex = self.laplacian.shape[0]
 
     def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
+        self,
+        params: Dict,
+        x: Float[Array, "1 D"],
+        y: Float[Array, "1 D"],
+        **kwargs,
     ) -> Float[Array, "1"]:
         """Evaluate the graph kernel on a pair of vertices :math:`v_i, v_j`.
 
@@ -829,17 +965,11 @@ class GraphKernel(AbstractKernel, _EigenKernel):
         Returns:
             Float[Array, "1"]: The value of :math:`k(v_i, v_j)`.
         """
-        psi = jnp.power(
-            2 * params["smoothness"] / params["lengthscale"] ** 2 + self.evals,
-            -params["smoothness"],
-        )
-        psi *= self.num_vertex / jnp.sum(psi)
-        x_evec = self.evecs[:, x]
-        y_evec = self.evecs[:, y]
-        kxy = params["variance"] * jnp.sum(
-            jnp.prod(jnp.stack([psi, x_evec, y_evec]).squeeze(), axis=0)
-        )
-        return kxy.squeeze()
+        S = kwargs["S"]
+        Kxx = (jax_gather_nd(self.evecs, x) * S[None, :]) @ jnp.transpose(
+            jax_gather_nd(self.evecs, y)
+        )  # shape (n,n)
+        return Kxx.squeeze()
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
         return {
@@ -847,6 +977,10 @@ class GraphKernel(AbstractKernel, _EigenKernel):
             "variance": jnp.array([1.0]),
             "smoothness": jnp.array([1.0]),
         }
+
+    @property
+    def num_vertex(self) -> int:
+        return self.compute_engine.num_vertex
 
 
 def squared_distance(
@@ -879,6 +1013,11 @@ def euclidean_distance(
     """
 
     return jnp.sqrt(jnp.maximum(squared_distance(x, y), 1e-36))
+
+
+def jax_gather_nd(params, indices):
+    tuple_indices = tuple(indices[..., i] for i in range(indices.shape[-1]))
+    return params[tuple_indices]
 
 
 __all__ = [
