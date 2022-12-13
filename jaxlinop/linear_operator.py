@@ -27,7 +27,7 @@ import distrax
 from jaxtyping import Array, Float
 from typing import Any, TypeVar, Iterable, Mapping, Generic, Tuple, Union
 
-from jaxutils import pytree
+from jaxutils import PyTree
 
 # Generic type.
 T = TypeVar("T")
@@ -40,7 +40,7 @@ ShapeT = TypeVar("ShapeT", bound=NestedT[Tuple[int, ...]])
 DTypeT = TypeVar("DTypeT", bound=NestedT[jnp.dtype])
 
 
-class LinearOperator(pytree.Pytree, Generic[ShapeT, DTypeT], metaclass=abc.ABCMeta):
+class LinearOperator(PyTree, Generic[ShapeT, DTypeT], metaclass=abc.ABCMeta):
     """Linear operator base class."""
 
     def __init__(self, *args, **kwargs) -> None:
