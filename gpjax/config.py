@@ -53,7 +53,6 @@ def get_defaults() -> ConfigDict:
 
     # Default parameter transforms
     transformations.alpha = "positive_transform"
-    transformations.bias = "positive_transform"
     transformations.lengthscale = "positive_transform"
     transformations.variance = "positive_transform"
     transformations.smoothness = "positive_transform"
