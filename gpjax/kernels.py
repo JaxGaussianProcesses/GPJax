@@ -30,13 +30,13 @@ from jaxtyping import Array, Float
 
 from .config import get_defaults
 from chex import PRNGKey as PRNGKeyType
-from .pytree import Pytree
+from jaxutils import PyTree
 
 
 JITTER = get_defaults()["jitter"]
 
 
-class AbstractKernelComputation(Pytree):
+class AbstractKernelComputation(PyTree):
     """Abstract class for kernel computations."""
 
     def __init__(
@@ -257,7 +257,7 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
 ##########################################
 # Abtract classes
 ##########################################
-class AbstractKernel(Pytree):
+class AbstractKernel(PyTree):
     """
     Base kernel class"""
 

@@ -18,7 +18,7 @@ from typing import Callable, Dict
 
 import jax.numpy as jnp
 import jax.scipy as jsp
-from chex import dataclass
+from chex import dataclass, PRNGKey as PRNGKeyType
 from jax import vmap
 from jaxtyping import Array, Float
 
@@ -28,7 +28,7 @@ from .config import get_defaults
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
-from .types import Dataset, PRNGKeyType
+from .types import Dataset
 from .utils import concat_dictionaries
 from .variational_families import (
     AbstractVariationalFamily,

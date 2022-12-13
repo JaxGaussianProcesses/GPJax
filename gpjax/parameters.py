@@ -22,11 +22,10 @@ import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-from chex import dataclass
+from chex import dataclass, PRNGKey as PRNGKeyType
 from jaxtyping import Array, Float
 
 from .config import Identity, get_defaults
-from .types import PRNGKeyType
 from .utils import merge_dictionaries
 
 

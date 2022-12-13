@@ -18,7 +18,7 @@ from typing import Any, Callable, Dict, Optional
 
 import distrax as dx
 import jax.numpy as jnp
-from chex import dataclass
+from chex import dataclass, PRNGKey as PRNGKeyType
 from jaxtyping import Array, Float
 
 from jaxlinop import identity
@@ -27,7 +27,7 @@ from .config import get_defaults
 from .kernels import AbstractKernel
 from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
-from .types import Dataset, PRNGKeyType
+from .types import Dataset
 from .utils import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
 

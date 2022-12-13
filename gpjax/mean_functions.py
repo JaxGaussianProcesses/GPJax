@@ -17,10 +17,8 @@ import abc
 from typing import Dict, Optional
 
 import jax.numpy as jnp
-from chex import dataclass
+from chex import dataclass, PRNGKey as PRNGKeyType
 from jaxtyping import Array, Float
-
-from .types import PRNGKeyType
 
 
 @dataclass(repr=False)

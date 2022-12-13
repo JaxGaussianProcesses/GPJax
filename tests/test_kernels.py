@@ -23,6 +23,7 @@ import networkx as nx
 import pytest
 from jax.config import config
 from jaxtyping import Array, Float
+from chex import PRNGKey as PRNGKeyType
 
 from jaxlinop import (
     LinearOperator,
@@ -47,7 +48,6 @@ from gpjax.kernels import (
     euclidean_distance,
 )
 from gpjax.parameters import initialise
-from gpjax.types import PRNGKeyType
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -379,7 +379,8 @@ def test_polynomial(
 
 
 @pytest.mark.parametrize(
-    "kernel", [RBF, Matern12, Matern32, Matern52, Linear, Polynomial, RationalQuadratic]
+    "kernel",
+    [RBF, Matern12, Matern32, Matern52, Linear, Polynomial, RationalQuadratic],
 )
 def test_active_dim(kernel: AbstractKernel) -> None:
     dim_list = [0, 1, 2, 3]
@@ -412,7 +413,8 @@ def test_active_dim(kernel: AbstractKernel) -> None:
 
 @pytest.mark.parametrize("combination_type", [SumKernel, ProductKernel])
 @pytest.mark.parametrize(
-    "kernel", [RBF, RationalQuadratic, Linear, Matern12, Matern32, Matern52, Polynomial]
+    "kernel",
+    [RBF, RationalQuadratic, Linear, Matern12, Matern32, Matern52, Polynomial],
 )
 @pytest.mark.parametrize("n_kerns", [2, 3, 4])
 def test_combination_kernel(
@@ -584,7 +586,8 @@ def test_graph_kernel():
 
 
 @pytest.mark.parametrize(
-    "kernel", [RBF, Matern12, Matern32, Matern52, Polynomial, Linear, RationalQuadratic]
+    "kernel",
+    [RBF, Matern12, Matern32, Matern52, Polynomial, Linear, RationalQuadratic],
 )
 def test_combination_kernel_type(kernel: AbstractKernel) -> None:
     prod_kern = kernel() * kernel()

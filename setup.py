@@ -30,6 +30,7 @@ REQUIRES = [
     "jax>=0.1.67",
     "jaxlib>=0.1.47",
     "optax",
+    "jaxutils",
     "chex",
     "distrax>=0.1.2",
     "tqdm>=4.0.0",
@@ -39,7 +40,15 @@ REQUIRES = [
 ]
 
 EXTRAS = {
-    "dev": ["black", "isort", "pylint", "flake8", "pytest", "networkx", "pytest-cov"],
+    "dev": [
+        "black",
+        "isort",
+        "pylint",
+        "flake8",
+        "pytest",
+        "networkx",
+        "pytest-cov",
+    ],
     "cuda": ["jax[cuda]"],
 }
 
