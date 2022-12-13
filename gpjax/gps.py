@@ -18,8 +18,7 @@ from typing import Any, Callable, Dict, Optional
 
 import distrax as dx
 import jax.numpy as jnp
-import jax.random as jr
-from chex import dataclass
+from chex import dataclass, PRNGKey as PRNGKeyType
 from jaxtyping import Array, Float
 
 from jaxlinop import identity
@@ -28,7 +27,7 @@ from .config import get_defaults
 from .kernels import AbstractKernel
 from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
-from .types import Dataset, PRNGKeyType
+from .types import Dataset
 from .utils import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
 
@@ -216,9 +215,6 @@ class Prior(AbstractPrior):
         mean_function = self.mean_function
         kernel = self.kernel
 
-        # Unpack kernel computation
-        gram = kernel.gram
-
         def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
 
             # Unpack test inputs
@@ -226,7 +222,7 @@ class Prior(AbstractPrior):
             n_test = test_inputs.shape[0]
 
             μt = mean_function(params["mean_function"], t)
-            Ktt = gram(kernel, params["kernel"], t)
+            Ktt = kernel.gram(params["kernel"], t)
             Ktt += identity(n_test) * jitter
 
             return GaussianDistribution(jnp.atleast_1d(μt.squeeze()), Ktt)
@@ -405,16 +401,12 @@ class ConjugatePosterior(AbstractPosterior):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        # Unpack kernel computation
-        gram = kernel.gram
-        cross_covariance = kernel.cross_covariance
-
         # Observation noise σ²
         obs_noise = params["likelihood"]["obs_noise"]
         μx = mean_function(params["mean_function"], x)
 
         # Precompute Gram matrix, Kxx, at training inputs, x
-        Kxx = gram(kernel, params["kernel"], x)
+        Kxx = kernel.gram(params["kernel"], x)
         Kxx += identity(n) * jitter
 
         # Σ = Kxx + Iσ²
@@ -436,8 +428,8 @@ class ConjugatePosterior(AbstractPosterior):
             n_test = test_inputs.shape[0]
 
             μt = mean_function(params["mean_function"], t)
-            Ktt = gram(kernel, params["kernel"], t)
-            Kxt = cross_covariance(kernel, params["kernel"], x, t)
+            Ktt = kernel.gram(params["kernel"], t)
+            Kxt = kernel.cross_covariance(params["kernel"], x, t)
 
             # Σ⁻¹ Kxt
             Sigma_inv_Kxt = Sigma.solve(Kxt)
@@ -528,9 +520,6 @@ class ConjugatePosterior(AbstractPosterior):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        # Unpack kernel computation
-        gram = kernel.gram
-
         # The sign of the marginal log-likelihood depends on whether we are maximising or minimising
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
 
@@ -554,7 +543,7 @@ class ConjugatePosterior(AbstractPosterior):
             # Future work concerns implementation of a custom Gaussian distribution / measure object that accepts a covariance operator.
 
             # Σ = (Kxx + Iσ²) = LLᵀ
-            Kxx = gram(kernel, params["kernel"], x)
+            Kxx = kernel.gram(params["kernel"], x)
             Kxx += identity(n) * jitter
             Sigma = Kxx + identity(n) * obs_noise
 
@@ -643,12 +632,8 @@ class NonConjugatePosterior(AbstractPosterior):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        # Unpack kernel computation
-        gram = kernel.gram
-        cross_covariance = kernel.cross_covariance
-
         # Precompute lower triangular of Gram matrix, Lx, at training inputs, x
-        Kxx = gram(kernel, params["kernel"], x)
+        Kxx = kernel.gram(params["kernel"], x)
         Kxx += identity(n) * jitter
         Lx = Kxx.to_root()
 
@@ -666,8 +651,8 @@ class NonConjugatePosterior(AbstractPosterior):
             t, n_test = test_inputs, test_inputs.shape[0]
 
             # Compute terms of the posterior predictive distribution
-            Ktx = cross_covariance(kernel, params["kernel"], t, x)
-            Ktt = gram(kernel, params["kernel"], t) + identity(n_test) * jitter
+            Ktx = kernel.cross_covariance(params["kernel"], t, x)
+            Ktt = kernel.gram(params["kernel"], t) + identity(n_test) * jitter
             μt = mean_function(params["mean_function"], t)
 
             # Lx⁻¹ Kxt
@@ -730,9 +715,6 @@ class NonConjugatePosterior(AbstractPosterior):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        # Unpack kernel computation
-        gram = kernel.gram
-
         # Link function of the likelihood
         link_function = self.likelihood.link_function
 
@@ -751,7 +733,7 @@ class NonConjugatePosterior(AbstractPosterior):
             """
 
             # Compute lower triangular of the kernel Gram matrix
-            Kxx = gram(kernel, params["kernel"], x)
+            Kxx = kernel.gram(params["kernel"], x)
             Kxx += identity(n) * jitter
             Lx = Kxx.to_root()
 
@@ -770,7 +752,9 @@ class NonConjugatePosterior(AbstractPosterior):
             # Whitened latent function values prior, p(wx | θ) = N(0, I)
             latent_prior = dx.Normal(loc=0.0, scale=1.0)
 
-            return constant * (likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum())
+            return constant * (
+                likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum()
+            )
 
         return mll
 

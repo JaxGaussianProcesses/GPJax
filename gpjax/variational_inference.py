@@ -18,7 +18,7 @@ from typing import Callable, Dict
 
 import jax.numpy as jnp
 import jax.scipy as jsp
-from chex import dataclass
+from chex import dataclass, PRNGKey as PRNGKeyType
 from jax import vmap
 from jaxtyping import Array, Float
 
@@ -28,7 +28,7 @@ from .config import get_defaults
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
-from .types import Dataset, PRNGKeyType
+from .types import Dataset
 from .utils import concat_dictionaries
 from .variational_families import (
     AbstractVariationalFamily,
@@ -180,9 +180,6 @@ class CollapsedVI(AbstractVariationalInference):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        # Unpack kernel computation
-        gram, cross_covariance = kernel.gram, kernel.cross_covariance
-
         m = self.num_inducing
         jitter = get_defaults()["jitter"]
 
@@ -192,9 +189,9 @@ class CollapsedVI(AbstractVariationalInference):
         def elbo_fn(params: Dict) -> Float[Array, "1"]:
             noise = params["likelihood"]["obs_noise"]
             z = params["variational_family"]["inducing_inputs"]
-            Kzz = gram(kernel, params["kernel"], z)
+            Kzz = kernel.gram(params["kernel"], z)
             Kzz += identity(m) * jitter
-            Kzx = cross_covariance(kernel, params["kernel"], z, x)
+            Kzx = kernel.cross_covariance(params["kernel"], z, x)
             Kxx_diag = vmap(kernel, in_axes=(None, 0, 0))(params["kernel"], x, x)
             μx = mean_function(params["mean_function"], x)
 

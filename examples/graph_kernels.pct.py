@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -55,7 +55,7 @@ random.seed(123)
 
 pos = nx.spring_layout(G, seed=123)  # positions for all nodes
 
-nx.draw(G, pos, node_color="tab:blue", with_labels=False, alpha=0.5)
+nx.draw(G)  # , pos, node_color="tab:blue", with_labels=False, alpha=0.5)
 
 # %% [markdown]
 #
@@ -94,6 +94,12 @@ fx = prior(true_params)(x)
 y = fx.sample(seed=key).reshape(-1, 1)
 
 D = gpx.Dataset(X=x, y=y)
+
+# %%
+kernel.compute_engine.gram
+
+# %%
+kernel.gram(params=kernel._initialise_params(key), inputs=x)
 
 # %% [markdown]
 #

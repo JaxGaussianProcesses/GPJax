@@ -19,7 +19,7 @@ from typing import Any, Callable, Dict, Optional
 import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
-from chex import dataclass
+from chex import dataclass, PRNGKey as PRNGKeyType
 from jaxtyping import Array, Float
 
 from jaxlinop import identity
@@ -28,7 +28,7 @@ import jaxlinop as jlo
 from .config import get_defaults
 from .gps import Prior
 from .likelihoods import AbstractLikelihood, Gaussian
-from .types import Dataset, PRNGKeyType
+from .types import Dataset
 from .utils import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
 
@@ -165,11 +165,8 @@ class VariationalGaussian(AbstractVariationalGaussian):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        # Unpack kernel computation
-        gram = kernel.gram
-
         μz = mean_function(params["mean_function"], z)
-        Kzz = gram(kernel, params["kernel"], z)
+        Kzz = kernel.gram(params["kernel"], z)
         Kzz += identity(m) * jitter
 
         sqrt = jlo.LowerTriangularLinearOperator.from_dense(sqrt)
@@ -212,11 +209,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        # Unpack kernel computation
-        gram = kernel.gram
-        cross_covariance = kernel.cross_covariance
-
-        Kzz = gram(kernel, params["kernel"], z)
+        Kzz = kernel.gram(params["kernel"], z)
         Kzz += identity(m) * jitter
         Lz = Kzz.to_root()
         μz = mean_function(params["mean_function"], z)
@@ -226,8 +219,8 @@ class VariationalGaussian(AbstractVariationalGaussian):
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
-            Ktt = gram(kernel, params["kernel"], t)
-            Kzt = cross_covariance(kernel, params["kernel"], z, t)
+            Ktt = kernel.gram(params["kernel"], t)
+            Kzt = kernel.cross_covariance(params["kernel"], z, t)
             μt = mean_function(params["mean_function"], t)
 
             # Lz⁻¹ Kzt
@@ -325,11 +318,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        # Unpack kernel computation
-        gram = kernel.gram
-        cross_covariance = kernel.cross_covariance
-
-        Kzz = gram(kernel, params["kernel"], z)
+        Kzz = kernel.gram(params["kernel"], z)
         Kzz += identity(m) * jitter
         Lz = Kzz.to_root()
 
@@ -338,8 +327,8 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
-            Ktt = gram(kernel, params["kernel"], t)
-            Kzt = cross_covariance(kernel, params["kernel"], z, t)
+            Ktt = kernel.gram(params["kernel"], t)
+            Kzt = kernel.cross_covariance(params["kernel"], z, t)
             μt = mean_function(params["mean_function"], t)
 
             # Lz⁻¹ Kzt
@@ -422,9 +411,6 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        # Unpack kernel computation
-        gram = kernel.gram
-
         # S⁻¹ = -2θ₂
         S_inv = -2 * natural_matrix
         S_inv += jnp.eye(m) * jitter
@@ -445,7 +431,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         mu = S @ natural_vector
 
         μz = mean_function(params["mean_function"], z)
-        Kzz = gram(kernel, params["kernel"], z)
+        Kzz = kernel.gram(params["kernel"], z)
         Kzz += identity(m) * jitter
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
@@ -482,10 +468,6 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        # Unpack kernel computation
-        gram = kernel.gram
-        cross_covariance = kernel.cross_covariance
-
         # S⁻¹ = -2θ₂
         S_inv = -2 * natural_matrix
         S_inv += jnp.eye(m) * jitter
@@ -504,7 +486,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         # μ = Sθ₁
         mu = jnp.matmul(S, natural_vector)
 
-        Kzz = gram(kernel, params["kernel"], z)
+        Kzz = kernel.gram(params["kernel"], z)
         Kzz += identity(m) * jitter
         Lz = Kzz.to_root()
         μz = mean_function(params["mean_function"], z)
@@ -514,8 +496,8 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
-            Ktt = gram(kernel, params["kernel"], t)
-            Kzt = cross_covariance(kernel, params["kernel"], z, t)
+            Ktt = kernel.gram(params["kernel"], t)
+            Kzt = kernel.cross_covariance(params["kernel"], z, t)
             μt = mean_function(params["mean_function"], t)
 
             # Lz⁻¹ Kzt
@@ -607,9 +589,6 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        # Unpack kernel compuation
-        gram = kernel.gram
-
         # μ = η₁
         mu = expectation_vector
 
@@ -619,7 +598,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         S += identity(m) * jitter
 
         μz = mean_function(params["mean_function"], z)
-        Kzz = gram(kernel, params["kernel"], z)
+        Kzz = kernel.gram(params["kernel"], z)
         Kzz += identity(m) * jitter
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
@@ -660,10 +639,6 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        # Unpack kernel compuation
-        gram = kernel.gram
-        cross_covariance = kernel.cross_covariance
-
         # μ = η₁
         mu = expectation_vector
 
@@ -675,7 +650,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         # S = sqrt sqrtᵀ
         sqrt = S.to_root().to_dense()
 
-        Kzz = gram(kernel, params["kernel"], z)
+        Kzz = kernel.gram(params["kernel"], z)
         Kzz += identity(m) * jitter
         Lz = Kzz.to_root()
         μz = mean_function(params["mean_function"], z)
@@ -685,8 +660,8 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
-            Ktt = gram(kernel, params["kernel"], t)
-            Kzt = cross_covariance(kernel, params["kernel"], z, t)
+            Ktt = kernel.gram(params["kernel"], t)
+            Kzt = kernel.cross_covariance(params["kernel"], z, t)
             μt = mean_function(params["mean_function"], t)
 
             # Lz⁻¹ Kzt
@@ -779,12 +754,8 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             mean_function = self.prior.mean_function
             kernel = self.prior.kernel
 
-            # Unpack kernel compuation
-            gram = kernel.gram
-            cross_covariance = kernel.cross_covariance
-
-            Kzx = cross_covariance(kernel, params["kernel"], z, x)
-            Kzz = gram(kernel, params["kernel"], z)
+            Kzx = kernel.cross_covariance(params["kernel"], z, x)
+            Kzz = kernel.gram(params["kernel"], z)
             Kzz += identity(m) * jitter
 
             # Lz Lzᵀ = Kzz
@@ -813,8 +784,8 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             # Kzz⁻¹ Kzx (y - μx)
             Kzz_inv_Kzx_diff = Lz.T.solve(Lz_inv_Kzx_diff)
 
-            Ktt = gram(kernel, params["kernel"], t)
-            Kzt = cross_covariance(kernel, params["kernel"], z, t)
+            Ktt = kernel.gram(params["kernel"], t)
+            Kzt = kernel.cross_covariance(params["kernel"], z, t)
             μt = mean_function(params["mean_function"], t)
 
             # Lz⁻¹ Kzt

@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -28,7 +28,6 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
-from chex import dataclass
 from jax.config import config
 from scipy.signal import sawtooth
 from jaxtyping import Float, Array
@@ -36,7 +35,11 @@ from typing import Dict
 
 
 import gpjax as gpx
-from gpjax.kernels import DenseKernelComputation, AbstractKernel
+from gpjax.kernels import (
+    DenseKernelComputation,
+    AbstractKernelComputation,
+    AbstractKernel,
+)
 from gpjax.types import PRNGKeyType
 
 # Enable Float64 for more stable matrix inversions.
@@ -79,16 +82,23 @@ ax.legend(loc="best")
 # Although deep kernels are not currently supported natively in GPJax, defining one is straightforward as we now demonstrate. Using the base `AbstractKernel` object given in GPJax, we provide a mixin class named `_DeepKernelFunction` to facilitate the user supplying the neural network and base kernel of their choice. Kernel matrices are then computed using the regular `gram` and `cross_covariance` functions.
 
 # %%
-@dataclass
-class _DeepKernelFunction:
-    network: hk.Module
-    base_kernel: AbstractKernel
+class DeepKernelFunction(AbstractKernel):
+    def __init__(
+        self,
+        network: hk.Module,
+        base_kernel: AbstractKernel,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: tp.Optional[tp.List[int]] = None,
+    ) -> None:
+        super().__init__(compute_engine, active_dims, True, False, "Deep    Kernel")
+        self.network = network
+        self.base_kernel = base_kernel
 
-
-@dataclass
-class DeepKernelFunction(AbstractKernel, DenseKernelComputation, _DeepKernelFunction):
     def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"], 
+        self,
+        params: Dict,
+        x: Float[Array, "1 D"],
+        y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
         xt = self.network.apply(params=params, x=x)
         yt = self.network.apply(params=params, x=y)

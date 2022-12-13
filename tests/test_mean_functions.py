@@ -18,11 +18,11 @@ from typing import Dict
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
+from chex import PRNGKey as PRNGKeyType
 from jax.config import config
 from jaxtyping import Array, Float
 
 from gpjax.mean_functions import AbstractMeanFunction, Constant, Zero
-from gpjax.types import PRNGKeyType
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -36,9 +36,9 @@ def test_abstract_mean_function() -> None:
 
     # Create a dummy mean funcion class with abstract methods implemented.
     class DummyMeanFunction(AbstractMeanFunction):
-        def __call__(self, params: Dict, x: Float[Array, "N D"]) ->  Float[Array, "N 1"]:
+        def __call__(self, params: Dict, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:
             return jnp.ones((x.shape[0], 1))
-        
+
         def _initialise_params(self, key: PRNGKeyType) -> Dict:
             return {}
 
@@ -50,7 +50,7 @@ def test_abstract_mean_function() -> None:
 @pytest.mark.parametrize("mean_function", [Zero, Constant])
 @pytest.mark.parametrize("dim", [1, 2, 5])
 @pytest.mark.parametrize("n", [1, 2])
-def test_shape(mean_function: AbstractMeanFunction, n:int, dim: int) -> None:
+def test_shape(mean_function: AbstractMeanFunction, n: int, dim: int) -> None:
     key = _initialise_key
 
     # Create test inputs.

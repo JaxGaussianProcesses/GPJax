@@ -21,7 +21,11 @@ from ml_collections import ConfigDict
 
 __config = None
 
-FillTriangular = dx.Chain([tfb.FillTriangular(), ])  # TODO: Dan to chain methods.
+FillTriangular = dx.Chain(
+    [
+        tfb.FillTriangular(),
+    ]
+)  # TODO: Dan to chain methods.
 Identity = dx.Lambda(forward=lambda x: x, inverse=lambda x: x)
 Softplus = dx.Lambda(
     forward=lambda x: jnp.log(1 + jnp.exp(x)),
@@ -48,6 +52,7 @@ def get_defaults() -> ConfigDict:
     transformations.triangular_transform = FillTriangular
 
     # Default parameter transforms
+    transformations.alpha = "positive_transform"
     transformations.lengthscale = "positive_transform"
     transformations.variance = "positive_transform"
     transformations.smoothness = "positive_transform"
