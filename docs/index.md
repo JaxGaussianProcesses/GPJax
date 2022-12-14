@@ -95,6 +95,7 @@ caption: Experimental
 hidden:
 ---
 examples/natgrads
+examples/geometric_kernels
 ```
 
 ```{toctree}

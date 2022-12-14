@@ -22,5 +22,8 @@ dm-haiku
 ipywidgets
 pandas
 scikit-learn
+backends
+git+https://github.com/gpflow/geometrickernels.git
+meshzoo
 # Install GPJax istself
 .
