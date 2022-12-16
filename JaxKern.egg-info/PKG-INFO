@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: JaxKern
+Version: 0.0.1
+Summary: Kernels in Jax.
+Author: Daniel Dodd and Thomas Pinder
+Author-email: tompinder@live.co.uk
+License: LICENSE
+Project-URL: Documentation, https://JaxKern.readthedocs.io/en/latest/
+Project-URL: Source, https://github.com/JaxGaussianProcesses/JaxKern
+Keywords: gaussian-processes jax machine-learning bayesian
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+Provides-Extra: cuda
+License-File: LICENSE
+
+<h1 align='center'>JaxKern</h1>
+<h2 align='center'>Kernels in Jax.</h2>

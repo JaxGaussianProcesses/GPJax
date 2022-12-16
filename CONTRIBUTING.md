@@ -1,115 +1,138 @@
-# Contributor Guide
+# Guidelines for Contributing
 
-Thank you for your interest in improving this project.
-This project is open-source under the [MIT license] and
-welcomes contributions in the form of bug reports, feature requests, and pull requests.
+JaxKern welcomes contributions from interested individuals or groups. These
+guidelines help explain how you can contribute to the library
 
-Here is a list of important resources for contributors:
+There are 4 main ways of contributing to the library (in descending order of
+difficulty or scope):
 
-- [Source Code]
-- [Documentation]
-- [Issue Tracker]
-- [Code of Conduct]
+- Adding new or improved functionality to the existing codebase
+- Fixing outstanding issues (bugs) with the existing codebase. They range from
+  low-level software bugs to higher-level design problems.
+- Contributing or improving the documentation (`docs`) or examples
+  (`examples`)
+- Submitting issues related to bugs or desired enhancements
 
-[mit license]: https://opensource.org/licenses/MIT
-[source code]: https://github.com/JaxGaussianProcesses/jaxkern
-[documentation]: https://jaxkern.readthedocs.io/
-[issue tracker]: https://github.com/JaxGaussianProcesses/jaxkern/issues
+## Code of conduct
 
-## How to report a bug
+As a contributor to JaxKern, you can help us keep the community open and
+inclusive. Please read and follow our [Code of
+Conduct](https://github.com/JaxGaussianProcesses/JaxKern/blob/master/.github/CODE_OF_CONDUCT.md).
 
-Report bugs on the [Issue Tracker].
+# Opening issues and getting support
 
-When filing an issue, make sure to answer these questions:
+Please open issues on [Github Issue
+Tracker](https://github.com/JaxGaussianProcesses/JaxKern/issues/new/choose).
 
-- Which operating system and Python version are you using?
-- Which version of this project are you using?
-- What did you do?
-- What did you expect to see?
-- What did you see instead?
+You can ask a question or start a discussion in the [Discussion
+section](https://github.com/JaxGaussianProcesses/JaxKern/discussions) on Github.
 
-The best way to get your bug fixed is to provide a test case,
-and/or steps to reproduce the issue.
+# Contributing code via pull requests
 
-## How to request a feature
+Please submit patches via pull requests.
 
-Request features on the [Issue Tracker].
+The preferred workflow for contributing is to fork the [GitHub
+repository](https://github.com/JaxGaussianProcesses/JaxKern), clone it to your local
+machine, and develop on a feature branch. Once you are ready to commit your
+changes, install the pre-commit hooks with `pre-commit install` and the commit
+and push your code as usual.
 
-## How to set up your development environment
+## Steps:
 
-You need Python 3.7+ and the following tools:
+1. Fork the [project repository](https://github.com/JaxGaussianProcesses/JaxKern) by
+   clicking on the 'Fork' button near the top right of the main repository page.
+   This creates a copy of the code under your GitHub user account.
 
-- [Poetry]
-- [Nox]
-- [nox-poetry]
+2. Clone your fork of the JaxKern repo from your GitHub account to your local
+   disk, and add the base repository as a remote:
 
-Install the package with development requirements:
+   ```bash
+   $ git clone git@github.com:<your GitHub handle>/JaxKern.git
+   $ cd JaxKern
+   $ git remote add upstream git@github.com:JaxKern.git
+   ```
 
-```console
-$ poetry install
-```
+3. Create a `feature` branch to hold your development changes:
 
-You can now run an interactive Python session,
-or the command-line interface:
+   ```bash
+   $ git checkout -b my-feature
+   ```
 
-```console
-$ poetry run python
-$ poetry run jaxkern
-```
+   Always use a `feature` branch. It's good practice to never routinely work on
+   the `master` branch of any repository.
 
-[poetry]: https://python-poetry.org/
-[nox]: https://nox.thea.codes/
-[nox-poetry]: https://nox-poetry.readthedocs.io/
+4. Project requirements are in `requirements.txt`.
 
-## How to test the project
+   We suggest using a [virtual
+   environment](https://docs.python-guide.org/dev/virtualenvs/) for development.
+   Once the virtual environment is activated, run:
 
-Run the full test suite:
+   ```bash
+   $ pip install -e .
+   $ pip install -r requirements-dev.txt
+   ```
 
-```console
-$ nox
-```
+5. Install the pre-commit hooks. Please **ensure you do this before commiting
+   any files**. This can be done by executing the following:
 
-List the available Nox sessions:
+   ```bash
+   $ pre-commit install
+   ```
 
-```console
-$ nox --list-sessions
-```
+   If successful, this will print the following output `pre-commit installed at
+.git/hooks/pre-commit`.
 
-You can also run a specific Nox session.
-For example, invoke the unit test suite like this:
+6. Develop the feature on your feature branch. Add changed files using `git add`
+   and then `git commit` files:
 
-```console
-$ nox --session=tests
-```
+   ```bash
+   $ git add modified_files
+   $ git commit
+   ```
 
-Unit tests are located in the _tests_ directory,
-and are written using the [pytest] testing framework.
+   to record your changes locally. After committing, it is a good idea to sync
+   with the base repository in case there have been any changes:
 
-[pytest]: https://pytest.readthedocs.io/
+   ```bash
+   $ git fetch upstream
+   $ git rebase upstream/main
+   ```
 
-## How to submit changes
+   Then push the changes to your GitHub account with:
 
-Open a [pull request] to submit changes to this project.
+   ```bash
+   $ git push -u origin my-feature
+   ```
 
-Your pull request needs to meet the following guidelines for acceptance:
+7. Go to the GitHub web page of your fork of the JaxKern repo. Click the 'Pull
+   request' button to send your changes to the project's maintainer for review.
 
-- The Nox test suite must pass without errors and warnings.
-- Include unit tests. This project maintains 100% code coverage.
-- If your changes add functionality, update the documentation accordingly.
+## Pull request checklist
 
-Feel free to submit early, though—we can always iterate on this.
+We recommended that your contribution complies with the following guidelines
+before you submit a pull request:
 
-To run linting and code formatting checks before committing your change, you can install pre-commit as a Git hook by running the following command:
+- If your pull request addresses an issue, please use the pull request title to
+  describe the issue and mention the issue number in the pull request
+  description. This will make sure a link back to the original issue is created.
 
-```console
-$ nox --session=pre-commit -- install
-```
+- All public methods must have informative docstrings
 
-It is recommended to open an issue before starting work on anything.
-This will allow a chance to talk it over with the owners and validate your approach.
+- Please prefix the title of incomplete contributions with `[WIP]` (to indicate
+  a work in progress). WIPs may be useful to (1) indicate you are working on
+  something to avoid duplicated work, (2) request broad review of functionality
+  or API, or (3) seek collaborators.
 
-[pull request]: https://github.com/JaxGaussianProcesses/jaxkern/pulls
+- All other tests pass when everything is rebuilt from scratch.
 
-<!-- github-only -->
+- Documentation and high-coverage tests are necessary for enhancements to be
+  accepted.
 
-[code of conduct]: CODE_OF_CONDUCT.md
+- Code with good test, check with:
+
+  ```bash
+  $ pip install -r requirements-dev.txt
+  $ pytest tests --cov=./ --cov-report=html
+  ```
+
+#### This guide was derived from [PyMC's guide to contributing](https://github.com/pymc-devs/pymc/blob/main/CONTRIBUTING.md)

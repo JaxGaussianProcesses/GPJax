@@ -1,0 +1,10 @@
+LICENSE
+README.md
+setup.py
+JaxKern.egg-info/PKG-INFO
+JaxKern.egg-info/SOURCES.txt
+JaxKern.egg-info/dependency_links.txt
+JaxKern.egg-info/requires.txt
+JaxKern.egg-info/top_level.txt
+jaxkern/__init__.py
+jaxkern/kernels.py
