@@ -428,9 +428,6 @@ class CombinationKernel(AbstractKernel):
         )
 
 
-@deprecation.deprecated(
-    deprecated_in="0.5.5", removed_in="0.6.0", details="Use JaxKern for the SumKernel"
-)
 class SumKernel(CombinationKernel):
     """A kernel that is the sum of a set of kernels."""
 
@@ -449,11 +446,6 @@ class SumKernel(CombinationKernel):
         self.combination_fn: Optional[Callable] = jnp.sum
 
 
-@deprecation.deprecated(
-    deprecated_in="0.5.5",
-    removed_in="0.6.0",
-    details="Use JaxKern for the ProductKernel",
-)
 class ProductKernel(CombinationKernel):
     """A kernel that is the product of a set of kernels."""
 
@@ -962,11 +954,6 @@ class Periodic(AbstractKernel):
 ##########################################
 # Graph kernels
 ##########################################
-@deprecation.deprecated(
-    deprecated_in="0.5.5",
-    removed_in="0.6.0",
-    details="Use JaxKern for the EigenKernelComputation",
-)
 class EigenKernelComputation(AbstractKernelComputation):
     def __init__(
         self,

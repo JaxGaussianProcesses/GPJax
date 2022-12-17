@@ -558,7 +558,6 @@ def test_graph_kernel():
 
     # Create graph kernel
     kern = GraphKernel(laplacian=L)
-    assert isinstance(kern, GraphKernel)
     assert kern.num_vertex == n_verticies
     assert kern.evals.shape == (n_verticies, 1)
     assert kern.evecs.shape == (n_verticies, n_verticies)
