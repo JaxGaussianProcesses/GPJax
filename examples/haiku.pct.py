@@ -32,10 +32,12 @@ from jax.config import config
 from scipy.signal import sawtooth
 from jaxtyping import Float, Array
 from typing import Dict
+from jaxutils import Dataset
+import jaxkern as jk
 
 
 import gpjax as gpx
-from gpjax.kernels import (
+from jaxkern.kernels import (
     DenseKernelComputation,
     AbstractKernelComputation,
     AbstractKernel,
@@ -60,7 +62,7 @@ f = lambda x: jnp.asarray(sawtooth(2 * jnp.pi * x))
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
 
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-2.0, 2.0, 500).reshape(-1, 1)
 ytest = f(xtest)
@@ -142,7 +144,7 @@ forward_linear1 = hk.without_apply_rng(forward_linear1)
 # Having characterised the feature extraction network, we move to define a Gaussian process parameterised by this deep kernel. We consider a third-order Matérn base kernel and assume a Gaussian likelihood. Parameters, trainability status and transformations are initialised in the usual manner.
 
 # %%
-base_kernel = gpx.RBF()
+base_kernel = jk.RBF()
 kernel = DeepKernelFunction(network=forward_linear1, base_kernel=base_kernel)
 kernel.initialise(x, key)
 prior = gpx.Prior(kernel=kernel)

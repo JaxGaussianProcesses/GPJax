@@ -29,6 +29,8 @@ import networkx as nx
 import optax as ox
 from jax import jit
 from jax.config import config
+from jaxutils import Dataset
+import jaxkern as jk
 
 import gpjax as gpx
 
@@ -80,7 +82,7 @@ L = nx.laplacian_matrix(G).toarray()
 # %%
 x = jnp.arange(G.number_of_nodes()).reshape(-1, 1)
 
-kernel = gpx.GraphKernel(laplacian=L)
+kernel = jk.GraphKernel(laplacian=L)
 prior = gpx.Prior(kernel=kernel)
 
 true_params = prior._initialise_params(key)
@@ -93,7 +95,7 @@ true_params["kernel"] = {
 fx = prior(true_params)(x)
 y = fx.sample(seed=key).reshape(-1, 1)
 
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 
 # %%
 kernel.compute_engine.gram
