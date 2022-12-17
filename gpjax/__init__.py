@@ -15,20 +15,9 @@
 
 from .abstractions import fit, fit_batches, fit_natgrads
 from .gps import Prior, construct_posterior
-from .kernels import (
-    RBF,
-    GraphKernel,
-    Matern12,
-    Matern32,
-    Matern52,
-    Polynomial,
-    ProductKernel,
-    SumKernel,
-)
 from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
 from .parameters import constrain, copy_dict_structure, initialise, unconstrain
-from .types import Dataset
 from .variational_families import (
     CollapsedVariationalGaussian,
     ExpectationVariationalGaussian,

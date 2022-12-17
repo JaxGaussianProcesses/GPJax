@@ -16,10 +16,16 @@
 import jax.numpy as jnp
 from chex import dataclass
 from jaxtyping import Array, Float
+import deprecation
 
 NoneType = type(None)
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxUtils for a Dataset object",
+)
 @dataclass
 class Dataset:
     """GPJax Dataset class."""

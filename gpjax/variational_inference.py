@@ -28,7 +28,7 @@ from .config import get_defaults
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
-from .types import Dataset
+from jaxutils import Dataset
 from .utils import concat_dictionaries
 from .variational_families import (
     AbstractVariationalFamily,
