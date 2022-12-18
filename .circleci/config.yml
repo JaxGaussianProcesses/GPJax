@@ -4,16 +4,38 @@ orbs:
 jobs:
   build-and-test:
     docker:
-      - image: cimg/python:3.9.0
+      - image: cimg/python:3.8.0
     steps:
       - checkout
+      - run:
+          name: Update pip
+          command: pip install --upgrade pip
       - python/install-packages:
           pkg-manager: pip-dist
           path-args: .[dev]
       - run:
           name: Run tests
           command: pytest
+  publish:
+    docker:
+      - image: cimg/python:3.9.0
+    steps:
+      - checkout
+      - run:
+          name: init .pypirc
+          command: |
+            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "username = levlaz" >> ~/.pypirc
+            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+      - run:
+          name: Publish to PyPI
+          command: |
+            pip install twine
+            python setup.py sdist bdist_wheel
+            twine upload dist/*
+
 workflows:
   sample:
     jobs:
       - build-and-test
+      - publish
