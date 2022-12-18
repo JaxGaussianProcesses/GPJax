@@ -27,12 +27,13 @@ jobs:
             echo -e "[distutils]" >> ~/.pypirc
             echo -e "index-servers = jaxkern" >> ~/.pypirc
             echo -e "[jaxkern]" >> ~/.pypirc
-            echo -e "username = thomaspinder" >> ~/.pypirc
+            echo -e "repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
+            echo -e "username = __token__" >> ~/.pypirc
             echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
       - run:
-          name: Publish to PyPI
+          name: Build package
           command: |
-            pip install twine
+            pip install -U twine
             python setup.py sdist bdist_wheel
       - run:
           name: Upload to PyPI
