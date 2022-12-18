@@ -43,6 +43,9 @@ jobs:
             pip install -U twine
             python setup.py sdist bdist_wheel
       - run:
+          name: Debug
+          command: cat ~/.pypirc
+      - run:
           name: Upload to PyPI
           command: twine upload dist/* -r jaxkern --verbose
 
