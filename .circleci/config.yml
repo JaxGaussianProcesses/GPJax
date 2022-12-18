@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   python: circleci/python@2.1.1
+  codecov: codecov/codecov@3.2.2
 jobs:
   build-and-test:
     docker:
@@ -15,7 +16,16 @@ jobs:
           path-args: .[dev]
       - run:
           name: Run tests
-          command: pytest
+          command: pytest --cov=./ --cov-report=xml -n auto
+      - run:
+          name: Upload tests to Codecov
+          command: |
+            curl -Os https://uploader.codecov.io/v0.1.0_4653/linux/codecov
+            chmod +x codecov
+            ./codecov -t ${CODECOV_TOKEN}
+      - codecov/upload:
+          file: coverage.xml
+
   publish:
     docker:
       - image: cimg/python:3.9.0
@@ -30,21 +40,18 @@ jobs:
             echo -e "    jaxkern" >> ~/.pypirc
             echo -e "" >> ~/.pypirc
             echo -e "[pypi]" >> ~/.pypirc
-            echo -e "username = thomaspinder" >> ~/.pypirc
-            echo -e "password = $PYPI_TOKEN" >> ~/.pypirc
+            echo -e "    username = thomaspinder" >> ~/.pypirc
+            echo -e "    password = $PYPI_TOKEN" >> ~/.pypirc
             echo -e "" >> ~/.pypirc
             echo -e "[jaxkern]" >> ~/.pypirc
-            echo -e "repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
-            echo -e "username = __token__" >> ~/.pypirc
-            echo -e "password = $JAXKERN_PYPI" >> ~/.pypirc
+            echo -e "    repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
+            echo -e "    username = __token__" >> ~/.pypirc
+            echo -e "    password = $JAXKERN_PYPI" >> ~/.pypirc
       - run:
           name: Build package
           command: |
             pip install -U twine
             python setup.py sdist bdist_wheel
-      - run:
-          name: Debug
-          command: cat ~/.pypirc
       - run:
           name: Upload to PyPI
           command: twine upload dist/* -r jaxkern --verbose
