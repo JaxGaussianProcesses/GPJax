@@ -34,7 +34,9 @@ jobs:
           command: |
             pip install twine
             python setup.py sdist bdist_wheel
-            twine upload dist/* --repository jaxkern
+      - run:
+          name: Upload to PyPI
+          command: twine upload dist/*
 
 workflows:
   sample:
