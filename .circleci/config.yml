@@ -24,6 +24,8 @@ jobs:
       - run:
           name: init .pypirc
           command: |
+            echo -e "[distutils]" >> ~/.pypirc
+            echo -e "index-servers = jaxkern" >> ~/.pypirc
             echo -e "[jaxkern]" >> ~/.pypirc
             echo -e "username = thomaspinder" >> ~/.pypirc
             echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
