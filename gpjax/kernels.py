@@ -31,6 +31,7 @@ from jaxtyping import Array, Float
 from .config import get_defaults
 from chex import PRNGKey as PRNGKeyType
 from jaxutils import PyTree
+import deprecation
 
 
 JITTER = get_defaults()["jitter"]
@@ -125,6 +126,11 @@ class AbstractKernelComputation(PyTree):
         return DiagonalLinearOperator(diag=diag)
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the DenseKernelComputation",
+)
 class DenseKernelComputation(AbstractKernelComputation):
     """Dense kernel computation class. Operations with the kernel assume
     a dense gram matrix structure.
@@ -158,6 +164,11 @@ class DenseKernelComputation(AbstractKernelComputation):
         return cross_cov
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the DiagonalKernelComputation",
+)
 class DiagonalKernelComputation(AbstractKernelComputation):
     def __init__(
         self,
@@ -195,6 +206,11 @@ class DiagonalKernelComputation(AbstractKernelComputation):
         raise ValueError("Cross covariance not defined for diagonal kernels.")
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the ConstantDiagonalKernelComputation",
+)
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):
     def __init__(
         self,
@@ -451,6 +467,9 @@ class ProductKernel(CombinationKernel):
 ##########################################
 # Euclidean kernels
 ##########################################
+@deprecation.deprecated(
+    deprecated_in="0.5.5", removed_in="0.6.0", details="Use JaxKern for the RBF kernel"
+)
 class RBF(AbstractKernel):
     """The Radial Basis Function (RBF) kernel."""
 
@@ -494,6 +513,11 @@ class RBF(AbstractKernel):
         return jax.tree_util.tree_map(lambda x: jnp.atleast_1d(x), params)
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the Matern12 kernel",
+)
 class Matern12(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 0.5."""
 
@@ -538,6 +562,11 @@ class Matern12(AbstractKernel):
         }
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the Matern32 kernel",
+)
 class Matern32(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 1.5."""
 
@@ -588,6 +617,11 @@ class Matern32(AbstractKernel):
         }
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the Matern52 kernel",
+)
 class Matern52(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 2.5."""
 
@@ -635,6 +669,11 @@ class Matern52(AbstractKernel):
         }
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the PoweredExponential kernel",
+)
 class PoweredExponential(AbstractKernel):
     """The powered exponential family of kernels.
 
@@ -679,6 +718,11 @@ class PoweredExponential(AbstractKernel):
         }
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the Linear kernel",
+)
 class Linear(AbstractKernel):
     """The linear kernel."""
 
@@ -714,6 +758,11 @@ class Linear(AbstractKernel):
         return {"variance": jnp.array([1.0])}
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the Polynomial kernel",
+)
 class Polynomial(AbstractKernel):
     """The Polynomial kernel with variable degree."""
 
@@ -758,7 +807,22 @@ class Polynomial(AbstractKernel):
         }
 
 
-class White(AbstractKernel, ConstantDiagonalKernelComputation):
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the White kernel",
+)
+class White(AbstractKernel):
+    def __init__(
+        self,
+        compute_engine: AbstractKernelComputation = ConstantDiagonalKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "White",
+    ) -> None:
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
+
     def __post_init__(self) -> None:
         super(White, self).__post_init__()
 
@@ -793,6 +857,11 @@ class White(AbstractKernel, ConstantDiagonalKernelComputation):
         return {"variance": jnp.array([1.0])}
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the RationalQuadratic kernel",
+)
 class RationalQuadratic(AbstractKernel):
     def __init__(
         self,
@@ -832,6 +901,11 @@ class RationalQuadratic(AbstractKernel):
         }
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the Periodic kernel",
+)
 class Periodic(AbstractKernel):
     """The periodic kernel.
 
@@ -931,6 +1005,9 @@ class EigenKernelComputation(AbstractKernelComputation):
         return matrix
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5", removed_in="0.6.0", details="Use JaxKern for the GraphKernel"
+)
 class GraphKernel(AbstractKernel):
     def __init__(
         self,
@@ -983,6 +1060,11 @@ class GraphKernel(AbstractKernel):
         return self.compute_engine.num_vertex
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the squared_distance function",
+)
 def squared_distance(
     x: Float[Array, "1 D"], y: Float[Array, "1 D"]
 ) -> Float[Array, "1"]:
@@ -999,6 +1081,11 @@ def squared_distance(
     return jnp.sum((x - y) ** 2)
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the euclidean_distance function",
+)
 def euclidean_distance(
     x: Float[Array, "1 D"], y: Float[Array, "1 D"]
 ) -> Float[Array, "1"]:
@@ -1015,6 +1102,11 @@ def euclidean_distance(
     return jnp.sqrt(jnp.maximum(squared_distance(x, y), 1e-36))
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxKern for the jax_gather_nd function",
+)
 def jax_gather_nd(params, indices):
     tuple_indices = tuple(indices[..., i] for i in range(indices.shape[-1]))
     return params[tuple_indices]

@@ -26,6 +26,8 @@ import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
 from jax.config import config
+from jaxutils import Dataset
+import jaxkern as jk
 
 import gpjax as gpx
 
@@ -52,7 +54,7 @@ f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
 
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 
 # %% [markdown]
@@ -75,7 +77,7 @@ plt.show()
 
 # %%
 likelihood = gpx.Gaussian(num_datapoints=n)
-kernel = gpx.RBF()
+kernel = jk.RBF()
 prior = gpx.Prior(kernel=kernel)
 p = prior * likelihood
 
@@ -137,7 +139,7 @@ f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
 
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 
@@ -152,7 +154,7 @@ plt.show()
 
 # %%
 likelihood = gpx.Gaussian(num_datapoints=n)
-kernel = gpx.RBF()
+kernel = jk.RBF()
 prior = gpx.Prior(kernel=kernel)
 p = prior * likelihood
 

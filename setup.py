@@ -31,12 +31,14 @@ REQUIRES = [
     "jaxlib<0.4.0",
     "optax",
     "jaxutils",
+    "jaxkern",
     "chex",
     "distrax>=0.1.2",
     "tqdm>=4.0.0",
     "ml-collections==0.1.0",
     "jaxtyping>=0.0.2",
     "jaxlinop>=0.0.3",
+    "deprecation",
 ]
 
 EXTRAS = {

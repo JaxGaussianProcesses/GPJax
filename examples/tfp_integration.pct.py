@@ -26,6 +26,8 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 from jax.config import config
+from jaxutils import Dataset
+import jaxkern as jk
 
 import gpjax as gpx
 from gpjax.utils import dict_array_coercion
@@ -62,9 +64,9 @@ ax.legend(loc="best")
 # We'll wrap our pair of observed data arrays up into a `Dataset` object $\mathcal{D}$ and define a GP posterior.
 
 # %%
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 likelihood = gpx.Gaussian(num_datapoints=D.n)
-posterior = gpx.Prior(kernel=gpx.RBF()) * likelihood
+posterior = gpx.Prior(kernel=jk.RBF()) * likelihood
 
 # %% [markdown]
 # ## Initialise parameters
@@ -140,9 +142,9 @@ def build_log_pi(log_mll, unconstrained_priors, mapper_fn):
         log_hyper_prior_eval = evaluate_priors(params_dict, unconstrained_priors)
 
         # Evaluate the log-likelihood probability kernel, log [p(y|f,  θ) p(f|  θ)]:
-        log_mll_eval = log_mll(gpx.constrain(params_dict, bijectors)) 
-        
-        return  log_mll_eval + log_hyper_prior_eval
+        log_mll_eval = log_mll(gpx.constrain(params_dict, bijectors))
+
+        return log_mll_eval + log_hyper_prior_eval
 
     return array_mll
 

@@ -22,12 +22,12 @@ from chex import dataclass, PRNGKey as PRNGKeyType
 from jaxtyping import Array, Float
 
 from jaxlinop import identity
+from jaxkern.kernels import AbstractKernel
 
 from .config import get_defaults
-from .kernels import AbstractKernel
 from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
-from .types import Dataset
+from jaxutils import Dataset
 from .utils import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
 
