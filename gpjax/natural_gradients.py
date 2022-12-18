@@ -21,7 +21,7 @@ import jax.scipy as jsp
 from jax import value_and_grad
 from jaxtyping import Array, Float
 
-from .config import get_defaults
+from .config import get_global_config
 from .gps import AbstractPosterior
 from .parameters import build_trainables, constrain, trainable_params
 from .types import Dataset
@@ -32,7 +32,7 @@ from .variational_families import (
 )
 from .variational_inference import StochasticVI
 
-DEFAULT_JITTER = get_defaults()["jitter"]
+DEFAULT_JITTER = get_global_config()["jitter"]
 
 
 def natural_to_expectation(params: Dict, jitter: float = DEFAULT_JITTER) -> Dict:

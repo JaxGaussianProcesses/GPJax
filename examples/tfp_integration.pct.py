@@ -140,9 +140,9 @@ def build_log_pi(log_mll, unconstrained_priors, mapper_fn):
         log_hyper_prior_eval = evaluate_priors(params_dict, unconstrained_priors)
 
         # Evaluate the log-likelihood probability kernel, log [p(y|f,  θ) p(f|  θ)]:
-        log_mll_eval = log_mll(gpx.constrain(params_dict, bijectors)) 
-        
-        return  log_mll_eval + log_hyper_prior_eval
+        log_mll_eval = log_mll(gpx.constrain(params_dict, bijectors))
+
+        return log_mll_eval + log_hyper_prior_eval
 
     return array_mll
 

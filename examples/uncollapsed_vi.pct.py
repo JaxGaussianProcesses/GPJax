@@ -7,9 +7,9 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.14.4
 #   kernelspec:
-#     display_name: base
+#     display_name: gpjax
 #     language: python
 #     name: python3
 # ---
@@ -27,7 +27,13 @@ import optax as ox
 from jax import jit
 from jax.config import config
 
+import tensorflow_probability.substrates.jax as tfp
+
+tfb = tfp.bijectors
+
+import distrax as dx
 import gpjax as gpx
+from gpjax.config import get_global_config, reset_global_config
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -154,6 +160,7 @@ negative_elbo = jit(svgp.elbo(D, negative=True))
 # Despite introducing inducing inputs into our model, inference can still be intractable with large datasets. To circumvent this, optimisation can be done using stochastic mini-batches.
 
 # %%
+reset_global_config()
 parameter_state = gpx.initialise(svgp, key)
 optimiser = ox.adam(learning_rate=0.01)
 
@@ -162,7 +169,7 @@ inference_state = gpx.fit_batches(
     parameter_state=parameter_state,
     train_data=D,
     optax_optim=optimiser,
-    n_iters=4000,
+    n_iters=3000,
     key=jr.PRNGKey(42),
     batch_size=128,
 )
@@ -192,8 +199,60 @@ ax.fill_between(xtest.flatten(), meanf - sigma, meanf + sigma, alpha=0.3)
 plt.show()
 
 # %% [markdown]
+# ## Custom transformations
+#
+# To train a covariance matrix, `gpjax` uses `tfb.FillScaleTriL` transformation by default. `tfb.FillScaleTriL` fills a 1d vector into a lower triangular matrix and then applies `SoftPlus` transformation on the diagonal to satisfy the necessary conditions for a valid Cholesky matrix. Users can change this default transformation with another valid transformation of their choice. For example, `Square` transformation on the diagonal can also serve the purpose.
+
+# %%
+gpx_config = get_global_config()
+transformations = gpx_config.transformations
+jitter = gpx_config.jitter
+
+triangular_transform = dx.Chain(
+    [tfb.FillScaleTriL(diag_bijector=tfb.Square(), diag_shift=jnp.array(jitter))]
+)
+
+transformations.update({"triangular_transform": triangular_transform})
+
+# %%
+parameter_state = gpx.initialise(svgp, key)
+optimiser = ox.adam(learning_rate=0.01)
+
+inference_state = gpx.fit_batches(
+    objective=negative_elbo,
+    parameter_state=parameter_state,
+    train_data=D,
+    optax_optim=optimiser,
+    n_iters=3000,
+    key=jr.PRNGKey(42),
+    batch_size=128,
+)
+
+learned_params, training_history = inference_state.unpack()
+
+# %%
+latent_dist = q(learned_params)(xtest)
+predictive_dist = likelihood(learned_params, latent_dist)
+
+meanf = predictive_dist.mean()
+sigma = predictive_dist.stddev()
+
+fig, ax = plt.subplots(figsize=(12, 5))
+ax.plot(x, y, "o", alpha=0.15, label="Training Data", color="tab:gray")
+ax.plot(xtest, meanf, label="Posterior mean", color="tab:blue")
+ax.fill_between(xtest.flatten(), meanf - sigma, meanf + sigma, alpha=0.3)
+[
+    ax.axvline(x=z_i, color="black", alpha=0.3, linewidth=1)
+    for z_i in learned_params["variational_family"]["inducing_inputs"]
+]
+plt.show()
+
+# %% [markdown]
+# We can see that `Square` transformation is able to get relatively better fit compared to `Softplus` with the same number of iterations, but `Softplus` is recommended over `Square` for stability of optimization.
+
+# %% [markdown]
 # ## System configuration
 
 # %%
 # %reload_ext watermark
-# %watermark -n -u -v -iv -w -a 'Thomas Pinder & Daniel Dodd'
+# %watermark -n -u -v -iv -w -a 'Thomas Pinder, Daniel Dodd & Zeel B Patel'

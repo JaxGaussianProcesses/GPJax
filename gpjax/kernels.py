@@ -28,12 +28,8 @@ from jax import vmap
 import jax
 from jaxtyping import Array, Float
 
-from .config import get_defaults
 from chex import PRNGKey as PRNGKeyType
 from jaxutils import PyTree
-
-
-JITTER = get_defaults()["jitter"]
 
 
 class AbstractKernelComputation(PyTree):

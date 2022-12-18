@@ -25,7 +25,7 @@ from jaxtyping import Array, Float
 from jaxlinop import identity
 import jaxlinop as jlo
 
-from .config import get_defaults
+from .config import get_global_config
 from .gps import Prior
 from .likelihoods import AbstractLikelihood, Gaussian
 from .types import Dataset
@@ -153,7 +153,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
                 approximation and the GP prior.
         """
 
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Unpack variational parameters
         mu = params["variational_family"]["moments"]["variational_mean"]
@@ -197,7 +197,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
                 function that accepts a set of test points and will return
                 the predictive distribution at those points.
         """
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Unpack variational parameters
         mu = params["variational_family"]["moments"]["variational_mean"]
@@ -306,7 +306,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         Returns:
             Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Unpack variational parameters
         mu = params["variational_family"]["moments"]["variational_mean"]
@@ -399,7 +399,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         Returns:
             Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
         """
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Unpack variational parameters
         natural_vector = params["variational_family"]["moments"]["natural_vector"]
@@ -456,7 +456,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         Returns:
             Callable[[Float[Array, "N D"]], GaussianDistribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Unpack variational parameters
         natural_vector = params["variational_family"]["moments"]["natural_vector"]
@@ -573,7 +573,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         Returns:
             Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
         """
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Unpack variational parameters
         expectation_vector = params["variational_family"]["moments"][
@@ -623,7 +623,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         Returns:
             Callable[[Float[Array, "N D"]], GaussianDistribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Unpack variational parameters
         expectation_vector = params["variational_family"]["moments"][
@@ -735,7 +735,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
         Returns:
             Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
 

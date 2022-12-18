@@ -14,7 +14,6 @@
 # ---
 
 # %%
-import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import numpy as np
@@ -150,7 +149,10 @@ learned_params, training_history = inference_state.unpack()
 # With an optimal set of parameters learned, we can make predictions on the set of data that we held back right at the start. We'll do this in the usual way by first computing the latent function's distribution before computing the predictive posterior distribution.
 
 # %%
-latent_dist = posterior(learned_params, training_data, )(scaled_Xte)
+latent_dist = posterior(
+    learned_params,
+    training_data,
+)(scaled_Xte)
 predictive_dist = likelihood(learned_params, latent_dist)
 
 predictive_mean = predictive_dist.mean()

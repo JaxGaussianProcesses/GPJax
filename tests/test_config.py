@@ -13,11 +13,12 @@
 # limitations under the License.
 # ==============================================================================
 
+import jax
 import distrax as dx
 from jax.config import config
 from ml_collections import ConfigDict
 
-from gpjax.config import Identity, add_parameter, get_defaults
+from gpjax.config import Identity, add_parameter, get_global_config
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -25,7 +26,7 @@ config.update("jax_enable_x64", True)
 
 def test_add_parameter():
     add_parameter("test_parameter", Identity)
-    config = get_defaults()
+    config = get_global_config()
     assert "test_parameter" in config.transformations
     assert "test_parameter_transform" in config.transformations
     assert config.transformations["test_parameter"] == "test_parameter_transform"
@@ -33,16 +34,32 @@ def test_add_parameter():
 
 
 def test_add_parameter():
-    config = get_defaults()
+    config = get_global_config()
     add_parameter("test_parameter", Identity)
-    config = get_defaults()
+    config = get_global_config()
     assert "test_parameter" in config.transformations
     assert "test_parameter_transform" in config.transformations
     assert config.transformations["test_parameter"] == "test_parameter_transform"
     assert isinstance(config.transformations["test_parameter_transform"], dx.Bijector)
 
 
-def test_get_defaults():
-    config = get_defaults()
+def test_get_global_config():
+    config = get_global_config()
     assert isinstance(config, ConfigDict)
     assert isinstance(config.transformations, ConfigDict)
+
+
+def test_x64_based_config_update():
+    cached_jax_precision = jax.config.x64_enabled
+
+    jax.config.update("jax_enable_x64", True)
+    config = get_global_config()
+    assert config.x64_state is True
+
+    jax.config.update("jax_enable_x64", False)
+    config = get_global_config()
+    assert config.x64_state is False
+
+    # Reset the JAX precision to the original value.
+    jax.config.update("jax_enable_x64", cached_jax_precision)
+    get_global_config()
