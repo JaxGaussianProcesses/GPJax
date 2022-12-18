@@ -8,9 +8,12 @@ from .kernels import (
     Polynomial,
     ProductKernel,
     SumKernel,
+    DenseKernelComputation,
+    DiagonalKernelComputation,
+    ConstantDiagonalKernelComputation,
 )
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 __all__ = [
     "RBF",
     "GraphKernel",
@@ -20,4 +23,7 @@ __all__ = [
     "Polynomial",
     "ProductKernel",
     "SumKernel",
+    "DenseKernelComputation",
+    "DiagonalKernelComputation",
+    "ConstantDiagonalKernelComputation",
 ]
