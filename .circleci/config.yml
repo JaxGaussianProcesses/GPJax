@@ -91,7 +91,10 @@ jobs:
 workflows:
   main:
     jobs:
-      - build-and-test
+      - build-and-test:
+          filters:  # required since `deploy` has tag filters AND requires `build`
+            tags:
+              only: /.*/
       - publish:
           requires:
             - build-and-test
