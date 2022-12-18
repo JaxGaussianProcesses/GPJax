@@ -64,7 +64,7 @@ workflows:
       - build-and-test
       - publish:
           requires:
-            - build
+            - build-and-test
           filters:
             tags:
               only: /[0-9]+(\.[0-9]+)*/
