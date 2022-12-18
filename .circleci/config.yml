@@ -9,7 +9,7 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip-dist
-          path-args: .[test]
+          path-args: .[dev]
       - run:
           name: Run tests
           command: pytest
