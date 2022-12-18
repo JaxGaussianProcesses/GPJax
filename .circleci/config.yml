@@ -24,7 +24,7 @@ jobs:
       - run:
           name: init .pypirc
           command: |
-            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "[jaxkern]" >> ~/.pypirc
             echo -e "username = thomaspinder" >> ~/.pypirc
             echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
       - run:
@@ -32,7 +32,7 @@ jobs:
           command: |
             pip install twine
             python setup.py sdist bdist_wheel
-            twine upload dist/*
+            twine upload dist/* --repository jaxkern
 
 workflows:
   sample:
