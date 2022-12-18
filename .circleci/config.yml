@@ -9,6 +9,7 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
+          path-args: .[test]
       - run:
           name: Run tests
           command: pytest
