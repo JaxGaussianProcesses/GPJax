@@ -59,7 +59,14 @@ jobs:
           command: twine upload dist/* -r jaxkern --verbose
 
 workflows:
-  sample:
+  main:
     jobs:
       - build-and-test
-      - publish
+  # Publish to PyPi when a tag is pushed
+  publish:
+    jobs:
+      - build-and-test
+      - publish:
+          filters:
+            tags:
+              only: /.*/
