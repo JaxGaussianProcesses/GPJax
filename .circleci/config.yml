@@ -28,7 +28,7 @@ jobs:
             echo -e "index-servers = jaxkern" >> ~/.pypirc
             echo -e "[jaxkern]" >> ~/.pypirc
             echo -e "repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
-            echo -e "username = __token__" >> ~/.pypirc
+            echo -e "username = thomaspinder" >> ~/.pypirc
             echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
       - run:
           name: Build package
