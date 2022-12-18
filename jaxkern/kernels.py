@@ -16,19 +16,17 @@
 import abc
 from typing import Callable, Dict, List, Optional, Sequence
 
-from jaxlinop import (
-    LinearOperator,
-    DenseLinearOperator,
-    DiagonalLinearOperator,
-    ConstantDiagonalLinearOperator,
-)
-
+import jax
 import jax.numpy as jnp
 from jax import vmap
-import jax
-from jaxtyping import Array, Float
-
 from jax.random import KeyArray as PRNGKeyType
+from jaxlinop import (
+    ConstantDiagonalLinearOperator,
+    DenseLinearOperator,
+    DiagonalLinearOperator,
+    LinearOperator,
+)
+from jaxtyping import Array, Float
 from jaxutils import PyTree
 
 
@@ -52,9 +50,7 @@ class AbstractKernelComputation(PyTree):
     @kernel_fn.setter
     def kernel_fn(
         self,
-        kernel_fn: Callable[
-            [Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array
-        ],
+        kernel_fn: Callable[[Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array],
     ) -> None:
         self._kernel_fn = kernel_fn
 
@@ -152,9 +148,7 @@ class DenseKernelComputation(AbstractKernelComputation):
         Returns:
             CovarianceOperator: The computed square Gram matrix.
         """
-        cross_cov = vmap(
-            lambda x: vmap(lambda y: self.kernel_fn(params, x, y))(y)
-        )(x)
+        cross_cov = vmap(lambda x: vmap(lambda y: self.kernel_fn(params, x, y))(y))(x)
         return cross_cov
 
 
@@ -251,9 +245,7 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
     def cross_covariance(
         self, params: Dict, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
-        raise ValueError(
-            "Cross covariance not defined for constant diagonal kernels."
-        )
+        raise ValueError("Cross covariance not defined for constant diagonal kernels.")
 
 
 ##########################################
@@ -367,17 +359,13 @@ class CombinationKernel(AbstractKernel):
         spectral: Optional[bool] = False,
         name: Optional[str] = "AbstractKernel",
     ) -> None:
-        super().__init__(
-            compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
         self.kernel_set = kernel_set
         name: Optional[str] = "Combination kernel"
         self.combination_fn: Optional[Callable] = None
 
         if not all(isinstance(k, AbstractKernel) for k in self.kernel_set):
-            raise TypeError(
-                "can only combine Kernel instances"
-            )  # pragma: no cover
+            raise TypeError("can only combine Kernel instances")  # pragma: no cover
 
         self._set_kernels(self.kernel_set)
 
@@ -468,15 +456,13 @@ class RBF(AbstractKernel):
         spectral: Optional[bool] = False,
         name: Optional[str] = "Radial basis function kernel",
     ) -> None:
-        super().__init__(
-            compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
+        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( \\frac{\\lVert x - y \\rVert^2_2}{2 \\ell^2} \\Bigg)
@@ -513,9 +499,7 @@ class Matern12(AbstractKernel):
         spectral: Optional[bool] = False,
         name: Optional[str] = "Matérn 1/2 kernel",
     ) -> None:
-        super().__init__(
-            compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
     def __call__(
         self,
@@ -524,7 +508,7 @@ class Matern12(AbstractKernel):
         y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
+        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( -\\frac{\\lvert x-y \\rvert}{2\\ell^2}  \\Bigg)
@@ -559,9 +543,7 @@ class Matern32(AbstractKernel):
         spectral: Optional[bool] = False,
         name: Optional[str] = "Matern 3/2",
     ) -> None:
-        super().__init__(
-            compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
     def __call__(
         self,
@@ -570,7 +552,7 @@ class Matern32(AbstractKernel):
         y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
+        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{3}\\lvert x-y \\rvert}{\\ell^2}  \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{3}\\lvert x-y\\rvert}{\\ell^2} \\Bigg)
@@ -611,15 +593,13 @@ class Matern52(AbstractKernel):
         spectral: Optional[bool] = False,
         name: Optional[str] = "Matern 5/2",
     ) -> None:
-        super().__init__(
-            compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\ell` and variance :math:`\sigma^2`
+        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{5}\\lvert x-y \\rvert}{\\ell^2} + \\frac{5\\lvert x - y \\rvert^2}{3\\ell^2} \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{5}\\lvert x-y\\rvert}{\\ell^2} \\Bigg)
@@ -664,21 +644,17 @@ class PoweredExponential(AbstractKernel):
         spectral: Optional[bool] = False,
         name: Optional[str] = "Powered exponential",
     ) -> None:
-        super().__init__(
-            compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
-    def __call__(
-        self, params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray
-    ) -> Array:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell`, :math:`\sigma` and power :math:`\kappa`.
+    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell`, :math:`\\sigma` and power :math:`\\kappa`.
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( - \\Big( \\frac{\\lVert x - y \\rVert^2}{\\ell^2} \\Big)^\\kappa \\Bigg)
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (jax.Array): The left hand argument of the kernel function's call.
+            y (jax.Array): The right hand argument of the kernel function's call
             params (dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
@@ -686,9 +662,7 @@ class PoweredExponential(AbstractKernel):
         """
         x = self.slice_input(x) / params["lengthscale"]
         y = self.slice_input(y) / params["lengthscale"]
-        K = params["variance"] * jnp.exp(
-            -euclidean_distance(x, y) ** params["power"]
-        )
+        K = params["variance"] * jnp.exp(-euclidean_distance(x, y) ** params["power"])
         return K.squeeze()
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
@@ -710,21 +684,17 @@ class Linear(AbstractKernel):
         spectral: Optional[bool] = False,
         name: Optional[str] = "Linear",
     ) -> None:
-        super().__init__(
-            compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
-    def __call__(
-        self, params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray
-    ) -> Array:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\sigma`
+    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\\sigma`
 
         .. math::
             k(x, y) = \\sigma^2 x^{T}y
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (jax.Array): The left hand argument of the kernel function's call.
+            y (jax.Array): The right hand argument of the kernel function's call
             params (dict): Parameter set for which the kernel should be evaluated on.
         Returns:
             Array: The value of :math:`k(x, y)`
@@ -750,16 +720,14 @@ class Polynomial(AbstractKernel):
         spectral: Optional[bool] = False,
         name: Optional[str] = "Polynomial",
     ) -> None:
-        super().__init__(
-            compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
         self.degree = degree
         self.name = f"Polynomial Degree: {self.degree}"
 
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\\alpha` and variance :math:`\sigma^2` through
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\\alpha` and variance :math:`\\sigma^2` through
 
         .. math::
             k(x, y) = \\Big( \\alpha + \\sigma^2 xy \\Big)^{d}
@@ -774,9 +742,7 @@ class Polynomial(AbstractKernel):
         """
         x = self.slice_input(x).squeeze()
         y = self.slice_input(y).squeeze()
-        K = jnp.power(
-            params["shift"] + jnp.dot(x * params["variance"], y), self.degree
-        )
+        K = jnp.power(params["shift"] + jnp.dot(x * params["variance"], y), self.degree)
         return K.squeeze()
 
     def _initialise_params(self, key: PRNGKeyType) -> Dict:
@@ -793,10 +759,10 @@ class White(AbstractKernel, ConstantDiagonalKernelComputation):
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\sigma`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\\sigma`
 
         .. math::
-            k(x, y) = \\sigma^2 \delta(x-y)
+            k(x, y) = \\sigma^2 \\delta(x-y)
 
         Args:
             params (Dict): Parameter set for which the kernel should be evaluated on.
@@ -830,21 +796,17 @@ class RationalQuadratic(AbstractKernel):
         spectral: Optional[bool] = False,
         name: Optional[str] = "Rational Quadratic",
     ) -> None:
-        super().__init__(
-            compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
-    def __call__(
-        self, params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray
-    ) -> Array:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
+    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( 1 + \\frac{\\lVert x - y \\rVert^2_2}{2 \\alpha \\ell^2} \\Bigg)
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (jax.Array): The left hand argument of the kernel function's call.
+            y (jax.Array): The right hand argument of the kernel function's call
             params (dict): Parameter set for which the kernel should be evaluated on.
         Returns:
             Array: The value of :math:`k(x, y)`
@@ -878,21 +840,17 @@ class Periodic(AbstractKernel):
         spectral: Optional[bool] = False,
         name: Optional[str] = "Periodic",
     ) -> None:
-        super().__init__(
-            compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
-    def __call__(
-        self, params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray
-    ) -> Array:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
+    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( -0.5 \\sum_{i=1}^{d} \\Bigg)
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (jax.Array): The left hand argument of the kernel function's call.
+            y (jax.Array): The right hand argument of the kernel function's call
             params (dict): Parameter set for which the kernel should be evaluated on.
         Returns:
             Array: The value of :math:`k(x, y)`
@@ -952,10 +910,7 @@ class EigenKernelComputation(AbstractKernelComputation):
         evals, evecs = self.eigensystem
         S = jnp.power(
             evals
-            + 2
-            * params["smoothness"]
-            / params["lengthscale"]
-            / params["lengthscale"],
+            + 2 * params["smoothness"] / params["lengthscale"] / params["lengthscale"],
             -params["smoothness"],
         )
         S = jnp.multiply(S, self.num_vertex / jnp.sum(S))
@@ -980,9 +935,7 @@ class GraphKernel(AbstractKernel):
         spectral: Optional[bool] = False,
         name: Optional[str] = "Graph kernel",
     ) -> None:
-        super().__init__(
-            compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
         self.laplacian = laplacian
         evals, self.evecs = jnp.linalg.eigh(self.laplacian)
         self.evals = evals.reshape(-1, 1)

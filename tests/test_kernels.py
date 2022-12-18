@@ -17,37 +17,34 @@
 from itertools import permutations
 from typing import Dict, List
 
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 import networkx as nx
 import pytest
+from gpjax.parameters import initialise
 from jax.config import config
-from jaxtyping import Array, Float
 from jax.random import KeyArray as PRNGKeyType
-
-from jaxlinop import (
-    LinearOperator,
-    identity,
-)
+from jaxlinop import LinearOperator, identity
+from jaxtyping import Array, Float
 
 from jaxkern.kernels import (
     RBF,
-    Linear,
-    RationalQuadratic,
+    AbstractKernel,
     CombinationKernel,
     GraphKernel,
-    AbstractKernel,
+    Linear,
     Matern12,
     Matern32,
     Matern52,
+    Periodic,
     Polynomial,
     PoweredExponential,
     ProductKernel,
-    Periodic,
+    RationalQuadratic,
     SumKernel,
     euclidean_distance,
 )
-from gpjax.parameters import initialise
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -73,9 +70,7 @@ def test_abstract_kernel():
     # Initialise dummy kernel class and test __call__ and _init_params methods:
     dummy_kernel = DummyKernel()
     assert dummy_kernel._initialise_params(_initialise_key) == {"test": 1.0}
-    assert (
-        dummy_kernel(jnp.array([1.0]), jnp.array([2.0]), {"test": 2.0}) == 4.0
-    )
+    assert dummy_kernel(jnp.array([1.0]), jnp.array([2.0]), {"test": 2.0}) == 4.0
 
 
 @pytest.mark.parametrize(
@@ -174,15 +169,13 @@ def test_call(kernel: AbstractKernel, dim: int) -> None:
     # Test calling gives an autocovariance value of no dimension between the inputs:
     kxy = kernel(params, x, y)
 
-    assert isinstance(kxy, jnp.DeviceArray)
+    assert isinstance(kxy, jax.Array)
     assert kxy.shape == ()
 
 
 @pytest.mark.parametrize("kern", [RBF, Matern12, Matern32, Matern52])
 @pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize(
-    "ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)]
-)
+@pytest.mark.parametrize("ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_pos_def(
     kern: AbstractKernel, dim: int, ell: float, sigma: float, n: int
@@ -224,14 +217,10 @@ def test_pos_def_lin_poly(
 
 
 @pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize(
-    "ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)]
-)
+@pytest.mark.parametrize("ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
 @pytest.mark.parametrize("alpha", [0.1, 0.5, 1.0])
 @pytest.mark.parametrize("n", [1, 2, 5])
-def test_pos_def_rq(
-    dim: int, ell: float, sigma: float, alpha: float, n: int
-) -> None:
+def test_pos_def_rq(dim: int, ell: float, sigma: float, alpha: float, n: int) -> None:
     kern = RationalQuadratic(active_dims=list(range(dim)))
     # Gram constructor static method:
     kern.gram
@@ -252,9 +241,7 @@ def test_pos_def_rq(
 
 
 @pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize(
-    "ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)]
-)
+@pytest.mark.parametrize("ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
 @pytest.mark.parametrize("power", [0.1, 0.5, 1.0])
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_pos_def_power_exp(
@@ -280,9 +267,7 @@ def test_pos_def_power_exp(
 
 
 @pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize(
-    "ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)]
-)
+@pytest.mark.parametrize("ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
 @pytest.mark.parametrize("period", [0.1, 0.5, 1.0])
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_pos_def_periodic(
