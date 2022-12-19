@@ -27,7 +27,7 @@ from tqdm.auto import tqdm
 
 from .natural_gradients import natural_gradients
 from .parameters import ParameterState, constrain, trainable_params, unconstrain
-from .types import Dataset
+from jaxutils import Dataset
 from .variational_inference import StochasticVI
 
 

@@ -30,6 +30,8 @@ import matplotlib.pyplot as plt
 import optax as ox
 from jax.config import config
 from jaxtyping import Array, Float
+from jaxutils import Dataset
+import jaxkern as jk
 
 import gpjax as gpx
 
@@ -51,7 +53,7 @@ key = jr.PRNGKey(123)
 x = jnp.sort(jr.uniform(key, shape=(100, 1), minval=-1.0, maxval=1.0), axis=0)
 y = 0.5 * jnp.sign(jnp.cos(3 * x + jr.normal(key, shape=x.shape) * 0.05)) + 0.5
 
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-1.0, 1.0, 500).reshape(-1, 1)
 plt.plot(x, y, "o", markersize=8)
@@ -62,7 +64,7 @@ plt.plot(x, y, "o", markersize=8)
 # We begin by defining a Gaussian process prior with a radial basis function (RBF) kernel, chosen for the purpose of exposition. Since our observations are binary, we choose a Bernoulli likelihood with a probit link function.
 
 # %%
-kernel = gpx.RBF()
+kernel = jk.RBF()
 prior = gpx.Prior(kernel=kernel)
 likelihood = gpx.Bernoulli(num_datapoints=D.n)
 

@@ -19,6 +19,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import optax as ox
 from jax.config import config
+from jaxutils import Dataset
+import jaxkern as jk
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -112,7 +114,7 @@ scaled_Xte = x_scaler.transform(Xte)
 
 # %%
 n_train, n_covariates = scaled_Xtr.shape
-kernel = gpx.kernels.RBF(active_dims=list(range(n_covariates)))
+kernel = jk.kernels.RBF(active_dims=list(range(n_covariates)))
 prior = gpx.Prior(kernel=kernel)
 
 likelihood = gpx.Gaussian(num_datapoints=n_train)
@@ -125,7 +127,7 @@ posterior = prior * likelihood
 # With a model now defined, we can proceed to optimise the hyperparameters of our model using Optax.
 
 # %%
-training_data = gpx.Dataset(X=scaled_Xtr, y=scaled_ytr)
+training_data = Dataset(X=scaled_Xtr, y=scaled_ytr)
 
 parameter_state = gpx.initialise(posterior, key)
 negative_mll = jit(
