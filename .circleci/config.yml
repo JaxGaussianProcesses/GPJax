@@ -84,6 +84,8 @@ jobs:
           command: |
             pip install -U twine
             python setup.py sdist bdist_wheel
+          environment:
+            BUILD_JAXKERN_NIGHTLY: 'nightly'
       - run:
           name: Upload to PyPI
           command: twine upload dist/* -r jaxkern-nightly --verbose

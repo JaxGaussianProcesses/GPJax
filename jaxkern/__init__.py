@@ -13,7 +13,6 @@ from .kernels import (
     ConstantDiagonalKernelComputation,
 )
 
-__version__ = "0.0.3"
 __all__ = [
     "RBF",
     "GraphKernel",
@@ -27,3 +26,7 @@ __all__ = [
     "DiagonalKernelComputation",
     "ConstantDiagonalKernelComputation",
 ]
+
+from . import _version
+
+__version__ = _version.get_versions()["version"]

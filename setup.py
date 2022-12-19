@@ -1,31 +1,27 @@
-import io
 import os
-import re
-
+import versioneer
 from setuptools import find_packages, setup
 
 
-# Get version number (function from GPyTorch)
-def read(*names, **kwargs):
-    with io.open(
-        os.path.join(os.path.dirname(__file__), *names),
-        encoding=kwargs.get("encoding", "utf8"),
-    ) as fp:
-        return fp.read()
-
-
-def find_version(*file_paths):
-    version_file = read(*file_paths)
-    version_match = re.search(
-        r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M
-    )
-    if version_match:
-        return version_match.group(1)
-    raise RuntimeError("Unable to find version string.")
-
-
-version = find_version("jaxkern", "__init__.py")
 readme = open("README.md").read()
+NAME = "jaxkern"
+
+
+# Handle builds of nightly release - adapted from BlackJax.
+if os.environ["BUILD_JAXKERN_NIGHTLY"] == "nightly":
+    NAME += "-nightly"
+
+    from versioneer import get_versions as original_get_versions
+
+    def get_versions():
+        from datetime import datetime, timezone
+
+        suffix = datetime.now(timezone.utc).strftime(r".dev%Y%m%d")
+        versions = original_get_versions()
+        versions["version"] = versions["version"].split("+")[0] + suffix
+        return versions
+
+    versioneer.get_versions = get_versions
 
 
 REQUIRES = [
@@ -53,8 +49,8 @@ EXTRAS = {
 
 
 setup(
-    name="JaxKern",
-    version=version,
+    name=NAME,
+    version=versioneer.get_version(),
     author="Daniel Dodd and Thomas Pinder",
     author_email="tompinder@live.co.uk",
     packages=find_packages(".", exclude=["tests"]),
