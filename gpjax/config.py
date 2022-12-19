@@ -71,7 +71,7 @@ def update_x64_sensitive_settings() -> None:
         [
             tfb.FillScaleTriL(diag_shift=jnp.array(__config.jitter)),
         ]
-    )  # TODO: Dan to chain methods.
+    )
 
     transformations = __config.transformations
     transformations.triangular_transform = FillScaleTriL
@@ -97,7 +97,7 @@ def get_default_config() -> ConfigDict:
         [
             tfb.FillScaleTriL(diag_shift=jnp.array(config.jitter)),
         ]
-    )  # TODO: Dan to chain methods.
+    )
 
     # Default bijections
     config.transformations = transformations = ConfigDict()

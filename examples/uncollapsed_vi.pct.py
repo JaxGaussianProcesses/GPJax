@@ -201,7 +201,7 @@ plt.show()
 # %% [markdown]
 # ## Custom transformations
 #
-# To train a covariance matrix, `gpjax` uses `tfb.FillScaleTriL` transformation by default. `tfb.FillScaleTriL` fills a 1d vector into a lower triangular matrix and then applies `SoftPlus` transformation on the diagonal to satisfy the necessary conditions for a valid Cholesky matrix. Users can change this default transformation with another valid transformation of their choice. For example, `Square` transformation on the diagonal can also serve the purpose.
+# To train a covariance matrix, GPJax uses `tfb.FillScaleTriL` transformation by default. `tfb.FillScaleTriL` fills a 1d vector into a lower triangular matrix and then applies `Softplus` transformation on the diagonal to satisfy the necessary conditions for a valid Cholesky matrix. Users can change this default transformation with another valid transformation of their choice. For example, `Square` transformation on the diagonal can also serve the purpose.
 
 # %%
 gpx_config = get_global_config()
@@ -248,7 +248,7 @@ ax.fill_between(xtest.flatten(), meanf - sigma, meanf + sigma, alpha=0.3)
 plt.show()
 
 # %% [markdown]
-# We can see that `Square` transformation is able to get relatively better fit compared to `Softplus` with the same number of iterations, but `Softplus` is recommended over `Square` for stability of optimization.
+# We can see that `Square` transformation is able to get relatively better fit compared to `Softplus` with the same number of iterations, but `Softplus` is recommended over `Square` for stability of optimisation.
 
 # %% [markdown]
 # ## System configuration

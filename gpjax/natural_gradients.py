@@ -32,10 +32,8 @@ from .variational_families import (
 )
 from .variational_inference import StochasticVI
 
-DEFAULT_JITTER = get_global_config()["jitter"]
 
-
-def natural_to_expectation(params: Dict, jitter: float = DEFAULT_JITTER) -> Dict:
+def natural_to_expectation(params: Dict) -> Dict:
     """
     Translate natural parameters to expectation parameters.
 
@@ -56,7 +54,6 @@ def natural_to_expectation(params: Dict, jitter: float = DEFAULT_JITTER) -> Dict
     Args:
         params: A dictionary of variational Gaussian parameters under the natural
             parameterisation.
-        jitter (float): A small value to prevent numerical instability.
 
     Returns:
         Dict: A dictionary of Gaussian moments under the expectation parameterisation.
@@ -68,6 +65,7 @@ def natural_to_expectation(params: Dict, jitter: float = DEFAULT_JITTER) -> Dict
 
     # S⁻¹ = -2θ₂
     S_inv = -2 * natural_matrix
+    jitter = get_global_config()["jitter"]
     S_inv += jnp.eye(m) * jitter
 
     # S⁻¹ = LLᵀ
