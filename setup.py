@@ -8,20 +8,21 @@ NAME = "jaxkern"
 
 
 # Handle builds of nightly release - adapted from BlackJax.
-if os.environ["BUILD_JAXKERN_NIGHTLY"] == "nightly":
-    NAME += "-nightly"
+if "BUILD_JAXKERN_NIGHTLY" in os.environ:
+    if os.environ["BUILD_JAXKERN_NIGHTLY"] == "nightly":
+        NAME += "-nightly"
 
-    from versioneer import get_versions as original_get_versions
+        from versioneer import get_versions as original_get_versions
 
-    def get_versions():
-        from datetime import datetime, timezone
+        def get_versions():
+            from datetime import datetime, timezone
 
-        suffix = datetime.now(timezone.utc).strftime(r".dev%Y%m%d")
-        versions = original_get_versions()
-        versions["version"] = versions["version"].split("+")[0] + suffix
-        return versions
+            suffix = datetime.now(timezone.utc).strftime(r".dev%Y%m%d")
+            versions = original_get_versions()
+            versions["version"] = versions["version"].split("+")[0] + suffix
+            return versions
 
-    versioneer.get_versions = get_versions
+        versioneer.get_versions = get_versions
 
 
 REQUIRES = [
