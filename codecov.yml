@@ -1,7 +1,6 @@
 comment: false
 ignore:
-  - "gpjax/_version.py"       # wildcards accepted
-
+  - "gpjax/_version.py"
 coverage:
   status:
     project:
