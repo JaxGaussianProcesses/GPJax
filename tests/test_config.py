@@ -18,10 +18,20 @@ import distrax as dx
 from jax.config import config
 from ml_collections import ConfigDict
 
-from gpjax.config import Identity, add_parameter, get_global_config
+from gpjax.config import (
+    Identity,
+    add_parameter,
+    get_global_config,
+    get_global_config_if_exists,
+)
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
+
+# This test needs to be run first to ensure that the global config is not set on library import.
+def test_config_on_library_import():
+    config = get_global_config_if_exists()
+    assert config is None
 
 
 def test_add_parameter():

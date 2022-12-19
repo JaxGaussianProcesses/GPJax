@@ -126,6 +126,17 @@ def get_default_config() -> ConfigDict:
     return config
 
 
+# This function is created for testing purposes only
+def get_global_config_if_exists() -> ConfigDict:
+    """Get the global config file used within GPJax if it is available.
+
+    Returns:
+        ConfigDict: A `ConfigDict` describing parameter transforms and default values.
+    """
+    global __config
+    return __config
+
+
 def add_parameter(param_name: str, bijection: dx.Bijector) -> None:
     """Add a parameter and its corresponding transform to GPJax's config file.
 
