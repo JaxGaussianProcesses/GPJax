@@ -26,6 +26,8 @@ import matplotlib.pyplot as plt
 import optax as ox
 from jax import jit
 from jax.config import config
+from jaxutils import Dataset
+import jaxkern as jk
 
 import tensorflow_probability.substrates.jax as tfp
 
@@ -57,7 +59,7 @@ f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
 
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 
@@ -128,7 +130,7 @@ plt.show()
 
 # %%
 likelihood = gpx.Gaussian(num_datapoints=n)
-prior = gpx.Prior(kernel=gpx.RBF())
+prior = gpx.Prior(kernel=jk.RBF())
 p = prior * likelihood
 q = gpx.VariationalGaussian(prior=prior, inducing_inputs=z)
 

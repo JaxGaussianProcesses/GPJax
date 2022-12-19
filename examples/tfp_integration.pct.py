@@ -26,6 +26,8 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 from jax.config import config
+from jaxutils import Dataset
+import jaxkern as jk
 
 import gpjax as gpx
 from gpjax.utils import dict_array_coercion
@@ -62,9 +64,9 @@ ax.legend(loc="best")
 # We'll wrap our pair of observed data arrays up into a `Dataset` object $\mathcal{D}$ and define a GP posterior.
 
 # %%
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 likelihood = gpx.Gaussian(num_datapoints=D.n)
-posterior = gpx.Prior(kernel=gpx.RBF()) * likelihood
+posterior = gpx.Prior(kernel=jk.RBF()) * likelihood
 
 # %% [markdown]
 # ## Initialise parameters

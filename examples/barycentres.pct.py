@@ -31,6 +31,8 @@ import jax.scipy.linalg as jsl
 import matplotlib.pyplot as plt
 import optax as ox
 from jax.config import config
+from jaxutils import Dataset
+import jaxkern as jk
 
 import gpjax as gpx
 
@@ -100,10 +102,10 @@ plt.show()
 def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray) -> dx.MultivariateNormalTri:
     if y.ndim == 1:
         y = y.reshape(-1, 1)
-    D = gpx.Dataset(X=x, y=y)
+    D = Dataset(X=x, y=y)
 
     likelihood = gpx.Gaussian(num_datapoints=n)
-    posterior = gpx.Prior(kernel=gpx.RBF()) * likelihood
+    posterior = gpx.Prior(kernel=jk.RBF()) * likelihood
 
     parameter_state = gpx.initialise(posterior, key)
     negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))

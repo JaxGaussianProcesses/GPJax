@@ -20,11 +20,11 @@ import jax.numpy as jnp
 import jax.scipy as jsp
 from jax import value_and_grad
 from jaxtyping import Array, Float
+from jaxutils import Dataset
 
 from .config import get_global_config
 from .gps import AbstractPosterior
 from .parameters import build_trainables, constrain, trainable_params
-from .types import Dataset
 from .variational_families import (
     AbstractVariationalFamily,
     ExpectationVariationalGaussian,

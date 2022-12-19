@@ -27,6 +27,8 @@ import matplotlib.pyplot as plt
 import optax as ox
 from jax import jit
 from jax.config import config
+from jaxutils import Dataset
+import jaxkern as jk
 
 import gpjax as gpx
 
@@ -53,7 +55,7 @@ f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
 
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-3.5, 3.5, 500).reshape(-1, 1)
 ytest = f(xtest)
@@ -82,7 +84,7 @@ ax.legend(loc="best")
 # On paper a GP is written as $f(\cdot) \sim \mathcal{GP}(\textbf{0}, k(\cdot, \cdot'))$, we can reciprocate this process in GPJax via defining a `Prior` with our chosen `RBF` kernel.
 
 # %%
-kernel = gpx.RBF()
+kernel = jk.RBF()
 prior = gpx.Prior(kernel=kernel)
 
 # %% [markdown]
