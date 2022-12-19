@@ -1,6 +1,6 @@
 comment: false
 ignore:
-  - "gpjax/_version.py"
+  - "jaxkern/_version.py"
 coverage:
   status:
     project:
