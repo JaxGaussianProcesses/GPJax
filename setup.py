@@ -27,8 +27,8 @@ readme = open("README.md").read()
 
 
 REQUIRES = [
-    "jax<0.4.0",
-    "jaxlib<0.4.0",
+    "jax>=0.4.1",
+    "jaxlib>=0.4.1",
     "optax",
     "jaxutils",
     "jaxkern",
