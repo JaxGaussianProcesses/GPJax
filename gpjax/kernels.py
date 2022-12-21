@@ -691,15 +691,15 @@ class PoweredExponential(AbstractKernel):
     ) -> None:
         super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
-    def __call__(self, params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray) -> Array:
+    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell`, :math:`\sigma` and power :math:`\kappa`.
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( - \\Big( \\frac{\\lVert x - y \\rVert^2}{\\ell^2} \\Big)^\\kappa \\Bigg)
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (jax.Array): The left hand argument of the kernel function's call.
+            y (jax.Array): The right hand argument of the kernel function's call
             params (dict): Parameter set for which the kernel should be evaluated on.
 
         Returns:
@@ -736,15 +736,15 @@ class Linear(AbstractKernel):
     ) -> None:
         super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
-    def __call__(self, params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray) -> Array:
+    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\sigma`
 
         .. math::
             k(x, y) = \\sigma^2 x^{T}y
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (jax.Array): The left hand argument of the kernel function's call.
+            y (jax.Array): The right hand argument of the kernel function's call
             params (dict): Parameter set for which the kernel should be evaluated on.
         Returns:
             Array: The value of :math:`k(x, y)`
@@ -873,15 +873,15 @@ class RationalQuadratic(AbstractKernel):
     ) -> None:
         super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
-    def __call__(self, params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray) -> Array:
+    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( 1 + \\frac{\\lVert x - y \\rVert^2_2}{2 \\alpha \\ell^2} \\Bigg)
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (jax.Array): The left hand argument of the kernel function's call.
+            y (jax.Array): The right hand argument of the kernel function's call
             params (dict): Parameter set for which the kernel should be evaluated on.
         Returns:
             Array: The value of :math:`k(x, y)`
@@ -922,15 +922,15 @@ class Periodic(AbstractKernel):
     ) -> None:
         super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
-    def __call__(self, params: dict, x: jnp.DeviceArray, y: jnp.DeviceArray) -> Array:
+    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\ell` and variance :math:`\sigma`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( -0.5 \\sum_{i=1}^{d} \\Bigg)
 
         Args:
-            x (jnp.DeviceArray): The left hand argument of the kernel function's call.
-            y (jnp.DeviceArray): The right hand argument of the kernel function's call
+            x (jax.Array): The left hand argument of the kernel function's call.
+            y (jax.Array): The right hand argument of the kernel function's call
             params (dict): Parameter set for which the kernel should be evaluated on.
         Returns:
             Array: The value of :math:`k(x, y)`

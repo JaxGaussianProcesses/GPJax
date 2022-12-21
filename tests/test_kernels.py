@@ -172,7 +172,7 @@ def test_call(kernel: AbstractKernel, dim: int) -> None:
     # Test calling gives an autocovariance value of no dimension between the inputs:
     kxy = kernel(params, x, y)
 
-    assert isinstance(kxy, jnp.DeviceArray)
+    assert isinstance(kxy, jax.Array)
     assert kxy.shape == ()
 
 
