@@ -17,6 +17,7 @@
 from itertools import permutations
 from typing import Dict, List
 
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 import networkx as nx

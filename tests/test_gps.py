@@ -15,6 +15,7 @@
 
 import typing as tp
 
+import jax
 import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr

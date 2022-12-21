@@ -15,6 +15,7 @@
 
 from typing import Callable, Dict, Tuple
 
+import jax
 import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
