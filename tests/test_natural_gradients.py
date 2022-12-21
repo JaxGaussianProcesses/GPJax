@@ -75,7 +75,7 @@ def test_natural_to_expectation(dim):
     natural_params, *_ = gpx.initialise(natural_svgp, key).unpack()
     expectation_params, *_ = gpx.initialise(expectation_svgp, key).unpack()
 
-    expectation_params_test = natural_to_expectation(natural_params, jitter=1e-6)
+    expectation_params_test = natural_to_expectation(natural_params)
 
     assert (
         "expectation_vector"

@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, Dict, Optional, Tuple
+from typing import Callable, Dict, Tuple
 
 import distrax as dx
 import jax.numpy as jnp
@@ -48,7 +48,7 @@ def test_abstract_variational_family():
 
         def _initialise_params(self, key: jr.PRNGKey) -> dict:
             return {}
-    
+
     # Test that the dummy variational family can be instantiated.
     dummy_variational_family = DummyVariationalFamily()
     assert isinstance(dummy_variational_family, AbstractVariationalFamily)
@@ -58,6 +58,7 @@ def test_abstract_variational_family():
 def vector_shape(n_inducing: int) -> Tuple[int, int]:
     """Shape of a vector with n_inducing rows and 1 column"""
     return (n_inducing, 1)
+
 
 def matrix_shape(n_inducing: int) -> Tuple[int, int]:
     """Shape of a matrix with n_inducing rows and 1 column"""
@@ -73,7 +74,10 @@ def vector_val(val: float) -> Callable[[int], Float[Array, "n_inducing 1"]]:
 
     return vector_val_fn
 
-def diag_matrix_val(val: float) -> Callable[[int], Float[Array, "n_inducing n_inducing"]]:
+
+def diag_matrix_val(
+    val: float,
+) -> Callable[[int], Float[Array, "n_inducing n_inducing"]]:
     """Diagonal matrix of shape (n_inducing, n_inducing) filled with val"""
 
     def diag_matrix_fn(n_inducing: int) -> Float[Array, "n_inducing n_inducing"]:
@@ -114,9 +118,9 @@ def diag_matrix_val(val: float) -> Callable[[int], Float[Array, "n_inducing n_in
     ],
 )
 def test_variational_gaussians(
-    n_test: int, 
-    n_inducing: int, 
-    variational_family: AbstractVariationalFamily, 
+    n_test: int,
+    n_inducing: int,
+    variational_family: AbstractVariationalFamily,
     moment_names: Tuple[str, str],
     shapes: Tuple,
     values: Tuple,
@@ -136,7 +140,7 @@ def test_variational_gaussians(
     params = q._initialise_params(jr.PRNGKey(123))
     assert isinstance(params, dict)
 
-    config_params = gpx.config.get_defaults()
+    config_params = gpx.config.get_global_config()
 
     # Test inducing induput parameters:
     assert "inducing_inputs" in params["variational_family"].keys()
@@ -180,7 +184,9 @@ def test_variational_gaussians(
 @pytest.mark.parametrize("n_datapoints", [1, 10])
 @pytest.mark.parametrize("n_inducing", [1, 10, 20])
 @pytest.mark.parametrize("point_dim", [1, 2])
-def test_collapsed_variational_gaussian(n_test: int, n_inducing: int, n_datapoints: int, point_dim: int) -> None:
+def test_collapsed_variational_gaussian(
+    n_test: int, n_inducing: int, n_datapoints: int, point_dim: int
+) -> None:
     x = jnp.linspace(-5.0, 5.0, n_datapoints).reshape(-1, 1)
     y = jnp.sin(x) + jr.normal(key=jr.PRNGKey(123), shape=x.shape) * 0.1
     x = jnp.hstack([x] * point_dim)
@@ -209,7 +215,7 @@ def test_collapsed_variational_gaussian(n_test: int, n_inducing: int, n_datapoin
 
     # Test init
     assert variational_family.num_inducing == n_inducing
-    params = gpx.config.get_defaults()
+    params = gpx.config.get_global_config()
     assert "inducing_inputs" in params["transformations"].keys()
     assert (variational_family.inducing_inputs == inducing_inputs).all()
 

@@ -24,7 +24,7 @@ from jaxtyping import Array, Float
 
 from jaxlinop import identity
 
-from .config import get_defaults
+from .config import get_global_config
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
@@ -181,7 +181,7 @@ class CollapsedVI(AbstractVariationalInference):
         kernel = self.prior.kernel
 
         m = self.num_inducing
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Constant for whether or not to negate the elbo for optimisation purposes
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
