@@ -37,12 +37,13 @@ from .variational_families import (
     WhitenedVariationalGaussian,
 )
 from .variational_inference import CollapsedVI, StochasticVI
+from . import _version
 
+__version__ = _version.get_versions()["version"]
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
 __url__ = "https://github.com/thomaspinder/GPJax"
 __contributors__ = "https://github.com/thomaspinder/GPJax/graphs/contributors"
-__version__ = "0.5.4"
 
 
 __all__ = [
