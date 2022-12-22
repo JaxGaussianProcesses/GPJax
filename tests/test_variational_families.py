@@ -15,6 +15,7 @@
 
 from typing import Callable, Dict, Tuple
 
+import jax
 import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
@@ -229,7 +230,7 @@ def test_collapsed_variational_gaussian(
         n_inducing,
         point_dim,
     )
-    assert isinstance(params["variational_family"]["inducing_inputs"], jnp.DeviceArray)
+    assert isinstance(params["variational_family"]["inducing_inputs"], jax.Array)
 
     # Test predictions
     params = variational_family._initialise_params(jr.PRNGKey(123))

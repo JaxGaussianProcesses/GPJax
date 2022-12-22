@@ -17,6 +17,7 @@
 from itertools import permutations
 from typing import Dict, List
 
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 import networkx as nx
@@ -172,7 +173,7 @@ def test_call(kernel: AbstractKernel, dim: int) -> None:
     # Test calling gives an autocovariance value of no dimension between the inputs:
     kxy = kernel(params, x, y)
 
-    assert isinstance(kxy, jnp.DeviceArray)
+    assert isinstance(kxy, jax.Array)
     assert kxy.shape == ()
 
 

@@ -16,7 +16,6 @@
 from typing import Callable, Dict, Tuple
 
 import jax
-import jax.numpy as jnp
 
 
 def concat_dictionaries(a: Dict, b: Dict) -> Dict:
@@ -89,7 +88,7 @@ def dict_array_coercion(params: Dict) -> Tuple[Callable, Callable]:
     """
     flattened_pytree = jax.tree_util.tree_flatten(params)
 
-    def dict_to_array(parameter_dict) -> jnp.DeviceArray:
+    def dict_to_array(parameter_dict) -> jax.Array:
         return jax.tree_util.tree_flatten(parameter_dict)[0]
 
     def array_to_dict(parameter_array) -> Dict:
