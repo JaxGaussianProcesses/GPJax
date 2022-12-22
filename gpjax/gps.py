@@ -24,7 +24,8 @@ from jaxtyping import Array, Float
 from jaxlinop import identity
 from jaxkern.kernels import AbstractKernel
 
-from .config import get_defaults
+from .config import get_global_config
+from .kernels import AbstractKernel
 from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
 from jaxutils import Dataset
@@ -209,7 +210,7 @@ class Prior(AbstractPrior):
             should be evaluated at. The mean function's value at these points is
             then returned.
         """
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Unpack mean function and kernel
         mean_function = self.mean_function
@@ -392,7 +393,7 @@ class ConjugatePosterior(AbstractPosterior):
                 function that accepts an input array and returns the predictive
                 distribution as a ``GaussianDistribution``.
         """
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Unpack training data
         x, y, n = train_data.X, train_data.y, train_data.n
@@ -511,7 +512,7 @@ class ConjugatePosterior(AbstractPosterior):
                 of the marginal log-likelihood that can be evaluated at a
                 given parameter set.
         """
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Unpack training data
         x, y, n = train_data.X, train_data.y, train_data.n
@@ -623,7 +624,7 @@ class NonConjugatePosterior(AbstractPosterior):
                 input array and returns the predictive distribution as
                 a ``dx.Distribution``.
         """
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Unpack training data
         x, n = train_data.X, train_data.n
@@ -706,7 +707,7 @@ class NonConjugatePosterior(AbstractPosterior):
                 of the marginal log-likelihood that can be evaluated at a given
                 parameter set.
         """
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Unpack dataset
         x, y, n = train_data.X, train_data.y, train_data.n

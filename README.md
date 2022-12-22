@@ -48,6 +48,20 @@ Feel free to join our [Slack Channel](https://join.slack.com/t/gpjax/shared_invi
 > - [**Custom kernels**](https://gpjax.readthedocs.io/en/latest/examples/kernels.html#Custom-Kernel)
 > - [**UCI regression**](https://gpjax.readthedocs.io/en/latest/examples/yacht.html)
 
+## Conversion between `.ipynb` and `.py`
+Above examples are stored in [examples](examples) directory in the double percent (`py:percent`) format. Checkout [jupytext using-cli](https://jupytext.readthedocs.io/en/latest/using-cli.html) for more info.
+
+* To convert `example.py` to `example.ipynb`, run:
+
+```bash
+jupytext --to notebook example.py
+```
+
+* To convert `example.ipynb` to `example.py`, run:
+
+```bash
+jupytext --to py:percent example.ipynb
+```
 
 # Simple example
 

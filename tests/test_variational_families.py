@@ -141,7 +141,7 @@ def test_variational_gaussians(
     params = q._initialise_params(jr.PRNGKey(123))
     assert isinstance(params, dict)
 
-    config_params = gpx.config.get_defaults()
+    config_params = gpx.config.get_global_config()
 
     # Test inducing induput parameters:
     assert "inducing_inputs" in params["variational_family"].keys()
@@ -216,7 +216,7 @@ def test_collapsed_variational_gaussian(
 
     # Test init
     assert variational_family.num_inducing == n_inducing
-    params = gpx.config.get_defaults()
+    params = gpx.config.get_global_config()
     assert "inducing_inputs" in params["transformations"].keys()
     assert (variational_family.inducing_inputs == inducing_inputs).all()
 
