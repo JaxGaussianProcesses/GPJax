@@ -1,9 +1,24 @@
+import os
 import versioneer
 from setuptools import find_packages, setup
 
 
 NAME = "gpjax"
 README = open("README.md").read()
+
+# Handle builds of nightly release
+if "BUILD_GPJAX_NIGHTLY" in os.environ:
+    NAME += "-nightly"
+
+    from versioneer import get_versions as original_get_versions
+
+    def get_versions():
+        from datetime import datetime, timezone
+
+        suffix = datetime.now(timezone.utc).strftime(r".dev%Y%m%d")
+        versions = original_get_versions()
+        versions["version"] = versions["version"].split("+")[0] + suffix
+        return versions
 
 
 REQUIRES = [
