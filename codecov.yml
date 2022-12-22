@@ -1,6 +1,5 @@
 comment: false
-ignore:
-  - "jaxkern/_version.py"
+
 coverage:
   status:
     project:
@@ -9,3 +8,12 @@ coverage:
     patch:
       default:
         target: "100"
+
+ignore:
+  - "setup.py"
+  - "*/tests/.*"
+  - "__init__.py"
+  - "tests/*.py"
+  - "**/_version.py"
+  - "**/versioneer.py"
+  - "versioneer.py"

@@ -11,15 +11,10 @@ NAME = "jaxkern"
 if "BUILD_JAXKERN_NIGHTLY" in os.environ:
     if os.environ["BUILD_JAXKERN_NIGHTLY"] == "nightly":
         NAME += "-nightly"
-
         from versioneer import get_versions as original_get_versions
 
         def get_versions():
-            from datetime import datetime, timezone
-
-            suffix = datetime.now(timezone.utc).strftime(r".dev%Y%m%d")
             versions = original_get_versions()
-            versions["version"] = versions["version"].split("+")[0] + suffix
             return versions
 
         versioneer.get_versions = get_versions
@@ -52,6 +47,7 @@ EXTRAS = {
 setup(
     name=NAME,
     version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     author="Daniel Dodd and Thomas Pinder",
     author_email="tompinder@live.co.uk",
     packages=find_packages(".", exclude=["tests"]),
