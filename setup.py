@@ -14,7 +14,11 @@ if "BUILD_JAXKERN_NIGHTLY" in os.environ:
         from versioneer import get_versions as original_get_versions
 
         def get_versions():
+            from datetime import datetime, timezone
+
+            suffix = datetime.now(timezone.utc).strftime(r".dev%Y%m%d")
             versions = original_get_versions()
+            versions["version"] = versions["version"].split("+")[0] + suffix
             return versions
 
         versioneer.get_versions = get_versions
