@@ -16,6 +16,7 @@
 
 import jax.numpy as jnp
 import jax.random as jr
+import jax
 import pytest
 from jax.config import config
 
@@ -29,7 +30,7 @@ from jaxlinop.constant_diagonal_linear_operator import ConstantDiagonalLinearOpe
 from jaxlinop.dense_linear_operator import DenseLinearOperator
 
 
-def approx_equal(res: jnp.ndarray, actual: jnp.ndarray) -> bool:
+def approx_equal(res: jax.Array, actual: jax.Array) -> bool:
     """Check if two arrays are approximately equal."""
     return jnp.linalg.norm(res - actual) < 1e-6
 
@@ -134,8 +135,8 @@ def test_matmul(n: int) -> None:
     id = IdentityLinearOperator(size=n)
     res_left = id @ array
     res_right = array @ id
-    assert isinstance(res_left, jnp.ndarray)
-    assert isinstance(res_right, jnp.ndarray)
+    assert isinstance(res_left, jax.Array)
+    assert isinstance(res_right, jax.Array)
     assert approx_equal(res_left, array)
     assert approx_equal(res_right, array)
 
@@ -147,7 +148,7 @@ def test_solve(n: int, m: int) -> None:
     rhs = jr.uniform(_PRNGKey, shape=(n, m))
     res = id.solve(rhs)
 
-    assert isinstance(res, jnp.ndarray)
+    assert isinstance(res, jax.Array)
     assert approx_equal(res, rhs)
 
 

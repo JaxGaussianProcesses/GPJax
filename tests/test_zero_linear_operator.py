@@ -16,6 +16,7 @@
 
 import jax.numpy as jnp
 import jax.random as jr
+import jax
 import pytest
 from jax.config import config
 
@@ -29,7 +30,7 @@ from jaxlinop.dense_linear_operator import DenseLinearOperator
 from jaxlinop.zero_linear_operator import ZeroLinearOperator
 
 
-def approx_equal(res: jnp.ndarray, actual: jnp.ndarray) -> bool:
+def approx_equal(res: jax.Array, actual: jax.Array) -> bool:
     """Check if two arrays are approximately equal."""
     return jnp.linalg.norm(res - actual) < 1e-6
 
