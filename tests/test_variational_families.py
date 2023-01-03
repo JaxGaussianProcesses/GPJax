@@ -15,6 +15,7 @@
 
 from typing import Callable, Dict, Tuple
 
+import jax
 import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
@@ -140,7 +141,7 @@ def test_variational_gaussians(
     params = q._initialise_params(jr.PRNGKey(123))
     assert isinstance(params, dict)
 
-    config_params = gpx.config.get_defaults()
+    config_params = gpx.config.get_global_config()
 
     # Test inducing induput parameters:
     assert "inducing_inputs" in params["variational_family"].keys()
@@ -215,7 +216,7 @@ def test_collapsed_variational_gaussian(
 
     # Test init
     assert variational_family.num_inducing == n_inducing
-    params = gpx.config.get_defaults()
+    params = gpx.config.get_global_config()
     assert "inducing_inputs" in params["transformations"].keys()
     assert (variational_family.inducing_inputs == inducing_inputs).all()
 
@@ -229,7 +230,7 @@ def test_collapsed_variational_gaussian(
         n_inducing,
         point_dim,
     )
-    assert isinstance(params["variational_family"]["inducing_inputs"], jnp.DeviceArray)
+    assert isinstance(params["variational_family"]["inducing_inputs"], jax.Array)
 
     # Test predictions
     params = variational_family._initialise_params(jr.PRNGKey(123))

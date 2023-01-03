@@ -26,6 +26,8 @@ import matplotlib.pyplot as plt
 import optax as ox
 from jax import jit
 from jax.config import config
+from jaxutils import Dataset
+import jaxkern as jk
 
 import gpjax as gpx
 
@@ -51,7 +53,7 @@ f = lambda x: jnp.sin(2 * x) + x * jnp.cos(5 * x)
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
 
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-3.1, 3.1, 500).reshape(-1, 1)
 ytest = f(xtest)
@@ -74,7 +76,7 @@ plt.show()
 # Next we define the posterior model for the data.
 
 # %%
-kernel = gpx.RBF()
+kernel = jk.RBF()
 likelihood = gpx.Gaussian(num_datapoints=D.n)
 prior = gpx.Prior(kernel=kernel)
 p = prior * likelihood

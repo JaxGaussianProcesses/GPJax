@@ -16,10 +16,16 @@
 import jax.numpy as jnp
 from chex import dataclass
 from jaxtyping import Array, Float
+import deprecation
 
 NoneType = type(None)
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.5",
+    removed_in="0.6.0",
+    details="Use JaxUtils for a Dataset object",
+)
 @dataclass
 class Dataset:
     """GPJax Dataset class."""
@@ -29,7 +35,8 @@ class Dataset:
 
     def __repr__(self) -> str:
         return (
-            f"- Number of datapoints: {self.X.shape[0]}\n- Dimension: {self.X.shape[1]}"
+            f"- Number of datapoints: {self.X.shape[0]}\n- Dimension:"
+            f" {self.X.shape[1]}"
         )
 
     def __add__(self, other: "Dataset") -> "Dataset":
@@ -57,13 +64,15 @@ class Dataset:
 
 def verify_dataset(ds: Dataset) -> None:
     """Apply a series of checks to the dataset to ensure that downstream operations are safe."""
-    assert (
-        ds.X.ndim == 2
-    ), f"2-dimensional training inputs are required. Current dimension: {ds.X.ndim}."
+    assert ds.X.ndim == 2, (
+        "2-dimensional training inputs are required. Current dimension:"
+        f" {ds.X.ndim}."
+    )
     if ds.y is not None:
-        assert (
-            ds.y.ndim == 2
-        ), f"2-dimensional training outputs are required. Current dimension: {ds.y.ndim}."
+        assert ds.y.ndim == 2, (
+            "2-dimensional training outputs are required. Current dimension:"
+            f" {ds.y.ndim}."
+        )
         assert ds.X.shape[0] == ds.y.shape[0], (
             "Number of inputs must equal the number of outputs. \nCurrent"
             f" counts:\n- X: {ds.X.shape[0]}\n- y: {ds.y.shape[0]}"

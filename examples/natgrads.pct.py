@@ -25,8 +25,9 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
-from jax import jit, lax
 from jax.config import config
+from jaxutils import Dataset
+import jaxkern as jk
 
 import gpjax as gpx
 
@@ -53,7 +54,7 @@ f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
 
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 
 # %% [markdown]
@@ -76,7 +77,7 @@ plt.show()
 
 # %%
 likelihood = gpx.Gaussian(num_datapoints=n)
-kernel = gpx.RBF()
+kernel = jk.RBF()
 prior = gpx.Prior(kernel=kernel)
 p = prior * likelihood
 
@@ -97,7 +98,7 @@ inference_state = gpx.fit_natgrads(
     n_iters=5000,
     batch_size=256,
     key=jr.PRNGKey(42),
-    moment_optim=ox.sgd(0.1),
+    moment_optim=ox.sgd(0.01),
     hyper_optim=ox.adam(1e-3),
 )
 
@@ -138,7 +139,7 @@ f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
 
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 
@@ -153,7 +154,7 @@ plt.show()
 
 # %%
 likelihood = gpx.Gaussian(num_datapoints=n)
-kernel = gpx.RBF()
+kernel = jk.RBF()
 prior = gpx.Prior(kernel=kernel)
 p = prior * likelihood
 

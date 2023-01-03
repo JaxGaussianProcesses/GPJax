@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -29,6 +29,8 @@ import networkx as nx
 import optax as ox
 from jax import jit
 from jax.config import config
+from jaxutils import Dataset
+import jaxkern as jk
 
 import gpjax as gpx
 
@@ -55,7 +57,7 @@ random.seed(123)
 
 pos = nx.spring_layout(G, seed=123)  # positions for all nodes
 
-nx.draw(G, pos, node_color="tab:blue", with_labels=False, alpha=0.5)
+nx.draw(G)  # , pos, node_color="tab:blue", with_labels=False, alpha=0.5)
 
 # %% [markdown]
 #
@@ -80,7 +82,7 @@ L = nx.laplacian_matrix(G).toarray()
 # %%
 x = jnp.arange(G.number_of_nodes()).reshape(-1, 1)
 
-kernel = gpx.GraphKernel(laplacian=L)
+kernel = jk.GraphKernel(laplacian=L)
 prior = gpx.Prior(kernel=kernel)
 
 true_params = prior._initialise_params(key)
@@ -93,7 +95,13 @@ true_params["kernel"] = {
 fx = prior(true_params)(x)
 y = fx.sample(seed=key).reshape(-1, 1)
 
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
+
+# %%
+kernel.compute_engine.gram
+
+# %%
+kernel.gram(params=kernel._initialise_params(key), inputs=x)
 
 # %% [markdown]
 #

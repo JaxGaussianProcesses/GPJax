@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -22,7 +22,6 @@
 # %%
 import blackjax
 import distrax as dx
-import jax
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
@@ -30,6 +29,8 @@ import matplotlib.pyplot as plt
 import optax as ox
 from jax.config import config
 from jaxtyping import Array, Float
+from jaxutils import Dataset
+import jaxkern as jk
 
 import gpjax as gpx
 
@@ -51,7 +52,7 @@ key = jr.PRNGKey(123)
 x = jnp.sort(jr.uniform(key, shape=(100, 1), minval=-1.0, maxval=1.0), axis=0)
 y = 0.5 * jnp.sign(jnp.cos(3 * x + jr.normal(key, shape=x.shape) * 0.05)) + 0.5
 
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-1.0, 1.0, 500).reshape(-1, 1)
 plt.plot(x, y, "o", markersize=8)
@@ -62,7 +63,7 @@ plt.plot(x, y, "o", markersize=8)
 # We begin by defining a Gaussian process prior with a radial basis function (RBF) kernel, chosen for the purpose of exposition. Since our observations are binary, we choose a Bernoulli likelihood with a probit link function.
 
 # %%
-kernel = gpx.RBF()
+kernel = jk.RBF()
 prior = gpx.Prior(kernel=kernel)
 likelihood = gpx.Bernoulli(num_datapoints=D.n)
 
@@ -163,10 +164,10 @@ gram, cross_covariance = (kernel.gram, kernel.cross_covariance)
 jitter = 1e-6
 
 # Compute (latent) function value map estimates at training points:
-Kxx = gram(kernel, map_estimate["kernel"], x)
+Kxx = gram(map_estimate["kernel"], x)
 Kxx += I(D.n) * jitter
-Lx = Kxx.triangular_lower()
-f_hat = jnp.matmul(Lx, map_estimate["latent"])
+Lx = Kxx.to_root()
+f_hat = Lx @ map_estimate["latent"]
 
 # Negative Hessian,  H = -∇²p_tilde(y|f):
 H = jax.jacfwd(jax.jacrev(negative_mll))(map_estimate)["latent"]["latent"][:, 0, :, 0]
@@ -195,16 +196,16 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormal
 
     map_latent_dist = posterior(map_estimate, D)(test_inputs)
 
-    Kxt = cross_covariance(kernel, map_estimate["kernel"], x, test_inputs)
-    Kxx = gram(kernel, map_estimate["kernel"], x)
+    Kxt = cross_covariance(map_estimate["kernel"], x, test_inputs)
+    Kxx = gram(map_estimate["kernel"], x)
     Kxx += I(D.n) * jitter
-    Lx = Kxx.triangular_lower()
+    Lx = Kxx.to_root()
 
     # Lx⁻¹ Kxt
-    Lx_inv_Ktx = jsp.linalg.solve_triangular(Lx, Kxt, lower=True)
+    Lx_inv_Ktx = Lx.solve(Kxt)
 
     # Kxx⁻¹ Kxt
-    Kxx_inv_Ktx = jsp.linalg.solve_triangular(Lx.T, Lx_inv_Ktx, lower=False)
+    Kxx_inv_Ktx = Lx.T.solve(Lx_inv_Ktx)
 
     # Ktx Kxx⁻¹[ H⁻¹ ] Kxx⁻¹ Kxt
     laplace_cov_term = jnp.matmul(jnp.matmul(Kxx_inv_Ktx.T, H_inv), Kxx_inv_Ktx)

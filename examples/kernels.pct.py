@@ -9,19 +9,21 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
 
 # %% [markdown]
+# ```{note}
+# This notebook is a duplicate of the one found in the [JaxKern documentation](https://jaxkern.readthedocs.io/en/latest/nbs/kernels.html). It is included here for completeness.
+# ```
 # # Kernel Guide
 #
 # In this guide, we introduce the kernels available in GPJax and demonstrate how to create custom ones.
 
 
 # %%
-
 import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
@@ -31,6 +33,8 @@ from jax.config import config
 from jaxtyping import Array, Float
 from optax import adam
 from typing import Dict
+from jaxutils import Dataset
+import jaxkern as jk
 
 import gpjax as gpx
 
@@ -54,24 +58,22 @@ key = jr.PRNGKey(123)
 
 # %%
 kernels = [
-    gpx.Matern12(),
-    gpx.Matern32(),
-    gpx.Matern52(),
-    gpx.RBF(),
-    gpx.Polynomial(degree=1),
-    gpx.Polynomial(degree=2),
+    jk.Matern12(),
+    jk.Matern32(),
+    jk.Matern52(),
+    jk.RBF(),
+    jk.Polynomial(),
+    jk.Polynomial(degree=2),
 ]
 fig, axes = plt.subplots(ncols=3, nrows=2, figsize=(20, 10))
 
 x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
-
 
 for k, ax in zip(kernels, axes.ravel()):
     prior = gpx.Prior(kernel=k)
     params, *_ = gpx.initialise(prior, key).unpack()
     rv = prior(params)(x)
     y = rv.sample(seed=key, sample_shape=(10,))
-
     ax.plot(x, y.T, alpha=0.7)
     ax.set_title(k.name)
 
@@ -87,7 +89,7 @@ for k, ax in zip(kernels, axes.ravel()):
 # like our RBF kernel to act on the first, second and fourth dimensions.
 
 # %%
-slice_kernel = gpx.RBF(active_dims=[0, 1, 3])
+slice_kernel = jk.RBF(active_dims=[0, 1, 3])
 
 # %% [markdown]
 #
@@ -104,14 +106,11 @@ print(f"Lengthscales: {slice_kernel._initialise_params(key)['lengthscale']}")
 # Inputs
 x_matrix = jr.normal(key, shape=(50, 5))
 
-# Gram kernel computation
-gram_fn = slice_kernel.gram
-
 # Default parameter dictionary
 params = slice_kernel._initialise_params(key)
 
 # Compute the Gram matrix
-K = gram_fn(slice_kernel, params, x_matrix)
+K = slice_kernel.gram(params, x_matrix)
 print(K.shape)
 
 # %% [markdown]
@@ -123,14 +122,14 @@ print(K.shape)
 # can be created by applying the `+` operator as follows.
 
 # %%
-k1 = gpx.RBF()
-k2 = gpx.Polynomial()
+k1 = jk.RBF()
+k2 = jk.Polynomial()
 sum_k = k1 + k2
 
 fig, ax = plt.subplots(ncols=3, figsize=(20, 5))
-im0 = ax[0].matshow(k1.gram(k1, k1._initialise_params(key), x).to_dense())
-im1 = ax[1].matshow(k2.gram(k2, k2._initialise_params(key), x).to_dense())
-im2 = ax[2].matshow(sum_k.gram(sum_k, sum_k._initialise_params(key), x).to_dense())
+im0 = ax[0].matshow(k1.gram(k1._initialise_params(key), x).to_dense())
+im1 = ax[1].matshow(k2.gram(k2._initialise_params(key), x).to_dense())
+im2 = ax[2].matshow(sum_k.gram(sum_k._initialise_params(key), x).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
@@ -140,15 +139,15 @@ fig.colorbar(im2, ax=ax[2])
 # Similarily, products of kernels can be created through the `*` operator.
 
 # %%
-k3 = gpx.Matern32()
+k3 = jk.Matern32()
 
 prod_k = k1 * k2 * k3
 
 fig, ax = plt.subplots(ncols=4, figsize=(20, 5))
-im0 = ax[0].matshow(k1.gram(k1, k1._initialise_params(key), x).to_dense())
-im1 = ax[1].matshow(k2.gram(k2, k2._initialise_params(key), x).to_dense())
-im2 = ax[2].matshow(k3.gram(k3, k3._initialise_params(key), x).to_dense())
-im3 = ax[3].matshow(prod_k.gram(prod_k, prod_k._initialise_params(key), x).to_dense())
+im0 = ax[0].matshow(k1.gram(k1._initialise_params(key), x).to_dense())
+im1 = ax[1].matshow(k2.gram(k2._initialise_params(key), x).to_dense())
+im2 = ax[2].matshow(k3.gram(k3._initialise_params(key), x).to_dense())
+im3 = ax[3].matshow(prod_k.gram(prod_k._initialise_params(key), x).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
@@ -159,8 +158,9 @@ fig.colorbar(im3, ax=ax[3])
 # Alternatively kernel sums and multiplications can be created by passing a list of kernels into the `SumKernel` `ProductKernel` objects respectively.
 
 # %%
-sum_k = gpx.SumKernel(kernel_set=[k1, k2])
-prod_k = gpx.ProductKernel(kernel_set=[k1, k2, k3])
+sum_k = jk.SumKernel(kernel_set=[k1, k2])
+prod_k = jk.ProductKernel(kernel_set=[k1, k2, k3])
+
 
 # %% [markdown]
 # ## Custom kernel
@@ -200,22 +200,18 @@ prod_k = gpx.ProductKernel(kernel_set=[k1, k2, k3])
 # To implement this, one must write the following class.
 
 # %%
-from chex import dataclass
-
-
 def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
 
 
-@dataclass
-class Polar(gpx.kernels.AbstractKernel, gpx.kernels.DenseKernelComputation):
-    period: float = 2 * jnp.pi
-
-    def __post_init__(self):
+class Polar(jk.kernels.AbstractKernel):
+    def __init__(self) -> None:
+        super().__init__()
+        self.period: float = 2 * jnp.pi
         self.c = self.period / 2.0  # in [0, \pi]
 
     def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"] 
+        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
         tau = params["tau"]
         t = angular_distance(x, y, self.c)
@@ -242,7 +238,7 @@ class Polar(gpx.kernels.AbstractKernel, gpx.kernels.DenseKernelComputation):
 # example, without a `@dataclass` decorator, the instantiation of the above
 # `Polar` kernel would be done through
 # ```python
-# class Polar(gpx.kernels.AbstractKernel):
+# class Polar(jk.kernels.AbstractKernel):
 #     def __init__(self, period: float = 2*jnp.pi):
 #         super().__init__()
 #         self.period = period
@@ -274,7 +270,6 @@ class Polar(gpx.kernels.AbstractKernel, gpx.kernels.DenseKernelComputation):
 # where the lower bound is shifted by $4$.
 
 # %%
-
 from jax.nn import softplus
 from gpjax.config import add_parameter
 
@@ -299,7 +294,7 @@ noise = 0.2
 X = jnp.sort(jr.uniform(key, minval=0.0, maxval=jnp.pi * 2, shape=(n, 1)), axis=0)
 y = 4 + jnp.cos(2 * X) + jr.normal(key, shape=X.shape) * noise
 
-D = gpx.Dataset(X=X, y=y)
+D = Dataset(X=X, y=y)
 
 # Define polar Gaussian process
 PKern = Polar()

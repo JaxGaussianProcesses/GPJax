@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: Python 3.9.7 ('gpjax')
 #     language: python
 #     name: python3
 # ---
@@ -28,16 +28,21 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
-from chex import dataclass
 from jax.config import config
 from scipy.signal import sawtooth
 from jaxtyping import Float, Array
 from typing import Dict
+from jaxutils import Dataset
+import jaxkern as jk
 
 
 import gpjax as gpx
-from gpjax.kernels import DenseKernelComputation, AbstractKernel
-from chex import PRNGKey as PRNGKeyType
+from jaxkern.kernels import (
+    DenseKernelComputation,
+    AbstractKernelComputation,
+    AbstractKernel,
+)
+from gpjax.types import PRNGKeyType
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -57,7 +62,7 @@ f = lambda x: jnp.asarray(sawtooth(2 * jnp.pi * x))
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
 
-D = gpx.Dataset(X=x, y=y)
+D = Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-2.0, 2.0, 500).reshape(-1, 1)
 ytest = f(xtest)
@@ -79,14 +84,18 @@ ax.legend(loc="best")
 # Although deep kernels are not currently supported natively in GPJax, defining one is straightforward as we now demonstrate. Using the base `AbstractKernel` object given in GPJax, we provide a mixin class named `_DeepKernelFunction` to facilitate the user supplying the neural network and base kernel of their choice. Kernel matrices are then computed using the regular `gram` and `cross_covariance` functions.
 
 # %%
-@dataclass
-class _DeepKernelFunction:
-    network: hk.Module
-    base_kernel: AbstractKernel
+class DeepKernelFunction(AbstractKernel):
+    def __init__(
+        self,
+        network: hk.Module,
+        base_kernel: AbstractKernel,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        active_dims: tp.Optional[tp.List[int]] = None,
+    ) -> None:
+        super().__init__(compute_engine, active_dims, True, False, "Deep    Kernel")
+        self.network = network
+        self.base_kernel = base_kernel
 
-
-@dataclass
-class DeepKernelFunction(AbstractKernel, DenseKernelComputation, _DeepKernelFunction):
     def __call__(
         self,
         params: Dict,
@@ -135,7 +144,7 @@ forward_linear1 = hk.without_apply_rng(forward_linear1)
 # Having characterised the feature extraction network, we move to define a Gaussian process parameterised by this deep kernel. We consider a third-order Matérn base kernel and assume a Gaussian likelihood. Parameters, trainability status and transformations are initialised in the usual manner.
 
 # %%
-base_kernel = gpx.RBF()
+base_kernel = jk.RBF()
 kernel = DeepKernelFunction(network=forward_linear1, base_kernel=base_kernel)
 kernel.initialise(x, key)
 prior = gpx.Prior(kernel=kernel)

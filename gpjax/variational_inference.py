@@ -18,17 +18,17 @@ from typing import Callable, Dict
 
 import jax.numpy as jnp
 import jax.scipy as jsp
-from chex import dataclass
-from chex import PRNGKey as PRNGKeyType
+from chex import dataclass, PRNGKey as PRNGKeyType
 from jax import vmap
 from jaxtyping import Array, Float
 
-from .config import get_defaults
-from .covariance_operator import identity
+from jaxlinop import identity
+
+from .config import get_global_config
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
-from .types import Dataset
+from jaxutils import Dataset
 from .utils import concat_dictionaries
 from .variational_families import (
     AbstractVariationalFamily,
@@ -125,12 +125,14 @@ class StochasticVI(AbstractVariationalInference):
         x, y = batch.X, batch.y
 
         # Variational distribution q(f(·)) = N(f(·); μ(·), Σ(·, ·))
-        q = self.variational_family
+        q = self.variational_family(params)
 
         # Compute variational mean, μ(x), and variance, √diag(Σ(x, x)), at training inputs, x
-        qx = vmap(q(params))(x[:, None])
-        mean = qx.mean().val.reshape(-1, 1)
-        variance = qx.variance().val.reshape(-1, 1)
+        def q_moments(x):
+            qx = q(x)
+            return qx.mean(), qx.variance()
+
+        mean, variance = vmap(q_moments)(x[:, None])
 
         # log(p(y|f(x)))
         link_function = self.likelihood.link_function
@@ -178,11 +180,8 @@ class CollapsedVI(AbstractVariationalInference):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        # Unpack kernel computation
-        gram, cross_covariance = kernel.gram, kernel.cross_covariance
-
         m = self.num_inducing
-        jitter = get_defaults()["jitter"]
+        jitter = get_global_config()["jitter"]
 
         # Constant for whether or not to negate the elbo for optimisation purposes
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
@@ -190,13 +189,13 @@ class CollapsedVI(AbstractVariationalInference):
         def elbo_fn(params: Dict) -> Float[Array, "1"]:
             noise = params["likelihood"]["obs_noise"]
             z = params["variational_family"]["inducing_inputs"]
-            Kzz = gram(kernel, params["kernel"], z)
+            Kzz = kernel.gram(params["kernel"], z)
             Kzz += identity(m) * jitter
-            Kzx = cross_covariance(kernel, params["kernel"], z, x)
+            Kzx = kernel.cross_covariance(params["kernel"], z, x)
             Kxx_diag = vmap(kernel, in_axes=(None, 0, 0))(params["kernel"], x, x)
             μx = mean_function(params["mean_function"], x)
 
-            Lz = Kzz.triangular_lower()
+            Lz = Kzz.to_root()
 
             # Notation and derivation:
             #
@@ -222,7 +221,7 @@ class CollapsedVI(AbstractVariationalInference):
             #
             #   with A and B defined as above.
 
-            A = jsp.linalg.solve_triangular(Lz, Kzx, lower=True) / jnp.sqrt(noise)
+            A = Lz.solve(Kzx) / jnp.sqrt(noise)
 
             # AAᵀ
             AAT = jnp.matmul(A, A.T)

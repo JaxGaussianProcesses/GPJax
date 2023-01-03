@@ -1,11 +1,11 @@
 <!-- <h1 align='center'>GPJax</h1>
 <h2 align='center'>Gaussian processes in Jax.</h2> -->
 <p align="center">
-<img width="700" height="300" src="https://github.com/thomaspinder/GPJax/raw/master/docs/_static/gpjax_logo.svg" alt="GPJax's logo">
+<img width="700" height="300" src="https://github.com/JaxGaussianProcesses/GPJax/raw/master/docs/_static/gpjax_logo.svg" alt="GPJax's logo">
 </p>
 
-[![codecov](https://codecov.io/gh/thomaspinder/gpjax/branch/master/graph/badge.svg?token=DM1DRDASU2)](https://codecov.io/gh/thomaspinder/gpjax)
-[![CodeFactor](https://www.codefactor.io/repository/github/thomaspinder/gpjax/badge)](https://www.codefactor.io/repository/github/thomaspinder/gpjax)
+[![codecov](https://codecov.io/gh/JaxGaussianProcesses/GPJax/branch/master/graph/badge.svg?token=DM1DRDASU2)](https://codecov.io/gh/JaxGaussianProcesses/GPJax)
+[![CodeFactor](https://www.codefactor.io/repository/github/jaxgaussianprocesses/gpjax/badge)](https://www.codefactor.io/repository/github/jaxgaussianprocesses/gpjax)
 [![Documentation Status](https://readthedocs.org/projects/gpjax/badge/?version=latest)](https://gpjax.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/GPJax.svg)](https://badge.fury.io/py/GPJax)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.04455/status.svg)](https://doi.org/10.21105/joss.04455)
@@ -23,7 +23,7 @@ GPJax aims to provide a low-level interface to Gaussian process (GP) models in [
 
 GPJax was founded by [Thomas Pinder](https://github.com/thomaspinder). Today, the maintenance of GPJax is undertaken by [Thomas Pinder](https://github.com/thomaspinder) and [Daniel Dodd](https://github.com/Daniel-Dodd).
 
-We would be delighted to receive contributions from interested individuals and groups. To learn how you can get involved, please read our [guide for contributing](https://github.com/thomaspinder/GPJax/blob/master/CONTRIBUTING.md). If you have any questions, we encourage you to [open an issue](https://github.com/thomaspinder/GPJax/issues/new/choose). For broader conversations, such as best GP fitting practices or questions about the mathematics of GPs, we invite you to [open a discussion](https://github.com/thomaspinder/GPJax/discussions).
+We would be delighted to receive contributions from interested individuals and groups. To learn how you can get involved, please read our [guide for contributing](https://github.com/JaxGaussianProcesses/GPJax/blob/master/CONTRIBUTING.md). If you have any questions, we encourage you to [open an issue](https://github.com/JaxGaussianProcesses/GPJax/issues/new/choose). For broader conversations, such as best GP fitting practices or questions about the mathematics of GPs, we invite you to [open a discussion](https://github.com/JaxGaussianProcesses/GPJax/discussions).
 
 Feel free to join our [Slack Channel](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw), where we can discuss the development of GPJax and broader support for Gaussian process modelling.
 
@@ -48,6 +48,20 @@ Feel free to join our [Slack Channel](https://join.slack.com/t/gpjax/shared_invi
 > - [**Custom kernels**](https://gpjax.readthedocs.io/en/latest/examples/kernels.html#Custom-Kernel)
 > - [**UCI regression**](https://gpjax.readthedocs.io/en/latest/examples/yacht.html)
 
+## Conversion between `.ipynb` and `.py`
+Above examples are stored in [examples](examples) directory in the double percent (`py:percent`) format. Checkout [jupytext using-cli](https://jupytext.readthedocs.io/en/latest/using-cli.html) for more info.
+
+* To convert `example.py` to `example.ipynb`, run:
+
+```bash
+jupytext --to notebook example.py
+```
+
+* To convert `example.ipynb` to `example.py`, run:
+
+```bash
+jupytext --to py:percent example.ipynb
+```
 
 # Simple example
 
@@ -123,8 +137,8 @@ xtest = jnp.linspace(-3., 3., 100).reshape(-1, 1)
 latent_distribution = posterior(learned_params, D)(xtest)
 predictive_distribution = likelihood(learned_params, latent_distribution)
 
-predictive_mean = predictive_distribution.mean
-predictive_cov = predictive_distribution.covariance
+predictive_mean = predictive_distribution.mean()
+predictive_cov = predictive_distribution.covariance()
 ```
 
 # Installation
@@ -153,7 +167,7 @@ pip install gpjax
 
 Clone a copy of the repository to your local machine and run the setup configuration in development mode.
 ```bash
-git clone https://github.com/thomaspinder/GPJax.git
+git clone https://github.com/JaxGaussianProcesses/GPJax.git
 cd GPJax
 python setup.py develop
 ```

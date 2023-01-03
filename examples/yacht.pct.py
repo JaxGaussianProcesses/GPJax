@@ -14,12 +14,13 @@
 # ---
 
 # %%
-import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import numpy as np
 import optax as ox
 from jax.config import config
+from jaxutils import Dataset
+import jaxkern as jk
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -113,7 +114,7 @@ scaled_Xte = x_scaler.transform(Xte)
 
 # %%
 n_train, n_covariates = scaled_Xtr.shape
-kernel = gpx.kernels.RBF(active_dims=list(range(n_covariates)))
+kernel = jk.kernels.RBF(active_dims=list(range(n_covariates)))
 prior = gpx.Prior(kernel=kernel)
 
 likelihood = gpx.Gaussian(num_datapoints=n_train)
@@ -126,7 +127,7 @@ posterior = prior * likelihood
 # With a model now defined, we can proceed to optimise the hyperparameters of our model using Optax.
 
 # %%
-training_data = gpx.Dataset(X=scaled_Xtr, y=scaled_ytr)
+training_data = Dataset(X=scaled_Xtr, y=scaled_ytr)
 
 parameter_state = gpx.initialise(posterior, key)
 negative_mll = jit(
@@ -150,7 +151,10 @@ learned_params, training_history = inference_state.unpack()
 # With an optimal set of parameters learned, we can make predictions on the set of data that we held back right at the start. We'll do this in the usual way by first computing the latent function's distribution before computing the predictive posterior distribution.
 
 # %%
-latent_dist = posterior(learned_params, training_data, )(scaled_Xte)
+latent_dist = posterior(
+    learned_params,
+    training_data,
+)(scaled_Xte)
 predictive_dist = likelihood(learned_params, latent_dist)
 
 predictive_mean = predictive_dist.mean()

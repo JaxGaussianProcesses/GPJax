@@ -14,3 +14,6 @@ ignore:
   - "*/tests/.*"
   - "__init__.py"
   - "tests/*.py"
+  - "**/_version.py"
+  - "**/versioneer.py"
+  - "versioneer.py"

@@ -22,11 +22,10 @@ import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-from chex import dataclass
+from chex import dataclass, PRNGKey as PRNGKeyType
 from jaxtyping import Array, Float
 
-from .config import Identity, get_defaults
-from chex import PRNGKey as PRNGKeyType
+from .config import Identity, get_global_config
 from .utils import merge_dictionaries
 
 
@@ -155,7 +154,7 @@ def build_bijectors(params: Dict) -> Dict:
         Dict: A dictionary that maps each parameter to a bijection.
     """
     bijectors = copy_dict_structure(params)
-    config = get_defaults()
+    config = get_global_config()
     transform_set = config["transformations"]
 
     def recursive_bijectors_list(ps, bs):

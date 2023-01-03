@@ -31,6 +31,8 @@ import jax.scipy.linalg as jsl
 import matplotlib.pyplot as plt
 import optax as ox
 from jax.config import config
+from jaxutils import Dataset
+import jaxkern as jk
 
 import gpjax as gpx
 
@@ -97,13 +99,13 @@ plt.show()
 # We'll now independently learn Gaussian process posterior distributions for each dataset. We won't spend any time here discussing how GP hyperparameters are optimised. For advice on achieving this, see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for advice on optimisation and the [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for advice on selecting an appropriate kernel.
 
 # %%
-def fit_gp(x: jnp.DeviceArray, y: jnp.DeviceArray) -> dx.MultivariateNormalTri:
+def fit_gp(x: jax.Array, y: jax.Array) -> dx.MultivariateNormalTri:
     if y.ndim == 1:
         y = y.reshape(-1, 1)
-    D = gpx.Dataset(X=x, y=y)
+    D = Dataset(X=x, y=y)
 
     likelihood = gpx.Gaussian(num_datapoints=n)
-    posterior = gpx.Prior(kernel=gpx.RBF()) * likelihood
+    posterior = gpx.Prior(kernel=jk.RBF()) * likelihood
 
     parameter_state = gpx.initialise(posterior, key)
     negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
@@ -128,18 +130,18 @@ posterior_preds = [fit_gp(x, i) for i in ys]
 # In GPJax, the predictive distribution of a GP is given by a [Distrax](https://github.com/deepmind/distrax) distribution, making it straightforward to extract the mean vector and covariance matrix of each GP for learning a barycentre. We implement the fixed point scheme given in (3) in the following cell by utilising Jax's `vmap` operator to speed up large matrix operations using broadcasting in `tensordot`.
 
 # %%
-def sqrtm(A: jnp.DeviceArray):
+def sqrtm(A: jax.Array):
     return jnp.real(jsl.sqrtm(A))
 
 
 def wasserstein_barycentres(
-    distributions: tp.List[dx.MultivariateNormalTri], weights: jnp.DeviceArray
+    distributions: tp.List[dx.MultivariateNormalTri], weights: jax.Array
 ):
     covariances = [d.covariance() for d in distributions]
     cov_stack = jnp.stack(covariances)
     stack_sqrt = jax.vmap(sqrtm)(cov_stack)
 
-    def step(covariance_candidate: jnp.DeviceArray, i: jnp.DeviceArray):
+    def step(covariance_candidate: jax.Array):
         inner_term = jax.vmap(sqrtm)(
             jnp.matmul(jnp.matmul(stack_sqrt, covariance_candidate), stack_sqrt)
         )

@@ -15,6 +15,7 @@
 
 import typing as tp
 
+import jax
 import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
@@ -84,7 +85,7 @@ def test_conjugate_posterior(num_datapoints):
     # Marginal likelihood
     mll = post.marginal_log_likelihood(train_data=D)
     objective_val = mll(params)
-    assert isinstance(objective_val, jnp.DeviceArray)
+    assert isinstance(objective_val, jax.Array)
     assert objective_val.shape == ()
 
     # Prediction
@@ -126,7 +127,7 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     # Marginal likelihood
     mll = post.marginal_log_likelihood(train_data=D)
     objective_val = mll(params)
-    assert isinstance(objective_val, jnp.DeviceArray)
+    assert isinstance(objective_val, jax.Array)
     assert objective_val.shape == ()
 
     # Prediction
