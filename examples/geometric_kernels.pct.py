@@ -25,65 +25,24 @@ import gpjax as gpx
 import jax.numpy as jnp
 import jax.random as jr
 from jax.config import config
-from geometric_kernels.kernels import MaternKarhunenLoeveKernel, BaseGeometricKernel
+from geometric_kernels.kernels import MaternKarhunenLoeveKernel
 from geometric_kernels.spaces import Mesh
-from gpjax.kernels import AbstractKernel, AbstractKernelComputation
-import typing as tp
-from jaxtyping import Float, Array
 import jax
 import meshzoo
 
 config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
 
-
 # %% [markdown]
 # ## Kernel Structure
 #
-# To allow GPJax to interact with Geometric Kernels, we'll need to define a wrapper object that connects the two libraries. Through the `AbstractKernelComputation` object supplied in GPJax, this is straightforward as we'll bow go on to show.
+# To allow GPJax to interact with Geometric Kernels, we'll need to define a wrapper object that connects the two libraries. This can be achieved using the `GPJaxGeometricKernel` wrapper that is implemented within Geometric Kernels.
 
 # %%
-class GeometricComputation(AbstractKernelComputation):
-    def __init__(
-        self,
-        kernel_fn: tp.Callable[
-            [tp.Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array
-        ] = None,
-    ) -> None:
-        super().__init__(kernel_fn)
-
-    def cross_covariance(
-        self, params: tp.Dict, x: Float[Array, "N D"], y: Float[Array, "M D"]
-    ) -> Float[Array, "N M"]:
-        matrix = jnp.asarray(self.kernel_fn(params, x, y))
-        return matrix
-
-
-class GeometricKernel(AbstractKernel):
-    def __init__(
-        self,
-        base_kernel: BaseGeometricKernel,
-        compute_engine: GeometricComputation = GeometricComputation,
-        active_dims: tp.Optional[tp.List[int]] = None,
-        name: tp.Optional[str] = "Geometric Kernel",
-    ) -> None:
-        super().__init__(compute_engine, active_dims, True, False, name)
-        self.base_kernel = base_kernel
-        _, self.state = base_kernel.init_params_and_state()
-
-    def __call__(
-        self, params: tp.Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
-    ) -> Float[Array, "1"]:
-        return self.base_kernel.K(params, self.state, x, y)
-
-    def _initialise_params(self, key: jr.KeyArray) -> tp.Dict:
-        params, _ = self.base_kernel.init_params_and_state()
-        # Convert each value to Jax arrays
-        return jax.tree_util.tree_map(lambda x: jnp.atleast_1d(x), params)
-
+from geometric_kernels.frontends.jax.gpjax import GPJaxGeometricKernel
 
 # %% [markdown]
-# Unpacking the above code, we first defined a `GeometricComputation` object that contains the logic required to compute a kernel matrix. This can then be supplied as the `compute_engine` in the `GeometricKernel` object. Along with a kernel from Geometric Kernels which we name `base_kernel`, this initialises the kernel. To make the object valid in GPJax, we must define the `__call__` function which accepts a set of parameters and a pair of arrays for which we'd like to compute a kernel. As Geometric kernels has already defined the kernel functions, all that is required here is to invoke the relevant method from the base kernel. Finally, we must tell GPJax how the object should be initialised. Again, this logic is contained within Geometric kernels, however, to the parameters' type must be coerced into a JAX array before returning.
+# Within the above code, a `GeometricComputation` object is first defined that contains the logic required to compute a kernel matrix. This can then be supplied as the `compute_engine` in the `GPJaxGeometricKernel` object. Along with a kernel from Geometric Kernels which we name `base_kernel`, this initialises the kernel. To make the object valid in GPJax, a `__call__` methods which accepts a set of parameters and a pair of arrays for which we'd like to compute a kernel is defined. As Geometric kernels has already defined the kernel functions, all that is required here is to invoke the relevant method from the base kernel. Finally, we must tell GPJax how the object should be initialised. Again, this logic is contained within Geometric kernels, however, to the parameters' type must be coerced into a JAX array before returning.
 #
 # ## Data
 #
@@ -97,7 +56,7 @@ mesh = Mesh(vertices, faces)
 
 truncation_level = 20
 base_kernel = MaternKarhunenLoeveKernel(mesh, truncation_level)
-geometric_kernel = GeometricKernel(base_kernel)
+geometric_kernel = GPJaxGeometricKernel(base_kernel)
 
 init_params = geometric_kernel._initialise_params(key)
 
