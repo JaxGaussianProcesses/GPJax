@@ -27,6 +27,29 @@ jobs:
             ./codecov -t ${CODECOV_TOKEN}
       - codecov/upload:
           file: coverage.xml
+  build-docs:
+    docker:
+      - image: cimg/python:3.8.0
+    steps:
+      - checkout
+      - run:
+          name: Update pip
+          command: pip install --upgrade pip
+      - python/install-packages:
+          pkg-manager: pip-dist
+          path-args: .[dev]
+      # Install requirements for docs within docs/requirements.txt
+      - run:
+          name: Install docs requirements
+          command: pip install -r docs/requirements.txt
+      - run:
+          name: Build docs
+          command: |
+            cd docs
+            make html
+      - store_artifacts:
+          path: docs/_build/html
+          destination: docs
 
   publish:
     docker:
@@ -94,6 +117,10 @@ workflows:
   main:
     jobs:
       - build-and-test:
+          filters:  # required since `deploy` has tag filters AND requires `build`
+            tags:
+              only: /.*/
+      - build-docs:
           filters:  # required since `deploy` has tag filters AND requires `build`
             tags:
               only: /.*/

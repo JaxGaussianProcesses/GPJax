@@ -170,10 +170,10 @@ key = jr.PRNGKey(123)
 
 d1 = dx.MultivariateNormalFullCovariance(jnp.zeros(2), jnp.eye(2))
 d2 = dx.MultivariateNormalTri(
-    jnp.zeros(2), jnp.linalg.cholesky(jax.Array([[1.0, 0.9], [0.9, 1.0]]))
+    jnp.zeros(2), jnp.linalg.cholesky(jnp.array([[1.0, 0.9], [0.9, 1.0]]))
 )
 d3 = dx.MultivariateNormalTri(
-    jnp.zeros(2), jnp.linalg.cholesky(jax.Array([[1.0, -0.5], [-0.5, 1.0]]))
+    jnp.zeros(2), jnp.linalg.cholesky(jnp.array([[1.0, -0.5], [-0.5, 1.0]]))
 )
 
 dists = [d1, d2, d3]

@@ -42,7 +42,6 @@ from jaxkern.kernels import (
     AbstractKernelComputation,
     AbstractKernel,
 )
-from gpjax.types import PRNGKeyType
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -106,12 +105,12 @@ class DeepKernelFunction(AbstractKernel):
         yt = self.network.apply(params=params, x=y)
         return self.base_kernel(params, xt, yt)
 
-    def initialise(self, dummy_x: Float[Array, "1 D"], key: PRNGKeyType) -> None:
+    def initialise(self, dummy_x: Float[Array, "1 D"], key: jr.PRNGKey) -> None:
         nn_params = self.network.init(rng=key, x=dummy_x)
         base_kernel_params = self.base_kernel._initialise_params(key)
         self._params = {**nn_params, **base_kernel_params}
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def _initialise_params(self, key: jr.PRNGKey) -> Dict:
         return self._params
 
 

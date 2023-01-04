@@ -20,8 +20,6 @@ sys.path.insert(0, os.path.abspath(".."))
 
 from importlib_metadata import version
 
-import docs.conf_sphinx_patch
-
 
 def read(*names, **kwargs):
     """Function to decode a read files. Credit GPyTorch."""
@@ -59,7 +57,14 @@ copyright = "2021, Thomas Pinder"
 author = "Thomas Pinder"
 
 # The full version, including alpha/beta/rc tags
-version = find_version("gpjax", "__init__.py")
+import sys
+from os.path import join, pardir, dirname
+
+sys.path.insert(0, join(dirname(__file__), pardir))
+
+import gpjax
+
+version = gpjax.__version__
 release = version
 
 
