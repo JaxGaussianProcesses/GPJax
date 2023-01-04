@@ -4,12 +4,39 @@ orbs:
   python: circleci/python@2.1.1
   codecov: codecov/codecov@3.2.2
 
+commands:
+  install_pandoc:
+    description: "Install pandoc"
+    parameters:
+      pandoc_url:
+        type: string
+      pandoc_dest:
+        type: string
+    steps:
+      - restore_cache:
+          keys:
+            - pandoc-download
+      - run:
+          name: Install pandoc
+          command: |
+            if [ ! -f "~/pandoc.tar.gz" ]; then
+              wget << parameters.pandoc_url >> -O ~/pandoc.tar.gz
+            fi
+            sudo tar xvzf ~/pandoc.tar.gz --strip-components 1 -C << parameters.pandoc_dest >>
+      - save_cache:
+          key: pandoc-download
+          paths:
+            - ~/pandoc.tar.gz
+
 jobs:
   build-and-test:
     docker:
       - image: cimg/python:3.8.0
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - pip-cache
       - run:
           name: Update pip
           command: pip install --upgrade pip
@@ -25,6 +52,10 @@ jobs:
             curl -Os https://uploader.codecov.io/v0.1.0_4653/linux/codecov
             chmod +x codecov
             ./codecov -t ${CODECOV_TOKEN}
+      - save_cache:
+          key: pip-cache
+          paths:
+            - ~/.cache/pip
       - codecov/upload:
           file: coverage.xml
   build-docs:
@@ -32,6 +63,9 @@ jobs:
       - image: cimg/python:3.8.0
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - pip-cache-doc
       - run:
           name: Update pip
           command: pip install --upgrade pip
@@ -42,6 +76,13 @@ jobs:
       - run:
           name: Install docs requirements
           command: pip install -r docs/requirements.txt
+      - save_cache:
+          key: pip-cache-doc
+          paths:
+            - ~/.cache/pip
+      - install_pandoc:
+          pandoc_url: "https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-linux-amd64.tar.gz"
+          pandoc_dest: "/usr/local/"
       - run:
           name: Build docs
           command: |
