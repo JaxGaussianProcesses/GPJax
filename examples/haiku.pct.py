@@ -45,7 +45,7 @@ from jaxkern.kernels import (
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
-key = jr.PRNGKey(123)
+key = jr.KeyArray(123)
 
 # %% [markdown]
 # ## Dataset
@@ -105,12 +105,12 @@ class DeepKernelFunction(AbstractKernel):
         yt = self.network.apply(params=params, x=y)
         return self.base_kernel(params, xt, yt)
 
-    def initialise(self, dummy_x: Float[Array, "1 D"], key: jr.PRNGKey) -> None:
+    def initialise(self, dummy_x: Float[Array, "1 D"], key: jr.KeyArray) -> None:
         nn_params = self.network.init(rng=key, x=dummy_x)
         base_kernel_params = self.base_kernel._initialise_params(key)
         self._params = {**nn_params, **base_kernel_params}
 
-    def _initialise_params(self, key: jr.PRNGKey) -> Dict:
+    def _initialise_params(self, key: jr.KeyArray) -> Dict:
         return self._params
 
 

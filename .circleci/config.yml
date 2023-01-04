@@ -5,6 +5,53 @@ orbs:
   codecov: codecov/codecov@3.2.2
 
 commands:
+  create_pypirc:
+    description: "Create .pypirc file"
+    steps:
+      - run:
+          name: init .pypirc
+          command: |
+            echo -e "[distutils]" >> ~/.pypirc
+            echo -e "index-servers = " >> ~/.pypirc
+            echo -e "    pypi" >> ~/.pypirc
+            echo -e "    gpjax-nightly" >> ~/.pypirc
+            echo -e "" >> ~/.pypirc
+            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "    username = thomaspinder" >> ~/.pypirc
+            echo -e "    password = $PYPI_TOKEN" >> ~/.pypirc
+            echo -e "" >> ~/.pypirc
+            echo -e "[gpjax]" >> ~/.pypirc
+            echo -e "    repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
+            echo -e "    username = __token__" >> ~/.pypirc
+            echo -e "    password = $GPJAX_PYPI" >> ~/.pypirc
+            echo -e "" >> ~/.pypirc
+            echo -e "[gpjax-nightly]" >> ~/.pypirc
+            echo -e "    repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
+            echo -e "    username = __token__" >> ~/.pypirc
+            echo -e "    password = $GPJAX_NIGHTLY_PYPI" >> ~/.pypirc
+  publish_to_pypi:
+    description: "Publish a package to PyPI"
+    parameters:
+      pkgname:
+        description: Package name
+        type: string
+        default: gpjax
+      nightly:
+        description: Perform a nightly installation
+        type: string
+        default: None
+    steps:
+      - run:
+          name: Build package
+          command: |
+            pip install -U twine
+            python setup.py sdist bdist_wheel
+          environment:
+            BUILD_GPJAX_NIGHTLY: << parameters.nightly >>
+      - run:
+          name: Upload to PyPI
+          command: twine upload dist/* -r << parameters.pkgname >> --verbose
+
   install_pandoc:
     description: "Install pandoc"
     parameters:
@@ -58,102 +105,59 @@ jobs:
             - ~/.cache/pip
       - codecov/upload:
           file: coverage.xml
-  build-docs:
-    docker:
-      - image: cimg/python:3.8.0
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - pip-cache-doc
-      - run:
-          name: Update pip
-          command: pip install --upgrade pip
-      - python/install-packages:
-          pkg-manager: pip-dist
-          path-args: .[dev]
-      # Install requirements for docs within docs/requirements.txt
-      - run:
-          name: Install docs requirements
-          command: pip install -r docs/requirements.txt
-      - save_cache:
-          key: pip-cache-doc
-          paths:
-            - ~/.cache/pip
-      - install_pandoc:
-          pandoc_url: "https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-linux-amd64.tar.gz"
-          pandoc_dest: "/usr/local/"
-      - run:
-          name: Build docs
-          no_output_timeout: 20m
-          command: |
-            cd docs
-            make html
-      - store_artifacts:
-          path: docs/_build/html
-          destination: docs
+  # build-docs:
+  #   docker:
+  #     - image: cimg/python:3.8.0
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         keys:
+  #           - pip-cache-doc
+  #     - run:
+  #         name: Update pip
+  #         command: pip install --upgrade pip
+  #     - python/install-packages:
+  #         pkg-manager: pip-dist
+  #         path-args: .[dev]
+  #     # Install requirements for docs within docs/requirements.txt
+  #     - run:
+  #         name: Install docs requirements
+  #         command: pip install -r docs/requirements.txt
+  #     - save_cache:
+  #         key: pip-cache-doc
+  #         paths:
+  #           - ~/.cache/pip
+  #     - install_pandoc:
+  #         pandoc_url: "https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-linux-amd64.tar.gz"
+  #         pandoc_dest: "/usr/local/"
+  #     - run:
+  #         name: Build docs
+  #         no_output_timeout: 20m
+  #         command: |
+  #           cd docs
+  #           make html
+  #     - store_artifacts:
+  #         path: docs/_build/html
+  #         destination: docs
 
   publish:
     docker:
       - image: cimg/python:3.9.0
     steps:
       - checkout
-      - run:
-          name: init .pypirc
-          command: |
-            echo -e "[distutils]" >> ~/.pypirc
-            echo -e "index-servers = " >> ~/.pypirc
-            echo -e "    pypi" >> ~/.pypirc
-            echo -e "    gpjax" >> ~/.pypirc
-            echo -e "" >> ~/.pypirc
-            echo -e "[pypi]" >> ~/.pypirc
-            echo -e "    username = thomaspinder" >> ~/.pypirc
-            echo -e "    password = $PYPI_TOKEN" >> ~/.pypirc
-            echo -e "" >> ~/.pypirc
-            echo -e "[gpjax]" >> ~/.pypirc
-            echo -e "    repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
-            echo -e "    username = __token__" >> ~/.pypirc
-            echo -e "    password = $GPJAX_PYPI" >> ~/.pypirc
-      - run:
-          name: Build package
-          command: |
-            pip install -U twine
-            python setup.py sdist bdist_wheel
-      - run:
-          name: Upload to PyPI
-          command: twine upload dist/* -r gpjax --verbose
+      - create_pypirc
+      - publish_to_pypi:
+          pkgname: gpjax
 
   publish-nightly:
     docker:
       - image: cimg/python:3.9.0
     steps:
       - checkout
-      - run:
-          name: init .pypirc
-          command: |
-            echo -e "[distutils]" >> ~/.pypirc
-            echo -e "index-servers = " >> ~/.pypirc
-            echo -e "    pypi" >> ~/.pypirc
-            echo -e "    gpjax-nightly" >> ~/.pypirc
-            echo -e "" >> ~/.pypirc
-            echo -e "[pypi]" >> ~/.pypirc
-            echo -e "    username = thomaspinder" >> ~/.pypirc
-            echo -e "    password = $PYPI_TOKEN" >> ~/.pypirc
-            echo -e "" >> ~/.pypirc
-            echo -e "[gpjax-nightly]" >> ~/.pypirc
-            echo -e "    repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
-            echo -e "    username = __token__" >> ~/.pypirc
-            echo -e "    password = $GPJAX_NIGHTLY_PYPI" >> ~/.pypirc
-      - run:
-          name: Build package
-          command: |
-            pip install -U twine
-            python setup.py sdist bdist_wheel
-          environment:
-            BUILD_GPJAX_NIGHTLY: 'nightly'
-      - run:
-          name: Upload to PyPI
-          command: twine upload dist/* -r gpjax-nightly --verbose
+      - create_pypirc
+      - publish_to_pypi:
+          pkgname: gpjax-nigthly
+          nightly: nightly
 
 workflows:
   main:
@@ -162,10 +166,10 @@ workflows:
           filters:  # required since `deploy` has tag filters AND requires `build`
             tags:
               only: /.*/
-      - build-docs:
-          filters:  # required since `deploy` has tag filters AND requires `build`
-            tags:
-              only: /.*/
+      # - build-docs:
+      #     filters:  # required since `deploy` has tag filters AND requires `build`
+      #       tags:
+      #         only: /.*/
       - publish:
           requires:
             - build-and-test
