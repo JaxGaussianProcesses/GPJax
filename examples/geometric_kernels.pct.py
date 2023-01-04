@@ -76,7 +76,7 @@ params = prior._initialise_params(key)
 
 n = 25
 x = jr.randint(key, minval=0, maxval=mesh.num_vertices, shape=(n, 1))
-y = prior(params)(x).sample(seed=key)
+y = prior(params)(x).sample(seed=key).reshape(-1, 1)
 D = Dataset(X=x, y=y)
 
 x_test = jnp.arange(mesh.num_vertices).reshape(mesh.num_vertices, 1)
