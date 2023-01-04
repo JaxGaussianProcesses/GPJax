@@ -85,6 +85,7 @@ jobs:
           pandoc_dest: "/usr/local/"
       - run:
           name: Build docs
+          no_output_timeout: 20m
           command: |
             cd docs
             make html
