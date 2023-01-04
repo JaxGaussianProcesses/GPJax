@@ -79,6 +79,8 @@ jobs:
   build-and-test:
     docker:
       - image: cimg/python:3.8.0
+    parallelism: 4
+    resource_class: large
     steps:
       - checkout
       - restore_cache:
@@ -92,7 +94,9 @@ jobs:
           path-args: .[dev]
       - run:
           name: Run tests
-          command: pytest --cov=./ --cov-report=xml
+          command: |
+            TEST_FILES=$(circleci tests glob "tests/test_*.py" | circleci tests split --split-by=timings)
+            pytest --cov=./ --cov-report=xml --verbose $TEST_FILES
       - run:
           name: Upload tests to Codecov
           command: |
@@ -103,42 +107,13 @@ jobs:
           key: pip-cache
           paths:
             - ~/.cache/pip
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
       - codecov/upload:
           file: coverage.xml
-  # build-docs:
-  #   docker:
-  #     - image: cimg/python:3.8.0
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         keys:
-  #           - pip-cache-doc
-  #     - run:
-  #         name: Update pip
-  #         command: pip install --upgrade pip
-  #     - python/install-packages:
-  #         pkg-manager: pip-dist
-  #         path-args: .[dev]
-  #     # Install requirements for docs within docs/requirements.txt
-  #     - run:
-  #         name: Install docs requirements
-  #         command: pip install -r docs/requirements.txt
-  #     - save_cache:
-  #         key: pip-cache-doc
-  #         paths:
-  #           - ~/.cache/pip
-  #     - install_pandoc:
-  #         pandoc_url: "https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-linux-amd64.tar.gz"
-  #         pandoc_dest: "/usr/local/"
-  #     - run:
-  #         name: Build docs
-  #         no_output_timeout: 20m
-  #         command: |
-  #           cd docs
-  #           make html
-  #     - store_artifacts:
-  #         path: docs/_build/html
-  #         destination: docs
+
 
   publish:
     docker:
@@ -166,10 +141,6 @@ workflows:
           filters:  # required since `deploy` has tag filters AND requires `build`
             tags:
               only: /.*/
-      # - build-docs:
-      #     filters:  # required since `deploy` has tag filters AND requires `build`
-      #       tags:
-      #         only: /.*/
       - publish:
           requires:
             - build-and-test
