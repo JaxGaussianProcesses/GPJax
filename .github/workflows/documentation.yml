@@ -1,6 +1,8 @@
 name: Build the documentation
 
 on:
+  push:
+    branches: [master]
   pull_request:
     branches: [master]
 
