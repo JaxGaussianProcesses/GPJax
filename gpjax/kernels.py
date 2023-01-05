@@ -17,6 +17,14 @@ import jaxkern
 import deprecation
 
 
+# These abstract types will also be removed in v0.6.0
+AbstractKernel = jaxkern.kernels.AbstractKernel
+AbstractKernelComputation = jaxkern.kernels.AbstractKernelComputation
+CombinationKernel = jaxkern.kernels.CombinationKernel
+SumKernel = jaxkern.kernels.SumKernel
+ProductKernel = jaxkern.kernels.ProductKernel
+
+# Import kernels/functions from `JaxKern`` and wrap them in a deprecation.
 def deprecate(cls):
     return deprecation.deprecated(
         deprecated_in="0.5.5",
@@ -25,15 +33,10 @@ def deprecate(cls):
     )(cls)
 
 
-AbstractKernelComputation = deprecate(jaxkern.kernels.AbstractKernelComputation)
 DiagonalKernelComputation = deprecate(jaxkern.kernels.DiagonalKernelComputation)
 ConstantDiagonalKernelComputation = deprecate(
     jaxkern.kernels.ConstantDiagonalKernelComputation
 )
-AbstractKernel = deprecate(jaxkern.kernels.AbstractKernel)
-CombinationKernel = deprecate(jaxkern.kernels.CombinationKernel)
-SumKernel = deprecate(jaxkern.kernels.SumKernel)
-ProductKernel = deprecate(jaxkern.kernels.ProductKernel)
 RBF = deprecate(jaxkern.kernels.RBF)
 Matern12 = deprecate(jaxkern.kernels.Matern12)
 Matern32 = deprecate(jaxkern.kernels.Matern32)
