@@ -156,6 +156,6 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - master
     jobs:
       - publish-nightly
