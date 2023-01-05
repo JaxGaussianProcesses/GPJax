@@ -45,7 +45,7 @@ from jaxkern.kernels import (
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
-key = jr.KeyArray(123)
+key = jr.PRNGKey(123)
 
 # %% [markdown]
 # ## Dataset
