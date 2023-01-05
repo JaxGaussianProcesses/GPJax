@@ -45,10 +45,7 @@ key = jr.PRNGKey(123)
 # We'll be using the [Yacht](https://archive.ics.uci.edu/ml/datasets/yacht+hydrodynamics) dataset from the UCI machine learning data repository. Each observation describes the hydrodynamic performance of a yacht through its resistance. The dataset contains 6 covariates and a single positive, real valued response variable. There are 308 observations in the dataset, so we can comfortably use a conjugate regression Gaussian process here (for more more details, checkout the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)).
 
 # %%
-yacht = pd.read_fwf(
-    "https://archive.ics.uci.edu/ml/machine-learning-databases/00243/yacht_hydrodynamics.data",
-    header=None,
-).values[:-1, :]
+yacht = pd.read_fwf("data/yacht_hydrodynamics.data", header=None).values[:-1, :]
 X = yacht[:, :-1]
 y = yacht[:, -1].reshape(-1, 1)
 

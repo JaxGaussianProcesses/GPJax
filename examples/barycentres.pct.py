@@ -141,7 +141,7 @@ def wasserstein_barycentres(
     cov_stack = jnp.stack(covariances)
     stack_sqrt = jax.vmap(sqrtm)(cov_stack)
 
-    def step(covariance_candidate: jax.Array):
+    def step(covariance_candidate: jax.Array, idx: None):
         inner_term = jax.vmap(sqrtm)(
             jnp.matmul(jnp.matmul(stack_sqrt, covariance_candidate), stack_sqrt)
         )

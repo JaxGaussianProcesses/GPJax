@@ -295,10 +295,17 @@ Configuration
 .. automodule:: gpjax.config
 .. currentmodule:: gpjax.config
 
-
-.. autofunction:: get_defaults
-
 .. autofunction:: add_parameter
+
+.. autofunction:: get_global_config_if_exists
+
+.. autofunction:: get_default_config
+
+.. autofunction:: update_x64_sensitive_settings
+
+.. autofunction:: get_global_config
+
+.. autofunction:: reset_global_config
 
 
 Quadrature

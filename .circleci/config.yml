@@ -4,65 +4,10 @@ orbs:
   python: circleci/python@2.1.1
   codecov: codecov/codecov@3.2.2
 
-jobs:
-  build-and-test:
-    docker:
-      - image: cimg/python:3.8.0
+commands:
+  create_pypirc:
+    description: "Create .pypirc file"
     steps:
-      - checkout
-      - run:
-          name: Update pip
-          command: pip install --upgrade pip
-      - python/install-packages:
-          pkg-manager: pip-dist
-          path-args: .[dev]
-      - run:
-          name: Run tests
-          command: pytest --cov=./ --cov-report=xml
-      - run:
-          name: Upload tests to Codecov
-          command: |
-            curl -Os https://uploader.codecov.io/v0.1.0_4653/linux/codecov
-            chmod +x codecov
-            ./codecov -t ${CODECOV_TOKEN}
-      - codecov/upload:
-          file: coverage.xml
-
-  publish:
-    docker:
-      - image: cimg/python:3.9.0
-    steps:
-      - checkout
-      - run:
-          name: init .pypirc
-          command: |
-            echo -e "[distutils]" >> ~/.pypirc
-            echo -e "index-servers = " >> ~/.pypirc
-            echo -e "    pypi" >> ~/.pypirc
-            echo -e "    gpjax" >> ~/.pypirc
-            echo -e "" >> ~/.pypirc
-            echo -e "[pypi]" >> ~/.pypirc
-            echo -e "    username = thomaspinder" >> ~/.pypirc
-            echo -e "    password = $PYPI_TOKEN" >> ~/.pypirc
-            echo -e "" >> ~/.pypirc
-            echo -e "[gpjax]" >> ~/.pypirc
-            echo -e "    repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
-            echo -e "    username = __token__" >> ~/.pypirc
-            echo -e "    password = $GPJAX_PYPI" >> ~/.pypirc
-      - run:
-          name: Build package
-          command: |
-            pip install -U twine
-            python setup.py sdist bdist_wheel
-      - run:
-          name: Upload to PyPI
-          command: twine upload dist/* -r gpjax --verbose
-
-  publish-nightly:
-    docker:
-      - image: cimg/python:3.9.0
-    steps:
-      - checkout
       - run:
           name: init .pypirc
           command: |
@@ -75,20 +20,119 @@ jobs:
             echo -e "    username = thomaspinder" >> ~/.pypirc
             echo -e "    password = $PYPI_TOKEN" >> ~/.pypirc
             echo -e "" >> ~/.pypirc
+            echo -e "[gpjax]" >> ~/.pypirc
+            echo -e "    repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
+            echo -e "    username = __token__" >> ~/.pypirc
+            echo -e "    password = $GPJAX_PYPI" >> ~/.pypirc
+            echo -e "" >> ~/.pypirc
             echo -e "[gpjax-nightly]" >> ~/.pypirc
             echo -e "    repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
             echo -e "    username = __token__" >> ~/.pypirc
             echo -e "    password = $GPJAX_NIGHTLY_PYPI" >> ~/.pypirc
+  publish_to_pypi:
+    description: "Publish a package to PyPI"
+    parameters:
+      pkgname:
+        description: Package name
+        type: string
+        default: gpjax
+      nightly:
+        description: Perform a nightly installation
+        type: string
+        default: None
+    steps:
       - run:
           name: Build package
           command: |
             pip install -U twine
             python setup.py sdist bdist_wheel
           environment:
-            BUILD_GPJAX_NIGHTLY: 'nightly'
+            BUILD_GPJAX_NIGHTLY: << parameters.nightly >>
       - run:
           name: Upload to PyPI
-          command: twine upload dist/* -r gpjax-nightly --verbose
+          command: twine upload dist/* -r << parameters.pkgname >> --verbose
+
+  install_pandoc:
+    description: "Install pandoc"
+    parameters:
+      pandoc_url:
+        type: string
+      pandoc_dest:
+        type: string
+    steps:
+      - restore_cache:
+          keys:
+            - pandoc-download
+      - run:
+          name: Install pandoc
+          command: |
+            if [ ! -f "~/pandoc.tar.gz" ]; then
+              wget << parameters.pandoc_url >> -O ~/pandoc.tar.gz
+            fi
+            sudo tar xvzf ~/pandoc.tar.gz --strip-components 1 -C << parameters.pandoc_dest >>
+      - save_cache:
+          key: pandoc-download
+          paths:
+            - ~/pandoc.tar.gz
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/python:3.8.0
+    parallelism: 4
+    resource_class: large
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - pip-cache
+      - run:
+          name: Update pip
+          command: pip install --upgrade pip
+      - python/install-packages:
+          pkg-manager: pip-dist
+          path-args: .[dev]
+      - run:
+          name: Run tests
+          command: |
+            TEST_FILES=$(circleci tests glob "tests/test_*.py" | circleci tests split --split-by=timings)
+            pytest --cov=./ --cov-report=xml --verbose $TEST_FILES
+      - run:
+          name: Upload tests to Codecov
+          command: |
+            curl -Os https://uploader.codecov.io/v0.1.0_4653/linux/codecov
+            chmod +x codecov
+            ./codecov -t ${CODECOV_TOKEN}
+      - save_cache:
+          key: pip-cache
+          paths:
+            - ~/.cache/pip
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+      - codecov/upload:
+          file: coverage.xml
+
+
+  publish:
+    docker:
+      - image: cimg/python:3.9.0
+    steps:
+      - checkout
+      - create_pypirc
+      - publish_to_pypi:
+          pkgname: gpjax
+
+  publish-nightly:
+    docker:
+      - image: cimg/python:3.9.0
+    steps:
+      - checkout
+      - create_pypirc
+      - publish_to_pypi:
+          pkgname: gpjax-nigthly
+          nightly: nightly
 
 workflows:
   main:
@@ -112,6 +156,6 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - master
     jobs:
       - publish-nightly
