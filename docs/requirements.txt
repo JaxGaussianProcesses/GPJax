@@ -10,7 +10,6 @@ matplotlib==3.3.3
 seaborn
 sphinx-copybutton
 networkx>=2.0.0
-pandoc
 sphinxcontrib.bibtex
 jupytext
 ipython
