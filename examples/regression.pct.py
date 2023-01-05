@@ -185,7 +185,7 @@ inference_state = gpx.fit(
     objective=negative_mll,
     parameter_state=parameter_state,
     optax_optim=optimiser,
-    n_iters=500,
+    num_iters=500,
 )
 
 # %% [markdown]

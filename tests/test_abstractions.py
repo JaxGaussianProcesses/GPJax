@@ -28,10 +28,10 @@ from gpjax.parameters import ParameterState, build_bijectors
 config.update("jax_enable_x64", True)
 
 
-@pytest.mark.parametrize("n_iters", [1, 5])
+@pytest.mark.parametrize("num_iters", [1, 5])
 @pytest.mark.parametrize("n", [1, 20])
 @pytest.mark.parametrize("verbose", [True, False])
-def test_fit(n_iters, n, verbose):
+def test_fit(num_iters, n, verbose):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
@@ -41,13 +41,13 @@ def test_fit(n_iters, n, verbose):
     mll = p.marginal_log_likelihood(D, negative=True)
     pre_mll_val = mll(parameter_state.params)
     optimiser = optax.adam(learning_rate=0.1)
-    inference_state = fit(mll, parameter_state, optimiser, n_iters, verbose=verbose)
+    inference_state = fit(mll, parameter_state, optimiser, num_iters, verbose=verbose)
     optimised_params, history = inference_state.unpack()
     assert isinstance(inference_state, InferenceState)
     assert isinstance(optimised_params, dict)
     assert mll(optimised_params) < pre_mll_val
     assert isinstance(history, jnp.ndarray)
-    assert history.shape[0] == n_iters
+    assert history.shape[0] == num_iters
 
 
 def test_stop_grads():
@@ -59,18 +59,18 @@ def test_stop_grads():
     parameter_state = ParameterState(
         params=params, trainables=trainables, bijectors=bijectors
     )
-    inference_state = fit(loss_fn, parameter_state, optimiser, n_iters=1)
+    inference_state = fit(loss_fn, parameter_state, optimiser, num_iters=1)
     learned_params = inference_state.params
     assert isinstance(inference_state, InferenceState)
     assert learned_params["y"] == params["y"]
     assert learned_params["x"] != params["x"]
 
 
-@pytest.mark.parametrize("n_iters", [1, 5])
+@pytest.mark.parametrize("num_iters", [1, 5])
 @pytest.mark.parametrize("nb", [1, 20, 50])
 @pytest.mark.parametrize("ndata", [50])
 @pytest.mark.parametrize("verbose", [True, False])
-def test_batch_fitting(n_iters, nb, ndata, verbose):
+def test_batch_fitting(num_iters, nb, ndata, verbose):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(ndata, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
@@ -93,21 +93,21 @@ def test_batch_fitting(n_iters, nb, ndata, verbose):
     optimiser = optax.adam(learning_rate=0.1)
     key = jr.PRNGKey(42)
     inference_state = fit_batches(
-        objective, parameter_state, D, optimiser, key, nb, n_iters, verbose=verbose
+        objective, parameter_state, D, optimiser, key, nb, num_iters, verbose=verbose
     )
     optimised_params, history = inference_state.unpack()
     assert isinstance(inference_state, InferenceState)
     assert isinstance(optimised_params, dict)
     assert objective(optimised_params, D) < pre_mll_val
     assert isinstance(history, jnp.ndarray)
-    assert history.shape[0] == n_iters
+    assert history.shape[0] == num_iters
 
 
-@pytest.mark.parametrize("n_iters", [1, 5])
+@pytest.mark.parametrize("num_iters", [1, 5])
 @pytest.mark.parametrize("nb", [1, 20, 50])
 @pytest.mark.parametrize("ndata", [50])
 @pytest.mark.parametrize("verbose", [True, False])
-def test_natural_gradients(ndata, nb, n_iters, verbose):
+def test_natural_gradients(ndata, nb, num_iters, verbose):
     key = jr.PRNGKey(123)
     x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(ndata, 1)), axis=0)
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
@@ -140,7 +140,7 @@ def test_natural_gradients(ndata, nb, n_iters, verbose):
         hyper_optimiser,
         key,
         nb,
-        n_iters,
+        num_iters,
         verbose=verbose,
     )
     optimised_params, history = inference_state.unpack()
@@ -148,7 +148,7 @@ def test_natural_gradients(ndata, nb, n_iters, verbose):
     assert isinstance(optimised_params, dict)
     assert objective(optimised_params, D) < pre_mll_val
     assert isinstance(history, jnp.ndarray)
-    assert history.shape[0] == n_iters
+    assert history.shape[0] == num_iters
 
 
 @pytest.mark.parametrize("batch_size", [1, 2, 50])

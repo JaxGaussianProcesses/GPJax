@@ -19,7 +19,8 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 import optax as ox
-from chex import dataclass, PRNGKey as PRNGKeyType
+
+from jax.random import KeyArray
 from jax import lax
 from jax.experimental import host_callback
 from jaxtyping import Array, Float
@@ -27,22 +28,40 @@ from tqdm.auto import tqdm
 
 from .natural_gradients import natural_gradients
 from .parameters import ParameterState, constrain, trainable_params, unconstrain
-from jaxutils import Dataset
+from jaxutils import Dataset, PyTree
 from .variational_inference import StochasticVI
 
 
-@dataclass(frozen=True)
-class InferenceState:
-    """Imutable dataclass for storing optimised parameters and training history."""
+class InferenceState(PyTree):
+    """Imutable class for storing optimised parameters and training history."""
 
-    params: Dict
-    history: Float[Array, "n_iters"]
+    def __init__(self, params: Dict, history: Float[Array, "num_iters"]):
+        self._params = params
+        self._history = history
 
-    def unpack(self) -> Tuple[Dict, Float[Array, "n_iters"]]:
+    @property
+    def params(self) -> Dict:
+        """Parameters.
+
+        Returns:
+            Dict: Parameters.
+        """
+        return self._params
+
+    @property
+    def history(self) -> Float[Array, "num_iters"]:
+        """Training history.
+
+        Returns:
+            Float[Array, "num_iters"]: Training history.
+        """
+        return self._history
+
+    def unpack(self) -> Tuple[Dict, Float[Array, "num_iters"]]:
         """Unpack parameters and training history into a tuple.
 
         Returns:
-            Tuple[Dict, Float[Array, "n_iters"]]: Tuple of parameters and training history.
+            Tuple[Dict, Float[Array, "num_iters"]]: Tuple of parameters and training history.
         """
         return self.params, self.history
 
@@ -51,7 +70,7 @@ def fit(
     objective: Callable,
     parameter_state: ParameterState,
     optax_optim: ox.GradientTransformation,
-    n_iters: Optional[int] = 100,
+    num_iters: Optional[int] = 100,
     log_rate: Optional[int] = 10,
     verbose: Optional[bool] = True,
 ) -> InferenceState:
@@ -62,9 +81,9 @@ def fit(
         objective (Callable): The objective function that we are optimising with respect to.
         parameter_state (ParameterState): The initial parameter state.
         optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
-        n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
-        log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
-        verbose (bool, optional): Whether to print the training loading bar. Defaults to True.
+        num_iters (Optional[int]): The number of optimisation steps to run. Defaults to 100.
+        log_rate (Optional[int]): How frequently the objective function's value should be printed. Defaults to 10.
+        verbose (Optional[bool]): Whether to print the training loading bar. Defaults to True.
 
     Returns:
         InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
@@ -85,7 +104,7 @@ def fit(
     opt_state = optax_optim.init(params)
 
     # Iteration loop numbers to scan over
-    iter_nums = jnp.arange(n_iters)
+    iter_nums = jnp.arange(num_iters)
 
     # Optimisation step
     def step(carry, iter_num: int):
@@ -98,7 +117,7 @@ def fit(
 
     # Display progress bar if verbose is True
     if verbose:
-        step = progress_bar_scan(n_iters, log_rate)(step)
+        step = progress_bar_scan(num_iters, log_rate)(step)
 
     # Run the optimisation loop
     (params, _), history = jax.lax.scan(step, (params, opt_state), iter_nums)
@@ -114,9 +133,9 @@ def fit_batches(
     parameter_state: ParameterState,
     train_data: Dataset,
     optax_optim: ox.GradientTransformation,
-    key: PRNGKeyType,
+    key: KeyArray,
     batch_size: int,
-    n_iters: Optional[int] = 100,
+    num_iters: Optional[int] = 100,
     log_rate: Optional[int] = 10,
     verbose: Optional[bool] = True,
 ) -> InferenceState:
@@ -129,11 +148,11 @@ def fit_batches(
         parameter_state (ParameterState): The parameters for which we would like to minimise our objective function with.
         train_data (Dataset): The training dataset.
         optax_optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
-        key (PRNGKeyType): The PRNG key for the mini-batch sampling.
-        batch_size(int): The batch_size.
-        n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
-        log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
-        verbose (bool, optional): Whether to print the training loading bar. Defaults to True.
+        key (KeyArray): The PRNG key for the mini-batch sampling.
+        batch_size (int): The batch_size.
+        num_iters (Optional[int]): The number of optimisation steps to run. Defaults to 100.
+        log_rate (Optional[int]): How frequently the objective function's value should be printed. Defaults to 10.
+        verbose (Optional[bool]): Whether to print the training loading bar. Defaults to True.
 
     Returns:
         InferenceState: An InferenceState object comprising the optimised parameters and training history respectively.
@@ -154,8 +173,8 @@ def fit_batches(
     opt_state = optax_optim.init(params)
 
     # Mini-batch random keys and iteration loop numbers to scan over
-    keys = jr.split(key, n_iters)
-    iter_nums = jnp.arange(n_iters)
+    keys = jr.split(key, num_iters)
+    iter_nums = jnp.arange(num_iters)
 
     # Optimisation step
     def step(carry, iter_num__and__key):
@@ -173,7 +192,7 @@ def fit_batches(
 
     # Display progress bar if verbose is True
     if verbose:
-        step = progress_bar_scan(n_iters, log_rate)(step)
+        step = progress_bar_scan(num_iters, log_rate)(step)
 
     # Run the optimisation loop
     (params, _), history = jax.lax.scan(step, (params, opt_state), (iter_nums, keys))
@@ -184,7 +203,7 @@ def fit_batches(
     return InferenceState(params=params, history=history)
 
 
-def get_batch(train_data: Dataset, batch_size: int, key: PRNGKeyType) -> Dataset:
+def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
     """Batch the data into mini-batches. Sampling is done with replacement.
 
     Args:
@@ -208,9 +227,9 @@ def fit_natgrads(
     train_data: Dataset,
     moment_optim: ox.GradientTransformation,
     hyper_optim: ox.GradientTransformation,
-    key: PRNGKeyType,
+    key: KeyArray,
     batch_size: int,
-    n_iters: Optional[int] = 100,
+    num_iters: Optional[int] = 100,
     log_rate: Optional[int] = 10,
     verbose: Optional[bool] = True,
 ) -> Dict:
@@ -226,11 +245,11 @@ def fit_natgrads(
         train_data (Dataset): The training dataset.
         moment_optim (GradientTransformation): The Optax optimiser for the natural gradient updates on the moments.
         hyper_optim (GradientTransformation): The Optax optimiser for gradient updates on the hyperparameters.
-        key (PRNGKeyType): The PRNG key for the mini-batch sampling.
+        key (KeyArray): The PRNG key for the mini-batch sampling.
         batch_size(int): The batch_size.
-        n_iters (int, optional): The number of optimisation steps to run. Defaults to 100.
-        log_rate (int, optional): How frequently the objective function's value should be printed. Defaults to 10.
-        verbose (bool, optional): Whether to print the training loading bar. Defaults to True.
+        num_iters (Optional[int]): The number of optimisation steps to run. Defaults to 100.
+        log_rate (Optional[int]): How frequently the objective function's value should be printed. Defaults to 10.
+        verbose (Optional[bool]): Whether to print the training loading bar. Defaults to True.
 
     Returns:
         InferenceState: A dataclass comprising optimised parameters and training history.
@@ -251,8 +270,8 @@ def fit_natgrads(
     )
 
     # Mini-batch random keys and iteration loop numbers to scan over
-    keys = jax.random.split(key, n_iters)
-    iter_nums = jnp.arange(n_iters)
+    keys = jax.random.split(key, num_iters)
+    iter_nums = jnp.arange(num_iters)
 
     # Optimisation step
     def step(carry, iter_num__and__key):
@@ -276,7 +295,7 @@ def fit_natgrads(
 
     # Display progress bar if verbose is True
     if verbose:
-        step = progress_bar_scan(n_iters, log_rate)(step)
+        step = progress_bar_scan(num_iters, log_rate)(step)
 
     # Run the optimisation loop
     (params, _, _), history = jax.lax.scan(
@@ -289,15 +308,15 @@ def fit_natgrads(
     return InferenceState(params=params, history=history)
 
 
-def progress_bar_scan(n_iters: int, log_rate: int) -> Callable:
+def progress_bar_scan(num_iters: int, log_rate: int) -> Callable:
     """Progress bar for Jax.lax scans (adapted from https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/)."""
 
     tqdm_bars = {}
-    remainder = n_iters % log_rate
+    remainder = num_iters % log_rate
 
     def _define_tqdm(args: Any, transform: Any) -> None:
         """Define a tqdm progress bar."""
-        tqdm_bars[0] = tqdm(range(n_iters))
+        tqdm_bars[0] = tqdm(range(num_iters))
 
     def _update_tqdm(args: Any, transform: Any) -> None:
         """Update the tqdm progress bar with the latest objective value."""
@@ -329,10 +348,10 @@ def progress_bar_scan(n_iters: int, log_rate: int) -> Callable:
         # Conditions for iteration number
         is_first: bool = iter_num == 0
         is_multiple: bool = (iter_num % log_rate == 0) & (
-            iter_num != n_iters - remainder
+            iter_num != num_iters - remainder
         )
-        is_remainder: bool = iter_num == n_iters - remainder
-        is_last: bool = iter_num == n_iters - 1
+        is_remainder: bool = iter_num == num_iters - remainder
+        is_last: bool = iter_num == num_iters - 1
 
         # Define progress bar, if first iteration
         _callback(is_first, _define_tqdm, None)

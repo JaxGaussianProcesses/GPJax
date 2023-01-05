@@ -18,23 +18,23 @@ from typing import Any, Callable, Dict, Optional
 
 import distrax as dx
 import jax.numpy as jnp
-from chex import dataclass, PRNGKey as PRNGKeyType
 from jaxtyping import Array, Float
+from jax.random import KeyArray
 
 from jaxlinop import identity
 from jaxkern.kernels import AbstractKernel
+from jaxutils import PyTree
 
 from .config import get_global_config
 from .kernels import AbstractKernel
-from .likelihoods import AbstractLikelihood, Conjugate, Gaussian, NonConjugate
+from .likelihoods import AbstractLikelihood, Conjugate, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
 from jaxutils import Dataset
 from .utils import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
 
 
-@dataclass
-class AbstractPrior:
+class AbstractPrior(PyTree):
     """Abstract Gaussian process prior.
 
     All Gaussian processes priors should inherit from this class.
@@ -79,7 +79,7 @@ class AbstractPrior:
         raise NotImplementedError
 
     @abstractmethod
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def _initialise_params(self, key: KeyArray) -> Dict:
         """An initialisation method for the GP's parameters. This method should
         be implemented for all classes that inherit the ``AbstractPrior`` class.
         Whilst not always necessary, the method accepts a PRNG key to allow
@@ -87,7 +87,7 @@ class AbstractPrior:
         through the ``initialise`` function given in GPJax.
 
         Args:
-            key (PRNGKeyType): The PRNG key.
+            key (KeyArray): The PRNG key.
 
         Returns:
             Dict: The initialised parameter set.
@@ -98,7 +98,8 @@ class AbstractPrior:
 #######################
 # GP Priors
 #######################
-@dataclass
+
+
 class Prior(AbstractPrior):
     """A Gaussian process prior object. The GP is parameterised by a
     `mean <https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.mean_functions>`_
@@ -120,17 +121,25 @@ class Prior(AbstractPrior):
         >>>
         >>> kernel = gpx.kernels.RBF()
         >>> prior = gpx.Prior(kernel = kernel)
-
-    Attributes:
-        kernel (AbstractKernel): The kernel function used to parameterise the prior.
-        mean_function (MeanFunction): The mean function used to parameterise the
-            prior. Defaults to zero.
-        name (str): The name of the GP prior. Defaults to "GP prior".
     """
 
-    kernel: AbstractKernel
-    mean_function: Optional[AbstractMeanFunction] = Zero()
-    name: Optional[str] = "GP prior"
+    def __init__(
+        self,
+        kernel: AbstractKernel,
+        mean_function: Optional[AbstractMeanFunction] = Zero(),
+        name: Optional[str] = "GP prior",
+    ) -> None:
+        """Initialise the GP prior.
+
+        Args:
+            kernel (AbstractKernel): The kernel function used to parameterise the prior.
+            mean_function (Optional[MeanFunction]): The mean function used to parameterise the
+                prior. Defaults to zero.
+            name (Optional[str]): The name of the GP prior. Defaults to "GP prior".
+        """
+        self.kernel = kernel
+        self.mean_function = mean_function
+        self.name = name
 
     def __mul__(self, other: AbstractLikelihood):
         """The product of a prior and likelihood is proportional to the
@@ -230,11 +239,11 @@ class Prior(AbstractPrior):
 
         return predict_fn
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def _initialise_params(self, key: KeyArray) -> Dict:
         """Initialise the GP prior's parameter set.
 
         Args:
-            key (PRNGKeyType): The PRNG key.
+            key (KeyArray): The PRNG key.
 
         Returns:
             Dict: The initialised parameter set.
@@ -248,7 +257,6 @@ class Prior(AbstractPrior):
 #######################
 # GP Posteriors
 #######################
-@dataclass
 class AbstractPosterior(AbstractPrior):
     """The base GP posterior object conditioned on an observed dataset. All
     posterior objects should inherit from this class.
@@ -257,17 +265,24 @@ class AbstractPosterior(AbstractPrior):
     <https://docs.python.org/3/library/dataclasses.html>`_. Since dataclasses
     take over ``__init__``, the ``__post_init__`` method can be used to
     initialise the GP's parameters.
-
-    Attributes:
-        prior (Prior): The prior distribution of the GP.
-        likelihood (AbstractLikelihood): The likelihood distribution of the
-            observed dataset.
-        name (str): The name of the GP posterior. Defaults to "GP posterior".
     """
 
-    prior: Prior
-    likelihood: AbstractLikelihood
-    name: Optional[str] = "GP posterior"
+    def __init__(
+        self,
+        prior: AbstractPrior,
+        likelihood: AbstractLikelihood,
+        name: Optional[str] = "GP posterior",
+    ) -> None:
+        """Initialise the GP posterior object.
+
+        Args:
+            prior (Prior): The prior distribution of the GP.
+            likelihood (AbstractLikelihood): The likelihood distribution of the observed dataset.
+            name (Optional[str]): The name of the GP posterior. Defaults to "GP posterior".
+        """
+        self.prior = prior
+        self.likelihood = likelihood
+        self.name = name
 
     @abstractmethod
     def predict(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
@@ -285,11 +300,11 @@ class AbstractPosterior(AbstractPrior):
         """
         raise NotImplementedError
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def _initialise_params(self, key: KeyArray) -> Dict:
         """Initialise the parameter set of a GP posterior.
 
         Args:
-            key (PRNGKeyType): The PRNG key.
+            key (KeyArray): The PRNG key.
 
         Returns:
             Dict: The initialised parameter set.
@@ -300,7 +315,6 @@ class AbstractPosterior(AbstractPrior):
         )
 
 
-@dataclass
 class ConjugatePosterior(AbstractPosterior):
     """A Gaussian process posterior distribution when the constituent likelihood
     function is a Gaussian distribution. In such cases, the latent function values
@@ -332,16 +346,24 @@ class ConjugatePosterior(AbstractPosterior):
         >>> likelihood = gpx.likelihoods.Gaussian()
         >>>
         >>> posterior = prior * likelihood
-
-    Attributes:
-        prior (Prior): The prior distribution of the GP.
-        likelihood (Gaussian): The Gaussian likelihood distribution of the observed dataset.
-        name (str): The name of the GP posterior. Defaults to "Conjugate posterior".
     """
 
-    prior: Prior
-    likelihood: Gaussian
-    name: Optional[str] = "Conjugate posterior"
+    def __init__(
+        self,
+        prior: AbstractPrior,
+        likelihood: AbstractLikelihood,
+        name: Optional[str] = "GP posterior",
+    ) -> None:
+        """Initialise the conjugate GP posterior object.
+
+        Args:
+            prior (Prior): The prior distribution of the GP.
+            likelihood (AbstractLikelihood): The likelihood distribution of the observed dataset.
+            name (Optional[str]): The name of the GP posterior. Defaults to "GP posterior".
+        """
+        self.prior = prior
+        self.likelihood = likelihood
+        self.name = name
 
     def predict(
         self,
@@ -501,7 +523,7 @@ class ConjugatePosterior(AbstractPosterior):
         Args:
             train_data (Dataset): The training dataset used to compute the
                 marginal log-likelihood.
-            negative (bool, optional): Whether or not the returned function
+            negative (Optional[bool]): Whether or not the returned function
                 should be negative. For optimisation, the negative is useful
                 as minimisation of the negative marginal log-likelihood is
                 equivalent to maximisation of the marginal log-likelihood.
@@ -560,7 +582,6 @@ class ConjugatePosterior(AbstractPosterior):
         return mll
 
 
-@dataclass
 class NonConjugatePosterior(AbstractPosterior):
     """
     A Gaussian process posterior object for models where the likelihood is
@@ -571,24 +592,30 @@ class NonConjugatePosterior(AbstractPosterior):
     hyperparameters and the latent function. Markov chain Monte Carlo,
     variational inference, or Laplace approximations can then be used to sample
     from, or optimise an approximation to, the posterior distribution.
-
-    Attributes:
-        prior (AbstractPrior): The Gaussian process prior distribution.
-        likelihood (AbstractLikelihood): The likelihood function that
-            represents the data.
-        name (str): The name of the posterior object. Defaults to
-            "Non-conjugate posterior".
     """
 
-    prior: AbstractPrior
-    likelihood: AbstractLikelihood
-    name: Optional[str] = "Non-conjugate posterior"
+    def __init__(
+        self,
+        prior: AbstractPrior,
+        likelihood: AbstractLikelihood,
+        name: Optional[str] = "GP posterior",
+    ) -> None:
+        """Initialise a non-conjugate Gaussian process posterior object.
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+        Args:
+            prior (AbstractPrior): The Gaussian process prior distribution.
+            likelihood (AbstractLikelihood): The likelihood function that represents the data.
+            name (Optional[str]): The name of the posterior object. Defaults to "GP posterior".
+        """
+        self.prior = prior
+        self.likelihood = likelihood
+        self.name = name
+
+    def _initialise_params(self, key: KeyArray) -> Dict:
         """Initialise the parameter set of a non-conjugate GP posterior.
 
         Args:
-            key (PRNGKeyType): A PRNG key used to initialise the parameters.
+            key (KeyArray): A PRNG key used to initialise the parameters.
 
         Returns:
             Dict: A dictionary containing the default parameter set.
@@ -620,7 +647,7 @@ class NonConjugatePosterior(AbstractPosterior):
                 and output data used for training dataset.
 
         Returns:
-            tp.Callable[[Array], dx.Distribution]: A function that accepts an
+            Callable[[Array], dx.Distribution]: A function that accepts an
                 input array and returns the predictive distribution as
                 a ``dx.Distribution``.
         """
@@ -697,7 +724,7 @@ class NonConjugatePosterior(AbstractPosterior):
         Args:
             train_data (Dataset): The training dataset used to compute the
                 marginal log-likelihood.
-            negative (bool, optional): Whether or not the returned function
+            negative (Optional[bool]): Whether or not the returned function
                 should be negative. For optimisation, the negative is useful as
                 minimisation of the negative marginal log-likelihood is equivalent
                 to maximisation of the marginal log-likelihood. Defaults to False.

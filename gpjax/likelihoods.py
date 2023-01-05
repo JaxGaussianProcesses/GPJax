@@ -16,22 +16,28 @@
 import abc
 from typing import Any, Callable, Dict, Optional
 from jaxlinop.utils import to_dense
+from jaxutils import PyTree
 
 import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
-from chex import dataclass
 from jaxtyping import Array, Float
 
 from jax.random import KeyArray
 
 
-@dataclass
-class AbstractLikelihood:
+class AbstractLikelihood(PyTree):
     """Abstract base class for likelihoods."""
 
-    num_datapoints: int  # The number of datapoints that the likelihood factorises over.
-    name: Optional[str] = "Likelihood"
+    def __init__(self, num_datapoints: int, name: Optional[str] = None):
+        """Initialise the likelihood.
+
+        Args:
+            num_datapoints (int): The number of datapoints that the likelihood factorises over.
+            name (Optional[str]): The name of the likelihood. Defaults to None.
+        """
+        self.num_datapoints = num_datapoints
+        self.name = name
 
     def __call__(self, *args: Any, **kwargs: Any) -> dx.Distribution:
         """Evaluate the likelihood function at a given predictive distribution.
@@ -81,22 +87,28 @@ class AbstractLikelihood:
         raise NotImplementedError
 
 
-@dataclass
 class Conjugate:
     """An abstract class for conjugate likelihoods with respect to a Gaussain process prior."""
 
 
-@dataclass
 class NonConjugate:
     """An abstract class for non-conjugate likelihoods with respect to a Gaussain process prior."""
 
 
-# TODO: revamp this will covariance operators.
-@dataclass
+# TODO: revamp this with covariance operators.
+
+
 class Gaussian(AbstractLikelihood, Conjugate):
     """Gaussian likelihood object."""
 
-    name: Optional[str] = "Gaussian"
+    def __init__(self, num_datapoints: int, name: Optional[str] = "Gaussian"):
+        """Initialise the Gaussian likelihood.
+
+        Args:
+            num_datapoints (int): The number of datapoints that the likelihood factorises over.
+            name (Optional[str]): The name of the likelihood. Defaults to "Gaussian".
+        """
+        super().__init__(num_datapoints, name)
 
     def _initialise_params(self, key: KeyArray) -> Dict:
         """Return the variance parameter of the likelihood function.
@@ -157,9 +169,15 @@ class Gaussian(AbstractLikelihood, Conjugate):
         return dx.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
 
 
-@dataclass
 class Bernoulli(AbstractLikelihood, NonConjugate):
-    name: Optional[str] = "Bernoulli"
+    def __init__(self, num_datapoints: int, name: Optional[str] = "Bernoulli"):
+        """Initialise the Bernoulli likelihood.
+
+        Args:
+            num_datapoints (int): The number of datapoints that the likelihood factorises over.
+            name (Optional[str]): The name of the likelihood. Defaults to "Bernoulli".
+        """
+        super().__init__(num_datapoints, name)
 
     def _initialise_params(self, key: KeyArray) -> Dict:
         """Initialise the parameter set of a Bernoulli likelihood.

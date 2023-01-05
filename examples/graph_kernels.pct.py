@@ -137,7 +137,7 @@ inference_state = gpx.fit(
     objective=negative_mll,
     parameter_state=parameter_state,
     optax_optim=optimiser,
-    n_iters=1000,
+    num_iters=1000,
 )
 
 learned_params, training_history = inference_state.unpack()

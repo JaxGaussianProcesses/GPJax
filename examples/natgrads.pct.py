@@ -95,7 +95,7 @@ inference_state = gpx.fit_natgrads(
     natural_svgp,
     parameter_state=parameter_state,
     train_data=D,
-    n_iters=5000,
+    num_iters=5000,
     batch_size=256,
     key=jr.PRNGKey(42),
     moment_optim=ox.sgd(0.01),

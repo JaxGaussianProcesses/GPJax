@@ -18,11 +18,12 @@ from typing import Callable, Dict
 
 import jax.numpy as jnp
 import jax.scipy as jsp
-from chex import dataclass, PRNGKey as PRNGKeyType
 from jax import vmap
 from jaxtyping import Array, Float
 
 from jaxlinop import identity
+from jax.random import KeyArray
+from jaxutils import PyTree
 
 from .config import get_global_config
 from .gps import AbstractPosterior
@@ -36,18 +37,26 @@ from .variational_families import (
 )
 
 
-@dataclass
-class AbstractVariationalInference:
+class AbstractVariationalInference(PyTree):
     """A base class for inference and training of variational families against an extact posterior"""
 
-    posterior: AbstractPosterior
-    variational_family: AbstractVariationalFamily
+    def __init__(
+        self,
+        posterior: AbstractPosterior,
+        variational_family: AbstractVariationalFamily,
+    ) -> None:
+        """Initialise the variational inference module.
 
-    def __post_init__(self):
+        Args:
+            posterior (AbstractPosterior): The exact posterior distribution.
+            variational_family (AbstractVariationalFamily): The variational family to be trained.
+        """
+        self.posterior = posterior
         self.prior = self.posterior.prior
         self.likelihood = self.posterior.likelihood
+        self.variational_family = variational_family
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def _initialise_params(self, key: KeyArray) -> Dict:
         """Construct the parameter set used within the variational scheme adopted."""
         hyperparams = concat_dictionaries(
             {"likelihood": self.posterior.likelihood._initialise_params(key)},
@@ -71,14 +80,8 @@ class AbstractVariationalInference:
         raise NotImplementedError
 
 
-@dataclass
 class StochasticVI(AbstractVariationalInference):
     """Stochastic Variational inference training module. The key reference is Hensman et. al., (2013) - Gaussian processes for big data."""
-
-    def __post_init__(self):
-        self.prior = self.posterior.prior
-        self.likelihood = self.posterior.likelihood
-        self.num_inducing = self.variational_family.num_inducing
 
     def elbo(
         self, train_data: Dataset, negative: bool = False
@@ -144,21 +147,29 @@ class StochasticVI(AbstractVariationalInference):
         return expectation
 
 
-@dataclass
 class CollapsedVI(AbstractVariationalInference):
     """Collapsed variational inference for a sparse Gaussian process regression model.
     The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes."""
 
-    def __post_init__(self):
-        self.prior = self.posterior.prior
-        self.likelihood = self.posterior.likelihood
-        self.num_inducing = self.variational_family.num_inducing
+    def __init__(
+        self,
+        posterior: AbstractPosterior,
+        variational_family: AbstractVariationalFamily,
+    ) -> None:
+        """Initialise the variational inference module.
 
-        if not isinstance(self.likelihood, Gaussian):
+        Args:
+            posterior (AbstractPosterior): The exact posterior distribution.
+            variational_family (AbstractVariationalFamily): The variational family to be trained.
+        """
+
+        if not isinstance(posterior.likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")
 
-        if not isinstance(self.variational_family, CollapsedVariationalGaussian):
+        if not isinstance(variational_family, CollapsedVariationalGaussian):
             raise TypeError("Variational family must be CollapsedVariationalGaussian.")
+
+        super().__init__(posterior, variational_family)
 
     def elbo(
         self, train_data: Dataset, negative: bool = False
@@ -180,7 +191,7 @@ class CollapsedVI(AbstractVariationalInference):
         mean_function = self.prior.mean_function
         kernel = self.prior.kernel
 
-        m = self.num_inducing
+        m = self.variational_family.num_inducing
         jitter = get_global_config()["jitter"]
 
         # Constant for whether or not to negate the elbo for optimisation purposes
