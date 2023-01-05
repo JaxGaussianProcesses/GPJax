@@ -252,7 +252,7 @@ def fit_natgrads(
         verbose (Optional[bool]): Whether to print the training loading bar. Defaults to True.
 
     Returns:
-        InferenceState: A dataclass comprising optimised parameters and training history.
+        InferenceState: A class comprising optimised parameters and training history.
     """
 
     params, trainables, bijectors = parameter_state.unpack()

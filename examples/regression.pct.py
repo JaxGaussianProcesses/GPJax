@@ -137,7 +137,7 @@ posterior = prior * likelihood
 #
 # ## Parameter state
 #
-# So far, all of the objects that we've defined have been stateless. To give our model state, we can use the `initialise` function provided in GPJax. Upon calling this, a `ParameterState` dataclass is returned that contains four dictionaries:
+# So far, all of the objects that we've defined have been stateless. To give our model state, we can use the `initialise` function provided in GPJax. Upon calling this, a `ParameterState` class is returned that contains four dictionaries:
 #
 # | Dictionary  | Description  |
 # |---|---|
@@ -189,7 +189,7 @@ inference_state = gpx.fit(
 )
 
 # %% [markdown]
-# Similar to the `ParameterState` object above, the returned variable from the `fit` function is a dataclass, namely an `InferenceState` object that contains the parameters' final values and a tracked array of the evaluation of our objective function throughout optimisation.
+# Similar to the `ParameterState` object above, the returned variable from the `fit` function is a class, namely an `InferenceState` object that contains the parameters' final values and a tracked array of the evaluation of our objective function throughout optimisation.
 
 # %%
 learned_params, training_history = inference_state.unpack()

@@ -228,28 +228,7 @@ class Polar(jk.kernels.AbstractKernel):
 # domain is a circle, this is $2\pi$. Next we define the kernel's `__call__`
 # function which is a direct implementation of Equation (1). Finally, we define
 # the Kernel's parameter property which contains just one value $\tau$ that we
-# initialise to 4 in the kernel's `__post_init__`.
-#
-# #### Aside on dataclasses
-#
-# One can see in the above definition of a `Polar` kernel that we decorated the
-# class with a `@dataclass` command. Dataclasses are simply regular classs
-# objects in Python, however, much of the boilerplate code has been removed. For
-# example, without a `@dataclass` decorator, the instantiation of the above
-# `Polar` kernel would be done through
-# ```python
-# class Polar(jk.kernels.AbstractKernel):
-#     def __init__(self, period: float = 2*jnp.pi):
-#         super().__init__()
-#         self.period = period
-# ```
-# As objects become increasingly large and complex, the conciseness of a
-# dataclass becomes increasingly attractive. To ensure full compatability with
-# Jax, it is crucial that the dataclass decorator is imported from Chex, not
-# base Python's `dataclass` module. Functionally, the two objects are identical.
-# However, unlike regular Python dataclasses, it is possilbe to apply operations
-# such as `jit`, `vmap` and `grad` to the dataclasses given by Chex as they are
-# registrered PyTrees.
+# initialise to 4 in the kernel's `__init__`.
 #
 #
 # ### Custom Parameter Bijection

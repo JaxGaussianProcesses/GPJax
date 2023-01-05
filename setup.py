@@ -28,7 +28,6 @@ REQUIRES = [
     "optax",
     "jaxutils",
     "jaxkern",
-    "chex",
     "distrax>=0.1.2",
     "tqdm>=4.0.0",
     "ml-collections==0.1.0",
