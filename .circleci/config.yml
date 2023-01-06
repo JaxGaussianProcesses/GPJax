@@ -131,7 +131,7 @@ jobs:
       - checkout
       - create_pypirc
       - publish_to_pypi:
-          pkgname: gpjax-nigthly
+          pkgname: gpjax-nightly
           nightly: nightly
 
 workflows:
