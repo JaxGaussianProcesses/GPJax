@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  python: circleci/python@2.1.1
+  # python: circleci/python@2.1.1
   codecov: codecov/codecov@3.2.2
 
 commands:
@@ -51,7 +51,6 @@ commands:
       - run:
           name: Upload to PyPI
           command: twine upload dist/* -r << parameters.pkgname >> --verbose
-
   install_pandoc:
     description: "Install pandoc"
     parameters:
@@ -83,15 +82,11 @@ jobs:
     resource_class: large
     steps:
       - checkout
-      - python/load-cache
       - run:
           name: Install dependencies
-          command: pip install --upgrade pip
-      - python/install-packages:
-          pkg-manager: pip-dist
-          path-args: .[dev]
-          # pypi-cache: false
-      - python/save-cache
+          command: |
+            pip install --upgrade pip
+            pip install -r requirements/dev.txt
       - run:
           name: Run tests
           command: |
