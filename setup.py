@@ -56,7 +56,7 @@ setup(
         "jax>=0.4.1",
         "jaxlib>=0.4.1",
         "optax",
-        "jaxutils>=0.0.5",
+        "jaxutils>=0.0.6",
         "jaxkern",
         "distrax>=0.1.2",
         "tqdm>=4.0.0",
