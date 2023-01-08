@@ -24,7 +24,7 @@ import networkx as nx
 import pytest
 from gpjax.parameters import initialise
 from jax.config import config
-from jax.random import KeyArray as PRNGKeyType
+from jax.random import KeyArray
 from jaxlinop import LinearOperator, identity
 from jaxtyping import Array, Float
 
@@ -64,12 +64,12 @@ def test_abstract_kernel():
         ) -> Float[Array, "1"]:
             return x * params["test"] * y
 
-        def _initialise_params(self, key: PRNGKeyType) -> Dict:
+        def init_params(self, key: KeyArray) -> Dict:
             return {"test": 1.0}
 
     # Initialise dummy kernel class and test __call__ and _init_params methods:
     dummy_kernel = DummyKernel()
-    assert dummy_kernel._initialise_params(_initialise_key) == {"test": 1.0}
+    assert dummy_kernel.init_params(_initialise_key) == {"test": 1.0}
     assert dummy_kernel(jnp.array([1.0]), jnp.array([2.0]), {"test": 2.0}) == 4.0
 
 
@@ -116,7 +116,7 @@ def test_gram(kernel: AbstractKernel, dim: int, n: int) -> None:
     x = jnp.linspace(0.0, 1.0, n * dim).reshape(n, dim)
 
     # Default kernel parameters:
-    params = kernel._initialise_params(_initialise_key)
+    params = kernel.init_params(_initialise_key)
 
     # Test gram matrix:
     Kxx = kernel.gram(params, x)
@@ -147,7 +147,7 @@ def test_cross_covariance(
     b = jnp.linspace(3.0, 4.0, num_b * dim).reshape(num_b, dim)
 
     # Default kernel parameters:
-    params = kernel._initialise_params(_initialise_key)
+    params = kernel.init_params(_initialise_key)
 
     # Test cross covariance, Kab:
     Kab = kernel.cross_covariance(params, a, b)
@@ -164,7 +164,7 @@ def test_call(kernel: AbstractKernel, dim: int) -> None:
     y = jnp.array([[0.5] * dim])
 
     # Defualt parameters:
-    params = kernel._initialise_params(_initialise_key)
+    params = kernel.init_params(_initialise_key)
 
     # Test calling gives an autocovariance value of no dimension between the inputs:
     kxy = kernel(params, x, y)
@@ -302,7 +302,7 @@ def test_initialisation(kernel: AbstractKernel, dim: int) -> None:
 
     else:
         kern = kernel(active_dims=[i for i in range(dim)])
-        params = kern._initialise_params(_initialise_key)
+        params = kern.init_params(_initialise_key)
 
         assert list(params.keys()) == ["lengthscale", "variance"]
         assert all(params["lengthscale"] == jnp.array([1.0] * dim))
@@ -355,7 +355,7 @@ def test_polynomial(
     assert kern.name == f"Polynomial Degree: {degree}"
 
     # Initialise parameters
-    params = kern._initialise_params(_initialise_key)
+    params = kern.init_params(_initialise_key)
     params["shift"] * shift
     params["variance"] * variance
 
@@ -397,8 +397,8 @@ def test_active_dim(kernel: AbstractKernel) -> None:
         manual_kern = kernel(active_dims=[i for i in range(perm_length)])
 
         # Get initial parameters
-        ad_params = ad_kern._initialise_params(_initialise_key)
-        manual_params = manual_kern._initialise_params(_initialise_key)
+        ad_params = ad_kern.init_params(_initialise_key)
+        manual_params = manual_kern.init_params(_initialise_key)
 
         # Compute gram matrices
         ad_Kxx = ad_kern.gram(ad_params, x)
@@ -429,7 +429,7 @@ def test_combination_kernel(
     combination_kernel = combination_type(kernel_set=kernel_set)
 
     # Initialise default parameters
-    params = combination_kernel._initialise_params(_initialise_key)
+    params = combination_kernel.init_params(_initialise_key)
 
     # Check params are a list of dictionaries
     assert len(params) == n_kerns
@@ -470,15 +470,15 @@ def test_sum_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
     sum_kernel = SumKernel(kernel_set=[k1, k2])
 
     # Initialise default parameters
-    params = sum_kernel._initialise_params(_initialise_key)
+    params = sum_kernel.init_params(_initialise_key)
 
     # Compute gram matrix
     Kxx = sum_kernel.gram(params, x)
 
     # NOW we do the same thing manually and check they are equal:
     # Initialise default parameters
-    k1_params = k1._initialise_params(_initialise_key)
-    k2_params = k2._initialise_params(_initialise_key)
+    k1_params = k1.init_params(_initialise_key)
+    k2_params = k2.init_params(_initialise_key)
 
     # Compute gram matrix
     Kxx_k1 = k1.gram(k1_params, x)
@@ -524,7 +524,7 @@ def test_prod_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
     prod_kernel = ProductKernel(kernel_set=[k1, k2])
 
     # Initialise default parameters
-    params = prod_kernel._initialise_params(_initialise_key)
+    params = prod_kernel.init_params(_initialise_key)
 
     # Compute gram matrix
     Kxx = prod_kernel.gram(params, x)
@@ -532,8 +532,8 @@ def test_prod_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
     # NOW we do the same thing manually and check they are equal:
 
     # Initialise default parameters
-    k1_params = k1._initialise_params(_initialise_key)
-    k2_params = k2._initialise_params(_initialise_key)
+    k1_params = k1.init_params(_initialise_key)
+    k2_params = k2.init_params(_initialise_key)
 
     # Compute gram matrix
     Kxx_k1 = k1.gram(k1_params, x)
@@ -564,7 +564,7 @@ def test_graph_kernel():
     kern.gram
 
     # Initialise default parameters
-    params = kern._initialise_params(_initialise_key)
+    params = kern.init_params(_initialise_key)
     assert isinstance(params, dict)
     assert list(sorted(list(params.keys()))) == [
         "lengthscale",
