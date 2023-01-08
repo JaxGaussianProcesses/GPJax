@@ -87,7 +87,7 @@ jobs:
           command: |
             pip install --upgrade pip
             pip install -r requirements/dev.txt
-            python setup.py install
+            pip install -e .
       - run:
           name: Run tests
           command: |
