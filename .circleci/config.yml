@@ -92,6 +92,7 @@ jobs:
       - python/install-packages:
           pkg-manager: pip-dist
           path-args: .[dev]
+          pypi-cache: false
       - run:
           name: Run tests
           command: |
