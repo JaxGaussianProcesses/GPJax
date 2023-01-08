@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: base
 #     language: python
 #     name: python3
 # ---
@@ -218,8 +218,12 @@ class Polar(jk.kernels.AbstractKernel):
         K = (1 + tau * t / self.c) * jnp.clip(1 - t / self.c, 0, jnp.inf) ** tau
         return K.squeeze()
 
-    def init_params(self, key: jr.PRNGKey) -> dict:
+    def init_params(self, key: jr.KeyArray) -> dict:
         return {"tau": jnp.array([4.0])}
+
+    # This is depreciated. Can be removed once JaxKern is updated.
+    def _initialise_params(self, key: jr.KeyArray) -> Dict:
+        return self.init_params(key)
 
 
 # %% [markdown]

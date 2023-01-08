@@ -113,6 +113,10 @@ class DeepKernelFunction(AbstractKernel):
     def init_params(self, key: jr.KeyArray) -> Dict:
         return self._params
 
+    # This is depreciated. Can be removed once JaxKern is updated.
+    def _initialise_params(self, key: jr.KeyArray) -> Dict:
+        return self.init_params(key)
+
 
 # %% [markdown]
 # ### Defining a network
