@@ -97,7 +97,7 @@ slice_kernel = jk.RBF(active_dims=[0, 1, 3])
 
 # %%
 print(f"ARD: {slice_kernel.ard}")
-print(f"Lengthscales: {slice_kernel._initialise_params(key)['lengthscale']}")
+print(f"Lengthscales: {slice_kernel.init_params(key)['lengthscale']}")
 
 # %% [markdown]
 # We'll now simulate some data and evaluate the kernel on the previously selected input dimensions.
@@ -107,7 +107,7 @@ print(f"Lengthscales: {slice_kernel._initialise_params(key)['lengthscale']}")
 x_matrix = jr.normal(key, shape=(50, 5))
 
 # Default parameter dictionary
-params = slice_kernel._initialise_params(key)
+params = slice_kernel.init_params(key)
 
 # Compute the Gram matrix
 K = slice_kernel.gram(params, x_matrix)
@@ -127,9 +127,9 @@ k2 = jk.Polynomial()
 sum_k = k1 + k2
 
 fig, ax = plt.subplots(ncols=3, figsize=(20, 5))
-im0 = ax[0].matshow(k1.gram(k1._initialise_params(key), x).to_dense())
-im1 = ax[1].matshow(k2.gram(k2._initialise_params(key), x).to_dense())
-im2 = ax[2].matshow(sum_k.gram(sum_k._initialise_params(key), x).to_dense())
+im0 = ax[0].matshow(k1.gram(k1.init_params(key), x).to_dense())
+im1 = ax[1].matshow(k2.gram(k2.init_params(key), x).to_dense())
+im2 = ax[2].matshow(sum_k.gram(sum_k.init_params(key), x).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
@@ -144,10 +144,10 @@ k3 = jk.Matern32()
 prod_k = k1 * k2 * k3
 
 fig, ax = plt.subplots(ncols=4, figsize=(20, 5))
-im0 = ax[0].matshow(k1.gram(k1._initialise_params(key), x).to_dense())
-im1 = ax[1].matshow(k2.gram(k2._initialise_params(key), x).to_dense())
-im2 = ax[2].matshow(k3.gram(k3._initialise_params(key), x).to_dense())
-im3 = ax[3].matshow(prod_k.gram(prod_k._initialise_params(key), x).to_dense())
+im0 = ax[0].matshow(k1.gram(k1.init_params(key), x).to_dense())
+im1 = ax[1].matshow(k2.gram(k2.init_params(key), x).to_dense())
+im2 = ax[2].matshow(k3.gram(k3.init_params(key), x).to_dense())
+im3 = ax[3].matshow(prod_k.gram(prod_k.init_params(key), x).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
@@ -218,7 +218,7 @@ class Polar(jk.kernels.AbstractKernel):
         K = (1 + tau * t / self.c) * jnp.clip(1 - t / self.c, 0, jnp.inf) ** tau
         return K.squeeze()
 
-    def _initialise_params(self, key: jr.PRNGKey) -> dict:
+    def init_params(self, key: jr.PRNGKey) -> dict:
         return {"tau": jnp.array([4.0])}
 
 

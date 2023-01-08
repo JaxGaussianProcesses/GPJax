@@ -25,6 +25,8 @@ from jaxtyping import Array, Float
 
 from jax.random import KeyArray
 
+import deprecation
+
 
 class AbstractLikelihood(PyTree):
     """Abstract base class for likelihoods."""
@@ -65,7 +67,7 @@ class AbstractLikelihood(PyTree):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """Return the parameters of the likelihood function.
 
         Args:
@@ -75,6 +77,15 @@ class AbstractLikelihood(PyTree):
             Dict: The parameters of the likelihood function.
         """
         raise NotImplementedError
+
+    @deprecation.deprecated(
+        deprecated_in="0.5.7",
+        removed_in="0.6.0",
+        details="Use the ``init_params`` method for parameter initialisation.",
+    )
+    def _initialise_params(self, key: KeyArray) -> Dict:
+        """Deprecated method for initialising the GP's parameters. Succeded by ``init_params``."""
+        return self.init_params(key)
 
     @property
     @abc.abstractmethod
@@ -110,7 +121,7 @@ class Gaussian(AbstractLikelihood, Conjugate):
         """
         super().__init__(num_datapoints, name)
 
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """Return the variance parameter of the likelihood function.
 
         Args:
@@ -179,7 +190,7 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
         """
         super().__init__(num_datapoints, name)
 
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """Initialise the parameter set of a Bernoulli likelihood.
 
         Args:

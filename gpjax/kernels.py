@@ -27,8 +27,7 @@ import jax.numpy as jnp
 from jax import vmap
 import jax
 from jaxtyping import Array, Float
-
-from chex import PRNGKey as PRNGKeyType
+from jax.random import KeyArray
 from jaxutils import PyTree
 import deprecation
 
@@ -352,17 +351,26 @@ class AbstractKernel(PyTree):
         return True if self.ndims > 1 else False
 
     @abc.abstractmethod
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """A template dictionary of the kernel's parameter set.
 
         Args:
-            key (PRNGKeyType): A PRNG key to be used for initialising
+            key (KeyArray): A PRNG key to be used for initialising
                 the kernel's parameters.
 
         Returns:
             Dict: A dictionary of the kernel's parameters.
         """
         raise NotImplementedError
+
+    @deprecation.deprecated(
+        deprecated_in="0.5.7",
+        removed_in="0.6.0",
+        details="Use the ``init_params`` method for parameter initialisation.",
+    )
+    def _initialise_params(self, key: KeyArray) -> Dict:
+        """Deprecated method for initialising the GP's parameters. Succeded by ``init_params``."""
+        return self.init_params(key)
 
 
 class CombinationKernel(AbstractKernel):
@@ -399,9 +407,9 @@ class CombinationKernel(AbstractKernel):
 
         self.kernel_set = kernels_list
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """A template dictionary of the kernel's parameter set."""
-        return [kernel._initialise_params(key) for kernel in self.kernel_set]
+        return [kernel.init_params(key) for kernel in self.kernel_set]
 
     def __call__(
         self,
@@ -501,7 +509,7 @@ class RBF(AbstractKernel):
         K = params["variance"] * jnp.exp(-0.5 * squared_distance(x, y))
         return K.squeeze()
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         params = {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),
@@ -551,7 +559,7 @@ class Matern12(AbstractKernel):
         K = params["variance"] * jnp.exp(-euclidean_distance(x, y))
         return K.squeeze()
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         return {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),
@@ -606,7 +614,7 @@ class Matern32(AbstractKernel):
         )
         return K.squeeze()
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         return {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),
@@ -658,7 +666,7 @@ class Matern52(AbstractKernel):
         )
         return K.squeeze()
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         return {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),
@@ -706,7 +714,7 @@ class PoweredExponential(AbstractKernel):
         K = params["variance"] * jnp.exp(-euclidean_distance(x, y) ** params["power"])
         return K.squeeze()
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         return {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),
@@ -750,7 +758,7 @@ class Linear(AbstractKernel):
         K = params["variance"] * jnp.matmul(x.T, y)
         return K.squeeze()
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         return {"variance": jnp.array([1.0])}
 
 
@@ -796,7 +804,7 @@ class Polynomial(AbstractKernel):
         K = jnp.power(params["shift"] + jnp.dot(x * params["variance"], y), self.degree)
         return K.squeeze()
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         return {
             "shift": jnp.array([1.0]),
             "variance": jnp.array([1.0] * self.ndims),
@@ -841,7 +849,7 @@ class White(AbstractKernel):
         K = jnp.all(jnp.equal(x, y)) * params["variance"]
         return K.squeeze()
 
-    def _initialise_params(self, key: Float[Array, "1 D"]) -> Dict:
+    def init_params(self, key: Float[Array, "1 D"]) -> Dict:
         """Initialise the kernel parameters.
 
         Args:
@@ -889,7 +897,7 @@ class RationalQuadratic(AbstractKernel):
         ) ** (-params["alpha"])
         return K.squeeze()
 
-    def _initialise_params(self, key: PRNGKeyType) -> dict:
+    def init_params(self, key: KeyArray) -> dict:
         return {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),
@@ -939,7 +947,7 @@ class Periodic(AbstractKernel):
         K = params["variance"] * jnp.exp(-0.5 * jnp.sum(sine_squared, axis=0))
         return K.squeeze()
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         return {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),
@@ -1044,7 +1052,7 @@ class GraphKernel(AbstractKernel):
         )  # shape (n,n)
         return Kxx.squeeze()
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         return {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),

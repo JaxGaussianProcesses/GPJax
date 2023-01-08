@@ -74,7 +74,7 @@ def initialise(model, key: KeyArray = None, **kwargs) -> ParameterState:
     if key is None:
         warn("No PRNGKey specified. Defaulting to seed 123.", UserWarning, stacklevel=2)
         key = jr.PRNGKey(123)
-    params = model._initialise_params(key)
+    params = model.init_params(key)
 
     if kwargs:
         _validate_kwargs(kwargs, params)

@@ -18,7 +18,7 @@ from typing import Dict
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
-from chex import PRNGKey as PRNGKeyType
+from jax.random import KeyArray
 from jax.config import config
 from jaxtyping import Array, Float
 
@@ -39,7 +39,7 @@ def test_abstract_mean_function() -> None:
         def __call__(self, params: Dict, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:
             return jnp.ones((x.shape[0], 1))
 
-        def _initialise_params(self, key: PRNGKeyType) -> Dict:
+        def init_params(self, key: KeyArray) -> Dict:
             return {}
 
     # Test that the dummy mean function can be instantiated.
@@ -60,7 +60,7 @@ def test_shape(mean_function: AbstractMeanFunction, n: int, dim: int) -> None:
     mf = mean_function(output_dim=dim)
 
     # Initialise parameters.
-    params = mf._initialise_params(key)
+    params = mf.init_params(key)
     assert isinstance(params, dict)
 
     # Test shape of mean function.

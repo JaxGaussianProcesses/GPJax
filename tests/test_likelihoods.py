@@ -20,7 +20,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import numpy as np
 import pytest
-from chex import PRNGKey as PRNGKeyType
+from jax.random import KeyArray
 from jax.config import config
 from jaxtyping import Array, Float
 
@@ -52,7 +52,7 @@ def test_abstract_likelihood():
 
     # Create a dummy likelihood class with abstract methods implemented.
     class DummyLikelihood(AbstractLikelihood):
-        def _initialise_params(self, key: PRNGKeyType) -> Dict:
+        def init_params(self, key: KeyArray) -> Dict:
             return {}
 
         def predict(self, params: Dict, dist: dx.Distribution) -> dx.Distribution:
@@ -78,7 +78,7 @@ def test_initialisers(n: int, lik: AbstractLikelihood) -> None:
     likelihood = lik(num_datapoints=n)
 
     # Get default parameter dictionary.
-    params = likelihood._initialise_params(key)
+    params = likelihood.init_params(key)
 
     # Check parameter dictionary
     assert list(params.keys()) == true_initialisation[likelihood.name]
@@ -93,7 +93,7 @@ def test_bernoulli_predictive_moment(n: int) -> None:
     likelihood = Bernoulli(num_datapoints=n)
 
     # Initialise parameters.
-    params = likelihood._initialise_params(key)
+    params = likelihood.init_params(key)
 
     # Construct latent function mean and variance values
     mean_key, var_key = jr.split(key)
@@ -123,7 +123,7 @@ def test_link_fns(lik: AbstractLikelihood, n: int) -> None:
     likelihood = lik(num_datapoints=n)
 
     # Initialise parameters.
-    params = likelihood._initialise_params(key)
+    params = likelihood.init_params(key)
 
     # Test likelihood link function.
     assert isinstance(likelihood.link_function, Callable)

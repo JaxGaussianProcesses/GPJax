@@ -107,10 +107,10 @@ class DeepKernelFunction(AbstractKernel):
 
     def initialise(self, dummy_x: Float[Array, "1 D"], key: jr.KeyArray) -> None:
         nn_params = self.network.init(rng=key, x=dummy_x)
-        base_kernel_params = self.base_kernel._initialise_params(key)
+        base_kernel_params = self.base_kernel.init_params(key)
         self._params = {**nn_params, **base_kernel_params}
 
-    def _initialise_params(self, key: jr.KeyArray) -> Dict:
+    def init_params(self, key: jr.KeyArray) -> Dict:
         return self._params
 
 

@@ -36,6 +36,8 @@ from .variational_families import (
     CollapsedVariationalGaussian,
 )
 
+import deprecation
+
 
 class AbstractVariationalInference(PyTree):
     """A base class for inference and training of variational families against an extact posterior"""
@@ -56,13 +58,22 @@ class AbstractVariationalInference(PyTree):
         self.likelihood = self.posterior.likelihood
         self.variational_family = variational_family
 
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """Construct the parameter set used within the variational scheme adopted."""
         hyperparams = concat_dictionaries(
-            {"likelihood": self.posterior.likelihood._initialise_params(key)},
-            self.variational_family._initialise_params(key),
+            {"likelihood": self.posterior.likelihood.init_params(key)},
+            self.variational_family.init_params(key),
         )
         return hyperparams
+
+    @deprecation.deprecated(
+        deprecated_in="0.5.7",
+        removed_in="0.6.0",
+        details="Use the ``init_params`` method for parameter initialisation.",
+    )
+    def _initialise_params(self, key: KeyArray) -> Dict:
+        """Deprecated method for initialising the GP's parameters. Succeded by ``init_params``."""
+        return self.init_params(key)
 
     @abc.abstractmethod
     def elbo(

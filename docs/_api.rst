@@ -30,7 +30,7 @@ process objects.
 .. autoclass:: AbstractPrior
    :members:
    :special-members: __call__
-   :private-members: _initialise_params
+   :private-members: init_params
    :exclude-members: from_tuple, replace, to_tuple
 
 .. autoclass:: AbstractPosterior
