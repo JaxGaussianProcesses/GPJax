@@ -30,7 +30,7 @@ REQUIRES = [
     "jaxutils>=0.0.8",
     "jaxtyping>=0.0.2",
     "jaxlinop>=0.0.3",
-    "depreciation"
+    "deprecation",
 ]
 
 EXTRAS = {
