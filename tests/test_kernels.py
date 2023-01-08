@@ -22,7 +22,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import networkx as nx
 import pytest
-from gpjax.parameters import initialise
+from jaxutils.parameters import initialise
 from jax.config import config
 from jax.random import KeyArray
 from jaxlinop import LinearOperator, identity

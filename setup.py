@@ -27,14 +27,13 @@ if "BUILD_JAXKERN_NIGHTLY" in os.environ:
 REQUIRES = [
     "jax>=0.4.1",
     "jaxlib>=0.4.1",
-    "jaxutils",
+    "jaxutils>=0.0.8",
     "jaxtyping>=0.0.2",
     "jaxlinop>=0.0.3",
 ]
 
 EXTRAS = {
     "dev": [
-        "gpjax",
         "black",
         "isort",
         "pylint",
