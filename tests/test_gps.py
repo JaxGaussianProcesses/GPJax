@@ -25,6 +25,7 @@ from jax.config import config
 from gpjax import Dataset, initialise
 from gpjax.gps import (
     AbstractPrior,
+    AbstractPosterior,
     ConjugatePosterior,
     NonConjugatePosterior,
     Prior,
@@ -164,6 +165,24 @@ def test_param_construction(num_datapoints, lik):
             "likelihood",
             "mean_function",
         ]
+
+
+@pytest.mark.parametrize("lik", [Bernoulli, Gaussian])
+def test_abstract_posterior(lik):
+    pr = Prior(kernel=RBF())
+    likelihood = lik(num_datapoints=10)
+
+    with pytest.raises(TypeError):
+        _ = AbstractPosterior(pr, likelihood)
+
+    class DummyPosterior(AbstractPosterior):
+        def predict(self):
+            pass
+
+    dummy_post = DummyPosterior(pr, likelihood)
+    assert isinstance(dummy_post, AbstractPosterior)
+    assert dummy_post.likelihood == likelihood
+    assert dummy_post.prior == pr
 
 
 @pytest.mark.parametrize("lik", [Bernoulli, Gaussian])

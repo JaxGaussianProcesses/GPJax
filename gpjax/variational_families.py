@@ -19,11 +19,11 @@ from typing import Any, Callable, Dict, Optional
 import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
-from chex import dataclass, PRNGKey as PRNGKeyType
+from jax.random import KeyArray
 from jaxtyping import Array, Float
 
 from jaxlinop import identity
-from jaxutils import Dataset
+from jaxutils import PyTree, Dataset
 import jaxlinop as jlo
 
 from .config import get_global_config
@@ -33,8 +33,7 @@ from .utils import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
 
 
-@dataclass
-class AbstractVariationalFamily:
+class AbstractVariationalFamily(PyTree):
     """
     Abstract base class used to represent families of distributions that can be
     used within variational inference.
@@ -55,13 +54,13 @@ class AbstractVariationalFamily:
         return self.predict(*args, **kwargs)
 
     @abc.abstractmethod
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def _initialise_params(self, key: KeyArray) -> Dict:
         """
         The parameters of the distribution. For example, the multivariate
         Gaussian would return a mean vector and covariance matrix.
 
         Args:
-            key (PRNGKeyType): The PRNG key used to initialise the parameters.
+            key (KeyArray): The PRNG key used to initialise the parameters.
 
         Returns:
             Dict: The parameters of the distribution.
@@ -84,20 +83,27 @@ class AbstractVariationalFamily:
         raise NotImplementedError
 
 
-@dataclass
 class AbstractVariationalGaussian(AbstractVariationalFamily):
     """The variational Gaussian family of probability distributions."""
 
-    prior: Prior
-    inducing_inputs: Float[Array, "N D"]
-    name: str = "Gaussian"
-
-    def __post_init__(self):
-        """Initialise the variational Gaussian distribution."""
+    def __init__(
+        self,
+        prior: Prior,
+        inducing_inputs: Float[Array, "N D"],
+        name: Optional[str] = "Variational Gaussian",
+    ) -> None:
+        """
+        Args:
+            prior (Prior): The prior distribution.
+            inducing_inputs (Float[Array, "N D"]): The inducing inputs.
+            name (Optional[str]): The name of the variational family. Defaults to "Gaussian".
+        """
+        self.prior = prior
+        self.inducing_inputs = inducing_inputs
         self.num_inducing = self.inducing_inputs.shape[0]
+        self.name = name
 
 
-@dataclass
 class VariationalGaussian(AbstractVariationalGaussian):
     """The variational Gaussian family of probability distributions.
 
@@ -108,14 +114,14 @@ class VariationalGaussian(AbstractVariationalGaussian):
     :math:`\\mu` and sqrt with S = sqrt sqrtᵀ.
     """
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+    def _initialise_params(self, key: KeyArray) -> Dict:
         """
         Return the variational mean vector, variational root covariance matrix,
         and inducing input vector that parameterise the variational Gaussian
         distribution.
 
         Args:
-            key (PRNGKeyType): The PRNG key used to initialise the parameters.
+            key (KeyArray): The PRNG key used to initialise the parameters.
 
         Returns:
             Dict: The parameters of the distribution.
@@ -250,7 +256,6 @@ class VariationalGaussian(AbstractVariationalGaussian):
         return predict_fn
 
 
-@dataclass
 class WhitenedVariationalGaussian(VariationalGaussian):
     """
     The whitened variational Gaussian family of probability distributions.
@@ -262,7 +267,21 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
     """
 
-    name: str = "Whitened variational Gaussian"
+    def __init__(
+        self,
+        prior: Prior,
+        inducing_inputs: Float[Array, "N D"],
+        name: Optional[str] = "Whitened variational Gaussian",
+    ) -> None:
+        """Initialise the whitened variational Gaussian family.
+
+        Args:
+            prior (Prior): The GP prior.
+            inducing_inputs (Float[Array, "N D"]): The inducing inputs.
+            name (Optional[str]): The name of the variational family.
+        """
+
+        super().__init__(prior, inducing_inputs, name)
 
     def prior_kl(self, params: Dict) -> Float[Array, "1"]:
         """Compute the KL-divergence between our variational approximation and
@@ -355,7 +374,6 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         return predict_fn
 
 
-@dataclass
 class NaturalVariationalGaussian(AbstractVariationalGaussian):
     """The natural variational Gaussian family of probability distributions.
 
@@ -363,12 +381,25 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
     and the distribution over the inducing inputs is q(u) = N(μ, S). Expressing the variational distribution, in the form of the
     exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the natural paramerisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2), to perform
     model inference, where T(u) = [u, uuᵀ] are the sufficient statistics.
-
     """
 
-    name: str = "Natural Gaussian"
+    def __init__(
+        self,
+        prior: Prior,
+        inducing_inputs: Float[Array, "N D"],
+        name: Optional[str] = "Natural variational Gaussian",
+    ) -> None:
+        """Initialise the natural variational Gaussian family.
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+        Args:
+            prior (Prior): The GP prior.
+            inducing_inputs (Float[Array, "N D"]): The inducing inputs.
+            name (Optional[str]): The name of the variational family.
+        """
+
+        super().__init__(prior, inducing_inputs, name)
+
+    def _initialise_params(self, key: KeyArray) -> Dict:
         """Return the natural vector and matrix, inducing inputs, and hyperparameters that parameterise the natural Gaussian distribution."""
 
         m = self.num_inducing
@@ -527,7 +558,6 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         return predict_fn
 
 
-@dataclass
 class ExpectationVariationalGaussian(AbstractVariationalGaussian):
     """The natural variational Gaussian family of probability distributions.
 
@@ -538,9 +568,23 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
     η = (η₁, η₁) = (μ, S + uuᵀ) to perform model inference over.
     """
 
-    name: str = "Expectation Gaussian"
+    def __init__(
+        self,
+        prior: Prior,
+        inducing_inputs: Float[Array, "N D"],
+        name: Optional[str] = "Expectation variational Gaussian",
+    ) -> None:
+        """Initialise the expectation variational Gaussian family.
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+        Args:
+            prior (Prior): The GP prior.
+            inducing_inputs (Float[Array, "N D"]): The inducing inputs.
+            name (Optional[str]): The name of the variational family.
+        """
+
+        super().__init__(prior, inducing_inputs, name)
+
+    def _initialise_params(self, key: KeyArray) -> Dict:
         """Return the expectation vector and matrix, inducing inputs, and hyperparameters that parameterise the expectation Gaussian distribution."""
 
         self.num_inducing = self.inducing_inputs.shape[0]
@@ -691,25 +735,36 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         return predict_fn
 
 
-@dataclass
 class CollapsedVariationalGaussian(AbstractVariationalFamily):
     """Collapsed variational Gaussian family of probability distributions.
     The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes."""
 
-    prior: Prior
-    likelihood: AbstractLikelihood
-    inducing_inputs: Float[Array, "M D"]
-    name: str = "Collapsed variational Gaussian"
-    diag: Optional[bool] = False
+    def __init__(
+        self,
+        prior: Prior,
+        likelihood: AbstractLikelihood,
+        inducing_inputs: Float[Array, "M D"],
+        name: str = "Collapsed variational Gaussian",
+    ):
+        """Initialise the collapsed variational Gaussian family of probability distributions.
 
-    def __post_init__(self):
-        """Initialise the variational Gaussian distribution."""
-        self.num_inducing = self.inducing_inputs.shape[0]
+        Args:
+            prior (Prior): The prior distribution that we are approximating.
+            likelihood (AbstractLikelihood): The likelihood function that we are using to model the data.
+            inducing_inputs (Float[Array, "M D"]): The inducing inputs that are to be used to parameterise the variational Gaussian distribution.
+            name (str, optional): The name of the variational family. Defaults to "Collapsed variational Gaussian".
+        """
 
-        if not isinstance(self.likelihood, Gaussian):
+        if not isinstance(likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")
 
-    def _initialise_params(self, key: PRNGKeyType) -> Dict:
+        self.prior = prior
+        self.likelihood = likelihood
+        self.inducing_inputs = inducing_inputs
+        self.num_inducing = self.inducing_inputs.shape[0]
+        self.name = name
+
+    def _initialise_params(self, key: KeyArray) -> Dict:
         """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
         return concat_dictionaries(
             self.prior._initialise_params(key),

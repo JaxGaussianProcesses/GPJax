@@ -22,21 +22,6 @@ if "BUILD_GPJAX_NIGHTLY" in os.environ:
             return versions
 
 
-REQUIRES = [
-    "jax>=0.4.1",
-    "jaxlib>=0.4.1",
-    "optax",
-    "jaxutils",
-    "jaxkern",
-    "chex",
-    "distrax>=0.1.2",
-    "tqdm>=4.0.0",
-    "ml-collections==0.1.0",
-    "jaxtyping>=0.0.2",
-    "jaxlinop>=0.0.3",
-    "deprecation",
-]
-
 EXTRAS = {
     "dev": [
         "black",
@@ -66,7 +51,20 @@ setup(
         "Documentation": "https://gpjax.readthedocs.io/en/latest/",
         "Source": "https://github.com/thomaspinder/GPJax",
     },
-    install_requires=REQUIRES,
+    python_requires=">=3.7",
+    install_requires=[
+        "jax>=0.4.1",
+        "jaxlib>=0.4.1",
+        "optax",
+        "jaxutils>=0.0.6",
+        "jaxkern",
+        "distrax>=0.1.2",
+        "tqdm>=4.0.0",
+        "ml-collections==0.1.0",
+        "jaxtyping>=0.0.2",
+        "jaxlinop>=0.0.3",
+        "deprecation",
+    ],
     tests_require=EXTRAS["dev"],
     extras_require=EXTRAS,
     keywords=["gaussian-processes jax machine-learning bayesian"],

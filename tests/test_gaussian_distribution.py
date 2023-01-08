@@ -72,6 +72,9 @@ def test_diag_linear_operator(n: int) -> None:
     distrax_dist = MultivariateNormalDiag(loc=mean, scale_diag=diag)
 
     assert approx_equal(dist_diag.mean(), distrax_dist.mean())
+    assert approx_equal(dist_diag.mode(), distrax_dist.mode())
+    assert approx_equal(dist_diag.median(), distrax_dist.median())
+    assert approx_equal(dist_diag.entropy(), distrax_dist.entropy())
     assert approx_equal(dist_diag.variance(), distrax_dist.variance())
     assert approx_equal(dist_diag.stddev(), distrax_dist.stddev())
     assert approx_equal(dist_diag.covariance(), distrax_dist.covariance())
@@ -104,6 +107,9 @@ def test_dense_linear_operator(n: int) -> None:
     )
 
     assert approx_equal(dist_dense.mean(), distrax_dist.mean())
+    assert approx_equal(dist_dense.mode(), distrax_dist.mode())
+    assert approx_equal(dist_dense.median(), distrax_dist.median())
+    assert approx_equal(dist_dense.entropy(), distrax_dist.entropy())
     assert approx_equal(dist_dense.variance(), distrax_dist.variance())
     assert approx_equal(dist_dense.stddev(), distrax_dist.stddev())
     assert approx_equal(dist_dense.covariance(), distrax_dist.covariance())
@@ -142,3 +148,7 @@ def test_kl_divergence(n: int) -> None:
     assert approx_equal(
         dist_a.kl_divergence(dist_b), distrax_dist_a.kl_divergence(distrax_dist_b)
     )
+
+    with pytest.raises(ValueError):
+        incompatible = GaussianDistribution(loc=jnp.ones((2 * n,)))
+        incompatible.kl_divergence(dist_a)

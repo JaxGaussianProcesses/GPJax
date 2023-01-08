@@ -171,7 +171,7 @@ inference_state = gpx.fit_batches(
     parameter_state=parameter_state,
     train_data=D,
     optax_optim=optimiser,
-    n_iters=3000,
+    num_iters=3000,
     key=jr.PRNGKey(42),
     batch_size=128,
 )
@@ -225,7 +225,7 @@ inference_state = gpx.fit_batches(
     parameter_state=parameter_state,
     train_data=D,
     optax_optim=optimiser,
-    n_iters=3000,
+    num_iters=3000,
     key=jr.PRNGKey(42),
     batch_size=128,
 )

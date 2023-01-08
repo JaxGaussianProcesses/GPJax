@@ -1001,9 +1001,9 @@ class EigenKernelComputation(AbstractKernelComputation):
         return matrix
 
 
-@deprecation.deprecated(
-    deprecated_in="0.5.5", removed_in="0.6.0", details="Use JaxKern for the GraphKernel"
-)
+# @deprecation.deprecated(
+#     deprecated_in="0.5.5", removed_in="0.6.0", details="Use JaxKern for the GraphKernel"
+# )
 class GraphKernel(AbstractKernel):
     def __init__(
         self,

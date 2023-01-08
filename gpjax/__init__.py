@@ -28,7 +28,6 @@ from .kernels import (
 from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
 from .parameters import constrain, copy_dict_structure, initialise, unconstrain
-from .types import Dataset
 from .variational_families import (
     CollapsedVariationalGaussian,
     ExpectationVariationalGaussian,
@@ -36,6 +35,7 @@ from .variational_families import (
     VariationalGaussian,
     WhitenedVariationalGaussian,
 )
+from .types import Dataset
 from .variational_inference import CollapsedVI, StochasticVI
 from . import _version
 

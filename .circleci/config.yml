@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  python: circleci/python@2.1.1
+  # python: circleci/python@2.1.1
   codecov: codecov/codecov@3.2.2
 
 commands:
@@ -51,7 +51,6 @@ commands:
       - run:
           name: Upload to PyPI
           command: twine upload dist/* -r << parameters.pkgname >> --verbose
-
   install_pandoc:
     description: "Install pandoc"
     parameters:
@@ -83,15 +82,12 @@ jobs:
     resource_class: large
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - pip-cache
       - run:
-          name: Update pip
-          command: pip install --upgrade pip
-      - python/install-packages:
-          pkg-manager: pip-dist
-          path-args: .[dev]
+          name: Install dependencies
+          command: |
+            pip install --upgrade pip
+            pip install -r requirements/dev.txt
+            pip install -e .
       - run:
           name: Run tests
           command: |
@@ -103,10 +99,6 @@ jobs:
             curl -Os https://uploader.codecov.io/v0.1.0_4653/linux/codecov
             chmod +x codecov
             ./codecov -t ${CODECOV_TOKEN}
-      - save_cache:
-          key: pip-cache
-          paths:
-            - ~/.cache/pip
       - store_test_results:
           path: test-results
       - store_artifacts:

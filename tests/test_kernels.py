@@ -22,33 +22,29 @@ import jax.numpy as jnp
 import jax.random as jr
 import networkx as nx
 import pytest
+from gpjax.parameters import initialise
 from jax.config import config
+from jax.random import KeyArray as PRNGKeyType
+from jaxlinop import LinearOperator, identity
 from jaxtyping import Array, Float
-from chex import PRNGKey as PRNGKeyType
-
-from jaxlinop import (
-    LinearOperator,
-    identity,
-)
 
 from gpjax.kernels import (
     RBF,
-    Linear,
-    RationalQuadratic,
+    AbstractKernel,
     CombinationKernel,
     GraphKernel,
-    AbstractKernel,
+    Linear,
     Matern12,
     Matern32,
     Matern52,
+    Periodic,
     Polynomial,
     PoweredExponential,
     ProductKernel,
-    Periodic,
+    RationalQuadratic,
     SumKernel,
     euclidean_distance,
 )
-from gpjax.parameters import initialise
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -559,6 +555,7 @@ def test_graph_kernel():
 
     # Create graph kernel
     kern = GraphKernel(laplacian=L)
+    assert isinstance(kern, GraphKernel)
     assert kern.num_vertex == n_verticies
     assert kern.evals.shape == (n_verticies, 1)
     assert kern.evecs.shape == (n_verticies, n_verticies)

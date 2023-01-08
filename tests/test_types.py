@@ -1,4 +1,4 @@
-# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+# Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,32 +15,26 @@
 
 import jax.numpy as jnp
 import pytest
-from jax.config import config
-
-from gpjax.types import Dataset, NoneType, verify_dataset
-
-# Enable Float64 for more stable matrix inversions.
-config.update("jax_enable_x64", True)
-
-
-def test_nonetype():
-    assert isinstance(None, NoneType)
+from gpjax.types import Dataset, verify_dataset
 
 
 @pytest.mark.parametrize("n", [1, 10])
 @pytest.mark.parametrize("outd", [1, 2, 10])
 @pytest.mark.parametrize("ind", [1, 2, 10])
 @pytest.mark.parametrize("n2", [1, 10])
-def test_dataset(n, outd, ind, n2):
+def test_dataset(n: int, outd: int, ind: int, n2: int) -> None:
     x = jnp.ones((n, ind))
     y = jnp.ones((n, outd))
     d = Dataset(X=x, y=y)
+
     verify_dataset(d)
     assert d.n == n
     assert d.in_dim == ind
     assert d.out_dim == outd
 
-    # test combine datasets
+    assert d.__repr__() == f"- Number of datapoints: {n}\n- Dimension: {ind}"
+
+    # Test combine datasets.
     x2 = 2 * jnp.ones((n2, ind))
     y2 = 2 * jnp.ones((n2, outd))
     d2 = Dataset(X=x2, y=y2)
@@ -54,17 +48,41 @@ def test_dataset(n, outd, ind, n2):
     assert (d_combined.X[:n] == 1.0).all()
     assert (d_combined.X[n:] == 2.0).all()
 
+    # Test supervised and unsupervised.
+    assert d.is_supervised() is True
+    dunsup = Dataset(y=y)
+    assert dunsup.is_unsupervised() is True
+
 
 @pytest.mark.parametrize("nx, ny", [(1, 2), (2, 1), (10, 5), (5, 10)])
-def test_dataset_assertions(nx, ny):
-    x = jnp.ones((nx, 1))
-    y = jnp.ones((ny, 1))
-    with pytest.raises(AssertionError):
+@pytest.mark.parametrize("outd", [1, 2, 10])
+@pytest.mark.parametrize("ind", [1, 2, 10])
+def test_dataset_assertions(nx: int, ny: int, outd: int, ind: int) -> None:
+    x = jnp.ones((nx, ind))
+    y = jnp.ones((ny, outd))
+
+    with pytest.raises(ValueError):
         ds = Dataset(X=x, y=y)
-        verify_dataset(ds)
 
 
-def test_y_none():
+@pytest.mark.parametrize("n", [1, 2, 10])
+@pytest.mark.parametrize("outd", [1, 2, 10])
+@pytest.mark.parametrize("ind", [1, 2, 10])
+def test_2d_inputs(n: int, outd: int, ind: int) -> None:
+    x = jnp.ones((n, ind))
+    y = jnp.ones((n,))
+
+    with pytest.raises(ValueError):
+        ds = Dataset(X=x, y=y)
+
+    x = jnp.ones((n,))
+    y = jnp.ones((n, outd))
+
+    with pytest.raises(ValueError):
+        ds = Dataset(X=x, y=y)
+
+
+def test_y_none() -> None:
     x = jnp.ones((10, 1))
     d = Dataset(X=x)
     verify_dataset(d)

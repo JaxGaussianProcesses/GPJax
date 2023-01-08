@@ -123,7 +123,7 @@ parameter_state = gpx.initialise(posterior, key=key)
 Finally, we run an optimisation loop using the Adam optimiser via the `fit` callable.
 
 ```python
-inference_state = gpx.fit(mll, parameter_state, opt, n_iters=500)
+inference_state = gpx.fit(mll, parameter_state, opt, num_iters=500)
 ```
 
 ## 3. Making predictions

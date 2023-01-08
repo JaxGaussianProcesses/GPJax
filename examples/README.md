@@ -77,4 +77,9 @@ class Prior(AbstractPrior):
 ### Documentation syntax
 
 A helpful cheatsheet for writing restructured text can be found 
-[here](https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst).
+[here](https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst). In addition to that, we adopt the following convention when documenting
+`` objects.
+
+*  Class attributes should be specified using the `Attributes:` tag.
+*  Method argument should be specified using the `Args:` tags.
+*  All attributes and arguments should have types.

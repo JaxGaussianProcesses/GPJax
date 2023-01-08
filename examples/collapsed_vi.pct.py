@@ -109,7 +109,7 @@ inference_state = gpx.fit(
     objective=negative_elbo,
     parameter_state=parameter_state,
     optax_optim=optimiser,
-    n_iters=2000,
+    num_iters=2000,
 )
 
 learned_params, training_history = inference_state.unpack()

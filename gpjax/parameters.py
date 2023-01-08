@@ -22,8 +22,9 @@ import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-from chex import dataclass, PRNGKey as PRNGKeyType
+from jax.random import KeyArray
 from jaxtyping import Array, Float
+from jaxutils import PyTree
 
 from .config import Identity, get_global_config
 from .utils import merge_dictionaries
@@ -32,17 +33,17 @@ from .utils import merge_dictionaries
 ################################
 # Base operations
 ################################
-@dataclass
-class ParameterState:
+class ParameterState(PyTree):
     """
     The state of the model. This includes the parameter set, which parameters
     are to be trained and bijectors that allow parameters to be constrained and
     unconstrained.
     """
 
-    params: Dict
-    trainables: Dict
-    bijectors: Dict
+    def __init__(self, params: Dict, trainables: Dict, bijectors: Dict) -> None:
+        self.params = params
+        self.trainables = trainables
+        self.bijectors = bijectors
 
     def unpack(self):
         """Unpack the state into a tuple of parameters, trainables and bijectors.
@@ -53,7 +54,7 @@ class ParameterState:
         return self.params, self.trainables, self.bijectors
 
 
-def initialise(model, key: PRNGKeyType = None, **kwargs) -> ParameterState:
+def initialise(model, key: KeyArray = None, **kwargs) -> ParameterState:
     """
     Initialise the stateful parameters of any GPJax object. This function also
     returns the trainability status of each parameter and set of bijectors that
@@ -61,7 +62,7 @@ def initialise(model, key: PRNGKeyType = None, **kwargs) -> ParameterState:
 
     Args:
         model: The GPJax object that is to be initialised.
-        key (PRNGKeyType, optional): The random key that is to be used for
+        key (KeyArray, optional): The random key that is to be used for
             initialisation. Defaults to None.
 
     Returns:
