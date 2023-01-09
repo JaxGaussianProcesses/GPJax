@@ -21,6 +21,8 @@ from jax.random import KeyArray
 from jaxtyping import Array, Float
 from jaxutils import PyTree
 
+import deprecation
+
 
 class AbstractMeanFunction(PyTree):
     """Abstract mean function that is used to parameterise the Gaussian process."""
@@ -51,7 +53,7 @@ class AbstractMeanFunction(PyTree):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """Return the parameters of the mean function. This method is required for all subclasses.
 
         Args:
@@ -61,6 +63,15 @@ class AbstractMeanFunction(PyTree):
             Dict: The parameters of the mean function.
         """
         raise NotImplementedError
+
+    @deprecation.deprecated(
+        deprecated_in="0.5.7",
+        removed_in="0.6.0",
+        details="Use the ``init_params`` method for parameter initialisation.",
+    )
+    def _initialise_params(self, key: KeyArray) -> Dict:
+        """Deprecated method for initialising the GP's parameters. Succeded by ``init_params``."""
+        return self.init_params(key)
 
 
 class Zero(AbstractMeanFunction):
@@ -92,7 +103,7 @@ class Zero(AbstractMeanFunction):
         out_shape = (x.shape[0], self.output_dim)
         return jnp.zeros(shape=out_shape)
 
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """The parameters of the mean function. For the zero-mean function, this is an empty dictionary.
 
         Args:
@@ -134,7 +145,7 @@ class Constant(AbstractMeanFunction):
         out_shape = (x.shape[0], self.output_dim)
         return jnp.ones(shape=out_shape) * params["constant"]
 
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """The parameters of the mean function. For the constant-mean function, this is a dictionary with a single value.
 
         Args:

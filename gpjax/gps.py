@@ -33,16 +33,13 @@ from jaxutils import Dataset
 from .utils import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
 
+import deprecation
+
 
 class AbstractPrior(PyTree):
     """Abstract Gaussian process prior.
 
-    All Gaussian processes priors should inherit from this class.
-
-    All GPJax Modules are `Chex dataclasses <https://docs.python.org/3/library/dataclasses.html>`_. Since
-    dataclasses take over ``__init__``, the ``__post_init__`` method can be used to
-    initialise the GP's parameters.
-    """
+    All Gaussian processes priors should inherit from this class."""
 
     def __call__(self, *args: Any, **kwargs: Any) -> dx.Distribution:
         """Evaluate the Gaussian process at the given points. The output of this function
@@ -79,7 +76,7 @@ class AbstractPrior(PyTree):
         raise NotImplementedError
 
     @abstractmethod
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """An initialisation method for the GP's parameters. This method should
         be implemented for all classes that inherit the ``AbstractPrior`` class.
         Whilst not always necessary, the method accepts a PRNG key to allow
@@ -93,6 +90,15 @@ class AbstractPrior(PyTree):
             Dict: The initialised parameter set.
         """
         raise NotImplementedError
+
+    @deprecation.deprecated(
+        deprecated_in="0.5.7",
+        removed_in="0.6.0",
+        details="Use the ``init_params`` method for parameter initialisation.",
+    )
+    def _initialise_params(self, key: KeyArray) -> Dict:
+        """Deprecated method for initialising the GP's parameters. Succeded by ``init_params``."""
+        return self.init_params(key)
 
 
 #######################
@@ -239,7 +245,7 @@ class Prior(AbstractPrior):
 
         return predict_fn
 
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """Initialise the GP prior's parameter set.
 
         Args:
@@ -249,8 +255,8 @@ class Prior(AbstractPrior):
             Dict: The initialised parameter set.
         """
         return {
-            "kernel": self.kernel._initialise_params(key),
-            "mean_function": self.mean_function._initialise_params(key),
+            "kernel": self.kernel.init_params(key),
+            "mean_function": self.mean_function.init_params(key),
         }
 
 
@@ -259,13 +265,7 @@ class Prior(AbstractPrior):
 #######################
 class AbstractPosterior(AbstractPrior):
     """The base GP posterior object conditioned on an observed dataset. All
-    posterior objects should inherit from this class.
-
-    All GPJax Modules are `Chex dataclasses
-    <https://docs.python.org/3/library/dataclasses.html>`_. Since dataclasses
-    take over ``__init__``, the ``__post_init__`` method can be used to
-    initialise the GP's parameters.
-    """
+    posterior objects should inherit from this class."""
 
     def __init__(
         self,
@@ -300,7 +300,7 @@ class AbstractPosterior(AbstractPrior):
         """
         raise NotImplementedError
 
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """Initialise the parameter set of a GP posterior.
 
         Args:
@@ -310,8 +310,8 @@ class AbstractPosterior(AbstractPrior):
             Dict: The initialised parameter set.
         """
         return concat_dictionaries(
-            self.prior._initialise_params(key),
-            {"likelihood": self.likelihood._initialise_params(key)},
+            self.prior.init_params(key),
+            {"likelihood": self.likelihood.init_params(key)},
         )
 
 
@@ -611,7 +611,7 @@ class NonConjugatePosterior(AbstractPosterior):
         self.likelihood = likelihood
         self.name = name
 
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """Initialise the parameter set of a non-conjugate GP posterior.
 
         Args:
@@ -621,8 +621,8 @@ class NonConjugatePosterior(AbstractPosterior):
             Dict: A dictionary containing the default parameter set.
         """
         parameters = concat_dictionaries(
-            self.prior._initialise_params(key),
-            {"likelihood": self.likelihood._initialise_params(key)},
+            self.prior.init_params(key),
+            {"likelihood": self.likelihood.init_params(key)},
         )
         parameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
         return parameters

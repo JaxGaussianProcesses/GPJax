@@ -85,7 +85,7 @@ x = jnp.arange(G.number_of_nodes()).reshape(-1, 1)
 kernel = jk.GraphKernel(laplacian=L)
 prior = gpx.Prior(kernel=kernel)
 
-true_params = prior._initialise_params(key)
+true_params = prior.init_params(key)
 true_params["kernel"] = {
     "lengthscale": jnp.array(2.3),
     "variance": jnp.array(3.2),
@@ -101,7 +101,7 @@ D = Dataset(X=x, y=y)
 kernel.compute_engine.gram
 
 # %%
-kernel.gram(params=kernel._initialise_params(key), inputs=x)
+kernel.gram(params=kernel.init_params(key), inputs=x)
 
 # %% [markdown]
 #

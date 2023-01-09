@@ -74,7 +74,21 @@ def initialise(model, key: KeyArray = None, **kwargs) -> ParameterState:
     if key is None:
         warn("No PRNGKey specified. Defaulting to seed 123.", UserWarning, stacklevel=2)
         key = jr.PRNGKey(123)
-    params = model._initialise_params(key)
+
+    # Initialise the parameters.
+    if hasattr(model, "init_params"):
+        params = model.init_params(key)
+
+    elif hasattr(model, "_initialise_params"):
+        warn(
+            "`_initialise_params` is deprecated. Please use `init_params` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        params = model._initialise_params(key)
+
+    else:
+        raise AttributeError("No `init_params` or `_initialise_params` method found.")
 
     if kwargs:
         _validate_kwargs(kwargs, params)

@@ -32,6 +32,8 @@ from .likelihoods import AbstractLikelihood, Gaussian
 from .utils import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
 
+import deprecation
+
 
 class AbstractVariationalFamily(PyTree):
     """
@@ -54,7 +56,7 @@ class AbstractVariationalFamily(PyTree):
         return self.predict(*args, **kwargs)
 
     @abc.abstractmethod
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """
         The parameters of the distribution. For example, the multivariate
         Gaussian would return a mean vector and covariance matrix.
@@ -66,6 +68,15 @@ class AbstractVariationalFamily(PyTree):
             Dict: The parameters of the distribution.
         """
         raise NotImplementedError
+
+    @deprecation.deprecated(
+        deprecated_in="0.5.7",
+        removed_in="0.6.0",
+        details="Use the ``init_params`` method for parameter initialisation.",
+    )
+    def _initialise_params(self, key: KeyArray) -> Dict:
+        """Deprecated method for initialising the GP's parameters. Succeded by ``init_params``."""
+        return self.init_params(key)
 
     @abc.abstractmethod
     def predict(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
@@ -114,7 +125,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
     :math:`\\mu` and sqrt with S = sqrt sqrtᵀ.
     """
 
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """
         Return the variational mean vector, variational root covariance matrix,
         and inducing input vector that parameterise the variational Gaussian
@@ -129,7 +140,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         m = self.num_inducing
 
         return concat_dictionaries(
-            self.prior._initialise_params(key),
+            self.prior.init_params(key),
             {
                 "variational_family": {
                     "inducing_inputs": self.inducing_inputs,
@@ -399,13 +410,13 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         super().__init__(prior, inducing_inputs, name)
 
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """Return the natural vector and matrix, inducing inputs, and hyperparameters that parameterise the natural Gaussian distribution."""
 
         m = self.num_inducing
 
         return concat_dictionaries(
-            self.prior._initialise_params(key),
+            self.prior.init_params(key),
             {
                 "variational_family": {
                     "inducing_inputs": self.inducing_inputs,
@@ -584,7 +595,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         super().__init__(prior, inducing_inputs, name)
 
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """Return the expectation vector and matrix, inducing inputs, and hyperparameters that parameterise the expectation Gaussian distribution."""
 
         self.num_inducing = self.inducing_inputs.shape[0]
@@ -592,7 +603,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         m = self.num_inducing
 
         return concat_dictionaries(
-            self.prior._initialise_params(key),
+            self.prior.init_params(key),
             {
                 "variational_family": {
                     "inducing_inputs": self.inducing_inputs,
@@ -764,14 +775,14 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
         self.num_inducing = self.inducing_inputs.shape[0]
         self.name = name
 
-    def _initialise_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
         return concat_dictionaries(
-            self.prior._initialise_params(key),
+            self.prior.init_params(key),
             {
                 "variational_family": {"inducing_inputs": self.inducing_inputs},
                 "likelihood": {
-                    "obs_noise": self.likelihood._initialise_params(key)["obs_noise"]
+                    "obs_noise": self.likelihood.init_params(key)["obs_noise"]
                 },
             },
         )

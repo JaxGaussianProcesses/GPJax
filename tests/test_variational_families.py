@@ -47,7 +47,7 @@ def test_abstract_variational_family():
         def predict(self, params: Dict, x: Float[Array, "N D"]) -> dx.Distribution:
             return dx.MultivariateNormalDiag(loc=x)
 
-        def _initialise_params(self, key: jr.PRNGKey) -> dict:
+        def init_params(self, key: jr.PRNGKey) -> dict:
             return {}
 
     # Test that the dummy variational family can be instantiated.
@@ -138,7 +138,7 @@ def test_variational_gaussians(
     assert isinstance(q, AbstractVariationalFamily)
 
     # Test params and keys:
-    params = q._initialise_params(jr.PRNGKey(123))
+    params = q.init_params(jr.PRNGKey(123))
     assert isinstance(params, dict)
 
     config_params = gpx.config.get_global_config()
@@ -161,7 +161,7 @@ def test_variational_gaussians(
         assert (moment == value(n_inducing)).all()
 
     # Test KL
-    params = q._initialise_params(jr.PRNGKey(123))
+    params = q.init_params(jr.PRNGKey(123))
     kl = q.prior_kl(params)
     assert isinstance(kl, jnp.ndarray)
 
@@ -221,7 +221,7 @@ def test_collapsed_variational_gaussian(
     assert (variational_family.inducing_inputs == inducing_inputs).all()
 
     # Test params
-    params = variational_family._initialise_params(jr.PRNGKey(123))
+    params = variational_family.init_params(jr.PRNGKey(123))
     assert isinstance(params, dict)
     assert "likelihood" in params.keys()
     assert "obs_noise" in params["likelihood"].keys()
@@ -233,7 +233,7 @@ def test_collapsed_variational_gaussian(
     assert isinstance(params["variational_family"]["inducing_inputs"], jax.Array)
 
     # Test predictions
-    params = variational_family._initialise_params(jr.PRNGKey(123))
+    params = variational_family.init_params(jr.PRNGKey(123))
     predictive_dist_fn = variational_family(params, D)
     assert isinstance(predictive_dist_fn, Callable)
 

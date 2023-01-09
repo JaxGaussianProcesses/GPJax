@@ -57,7 +57,7 @@ setup(
         "jaxlib>=0.4.1",
         "optax",
         "jaxutils>=0.0.6",
-        "jaxkern",
+        "jaxkern>=0.0.4",
         "distrax>=0.1.2",
         "tqdm>=4.0.0",
         "ml-collections==0.1.0",
