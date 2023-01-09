@@ -24,7 +24,6 @@ commands:
             echo -e "    repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
             echo -e "    username = __token__" >> ~/.pypirc
             echo -e "    password = $GPJAX_PYPI" >> ~/.pypirc
-            echo -e "" >> ~/.pypirc
             echo -e "[gpjax-nightly]" >> ~/.pypirc
             echo -e "    repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
             echo -e "    username = __token__" >> ~/.pypirc
