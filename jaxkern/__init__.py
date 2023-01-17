@@ -1,17 +1,25 @@
 """JaxKern."""
-from .kernels import (
+from .base import ProductKernel, SumKernel
+from .computations import (
+    ConstantDiagonalKernelComputation,
+    DenseKernelComputation,
+    DiagonalKernelComputation,
+    EigenKernelComputation,
+)
+from .nonstationary import (
+    Linear,
+    Periodic,
+    Polynomial,
+)
+from .stationary import (
     RBF,
-    GraphKernel,
     Matern12,
     Matern32,
     Matern52,
-    Polynomial,
-    ProductKernel,
-    SumKernel,
-    DenseKernelComputation,
-    DiagonalKernelComputation,
-    ConstantDiagonalKernelComputation,
+    RationalQuadratic,
+    PoweredExponential,
 )
+from .non_euclidean import GraphKernel
 
 __all__ = [
     "RBF",
@@ -19,12 +27,17 @@ __all__ = [
     "Matern12",
     "Matern32",
     "Matern52",
+    "Linear",
     "Polynomial",
     "ProductKernel",
     "SumKernel",
     "DenseKernelComputation",
     "DiagonalKernelComputation",
     "ConstantDiagonalKernelComputation",
+    "EigenKernelComputation",
+    "PoweredExponential",
+    "Periodic",
+    "RationalQuadratic",
 ]
 
 from . import _version
