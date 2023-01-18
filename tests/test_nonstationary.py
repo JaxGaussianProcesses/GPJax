@@ -15,24 +15,16 @@
 
 
 from itertools import permutations
-from typing import Dict, List
 
-import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
 from jax.config import config
-from jax.random import KeyArray
 from jaxlinop import LinearOperator, identity
-from jaxtyping import Array, Float
 from jaxutils.parameters import initialise
 
 from jaxkern.base import AbstractKernel
-from jaxkern.nonstationary import (
-    Linear,
-    Periodic,
-    Polynomial,
-)
+from jaxkern.nonstationary import Linear, Polynomial, White
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -115,40 +107,12 @@ def test_pos_def(
     assert (eigen_values > 0.0).all()
 
 
-@pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize(
-    "ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)]
-)
-@pytest.mark.parametrize("period", [0.1, 0.5, 1.0])
-@pytest.mark.parametrize("n", [1, 2, 5])
-def test_pos_def_periodic(
-    dim: int, ell: float, sigma: float, period: float, n: int
-) -> None:
-    kern = Periodic(active_dims=list(range(dim)))
-    # Gram constructor static method:
-    kern.gram
-
-    # Create inputs x:
-    x = jr.uniform(_initialise_key, (n, dim))
-    params = {
-        "lengthscale": jnp.array([ell]),
-        "variance": jnp.array([sigma]),
-        "period": jnp.array([period]),
-    }
-
-    # Test gram matrix eigenvalues are positive:
-    Kxx = kern.gram(params, x)
-    Kxx += identity(n) * _jitter
-    eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
-    assert (eigen_values > 0.0).all()
-
-
 @pytest.mark.parametrize(
     "kernel",
     [
         Linear,
         Polynomial,
-        Periodic,
+        White,
     ],
 )
 def test_dtype(kernel: AbstractKernel) -> None:

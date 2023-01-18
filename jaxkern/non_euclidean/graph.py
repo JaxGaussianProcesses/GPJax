@@ -4,8 +4,8 @@ import jax.numpy as jnp
 from jax.random import KeyArray
 from jaxtyping import Array, Float
 
-from .computations import EigenKernelComputation
-from .nonstationary import AbstractKernel
+from ..computations import EigenKernelComputation
+from ..base import AbstractKernel
 from .utils import jax_gather_nd
 
 
@@ -22,9 +22,7 @@ class GraphKernel(AbstractKernel):
         spectral: Optional[bool] = False,
         name: Optional[str] = "Graph kernel",
     ) -> None:
-        super().__init__(
-            compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
         self.laplacian = laplacian
         evals, self.evecs = jnp.linalg.eigh(self.laplacian)
         self.evals = evals.reshape(-1, 1)

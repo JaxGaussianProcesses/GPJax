@@ -6,17 +6,14 @@ from .computations import (
     DiagonalKernelComputation,
     EigenKernelComputation,
 )
-from .nonstationary import (
-    Linear,
-    Periodic,
-    Polynomial,
-)
+from .nonstationary import Linear, Polynomial, White
 from .stationary import (
     RBF,
     Matern12,
     Matern32,
     Matern52,
     RationalQuadratic,
+    Periodic,
     PoweredExponential,
 )
 from .non_euclidean import GraphKernel
@@ -38,6 +35,7 @@ __all__ = [
     "PoweredExponential",
     "Periodic",
     "RationalQuadratic",
+    "White",
 ]
 
 from . import _version

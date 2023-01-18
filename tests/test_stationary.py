@@ -15,16 +15,13 @@
 
 
 from itertools import permutations
-from typing import Dict, List
 
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
 from jax.config import config
-from jax.random import KeyArray
 from jaxlinop import LinearOperator, identity
-from jaxtyping import Array, Float
 from jaxutils.parameters import initialise
 
 from jaxkern.base import AbstractKernel
@@ -35,8 +32,8 @@ from jaxkern.stationary import (
     Matern52,
     PoweredExponential,
     RationalQuadratic,
+    Periodic,
 )
-from jaxkern.utils import euclidean_distance
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -122,9 +119,7 @@ def test_call(kernel: AbstractKernel, dim: int) -> None:
 
 @pytest.mark.parametrize("kern", [RBF, Matern12, Matern32, Matern52])
 @pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize(
-    "ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)]
-)
+@pytest.mark.parametrize("ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_pos_def(
     kern: AbstractKernel, dim: int, ell: float, sigma: float, n: int
@@ -143,14 +138,10 @@ def test_pos_def(
 
 
 @pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize(
-    "ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)]
-)
+@pytest.mark.parametrize("ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
 @pytest.mark.parametrize("alpha", [0.1, 0.5, 1.0])
 @pytest.mark.parametrize("n", [1, 2, 5])
-def test_pos_def_rq(
-    dim: int, ell: float, sigma: float, alpha: float, n: int
-) -> None:
+def test_pos_def_rq(dim: int, ell: float, sigma: float, alpha: float, n: int) -> None:
     kern = RationalQuadratic(active_dims=list(range(dim)))
     # Gram constructor static method:
     kern.gram
@@ -171,9 +162,33 @@ def test_pos_def_rq(
 
 
 @pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize(
-    "ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)]
-)
+@pytest.mark.parametrize("ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
+@pytest.mark.parametrize("period", [0.1, 0.5, 1.0])
+@pytest.mark.parametrize("n", [1, 2, 5])
+def test_pos_def_periodic(
+    dim: int, ell: float, sigma: float, period: float, n: int
+) -> None:
+    kern = Periodic(active_dims=list(range(dim)))
+    # Gram constructor static method:
+    kern.gram
+
+    # Create inputs x:
+    x = jr.uniform(_initialise_key, (n, dim))
+    params = {
+        "lengthscale": jnp.array([ell]),
+        "variance": jnp.array([sigma]),
+        "period": jnp.array([period]),
+    }
+
+    # Test gram matrix eigenvalues are positive:
+    Kxx = kern.gram(params, x)
+    Kxx += identity(n) * _jitter
+    eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
+    assert (eigen_values > 0.0).all()
+
+
+@pytest.mark.parametrize("dim", [1, 2, 5])
+@pytest.mark.parametrize("ell, sigma", [(0.1, 0.2), (0.5, 0.1), (0.1, 0.5), (0.5, 0.5)])
 @pytest.mark.parametrize("power", [0.1, 0.5, 1.0])
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_pos_def_power_exp(
@@ -228,6 +243,7 @@ def test_initialisation(kernel: AbstractKernel, dim: int) -> None:
         Matern32,
         Matern52,
         RationalQuadratic,
+        Periodic,
         PoweredExponential,
     ],
 )

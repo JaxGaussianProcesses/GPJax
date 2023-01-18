@@ -3,7 +3,7 @@ from typing import List
 import jax.numpy as jnp
 import pytest
 from jaxtyping import Array, Float
-from jaxkern.utils import euclidean_distance
+from jaxkern.stationary.utils import euclidean_distance
 
 
 @pytest.mark.parametrize(

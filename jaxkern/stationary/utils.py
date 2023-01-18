@@ -32,8 +32,3 @@ def euclidean_distance(
     """
 
     return jnp.sqrt(jnp.maximum(squared_distance(x, y), 1e-36))
-
-
-def jax_gather_nd(params, indices):
-    tuple_indices = tuple(indices[..., i] for i in range(indices.shape[-1]))
-    return params[tuple_indices]
