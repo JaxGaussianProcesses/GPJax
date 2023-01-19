@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional, List
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
@@ -6,12 +6,20 @@ from jaxtyping import Array, Float
 from ..base import AbstractKernel
 from ..computations import (
     ConstantDiagonalKernelComputation,
+    AbstractKernelComputation,
 )
 
 
 class White(AbstractKernel, ConstantDiagonalKernelComputation):
-    def __post_init__(self) -> None:
-        super(White, self).__post_init__()
+    def __init__(
+        self,
+        compute_engine: AbstractKernelComputation = ConstantDiagonalKernelComputation,
+        active_dims: Optional[List[int]] = None,
+        stationary: Optional[bool] = False,
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "White Noise Kernel",
+    ) -> None:
+        super().__init__(compute_engine, active_dims, stationary, spectral, name)
 
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
