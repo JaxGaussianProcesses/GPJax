@@ -1,4 +1,4 @@
-# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+# Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-
 from itertools import permutations
 
 import jax.numpy as jnp
@@ -24,7 +23,7 @@ from jaxlinop import LinearOperator, identity
 from jaxutils.parameters import initialise
 
 from jaxkern.base import AbstractKernel
-from jaxkern.nonstationary import Linear, Polynomial, White
+from jaxkern.nonstationary import Linear, Polynomial
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -112,7 +111,6 @@ def test_pos_def(
     [
         Linear,
         Polynomial,
-        White,
     ],
 )
 def test_dtype(kernel: AbstractKernel) -> None:

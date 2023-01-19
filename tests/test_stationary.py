@@ -1,4 +1,4 @@
-# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+# Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ from jaxkern.stationary import (
     PoweredExponential,
     RationalQuadratic,
     Periodic,
+    White,
 )
 
 # Enable Float64 for more stable matrix inversions.
@@ -49,6 +50,7 @@ _jitter = 1e-6
         Matern32(),
         Matern52(),
         RationalQuadratic(),
+        White(),
     ],
 )
 @pytest.mark.parametrize("dim", [1, 2, 5])
@@ -78,6 +80,7 @@ def test_gram(kernel: AbstractKernel, dim: int, n: int) -> None:
         Matern32(),
         Matern52(),
         RationalQuadratic(),
+        White(),
     ],
 )
 @pytest.mark.parametrize("num_a", [1, 2, 5])
@@ -99,7 +102,7 @@ def test_cross_covariance(
     assert Kab.shape == (num_a, num_b)
 
 
-@pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
+@pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52(), White()])
 @pytest.mark.parametrize("dim", [1, 2, 5])
 def test_call(kernel: AbstractKernel, dim: int) -> None:
 
