@@ -21,6 +21,8 @@ if "BUILD_GPJAX_NIGHTLY" in os.environ:
             versions["version"] = versions["version"].split("+")[0] + suffix
             return versions
 
+        versioneer.get_versions = get_versions
+
 
 EXTRAS = {
     "dev": [
