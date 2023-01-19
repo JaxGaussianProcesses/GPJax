@@ -13,4 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-"""Test suite for the jaxkern package."""
+from .linear import Linear
+from .polynomial import Polynomial
+
+__all__ = ["Linear", "Polynomial"]

@@ -18,4 +18,18 @@ repos:
         language: system
         types: [python]
         require_serial: true
-
+      - id: autoflake
+        name: autoflake
+        entry: autoflake
+        language: python
+        "types": [python]
+        require_serial: true
+        args:
+          - "--in-place"
+          - "--expand-star-imports"
+          - "--remove-all-unused-imports"
+          - "--remove-unused-variables"
+  - repo: https://github.com/psf/black
+    rev: 22.3.0
+    hooks:
+      - id: black

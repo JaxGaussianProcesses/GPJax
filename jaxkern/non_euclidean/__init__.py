@@ -13,4 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-"""Test suite for the jaxkern package."""
+from .graph import GraphKernel
+
+__all__ = ["GraphKernel"]
