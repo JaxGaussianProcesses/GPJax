@@ -72,6 +72,7 @@ import gpjax as gpx
 from jax import grad, jit
 import jax.numpy as jnp
 import jax.random as jr
+import jaxkern as jk
 import optax as ox
 
 key = jr.PRNGKey(123)
@@ -91,7 +92,7 @@ The function of interest here, $f(\cdot)$, is sinusoidal, but our observations o
 We begin by defining a zero-mean Gaussian process prior with a radial basis function kernel and assume the likelihood to be Gaussian.
 
 ```python
-prior = gpx.Prior(kernel = gpx.RBF())
+prior = gpx.Prior(kernel = jk.RBF())
 likelihood = gpx.Gaussian(num_datapoints = n)
 ```
 

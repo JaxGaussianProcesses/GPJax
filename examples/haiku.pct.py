@@ -37,11 +37,9 @@ import jaxkern as jk
 
 
 import gpjax as gpx
-from jaxkern.kernels import (
-    DenseKernelComputation,
-    AbstractKernelComputation,
-    AbstractKernel,
-)
+from jaxkern import DenseKernelComputation
+from jaxkern.base import AbstractKernel
+from jaxkern.computations import AbstractKernelComputation
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -56,7 +54,11 @@ key = jr.PRNGKey(123)
 n = 500
 noise = 0.2
 
-x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n,)).sort().reshape(-1, 1)
+x = (
+    jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n,))
+    .sort()
+    .reshape(-1, 1)
+)
 f = lambda x: jnp.asarray(sawtooth(2 * jnp.pi * x))
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
@@ -91,7 +93,9 @@ class DeepKernelFunction(AbstractKernel):
         compute_engine: AbstractKernelComputation = DenseKernelComputation,
         active_dims: tp.Optional[tp.List[int]] = None,
     ) -> None:
-        super().__init__(compute_engine, active_dims, True, False, "Deep    Kernel")
+        super().__init__(
+            compute_engine, active_dims, True, False, "Deep    Kernel"
+        )
         self.network = network
         self.base_kernel = base_kernel
 
@@ -105,7 +109,9 @@ class DeepKernelFunction(AbstractKernel):
         yt = self.network.apply(params=params, x=y)
         return self.base_kernel(params, xt, yt)
 
-    def initialise(self, dummy_x: Float[Array, "1 D"], key: jr.KeyArray) -> None:
+    def initialise(
+        self, dummy_x: Float[Array, "1 D"], key: jr.KeyArray
+    ) -> None:
         nn_params = self.network.init(rng=key, x=dummy_x)
         base_kernel_params = self.base_kernel.init_params(key)
         self._params = {**nn_params, **base_kernel_params}
