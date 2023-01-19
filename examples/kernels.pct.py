@@ -204,7 +204,7 @@ def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
 
 
-class Polar(jk.kernels.AbstractKernel):
+class Polar(jk.base.AbstractKernel):
     def __init__(self) -> None:
         super().__init__()
         self.period: float = 2 * jnp.pi
