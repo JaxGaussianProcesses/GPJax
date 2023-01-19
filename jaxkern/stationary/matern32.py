@@ -6,10 +6,9 @@ from jaxtyping import Array, Float
 
 from ..base import AbstractKernel
 from ..computations import (
-    AbstractKernelComputation,
     DenseKernelComputation,
 )
-from .utils import euclidean_distance
+from .utils import euclidean_distance, build_student_t_distribution
 
 
 class Matern32(AbstractKernel):
@@ -17,13 +16,14 @@ class Matern32(AbstractKernel):
 
     def __init__(
         self,
-        compute_engine: AbstractKernelComputation = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = False,
-        spectral: Optional[bool] = False,
+        stationary: Optional[bool] = True,
         name: Optional[str] = "Matern 3/2",
     ) -> None:
-        super().__init__(compute_engine, active_dims, stationary, spectral, name)
+        spectral_density = build_student_t_distribution(nu=3)
+        super().__init__(
+            DenseKernelComputation, active_dims, stationary, spectral_density, name
+        )
 
     def __call__(
         self,

@@ -35,10 +35,10 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
         Returns:
             CovarianceOperator: The computed square Gram matrix.
         """
-
         value = self.kernel_fn(params, inputs[0], inputs[0])
-
-        return ConstantDiagonalLinearOperator(value=value, size=inputs.shape[0])
+        return ConstantDiagonalLinearOperator(
+            value=value.reshape(1), size=inputs.shape[0]
+        )
 
     def diagonal(
         self,

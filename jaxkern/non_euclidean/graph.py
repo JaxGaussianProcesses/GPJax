@@ -16,13 +16,11 @@ class GraphKernel(AbstractKernel):
     def __init__(
         self,
         laplacian: Float[Array, "N N"],
-        compute_engine: EigenKernelComputation = EigenKernelComputation,
         active_dims: Optional[List[int]] = None,
         stationary: Optional[bool] = False,
-        spectral: Optional[bool] = False,
         name: Optional[str] = "Graph kernel",
     ) -> None:
-        super().__init__(compute_engine, active_dims, stationary, spectral, name)
+        super().__init__(EigenKernelComputation, active_dims, stationary, False, name)
         self.laplacian = laplacian
         evals, self.evecs = jnp.linalg.eigh(self.laplacian)
         self.evals = evals.reshape(-1, 1)

@@ -7,7 +7,6 @@ from jaxtyping import Array
 
 from ..base import AbstractKernel
 from ..computations import (
-    AbstractKernelComputation,
     DenseKernelComputation,
 )
 
@@ -20,13 +19,11 @@ class Periodic(AbstractKernel):
 
     def __init__(
         self,
-        compute_engine: AbstractKernelComputation = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
         stationary: Optional[bool] = False,
-        spectral: Optional[bool] = False,
         name: Optional[str] = "Periodic",
     ) -> None:
-        super().__init__(compute_engine, active_dims, stationary, spectral, name)
+        super().__init__(DenseKernelComputation, active_dims, stationary, None, name)
 
     def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`

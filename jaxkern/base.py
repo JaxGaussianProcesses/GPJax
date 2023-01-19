@@ -8,6 +8,7 @@ from jaxtyping import Array, Float
 from jaxutils import PyTree
 
 from .computations import AbstractKernelComputation, DenseKernelComputation
+import distrax as dx
 
 
 ##########################################
@@ -22,15 +23,31 @@ class AbstractKernel(PyTree):
         compute_engine: AbstractKernelComputation = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
         stationary: Optional[bool] = False,
-        spectral: Optional[bool] = False,
+        spectral_density: Optional[dx.Distribution] = None,
         name: Optional[str] = "AbstractKernel",
     ) -> None:
-        self.compute_engine = compute_engine
+        self._compute_engine = compute_engine
         self.active_dims = active_dims
         self.stationary = stationary
-        self.spectral = spectral
+        self.spectral_density = spectral_density
         self.name = name
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
+        compute_engine = self.compute_engine(kernel_fn=self.__call__)
+        self.gram = compute_engine.gram
+        self.cross_covariance = compute_engine.cross_covariance
+
+    @property
+    def compute_engine(self) -> AbstractKernelComputation:
+        """The compute engine that is used to perform the kernel computations.
+
+        Returns:
+            AbstractKernelComputation: The compute engine that is used to perform the kernel computations.
+        """
+        return self._compute_engine
+
+    @compute_engine.setter
+    def compute_engine(self, compute_engine: AbstractKernelComputation) -> None:
+        self._compute_engine = compute_engine
         compute_engine = self.compute_engine(kernel_fn=self.__call__)
         self.gram = compute_engine.gram
         self.cross_covariance = compute_engine.cross_covariance

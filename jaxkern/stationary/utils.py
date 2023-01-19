@@ -1,5 +1,14 @@
 import jax.numpy as jnp
 from jaxtyping import Array, Float
+import distrax as dx
+import tensorflow_probability.substrates.jax as tfp
+
+tfd = tfp.distributions
+
+
+def build_student_t_distribution(nu: int) -> dx.Distribution:
+    tfp_dist = tfd.StudentT(df=nu, loc=0.0, scale=1.0)
+    return dx._src.distributions.distribution_from_tfp.distribution_from_tfp(tfp_dist)
 
 
 def squared_distance(
