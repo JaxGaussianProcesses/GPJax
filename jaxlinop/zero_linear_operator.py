@@ -22,20 +22,7 @@ from jaxtyping import Array, Float
 
 from .linear_operator import LinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
-from .utils import check_shapes_match, to_linear_operator
-import jax
-
-
-def _default_dtype() -> jnp.dtype:
-    """Get the default dtype for the linear operator.
-
-    Returns:
-        jnp.dtype: Default dtype for the linear operator.
-    """
-    if jax.config.x64_enabled:
-        return jnp.float64
-    else:
-        return jnp.float32
+from .utils import check_shapes_match, to_linear_operator, default_dtype
 
 
 def _check_size(shape: Any) -> None:
@@ -58,7 +45,7 @@ class ZeroLinearOperator(LinearOperator):
         _check_size(shape)
 
         if dtype is None:
-            dtype = _default_dtype()
+            dtype = default_dtype()
 
         self._shape = shape
         self._dype = dtype

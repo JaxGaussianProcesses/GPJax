@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 from jaxtyping import Float, Array
 
 import jax.numpy as jnp
+import jax
 
 from .linear_operator import LinearOperator
 
@@ -103,6 +104,18 @@ def check_shapes_match(shape1: Tuple[int, ...], shape2: Tuple[int, ...]) -> None
         raise ValueError(
             f"`shape1` must have shape {shape1}, but `shape2` has shape {shape2}."
         )
+
+
+def default_dtype() -> jnp.dtype:
+    """Get the default dtype for the linear operator.
+
+    Returns:
+        jnp.dtype: Default dtype for the linear operator.
+    """
+    if jax.config.x64_enabled:
+        return jnp.float64
+    else:
+        return jnp.float32
 
 
 __all__ = [

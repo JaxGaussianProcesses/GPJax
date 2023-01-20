@@ -15,13 +15,13 @@
 
 from __future__ import annotations
 
-from typing import Tuple, Any, Union
+from typing import Any
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 
 from .constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
-from .utils import to_linear_operator
+from .utils import default_dtype
 
 
 def _check_size(size: Any) -> None:
@@ -32,7 +32,7 @@ def _check_size(size: Any) -> None:
 
 
 class IdentityLinearOperator(ConstantDiagonalLinearOperator):
-    def __init__(self, size: int) -> None:
+    def __init__(self, size: int, dtype=None) -> None:
         """Identity matrix.
 
         Args:
@@ -40,7 +40,11 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         """
         _check_size(size)
         self.size = size
-        self.value = jnp.array([1.0])
+
+        if dtype is None:
+            dtype = default_dtype()
+
+        self.value = jnp.array([1.0], dtype=dtype)
 
     def __matmul__(self, other: Float[Array, "N M"]) -> Float[Array, "N M"]:
         """Matrix multiplication.
