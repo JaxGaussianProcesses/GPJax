@@ -49,6 +49,24 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         self.value = value
         self.size = size
 
+    @property
+    def shape(self) -> Tuple[int, ...]:
+        """Linear operator shape.
+
+        Returns:
+            Tuple[int, ...]: shape of the covariance operator.
+        """
+        return (self.size, self.size)
+
+    @property
+    def dtype(self) -> jnp.dtype:
+        """Dtype of the covariance operator.
+
+        Returns:
+            jnp.dtype: Dtype of the covariance operator.
+        """
+        return self.value.dtype
+
     def __add__(
         self, other: Union[Float[Array, "N N"], LinearOperator]
     ) -> DiagonalLinearOperator:
@@ -99,15 +117,6 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
 
         else:
             return super()._add_diagonal(other)
-
-    @property
-    def shape(self) -> Tuple[int, int]:
-        """Covaraince matrix shape.
-
-        Returns:
-            Tuple[int, int]: shape of the covariance operator.
-        """
-        return (self.size, self.size)
 
     def diagonal(self) -> Float[Array, "N"]:
         """Diagonal of the covariance operator."""

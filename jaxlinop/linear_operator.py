@@ -43,11 +43,6 @@ DTypeT = TypeVar("DTypeT", bound=NestedT[jnp.dtype])
 class LinearOperator(PyTree, Generic[ShapeT, DTypeT], metaclass=abc.ABCMeta):
     """Linear operator base class."""
 
-    def __init__(self, *args, **kwargs) -> None:
-        """Initialise linear operator."""
-        self._args = args
-        self._kwargs = kwargs
-
     @property
     def name(self) -> str:
         """Linear operator name."""
@@ -60,14 +55,15 @@ class LinearOperator(PyTree, Generic[ShapeT, DTypeT], metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @property
+    @abc.abstractmethod
     def dtype(self) -> DTypeT:
         """Linear operator data type."""
-        return self._args[0].dtype
+        raise NotImplementedError
 
     @property
     def ndim(self) -> int:
         """Linear operator dimension."""
-        return len(self.shape)
+        return len(self._shape)
 
     @property
     def T(self) -> LinearOperator:

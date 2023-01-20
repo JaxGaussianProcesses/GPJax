@@ -47,6 +47,24 @@ class DiagonalLinearOperator(LinearOperator):
         _check_diag(diag)
         self.diag = diag
 
+    @property
+    def shape(self) -> Tuple[int, ...]:
+        """Shape of the linear operator.
+
+        Returns:
+            Tuple[int, ...]: Shape of the covariance operator.
+        """
+        return (self.diag.shape[0], self.diag.shape[0])
+
+    @property
+    def dtype(self) -> jnp.dtype:
+        """Dtype of the linear operator.
+
+        Returns:
+            Any: Dtype of the covariance operator.
+        """
+        return self.diag.dtype
+
     def diagonal(self) -> Float[Array, "N"]:
         """Diagonal of the covariance operator.
 
@@ -106,16 +124,6 @@ class DiagonalLinearOperator(LinearOperator):
         """
 
         return DiagonalLinearOperator(diag=self.diagonal() + other.diagonal())
-
-    @property
-    def shape(self) -> Tuple[int, int]:
-        """Covaraince matrix shape.
-
-        Returns:
-            Tuple[int, int]: shape of the covariance operator.
-        """
-        N = self.diag.shape[0]
-        return (N, N)
 
     def to_dense(self) -> Float[Array, "N N"]:
         """Construct dense Covaraince matrix from the covariance operator.
@@ -184,7 +192,7 @@ class DiagonalLinearOperator(LinearOperator):
         Returns:
             DiagonalLinearOperator: Covariance operator.
         """
-        return _DiagonalFromRoot(root=root)
+        return DiagonalFromRootLinearOperator(root=root)
 
     @classmethod
     def from_dense(cls, dense: Float[Array, "N N"]) -> DiagonalLinearOperator:
@@ -196,7 +204,7 @@ class DiagonalLinearOperator(LinearOperator):
         return DiagonalLinearOperator(diag=dense.diagonal())
 
 
-class _DiagonalFromRoot(DiagonalLinearOperator):
+class DiagonalFromRootLinearOperator(DiagonalLinearOperator):
     def __init__(self, root: DiagonalLinearOperator):
         """Initialize the covariance operator."""
 
@@ -207,6 +215,24 @@ class _DiagonalFromRoot(DiagonalLinearOperator):
 
     def to_root(self) -> LinearOperator:
         return self.root
+
+    @property
+    def shape(self) -> Tuple[int, ...]:
+        """Shape of the linear operator.
+
+        Returns:
+            Tuple[int, ...]: Shape of the covariance operator.
+        """
+        return self.root.shape
+
+    @property
+    def dtype(self) -> jnp.dtype:
+        """Dtype of the linear operator.
+
+        Returns:
+            Any: Dtype of the covariance operator.
+        """
+        return self.root.dtype
 
     @property
     def shape(self) -> Tuple[int, int]:

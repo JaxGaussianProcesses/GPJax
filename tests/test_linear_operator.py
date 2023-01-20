@@ -29,16 +29,17 @@ class DummyLinearOperator(LinearOperator):
     def shape(self, *args, **kwargs):
         pass
 
+    def dtype(self, *args, **kwargs):
+        pass
+
     def __mul__(self, *args, **kwargs):
         """Multiply linear operator by scalar."""
-        pass
 
     def _add_diagonal(self, *args, **kwargs):
         pass
 
     def __matmul__(self, *args, **kwargs):
         """Matrix multiplication."""
-        pass
 
     def to_dense(self, *args, **kwargs):
         pass

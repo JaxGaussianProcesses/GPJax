@@ -37,14 +37,13 @@ def approx_equal(res: jax.Array, actual: jax.Array) -> bool:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_init(n: int) -> None:
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
     assert zero.shape == (n, n)
-    assert zero.size == n
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_diag(n: int) -> None:
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
     res = zero.diagonal()
     actual = jnp.zeros(n)
     assert approx_equal(res, actual)
@@ -52,7 +51,7 @@ def test_diag(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_to_dense(n: int) -> None:
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
     actual = jnp.zeros(shape=(n, n))
     res = zero.to_dense()
     assert approx_equal(res, actual)
@@ -60,7 +59,7 @@ def test_to_dense(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_add_diagonal(n: int) -> None:
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
     entries = jr.uniform(_PRNGKey, shape=(n,))
     diag = DiagonalLinearOperator(diag=entries)
     zero_add_diag = zero._add_diagonal(diag)
@@ -77,7 +76,7 @@ def test_add(n: int) -> None:
 
     array = jr.uniform(_PRNGKey, shape=(n, n))
     entries = jr.uniform(_PRNGKey, shape=(n,))
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
 
     # Add array.
     res_left = zero + array
@@ -114,7 +113,7 @@ def test_add(n: int) -> None:
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_mul(n: int) -> None:
     constant = jr.uniform(_PRNGKey, shape=())
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
 
     res_left = zero * constant
     res_right = constant * zero
@@ -126,7 +125,7 @@ def test_mul(n: int) -> None:
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_matmul(n: int) -> None:
     array = jr.uniform(_PRNGKey, shape=(n, n))
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
 
     res_left = zero @ array
     res_right = array @ zero
@@ -137,7 +136,7 @@ def test_matmul(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_solve(n: int) -> None:
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
 
     with pytest.raises(RuntimeError):
         rhs = jr.uniform(_PRNGKey, shape=(n,))
@@ -146,7 +145,7 @@ def test_solve(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_inverse(n: int) -> None:
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
 
     with pytest.raises(RuntimeError):
         zero.inverse()
@@ -154,7 +153,7 @@ def test_inverse(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_to_root(n: int) -> None:
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
 
     res = zero.to_root()
     actual = zero
@@ -166,14 +165,14 @@ def test_to_root(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_log_det(n: int) -> None:
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
 
     assert zero.log_det() == jnp.log(0.0)
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_trace(n: int) -> None:
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
     res = zero.trace()
     actual = 0.0
 
@@ -182,7 +181,7 @@ def test_trace(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_from_root(n: int) -> None:
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
 
     res = ZeroLinearOperator.from_root(zero)
     actual = zero
@@ -194,7 +193,7 @@ def test_from_root(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_from_dense(n: int) -> None:
-    zero = ZeroLinearOperator(size=n)
+    zero = ZeroLinearOperator(shape=(n, n))
 
     dense = jr.uniform(_PRNGKey, shape=(n, n))
     res = ZeroLinearOperator.from_dense(dense)

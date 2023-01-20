@@ -27,7 +27,7 @@ import jax.numpy as jnp
 from jaxtyping import Array, Float
 
 from .linear_operator import LinearOperator
-from .utils import to_dense, to_linear_operator
+from .utils import to_linear_operator
 
 
 def _check_matrix(matrix: Array) -> None:
@@ -47,15 +47,32 @@ def _check_matrix(matrix: Array) -> None:
 class DenseLinearOperator(LinearOperator):
     """Dense covariance operator."""
 
-    def __init__(self, matrix: Float[Array, "N N"]):
+    def __init__(self, matrix: Float[Array, "N N"]) -> None:
         """Initialize the covariance operator.
 
         Args:
             matrix (Float[Array, "N N"]): Dense matrix.
         """
         _check_matrix(matrix)
-
         self.matrix = matrix
+
+    @property
+    def shape(self) -> Tuple[int, ...]:
+        """Shape of the linear operator.
+
+        Returns:
+            Tuple[int, ...]: Shape of the covariance operator.
+        """
+        return self.matrix.shape
+
+    @property
+    def dtype(self) -> jnp.dtype:
+        """Dtype of the linear operator.
+
+        Returns:
+            Any: Dtype of the covariance operator.
+        """
+        return self.matrix.dtype
 
     def __add__(
         self, other: Union[LinearOperator, Float[Array, "N N"]]
@@ -114,15 +131,6 @@ class DenseLinearOperator(LinearOperator):
 
         return DenseLinearOperator(matrix=new_matrix)
 
-    @property
-    def shape(self) -> Tuple[int, int]:
-        """Covaraince matrix shape.
-
-        Returns:
-            Tuple[int, int]: shape of the covariance operator.
-        """
-        return self.matrix.shape
-
     def diagonal(self) -> Float[Array, "N"]:
         """
         Diagonal of the covariance operator.
@@ -176,10 +184,10 @@ class DenseLinearOperator(LinearOperator):
             DenseLinearOperator: Covariance operator.
         """
 
-        return _DenseFromRoot(root=root)
+        return DenseFromRootLinearOperator(root=root)
 
 
-class _DenseFromRoot(DenseLinearOperator):
+class DenseFromRootLinearOperator(DenseLinearOperator):
     def __init__(self, root: LinearOperator):
         """Initialize the covariance operator."""
 
@@ -201,8 +209,22 @@ class _DenseFromRoot(DenseLinearOperator):
         return dense_root @ dense_root.T
 
     @property
-    def shape(self) -> Tuple[int, int]:
+    def shape(self) -> Tuple[int, ...]:
+        """Shape of the linear operator.
+
+        Returns:
+            Tuple[int, ...]: Shape of the covariance operator.
+        """
         return self.root.shape
+
+    @property
+    def dtype(self) -> jnp.dtype:
+        """Dtype of the linear operator.
+
+        Returns:
+            Any: Dtype of the covariance operator.
+        """
+        return self.root.dtype
 
 
 __all__ = [

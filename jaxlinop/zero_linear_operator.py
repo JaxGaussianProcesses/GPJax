@@ -23,22 +23,49 @@ from jaxtyping import Array, Float
 from .linear_operator import LinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
 from .utils import check_shapes_match, to_linear_operator
+import jax
 
 
-def _check_size(size: Any) -> None:
+def _default_dtype() -> jnp.dtype:
+    """Get the default dtype for the linear operator.
 
-    if not isinstance(size, int):
-        raise ValueError(f"`length` must be an integer, but `length = {size}`.")
+    Returns:
+        jnp.dtype: Default dtype for the linear operator.
+    """
+    if jax.config.x64_enabled:
+        return jnp.float64
+    else:
+        return jnp.float32
+
+
+def _check_size(shape: Any) -> None:
+
+    if not isinstance(shape, tuple):
+        raise ValueError(
+            f"`shape` must be a a tuple, but `type(shape) = {type(shape)}`."
+        )
+
+    if len(shape) != 2:
+        raise ValueError(f"`shape` must be a 2-tuple, but `shape = {shape}`.")
 
 
 class ZeroLinearOperator(LinearOperator):
 
     # TODO: Generalise to non-square matrices.
 
-    def __init__(self, size: int) -> None:
+    def __init__(self, shape: Tuple[int, int], dtype: jnp.dtype = None) -> None:
 
-        _check_size(size)
-        self.size = size
+        _check_size(shape)
+
+        if dtype is None:
+            dtype = _default_dtype()
+
+        self._shape = shape
+        self._dype = dtype
+
+    @property
+    def dtype(self) -> jnp.dtype:
+        return self._dtype
 
     @property
     def shape(self) -> Tuple[int, int]:
@@ -47,7 +74,7 @@ class ZeroLinearOperator(LinearOperator):
         Returns:
             Tuple[int, int]: shape of the covariance operator.
         """
-        return (self.size, self.size)
+        return self._shape
 
     def diagonal(self) -> Float[Array, "N"]:
         """
@@ -56,7 +83,7 @@ class ZeroLinearOperator(LinearOperator):
         Returns:
             Float[Array, "N"]: The diagonal of the covariance operator.
         """
-        return jnp.zeros(self.size)
+        return jnp.zeros(self.shape[0])
 
     def __add__(
         self, other: Union[Float[Array, "N N"], LinearOperator]
@@ -175,7 +202,8 @@ class ZeroLinearOperator(LinearOperator):
         """
 
         # TODO: check shapes.
-        return ZeroLinearOperator(dense.shape[0])
+        n = dense.shape[0]
+        return ZeroLinearOperator((n, n))
 
 
 __all__ = [
