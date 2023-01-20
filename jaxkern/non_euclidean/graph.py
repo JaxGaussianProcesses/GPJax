@@ -1,3 +1,18 @@
+# Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 from typing import Dict, List, Optional
 
 import jax.numpy as jnp
@@ -13,14 +28,25 @@ from .utils import jax_gather_nd
 # Graph kernels
 ##########################################
 class GraphKernel(AbstractKernel):
+    """A Matérn graph kernel defined on the vertices of a graph. The key reference for this object is borovitskiy et. al., (2020)."""
+
     def __init__(
         self,
         laplacian: Float[Array, "N N"],
         active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = False,
-        name: Optional[str] = "Graph kernel",
+        spectral: Optional[bool] = False,
+        name: Optional[str] = "Matérn Graph kernel",
     ) -> None:
-        super().__init__(EigenKernelComputation, active_dims, stationary, False, name)
+        """Initialize a Matérn graph kernel.
+
+        Args:
+            laplacian (Float[Array]): An N x N matrix representing the Laplacian matrix of a graph.
+            compute_engine (EigenKernelComputation, optional): The compute engine that should be used in the kernel to compute covariance matrices. Defaults to EigenKernelComputation.
+            active_dims (Optional[List[int]], optional): The dimensions of the input data for which the kernel should be evaluated on. Defaults to None.
+            stationary (Optional[bool], optional): _description_. Defaults to False.
+            name (Optional[str], optional): _description_. Defaults to "Graph kernel".
+        """
+        super().__init__(EigenKernelComputation, active_dims, True, spectral, name)
         self.laplacian = laplacian
         evals, self.evecs = jnp.linalg.eigh(self.laplacian)
         self.evals = evals.reshape(-1, 1)
@@ -51,6 +77,7 @@ class GraphKernel(AbstractKernel):
         return Kxx.squeeze()
 
     def init_params(self, key: KeyArray) -> Dict:
+        """Initialise the lengthscale, variance and smoothness parameters of the kernel"""
         return {
             "lengthscale": jnp.array([1.0] * self.ndims),
             "variance": jnp.array([1.0]),
@@ -59,4 +86,9 @@ class GraphKernel(AbstractKernel):
 
     @property
     def num_vertex(self) -> int:
+        """The number of vertices within the graph.
+
+        Returns:
+            int: An integer representing the number of vertices within the graph.
+        """
         return self.compute_engine.num_vertex
