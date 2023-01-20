@@ -22,6 +22,14 @@ tfd = tfp.distributions
 
 
 def build_student_t_distribution(nu: int) -> dx.Distribution:
+    """For a fixed half-integer smoothness parameter, compute the spectral density of a Matérn kernel; a Student's t distribution.
+
+    Args:
+        nu (int): The smoothness parameter of the Matérn kernel.
+
+    Returns:
+        dx.Distribution: A Student's t distribution with the same smoothness parameter.
+    """
     tfp_dist = tfd.StudentT(df=nu, loc=0.0, scale=1.0)
     return dx._src.distributions.distribution_from_tfp.distribution_from_tfp(tfp_dist)
 

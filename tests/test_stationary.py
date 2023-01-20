@@ -20,6 +20,7 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
+import distrax as dx
 from jax.config import config
 from jaxlinop import LinearOperator, identity
 from jaxutils.parameters import initialise
@@ -35,6 +36,7 @@ from jaxkern.stationary import (
     Periodic,
     White,
 )
+from jaxkern.stationary.utils import build_student_t_distribution
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -289,3 +291,9 @@ def test_active_dim(kernel: AbstractKernel) -> None:
 
         # Test gram matrices are equal
         assert jnp.all(ad_Kxx.to_dense() == manual_Kxx.to_dense())
+
+
+@pytest.mark.parametrize("smoothness", [1, 2, 3])
+def test_build_studentt_dist(smoothness: int) -> None:
+    dist = build_student_t_distribution(smoothness)
+    assert isinstance(dist, dx.Distribution)
