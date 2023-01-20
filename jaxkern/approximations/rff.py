@@ -28,7 +28,7 @@ class RFF(AbstractKernel):
 
     def _check_valid_base_kernel(self, kernel):
         error_msg = """
-        Base kernel must have a spectral density. Currently, only Matern
+        Base kernel must have a spectral density. Currently, only Matérn
         and RBF kernels have implemented spectral densities.
         """
         if kernel.spectral_density is None:

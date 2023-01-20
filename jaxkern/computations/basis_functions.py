@@ -47,12 +47,10 @@ class BasisFunctionComputation(AbstractKernelComputation):
         scaled_frequencies = (
             params["frequencies"] / params["lengthscale"]
         )  # shape: (num_basis_fns, n_dims)
-        z1 = jnp.matmul(x, scaled_frequencies.T)  # shape: (n_samples, num_basis_fns)
-        z2 = jnp.matmul(y, scaled_frequencies.T)  # shape: (m_samples, num_basis_fns)
-        z1 = jnp.concatenate([jnp.cos(z1), jnp.sin(z1)], axis=-1)
-        z2 = jnp.concatenate([jnp.cos(z2), jnp.sin(z2)], axis=-1)
+        z1 = self._compute_features(x, scaled_frequencies)
+        z2 = self._compute_features(y, scaled_frequencies)
         z1 /= self.num_basis_fns
-        return jnp.matmul(z1, z2.T)
+        return params["variance"] * jnp.matmul(z1, z2.T)
 
     def gram(self, params: Dict, inputs: Float[Array, "N D"]) -> DenseLinearOperator:
         """For the Gram matrix, we can save computations by computing only one matrix multiplication between the inputs and the scaled frequencies.
@@ -67,10 +65,23 @@ class BasisFunctionComputation(AbstractKernelComputation):
         scaled_frequencies = (
             params["frequencies"] / params["lengthscale"]
         )  # shape: (num_basis_fns, n_dims)
-        z1 = jnp.matmul(
-            inputs, scaled_frequencies.T
-        )  # shape: (n_samples, num_basis_fns)
-        z1 = jnp.concatenate([jnp.cos(z1), jnp.sin(z1)], axis=-1)
-        matrix = jnp.matmul(z1, z1.T)
+        z1 = self._compute_features(inputs, scaled_frequencies)
+        matrix = jnp.matmul(z1, z1.T)  # shape: (n_samples, n_samples)
         matrix /= self.num_basis_fns
-        return DenseLinearOperator(matrix)
+        return DenseLinearOperator(params["variance"] * matrix)
+
+    def _compute_features(
+        self, x: Float[Array, "N D"], frequencies: Float[Array, "M D"]
+    ) -> Float[Array, "N L"]:
+        """Compute the features for the inputs.
+
+        Args:
+            x: A N x D array of inputs.
+            frequencies: A M x D array of frequencies.
+
+        Returns:
+            Float[Array, "N L"]: A N x L array of features where L = 2M.
+        """
+        z = jnp.matmul(x, frequencies.T)
+        z = jnp.concatenate([jnp.cos(z), jnp.sin(z)], axis=-1)
+        return z
