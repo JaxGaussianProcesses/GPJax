@@ -5,8 +5,8 @@ from jaxkern.stationary import (
     Matern32,
     Matern52,
     RBF,
-    PoweredExponential,
     RationalQuadratic,
+    PoweredExponential,
     Periodic,
 )
 from jaxkern.nonstationary import Polynomial, Linear
@@ -14,8 +14,8 @@ from jaxkern.base import AbstractKernel
 import jax.random as jr
 from jax.config import config
 import jax.numpy as jnp
-from typing import Tuple
 from jaxlinop import DenseLinearOperator
+from typing import Tuple
 import jax
 
 config.update("jax_enable_x64", True)

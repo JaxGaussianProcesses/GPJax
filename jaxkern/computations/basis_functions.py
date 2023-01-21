@@ -44,11 +44,12 @@ class BasisFunctionComputation(AbstractKernelComputation):
         Returns:
             _type_: A N x M array of cross-covariances.
         """
-        scaled_frequencies = (
-            params["frequencies"] / params["lengthscale"]
-        )  # shape: (num_basis_fns, n_dims)
-        z1 = self._compute_features(x, scaled_frequencies)
-        z2 = self._compute_features(y, scaled_frequencies)
+        z1 = self.compute_features(
+            x, params["frequencies"], scaling_factor=params["lengthscale"]
+        )
+        z2 = self.compute_features(
+            y, params["frequencies"], scaling_factor=params["lengthscale"]
+        )
         z1 /= self.num_basis_fns
         return params["variance"] * jnp.matmul(z1, z2.T)
 
@@ -62,16 +63,18 @@ class BasisFunctionComputation(AbstractKernelComputation):
         Returns:
             DenseLinearOperator: A dense linear operator representing the N x N Gram matrix.
         """
-        scaled_frequencies = (
-            params["frequencies"] / params["lengthscale"]
-        )  # shape: (num_basis_fns, n_dims)
-        z1 = self._compute_features(inputs, scaled_frequencies)
+        z1 = self.compute_features(
+            inputs, params["frequencies"], scaling_factor=params["lengthscale"]
+        )
         matrix = jnp.matmul(z1, z1.T)  # shape: (n_samples, n_samples)
         matrix /= self.num_basis_fns
         return DenseLinearOperator(params["variance"] * matrix)
 
-    def _compute_features(
-        self, x: Float[Array, "N D"], frequencies: Float[Array, "M D"]
+    @staticmethod
+    def compute_features(
+        x: Float[Array, "N D"],
+        frequencies: Float[Array, "M D"],
+        scaling_factor: Float[Array, "D"] = None,
     ) -> Float[Array, "N L"]:
         """Compute the features for the inputs.
 
@@ -82,6 +85,8 @@ class BasisFunctionComputation(AbstractKernelComputation):
         Returns:
             Float[Array, "N L"]: A N x L array of features where L = 2M.
         """
+        if scaling_factor is not None:
+            frequencies = frequencies / scaling_factor
         z = jnp.matmul(x, frequencies.T)
         z = jnp.concatenate([jnp.cos(z), jnp.sin(z)], axis=-1)
         return z
