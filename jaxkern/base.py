@@ -19,6 +19,7 @@ from typing import Callable, Dict, List, Optional, Sequence
 import deprecation
 import jax.numpy as jnp
 import jax.random
+import jax
 from jax.random import KeyArray
 from jaxtyping import Array, Float
 from jaxutils import PyTree
