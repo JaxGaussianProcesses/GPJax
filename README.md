@@ -170,7 +170,7 @@ Clone a copy of the repository to your local machine and run the setup configura
 ```bash
 git clone https://github.com/JaxGaussianProcesses/GPJax.git
 cd GPJax
-python setup.py develop
+pip install -e .[dev]
 ```
 
 > **Note**
