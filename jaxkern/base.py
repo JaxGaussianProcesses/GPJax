@@ -18,6 +18,7 @@ from typing import Callable, Dict, List, Optional, Sequence
 
 import deprecation
 import jax.numpy as jnp
+import jax.random
 from jax.random import KeyArray
 from jaxtyping import Array, Float
 from jaxutils import PyTree
@@ -176,7 +177,9 @@ class CombinationKernel(AbstractKernel):
 
     def init_params(self, key: KeyArray) -> Dict:
         """A template dictionary of the kernel's parameter set."""
-        return [kernel.init_params(key) for kernel in self.kernel_set]
+        num_kernels = len(self.kernel_set)
+        key_per_kernel = jax.random.split(key=key, num=num_kernels)
+        return [kernel.init_params(key_) for key_, kernel in zip(key_per_kernel, self.kernel_set)]
 
     def __call__(
         self,
