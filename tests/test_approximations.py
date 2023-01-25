@@ -123,6 +123,23 @@ def test_improvement(kernel, n_dim):
     assert c_delta > b_delta
 
 
+@pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
+def test_exactness(kernel):
+    n_data = 100
+    key = jr.PRNGKey(123)
+
+    x = jr.uniform(key, minval=-3.0, maxval=3.0, shape=(n_data, 1))
+    exact_params = kernel.init_params(key)
+    exact_linop = kernel.gram(exact_params, x).to_dense()
+
+    better_approximation = RFF(kernel, num_basis_fns=500)
+    b_params = better_approximation.init_params(key)
+    b_linop = better_approximation.gram(b_params, x).to_dense()
+
+    max_delta = jnp.max(exact_linop - b_linop)
+    assert max_delta < 0.1
+
+
 @pytest.mark.parametrize(
     "kernel",
     [RationalQuadratic, PoweredExponential, Polynomial, Linear, Periodic],

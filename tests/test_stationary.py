@@ -297,3 +297,22 @@ def test_active_dim(kernel: AbstractKernel) -> None:
 def test_build_studentt_dist(smoothness: int) -> None:
     dist = build_student_t_distribution(smoothness)
     assert isinstance(dist, dx.Distribution)
+
+
+@pytest.mark.parametrize(
+    "kern, df", [(Matern12(), 1), (Matern32(), 3), (Matern52(), 5)]
+)
+def test_matern_spectral_density(kern, df) -> None:
+    sdensity = kern.spectral_density
+    assert sdensity.name == "StudentT"
+    assert sdensity.df == df
+    assert sdensity.loc == jnp.array(0.0)
+    assert sdensity.scale == jnp.array(1.0)
+
+
+def test_rbf_spectral_density() -> None:
+    kern = RBF()
+    sdensity = kern.spectral_density
+    assert sdensity.name == "Normal"
+    assert sdensity.loc == jnp.array(0.0)
+    assert sdensity.scale == jnp.array(1.0)

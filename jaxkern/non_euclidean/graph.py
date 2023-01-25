@@ -34,7 +34,6 @@ class GraphKernel(AbstractKernel):
         self,
         laplacian: Float[Array, "N N"],
         active_dims: Optional[List[int]] = None,
-        spectral: Optional[bool] = False,
         name: Optional[str] = "Matérn Graph kernel",
     ) -> None:
         """Initialize a Matérn graph kernel.
@@ -46,12 +45,18 @@ class GraphKernel(AbstractKernel):
             stationary (Optional[bool], optional): _description_. Defaults to False.
             name (Optional[str], optional): _description_. Defaults to "Graph kernel".
         """
-        super().__init__(EigenKernelComputation, active_dims, True, spectral, name)
+        super().__init__(
+            EigenKernelComputation,
+            active_dims,
+            spectral_density=None,
+            name=name,
+        )
         self.laplacian = laplacian
         evals, self.evecs = jnp.linalg.eigh(self.laplacian)
         self.evals = evals.reshape(-1, 1)
         self.compute_engine.eigensystem = self.evals, self.evecs
         self.compute_engine.num_vertex = self.laplacian.shape[0]
+        self._stationary = True
 
     def __call__(
         self,

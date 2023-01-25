@@ -35,9 +35,15 @@ class Polynomial(AbstractKernel):
         stationary: Optional[bool] = False,
         name: Optional[str] = "Polynomial",
     ) -> None:
-        super().__init__(DenseKernelComputation, active_dims, stationary, None, name)
+        super().__init__(
+            DenseKernelComputation,
+            active_dims,
+            spectral_density=None,
+            name=name,
+        )
         self.degree = degree
         self.name = f"Polynomial Degree: {self.degree}"
+        self._stationary = False
 
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]

@@ -32,13 +32,11 @@ class Matern32(AbstractKernel):
     def __init__(
         self,
         active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = True,
         name: Optional[str] = "Matern 3/2",
     ) -> None:
         spectral_density = build_student_t_distribution(nu=3)
-        super().__init__(
-            DenseKernelComputation, active_dims, stationary, spectral_density, name
-        )
+        super().__init__(DenseKernelComputation, active_dims, spectral_density, name)
+        self._stationary = True
 
     def __call__(
         self,

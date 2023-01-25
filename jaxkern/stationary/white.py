@@ -30,11 +30,10 @@ class White(AbstractKernel):
         self,
         compute_engine: AbstractKernelComputation = ConstantDiagonalKernelComputation,
         active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = True,
-        spectral: Optional[bool] = False,
         name: Optional[str] = "White Noise Kernel",
     ) -> None:
-        super().__init__(compute_engine, active_dims, stationary, spectral, name)
+        super().__init__(compute_engine, active_dims, spectral_density=None, name=name)
+        self._stationary = True
 
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]

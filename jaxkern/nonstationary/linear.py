@@ -38,7 +38,13 @@ class Linear(AbstractKernel):
         stationary: Optional[bool] = False,
         name: Optional[str] = "Linear",
     ) -> None:
-        super().__init__(DenseKernelComputation, active_dims, stationary, None, name)
+        super().__init__(
+            DenseKernelComputation,
+            active_dims,
+            spectral_density=None,
+            name=name,
+        )
+        self._stationary = False
 
     def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\\sigma`

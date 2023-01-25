@@ -34,16 +34,15 @@ class RBF(AbstractKernel):
     def __init__(
         self,
         active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = True,
         name: Optional[str] = "Radial basis function kernel",
     ) -> None:
         super().__init__(
             DenseKernelComputation,
             active_dims,
-            stationary,
             spectral_density=dx.Normal(loc=0.0, scale=1.0),
             name=name,
         )
+        self._stationary = True
 
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]

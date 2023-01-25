@@ -35,10 +35,12 @@ class Periodic(AbstractKernel):
     def __init__(
         self,
         active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = False,
         name: Optional[str] = "Periodic",
     ) -> None:
-        super().__init__(DenseKernelComputation, active_dims, stationary, None, name)
+        super().__init__(
+            DenseKernelComputation, active_dims, spectral_density=None, name=name
+        )
+        self._stationary = True
 
     def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`
