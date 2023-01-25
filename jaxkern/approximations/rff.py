@@ -48,7 +48,7 @@ class RFF(AbstractKernel):
             Dict: A dictionary containing the original kernel's parameters and the initial frequencies used in RFF approximation.
         """
         base_params = self.base_kernel.init_params(key)
-        n_dims = base_params["lengthscale"].shape[0]
+        n_dims = self.base_kernel.ndims
         frequencies = self.base_kernel.spectral_density.sample(
             seed=key, sample_shape=(self.num_basis_fns, n_dims)
         )
