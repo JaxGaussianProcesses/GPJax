@@ -22,7 +22,6 @@ from jaxtyping import Array
 
 from ..base import AbstractKernel
 from ..computations import (
-    AbstractKernelComputation,
     DenseKernelComputation,
 )
 
@@ -35,13 +34,17 @@ class Linear(AbstractKernel):
 
     def __init__(
         self,
-        compute_engine: AbstractKernelComputation = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
         stationary: Optional[bool] = False,
-        spectral: Optional[bool] = False,
         name: Optional[str] = "Linear",
     ) -> None:
-        super().__init__(compute_engine, active_dims, stationary, spectral, name)
+        super().__init__(
+            DenseKernelComputation,
+            active_dims,
+            spectral_density=None,
+            name=name,
+        )
+        self._stationary = False
 
     def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\\sigma`

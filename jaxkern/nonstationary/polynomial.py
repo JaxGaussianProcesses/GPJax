@@ -21,7 +21,6 @@ from jaxtyping import Array, Float
 
 from ..base import AbstractKernel
 from ..computations import (
-    AbstractKernelComputation,
     DenseKernelComputation,
 )
 
@@ -32,15 +31,19 @@ class Polynomial(AbstractKernel):
     def __init__(
         self,
         degree: int = 1,
-        compute_engine: AbstractKernelComputation = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
         stationary: Optional[bool] = False,
-        spectral: Optional[bool] = False,
         name: Optional[str] = "Polynomial",
     ) -> None:
-        super().__init__(compute_engine, active_dims, stationary, spectral, name)
+        super().__init__(
+            DenseKernelComputation,
+            active_dims,
+            spectral_density=None,
+            name=name,
+        )
         self.degree = degree
         self.name = f"Polynomial Degree: {self.degree}"
+        self._stationary = False
 
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]

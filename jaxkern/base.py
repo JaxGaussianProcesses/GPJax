@@ -25,6 +25,7 @@ from jaxtyping import Array, Float
 from jaxutils import PyTree
 
 from .computations import AbstractKernelComputation, DenseKernelComputation
+import distrax as dx
 
 
 ##########################################
@@ -38,16 +39,40 @@ class AbstractKernel(PyTree):
         self,
         compute_engine: AbstractKernelComputation = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = False,
-        spectral: Optional[bool] = False,
+        spectral_density: Optional[dx.Distribution] = None,
         name: Optional[str] = "AbstractKernel",
     ) -> None:
-        self.compute_engine = compute_engine
+        self._compute_engine = compute_engine
         self.active_dims = active_dims
-        self.stationary = stationary
-        self.spectral = spectral
+        self.spectral_density = spectral_density
         self.name = name
+        self._stationary = False
         self.ndims = 1 if not self.active_dims else len(self.active_dims)
+        compute_engine = self.compute_engine(kernel_fn=self.__call__)
+        self.gram = compute_engine.gram
+        self.cross_covariance = compute_engine.cross_covariance
+
+    @property
+    def stationary(self) -> bool:
+        """Boolean property as to whether the kernel is stationary or not.
+
+        Returns:
+            bool: True if the kernel is stationary.
+        """
+        return self._stationary
+
+    @property
+    def compute_engine(self) -> AbstractKernelComputation:
+        """The compute engine that is used to perform the kernel computations.
+
+        Returns:
+            AbstractKernelComputation: The compute engine that is used to perform the kernel computations.
+        """
+        return self._compute_engine
+
+    @compute_engine.setter
+    def compute_engine(self, compute_engine: AbstractKernelComputation) -> None:
+        self._compute_engine = compute_engine
         compute_engine = self.compute_engine(kernel_fn=self.__call__)
         self.gram = compute_engine.gram
         self.cross_covariance = compute_engine.cross_covariance
@@ -150,18 +175,17 @@ class CombinationKernel(AbstractKernel):
         kernel_set: List[AbstractKernel],
         compute_engine: AbstractKernelComputation = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = False,
-        spectral: Optional[bool] = False,
         name: Optional[str] = "AbstractKernel",
     ) -> None:
-        super().__init__(compute_engine, active_dims, stationary, spectral, name)
+        super().__init__(compute_engine, active_dims, name)
         self.kernel_set = kernel_set
         name: Optional[str] = "Combination kernel"
         self.combination_fn: Optional[Callable] = None
 
         if not all(isinstance(k, AbstractKernel) for k in self.kernel_set):
             raise TypeError("can only combine Kernel instances")  # pragma: no cover
-
+        if all(k.stationary for k in self.kernel_set):
+            self._stationary = True
         self._set_kernels(self.kernel_set)
 
     def _set_kernels(self, kernels: Sequence[AbstractKernel]) -> None:
@@ -211,13 +235,9 @@ class SumKernel(CombinationKernel):
         kernel_set: List[AbstractKernel],
         compute_engine: AbstractKernelComputation = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = False,
-        spectral: Optional[bool] = False,
         name: Optional[str] = "Sum kernel",
     ) -> None:
-        super().__init__(
-            kernel_set, compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(kernel_set, compute_engine, active_dims, name)
         self.combination_fn: Optional[Callable] = jnp.sum
 
 
@@ -229,11 +249,7 @@ class ProductKernel(CombinationKernel):
         kernel_set: List[AbstractKernel],
         compute_engine: AbstractKernelComputation = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = False,
-        spectral: Optional[bool] = False,
         name: Optional[str] = "Product kernel",
     ) -> None:
-        super().__init__(
-            kernel_set, compute_engine, active_dims, stationary, spectral, name
-        )
+        super().__init__(kernel_set, compute_engine, active_dims, name)
         self.combination_fn: Optional[Callable] = jnp.prod

@@ -22,10 +22,10 @@ from jaxtyping import Array, Float
 
 from ..base import AbstractKernel
 from ..computations import (
-    AbstractKernelComputation,
     DenseKernelComputation,
 )
 from .utils import squared_distance
+import distrax as dx
 
 
 class RBF(AbstractKernel):
@@ -33,13 +33,16 @@ class RBF(AbstractKernel):
 
     def __init__(
         self,
-        compute_engine: AbstractKernelComputation = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = False,
-        spectral: Optional[bool] = False,
         name: Optional[str] = "Radial basis function kernel",
     ) -> None:
-        super().__init__(compute_engine, active_dims, stationary, spectral, name)
+        super().__init__(
+            DenseKernelComputation,
+            active_dims,
+            spectral_density=dx.Normal(loc=0.0, scale=1.0),
+            name=name,
+        )
+        self._stationary = True
 
     def __call__(
         self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
