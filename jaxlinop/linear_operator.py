@@ -27,7 +27,7 @@ import distrax
 from jaxtyping import Array, Float
 from typing import Any, TypeVar, Iterable, Mapping, Generic, Tuple, Union
 
-from jaxutils import PyTree
+from distrax._src.utils.jittable import Jittable as PyTree
 
 # Generic type.
 T = TypeVar("T")
