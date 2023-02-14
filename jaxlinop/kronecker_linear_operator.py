@@ -57,11 +57,13 @@ class KroneckerLinearOperator(LinearOperator):
         if dtype is None:
             self._dtype = linops[0].dtype
 
+    @property
     def shape(self) -> tuple[int, int]:
         left = reduce(operator.mul, [linop.shape[-2] for linop in self.linops], 1)
         right = reduce(operator.mul, [linop.shape[-1] for linop in self.linops], 1)
         return (left, right)
 
+    @property
     def dtype(self) -> jnp.dtype:
         return self._dtype
 
@@ -80,22 +82,29 @@ class KroneckerLinearOperator(LinearOperator):
     def __add__(
         self, other: Union[LinearOperator, Float[Array, "N N"]]
     ) -> LinearOperator:
-        raise NotImplementedError
+        raise NotImplementedError(
+            "KroneckerLinearOperator currently does not support addition. We are looking to support this soon."
+        )
 
     def __mul__(self, other: float) -> LinearOperator:
-        raise NotImplementedError
+        raise NotImplementedError(
+            "KroneckerLinearOperator currently does not support multiplication. We are looking to support this soon."
+        )
 
     def _add_diagonal(self, other: DiagonalLinearOperator) -> LinearOperator:
-        raise NotImplementedError
+        raise NotImplementedError(
+            "KroneckerLinearOperator currently does not support addition. We are looking to support this soon."
+        )
 
     def diagonal(self) -> Float[Array, "N"]:
         raise NotImplementedError
 
     def __matmul__(self, other: Float[Array, "N M"]) -> Float[Array, "N M"]:
-        raise NotImplementedError
+        # TODO: Code this!!!
+        pass
 
     def to_dense(self) -> Float[Array, "N N"]:
-        raise NotImplementedError
+        return reduce(jnp.kron, [linop.to_dense() for linop in self.linops])
 
     @classmethod
     def from_root(cls, root: LowerTriangularLinearOperator) -> KroneckerLinearOperator:
@@ -111,10 +120,6 @@ class KroneckerLinearOperator(LinearOperator):
         raise NotImplementedError
 
 
-class _KroneckerFromRoot(KroneckerLinearOperator):
-    pass
-
-
 __all__ = [
-    "DenseLinearOperator",
+    "KroneckerLinearOperator",
 ]

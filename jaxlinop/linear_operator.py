@@ -204,7 +204,7 @@ class LinearOperator(PyTree, Generic[ShapeT, DTypeT], metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @classmethod
-    @abc.abstractmethod
+    # @abc.abstractmethod
     def from_dense(cls, dense: Float[Array, "N N"]) -> LinearOperator:
         """Construct linear operator from dense matrix.
 
