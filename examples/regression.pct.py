@@ -217,8 +217,8 @@ ax.plot(x, y, "o", label="Observations", color="tab:red")
 ax.plot(xtest, predictive_mean, label="Predictive mean", color="tab:blue")
 ax.fill_between(
     xtest.squeeze(),
-    predictive_mean - predictive_std,
-    predictive_mean + predictive_std,
+    predictive_mean - 2 * predictive_std,
+    predictive_mean + 2 * predictive_std,
     alpha=0.2,
     color="tab:blue",
     label="Two sigma",
