@@ -33,7 +33,7 @@ from .variational_inference import StochasticVI
 
 
 class InferenceState(PyTree):
-    """Imutable class for storing optimised parameters and training history."""
+    """Immutable class for storing optimised parameters and training history."""
 
     def __init__(self, params: Dict, history: Float[Array, "num_iters"]):
         self._params = params
@@ -97,7 +97,7 @@ def fit(
         params = constrain(params, bijectors)
         return objective(params)
 
-    # Tranform params to unconstrained space
+    # Transform params to unconstrained space
     params = unconstrain(params, bijectors)
 
     # Initialise optimiser state
@@ -122,7 +122,7 @@ def fit(
     # Run the optimisation loop
     (params, _), history = jax.lax.scan(step, (params, opt_state), iter_nums)
 
-    # Tranform final params to constrained space
+    # Transform final params to constrained space
     params = constrain(params, bijectors)
 
     return InferenceState(params=params, history=history)
@@ -166,7 +166,7 @@ def fit_batches(
         params = constrain(params, bijectors)
         return objective(params, batch)
 
-    # Tranform params to unconstrained space
+    # Transform params to unconstrained space
     params = unconstrain(params, bijectors)
 
     # Initialise optimiser state
@@ -197,7 +197,7 @@ def fit_batches(
     # Run the optimisation loop
     (params, _), history = jax.lax.scan(step, (params, opt_state), (iter_nums, keys))
 
-    # Tranform final params to constrained space
+    # Transform final params to constrained space
     params = constrain(params, bijectors)
 
     return InferenceState(params=params, history=history)
@@ -215,7 +215,7 @@ def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
     """
     x, y, n = train_data.X, train_data.y, train_data.n
 
-    # Subsample data inidicies with replacement to get the mini-batch
+    # Subsample data indices with replacement to get the mini-batch
     indicies = jr.choice(key, n, (batch_size,), replace=True)
 
     return Dataset(X=x[indicies], y=y[indicies])
@@ -257,7 +257,7 @@ def fit_natgrads(
 
     params, trainables, bijectors = parameter_state.unpack()
 
-    # Tranform params to unconstrained space
+    # Transform params to unconstrained space
     params = unconstrain(params, bijectors)
 
     # Initialise optimiser states
@@ -302,7 +302,7 @@ def fit_natgrads(
         step, (params, hyper_state, moment_state), (iter_nums, keys)
     )
 
-    # Tranform final params to constrained space
+    # Transform final params to constrained space
     params = constrain(params, bijectors)
 
     return InferenceState(params=params, history=history)

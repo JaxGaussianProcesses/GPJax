@@ -369,7 +369,7 @@ class AbstractKernel(PyTree):
         details="Use the ``init_params`` method for parameter initialisation.",
     )
     def _initialise_params(self, key: KeyArray) -> Dict:
-        """Deprecated method for initialising the GP's parameters. Succeded by ``init_params``."""
+        """Deprecated method for initialising the GP's parameters. Succeeded by ``init_params``."""
         return self.init_params(key)
 
 

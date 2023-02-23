@@ -40,10 +40,10 @@ def natural_to_expectation(params: Dict) -> Dict:
     In particular, in terms of the Gaussian mean μ and covariance matrix μ for
     the Gaussian variational family,
 
-        - the natural parameteristaion is θ = (S⁻¹μ, -S⁻¹/2)
+        - the natural parameterisation is θ = (S⁻¹μ, -S⁻¹/2)
         - the expectation parameters are  η = (μ, S + μ μᵀ).
 
-    This function solves these eqautions in terms of μ and S to convert θ to η.
+    This function solves these equations in terms of μ and S to convert θ to η.
 
     Writing θ = (θ₁, θ₂), we have that S⁻¹ = -2θ₂ . Taking the cholesky
     decomposition of the inverse covariance, S⁻¹ = LLᵀ and defining C = L⁻¹, we
@@ -165,7 +165,7 @@ def _rename_natural_to_expectation(params: Dict) -> Dict:
 
 def _get_moment_trainables(trainables: Dict) -> Dict:
     """
-    This function takes a trainbles dictionary, and sets non-moment parameter
+    This function takes a trainables dictionary, and sets non-moment parameter
     training to false for gradient stopping.
 
     Args:
@@ -185,7 +185,7 @@ def _get_moment_trainables(trainables: Dict) -> Dict:
 
 def _get_hyperparameter_trainables(trainables: Dict) -> Dict:
     """
-    This function takes a trainbles dictionary, and sets moment parameter
+    This function takes a trainables dictionary, and sets moment parameter
     training to false for gradient stopping.
 
     Args:
@@ -251,7 +251,7 @@ def natural_gradients(
             # Transform parameters to constrained space.
             params = constrain(params, bijectors)
 
-            # Convert natural parameterisation θ to the expectation parametersation η.
+            # Convert natural parameterisation θ to the expectation parameterisation η.
             expectation_params = natural_to_expectation(params)
 
             # Compute gradient ∂L/∂η:
