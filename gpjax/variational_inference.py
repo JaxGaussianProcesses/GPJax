@@ -72,7 +72,7 @@ class AbstractVariationalInference(PyTree):
         details="Use the ``init_params`` method for parameter initialisation.",
     )
     def _initialise_params(self, key: KeyArray) -> Dict:
-        """Deprecated method for initialising the GP's parameters. Succeded by ``init_params``."""
+        """Deprecated method for initialising the GP's parameters. Succeeded by ``init_params``."""
         return self.init_params(key)
 
     @abc.abstractmethod
@@ -231,7 +231,7 @@ class CollapsedVI(AbstractVariationalInference):
             #
             #   with B = I + AAᵀ and A = Lz⁻¹ Kzx / σ.
             #
-            # Similary we apply matrix inversion lemma to invert σ²I + Q
+            # Similarly we apply matrix inversion lemma to invert σ²I + Q
             #
             #   (σ²I + Q)⁻¹ = (Iσ²)⁻¹ - (Iσ²)⁻¹ Kxz Lz⁻ᵀ (I + Lz⁻¹ Kzx (Iσ²)⁻¹ Kxz Lz⁻ᵀ )⁻¹ Lz⁻¹ Kzx (Iσ²)⁻¹
             #               = (Iσ²)⁻¹ - (Iσ²)⁻¹ σAᵀ (I + σA (Iσ²)⁻¹ σAᵀ)⁻¹ σA (Iσ²)⁻¹

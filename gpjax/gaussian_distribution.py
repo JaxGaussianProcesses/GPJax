@@ -210,7 +210,7 @@ def _kl_divergence(
 
     Args:
         q (GaussianDistribution): A multivariate Gaussian distribution.
-        p (GaussianDistribution): A multivariate Gaussia distribution.
+        p (GaussianDistribution): A multivariate Gaussian distribution.
 
     Returns:
         Float[Array, "1"]: The KL divergence between q and p.

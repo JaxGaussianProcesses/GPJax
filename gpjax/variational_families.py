@@ -75,7 +75,7 @@ class AbstractVariationalFamily(PyTree):
         details="Use the ``init_params`` method for parameter initialisation.",
     )
     def _initialise_params(self, key: KeyArray) -> Dict:
-        """Deprecated method for initialising the GP's parameters. Succeded by ``init_params``."""
+        """Deprecated method for initialising the GP's parameters. Succeeded by ``init_params``."""
         return self.init_params(key)
 
     @abc.abstractmethod
@@ -390,7 +390,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
     The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
     and the distribution over the inducing inputs is q(u) = N(μ, S). Expressing the variational distribution, in the form of the
-    exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the natural paramerisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2), to perform
+    exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the natural parameterisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2), to perform
     model inference, where T(u) = [u, uuᵀ] are the sufficient statistics.
     """
 
@@ -433,7 +433,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],
 
-        with μ and S computed from the natural paramerisation θ = (S⁻¹μ, -S⁻¹/2).
+        with μ and S computed from the natural parameterisation θ = (S⁻¹μ, -S⁻¹/2).
 
         Args:
             params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
@@ -490,7 +490,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
              N[f(t); μt + Ktz Kzz⁻¹ (μ - μz),  Ktt - Ktz Kzz⁻¹ Kzt + Ktz Kzz⁻¹ S Kzz⁻¹ Kzt ],
 
-        with μ and S computed from the natural paramerisation θ = (S⁻¹μ, -S⁻¹/2).
+        with μ and S computed from the natural parameterisation θ = (S⁻¹μ, -S⁻¹/2).
 
         Args:
             params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
@@ -574,7 +574,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
     The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
     and the distribution over the inducing inputs is q(u) = N(μ, S). Expressing the variational distribution, in the form of the
-    exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the natural paramerisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2) and
+    exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the natural parameterisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2) and
     sufficient stastics T(u) = [u, uuᵀ]. The expectation parameters are given by η = ∫ T(u) q(u) du. This gives a parameterisation,
     η = (η₁, η₁) = (μ, S + uuᵀ) to perform model inference over.
     """
@@ -620,7 +620,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],
 
-        with μ and S computed from the expectation paramerisation η = (μ, S + uuᵀ).
+        with μ and S computed from the expectation parameterisation η = (μ, S + uuᵀ).
 
         Args:
             params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
@@ -670,7 +670,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
              N[f(t); μt + Ktz Kzz⁻¹ (μ - μz),  Ktt - Ktz Kzz⁻¹ Kzt + Ktz Kzz⁻¹ S Kzz⁻¹ Kzt ],
 
-        with μ and S computed from the expectation paramerisation η = (μ, S + uuᵀ).
+        with μ and S computed from the expectation parameterisation η = (μ, S + uuᵀ).
 
         Args:
             params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
