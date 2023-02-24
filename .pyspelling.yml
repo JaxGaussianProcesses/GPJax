@@ -1,0 +1,43 @@
+matrix:
+- name: Python Source
+  aspell:
+    lang: en
+    d: en_GB
+  dictionary:
+    wordlists:
+    - wordlist-custom.txt
+  pipeline:
+  - pyspelling.filters.python:
+      strings: true
+  - pyspelling.filters.context:
+      context_visible_first: true
+      # escapes: \\[\\`~]
+      delimiters:
+      # ignore code examples
+      - open: '>>>'
+        close: '$'
+      # ignore .. math:: blocks
+      - open: '(?s)^(?P<open> *)\.\. math::[\n]*'
+        close: '^[ ]*$'
+      # ignore :math:`` inline
+      - open: ':math:(?P<open>`+)'
+        close: '(?P=open)'
+      # Ignore multiline content between fences (fences can have 3 or more back ticks)
+      # ```
+      # content
+      # ```
+      - open: '(?s)^(?P<open> *`{3,})$'
+        close: '^(?P=open)$'
+      # Ignore text between inline back ticks
+      - open: '(?P<open>`+)'
+        close: '(?P=open)'
+      - open: 'http://'
+        close: '[: \n]'
+      - open: 'https://'
+        close: '[: \n]'
+      - open: 'pragma:'
+        close: '$'
+      - open: '__all__ = \['
+        close: ']'
+  sources:
+  - gpjax/**/[a-z]*.py
