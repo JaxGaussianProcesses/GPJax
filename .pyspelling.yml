@@ -10,6 +10,7 @@ matrix:
   - pyspelling.filters.context:
       context_visible_first: true
       delimiters:
+      # needs to come *before* pyspelling.filters.python
       - open: '__all__ = \[[^]]*'
         close: '\]'
   - pyspelling.filters.python:
@@ -18,10 +19,10 @@ matrix:
       context_visible_first: true
       # escapes: \\[\\`~]
       delimiters:
-      # ignore code examples
+      # ignore code examples (up to end of line)
       - open: '>>>'
         close: '$'
-      # ignore .. math:: blocks
+      # ignore .. math:: blocks (up to next blank line)
       - open: '(?s)^(?P<open> *)\.\. math::[\n]*'
         close: '^[ ]*$'
       # ignore :math:`` inline
@@ -36,10 +37,12 @@ matrix:
       # Ignore text between inline back ticks
       - open: '(?P<open>`+)'
         close: '(?P=open)'
+      # URLs
       - open: 'http://'
         close: '[: \n]'
       - open: 'https://'
         close: '[: \n]'
+      # pragma: ...
       - open: 'pragma:'
         close: '$'
   sources:
