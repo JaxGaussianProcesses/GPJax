@@ -114,6 +114,7 @@ NxM
 NxN
 
 
+# names from references etc.
 Diggle
 Frobenius
 Hensman
@@ -131,6 +132,7 @@ Geostatistics
 
 Matern
 RBF
+# object types that are referenced throughout
 AbstractKernel
 AbstractKernelComputation
 AbstractLikelihood
