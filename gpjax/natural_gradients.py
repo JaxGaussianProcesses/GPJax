@@ -124,7 +124,7 @@ def _expectation_elbo(
 def _rename_expectation_to_natural(params: Dict) -> Dict:
     """
     This function renames the gradient components (that have expectation
-    parameterisation keys) to match the natural parameterisation pytree.
+    parameterisation keys) to match the natural parameterisation PyTree.
 
     Args:
         params (Dict): A dictionary of variational Gaussian parameters
@@ -145,7 +145,7 @@ def _rename_expectation_to_natural(params: Dict) -> Dict:
 def _rename_natural_to_expectation(params: Dict) -> Dict:
     """
     This function renames the gradient components (that have natural
-    parameterisation keys) to match the expectation parameterisation pytree.
+    parameterisation keys) to match the expectation parameterisation PyTree.
 
     Args:
         params (Dict): A dictionary of variational Gaussian parameters

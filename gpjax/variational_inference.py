@@ -40,7 +40,7 @@ import deprecation
 
 
 class AbstractVariationalInference(PyTree):
-    """A base class for inference and training of variational families against an extact posterior"""
+    """A base class for inference and training of variational families against an exact posterior"""
 
     def __init__(
         self,

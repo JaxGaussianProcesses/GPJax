@@ -199,7 +199,7 @@ class Prior(AbstractPrior):
     ) -> Callable[[Float[Array, "N D"]], GaussianDistribution]:
         """Compute the predictive prior distribution for a given set of
         parameters. The output of this function is a function that computes
-        a distrx distribution for a given set of inputs.
+        a Distrax distribution for a given set of inputs.
 
         In the following example, we compute the predictive prior distribution
         and then evaluate it on the interval :math:`[0, 1]`:
@@ -444,8 +444,8 @@ class ConjugatePosterior(AbstractPosterior):
                 test_inputs (Float[Array, "N D"]): A Jax array of test inputs.
 
             Returns:
-                GaussianDistribution: A ``GaussianDistribution``
-                object that represents the predictive distribution.
+                A ``GaussianDistribution`` object that represents the
+                predictive distribution.
             """
 
             # Unpack test inputs
@@ -723,8 +723,8 @@ class NonConjugatePosterior(AbstractPosterior):
 
         Unlike the marginal_log_likelihood function of the ConjugatePosterior
         object, the marginal_log_likelihood function of the
-        NonConjugatePosterior object does not provide an exact marginal
-        log-likelihood function. Instead, the NonConjugatePosterior object
+        ``NonConjugatePosterior`` object does not provide an exact marginal
+        log-likelihood function. Instead, the ``NonConjugatePosterior`` object
         represents the posterior distributions as a function of the model's
         hyperparameters and the latent function. Markov chain Monte Carlo,
         variational inference, or Laplace approximations can then be used to
