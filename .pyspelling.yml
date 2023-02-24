@@ -7,6 +7,11 @@ matrix:
     wordlists:
     - wordlist-custom.txt
   pipeline:
+  - pyspelling.filters.context:
+      context_visible_first: true
+      delimiters:
+      - open: '__all__ = \[[^]]*'
+        close: '\]'
   - pyspelling.filters.python:
       strings: true
   - pyspelling.filters.context:
@@ -37,7 +42,5 @@ matrix:
         close: '[: \n]'
       - open: 'pragma:'
         close: '$'
-      - open: '__all__ = \['
-        close: ']'
   sources:
   - gpjax/**/[a-z]*.py
