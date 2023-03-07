@@ -47,6 +47,8 @@ def _check_matrix(matrix: Array) -> None:
 class DenseLinearOperator(LinearOperator):
     """Dense covariance operator."""
 
+    matrix: Float[Array, "N N"]
+
     def __init__(self, matrix: Float[Array, "N N"]) -> None:
         """Initialize the covariance operator.
 
@@ -188,6 +190,8 @@ class DenseLinearOperator(LinearOperator):
 
 
 class DenseFromRootLinearOperator(DenseLinearOperator):
+    root: LinearOperator
+
     def __init__(self, root: LinearOperator):
         """Initialize the covariance operator."""
 

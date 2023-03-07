@@ -25,6 +25,7 @@ import jax.numpy as jnp
 import operator
 from functools import reduce
 from jaxtyping import Array, Float
+from jaxutils import static
 
 from .linear_operator import LinearOperator
 
@@ -43,6 +44,9 @@ def _check_linops(linops: Any) -> None:
 
 
 class KroneckerLinearOperator(LinearOperator):
+    linops: List[LinearOperator]
+    dtype: jnp.dtype = static()
+
     """Dense covariance operator."""
 
     def __init__(self, linops: List[LinearOperator], dtype: jnp.dtype = None):

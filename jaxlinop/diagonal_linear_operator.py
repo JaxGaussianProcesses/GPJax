@@ -38,6 +38,8 @@ def _check_diag(diag: Any) -> None:
 class DiagonalLinearOperator(LinearOperator):
     """Diagonal covariance operator."""
 
+    diag: Float[Array, "N"]
+
     def __init__(self, diag: Float[Array, "N"]) -> None:
         """Initialize the covariance operator.
 
@@ -205,6 +207,8 @@ class DiagonalLinearOperator(LinearOperator):
 
 
 class DiagonalFromRootLinearOperator(DiagonalLinearOperator):
+    root: DiagonalLinearOperator
+
     def __init__(self, root: DiagonalLinearOperator):
         """Initialize the covariance operator."""
 
