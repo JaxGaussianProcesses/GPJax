@@ -192,7 +192,7 @@ def build_bijectors(params: Dict) -> Dict:
                     else:
                         bijector = Identity
                         warnings.warn(
-                            f"Parameter {key} has no transform. Defaulting to identity transfom."
+                            f"Parameter {key} has no transform. Defaulting to identity transform."
                         )
                     bs[key] = bijector
         return bs

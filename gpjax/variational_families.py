@@ -575,7 +575,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
     The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
     and the distribution over the inducing inputs is q(u) = N(μ, S). Expressing the variational distribution, in the form of the
     exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the natural parameterisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2) and
-    sufficient stastics T(u) = [u, uuᵀ]. The expectation parameters are given by η = ∫ T(u) q(u) du. This gives a parameterisation,
+    sufficient statistics T(u) = [u, uuᵀ]. The expectation parameters are given by η = ∫ T(u) q(u) du. This gives a parameterisation,
     η = (η₁, η₁) = (μ, S + uuᵀ) to perform model inference over.
     """
 

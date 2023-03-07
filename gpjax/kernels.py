@@ -266,7 +266,7 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
 
 
 ##########################################
-# Abtract classes
+# Abstract classes
 ##########################################
 class AbstractKernel(PyTree):
     """
@@ -1040,8 +1040,8 @@ class GraphKernel(AbstractKernel):
 
         Args:
             params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, "1 D"]): Index of the ith vertex.
-            y (Float[Array, "1 D"]): Index of the jth vertex.
+            x (Float[Array, "1 D"]): Index of the i'th vertex.
+            y (Float[Array, "1 D"]): Index of the j'th vertex.
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(v_i, v_j)`.
