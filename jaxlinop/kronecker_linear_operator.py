@@ -25,7 +25,7 @@ import jax.numpy as jnp
 import operator
 from functools import reduce
 from jaxtyping import Array, Float
-from jaxutils import static
+from simple_pytree import static_field
 
 from .linear_operator import LinearOperator
 
@@ -45,7 +45,7 @@ def _check_linops(linops: Any) -> None:
 
 class KroneckerLinearOperator(LinearOperator):
     linops: List[LinearOperator]
-    dtype: jnp.dtype = static()
+    dtype: jnp.dtype = static_field()
 
     """Dense covariance operator."""
 

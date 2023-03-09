@@ -19,7 +19,7 @@ from typing import Any
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from jaxutils import static
+from simple_pytree import static_field
 
 from .constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
 from .utils import default_dtype
@@ -35,8 +35,8 @@ def _check_size(size: Any) -> None:
 class IdentityLinearOperator(ConstantDiagonalLinearOperator):
     """Identity linear operator."""
 
-    size: int = static()
-    dtype: Any = static()
+    size: int = static_field()
+    dtype: Any = static_field()
 
     def __init__(self, size: int, dtype=None) -> None:
         """Identity matrix.

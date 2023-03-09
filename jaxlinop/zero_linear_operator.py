@@ -19,7 +19,7 @@ from typing import Any, Tuple, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from jaxutils import static
+from simple_pytree import static_field
 
 from .linear_operator import LinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
@@ -40,8 +40,8 @@ def _check_size(shape: Any) -> None:
 class ZeroLinearOperator(LinearOperator):
     """Zero linear operator."""
 
-    _shape: Tuple[int, int] = static()
-    _dtype: jnp.dtype = static()
+    _shape: Tuple[int, int] = static_field()
+    _dtype: jnp.dtype = static_field()
 
     # TODO: Generalise to non-square matrices.
 

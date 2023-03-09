@@ -19,7 +19,7 @@ from typing import Tuple, Union, Any
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from jaxutils import static
+from simple_pytree import static_field
 
 from .linear_operator import LinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
@@ -38,7 +38,7 @@ def _check_args(value: Any, size: Any) -> None:
 
 class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
     value: Float[Array, "1"]
-    size: int = static()
+    size: int = static_field()
 
     def __init__(self, value: Float[Array, "1"], size: int) -> None:
         """Initialize the constant diagonal linear operator.
