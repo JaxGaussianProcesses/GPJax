@@ -199,6 +199,7 @@ prod_k = jk.ProductKernel(kernel_set=[k1, k2, k3])
 #
 # To implement this, one must write the following class.
 
+
 # %%
 def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
@@ -256,7 +257,11 @@ class Polar(jk.base.AbstractKernel):
 from jax.nn import softplus
 from gpjax.config import add_parameter
 
-bij_fn = lambda x: softplus(x + jnp.array(4.0))
+
+def bij_fn(x):
+    return softplus(x + jnp.array(4.0))
+
+
 bij = dx.Lambda(
     forward=bij_fn, inverse=lambda y: -jnp.log(-jnp.expm1(-y - 4.0)) + y - 4.0
 )

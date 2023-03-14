@@ -157,7 +157,10 @@ predictive_dist = likelihood(learned_params, posterior(learned_params, D)(x))
 initial_mean = initial_dist.mean()
 learned_mean = predictive_dist.mean()
 
-rmse = lambda ytrue, ypred: jnp.sum(jnp.sqrt(jnp.square(ytrue - ypred)))
+
+def rmse(ytrue, ypred):
+    return jnp.sum(jnp.sqrt(jnp.square(ytrue - ypred)))
+
 
 initial_rmse = jnp.sum(jnp.sqrt(jnp.square(y.squeeze() - initial_mean)))
 learned_rmse = jnp.sum(jnp.sqrt(jnp.square(y.squeeze() - learned_mean)))

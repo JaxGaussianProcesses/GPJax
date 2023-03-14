@@ -16,24 +16,18 @@
 from abc import abstractmethod
 from typing import Any, Callable, Dict, Optional
 
+import deprecation
 import distrax as dx
 import jax.numpy as jnp
-from jaxtyping import Array, Float
 from jax.random import KeyArray
-
-from jaxlinop import identity
 from jaxkern.base import AbstractKernel
-from jaxutils import PyTree, Parameters
+from jaxlinop import identity
+from jaxtyping import Array, Float
+from jaxutils import Dataset, Parameters, PyTree, Identity
 
+from .gaussian_distribution import GaussianDistribution
 from .likelihoods import AbstractLikelihood, Conjugate, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
-from jaxutils import Dataset
-from jaxutils.bijectors import Identity
-
-# from .utils import concat_dictionaries
-from .gaussian_distribution import GaussianDistribution
-
-import deprecation
 
 
 class AbstractPrior(PyTree):
@@ -241,7 +235,6 @@ class Prior(AbstractPrior):
         kernel = self.kernel
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
-
             # Unpack test inputs
             t = test_inputs
             n_test = test_inputs.shape[0]

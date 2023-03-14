@@ -50,7 +50,12 @@ n = 100
 noise = 0.1
 
 x = jnp.sort(jr.uniform(key, minval=-5.0, maxval=5.0, shape=(n, 1)), axis=0)
-f = lambda x: jnp.sin(jnp.pi * x) / (jnp.pi * x)
+
+
+def f(x):
+    return jnp.sin(jnp.pi * x) / (jnp.pi * x)
+
+
 y = f(x) + jr.normal(key, shape=x.shape) * noise
 
 fig, ax = plt.subplots(figsize=(12, 6))
@@ -134,7 +139,6 @@ from gpjax.parameters import evaluate_priors
 
 def build_log_pi(log_mll, unconstrained_priors, mapper_fn):
     def array_mll(parameter_array):
-
         # Convert parameter array to a dictionary:
         params_dict = mapper_fn([jnp.array(i) for i in parameter_array])
 

@@ -76,7 +76,11 @@ n_datasets = 5
 
 x = jnp.linspace(-5.0, 5.0, n).reshape(-1, 1)
 xtest = jnp.linspace(-5.5, 5.5, n_test).reshape(-1, 1)
-f = lambda x, a, b: a + jnp.sin(b * x)
+
+
+def f(x, a, b):
+    return a + jnp.sin(b * x)
+
 
 ys = []
 for i in range(n_datasets):
@@ -97,6 +101,7 @@ plt.show()
 # ## Learning a posterior distribution
 #
 # We'll now independently learn Gaussian process posterior distributions for each dataset. We won't spend any time here discussing how GP hyperparameters are optimised. For advice on achieving this, see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for advice on optimisation and the [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for advice on selecting an appropriate kernel.
+
 
 # %%
 def fit_gp(x: jax.Array, y: jax.Array) -> dx.MultivariateNormalTri:
@@ -128,6 +133,7 @@ posterior_preds = [fit_gp(x, i) for i in ys]
 # ## Computing the barycentre
 #
 # In GPJax, the predictive distribution of a GP is given by a [Distrax](https://github.com/deepmind/distrax) distribution, making it straightforward to extract the mean vector and covariance matrix of each GP for learning a barycentre. We implement the fixed point scheme given in (3) in the following cell by utilising Jax's `vmap` operator to speed up large matrix operations using broadcasting in `tensordot`.
+
 
 # %%
 def sqrtm(A: jax.Array):
@@ -174,6 +180,7 @@ barycentre_process = dx.MultivariateNormalTri(barycentre_mean, L)
 # ## Plotting the result
 #
 # With a barycentre learned, we can visualise the result. We can see that the result looks reasonable as it follows the sinusoidal curve of all the inferred GPs, and the uncertainty bands are sensible.
+
 
 # %%
 def plot(

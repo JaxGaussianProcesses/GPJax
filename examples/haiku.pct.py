@@ -55,7 +55,12 @@ n = 500
 noise = 0.2
 
 x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n,)).sort().reshape(-1, 1)
-f = lambda x: jnp.asarray(sawtooth(2 * jnp.pi * x))
+
+
+def f(x):
+    return jnp.asarray(sawtooth(2 * jnp.pi * x))
+
+
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
 
@@ -79,6 +84,7 @@ ax.legend(loc="best")
 # ### Implementation
 #
 # Although deep kernels are not currently supported natively in GPJax, defining one is straightforward as we now demonstrate. Using the base `AbstractKernel` object given in GPJax, we provide a mixin class named `_DeepKernelFunction` to facilitate the user supplying the neural network and base kernel of their choice. Kernel matrices are then computed using the regular `gram` and `cross_covariance` functions.
+
 
 # %%
 class DeepKernelFunction(AbstractKernel):
@@ -121,6 +127,7 @@ class DeepKernelFunction(AbstractKernel):
 #
 # With a deep kernel object created, we proceed to define a neural network. Here we consider a small multi-layer perceptron with two linear hidden layers and ReLU activation functions between the layers. The first hidden layer contains 32 units, while the second layer contains 64 units. Finally, we'll make the output of our network a single unit. However, it would be possible to project our data into a $d-$dimensional space for $d>1$. In these instances, making the [base kernel ARD](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html#Active-dimensions) would be sensible.
 # Users may wish to design more intricate network structures for more complex tasks, which functionality is supported well in Haiku.
+
 
 # %%
 def forward(x):

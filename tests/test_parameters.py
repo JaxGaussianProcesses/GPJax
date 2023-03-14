@@ -41,6 +41,7 @@ from gpjax.parameters import (
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 
+
 #########################
 # Test base functionality
 #########################
@@ -89,7 +90,7 @@ def test_prior_template(lik):
         v1,
         v2,
     ) in recursive_items(params, prior_container):
-        assert v2 == None
+        assert v2 is None
 
 
 @pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
@@ -108,7 +109,7 @@ def test_recursive_complete(lik):
         if k == "lengthscale":
             assert isinstance(v2, dx.Laplace)
         else:
-            assert v2 == None
+            assert v2 is None
 
 
 def test_prior_evaluation():
@@ -176,7 +177,7 @@ def test_incomplete_priors():
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 def test_checks(num_datapoints):
     incomplete_priors = {"lengthscale": jnp.array([1.0])}
-    posterior = Prior(kernel=RBF()) * Bernoulli(num_datapoints=num_datapoints)
+    Prior(kernel=RBF()) * Bernoulli(num_datapoints=num_datapoints)
     priors = prior_checks(incomplete_priors)
     assert "latent" in priors.keys()
     assert "variance" not in priors.keys()

@@ -16,12 +16,11 @@
 import abc
 from typing import Dict, Optional
 
+import deprecation
 import jax.numpy as jnp
 from jax.random import KeyArray
 from jaxtyping import Array, Float
-from jaxutils import PyTree, Parameters
-
-import deprecation
+from jaxutils import Parameters, PyTree
 
 
 class AbstractMeanFunction(PyTree):

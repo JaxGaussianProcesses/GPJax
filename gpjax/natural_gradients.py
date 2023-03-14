@@ -16,9 +16,9 @@
 from copy import deepcopy
 from typing import Callable, Dict, Tuple
 
+from jax import value_and_grad
 import jax.numpy as jnp
 import jax.scipy as jsp
-from jax import value_and_grad
 from jaxtyping import Array, Float
 from jaxutils import Dataset
 

@@ -49,7 +49,12 @@ n = 2500
 noise = 0.5
 
 x = jr.uniform(key=key, minval=-3.0, maxval=3.0, shape=(n,)).sort().reshape(-1, 1)
-f = lambda x: jnp.sin(2 * x) + x * jnp.cos(5 * x)
+
+
+def f(x):
+    return jnp.sin(2 * x) + x * jnp.cos(5 * x)
+
+
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
 

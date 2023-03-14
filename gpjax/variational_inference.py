@@ -16,25 +16,22 @@
 import abc
 from typing import Callable, Dict
 
-import jax.numpy as jnp
-import jax.scipy as jsp
+import deprecation
 from jax import vmap
-from jaxtyping import Array, Float
-
-from jaxlinop import identity
+import jax.numpy as jnp
 from jax.random import KeyArray
-from jaxutils import PyTree
+import jax.scipy as jsp
+from jaxlinop import identity
+from jaxtyping import Array, Float
+from jaxutils import Dataset, PyTree
 
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
-from jaxutils import Dataset
 from .variational_families import (
     AbstractVariationalFamily,
     CollapsedVariationalGaussian,
 )
-
-import deprecation
 
 
 class AbstractVariationalInference(PyTree):
@@ -172,7 +169,8 @@ class StochasticVI(AbstractVariationalInference):
 
 class CollapsedVI(AbstractVariationalInference):
     """Collapsed variational inference for a sparse Gaussian process regression model.
-    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes."""
+    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes.
+    """
 
     def __init__(
         self,
