@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-import jaxutils
 import deprecation
 
 depreciate = deprecation.deprecated(
@@ -22,11 +21,10 @@ depreciate = deprecation.deprecated(
     details="Use method from jaxutils.config instead.",
 )
 
-
-concat_dictionaries = depreciate(jaxutils.dict.concat_dictionaries)
-merge_dictionaries = depreciate(jaxutils.dict.merge_dictionaries)
-sort_dictionary = depreciate(jaxutils.dict.sort_dictionary)
-dict_array_coercion = depreciate(jaxutils.dict.dict_array_coercion)
+# concat_dictionaries = depreciate(jaxutils.dict.concat_dictionaries)
+# merge_dictionaries = depreciate(jaxutils.dict.merge_dictionaries)
+# sort_dictionary = depreciate(jaxutils.dict.sort_dictionary)
+# dict_array_coercion = depreciate(jaxutils.dict.dict_array_coercion)
 
 
 __all__ = [

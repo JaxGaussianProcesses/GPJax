@@ -22,7 +22,6 @@ from jax import value_and_grad
 from jaxtyping import Array, Float
 from jaxutils import Dataset
 
-from .config import get_global_config
 from .gps import AbstractPosterior
 from .parameters import build_trainables, constrain, trainable_params
 from .variational_families import (
@@ -33,7 +32,7 @@ from .variational_families import (
 from .variational_inference import StochasticVI
 
 
-def natural_to_expectation(params: Dict) -> Dict:
+def natural_to_expectation(params: Dict, jitter: float = 1e-6) -> Dict:
     """
     Translate natural parameters to expectation parameters.
 
@@ -65,7 +64,6 @@ def natural_to_expectation(params: Dict) -> Dict:
 
     # S⁻¹ = -2θ₂
     S_inv = -2 * natural_matrix
-    jitter = get_global_config()["jitter"]
     S_inv += jnp.eye(m) * jitter
 
     # S⁻¹ = LLᵀ

@@ -26,7 +26,6 @@ from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.parameters import (
     build_bijectors,
-    build_trainables,
     constrain,
     copy_dict_structure,
     evaluate_priors,

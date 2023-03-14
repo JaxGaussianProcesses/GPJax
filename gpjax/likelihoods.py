@@ -22,6 +22,7 @@ import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Array, Float
+from jaxutils import Parameters, Softplus
 
 from jax.random import KeyArray
 
@@ -67,14 +68,14 @@ class AbstractLikelihood(PyTree):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """Return the parameters of the likelihood function.
 
         Args:
             key (KeyArray): A PRNG key.
 
         Returns:
-            Dict: The parameters of the likelihood function.
+            Parameters: The parameters of the likelihood function.
         """
         raise NotImplementedError
 
@@ -106,9 +107,6 @@ class NonConjugate:
     """An abstract class for non-conjugate likelihoods with respect to a Gaussain process prior."""
 
 
-# TODO: revamp this with covariance operators.
-
-
 class Gaussian(AbstractLikelihood, Conjugate):
     """Gaussian likelihood object."""
 
@@ -121,19 +119,23 @@ class Gaussian(AbstractLikelihood, Conjugate):
         """
         super().__init__(num_datapoints, name)
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """Return the variance parameter of the likelihood function.
 
         Args:
             key (KeyArray): A PRNG key.
 
         Returns:
-            Dict: The parameters of the likelihood function.
+            Parameters: The parameters of the likelihood function.
         """
-        return {"obs_noise": jnp.array([1.0])}
+        params = {"obs_noise": jnp.array([1.0])}
+        bijectors = {"obs_noise": Softplus}
+        return Parameters(params, bijectors)
 
     @property
-    def link_function(self) -> Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]:
+    def link_function(
+        self,
+    ) -> Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]:
         """Return the link function of the Gaussian likelihood. Here, this is
         simply the identity function, but we include it for completeness.
 
@@ -190,19 +192,21 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
         """
         super().__init__(num_datapoints, name)
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """Initialise the parameter set of a Bernoulli likelihood.
 
         Args:
             key (KeyArray): A PRNG key.
 
         Returns:
-            Dict: The parameters of the likelihood function (empty for the Bernoulli likelihood).
+            Parameters: The parameters of the likelihood function (empty for the Bernoulli likelihood).
         """
-        return {}
+        return Parameters({})
 
     @property
-    def link_function(self) -> Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]:
+    def link_function(
+        self,
+    ) -> Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]:
         """Return the probit link function of the Bernoulli likelihood.
 
         Returns:

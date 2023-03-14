@@ -23,14 +23,14 @@ from jax.random import KeyArray
 
 from jaxlinop import identity
 from jaxkern.base import AbstractKernel
-from jaxutils import PyTree
+from jaxutils import PyTree, Parameters
 
-from .config import get_global_config
-from .kernels import AbstractKernel
 from .likelihoods import AbstractLikelihood, Conjugate, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
 from jaxutils import Dataset
-from .utils import concat_dictionaries
+from jaxutils.bijectors import Identity
+
+# from .utils import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
 
 import deprecation
@@ -40,6 +40,10 @@ class AbstractPrior(PyTree):
     """Abstract Gaussian process prior.
 
     All Gaussian processes priors should inherit from this class."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._jitter = 1e-6
 
     def __call__(self, *args: Any, **kwargs: Any) -> dx.Distribution:
         """Evaluate the Gaussian process at the given points. The output of this function
@@ -76,7 +80,7 @@ class AbstractPrior(PyTree):
         raise NotImplementedError
 
     @abstractmethod
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """An initialisation method for the GP's parameters. This method should
         be implemented for all classes that inherit the ``AbstractPrior`` class.
         Whilst not always necessary, the method accepts a PRNG key to allow
@@ -100,12 +104,18 @@ class AbstractPrior(PyTree):
         """Deprecated method for initialising the GP's parameters. Succeded by ``init_params``."""
         return self.init_params(key)
 
+    @property
+    def jitter(self) -> float:
+        return self._jitter
+
+    @jitter.setter
+    def jitter(self, value: float):
+        self._jitter = value
+
 
 #######################
 # GP Priors
 #######################
-
-
 class Prior(AbstractPrior):
     """A Gaussian process prior object. The GP is parameterised by a
     `mean <https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.mean_functions>`_
@@ -225,15 +235,12 @@ class Prior(AbstractPrior):
             should be evaluated at. The mean function's value at these points is
             then returned.
         """
-        jitter = get_global_config()["jitter"]
 
         # Unpack mean function and kernel
         mean_function = self.mean_function
         kernel = self.kernel
 
-        def predict_fn(
-            test_inputs: Float[Array, "N D"]
-        ) -> GaussianDistribution:
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
 
             # Unpack test inputs
             t = test_inputs
@@ -241,13 +248,13 @@ class Prior(AbstractPrior):
 
             μt = mean_function(params["mean_function"], t)
             Ktt = kernel.gram(params["kernel"], t)
-            Ktt += identity(n_test) * jitter
+            Ktt += identity(n_test) * self.jitter
 
             return GaussianDistribution(jnp.atleast_1d(μt.squeeze()), Ktt)
 
         return predict_fn
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """Initialise the GP prior's parameter set.
 
         Args:
@@ -256,10 +263,13 @@ class Prior(AbstractPrior):
         Returns:
             Dict: The initialised parameter set.
         """
-        return {
-            "kernel": self.kernel.init_params(key),
-            "mean_function": self.mean_function.init_params(key),
-        }
+        kernel = self.kernel.init_params(key)
+        meanf = self.mean_function.init_params(key)
+        params = kernel.combine(meanf, left_key="kernel", right_key="mean_function")
+        return params
+
+
+# def combine(params: tp.Tuple[Parameters, Parameters], keys: tp.Tuple[str, str]):
 
 
 #######################
@@ -302,7 +312,7 @@ class AbstractPosterior(AbstractPrior):
         """
         raise NotImplementedError
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """Initialise the parameter set of a GP posterior.
 
         Args:
@@ -311,9 +321,10 @@ class AbstractPosterior(AbstractPrior):
         Returns:
             Dict: The initialised parameter set.
         """
-        return concat_dictionaries(
-            self.prior.init_params(key),
-            {"likelihood": self.likelihood.init_params(key)},
+        prior_params = self.prior.init_params(key)
+        likelihood_params = self.likelihood.init_params(key)
+        return prior_params.combine(
+            likelihood_params, left_key="prior", right_key="likelihood"
         )
 
 
@@ -417,8 +428,6 @@ class ConjugatePosterior(AbstractPosterior):
                 function that accepts an input array and returns the predictive
                 distribution as a ``GaussianDistribution``.
         """
-        jitter = get_global_config()["jitter"]
-
         # Unpack training data
         x, y, n = train_data.X, train_data.y, train_data.n
 
@@ -432,7 +441,7 @@ class ConjugatePosterior(AbstractPosterior):
 
         # Precompute Gram matrix, Kxx, at training inputs, x
         Kxx = kernel.gram(params["kernel"], x)
-        Kxx += identity(n) * jitter
+        Kxx += identity(n) * self.jitter
 
         # Σ = Kxx + Iσ²
         Sigma = Kxx + identity(n) * obs_noise
@@ -464,11 +473,9 @@ class ConjugatePosterior(AbstractPosterior):
 
             # Ktt  -  Ktx (Kxx + Iσ²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
             covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
-            covariance += identity(n_test) * jitter
+            covariance += identity(n_test) * self.jitter
 
-            return GaussianDistribution(
-                jnp.atleast_1d(mean.squeeze()), covariance
-            )
+            return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict
 
@@ -538,8 +545,6 @@ class ConjugatePosterior(AbstractPosterior):
                 of the marginal log-likelihood that can be evaluated at a
                 given parameter set.
         """
-        jitter = get_global_config()["jitter"]
-
         # Unpack training data
         x, y, n = train_data.X, train_data.y, train_data.n
 
@@ -571,7 +576,7 @@ class ConjugatePosterior(AbstractPosterior):
 
             # Σ = (Kxx + Iσ²) = LLᵀ
             Kxx = kernel.gram(params["kernel"], x)
-            Kxx += identity(n) * jitter
+            Kxx += identity(n) * self.jitter
             Sigma = Kxx + identity(n) * obs_noise
 
             # p(y | x, θ), where θ are the model hyperparameters:
@@ -580,9 +585,7 @@ class ConjugatePosterior(AbstractPosterior):
             )
 
             return constant * (
-                marginal_likelihood.log_prob(
-                    jnp.atleast_1d(y.squeeze())
-                ).squeeze()
+                marginal_likelihood.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
             )
 
         return mll
@@ -617,23 +620,28 @@ class NonConjugatePosterior(AbstractPosterior):
         self.likelihood = likelihood
         self.name = name
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """Initialise the parameter set of a non-conjugate GP posterior.
 
         Args:
             key (KeyArray): A PRNG key used to initialise the parameters.
 
         Returns:
-            Dict: A dictionary containing the default parameter set.
+            DParametersict: A `Parameters` object containing the default parameter set.
         """
-        parameters = concat_dictionaries(
-            self.prior.init_params(key),
-            {"likelihood": self.likelihood.init_params(key)},
+        prior_params = self.prior.init_params(key)
+        likelihood_params = self.likelihood.init_params(key)
+        params = prior_params.combine(
+            likelihood_params, left_key="prior", right_key="likelihood"
         )
-        parameters["latent"] = jnp.zeros(
-            shape=(self.likelihood.num_datapoints, 1)
+        params.add_parameter(
+            "latent",
+            jnp.zeros(shape=(self.likelihood.num_datapoints, 1)),
+            prior=dx.Normal(0.0, 1.0),
+            trainability=True,
+            bijector=Identity,
         )
-        return parameters
+        return params
 
     def predict(
         self,
@@ -659,8 +667,6 @@ class NonConjugatePosterior(AbstractPosterior):
                 input array and returns the predictive distribution as
                 a ``dx.Distribution``.
         """
-        jitter = get_global_config()["jitter"]
-
         # Unpack training data
         x, n = train_data.X, train_data.n
 
@@ -670,7 +676,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
         # Precompute lower triangular of Gram matrix, Lx, at training inputs, x
         Kxx = kernel.gram(params["kernel"], x)
-        Kxx += identity(n) * jitter
+        Kxx += identity(n) * self.jitter
         Lx = Kxx.to_root()
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
@@ -688,7 +694,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
             # Compute terms of the posterior predictive distribution
             Ktx = kernel.cross_covariance(params["kernel"], t, x)
-            Ktt = kernel.gram(params["kernel"], t) + identity(n_test) * jitter
+            Ktt = kernel.gram(params["kernel"], t) + identity(n_test) * self.jitter
             μt = mean_function(params["mean_function"], t)
 
             # Lx⁻¹ Kxt
@@ -702,11 +708,9 @@ class NonConjugatePosterior(AbstractPosterior):
 
             # Ktt - Ktx Kxx⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
             covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
-            covariance += identity(n_test) * jitter
+            covariance += identity(n_test) * self.jitter
 
-            return GaussianDistribution(
-                jnp.atleast_1d(mean.squeeze()), covariance
-            )
+            return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict_fn
 
@@ -744,8 +748,6 @@ class NonConjugatePosterior(AbstractPosterior):
                 of the marginal log-likelihood that can be evaluated at a given
                 parameter set.
         """
-        jitter = get_global_config()["jitter"]
-
         # Unpack dataset
         x, y, n = train_data.X, train_data.y, train_data.n
 
@@ -772,7 +774,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
             # Compute lower triangular of the kernel Gram matrix
             Kxx = kernel.gram(params["kernel"], x)
-            Kxx += identity(n) * jitter
+            Kxx += identity(n) * self.jitter
             Lx = Kxx.to_root()
 
             # Compute the prior mean function

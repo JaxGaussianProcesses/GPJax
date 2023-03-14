@@ -22,16 +22,7 @@ depreciate = deprecation.deprecated(
     details="Use method from jaxutils.config instead.",
 )
 
-from jaxutils import config
-
-Identity = config.Identity
-Softplus = config.Softplus
-reset_global_config = depreciate(config.reset_global_config)
-get_global_config = depreciate(config.get_global_config)
-get_default_config = depreciate(config.get_default_config)
-update_x64_sensitive_settings = depreciate(config.update_x64_sensitive_settings)
-get_global_config_if_exists = depreciate(config.get_global_config_if_exists)
-add_parameter = depreciate(config.add_parameter)
+from jaxutils import Identity, Softplus
 
 __all__ = [
     "Identity",
@@ -39,7 +30,5 @@ __all__ = [
     "reset_global_config",
     "get_global_config",
     "get_default_config",
-    "update_x64_sensitive_settings",
-    "get_global_config_if_exists",
     "set_global_config",
 ]

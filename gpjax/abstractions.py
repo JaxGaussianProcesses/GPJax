@@ -27,7 +27,7 @@ from jaxtyping import Array, Float
 from tqdm.auto import tqdm
 
 from .natural_gradients import natural_gradients
-from .parameters import ParameterState, constrain, trainable_params, unconstrain
+from .parameters import ParameterState, trainable_params
 from jaxutils import Dataset, PyTree
 from .variational_inference import StochasticVI
 
