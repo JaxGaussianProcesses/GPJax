@@ -14,12 +14,13 @@
 # ==============================================================================
 
 import pytest
+import jax.numpy as jnp
 from jaxlinop.linear_operator import LinearOperator
 
 
 def test_covariance_operator() -> None:
     with pytest.raises(TypeError):
-        LinearOperator()
+        LinearOperator(shape=(1, 1), dtype=jnp.float32)
 
 
 class DummyLinearOperator(LinearOperator):
@@ -51,7 +52,9 @@ class DummyLinearOperator(LinearOperator):
 
 def test_can_instantiate() -> None:
     """Test if the covariance operator can be instantiated."""
-    res = DummyLinearOperator()
+    res = DummyLinearOperator(shape=(1, 1), dtype=jnp.float32)
 
     assert isinstance(res, DummyLinearOperator)
     assert isinstance(res, LinearOperator)
+    assert res.shape == (1, 1)
+    assert res.dtype == jnp.float32

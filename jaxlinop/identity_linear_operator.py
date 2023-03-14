@@ -18,6 +18,7 @@ from __future__ import annotations
 from typing import Any
 
 import jax.numpy as jnp
+from dataclasses import dataclass
 from jaxtyping import Array, Float
 
 from .constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
@@ -31,6 +32,7 @@ def _check_size(size: Any) -> None:
         raise ValueError(f"`size` must be an integer, but `size = {size}`.")
 
 
+@dataclass
 class IdentityLinearOperator(ConstantDiagonalLinearOperator):
     """Identity linear operator."""
 

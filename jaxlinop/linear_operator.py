@@ -14,7 +14,6 @@
 # ==============================================================================
 
 from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -22,6 +21,7 @@ if TYPE_CHECKING:
 
 import abc
 import jax.numpy as jnp
+from dataclasses import dataclass
 from jaxtyping import Array, Float
 from typing import Any, TypeVar, Iterable, Mapping, Generic, Tuple, Union
 from simple_pytree import Pytree, static_field
@@ -37,6 +37,7 @@ ShapeT = TypeVar("ShapeT", bound=NestedT[Tuple[int, ...]])
 DTypeT = TypeVar("DTypeT", bound=NestedT[jnp.dtype])
 
 
+@dataclass
 class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
     """Linear operator base class."""
 

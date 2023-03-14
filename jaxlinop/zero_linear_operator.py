@@ -19,6 +19,7 @@ from typing import Any, Tuple, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
+from dataclasses import dataclass
 
 from .linear_operator import LinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
@@ -37,6 +38,7 @@ def _check_size(shape: Any) -> None:
 
 
 # TODO: Generalise to non-square matrices.
+@dataclass
 class ZeroLinearOperator(LinearOperator):
     """Zero linear operator."""
 

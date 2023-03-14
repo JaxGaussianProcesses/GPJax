@@ -20,6 +20,7 @@ from typing import Any, Union
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 from simple_pytree import static_field
+from dataclasses import dataclass
 
 from .linear_operator import LinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
@@ -36,6 +37,7 @@ def _check_args(value: Any, size: Any) -> None:
         )
 
 
+@dataclass
 class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
     value: Float[Array, "1"]
     size: int = static_field()

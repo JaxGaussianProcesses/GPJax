@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 from typing import Union
 
 import jax.numpy as jnp
+from dataclasses import dataclass
 from jaxtyping import Array, Float
 
 from .linear_operator import LinearOperator
@@ -43,6 +44,7 @@ def _check_matrix(matrix: Array) -> None:
         )
 
 
+@dataclass
 class DenseLinearOperator(LinearOperator):
     """Dense covariance operator."""
 
