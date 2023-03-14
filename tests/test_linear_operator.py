@@ -54,4 +54,4 @@ def test_can_instantiate() -> None:
     res = DummyLinearOperator()
 
     assert isinstance(res, DummyLinearOperator)
-    assert res.name == "DummyLinearOperator"
+    assert isinstance(res, LinearOperator)

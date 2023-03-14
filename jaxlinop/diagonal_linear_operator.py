@@ -15,7 +15,7 @@
 
 from __future__ import annotations
 
-from typing import Tuple, Union, Any
+from typing import Any, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
@@ -40,32 +40,21 @@ class DiagonalLinearOperator(LinearOperator):
 
     diag: Float[Array, "N"]
 
-    def __init__(self, diag: Float[Array, "N"]) -> None:
+    def __init__(self, diag: Float[Array, "N"], dtype: jnp.dtype = None) -> None:
         """Initialize the covariance operator.
 
         Args:
             diag (Float[Array, "N"]): Diagonal of the covariance operator.
         """
         _check_diag(diag)
+
+        if dtype is not None:
+            diag = diag.astype(dtype)
+
+        dim = diag.shape[0]
         self.diag = diag
-
-    @property
-    def shape(self) -> Tuple[int, ...]:
-        """Shape of the linear operator.
-
-        Returns:
-            Tuple[int, ...]: Shape of the covariance operator.
-        """
-        return (self.diag.shape[0], self.diag.shape[0])
-
-    @property
-    def dtype(self) -> jnp.dtype:
-        """Dtype of the linear operator.
-
-        Returns:
-            Any: Dtype of the covariance operator.
-        """
-        return self.diag.dtype
+        self.shape = (dim, dim)
+        self.dtype = diag.dtype
 
     def diagonal(self) -> Float[Array, "N"]:
         """Diagonal of the covariance operator.
@@ -216,31 +205,11 @@ class DiagonalFromRootLinearOperator(DiagonalLinearOperator):
             raise ValueError("root must be a DiagonalLinearOperator")
 
         self.root = root
+        self.shape = root.shape
+        self.dtype = root.dtype
 
     def to_root(self) -> LinearOperator:
         return self.root
-
-    @property
-    def shape(self) -> Tuple[int, ...]:
-        """Shape of the linear operator.
-
-        Returns:
-            Tuple[int, ...]: Shape of the covariance operator.
-        """
-        return self.root.shape
-
-    @property
-    def dtype(self) -> jnp.dtype:
-        """Dtype of the linear operator.
-
-        Returns:
-            Any: Dtype of the covariance operator.
-        """
-        return self.root.dtype
-
-    @property
-    def shape(self) -> Tuple[int, int]:
-        return self.root.shape
 
     @property
     def diag(self) -> Float[Array, "N"]:

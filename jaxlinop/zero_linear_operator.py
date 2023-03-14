@@ -19,7 +19,6 @@ from typing import Any, Tuple, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from simple_pytree import static_field
 
 from .linear_operator import LinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
@@ -37,36 +36,19 @@ def _check_size(shape: Any) -> None:
         raise ValueError(f"`shape` must be a 2-tuple, but `shape = {shape}`.")
 
 
+# TODO: Generalise to non-square matrices.
 class ZeroLinearOperator(LinearOperator):
     """Zero linear operator."""
 
-    _shape: Tuple[int, int] = static_field()
-    _dtype: jnp.dtype = static_field()
-
-    # TODO: Generalise to non-square matrices.
-
-    def __init__(self, shape: Tuple[int, int], dtype: jnp.dtype = None) -> None:
+    def __init__(self, shape: Tuple[int], dtype: jnp.dtype = None) -> None:
 
         _check_size(shape)
 
         if dtype is None:
             dtype = default_dtype()
 
-        self._shape = shape
-        self._dtype = dtype
-
-    @property
-    def dtype(self) -> jnp.dtype:
-        return self._dtype
-
-    @property
-    def shape(self) -> Tuple[int, int]:
-        """Covaraince matrix shape.
-
-        Returns:
-            Tuple[int, int]: shape of the covariance operator.
-        """
-        return self._shape
+        self.shape = shape
+        self.dtype = dtype
 
     def diagonal(self) -> Float[Array, "N"]:
         """
@@ -195,7 +177,7 @@ class ZeroLinearOperator(LinearOperator):
 
         # TODO: check shapes.
         n = dense.shape[0]
-        return ZeroLinearOperator((n, n))
+        return ZeroLinearOperator(shape=(n, n))
 
 
 __all__ = [

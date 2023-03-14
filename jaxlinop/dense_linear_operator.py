@@ -19,9 +19,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .diagonal_linear_operator import DiagonalLinearOperator
-    from .triangular_linear_operator import LowerTriangularLinearOperator
 
-from typing import Tuple, Union
+from typing import Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
@@ -49,32 +48,20 @@ class DenseLinearOperator(LinearOperator):
 
     matrix: Float[Array, "N N"]
 
-    def __init__(self, matrix: Float[Array, "N N"]) -> None:
+    def __init__(self, matrix: Float[Array, "N N"], dtype: jnp.dtype = None) -> None:
         """Initialize the covariance operator.
 
         Args:
             matrix (Float[Array, "N N"]): Dense matrix.
         """
         _check_matrix(matrix)
+
+        if dtype is not None:
+            matrix = matrix.astype(dtype)
+
         self.matrix = matrix
-
-    @property
-    def shape(self) -> Tuple[int, ...]:
-        """Shape of the linear operator.
-
-        Returns:
-            Tuple[int, ...]: Shape of the covariance operator.
-        """
-        return self.matrix.shape
-
-    @property
-    def dtype(self) -> jnp.dtype:
-        """Dtype of the linear operator.
-
-        Returns:
-            Any: Dtype of the covariance operator.
-        """
-        return self.matrix.dtype
+        self.shape = matrix.shape
+        self.dtype = matrix.dtype
 
     def __add__(
         self, other: Union[LinearOperator, Float[Array, "N N"]]
@@ -126,9 +113,8 @@ class DenseLinearOperator(LinearOperator):
         Returns:
             LinearOperator: Sum of the two covariance operators.
         """
-
-        n = self.shape[0]
-        diag_indices = jnp.diag_indices(n)
+        dim = self.shape[0]
+        diag_indices = jnp.diag_indices(dim)
         new_matrix = self.matrix.at[diag_indices].add(other.diagonal())
 
         return DenseLinearOperator(matrix=new_matrix)
@@ -172,11 +158,10 @@ class DenseLinearOperator(LinearOperator):
         Returns:
             DenseLinearOperator: Covariance operator.
         """
-
         return DenseLinearOperator(matrix=matrix)
 
     @classmethod
-    def from_root(cls, root: LowerTriangularLinearOperator) -> DenseLinearOperator:
+    def from_root(cls, root: LinearOperator) -> DenseLinearOperator:
         """Construct covariance operator from the root of the covariance matrix.
 
         Args:
@@ -185,7 +170,6 @@ class DenseLinearOperator(LinearOperator):
         Returns:
             DenseLinearOperator: Covariance operator.
         """
-
         return DenseFromRootLinearOperator(root=root)
 
 
@@ -195,40 +179,17 @@ class DenseFromRootLinearOperator(DenseLinearOperator):
     def __init__(self, root: LinearOperator):
         """Initialize the covariance operator."""
 
-        from .triangular_linear_operator import LowerTriangularLinearOperator
-
-        if not isinstance(root, LowerTriangularLinearOperator):
-            raise ValueError("root must be a LowerTriangularLinearOperator")
-
         self.root = root
+        self.shape = root.shape
+        self.dtype = root.dtype
 
     def to_root(self) -> LinearOperator:
         return self.root
 
     @property
     def matrix(self) -> Float[Array, "N N"]:
-
         dense_root = self.root.to_dense()
-
         return dense_root @ dense_root.T
-
-    @property
-    def shape(self) -> Tuple[int, ...]:
-        """Shape of the linear operator.
-
-        Returns:
-            Tuple[int, ...]: Shape of the covariance operator.
-        """
-        return self.root.shape
-
-    @property
-    def dtype(self) -> jnp.dtype:
-        """Dtype of the linear operator.
-
-        Returns:
-            Any: Dtype of the covariance operator.
-        """
-        return self.root.dtype
 
 
 __all__ = [

@@ -19,7 +19,6 @@ from typing import Any
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from simple_pytree import static_field
 
 from .constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
 from .utils import default_dtype
@@ -35,22 +34,21 @@ def _check_size(size: Any) -> None:
 class IdentityLinearOperator(ConstantDiagonalLinearOperator):
     """Identity linear operator."""
 
-    size: int = static_field()
-    dtype: Any = static_field()
-
-    def __init__(self, size: int, dtype=None) -> None:
+    def __init__(self, size: int, dtype: jnp.dtype = None) -> None:
         """Identity matrix.
 
         Args:
             size (int): Size of the identity matrix.
         """
         _check_size(size)
-        self.size = size
 
         if dtype is None:
             dtype = default_dtype()
 
         self.value = jnp.array([1.0], dtype=dtype)
+        self.size = size
+        self.shape = (size, size)
+        self.dtype = dtype
 
     def __matmul__(self, other: Float[Array, "N M"]) -> Float[Array, "N M"]:
         """Matrix multiplication.

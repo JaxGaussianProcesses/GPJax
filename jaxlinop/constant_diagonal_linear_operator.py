@@ -15,7 +15,7 @@
 
 from __future__ import annotations
 
-from typing import Tuple, Union, Any
+from typing import Any, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
@@ -40,7 +40,9 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
     value: Float[Array, "1"]
     size: int = static_field()
 
-    def __init__(self, value: Float[Array, "1"], size: int) -> None:
+    def __init__(
+        self, value: Float[Array, "1"], size: int, dtype: jnp.dtype = None
+    ) -> None:
         """Initialize the constant diagonal linear operator.
 
         Args:
@@ -50,26 +52,13 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
 
         _check_args(value, size)
 
+        if dtype is not None:
+            value = value.astype(dtype)
+
         self.value = value
         self.size = size
-
-    @property
-    def shape(self) -> Tuple[int, ...]:
-        """Linear operator shape.
-
-        Returns:
-            Tuple[int, ...]: shape of the covariance operator.
-        """
-        return (self.size, self.size)
-
-    @property
-    def dtype(self) -> jnp.dtype:
-        """Dtype of the covariance operator.
-
-        Returns:
-            jnp.dtype: Dtype of the covariance operator.
-        """
-        return self.value.dtype
+        self.shape = (size, size)
+        self.dtype = value.dtype
 
     def __add__(
         self, other: Union[Float[Array, "N N"], LinearOperator]
