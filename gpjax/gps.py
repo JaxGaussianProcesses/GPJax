@@ -101,7 +101,7 @@ class AbstractPrior(PyTree):
         details="Use the ``init_params`` method for parameter initialisation.",
     )
     def _initialise_params(self, key: KeyArray) -> Dict:
-        """Deprecated method for initialising the GP's parameters. Succeded by ``init_params``."""
+        """Deprecated method for initialising the GP's parameters. Succeeded by ``init_params``."""
         return self.init_params(key)
 
     @property
@@ -160,7 +160,7 @@ class Prior(AbstractPrior):
     def __mul__(self, other: AbstractLikelihood):
         """The product of a prior and likelihood is proportional to the
         posterior distribution. By computing the product of a GP prior and a
-        likelihood object, a posterior GP object will be returned. Mathetically,
+        likelihood object, a posterior GP object will be returned. Mathematically,
         this can be described by:
          .. math::
 
@@ -209,7 +209,7 @@ class Prior(AbstractPrior):
     ) -> Callable[[Float[Array, "N D"]], GaussianDistribution]:
         """Compute the predictive prior distribution for a given set of
         parameters. The output of this function is a function that computes
-        a distrx distribution for a given set of inputs.
+        a Distrax distribution for a given set of inputs.
 
         In the following example, we compute the predictive prior distribution
         and then evaluate it on the interval :math:`[0, 1]`:
@@ -403,7 +403,7 @@ class ConjugatePosterior(AbstractPosterior):
         The conditioning set is a GPJax ``Dataset`` object, whilst predictions
         are made on a regular Jax array.
 
-        £xample:
+        Example:
             For a ``posterior`` distribution, the following code snippet will
             evaluate the predictive distribution.
 
@@ -453,8 +453,8 @@ class ConjugatePosterior(AbstractPosterior):
                 test_inputs (Float[Array, "N D"]): A Jax array of test inputs.
 
             Returns:
-                GaussianDistribution: A ``GaussianDistribution``
-                object that represents the predictive distribution.
+                A ``GaussianDistribution`` object that represents the
+                predictive distribution.
             """
 
             # Unpack test inputs
@@ -700,7 +700,7 @@ class NonConjugatePosterior(AbstractPosterior):
             # Lx⁻¹ Kxt
             Lx_inv_Kxt = Lx.solve(Ktx.T)
 
-            # Whitened function values, wx, correponding to the inputs, x
+            # Whitened function values, wx, corresponding to the inputs, x
             wx = params["latent"]
 
             # μt + Ktx Lx⁻¹ wx
@@ -727,8 +727,8 @@ class NonConjugatePosterior(AbstractPosterior):
 
         Unlike the marginal_log_likelihood function of the ConjugatePosterior
         object, the marginal_log_likelihood function of the
-        NonConjugatePosterior object does not provide an exact marginal
-        log-likelihood function. Instead, the NonConjugatePosterior object
+        ``NonConjugatePosterior`` object does not provide an exact marginal
+        log-likelihood function. Instead, the ``NonConjugatePosterior`` object
         represents the posterior distributions as a function of the model's
         hyperparameters and the latent function. Markov chain Monte Carlo,
         variational inference, or Laplace approximations can then be used to
@@ -780,7 +780,7 @@ class NonConjugatePosterior(AbstractPosterior):
             # Compute the prior mean function
             μx = mean_function(params["mean_function"], x)
 
-            # Whitened function values, wx, correponding to the inputs, x
+            # Whitened function values, wx, corresponding to the inputs, x
             wx = params["latent"]
 
             # f(x) = μx  +  Lx wx

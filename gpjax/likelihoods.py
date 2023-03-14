@@ -85,7 +85,7 @@ class AbstractLikelihood(PyTree):
         details="Use the ``init_params`` method for parameter initialisation.",
     )
     def _initialise_params(self, key: KeyArray) -> Dict:
-        """Deprecated method for initialising the GP's parameters. Succeded by ``init_params``."""
+        """Deprecated method for initialising the GP's parameters. Succeeded by ``init_params``."""
         return self.init_params(key)
 
     @property
@@ -100,11 +100,11 @@ class AbstractLikelihood(PyTree):
 
 
 class Conjugate:
-    """An abstract class for conjugate likelihoods with respect to a Gaussain process prior."""
+    """An abstract class for conjugate likelihoods with respect to a Gaussian process prior."""
 
 
 class NonConjugate:
-    """An abstract class for non-conjugate likelihoods with respect to a Gaussain process prior."""
+    """An abstract class for non-conjugate likelihoods with respect to a Gaussian process prior."""
 
 
 class Gaussian(AbstractLikelihood, Conjugate):

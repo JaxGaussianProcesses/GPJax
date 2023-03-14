@@ -210,7 +210,7 @@ def _kl_divergence(
 
     Args:
         q (GaussianDistribution): A multivariate Gaussian distribution.
-        p (GaussianDistribution): A multivariate Gaussia distribution.
+        p (GaussianDistribution): A multivariate Gaussian distribution.
 
     Returns:
         Float[Array, "1"]: The KL divergence between q and p.
@@ -241,7 +241,7 @@ def _kl_divergence(
     # Mahalanobis term, (μp - μq)ᵀ Σp⁻¹ (μp - μq) = tr [(μp - μq)ᵀ [LpLpᵀ]⁻¹ (μp - μq)] = (fr[Lp⁻¹(μp - μq)])²
     mahalanobis = _frobeinius_norm_squared(
         sqrt_p.solve(diff)
-    )  # TODO: Need to improve this. Perhaps add a Mahalanobis method to LinearOperators.
+    )  # TODO: Need to improve this. Perhaps add a Mahalanobis method to ``LinearOperator``s.
 
     # KL[q(x)||p(x)] = [ [(μp - μq)ᵀ Σp⁻¹ (μp - μq)] - n - log|Σq| + log|Σp| + tr[Σp⁻¹ Σq] ] / 2
     return (mahalanobis - n_dim - sigma_q.log_det() + sigma_p.log_det() + trace) / 2.0
