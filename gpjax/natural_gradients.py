@@ -20,7 +20,7 @@ from jax import value_and_grad
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Array, Float
-from jaxutils import Dataset
+from jaxutils import Dataset, Parameters
 
 from .gps import AbstractPosterior
 from .parameters import build_trainables, constrain, trainable_params
@@ -32,7 +32,7 @@ from .variational_families import (
 from .variational_inference import StochasticVI
 
 
-def natural_to_expectation(params: Dict, jitter: float = 1e-6) -> Dict:
+def natural_to_expectation(params: Parameters, jitter: float = 1e-6) -> Dict:
     """
     Translate natural parameters to expectation parameters.
 
@@ -48,7 +48,8 @@ def natural_to_expectation(params: Dict, jitter: float = 1e-6) -> Dict:
     decomposition of the inverse covariance, S⁻¹ = LLᵀ and defining C = L⁻¹, we
     have S = CᵀC and μ = Sθ₁ = CᵀC θ₁.
 
-    Now from here, using μ and S found from θ, we compute η as η₁ = μ, and  η₂ = S + μ μᵀ.
+    Now from here, using μ and S found from θ, we compute η as η₁ = μ,
+        and  η₂ = S + μ μᵀ.
 
     Args:
         params: A dictionary of variational Gaussian parameters under the natural
@@ -119,7 +120,7 @@ def _expectation_elbo(
     return svgp.elbo(train_data, negative=True)
 
 
-def _rename_expectation_to_natural(params: Dict) -> Dict:
+def _rename_expectation_to_natural(params: trainable_params) -> Dict:
     """
     This function renames the gradient components (that have expectation
     parameterisation keys) to match the natural parameterisation PyTree.
@@ -140,7 +141,7 @@ def _rename_expectation_to_natural(params: Dict) -> Dict:
     return params
 
 
-def _rename_natural_to_expectation(params: Dict) -> Dict:
+def _rename_natural_to_expectation(params: Parameters) -> Dict:
     """
     This function renames the gradient components (that have natural
     parameterisation keys) to match the expectation parameterisation PyTree.
@@ -200,6 +201,7 @@ def _get_hyperparameter_trainables(trainables: Dict) -> Dict:
     return hyper_trainables
 
 
+# Should this not be JaxUtils?
 def natural_gradients(
     stochastic_vi: StochasticVI,
     train_data: Dataset,
@@ -235,7 +237,7 @@ def natural_gradients(
 
     if isinstance(variational_family, NaturalVariationalGaussian):
 
-        def nat_grads_fn(params: Dict, batch: Dataset) -> Dict:
+        def nat_grads_fn(params: Parameters, batch: Dataset) -> Dict:
             """
             Computes the natural gradients of the ELBO.
 
@@ -253,7 +255,7 @@ def natural_gradients(
             expectation_params = natural_to_expectation(params)
 
             # Compute gradient ∂L/∂η:
-            def loss_fn(params: Dict, batch: Dataset) -> Float[Array, "1"]:
+            def loss_fn(params: Parameters, batch: Dataset) -> Float[Array, "1"]:
                 # Stop gradients for non-trainable and non-moment parameters.
                 params = trainable_params(params, moment_trainables)
 
@@ -268,7 +270,7 @@ def natural_gradients(
     else:
         raise NotImplementedError
 
-    def hyper_grads_fn(params: Dict, batch: Dataset) -> Dict:
+    def hyper_grads_fn(params: Parameters, batch: Dataset) -> Dict:
         """
         Computes the hyperparameter gradients of the ELBO.
 
@@ -280,7 +282,7 @@ def natural_gradients(
             Dict: A dictionary of hyperparameter gradients.
         """
 
-        def loss_fn(params: Dict, batch: Dataset) -> Float[Array, "1"]:
+        def loss_fn(params: Parameters, batch: Dataset) -> Float[Array, "1"]:
             # Stop gradients for non-trainable and moment parameters.
             params = constrain(params, bijectors)
             params = trainable_params(params, hyper_trainables)
