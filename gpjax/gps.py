@@ -147,6 +147,7 @@ class Prior(AbstractPrior):
                 prior. Defaults to zero.
             name (Optional[str]): The name of the GP prior. Defaults to "GP prior".
         """
+        super().__init__()
         self.kernel = kernel
         self.mean_function = mean_function
         self.name = name
@@ -285,6 +286,7 @@ class AbstractPosterior(AbstractPrior):
             likelihood (AbstractLikelihood): The likelihood distribution of the observed dataset.
             name (Optional[str]): The name of the GP posterior. Defaults to "GP posterior".
         """
+        super().__init__()
         self.prior = prior
         self.likelihood = likelihood
         self.name = name
@@ -316,9 +318,11 @@ class AbstractPosterior(AbstractPrior):
         """
         prior_params = self.prior.init_params(key)
         likelihood_params = self.likelihood.init_params(key)
-        return prior_params.combine(
-            likelihood_params, left_key="prior", right_key="likelihood"
+        prior_params.add_parameter(
+            key="likelihood",
+            parameter=likelihood_params,
         )
+        return prior_params
 
 
 class ConjugatePosterior(AbstractPosterior):
@@ -367,8 +371,7 @@ class ConjugatePosterior(AbstractPosterior):
             likelihood (AbstractLikelihood): The likelihood distribution of the observed dataset.
             name (Optional[str]): The name of the GP posterior. Defaults to "GP posterior".
         """
-        self.prior = prior
-        self.likelihood = likelihood
+        super().__init__(prior=prior, likelihood=likelihood)
         self.name = name
 
     def predict(
@@ -609,8 +612,7 @@ class NonConjugatePosterior(AbstractPosterior):
             likelihood (AbstractLikelihood): The likelihood function that represents the data.
             name (Optional[str]): The name of the posterior object. Defaults to "GP posterior".
         """
-        self.prior = prior
-        self.likelihood = likelihood
+        super().__init__(prior=prior, likelihood=likelihood)
         self.name = name
 
     def init_params(self, key: KeyArray) -> Parameters:
@@ -622,14 +624,12 @@ class NonConjugatePosterior(AbstractPosterior):
         Returns:
             DParametersict: A `Parameters` object containing the default parameter set.
         """
-        prior_params = self.prior.init_params(key)
+        params = self.prior.init_params(key)
         likelihood_params = self.likelihood.init_params(key)
-        params = prior_params.combine(
-            likelihood_params, left_key="prior", right_key="likelihood"
-        )
+        params.add_parameter(key="likelihood", parameter=likelihood_params)
         params.add_parameter(
             "latent",
-            jnp.zeros(shape=(self.likelihood.num_datapoints, 1)),
+            value=jnp.zeros(shape=(self.likelihood.num_datapoints, 1)),
             prior=dx.Normal(0.0, 1.0),
             trainability=True,
             bijector=Identity,

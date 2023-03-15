@@ -52,7 +52,7 @@ class AbstractVariationalInference(PyTree):
         self.prior = self.posterior.prior
         self.likelihood = self.posterior.likelihood
         self.variational_family = variational_family
-        self._jitter = None
+        self._jitter = 1e-6
 
     def init_params(self, key: KeyArray) -> Dict:
         """Construct the parameter set used within the variational scheme adopted."""
@@ -60,10 +60,7 @@ class AbstractVariationalInference(PyTree):
         likelihood_params = self.posterior.likelihood.init_params(key)
         variational_params.add_parameter(
             key="likelihood",
-            value=likelihood_params.params,
-            prior=likelihood_params.priors,
-            bijector=likelihood_params.bijectors,
-            trainability=likelihood_params.trainables,
+            parameter=likelihood_params,
         )
         return variational_params
 
@@ -286,6 +283,11 @@ class CollapsedVI(AbstractVariationalInference):
             return constant * (two_log_prob - two_trace).squeeze() / 2.0
 
         return elbo_fn
+
+    def init_params(self, key: KeyArray) -> Dict:
+        """Construct the parameter set used within the variational scheme adopted."""
+        variational_params = self.variational_family.init_params(key)
+        return variational_params
 
 
 __all__ = [

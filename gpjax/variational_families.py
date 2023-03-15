@@ -118,6 +118,7 @@ class AbstractVariationalGaussian(AbstractVariationalFamily):
             inducing_inputs (Float[Array, "N D"]): The inducing inputs.
             name (Optional[str]): The name of the variational family. Defaults to "Gaussian".
         """
+        super().__init__()
         self.prior = prior
         self.inducing_inputs = inducing_inputs
         self.num_inducing = self.inducing_inputs.shape[0]
@@ -134,6 +135,14 @@ class VariationalGaussian(AbstractVariationalGaussian):
     :math:`\\mu` and sqrt with S = sqrt sqrtᵀ.
     """
 
+    def __init__(
+        self,
+        prior: Prior,
+        inducing_inputs: Float[Array, "N D"],
+        name: Optional[str] = "Variational Gaussian",
+    ) -> None:
+        super().__init__(prior, inducing_inputs, name)
+
     def init_params(self, key: KeyArray) -> Parameters:
         """
         Return the variational mean vector, variational root covariance matrix,
@@ -147,7 +156,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
             Dict: The parameters of the distribution.
         """
         m = self.num_inducing
-        prior_params = self.prior.init_params(key)
+        params = self.prior.init_params(key)
         variational_param_values = {
             "inducing_inputs": self.inducing_inputs,
             "moments": {
@@ -166,10 +175,9 @@ class VariationalGaussian(AbstractVariationalGaussian):
         variational_params = Parameters(
             variational_param_values, variationnal_bijectors
         )
-        params = prior_params.combine(
-            variational_params,
-            left_name="prior",
-            right_name="variational_family",
+        params.add_parameter(
+            key="variational_family",
+            parameter=variational_params,
         )
         return params
 
@@ -306,7 +314,6 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             inducing_inputs (Float[Array, "N D"]): The inducing inputs.
             name (Optional[str]): The name of the variational family.
         """
-
         super().__init__(prior, inducing_inputs, name)
 
     def prior_kl(self, params: Dict) -> Float[Array, "1"]:
@@ -425,7 +432,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
     def init_params(self, key: KeyArray) -> Dict:
         """Return the natural vector and matrix, inducing inputs, and hyperparameters that parameterise the natural Gaussian distribution."""
         m = self.num_inducing
-        prior_params = self.prior.init_params(key)
+        params = self.prior.init_params(key)
         variational_param_values = {
             "inducing_inputs": self.inducing_inputs,
             "moments": {
@@ -442,10 +449,9 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         }
 
         variational_params = Parameters(variational_param_values, variational_bijectors)
-        params = prior_params.combine(
-            variational_params,
-            left_name="prior",
-            right_name="variational_family",
+        params.add_parameter(
+            key="variational_family",
+            parameter=variational_params,
         )
         return params
 
@@ -614,7 +620,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
     def init_params(self, key: KeyArray) -> Dict:
         """Return the expectation vector and matrix, inducing inputs, and hyperparameters that parameterise the expectation Gaussian distribution."""
         m = self.num_inducing
-        prior_params = self.prior.init_params(key)
+        params = self.prior.init_params(key)
         variational_param_values = {
             "inducing_inputs": self.inducing_inputs,
             "moments": {
@@ -631,10 +637,9 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         }
 
         variational_params = Parameters(variational_param_values, variational_bijectors)
-        params = prior_params.combine(
-            variational_params,
-            left_name="prior",
-            right_name="variational_family",
+        params.add_parameter(
+            key="variational_family",
+            parameter=variational_params,
         )
         return params
 
@@ -787,7 +792,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
 
         if not isinstance(likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")
-
+        super().__init__()
         self.prior = prior
         self.likelihood = likelihood
         self.inducing_inputs = inducing_inputs
@@ -796,24 +801,20 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
 
     def init_params(self, key: KeyArray) -> Dict:
         """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
-        prior_params = self.prior.init_params(key)
+        params = self.prior.init_params(key)
 
         likelihood_params = self.likelihood.init_params(key)
 
         variational_param_values = {"inducing_inputs": self.inducing_inputs}
         variational_bijectors = {"inducing_inputs": Identity}
         variational_params = Parameters(variational_param_values, variational_bijectors)
-        params = prior_params.combine(
-            variational_params,
-            left_name="prior",
-            right_name="variational_family",
+        params.add_parameter(
+            key="variational_family",
+            parameter=variational_params,
         )
         params.add_parameter(
             key="likelihood",
-            value={"obs_noise": likelihood_params["obs_noise"]},
-            prior={"obs_noise": likelihood_params.priors["obs_noise"]},
-            bijector={"obs_noise": likelihood_params.bijectors["obs_noise"]},
-            trainability={"obs_noise": likelihood_params.trainability["obs_noise"]},
+            parameter=likelihood_params,
         )
         return params
 

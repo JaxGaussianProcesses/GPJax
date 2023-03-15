@@ -35,9 +35,6 @@ __contributors__ = "https://github.com/JAXGaussianProcesses/GPJax/graphs/contrib
 
 
 __all__ = [
-    "fit",
-    "fit_batches",
-    "fit_natgrads",
     "Prior",
     "construct_posterior",
     "RBF",
