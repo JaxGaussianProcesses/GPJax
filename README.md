@@ -41,7 +41,7 @@ Feel free to join our [Slack Channel](https://join.slack.com/t/gpjax/shared_invi
 > - [**Inference on Graphs**](https://gpjax.readthedocs.io/en/latest/examples/graph_kernels.html)
 > - [**Learning Gaussian Process Barycentres**](https://gpjax.readthedocs.io/en/latest/examples/barycentres.html)
 > - [**Deep Kernel Regression**](https://gpjax.readthedocs.io/en/latest/examples/haiku.html)
-> - [**Natural Gradients**](https://gpjax.readthedocs.io/en/latest/examples/natgrads.html)
+<!-- > - [**Natural Gradients**](https://gpjax.readthedocs.io/en/latest/examples/natgrads.html) -->
 
 ## Guides for customisation
 > 
