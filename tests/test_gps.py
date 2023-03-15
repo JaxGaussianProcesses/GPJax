@@ -87,12 +87,6 @@ def test_conjugate_posterior(num_datapoints):
     assert isinstance(params, Parameters)
     print(params.params)
 
-    # Marginal likelihood
-    mll = post.marginal_log_likelihood(train_data=D)
-    objective_val = mll(params)
-    assert isinstance(objective_val, jax.Array)
-    assert objective_val.shape == ()
-
     # Prediction
     predictive_dist_fn = post(params, D)
     assert isinstance(predictive_dist_fn, tp.Callable)

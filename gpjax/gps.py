@@ -263,9 +263,6 @@ class Prior(AbstractPrior):
         return params
 
 
-# def combine(params: tp.Tuple[Parameters, Parameters], keys: tp.Tuple[str, str]):
-
-
 #######################
 # GP Posteriors
 #######################
@@ -475,117 +472,6 @@ class ConjugatePosterior(AbstractPosterior):
 
         return predict
 
-    def marginal_log_likelihood(
-        self,
-        train_data: Dataset,
-        negative: bool = False,
-    ) -> Callable[[Dict], Float[Array, "1"]]:
-        """Compute the marginal log-likelihood function of the Gaussian process.
-        The returned function can then be used for gradient based optimisation
-        of the model's parameters or for model comparison. The implementation
-        given here enables exact estimation of the Gaussian process' latent
-        function values.
-
-        For a training dataset :math:`\\{x_n, y_n\\}_{n=1}^N`, set of test
-        inputs :math:`\\mathbf{x}^{\\star}` the corresponding latent function
-        evaluations are given by :math:`\\mathbf{f} = f(\\mathbf{x})`
-        and :math:`\\mathbf{f}^{\\star} = f(\\mathbf{x}^{\\star})`, the marginal
-        log-likelihood is given by:
-
-        .. math::
-
-            \\log p(\\mathbf{y}) & = \\int p(\\mathbf{y}\\mid\\mathbf{f})p(\\mathbf{f}, \\mathbf{f}^{\\star}\\mathrm{d}\\mathbf{f}^{\\star}\\\\
-            &=0.5\\left(-\\mathbf{y}^{\\top}\\left(k(\\mathbf{x}, \\mathbf{x}') +\\sigma^2\\mathbf{I}_N  \\right)^{-1}\\mathbf{y}-\\log\\lvert k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_N\\rvert - n\\log 2\\pi \\right).
-
-        Example:
-
-        For a given ``ConjugatePosterior`` object, the following code snippet shows
-        how the marginal log-likelihood can be evaluated.
-
-        >>> import gpjax as gpx
-        >>>
-        >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
-        >>> ytrain = jnp.sin(xtrain)
-        >>> D = gpx.Dataset(X=xtrain, y=ytrain)
-        >>>
-        >>> params = gpx.initialise(posterior)
-        >>> mll = posterior.marginal_log_likelihood(train_data = D)
-        >>> mll(params)
-
-        Our goal is to maximise the marginal log-likelihood. Therefore, when
-        optimising the model's parameters with respect to the parameters, we
-        use the negative marginal log-likelihood. This can be realised through
-
-        >>> mll = posterior.marginal_log_likelihood(train_data = D, negative=True)
-
-        Further, prior distributions can be passed into the marginal log-likelihood
-
-        >>> mll = posterior.marginal_log_likelihood(train_data = D)
-
-        For optimal performance, the marginal log-likelihood should be ``jax.jit``
-        compiled.
-
-        >>> mll = jit(posterior.marginal_log_likelihood(train_data = D))
-
-        Args:
-            train_data (Dataset): The training dataset used to compute the
-                marginal log-likelihood.
-            negative (Optional[bool]): Whether or not the returned function
-                should be negative. For optimisation, the negative is useful
-                as minimisation of the negative marginal log-likelihood is
-                equivalent to maximisation of the marginal log-likelihood.
-                Defaults to False.
-
-        Returns:
-            Callable[[Dict], Float[Array, "1"]]: A functional representation
-                of the marginal log-likelihood that can be evaluated at a
-                given parameter set.
-        """
-        # Unpack training data
-        x, y, n = train_data.X, train_data.y, train_data.n
-
-        # Unpack mean function and kernel
-        mean_function = self.prior.mean_function
-        kernel = self.prior.kernel
-
-        # The sign of the marginal log-likelihood depends on whether we are maximising or minimising
-        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-
-        def mll(
-            params: Dict,
-        ):
-            """Compute the marginal log-likelihood of the Gaussian process.
-
-            Args:
-                params (Dict): The model's parameters.
-
-            Returns:
-                Float[Array, "1"]: The marginal log-likelihood.
-            """
-
-            # Observation noise σ²
-            obs_noise = params["likelihood"]["obs_noise"]
-            μx = mean_function(params["mean_function"], x)
-
-            # TODO: This implementation does not take advantage of the covariance operator structure.
-            # Future work concerns implementation of a custom Gaussian distribution / measure object that accepts a covariance operator.
-
-            # Σ = (Kxx + Iσ²) = LLᵀ
-            Kxx = kernel.gram(params["kernel"], x)
-            Kxx += identity(n) * self.jitter
-            Sigma = Kxx + identity(n) * obs_noise
-
-            # p(y | x, θ), where θ are the model hyperparameters:
-            marginal_likelihood = GaussianDistribution(
-                jnp.atleast_1d(μx.squeeze()), Sigma
-            )
-
-            return constant * (
-                marginal_likelihood.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
-            )
-
-        return mll
-
 
 class NonConjugatePosterior(AbstractPosterior):
     """
@@ -712,35 +598,6 @@ class NonConjugatePosterior(AbstractPosterior):
         train_data: Dataset,
         negative: bool = False,
     ) -> Callable[[Dict], Float[Array, "1"]]:
-        """
-        Compute the marginal log-likelihood function of the Gaussian process.
-        The returned function can then be used for gradient based optimisation
-        of the model's parameters or for model comparison. The implementation
-        given here is general and will work for any likelihood support by GPJax.
-
-        Unlike the marginal_log_likelihood function of the ConjugatePosterior
-        object, the marginal_log_likelihood function of the
-        ``NonConjugatePosterior`` object does not provide an exact marginal
-        log-likelihood function. Instead, the ``NonConjugatePosterior`` object
-        represents the posterior distributions as a function of the model's
-        hyperparameters and the latent function. Markov chain Monte Carlo,
-        variational inference, or Laplace approximations can then be used to
-        sample from, or optimise an approximation to, the posterior
-        distribution.
-
-        Args:
-            train_data (Dataset): The training dataset used to compute the
-                marginal log-likelihood.
-            negative (Optional[bool]): Whether or not the returned function
-                should be negative. For optimisation, the negative is useful as
-                minimisation of the negative marginal log-likelihood is equivalent
-                to maximisation of the marginal log-likelihood. Defaults to False.
-
-        Returns:
-            Callable[[Dict], Float[Array, "1"]]: A functional representation
-                of the marginal log-likelihood that can be evaluated at a given
-                parameter set.
-        """
         # Unpack dataset
         x, y, n = train_data.X, train_data.y, train_data.n
 
