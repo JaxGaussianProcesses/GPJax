@@ -2,6 +2,7 @@ from gpjax.objectives import (
     AbstractObjective,
     ConjugateMarginalLogLikelihood,
     NonConjugateMarginalLogLikelihood,
+    LogPosteriorDensity,
 )
 import pytest
 import jax.random as jr
@@ -88,3 +89,8 @@ def test_non_conjugate_mll(
     evaluation = mll(params, D)
     assert isinstance(evaluation, jax.Array)
     assert evaluation.shape == ()
+
+    mll2 = LogPosteriorDensity(model=post, negative=negative)
+    if jit_compile:
+        mll2 = jax.jit(mll2)
+    assert mll2(params, D) == evaluation

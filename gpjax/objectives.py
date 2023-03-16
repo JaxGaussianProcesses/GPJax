@@ -34,7 +34,9 @@ class ConjugateMarginalLogLikelihood(AbstractObjective):
     ) -> None:
         if isinstance(model.likelihood, NonConjugate):
             raise ValueError(
-                f"ConjugateMarginalLogLikelihood objective can only be used with conjugate likelihoods. {model.likelihood} is not conjugate to Gaussian distribution."
+                f"""ConjugateMarginalLogLikelihood objective can only be used with
+                conjugate likelihoods. {model.likelihood} is not conjugate to Gaussian
+                distribution."""
             )
         super().__init__(model, negative, name)
 
@@ -55,8 +57,11 @@ class ConjugateMarginalLogLikelihood(AbstractObjective):
 
         .. math::
 
-            \\log p(\\mathbf{y}) & = \\int p(\\mathbf{y}\\mid\\mathbf{f})p(\\mathbf{f}, \\mathbf{f}^{\\star}\\mathrm{d}\\mathbf{f}^{\\star}\\\\
-            &=0.5\\left(-\\mathbf{y}^{\\top}\\left(k(\\mathbf{x}, \\mathbf{x}') +\\sigma^2\\mathbf{I}_N  \\right)^{-1}\\mathbf{y}-\\log\\lvert k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_N\\rvert - n\\log 2\\pi \\right).
+            \\log p(\\mathbf{y}) & = \\int p(\\mathbf{y}\\mid\\mathbf{f})p(\\mathbf{f},
+            \\mathbf{f}^{\\star}\\mathrm{d}\\mathbf{f}^{\\star}\\\\
+            &=0.5\\left(-\\mathbf{y}^{\\top}\\left(k(\\mathbf{x}, \\mathbf{x}') +
+            \\sigma^2\\mathbf{I}_N  \\right)^{-1}\\mathbf{y}-\\log\\lvert k(\\mathbf{x},
+            \\mathbf{x}') + \\sigma^2\\mathbf{I}_N\\rvert - n\\log 2\\pi \\right).
 
         Example:
 
@@ -185,3 +190,6 @@ class NonConjugateMarginalLogLikelihood(AbstractObjective):
         return self.constant * (
             likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum()
         )
+
+
+LogPosteriorDensity = NonConjugateMarginalLogLikelihood
