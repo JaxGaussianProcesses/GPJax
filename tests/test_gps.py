@@ -32,6 +32,11 @@ from gpjax.gps import (
     Prior,
     construct_posterior,
 )
+from gpjax.objectives import (
+    AbstractObjective,
+    ConjugateMarginalLogLikelihood,
+    NonConjugateMarginalLogLikelihood,
+)
 from jaxkern import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian
 
@@ -62,7 +67,8 @@ def test_prior(num_datapoints):
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])
-def test_conjugate_posterior(num_datapoints):
+@pytest.mark.parametrize("jit_compile", [True, False])
+def test_conjugate_posterior(num_datapoints, jit_compile):
     key = jr.PRNGKey(123)
     x = jnp.sort(
         jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1)),
@@ -100,10 +106,21 @@ def test_conjugate_posterior(num_datapoints):
     assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
 
+    # Loss function
+    loss_fn = post.loss_function()
+    assert isinstance(loss_fn, AbstractObjective)
+    assert isinstance(loss_fn, ConjugateMarginalLogLikelihood)
+    if jit_compile:
+        loss_fn = jax.jit(loss_fn)
+    objective_val = loss_fn(params=params, data=D)
+    assert isinstance(objective_val, jax.Array)
+    assert objective_val.shape == ()
+
 
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])
 @pytest.mark.parametrize("likel", NonConjugateLikelihoods)
-def test_nonconjugate_posterior(num_datapoints, likel):
+@pytest.mark.parametrize("jit_compile", [True, False])
+def test_nonconjugate_posterior(num_datapoints, likel, jit_compile):
     key = jr.PRNGKey(123)
     x = jnp.sort(
         jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1)),
@@ -122,12 +139,6 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     params = post.init_params(key)
     assert isinstance(params, Parameters)
 
-    # Marginal likelihood
-    mll = post.marginal_log_likelihood(train_data=D)
-    objective_val = mll(params)
-    assert isinstance(objective_val, jax.Array)
-    assert objective_val.shape == ()
-
     # Prediction
     predictive_dist_fn = post(params, D)
     assert isinstance(predictive_dist_fn, tp.Callable)
@@ -140,6 +151,16 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     sigma = predictive_dist.covariance()
     assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
+
+    # Loss function
+    loss_fn = post.loss_function()
+    assert isinstance(loss_fn, AbstractObjective)
+    assert isinstance(loss_fn, NonConjugateMarginalLogLikelihood)
+    if jit_compile:
+        loss_fn = jax.jit(loss_fn)
+    objective_val = loss_fn(params=params, data=D)
+    assert isinstance(objective_val, jax.Array)
+    assert objective_val.shape == ()
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 10])

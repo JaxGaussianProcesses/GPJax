@@ -1,4 +1,7 @@
-from .gps import AbstractPosterior, ConjugatePosterior, NonConjugatePosterior
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .gps import AbstractPosterior, ConjugatePosterior, NonConjugatePosterior
 from jaxutils import Dataset, Parameters
 from jaxtyping import Float, Array
 from abc import ABCMeta, abstractmethod
@@ -11,7 +14,10 @@ from .likelihoods import NonConjugate
 
 class AbstractObjective(metaclass=ABCMeta):
     def __init__(
-        self, model: AbstractPosterior, negative: bool, name: str = "Abstract Objective"
+        self,
+        model: "AbstractPosterior",
+        negative: bool,
+        name: str = "Abstract Objective",
     ) -> None:
         self.model = model
         self.constant = jnp.array(-1.0) if negative else jnp.array(1.0)
@@ -28,7 +34,7 @@ class AbstractObjective(metaclass=ABCMeta):
 class ConjugateMarginalLogLikelihood(AbstractObjective):
     def __init__(
         self,
-        model: ConjugatePosterior,
+        model: "ConjugatePosterior",
         negative: bool,
         name: str = "Conjugate Marginal Log Likelihood",
     ) -> None:
@@ -128,7 +134,7 @@ class ConjugateMarginalLogLikelihood(AbstractObjective):
 class NonConjugateMarginalLogLikelihood(AbstractObjective):
     def __init__(
         self,
-        model: NonConjugatePosterior,
+        model: "NonConjugatePosterior",
         negative: bool,
         name: str = "Non-conjugate Marginal Log Likelihood",
     ) -> None:

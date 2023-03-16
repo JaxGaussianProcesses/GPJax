@@ -17,6 +17,11 @@ repos:
         language: system
         types: [python]
         stages: [manual]
+  # - repo: https://github.com/PyCQA/docformatter
+  #   rev: v1.5.0
+  #   hooks:
+  #     - id: docformatter
+  #       args: [--in-place --config ./pyproject.toml]
   - repo: https://github.com/psf/black
     rev: 23.1.0
     hooks:

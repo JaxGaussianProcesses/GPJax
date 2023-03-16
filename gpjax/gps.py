@@ -28,6 +28,11 @@ from jaxutils import Dataset, Parameters, PyTree, Identity
 from .gaussian_distribution import GaussianDistribution
 from .likelihoods import AbstractLikelihood, Conjugate, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
+from .objectives import (
+    AbstractObjective,
+    ConjugateMarginalLogLikelihood,
+    NonConjugateMarginalLogLikelihood,
+)
 
 
 class AbstractPrior(PyTree):
@@ -304,6 +309,9 @@ class AbstractPosterior(AbstractPrior):
         """
         raise NotImplementedError
 
+    def loss_function(self) -> AbstractObjective:
+        raise NotImplementedError(f"No loss function defined for {self.name}.")
+
     def init_params(self, key: KeyArray) -> Parameters:
         """Initialise the parameter set of a GP posterior.
 
@@ -472,6 +480,9 @@ class ConjugatePosterior(AbstractPosterior):
 
         return predict
 
+    def loss_function(self) -> ConjugateMarginalLogLikelihood:
+        return ConjugateMarginalLogLikelihood(model=self, negative=True)
+
 
 class NonConjugatePosterior(AbstractPosterior):
     """
@@ -593,60 +604,8 @@ class NonConjugatePosterior(AbstractPosterior):
 
         return predict_fn
 
-    def marginal_log_likelihood(
-        self,
-        train_data: Dataset,
-        negative: bool = False,
-    ) -> Callable[[Dict], Float[Array, "1"]]:
-        # Unpack dataset
-        x, y, n = train_data.X, train_data.y, train_data.n
-
-        # Unpack mean function and kernel
-        mean_function = self.prior.mean_function
-        kernel = self.prior.kernel
-
-        # Link function of the likelihood
-        link_function = self.likelihood.link_function
-
-        # The sign of the marginal log-likelihood depends on whether we are maximising or minimising
-        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-
-        def mll(params: Dict):
-            """Compute the marginal log-likelihood of the model.
-
-            Args:
-                params (Dict): A dictionary of parameters that should be used
-                    to compute the marginal log-likelihood.
-
-            Returns:
-                Float[Array, "1"]: The marginal log-likelihood of the model.
-            """
-
-            # Compute lower triangular of the kernel Gram matrix
-            Kxx = kernel.gram(params["kernel"], x)
-            Kxx += identity(n) * self.jitter
-            Lx = Kxx.to_root()
-
-            # Compute the prior mean function
-            μx = mean_function(params["mean_function"], x)
-
-            # Whitened function values, wx, corresponding to the inputs, x
-            wx = params["latent"]
-
-            # f(x) = μx  +  Lx wx
-            fx = μx + Lx @ wx
-
-            # p(y | f(x), θ), where θ are the model hyperparameters
-            likelihood = link_function(params, fx)
-
-            # Whitened latent function values prior, p(wx | θ) = N(0, I)
-            latent_prior = dx.Normal(loc=0.0, scale=1.0)
-
-            return constant * (
-                likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum()
-            )
-
-        return mll
+    def loss_function(self) -> NonConjugateMarginalLogLikelihood:
+        return NonConjugateMarginalLogLikelihood(model=self, negative=True)
 
 
 def construct_posterior(

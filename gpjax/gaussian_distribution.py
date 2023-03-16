@@ -68,6 +68,7 @@ class GaussianDistribution(dx.Distribution):
 
     Returns:
         GaussianDistribution: A multivariate Gaussian distribution with a linear operator scale matrix.
+
     """
 
     # TODO: Consider `distrax.transformed.Transformed` object. Can we create a LinearOperator to `distrax.bijector` representation
@@ -145,6 +146,7 @@ class GaussianDistribution(dx.Distribution):
 
         Returns:
             Float[Array, "1"]: The log probability of the value.
+
         """
         mu = self.loc
         sigma = self.scale
@@ -166,6 +168,7 @@ class GaussianDistribution(dx.Distribution):
 
         Returns:
             Float[Array, "n N"]: The samples.
+
         """
         # Obtain covariance root.
         sqrt = self.scale.to_root()
