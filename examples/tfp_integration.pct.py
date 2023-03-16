@@ -49,9 +49,10 @@ key = jr.PRNGKey(123)
 n = 100
 noise = 0.1
 
-x = jnp.sort(jr.uniform(key, minval=-5.0, maxval=5.0, shape=(n, 1)), axis=0)
+key, subkey = jr.split(key)
+x = jr.uniform(key, minval=-5.0, maxval=5.0, shape=(n, 1))
 f = lambda x: jnp.sin(jnp.pi * x) / (jnp.pi * x)
-y = f(x) + jr.normal(key, shape=x.shape) * noise
+y = f(x) + jr.normal(subkey, shape=x.shape) * noise
 
 fig, ax = plt.subplots(figsize=(12, 6))
 ax.plot(x, f(x), label="Latent fn")

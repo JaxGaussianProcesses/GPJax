@@ -50,10 +50,11 @@ key = jr.PRNGKey(123)
 n = 100
 noise = 0.3
 
-x = jr.uniform(key=key, minval=-3.0, maxval=3.0, shape=(n,)).sort().reshape(-1, 1)
+key, subkey = jr.split(key)
+x = jr.uniform(key=key, minval=-3.0, maxval=3.0, shape=(n,)).reshape(-1, 1)
 f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
-y = signal + jr.normal(key, shape=signal.shape) * noise
+y = signal + jr.normal(subkey, shape=signal.shape) * noise
 
 D = Dataset(X=x, y=y)
 

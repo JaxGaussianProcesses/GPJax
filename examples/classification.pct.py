@@ -50,8 +50,9 @@ key = jr.PRNGKey(123)
 # We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs for later.
 
 # %%
-x = jnp.sort(jr.uniform(key, shape=(100, 1), minval=-1.0, maxval=1.0), axis=0)
-y = 0.5 * jnp.sign(jnp.cos(3 * x + jr.normal(key, shape=x.shape) * 0.05)) + 0.5
+key, subkey = jr.split(key)
+x = jr.uniform(key, shape=(100, 1), minval=-1.0, maxval=1.0)
+y = 0.5 * jnp.sign(jnp.cos(3 * x + jr.normal(subkey, shape=x.shape) * 0.05)) + 0.5
 
 D = Dataset(X=x, y=y)
 
