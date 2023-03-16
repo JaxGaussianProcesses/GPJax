@@ -31,6 +31,22 @@ from .variational_families import (
 )
 from .variational_inference import CollapsedVI, StochasticVI
 
+from jaxkern import (
+    RBF,
+    Matern12,
+    Matern32,
+    Matern52,
+    Periodic,
+    Polynomial,
+    PoweredExponential,
+    RationalQuadratic,
+    GraphKernel,
+    RFF,
+    Linear,
+    White,
+)
+from jaxutils import Dataset, fit
+
 __version__ = _version.get_versions()["version"]
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
@@ -54,4 +70,18 @@ __all__ = [
     "WhitenedVariationalGaussian",
     "CollapsedVI",
     "StochasticVI",
+    "RBF",
+    "Matern12",
+    "Matern32",
+    "Matern52",
+    "Periodic",
+    "Polynomial",
+    "PoweredExponential",
+    "RationalQuadratic",
+    "GraphKernel",
+    "RFF",
+    "Linear",
+    "White",
+    "Dataset",
+    "fit",
 ]
