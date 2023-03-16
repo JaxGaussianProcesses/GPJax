@@ -36,6 +36,10 @@ NestedT = Union[T, Iterable["NestedT"], Mapping[Any, "NestedT"]]
 ShapeT = TypeVar("ShapeT", bound=NestedT[Tuple[int, ...]])
 DTypeT = TypeVar("DTypeT", bound=NestedT[jnp.dtype])
 
+# The Generic type is used for type checking the LinearOperator's shape and datatype.
+# `static_field` is used to mark nodes of the PyTree that don't change under JAX transformations.
+# this is important, so that we e.g., don't take the gradient with respect to the shape!
+
 
 @dataclass
 class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
