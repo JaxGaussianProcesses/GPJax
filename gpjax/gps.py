@@ -23,7 +23,7 @@ from jax.random import KeyArray
 from jaxkern.base import AbstractKernel
 from jaxlinop import identity
 from jaxtyping import Array, Float
-from jaxutils import Dataset, Parameters, PyTree, Identity
+from jaxutils import Dataset, Identity, Parameters, PyTree
 
 from .gaussian_distribution import GaussianDistribution
 from .likelihoods import AbstractLikelihood, Conjugate, NonConjugate

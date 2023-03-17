@@ -1,27 +1,30 @@
-from .gps import AbstractPosterior, ConjugatePosterior, NonConjugatePosterior
-from jaxutils import Dataset, Parameters
-from jaxtyping import Float, Array
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .gps import AbstractPosterior, ConjugatePosterior, NonConjugatePosterior
+    from .variational_families import AbstractVariationalFamily
+
 from abc import ABCMeta, abstractmethod
-from jaxlinop import identity
-from gpjax.gaussian_distribution import GaussianDistribution
-import jax.numpy as jnp
-import distrax as dx
-from .likelihoods import NonConjugate, AbstractLikelihood
-from .gps import AbstractPosterior
-from .likelihoods import Gaussian
-from .quadrature import gauss_hermite_quadrature
-from .variational_families import (
-    AbstractVariationalFamily,
-    CollapsedVariationalGaussian,
-)
-from jax import vmap
-import jax.scipy as jsp
-from jax.random import KeyArray
 from typing import Dict
+
+import distrax as dx
+from jax import vmap
+import jax.numpy as jnp
+from jax.random import KeyArray
+import jax.scipy as jsp
+from jaxlinop import identity
+from jaxtyping import Array, Float
+from jaxutils import Dataset, Parameters
+
+from .gaussian_distribution import GaussianDistribution
+from .likelihoods import AbstractLikelihood, Gaussian, NonConjugate
+from .quadrature import gauss_hermite_quadrature
+
+
 
 class AbstractObjective(metaclass=ABCMeta):
     def __init__(
-        self, model: AbstractPosterior, negative: bool, name: str = "Abstract Objective"
+        self, model: "AbstractPosterior", negative: bool, name: str = "Abstract Objective"
     ) -> None:
         self.model = model
         self.constant = jnp.array(-1.0) if negative else jnp.array(1.0)
@@ -33,7 +36,7 @@ class AbstractObjective(metaclass=ABCMeta):
         self, params: Parameters, data: Dataset, **kwargs
     ) -> Float[Array, "1"]:
         raise NotImplementedError(f"__call__ method not implemented for {self.name}.")
-    
+
     @abstractmethod
     def init_params(self, key: KeyArray) -> Dict:
         raise NotImplementedError(f"init_params method not implemented for {self.name}.")
@@ -42,7 +45,7 @@ class AbstractObjective(metaclass=ABCMeta):
 class ConjugateMarginalLogLikelihood(AbstractObjective):
     def __init__(
         self,
-        model: ConjugatePosterior,
+        model: "ConjugatePosterior",
         negative: bool,
         name: str = "Conjugate Marginal Log Likelihood",
     ) -> None:
@@ -132,7 +135,7 @@ class ConjugateMarginalLogLikelihood(AbstractObjective):
         mll = GaussianDistribution(jnp.atleast_1d(μx.squeeze()), Sigma)
 
         return self.constant * (mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze())
-    
+
     def init_params(self, key: KeyArray) -> Dict:
         return self.model.init_params(key)
 
@@ -140,7 +143,7 @@ class ConjugateMarginalLogLikelihood(AbstractObjective):
 class NonConjugateMarginalLogLikelihood(AbstractObjective):
     def __init__(
         self,
-        model: NonConjugatePosterior,
+        model: "NonConjugatePosterior",
         negative: bool,
         name: str = "Non-conjugate Marginal Log Likelihood",
     ) -> None:
@@ -202,22 +205,22 @@ class NonConjugateMarginalLogLikelihood(AbstractObjective):
         return self.constant * (
             likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum()
         )
-    
+
     def init_params(self, key: KeyArray) -> Dict:
         return self.model.init_params(key)
 
 class ELBO(AbstractObjective):
 
-    def __init__(self, 
-                num_datapoints: int, 
-                posterior: AbstractPosterior, 
-                variational_family: AbstractVariationalFamily,
+    def __init__(self,
+                num_datapoints: int,
+                posterior: "AbstractPosterior",
+                variational_family: "AbstractVariationalFamily",
                 negative: bool,
                 name: str = "Evidence lower bound",
                  ) -> None:
-        
+
         super().__init__(variational_family, negative, name)
-        self.num_datapoints = num_datapoints 
+        self.num_datapoints = num_datapoints
         self.posterior = posterior
         self.variational_family = variational_family
         self.negative = negative
@@ -235,7 +238,7 @@ class ELBO(AbstractObjective):
         Returns:
             Callable[[Parameters, Dataset], Array]: A callable function that accepts a current parameter estimate and batch of data for which gradients should be computed.
         """
-        
+
         # KL[q(f(·)) || p(f(·))]
         kl = self.variational_family.prior_kl(params)
 
@@ -244,7 +247,7 @@ class ELBO(AbstractObjective):
 
         # For batch size b, we compute  n/b * Σᵢ[ ∫log(p(y|f(xᵢ))) q(f(xᵢ)) df(xᵢ)] - KL[q(f(·)) || p(f(·))]
         return self.constant * (jnp.sum(var_exp) * self.num_datapoints / train_data.n - kl)
-    
+
     def init_params(self, key: KeyArray) -> Dict:
         """Construct the parameter set used within the variational scheme adopted."""
         variational_params = self.variational_family.init_params(key)
@@ -256,8 +259,9 @@ class ELBO(AbstractObjective):
         return variational_params
 
 
+LogPosteriorDensity = NonConjugateMarginalLogLikelihood
 
-def variational_expectation(params: Parameters, variational_family: AbstractVariationalFamily, likelihood: AbstractLikelihood, train_data: Dataset) -> Float[Array, "N 1"]:
+def variational_expectation(params: Parameters, variational_family: "AbstractVariationalFamily", likelihood: AbstractLikelihood, train_data: Dataset) -> Float[Array, "N 1"]:
     """Compute the expectation of our model's log-likelihood under our variational distribution. Batching can be done here to speed up computation.
 
     Args:
@@ -299,8 +303,8 @@ class CollapsedELBO(AbstractObjective):
 
     def __init__(
         self,
-        posterior: AbstractPosterior,
-        variational_family: AbstractVariationalFamily,
+        posterior: "AbstractPosterior",
+        variational_family: "AbstractVariationalFamily",
         negative: bool,
         name: str = "Conjugate Marginal Log Likelihood",
     ) -> None:
@@ -313,9 +317,6 @@ class CollapsedELBO(AbstractObjective):
 
         if not isinstance(posterior.likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")
-
-        if not isinstance(variational_family, CollapsedVariationalGaussian):
-            raise TypeError("Variational family must be CollapsedVariationalGaussian.")
 
         super().__init__(variational_family, negative, name)
         self.posterior = posterior
@@ -407,7 +408,7 @@ class CollapsedELBO(AbstractObjective):
 
         # log N(y; μx, Iσ² + KxzKzz⁻¹Kzx) - 1/2σ² tr(Kxx - KxzKzz⁻¹Kzx)
         return self.constant * (two_log_prob - two_trace).squeeze() / 2.0
-    
+
     def init_params(self, key: KeyArray) -> Dict:
         """Construct the parameter set used within the variational scheme adopted."""
         return self.variational_family.init_params(key)

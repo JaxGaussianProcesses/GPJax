@@ -13,8 +13,10 @@
 # limitations under the License.
 # ==============================================================================
 
-from . import _version
+import jaxkern as kernels
+import jaxutils as utils
 
+from . import _version
 from .gps import Prior, construct_posterior
 from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
@@ -30,9 +32,6 @@ from .variational_families import (
     WhitenedVariationalGaussian,
 )
 from .variational_inference import CollapsedVI, StochasticVI
-
-import jaxkern as kernels
-import jaxutils as utils
 
 __version__ = _version.get_versions()["version"]
 __license__ = "MIT"
