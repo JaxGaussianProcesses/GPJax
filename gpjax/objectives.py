@@ -21,10 +21,12 @@ from .likelihoods import AbstractLikelihood, Gaussian, NonConjugate
 from .quadrature import gauss_hermite_quadrature
 
 
-
 class AbstractObjective(metaclass=ABCMeta):
     def __init__(
-        self, model: "AbstractPosterior", negative: bool, name: str = "Abstract Objective"
+        self,
+        model: "AbstractPosterior",
+        negative: bool,
+        name: str = "Abstract Objective",
     ) -> None:
         self.model = model
         self.constant = jnp.array(-1.0) if negative else jnp.array(1.0)
@@ -39,7 +41,9 @@ class AbstractObjective(metaclass=ABCMeta):
 
     @abstractmethod
     def init_params(self, key: KeyArray) -> Dict:
-        raise NotImplementedError(f"init_params method not implemented for {self.name}.")
+        raise NotImplementedError(
+            f"init_params method not implemented for {self.name}."
+        )
 
 
 class ConjugateMarginalLogLikelihood(AbstractObjective):
@@ -51,7 +55,9 @@ class ConjugateMarginalLogLikelihood(AbstractObjective):
     ) -> None:
         if isinstance(model.likelihood, NonConjugate):
             raise ValueError(
-                f"ConjugateMarginalLogLikelihood objective can only be used with conjugate likelihoods. {model.likelihood} is not conjugate to Gaussian distribution."
+                f"""ConjugateMarginalLogLikelihood objective can only be used with
+                conjugate likelihoods. {model.likelihood} is not conjugate to Gaussian
+                distribution."""
             )
         super().__init__(model, negative, name)
 
@@ -209,15 +215,16 @@ class NonConjugateMarginalLogLikelihood(AbstractObjective):
     def init_params(self, key: KeyArray) -> Dict:
         return self.model.init_params(key)
 
-class ELBO(AbstractObjective):
 
-    def __init__(self,
-                num_datapoints: int,
-                posterior: "AbstractPosterior",
-                variational_family: "AbstractVariationalFamily",
-                negative: bool,
-                name: str = "Evidence lower bound",
-                 ) -> None:
+class ELBO(AbstractObjective):
+    def __init__(
+        self,
+        num_datapoints: int,
+        posterior: "AbstractPosterior",
+        variational_family: "AbstractVariationalFamily",
+        negative: bool,
+        name: str = "Evidence lower bound",
+    ) -> None:
 
         super().__init__(variational_family, negative, name)
         self.num_datapoints = num_datapoints
@@ -228,25 +235,40 @@ class ELBO(AbstractObjective):
         self.constant = jnp.array(-1.0) if self.negative else jnp.array(1.0)
 
     def __call__(self, params: Parameters, train_data: Dataset) -> Float[Array, "1"]:
-        """Compute the evidence lower bound under this model. In short, this requires evaluating the expectation of the model's log-likelihood under the variational approximation. To this, we sum the KL divergence from the variational posterior to the prior. When batching occurs, the result is scaled by the batch size relative to the full dataset size.
+        """Compute the evidence lower bound under this model. In short, this requires
+        evaluating the expectation of the model's log-likelihood under the variational
+        approximation. To this, we sum the KL divergence from the variational posterior
+        to the prior. When batching occurs, the result is scaled by the batch size
+        relative to the full dataset size.
 
         Args:
-            params (Parameters): The set of parameters that induce our variational approximation.
-            train_data (Dataset): The training data for which we should maximise the ELBO with respect to.
-            negative (bool, optional): Whether or not the resultant elbo function should be negative. For gradient descent where we minimise our objective function this argument should be true as minimisation of the negative corresponds to maximisation of the ELBO. Defaults to False.
+            params (Parameters): The set of parameters that induce our variational
+                approximation.
+            train_data (Dataset): The training data for which we should maximise the
+                ELBO with respect to.
+            negative (bool, optional): Whether or not the resultant elbo function should
+                be negative. For gradient descent where we minimise our objective
+                function this argument should be true as minimisation of the negative
+                corresponds to maximisation of the ELBO. Defaults to False.
 
         Returns:
-            Callable[[Parameters, Dataset], Array]: A callable function that accepts a current parameter estimate and batch of data for which gradients should be computed.
+            Callable[[Parameters, Dataset], Array]: A callable function that accepts a
+                current parameter estimate and batch of data for which gradients should
+                be computed.
         """
 
         # KL[q(f(·)) || p(f(·))]
         kl = self.variational_family.prior_kl(params)
 
         # ∫[log(p(y|f(·))) q(f(·))] df(·)
-        var_exp = variational_expectation(params, self.variational_family, self.posterior.likelihood, train_data)
+        var_exp = variational_expectation(
+            params, self.variational_family, self.posterior.likelihood, train_data
+        )
 
         # For batch size b, we compute  n/b * Σᵢ[ ∫log(p(y|f(xᵢ))) q(f(xᵢ)) df(xᵢ)] - KL[q(f(·)) || p(f(·))]
-        return self.constant * (jnp.sum(var_exp) * self.num_datapoints / train_data.n - kl)
+        return self.constant * (
+            jnp.sum(var_exp) * self.num_datapoints / train_data.n - kl
+        )
 
     def init_params(self, key: KeyArray) -> Dict:
         """Construct the parameter set used within the variational scheme adopted."""
@@ -261,16 +283,25 @@ class ELBO(AbstractObjective):
 
 LogPosteriorDensity = NonConjugateMarginalLogLikelihood
 
-def variational_expectation(params: Parameters, variational_family: "AbstractVariationalFamily", likelihood: AbstractLikelihood, train_data: Dataset) -> Float[Array, "N 1"]:
-    """Compute the expectation of our model's log-likelihood under our variational distribution. Batching can be done here to speed up computation.
+
+def variational_expectation(
+    params: Parameters,
+    variational_family: "AbstractVariationalFamily",
+    likelihood: AbstractLikelihood,
+    train_data: Dataset,
+) -> Float[Array, "N 1"]:
+    """Compute the expectation of our model's log-likelihood under our variational
+    distribution. Batching can be done here to speed up computation.
 
     Args:
-        params (Parameters): The set of parameters that induce our variational approximation.
+        params (Parameters): The set of parameters that induce our variational
+            approximation.
         likelihood (AbstractLikelihood)
-        batch (Dataset): The data batch for which the expectation should be computed for.
+        batch (Dataset): The batch for which the expectation should be computed for.
 
     Returns:
-        Array: The expectation of the model's log-likelihood under our variational distribution.
+        Array: The expectation of the model's log-likelihood under our variational
+            distribution.
     """
 
     # Unpack training batch
@@ -279,7 +310,8 @@ def variational_expectation(params: Parameters, variational_family: "AbstractVar
     # Variational distribution q(f(·)) = N(f(·); μ(·), Σ(·, ·))
     q = variational_family(params)
 
-    # Compute variational mean, μ(x), and variance, √diag(Σ(x, x)), at training inputs, x
+    # Compute variational mean, μ(x), and variance, √diag(Σ(x, x)), at the training
+    # inputs, x
     def q_moments(x):
         qx = q(x)
         return qx.mean(), qx.variance()
@@ -298,7 +330,8 @@ def variational_expectation(params: Parameters, variational_family: "AbstractVar
 
 class CollapsedELBO(AbstractObjective):
     """Collapsed variational inference for a sparse Gaussian process regression model.
-    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes.
+    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables
+    in Sparse Gaussian Processes.
     """
 
     def __init__(
@@ -312,7 +345,8 @@ class CollapsedELBO(AbstractObjective):
 
         Args:
             posterior (AbstractPosterior): The exact posterior distribution.
-            variational_family (AbstractVariationalFamily): The variational family to be trained.
+            variational_family (AbstractVariationalFamily): The variational family to
+                be trained.
         """
 
         if not isinstance(posterior.likelihood, Gaussian):
@@ -323,14 +357,23 @@ class CollapsedELBO(AbstractObjective):
         self.variational_family = variational_family
 
     def __call__(self, params: Parameters, train_data: Dataset) -> Float[Array, "1"]:
-        """Compute the evidence lower bound under this model. In short, this requires evaluating the expectation of the model's log-likelihood under the variational approximation. To this, we sum the KL divergence from the variational posterior to the prior. When batching occurs, the result is scaled by the batch size relative to the full dataset size.
+        """Compute the evidence lower bound under this model. In short, this requires
+        evaluating the expectation of the model's log-likelihood under the variational
+        approximation. To this, we sum the KL divergence from the variational posterior
+        to the prior. When batching occurs, the result is scaled by the batch size
+        relative to the full dataset size.
 
         Args:
-            train_data (Dataset): The training data for which we should maximise the ELBO with respect to.
-            negative (bool, optional): Whether or not the resultant elbo function should be negative. For gradient descent where we minimise our objective function this argument should be true as minimisation of the negative corresponds to maximisation of the ELBO. Defaults to False.
+            train_data (Dataset): The training data for which we should maximise the
+                ELBO with respect to.
+            negative (bool, optional): Whether or not the resultant elbo function should
+                be negative. For gradient descent where we minimise our objective
+                function this argument should be true as minimisation of the negative
+                corresponds to maximisation of the ELBO. Defaults to False.
 
         Returns:
-            Callable[[Parameters, Dataset], Array]: A callable function that accepts a current parameter estimate for which gradients should be computed.
+            Callable[[Parameters, Dataset], Array]: A callable function that accepts a
+                current parameter estimate for which gradients should be computed.
         """
 
         # Unpack training data
@@ -356,9 +399,11 @@ class CollapsedELBO(AbstractObjective):
         #
         # Let Q = KxzKzz⁻¹Kzx, we must compute the log normal pdf:
         #
-        #   log N(y; μx, σ²I + Q) = -nπ - n/2 log|σ²I + Q| - 1/2 (y - μx)ᵀ (σ²I + Q)⁻¹ (y - μx).
+        #   log N(y; μx, σ²I + Q) = -nπ - n/2 log|σ²I + Q|
+        #   - 1/2 (y - μx)ᵀ (σ²I + Q)⁻¹ (y - μx).
         #
-        # The log determinant |σ²I + Q| is computed via applying the matrix determinant lemma
+        # The log determinant |σ²I + Q| is computed via applying the matrix determinant
+        #   lemma
         #
         #   |σ²I + Q| = log|σ²I| + log|I + Lz⁻¹ Kzx (σ²I)⁻¹ Kxz Lz⁻¹| = log(σ²) +  log|B|,
         #
@@ -393,12 +438,10 @@ class CollapsedELBO(AbstractObjective):
         diff = y - μx
 
         # L⁻¹ A (y - μx)
-        L_inv_A_diff = jsp.linalg.solve_triangular(
-            L, jnp.matmul(A, diff), lower=True
-        )
+        L_inv_A_diff = jsp.linalg.solve_triangular(L, jnp.matmul(A, diff), lower=True)
 
         # (y - μx)ᵀ (Iσ² + Q)⁻¹ (y - μx)
-        quad = (jnp.sum(diff**2) - jnp.sum(L_inv_A_diff**2)) / noise
+        quad = (jnp.sum(diff ** 2) - jnp.sum(L_inv_A_diff ** 2)) / noise
 
         # 2 * log N(y; μx, Iσ² + Q)
         two_log_prob = -n * jnp.log(2.0 * jnp.pi * noise) - log_det_B - quad

@@ -42,12 +42,21 @@ def test_conjugate_mll(
 
     mll = ConjugateMarginalLogLikelihood(model=post, negative=negative)
     assert isinstance(mll, AbstractObjective)
+
+    # Test parameter initialisation
+    obj_params = mll.init_params(key)
+    assert isinstance(obj_params, ju.Parameters)
+
     if jit_compile:
         mll = jax.jit(mll)
 
     evaluation = mll(params, D)
     assert isinstance(evaluation, jax.Array)
     assert evaluation.shape == ()
+
+    # Test parameter initialisation
+    # mll_params = ConjugateMarginalLogLikelihood(model=post, negative=negative).init_params(key)
+    # assert all(mll_params == params)
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])
@@ -91,6 +100,11 @@ def test_non_conjugate_mll(
     assert evaluation.shape == ()
 
     mll2 = LogPosteriorDensity(model=post, negative=negative)
+
+    # Test parameter initialisation
+    obj_params = mll2.init_params(key)
+    assert isinstance(obj_params, ju.Parameters)
+
     if jit_compile:
         mll2 = jax.jit(mll2)
     assert mll2(params, D) == evaluation
