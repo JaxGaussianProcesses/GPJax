@@ -87,6 +87,7 @@ jobs:
           command: |
             pip install --upgrade pip
             pip install -e .
+            pip install -e .[dev]
       - run:
           name: Run tests
           command: |
