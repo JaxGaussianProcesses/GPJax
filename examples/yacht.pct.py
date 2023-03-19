@@ -128,11 +128,10 @@ params = posterior.init_params(key)
 training_data = Dataset(X=scaled_Xtr, y=scaled_ytr)
 
 parameter_state = posterior.init_params(key)
-negative_mll = jit(gpx.ConjugateMLL(posterior=posterior, negative=True))
+negative_mll = gpx.ConjugateMLL(posterior=posterior, negative=True)
 
 
 learned_params = fit(
-    params=params,
     objective=negative_mll,
     train_data=training_data,
     optim=ox.adam(1e-1),

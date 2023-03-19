@@ -190,7 +190,6 @@ optimiser = ox.chain(
 )
 
 learned_params = fit(
-    params=params,
     objective=negative_mll,
     train_data=D,
     optim=optimiser,

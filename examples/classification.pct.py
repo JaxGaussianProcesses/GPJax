@@ -89,12 +89,11 @@ print(type(posterior))
 
 # %%
 params = posterior.init_params(key)
-negative_mll = jax.jit(gpx.NonConjugateMLL(posterior=posterior, negative=True))
+negative_mll = gpx.NonConjugateMLL(posterior=posterior, negative=True)
 
 optimiser = ox.adam(learning_rate=0.01)
 
 map_estimate = fit(
-    params=params,
     objective=negative_mll,
     optim=optimiser,
     train_data=D,
@@ -176,7 +175,7 @@ Lx = Kxx.to_root()
 f_hat = Lx @ map_estimate["latent"]
 
 # Negative Hessian,  H = -∇²p_tilde(y|f):
-H = jax.jacfwd(jax.jacrev(negative_mll))(map_estimate, D)["latent"]["latent"][
+H = jax.jacfwd(jax.jacrev(negative_mll.step))(map_estimate, D)["latent"]["latent"][
     :, 0, :, 0
 ]
 

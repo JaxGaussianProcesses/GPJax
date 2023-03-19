@@ -106,14 +106,13 @@ sgpr = gpx.CollapsedVI(posterior=p, variational_family=q)
 # %%
 params = sgpr.init_params(key)
 
-negative_elbo = jit(gpx.CollapsedELBO(posterior=p, variational_family=q, negative=True))
+negative_elbo = gpx.CollapsedELBO(posterior=p, variational_family=q, negative=True)
 
 optimiser = ox.adam(learning_rate=5e-3)
 
 learned_params = fit(
-    params=params,
-    train_data=D,
     objective=negative_elbo,
+    train_data=D,
     optim=optimiser,
     num_iters=2000,
 )
@@ -183,14 +182,14 @@ plt.show()
 # %%
 full_rank_model = gpx.Prior(kernel=jk.RBF()) * gpx.Gaussian(num_datapoints=D.n)
 fr_params = full_rank_model.init_params(key)
-negative_mll = jit(gpx.ConjugateMLL(full_rank_model, negative=True))
+negative_mll = jit(gpx.ConjugateMLL(full_rank_model, negative=True).step)
 
-# %timeit negative_mll(fr_params, D).block_until_ready()
+negative_mll(fr_params, D).block_until_ready()
 
 # %%
 params = sgpr.init_params(key)
-negative_elbo = jit(gpx.CollapsedELBO(posterior=p, variational_family=q, negative=True))
-# %timeit negative_elbo(params, D).block_until_ready()
+negative_elbo = jit(gpx.CollapsedELBO(posterior=p, variational_family=q, negative=True).step)
+negative_elbo(params, D).block_until_ready()
 
 # %% [markdown]
 # As we can see, the sparse approximation given here is around 50 times faster when compared against a full-rank model.

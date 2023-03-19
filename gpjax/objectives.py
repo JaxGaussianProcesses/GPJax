@@ -34,17 +34,21 @@ class AbstractObjective(metaclass=ABCMeta):
         self.jitter = self.posterior.jitter
 
     @abstractmethod
-    def __call__(
-        self, params: Parameters, data: Dataset, **kwargs
+    def step(
+        self, params: Parameters, data: Dataset
     ) -> Float[Array, "1"]:
-        raise NotImplementedError(f"__call__ method not implemented for {self.name}.")
+        raise NotImplementedError(f"`step` method not implemented for {self.name}.")
 
     @abstractmethod
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         raise NotImplementedError(
             f"init_params method not implemented for {self.name}."
         )
 
+    def __call__(
+        self, params: Parameters, data: Dataset
+    ) -> Float[Array, "1"]:
+        return self.step(params, data)
 
 class ConjugateMLL(AbstractObjective):
     def __init__(
@@ -61,8 +65,8 @@ class ConjugateMLL(AbstractObjective):
             )
         super().__init__(posterior, negative, name)
 
-    def __call__(
-        self, params: Parameters, data: Dataset, **kwargs
+    def step(
+        self, params: Parameters, data: Dataset
     ) -> Float[Array, "1"]:
         """Compute the marginal log-likelihood function of the Gaussian process.
         The returned function can then be used for gradient based optimisation
@@ -142,7 +146,7 @@ class ConjugateMLL(AbstractObjective):
 
         return self.constant * (mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze())
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         return self.posterior.init_params(key)
 
 
@@ -155,8 +159,8 @@ class NonConjugateMLL(AbstractObjective):
     ) -> None:
         super().__init__(posterior, negative, name)
 
-    def __call__(
-        self, params: Parameters, data: Dataset, **kwargs
+    def step(
+        self, params: Parameters, data: Dataset
     ) -> Float[Array, "1"]:
         """
         Compute the marginal log-likelihood function of the Gaussian process.
@@ -212,7 +216,7 @@ class NonConjugateMLL(AbstractObjective):
             likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum()
         )
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         return self.posterior.init_params(key)
 
 
@@ -233,7 +237,7 @@ class ELBO(AbstractObjective):
         self.name = name
         self.constant = jnp.array(-1.0) if self.negative else jnp.array(1.0)
 
-    def __call__(self, params: Parameters, train_data: Dataset) -> Float[Array, "1"]:
+    def step(self, params: Parameters, train_data: Dataset) -> Float[Array, "1"]:
         """Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
         approximation. To this, we sum the KL divergence from the variational posterior
@@ -246,7 +250,7 @@ class ELBO(AbstractObjective):
             train_data (Dataset): The training data for which we should maximise the
                 ELBO with respect to.
             negative (bool, optional): Whether or not the resultant elbo function should
-                be negative. For gradient descent where we minimise our objective
+                be negative. For gradient descent where we optimise our objective
                 function this argument should be true as minimisation of the negative
                 corresponds to maximisation of the ELBO. Defaults to False.
 
@@ -269,7 +273,7 @@ class ELBO(AbstractObjective):
             jnp.sum(var_exp) * self.num_datapoints / train_data.n - kl
         )
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """Construct the parameter set used within the variational scheme adopted."""
         variational_params = self.variational_family.init_params(key)
         likelihood_params = self.posterior.likelihood.init_params(key)
@@ -355,7 +359,7 @@ class CollapsedELBO(AbstractObjective):
         self.posterior = posterior
         self.variational_family = variational_family
 
-    def __call__(self, params: Parameters, train_data: Dataset) -> Float[Array, "1"]:
+    def step(self, params: Parameters, train_data: Dataset) -> Float[Array, "1"]:
         """Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
         approximation. To this, we sum the KL divergence from the variational posterior
@@ -366,7 +370,7 @@ class CollapsedELBO(AbstractObjective):
             train_data (Dataset): The training data for which we should maximise the
                 ELBO with respect to.
             negative (bool, optional): Whether or not the resultant elbo function should
-                be negative. For gradient descent where we minimise our objective
+                be negative. For gradient descent where we optimise our objective
                 function this argument should be true as minimisation of the negative
                 corresponds to maximisation of the ELBO. Defaults to False.
 
@@ -451,6 +455,6 @@ class CollapsedELBO(AbstractObjective):
         # log N(y; μx, Iσ² + KxzKzz⁻¹Kzx) - 1/2σ² tr(Kxx - KxzKzz⁻¹Kzx)
         return self.constant * (two_log_prob - two_trace).squeeze() / 2.0
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """Construct the parameter set used within the variational scheme adopted."""
         return self.variational_family.init_params(key)

@@ -25,6 +25,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
+from jax import jit
 from jax.config import config
 from jaxutils import Dataset, fit
 import jaxkern as jk
@@ -171,13 +172,12 @@ negative_mll(params, D)
 # Since most optimisers (including here) minimise a given function, we have realised the negative marginal log-likelihood and just-in-time (JIT) compiled this to accelerate training.
 
 # %% [markdown]
-# We can now define an optimiser with `optax`. For this example we'll use the `adam` optimiser.
+# We can now define an optimiser with `optax`. For this example we'll use the `adamw` optimiser.
 
 # %%
-optimiser = ox.adam(learning_rate=0.01)
+optimiser = ox.adamw(learning_rate=0.01)
 
-learned_params = fit(
-    params=params, objective=negative_mll, train_data=D, optim=optimiser, num_iters=500
+learned_params = fit(objective=negative_mll, train_data=D, optim=optimiser, num_iters=500
 )
 
 # %% [markdown]

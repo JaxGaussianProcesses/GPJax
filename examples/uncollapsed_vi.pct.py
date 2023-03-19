@@ -165,7 +165,7 @@ svgp = gpx.StochasticVI(posterior=p, variational_family=q)
 # Since Optax's optimisers work to minimise functions, to maximise the ELBO we return its negative.
 
 # %%
-negative_elbo = jit(svgp.elbo(D, negative=True))
+negative_elbo = gpx.ELBO(num_datapoints=n, posterior=p, variational_family=q, negative=True)
 
 # %% [markdown]
 # ### Mini-batching
@@ -173,11 +173,9 @@ negative_elbo = jit(svgp.elbo(D, negative=True))
 # Despite introducing inducing inputs into our model, inference can still be intractable with large datasets. To circumvent this, optimisation can be done using stochastic mini-batches.
 
 # %%
-params = svgp.init_params(key)
 optimiser = ox.adam(learning_rate=0.05)
 
 learned_params = fit(
-    params=params,
     objective=negative_elbo,
     train_data=D,
     optim=optimiser,
@@ -214,6 +212,7 @@ plt.show()
 # To train a covariance matrix, GPJax uses `tfb.FillScaleTriL` transformation by default. `tfb.FillScaleTriL` fills a 1d vector into a lower triangular matrix and then applies `Softplus` transformation on the diagonal to satisfy the necessary conditions for a valid Cholesky matrix. Users can change this default transformation with another valid transformation of their choice. For example, `Square` transformation on the diagonal can also serve the purpose.
 
 # %%
+params = negative_elbo.init_params(key)
 transforms = params.bijectors
 
 triangular_transform = dx.Chain(

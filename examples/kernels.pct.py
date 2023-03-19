@@ -278,11 +278,10 @@ circlular_posterior = gpx.Prior(kernel=PKern) * likelihood
 params = circlular_posterior.init_params(key)
 
 # Optimise GP's marginal log-likelihood using Adam
-negative_mll = jit(gpx.ConjugateMLL(circlular_posterior, negative=True))
+negative_mll = gpx.ConjugateMLL(circlular_posterior, negative=True)
 optimiser = adam(learning_rate=0.05)
 
 learned_params = fit(
-    params=params,
     objective=negative_mll,
     train_data=D,
     optim=optimiser,

@@ -128,11 +128,10 @@ posterior = prior * likelihood
 
 params = posterior.init_params(key)
 
-negative_mll = jit(gpx.ConjugateMLL(posterior, negative=True))
+negative_mll = gpx.ConjugateMLL(posterior, negative=True)
 optimiser = ox.adam(learning_rate=0.01)
 
 learned_params = fit(
-    params=params,
     objective=negative_mll,
     train_data=D,
     optim=optimiser,
