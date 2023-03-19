@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.4
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -20,13 +20,14 @@
 # In this notebook we demonstrate how to implement sparse variational Gaussian processes (SVGPs) of <strong data-cite="hensman2013gaussian">Hensman et al. (2013)</strong>; <strong data-cite="hensman2015gaussian">Hensman et al. (2015)</strong>. In particular, this approximation framework provides a tractable option for working with non-conjugate Gaussian processes with more than ~5000 data points. However, for conjugate models of less than 5000 data points, we recommend using the marginal log-likelihood approach presented in the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html). Though we illustrate SVGPs here with a conjugate regression example, the same GPJax code works for general likelihoods, such as a Bernoulli for classification.
 
 # %%
+import sys
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
 from jax import jit
 from jax.config import config
-from jaxutils import Dataset
+from jaxutils import Dataset, fit
 import jaxkern as jk
 
 import tensorflow_probability.substrates.jax as tfp
@@ -35,10 +36,15 @@ tfb = tfp.bijectors
 
 import distrax as dx
 import gpjax as gpx
-from gpjax.config import get_global_config, reset_global_config
 
-# Enable Float64 for more stable matrix inversions.
-config.update("jax_enable_x64", True)
+# Due to an issue with Distrax, for Apple's silicon chips Float64 cannot be used in
+# conjunction with TensorFlow bijectors (as is done in this notebook)
+if sys.platform != 'darwin':
+    # Enable Float64 for more stable matrix inversions.
+    config.update("jax_enable_x64", True)
+    jitter=1e-6
+else:
+    jitter=1e-4
 key = jr.PRNGKey(123)
 
 # %% [markdown]
@@ -105,7 +111,6 @@ ax.plot(x, y, "o", alpha=0.3)
 ax.plot(xtest, f(xtest))
 [ax.axvline(x=z_i, color="black", alpha=0.3, linewidth=1) for z_i in z]
 plt.show()
-
 # %% [markdown]
 # The inducing inputs will summarise our dataset, and since they are treated as variational parameters, their locations will be optimised. The next step to SVGP is to define a variational family.
 
@@ -137,8 +142,9 @@ plt.show()
 likelihood = gpx.Gaussian(num_datapoints=n)
 prior = gpx.Prior(kernel=jk.RBF())
 p = prior * likelihood
+p.jitter = jitter
 q = gpx.VariationalGaussian(prior=prior, inducing_inputs=z)
-
+q.jitter=jitter
 # %% [markdown]
 # Here, the variational process $q(\cdot)$ depends on the prior through $p(f(\cdot)|f(\boldsymbol{z}))$ in $(\times)$.
 
@@ -167,21 +173,18 @@ negative_elbo = jit(svgp.elbo(D, negative=True))
 # Despite introducing inducing inputs into our model, inference can still be intractable with large datasets. To circumvent this, optimisation can be done using stochastic mini-batches.
 
 # %%
-reset_global_config()
-parameter_state = gpx.initialise(svgp, key)
-optimiser = ox.adam(learning_rate=0.01)
+params = svgp.init_params(key)
+optimiser = ox.adam(learning_rate=0.05)
 
-inference_state = gpx.fit_batches(
-    objective=negative_elbo,
-    parameter_state=parameter_state,
+learned_params = fit(
+    params=params,
+    objective = negative_elbo,
     train_data=D,
-    optax_optim=optimiser,
+    optim=optimiser,
     num_iters=3000,
-    key=jr.PRNGKey(42),
-    batch_size=128,
+    key=jr.PRNGKey(123),
+    batch_size=256
 )
-
-learned_params, training_history = inference_state.unpack()
 # %% [markdown]
 # ## Predictions
 #
@@ -211,31 +214,29 @@ plt.show()
 # To train a covariance matrix, GPJax uses `tfb.FillScaleTriL` transformation by default. `tfb.FillScaleTriL` fills a 1d vector into a lower triangular matrix and then applies `Softplus` transformation on the diagonal to satisfy the necessary conditions for a valid Cholesky matrix. Users can change this default transformation with another valid transformation of their choice. For example, `Square` transformation on the diagonal can also serve the purpose.
 
 # %%
-gpx_config = get_global_config()
-transformations = gpx_config.transformations
-jitter = gpx_config.jitter
+transforms = params.bijectors
 
 triangular_transform = dx.Chain(
-    [tfb.FillScaleTriL(diag_bijector=tfb.Square(), diag_shift=jnp.array(jitter))]
+    [tfb.FillScaleTriL(diag_bijector=tfb.Square(), diag_shift=jnp.array(p.jitter))]
 )
 
-transformations.update({"triangular_transform": triangular_transform})
+transforms['variational_family']['moments']['variational_root_covariance']=triangular_transform
+params.update_bijectors(transforms)
 
 # %%
-parameter_state = gpx.initialise(svgp, key)
-optimiser = ox.adam(learning_rate=0.01)
+parameter_state = svgp.init_params(key)
 
-inference_state = gpx.fit_batches(
-    objective=negative_elbo,
-    parameter_state=parameter_state,
+optimiser = ox.adam(learning_rate=0.05)
+
+learned_params = fit(
+    params=params,
+    objective = negative_elbo,
     train_data=D,
-    optax_optim=optimiser,
+    optim=optimiser,
     num_iters=3000,
-    key=jr.PRNGKey(42),
-    batch_size=128,
+    key=jr.PRNGKey(123),
+    batch_size=256
 )
-
-learned_params, training_history = inference_state.unpack()
 
 # %%
 latent_dist = q(learned_params)(xtest)

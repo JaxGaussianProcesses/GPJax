@@ -20,10 +20,7 @@ from . import _version
 from .gps import Prior, construct_posterior
 from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
-from .objectives import (
-    ConjugateMarginalLogLikelihood,
-    NonConjugateMarginalLogLikelihood,
-)
+from .objectives import ConjugateMLL, NonConjugateMLL, ELBO, CollapsedELBO
 from .variational_families import (
     CollapsedVariationalGaussian,
     ExpectationVariationalGaussian,
@@ -43,8 +40,10 @@ __contributors__ = "https://github.com/JAXGaussianProcesses/GPJax/graphs/contrib
 __all__ = [
     "Prior",
     "construct_posterior",
-    "ConjugateMarginalLogLikelihood",
-    "NonConjugateMarginalLogLikelihood",
+    "ConjugateMLL",
+    "NonConjugateMLL",
+    "ELBO",
+    "CollapsedELBO",
     "Bernoulli",
     "Gaussian",
     "Constant",

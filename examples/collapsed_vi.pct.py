@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 import optax as ox
 from jax import jit
 from jax.config import config
-from jaxutils import Dataset
+from jaxutils import Dataset, fit
 import jaxkern as jk
 
 import gpjax as gpx
@@ -104,20 +104,19 @@ sgpr = gpx.CollapsedVI(posterior=p, variational_family=q)
 # We now train our model akin to a Gaussian process regression model via the `fit` abstraction. Unlike the regression example given in the [conjugate regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html), the inducing locations that induce our variational posterior distribution are now part of the model's parameters. Using a gradient-based optimiser, we can then _optimise_ their location such that the evidence lower bound is maximised.
 
 # %%
-parameter_state = gpx.initialise(sgpr, key)
+params = sgpr.init_params(key)
 
-negative_elbo = jit(sgpr.elbo(D, negative=True))
+negative_elbo = jit(gpx.CollapsedELBO(posterior=p, variational_family=q, negative=True))
 
 optimiser = ox.adam(learning_rate=5e-3)
 
-inference_state = gpx.fit(
+learned_params = fit(
+    params=params,
+    train_data=D,
     objective=negative_elbo,
-    parameter_state=parameter_state,
-    optax_optim=optimiser,
+    optim=optimiser,
     num_iters=2000,
 )
-
-learned_params, training_history = inference_state.unpack()
 
 # %% [markdown]
 # We show predictions of our model with the learned inducing points overlayed in grey.
@@ -182,17 +181,16 @@ plt.show()
 # Given the size of the data being considered here, inference in a GP with a full-rank covariance matrix is possible, albeit quite slow. We can therefore compare the speedup that we get from using the above sparse approximation with corresponding bound on the marginal log-likelihood against the marginal log-likelihood in the full model.
 
 # %%
-full_rank_model = gpx.Prior(kernel=gpx.RBF()) * gpx.Gaussian(num_datapoints=D.n)
-fr_params, *_ = gpx.initialise(full_rank_model, key).unpack()
-negative_mll = jit(full_rank_model.marginal_log_likelihood(D, negative=True))
+full_rank_model = gpx.Prior(kernel=jk.RBF()) * gpx.Gaussian(num_datapoints=D.n)
+fr_params = full_rank_model.init_params(key)
+negative_mll = jit(gpx.ConjugateMLL(full_rank_model, negative=True))
 
-# %timeit negative_mll(fr_params).block_until_ready()
+# %timeit negative_mll(fr_params, D).block_until_ready()
 
 # %%
-params, *_ = gpx.initialise(sgpr, key).unpack()
-negative_elbo = jit(sgpr.elbo(D, negative=True))
-
-# %timeit negative_elbo(params).block_until_ready()
+params = sgpr.init_params(key)
+negative_elbo = jit(gpx.CollapsedELBO(posterior=p, variational_family=q, negative=True))
+# %timeit negative_elbo(params, D).block_until_ready()
 
 # %% [markdown]
 # As we can see, the sparse approximation given here is around 50 times faster when compared against a full-rank model.

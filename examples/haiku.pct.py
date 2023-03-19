@@ -32,7 +32,7 @@ from jax.config import config
 from scipy.signal import sawtooth
 from jaxtyping import Float, Array
 from typing import Dict
-from jaxutils import Dataset
+from jaxutils import Dataset, Parameters, fit
 import jaxkern as jk
 
 
@@ -95,7 +95,7 @@ class DeepKernelFunction(AbstractKernel):
         compute_engine: AbstractKernelComputation = DenseKernelComputation,
         active_dims: tp.Optional[tp.List[int]] = None,
     ) -> None:
-        super().__init__(compute_engine, active_dims, True, False, "Deep    Kernel")
+        super().__init__(compute_engine=compute_engine, active_dims=active_dims, name="Deep Kernel")
         self.network = network
         self.base_kernel = base_kernel
 
@@ -105,14 +105,14 @@ class DeepKernelFunction(AbstractKernel):
         x: Float[Array, "1 D"],
         y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
-        xt = self.network.apply(params=params, x=x)
-        yt = self.network.apply(params=params, x=y)
-        return self.base_kernel(params, xt, yt)
+        xt = self.network.apply(params=params['network'], x=x)
+        yt = self.network.apply(params=params['network'], x=y)
+        return self.base_kernel(params['base'], xt, yt)
 
     def initialise(self, dummy_x: Float[Array, "1 D"], key: jr.KeyArray) -> None:
-        nn_params = self.network.init(rng=key, x=dummy_x)
+        nn_params = Parameters(self.network.init(rng=key, x=dummy_x))
         base_kernel_params = self.base_kernel.init_params(key)
-        self._params = {**nn_params, **base_kernel_params}
+        self._params = base_kernel_params.combine(nn_params, left_key = 'base', right_key = 'network')
 
     def init_params(self, key: jr.KeyArray) -> Dict:
         return self._params
@@ -167,15 +167,10 @@ posterior = prior * likelihood
 # With the inclusion of a neural network, we take this opportunity to highlight the additional benefits gleaned from using [Optax](https://optax.readthedocs.io/en/latest/) for optimisation. In particular, we showcase the ability to use a learning rate scheduler that decays the optimiser's learning rate throughout the inference. We decrease the learning rate according to a half-cosine curve over 1000 iterations, providing us with large step sizes early in the optimisation procedure before approaching more conservative values, ensuring we do not step too far. We also consider a linear warmup, where the learning rate is increased from 0 to 1 over 50 steps to get a reasonable initial learning rate value.
 
 # %%
-parameter_state = gpx.initialise(posterior, key)
 
-negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
+params = posterior.init_params(key)
 
-# %%
-parameter_state = gpx.initialise(posterior, key)
-
-negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
-negative_mll(parameter_state.params)
+negative_mll = gpx.ConjugateMLL(posterior, negative=True)
 
 schedule = ox.warmup_cosine_decay_schedule(
     init_value=0.0,
@@ -190,14 +185,13 @@ optimiser = ox.chain(
     ox.adamw(learning_rate=schedule),
 )
 
-inference_state = gpx.fit(
+learned_params = fit(
+    params=params,
     objective=negative_mll,
-    parameter_state=parameter_state,
-    optax_optim=optimiser,
+    train_data=D,
+    optim=optimiser,
     num_iters=2500,
 )
-
-learned_params, training_history = inference_state.unpack()
 
 # %% [markdown]
 # ## Prediction

@@ -165,7 +165,7 @@ params = posterior.init_params(key)
 # To train our hyperparameters, we optimising the marginal log-likelihood of the posterior with respect to them. We define the marginal log-likelihood with `marginal_log_likelihood` on the posterior.
 
 # %%
-negative_mll = jit(gpx.ConjugateMarginalLogLikelihood(model=posterior, negative=True))
+negative_mll = gpx.ConjugateMLL(model=posterior, negative=True)
 negative_mll(params, D)
 
 # %% [markdown]
@@ -177,8 +177,7 @@ negative_mll(params, D)
 # %%
 optimiser = ox.adam(learning_rate=0.01)
 
-learned_params = fit(
-    params=params, objective=negative_mll, train_data=D, optim=optimiser, num_iters=500
+learned_params = fit(params=params, objective=negative_mll, train_data=D, optim=optimiser, num_iters=500
 )
 
 # %% [markdown]

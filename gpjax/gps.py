@@ -30,8 +30,8 @@ from .likelihoods import AbstractLikelihood, Conjugate, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
 from .objectives import (
     AbstractObjective,
-    ConjugateMarginalLogLikelihood,
-    NonConjugateMarginalLogLikelihood,
+    ConjugateMLL,
+    NonConjugateMLL,
 )
 
 
@@ -480,8 +480,8 @@ class ConjugatePosterior(AbstractPosterior):
 
         return predict
 
-    def loss_function(self) -> ConjugateMarginalLogLikelihood:
-        return ConjugateMarginalLogLikelihood(model=self, negative=True)
+    def loss_function(self) -> ConjugateMLL:
+        return ConjugateMLL(model=self, negative=True)
 
 
 class NonConjugatePosterior(AbstractPosterior):
@@ -604,8 +604,8 @@ class NonConjugatePosterior(AbstractPosterior):
 
         return predict_fn
 
-    def loss_function(self) -> NonConjugateMarginalLogLikelihood:
-        return NonConjugateMarginalLogLikelihood(model=self, negative=True)
+    def loss_function(self) -> NonConjugateMLL:
+        return NonConjugateMLL(model=self, negative=True)
 
 
 def construct_posterior(

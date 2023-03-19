@@ -128,7 +128,7 @@ params = posterior.init_params(key)
 training_data = Dataset(X=scaled_Xtr, y=scaled_ytr)
 
 parameter_state = posterior.init_params(key)
-negative_mll = jit(gpx.ConjugateMarginalLogLikelihood(model=posterior, negative=True))
+negative_mll = jit(gpx.ConjugateMLL(model=posterior, negative=True))
 
 
 learned_params = fit(

@@ -31,7 +31,7 @@ import jax.scipy.linalg as jsl
 import matplotlib.pyplot as plt
 import optax as ox
 from jax.config import config
-from jaxutils import Dataset
+from jaxutils import Dataset, fit
 import jaxkern as jk
 
 import gpjax as gpx
@@ -112,18 +112,21 @@ def fit_gp(x: jax.Array, y: jax.Array) -> dx.MultivariateNormalTri:
     likelihood = gpx.Gaussian(num_datapoints=n)
     posterior = gpx.Prior(kernel=jk.RBF()) * likelihood
 
-    parameter_state = gpx.initialise(posterior, key)
-    negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
+    params = posterior.init_params(key)
+    negative_mll = jax.jit(gpx.ConjugateMLL(model=posterior, negative=True))
     optimiser = ox.adam(learning_rate=0.01)
 
-    inference_state = gpx.fit(
-        objective=negative_mll,
-        parameter_state=parameter_state,
-        optax_optim=optimiser,
-        num_iters=1000,
+    # inference_state = gpx.fit(
+    #     objective=negative_mll,
+    #     parameter_state=parameter_state,
+    #     optax_optim=optimiser,
+    #     num_iters=1000,
+    # )
+    
+    learned_params = fit(
+        params=params, objective=negative_mll, train_data=D, optim=optimiser, num_iters=500
     )
 
-    learned_params, training_history = inference_state.unpack()
     return likelihood(learned_params, posterior(learned_params, D)(xtest))
 
 

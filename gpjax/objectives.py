@@ -46,7 +46,7 @@ class AbstractObjective(metaclass=ABCMeta):
         )
 
 
-class ConjugateMarginalLogLikelihood(AbstractObjective):
+class ConjugateMLL(AbstractObjective):
     def __init__(
         self,
         model: "ConjugatePosterior",
@@ -146,7 +146,7 @@ class ConjugateMarginalLogLikelihood(AbstractObjective):
         return self.model.init_params(key)
 
 
-class NonConjugateMarginalLogLikelihood(AbstractObjective):
+class NonConjugateMLL(AbstractObjective):
     def __init__(
         self,
         model: "NonConjugatePosterior",
@@ -281,7 +281,7 @@ class ELBO(AbstractObjective):
         return variational_params
 
 
-LogPosteriorDensity = NonConjugateMarginalLogLikelihood
+LogPosteriorDensity = NonConjugateMLL
 
 
 def variational_expectation(
@@ -441,7 +441,7 @@ class CollapsedELBO(AbstractObjective):
         L_inv_A_diff = jsp.linalg.solve_triangular(L, jnp.matmul(A, diff), lower=True)
 
         # (y - μx)ᵀ (Iσ² + Q)⁻¹ (y - μx)
-        quad = (jnp.sum(diff ** 2) - jnp.sum(L_inv_A_diff ** 2)) / noise
+        quad = (jnp.sum(diff**2) - jnp.sum(L_inv_A_diff**2)) / noise
 
         # 2 * log N(y; μx, Iσ² + Q)
         two_log_prob = -n * jnp.log(2.0 * jnp.pi * noise) - log_det_B - quad
