@@ -17,7 +17,10 @@
 # %% [markdown]
 # # Classification
 #
-# In this notebook we demonstrate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
+# In this notebook we demonstrate how to perform inference for Gaussian process models
+# with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte
+# Carlo (MCMC). We focus on a classification task here and use
+# [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
 
 # %%
 import blackjax
@@ -43,9 +46,12 @@ key = jr.PRNGKey(123)
 # %% [markdown]
 # ## Dataset
 #
-# With the necessary modules imported, we simulate a dataset $\mathcal{D} = (, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{100}$ with inputs $\boldsymbol{x}$ sampled uniformly on $(-1., 1)$ and corresponding binary outputs
+# With the necessary modules imported, we simulate a dataset
+# $\mathcal{D} = (, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{100}$ with inputs
+# $\boldsymbol{x}$ sampled uniformly on $(-1., 1)$ and corresponding binary outputs
 #
-# $$\boldsymbol{y} = 0.5 * \text{sign}(\cos(2 *  + \boldsymbol{\epsilon})) + 0.5, \quad \boldsymbol{\epsilon} \sim \mathcal{N} \left(\textbf{0}, \textbf{I} * (0.05)^{2} \right).$$
+# $$
+# \boldsymbol{y} = 0.5 * \text{sign}(\cos(2 *  + \boldsymbol{\epsilon})) + 0.5, \quad \boldsymbol{\epsilon} \sim \mathcal{N} \left(\textbf{0}, \textbf{I} * (0.05)^{2} \right).$$
 #
 # We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs for later.
 
