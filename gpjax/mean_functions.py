@@ -16,12 +16,11 @@
 import abc
 from typing import Dict, Optional
 
+import deprecation
 import jax.numpy as jnp
 from jax.random import KeyArray
 from jaxtyping import Array, Float
-from jaxutils import PyTree
-
-import deprecation
+from jaxutils import Parameters, PyTree
 
 
 class AbstractMeanFunction(PyTree):
@@ -53,7 +52,7 @@ class AbstractMeanFunction(PyTree):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """Return the parameters of the mean function. This method is required for all subclasses.
 
         Args:
@@ -103,7 +102,7 @@ class Zero(AbstractMeanFunction):
         out_shape = (x.shape[0], self.output_dim)
         return jnp.zeros(shape=out_shape)
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """The parameters of the mean function. For the zero-mean function, this is an empty dictionary.
 
         Args:
@@ -112,7 +111,7 @@ class Zero(AbstractMeanFunction):
         Returns:
             Dict: The parameters of the mean function.
         """
-        return {}
+        return Parameters({})
 
 
 class Constant(AbstractMeanFunction):
@@ -145,7 +144,7 @@ class Constant(AbstractMeanFunction):
         out_shape = (x.shape[0], self.output_dim)
         return jnp.ones(shape=out_shape) * params["constant"]
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """The parameters of the mean function. For the constant-mean function, this is a dictionary with a single value.
 
         Args:
@@ -154,7 +153,7 @@ class Constant(AbstractMeanFunction):
         Returns:
             Dict: The parameters of the mean function.
         """
-        return {"constant": jnp.array([1.0])}
+        return Parameters({"constant": jnp.array([1.0])})
 
 
 __all__ = [

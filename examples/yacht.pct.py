@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import optax as ox
 from jax.config import config
-from jaxutils import Dataset
+from jaxutils import Dataset, fit
 import jaxkern as jk
 
 # Enable Float64 for more stable matrix inversions.
@@ -117,6 +117,7 @@ prior = gpx.Prior(kernel=kernel)
 likelihood = gpx.Gaussian(num_datapoints=n_train)
 
 posterior = prior * likelihood
+params = posterior.init_params(key)
 
 # %% [markdown]
 # ### Model Optimisation
@@ -126,21 +127,19 @@ posterior = prior * likelihood
 # %%
 training_data = Dataset(X=scaled_Xtr, y=scaled_ytr)
 
-parameter_state = gpx.initialise(posterior, key)
-negative_mll = jit(
-    posterior.marginal_log_likelihood(train_data=training_data, negative=True)
-)
-optimiser = ox.adam(0.05)
+parameter_state = posterior.init_params(key)
+negative_mll = jit(gpx.ConjugateMLL(posterior=posterior, negative=True))
 
-inference_state = gpx.fit(
+
+learned_params = fit(
+    params=params,
     objective=negative_mll,
-    parameter_state=parameter_state,
-    optax_optim=optimiser,
+    train_data=training_data,
+    optim=ox.adam(1e-1),
     num_iters=1000,
     log_rate=50,
 )
 
-learned_params, training_history = inference_state.unpack()
 
 # %% [markdown]
 # ## Prediction
@@ -196,9 +195,7 @@ ax[0].set(xlabel="Predicted", ylabel="Actual", title="Predicted vs Actual")
 ax[1].scatter(predictive_mean.squeeze(), residuals)
 ax[1].plot([0, 1], [0.5, 0.5], color="tab:orange", transform=ax[1].transAxes)
 ax[1].set_ylim([-1.0, 1.0])
-ax[1].set(
-    xlabel="Predicted", ylabel="Residuals", title="Predicted vs Residuals"
-)
+ax[1].set(xlabel="Predicted", ylabel="Residuals", title="Predicted vs Residuals")
 
 ax[2].hist(np.asarray(residuals), bins=30)
 ax[2].set_title("Residuals")

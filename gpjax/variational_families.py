@@ -16,23 +16,20 @@
 import abc
 from typing import Any, Callable, Dict, Optional
 
+import deprecation
 import distrax as dx
 import jax.numpy as jnp
-import jax.scipy as jsp
 from jax.random import KeyArray
-from jaxtyping import Array, Float
-
-from jaxlinop import identity
-from jaxutils import PyTree, Dataset
+import jax.scipy as jsp
 import jaxlinop as jlo
+from jaxlinop import identity
+from jaxtyping import Array, Float
+from jaxutils import Dataset, Parameters, PyTree
+from jaxutils.bijectors import FillScaleTriL, Identity
 
-from .config import get_global_config
+from .gaussian_distribution import GaussianDistribution
 from .gps import Prior
 from .likelihoods import AbstractLikelihood, Gaussian
-from .utils import concat_dictionaries
-from .gaussian_distribution import GaussianDistribution
-
-import deprecation
 
 
 class AbstractVariationalFamily(PyTree):
@@ -40,6 +37,10 @@ class AbstractVariationalFamily(PyTree):
     Abstract base class used to represent families of distributions that can be
     used within variational inference.
     """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._jitter = 1e-6
 
     def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
         """For a given set of parameters, compute the latent function's prediction
@@ -56,7 +57,7 @@ class AbstractVariationalFamily(PyTree):
         return self.predict(*args, **kwargs)
 
     @abc.abstractmethod
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """
         The parameters of the distribution. For example, the multivariate
         Gaussian would return a mean vector and covariance matrix.
@@ -65,7 +66,7 @@ class AbstractVariationalFamily(PyTree):
             key (KeyArray): The PRNG key used to initialise the parameters.
 
         Returns:
-            Dict: The parameters of the distribution.
+            Parameters: The parameters of the distribution.
         """
         raise NotImplementedError
 
@@ -93,6 +94,14 @@ class AbstractVariationalFamily(PyTree):
         """
         raise NotImplementedError
 
+    @property
+    def jitter(self) -> float:
+        return self._jitter
+
+    @jitter.setter
+    def jitter(self, value: float):
+        self._jitter = value
+
 
 class AbstractVariationalGaussian(AbstractVariationalFamily):
     """The variational Gaussian family of probability distributions."""
@@ -109,6 +118,7 @@ class AbstractVariationalGaussian(AbstractVariationalFamily):
             inducing_inputs (Float[Array, "N D"]): The inducing inputs.
             name (Optional[str]): The name of the variational family. Defaults to "Gaussian".
         """
+        super().__init__()
         self.prior = prior
         self.inducing_inputs = inducing_inputs
         self.num_inducing = self.inducing_inputs.shape[0]
@@ -125,7 +135,15 @@ class VariationalGaussian(AbstractVariationalGaussian):
     :math:`\\mu` and sqrt with S = sqrt sqrtᵀ.
     """
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def __init__(
+        self,
+        prior: Prior,
+        inducing_inputs: Float[Array, "N D"],
+        name: Optional[str] = "Variational Gaussian",
+    ) -> None:
+        super().__init__(prior, inducing_inputs, name)
+
+    def init_params(self, key: KeyArray) -> Parameters:
         """
         Return the variational mean vector, variational root covariance matrix,
         and inducing input vector that parameterise the variational Gaussian
@@ -138,19 +156,30 @@ class VariationalGaussian(AbstractVariationalGaussian):
             Dict: The parameters of the distribution.
         """
         m = self.num_inducing
-
-        return concat_dictionaries(
-            self.prior.init_params(key),
-            {
-                "variational_family": {
-                    "inducing_inputs": self.inducing_inputs,
-                    "moments": {
-                        "variational_mean": jnp.zeros((m, 1)),
-                        "variational_root_covariance": jnp.eye(m),
-                    },
-                }
+        params = self.prior.init_params(key)
+        variational_param_values = {
+            "inducing_inputs": self.inducing_inputs,
+            "moments": {
+                "variational_mean": jnp.zeros((m, 1)),
+                "variational_root_covariance": jnp.eye(m),
             },
+        }
+        variationnal_bijectors = {
+            "inducing_inputs": Identity,
+            "moments": {
+                "variational_mean": Identity,
+                "variational_root_covariance": FillScaleTriL,
+            },
+        }
+
+        variational_params = Parameters(
+            variational_param_values, variationnal_bijectors
         )
+        params.add_parameter(
+            key="variational_family",
+            parameter=variational_params,
+        )
+        return params
 
     def prior_kl(self, params: Dict) -> Float[Array, "1"]:
         """
@@ -169,9 +198,6 @@ class VariationalGaussian(AbstractVariationalGaussian):
              Float[Array, "1"]: The KL-divergence between our variational
                 approximation and the GP prior.
         """
-
-        jitter = get_global_config()["jitter"]
-
         # Unpack variational parameters
         mu = params["variational_family"]["moments"]["variational_mean"]
         sqrt = params["variational_family"]["moments"]["variational_root_covariance"]
@@ -184,7 +210,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         μz = mean_function(params["mean_function"], z)
         Kzz = kernel.gram(params["kernel"], z)
-        Kzz += identity(m) * jitter
+        Kzz += identity(m) * self.jitter
 
         sqrt = jlo.LowerTriangularLinearOperator.from_dense(sqrt)
         S = jlo.DenseLinearOperator.from_root(sqrt)
@@ -214,8 +240,6 @@ class VariationalGaussian(AbstractVariationalGaussian):
                 function that accepts a set of test points and will return
                 the predictive distribution at those points.
         """
-        jitter = get_global_config()["jitter"]
-
         # Unpack variational parameters
         mu = params["variational_family"]["moments"]["variational_mean"]
         sqrt = params["variational_family"]["moments"]["variational_root_covariance"]
@@ -227,12 +251,11 @@ class VariationalGaussian(AbstractVariationalGaussian):
         kernel = self.prior.kernel
 
         Kzz = kernel.gram(params["kernel"], z)
-        Kzz += identity(m) * jitter
+        Kzz += identity(m) * self.jitter
         Lz = Kzz.to_root()
         μz = mean_function(params["mean_function"], z)
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
-
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
@@ -258,7 +281,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
             )
-            covariance += identity(n_test) * jitter
+            covariance += identity(n_test) * self.jitter
 
             return GaussianDistribution(
                 loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -291,7 +314,6 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             inducing_inputs (Float[Array, "N D"]): The inducing inputs.
             name (Optional[str]): The name of the variational family.
         """
-
         super().__init__(prior, inducing_inputs, name)
 
     def prior_kl(self, params: Dict) -> Float[Array, "1"]:
@@ -336,8 +358,6 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         Returns:
             Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
-        jitter = get_global_config()["jitter"]
-
         # Unpack variational parameters
         mu = params["variational_family"]["moments"]["variational_mean"]
         sqrt = params["variational_family"]["moments"]["variational_root_covariance"]
@@ -349,11 +369,10 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         kernel = self.prior.kernel
 
         Kzz = kernel.gram(params["kernel"], z)
-        Kzz += identity(m) * jitter
+        Kzz += identity(m) * self.jitter
         Lz = Kzz.to_root()
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
-
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
@@ -376,7 +395,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Lz_invT_sqrt, Ktz_Lz_invT_sqrt.T)
             )
-            covariance += identity(n_test) * jitter
+            covariance += identity(n_test) * self.jitter
 
             return GaussianDistribution(
                 loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -412,21 +431,29 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
     def init_params(self, key: KeyArray) -> Dict:
         """Return the natural vector and matrix, inducing inputs, and hyperparameters that parameterise the natural Gaussian distribution."""
-
         m = self.num_inducing
-
-        return concat_dictionaries(
-            self.prior.init_params(key),
-            {
-                "variational_family": {
-                    "inducing_inputs": self.inducing_inputs,
-                    "moments": {
-                        "natural_vector": jnp.zeros((m, 1)),
-                        "natural_matrix": -0.5 * jnp.eye(m),
-                    },
-                }
+        params = self.prior.init_params(key)
+        variational_param_values = {
+            "inducing_inputs": self.inducing_inputs,
+            "moments": {
+                "natural_vector": jnp.zeros((m, 1)),
+                "natural_matrix": -0.5 * jnp.eye(m),
             },
+        }
+        variational_bijectors = {
+            "inducing_inputs": Identity,
+            "moments": {
+                "natural_vector": Identity,
+                "natural_matrix": Identity,
+            },
+        }
+
+        variational_params = Parameters(variational_param_values, variational_bijectors)
+        params.add_parameter(
+            key="variational_family",
+            parameter=variational_params,
         )
+        return params
 
     def prior_kl(self, params: Dict) -> Float[Array, "1"]:
         """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
@@ -441,8 +468,6 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         Returns:
             Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
         """
-        jitter = get_global_config()["jitter"]
-
         # Unpack variational parameters
         natural_vector = params["variational_family"]["moments"]["natural_vector"]
         natural_matrix = params["variational_family"]["moments"]["natural_matrix"]
@@ -455,7 +480,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         # S⁻¹ = -2θ₂
         S_inv = -2 * natural_matrix
-        S_inv += jnp.eye(m) * jitter
+        S_inv += jnp.eye(m) * self.jitter
 
         # Compute L⁻¹, where LLᵀ = S, via a trick found in the NumPyro source code and https://nbviewer.org/gist/fehiepsi/5ef8e09e61604f10607380467eb82006#Precision-to-scale_tril:
         sqrt_inv = jnp.swapaxes(
@@ -474,7 +499,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         μz = mean_function(params["mean_function"], z)
         Kzz = kernel.gram(params["kernel"], z)
-        Kzz += identity(m) * jitter
+        Kzz += identity(m) * self.jitter
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
         pu = GaussianDistribution(loc=jnp.atleast_1d(μz.squeeze()), scale=Kzz)
@@ -498,8 +523,6 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         Returns:
             Callable[[Float[Array, "N D"]], GaussianDistribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
-        jitter = get_global_config()["jitter"]
-
         # Unpack variational parameters
         natural_vector = params["variational_family"]["moments"]["natural_vector"]
         natural_matrix = params["variational_family"]["moments"]["natural_matrix"]
@@ -512,7 +535,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         # S⁻¹ = -2θ₂
         S_inv = -2 * natural_matrix
-        S_inv += jnp.eye(m) * jitter
+        S_inv += jnp.eye(m) * self.jitter
 
         # Compute L⁻¹, where LLᵀ = S, via a trick found in the NumPyro source code and https://nbviewer.org/gist/fehiepsi/5ef8e09e61604f10607380467eb82006#Precision-to-scale_tril:
         sqrt_inv = jnp.swapaxes(
@@ -529,12 +552,11 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         mu = jnp.matmul(S, natural_vector)
 
         Kzz = kernel.gram(params["kernel"], z)
-        Kzz += identity(m) * jitter
+        Kzz += identity(m) * self.jitter
         Lz = Kzz.to_root()
         μz = mean_function(params["mean_function"], z)
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
-
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
@@ -560,7 +582,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Kzz_inv_L, Ktz_Kzz_inv_L.T)
             )
-            covariance += identity(n_test) * jitter
+            covariance += identity(n_test) * self.jitter
 
             return GaussianDistribution(
                 loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -597,23 +619,29 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
     def init_params(self, key: KeyArray) -> Dict:
         """Return the expectation vector and matrix, inducing inputs, and hyperparameters that parameterise the expectation Gaussian distribution."""
-
-        self.num_inducing = self.inducing_inputs.shape[0]
-
         m = self.num_inducing
-
-        return concat_dictionaries(
-            self.prior.init_params(key),
-            {
-                "variational_family": {
-                    "inducing_inputs": self.inducing_inputs,
-                    "moments": {
-                        "expectation_vector": jnp.zeros((m, 1)),
-                        "expectation_matrix": jnp.eye(m),
-                    },
-                }
+        params = self.prior.init_params(key)
+        variational_param_values = {
+            "inducing_inputs": self.inducing_inputs,
+            "moments": {
+                "expectation_vector": jnp.zeros((m, 1)),
+                "expectation_matrix": jnp.eye(m),
             },
+        }
+        variational_bijectors = {
+            "inducing_inputs": Identity,
+            "moments": {
+                "expectation_vector": Identity,
+                "expectation_matrix": Identity,
+            },
+        }
+
+        variational_params = Parameters(variational_param_values, variational_bijectors)
+        params.add_parameter(
+            key="variational_family",
+            parameter=variational_params,
         )
+        return params
 
     def prior_kl(self, params: Dict) -> Float[Array, "1"]:
         """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
@@ -628,8 +656,6 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         Returns:
             Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
         """
-        jitter = get_global_config()["jitter"]
-
         # Unpack variational parameters
         expectation_vector = params["variational_family"]["moments"][
             "expectation_vector"
@@ -650,11 +676,11 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         # S = η₂ - η₁ η₁ᵀ
         S = expectation_matrix - jnp.outer(mu, mu)
         S = jlo.DenseLinearOperator(S)
-        S += identity(m) * jitter
+        S += identity(m) * self.jitter
 
         μz = mean_function(params["mean_function"], z)
         Kzz = kernel.gram(params["kernel"], z)
-        Kzz += identity(m) * jitter
+        Kzz += identity(m) * self.jitter
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
         pu = GaussianDistribution(loc=jnp.atleast_1d(μz.squeeze()), scale=Kzz)
@@ -678,8 +704,6 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         Returns:
             Callable[[Float[Array, "N D"]], GaussianDistribution]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
-        jitter = get_global_config()["jitter"]
-
         # Unpack variational parameters
         expectation_vector = params["variational_family"]["moments"][
             "expectation_vector"
@@ -700,18 +724,17 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         # S = η₂ - η₁ η₁ᵀ
         S = expectation_matrix - jnp.matmul(mu, mu.T)
         S = jlo.DenseLinearOperator(S)
-        S += identity(m) * jitter
+        S += identity(m) * self.jitter
 
         # S = sqrt sqrtᵀ
         sqrt = S.to_root().to_dense()
 
         Kzz = kernel.gram(params["kernel"], z)
-        Kzz += identity(m) * jitter
+        Kzz += identity(m) * self.jitter
         Lz = Kzz.to_root()
         μz = mean_function(params["mean_function"], z)
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
-
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
@@ -737,7 +760,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
             )
-            covariance += identity(n_test) * jitter
+            covariance += identity(n_test) * self.jitter
 
             return GaussianDistribution(
                 loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -748,7 +771,8 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
 class CollapsedVariationalGaussian(AbstractVariationalFamily):
     """Collapsed variational Gaussian family of probability distributions.
-    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes."""
+    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes.
+    """
 
     def __init__(
         self,
@@ -768,7 +792,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
 
         if not isinstance(likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")
-
+        super().__init__()
         self.prior = prior
         self.likelihood = likelihood
         self.inducing_inputs = inducing_inputs
@@ -777,15 +801,22 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
 
     def init_params(self, key: KeyArray) -> Dict:
         """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
-        return concat_dictionaries(
-            self.prior.init_params(key),
-            {
-                "variational_family": {"inducing_inputs": self.inducing_inputs},
-                "likelihood": {
-                    "obs_noise": self.likelihood.init_params(key)["obs_noise"]
-                },
-            },
+        params = self.prior.init_params(key)
+
+        likelihood_params = self.likelihood.init_params(key)
+
+        variational_param_values = {"inducing_inputs": self.inducing_inputs}
+        variational_bijectors = {"inducing_inputs": Identity}
+        variational_params = Parameters(variational_param_values, variational_bijectors)
+        params.add_parameter(
+            key="variational_family",
+            parameter=variational_params,
         )
+        params.add_parameter(
+            key="likelihood",
+            parameter=likelihood_params,
+        )
+        return params
 
     def predict(
         self,
@@ -801,10 +832,8 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
         Returns:
             Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
-        jitter = get_global_config()["jitter"]
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
-
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
@@ -822,7 +851,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
 
             Kzx = kernel.cross_covariance(params["kernel"], z, x)
             Kzz = kernel.gram(params["kernel"], z)
-            Kzz += identity(m) * jitter
+            Kzz += identity(m) * self.jitter
 
             # Lz Lzᵀ = Kzz
             Lz = Kzz.to_root()
@@ -869,7 +898,7 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
                 - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
                 + jnp.matmul(L_inv_Lz_inv_Kzt.T, L_inv_Lz_inv_Kzt)
             )
-            covariance += identity(n_test) * jitter
+            covariance += identity(n_test) * self.jitter
 
             return GaussianDistribution(
                 loc=jnp.atleast_1d(mean.squeeze()), scale=covariance

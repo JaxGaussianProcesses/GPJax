@@ -29,7 +29,7 @@ import networkx as nx
 import optax as ox
 from jax import jit
 from jax.config import config
-from jaxutils import Dataset
+from jaxutils import Dataset, fit
 import jaxkern as jk
 
 import gpjax as gpx
@@ -46,6 +46,9 @@ key = jr.PRNGKey(123)
 # Contrary to the typical barbell graph, we'll randomly remove a subset of 30 edges within each of the two clusters. Given the 40 vertices within the graph, this results in 351 edges as shown below.
 
 # %%
+nx.__version__
+
+# %%
 vertex_per_side = 20
 n_edges_to_remove = 30
 p = 0.8
@@ -57,7 +60,7 @@ random.seed(123)
 
 pos = nx.spring_layout(G, seed=123)  # positions for all nodes
 
-nx.draw(G)  # , pos, node_color="tab:blue", with_labels=False, alpha=0.5)
+nx.draw(G, pos, node_color="tab:blue", with_labels=False, alpha=0.5)
 
 # %% [markdown]
 #
@@ -97,12 +100,6 @@ y = fx.sample(seed=key).reshape(-1, 1)
 
 D = Dataset(X=x, y=y)
 
-# %%
-kernel.compute_engine.gram
-
-# %%
-kernel.gram(params=kernel.init_params(key), inputs=x)
-
 # %% [markdown]
 #
 # We can visualise this signal in the following cell.
@@ -129,18 +126,18 @@ cbar = plt.colorbar(sm)
 likelihood = gpx.Gaussian(num_datapoints=y.shape[0])
 posterior = prior * likelihood
 
-parameter_state = gpx.initialise(posterior, key)
-negative_mll = jit(posterior.marginal_log_likelihood(train_data=D, negative=True))
+params = posterior.init_params(key)
+
+negative_mll = jit(gpx.ConjugateMLL(posterior, negative=True))
 optimiser = ox.adam(learning_rate=0.01)
 
-inference_state = gpx.fit(
+learned_params = fit(
+    params=params,
     objective=negative_mll,
-    parameter_state=parameter_state,
-    optax_optim=optimiser,
+    train_data=D,
+    optim=optimiser,
     num_iters=1000,
 )
-
-learned_params, training_history = inference_state.unpack()
 
 # %% [markdown]
 #
@@ -150,14 +147,16 @@ learned_params, training_history = inference_state.unpack()
 # Though we haven't defined a training and testing dataset here, we'll simply query the predictive posterior for the full graph to compare the root-mean-squared error (RMSE) of the model for the initialised parameters vs the optimised set.
 
 # %%
-initial_params = parameter_state.params
-initial_dist = likelihood(initial_params, posterior(initial_params, D)(x))
+initial_dist = likelihood(params, posterior(params, D)(x))
 predictive_dist = likelihood(learned_params, posterior(learned_params, D)(x))
 
 initial_mean = initial_dist.mean()
 learned_mean = predictive_dist.mean()
 
-rmse = lambda ytrue, ypred: jnp.sum(jnp.sqrt(jnp.square(ytrue - ypred)))
+
+def rmse(ytrue, ypred):
+    return jnp.sum(jnp.sqrt(jnp.square(ytrue - ypred)))
+
 
 initial_rmse = jnp.sum(jnp.sqrt(jnp.square(y.squeeze() - initial_mean)))
 learned_rmse = jnp.sum(jnp.sqrt(jnp.square(y.squeeze() - learned_mean)))

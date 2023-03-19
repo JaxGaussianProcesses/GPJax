@@ -25,9 +25,8 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
-from jax import jit
 from jax.config import config
-from jaxutils import Dataset
+from jaxutils import Dataset, fit
 import jaxkern as jk
 
 import gpjax as gpx
@@ -51,7 +50,12 @@ n = 100
 noise = 0.3
 
 x = jr.uniform(key=key, minval=-3.0, maxval=3.0, shape=(n,)).sort().reshape(-1, 1)
-f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
+
+
+def f(x):
+    return jnp.sin(4 * x) + jnp.cos(2 * x)
+
+
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
 
@@ -92,7 +96,7 @@ prior = gpx.Prior(kernel=kernel)
 # The above construction forms the foundation for GPJax's models. Moreover, the GP prior we have just defined can be represented by a [Distrax](https://github.com/deepmind/distrax) multivariate Gaussian distribution. Such functionality enables trivial sampling, and mean and covariance evaluation of the GP.
 
 # %%
-parameter_state = gpx.initialise(prior, key)
+parameter_state = prior.init_params(key)
 prior_dist = prior(parameter_state.params)(xtest)
 
 prior_mean = prior_dist.mean()
@@ -137,30 +141,21 @@ posterior = prior * likelihood
 #
 # ## Parameter state
 #
-# So far, all of the objects that we've defined have been stateless. To give our model state, we can use the `initialise` function provided in GPJax. Upon calling this, a `ParameterState` class is returned that contains four dictionaries:
+# So far, all of the objects that we've defined have been stateless. To give our model state, we can use the `init_params` method in GPJax. Upon calling this, a `Parameters` class is returned that contains four dictionaries:
 #
 # | Dictionary  | Description  |
 # |---|---|
 # |  `params` | Initial parameter values.  |
 # | `trainable`  | Boolean dictionary that determines the training status of parameters (`True` for being trained and `False` otherwise).  |
 # |  `bijectors` | Bijectors that can map parameters between the _unconstrained space_ and their original _constrained space_.  |
+# |  `priors` | Where relevant, the prior distribution that is specified for each parameter on its _constrained space_.  |
 #
-# Further, upon calling `initialise`, we can state specific initial values for some, or all, of the parameters within our model. By default, the kernel lengthscale and variance and the likelihood's variance parameter are all initialised to 1. However, in the following cell, we'll demonstrate how the kernel lengthscale can be initialised to 0.5.
 
 # %%
-parameter_state = gpx.initialise(
-    posterior, key, kernel={"lengthscale": jnp.array([0.5])}
-)
-print(type(parameter_state))
+params = posterior.init_params(key)
 
 # %% [markdown]
-# Note, for this example a key is not strictly necessary as none of the parameters are stochastic variables. For this reason, it is valid to call `initialise` without supplying a key. For some models, such as the sparse spectrum GP, the parameters are themselves random variables and the key is therefore essential.
-#
-# We can now unpack the `ParameterState` to receive each of the four components listed above.
-
-# %%
-params, trainable, bijectors = parameter_state.unpack()
-pp.pprint(params)
+# Note, for this example a key is not strictly necessary as none of the parameters are stochastic variables. Howeveror some models, such as the sparse spectrum GP, the parameters are themselves random variables and the key is therefore essential.
 
 # %% [markdown]
 # To motivate the purpose the `bijectors` more precisely, notice that our model hyperparameters $\{\ell^2, \sigma^2, \alpha^2 \}$ are all strictly positive, bijectors act to unconstrain these during the optimisation proceedure.
@@ -169,8 +164,8 @@ pp.pprint(params)
 # To train our hyperparameters, we optimising the marginal log-likelihood of the posterior with respect to them. We define the marginal log-likelihood with `marginal_log_likelihood` on the posterior.
 
 # %%
-negative_mll = jit(posterior.marginal_log_likelihood(D, negative=True))
-negative_mll(params)
+negative_mll = gpx.ConjugateMLL(posterior=posterior, negative=True)
+negative_mll(params, D)
 
 # %% [markdown]
 # Since most optimisers (including here) minimise a given function, we have realised the negative marginal log-likelihood and just-in-time (JIT) compiled this to accelerate training.
@@ -181,20 +176,12 @@ negative_mll(params)
 # %%
 optimiser = ox.adam(learning_rate=0.01)
 
-inference_state = gpx.fit(
-    objective=negative_mll,
-    parameter_state=parameter_state,
-    optax_optim=optimiser,
-    num_iters=500,
+learned_params = fit(
+    params=params, objective=negative_mll, train_data=D, optim=optimiser, num_iters=500
 )
 
 # %% [markdown]
-# Similar to the `ParameterState` object above, the returned variable from the `fit` function is a class, namely an `InferenceState` object that contains the parameters' final values and a tracked array of the evaluation of our objective function throughout optimisation.
-
-# %%
-learned_params, training_history = inference_state.unpack()
-
-pp.pprint(learned_params)
+# The returned variable from the `fit` function is another `Parameters` object that contains the learned values.
 
 # %% [markdown]
 # ## Prediction

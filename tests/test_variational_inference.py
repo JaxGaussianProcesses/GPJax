@@ -20,6 +20,8 @@ import jax.numpy as jnp
 import jax.random as jr
 import pytest
 from jax.config import config
+import jaxutils as ju
+import jaxkern as jk
 
 import gpjax as gpx
 from gpjax.variational_families import (
@@ -35,7 +37,7 @@ config.update("jax_enable_x64", True)
 
 
 def test_abstract_variational_inference():
-    prior = gpx.Prior(kernel=gpx.RBF())
+    prior = gpx.Prior(kernel=jk.RBF())
     lik = gpx.Gaussian(num_datapoints=20)
     post = prior * lik
     n_inducing_points = 10
@@ -54,9 +56,9 @@ def get_data_and_gp(n_datapoints, point_dim):
     x = jnp.linspace(-5.0, 5.0, n_datapoints).reshape(-1, 1)
     y = jnp.sin(x) + jr.normal(key=jr.PRNGKey(123), shape=x.shape) * 0.1
     x = jnp.hstack([x] * point_dim)
-    D = gpx.Dataset(X=x, y=y)
+    D = ju.Dataset(X=x, y=y)
 
-    p = gpx.Prior(kernel=gpx.RBF())
+    p = gpx.Prior(kernel=jk.RBF())
     lik = gpx.Gaussian(num_datapoints=n_datapoints)
     post = p * lik
     return D, post, p
@@ -87,7 +89,7 @@ def test_stochastic_vi(
     assert svgp.posterior.prior == post.prior
     assert svgp.posterior.likelihood == post.likelihood
 
-    params, _, _ = gpx.initialise(svgp, jr.PRNGKey(123)).unpack()
+    params = svgp.init_params(jr.PRNGKey(123))
 
     assert svgp.prior == post.prior
     assert svgp.likelihood == post.likelihood
@@ -124,7 +126,7 @@ def test_collapsed_vi(n_datapoints, n_inducing_points, jit_fns, point_dim):
     assert sgpr.posterior.prior == post.prior
     assert sgpr.posterior.likelihood == post.likelihood
 
-    params, _, _ = gpx.initialise(sgpr, jr.PRNGKey(123)).unpack()
+    params = sgpr.init_params(jr.PRNGKey(123))
 
     assert sgpr.prior == post.prior
     assert sgpr.likelihood == post.likelihood
@@ -134,6 +136,7 @@ def test_collapsed_vi(n_datapoints, n_inducing_points, jit_fns, point_dim):
     else:
         elbo_fn = sgpr.elbo(D)
     assert isinstance(elbo_fn, tp.Callable)
+
     elbo_value = elbo_fn(params)
     assert isinstance(elbo_value, jnp.ndarray)
 

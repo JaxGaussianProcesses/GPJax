@@ -22,6 +22,8 @@ import jax.random as jr
 import pytest
 from jax.config import config
 from jaxtyping import Float, Array
+import jaxutils as ju
+import jaxkern as jk
 
 import gpjax as gpx
 from gpjax.variational_families import (
@@ -47,7 +49,7 @@ def test_abstract_variational_family():
         def predict(self, params: Dict, x: Float[Array, "N D"]) -> dx.Distribution:
             return dx.MultivariateNormalDiag(loc=x)
 
-        def init_params(self, key: jr.PRNGKey) -> dict:
+        def init_params(self, key: jr.PRNGKey) -> ju.Parameters:
             return {}
 
     # Test that the dummy variational family can be instantiated.
@@ -81,7 +83,9 @@ def diag_matrix_val(
 ) -> Callable[[int], Float[Array, "n_inducing n_inducing"]]:
     """Diagonal matrix of shape (n_inducing, n_inducing) filled with val"""
 
-    def diag_matrix_fn(n_inducing: int) -> Float[Array, "n_inducing n_inducing"]:
+    def diag_matrix_fn(
+        n_inducing: int,
+    ) -> Float[Array, "n_inducing n_inducing"]:
         return jnp.eye(n_inducing) * val
 
     return diag_matrix_fn
@@ -126,9 +130,8 @@ def test_variational_gaussians(
     shapes: Tuple,
     values: Tuple,
 ) -> None:
-
     # Initialise variational family:
-    prior = gpx.Prior(kernel=gpx.RBF())
+    prior = gpx.Prior(kernel=jk.RBF())
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
     test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
     q = variational_family(prior=prior, inducing_inputs=inducing_inputs)
@@ -139,20 +142,15 @@ def test_variational_gaussians(
 
     # Test params and keys:
     params = q.init_params(jr.PRNGKey(123))
-    assert isinstance(params, dict)
-
-    config_params = gpx.config.get_global_config()
+    assert isinstance(params, ju.Parameters)
 
     # Test inducing induput parameters:
     assert "inducing_inputs" in params["variational_family"].keys()
-    assert "inducing_inputs" in config_params["transformations"].keys()
 
     for moment_name, shape, value in zip(moment_names, shapes, values):
-
         moment_params = params["variational_family"]["moments"]
 
         assert moment_name in moment_params.keys()
-        assert moment_name in config_params["transformations"].keys()
 
         # Test moment shape and values:
         moment = moment_params[moment_name]
@@ -191,9 +189,9 @@ def test_collapsed_variational_gaussian(
     x = jnp.linspace(-5.0, 5.0, n_datapoints).reshape(-1, 1)
     y = jnp.sin(x) + jr.normal(key=jr.PRNGKey(123), shape=x.shape) * 0.1
     x = jnp.hstack([x] * point_dim)
-    D = gpx.Dataset(X=x, y=y)
+    D = ju.Dataset(X=x, y=y)
 
-    prior = gpx.Prior(kernel=gpx.RBF())
+    prior = gpx.Prior(kernel=jk.RBF())
 
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
     inducing_inputs = jnp.hstack([inducing_inputs] * point_dim)
@@ -216,13 +214,11 @@ def test_collapsed_variational_gaussian(
 
     # Test init
     assert variational_family.num_inducing == n_inducing
-    params = gpx.config.get_global_config()
-    assert "inducing_inputs" in params["transformations"].keys()
     assert (variational_family.inducing_inputs == inducing_inputs).all()
 
     # Test params
     params = variational_family.init_params(jr.PRNGKey(123))
-    assert isinstance(params, dict)
+    assert isinstance(params, ju.Parameters)
     assert "likelihood" in params.keys()
     assert "obs_noise" in params["likelihood"].keys()
     assert "inducing_inputs" in params["variational_family"].keys()

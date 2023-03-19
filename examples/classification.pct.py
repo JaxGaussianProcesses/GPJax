@@ -17,7 +17,10 @@
 # %% [markdown]
 # # Classification
 #
-# In this notebook we demonstrate how to perform inference for Gaussian process models with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte Carlo (MCMC). We focus on a classification task here and use [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
+# In this notebook we demonstrate how to perform inference for Gaussian process models
+# with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte
+# Carlo (MCMC). We focus on a classification task here and use
+# [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
 
 # %%
 import blackjax
@@ -29,7 +32,7 @@ import matplotlib.pyplot as plt
 import optax as ox
 from jax.config import config
 from jaxtyping import Array, Float
-from jaxutils import Dataset
+from jaxutils import Dataset, fit
 import jaxkern as jk
 import jax
 
@@ -43,9 +46,12 @@ key = jr.PRNGKey(123)
 # %% [markdown]
 # ## Dataset
 #
-# With the necessary modules imported, we simulate a dataset $\mathcal{D} = (, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{100}$ with inputs $\boldsymbol{x}$ sampled uniformly on $(-1., 1)$ and corresponding binary outputs
+# With the necessary modules imported, we simulate a dataset
+# $\mathcal{D} = (, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{100}$ with inputs
+# $\boldsymbol{x}$ sampled uniformly on $(-1., 1)$ and corresponding binary outputs
 #
-# $$\boldsymbol{y} = 0.5 * \text{sign}(\cos(2 *  + \boldsymbol{\epsilon})) + 0.5, \quad \boldsymbol{\epsilon} \sim \mathcal{N} \left(\textbf{0}, \textbf{I} * (0.05)^{2} \right).$$
+# $$
+# \boldsymbol{y} = 0.5 * \text{sign}(\cos(2 *  + \boldsymbol{\epsilon})) + 0.5, \quad \boldsymbol{\epsilon} \sim \mathcal{N} \left(\textbf{0}, \textbf{I} * (0.05)^{2} \right).$$
 #
 # We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs for later.
 
@@ -79,22 +85,21 @@ print(type(posterior))
 # Whilst the latent function is Gaussian, the posterior distribution is non-Gaussian since our generative model first samples the latent GP and propagates these samples through the likelihood function's inverse link function. This step prevents us from being able to analytically integrate the latent function's values out of our posterior, and we must instead adopt alternative inference techniques. We begin with maximum a posteriori (MAP) estimation, a fast inference procedure to obtain point estimates for the latent function and the kernel's hyperparameters by maximising the marginal log-likelihood.
 
 # %% [markdown]
-# To begin we obtain an initial parameter state through the `initialise` callable (see the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)). We can obtain a MAP estimate by optimising the marginal log-likelihood with Optax's optimisers.
+# To begin we obtain an initial parameter state through the `init_params` method (see the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)). We can obtain a MAP estimate by optimising the marginal log-likelihood with Optax's optimisers.
 
 # %%
-parameter_state = gpx.initialise(posterior)
-negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
+params = posterior.init_params(key)
+negative_mll = jax.jit(gpx.NonConjugateMLL(posterior=posterior, negative=True))
 
 optimiser = ox.adam(learning_rate=0.01)
 
-inference_state = gpx.fit(
+map_estimate = fit(
+    params=params,
     objective=negative_mll,
-    parameter_state=parameter_state,
-    optax_optim=optimiser,
+    optim=optimiser,
+    train_data=D,
     num_iters=1000,
 )
-
-map_estimate, training_history = inference_state.unpack()
 
 # %% [markdown]
 # From which we can make predictions at novel inputs, as illustrated below.
@@ -171,7 +176,9 @@ Lx = Kxx.to_root()
 f_hat = Lx @ map_estimate["latent"]
 
 # Negative Hessian,  H = -∇²p_tilde(y|f):
-H = jax.jacfwd(jax.jacrev(negative_mll))(map_estimate)["latent"]["latent"][:, 0, :, 0]
+H = jax.jacfwd(jax.jacrev(negative_mll))(map_estimate, D)["latent"]["latent"][
+    :, 0, :, 0
+]
 
 # LLᵀ = H
 L = jnp.linalg.cholesky(H + I(D.n) * jitter)
@@ -192,9 +199,9 @@ laplace_approximation = dx.MultivariateNormalFullCovariance(f_hat.squeeze(), H_i
 #
 # This is the same approximate distribution $q_{map}(f(\cdot))$, but we have pertubed the covariance by a curvature term of $\mathbf{K}_{\boldsymbol{(\cdot)\boldsymbol{x}}} \mathbf{K}_{\boldsymbol{xx}}^{-1} [-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} ]^{-1} \mathbf{K}_{\boldsymbol{xx}}^{-1} \mathbf{K}_{\boldsymbol{\boldsymbol{x}(\cdot)}}$. We take the latent distribution computed in the previous section and add this term to the covariance to construct $q_{Laplace}(f(\cdot))$.
 
+
 # %%
 def construct_laplace(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
-
     map_latent_dist = posterior(map_estimate, D)(test_inputs)
 
     Kxt = cross_covariance(map_estimate["kernel"], x, test_inputs)
@@ -274,16 +281,16 @@ ax.legend()
 num_adapt = 500
 num_samples = 500
 
-params, trainables, bijectors = gpx.initialise(posterior, key).unpack()
-mll = posterior.marginal_log_likelihood(D, negative=False)
-unconstrained_mll = jax.jit(lambda params: mll(gpx.constrain(params, bijectors)))
+params = posterior.init_params(key)
+mll = gpx.NonConjugateMLL(posterior=posterior, negative=False)
+unconstrained_mll = jax.jit(lambda params: mll(params.constrain(), data=D))
 
 adapt = blackjax.window_adaptation(
     blackjax.nuts, unconstrained_mll, num_adapt, target_acceptance_rate=0.65
 )
 
 # Initialise the chain
-unconstrained_params = gpx.unconstrain(params, bijectors)
+unconstrained_params = params.unconstrain()
 last_state, kernel, _ = adapt.run(key, unconstrained_params)
 
 
@@ -334,14 +341,15 @@ thin_factor = 10
 samples = []
 
 for i in range(0, num_samples, thin_factor):
-    ps = gpx.parameters.copy_dict_structure(params)
-    ps["kernel"]["lengthscale"] = states.position["kernel"]["lengthscale"][i]
-    ps["kernel"]["variance"] = states.position["kernel"]["variance"][i]
-    ps["latent"] = states.position["latent"][i, :, :]
-    ps = gpx.constrain(ps, bijectors)
+    temp_params = params.params
+    temp_params["kernel"]["lengthscale"] = states.position["kernel"]["lengthscale"][i]
+    temp_params["kernel"]["variance"] = states.position["kernel"]["variance"][i]
+    temp_params["latent"] = states.position["latent"][i, :, :]
+    params.update_params(temp_params)
+    params = params.constrain()
 
-    latent_dist = posterior(ps, D)(xtest)
-    predictive_dist = likelihood(ps, latent_dist)
+    latent_dist = posterior(params, D)(xtest)
+    predictive_dist = likelihood(params, latent_dist)
     samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
 
 samples = jnp.vstack(samples)

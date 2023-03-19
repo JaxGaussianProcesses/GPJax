@@ -16,27 +16,22 @@
 import abc
 from typing import Callable, Dict
 
-import jax.numpy as jnp
-import jax.scipy as jsp
+import deprecation
 from jax import vmap
-from jaxtyping import Array, Float
-
-from jaxlinop import identity
+import jax.numpy as jnp
 from jax.random import KeyArray
-from jaxutils import PyTree
+import jax.scipy as jsp
+from jaxlinop import identity
+from jaxtyping import Array, Float
+from jaxutils import Dataset, PyTree
 
-from .config import get_global_config
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .quadrature import gauss_hermite_quadrature
-from jaxutils import Dataset
-from .utils import concat_dictionaries
 from .variational_families import (
     AbstractVariationalFamily,
     CollapsedVariationalGaussian,
 )
-
-import deprecation
 
 
 class AbstractVariationalInference(PyTree):
@@ -57,14 +52,17 @@ class AbstractVariationalInference(PyTree):
         self.prior = self.posterior.prior
         self.likelihood = self.posterior.likelihood
         self.variational_family = variational_family
+        self._jitter = 1e-6
 
     def init_params(self, key: KeyArray) -> Dict:
         """Construct the parameter set used within the variational scheme adopted."""
-        hyperparams = concat_dictionaries(
-            {"likelihood": self.posterior.likelihood.init_params(key)},
-            self.variational_family.init_params(key),
+        variational_params = self.variational_family.init_params(key)
+        likelihood_params = self.posterior.likelihood.init_params(key)
+        variational_params.add_parameter(
+            key="likelihood",
+            parameter=likelihood_params,
         )
-        return hyperparams
+        return variational_params
 
     @deprecation.deprecated(
         deprecated_in="0.5.7",
@@ -89,6 +87,14 @@ class AbstractVariationalInference(PyTree):
             Callable[[Array], Array]: A function that computes the ELBO given a set of parameters.
         """
         raise NotImplementedError
+
+    @property
+    def jitter(self) -> float:
+        return self._jitter
+
+    @jitter.setter
+    def jitter(self, value: float):
+        self._jitter = value
 
 
 class StochasticVI(AbstractVariationalInference):
@@ -160,7 +166,8 @@ class StochasticVI(AbstractVariationalInference):
 
 class CollapsedVI(AbstractVariationalInference):
     """Collapsed variational inference for a sparse Gaussian process regression model.
-    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes."""
+    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes.
+    """
 
     def __init__(
         self,
@@ -203,7 +210,6 @@ class CollapsedVI(AbstractVariationalInference):
         kernel = self.prior.kernel
 
         m = self.variational_family.num_inducing
-        jitter = get_global_config()["jitter"]
 
         # Constant for whether or not to negate the elbo for optimisation purposes
         constant = jnp.array(-1.0) if negative else jnp.array(1.0)
@@ -212,7 +218,7 @@ class CollapsedVI(AbstractVariationalInference):
             noise = params["likelihood"]["obs_noise"]
             z = params["variational_family"]["inducing_inputs"]
             Kzz = kernel.gram(params["kernel"], z)
-            Kzz += identity(m) * jitter
+            Kzz += identity(m) * self.jitter
             Kzx = kernel.cross_covariance(params["kernel"], z, x)
             Kxx_diag = vmap(kernel, in_axes=(None, 0, 0))(params["kernel"], x, x)
             μx = mean_function(params["mean_function"], x)
@@ -277,6 +283,11 @@ class CollapsedVI(AbstractVariationalInference):
             return constant * (two_log_prob - two_trace).squeeze() / 2.0
 
         return elbo_fn
+
+    def init_params(self, key: KeyArray) -> Dict:
+        """Construct the parameter set used within the variational scheme adopted."""
+        variational_params = self.variational_family.init_params(key)
+        return variational_params
 
 
 __all__ = [

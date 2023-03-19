@@ -21,8 +21,9 @@ import jax.numpy as jnp
 import jax.random as jr
 import pytest
 from jax.config import config
+from jaxutils import Dataset, Parameters
 
-from gpjax import Dataset, initialise
+
 from gpjax.gps import (
     AbstractPrior,
     AbstractPosterior,
@@ -31,9 +32,9 @@ from gpjax.gps import (
     Prior,
     construct_posterior,
 )
-from gpjax.kernels import RBF, Matern12, Matern32, Matern52
+from gpjax.objectives import AbstractObjective, ConjugateMLL, NonConjugateMLL
+from jaxkern import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian
-from gpjax.parameters import ParameterState
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -43,11 +44,13 @@ NonConjugateLikelihoods = [Bernoulli]
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 def test_prior(num_datapoints):
     p = Prior(kernel=RBF())
-    parameter_state = initialise(p, jr.PRNGKey(123))
-    params, _, _ = parameter_state.unpack()
+    parameters = p.init_params(jr.PRNGKey(123))
+
     assert isinstance(p, Prior)
     assert isinstance(p, AbstractPrior)
-    prior_rv_fn = p(params)
+    assert isinstance(parameters, Parameters)
+
+    prior_rv_fn = p(parameters)
     assert isinstance(prior_rv_fn, tp.Callable)
 
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
@@ -60,7 +63,8 @@ def test_prior(num_datapoints):
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])
-def test_conjugate_posterior(num_datapoints):
+@pytest.mark.parametrize("jit_compile", [True, False])
+def test_conjugate_posterior(num_datapoints, jit_compile):
     key = jr.PRNGKey(123)
     x = jnp.sort(
         jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1)),
@@ -68,6 +72,7 @@ def test_conjugate_posterior(num_datapoints):
     )
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
     D = Dataset(X=x, y=y)
+
     # Initialisation
     p = Prior(kernel=RBF())
     lik = Gaussian(num_datapoints=num_datapoints)
@@ -80,14 +85,9 @@ def test_conjugate_posterior(num_datapoints):
     assert isinstance(post2, ConjugatePosterior)
     assert isinstance(post2, AbstractPrior)
 
-    parameter_state = initialise(post, key)
-    params, *_ = parameter_state.unpack()
-
-    # Marginal likelihood
-    mll = post.marginal_log_likelihood(train_data=D)
-    objective_val = mll(params)
-    assert isinstance(objective_val, jax.Array)
-    assert objective_val.shape == ()
+    params = post.init_params(key)
+    assert isinstance(params, Parameters)
+    print(params.params)
 
     # Prediction
     predictive_dist_fn = post(params, D)
@@ -102,10 +102,21 @@ def test_conjugate_posterior(num_datapoints):
     assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
 
+    # Loss function
+    loss_fn = post.loss_function()
+    assert isinstance(loss_fn, AbstractObjective)
+    assert isinstance(loss_fn, ConjugateMLL)
+    if jit_compile:
+        loss_fn = jax.jit(loss_fn)
+    objective_val = loss_fn(params=params, data=D)
+    assert isinstance(objective_val, jax.Array)
+    assert objective_val.shape == ()
+
 
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])
 @pytest.mark.parametrize("likel", NonConjugateLikelihoods)
-def test_nonconjugate_posterior(num_datapoints, likel):
+@pytest.mark.parametrize("jit_compile", [True, False])
+def test_nonconjugate_posterior(num_datapoints, likel, jit_compile):
     key = jr.PRNGKey(123)
     x = jnp.sort(
         jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1)),
@@ -121,15 +132,8 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     assert isinstance(post, AbstractPrior)
     assert isinstance(p, AbstractPrior)
 
-    parameter_state = initialise(post, key)
-    params, _, _ = parameter_state.unpack()
-    assert isinstance(parameter_state, ParameterState)
-
-    # Marginal likelihood
-    mll = post.marginal_log_likelihood(train_data=D)
-    objective_val = mll(params)
-    assert isinstance(objective_val, jax.Array)
-    assert objective_val.shape == ()
+    params = post.init_params(key)
+    assert isinstance(params, Parameters)
 
     # Prediction
     predictive_dist_fn = post(params, D)
@@ -144,13 +148,22 @@ def test_nonconjugate_posterior(num_datapoints, likel):
     assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
 
+    # Loss function
+    loss_fn = post.loss_function()
+    assert isinstance(loss_fn, AbstractObjective)
+    assert isinstance(loss_fn, NonConjugateMLL)
+    if jit_compile:
+        loss_fn = jax.jit(loss_fn)
+    objective_val = loss_fn(params=params, data=D)
+    assert isinstance(objective_val, jax.Array)
+    assert objective_val.shape == ()
+
 
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 @pytest.mark.parametrize("lik", [Bernoulli, Gaussian])
 def test_param_construction(num_datapoints, lik):
     p = Prior(kernel=RBF()) * lik(num_datapoints=num_datapoints)
-    parameter_state = initialise(p, jr.PRNGKey(123))
-    params, _, _ = parameter_state.unpack()
+    params = p.init_params(jr.PRNGKey(123))
 
     if isinstance(lik, Bernoulli):
         assert sorted(list(params.keys())) == [
@@ -192,20 +205,3 @@ def test_posterior_construct(lik):
     p1 = pr * likelihood
     p2 = construct_posterior(prior=pr, likelihood=likelihood)
     assert type(p1) == type(p2)
-
-
-@pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
-def test_initialisation_override(kernel):
-    key = jr.PRNGKey(123)
-    override_params = {"lengthscale": jnp.array([0.5]), "variance": jnp.array([0.1])}
-    p = Prior(kernel=kernel) * Gaussian(num_datapoints=10)
-    parameter_state = initialise(p, key, kernel=override_params)
-    ds = parameter_state.unpack()
-    for d in ds:
-        assert "lengthscale" in d["kernel"].keys()
-        assert "variance" in d["kernel"].keys()
-    assert ds[0]["kernel"]["lengthscale"] == jnp.array([0.5])
-    assert ds[0]["kernel"]["variance"] == jnp.array([0.1])
-
-    with pytest.raises(ValueError):
-        parameter_state = initialise(p, key, keernel=override_params)

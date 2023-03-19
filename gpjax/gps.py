@@ -16,30 +16,33 @@
 from abc import abstractmethod
 from typing import Any, Callable, Dict, Optional
 
+import deprecation
 import distrax as dx
 import jax.numpy as jnp
-from jaxtyping import Array, Float
 from jax.random import KeyArray
-
-from jaxlinop import identity
 from jaxkern.base import AbstractKernel
-from jaxutils import PyTree
+from jaxlinop import identity
+from jaxtyping import Array, Float
+from jaxutils import Dataset, Identity, Parameters, PyTree
 
-from .config import get_global_config
-from .kernels import AbstractKernel
+from .gaussian_distribution import GaussianDistribution
 from .likelihoods import AbstractLikelihood, Conjugate, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
-from jaxutils import Dataset
-from .utils import concat_dictionaries
-from .gaussian_distribution import GaussianDistribution
-
-import deprecation
+from .objectives import (
+    AbstractObjective,
+    ConjugateMLL,
+    NonConjugateMLL,
+)
 
 
 class AbstractPrior(PyTree):
     """Abstract Gaussian process prior.
 
     All Gaussian processes priors should inherit from this class."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._jitter = 1e-6
 
     def __call__(self, *args: Any, **kwargs: Any) -> dx.Distribution:
         """Evaluate the Gaussian process at the given points. The output of this function
@@ -76,7 +79,7 @@ class AbstractPrior(PyTree):
         raise NotImplementedError
 
     @abstractmethod
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """An initialisation method for the GP's parameters. This method should
         be implemented for all classes that inherit the ``AbstractPrior`` class.
         Whilst not always necessary, the method accepts a PRNG key to allow
@@ -100,12 +103,18 @@ class AbstractPrior(PyTree):
         """Deprecated method for initialising the GP's parameters. Succeeded by ``init_params``."""
         return self.init_params(key)
 
+    @property
+    def jitter(self) -> float:
+        return self._jitter
+
+    @jitter.setter
+    def jitter(self, value: float):
+        self._jitter = value
+
 
 #######################
 # GP Priors
 #######################
-
-
 class Prior(AbstractPrior):
     """A Gaussian process prior object. The GP is parameterised by a
     `mean <https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.mean_functions>`_
@@ -143,6 +152,7 @@ class Prior(AbstractPrior):
                 prior. Defaults to zero.
             name (Optional[str]): The name of the GP prior. Defaults to "GP prior".
         """
+        super().__init__()
         self.kernel = kernel
         self.mean_function = mean_function
         self.name = name
@@ -225,29 +235,25 @@ class Prior(AbstractPrior):
             should be evaluated at. The mean function's value at these points is
             then returned.
         """
-        jitter = get_global_config()["jitter"]
 
         # Unpack mean function and kernel
         mean_function = self.mean_function
         kernel = self.kernel
 
-        def predict_fn(
-            test_inputs: Float[Array, "N D"]
-        ) -> GaussianDistribution:
-
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
             # Unpack test inputs
             t = test_inputs
             n_test = test_inputs.shape[0]
 
             μt = mean_function(params["mean_function"], t)
             Ktt = kernel.gram(params["kernel"], t)
-            Ktt += identity(n_test) * jitter
+            Ktt += identity(n_test) * self.jitter
 
             return GaussianDistribution(jnp.atleast_1d(μt.squeeze()), Ktt)
 
         return predict_fn
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """Initialise the GP prior's parameter set.
 
         Args:
@@ -256,10 +262,10 @@ class Prior(AbstractPrior):
         Returns:
             Dict: The initialised parameter set.
         """
-        return {
-            "kernel": self.kernel.init_params(key),
-            "mean_function": self.mean_function.init_params(key),
-        }
+        kernel = self.kernel.init_params(key)
+        meanf = self.mean_function.init_params(key)
+        params = kernel.combine(meanf, left_key="kernel", right_key="mean_function")
+        return params
 
 
 #######################
@@ -282,6 +288,7 @@ class AbstractPosterior(AbstractPrior):
             likelihood (AbstractLikelihood): The likelihood distribution of the observed dataset.
             name (Optional[str]): The name of the GP posterior. Defaults to "GP posterior".
         """
+        super().__init__()
         self.prior = prior
         self.likelihood = likelihood
         self.name = name
@@ -302,7 +309,10 @@ class AbstractPosterior(AbstractPrior):
         """
         raise NotImplementedError
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def loss_function(self) -> AbstractObjective:
+        raise NotImplementedError(f"No loss function defined for {self.name}.")
+
+    def init_params(self, key: KeyArray) -> Parameters:
         """Initialise the parameter set of a GP posterior.
 
         Args:
@@ -311,10 +321,13 @@ class AbstractPosterior(AbstractPrior):
         Returns:
             Dict: The initialised parameter set.
         """
-        return concat_dictionaries(
-            self.prior.init_params(key),
-            {"likelihood": self.likelihood.init_params(key)},
+        prior_params = self.prior.init_params(key)
+        likelihood_params = self.likelihood.init_params(key)
+        prior_params.add_parameter(
+            key="likelihood",
+            parameter=likelihood_params,
         )
+        return prior_params
 
 
 class ConjugatePosterior(AbstractPosterior):
@@ -363,8 +376,7 @@ class ConjugatePosterior(AbstractPosterior):
             likelihood (AbstractLikelihood): The likelihood distribution of the observed dataset.
             name (Optional[str]): The name of the GP posterior. Defaults to "GP posterior".
         """
-        self.prior = prior
-        self.likelihood = likelihood
+        super().__init__(prior=prior, likelihood=likelihood)
         self.name = name
 
     def predict(
@@ -417,8 +429,6 @@ class ConjugatePosterior(AbstractPosterior):
                 function that accepts an input array and returns the predictive
                 distribution as a ``GaussianDistribution``.
         """
-        jitter = get_global_config()["jitter"]
-
         # Unpack training data
         x, y, n = train_data.X, train_data.y, train_data.n
 
@@ -432,7 +442,7 @@ class ConjugatePosterior(AbstractPosterior):
 
         # Precompute Gram matrix, Kxx, at training inputs, x
         Kxx = kernel.gram(params["kernel"], x)
-        Kxx += identity(n) * jitter
+        Kxx += identity(n) * self.jitter
 
         # Σ = Kxx + Iσ²
         Sigma = Kxx + identity(n) * obs_noise
@@ -464,128 +474,14 @@ class ConjugatePosterior(AbstractPosterior):
 
             # Ktt  -  Ktx (Kxx + Iσ²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
             covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
-            covariance += identity(n_test) * jitter
+            covariance += identity(n_test) * self.jitter
 
-            return GaussianDistribution(
-                jnp.atleast_1d(mean.squeeze()), covariance
-            )
+            return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict
 
-    def marginal_log_likelihood(
-        self,
-        train_data: Dataset,
-        negative: bool = False,
-    ) -> Callable[[Dict], Float[Array, "1"]]:
-        """Compute the marginal log-likelihood function of the Gaussian process.
-        The returned function can then be used for gradient based optimisation
-        of the model's parameters or for model comparison. The implementation
-        given here enables exact estimation of the Gaussian process' latent
-        function values.
-
-        For a training dataset :math:`\\{x_n, y_n\\}_{n=1}^N`, set of test
-        inputs :math:`\\mathbf{x}^{\\star}` the corresponding latent function
-        evaluations are given by :math:`\\mathbf{f} = f(\\mathbf{x})`
-        and :math:`\\mathbf{f}^{\\star} = f(\\mathbf{x}^{\\star})`, the marginal
-        log-likelihood is given by:
-
-        .. math::
-
-            \\log p(\\mathbf{y}) & = \\int p(\\mathbf{y}\\mid\\mathbf{f})p(\\mathbf{f}, \\mathbf{f}^{\\star}\\mathrm{d}\\mathbf{f}^{\\star}\\\\
-            &=0.5\\left(-\\mathbf{y}^{\\top}\\left(k(\\mathbf{x}, \\mathbf{x}') +\\sigma^2\\mathbf{I}_N  \\right)^{-1}\\mathbf{y}-\\log\\lvert k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_N\\rvert - n\\log 2\\pi \\right).
-
-        Example:
-
-        For a given ``ConjugatePosterior`` object, the following code snippet shows
-        how the marginal log-likelihood can be evaluated.
-
-        >>> import gpjax as gpx
-        >>>
-        >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
-        >>> ytrain = jnp.sin(xtrain)
-        >>> D = gpx.Dataset(X=xtrain, y=ytrain)
-        >>>
-        >>> params = gpx.initialise(posterior)
-        >>> mll = posterior.marginal_log_likelihood(train_data = D)
-        >>> mll(params)
-
-        Our goal is to maximise the marginal log-likelihood. Therefore, when
-        optimising the model's parameters with respect to the parameters, we
-        use the negative marginal log-likelihood. This can be realised through
-
-        >>> mll = posterior.marginal_log_likelihood(train_data = D, negative=True)
-
-        Further, prior distributions can be passed into the marginal log-likelihood
-
-        >>> mll = posterior.marginal_log_likelihood(train_data = D)
-
-        For optimal performance, the marginal log-likelihood should be ``jax.jit``
-        compiled.
-
-        >>> mll = jit(posterior.marginal_log_likelihood(train_data = D))
-
-        Args:
-            train_data (Dataset): The training dataset used to compute the
-                marginal log-likelihood.
-            negative (Optional[bool]): Whether or not the returned function
-                should be negative. For optimisation, the negative is useful
-                as minimisation of the negative marginal log-likelihood is
-                equivalent to maximisation of the marginal log-likelihood.
-                Defaults to False.
-
-        Returns:
-            Callable[[Dict], Float[Array, "1"]]: A functional representation
-                of the marginal log-likelihood that can be evaluated at a
-                given parameter set.
-        """
-        jitter = get_global_config()["jitter"]
-
-        # Unpack training data
-        x, y, n = train_data.X, train_data.y, train_data.n
-
-        # Unpack mean function and kernel
-        mean_function = self.prior.mean_function
-        kernel = self.prior.kernel
-
-        # The sign of the marginal log-likelihood depends on whether we are maximising or minimising
-        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-
-        def mll(
-            params: Dict,
-        ):
-            """Compute the marginal log-likelihood of the Gaussian process.
-
-            Args:
-                params (Dict): The model's parameters.
-
-            Returns:
-                Float[Array, "1"]: The marginal log-likelihood.
-            """
-
-            # Observation noise σ²
-            obs_noise = params["likelihood"]["obs_noise"]
-            μx = mean_function(params["mean_function"], x)
-
-            # TODO: This implementation does not take advantage of the covariance operator structure.
-            # Future work concerns implementation of a custom Gaussian distribution / measure object that accepts a covariance operator.
-
-            # Σ = (Kxx + Iσ²) = LLᵀ
-            Kxx = kernel.gram(params["kernel"], x)
-            Kxx += identity(n) * jitter
-            Sigma = Kxx + identity(n) * obs_noise
-
-            # p(y | x, θ), where θ are the model hyperparameters:
-            marginal_likelihood = GaussianDistribution(
-                jnp.atleast_1d(μx.squeeze()), Sigma
-            )
-
-            return constant * (
-                marginal_likelihood.log_prob(
-                    jnp.atleast_1d(y.squeeze())
-                ).squeeze()
-            )
-
-        return mll
+    def loss_function(self) -> ConjugateMLL:
+        return ConjugateMLL(posterior=self, negative=True)
 
 
 class NonConjugatePosterior(AbstractPosterior):
@@ -613,27 +509,29 @@ class NonConjugatePosterior(AbstractPosterior):
             likelihood (AbstractLikelihood): The likelihood function that represents the data.
             name (Optional[str]): The name of the posterior object. Defaults to "GP posterior".
         """
-        self.prior = prior
-        self.likelihood = likelihood
+        super().__init__(prior=prior, likelihood=likelihood)
         self.name = name
 
-    def init_params(self, key: KeyArray) -> Dict:
+    def init_params(self, key: KeyArray) -> Parameters:
         """Initialise the parameter set of a non-conjugate GP posterior.
 
         Args:
             key (KeyArray): A PRNG key used to initialise the parameters.
 
         Returns:
-            Dict: A dictionary containing the default parameter set.
+            DParametersict: A `Parameters` object containing the default parameter set.
         """
-        parameters = concat_dictionaries(
-            self.prior.init_params(key),
-            {"likelihood": self.likelihood.init_params(key)},
+        params = self.prior.init_params(key)
+        likelihood_params = self.likelihood.init_params(key)
+        params.add_parameter(key="likelihood", parameter=likelihood_params)
+        params.add_parameter(
+            "latent",
+            value=jnp.zeros(shape=(self.likelihood.num_datapoints, 1)),
+            prior=dx.Normal(0.0, 1.0),
+            trainability=True,
+            bijector=Identity,
         )
-        parameters["latent"] = jnp.zeros(
-            shape=(self.likelihood.num_datapoints, 1)
-        )
-        return parameters
+        return params
 
     def predict(
         self,
@@ -659,8 +557,6 @@ class NonConjugatePosterior(AbstractPosterior):
                 input array and returns the predictive distribution as
                 a ``dx.Distribution``.
         """
-        jitter = get_global_config()["jitter"]
-
         # Unpack training data
         x, n = train_data.X, train_data.n
 
@@ -670,7 +566,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
         # Precompute lower triangular of Gram matrix, Lx, at training inputs, x
         Kxx = kernel.gram(params["kernel"], x)
-        Kxx += identity(n) * jitter
+        Kxx += identity(n) * self.jitter
         Lx = Kxx.to_root()
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
@@ -688,7 +584,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
             # Compute terms of the posterior predictive distribution
             Ktx = kernel.cross_covariance(params["kernel"], t, x)
-            Ktt = kernel.gram(params["kernel"], t) + identity(n_test) * jitter
+            Ktt = kernel.gram(params["kernel"], t) + identity(n_test) * self.jitter
             μt = mean_function(params["mean_function"], t)
 
             # Lx⁻¹ Kxt
@@ -702,99 +598,14 @@ class NonConjugatePosterior(AbstractPosterior):
 
             # Ktt - Ktx Kxx⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
             covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
-            covariance += identity(n_test) * jitter
+            covariance += identity(n_test) * self.jitter
 
-            return GaussianDistribution(
-                jnp.atleast_1d(mean.squeeze()), covariance
-            )
+            return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict_fn
 
-    def marginal_log_likelihood(
-        self,
-        train_data: Dataset,
-        negative: bool = False,
-    ) -> Callable[[Dict], Float[Array, "1"]]:
-        """
-        Compute the marginal log-likelihood function of the Gaussian process.
-        The returned function can then be used for gradient based optimisation
-        of the model's parameters or for model comparison. The implementation
-        given here is general and will work for any likelihood support by GPJax.
-
-        Unlike the marginal_log_likelihood function of the ConjugatePosterior
-        object, the marginal_log_likelihood function of the
-        ``NonConjugatePosterior`` object does not provide an exact marginal
-        log-likelihood function. Instead, the ``NonConjugatePosterior`` object
-        represents the posterior distributions as a function of the model's
-        hyperparameters and the latent function. Markov chain Monte Carlo,
-        variational inference, or Laplace approximations can then be used to
-        sample from, or optimise an approximation to, the posterior
-        distribution.
-
-        Args:
-            train_data (Dataset): The training dataset used to compute the
-                marginal log-likelihood.
-            negative (Optional[bool]): Whether or not the returned function
-                should be negative. For optimisation, the negative is useful as
-                minimisation of the negative marginal log-likelihood is equivalent
-                to maximisation of the marginal log-likelihood. Defaults to False.
-
-        Returns:
-            Callable[[Dict], Float[Array, "1"]]: A functional representation
-                of the marginal log-likelihood that can be evaluated at a given
-                parameter set.
-        """
-        jitter = get_global_config()["jitter"]
-
-        # Unpack dataset
-        x, y, n = train_data.X, train_data.y, train_data.n
-
-        # Unpack mean function and kernel
-        mean_function = self.prior.mean_function
-        kernel = self.prior.kernel
-
-        # Link function of the likelihood
-        link_function = self.likelihood.link_function
-
-        # The sign of the marginal log-likelihood depends on whether we are maximising or minimising
-        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
-
-        def mll(params: Dict):
-            """Compute the marginal log-likelihood of the model.
-
-            Args:
-                params (Dict): A dictionary of parameters that should be used
-                    to compute the marginal log-likelihood.
-
-            Returns:
-                Float[Array, "1"]: The marginal log-likelihood of the model.
-            """
-
-            # Compute lower triangular of the kernel Gram matrix
-            Kxx = kernel.gram(params["kernel"], x)
-            Kxx += identity(n) * jitter
-            Lx = Kxx.to_root()
-
-            # Compute the prior mean function
-            μx = mean_function(params["mean_function"], x)
-
-            # Whitened function values, wx, corresponding to the inputs, x
-            wx = params["latent"]
-
-            # f(x) = μx  +  Lx wx
-            fx = μx + Lx @ wx
-
-            # p(y | f(x), θ), where θ are the model hyperparameters
-            likelihood = link_function(params, fx)
-
-            # Whitened latent function values prior, p(wx | θ) = N(0, I)
-            latent_prior = dx.Normal(loc=0.0, scale=1.0)
-
-            return constant * (
-                likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum()
-            )
-
-        return mll
+    def loss_function(self) -> NonConjugateMLL:
+        return NonConjugateMLL(posterior=self, negative=True)
 
 
 def construct_posterior(

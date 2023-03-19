@@ -32,7 +32,7 @@ from jax.config import config
 from scipy.signal import sawtooth
 from jaxtyping import Float, Array
 from typing import Dict
-from jaxutils import Dataset
+from jaxutils import Dataset, Parameters, fit
 import jaxkern as jk
 
 
@@ -54,12 +54,13 @@ key = jr.PRNGKey(123)
 n = 500
 noise = 0.2
 
-x = (
-    jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n,))
-    .sort()
-    .reshape(-1, 1)
-)
-f = lambda x: jnp.asarray(sawtooth(2 * jnp.pi * x))
+x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n,)).sort().reshape(-1, 1)
+
+
+def f(x):
+    return jnp.asarray(sawtooth(2 * jnp.pi * x))
+
+
 signal = f(x)
 y = signal + jr.normal(key, shape=signal.shape) * noise
 
@@ -84,6 +85,7 @@ ax.legend(loc="best")
 #
 # Although deep kernels are not currently supported natively in GPJax, defining one is straightforward as we now demonstrate. Using the base `AbstractKernel` object given in GPJax, we provide a mixin class named `_DeepKernelFunction` to facilitate the user supplying the neural network and base kernel of their choice. Kernel matrices are then computed using the regular `gram` and `cross_covariance` functions.
 
+
 # %%
 class DeepKernelFunction(AbstractKernel):
     def __init__(
@@ -94,7 +96,7 @@ class DeepKernelFunction(AbstractKernel):
         active_dims: tp.Optional[tp.List[int]] = None,
     ) -> None:
         super().__init__(
-            compute_engine, active_dims, True, False, "Deep    Kernel"
+            compute_engine=compute_engine, active_dims=active_dims, name="Deep Kernel"
         )
         self.network = network
         self.base_kernel = base_kernel
@@ -105,16 +107,16 @@ class DeepKernelFunction(AbstractKernel):
         x: Float[Array, "1 D"],
         y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
-        xt = self.network.apply(params=params, x=x)
-        yt = self.network.apply(params=params, x=y)
-        return self.base_kernel(params, xt, yt)
+        xt = self.network.apply(params=params["network"], x=x)
+        yt = self.network.apply(params=params["network"], x=y)
+        return self.base_kernel(params["base"], xt, yt)
 
-    def initialise(
-        self, dummy_x: Float[Array, "1 D"], key: jr.KeyArray
-    ) -> None:
-        nn_params = self.network.init(rng=key, x=dummy_x)
+    def initialise(self, dummy_x: Float[Array, "1 D"], key: jr.KeyArray) -> None:
+        nn_params = Parameters(self.network.init(rng=key, x=dummy_x))
         base_kernel_params = self.base_kernel.init_params(key)
-        self._params = {**nn_params, **base_kernel_params}
+        self._params = base_kernel_params.combine(
+            nn_params, left_key="base", right_key="network"
+        )
 
     def init_params(self, key: jr.KeyArray) -> Dict:
         return self._params
@@ -129,6 +131,7 @@ class DeepKernelFunction(AbstractKernel):
 #
 # With a deep kernel object created, we proceed to define a neural network. Here we consider a small multi-layer perceptron with two linear hidden layers and ReLU activation functions between the layers. The first hidden layer contains 32 units, while the second layer contains 64 units. Finally, we'll make the output of our network a single unit. However, it would be possible to project our data into a $d-$dimensional space for $d>1$. In these instances, making the [base kernel ARD](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html#Active-dimensions) would be sensible.
 # Users may wish to design more intricate network structures for more complex tasks, which functionality is supported well in Haiku.
+
 
 # %%
 def forward(x):
@@ -168,15 +171,10 @@ posterior = prior * likelihood
 # With the inclusion of a neural network, we take this opportunity to highlight the additional benefits gleaned from using [Optax](https://optax.readthedocs.io/en/latest/) for optimisation. In particular, we showcase the ability to use a learning rate scheduler that decays the optimiser's learning rate throughout the inference. We decrease the learning rate according to a half-cosine curve over 1000 iterations, providing us with large step sizes early in the optimisation procedure before approaching more conservative values, ensuring we do not step too far. We also consider a linear warmup, where the learning rate is increased from 0 to 1 over 50 steps to get a reasonable initial learning rate value.
 
 # %%
-parameter_state = gpx.initialise(posterior, key)
 
-negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
+params = posterior.init_params(key)
 
-# %%
-parameter_state = gpx.initialise(posterior, key)
-
-negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
-negative_mll(parameter_state.params)
+negative_mll = gpx.ConjugateMLL(posterior, negative=True)
 
 schedule = ox.warmup_cosine_decay_schedule(
     init_value=0.0,
@@ -191,14 +189,13 @@ optimiser = ox.chain(
     ox.adamw(learning_rate=schedule),
 )
 
-inference_state = gpx.fit(
+learned_params = fit(
+    params=params,
     objective=negative_mll,
-    parameter_state=parameter_state,
-    optax_optim=optimiser,
+    train_data=D,
+    optim=optimiser,
     num_iters=2500,
 )
-
-learned_params, training_history = inference_state.unpack()
 
 # %% [markdown]
 # ## Prediction

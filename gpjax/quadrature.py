@@ -16,8 +16,8 @@
 from typing import Callable, Optional
 
 import jax.numpy as jnp
-import numpy as np
 from jaxtyping import Array, Float
+import numpy as np
 
 """The number of Gauss-Hermite points to use for quadrature"""
 DEFAULT_NUM_GAUSS_HERMITE_POINTS = 20

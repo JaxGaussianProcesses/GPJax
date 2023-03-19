@@ -33,7 +33,7 @@ from jax.config import config
 from jaxtyping import Array, Float
 from optax import adam
 from typing import Dict
-from jaxutils import Dataset
+from jaxutils import Dataset, Parameters, fit
 import jaxkern as jk
 
 import gpjax as gpx
@@ -71,7 +71,7 @@ x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 
 for k, ax in zip(kernels, axes.ravel()):
     prior = gpx.Prior(kernel=k)
-    params, *_ = gpx.initialise(prior, key).unpack()
+    params = prior.init_params(key)
     rv = prior(params)(x)
     y = rv.sample(seed=key, sample_shape=(10,))
     ax.plot(x, y.T, alpha=0.7)
@@ -199,7 +199,11 @@ prod_k = jk.ProductKernel(kernel_set=[k1, k2, k3])
 #
 # To implement this, one must write the following class.
 
+
 # %%
+from jax.nn import softplus
+
+
 def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
 
@@ -219,11 +223,15 @@ class Polar(jk.base.AbstractKernel):
         return K.squeeze()
 
     def init_params(self, key: jr.KeyArray) -> dict:
-        return {"tau": jnp.array([4.0])}
+        # Define the custom bijection.
+        def bij_fn(x):
+            return softplus(x + jnp.array(4.0))
 
-    # This is depreciated. Can be removed once JaxKern is updated.
-    def _initialise_params(self, key: jr.KeyArray) -> Dict:
-        return self.init_params(key)
+        bij = dx.Lambda(
+            forward=bij_fn, inverse=lambda y: -jnp.log(-jnp.expm1(-y - 4.0)) + y - 4.0
+        )
+
+        return Parameters(params={"tau": jnp.array([4.0])}, bijectors={"tau": bij})
 
 
 # %% [markdown]
@@ -234,16 +242,9 @@ class Polar(jk.base.AbstractKernel):
 # the Kernel's parameter property which contains just one value $\tau$ that we
 # initialise to 4 in the kernel's `__init__`.
 #
-#
-# ### Custom Parameter Bijection
-#
 # The constraint on $\tau$ makes optimisation challenging with gradient descent.
 # It would be much easier if we could instead parameterise $\tau$ to be on the
-# real line. Fortunately, this can be taken care of with GPJax's `add parameter`
-# function, only requiring us to define the parameter's name and matching
-# bijection (either a Distrax of TensorFlow probability bijector). Under the
-# hood, calling this function updates a configuration object to register this
-# parameter and its corresponding transform.
+# real line. Fortunately, this can be taken care of with `bijectors` field in the `Parameters` class.
 #
 # To define a bijector here we'll make use of the `Lambda` operator given in
 # Distrax. This lets us convert any regular Jax function into a bijection. Given
@@ -251,17 +252,6 @@ class Polar(jk.base.AbstractKernel):
 # [softplus
 # transformation](https://jax.readthedocs.io/en/latest/_autosummary/jax.nn.softplus.html)
 # where the lower bound is shifted by $4$.
-
-# %%
-from jax.nn import softplus
-from gpjax.config import add_parameter
-
-bij_fn = lambda x: softplus(x + jnp.array(4.0))
-bij = dx.Lambda(
-    forward=bij_fn, inverse=lambda y: -jnp.log(-jnp.expm1(-y - 4.0)) + y - 4.0
-)
-
-add_parameter("tau", bij)
 
 # %% [markdown]
 # ### Using our polar kernel
@@ -285,20 +275,19 @@ likelihood = gpx.Gaussian(num_datapoints=n)
 circlular_posterior = gpx.Prior(kernel=PKern) * likelihood
 
 # Initialise parameter state:
-parameter_state = gpx.initialise(circlular_posterior, key)
+params = circlular_posterior.init_params(key)
 
 # Optimise GP's marginal log-likelihood using Adam
-negative_mll = jit(circlular_posterior.marginal_log_likelihood(D, negative=True))
+negative_mll = jit(gpx.ConjugateMLL(circlular_posterior, negative=True))
 optimiser = adam(learning_rate=0.05)
 
-inference_state = gpx.fit(
+learned_params = fit(
+    params=params,
     objective=negative_mll,
-    parameter_state=parameter_state,
-    optax_optim=optimiser,
+    train_data=D,
+    optim=optimiser,
     num_iters=1000,
 )
-
-learned_params, training_history = inference_state.unpack()
 
 # %% [markdown]
 # ### Prediction

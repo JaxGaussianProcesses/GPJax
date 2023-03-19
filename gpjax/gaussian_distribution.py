@@ -13,17 +13,15 @@
 # limitations under the License.
 # ==============================================================================
 
-import jax.numpy as jnp
-from jaxlinop import LinearOperator, IdentityLinearOperator
-
-from jaxtyping import Array, Float
-from jax import vmap
-
-from typing import Tuple, Optional, Any
+from typing import Any, Optional, Tuple
 
 import distrax as dx
+from jax import vmap
+import jax.numpy as jnp
 import jax.random as jr
 from jax.random import KeyArray
+from jaxlinop import IdentityLinearOperator, LinearOperator
+from jaxtyping import Array, Float
 
 
 def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
@@ -70,6 +68,7 @@ class GaussianDistribution(dx.Distribution):
 
     Returns:
         GaussianDistribution: A multivariate Gaussian distribution with a linear operator scale matrix.
+
     """
 
     # TODO: Consider `distrax.transformed.Transformed` object. Can we create a LinearOperator to `distrax.bijector` representation
@@ -147,6 +146,7 @@ class GaussianDistribution(dx.Distribution):
 
         Returns:
             Float[Array, "1"]: The log probability of the value.
+
         """
         mu = self.loc
         sigma = self.scale
@@ -168,6 +168,7 @@ class GaussianDistribution(dx.Distribution):
 
         Returns:
             Float[Array, "n N"]: The samples.
+
         """
         # Obtain covariance root.
         sqrt = self.scale.to_root()
@@ -176,7 +177,8 @@ class GaussianDistribution(dx.Distribution):
         Z = jr.normal(key, shape=(n, *self.event_shape))
 
         # xᵢ ~ N(loc, cov) <=> xᵢ = loc + sqrt zᵢ, where zᵢ ~ N(0, I).
-        affine_transformation = lambda x: self.loc + sqrt @ x
+        def affine_transformation(x):
+            return self.loc + sqrt @ x
 
         return vmap(affine_transformation)(Z)
 

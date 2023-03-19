@@ -1,0 +1,14 @@
+[tool.ruff]
+line-length = 88
+update-check = false
+ignore = ["F722"]
+
+[tool.isort]
+profile = "black"
+force_sort_within_sections = true  # Don't group `from` imports separately
+order_by_type = true  # Order by CONSTANT, CamelCase, snake_case
+
+[tool.docformatter]
+recursive = true
+wrap-summaries = 88
+blank = true

@@ -17,3 +17,4 @@ ignore:
   - "**/_version.py"
   - "**/versioneer.py"
   - "versioneer.py"
+  - "gpjax/_version.py"

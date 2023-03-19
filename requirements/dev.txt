@@ -3,5 +3,5 @@ isort
 pylint
 flake8
 pytest
-networkx
+networkx>=3.0
 pytest-cov
