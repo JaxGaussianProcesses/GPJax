@@ -32,11 +32,7 @@ from gpjax.gps import (
     Prior,
     construct_posterior,
 )
-from gpjax.objectives import (
-    AbstractObjective,
-    ConjugateMLL,
-    NonConjugateMLL
-)
+from gpjax.objectives import AbstractObjective, ConjugateMLL, NonConjugateMLL
 from jaxkern import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian
 

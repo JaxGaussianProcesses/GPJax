@@ -271,7 +271,7 @@ class CollapsedVI(AbstractVariationalInference):
             )
 
             # (y - μx)ᵀ (Iσ² + Q)⁻¹ (y - μx)
-            quad = (jnp.sum(diff ** 2) - jnp.sum(L_inv_A_diff ** 2)) / noise
+            quad = (jnp.sum(diff**2) - jnp.sum(L_inv_A_diff**2)) / noise
 
             # 2 * log N(y; μx, Iσ² + Q)
             two_log_prob = -n * jnp.log(2.0 * jnp.pi * noise) - log_det_B - quad

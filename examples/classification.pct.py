@@ -176,7 +176,9 @@ Lx = Kxx.to_root()
 f_hat = Lx @ map_estimate["latent"]
 
 # Negative Hessian,  H = -∇²p_tilde(y|f):
-H = jax.jacfwd(jax.jacrev(negative_mll))(map_estimate, D)["latent"]["latent"][:, 0, :, 0]
+H = jax.jacfwd(jax.jacrev(negative_mll))(map_estimate, D)["latent"]["latent"][
+    :, 0, :, 0
+]
 
 # LLᵀ = H
 L = jnp.linalg.cholesky(H + I(D.n) * jitter)

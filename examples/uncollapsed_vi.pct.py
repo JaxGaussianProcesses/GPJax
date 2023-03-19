@@ -39,12 +39,12 @@ import gpjax as gpx
 
 # Due to an issue with Distrax, for Apple's silicon chips Float64 cannot be used in
 # conjunction with TensorFlow bijectors (as is done in this notebook)
-if sys.platform != 'darwin':
+if sys.platform != "darwin":
     # Enable Float64 for more stable matrix inversions.
     config.update("jax_enable_x64", True)
-    jitter=1e-6
+    jitter = 1e-6
 else:
-    jitter=1e-4
+    jitter = 1e-4
 key = jr.PRNGKey(123)
 
 # %% [markdown]
@@ -144,7 +144,7 @@ prior = gpx.Prior(kernel=jk.RBF())
 p = prior * likelihood
 p.jitter = jitter
 q = gpx.VariationalGaussian(prior=prior, inducing_inputs=z)
-q.jitter=jitter
+q.jitter = jitter
 # %% [markdown]
 # Here, the variational process $q(\cdot)$ depends on the prior through $p(f(\cdot)|f(\boldsymbol{z}))$ in $(\times)$.
 
@@ -178,12 +178,12 @@ optimiser = ox.adam(learning_rate=0.05)
 
 learned_params = fit(
     params=params,
-    objective = negative_elbo,
+    objective=negative_elbo,
     train_data=D,
     optim=optimiser,
     num_iters=3000,
     key=jr.PRNGKey(123),
-    batch_size=256
+    batch_size=256,
 )
 # %% [markdown]
 # ## Predictions
@@ -220,7 +220,9 @@ triangular_transform = dx.Chain(
     [tfb.FillScaleTriL(diag_bijector=tfb.Square(), diag_shift=jnp.array(p.jitter))]
 )
 
-transforms['variational_family']['moments']['variational_root_covariance']=triangular_transform
+transforms["variational_family"]["moments"][
+    "variational_root_covariance"
+] = triangular_transform
 params.update_bijectors(transforms)
 
 # %%
@@ -230,12 +232,12 @@ optimiser = ox.adam(learning_rate=0.05)
 
 learned_params = fit(
     params=params,
-    objective = negative_elbo,
+    objective=negative_elbo,
     train_data=D,
     optim=optimiser,
     num_iters=3000,
     key=jr.PRNGKey(123),
-    batch_size=256
+    batch_size=256,
 )
 
 # %%

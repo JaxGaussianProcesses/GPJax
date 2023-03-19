@@ -167,7 +167,11 @@ def fit_gp(x: jax.Array, y: jax.Array) -> dx.MultivariateNormalTri:
     # )
 
     learned_params = fit(
-        params=params, objective=negative_mll, train_data=D, optim=optimiser, num_iters=500
+        params=params,
+        objective=negative_mll,
+        train_data=D,
+        optim=optimiser,
+        num_iters=500,
     )
 
     return likelihood(learned_params, posterior(learned_params, D)(xtest))

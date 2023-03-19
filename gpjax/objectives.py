@@ -24,7 +24,7 @@ from .quadrature import gauss_hermite_quadrature
 class AbstractObjective(metaclass=ABCMeta):
     def __init__(
         self,
-        posterior:"AbstractPosterior",
+        posterior: "AbstractPosterior",
         negative: bool,
         name: str = "Abstract Objective",
     ) -> None:
@@ -49,7 +49,7 @@ class AbstractObjective(metaclass=ABCMeta):
 class ConjugateMLL(AbstractObjective):
     def __init__(
         self,
-        posterior:"ConjugatePosterior",
+        posterior: "ConjugatePosterior",
         negative: bool,
         name: str = "Conjugate Marginal Log Likelihood",
     ) -> None:
@@ -149,7 +149,7 @@ class ConjugateMLL(AbstractObjective):
 class NonConjugateMLL(AbstractObjective):
     def __init__(
         self,
-        posterior:"NonConjugatePosterior",
+        posterior: "NonConjugatePosterior",
         negative: bool,
         name: str = "Non-conjugate Marginal Log Likelihood",
     ) -> None:
@@ -225,7 +225,6 @@ class ELBO(AbstractObjective):
         negative: bool,
         name: str = "Evidence lower bound",
     ) -> None:
-
         super().__init__(variational_family, negative, name)
         self.num_datapoints = num_datapoints
         self.posterior = posterior

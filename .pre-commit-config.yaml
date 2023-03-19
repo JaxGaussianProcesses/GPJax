@@ -1,16 +1,11 @@
 repos:
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.254'
-    hooks:
-      - id: ruff
-        args: ['--fix']
+  # - repo: https://github.com/charliermarsh/ruff-pre-commit
+  #   rev: 'v0.0.254'
+  #   hooks:
+  #     - id: ruff
+  #       args: ['--fix']
   - repo: local
     hooks:
-      - id: check-toml
-        name: Check Toml
-        entry: check-toml
-        language: system
-        types: [toml]
       - id: darglint
         name: darglint
         entry: darglint

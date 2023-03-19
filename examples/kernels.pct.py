@@ -203,6 +203,7 @@ prod_k = jk.ProductKernel(kernel_set=[k1, k2, k3])
 # %%
 from jax.nn import softplus
 
+
 def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
 
@@ -225,11 +226,12 @@ class Polar(jk.base.AbstractKernel):
         # Define the custom bijection.
         def bij_fn(x):
             return softplus(x + jnp.array(4.0))
+
         bij = dx.Lambda(
             forward=bij_fn, inverse=lambda y: -jnp.log(-jnp.expm1(-y - 4.0)) + y - 4.0
         )
-        
-        return Parameters(params={"tau": jnp.array([4.0])}, bijectors={'tau': bij})
+
+        return Parameters(params={"tau": jnp.array([4.0])}, bijectors={"tau": bij})
 
 
 # %% [markdown]
@@ -242,7 +244,7 @@ class Polar(jk.base.AbstractKernel):
 #
 # The constraint on $\tau$ makes optimisation challenging with gradient descent.
 # It would be much easier if we could instead parameterise $\tau$ to be on the
-# real line. Fortunately, this can be taken care of with `bijectors` field in the `Parameters` class. 
+# real line. Fortunately, this can be taken care of with `bijectors` field in the `Parameters` class.
 #
 # To define a bijector here we'll make use of the `Lambda` operator given in
 # Distrax. This lets us convert any regular Jax function into a bijection. Given

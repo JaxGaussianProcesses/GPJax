@@ -95,7 +95,9 @@ class DeepKernelFunction(AbstractKernel):
         compute_engine: AbstractKernelComputation = DenseKernelComputation,
         active_dims: tp.Optional[tp.List[int]] = None,
     ) -> None:
-        super().__init__(compute_engine=compute_engine, active_dims=active_dims, name="Deep Kernel")
+        super().__init__(
+            compute_engine=compute_engine, active_dims=active_dims, name="Deep Kernel"
+        )
         self.network = network
         self.base_kernel = base_kernel
 
@@ -105,14 +107,16 @@ class DeepKernelFunction(AbstractKernel):
         x: Float[Array, "1 D"],
         y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
-        xt = self.network.apply(params=params['network'], x=x)
-        yt = self.network.apply(params=params['network'], x=y)
-        return self.base_kernel(params['base'], xt, yt)
+        xt = self.network.apply(params=params["network"], x=x)
+        yt = self.network.apply(params=params["network"], x=y)
+        return self.base_kernel(params["base"], xt, yt)
 
     def initialise(self, dummy_x: Float[Array, "1 D"], key: jr.KeyArray) -> None:
         nn_params = Parameters(self.network.init(rng=key, x=dummy_x))
         base_kernel_params = self.base_kernel.init_params(key)
-        self._params = base_kernel_params.combine(nn_params, left_key = 'base', right_key = 'network')
+        self._params = base_kernel_params.combine(
+            nn_params, left_key="base", right_key="network"
+        )
 
     def init_params(self, key: jr.KeyArray) -> Dict:
         return self._params
