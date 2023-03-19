@@ -14,47 +14,109 @@
 # ==============================================================================
 
 import pytest
+import jax.tree_util as jtu
 import jax.numpy as jnp
 from jaxlinop.linear_operator import LinearOperator
+from dataclasses import dataclass
+from simple_pytree import static_field
 
 
 def test_covariance_operator() -> None:
     with pytest.raises(TypeError):
-        LinearOperator(shape=(1, 1), dtype=jnp.float32)
+        LinearOperator()
+
+@pytest.mark.parametrize("is_dataclass", [True, False])
+@pytest.mark.parametrize("shape", [(1, 1), (2, 3), (4, 5, 6)])
+@pytest.mark.parametrize("dtype", [jnp.float32, jnp.float64])
+def test_instantiate_no_attributes(is_dataclass, shape, dtype) -> None:
+    """Test if the abstract operator can be instantiated, given the abstract methods."""
+
+    class DummyLinearOperator(LinearOperator):
+        def diagonal(self, *args, **kwargs):
+            pass
+
+        def shape(self, *args, **kwargs):
+            pass
+
+        def dtype(self, *args, **kwargs):
+            pass
+
+        def __mul__(self, *args, **kwargs):
+            """Multiply linear operator by scalar."""
+
+        def _add_diagonal(self, *args, **kwargs):
+            pass
+
+        def __matmul__(self, *args, **kwargs):
+            """Matrix multiplication."""
+
+        def to_dense(self, *args, **kwargs):
+            pass
+
+        @classmethod
+        def from_dense(cls, *args, **kwargs):
+            pass
+
+    if is_dataclass:
+        dataclass(DummyLinearOperator)
+
+    linop = DummyLinearOperator(shape=shape, dtype=dtype)
+    assert isinstance(linop, DummyLinearOperator)
+    assert isinstance(linop, LinearOperator)
+    assert linop.shape == shape
+    assert linop.dtype == dtype
+    assert jtu.tree_leaves(linop) == [] # shape and dtype are static!
 
 
-class DummyLinearOperator(LinearOperator):
-    def diagonal(self, *args, **kwargs):
-        pass
+@pytest.mark.parametrize("is_dataclass", [True, False])
+@pytest.mark.parametrize("shape", [(1, 1), (2, 3), (4, 5, 6)])
+@pytest.mark.parametrize("dtype", [jnp.float32, jnp.float64])
+def test_instantiate_with_attributes(is_dataclass, shape, dtype) -> None:
+    """Test if the covariance operator can be instantiated with attribute annotations."""
 
-    def shape(self, *args, **kwargs):
-        pass
+    class DummyLinearOperator(LinearOperator):
+        a: int
+        b: int = static_field() # Lets have a static attribute here.
+        c: int
 
-    def dtype(self, *args, **kwargs):
-        pass
+        def __init__(self, shape, dtype, a=1, b=2, c=3):
+            self.a = a
+            self.b = b
+            self.c = c
+            self.shape = shape
+            self.dtype = dtype
 
-    def __mul__(self, *args, **kwargs):
-        """Multiply linear operator by scalar."""
+        def diagonal(self, *args, **kwargs):
+            pass
 
-    def _add_diagonal(self, *args, **kwargs):
-        pass
+        def shape(self, *args, **kwargs):
+            pass
 
-    def __matmul__(self, *args, **kwargs):
-        """Matrix multiplication."""
+        def dtype(self, *args, **kwargs):
+            pass
 
-    def to_dense(self, *args, **kwargs):
-        pass
+        def __mul__(self, *args, **kwargs):
+            """Multiply linear operator by scalar."""
 
-    @classmethod
-    def from_dense(self, *args, **kwargs):
-        pass
+        def _add_diagonal(self, *args, **kwargs):
+            pass
 
+        def __matmul__(self, *args, **kwargs):
+            """Matrix multiplication."""
 
-def test_can_instantiate() -> None:
-    """Test if the covariance operator can be instantiated."""
-    res = DummyLinearOperator(shape=(1, 1), dtype=jnp.float32)
+        def to_dense(self, *args, **kwargs):
+            pass
 
-    assert isinstance(res, DummyLinearOperator)
-    assert isinstance(res, LinearOperator)
-    assert res.shape == (1, 1)
-    assert res.dtype == jnp.float32
+        @classmethod
+        def from_dense(cls, *args, **kwargs):
+            pass
+
+    if is_dataclass:
+        dataclass(DummyLinearOperator)
+
+    linop = DummyLinearOperator(shape=shape, dtype=dtype)
+    assert isinstance(linop, DummyLinearOperator)
+    assert isinstance(linop, LinearOperator)
+    assert linop.shape == shape
+    assert linop.dtype == dtype
+    assert jtu.tree_leaves(linop) == [1, 3] # b, shape, dtype are static!
