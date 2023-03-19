@@ -89,7 +89,7 @@ print(type(posterior))
 
 # %%
 params = posterior.init_params(key)
-negative_mll = jax.jit(gpx.NonConjugateMLL(model=posterior, negative=True))
+negative_mll = jax.jit(gpx.NonConjugateMLL(posterior=posterior, negative=True))
 
 optimiser = ox.adam(learning_rate=0.01)
 
@@ -280,7 +280,7 @@ num_adapt = 500
 num_samples = 500
 
 params = posterior.init_params(key)
-mll = gpx.NonConjugateMLL(model=posterior, negative=False)
+mll = gpx.NonConjugateMLL(posterior=posterior, negative=False)
 unconstrained_mll = jax.jit(lambda params: mll(params.constrain(), data=D))
 
 adapt = blackjax.window_adaptation(

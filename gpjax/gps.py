@@ -481,7 +481,7 @@ class ConjugatePosterior(AbstractPosterior):
         return predict
 
     def loss_function(self) -> ConjugateMLL:
-        return ConjugateMLL(model=self, negative=True)
+        return ConjugateMLL(posterior=self, negative=True)
 
 
 class NonConjugatePosterior(AbstractPosterior):
@@ -605,7 +605,7 @@ class NonConjugatePosterior(AbstractPosterior):
         return predict_fn
 
     def loss_function(self) -> NonConjugateMLL:
-        return NonConjugateMLL(model=self, negative=True)
+        return NonConjugateMLL(posterior=self, negative=True)
 
 
 def construct_posterior(

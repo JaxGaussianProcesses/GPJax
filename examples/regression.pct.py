@@ -25,7 +25,6 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
-from jax import jit
 from jax.config import config
 from jaxutils import Dataset, fit
 import jaxkern as jk
@@ -165,7 +164,7 @@ params = posterior.init_params(key)
 # To train our hyperparameters, we optimising the marginal log-likelihood of the posterior with respect to them. We define the marginal log-likelihood with `marginal_log_likelihood` on the posterior.
 
 # %%
-negative_mll = gpx.ConjugateMLL(model=posterior, negative=True)
+negative_mll = gpx.ConjugateMLL(posterior=posterior, negative=True)
 negative_mll(params, D)
 
 # %% [markdown]

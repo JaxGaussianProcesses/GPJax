@@ -156,7 +156,7 @@ def fit_gp(x: jax.Array, y: jax.Array) -> dx.MultivariateNormalTri:
     posterior = gpx.Prior(kernel=jk.RBF()) * likelihood
 
     params = posterior.init_params(key)
-    negative_mll = jax.jit(gpx.ConjugateMLL(model=posterior, negative=True))
+    negative_mll = jax.jit(gpx.ConjugateMLL(posterior=posterior, negative=True))
     optimiser = ox.adam(learning_rate=0.01)
 
     # inference_state = gpx.fit(

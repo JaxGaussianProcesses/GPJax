@@ -24,14 +24,14 @@ from .quadrature import gauss_hermite_quadrature
 class AbstractObjective(metaclass=ABCMeta):
     def __init__(
         self,
-        model: "AbstractPosterior",
+        posterior:"AbstractPosterior",
         negative: bool,
         name: str = "Abstract Objective",
     ) -> None:
-        self.model = model
+        self.posterior = posterior
         self.constant = jnp.array(-1.0) if negative else jnp.array(1.0)
         self.name = name
-        self.jitter = self.model.jitter
+        self.jitter = self.posterior.jitter
 
     @abstractmethod
     def __call__(
@@ -49,17 +49,17 @@ class AbstractObjective(metaclass=ABCMeta):
 class ConjugateMLL(AbstractObjective):
     def __init__(
         self,
-        model: "ConjugatePosterior",
+        posterior:"ConjugatePosterior",
         negative: bool,
         name: str = "Conjugate Marginal Log Likelihood",
     ) -> None:
-        if isinstance(model.likelihood, NonConjugate):
+        if isinstance(posterior.likelihood, NonConjugate):
             raise ValueError(
-                f"""ConjugateMarginalLogLikelihood objective can only be used with
-                conjugate likelihoods. {model.likelihood} is not conjugate to Gaussian
+                f"""ConjugateMLL objective can only be used with
+                conjugate likelihoods. {posterior.likelihood} is not conjugate to Gaussian
                 distribution."""
             )
-        super().__init__(model, negative, name)
+        super().__init__(posterior, negative, name)
 
     def __call__(
         self, params: Parameters, data: Dataset, **kwargs
@@ -130,10 +130,10 @@ class ConjugateMLL(AbstractObjective):
 
         # Observation noise σ²
         obs_noise = params["likelihood"]["obs_noise"]
-        μx = self.model.prior.mean_function(params["mean_function"], x)
+        μx = self.posterior.prior.mean_function(params["mean_function"], x)
 
         # Σ = (Kxx + Iσ²) = LLᵀ
-        Kxx = self.model.prior.kernel.gram(params["kernel"], x)
+        Kxx = self.posterior.prior.kernel.gram(params["kernel"], x)
         Kxx += identity(n) * self.jitter
         Sigma = Kxx + identity(n) * obs_noise
 
@@ -143,17 +143,17 @@ class ConjugateMLL(AbstractObjective):
         return self.constant * (mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze())
 
     def init_params(self, key: KeyArray) -> Dict:
-        return self.model.init_params(key)
+        return self.posterior.init_params(key)
 
 
 class NonConjugateMLL(AbstractObjective):
     def __init__(
         self,
-        model: "NonConjugatePosterior",
+        posterior:"NonConjugatePosterior",
         negative: bool,
         name: str = "Non-conjugate Marginal Log Likelihood",
     ) -> None:
-        super().__init__(model, negative, name)
+        super().__init__(posterior, negative, name)
 
     def __call__(
         self, params: Parameters, data: Dataset, **kwargs
@@ -189,12 +189,12 @@ class NonConjugateMLL(AbstractObjective):
         """
         # Unpack the training data
         x, y, n = data.X, data.y, data.n
-        Kxx = self.model.prior.kernel.gram(params["kernel"], x)
+        Kxx = self.posterior.prior.kernel.gram(params["kernel"], x)
         Kxx += identity(n) * self.jitter
         Lx = Kxx.to_root()
 
         # Compute the prior mean function
-        μx = self.model.prior.mean_function(params["mean_function"], x)
+        μx = self.posterior.prior.mean_function(params["mean_function"], x)
 
         # Whitened function values, wx, corresponding to the inputs, x
         wx = params["latent"]
@@ -203,7 +203,7 @@ class NonConjugateMLL(AbstractObjective):
         fx = μx + Lx @ wx
 
         # p(y | f(x), θ), where θ are the model hyperparameters
-        likelihood = self.model.likelihood.link_function(params, fx)
+        likelihood = self.posterior.likelihood.link_function(params, fx)
 
         # Whitened latent function values prior, p(wx | θ) = N(0, I)
         latent_prior = dx.Normal(loc=0.0, scale=1.0)
@@ -213,7 +213,7 @@ class NonConjugateMLL(AbstractObjective):
         )
 
     def init_params(self, key: KeyArray) -> Dict:
-        return self.model.init_params(key)
+        return self.posterior.init_params(key)
 
 
 class ELBO(AbstractObjective):

@@ -34,8 +34,8 @@ from gpjax.gps import (
 )
 from gpjax.objectives import (
     AbstractObjective,
-    ConjugateMarginalLogLikelihood,
-    NonConjugateMarginalLogLikelihood,
+    ConjugateMLL,
+    NonConjugateMLL
 )
 from jaxkern import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian
@@ -109,7 +109,7 @@ def test_conjugate_posterior(num_datapoints, jit_compile):
     # Loss function
     loss_fn = post.loss_function()
     assert isinstance(loss_fn, AbstractObjective)
-    assert isinstance(loss_fn, ConjugateMarginalLogLikelihood)
+    assert isinstance(loss_fn, ConjugateMLL)
     if jit_compile:
         loss_fn = jax.jit(loss_fn)
     objective_val = loss_fn(params=params, data=D)
@@ -155,7 +155,7 @@ def test_nonconjugate_posterior(num_datapoints, likel, jit_compile):
     # Loss function
     loss_fn = post.loss_function()
     assert isinstance(loss_fn, AbstractObjective)
-    assert isinstance(loss_fn, NonConjugateMarginalLogLikelihood)
+    assert isinstance(loss_fn, NonConjugateMLL)
     if jit_compile:
         loss_fn = jax.jit(loss_fn)
     objective_val = loss_fn(params=params, data=D)

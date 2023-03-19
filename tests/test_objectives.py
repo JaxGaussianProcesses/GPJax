@@ -1,8 +1,8 @@
 from gpjax.objectives import (
     AbstractObjective,
-    ConjugateMarginalLogLikelihood,
-    NonConjugateMarginalLogLikelihood,
     LogPosteriorDensity,
+    ConjugateMLL,
+    NonConjugateMLL
 )
 import pytest
 import jax.random as jr
@@ -40,7 +40,7 @@ def test_conjugate_mll(
     post = p * lik
     params = post.init_params(key)
 
-    mll = ConjugateMarginalLogLikelihood(model=post, negative=negative)
+    mll = ConjugateMLL(posterior=post, negative=negative)
     assert isinstance(mll, AbstractObjective)
 
     # Test parameter initialisation
@@ -55,7 +55,7 @@ def test_conjugate_mll(
     assert evaluation.shape == ()
 
     # Test parameter initialisation
-    # mll_params = ConjugateMarginalLogLikelihood(model=post, negative=negative).init_params(key)
+    # mll_params = ConjugateMLL(model=post, negative=negative).init_params(key)
     # assert all(mll_params == params)
 
 
@@ -88,9 +88,9 @@ def test_non_conjugate_mll(
     params = post.init_params(key)
 
     with pytest.raises(ValueError):
-        ConjugateMarginalLogLikelihood(model=post, negative=negative)
+        ConjugateMLL(posterior=post, negative=negative)
 
-    mll = NonConjugateMarginalLogLikelihood(model=post, negative=negative)
+    mll = NonConjugateMLL(posterior=post, negative=negative)
     assert isinstance(mll, AbstractObjective)
     if jit_compile:
         mll = jax.jit(mll)
@@ -99,7 +99,7 @@ def test_non_conjugate_mll(
     assert isinstance(evaluation, jax.Array)
     assert evaluation.shape == ()
 
-    mll2 = LogPosteriorDensity(model=post, negative=negative)
+    mll2 = LogPosteriorDensity(posterior=post, negative=negative)
 
     # Test parameter initialisation
     obj_params = mll2.init_params(key)
