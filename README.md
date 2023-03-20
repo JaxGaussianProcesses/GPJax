@@ -2,7 +2,7 @@
 <h2 align='center'>Kernels in Jax.</h2>
 
 <p align="center">
-<img width="700" height="300" src="https://github.com/JaxGaussianProcesses/JaxKern/raw/master/docs/_static/logo/logo.png" alt="JaxKern's logo">
+<img width="700" height="300" src="https://raw.githubusercontent.com/JaxGaussianProcesses/JaxKern/main/docs/_static/logo/logo.png" alt="JaxKern's logo">
 </p>
 
 
