@@ -28,7 +28,6 @@ from .variational_families import (
     VariationalGaussian,
     WhitenedVariationalGaussian,
 )
-from .variational_inference import CollapsedVI, StochasticVI
 
 __version__ = _version.get_versions()["version"]
 __license__ = "MIT"
@@ -53,8 +52,6 @@ __all__ = [
     "NaturalVariationalGaussian",
     "VariationalGaussian",
     "WhitenedVariationalGaussian",
-    "CollapsedVI",
-    "StochasticVI",
     "kernels",
     "utils",
 ]
