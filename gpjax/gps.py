@@ -110,7 +110,6 @@ sample draw across these inputs.
 """
 
 
-
 #######################
 # GP Priors
 #######################
@@ -241,9 +240,7 @@ class Prior(AbstractPrior):
         mean_function = self.mean_function
         kernel = self.kernel
 
-        def predict_fn(
-            test_inputs: Float[Array, "N D"]
-        ) -> GaussianDistribution:
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
 
             # Unpack test inputs
             t = test_inputs
@@ -258,15 +255,15 @@ class Prior(AbstractPrior):
         return predict_fn
 
     def sample_approx(
-        self,  
+        self,
         num_samples: int,
         params: Dict,
-        seed: KeyArray,  
-        num_features: Optional[int]=100,
+        seed: KeyArray,
+        num_features: Optional[int] = 100,
     ) -> FunctionalSample:
         """Build an approximate sample from the Gaussian process prior. This method
-        provides a function that returns the evaluations of a sample across any given 
-        inputs. 
+        provides a function that returns the evaluations of a sample across any given
+        inputs.
 
         In particular, we approximate the Gaussian processes' prior as the finite feature
         approximation
@@ -304,7 +301,7 @@ class Prior(AbstractPrior):
             params (Dict): The specific set of parameters for which the sample
             should be generated for.
             seed (KeyArray): The random seed used for the sample(s).
-            num_features (int): The number of features used when approximating the 
+            num_features (int): The number of features used when approximating the
             kernel.
 
 
@@ -313,27 +310,32 @@ class Prior(AbstractPrior):
             process prior.
         """
         for integer_input in [num_features, num_samples]:
-            if (not isinstance(integer_input,int)) or integer_input<0:
+            if (not isinstance(integer_input, int)) or integer_input < 0:
                 raise ValueError
 
         approximate_kernel = RFF(self.kernel, num_features)
         approximate_kernel_params = approximate_kernel.init_params(seed)
-        feature_weights = jax.random.normal(seed, [num_samples, 2*num_features]) # [B, L]
+        feature_weights = jax.random.normal(
+            seed, [num_samples, 2 * num_features]
+        )  # [B, L]
 
-        def sample_fn(test_inputs: Float[Array, "N D"]
-            ) -> Float[Array, "N B"]:
+        def sample_fn(test_inputs: Float[Array, "N D"]) -> Float[Array, "N B"]:
 
-            feature_evals = approximate_kernel.compute_engine.compute_features( # [N, L]
-                test_inputs, 
-                frequencies=approximate_kernel_params["frequencies"], 
-                scaling_factor=approximate_kernel_params["lengthscale"], 
-                ) 
+            feature_evals = (
+                approximate_kernel.compute_engine.compute_features(  # [N, L]
+                    test_inputs,
+                    frequencies=approximate_kernel_params["frequencies"],
+                    scaling_factor=approximate_kernel_params["lengthscale"],
+                )
+            )
             feature_evals *= jnp.sqrt(params["kernel"]["variance"] / num_features)
-            evaluated_sample =  jnp.inner(feature_evals,feature_weights)  # [N, B]
-            return self.mean_function(params["mean_function"], test_inputs) + evaluated_sample
+            evaluated_sample = jnp.inner(feature_evals, feature_weights)  # [N, B]
+            return (
+                self.mean_function(params["mean_function"], test_inputs)
+                + evaluated_sample
+            )
 
         return sample_fn
-
 
     def init_params(self, key: KeyArray) -> Dict:
         """Initialise the GP prior's parameter set.
@@ -348,7 +350,6 @@ class Prior(AbstractPrior):
             "kernel": self.kernel.init_params(key),
             "mean_function": self.mean_function.init_params(key),
         }
-
 
 
 #######################
@@ -555,9 +556,7 @@ class ConjugatePosterior(AbstractPosterior):
             covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
             covariance += identity(n_test) * jitter
 
-            return GaussianDistribution(
-                jnp.atleast_1d(mean.squeeze()), covariance
-            )
+            return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict
 
@@ -669,9 +668,7 @@ class ConjugatePosterior(AbstractPosterior):
             )
 
             return constant * (
-                marginal_likelihood.log_prob(
-                    jnp.atleast_1d(y.squeeze())
-                ).squeeze()
+                marginal_likelihood.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
             )
 
         return mll
@@ -719,9 +716,7 @@ class NonConjugatePosterior(AbstractPosterior):
             self.prior.init_params(key),
             {"likelihood": self.likelihood.init_params(key)},
         )
-        parameters["latent"] = jnp.zeros(
-            shape=(self.likelihood.num_datapoints, 1)
-        )
+        parameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
         return parameters
 
     def predict(
@@ -793,9 +788,7 @@ class NonConjugatePosterior(AbstractPosterior):
             covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
             covariance += identity(n_test) * jitter
 
-            return GaussianDistribution(
-                jnp.atleast_1d(mean.squeeze()), covariance
-            )
+            return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict_fn
 
