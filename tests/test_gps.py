@@ -31,7 +31,8 @@ from gpjax.gps import (
     Prior,
     construct_posterior,
 )
-from gpjax.kernels import RBF, Matern12, Matern32, Matern52
+from gpjax.mean_functions import Zero, Constant
+from jaxkern import RBF, Matern12, Matern32, Matern52
 from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.parameters import ParameterState
 
@@ -57,6 +58,58 @@ def test_prior(num_datapoints):
     sigma = predictive_dist.covariance()
     assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
+
+
+@pytest.mark.parametrize("num_datapoints", [1, 5])
+@pytest.mark.parametrize("kernel", [RBF(), Matern52()])
+@pytest.mark.parametrize("mean_function", [Zero(), Constant()])
+def test_prior_sample_approx(num_datapoints, kernel, mean_function):
+    p = Prior(kernel=kernel, mean_function=mean_function)
+    key = jr.PRNGKey(123)
+    parameter_state = initialise(p, key)
+    params, _, _ = parameter_state.unpack()
+    params["kernel"]["lengthscale"]=5.0
+    params["kernel"]["variance"]=0.1
+    
+    with pytest.raises(ValueError):
+        p.sample_approx(-1,params, key)
+    with pytest.raises(ValueError):
+        p.sample_approx(0.5,params, key)
+    with pytest.raises(ValueError):
+        p.sample_approx(1,params, key, -10)
+    with pytest.raises(ValueError):
+        p.sample_approx(1,params, key, 0.5)
+
+    sampled_fn = p.sample_approx(1,params, key, 100)
+    assert isinstance(sampled_fn, tp.Callable) # check type
+
+    x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
+    evals = sampled_fn(x)
+    assert evals.shape == (num_datapoints, 1.0) # check shape
+
+    sampled_fn_2 = p.sample_approx(1,params, key, 100)
+    evals_2 = sampled_fn_2(x)
+    max_delta = jnp.max(jnp.abs(evals - evals_2))
+    assert max_delta == 0.0 # samples same for same seed
+
+    new_key = jr.PRNGKey(12345)
+    sampled_fn_3 = p.sample_approx(1,params, new_key, 100)
+    evals_3 = sampled_fn_3(x)
+    max_delta = jnp.max(jnp.abs(evals - evals_3))
+    assert max_delta > 0.1 # samples different for different seed
+
+    # Check validty of samples using Monte-Carlo
+    sampled_fn = p.sample_approx(10_000,params, key, 100)
+    sampled_evals = sampled_fn(x)
+    approx_mean = jnp.mean(sampled_evals, -1) 
+    approx_var = jnp.var(sampled_evals, -1)
+    true_predictive = p(params)(x)
+    true_mean = true_predictive.mean()
+    true_var = jnp.diagonal(true_predictive.covariance())
+    max_error_in_mean = jnp.max(jnp.abs(approx_mean - true_mean))
+    max_error_in_var = jnp.max(jnp.abs(approx_var - true_var))
+    assert max_error_in_mean < 0.02 # check that samples are correct
+    assert max_error_in_var < 0.05 # check that samples are correct
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])
@@ -209,3 +262,7 @@ def test_initialisation_override(kernel):
 
     with pytest.raises(ValueError):
         parameter_state = initialise(p, key, keernel=override_params)
+
+
+
+

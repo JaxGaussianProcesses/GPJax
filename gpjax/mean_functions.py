@@ -117,8 +117,9 @@ class Zero(AbstractMeanFunction):
 
 class Constant(AbstractMeanFunction):
     """
-    A zero mean function. This function returns a repeated scalar value for all inputs.
-    The scalar value itself can be treated as a model hyperparameter and learned during training.
+    A constant mean function. This function returns a repeated scalar value for all inputs.
+    The scalar value itself can be treated as a model hyperparameter and learned during training but
+    defaults to 1.0.
     """
 
     def __init__(

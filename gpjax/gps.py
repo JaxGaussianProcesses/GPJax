@@ -17,11 +17,13 @@ from abc import abstractmethod
 from typing import Any, Callable, Dict, Optional
 
 import distrax as dx
+import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 from jax.random import KeyArray
 
 from jaxlinop import identity
+from jaxkern import RFF
 from jaxkern.base import AbstractKernel
 from jaxutils import PyTree
 
@@ -99,6 +101,14 @@ class AbstractPrior(PyTree):
     def _initialise_params(self, key: KeyArray) -> Dict:
         """Deprecated method for initialising the GP's parameters. Succeeded by ``init_params``."""
         return self.init_params(key)
+
+
+FunctionalSample = Callable[[Float[Array, "N D"]], Float[Array, "N B"]]
+""" Type alias for functions representing `B` samples from a model, to be evaluated on any set of
+`N` inputs (of dimension `D`) and returning the evaluations of each (potentially approximate)
+sample draw across these inputs.
+"""
+
 
 
 #######################
@@ -247,6 +257,84 @@ class Prior(AbstractPrior):
 
         return predict_fn
 
+    def sample_approx(
+        self,  
+        num_samples: int,
+        params: Dict,
+        seed: KeyArray,  
+        num_features: Optional[int]=100,
+    ) -> FunctionalSample:
+        """Build an approximate sample from the Gaussian process prior. This method
+        provides a function that returns the evaluations of a sample across any given 
+        inputs. 
+
+        In particular, we approximate the Gaussian processes' prior as the finite feature
+        approximation
+
+        .. math:: \hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i
+
+
+        where :math:`\phi_i` are m features sampled from the Fourier feature decomposition of
+        the model's kernel and :math:`\theta_i` are samples from a unit Gaussian.
+
+
+        A key property of such functional samples is that the same sample draw is
+        evaluated for all queries. Consistency is a property that is prohibitively costly
+        to ensure when sampling exactly from the GP prior, as the cost of exact sampling
+        scales cubically with the size of the sample. In contrast, finite feature representations
+        can be evaluated with constant cost regardless of the required number of queries.
+
+        In the following example, we build 10 such samples
+        and then evaluate them over the interval :math:`[0, 1]`:
+
+        Example:
+            >>> import gpjax as gpx
+            >>> import jax.numpy as jnp
+            >>>
+            >>> kernel = gpx.kernels.RBF()
+            >>> prior = gpx.Prior(kernel = kernel)
+            >>> seed = jr.PRNGKey(123)
+            >>>
+            >>> parameter_state = gpx.initialise(prior)
+            >>> sample_fn = prior.sample_appox(10, parameter_state.params, seed)
+            >>> sample_fn(jnp.linspace(0, 1, 100))
+
+        Args:
+            num_samples (int): The desired number of samples.
+            params (Dict): The specific set of parameters for which the sample
+            should be generated for.
+            seed (KeyArray): The random seed used for the sample(s).
+            num_features (int): The number of features used when approximating the 
+            kernel.
+
+
+        Returns:
+            FunctionalSample: A function representing an approximate sample from the Gaussian
+            process prior.
+        """
+        for integer_input in [num_features, num_samples]:
+            if (not isinstance(integer_input,int)) or integer_input<0:
+                raise ValueError
+
+        approximate_kernel = RFF(self.kernel, num_features)
+        approximate_kernel_params = approximate_kernel.init_params(seed)
+        feature_weights = jax.random.normal(seed, [num_samples, 2*num_features]) # [B, L]
+
+        def sample_fn(test_inputs: Float[Array, "N D"]
+            ) -> Float[Array, "N B"]:
+
+            feature_evals = approximate_kernel.compute_engine.compute_features( # [N, L]
+                test_inputs, 
+                frequencies=approximate_kernel_params["frequencies"], 
+                scaling_factor=approximate_kernel_params["lengthscale"], 
+                ) 
+            feature_evals *= jnp.sqrt(params["kernel"]["variance"] / num_features)
+            evaluated_sample =  jnp.inner(feature_evals,feature_weights)  # [N, B]
+            return self.mean_function(params["mean_function"], test_inputs) + evaluated_sample
+
+        return sample_fn
+
+
     def init_params(self, key: KeyArray) -> Dict:
         """Initialise the GP prior's parameter set.
 
@@ -260,6 +348,7 @@ class Prior(AbstractPrior):
             "kernel": self.kernel.init_params(key),
             "mean_function": self.mean_function.init_params(key),
         }
+
 
 
 #######################
