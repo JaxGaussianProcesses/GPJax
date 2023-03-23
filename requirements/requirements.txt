@@ -8,3 +8,4 @@ tqdm>=4.0.0
 ml-collections==0.1.0
 jaxtyping>=0.0.2
 deprecation
+simple-pytree>=0.1.6
