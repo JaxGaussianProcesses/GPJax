@@ -2,7 +2,7 @@ jax>=0.4.1
 jaxlib>=0.4.1
 optax
 jaxutils
-jaxkern
+jaxlinop
 distrax>=0.1.2
 tqdm>=4.0.0
 ml-collections==0.1.0
