@@ -2,199 +2,52 @@
 
 The `linops` submodule is a lightweight linear operator library written in [`jax`](https://github.com/google/jax).
 
-GPJax aims to provide a low-level interface to Gaussian process (GP) models in [Jax](https://github.com/google/jax), structured to give researchers maximum flexibility in extending the code to suit their own needs. The idea is that the code should be as close as possible to the maths we write on paper when working with GP models.
+# Overview
+Consider solving a diagonal matrix $A$ against a vector $b$.
 
-# Package support
+```python
+import jax.numpy as jnp
 
-GPJax was founded by [Thomas Pinder](https://github.com/thomaspinder). Today, the maintenance of GPJax is undertaken by [Thomas Pinder](https://github.com/thomaspinder) and [Daniel Dodd](https://github.com/Daniel-Dodd).
+n = 1000
+diag = jnp.linspace(1.0, 2.0, n)
 
-We would be delighted to receive contributions from interested individuals and groups. To learn how you can get involved, please read our [guide for contributing](https://github.com/JaxGaussianProcesses/GPJax/blob/master/CONTRIBUTING.md). If you have any questions, we encourage you to [open an issue](https://github.com/JaxGaussianProcesses/GPJax/issues/new/choose). For broader conversations, such as best GP fitting practices or questions about the mathematics of GPs, we invite you to [open a discussion](https://github.com/JaxGaussianProcesses/GPJax/discussions).
+A = jnp.diag(diag)
+b = jnp.linspace(3.0, 4.0, n)
 
-Feel free to join our [Slack Channel](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw), where we can discuss the development of GPJax and broader support for Gaussian process modelling.
-
-# Supported methods and interfaces
-
-## Notebook examples
-
-> - [**Conjugate Inference**](https://gpjax.readthedocs.io/en/latest/examples/regression.html)
-> - [**Classification with MCMC**](https://gpjax.readthedocs.io/en/latest/examples/classification.html)
-> - [**Sparse Variational Inference**](https://gpjax.readthedocs.io/en/latest/examples/uncollapsed_vi.html)
-> - [**BlackJax Integration**](https://gpjax.readthedocs.io/en/latest/examples/classification.html)
-> - [**Laplace Approximation**](https://gpjax.readthedocs.io/en/latest/examples/classification.html#Laplace-approximation)
-> - [**TensorFlow Probability Integration**](https://gpjax.readthedocs.io/en/latest/examples/tfp_integration.html)
-> - [**Inference on Non-Euclidean Spaces**](https://gpjax.readthedocs.io/en/latest/examples/kernels.html#Custom-Kernel)
-> - [**Inference on Graphs**](https://gpjax.readthedocs.io/en/latest/examples/graph_kernels.html)
-> - [**Learning Gaussian Process Barycentres**](https://gpjax.readthedocs.io/en/latest/examples/barycentres.html)
-> - [**Deep Kernel Regression**](https://gpjax.readthedocs.io/en/latest/examples/haiku.html)
-> - [**Natural Gradients**](https://gpjax.readthedocs.io/en/latest/examples/natgrads.html)
-
-## Guides for customisation
-> 
-> - [**Custom kernels**](https://gpjax.readthedocs.io/en/latest/examples/kernels.html#Custom-Kernel)
-> - [**UCI regression**](https://gpjax.readthedocs.io/en/latest/examples/yacht.html)
-
-## Conversion between `.ipynb` and `.py`
-Above examples are stored in [examples](examples) directory in the double percent (`py:percent`) format. Checkout [jupytext using-cli](https://jupytext.readthedocs.io/en/latest/using-cli.html) for more info.
-
-* To convert `example.py` to `example.ipynb`, run:
-
-```bash
-jupytext --to notebook example.py
+# A⁻¹ b
+jnp.solve(A, b)
 ```
+Doing so is costly in large problems. Storing the matrix gives rise to memory costs of $O(n^2)$, and inverting the matrix costs $O(n^3)$ in the number of data points $n$.
 
-* To convert `example.ipynb` to `example.py`, run:
+But hold on a second. Notice:
 
-```bash
-jupytext --to py:percent example.ipynb
-```
+- We only have to store the diagonal entries to determine the matrix $A$. Doing so, would reduce memory costs from $O(n^2)$ to $O(n)$. 
+- To invert $A$, we only need to take the reciprocal of the diagonal, reducing inversion costs from $O(n^3)$, to $O(n)$. 
 
-# Simple example
-
-Let us import some dependencies and simulate a toy dataset $\mathcal{D}$.
-
-`gpjax.linops` is designed to exploit stucture of this kind. 
+`JaxLinOp` is designed to exploit stucture of this kind. 
 ```python
 from gpjax import linops
 
 A = linops.DiagonalLinearOperator(diag = diag)
 
-f = lambda x: 10 * jnp.sin(x)
-
-n = 50
-x = jr.uniform(key=key, minval=-3.0, maxval=3.0, shape=(n,1)).sort()
-y = f(x) + jr.normal(key, shape=(n,1))
-D = gpx.Dataset(X=x, y=y)
+# A⁻¹ b
+A.solve(b)
 ```
-
-The function of interest here, $f(\cdot)$, is sinusoidal, but our observations of it have been perturbed by Gaussian noise. We aim to utilise a Gaussian process to try and recover this latent function.
-
-## 1. Constructing the prior and posterior
-
-We begin by defining a zero-mean Gaussian process prior with a radial basis function kernel and assume the likelihood to be Gaussian.
-
-```python
-prior = gpx.Prior(kernel = jk.RBF())
-likelihood = gpx.Gaussian(num_datapoints = n)
-```
-
-Similar to how we would write on paper, the posterior is constructed by the product of our prior with our likelihood.
-
-```python
-posterior = prior * likelihood
-```
-
-## 2. Learning hyperparameters
-
-Equipped with the posterior, we seek to learn the model's hyperparameters through gradient-optimisation of the marginal log-likelihood. We this below, adding Jax's [just-in-time (JIT)](https://jax.readthedocs.io/en/latest/jax-101/02-jitting.html) compilation to accelerate training. 
-
-```python
-mll = jit(posterior.marginal_log_likelihood(D, negative=True))
-```
-
-For purposes of optimisation, we'll use optax's Adam.
-```
-opt = ox.adam(learning_rate=1e-3)
-```
-
-We define an initial parameter state through the `initialise` callable.
-
-```python
-parameter_state = gpx.initialise(posterior, key=key)
-```
-
-Finally, we run an optimisation loop using the Adam optimiser via the `fit` callable.
-
-```python
-inference_state = gpx.fit(mll, parameter_state, opt, num_iters=500)
-```
-
-## 3. Making predictions
-
-Using our learned hyperparameters, we can obtain the posterior distribution of the latent function at novel test points.
-
-```python
-learned_params, _ = inference_state.unpack()
-xtest = jnp.linspace(-3., 3., 100).reshape(-1, 1)
-
-latent_distribution = posterior(learned_params, D)(xtest)
-predictive_distribution = likelihood(learned_params, latent_distribution)
-
-predictive_mean = predictive_distribution.mean()
-predictive_cov = predictive_distribution.covariance()
-```
-
-# Installation
-
-## Stable version
-
-The latest stable version of GPJax can be installed via [`pip`](https://pip.pypa.io/en/stable/):
-
-```bash
-pip install gpjax
-```
-
-> **Note**
->
-> We recommend you check your installation version:
-> ```python
-> python -c 'import gpjax; print(gpjax.__version__)'
-> ```
-
-
-
-## Development version
-> **Warning**
->
-> This version is possibly unstable and may contain bugs. 
-
-Clone a copy of the repository to your local machine and run the setup configuration in development mode.
-```bash
-git clone https://github.com/JaxGaussianProcesses/GPJax.git
-cd GPJax
-python setup.py develop
-```
-
-> **Note**
->
-> We advise you create virtual environment before installing:
-> ```
-> conda create -n gpjax_experimental python=3.10.0
-> conda activate gpjax_experimental
->  ```
->
-> and recommend you check your installation passes the supplied unit tests:
->
-> ```python
-> python -m pytest tests/
-> ```
-
-# Citing GPJax
-
-If you use GPJax in your research, please cite our [JOSS paper](https://joss.theoj.org/papers/10.21105/joss.04455#).
-
-```
-@article{Pinder2022,
-  doi = {10.21105/joss.04455},
-  url = {https://doi.org/10.21105/joss.04455},
-  year = {2022},
-  publisher = {The Open Journal},
-  volume = {7},
-  number = {75},
-  pages = {4455},
-  author = {Thomas Pinder and Daniel Dodd},
-  title = {GPJax: A Gaussian Process Framework in JAX},
-  journal = {Journal of Open Source Software}
-}
-```
-`gpjax.linops` are designed to automatically reduce cost savings in matrix addition, multiplication, computing log-determinants and more, for other matrix stuctures too!
+`linops` is designed to automatically reduce cost savings in matrix addition, multiplication, computing log-determinants and more, for other matrix stuctures too!
 
 # Custom Linear Operator (details to come soon)
 
-The flexible design of `gpjax.linops` will allow users to impliment their own custom linear operators.
+The flexible design of `linops` will allow users to impliment their own custom linear operators.
 
 ```python
-class MyLinearOperator(linops.LinearOperator):
-  ....
+from gpjax.linops import LinearOperator
 
- # Coming very soon.
+class MyLinearOperator(LinearOperator):
+  
+  def __init__(self, ...)
+    ...
+
+# There will be a minimal number methods that users need to impliment for their custom operator. 
+# For optimal efficiency, we'll make it easy for the user to add optional methods to their operator, 
+# if they give better performance than the defaults.
 ```
