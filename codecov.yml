@@ -12,6 +12,7 @@ fixes:
 ignore:
   - "setup.py"
   - "*/tests/.*"
+  - "tests/kernels/*.py"
   - "__init__.py"
   - "tests/*.py"
   - "**/_version.py"
