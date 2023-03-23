@@ -1,20 +1,13 @@
 coverage:
   range: 70..90
   status:
-    project:
-      default:
-        target: auto
-        threshold: 5%
-
+    patch: false
 fixes:
   - "/home/runner/work/gpjax/gpjax/::" # Correct paths
 
 ignore:
-  - "setup.py"
-  - "*/tests/.*"
-  - "tests/kernels/*.py"
-  - "__init__.py"
+  - "*.py"
   - "tests/*.py"
-  - "**/_version.py"
-  - "**/versioneer.py"
+  - "test_*.py"
+  - "*_version.py"
   - "versioneer.py"

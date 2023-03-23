@@ -6,3 +6,7 @@ exclude_lines =
     def __str__
     print
     raise NotImplementedError
+omit =
+    *tests*
+    *setup.py*
+    *gpjax/_version.py*
