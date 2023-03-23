@@ -17,12 +17,13 @@ from typing import Callable, Dict
 import jax.numpy as jnp
 
 from jax import vmap
-from jaxlinop import (
+from jaxtyping import Array, Float
+from .base import AbstractKernelComputation
+
+from ...linops import (
     ConstantDiagonalLinearOperator,
     DiagonalLinearOperator,
 )
-from jaxtyping import Array, Float
-from .base import AbstractKernelComputation
 
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):

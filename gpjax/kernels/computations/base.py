@@ -17,13 +17,14 @@ import abc
 from typing import Callable, Dict
 
 from jax import vmap
-from jaxlinop import (
+from jaxtyping import Array, Float
+from jaxutils import PyTree
+
+from ...linops import (
     DenseLinearOperator,
     DiagonalLinearOperator,
     LinearOperator,
 )
-from jaxtyping import Array, Float
-from jaxutils import PyTree
 
 
 class AbstractKernelComputation(PyTree):

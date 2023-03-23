@@ -22,7 +22,7 @@ import jax.random as jr
 import pytest
 import distrax as dx
 from jax.config import config
-from jaxlinop import LinearOperator, identity
+from gpjax.linops import LinearOperator, identity
 from jaxutils.parameters import initialise
 
 from gpjax.kernels.base import AbstractKernel
