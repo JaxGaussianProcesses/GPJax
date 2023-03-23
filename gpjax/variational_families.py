@@ -22,9 +22,12 @@ import jax.scipy as jsp
 from jax.random import KeyArray
 from jaxtyping import Array, Float
 
-from jaxlinop import identity
+from .linops import identity
 from jaxutils import PyTree, Dataset
-import jaxlinop as jlo
+from .linops import (
+    DenseLinearOperator,
+    LowerTriangularLinearOperator
+)
 
 from .config import get_global_config
 from .gps import Prior
@@ -186,8 +189,8 @@ class VariationalGaussian(AbstractVariationalGaussian):
         Kzz = kernel.gram(params["kernel"], z)
         Kzz += identity(m) * jitter
 
-        sqrt = jlo.LowerTriangularLinearOperator.from_dense(sqrt)
-        S = jlo.DenseLinearOperator.from_root(sqrt)
+        sqrt = LowerTriangularLinearOperator.from_dense(sqrt)
+        S = DenseLinearOperator.from_root(sqrt)
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
         pu = GaussianDistribution(loc=jnp.atleast_1d(μz.squeeze()), scale=Kzz)
@@ -313,8 +316,8 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         mu = params["variational_family"]["moments"]["variational_mean"]
         sqrt = params["variational_family"]["moments"]["variational_root_covariance"]
 
-        sqrt = jlo.LowerTriangularLinearOperator.from_dense(sqrt)
-        S = jlo.DenseLinearOperator.from_root(sqrt)
+        sqrt = LowerTriangularLinearOperator.from_dense(sqrt)
+        S = DenseLinearOperator.from_root(sqrt)
 
         # Compute whitened KL divergence
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
@@ -464,10 +467,10 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         # L = (L⁻¹)⁻¹I
         sqrt = jsp.linalg.solve_triangular(sqrt_inv, jnp.eye(m), lower=True)
-        sqrt = jlo.LowerTriangularLinearOperator.from_dense(sqrt)
+        sqrt = LowerTriangularLinearOperator.from_dense(sqrt)
 
         # S = LLᵀ:
-        S = jlo.DenseLinearOperator.from_root(sqrt)
+        S = DenseLinearOperator.from_root(sqrt)
 
         # μ = Sθ₁
         mu = S @ natural_vector
@@ -649,7 +652,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         # S = η₂ - η₁ η₁ᵀ
         S = expectation_matrix - jnp.outer(mu, mu)
-        S = jlo.DenseLinearOperator(S)
+        S = DenseLinearOperator(S)
         S += identity(m) * jitter
 
         μz = mean_function(params["mean_function"], z)
@@ -699,7 +702,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         # S = η₂ - η₁ η₁ᵀ
         S = expectation_matrix - jnp.matmul(mu, mu.T)
-        S = jlo.DenseLinearOperator(S)
+        S = DenseLinearOperator(S)
         S += identity(m) * jitter
 
         # S = sqrt sqrtᵀ

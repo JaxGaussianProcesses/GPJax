@@ -15,7 +15,7 @@
 
 import abc
 from typing import Any, Callable, Dict, Optional
-from jaxlinop.utils import to_dense
+from .linops.utils import to_dense
 from jaxutils import PyTree
 
 import distrax as dx

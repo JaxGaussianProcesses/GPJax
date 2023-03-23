@@ -13,15 +13,12 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, Dict
-
 from jax import vmap
-from jaxlinop import (
-    DiagonalLinearOperator,
-)
+from typing import Callable, Dict
 from jaxtyping import Array, Float
-from .base import AbstractKernelComputation
 
+from .base import AbstractKernelComputation
+from ...linops import DiagonalLinearOperator
 
 class DiagonalKernelComputation(AbstractKernelComputation):
     def __init__(

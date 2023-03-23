@@ -3,7 +3,7 @@ from typing import Callable, Dict
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 from .base import AbstractKernelComputation
-from jaxlinop import DenseLinearOperator
+from ...linops import DenseLinearOperator
 
 
 class BasisFunctionComputation(AbstractKernelComputation):

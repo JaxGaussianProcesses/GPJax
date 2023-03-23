@@ -14,7 +14,7 @@ from gpjax.kernels.base import AbstractKernel
 import jax.random as jr
 from jax.config import config
 import jax.numpy as jnp
-from jaxlinop import DenseLinearOperator
+from gpjax.linops import DenseLinearOperator
 from typing import Tuple
 import jax
 

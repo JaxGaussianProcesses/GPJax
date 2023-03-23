@@ -21,8 +21,8 @@ import jax.numpy as jnp
 from jaxtyping import Array, Float
 from jax.random import KeyArray
 
-from jaxlinop import identity
-from jaxkern.base import AbstractKernel
+from .linops import identity
+from .kernels.base import AbstractKernel
 from jaxutils import PyTree
 
 from .config import get_global_config
