@@ -30,7 +30,7 @@ import optax as ox
 from jax.config import config
 from jaxtyping import Array, Float
 from jaxutils import Dataset
-import jaxkern as jk
+import gpjax.kernels as jk
 import jax
 
 import gpjax as gpx
