@@ -27,7 +27,7 @@ import jax.random as jr
 import matplotlib.pyplot as plt
 from jax.config import config
 from jaxutils import Dataset
-import jaxkern as jk
+import gpjax.kernels as jk
 
 import gpjax as gpx
 from gpjax.utils import dict_array_coercion

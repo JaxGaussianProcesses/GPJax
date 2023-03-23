@@ -15,7 +15,7 @@
 
 """JaxKern."""
 from .approximations import RFF
-from .base import ProductKernel, SumKernel
+from .base import ProductKernel, SumKernel, AbstractKernel
 from .computations import (
     BasisFunctionComputation,
     ConstantDiagonalKernelComputation,
@@ -37,6 +37,7 @@ from .stationary import (
 from .non_euclidean import GraphKernel
 
 __all__ = [
+    "AbstractKernel",
     "RBF",
     "GraphKernel",
     "Matern12",
@@ -57,7 +58,3 @@ __all__ = [
     "BasisFunctionComputation",
     "RFF",
 ]
-
-from . import _version
-
-__version__ = _version.get_versions()["version"]

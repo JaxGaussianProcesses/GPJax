@@ -15,7 +15,7 @@
 
 from .abstractions import fit, fit_batches, fit_natgrads
 from .gps import Prior, construct_posterior
-import jaxkern as kernels
+from .kernels import *
 from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
 from .parameters import constrain, copy_dict_structure, initialise, unconstrain
@@ -38,6 +38,7 @@ __contributors__ = "https://github.com/thomaspinder/GPJax/graphs/contributors"
 
 
 __all__ = [
+    "kernels",
     "fit",
     "fit_batches",
     "fit_natgrads",

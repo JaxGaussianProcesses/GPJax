@@ -33,13 +33,13 @@ from scipy.signal import sawtooth
 from jaxtyping import Float, Array
 from typing import Dict
 from jaxutils import Dataset
-import jaxkern as jk
+import gpjax.kernels as jk
 
 
 import gpjax as gpx
-from jaxkern import DenseKernelComputation
-from jaxkern.base import AbstractKernel
-from jaxkern.computations import AbstractKernelComputation
+from gpjax.kernels import DenseKernelComputation
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import AbstractKernelComputation
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

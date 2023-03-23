@@ -72,7 +72,7 @@ import gpjax as gpx
 from jax import grad, jit
 import jax.numpy as jnp
 import jax.random as jr
-import jaxkern as jk
+import gpjax.kernels as jk
 import optax as ox
 
 key = jr.PRNGKey(123)

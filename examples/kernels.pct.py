@@ -34,7 +34,7 @@ from jaxtyping import Array, Float
 from optax import adam
 from typing import Dict
 from jaxutils import Dataset
-import jaxkern as jk
+import gpjax.kernels as jk
 
 import gpjax as gpx
 
