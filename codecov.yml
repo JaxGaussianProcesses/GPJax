@@ -6,6 +6,7 @@ fixes:
   - "/home/runner/work/gpjax/gpjax/::" # Correct paths
 
 ignore:
+  - "gpjax/_version.py"
   - "*.py"
   - "tests/*.py"
   - "test_*.py"
