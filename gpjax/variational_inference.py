@@ -21,7 +21,7 @@ import jax.scipy as jsp
 from jax import vmap
 from jaxtyping import Array, Float
 
-from jaxlinop import identity
+from .linops import identity
 from jax.random import KeyArray
 from jaxutils import PyTree
 

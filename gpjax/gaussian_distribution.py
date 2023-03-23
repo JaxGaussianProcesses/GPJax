@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import jax.numpy as jnp
-from jaxlinop import LinearOperator, IdentityLinearOperator
+from .linops import LinearOperator, IdentityLinearOperator
 
 from jaxtyping import Array, Float
 from jax import vmap

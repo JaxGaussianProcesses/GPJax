@@ -23,8 +23,8 @@ from jax.config import config
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 
-from jaxlinop.dense_linear_operator import DenseLinearOperator
-from jaxlinop.diagonal_linear_operator import DiagonalLinearOperator
+from .linops.dense_linear_operator import DenseLinearOperator
+from .linops.diagonal_linear_operator import DiagonalLinearOperator
 
 from gpjax.gaussian_distribution import GaussianDistribution
 

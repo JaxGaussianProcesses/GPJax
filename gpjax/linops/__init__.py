@@ -40,15 +40,3 @@ __all__ = [
     "identity",
     "to_dense",
 ]
-
-from . import _version
-
-__version__ = _version.get_versions()["version"]
-__authors__ = "Daniel Dodd, Thomas Pinder"
-__emails__ = "d.dodd1@lancaster.ac.uk, tompinder@live.co.uk"
-__license__ = "Apache 2.0"
-__uri__ = "https://github.com/JaxGaussianProcesses/JaxLinOp"
-__description__ = "A JaxLinOp library."
-__contributors__ = (
-    "https://github.com/JaxGaussianProcesses/JaxLinOp/graphs/contributors"
-)

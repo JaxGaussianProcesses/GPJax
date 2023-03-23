@@ -21,7 +21,7 @@ import jax.numpy as jnp
 from jaxtyping import Array, Float
 from jax.random import KeyArray
 
-from jaxlinop import identity
+from .linops import identity
 from jaxkern.base import AbstractKernel
 from jaxutils import PyTree
 

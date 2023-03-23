@@ -22,9 +22,9 @@ import jax.scipy as jsp
 from jax.random import KeyArray
 from jaxtyping import Array, Float
 
-from jaxlinop import identity
+from .linops import identity
 from jaxutils import PyTree, Dataset
-import jaxlinop as jlo
+import .linops as jlo # <- remove this "as jlo" import in future refactoring and import direct objects! 
 
 from .config import get_global_config
 from .gps import Prior

@@ -1,21 +1,6 @@
-<!-- <h1 align='center'>GPJax</h1>
-<h2 align='center'>Gaussian processes in Jax.</h2> -->
-<p align="center">
-<img width="700" height="300" src="https://github.com/JaxGaussianProcesses/GPJax/raw/master/docs/_static/gpjax_logo.svg" alt="GPJax's logo">
-</p>
+# LinOps
 
-[![codecov](https://codecov.io/gh/JaxGaussianProcesses/GPJax/branch/master/graph/badge.svg?token=DM1DRDASU2)](https://codecov.io/gh/JaxGaussianProcesses/GPJax)
-[![CodeFactor](https://www.codefactor.io/repository/github/jaxgaussianprocesses/gpjax/badge)](https://www.codefactor.io/repository/github/jaxgaussianprocesses/gpjax)
-[![Documentation Status](https://readthedocs.org/projects/gpjax/badge/?version=latest)](https://gpjax.readthedocs.io/en/latest/?badge=latest)
-[![PyPI version](https://badge.fury.io/py/GPJax.svg)](https://badge.fury.io/py/GPJax)
-[![DOI](https://joss.theoj.org/papers/10.21105/joss.04455/status.svg)](https://doi.org/10.21105/joss.04455)
-[![Downloads](https://pepy.tech/badge/gpjax)](https://pepy.tech/project/gpjax)
-[![Slack Invite](https://img.shields.io/badge/Slack_Invite--blue?style=social&logo=slack)](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw)
-
-[**Quickstart**](#simple-example)
-| [**Install guide**](#installation)
-| [**Documentation**](https://gpjax.readthedocs.io/en/latest/)
-| [**Slack Community**](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw)
+The `linops` submodule is a lightweight linear operator library written in [`jax`](https://github.com/google/jax).
 
 GPJax aims to provide a low-level interface to Gaussian process (GP) models in [Jax](https://github.com/google/jax), structured to give researchers maximum flexibility in extending the code to suit their own needs. The idea is that the code should be as close as possible to the maths we write on paper when working with GP models.
 
@@ -67,15 +52,11 @@ jupytext --to py:percent example.ipynb
 
 Let us import some dependencies and simulate a toy dataset $\mathcal{D}$.
 
+`gpjax.linops` is designed to exploit stucture of this kind. 
 ```python
-import gpjax as gpx
-from jax import grad, jit
-import jax.numpy as jnp
-import jax.random as jr
-import gpjax.kernels as jk
-import optax as ox
+from gpjax import linops
 
-key = jr.PRNGKey(123)
+A = linops.DiagonalLinearOperator(diag = diag)
 
 f = lambda x: 10 * jnp.sin(x)
 
@@ -205,67 +186,15 @@ If you use GPJax in your research, please cite our [JOSS paper](https://joss.the
   journal = {Journal of Open Source Software}
 }
 ```
-`JaxLinOp` is designed to automatically reduce cost savings in matrix addition, multiplication, computing log-determinants and more, for other matrix stuctures too!
+`gpjax.linops` are designed to automatically reduce cost savings in matrix addition, multiplication, computing log-determinants and more, for other matrix stuctures too!
 
 # Custom Linear Operator (details to come soon)
 
-The flexible design of `JaxLinOp` will allow users to impliment their own custom linear operators.
+The flexible design of `gpjax.linops` will allow users to impliment their own custom linear operators.
 
 ```python
-from jaxlinop import LinearOperator
+class MyLinearOperator(linops.LinearOperator):
+  ....
 
-class MyLinearOperator(LinearOperator):
-  
-  def __init__(self, ...)
-    ...
-
-# There will be a minimal number methods that users need to impliment for their custom operator. 
-# For optimal efficiency, we'll make it easy for the user to add optional methods to their operator, 
-# if they give better performance than the defaults.
+ # Coming very soon.
 ```
-
-
-# Installation
-
-## Stable version
-
-The latest stable version of `jaxlinop` can be installed via [`pip`](https://pip.pypa.io/en/stable/):
-
-```bash
-pip install jaxlinop
-```
-
-> **Note**
->
-> We recommend you check your installation version:
-> ```python
-> python -c 'import jaxlinop; print(jaxlinop.__version__)'
-> ```
-
-
-
-## Development version
-> **Warning**
->
-> This version is possibly unstable and may contain bugs. 
-
-Clone a copy of the repository to your local machine and run the setup configuration in development mode.
-```bash
-git clone https://github.com/JaxGaussianProcesses/JaxLinOp.git
-cd jaxlinop
-python -m setup develop
-```
-
-> **Note**
->
-> We advise you create virtual environment before installing:
-> ```
-> conda create -n jaxlinop_ex python=3.10.0
-> conda activate jaxlinop_ex
->  ```
->
-> and recommend you check your installation passes the supplied unit tests:
->
-> ```python
-> python -m pytest tests/
-> ```
