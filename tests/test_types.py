@@ -15,6 +15,7 @@
 
 import jax.numpy as jnp
 import pytest
+
 from gpjax.types import Dataset, verify_dataset
 
 

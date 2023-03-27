@@ -16,24 +16,21 @@
 from abc import abstractmethod
 from typing import Any, Callable, Dict, Optional
 
+import deprecation
 import distrax as dx
 import jax.numpy as jnp
-from jaxtyping import Array, Float
 from jax.random import KeyArray
-
-from .linops import identity
-from .kernels.base import AbstractKernel
-from jaxutils import PyTree
+from jaxtyping import Array, Float
+from jaxutils import Dataset, PyTree
 
 from .config import get_global_config
-from .kernels import AbstractKernel
-from .likelihoods import AbstractLikelihood, Conjugate, NonConjugate
-from .mean_functions import AbstractMeanFunction, Zero
-from jaxutils import Dataset
-from .utils import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
-
-import deprecation
+from .kernels import AbstractKernel
+from .kernels.base import AbstractKernel
+from .likelihoods import AbstractLikelihood, Conjugate, NonConjugate
+from .linops import identity
+from .mean_functions import AbstractMeanFunction, Zero
+from .utils import concat_dictionaries
 
 
 class AbstractPrior(PyTree):

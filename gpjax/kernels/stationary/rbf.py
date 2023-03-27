@@ -21,7 +21,7 @@ from .utils import squared_distance
 import distrax as dx
 
 from dataclasses import dataclass
-from mytree import param_field, Softplus
+from ...parameters import param_field, Softplus
 
 @dataclass
 class RBF(AbstractKernel):
@@ -48,6 +48,6 @@ class RBF(AbstractKernel):
         y = self.slice_input(y) / self.lengthscale
         K = self.variance * jnp.exp(-0.5 * squared_distance(x, y))
         return K.squeeze()
-  
+
     def spectral_density(self) -> dx.Normal:
         return dx.Normal(loc=0.0, scale=1.0)

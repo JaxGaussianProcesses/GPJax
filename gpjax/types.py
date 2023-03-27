@@ -13,8 +13,8 @@
 # limitations under the License.
 # ==============================================================================
 
-import jaxutils
 import deprecation
+import jaxutils
 
 Dataset = deprecation.deprecated(
     deprecated_in="0.5.5",

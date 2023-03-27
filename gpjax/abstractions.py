@@ -13,22 +13,21 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, Dict, Optional, Tuple, Any, Union
+from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import optax as ox
-
-from jax.random import KeyArray
 from jax import lax
 from jax.experimental import host_callback
+from jax.random import KeyArray
 from jaxtyping import Array, Float
+from jaxutils import Dataset, PyTree
 from tqdm.auto import tqdm
 
 from .natural_gradients import natural_gradients
-from .parameters import ParameterState, constrain, trainable_params, unconstrain
-from jaxutils import Dataset, PyTree
+from .params import ParameterState, constrain, trainable_params, unconstrain
 from .variational_inference import StochasticVI
 
 

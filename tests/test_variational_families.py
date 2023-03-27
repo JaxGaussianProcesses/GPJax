@@ -15,13 +15,13 @@
 
 from typing import Callable, Dict, Tuple
 
-import jax
 import distrax as dx
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
 from jax.config import config
-from jaxtyping import Float, Array
+from jaxtyping import Array, Float
 
 import gpjax as gpx
 from gpjax.variational_families import (

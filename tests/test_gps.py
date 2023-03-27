@@ -15,8 +15,8 @@
 
 import typing as tp
 
-import jax
 import distrax as dx
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
@@ -24,8 +24,8 @@ from jax.config import config
 
 from gpjax import Dataset, initialise
 from gpjax.gps import (
-    AbstractPrior,
     AbstractPosterior,
+    AbstractPrior,
     ConjugatePosterior,
     NonConjugatePosterior,
     Prior,

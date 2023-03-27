@@ -9,9 +9,10 @@ import pytest
 from flax import serialization
 from simple_pytree import Pytree, static_field
 
-from gpjax.module import Module, meta
 from gpjax.bijectors import Identity, Softplus
+from gpjax.module import Module, meta
 from gpjax.param import param_field
+
 
 @pytest.mark.parametrize("is_dataclass", [True, False])
 def test_init_and_meta_scrambled(is_dataclass):

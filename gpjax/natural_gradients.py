@@ -24,7 +24,7 @@ from jaxutils import Dataset
 
 from .config import get_global_config
 from .gps import AbstractPosterior
-from .parameters import build_trainables, constrain, trainable_params
+from .params import build_trainables, constrain, trainable_params
 from .variational_families import (
     AbstractVariationalFamily,
     ExpectationVariationalGaussian,

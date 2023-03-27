@@ -16,26 +16,20 @@
 import abc
 from typing import Any, Callable, Dict, Optional
 
+import deprecation
 import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jax.random import KeyArray
 from jaxtyping import Array, Float
-
-from .linops import identity
-from jaxutils import PyTree, Dataset
-from .linops import (
-    DenseLinearOperator,
-    LowerTriangularLinearOperator
-)
+from jaxutils import Dataset, PyTree
 
 from .config import get_global_config
+from .gaussian_distribution import GaussianDistribution
 from .gps import Prior
 from .likelihoods import AbstractLikelihood, Gaussian
+from .linops import DenseLinearOperator, LowerTriangularLinearOperator, identity
 from .utils import concat_dictionaries
-from .gaussian_distribution import GaussianDistribution
-
-import deprecation
 
 
 class AbstractVariationalFamily(PyTree):

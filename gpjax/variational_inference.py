@@ -16,27 +16,24 @@
 import abc
 from typing import Callable, Dict
 
+import deprecation
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jax import vmap
-from jaxtyping import Array, Float
-
-from .linops import identity
 from jax.random import KeyArray
-from jaxutils import PyTree
+from jaxtyping import Array, Float
+from jaxutils import Dataset, PyTree
 
 from .config import get_global_config
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
+from .linops import identity
 from .quadrature import gauss_hermite_quadrature
-from jaxutils import Dataset
 from .utils import concat_dictionaries
 from .variational_families import (
     AbstractVariationalFamily,
     CollapsedVariationalGaussian,
 )
-
-import deprecation
 
 
 class AbstractVariationalInference(PyTree):

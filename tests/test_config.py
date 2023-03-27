@@ -13,17 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 
-import jax
 import distrax as dx
+import jax
 from jax.config import config
 from ml_collections import ConfigDict
 
-from gpjax.config import (
-    Identity,
-    add_parameter,
-    get_global_config,
-    get_global_config_if_exists,  # ignore: unused-import
-)
+from gpjax.config import get_global_config_if_exists  # ignore: unused-import
+from gpjax.config import Identity, add_parameter, get_global_config
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

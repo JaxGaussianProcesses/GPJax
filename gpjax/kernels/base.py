@@ -20,7 +20,7 @@ import jax.numpy as jnp
 from typing import List, Callable, Union
 from jaxtyping import Array, Float
 from functools import partial
-from mytree import Mytree, param_field
+from ..parameters import Module, param_field
 from simple_pytree import static_field
 from dataclasses import dataclass
 from functools import partial
@@ -28,7 +28,7 @@ from functools import partial
 from .computations import AbstractKernelComputation, DenseKernelComputation
 
 @dataclass
-class AbstractKernel(Mytree):
+class AbstractKernel(Module):
     """Base kernel class."""
     compute_engine: AbstractKernelComputation = static_field(DenseKernelComputation)
     active_dims: List[int] = static_field(None)
@@ -42,7 +42,7 @@ class AbstractKernel(Mytree):
 
     def gram(self, x: Float[Array, "N D"]):
         return self.compute_engine(self).gram(x)
-    
+
     def slice_input(self, x: Float[Array, "N D"]) -> Float[Array, "N S"]:
         """Select the relevant columns of the supplied matrix to be used within the kernel's evaluation.
 
@@ -81,9 +81,9 @@ class AbstractKernel(Mytree):
 
         if isinstance(other, AbstractKernel):
             return SumKernel([self, other])
-        
+
         return SumKernel([self, Constant(other)])
-    
+
     def __radd__(self, other: Union[AbstractKernel, Float[Array, "1"]]) -> AbstractKernel:
         """Add two kernels together.
         Args:
@@ -105,7 +105,7 @@ class AbstractKernel(Mytree):
         """
         if isinstance(other, AbstractKernel):
             return ProductKernel([self, other])
-        
+
         return ProductKernel([self, Constant(other)])
 
 
@@ -135,11 +135,11 @@ class CombinationKernel(AbstractKernel):
     """A base class for products or sums of MeanFunctions."""
     kernels: List[AbstractKernel] = None
     operator: Callable = static_field(None)
-    
+
     def __post_init__(self):
         #Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
         kernels_list: List[AbstractKernel] = []
-        
+
         for kernel in self.kernels:
             if not isinstance(kernel, AbstractKernel):
                 raise TypeError("can only combine Kernel instances") # pragma: no cover
@@ -166,7 +166,7 @@ class CombinationKernel(AbstractKernel):
             Float[Array, "1"]: The evaluated kernel function at the supplied inputs.
         """
         return self.operator(jnp.stack([k(x, y) for k in self.kernels]))
-    
+
 
 SumKernel = partial(CombinationKernel, operator=jnp.sum)
 ProductKernel = partial(CombinationKernel, operator=jnp.sum)

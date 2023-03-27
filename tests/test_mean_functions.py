@@ -18,8 +18,8 @@ from typing import Dict
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
-from jax.random import KeyArray
 from jax.config import config
+from jax.random import KeyArray
 from jaxtyping import Array, Float
 
 from gpjax.mean_functions import AbstractMeanFunction, Constant, Zero

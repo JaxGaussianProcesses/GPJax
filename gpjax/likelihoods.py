@@ -15,17 +15,16 @@
 
 import abc
 from typing import Any, Callable, Dict, Optional
-from .linops.utils import to_dense
-from jaxutils import PyTree
 
+import deprecation
 import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
-from jaxtyping import Array, Float
-
 from jax.random import KeyArray
+from jaxtyping import Array, Float
+from jaxutils import PyTree
 
-import deprecation
+from .linops.utils import to_dense
 
 
 class AbstractLikelihood(PyTree):

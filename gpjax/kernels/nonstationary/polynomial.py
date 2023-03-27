@@ -18,7 +18,7 @@ from jaxtyping import Array, Float
 from ..base import AbstractKernel
 from dataclasses import dataclass
 from simple_pytree import static_field
-from mytree import param_field, Softplus
+from ...parameters import param_field, Softplus
 
 @dataclass
 class Polynomial(AbstractKernel):
