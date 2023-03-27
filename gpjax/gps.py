@@ -228,9 +228,7 @@ class Prior(AbstractPrior):
         mean_function = self.mean_function
         kernel = self.kernel
 
-        def predict_fn(
-            test_inputs: Float[Array, "N D"]
-        ) -> GaussianDistribution:
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
 
             # Unpack test inputs
             t = test_inputs
@@ -463,9 +461,7 @@ class ConjugatePosterior(AbstractPosterior):
             covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
             covariance += identity(n_test) * jitter
 
-            return GaussianDistribution(
-                jnp.atleast_1d(mean.squeeze()), covariance
-            )
+            return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict
 
@@ -577,9 +573,7 @@ class ConjugatePosterior(AbstractPosterior):
             )
 
             return constant * (
-                marginal_likelihood.log_prob(
-                    jnp.atleast_1d(y.squeeze())
-                ).squeeze()
+                marginal_likelihood.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
             )
 
         return mll
@@ -627,9 +621,7 @@ class NonConjugatePosterior(AbstractPosterior):
             self.prior.init_params(key),
             {"likelihood": self.likelihood.init_params(key)},
         )
-        parameters["latent"] = jnp.zeros(
-            shape=(self.likelihood.num_datapoints, 1)
-        )
+        parameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
         return parameters
 
     def predict(
@@ -701,9 +693,7 @@ class NonConjugatePosterior(AbstractPosterior):
             covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
             covariance += identity(n_test) * jitter
 
-            return GaussianDistribution(
-                jnp.atleast_1d(mean.squeeze()), covariance
-            )
+            return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict_fn
 

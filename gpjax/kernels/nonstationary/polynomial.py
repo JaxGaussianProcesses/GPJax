@@ -20,11 +20,12 @@ from dataclasses import dataclass
 from simple_pytree import static_field
 from ...parameters import param_field, Softplus
 
+
 @dataclass
 class Polynomial(AbstractKernel):
     """The Polynomial kernel with variable degree."""
 
-    degree: int  = static_field(2)
+    degree: int = static_field(2)
     shift: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
 

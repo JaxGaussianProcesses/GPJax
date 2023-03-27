@@ -9,9 +9,12 @@ from dataclasses import dataclass
 @dataclass
 class BasisFunctionComputation(AbstractKernelComputation):
     """Compute engine class for finite basis function approximations to a kernel."""
+
     num_basis_fns = None
 
-    def cross_covariance(self, x: Float[Array, "N D"], y: Float[Array, "M D"]) -> Float[Array, "N M"]:
+    def cross_covariance(
+        self, x: Float[Array, "N D"], y: Float[Array, "M D"]
+    ) -> Float[Array, "N M"]:
         """For a pair of inputs, compute the cross covariance matrix between the inputs.
         Args:
             params (Dict): A dictionary of parameters for which the cross-covariance matrix should be constructed with.

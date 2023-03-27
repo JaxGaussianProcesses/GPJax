@@ -22,9 +22,11 @@ from dataclasses import dataclass
 from jaxtyping import Array, Float
 from ...parameters import param_field, Softplus
 
+
 @dataclass
 class Linear(AbstractKernel):
     """The linear kernel."""
+
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
 
     def __call__(

@@ -182,7 +182,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         Returns:
             ConstantDiagonalLinearOperator: Covariance operator.
         """
-        return ConstantDiagonalLinearOperator(value=root.value**2, size=root.size)
+        return ConstantDiagonalLinearOperator(value=root.value ** 2, size=root.size)
 
 
 __all__ = [

@@ -23,9 +23,11 @@ import distrax as dx
 from dataclasses import dataclass
 from ...parameters import param_field, Softplus
 
+
 @dataclass
 class RBF(AbstractKernel):
     """The Radial Basis Function (RBF) kernel."""
+
     lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=Softplus)
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
 

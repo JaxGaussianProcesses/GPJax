@@ -27,9 +27,11 @@ from functools import partial
 
 from .computations import AbstractKernelComputation, DenseKernelComputation
 
+
 @dataclass
 class AbstractKernel(Module):
     """Base kernel class."""
+
     compute_engine: AbstractKernelComputation = static_field(DenseKernelComputation)
     active_dims: List[int] = static_field(None)
 
@@ -70,7 +72,9 @@ class AbstractKernel(Module):
         """
         raise NotImplementedError
 
-    def __add__(self, other: Union[AbstractKernel, Float[Array, "1"]]) -> AbstractKernel:
+    def __add__(
+        self, other: Union[AbstractKernel, Float[Array, "1"]]
+    ) -> AbstractKernel:
         """Add two kernels together.
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
@@ -84,7 +88,9 @@ class AbstractKernel(Module):
 
         return SumKernel([self, Constant(other)])
 
-    def __radd__(self, other: Union[AbstractKernel, Float[Array, "1"]]) -> AbstractKernel:
+    def __radd__(
+        self, other: Union[AbstractKernel, Float[Array, "1"]]
+    ) -> AbstractKernel:
         """Add two kernels together.
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
@@ -94,7 +100,9 @@ class AbstractKernel(Module):
         """
         return self.__add__(other)
 
-    def __mul__(self, other: Union[AbstractKernel, Float[Array, "1"]]) -> AbstractKernel:
+    def __mul__(
+        self, other: Union[AbstractKernel, Float[Array, "1"]]
+    ) -> AbstractKernel:
         """Multiply two kernels together.
 
         Args:
@@ -115,6 +123,7 @@ class Constant(AbstractKernel):
     A constant mean function. This function returns a repeated scalar value for all inputs.
     The scalar value itself can be treated as a model hyperparameter and learned during training.
     """
+
     constant: Float[Array, "1"] = param_field(jnp.array(0.0))
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
@@ -133,16 +142,17 @@ class Constant(AbstractKernel):
 @dataclass
 class CombinationKernel(AbstractKernel):
     """A base class for products or sums of MeanFunctions."""
+
     kernels: List[AbstractKernel] = None
     operator: Callable = static_field(None)
 
     def __post_init__(self):
-        #Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
+        # Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
         kernels_list: List[AbstractKernel] = []
 
         for kernel in self.kernels:
             if not isinstance(kernel, AbstractKernel):
-                raise TypeError("can only combine Kernel instances") # pragma: no cover
+                raise TypeError("can only combine Kernel instances")  # pragma: no cover
 
             if isinstance(kernel, self.__class__):
                 kernels_list.extend(kernel.kernels)

@@ -26,9 +26,11 @@ from dataclasses import dataclass
 
 Kernel = Any
 
+
 @dataclass
 class AbstractKernelComputation:
     """Abstract class for kernel computations."""
+
     kernel: Kernel
 
     def gram(
@@ -48,7 +50,9 @@ class AbstractKernelComputation:
         return DenseLinearOperator(Kxx)
 
     @abc.abstractmethod
-    def cross_covariance(self, x: Float[Array, "N D"], y: Float[Array, "M D"]) -> Float[Array, "N M"]:
+    def cross_covariance(
+        self, x: Float[Array, "N D"], y: Float[Array, "M D"]
+    ) -> Float[Array, "N M"]:
         """For a given kernel, compute the NxM gram matrix on an a pair
         of input matrices with shape NxD and MxD.
 

@@ -22,7 +22,6 @@ from .base import AbstractKernelComputation
 
 
 class DiagonalKernelComputation(AbstractKernelComputation):
-
     def gram(self, x: Float[Array, "N D"]) -> DiagonalLinearOperator:
         """For a kernel with diagonal structure, compute the NxN gram matrix on
         an input matrix of shape NxD.
@@ -35,7 +34,9 @@ class DiagonalKernelComputation(AbstractKernelComputation):
         """
         return DiagonalLinearOperator(diag=vmap(lambda x: self.kernel(x, x))(x))
 
-    def cross_covariance(self, x: Float[Array, "N D"], y: Float[Array, "M D"]) -> Float[Array, "N M"]:
+    def cross_covariance(
+        self, x: Float[Array, "N D"], y: Float[Array, "M D"]
+    ) -> Float[Array, "N M"]:
         """For a given kernel, compute the NxM covariance matrix on a pair of input
         matrices of shape NxD and MxD.
 
