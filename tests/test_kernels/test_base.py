@@ -17,7 +17,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import pytest
 from jax.config import config
-from gpjax.linops import identity
+from jaxlinop import identity
 
 from gpjax.kernels.base import (
     AbstractKernel,

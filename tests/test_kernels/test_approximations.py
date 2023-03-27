@@ -1,6 +1,6 @@
 import pytest
-from gpjax.kernels.approximations import RFF
-from gpjax.kernels.stationary import (
+from jaxkern.approximations import RFF
+from jaxkern.stationary import (
     Matern12,
     Matern32,
     Matern52,
@@ -9,8 +9,8 @@ from gpjax.kernels.stationary import (
     PoweredExponential,
     Periodic,
 )
-from gpjax.kernels.nonstationary import Polynomial, Linear
-from gpjax.kernels.base import AbstractKernel
+from jaxkern.nonstationary import Polynomial, Linear
+from jaxkern.base import AbstractKernel
 import jax.random as jr
 from jax.config import config
 import jax.numpy as jnp

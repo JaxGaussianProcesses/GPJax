@@ -1,12 +1,11 @@
 import jax.numpy as jnp
-import jax.random as jr
 import pytest
 
 from gpjax.kernels.computations import (
     DiagonalKernelComputation,
     ConstantDiagonalKernelComputation,
 )
-from gpjax.kernels.stationary import (
+from jaxkern.stationary import (
     RBF,
     Matern12,
     Matern32,
@@ -34,16 +33,14 @@ from gpjax.kernels.nonstationary import Linear, Polynomial
 )
 def test_change_computation(kernel):
     x = jnp.linspace(-3.0, 3.0, 5).reshape(-1, 1)
-    key = jr.PRNGKey(123)
-    params = kernel.init_params(key)
 
     # The default computation is DenseKernelComputation
-    dense_matrix = kernel.gram(params, x).to_dense()
+    dense_matrix = kernel.gram(x).to_dense()
     dense_diagonals = jnp.diag(dense_matrix)
 
     # Let's now change the computation to DiagonalKernelComputation
-    kernel.compute_engine = DiagonalKernelComputation
-    diagonal_matrix = kernel.gram(params, x).to_dense()
+    kernel = kernel.replace(compute_engine = DiagonalKernelComputation)
+    diagonal_matrix = kernel.gram(x).to_dense()
     diag_entries = jnp.diag(diagonal_matrix)
 
     # The diagonal entries should be the same as the dense matrix
@@ -53,8 +50,8 @@ def test_change_computation(kernel):
     assert jnp.allclose(diagonal_matrix - jnp.diag(diag_entries), 0.0)
 
     # Let's now change the computation to ConstantDiagonalKernelComputation
-    kernel.compute_engine = ConstantDiagonalKernelComputation
-    constant_diagonal_matrix = kernel.gram(params, x).to_dense()
+    kernel = kernel.replace(compute_engine = ConstantDiagonalKernelComputation)
+    constant_diagonal_matrix = kernel.gram(x).to_dense()
     constant_entries = jnp.diag(constant_diagonal_matrix)
 
     # Assert all the diagonal entries are the same
