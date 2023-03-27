@@ -17,6 +17,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import networkx as nx
 from jax.config import config
+from jaxlinop import identity
 
 from gpjax.kernels.non_euclidean import GraphKernel
 from gpjax.linops import identity

@@ -1,3 +1,20 @@
+import pytest
+from jaxkern.approximations import RFF
+from jaxkern.stationary import (
+    Matern12,
+    Matern32,
+    Matern52,
+    RBF,
+    RationalQuadratic,
+    PoweredExponential,
+    Periodic,
+)
+from jaxkern.nonstationary import Polynomial, Linear
+from jaxkern.base import AbstractKernel
+import jax.random as jr
+from jax.config import config
+import jax.numpy as jnp
+from gpjax.linops import DenseLinearOperator
 from typing import Tuple
 
 import jax
@@ -9,9 +26,15 @@ from jax.config import config
 from gpjax.kernels.approximations import RFF
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.nonstationary import Linear, Polynomial
-from gpjax.kernels.stationary import (RBF, Matern12, Matern32, Matern52,
-                                      Periodic, PoweredExponential,
-                                      RationalQuadratic)
+from gpjax.kernels.stationary import (
+    RBF,
+    Matern12,
+    Matern32,
+    Matern52,
+    Periodic,
+    PoweredExponential,
+    RationalQuadratic,
+)
 from gpjax.linops import DenseLinearOperator
 
 config.update("jax_enable_x64", True)

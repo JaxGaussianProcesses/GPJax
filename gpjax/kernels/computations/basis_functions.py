@@ -1,18 +1,19 @@
-from dataclasses import dataclass
-
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 
 from gpjax.linops import DenseLinearOperator
 
 from .base import AbstractKernelComputation
+from gpjax.linops import DenseLinearOperator
+
+from dataclasses import dataclass
 
 
 @dataclass
 class BasisFunctionComputation(AbstractKernelComputation):
     """Compute engine class for finite basis function approximations to a kernel."""
 
-    num_basis_fns: int = None
+    num_basis_fns = None
 
     def cross_covariance(
         self, x: Float[Array, "N D"], y: Float[Array, "M D"]
@@ -28,8 +29,8 @@ class BasisFunctionComputation(AbstractKernelComputation):
         """
         z1 = self.compute_features(x)
         z2 = self.compute_features(y)
-        z1 /= self.kernel.num_basis_fns
-        return self.kernel.base_kernel.variance * jnp.matmul(z1, z2.T)
+        z1 /= self.num_basis_fns
+        return self.kernel.variance * jnp.matmul(z1, z2.T)
 
     def gram(self, inputs: Float[Array, "N D"]) -> DenseLinearOperator:
         """For the Gram matrix, we can save computations by computing only one matrix multiplication between the inputs and the scaled frequencies.
@@ -43,8 +44,8 @@ class BasisFunctionComputation(AbstractKernelComputation):
         """
         z1 = self.compute_features(inputs)
         matrix = jnp.matmul(z1, z1.T)  # shape: (n_samples, n_samples)
-        matrix /= self.kernel.num_basis_fns
-        return DenseLinearOperator(self.kernel.base_kernel.variance * matrix)
+        matrix /= self.num_basis_fns
+        return DenseLinearOperator(self.kernel.variance * matrix)
 
     def compute_features(self, x: Float[Array, "N D"]) -> Float[Array, "N L"]:
         """Compute the features for the inputs.
@@ -57,7 +58,7 @@ class BasisFunctionComputation(AbstractKernelComputation):
             Float[Array, "N L"]: A N x L array of features where L = 2M.
         """
         frequencies = self.kernel.frequencies
-        scaling_factor = self.kernel.base_kernel.lengthscale
+        scaling_factor = self.kernel.lengthscale
         z = jnp.matmul(x, (frequencies / scaling_factor).T)
         z = jnp.concatenate([jnp.cos(z), jnp.sin(z)], axis=-1)
         return z

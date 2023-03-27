@@ -16,25 +16,25 @@
 from __future__ import annotations
 
 import abc
+import jax.numpy as jnp
+from typing import List, Callable, Union
+from jaxtyping import Array, Float
+from functools import partial
+from mytree import Mytree, param_field
+from simple_pytree import static_field
 from dataclasses import dataclass
 from functools import partial
-from typing import Callable, List, Union
-
-import jax.numpy as jnp
-from jaxtyping import Array, Float
-from simple_pytree import static_field
 
 from ..base import Module, param_field
 from .computations import AbstractKernelComputation, DenseKernelComputation
 
 
 @dataclass
-class AbstractKernel(Module):
+class AbstractKernel(Mytree):
     """Base kernel class."""
 
     compute_engine: AbstractKernelComputation = static_field(DenseKernelComputation)
     active_dims: List[int] = static_field(None)
-    name: str = static_field("AbstractKernel")
 
     @property
     def ndims(self):
@@ -85,9 +85,9 @@ class AbstractKernel(Module):
         """
 
         if isinstance(other, AbstractKernel):
-            return SumKernel(kernels=[self, other])
+            return SumKernel([self, other])
 
-        return SumKernel(kernels=[self, Constant(other)])
+        return SumKernel([self, Constant(other)])
 
     def __radd__(
         self, other: Union[AbstractKernel, Float[Array, "1"]]
@@ -113,13 +113,9 @@ class AbstractKernel(Module):
             AbstractKernel: A new kernel that is the product of the two kernels.
         """
         if isinstance(other, AbstractKernel):
-            return ProductKernel(kernels=[self, other])
+            return ProductKernel([self, other])
 
-        return ProductKernel(kernels=[self, Constant(other)])
-
-    @property
-    def spectral_density(self) -> tfd.Distribution:
-        return None
+        return ProductKernel([self, Constant(other)])
 
 
 @dataclass
@@ -184,4 +180,4 @@ class CombinationKernel(AbstractKernel):
 
 
 SumKernel = partial(CombinationKernel, operator=jnp.sum)
-ProductKernel = partial(CombinationKernel, operator=jnp.prod)
+ProductKernel = partial(CombinationKernel, operator=jnp.sum)

@@ -20,6 +20,7 @@ import jax.random as jr
 import jax.tree_util as jtu
 import pytest
 from jax.config import config
+from gpjax.linops import LinearOperator, identity
 
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.nonstationary import Linear, Polynomial
@@ -101,6 +102,19 @@ def test_pos_def(
     Kxx += identity(n) * _jitter
     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
     assert (eigen_values > 0.0).all()
+
+
+# @pytest.mark.parametrize(
+#     "kernel",
+#     [
+#         Linear,
+#         Polynomial,
+#     ],
+# )
+# def test_dtype(kernel: AbstractKernel) -> None:
+#     params_list = jtu.tree_leaves(kernel())
+#     for v in params_list:
+#         assert v.dtype == jnp.float64
 
 
 @pytest.mark.parametrize("degree", [1, 2, 3])

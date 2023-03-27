@@ -13,22 +13,22 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
 import jax.numpy as jnp
-import tensorflow_probability.substrates.jax.bijectors as tfb
-from jaxtyping import Array, Float
+from jaxtyping import Array
 
 from ...base import param_field
 from ..base import AbstractKernel
+
+from dataclasses import dataclass
+from jaxtyping import Array, Float
+from mytree import param_field, Softplus
 
 
 @dataclass
 class Linear(AbstractKernel):
     """The linear kernel."""
 
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    name: str = "Linear"
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
 
     def __call__(
         self,
