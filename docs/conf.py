@@ -123,7 +123,6 @@ nbsphinx_execute_arguments = ["--InlineBackend.figure_formats={'svg', 'pdf'}"]
 nbsphinx_responsive_width = "700px"
 
 # Latex commands
-# mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 mathjax3_config = {
     "tex": {
         "equationNumbers": {"autoNumber": "AMS", "useLabelIds": True},
@@ -179,7 +178,6 @@ master_doc = "index"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ["_static"]
 html_static_path = ["_static"]
 html_css_files = ["css/gpjax_theme.css"]
 
@@ -204,7 +202,6 @@ autodoc_default_options = {
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-# html_theme = "furo"
 html_theme = "sphinx_book_theme"
 html_logo = "_static/gpjax_logo.svg"
 html_favicon = "_static/gpjax_logo.svg"

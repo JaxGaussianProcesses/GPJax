@@ -24,13 +24,13 @@ from jax.random import KeyArray
 from jaxtyping import Array, Float
 from jaxutils import Dataset, PyTree
 
-from .config import get_global_config
-from .gps import AbstractPosterior
-from .likelihoods import Gaussian
-from .linops import identity
-from .quadrature import gauss_hermite_quadrature
-from .utils import concat_dictionaries
-from .variational_families import (
+from gpjax.config import get_global_config
+from gpjax.gps import AbstractPosterior
+from gpjax.likelihoods import Gaussian
+from gpjax.linops import identity
+from gpjax.quadrature import gauss_hermite_quadrature
+from gpjax.utils import concat_dictionaries
+from gpjax.variational_families import (
     AbstractVariationalFamily,
     CollapsedVariationalGaussian,
 )
@@ -145,7 +145,6 @@ class StochasticVI(AbstractVariationalInference):
 
         mean, variance = vmap(q_moments)(x[:, None])
 
-        # log(p(y|f(x)))
         link_function = self.likelihood.link_function
         log_prob = vmap(lambda f, y: link_function(params["likelihood"], f).log_prob(y))
 
@@ -157,7 +156,8 @@ class StochasticVI(AbstractVariationalInference):
 
 class CollapsedVI(AbstractVariationalInference):
     """Collapsed variational inference for a sparse Gaussian process regression model.
-    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes."""
+    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes.
+    """
 
     def __init__(
         self,
@@ -245,10 +245,8 @@ class CollapsedVI(AbstractVariationalInference):
             # AAᵀ
             AAT = jnp.matmul(A, A.T)
 
-            # B = I + AAᵀ
             B = jnp.eye(m) + AAT
 
-            # LLᵀ = I + AAᵀ
             L = jnp.linalg.cholesky(B)
 
             # log|B| = 2 trace(log|L|) = 2 Σᵢ log Lᵢᵢ  [since |B| = |LLᵀ| = |L|²  => log|B| = 2 log|L|, and |L| = Πᵢ Lᵢᵢ]
@@ -262,7 +260,7 @@ class CollapsedVI(AbstractVariationalInference):
             )
 
             # (y - μx)ᵀ (Iσ² + Q)⁻¹ (y - μx)
-            quad = (jnp.sum(diff ** 2) - jnp.sum(L_inv_A_diff ** 2)) / noise
+            quad = (jnp.sum(diff**2) - jnp.sum(L_inv_A_diff**2)) / noise
 
             # 2 * log N(y; μx, Iσ² + Q)
             two_log_prob = -n * jnp.log(2.0 * jnp.pi * noise) - log_det_B - quad

@@ -23,14 +23,14 @@ from jax.random import KeyArray
 from jaxtyping import Array, Float
 from jaxutils import Dataset, PyTree
 
-from .config import get_global_config
-from .gaussian_distribution import GaussianDistribution
-from .kernels import AbstractKernel
-from .kernels.base import AbstractKernel
-from .likelihoods import AbstractLikelihood, Conjugate, NonConjugate
-from .linops import identity
-from .mean_functions import AbstractMeanFunction, Zero
-from .utils import concat_dictionaries
+from gpjax.config import get_global_config
+from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.kernels import AbstractKernel
+from gpjax.kernels.base import AbstractKernel
+from gpjax.likelihoods import AbstractLikelihood, Conjugate, NonConjugate
+from gpjax.linops import identity
+from gpjax.mean_functions import AbstractMeanFunction, Zero
+from gpjax.utils import concat_dictionaries
 
 
 class AbstractPrior(PyTree):
@@ -229,7 +229,6 @@ class Prior(AbstractPrior):
         kernel = self.kernel
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
-
             # Unpack test inputs
             t = test_inputs
             n_test = test_inputs.shape[0]

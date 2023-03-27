@@ -24,7 +24,7 @@ from jax.random import KeyArray
 from jaxtyping import Array, Float
 from jaxutils import PyTree
 
-from .linops.utils import to_dense
+from gpjax.linops.utils import to_dense
 
 
 class AbstractLikelihood(PyTree):

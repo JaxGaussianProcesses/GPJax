@@ -24,12 +24,12 @@ from jax.random import KeyArray
 from jaxtyping import Array, Float
 from jaxutils import Dataset, PyTree
 
-from .config import get_global_config
-from .gaussian_distribution import GaussianDistribution
-from .gps import Prior
-from .likelihoods import AbstractLikelihood, Gaussian
-from .linops import DenseLinearOperator, LowerTriangularLinearOperator, identity
-from .utils import concat_dictionaries
+from gpjax.config import get_global_config
+from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.gps import Prior
+from gpjax.likelihoods import AbstractLikelihood, Gaussian
+from gpjax.linops import DenseLinearOperator, LowerTriangularLinearOperator, identity
+from gpjax.utils import concat_dictionaries
 
 
 class AbstractVariationalFamily(PyTree):
@@ -229,7 +229,6 @@ class VariationalGaussian(AbstractVariationalGaussian):
         μz = mean_function(params["mean_function"], z)
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
-
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
@@ -350,7 +349,6 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         Lz = Kzz.to_root()
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
-
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
@@ -531,7 +529,6 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         μz = mean_function(params["mean_function"], z)
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
-
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
@@ -708,7 +705,6 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         μz = mean_function(params["mean_function"], z)
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
-
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
@@ -745,7 +741,8 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
 class CollapsedVariationalGaussian(AbstractVariationalFamily):
     """Collapsed variational Gaussian family of probability distributions.
-    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes."""
+    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes.
+    """
 
     def __init__(
         self,
@@ -801,7 +798,6 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
         jitter = get_global_config()["jitter"]
 
         def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
-
             # Unpack test inputs
             t, n_test = test_inputs, test_inputs.shape[0]
 
@@ -833,7 +829,6 @@ class CollapsedVariationalGaussian(AbstractVariationalFamily):
             # AAᵀ
             AAT = jnp.matmul(A, A.T)
 
-            # LLᵀ = I + AAᵀ
             L = jnp.linalg.cholesky(jnp.eye(m) + AAT)
 
             μx = mean_function(params["mean_function"], x)

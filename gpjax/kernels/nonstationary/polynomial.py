@@ -15,10 +15,10 @@
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from ..base import AbstractKernel
+from gpjax.kernels.base import AbstractKernel
 from dataclasses import dataclass
 from simple_pytree import static_field
-from ...parameters import param_field, Softplus
+from gpjax.parameters import param_field, Softplus
 
 
 @dataclass

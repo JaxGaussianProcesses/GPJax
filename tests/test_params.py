@@ -26,7 +26,6 @@ from gpjax.kernels import RBF
 from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.params import (
     build_bijectors,
-    build_trainables,
     constrain,
     copy_dict_structure,
     evaluate_priors,
@@ -41,6 +40,7 @@ from gpjax.params import (
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
+
 
 #########################
 # Test base functionality
@@ -177,7 +177,7 @@ def test_incomplete_priors():
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 def test_checks(num_datapoints):
     incomplete_priors = {"lengthscale": jnp.array([1.0])}
-    posterior = Prior(kernel=RBF()) * Bernoulli(num_datapoints=num_datapoints)
+    Prior(kernel=RBF()) * Bernoulli(num_datapoints=num_datapoints)
     priors = prior_checks(incomplete_priors)
     assert "latent" in priors.keys()
     assert "variance" not in priors.keys()

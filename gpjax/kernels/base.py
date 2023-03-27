@@ -20,12 +20,12 @@ import jax.numpy as jnp
 from typing import List, Callable, Union
 from jaxtyping import Array, Float
 from functools import partial
-from ..parameters import Module, param_field
+from gpjax.parameters import Module, param_field
 from simple_pytree import static_field
 from dataclasses import dataclass
 from functools import partial
 
-from .computations import AbstractKernelComputation, DenseKernelComputation
+from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 
 
 @dataclass

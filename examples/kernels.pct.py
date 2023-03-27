@@ -2,16 +2,10 @@
 # ---
 # jupyter:
 #   jupytext:
-#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
-#     language: python
-#     name: python3
 # ---
 
 # %% [markdown]
@@ -198,6 +192,7 @@ prod_k = jk.ProductKernel(kernel_set=[k1, k2, k3])
 # \rvert.$$
 #
 # To implement this, one must write the following class.
+
 
 # %%
 def angular_distance(x, y, c):

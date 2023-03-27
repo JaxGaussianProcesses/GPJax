@@ -18,14 +18,14 @@ from __future__ import annotations
 from typing import Union, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .identity_linear_operator import IdentityLinearOperator
+    from gpjax.linops.identity_linear_operator import IdentityLinearOperator
 
 from jaxtyping import Float, Array
 
 import jax.numpy as jnp
 import jax
 
-from .linear_operator import LinearOperator
+from gpjax.linops.linear_operator import LinearOperator
 
 
 def identity(n: int) -> IdentityLinearOperator:
@@ -38,7 +38,7 @@ def identity(n: int) -> IdentityLinearOperator:
         IdentityLinearOperator: Identity matrix of shape [n, n].
     """
 
-    from .identity_linear_operator import IdentityLinearOperator
+    from gpjax.linops.identity_linear_operator import IdentityLinearOperator
 
     return IdentityLinearOperator(size=n)
 
@@ -79,7 +79,7 @@ def to_linear_operator(obj: Union[Float[Array, "..."], LinearOperator]):
         return obj
 
     elif isinstance(obj, jnp.ndarray):
-        from .dense_linear_operator import DenseLinearOperator
+        from gpjax.linops.dense_linear_operator import DenseLinearOperator
 
         return DenseLinearOperator.from_dense(obj)
     else:

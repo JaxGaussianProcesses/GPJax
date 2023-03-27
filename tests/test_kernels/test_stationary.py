@@ -27,9 +27,6 @@ from gpjax.linops import LinearOperator, identity
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.stationary import (
     RBF,
-    Matern12,
-    Matern32,
-    Matern52,
 )
 from gpjax.kernels.stationary.utils import build_student_t_distribution
 
@@ -43,17 +40,11 @@ _jitter = 1e-6
     "kernel",
     [
         RBF(),
-        # Matern12(),
-        # Matern32(),
-        # Matern52(),
-        # RationalQuadratic(),
-        # White(),
     ],
 )
 @pytest.mark.parametrize("dim", [1, 2, 5])
 @pytest.mark.parametrize("n", [1, 2, 10])
 def test_gram(kernel: AbstractKernel, dim: int, n: int) -> None:
-
     # Gram constructor static method:
     kernel.gram
 
@@ -70,11 +61,6 @@ def test_gram(kernel: AbstractKernel, dim: int, n: int) -> None:
     "kernel",
     [
         RBF(),
-        # Matern12(),
-        # Matern32(),
-        # Matern52(),
-        # RationalQuadratic(),
-        # White(),
     ],
 )
 @pytest.mark.parametrize("num_a", [1, 2, 5])
@@ -97,15 +83,10 @@ def test_cross_covariance(
     "kernel",
     [
         RBF(),
-        # Matern12(),
-        # Matern32(),
-        # Matern52(),
-        # White(),
     ],
 )
 @pytest.mark.parametrize("dim", [1, 2, 5])
 def test_call(kernel: AbstractKernel, dim: int) -> None:
-
     # Datapoint x and datapoint y:
     x = jnp.array([[1.0] * dim])
     y = jnp.array([[0.5] * dim])
@@ -153,23 +134,7 @@ def test_pos_def(
 # @pytest.mark.parametrize("alpha", [0.1, 0.5, 1.0])
 # @pytest.mark.parametrize("n", [1, 2, 5])
 # def test_pos_def_rq(dim: int, ell: float, sigma: float, alpha: float, n: int) -> None:
-#     kern = RationalQuadratic(active_dims=list(range(dim)))
-#     # Gram constructor static method:
 #     kern.gram
-
-#     # Create inputs x:
-#     x = jr.uniform(_initialise_key, (n, dim))
-#     params = {
-#         "lengthscale": jnp.array([ell]),
-#         "variance": jnp.array([sigma]),
-#         "alpha": jnp.array([alpha]),
-#     }
-
-#     # Test gram matrix eigenvalues are positive:
-#     Kxx = kern.gram(params, x)
-#     Kxx += identity(n) * _jitter
-#     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
-#     assert (eigen_values > 0.0).all()
 
 
 # @pytest.mark.parametrize("dim", [1, 2, 5])
@@ -179,23 +144,7 @@ def test_pos_def(
 # def test_pos_def_periodic(
 #     dim: int, ell: float, sigma: float, period: float, n: int
 # ) -> None:
-#     kern = Periodic(active_dims=list(range(dim)))
-#     # Gram constructor static method:
 #     kern.gram
-
-#     # Create inputs x:
-#     x = jr.uniform(_initialise_key, (n, dim))
-#     params = {
-#         "lengthscale": jnp.array([ell]),
-#         "variance": jnp.array([sigma]),
-#         "period": jnp.array([period]),
-#     }
-
-#     # Test gram matrix eigenvalues are positive:
-#     Kxx = kern.gram(params, x)
-#     Kxx += identity(n) * _jitter
-#     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
-# #     assert (eigen_values > 0.0).all()
 
 
 # @pytest.mark.parametrize("dim", [1, 2, 5])
@@ -205,57 +154,28 @@ def test_pos_def(
 # def test_pos_def_power_exp(
 #     dim: int, ell: float, sigma: float, power: float, n: int
 # ) -> None:
-#     kern = PoweredExponential(active_dims=list(range(dim)))
-#     # Gram constructor static method:
 #     kern.gram
-
-#     # Create inputs x:
-#     x = jr.uniform(_initialise_key, (n, dim))
-#     params = {
-#         "lengthscale": jnp.array([ell]),
-#         "variance": jnp.array([sigma]),
-#         "power": jnp.array([power]),
-#     }
-
-#     # Test gram matrix eigenvalues are positive:
-#     Kxx = kern.gram(params, x)
-#     Kxx += identity(n) * _jitter
-#     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
-#     assert (eigen_values > 0.0).all()
 
 
 # @pytest.mark.parametrize("kernel",
-#     [
 #         RBF,
 #         #Matern12,
 #         #Matern32,
 #         #Matern52,
 #     ],
-# )
 # @pytest.mark.parametrize("dim", [None, 1, 2, 5, 10])
 # def test_initialisation(kernel: AbstractKernel, dim: int) -> None:
 
 #     if dim is None:
-#         kern = kernel()
-#         assert kern.ndims == 1
 
-#     else:
-#         kern = kernel(active_dims=[i for i in range(dim)])
-#         params = kern.init_params(_initialise_key)
-
-#         assert list(params.keys()) == ["lengthscale", "variance"]
-#         assert all(params["lengthscale"] == jnp.array([1.0] * dim))
-#         assert params["variance"] == jnp.array([1.0])
 
 #         if dim > 1:
 #             assert kern.ard
-#         else:
 #             assert not kern.ard
 
 
 # @pytest.mark.parametrize(
 #     "kernel",
-#     [
 #         RBF,
 #         # Matern12,
 #         # Matern32,
@@ -264,13 +184,8 @@ def test_pos_def(
 #         # Periodic,
 #         # PoweredExponential,
 #     ],
-# )
 # def test_dtype(kernel: AbstractKernel) -> None:
-#     parameter_state = initialise(kernel(), _initialise_key)
-#     params, *_ = parameter_state.unpack()
 #     for k, v in params.items():
-#         assert v.dtype == jnp.float64
-#         assert isinstance(k, str)
 
 
 @pytest.mark.parametrize(
@@ -315,19 +230,7 @@ def test_build_studentt_dist(smoothness: int) -> None:
 
 
 # @pytest.mark.parametrize(
-#     "kern, df", [(Matern12(), 1), (Matern32(), 3), (Matern52(), 5)]
-# )
 # def test_matern_spectral_density(kern, df) -> None:
-#     sdensity = kern.spectral_density
-#     assert sdensity.name == "StudentT"
-#     assert sdensity.df == df
-#     assert sdensity.loc == jnp.array(0.0)
-#     assert sdensity.scale == jnp.array(1.0)
 
 
 # def test_rbf_spectral_density() -> None:
-#     kern = RBF()
-#     sdensity = kern.spectral_density
-#     assert sdensity.name == "Normal"
-#     assert sdensity.loc == jnp.array(0.0)
-#     assert sdensity.scale == jnp.array(1.0)

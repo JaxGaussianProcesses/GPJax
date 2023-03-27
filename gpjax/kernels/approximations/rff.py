@@ -1,5 +1,5 @@
-from ..base import AbstractKernel
-from ..computations import BasisFunctionComputation
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import BasisFunctionComputation
 from jax.random import KeyArray
 from typing import Dict, Any
 

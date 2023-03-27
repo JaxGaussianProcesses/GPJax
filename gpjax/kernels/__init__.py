@@ -14,17 +14,17 @@
 # ==============================================================================
 
 """JaxKern."""
-from .approximations import RFF
-from .base import ProductKernel, SumKernel, AbstractKernel
-from .computations import (
+from gpjax.kernels.approximations import RFF
+from gpjax.kernels.base import ProductKernel, SumKernel, AbstractKernel
+from gpjax.kernels.computations import (
     BasisFunctionComputation,
     ConstantDiagonalKernelComputation,
     DenseKernelComputation,
     DiagonalKernelComputation,
     EigenKernelComputation,
 )
-from .nonstationary import Linear, Polynomial
-from .stationary import (
+from gpjax.kernels.nonstationary import Linear, Polynomial
+from gpjax.kernels.stationary import (
     RBF,
     Matern12,
     Matern32,
@@ -34,7 +34,7 @@ from .stationary import (
     PoweredExponential,
     White,
 )
-from .non_euclidean import GraphKernel
+from gpjax.kernels.non_euclidean import GraphKernel
 
 __all__ = [
     "AbstractKernel",

@@ -16,11 +16,11 @@
 import jax.numpy as jnp
 from jaxtyping import Array
 
-from ..base import AbstractKernel
+from gpjax.kernels.base import AbstractKernel
 
 from dataclasses import dataclass
 from jaxtyping import Array, Float
-from ...parameters import param_field, Softplus
+from gpjax.parameters import param_field, Softplus
 
 
 @dataclass

@@ -63,7 +63,7 @@ def test_dataset_assertions(nx: int, ny: int, outd: int, ind: int) -> None:
     y = jnp.ones((ny, outd))
 
     with pytest.raises(ValueError):
-        ds = Dataset(X=x, y=y)
+        Dataset(X=x, y=y)
 
 
 @pytest.mark.parametrize("n", [1, 2, 10])
@@ -74,13 +74,13 @@ def test_2d_inputs(n: int, outd: int, ind: int) -> None:
     y = jnp.ones((n,))
 
     with pytest.raises(ValueError):
-        ds = Dataset(X=x, y=y)
+        Dataset(X=x, y=y)
 
     x = jnp.ones((n,))
     y = jnp.ones((n, outd))
 
     with pytest.raises(ValueError):
-        ds = Dataset(X=x, y=y)
+        Dataset(X=x, y=y)
 
 
 def test_y_none() -> None:

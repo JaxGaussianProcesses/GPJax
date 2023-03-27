@@ -1,16 +1,10 @@
 # ---
 # jupyter:
 #   jupytext:
-#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
-#     language: python
-#     name: python3
 # ---
 
 # %%
@@ -196,9 +190,7 @@ ax[0].set(xlabel="Predicted", ylabel="Actual", title="Predicted vs Actual")
 ax[1].scatter(predictive_mean.squeeze(), residuals)
 ax[1].plot([0, 1], [0.5, 0.5], color="tab:orange", transform=ax[1].transAxes)
 ax[1].set_ylim([-1.0, 1.0])
-ax[1].set(
-    xlabel="Predicted", ylabel="Residuals", title="Predicted vs Residuals"
-)
+ax[1].set(xlabel="Predicted", ylabel="Residuals", title="Predicted vs Residuals")
 
 ax[2].hist(np.asarray(residuals), bins=30)
 ax[2].set_title("Residuals")

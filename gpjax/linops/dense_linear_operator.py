@@ -18,7 +18,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .diagonal_linear_operator import DiagonalLinearOperator
+    from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 
 from typing import Union
 
@@ -26,8 +26,8 @@ import jax.numpy as jnp
 from dataclasses import dataclass
 from jaxtyping import Array, Float
 
-from .linear_operator import LinearOperator
-from .utils import to_linear_operator
+from gpjax.linops.linear_operator import LinearOperator
+from gpjax.linops.utils import to_linear_operator
 
 
 def _check_matrix(matrix: Array) -> None:
@@ -77,8 +77,8 @@ class DenseLinearOperator(LinearOperator):
             LinearOperator: linear operator plus the diagonal linear operator.
         """
 
-        from .diagonal_linear_operator import DiagonalLinearOperator
-        from .zero_linear_operator import ZeroLinearOperator
+        from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+        from gpjax.linops.zero_linear_operator import ZeroLinearOperator
 
         other = to_linear_operator(other)
 

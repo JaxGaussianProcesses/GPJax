@@ -2,16 +2,11 @@
 # ---
 # jupyter:
 #   jupytext:
-#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.9.7 ('gpjax')
-#     language: python
-#     name: python3
 # ---
 
 # %% [markdown]
@@ -174,7 +169,6 @@ f_hat = Lx @ map_estimate["latent"]
 # Negative Hessian,  H = -∇²p_tilde(y|f):
 H = jax.jacfwd(jax.jacrev(negative_mll))(map_estimate)["latent"]["latent"][:, 0, :, 0]
 
-# LLᵀ = H
 L = jnp.linalg.cholesky(H + I(D.n) * jitter)
 
 # H⁻¹ = H⁻¹ I = (LLᵀ)⁻¹ I = L⁻ᵀL⁻¹ I
@@ -193,9 +187,9 @@ laplace_approximation = dx.MultivariateNormalFullCovariance(f_hat.squeeze(), H_i
 #
 # This is the same approximate distribution $q_{map}(f(\cdot))$, but we have pertubed the covariance by a curvature term of $\mathbf{K}_{\boldsymbol{(\cdot)\boldsymbol{x}}} \mathbf{K}_{\boldsymbol{xx}}^{-1} [-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} ]^{-1} \mathbf{K}_{\boldsymbol{xx}}^{-1} \mathbf{K}_{\boldsymbol{\boldsymbol{x}(\cdot)}}$. We take the latent distribution computed in the previous section and add this term to the covariance to construct $q_{Laplace}(f(\cdot))$.
 
+
 # %%
 def construct_laplace(test_inputs: Float[Array, "N D"]) -> dx.MultivariateNormalTri:
-
     map_latent_dist = posterior(map_estimate, D)(test_inputs)
 
     Kxt = cross_covariance(map_estimate["kernel"], x, test_inputs)

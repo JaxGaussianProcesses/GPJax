@@ -20,7 +20,7 @@ from gpjax.linops import (
     DiagonalLinearOperator,
 )
 from jaxtyping import Array, Float
-from .base import AbstractKernelComputation
+from gpjax.kernels.computations.base import AbstractKernelComputation
 
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):

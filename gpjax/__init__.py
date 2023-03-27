@@ -13,24 +13,23 @@
 # limitations under the License.
 # ==============================================================================
 
-from . import _version
-from .abstractions import fit, fit_batches, fit_natgrads
-from .gps import Prior, construct_posterior
-from .kernels import *
-from .likelihoods import Bernoulli, Gaussian
-from .mean_functions import Constant, Zero
-from .params import constrain, copy_dict_structure, initialise, unconstrain
-from .types import Dataset
-from .variational_families import (
+from gpjax import _version
+from gpjax.abstractions import fit, fit_batches, fit_natgrads
+from gpjax.gps import Prior, construct_posterior
+from gpjax.kernels import *
+from gpjax.likelihoods import Bernoulli, Gaussian
+from gpjax.mean_functions import Constant, Zero
+from gpjax.params import constrain, copy_dict_structure, initialise, unconstrain
+from gpjax.types import Dataset
+from gpjax.variational_families import (
     CollapsedVariationalGaussian,
     ExpectationVariationalGaussian,
     NaturalVariationalGaussian,
     VariationalGaussian,
     WhitenedVariationalGaussian,
 )
-from .variational_inference import CollapsedVI, StochasticVI
+from gpjax.variational_inference import CollapsedVI, StochasticVI
 
-__version__ = _version.get_versions()["version"]
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
 __url__ = "https://github.com/thomaspinder/GPJax"

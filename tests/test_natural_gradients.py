@@ -50,7 +50,6 @@ def get_data_and_gp(n_datapoints):
 
 @pytest.mark.parametrize("dim", [1, 2, 3])
 def test_natural_to_expectation(dim):
-
     _, posterior, prior = get_data_and_gp(10)
 
     z = jnp.linspace(-5.0, 5.0, 5 * dim).reshape(-1, dim)
@@ -107,7 +106,6 @@ from copy import deepcopy
 
 
 def test_renaming():
-
     _, posterior, prior = get_data_and_gp(10)
 
     z = jnp.linspace(-5.0, 5.0, 5).reshape(-1, 1)

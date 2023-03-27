@@ -20,9 +20,9 @@ from typing import Any, Union
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 from dataclasses import dataclass
-from .linear_operator import LinearOperator
-from .dense_linear_operator import DenseLinearOperator
-from .utils import to_linear_operator
+from gpjax.linops.linear_operator import LinearOperator
+from gpjax.linops.dense_linear_operator import DenseLinearOperator
+from gpjax.linops.utils import to_linear_operator
 
 
 def _check_diag(diag: Any) -> None:
@@ -77,7 +77,7 @@ class DiagonalLinearOperator(LinearOperator):
             LinearOperator: linear operator plus the diagonal linear operator.
         """
 
-        from .zero_linear_operator import ZeroLinearOperator
+        from gpjax.linops.zero_linear_operator import ZeroLinearOperator
 
         other = to_linear_operator(other)
 

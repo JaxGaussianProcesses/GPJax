@@ -67,7 +67,7 @@ def test_diag_linear_operator(n: int) -> None:
     mean = jr.uniform(key_mean, shape=(n,))
     diag = jr.uniform(key_diag, shape=(n,))
 
-    dist_diag = GaussianDistribution(loc=mean, scale=DiagonalLinearOperator(diag ** 2))
+    dist_diag = GaussianDistribution(loc=mean, scale=DiagonalLinearOperator(diag**2))
     distrax_dist = MultivariateNormalDiag(loc=mean, scale_diag=diag)
 
     assert approx_equal(dist_diag.mean(), distrax_dist.mean())

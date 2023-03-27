@@ -126,7 +126,6 @@ def test_variational_gaussians(
     shapes: Tuple,
     values: Tuple,
 ) -> None:
-
     # Initialise variational family:
     prior = gpx.Prior(kernel=gpx.RBF())
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
@@ -148,7 +147,6 @@ def test_variational_gaussians(
     assert "inducing_inputs" in config_params["transformations"].keys()
 
     for moment_name, shape, value in zip(moment_names, shapes, values):
-
         moment_params = params["variational_family"]["moments"]
 
         assert moment_name in moment_params.keys()

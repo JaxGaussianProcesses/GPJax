@@ -13,9 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-import jax.numpy as jnp
 import jax.random as jr
-import pytest
 from jax.config import config
 from jax.random import KeyArray
 
@@ -24,10 +22,3 @@ key: KeyArray = jr.PRNGKey(seed=42)
 jitter: float = 1e-6
 atol: float = 1e-6
 config.update("jax_enable_x64", True)
-
-from gpjax.linops.triangular_linear_operator import (
-    LowerTriangularLinearOperator,
-    UpperTriangularLinearOperator,
-)
-from gpjax.linops.dense_linear_operator import DenseLinearOperator
-from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator

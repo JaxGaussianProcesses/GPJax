@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="1" failures="0" skipped="0" tests="1" time="7.677" timestamp="2023-03-27T22:16:59.809854" hostname="Toms-MacBook-Air-2.local"><testcase classname="" name="gpjax.__init__" time="0.000"><error message="collection failure">gpjax/__init__.py:17: in &lt;module&gt;
+    from .abstractions import fit, fit_batches, fit_natgrads
+gpjax/abstractions.py:26: in &lt;module&gt;
+    from jaxutils import Dataset, PyTree
+E   ModuleNotFoundError: No module named 'jaxutils'</error></testcase></testsuite></testsuites>

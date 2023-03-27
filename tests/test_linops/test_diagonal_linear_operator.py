@@ -61,7 +61,6 @@ def test_to_dense(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_add_diagonal(n: int) -> None:
-
     # Test adding two diagonal linear operators.
     key_a, key_b = jr.split(_PRNGKey)
 

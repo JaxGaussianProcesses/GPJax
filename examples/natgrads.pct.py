@@ -2,16 +2,10 @@
 # ---
 # jupyter:
 #   jupytext:
-#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
-#     language: python
-#     name: python3
 # ---
 
 # %% [markdown]
@@ -36,7 +30,6 @@ config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
 
 # %% [markdown]
-# # Dataset:
 
 # %% [markdown]
 # We simulate a dataset $\mathcal{D} = (\boldsymbol{x}, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{5000}$ with inputs $\boldsymbol{x}$ sampled uniformly on $(-5, 5)$ and corresponding binary outputs
@@ -71,7 +64,6 @@ ax.plot(xtest, f(xtest))
 plt.show()
 
 # %% [markdown]
-# # Natural gradients:
 
 # %% [markdown]
 # We begin by defining our model, variational family and variational inference strategy:
@@ -126,7 +118,6 @@ ax.fill_between(xtest.flatten(), meanf - sigma, meanf + sigma, alpha=0.3)
 plt.show()
 
 # %% [markdown]
-# # Natural gradients and sparse varational Gaussian process regression:
 
 # %% [markdown]
 # As mentioned in <strong data-cite="hensman2013gaussian">Hensman et al. (2013)</strong>, in the case of a Gaussian likelihood, taking a step of unit length for natural gradients on a full batch of data recovers the same solution as <strong data-cite="titsias2009">Titsias (2009)</strong>. We now illustrate this.

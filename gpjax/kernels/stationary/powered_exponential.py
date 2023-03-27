@@ -20,11 +20,11 @@ import jax.numpy as jnp
 from jax.random import KeyArray
 from jaxtyping import Array
 
-from ..base import AbstractKernel
-from ..computations import (
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import (
     DenseKernelComputation,
 )
-from .utils import euclidean_distance
+from gpjax.kernels.stationary.utils import euclidean_distance
 
 
 class PoweredExponential(AbstractKernel):

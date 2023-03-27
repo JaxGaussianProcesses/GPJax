@@ -37,7 +37,6 @@ class AbstractKernelComputation:
         self,
         x: Float[Array, "N D"],
     ) -> LinearOperator:
-
         """Compute Gram covariance operator of the kernel function.
 
         Args:

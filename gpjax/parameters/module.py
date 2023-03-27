@@ -11,7 +11,7 @@ import jax.tree_util as jtu
 from jax._src.tree_util import _registry
 from simple_pytree import Pytree, static_field
 
-from .bijectors import Bijector, Identity
+from gpjax.parameters.bijectors import Bijector, Identity
 
 
 class Module(Pytree):

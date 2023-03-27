@@ -26,7 +26,9 @@ _PRNGKey = jr.PRNGKey(42)
 
 from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 from gpjax.linops.identity_linear_operator import IdentityLinearOperator
-from gpjax.linops.constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
+from gpjax.linops.constant_diagonal_linear_operator import (
+    ConstantDiagonalLinearOperator,
+)
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
 
 
@@ -74,7 +76,6 @@ def test_add_diagonal(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_add(n: int) -> None:
-
     array = jr.uniform(_PRNGKey, shape=(n, n))
     entries = jr.uniform(_PRNGKey, shape=(n,))
     id = IdentityLinearOperator(size=n)

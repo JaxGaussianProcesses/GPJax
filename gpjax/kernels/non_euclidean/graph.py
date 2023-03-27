@@ -19,9 +19,9 @@ import jax.numpy as jnp
 from jax.random import KeyArray
 from jaxtyping import Array, Float
 
-from ..computations import EigenKernelComputation
-from ..base import AbstractKernel
-from .utils import jax_gather_nd
+from gpjax.kernels.computations import EigenKernelComputation
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.non_euclidean.utils import jax_gather_nd
 
 
 ##########################################

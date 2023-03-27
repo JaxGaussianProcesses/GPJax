@@ -16,12 +16,12 @@
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 
-from ..base import AbstractKernel
-from .utils import squared_distance
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.utils import squared_distance
 import distrax as dx
 
 from dataclasses import dataclass
-from ...parameters import param_field, Softplus
+from gpjax.parameters import param_field, Softplus
 
 
 @dataclass

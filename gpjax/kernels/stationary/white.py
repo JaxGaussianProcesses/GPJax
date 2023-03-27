@@ -18,8 +18,8 @@ from typing import Dict, Optional, List
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 
-from ..base import AbstractKernel
-from ..computations import (
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import (
     ConstantDiagonalKernelComputation,
     AbstractKernelComputation,
 )

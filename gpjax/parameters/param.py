@@ -5,7 +5,7 @@ __all__ = ["param_field"]
 import dataclasses
 from typing import Any, Mapping, Optional
 
-from .bijectors import Bijector, Identity
+from gpjax.parameters.bijectors import Bijector, Identity
 
 
 def param_field(

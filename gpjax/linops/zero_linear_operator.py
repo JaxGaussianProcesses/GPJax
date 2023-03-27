@@ -21,13 +21,12 @@ import jax.numpy as jnp
 from jaxtyping import Array, Float
 from dataclasses import dataclass
 
-from .linear_operator import LinearOperator
-from .diagonal_linear_operator import DiagonalLinearOperator
-from .utils import check_shapes_match, to_linear_operator, default_dtype
+from gpjax.linops.linear_operator import LinearOperator
+from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+from gpjax.linops.utils import check_shapes_match, to_linear_operator, default_dtype
 
 
 def _check_size(shape: Any) -> None:
-
     if not isinstance(shape, tuple):
         raise ValueError(
             f"`shape` must be a a tuple, but `type(shape) = {type(shape)}`."
@@ -43,7 +42,6 @@ class ZeroLinearOperator(LinearOperator):
     """Zero linear operator."""
 
     def __init__(self, shape: Tuple[int], dtype: jnp.dtype = None) -> None:
-
         _check_size(shape)
 
         if dtype is None:

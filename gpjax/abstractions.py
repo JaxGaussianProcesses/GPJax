@@ -26,9 +26,9 @@ from jaxtyping import Array, Float
 from jaxutils import Dataset, PyTree
 from tqdm.auto import tqdm
 
-from .natural_gradients import natural_gradients
-from .params import ParameterState, constrain, trainable_params, unconstrain
-from .variational_inference import StochasticVI
+from gpjax.natural_gradients import natural_gradients
+from gpjax.params import ParameterState, constrain, trainable_params, unconstrain
+from gpjax.variational_inference import StochasticVI
 
 
 class InferenceState(PyTree):
@@ -368,7 +368,6 @@ def progress_bar_scan(num_iters: int, log_rate: int) -> Callable:
         """Decorator that adds a progress bar to `body_fun` used in `lax.scan`."""
 
         def wrapper_progress_bar(carry: Any, x: Union[tuple, int]) -> Any:
-
             # Get iteration number
             if type(x) is tuple:
                 iter_num, *_ = x

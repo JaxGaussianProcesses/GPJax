@@ -2,16 +2,11 @@
 # ---
 # jupyter:
 #   jupytext:
-#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3.10.0 ('base')
-#     language: python
-#     name: python3
 # ---
 
 # %% [markdown]
@@ -135,7 +130,6 @@ from gpjax.parameters import evaluate_priors
 
 def build_log_pi(log_mll, unconstrained_priors, mapper_fn):
     def array_mll(parameter_array):
-
         # Convert parameter array to a dictionary:
         params_dict = mapper_fn([jnp.array(i) for i in parameter_array])
 

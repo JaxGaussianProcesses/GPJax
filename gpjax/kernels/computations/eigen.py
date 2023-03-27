@@ -17,7 +17,7 @@ from typing import Dict
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from .base import AbstractKernelComputation
+from gpjax.kernels.computations.base import AbstractKernelComputation
 from dataclasses import dataclass
 
 

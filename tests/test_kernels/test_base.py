@@ -62,9 +62,7 @@ def test_abstract_kernel():
     # Initialise dummy kernel class and test __call__ and _init_params methods:
     dummy_kernel = DummyKernel()
     assert dummy_kernel.init_params(_initialise_key) == {"test": 1.0}
-    assert (
-        dummy_kernel(jnp.array([1.0]), jnp.array([2.0]), {"test": 2.0}) == 4.0
-    )
+    assert dummy_kernel(jnp.array([1.0]), jnp.array([2.0]), {"test": 2.0}) == 4.0
 
 
 @pytest.mark.parametrize("combination_type", [SumKernel, ProductKernel])
@@ -76,7 +74,6 @@ def test_abstract_kernel():
 def test_combination_kernel(
     combination_type: CombinationKernel, kernel: AbstractKernel, n_kerns: int
 ) -> None:
-
     # Create inputs
     n = 20
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
@@ -174,7 +171,6 @@ def test_sum_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
     ],
 )
 def test_prod_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
-
     # Create inputs
     n = 10
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)

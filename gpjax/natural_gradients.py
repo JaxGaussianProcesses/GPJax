@@ -22,15 +22,15 @@ from jax import value_and_grad
 from jaxtyping import Array, Float
 from jaxutils import Dataset
 
-from .config import get_global_config
-from .gps import AbstractPosterior
-from .params import build_trainables, constrain, trainable_params
-from .variational_families import (
+from gpjax.config import get_global_config
+from gpjax.gps import AbstractPosterior
+from gpjax.params import build_trainables, constrain, trainable_params
+from gpjax.variational_families import (
     AbstractVariationalFamily,
     ExpectationVariationalGaussian,
     NaturalVariationalGaussian,
 )
-from .variational_inference import StochasticVI
+from gpjax.variational_inference import StochasticVI
 
 
 def natural_to_expectation(params: Dict) -> Dict:
@@ -74,7 +74,6 @@ def natural_to_expectation(params: Dict) -> Dict:
     # C = L⁻¹I
     C = jsp.linalg.solve_triangular(L, jnp.eye(m), lower=True)
 
-    # S = CᵀC
     S = jnp.matmul(C.T, C)
 
     # μ = Sθ₁
