@@ -201,6 +201,7 @@ class Prior(AbstractPrior):
 
         .. math:: \hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i
 
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
 
         where :math:`\phi_i` are m features sampled from the Fourier feature decomposition of
         the model's kernel and :math:`\theta_i` are samples from a unit Gaussian.
@@ -419,7 +420,21 @@ class ConjugatePosterior(AbstractPosterior):
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
-    def sample_approx(
+            # Σ⁻¹ Kxt
+            Sigma_inv_Kxt = Sigma.solve(Kxt)
+
+            # μt  +  Ktx (Kxx + Iσ²)⁻¹ (y  -  μx)
+            mean = μt + jnp.matmul(Sigma_inv_Kxt.T, y - μx)
+
+            # Ktt  -  Ktx (Kxx + Iσ²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
+            covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
+            covariance += identity(n_test) * jitter
+
+            return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
+
+        return predict
+
+    def marginal_log_likelihood(
         self,
         num_samples: int,
         train_data: Dataset,
@@ -513,10 +528,8 @@ class ConjugatePosterior(AbstractPosterior):
                 canonical_features, canonical_weights
             )
 
-            return (
-                self.prior.mean_function(test_inputs)
-                + weight_space_contribution
-                + function_space_contribution
+            return constant * (
+                marginal_likelihood.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
             )
 
         return sample_fn
@@ -538,9 +551,21 @@ class NonConjugatePosterior(AbstractPosterior):
     latent: Float[Array, "N 1"] = param_field(None)
     key: KeyArray = static_field(PRNGKey(42))
 
-    def __post_init__(self):
-        if self.latent is None:
-            self.latent = normal(self.key, shape=(self.likelihood.num_datapoints, 1))
+    def init_params(self, key: KeyArray) -> Dict:
+        """Initialise the parameter set of a non-conjugate GP posterior.
+
+        Args:
+            key (KeyArray): A PRNG key used to initialise the parameters.
+
+        Returns:
+            Dict: A dictionary containing the default parameter set.
+        """
+        parameters = concat_dictionaries(
+            self.prior.init_params(key),
+            {"likelihood": self.likelihood.init_params(key)},
+        )
+        parameters["latent"] = jnp.zeros(shape=(self.likelihood.num_datapoints, 1))
+        return parameters
 
     def predict(
         self, test_inputs: Float[Array, "N D"], train_data: Dataset
@@ -574,8 +599,89 @@ class NonConjugatePosterior(AbstractPosterior):
         Kxx += identity(n) * self.prior.jitter
         Lx = Kxx.to_root()
 
-        # Unpack test inputs
-        t, n_test = test_inputs, test_inputs.shape[0]
+        def predict_fn(test_inputs: Float[Array, "N D"]) -> dx.Distribution:
+            """Predictive distribution of the latent function for a given set of test inputs.
+
+            Args:
+                test_inputs (Float[Array, "N D"]): A set of test inputs.
+
+            Returns:
+                dx.Distribution: The predictive distribution of the latent function.
+            """
+
+            # Unpack test inputs
+            t, n_test = test_inputs, test_inputs.shape[0]
+
+            # Compute terms of the posterior predictive distribution
+            Ktx = kernel.cross_covariance(params["kernel"], t, x)
+            Ktt = kernel.gram(params["kernel"], t) + identity(n_test) * jitter
+            μt = mean_function(params["mean_function"], t)
+
+            # Lx⁻¹ Kxt
+            Lx_inv_Kxt = Lx.solve(Ktx.T)
+
+            # Whitened function values, wx, corresponding to the inputs, x
+            wx = params["latent"]
+
+            # μt + Ktx Lx⁻¹ wx
+            mean = μt + jnp.matmul(Lx_inv_Kxt.T, wx)
+
+            # Ktt - Ktx Kxx⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
+            covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
+            covariance += identity(n_test) * jitter
+
+            return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
+
+        return predict_fn
+
+    def marginal_log_likelihood(
+        self,
+        train_data: Dataset,
+        negative: bool = False,
+    ) -> Callable[[Dict], Float[Array, "1"]]:
+        """
+        Compute the marginal log-likelihood function of the Gaussian process.
+        The returned function can then be used for gradient based optimisation
+        of the model's parameters or for model comparison. The implementation
+        given here is general and will work for any likelihood support by GPJax.
+
+        Unlike the marginal_log_likelihood function of the ConjugatePosterior
+        object, the marginal_log_likelihood function of the
+        ``NonConjugatePosterior`` object does not provide an exact marginal
+        log-likelihood function. Instead, the ``NonConjugatePosterior`` object
+        represents the posterior distributions as a function of the model's
+        hyperparameters and the latent function. Markov chain Monte Carlo,
+        variational inference, or Laplace approximations can then be used to
+        sample from, or optimise an approximation to, the posterior
+        distribution.
+
+        Args:
+            train_data (Dataset): The training dataset used to compute the
+                marginal log-likelihood.
+            negative (Optional[bool]): Whether or not the returned function
+                should be negative. For optimisation, the negative is useful as
+                minimisation of the negative marginal log-likelihood is equivalent
+                to maximisation of the marginal log-likelihood. Defaults to False.
+
+        Returns:
+            Callable[[Dict], Float[Array, "1"]]: A functional representation
+                of the marginal log-likelihood that can be evaluated at a given
+                parameter set.
+        """
+        jitter = get_global_config()["jitter"]
+
+        # Unpack dataset
+        x, y, n = train_data.X, train_data.y, train_data.n
+
+        # Unpack mean function and kernel
+        mean_function = self.prior.mean_function
+        kernel = self.prior.kernel
+
+        # Link function of the likelihood
+        link_function = self.likelihood.link_function
+
+        # The sign of the marginal log-likelihood depends on whether we are maximising or minimising
+        constant = jnp.array(-1.0) if negative else jnp.array(1.0)
 
         # Compute terms of the posterior predictive distribution
         Ktx = kernel.cross_covariance(t, x)

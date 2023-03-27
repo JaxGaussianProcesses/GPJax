@@ -18,6 +18,7 @@ from jaxtyping import Array, Float
 
 from .base import AbstractKernelComputation
 
+
 class DenseKernelComputation(AbstractKernelComputation):
     """Dense kernel computation class. Operations with the kernel assume
     a dense gram matrix structure.

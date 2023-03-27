@@ -31,7 +31,10 @@ class EigenKernelComputation(AbstractKernelComputation):
     def cross_covariance(
         self, params: Dict, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
+        # Extract the graph Laplacian's eigenvalues
         evals = self.eigenvalues
+        # Transform the eigenvalues of the graph Laplacian according to the
+        # RBF kernel's SPDE form.
         S = jnp.power(
             evals
             + 2
@@ -41,5 +44,6 @@ class EigenKernelComputation(AbstractKernelComputation):
             -self.kernel.smoothness,
         )
         S = jnp.multiply(S, self.num_vertex / jnp.sum(S))
+        # Scale the transform eigenvalues by the kernel variance
         S = jnp.multiply(S, params["variance"])
         return self.kernel(x, y, S=S)
