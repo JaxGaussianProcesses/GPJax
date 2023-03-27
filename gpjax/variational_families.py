@@ -17,19 +17,20 @@ import abc
 from dataclasses import dataclass
 from typing import Any
 
+import deprecation
+import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from jaxtyping import Array, Float
-from simple_pytree import static_field
+from jaxutils import Dataset, PyTree
 
-from .base import Module, param_field
-from .dataset import Dataset
+from .config import get_global_config
 from .gaussian_distribution import GaussianDistribution
-from .gps import AbstractPosterior
-from .likelihoods import Gaussian
-from .linops import (DenseLinearOperator, LowerTriangularLinearOperator,
-                     identity)
+from .gps import Prior
+from .likelihoods import AbstractLikelihood, Gaussian
+from .linops import DenseLinearOperator, LowerTriangularLinearOperator, identity
+from .utils import concat_dictionaries
 
 
 @dataclass

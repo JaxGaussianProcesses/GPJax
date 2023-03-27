@@ -17,26 +17,21 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any, Callable, Optional, Dict
 
+import deprecation
+import distrax as dx
 import jax.numpy as jnp
-from jax.random import KeyArray, PRNGKey, normal
+from jax.random import KeyArray
 from jaxtyping import Array, Float
-from simple_pytree import static_field
+from jaxutils import Dataset, PyTree
 
-from .base import Module, param_field
-from .dataset import Dataset
+from .config import get_global_config
 from .gaussian_distribution import GaussianDistribution
+from .kernels import AbstractKernel
 from .kernels.base import AbstractKernel
-from .kernels import RFF
-from .likelihoods import AbstractLikelihood, Gaussian
+from .likelihoods import AbstractLikelihood, Conjugate, NonConjugate
 from .linops import identity
-from .mean_functions import AbstractMeanFunction
-
-
-FunctionalSample = Callable[[Float[Array, "N D"]], Float[Array, "N B"]]
-""" Type alias for functions representing `B` samples from a model, to be evaluated on
-any set of `N` inputs (of dimension `D`) and returning the evaluations of each
-(potentially approximate) sample draw across these inputs.
-"""
+from .mean_functions import AbstractMeanFunction, Zero
+from .utils import concat_dictionaries
 
 
 @dataclass
@@ -253,15 +248,10 @@ class Prior(AbstractPrior):
 
         def sample_fn(test_inputs: Float[Array, "N D"]) -> Float[Array, "N B"]:
 
-            feature_evals = (
-                approximate_kernel.compute_features(x=test_inputs)
-            )
+            feature_evals = approximate_kernel.compute_features(x=test_inputs)
             feature_evals *= jnp.sqrt(self.kernel.variance / num_features)
             evaluated_sample = jnp.inner(feature_evals, feature_weights)  # [N, B]
-            return (
-                self.mean_function(test_inputs)
-                + evaluated_sample
-            )
+            return self.mean_function(test_inputs) + evaluated_sample
 
         return sample_fn
 
@@ -482,7 +472,9 @@ class ConjugatePosterior(AbstractPosterior):
             raise ValueError(f"num_samples must be a positive integer")
 
         # Approximate kernel with feature decomposition
-        approximate_kernel = RFF(base_kernel=self.prior.kernel, num_basis_fns=num_features)
+        approximate_kernel = RFF(
+            base_kernel=self.prior.kernel, num_basis_fns=num_features
+        )
 
         def eval_fourier_features(
             test_inputs: Float[Array, "N D"]
@@ -497,8 +489,12 @@ class ConjugatePosterior(AbstractPosterior):
         # sample weights v for canonical features
         # v = Σ⁻¹ (y + ε - ɸ⍵) for  Σ = Kxx + Iσ² and ε ᯈ N(0, σ²)
         Kxx = self.prior.kernel.gram(train_data.X)  #  [N, N]
-        Sigma = Kxx + identity(train_data.n) * (self.likelihood.obs_noise + self.jitter)  #  [N, N]
-        eps = jnp.sqrt(self.likelihood.obs_noise) * normal(key, [train_data.n, num_samples])  #  [N, B]
+        Sigma = Kxx + identity(train_data.n) * (
+            self.likelihood.obs_noise + self.jitter
+        )  #  [N, N]
+        eps = jnp.sqrt(self.likelihood.obs_noise) * normal(
+            key, [train_data.n, num_samples]
+        )  #  [N, B]
         y = train_data.y - self.prior.mean_function(train_data.X)  # account for mean
         Phi = eval_fourier_features(train_data.X)
         canonical_weights = Sigma.solve(
@@ -524,6 +520,7 @@ class ConjugatePosterior(AbstractPosterior):
             )
 
         return sample_fn
+
 
 @dataclass
 class NonConjugatePosterior(AbstractPosterior):

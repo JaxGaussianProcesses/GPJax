@@ -21,7 +21,7 @@ from ..base import AbstractKernel
 from .utils import squared_distance
 
 from dataclasses import dataclass
-from mytree import param_field, Softplus
+from ...parameters import param_field, Softplus
 
 
 @dataclass

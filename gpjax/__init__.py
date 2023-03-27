@@ -13,19 +13,22 @@
 # limitations under the License.
 # ==============================================================================
 
-from .dataset import Dataset
-from .fit import fit
+from . import _version
+from .abstractions import fit, fit_batches, fit_natgrads
 from .gps import Prior, construct_posterior
 from .kernels import *
 from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
-from .objectives import (ELBO, CollapsedELBO, ConjugateMLL,
-                         LogPosteriorDensity, NonConjugateMLL)
-from .variational_families import (CollapsedVariationalGaussian,
-                                   ExpectationVariationalGaussian,
-                                   NaturalVariationalGaussian,
-                                   VariationalGaussian,
-                                   WhitenedVariationalGaussian)
+from .params import constrain, copy_dict_structure, initialise, unconstrain
+from .types import Dataset
+from .variational_families import (
+    CollapsedVariationalGaussian,
+    ExpectationVariationalGaussian,
+    NaturalVariationalGaussian,
+    VariationalGaussian,
+    WhitenedVariationalGaussian,
+)
+from .variational_inference import CollapsedVI, StochasticVI
 
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"

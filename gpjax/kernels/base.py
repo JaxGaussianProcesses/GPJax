@@ -20,7 +20,7 @@ import jax.numpy as jnp
 from typing import List, Callable, Union
 from jaxtyping import Array, Float
 from functools import partial
-from mytree import Mytree, param_field
+from ..parameters import Module, param_field
 from simple_pytree import static_field
 from dataclasses import dataclass
 from functools import partial
@@ -30,7 +30,7 @@ from .computations import AbstractKernelComputation, DenseKernelComputation
 
 
 @dataclass
-class AbstractKernel(Mytree):
+class AbstractKernel(Module):
     """Base kernel class."""
 
     compute_engine: AbstractKernelComputation = static_field(DenseKernelComputation)

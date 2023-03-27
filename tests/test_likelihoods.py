@@ -20,15 +20,19 @@ import jax.random as jr
 import jax.tree_util as jtu
 import numpy as np
 import pytest
-import tensorflow_probability.substrates.jax as tfp
 from jax.config import config
 from jax.random import KeyArray
 from jaxtyping import Array, Float
 
-from gpjax.likelihoods import (AbstractLikelihood, Bernoulli, Gaussian,
-                               inv_probit)
+from gpjax.likelihoods import (
+    AbstractLikelihood,
+    Bernoulli,
+    Conjugate,
+    Gaussian,
+    NonConjugate,
+    inv_probit,
+)
 
-tfd = tfp.distributions
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 

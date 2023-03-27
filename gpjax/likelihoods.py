@@ -14,20 +14,17 @@
 # ==============================================================================
 
 import abc
-from dataclasses import dataclass
-from typing import Any
+from typing import Any, Callable, Dict, Optional
 
+import deprecation
+import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
-import tensorflow_probability.substrates.jax as tfp
+from jax.random import KeyArray
 from jaxtyping import Array, Float
-from simple_pytree import static_field
+from jaxutils import PyTree
 
-from .base import Module, param_field
 from .linops.utils import to_dense
-
-tfb = tfp.bijectors
-tfd = tfp.distributions
 
 
 @dataclass

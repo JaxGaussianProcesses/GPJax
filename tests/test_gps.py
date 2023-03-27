@@ -13,15 +13,24 @@
 # limitations under the License.
 # ==============================================================================
 
+import typing as tp
+
+import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
 from jax.config import config
 
-from gpjax.dataset import Dataset
-from gpjax.gps import (AbstractPosterior, AbstractPrior, ConjugatePosterior,
-                       NonConjugatePosterior, Prior, construct_posterior)
+from gpjax import Dataset, initialise
+from gpjax.gps import (
+    AbstractPosterior,
+    AbstractPrior,
+    ConjugatePosterior,
+    NonConjugatePosterior,
+    Prior,
+    construct_posterior,
+)
 from gpjax.kernels import RBF, Matern12, Matern32, Matern52
 from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.mean_functions import Constant, Zero
@@ -54,7 +63,7 @@ def test_prior(num_datapoints):
 @pytest.mark.parametrize("kernel", [RBF, Matern52])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
 def test_prior_sample_approx(num_datapoints, kernel, mean_function):
-    kern = kernel(lengthscale=5., variance=0.1)
+    kern = kernel(lengthscale=5.0, variance=0.1)
     p = Prior(kernel=kern, mean_function=mean_function)
     key = jr.PRNGKey(123)
 
@@ -148,7 +157,7 @@ def test_conjugate_posterior(num_datapoints, jit_compile):
 @pytest.mark.parametrize("kernel", [RBF, Matern52])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
 def test_conjugate_posterior_sample_approx(num_datapoints, kernel, mean_function):
-    kern = kernel(lengthscale=5., variance=0.1)
+    kern = kernel(lengthscale=5.0, variance=0.1)
     p = Prior(kernel=kern, mean_function=mean_function) * Gaussian(
         num_datapoints=num_datapoints
     )
@@ -186,7 +195,7 @@ def test_conjugate_posterior_sample_approx(num_datapoints, kernel, mean_function
     assert max_delta == 0.0  # samples same for same seed
 
     new_key = jr.PRNGKey(12345)
-    sampled_fn_3 = p.sample_approx(1,D, new_key, 100)
+    sampled_fn_3 = p.sample_approx(1, D, new_key, 100)
     evals_3 = sampled_fn_3(x)
     max_delta = jnp.max(jnp.abs(evals - evals_3))
     assert max_delta > 0.01  # samples different for different seed

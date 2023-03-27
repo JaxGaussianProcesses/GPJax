@@ -1,5 +1,7 @@
 import jax
 import pytest
+from jax.config import config
+from jax.random import KeyArray
 from jaxtyping import Array, Float
 
 from gpjax.mean_functions import AbstractMeanFunction, Constant

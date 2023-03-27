@@ -15,6 +15,7 @@
 
 from typing import Callable, Tuple
 
+import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
@@ -23,12 +24,14 @@ from jax.config import config
 from jaxtyping import Array, Float
 
 import gpjax as gpx
-from gpjax.variational_families import (AbstractVariationalFamily,
-                                        CollapsedVariationalGaussian,
-                                        ExpectationVariationalGaussian,
-                                        NaturalVariationalGaussian,
-                                        VariationalGaussian,
-                                        WhitenedVariationalGaussian)
+from gpjax.variational_families import (
+    AbstractVariationalFamily,
+    CollapsedVariationalGaussian,
+    ExpectationVariationalGaussian,
+    NaturalVariationalGaussian,
+    VariationalGaussian,
+    WhitenedVariationalGaussian,
+)
 import tensorflow_probability.substrates.jax as tfp
 
 # Enable Float64 for more stable matrix inversions.

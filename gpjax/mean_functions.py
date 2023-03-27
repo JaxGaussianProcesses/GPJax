@@ -20,11 +20,10 @@ import dataclasses
 from functools import partial
 from typing import Callable, List, Union
 
+import deprecation
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from simple_pytree import static_field
-
-from .base import Module, param_field
+from jaxutils import PyTree
 
 
 @dataclasses.dataclass
@@ -107,12 +106,8 @@ class AbstractMeanFunction(Module):
 class Constant(AbstractMeanFunction):
     """
     A constant mean function. This function returns a repeated scalar value for all inputs.
-<<<<<<< HEAD
-    The scalar value itself can be treated as a model hyperparameter and learned during training.
-=======
     The scalar value itself can be treated as a model hyperparameter and learned during training but
     defaults to 1.0.
->>>>>>> origin/rff_sampler
     """
 
     constant: Float[Array, "1"] = param_field(jnp.array([0.0]))
