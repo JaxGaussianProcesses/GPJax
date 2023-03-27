@@ -2,7 +2,7 @@ import dataclasses
 
 import pytest
 
-from mytree import Identity, Softplus, param_field
+from gpjax.parameters import Identity, Softplus, param_field
 
 
 @pytest.mark.parametrize("bijector", [Identity, Softplus])

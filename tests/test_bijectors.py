@@ -1,7 +1,7 @@
 import jax.numpy as jnp
 import pytest
 
-from mytree.bijectors import Bijector, Identity, Softplus
+from gpjax.parameters.bijectors import Bijector, Identity, Softplus
 
 
 def test_bijector():
