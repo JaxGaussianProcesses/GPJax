@@ -13,32 +13,28 @@
 # limitations under the License.
 # ==============================================================================
 
+from dataclasses import dataclass
 from typing import List, Optional
 
 import jax
 import jax.numpy as jnp
 from jax.random import KeyArray
-from jaxtyping import Array
+from jaxtyping import Array, Float
 
+from ...parameters import Softplus, param_field
 from ..base import AbstractKernel
-from ..computations import (
-    DenseKernelComputation,
-)
+from ..computations import DenseKernelComputation
 from .utils import squared_distance
 
 
+@dataclass
 class RationalQuadratic(AbstractKernel):
-    def __init__(
-        self,
-        active_dims: Optional[List[int]] = None,
-        name: Optional[str] = "Rational Quadratic",
-    ) -> None:
-        super().__init__(
-            DenseKernelComputation, active_dims, spectral_density=None, name=name
-        )
-        self._stationary = True
 
-    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
+    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    alpha: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+
+    def __call__(self, x: jax.Array, y: jax.Array) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`
 
         .. math::
@@ -47,20 +43,12 @@ class RationalQuadratic(AbstractKernel):
         Args:
             x (jax.Array): The left hand argument of the kernel function's call.
             y (jax.Array): The right hand argument of the kernel function's call
-            params (dict): Parameter set for which the kernel should be evaluated on.
         Returns:
             Array: The value of :math:`k(x, y)`
         """
-        x = self.slice_input(x) / params["lengthscale"]
-        y = self.slice_input(y) / params["lengthscale"]
-        K = params["variance"] * (
-            1 + 0.5 * squared_distance(x, y) / params["alpha"]
-        ) ** (-params["alpha"])
+        x = self.slice_input(x) / self.lengthscale
+        y = self.slice_input(y) / self.lengthscale
+        K = self.variance * (1 + 0.5 * squared_distance(x, y) / self.alpha) ** (
+            -self.alpha
+        )
         return K.squeeze()
-
-    def init_params(self, key: KeyArray) -> dict:
-        return {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-            "alpha": jnp.array([1.0]),
-        }

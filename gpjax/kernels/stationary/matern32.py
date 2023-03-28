@@ -13,34 +13,28 @@
 # limitations under the License.
 # ==============================================================================
 
+from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 import jax.numpy as jnp
 from jax.random import KeyArray
 from jaxtyping import Array, Float
 
+from ...parameters import Softplus, param_field
 from ..base import AbstractKernel
-from ..computations import (
-    DenseKernelComputation,
-)
-from .utils import euclidean_distance, build_student_t_distribution
+from ..computations import DenseKernelComputation
+from .utils import build_student_t_distribution, euclidean_distance
 
 
+@dataclass
 class Matern32(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 1.5."""
 
-    def __init__(
-        self,
-        active_dims: Optional[List[int]] = None,
-        name: Optional[str] = "Matern 3/2",
-    ) -> None:
-        spectral_density = build_student_t_distribution(nu=3)
-        super().__init__(DenseKernelComputation, active_dims, spectral_density, name)
-        self._stationary = True
+    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
 
     def __call__(
         self,
-        params: Dict,
         x: Float[Array, "1 D"],
         y: Float[Array, "1 D"],
     ) -> Float[Array, "1"]:
@@ -51,25 +45,18 @@ class Matern32(AbstractKernel):
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{3}\\lvert x-y \\rvert}{\\ell^2}  \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{3}\\lvert x-y\\rvert}{\\ell^2} \\Bigg)
 
         Args:
-            params (Dict): Parameter set for which the kernel should be evaluated on.
             x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`.
         """
-        x = self.slice_input(x) / params["lengthscale"]
-        y = self.slice_input(y) / params["lengthscale"]
+        x = self.slice_input(x) / self.lengthscale
+        y = self.slice_input(y) / self.lengthscale
         tau = euclidean_distance(x, y)
-        K = (
-            params["variance"]
-            * (1.0 + jnp.sqrt(3.0) * tau)
-            * jnp.exp(-jnp.sqrt(3.0) * tau)
-        )
+        K = self.variance * (1.0 + jnp.sqrt(3.0) * tau) * jnp.exp(-jnp.sqrt(3.0) * tau)
         return K.squeeze()
 
-    def init_params(self, key: KeyArray) -> Dict:
-        return {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-        }
+    @property
+    def spectral_density(self):
+        return build_student_t_distribution(nu=3)
