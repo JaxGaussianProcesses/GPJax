@@ -40,6 +40,31 @@ pylint = "^2.17.1"
 nox = "^2022.11.21"
 ruff = "^0.0.259"
 
+
+[tool.poetry.group.docs.dependencies]
+sphinx-book-theme = "^1.0.0"
+myst-parser = "^1.0.0"
+linkify-it-py = "^2.0.0"
+jinja2 = "^3.1.2"
+nbsphinx = "^0.9.1"
+sphinx-tabs = "^3.4.1"
+matplotlib = "^3.7.1"
+seaborn = "^0.12.2"
+sphinx-copybutton = "^0.5.1"
+networkx = "^3.0"
+sphinxcontrib-bibtex = "^2.5.0"
+jupytext = "^1.14.5"
+ipython = "^8.11.0"
+ipykernel = "^6.22.0"
+watermark = "^2.3.1"
+sphinxext-opengraph = "^0.8.1"
+blackjax = "^0.9.6"
+jaxopt = "^0.6"
+dm-haiku = "^0.0.9"
+ipywidgets = "^8.0.5"
+pandas = "^1.5.3"
+scikit-learn = "^1.2.2"
+
 [build-system]
 requires = ["poetry-core", "poetry-dynamic-versioning"]
 build-backend = "poetry_dynamic_versioning.backend"
