@@ -17,17 +17,16 @@ from __future__ import annotations
 
 import abc
 import dataclasses
-from functools import partial
-from typing import Callable, List, Union
-
-import deprecation
 import jax.numpy as jnp
+from beartype.typing import List, Callable, Union
 from jaxtyping import Array, Float
-from jaxutils import PyTree
+from mytree import Mytree, param_field
+from simple_pytree import static_field
+from functools import partial
 
 
 @dataclasses.dataclass
-class AbstractMeanFunction(Module):
+class AbstractMeanFunction(Mytree):
     """Mean function that is used to parameterise the Gaussian process."""
 
     @abc.abstractmethod
@@ -106,8 +105,7 @@ class AbstractMeanFunction(Module):
 class Constant(AbstractMeanFunction):
     """
     A constant mean function. This function returns a repeated scalar value for all inputs.
-    The scalar value itself can be treated as a model hyperparameter and learned during training but
-    defaults to 1.0.
+    The scalar value itself can be treated as a model hyperparameter and learned during training.
     """
 
     constant: Float[Array, "1"] = param_field(jnp.array([0.0]))
@@ -128,32 +126,32 @@ class Constant(AbstractMeanFunction):
 class CombinationMeanFunction(AbstractMeanFunction):
     """A base class for products or sums of AbstractMeanFunctions."""
 
-    means: List[AbstractMeanFunction]
+    items: List[AbstractMeanFunction]
     operator: Callable = static_field()
 
     def __init__(
         self,
-        means: List[AbstractMeanFunction],
+        items: List[AbstractMeanFunction],
         operator: Callable,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
 
-        # Add means to a list, flattening out instances of this class therein, as in GPFlow kernels.
+        # Add items to a list, flattening out instances of this class therein, as in GPFlow kernels.
         items_list: List[AbstractMeanFunction] = []
 
-        for item in means:
+        for item in items:
             if not isinstance(item, AbstractMeanFunction):
                 raise TypeError(
                     "can only combine AbstractMeanFunction instances"
                 )  # pragma: no cover
 
             if isinstance(item, self.__class__):
-                items_list.extend(item.means)
+                items_list.extend(item.items)
             else:
                 items_list.append(item)
 
-        self.means = items_list
+        self.items = items_list
         self.operator = operator
 
     def __call__(self, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:
@@ -165,7 +163,7 @@ class CombinationMeanFunction(AbstractMeanFunction):
         Returns:
             Float[Array, "Q"]: The evaluated mean function.
         """
-        return self.operator(jnp.stack([m(x) for m in self.means]))
+        return self.operator(jnp.stack([m(x) for m in self.items]))
 
 
 SumMeanFunction = partial(CombinationMeanFunction, operator=partial(jnp.sum, axis=0))

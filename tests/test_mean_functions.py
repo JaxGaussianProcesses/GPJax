@@ -1,10 +1,9 @@
-import jax
 import pytest
-from jax.config import config
-from jax.random import KeyArray
-from jaxtyping import Array, Float
+import jax
+import mytree
 
 from gpjax.mean_functions import AbstractMeanFunction, Constant
+from jaxtyping import Array, Float
 
 
 def test_abstract() -> None:
@@ -18,6 +17,7 @@ def test_abstract() -> None:
             return jax.numpy.array([1.0])
 
     mf = DummyMeanFunction()
+    assert isinstance(mf, mytree.Mytree)
     assert isinstance(mf, AbstractMeanFunction)
     assert (mf(jax.numpy.array([1.0])) == jax.numpy.array([1.0])).all()
     assert (mf(jax.numpy.array([2.0, 3.0])) == jax.numpy.array([1.0])).all()

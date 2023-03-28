@@ -14,8 +14,7 @@
 # ==============================================================================
 
 import abc
-from dataclasses import dataclass
-from typing import Any
+from typing import Any, Callable, Dict
 
 import deprecation
 import distrax as dx
@@ -23,7 +22,12 @@ import jax.numpy as jnp
 import jax.scipy as jsp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from jaxtyping import Array, Float
-from jaxutils import Dataset, PyTree
+
+from .linops import identity
+from jaxutils import Dataset
+from .linops import DenseLinearOperator, LowerTriangularLinearOperator
+from mytree import Mytree, param_field
+from simple_pytree import static_field
 
 from .config import get_global_config
 from .gaussian_distribution import GaussianDistribution
@@ -31,10 +35,15 @@ from .gps import Prior
 from .likelihoods import AbstractLikelihood, Gaussian
 from .linops import DenseLinearOperator, LowerTriangularLinearOperator, identity
 from .utils import concat_dictionaries
+from .gaussian_distribution import GaussianDistribution
+
+from dataclasses import dataclass
+
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
 
 @dataclass
-class AbstractVariationalFamily(Module):
+class AbstractVariationalFamily(Mytree):
     """
     Abstract base class used to represent families of distributions that can be
     used within variational inference.
@@ -76,8 +85,13 @@ class AbstractVariationalFamily(Module):
 class AbstractVariationalGaussian(AbstractVariationalFamily):
     """The variational Gaussian family of probability distributions."""
 
+    prior: Prior
     inducing_inputs: Float[Array, "N D"]
-    jitter: Float[Array, "1"] = static_field(1e-6)
+
+    @property
+    def num_inducing(self) -> int:
+        """The number of inducing inputs."""
+        return self.inducing_inputs.shape[0]
 
     @property
     def num_inducing(self) -> int:
@@ -98,8 +112,9 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
     variational_mean: Float[Array, "N 1"] = param_field(None)
     variational_root_covariance: Float[Array, "N N"] = param_field(
-        None, bijector=tfb.FillTriangular()
+        None, bijector=tfb.FillScaleTriL(diag_shift=jnp.array(1e-6))
     )
+    jitter: Float[Array, "1"] = static_field(1e-6)
 
     def __post_init__(self) -> None:
         if self.variational_mean is None:
@@ -134,7 +149,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         μz = mean_function(z)
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += identity(m) * jitter
 
         sqrt = LowerTriangularLinearOperator.from_dense(sqrt)
         S = DenseLinearOperator.from_root(sqrt)
@@ -171,7 +186,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         kernel = self.posterior.prior.kernel
 
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += identity(m) * jitter
         Lz = Kzz.to_root()
         μz = mean_function(z)
 
@@ -200,7 +215,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
         )
-        covariance += identity(n_test) * self.jitter
+        covariance += identity(n_test) * jitter
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -266,7 +281,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         kernel = self.posterior.prior.kernel
 
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += identity(m) * jitter
         Lz = Kzz.to_root()
 
         # Unpack test inputs
@@ -291,7 +306,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Lz_invT_sqrt, Ktz_Lz_invT_sqrt.T)
         )
-        covariance += identity(n_test) * self.jitter
+        covariance += identity(n_test) * jitter
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -360,7 +375,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         μz = mean_function(z)
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += identity(m) * jitter
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
         pu = GaussianDistribution(loc=jnp.atleast_1d(μz.squeeze()), scale=Kzz)
@@ -409,7 +424,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         mu = jnp.matmul(S, natural_vector)
 
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += identity(m) * jitter
         Lz = Kzz.to_root()
         μz = mean_function(z)
 
@@ -438,7 +453,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Kzz_inv_L, Ktz_Kzz_inv_L.T)
         )
-        covariance += identity(n_test) * self.jitter
+        covariance += identity(n_test) * jitter
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -499,7 +514,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         μz = mean_function(z)
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += identity(m) * jitter
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
         pu = GaussianDistribution(loc=jnp.atleast_1d(μz.squeeze()), scale=Kzz)
@@ -541,7 +556,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         sqrt = S.to_root().to_dense()
 
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += identity(m) * jitter
         Lz = Kzz.to_root()
         μz = mean_function(z)
 
@@ -570,7 +585,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
         )
-        covariance += identity(n_test) * self.jitter
+        covariance += identity(n_test) * jitter
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
