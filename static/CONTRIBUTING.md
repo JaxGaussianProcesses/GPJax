@@ -80,8 +80,19 @@ and push your code as usual.
    If successful, this will print the following output `pre-commit installed at
    .git/hooks/pre-commit`.
 
-6. Develop the feature on your feature branch. Add changed files using `git add`
-   and then `git commit` files:
+6. Develop the feature on your feature branch.  When you're done editing, format the new code with
+   ```bash
+   $ poetry run pre-commit run --all-files --show-diff-on-failure
+   ```
+   If any errors are reported, fix them and re-run the command. 
+
+7. Check all tests are passing
+   ```bash
+   poetry run pytest tests --n auto
+   ```
+   If any tests fail, fix them and re-run the command.
+   
+8. Add changed files using `git add` and then `git commit` files:
 
    ```bash
    $ git add modified_files
@@ -102,7 +113,7 @@ and push your code as usual.
    $ git push -u origin my-feature
    ```
 
-7. Go to the GitHub web page of your fork of the GPJax repo. Click the 'Pull
+9.  Go to the GitHub web page of your fork of the GPJax repo. Click the 'Pull
    request' button to send your changes to the project's maintainer for review.
 
 ## Pull request checklist

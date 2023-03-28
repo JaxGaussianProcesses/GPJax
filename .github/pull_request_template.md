@@ -8,7 +8,7 @@
 
 ## Checklist
 
-- [ ] I've formatted the new code by running `pre-commit run --all-files` before committing.
+- [ ] I've formatted the new code by running `poetry run pre-commit run --all-files --show-diff-on-failure` before committing.
 - [ ] I've added tests for new code.
 - [ ] I've added docstrings for the new code.
 
