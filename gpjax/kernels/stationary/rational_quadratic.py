@@ -14,35 +14,34 @@
 # ==============================================================================
 
 from dataclasses import dataclass
+from typing import List, Optional
 
 import jax.numpy as jnp
-import tensorflow_probability.substrates.jax.bijectors as tfb
-import tensorflow_probability.substrates.jax.distributions as tfd
+from jax.random import KeyArray
 from jaxtyping import Array, Float
 
-from ...base import param_field
+from ...parameters import Softplus, param_field
 from ..base import AbstractKernel
+from ..computations import DenseKernelComputation
 from .utils import squared_distance
 
 
 @dataclass
 class RationalQuadratic(AbstractKernel):
-    lengthscale: Float[Array, "D"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
-    )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    alpha: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    name: str = "Rational Quadratic"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
+    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    alpha: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+
+    def __call__(self, x: jax.Array, y: jax.Array) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( 1 + \\frac{\\lVert x - y \\rVert^2_2}{2 \\alpha \\ell^2} \\Bigg)
 
         Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's call
+            x (jax.Array): The left hand argument of the kernel function's call.
+            y (jax.Array): The right hand argument of the kernel function's call
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`
         """

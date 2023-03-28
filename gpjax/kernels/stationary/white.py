@@ -14,6 +14,7 @@
 # ==============================================================================
 
 from dataclasses import dataclass
+from typing import Dict, List, Optional
 
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
@@ -21,29 +22,27 @@ import tensorflow_probability.substrates.jax.distributions as tfd
 from jaxtyping import Array, Float
 from simple_pytree import static_field
 
-from ...base import param_field
+from ...parameters import Softplus, param_field
 from ..base import AbstractKernel
-from ..computations import (AbstractKernelComputation,
-                            ConstantDiagonalKernelComputation)
+from ..computations import AbstractKernelComputation, ConstantDiagonalKernelComputation
 
 
 @dataclass
 class White(AbstractKernel):
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    compute_engine: AbstractKernelComputation = static_field(
-        ConstantDiagonalKernelComputation
-    )
-    name: str = "White"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+
+    def __call__(
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
+    ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\\sigma`
 
         .. math::
             k(x, y) = \\sigma^2 \\delta(x-y)
 
         Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's call.
+            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`.

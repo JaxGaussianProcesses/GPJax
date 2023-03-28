@@ -14,14 +14,15 @@
 # ==============================================================================
 
 from dataclasses import dataclass
+from typing import Dict, List, Optional
 
 import jax.numpy as jnp
-import tensorflow_probability.substrates.jax.bijectors as tfb
-import tensorflow_probability.substrates.jax.distributions as tfd
+from jax.random import KeyArray
 from jaxtyping import Array, Float
 
-from ...base import param_field
+from ...parameters import Softplus, param_field
 from ..base import AbstractKernel
+from ..computations import DenseKernelComputation
 from .utils import euclidean_distance
 
 
@@ -33,22 +34,19 @@ class PoweredExponential(AbstractKernel):
 
     """
 
-    lengthscale: Float[Array, "D"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
-    )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
     power: Float[Array, "1"] = param_field(jnp.array([1.0]))
-    name: str = "Powered Exponential"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
+    def __call__(self, x: jax.Array, y: jax.Array) -> Array:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell`, :math:`\\sigma` and power :math:`\\kappa`.
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( - \\Big( \\frac{\\lVert x - y \\rVert^2}{\\ell^2} \\Big)^\\kappa \\Bigg)
 
         Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's call
+            x (jax.Array): The left hand argument of the kernel function's call.
+            y (jax.Array): The right hand argument of the kernel function's call
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`
