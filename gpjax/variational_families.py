@@ -591,137 +591,96 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
         )
 
-
-class CollapsedVariationalGaussian(AbstractVariationalFamily):
+@dataclass
+class CollapsedVariationalGaussian(AbstractVariationalGaussian):
     """Collapsed variational Gaussian family of probability distributions.
     The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes."""
+    likelihood: AbstractLikelihood
 
-    def __init__(
-        self,
-        prior: Prior,
-        likelihood: AbstractLikelihood,
-        inducing_inputs: Float[Array, "M D"],
-        name: str = "Collapsed variational Gaussian",
-    ):
-        """Initialise the collapsed variational Gaussian family of probability distributions.
-
-        Args:
-            prior (Prior): The prior distribution that we are approximating.
-            likelihood (AbstractLikelihood): The likelihood function that we are using to model the data.
-            inducing_inputs (Float[Array, "M D"]): The inducing inputs that are to be used to parameterise the variational Gaussian distribution.
-            name (str, optional): The name of the variational family. Defaults to "Collapsed variational Gaussian".
-        """
-
-        if not isinstance(likelihood, Gaussian):
+    def __post_init__(self):
+        if not isinstance(self.likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")
 
-        self.prior = prior
-        self.likelihood = likelihood
-        self.inducing_inputs = inducing_inputs
-        self.num_inducing = self.inducing_inputs.shape[0]
-        self.name = name
-
-    def init_params(self, key: KeyArray) -> Dict:
-        """Return the variational mean vector, variational root covariance matrix, and inducing input vector that parameterise the variational Gaussian distribution."""
-        return concat_dictionaries(
-            self.prior.init_params(key),
-            {
-                "variational_family": {"inducing_inputs": self.inducing_inputs},
-                "likelihood": {
-                    "obs_noise": self.likelihood.init_params(key)["obs_noise"]
-                },
-            },
-        )
-
-    def predict(
-        self,
-        params: Dict,
-        train_data: Dataset,
-    ) -> Callable[[Float[Array, "N D"]], GaussianDistribution]:
+    def predict(self, test_inputs: Float[Array, "N D"], train_data: Dataset) -> GaussianDistribution:
         """Compute the predictive distribution of the GP at the test inputs.
 
         Args:
-            params (Dict): The set of parameters that are to be used to parameterise our variational approximation and GP.
             train_data (Dataset): The training data that was used to fit the GP.
 
         Returns:
-            Callable[[Float[Array, "N D"]], dx.MultivariateNormalTri]: A function that accepts a set of test points and will return the predictive distribution at those points.
+            GaussianDistribution: The predictive distribution of the collapsed variational Gaussian process at the test inputs t.
         """
         jitter = get_global_config()["jitter"]
 
-        def predict_fn(test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
+        # Unpack test inputs
+        t, n_test = test_inputs, test_inputs.shape[0]
 
-            # Unpack test inputs
-            t, n_test = test_inputs, test_inputs.shape[0]
+        # Unpack training data
+        x, y = train_data.X, train_data.y
 
-            # Unpack training data
-            x, y = train_data.X, train_data.y
+        # Unpack variational parameters
+        noise = self.likelihood.obs_noise
+        z = self.inducing_inputs
+        m = self.num_inducing
 
-            # Unpack variational parameters
-            noise = params["likelihood"]["obs_noise"]
-            z = params["variational_family"]["inducing_inputs"]
-            m = self.num_inducing
+        # Unpack mean function and kernel
+        mean_function = self.prior.mean_function
+        kernel = self.prior.kernel
 
-            # Unpack mean function and kernel
-            mean_function = self.prior.mean_function
-            kernel = self.prior.kernel
+        Kzx = kernel.cross_covariance(z, x)
+        Kzz = kernel.gram(z)
+        Kzz += identity(m) * jitter
 
-            Kzx = kernel.cross_covariance(params["kernel"], z, x)
-            Kzz = kernel.gram(params["kernel"], z)
-            Kzz += identity(m) * jitter
+        # Lz Lzᵀ = Kzz
+        Lz = Kzz.to_root()
 
-            # Lz Lzᵀ = Kzz
-            Lz = Kzz.to_root()
+        # Lz⁻¹ Kzx
+        Lz_inv_Kzx = Lz.solve(Kzx)
 
-            # Lz⁻¹ Kzx
-            Lz_inv_Kzx = Lz.solve(Kzx)
+        # A = Lz⁻¹ Kzt / σ
+        A = Lz_inv_Kzx / jnp.sqrt(noise)
 
-            # A = Lz⁻¹ Kzt / σ
-            A = Lz_inv_Kzx / jnp.sqrt(noise)
+        # AAᵀ
+        AAT = jnp.matmul(A, A.T)
 
-            # AAᵀ
-            AAT = jnp.matmul(A, A.T)
+        # LLᵀ = I + AAᵀ
+        L = jnp.linalg.cholesky(jnp.eye(m) + AAT)
 
-            # LLᵀ = I + AAᵀ
-            L = jnp.linalg.cholesky(jnp.eye(m) + AAT)
+        μx = mean_function(x)
+        diff = y - μx
 
-            μx = mean_function(params["mean_function"], x)
-            diff = y - μx
+        # Lz⁻¹ Kzx (y - μx)
+        Lz_inv_Kzx_diff = jsp.linalg.cho_solve(
+            (L, True), jnp.matmul(Lz_inv_Kzx, diff)
+        )
 
-            # Lz⁻¹ Kzx (y - μx)
-            Lz_inv_Kzx_diff = jsp.linalg.cho_solve(
-                (L, True), jnp.matmul(Lz_inv_Kzx, diff)
-            )
+        # Kzz⁻¹ Kzx (y - μx)
+        Kzz_inv_Kzx_diff = Lz.T.solve(Lz_inv_Kzx_diff)
 
-            # Kzz⁻¹ Kzx (y - μx)
-            Kzz_inv_Kzx_diff = Lz.T.solve(Lz_inv_Kzx_diff)
+        Ktt = kernel.gram(t)
+        Kzt = kernel.cross_covariance(z, t)
+        μt = mean_function(t)
 
-            Ktt = kernel.gram(params["kernel"], t)
-            Kzt = kernel.cross_covariance(params["kernel"], z, t)
-            μt = mean_function(params["mean_function"], t)
+        # Lz⁻¹ Kzt
+        Lz_inv_Kzt = Lz.solve(Kzt)
 
-            # Lz⁻¹ Kzt
-            Lz_inv_Kzt = Lz.solve(Kzt)
+        # L⁻¹ Lz⁻¹ Kzt
+        L_inv_Lz_inv_Kzt = jsp.linalg.solve_triangular(L, Lz_inv_Kzt, lower=True)
 
-            # L⁻¹ Lz⁻¹ Kzt
-            L_inv_Lz_inv_Kzt = jsp.linalg.solve_triangular(L, Lz_inv_Kzt, lower=True)
+        # μt + 1/σ² Ktz Kzz⁻¹ Kzx (y - μx)
+        mean = μt + jnp.matmul(Kzt.T / noise, Kzz_inv_Kzx_diff)
 
-            # μt + 1/σ² Ktz Kzz⁻¹ Kzx (y - μx)
-            mean = μt + jnp.matmul(Kzt.T / noise, Kzz_inv_Kzx_diff)
+        # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻¹ (I + AAᵀ)⁻¹ Lz⁻¹ Kzt
+        covariance = (
+            Ktt
+            - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
+            + jnp.matmul(L_inv_Lz_inv_Kzt.T, L_inv_Lz_inv_Kzt)
+        )
+        covariance += identity(n_test) * jitter
 
-            # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻¹ (I + AAᵀ)⁻¹ Lz⁻¹ Kzt
-            covariance = (
-                Ktt
-                - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
-                + jnp.matmul(L_inv_Lz_inv_Kzt.T, L_inv_Lz_inv_Kzt)
-            )
-            covariance += identity(n_test) * jitter
-
-            return GaussianDistribution(
-                loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
-            )
-
-        return predict_fn
+        return GaussianDistribution(
+            loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
+        )
 
 
 __all__ = [
