@@ -34,6 +34,7 @@ from .mean_functions import AbstractMeanFunction, Zero
 from jaxutils import Dataset
 from .utils import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
+from .types import FunctionalSample
 
 import deprecation
 
@@ -101,13 +102,6 @@ class AbstractPrior(PyTree):
     def _initialise_params(self, key: KeyArray) -> Dict:
         """Deprecated method for initialising the GP's parameters. Succeeded by ``init_params``."""
         return self.init_params(key)
-
-
-FunctionalSample = Callable[[Float[Array, "N D"]], Float[Array, "N B"]]
-""" Type alias for functions representing `B` samples from a model, to be evaluated on any set of
-`N` inputs (of dimension `D`) and returning the evaluations of each (potentially approximate)
-sample draw across these inputs.
-"""
 
 
 #######################
@@ -258,7 +252,7 @@ class Prior(AbstractPrior):
         self,
         num_samples: int,
         params: Dict,
-        seed: KeyArray,
+        key: KeyArray,
         num_features: Optional[int] = 100,
     ) -> FunctionalSample:
         """Build an approximate sample from the Gaussian process prior. This method
@@ -285,22 +279,21 @@ class Prior(AbstractPrior):
         and then evaluate them over the interval :math:`[0, 1]`:
 
         Example:
+            For a ``prior`` distribution, the following code snippet will
+            build and evaluate an approximate sample.
+
             >>> import gpjax as gpx
             >>> import jax.numpy as jnp
             >>>
-            >>> kernel = gpx.kernels.RBF()
-            >>> prior = gpx.Prior(kernel = kernel)
-            >>> seed = jr.PRNGKey(123)
-            >>>
             >>> parameter_state = gpx.initialise(prior)
-            >>> sample_fn = prior.sample_appox(10, parameter_state.params, seed)
+            >>> sample_fn = prior.sample_appox(10, parameter_state.params, key)
             >>> sample_fn(jnp.linspace(0, 1, 100))
 
         Args:
             num_samples (int): The desired number of samples.
             params (Dict): The specific set of parameters for which the sample
             should be generated for.
-            seed (KeyArray): The random seed used for the sample(s).
+            key (KeyArray): The random seed used for the sample(s).
             num_features (int): The number of features used when approximating the
             kernel.
 
@@ -309,14 +302,15 @@ class Prior(AbstractPrior):
             FunctionalSample: A function representing an approximate sample from the Gaussian
             process prior.
         """
-        for integer_input in [num_features, num_samples]:
-            if (not isinstance(integer_input, int)) or integer_input < 0:
-                raise ValueError
+        if (not isinstance(num_features, int)) or num_features <= 0:
+            raise ValueError(f"num_features must be a positive integer")
+        if (not isinstance(num_samples, int)) or num_samples <= 0:
+            raise ValueError(f"num_samples must be a positive integer")
 
         approximate_kernel = RFF(self.kernel, num_features)
-        approximate_kernel_params = approximate_kernel.init_params(seed)
+        approximate_kernel_params = approximate_kernel.init_params(key)
         feature_weights = jax.random.normal(
-            seed, [num_samples, 2 * num_features]
+            key, [num_samples, 2 * num_features]
         )  # [B, L]
 
         def sample_fn(test_inputs: Float[Array, "N D"]) -> Float[Array, "N B"]:
@@ -355,6 +349,8 @@ class Prior(AbstractPrior):
 #######################
 # GP Posteriors
 #######################
+
+
 class AbstractPosterior(AbstractPrior):
     """The base GP posterior object conditioned on an observed dataset. All
     posterior objects should inherit from this class."""
@@ -559,6 +555,118 @@ class ConjugatePosterior(AbstractPosterior):
             return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
         return predict
+
+    def sample_approx(
+        self,
+        num_samples: int,
+        params: Dict,
+        train_data: Dataset,
+        key: KeyArray,
+        num_features: Optional[int] = 100,
+    ) -> FunctionalSample:
+        """Build an approximate sample from the Gaussian process posterior. This method
+        provides a function that returns the evaluations of a sample across any given
+        inputs.
+
+        Unlike when building approximate samples from a Gaussian process prior, decompositions
+        based on Fourier features alone rarely give accurate samples. Therefore, we must also
+        include an additional set of features (known as canonical features) to better model the
+        transition from Gaussian process prior to Gaussian process posterior.
+
+        In particular, we approximate the Gaussian processes' posterior as the finite feature
+        approximation
+
+        .. math:: \hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i + \sum{j=1}^N v_jk(.,x_j)
+
+
+        where :math:`\phi_i` are m features sampled from the Fourier feature decomposition of
+        the model's kernel and :math:`k(., x_j)` are N canonical features. The Fourier
+        weights :math:`\theta_i` are samples from a unit Gaussian. See REF for expressions for
+        the canonical weights :math:`v_j`.
+
+
+        A key property of such functional samples is that the same sample draw is
+        evaluated for all queries. Consistency is a property that is prohibitively costly
+        to ensure when sampling exactly from the GP prior, as the cost of exact sampling
+        scales cubically with the size of the sample. In contrast, finite feature representations
+        can be evaluated with constant cost regardless of the required number of queries.
+
+        Args:
+            num_samples (int): The desired number of samples.
+            params (Dict): The specific set of parameters for which the sample
+            should be generated for.
+            key (KeyArray): The random seed used for the sample(s).
+            num_features (int): The number of features used when approximating the
+            kernel.
+
+
+        Returns:
+            FunctionalSample: A function representing an approximate sample from the Gaussian
+            process prior.
+        """
+        if (not isinstance(num_features, int)) or num_features <= 0:
+            raise ValueError(f"num_features must be a positive integer")
+        if (not isinstance(num_samples, int)) or num_samples <= 0:
+            raise ValueError(f"num_samples must be a positive integer")
+
+        # Collect required quantities
+        jitter = get_global_config()["jitter"]
+        obs_noise = params["likelihood"]["obs_noise"]
+
+        # Approximate kernel with feature decomposition
+        approximate_kernel = RFF(self.prior.kernel, num_features)
+        approximate_kernel_params = approximate_kernel.init_params(key)
+
+        def eval_fourier_features(
+            test_inputs: Float[Array, "N D"]
+        ) -> Float[Array, "N L"]:
+            Phi = approximate_kernel.compute_engine.compute_features(  # [N, L]
+                test_inputs,
+                frequencies=approximate_kernel_params["frequencies"],
+                scaling_factor=approximate_kernel_params["lengthscale"],
+            )
+            Phi *= jnp.sqrt(params["kernel"]["variance"] / num_features)
+            return Phi
+
+        # sample weights for Fourier features
+        fourier_weights = jax.random.normal(
+            key, [num_samples, 2 * num_features]
+        )  # [B, L]
+
+        # sample weights v for canonical features
+        # v = Σ⁻¹ (y + ε - ɸ⍵) for  Σ = Kxx + Iσ² and ε ᯈ N(0, σ²)
+        Kxx = self.prior.kernel.gram(params["kernel"], train_data.X)  #  [N, N]
+        Sigma = Kxx + identity(train_data.n) * (obs_noise + jitter)  #  [N, N]
+        eps = jnp.sqrt(obs_noise) * jax.random.normal(
+            key, [train_data.n, num_samples]
+        )  #  [N, B]
+        y = train_data.y - self.prior.mean_function(
+            params["mean_function"], train_data.X
+        )  # account for mean
+        Phi = eval_fourier_features(train_data.X)
+        canonical_weights = Sigma.solve(
+            y + eps - jnp.inner(Phi, fourier_weights)
+        )  #  [N, B]
+
+        def sample_fn(test_inputs: Float[Array, "n D"]) -> Float[Array, "n B"]:
+            fourier_features = eval_fourier_features(test_inputs)
+            weight_space_contribution = jnp.inner(
+                fourier_features, fourier_weights
+            )  # [n, B]
+            canonical_features = self.prior.kernel.cross_covariance(
+                params["kernel"], test_inputs, train_data.X
+            )  # [n, N]
+            function_space_contribution = jnp.matmul(
+                canonical_features, canonical_weights
+            )
+
+            return (
+                self.prior.mean_function(params["mean_function"], test_inputs)
+                + weight_space_contribution
+                + function_space_contribution
+            )
+
+        return sample_fn
 
     def marginal_log_likelihood(
         self,

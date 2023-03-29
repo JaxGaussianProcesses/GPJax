@@ -15,6 +15,8 @@
 
 import jaxutils
 import deprecation
+from typing import Callable
+from jaxtyping import Array, Float
 
 Dataset = deprecation.deprecated(
     deprecated_in="0.5.5",
@@ -30,3 +32,10 @@ verify_dataset = deprecation.deprecated(
 
 
 __all__ = ["Dataset" "verify_dataset"]
+
+
+FunctionalSample = Callable[[Float[Array, "N D"]], Float[Array, "N B"]]
+""" Type alias for functions representing `B` samples from a model, to be evaluated on any set of
+`N` inputs (of dimension `D`) and returning the evaluations of each (potentially approximate)
+sample draw across these inputs.
+"""
