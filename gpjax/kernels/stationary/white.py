@@ -18,6 +18,7 @@ from typing import Dict, List, Optional
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
+from simple_pytree import static_field
 
 from ...parameters import Softplus, param_field
 from ..base import AbstractKernel
@@ -28,6 +29,9 @@ from ..computations import AbstractKernelComputation, ConstantDiagonalKernelComp
 class White(AbstractKernel):
 
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    compute_engine: AbstractKernelComputation = static_field(
+        ConstantDiagonalKernelComputation
+    )
 
     def __call__(
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]

@@ -36,7 +36,11 @@ from gpjax.kernels.stationary import (
     PoweredExponential,
     RationalQuadratic,
 )
-from gpjax.kernels.computations import DenseKernelComputation, DiagonalKernelComputation
+from gpjax.kernels.computations import (
+    DenseKernelComputation,
+    DiagonalKernelComputation,
+    ConstantDiagonalKernelComputation,
+)
 from gpjax.kernels.stationary.utils import build_student_t_distribution
 from gpjax.parameters.bijectors import Identity, Softplus
 
@@ -187,7 +191,7 @@ class TestWhite(BaseTestKernel):
     kernel = White
     fields = prod({"variance": [0.1, 1.0]})
     params = {"test_initialization": fields}
-    default_compute_engine = DenseKernelComputation
+    default_compute_engine = ConstantDiagonalKernelComputation
 
 
 class TestPeriodic(BaseTestKernel):
