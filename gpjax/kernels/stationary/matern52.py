@@ -34,7 +34,7 @@ class Matern52(AbstractKernel):
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
 
     def __call__(
-        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
+        self, x: Float[Array, "D"], y: Float[Array, "D"]
     ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
         lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
@@ -43,8 +43,8 @@ class Matern52(AbstractKernel):
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{5}\\lvert x-y \\rvert}{\\ell^2} + \\frac{5\\lvert x - y \\rvert^2}{3\\ell^2} \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{5}\\lvert x-y\\rvert}{\\ell^2} \\Bigg)
 
         Args:
-            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
+            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's call.
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`.
