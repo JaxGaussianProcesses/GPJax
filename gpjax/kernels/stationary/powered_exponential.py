@@ -38,15 +38,15 @@ class PoweredExponential(AbstractKernel):
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
     power: Float[Array, "1"] = param_field(jnp.array([1.0]))
 
-    def __call__(self, x: jax.Array, y: jax.Array) -> Array:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell`, :math:`\\sigma` and power :math:`\\kappa`.
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( - \\Big( \\frac{\\lVert x - y \\rVert^2}{\\ell^2} \\Big)^\\kappa \\Bigg)
 
         Args:
-            x (jax.Array): The left hand argument of the kernel function's call.
-            y (jax.Array): The right hand argument of the kernel function's call
+            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's call
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`

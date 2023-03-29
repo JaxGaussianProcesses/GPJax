@@ -35,21 +35,19 @@ class Periodic(AbstractKernel):
 
     lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=Softplus)
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
-    period: Float[Array, "1"] = param_field(
-        jnp.array([1.0]), bijector=Softplus
-    )  # NOTE: is bijector needed?
+    period: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
 
-    def __call__(self, x: jax.Array, y: jax.Array) -> Array:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`
 
-        TODO: write docstring
+        TODO: update docstring
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( -0.5 \\sum_{i=1}^{d} \\Bigg)
 
         Args:
-            x (jax.Array): The left hand argument of the kernel function's call.
-            y (jax.Array): The right hand argument of the kernel function's call
+            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's call
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`
         """
