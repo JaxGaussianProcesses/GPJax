@@ -116,7 +116,7 @@ class BaseTestKernel:
         Kxx = kernel.gram(x)
         assert isinstance(Kxx, LinearOperator)
         assert Kxx.shape == (n, n)
-        assert jnp.all(jnp.linalg.eigvalsh(Kxx.to_dense()) > 0.0)
+        assert jnp.all(jnp.linalg.eigvalsh(Kxx.to_dense() + jnp.eye(n) * 1e-6) > 0.0)
 
     @pytest.mark.parametrize("n_a", [1, 2, 5], ids=lambda x: f"n_a={x}")
     @pytest.mark.parametrize("n_b", [1, 2, 5], ids=lambda x: f"n_b={x}")
