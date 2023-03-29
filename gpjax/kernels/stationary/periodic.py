@@ -18,54 +18,44 @@ from typing import Dict, List, Optional
 import jax
 import jax.numpy as jnp
 from jax.random import KeyArray
-from jaxtyping import Array
+from jaxtyping import Array, Float
 
 from ..base import AbstractKernel
 from ..computations import (
     DenseKernelComputation,
 )
 
+from dataclasses import dataclass
+from ...parameters import param_field, Softplus
 
+
+@dataclass
 class Periodic(AbstractKernel):
     """The periodic kernel.
 
     Key reference is MacKay 1998 - "Introduction to Gaussian processes".
     """
 
-    def __init__(
-        self,
-        active_dims: Optional[List[int]] = None,
-        name: Optional[str] = "Periodic",
-    ) -> None:
-        super().__init__(
-            DenseKernelComputation, active_dims, spectral_density=None, name=name
-        )
-        self._stationary = True
+    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    period: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
 
-    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`
+
+        TODO: update docstring
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( -0.5 \\sum_{i=1}^{d} \\Bigg)
 
         Args:
-            x (jax.Array): The left hand argument of the kernel function's call.
-            y (jax.Array): The right hand argument of the kernel function's call
-            params (dict): Parameter set for which the kernel should be evaluated on.
+            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's call
         Returns:
-            Array: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The value of :math:`k(x, y)`
         """
         x = self.slice_input(x)
         y = self.slice_input(y)
-        sine_squared = (
-            jnp.sin(jnp.pi * (x - y) / params["period"]) / params["lengthscale"]
-        ) ** 2
-        K = params["variance"] * jnp.exp(-0.5 * jnp.sum(sine_squared, axis=0))
+        sine_squared = (jnp.sin(jnp.pi * (x - y) / self.period) / self.lengthscale) ** 2
+        K = self.variance * jnp.exp(-0.5 * jnp.sum(sine_squared, axis=0))
         return K.squeeze()
-
-    def init_params(self, key: KeyArray) -> Dict:
-        return {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-            "period": jnp.array([1.0] * self.ndims),
-        }

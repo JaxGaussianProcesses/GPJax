@@ -35,13 +35,13 @@ def build_student_t_distribution(nu: int) -> dx.Distribution:
 
 
 def squared_distance(
-    x: Float[Array, "1 D"], y: Float[Array, "1 D"]
+    x: Float[Array, "D"], y: Float[Array, "D"]
 ) -> Float[Array, "1"]:
     """Compute the squared distance between a pair of inputs.
 
     Args:
-        x (Float[Array, "1 D"]): First input.
-        y (Float[Array, "1 D"]): Second input.
+        x (Float[Array, "D"]): First input.
+        y (Float[Array, "D"]): Second input.
 
     Returns:
         Float[Array, "1"]: The squared distance between the inputs.
@@ -51,13 +51,13 @@ def squared_distance(
 
 
 def euclidean_distance(
-    x: Float[Array, "1 D"], y: Float[Array, "1 D"]
+    x: Float[Array, "D"], y: Float[Array, "D"]
 ) -> Float[Array, "1"]:
     """Compute the euclidean distance between a pair of inputs.
 
     Args:
-        x (Float[Array, "1 D"]): First input.
-        y (Float[Array, "1 D"]): Second input.
+        x (Float[Array, "D"]): First input.
+        y (Float[Array, "D"]): Second input.
 
     Returns:
         Float[Array, "1"]: The euclidean distance between the inputs.

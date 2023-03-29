@@ -51,5 +51,6 @@ class RBF(AbstractKernel):
         K = self.variance * jnp.exp(-0.5 * squared_distance(x, y))
         return K.squeeze()
 
+    @property
     def spectral_density(self) -> dx.Normal:
         return dx.Normal(loc=0.0, scale=1.0)

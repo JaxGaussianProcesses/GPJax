@@ -13,54 +13,38 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Dict, Optional, List
+from dataclasses import dataclass
+from typing import Dict, List, Optional
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
+from simple_pytree import static_field
 
+from ...parameters import Softplus, param_field
 from ..base import AbstractKernel
-from ..computations import (
-    ConstantDiagonalKernelComputation,
-    AbstractKernelComputation,
-)
+from ..computations import AbstractKernelComputation, ConstantDiagonalKernelComputation
 
 
+@dataclass
 class White(AbstractKernel):
-    def __init__(
-        self,
-        compute_engine: AbstractKernelComputation = ConstantDiagonalKernelComputation,
-        active_dims: Optional[List[int]] = None,
-        name: Optional[str] = "White Noise Kernel",
-    ) -> None:
-        super().__init__(compute_engine, active_dims, spectral_density=None, name=name)
-        self._stationary = True
 
-    def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
-    ) -> Float[Array, "1"]:
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    compute_engine: AbstractKernelComputation = static_field(
+        ConstantDiagonalKernelComputation
+    )
+
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\\sigma`
 
         .. math::
             k(x, y) = \\sigma^2 \\delta(x-y)
 
         Args:
-            params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
+            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's call.
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`.
         """
-        K = jnp.all(jnp.equal(x, y)) * params["variance"]
+        K = jnp.all(jnp.equal(x, y)) * self.variance
         return K.squeeze()
-
-    def init_params(self, key: Float[Array, "1 D"]) -> Dict:
-        """Initialise the kernel parameters.
-
-        Args:
-            key (Float[Array, "1 D"]): The key to initialise the parameters with.
-
-        Returns:
-            Dict: The initialised parameters.
-        """
-        return {"variance": jnp.array([1.0])}
