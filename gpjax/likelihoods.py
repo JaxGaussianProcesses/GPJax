@@ -14,26 +14,26 @@
 # ==============================================================================
 
 import abc
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict
+from .linops.utils import to_dense
 
 import deprecation
 import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
-from jax.random import KeyArray
 from jaxtyping import Array, Float
-from jaxutils import PyTree
 
-from .linops.utils import to_dense
+from dataclasses import dataclass
+from mytree import Mytree
 
 
 @dataclass
-class AbstractLikelihood(Module):
+class AbstractLikelihood(Mytree):
     """Abstract base class for likelihoods."""
 
-    num_datapoints: int = static_field()
+    num_datapoints: int
 
-    def __call__(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
+    def __call__(self, *args: Any, **kwargs: Any) -> dx.Distribution:
         """Evaluate the likelihood function at a given predictive distribution.
 
         Args:
@@ -54,7 +54,7 @@ class AbstractLikelihood(Module):
             **kwargs (Any): Keyword arguments to be passed to the likelihood's `predict` method.
 
         Returns:
-            tfd.Distribution: The predictive distribution.
+            dx.Distribution: The predictive distribution.
         """
         raise NotImplementedError
 
@@ -69,29 +69,47 @@ class AbstractLikelihood(Module):
         raise NotImplementedError
 
 
+# I don't think we need these? Either we inherit a conjugate likelihood for the Gaussian, or we check it's Gaussian in the posterior construction.
+# I don't like multiple iheritance, and think its an annoying thing to have to remember to do, if the user want to add their own likelihoods!
+class Conjugate:
+    """An abstract class for conjugate likelihoods with respect to a Gaussian process prior."""
+
+
+class NonConjugate:
+    """An abstract class for non-conjugate likelihoods with respect to a Gaussian process prior."""
+
+
 @dataclass
-class Gaussian(AbstractLikelihood):
+class Gaussian(AbstractLikelihood, Conjugate):
     """Gaussian likelihood object."""
 
-    obs_noise: Float[Array, "1"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
-    )
+    obs_noise: float = 1.0
 
-    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Normal:
-        """The link function of the Gaussian likelihood.
-
-        Args:
-            params (Dict): The parameters of the likelihood function.
-            f (Float[Array, "N 1"]): Function values.
+    @property
+    def link_function(self) -> Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]:
+        """Return the link function of the Gaussian likelihood. Here, this is
+        simply the identity function, but we include it for completeness.
 
         Returns:
             tfd.Normal: The likelihood function.
         """
         return tfd.Normal(loc=f, scale=self.obs_noise.astype(f.dtype))
 
-    def predict(
-        self, dist: tfd.MultivariateNormalTriL
-    ) -> tfd.MultivariateNormalFullCovariance:
+        def link_fn(f: Float[Array, "N 1"]) -> dx.Normal:
+            """The link function of the Gaussian likelihood.
+
+            Args:
+                params (Dict): The parameters of the likelihood function.
+                f (Float[Array, "N 1"]): Function values.
+
+            Returns:
+                dx.Normal: The likelihood function.
+            """
+            return dx.Normal(loc=f, scale=self.obs_noise)
+
+        return link_fn
+
+    def predict(self, dist: dx.MultivariateNormalTri) -> dx.Distribution:
         """
         Evaluate the Gaussian likelihood function at a given predictive
         distribution. Computationally, this is equivalent to summing the
@@ -110,23 +128,63 @@ class Gaussian(AbstractLikelihood):
         cov = to_dense(dist.covariance())
         noisy_cov = cov.at[jnp.diag_indices(n_data)].add(self.obs_noise)
 
-        return tfd.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
+        return dx.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
 
 
 @dataclass
-class Bernoulli(AbstractLikelihood):
-    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Distribution:
-        """The probit link function of the Bernoulli likelihood.
-
-        Args:
-            f (Float[Array, "N 1"]): Function values.
+class Bernoulli(AbstractLikelihood, NonConjugate):
+    @property
+    def link_function(self) -> Callable[[Float[Array, "N 1"]], dx.Distribution]:
+        """Return the probit link function of the Bernoulli likelihood.
 
         Returns:
             tfd.Distribution: The likelihood function.
         """
-        return tfd.Bernoulli(probs=inv_probit(f))
 
-    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        def link_fn(f: Float[Array, "N 1"]) -> dx.Distribution:
+            """The probit link function of the Bernoulli likelihood.
+
+            Args:
+                f (Float[Array, "N 1"]): Function values.
+
+            Returns:
+                dx.Distribution: The likelihood function.
+            """
+            return dx.Bernoulli(probs=inv_probit(f))
+
+        return link_fn
+
+    @property
+    def predictive_moment_fn(
+        self,
+    ) -> Callable[[Float[Array, "N 1"]], Float[Array, "N 1"]]:
+        """Instantiate the predictive moment function of the Bernoulli likelihood
+        that is parameterised by a probit link function.
+
+        Returns:
+            Callable: A callable object that accepts a mean and variance term
+                from which the predictive random variable is computed.
+        """
+
+        def moment_fn(
+            mean: Float[Array, "N 1"],
+            variance: Float[Array, "N 1"],
+        ):
+            """The predictive moment function of the Bernoulli likelihood.
+
+            Args:
+                mean (Float[Array, "N 1"]): The mean of the latent function values.
+                variance (Float[Array, "N 1"]): The diagonal variance of the latent function values.
+
+            Returns:
+                Float[Array, "N 1"]: The pointwise predictive distribution.
+            """
+            rv = self.link_function(mean / jnp.sqrt(1.0 + variance))
+            return rv
+
+        return moment_fn
+
+    def predict(self, dist: dx.Distribution) -> dx.Distribution:
         """Evaluate the pointwise predictive distribution, given a Gaussian
         process posterior and likelihood parameters.
 
@@ -140,7 +198,7 @@ class Bernoulli(AbstractLikelihood):
         """
         variance = jnp.diag(dist.covariance())
         mean = dist.mean().ravel()
-        return self.link_function(mean / jnp.sqrt(1.0 + variance))
+        return self.predictive_moment_fn(mean, variance)
 
 
 def inv_probit(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:

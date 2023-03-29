@@ -595,11 +595,12 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 @dataclass
 class CollapsedVariationalGaussian(AbstractVariationalGaussian):
     """Collapsed variational Gaussian family of probability distributions.
-    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes.
-    """
+    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes."""
+
+    likelihood: AbstractLikelihood
 
     def __post_init__(self):
-        if not isinstance(self.posterior.likelihood, Gaussian):
+        if not isinstance(self.likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")
 
     def predict(
@@ -613,6 +614,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         Returns:
             GaussianDistribution: The predictive distribution of the collapsed variational Gaussian process at the test inputs t.
         """
+        jitter = get_global_config()["jitter"]
 
         # Unpack test inputs
         t, n_test = test_inputs, test_inputs.shape[0]
@@ -621,17 +623,17 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         x, y = train_data.X, train_data.y
 
         # Unpack variational parameters
-        noise = self.posterior.likelihood.obs_noise
+        noise = self.likelihood.obs_noise
         z = self.inducing_inputs
         m = self.num_inducing
 
         # Unpack mean function and kernel
-        mean_function = self.posterior.prior.mean_function
-        kernel = self.posterior.prior.kernel
+        mean_function = self.prior.mean_function
+        kernel = self.prior.kernel
 
         Kzx = kernel.cross_covariance(z, x)
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += identity(m) * jitter
 
         # Lz Lzᵀ = Kzz
         Lz = Kzz.to_root()
@@ -676,7 +678,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(L_inv_Lz_inv_Kzt.T, L_inv_Lz_inv_Kzt)
         )
-        covariance += identity(n_test) * self.jitter
+        covariance += identity(n_test) * jitter
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
