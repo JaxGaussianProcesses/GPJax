@@ -15,6 +15,8 @@
 
 from typing import Callable
 
+import jax.tree_util as jtu
+import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
@@ -27,9 +29,7 @@ from jaxtyping import Array, Float
 from gpjax.likelihoods import (
     AbstractLikelihood,
     Bernoulli,
-    Conjugate,
     Gaussian,
-    NonConjugate,
     inv_probit,
 )
 
@@ -44,11 +44,11 @@ def test_abstract_likelihood():
 
     # Create a dummy likelihood class with abstract methods implemented.
     class DummyLikelihood(AbstractLikelihood):
-        def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
-            return tfd.Normal(0.0, 1.0)
+        def predict(self, dist: dx.Distribution) -> dx.Distribution:
+            return dx.Normal(0.0, 1.0)
 
         def link_function(self, f: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
-            return tfd.MultivariateNormalDiag(loc=f)
+            return dx.MultivariateNormalDiag(loc=f)
 
     # Test that the dummy likelihood can be instantiated.
     dummy_likelihood = DummyLikelihood(num_datapoints=123)
@@ -58,6 +58,7 @@ def test_abstract_likelihood():
 @pytest.mark.parametrize("n", [1, 10])
 @pytest.mark.parametrize("noise", [0.1, 0.5, 1.0])
 def test_gaussian_init(n: int, noise: float) -> None:
+
     likelihood = Gaussian(num_datapoints=n, obs_noise=jnp.array([noise]))
 
     assert likelihood.obs_noise == jnp.array([noise])
@@ -83,7 +84,7 @@ def test_link_fns(lik: AbstractLikelihood, n: int) -> None:
 
     # Test likelihood link function.
     assert isinstance(likelihood.link_function, Callable)
-    assert isinstance(likelihood.link_function(f), tfd.Distribution)
+    assert isinstance(likelihood.link_function(f), dx.Distribution)
 
 
 @pytest.mark.parametrize("noise", [0.1, 0.5, 1.0])
