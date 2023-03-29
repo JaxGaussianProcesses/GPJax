@@ -6,11 +6,11 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.6.0
 #   kernelspec:
-#     display_name: base
+#     display_name: gpjax
 #     language: python
-#     name: python3
+#     name: gpjax
 # ---
 
 # %% [markdown]
@@ -242,8 +242,6 @@ ax.plot(
 ax.plot(
     xtest, ytest, label="Latent function", color="black", linestyle="--", linewidth=1
 )
-
-ax.legend()
 
 # %% [markdown]
 # ## System configuration

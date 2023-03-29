@@ -517,7 +517,7 @@ class ConjugatePosterior(AbstractPosterior):
         μx = mean_function(params["mean_function"], x)
 
         # Precompute Gram matrix, Kxx, at training inputs, x
-        Kxx = kernel.gram(params["kernel"], x)
+        Kxx = kernel.gram(params["kerrspb nel"], x)
         Kxx += identity(n) * jitter
 
         # Σ = Kxx + Iσ²
@@ -571,7 +571,8 @@ class ConjugatePosterior(AbstractPosterior):
         Unlike when building approximate samples from a Gaussian process prior, decompositions
         based on Fourier features alone rarely give accurate samples. Therefore, we must also
         include an additional set of features (known as canonical features) to better model the
-        transition from Gaussian process prior to Gaussian process posterior.
+        transition from Gaussian process prior to Gaussian process posterior. For more details
+        see https://arxiv.org/pdf/2002.09309.pdf
 
         In particular, we approximate the Gaussian processes' posterior as the finite feature
         approximation
@@ -581,8 +582,9 @@ class ConjugatePosterior(AbstractPosterior):
 
         where :math:`\phi_i` are m features sampled from the Fourier feature decomposition of
         the model's kernel and :math:`k(., x_j)` are N canonical features. The Fourier
-        weights :math:`\theta_i` are samples from a unit Gaussian. See REF for expressions for
-        the canonical weights :math:`v_j`.
+        weights :math:`\theta_i` are samples from a unit Gaussian.
+        See https://arxiv.org/pdf/2002.09309.pdf for expressions for the canonical
+        weights :math:`v_j`.
 
 
         A key property of such functional samples is that the same sample draw is
