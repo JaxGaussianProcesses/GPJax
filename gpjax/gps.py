@@ -24,6 +24,11 @@ from jaxtyping import Array, Float
 from jaxutils import Dataset, PyTree
 
 from .config import get_global_config
+from .kernels import AbstractKernel
+from .likelihoods import AbstractLikelihood
+from .mean_functions import AbstractMeanFunction, Zero
+from jaxutils import Dataset
+from .utils import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
 from .kernels import AbstractKernel
 from .kernels.base import AbstractKernel

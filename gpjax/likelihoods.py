@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import abc
-from typing import Any, Callable, Dict
+from typing import Any
 from .linops.utils import to_dense
 
 import deprecation
@@ -22,14 +22,15 @@ import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Array, Float
+from simple_pytree import static_field
 
 from dataclasses import dataclass
-from mytree import Mytree
+from mytree import Mytree, param_field, Softplus
 
 @dataclass
 class AbstractLikelihood(Mytree):
     """Abstract base class for likelihoods."""
-    num_datapoints: int
+    num_datapoints: int = static_field()
 
 
     def __call__(self, *args: Any, **kwargs: Any) -> dx.Distribution:
@@ -59,53 +60,31 @@ class AbstractLikelihood(Mytree):
 
     @property
     @abc.abstractmethod
-    def link_function(self) -> Callable:
+    def link_function(self) -> dx.Distribution:
         """Return the link function of the likelihood function.
 
         Returns:
-            Callable: The link function of the likelihood function.
+            dx.Distribution: The distribution of observations, y, given values of the Gaussian process, f.
         """
         raise NotImplementedError
 
 
-# I don't think we need these? Either we inherit a conjugate likelihood for the Gaussian, or we check it's Gaussian in the posterior construction.
-# I don't like multiple iheritance, and think its an annoying thing to have to remember to do, if the user want to add their own likelihoods!
-class Conjugate:
-    """An abstract class for conjugate likelihoods with respect to a Gaussian process prior."""
-
-
-class NonConjugate:
-    """An abstract class for non-conjugate likelihoods with respect to a Gaussian process prior."""
-
-
 @dataclass
-class Gaussian(AbstractLikelihood, Conjugate):
+class Gaussian(AbstractLikelihood):
     """Gaussian likelihood object."""
-    obs_noise: float = 1.0
+    obs_noise: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
 
-    @property
-    def link_function(self) -> Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]:
-        """Return the link function of the Gaussian likelihood. Here, this is
-        simply the identity function, but we include it for completeness.
+    def link_function(self, f: Float[Array, "N 1"]) -> dx.Normal:
+        """The link function of the Gaussian likelihood.
+
+        Args:
+            params (Dict): The parameters of the likelihood function.
+            f (Float[Array, "N 1"]): Function values.
 
         Returns:
-            Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]: A link
-            function that maps the predictive distribution to the likelihood function.
+            dx.Normal: The likelihood function.
         """
-
-        def link_fn(f: Float[Array, "N 1"]) -> dx.Normal:
-            """The link function of the Gaussian likelihood.
-
-            Args:
-                params (Dict): The parameters of the likelihood function.
-                f (Float[Array, "N 1"]): Function values.
-
-            Returns:
-                dx.Normal: The likelihood function.
-            """
-            return dx.Normal(loc=f, scale=self.obs_noise)
-
-        return link_fn
+        return dx.Normal(loc=f, scale=self.obs_noise)
 
     def predict(self, dist: dx.MultivariateNormalTri) -> dx.Distribution:
         """
@@ -130,58 +109,18 @@ class Gaussian(AbstractLikelihood, Conjugate):
 
 
 @dataclass
-class Bernoulli(AbstractLikelihood, NonConjugate):
+class Bernoulli(AbstractLikelihood):
 
-    @property
-    def link_function(self) -> Callable[[Float[Array, "N 1"]], dx.Distribution]:
-        """Return the probit link function of the Bernoulli likelihood.
+    def link_function(self, f: Float[Array, "N 1"]) -> dx.Distribution:
+        """The probit link function of the Bernoulli likelihood.
 
-        Returns:
-            Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]: A probit link
-                function that maps the predictive distribution to the likelihood function.
-        """
-        def link_fn(f: Float[Array, "N 1"]) -> dx.Distribution:
-            """The probit link function of the Bernoulli likelihood.
-
-            Args:
-                f (Float[Array, "N 1"]): Function values.
-
-            Returns:
-                dx.Distribution: The likelihood function.
-            """
-            return dx.Bernoulli(probs=inv_probit(f))
-
-        return link_fn
-
-    @property
-    def predictive_moment_fn(
-        self,
-    ) -> Callable[[Float[Array, "N 1"]], Float[Array, "N 1"]]:
-        """Instantiate the predictive moment function of the Bernoulli likelihood
-        that is parameterised by a probit link function.
+        Args:
+            f (Float[Array, "N 1"]): Function values.
 
         Returns:
-            Callable: A callable object that accepts a mean and variance term
-                from which the predictive random variable is computed.
+            dx.Distribution: The likelihood function.
         """
-
-        def moment_fn(
-            mean: Float[Array, "N 1"],
-            variance: Float[Array, "N 1"],
-        ):
-            """The predictive moment function of the Bernoulli likelihood.
-
-            Args:
-                mean (Float[Array, "N 1"]): The mean of the latent function values.
-                variance (Float[Array, "N 1"]): The diagonal variance of the latent function values.
-
-            Returns:
-                Float[Array, "N 1"]: The pointwise predictive distribution.
-            """
-            rv = self.link_function(mean / jnp.sqrt(1.0 + variance))
-            return rv
-
-        return moment_fn
+        return dx.Bernoulli(probs=inv_probit(f))
 
     def predict(self, dist: dx.Distribution) -> dx.Distribution:
         """Evaluate the pointwise predictive distribution, given a Gaussian
@@ -197,7 +136,7 @@ class Bernoulli(AbstractLikelihood, NonConjugate):
         """
         variance = jnp.diag(dist.covariance())
         mean = dist.mean().ravel()
-        return self.predictive_moment_fn(mean, variance)
+        return  self.link_function(mean / jnp.sqrt(1.0 + variance))
 
 
 def inv_probit(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
