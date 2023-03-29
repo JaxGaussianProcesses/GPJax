@@ -31,6 +31,9 @@ from ..computations import AbstractKernelComputation, ConstantDiagonalKernelComp
 class White(AbstractKernel):
 
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    compute_engine: AbstractKernelComputation = static_field(
+        ConstantDiagonalKernelComputation
+    )
 
     def __call__(
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
