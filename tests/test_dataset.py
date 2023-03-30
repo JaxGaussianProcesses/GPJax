@@ -13,137 +13,78 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import is_dataclass
-
 import jax.numpy as jnp
-import jax.tree_util as jtu
 import pytest
+from jaxutils.dataset import Dataset
 
-from gpjax.dataset import Dataset
 
+@pytest.mark.parametrize("n", [1, 10])
+@pytest.mark.parametrize("outd", [1, 2, 10])
+@pytest.mark.parametrize("ind", [1, 2, 10])
+@pytest.mark.parametrize("n2", [1, 10])
+def test_dataset(n: int, outd: int, ind: int, n2: int) -> None:
+    x = jnp.ones((n, ind))
+    y = jnp.ones((n, outd))
+    d = Dataset(X=x, y=y)
 
-@pytest.mark.parametrize("n", [1, 2, 10])
-@pytest.mark.parametrize("out_dim", [1, 2, 10])
-@pytest.mark.parametrize("in_dim", [1, 2, 10])
-def test_dataset_init(n: int, in_dim: int, out_dim: int) -> None:
-    # Create dataset
-    x = jnp.ones((n, in_dim))
-    y = jnp.ones((n, out_dim))
-    D = Dataset(X=x, y=y)
-
-    # Test dataset shapes
-    assert D.n == n
-    assert D.in_dim == in_dim
-    assert D.out_dim == out_dim
-
-    # Test representation
+    assert d.n == n
+    assert d.in_dim == ind
+    assert d.out_dim == outd
     assert (
-        D.__repr__()
-        == f"- Number of observations: {n}\n- Input dimension: {in_dim}\n- Output"
-        f" dimension: {out_dim}"
+        d.__repr__()
+        == f"- Number of observations: {n}\n- Input dimension: {ind}\n- Output"
+        f" dimension: {outd}"
     )
 
-    # Ensure dataclass
-    assert is_dataclass(D)
+    # Test combine datasets.
+    x2 = 2 * jnp.ones((n2, ind))
+    y2 = 2 * jnp.ones((n2, outd))
+    d2 = Dataset(X=x2, y=y2)
 
-    # Test supervised and unsupervised
-    assert Dataset(X=x, y=y).is_supervised() is True
-    assert Dataset(y=y).is_unsupervised() is True
+    d_combined = d + d2
+    assert d_combined.n == n + n2
+    assert d_combined.in_dim == ind
+    assert d_combined.out_dim == outd
+    assert (d_combined.y[:n] == 1.0).all()
+    assert (d_combined.y[n:] == 2.0).all()
+    assert (d_combined.X[:n] == 1.0).all()
+    assert (d_combined.X[n:] == 2.0).all()
 
-    # Check tree flatten
-    assert jtu.tree_leaves(D) == [x, y]
-
-
-@pytest.mark.parametrize("n1", [1, 2, 10])
-@pytest.mark.parametrize("n2", [1, 2, 10])
-@pytest.mark.parametrize("out_dim", [1, 2, 10])
-@pytest.mark.parametrize("in_dim", [1, 2, 10])
-def test_dataset_add(n1: int, n2: int, in_dim: int, out_dim: int) -> None:
-    # Create first dataset
-    x1 = jnp.ones((n1, in_dim))
-    y1 = jnp.ones((n1, out_dim))
-    D1 = Dataset(X=x1, y=y1)
-
-    # Create second dataset
-    x2 = 2 * jnp.ones((n2, in_dim))
-    y2 = 2 * jnp.ones((n2, out_dim))
-    D2 = Dataset(X=x2, y=y2)
-
-    # Add datasets
-    D = D1 + D2
-
-    # Test shapes
-    assert D.n == n1 + n2
-    assert D.in_dim == in_dim
-    assert D.out_dim == out_dim
-
-    # Test representation
-    assert (
-        D.__repr__()
-        == f"- Number of observations: {n1 + n2}\n- Input dimension: {in_dim}\n- Output"
-        f" dimension: {out_dim}"
-    )
-
-    # Ensure dataclass
-    assert is_dataclass(D)
-
-    # Test supervised and unsupervised
-    assert (Dataset(X=x1, y=y1) + Dataset(X=x2, y=y2)).is_supervised() is True
-    assert (Dataset(y=y1) + Dataset(y=y2)).is_unsupervised() is True
-
-    # Check tree flatten
-    x = jnp.concatenate((x1, x2))
-    y = jnp.concatenate((y1, y2))
-    (jtu.tree_leaves(D)[0] == x).all()
-    (jtu.tree_leaves(D)[1] == y).all()
+    # Test supervised and unsupervised.
+    assert d.is_supervised() is True
+    dunsup = Dataset(y=y)
+    assert dunsup.is_unsupervised() is True
 
 
 @pytest.mark.parametrize("nx, ny", [(1, 2), (2, 1), (10, 5), (5, 10)])
-@pytest.mark.parametrize("out_dim", [1, 2, 10])
-@pytest.mark.parametrize("in_dim", [1, 2, 10])
-def test_dataset_incorrect_lengths(nx: int, ny: int, out_dim: int, in_dim: int) -> None:
-    # Create input and output pairs of different lengths
-    x = jnp.ones((nx, in_dim))
-    y = jnp.ones((ny, out_dim))
+@pytest.mark.parametrize("outd", [1, 2, 10])
+@pytest.mark.parametrize("ind", [1, 2, 10])
+def test_dataset_assertions(nx: int, ny: int, outd: int, ind: int) -> None:
+    x = jnp.ones((nx, ind))
+    y = jnp.ones((ny, outd))
 
-    # Ensure error is raised upon dataset creation
     with pytest.raises(ValueError):
         Dataset(X=x, y=y)
 
 
 @pytest.mark.parametrize("n", [1, 2, 10])
-@pytest.mark.parametrize("out_dim", [1, 2, 10])
-@pytest.mark.parametrize("in_dim", [1, 2, 10])
-def test_2d_inputs(n: int, out_dim: int, in_dim: int) -> None:
-    # Create dataset where output dimension is incorrectly not 2D
-    x = jnp.ones((n, in_dim))
+@pytest.mark.parametrize("outd", [1, 2, 10])
+@pytest.mark.parametrize("ind", [1, 2, 10])
+def test_2d_inputs(n: int, outd: int, ind: int) -> None:
+    x = jnp.ones((n, ind))
     y = jnp.ones((n,))
 
-    # Ensure error is raised upon dataset creation
     with pytest.raises(ValueError):
         Dataset(X=x, y=y)
 
-    # Create dataset where input dimension is incorrectly not 2D
     x = jnp.ones((n,))
-    y = jnp.ones((n, out_dim))
+    y = jnp.ones((n, outd))
 
-    # Ensure error is raised upon dataset creation
     with pytest.raises(ValueError):
         Dataset(X=x, y=y)
 
 
-@pytest.mark.parametrize("n", [1, 2, 10])
-@pytest.mark.parametrize("in_dim", [1, 2, 10])
-def test_y_none(n: int, in_dim: int) -> None:
-    # Create a dataset with no output
-    x = jnp.ones((n, in_dim))
-    D = Dataset(X=x)
-
-    # Ensure is dataclass
-    assert is_dataclass(D)
-
-    # Ensure output is None
-    assert D.y is None
-
-    # Check tree flatten
-    assert jtu.tree_leaves(D) == [x]
+def test_y_none() -> None:
+    x = jnp.ones((10, 1))
+    d = Dataset(X=x)
+    assert d.y is None

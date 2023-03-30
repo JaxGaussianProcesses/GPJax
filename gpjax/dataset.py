@@ -14,12 +14,11 @@
 # ==============================================================================
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Optional
-
 import jax.numpy as jnp
 from jaxtyping import Array, Float
+from typing import Optional
 from simple_pytree import Pytree
+from dataclasses import dataclass
 
 
 @dataclass
@@ -56,15 +55,8 @@ class Dataset(Pytree):
 
     def __add__(self, other: Dataset) -> Dataset:
         """Combine two datasets. Right hand dataset is stacked beneath the left."""
-
-        X = None
-        y = None
-
-        if self.X is not None and other.X is not None:
-            X = jnp.concatenate((self.X, other.X))
-
-        if self.y is not None and other.y is not None:
-            y = jnp.concatenate((self.y, other.y))
+        X = jnp.concatenate((self.X, other.X))
+        y = jnp.concatenate((self.y, other.y))
 
         return Dataset(X=X, y=y)
 
