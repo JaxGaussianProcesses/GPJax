@@ -84,9 +84,9 @@ class AbstractKernel(Module):
         """
 
         if isinstance(other, AbstractKernel):
-            return SumKernel([self, other])
+            return SumKernel(kernels=[self, other])
 
-        return SumKernel([self, Constant(other)])
+        return SumKernel(kernels=[self, Constant(other)])
 
     def __radd__(
         self, other: Union[AbstractKernel, Float[Array, "1"]]
@@ -112,9 +112,9 @@ class AbstractKernel(Module):
             AbstractKernel: A new kernel that is the product of the two kernels.
         """
         if isinstance(other, AbstractKernel):
-            return ProductKernel([self, other])
+            return ProductKernel(kernels=[self, other])
 
-        return ProductKernel([self, Constant(other)])
+        return ProductKernel(kernels=[self, Constant(other)])
 
 
 @dataclass
@@ -179,4 +179,4 @@ class CombinationKernel(AbstractKernel):
 
 
 SumKernel = partial(CombinationKernel, operator=jnp.sum)
-ProductKernel = partial(CombinationKernel, operator=jnp.sum)
+ProductKernel = partial(CombinationKernel, operator=jnp.prod)
