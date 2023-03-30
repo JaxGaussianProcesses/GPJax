@@ -13,27 +13,28 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Any, Optional, Tuple
+from typing import Optional, Tuple
 
 import jax
 import jax.random as jr
 import optax as ox
-from jax._src.random import _check_prng_key
-from jax.random import KeyArray
-from jaxtyping import Array, Float
-from jaxlib.xla_extension import PjitFunction
-from warnings import warn
 
-from .base import Module
+from jax.random import KeyArray
+from jax._src.random import _check_prng_key
+from jaxtyping import Array, Float
+from typing import Any
+
 from .dataset import Dataset
-from .objectives import AbstractObjective
+from .objective import Objective
 from .scan import vscan
+
+Module = Any
 
 
 def fit(
     *,
     model: Module,
-    objective: AbstractObjective,
+    objective: Objective,
     train_data: Dataset,
     optim: ox.GradientTransformation,
     num_iters: Optional[int] = 100,
@@ -41,27 +42,25 @@ def fit(
     key: Optional[KeyArray] = jr.PRNGKey(42),
     log_rate: Optional[int] = 10,
     verbose: Optional[bool] = True,
-    unroll: Optional[int] = 1,
-    safe: Optional[bool] = True,
+    unroll: int = 1,
 ) -> Tuple[Module, Array]:
-    """Train a Module model with respect to a supplied Objective function.
-    Optimisers used here should originate from Optax.
+    """Train a Module model with respect to a supplied Objective function. Optimisers used here should originate from Optax.
 
     Example:
         >>> import jax.numpy as jnp
         >>> import jax.random as jr
         >>> import optax as ox
-        >>> import gpjax as gpx
+        >>> import jaxutils as ju
         >>>
         >>> # (1) Create a dataset:
         >>> X = jnp.linspace(0.0, 10.0, 100)[:, None]
         >>> y = 2.0 * X + 1.0 + 10 * jr.normal(jr.PRNGKey(0), X.shape)
-        >>> D = gpx.Dataset(X, y)
+        >>> D = ju.Dataset(X, y)
         >>>
         >>> # (2) Define your model:
-        >>> class LinearModel(gpx.Module):
-        ...     weight: float = gpx.param_field()
-        ...     bias: float = gpx.param_field()
+        >>> class LinearModel(ju.Module):
+        ...     weight: float = ju.param(ju.Identity)
+        ...     bias: float = ju.param(ju.Identity)
         ...
         ...     def __call__(self, x):
         ...         return self.weight * x + self.bias
@@ -69,56 +68,47 @@ def fit(
         >>> model = LinearModel(weight=1.0, bias=1.0)
         >>>
         >>> # (3) Define your loss function:
-        >>> class MeanSqaureError(gpx.AbstractObjective):
-        ...     def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
+        >>> class MeanSqaureError(ju.Objective):
+        ...     def evaluate(self, model: LinearModel, train_data: ju.Dataset) -> float:
         ...         return jnp.mean((train_data.y - model(train_data.X)) ** 2)
         ...
         >>> loss = MeanSqaureError()
         >>>
         >>> # (4) Train!
-        >>> trained_model, history = gpx.fit(
+        >>> trained_model, history = ju.fit(
         ...     model=model, objective=loss, train_data=D, optim=ox.sgd(0.001), num_iters=1000
         ... )
 
     Args:
         model (Module): The model Module to be optimised.
-        objective (Objective): The objective function that we are optimising with
-            respect to.
+        objective (Objective): The objective function that we are optimising with respect to.
         train_data (Dataset): The training data to be used for the optimisation.
-        optim (GradientTransformation): The Optax optimiser that is to be used for
-            learning a parameter set.
-        num_iters (Optional[int]): The number of optimisation steps to run. Defaults
-            to 100.
-        batch_size (Optional[int]): The size of the mini-batch to use. Defaults to -1
-            (i.e. full batch).
-        key (Optional[KeyArray]): The random key to use for the optimisation batch
-            selection. Defaults to jr.PRNGKey(42).
-        log_rate (Optional[int]): How frequently the objective function's value should
-        be printed. Defaults to 10.
-        verbose (Optional[bool]): Whether to print the training loading bar. Defaults
-            to True.
-        unroll (int): The number of unrolled steps to use for the optimisation.
-            Defaults to 1.
+        optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
+        num_iters (Optional[int]): The number of optimisation steps to run. Defaults to 100.
+        batch_size (Optional[int]): The size of the mini-batch to use. Defaults to -1 (i.e. full batch).
+        key (Optional[KeyArray]): The random key to use for the optimisation batch selection. Defaults to jr.PRNGKey(42).
+        log_rate (Optional[int]): How frequently the objective function's value should be printed. Defaults to 10.
+        verbose (Optional[bool]): Whether to print the training loading bar. Defaults to True.
+        unroll (int): The number of unrolled steps to use for the optimisation. Defaults to 1.
 
     Returns:
-        Tuple[Module, Array]: A Tuple comprising the optimised model and training
-            history respectively.
+        Tuple[Module, Array]: A Tuple comprising the optimised model and training history respectively.
     """
-    if safe:
-        # Check inputs.
-        _check_model(model)
-        _check_objective(objective)
-        _check_train_data(train_data)
-        _check_optim(optim)
-        _check_num_iters(num_iters)
-        _check_batch_size(batch_size)
-        _check_prng_key(key)
-        _check_log_rate(log_rate)
-        _check_verbose(verbose)
+
+    # Check inputs.
+    _check_model(model)
+    _check_objective(objective)
+    _check_train_data(train_data)
+    _check_optim(optim)
+    _check_num_iters(num_iters)
+    _check_batch_size(batch_size)
+    _check_prng_key(key)
+    _check_log_rate(log_rate)
+    _check_verbose(verbose)
 
     # Unconstrained space loss function with stop-gradient rule for non-trainable params.
     def loss(model: Module, batch: Dataset) -> Float[Array, "1"]:
-        model = model.stop_gradient()
+        model = model.stop_gradients()
         return objective(model.constrain(), batch)
 
     # Unconstrained space model.
@@ -180,24 +170,19 @@ def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
 def _check_model(model: Any) -> None:
     """Check that the model is of type Module. Check trainables and bijectors tree structure."""
     if not isinstance(model, Module):
-        raise TypeError("model must be of type gpjax.Module")
+        raise TypeError("model must be of type jaxutils.Module")
 
 
 def _check_objective(objective: Any) -> None:
     """Check that the objective is of type Objective."""
-    if not isinstance(objective, AbstractObjective):
-        if isinstance(objective, PjitFunction):
-            warn("Objective is jit-compiled. Please ensure that the objective is of type gpjax.Objective.")
-        else:
-            raise TypeError(
-                f"objective of type {type(objective)} must be of type gpjax.Objective."
-            )
+    if not isinstance(objective, Objective):
+        raise TypeError("objective must be of type jaxutils.Objective")
 
 
 def _check_train_data(train_data: Any) -> None:
     """Check that the train_data is of type Dataset."""
     if not isinstance(train_data, Dataset):
-        raise TypeError("train_data must be of type gpjax.Dataset")
+        raise TypeError("train_data must be of type jaxutils.Dataset")
 
 
 def _check_optim(optim: Any) -> None:

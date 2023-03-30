@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Any, Callable, Union
+from typing import Callable, Any, Union
 
 from jax import lax
 from jax.experimental import host_callback
