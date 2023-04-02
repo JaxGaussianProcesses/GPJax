@@ -25,7 +25,7 @@ from jaxtyping import Array, Float
 from typing import Any
 
 from .dataset import Dataset
-from .objective import Objective
+from .objectives import AbstractObjective
 from .scan import vscan
 
 Module = Any
@@ -34,7 +34,7 @@ Module = Any
 def fit(
     *,
     model: Module,
-    objective: Objective,
+    objective: AbstractObjective,
     train_data: Dataset,
     optim: ox.GradientTransformation,
     num_iters: Optional[int] = 100,
@@ -96,19 +96,19 @@ def fit(
     """
 
     # Check inputs.
-    _check_model(model)
-    _check_objective(objective)
-    _check_train_data(train_data)
-    _check_optim(optim)
-    _check_num_iters(num_iters)
-    _check_batch_size(batch_size)
-    _check_prng_key(key)
-    _check_log_rate(log_rate)
-    _check_verbose(verbose)
+    # _check_model(model)
+    # _check_objective(objective)
+    # _check_train_data(train_data)
+    # _check_optim(optim)
+    # _check_num_iters(num_iters)
+    # _check_batch_size(batch_size)
+    # _check_prng_key(key)
+    # _check_log_rate(log_rate)
+    # _check_verbose(verbose)
 
     # Unconstrained space loss function with stop-gradient rule for non-trainable params.
     def loss(model: Module, batch: Dataset) -> Float[Array, "1"]:
-        model = model.stop_gradients()
+        model = model.stop_gradient()
         return objective(model.constrain(), batch)
 
     # Unconstrained space model.
@@ -175,7 +175,7 @@ def _check_model(model: Any) -> None:
 
 def _check_objective(objective: Any) -> None:
     """Check that the objective is of type Objective."""
-    if not isinstance(objective, Objective):
+    if not isinstance(objective, AbstractObjective):
         raise TypeError("objective must be of type jaxutils.Objective")
 
 

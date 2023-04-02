@@ -14,13 +14,12 @@
 # ==============================================================================
 
 from . import _version
-from .abstractions import fit, fit_batches, fit_natgrads
+from .fit import fit
 from .gps import Prior, construct_posterior
 from .kernels import *
 from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
-from .params import constrain, copy_dict_structure, initialise, unconstrain
-from .types import Dataset
+from .dataset import Dataset
 from .variational_families import (
     CollapsedVariationalGaussian,
     ExpectationVariationalGaussian,
@@ -28,7 +27,6 @@ from .variational_families import (
     VariationalGaussian,
     WhitenedVariationalGaussian,
 )
-from .variational_inference import CollapsedVI, StochasticVI
 
 __version__ = _version.get_versions()["version"]
 __license__ = "MIT"
@@ -40,8 +38,6 @@ __contributors__ = "https://github.com/thomaspinder/GPJax/graphs/contributors"
 __all__ = [
     "kernels",
     "fit",
-    "fit_batches",
-    "fit_natgrads",
     "Prior",
     "construct_posterior",
     "RBF",
@@ -56,10 +52,6 @@ __all__ = [
     "Gaussian",
     "Constant",
     "Zero",
-    "constrain",
-    "copy_dict_structure",
-    "initialise",
-    "unconstrain",
     "Dataset",
     "CollapsedVariationalGaussian",
     "ExpectationVariationalGaussian",
