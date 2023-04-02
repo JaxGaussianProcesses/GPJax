@@ -13,17 +13,19 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
-from gpjax.dataset import Dataset
-from gpjax.fit import fit
-from gpjax.parameters.bijectors import Identity
-from gpjax.parameters import param_field, Module
-from gpjax.objectives import AbstractObjective
 
 import jax.numpy as jnp
 import jax.random as jr
 import optax as ox
+import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax.distributions as tfd
+
+from dataclasses import dataclass
+
+from gpjax.base import param_field, Module
+from gpjax.objectives import AbstractObjective
+from gpjax.dataset import Dataset
+from gpjax.fit import fit
 
 
 def test_simple_linear_model():
@@ -35,8 +37,8 @@ def test_simple_linear_model():
     # (2) Define your model:
     @dataclass
     class LinearModel(Module):
-        weight: float = param_field(bijector=Identity)
-        bias: float = param_field(bijector=Identity)
+        weight: float = param_field(bijector=tfb.Identity())
+        bias: float = param_field(bijector=tfb.Identity())
 
         def __call__(self, x):
             return self.weight * x + self.bias

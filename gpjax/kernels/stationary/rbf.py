@@ -14,22 +14,23 @@
 # ==============================================================================
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax.distributions as tfd
 
+from jaxtyping import Array, Float
+from dataclasses import dataclass
+
+from ...base import param_field
 from ..base import AbstractKernel
 from .utils import squared_distance
-import distrax as dx
-
-from dataclasses import dataclass
-from ...parameters import param_field, Softplus
 
 
 @dataclass
 class RBF(AbstractKernel):
     """The Radial Basis Function (RBF) kernel."""
 
-    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=Softplus)
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
@@ -52,5 +53,5 @@ class RBF(AbstractKernel):
         return K.squeeze()
 
     @property
-    def spectral_density(self) -> dx.Normal:
-        return dx.Normal(loc=0.0, scale=1.0)
+    def spectral_density(self) -> tfd.Normal:
+        return tfd.Normal(loc=0.0, scale=1.0)

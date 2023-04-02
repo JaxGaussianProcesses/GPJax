@@ -13,20 +13,15 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Dict, List, Optional
-
-import jax
 import jax.numpy as jnp
-from jax.random import KeyArray
+import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax.distributions as tfd
+
 from jaxtyping import Array, Float
-
-from ..base import AbstractKernel
-from ..computations import (
-    DenseKernelComputation,
-)
-
 from dataclasses import dataclass
-from ...parameters import param_field, Softplus
+
+from ...base import param_field
+from ..base import AbstractKernel
 
 
 @dataclass
@@ -36,9 +31,9 @@ class Periodic(AbstractKernel):
     Key reference is MacKay 1998 - "Introduction to Gaussian processes".
     """
 
-    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=Softplus)
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
-    period: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    period: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`

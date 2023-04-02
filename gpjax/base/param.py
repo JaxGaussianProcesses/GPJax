@@ -5,13 +5,12 @@ __all__ = ["param_field"]
 import dataclasses
 from typing import Any, Mapping, Optional
 
-from .bijectors import Bijector, Identity
-
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
 def param_field(
     default: Any = dataclasses.MISSING,
     *,
-    bijector: Bijector = Identity,
+    bijector: tfb.Bijector = tfb.Identity(),
     trainable: bool = True,
     default_factory: Any = dataclasses.MISSING,
     init: bool = True,

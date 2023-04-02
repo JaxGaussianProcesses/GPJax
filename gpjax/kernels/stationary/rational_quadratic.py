@@ -13,26 +13,24 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-from typing import List, Optional
-
-import jax
 import jax.numpy as jnp
-from jax.random import KeyArray
-from jaxtyping import Array, Float
+import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax.distributions as tfd
 
-from ...parameters import Softplus, param_field
+from jaxtyping import Array, Float
+from dataclasses import dataclass
+
+from ...base import param_field
 from ..base import AbstractKernel
-from ..computations import DenseKernelComputation
 from .utils import squared_distance
 
 
 @dataclass
 class RationalQuadratic(AbstractKernel):
 
-    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=Softplus)
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
-    alpha: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    alpha: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`

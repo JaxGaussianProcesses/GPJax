@@ -12,8 +12,7 @@ import jax.tree_util as jtu
 from jax._src.tree_util import _registry
 from simple_pytree import Pytree, static_field
 
-from .bijectors import Bijector, Identity
-
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
 class Module(Pytree):
     _pytree__meta: Dict[str, Any] = static_field()
@@ -97,7 +96,7 @@ class Module(Pytree):
         """Replace the trainability status of local nodes of the Module."""
         return self.update_meta(**{k: {"trainable": v} for k, v in kwargs.items()})
 
-    def replace_bijector(self: Module, **kwargs: Dict[str, Bijector]) -> Self:
+    def replace_bijector(self: Module, **kwargs: Dict[str, tfb.Bijector]) -> Self:
         """Replace the bijectors of local nodes of the Module."""
         return self.update_meta(**{k: {"bijector": v} for k, v in kwargs.items()})
 
@@ -110,7 +109,7 @@ class Module(Pytree):
 
         def _apply_constrain(meta_leaf):
             meta, leaf = meta_leaf
-            return meta.get("bijector", Identity).forward(leaf)
+            return meta.get("bijector", tfb.Identity()).forward(leaf)
 
         return meta_map(_apply_constrain, self)
 
@@ -123,7 +122,7 @@ class Module(Pytree):
 
         def _apply_unconstrain(meta_leaf):
             meta, leaf = meta_leaf
-            return meta.get("bijector", Identity).inverse(leaf)
+            return meta.get("bijector", tfb.Identity()).inverse(leaf)
 
         return meta_map(_apply_unconstrain, self)
 

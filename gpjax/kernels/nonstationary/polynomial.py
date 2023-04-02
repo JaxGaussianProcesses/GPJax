@@ -14,11 +14,15 @@
 # ==============================================================================
 
 import jax.numpy as jnp
+import tensorflow_probability.substrates.jax.bijectors as tfb
+
 from jaxtyping import Array, Float
-from ..base import AbstractKernel
 from dataclasses import dataclass
 from simple_pytree import static_field
-from ...parameters import param_field, Softplus
+
+from ..base import AbstractKernel
+from ...base import param_field
+
 
 
 @dataclass
@@ -26,8 +30,8 @@ class Polynomial(AbstractKernel):
     """The Polynomial kernel with variable degree."""
 
     degree: int = static_field(2)
-    shift: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    shift: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\\alpha` and variance :math:`\\sigma^2` through
