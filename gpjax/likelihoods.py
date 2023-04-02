@@ -18,17 +18,18 @@ from typing import Any
 from .linops.utils import to_dense
 
 import distrax as dx
+import tensorflow_probability.substrates.jax.bijectors as tfb
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Array, Float
 from simple_pytree import static_field
 
 from dataclasses import dataclass
-from mytree import Mytree, param_field, Softplus
+from .base import Module, param_field
 
 
 @dataclass
-class AbstractLikelihood(Mytree):
+class AbstractLikelihood(Module):
     """Abstract base class for likelihoods."""
 
     num_datapoints: int = static_field()
@@ -75,7 +76,9 @@ class AbstractLikelihood(Mytree):
 class Gaussian(AbstractLikelihood):
     """Gaussian likelihood object."""
 
-    obs_noise: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    obs_noise: Float[Array, "1"] = param_field(
+        jnp.array([1.0]), bijector=tfb.Softplus()
+    )
 
     def link_function(self, f: Float[Array, "N 1"]) -> dx.Normal:
         """The link function of the Gaussian likelihood.

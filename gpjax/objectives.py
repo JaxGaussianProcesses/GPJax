@@ -11,14 +11,15 @@ import distrax as dx
 from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
-from .linops import identity
+
 from jaxtyping import Array, Float
 
+from .base import Module
+from .linops import identity
 from .dataset import Dataset
 from .gaussian_distribution import GaussianDistribution
 from .quadrature import gauss_hermite_quadrature
 
-from mytree import Mytree
 from dataclasses import dataclass
 from simple_pytree import static_field
 
@@ -26,7 +27,7 @@ import jax.tree_util as jtu
 
 
 @dataclass
-class AbstractObjective(Mytree):
+class AbstractObjective(Module):
     """Abstract base class for objectives."""
 
     negative: bool = static_field(False)

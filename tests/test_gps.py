@@ -19,7 +19,6 @@ import jax.random as jr
 import pytest
 from jax.config import config
 
-
 from gpjax.gps import (
     AbstractPrior,
     AbstractPosterior,
@@ -165,7 +164,7 @@ def test_nonconjugate_posterior(num_datapoints, likel, jit_compile):
     lik = likel(num_datapoints=num_datapoints)
     post = p * lik
     assert isinstance(post, NonConjugatePosterior)
-    assert (post.latent == jnp.zeros((num_datapoints, 1))).all()
+    assert (post.latent == jr.normal(post.key,(num_datapoints, 1))).all()
 
     # Prediction
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)

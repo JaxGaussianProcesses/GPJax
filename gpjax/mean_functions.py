@@ -20,13 +20,15 @@ import dataclasses
 import jax.numpy as jnp
 from beartype.typing import List, Callable, Union
 from jaxtyping import Array, Float
-from mytree import Mytree, param_field
+
+
+from .base import Module, param_field
 from simple_pytree import static_field
 from functools import partial
 
 
 @dataclasses.dataclass
-class AbstractMeanFunction(Mytree):
+class AbstractMeanFunction(Module):
     """Mean function that is used to parameterise the Gaussian process."""
 
     @abc.abstractmethod
@@ -126,32 +128,32 @@ class Constant(AbstractMeanFunction):
 class CombinationMeanFunction(AbstractMeanFunction):
     """A base class for products or sums of AbstractMeanFunctions."""
 
-    items: List[AbstractMeanFunction]
+    means: List[AbstractMeanFunction]
     operator: Callable = static_field()
 
     def __init__(
         self,
-        items: List[AbstractMeanFunction],
+        means: List[AbstractMeanFunction],
         operator: Callable,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
 
-        # Add items to a list, flattening out instances of this class therein, as in GPFlow kernels.
+        # Add means to a list, flattening out instances of this class therein, as in GPFlow kernels.
         items_list: List[AbstractMeanFunction] = []
 
-        for item in items:
+        for item in means:
             if not isinstance(item, AbstractMeanFunction):
                 raise TypeError(
                     "can only combine AbstractMeanFunction instances"
                 )  # pragma: no cover
 
             if isinstance(item, self.__class__):
-                items_list.extend(item.items)
+                items_list.extend(item.means)
             else:
                 items_list.append(item)
 
-        self.items = items_list
+        self.means = items_list
         self.operator = operator
 
     def __call__(self, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:
@@ -163,7 +165,7 @@ class CombinationMeanFunction(AbstractMeanFunction):
         Returns:
             Float[Array, "Q"]: The evaluated mean function.
         """
-        return self.operator(jnp.stack([m(x) for m in self.items]))
+        return self.operator(jnp.stack([m(x) for m in self.means]))
 
 
 SumMeanFunction = partial(CombinationMeanFunction, operator=partial(jnp.sum, axis=0))

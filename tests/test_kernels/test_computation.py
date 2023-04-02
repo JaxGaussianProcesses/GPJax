@@ -5,7 +5,7 @@ from gpjax.kernels.computations import (
     DiagonalKernelComputation,
     ConstantDiagonalKernelComputation,
 )
-from jaxkern.stationary import (
+from gpjax.kernels.stationary import (
     RBF,
     Matern12,
     Matern32,
