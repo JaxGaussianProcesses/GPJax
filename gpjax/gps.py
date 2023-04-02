@@ -21,18 +21,18 @@ from .kernels.base import AbstractKernel
 from jaxtyping import Array, Float
 from jax.random import KeyArray, PRNGKey, normal
 
-from .dataset import Dataset
-from .linops import identity
-
-from .gaussian_distribution import GaussianDistribution
-from .likelihoods import AbstractLikelihood, Gaussian
-from .mean_functions import AbstractMeanFunction
-from mytree import Mytree
 from simple_pytree import static_field
 from dataclasses import dataclass
 
+from .base import Module, param_field
+from .dataset import Dataset
+from .linops import identity
+from .gaussian_distribution import GaussianDistribution
+from .likelihoods import AbstractLikelihood, Gaussian
+from .mean_functions import AbstractMeanFunction
+
 @dataclass
-class AbstractPrior(Mytree):
+class AbstractPrior(Module):
     """Abstract Gaussian process prior."""
     kernel: AbstractKernel
     mean_function: AbstractMeanFunction
@@ -187,7 +187,7 @@ class Prior(AbstractPrior):
 # GP Posteriors
 #######################
 @dataclass
-class AbstractPosterior(Mytree):
+class AbstractPosterior(Module):
     """The base GP posterior object conditioned on an observed dataset. All
     posterior objects should inherit from this class."""
     prior: AbstractPrior
@@ -355,8 +355,8 @@ class NonConjugatePosterior(AbstractPosterior):
     variational inference, or Laplace approximations can then be used to sample
     from, or optimise an approximation to, the posterior distribution.
     """
-    latent: Float[Array, "N 1"] = None
-    key: KeyArray = PRNGKey(42)
+    latent: Float[Array, "N 1"] = param_field(None)
+    key: KeyArray = static_field(PRNGKey(42))
 
     def __post_init__(self):
         if self.latent is None:

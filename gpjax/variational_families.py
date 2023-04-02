@@ -19,9 +19,9 @@ import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Array, Float
 
-from mytree import Mytree, param_field
 from simple_pytree import static_field
 
+from .base import Module, param_field
 from .dataset import Dataset
 from .gaussian_distribution import GaussianDistribution
 from .gps import AbstractPosterior
@@ -34,7 +34,7 @@ from dataclasses import dataclass
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 @dataclass
-class AbstractVariationalFamily(Mytree):
+class AbstractVariationalFamily(Module):
     """
     Abstract base class used to represent families of distributions that can be
     used within variational inference.

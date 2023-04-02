@@ -16,7 +16,6 @@
 import jax.numpy as jnp
 import pytest
 from jax.config import config
-from jaxlinop import identity
 
 from gpjax.kernels.base import (
     AbstractKernel,
@@ -34,7 +33,10 @@ from gpjax.kernels.stationary import (
 from gpjax.kernels.nonstationary import Polynomial, Linear
 from jaxtyping import Array, Float
 from dataclasses import dataclass
-from mytree import param_field, Softplus
+from gpjax.base import param_field
+
+import tensorflow_probability.substrates.jax.bijectors as tfb
+
 
 
 # Enable Float64 for more stable matrix inversions.
@@ -50,7 +52,7 @@ def test_abstract_kernel():
     @dataclass
     class DummyKernel(AbstractKernel):
         test_a: Float[Array, "1"] = jnp.array([1.0])
-        test_b: Float[Array, "1"] = param_field(jnp.array([2.0]), bijector=Softplus)
+        test_b: Float[Array, "1"] = param_field(jnp.array([2.0]), bijector=tfb.Softplus())
 
         def __call__(self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]) -> Float[Array, "1"]:
             return x * self.test_b * y
@@ -58,7 +60,7 @@ def test_abstract_kernel():
     # Initialise dummy kernel class and test __call__ method:
     dummy_kernel = DummyKernel()
     assert dummy_kernel.test_a ==  jnp.array([1.0])
-    assert dummy_kernel._pytree__meta["test_b"].get("bijector") == Softplus
+    assert isinstance(dummy_kernel._pytree__meta["test_b"].get("bijector"), tfb.Softplus)
     assert dummy_kernel.test_b ==  jnp.array([2.0])
     assert (dummy_kernel(jnp.array([1.0]), jnp.array([2.0])) == 4.0)
 
