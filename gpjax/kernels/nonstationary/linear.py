@@ -14,21 +14,21 @@
 # ==============================================================================
 
 import jax.numpy as jnp
+import tensorflow_probability.substrates.jax.bijectors as tfb
+
 from jaxtyping import Array
-
-from ...base import param_field
-from ..base import AbstractKernel
-
 from dataclasses import dataclass
 from jaxtyping import Array, Float
-from ...parameters import param_field, Softplus
+
+from ..base import AbstractKernel
+from ...base import param_field
 
 
 @dataclass
 class Linear(AbstractKernel):
     """The linear kernel."""
 
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
 
     def __call__(
         self,

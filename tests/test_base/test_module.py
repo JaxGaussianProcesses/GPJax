@@ -13,6 +13,9 @@
 # limitations under the License.
 # ==============================================================================
 
+import jax.numpy as jnp
+import tensorflow_probability.substrates.jax.bijectors as tfb
+
 import dataclasses
 from dataclasses import dataclass, field
 from typing import Any, Generic, Iterable, TypeVar
@@ -21,9 +24,9 @@ import jax
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import pytest
-import tensorflow_probability.substrates.jax.bijectors as tfb
 from flax import serialization
 from simple_pytree import Pytree, static_field
+
 
 from gpjax.base.module import Module, meta
 from gpjax.base.param import param_field

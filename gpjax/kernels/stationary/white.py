@@ -13,16 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional
-
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 from jaxtyping import Array, Float
+from dataclasses import dataclass
 from simple_pytree import static_field
 
-from ...parameters import Softplus, param_field
+from ...base import param_field
 from ..base import AbstractKernel
 from ..computations import AbstractKernelComputation, ConstantDiagonalKernelComputation
 
@@ -30,7 +28,7 @@ from ..computations import AbstractKernelComputation, ConstantDiagonalKernelComp
 @dataclass
 class White(AbstractKernel):
 
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
     compute_engine: AbstractKernelComputation = static_field(
         ConstantDiagonalKernelComputation
     )

@@ -14,16 +14,18 @@
 # ==============================================================================
 
 
-from itertools import permutations, product
+from itertools import product
 
 import jax.numpy as jnp
-import jax.random as jr
 import jax.tree_util as jtu
+import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax.distributions as tfd
+
 import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 from jax.config import config
-from gpjax.linops import LinearOperator, identity
+from gpjax.linops import LinearOperator
 
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.stationary import (
@@ -38,11 +40,10 @@ from gpjax.kernels.stationary import (
 )
 from gpjax.kernels.computations import (
     DenseKernelComputation,
-    DiagonalKernelComputation,
     ConstantDiagonalKernelComputation,
 )
+
 from gpjax.kernels.stationary.utils import build_student_t_distribution
-from gpjax.parameters.bijectors import Identity, Softplus
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -102,9 +103,9 @@ class BaseTestKernel:
         assert meta_leaves.keys() == fields.keys()
         for field in fields:
             if field in ["variance", "lengthscale", "period", "alpha"]:
-                assert meta_leaves[field]["bijector"] == Softplus
+                assert isinstance(meta_leaves[field]["bijector"], tfb.Softplus)
             if field in ["power"]:
-                assert meta_leaves[field]["bijector"] == Identity
+                assert isinstance(meta_leaves[field]["bijector"], tfb.Identity)
             assert meta_leaves[field]["trainable"] == True
 
         # call

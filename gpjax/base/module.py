@@ -1,33 +1,18 @@
-# Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-
 from __future__ import annotations
 
 __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
 
 import dataclasses
 from copy import copy, deepcopy
-from typing import Any, Callable, Dict, Iterable, List, Tuple
+from typing import Any, Callable, Dict, Iterable, Tuple, List
+from typing_extensions import Self
 
 import jax
 import jax.tree_util as jtu
-import tensorflow_probability.substrates.jax.bijectors as tfb
-from jax import lax
 from jax._src.tree_util import _registry
 from simple_pytree import Pytree, static_field
-from typing_extensions import Self
+
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
 
 class Module(Pytree):
@@ -125,10 +110,6 @@ class Module(Pytree):
 
         def _apply_constrain(meta_leaf):
             meta, leaf = meta_leaf
-
-            if meta is None:
-                return leaf
-
             return meta.get("bijector", tfb.Identity()).forward(leaf)
 
         return meta_map(_apply_constrain, self)
@@ -142,10 +123,6 @@ class Module(Pytree):
 
         def _apply_unconstrain(meta_leaf):
             meta, leaf = meta_leaf
-
-            if meta is None:
-                return leaf
-
             return meta.get("bijector", tfb.Identity()).inverse(leaf)
 
         return meta_map(_apply_unconstrain, self)
@@ -163,10 +140,6 @@ class Module(Pytree):
 
         def _apply_stop_grad(meta_leaf):
             meta, leaf = meta_leaf
-
-            if meta is None:
-                return leaf
-
             return _stop_grad(leaf, meta.get("trainable", True))
 
         return meta_map(_apply_stop_grad, self)

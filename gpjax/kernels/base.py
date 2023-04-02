@@ -20,10 +20,8 @@ import jax.numpy as jnp
 from typing import List, Callable, Union
 from jaxtyping import Array, Float
 from functools import partial
-from ..parameters import Module, param_field
 from simple_pytree import static_field
 from dataclasses import dataclass
-from functools import partial
 
 from ..base import Module, param_field
 from .computations import AbstractKernelComputation, DenseKernelComputation

@@ -13,17 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional
-
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 from jaxtyping import Array, Float
+from dataclasses import dataclass
 
-from ...parameters import Softplus, param_field
+from ...base import param_field
 from ..base import AbstractKernel
-from ..computations import DenseKernelComputation
 from .utils import build_student_t_distribution, euclidean_distance
 
 
@@ -31,8 +28,10 @@ from .utils import build_student_t_distribution, euclidean_distance
 class Matern32(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 1.5."""
 
-    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=Softplus)
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    lengthscale: Float[Array, "D"] = param_field(
+        jnp.array([1.0]), bijector=tfb.Softplus()
+    )
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
 
     def __call__(
         self,
@@ -59,5 +58,5 @@ class Matern32(AbstractKernel):
         return K.squeeze()
 
     @property
-    def spectral_density(self):
+    def spectral_density(self) -> tfd.Distribution:
         return build_student_t_distribution(nu=3)
