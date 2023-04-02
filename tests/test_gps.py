@@ -13,29 +13,25 @@
 # limitations under the License.
 # ==============================================================================
 
-import typing as tp
-
 import distrax as dx
-import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
 from jax.config import config
 
-from gpjax import Dataset, initialise
+
 from gpjax.gps import (
-    AbstractPosterior,
     AbstractPrior,
+    AbstractPosterior,
     ConjugatePosterior,
     NonConjugatePosterior,
     Prior,
     construct_posterior,
 )
-from gpjax.kernels import RBF, Matern12, Matern32, Matern52
+from gpjax.kernels import RBF
+from gpjax.mean_functions import Constant
 from gpjax.likelihoods import Bernoulli, Gaussian
-from gpjax.mean_functions import Constant, Zero
-import tensorflow_probability.substrates.jax as tfp
-from typing import Callable
+from gpjax.dataset import Dataset
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -52,7 +48,7 @@ def test_prior(num_datapoints):
 
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
     predictive_dist = p(x)
-    assert isinstance(predictive_dist, tfd.Distribution)
+    assert isinstance(predictive_dist, dx.Distribution)
     mu = predictive_dist.mean()
     sigma = predictive_dist.covariance()
     assert mu.shape == (num_datapoints,)
@@ -135,7 +131,7 @@ def test_conjugate_posterior(num_datapoints, jit_compile):
     # Prediction
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
     predictive_dist = post(x, D)
-    assert isinstance(predictive_dist, tfd.Distribution)
+    assert isinstance(predictive_dist, dx.Distribution)
 
     mu = predictive_dist.mean()
     sigma = predictive_dist.covariance()
@@ -151,67 +147,6 @@ def test_conjugate_posterior(num_datapoints, jit_compile):
     # objective_val = loss_fn(params=params, data=D)
     # assert isinstance(objective_val, jax.Array)
     # assert objective_val.shape == ()
-
-
-@pytest.mark.parametrize("num_datapoints", [1, 5])
-@pytest.mark.parametrize("kernel", [RBF, Matern52])
-@pytest.mark.parametrize("mean_function", [Zero(), Constant()])
-def test_conjugate_posterior_sample_approx(num_datapoints, kernel, mean_function):
-    kern = kernel(lengthscale=5.0, variance=0.1)
-    p = Prior(kernel=kern, mean_function=mean_function) * Gaussian(
-        num_datapoints=num_datapoints
-    )
-    key = jr.PRNGKey(123)
-    x = jnp.sort(
-        jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1)),
-        axis=0,
-    )
-    y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
-    D = Dataset(X=x, y=y)
-
-    with pytest.raises(ValueError):
-        p.sample_approx(-1, D, key)
-    with pytest.raises(ValueError):
-        p.sample_approx(0, D, key)
-    with pytest.raises(ValueError):
-        p.sample_approx(0.5, D, key)
-    with pytest.raises(ValueError):
-        p.sample_approx(1, D, key, -10)
-    with pytest.raises(ValueError):
-        p.sample_approx(1, D, key, 0)
-    with pytest.raises(ValueError):
-        p.sample_approx(1, D, key, 0.5)
-
-    sampled_fn = p.sample_approx(1, D, key, 100)
-    assert isinstance(sampled_fn, Callable)  # check type
-
-    x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
-    evals = sampled_fn(x)
-    assert evals.shape == (num_datapoints, 1.0)  # check shape
-
-    sampled_fn_2 = p.sample_approx(1, D, key, 100)
-    evals_2 = sampled_fn_2(x)
-    max_delta = jnp.max(jnp.abs(evals - evals_2))
-    assert max_delta == 0.0  # samples same for same seed
-
-    new_key = jr.PRNGKey(12345)
-    sampled_fn_3 = p.sample_approx(1, D, new_key, 100)
-    evals_3 = sampled_fn_3(x)
-    max_delta = jnp.max(jnp.abs(evals - evals_3))
-    assert max_delta > 0.01  # samples different for different seed
-
-    # Check validty of samples using Monte-Carlo
-    sampled_fn = p.sample_approx(10_000, D, key, 100)
-    sampled_evals = sampled_fn(x)
-    approx_mean = jnp.mean(sampled_evals, -1)
-    approx_var = jnp.var(sampled_evals, -1)
-    true_predictive = p(x, train_data=D)
-    true_mean = true_predictive.mean()
-    true_var = jnp.diagonal(true_predictive.covariance())
-    max_error_in_mean = jnp.max(jnp.abs(approx_mean - true_mean))
-    max_error_in_var = jnp.max(jnp.abs(approx_var - true_var))
-    assert max_error_in_mean < 0.02  # check that samples are correct
-    assert max_error_in_var < 0.05  # check that samples are correct
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])
@@ -230,12 +165,12 @@ def test_nonconjugate_posterior(num_datapoints, likel, jit_compile):
     lik = likel(num_datapoints=num_datapoints)
     post = p * lik
     assert isinstance(post, NonConjugatePosterior)
-    assert (post.latent == jr.normal(post.key, (num_datapoints, 1))).all()
+    assert (post.latent == jnp.zeros((num_datapoints, 1))).all()
 
     # Prediction
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
     predictive_dist = post(x, D)
-    assert isinstance(predictive_dist, tfd.Distribution)
+    assert isinstance(predictive_dist, dx.Distribution)
 
     mu = predictive_dist.mean()
     sigma = predictive_dist.covariance()

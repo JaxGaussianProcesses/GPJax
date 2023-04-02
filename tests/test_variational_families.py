@@ -16,7 +16,6 @@
 from typing import Callable, Tuple
 
 import distrax as dx
-import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
@@ -46,7 +45,7 @@ def test_abstract_variational_family():
 
     # Create a dummy variational family class with abstract methods implemented.
     class DummyVariationalFamily(AbstractVariationalFamily):
-        def predict(self, params: Dict, x: Float[Array, "N D"]) -> dx.Distribution:
+        def predict(self, x: Float[Array, "N D"]) -> dx.Distribution:
             return dx.MultivariateNormalDiag(loc=x)
 
     # Test that the dummy variational family can be instantiated.
@@ -170,7 +169,7 @@ def test_collapsed_variational_gaussian(
     x = jnp.hstack([x] * point_dim)
     D = gpx.Dataset(X=x, y=y)
 
-    prior = gpx.Prior(kernel=gpx.RBF())
+    prior = gpx.Prior(kernel=gpx.RBF(), mean_function=gpx.Constant())
 
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
     inducing_inputs = jnp.hstack([inducing_inputs] * point_dim)
@@ -178,23 +177,21 @@ def test_collapsed_variational_gaussian(
     test_inputs = jnp.hstack([test_inputs] * point_dim)
 
     variational_family = CollapsedVariationalGaussian(
-        prior=prior,
-        likelihood=gpx.Gaussian(num_datapoints=D.n),
+        posterior=prior * gpx.Gaussian(num_datapoints=D.n),
         inducing_inputs=inducing_inputs,
     )
 
     # We should raise an error for non-Gaussian likelihoods:
     with pytest.raises(TypeError):
         CollapsedVariationalGaussian(
-            prior=prior,
-            likelihood=gpx.Bernoulli(num_datapoints=D.n),
+            posterior=prior * gpx.Bernoulli(num_datapoints=D.n),
             inducing_inputs=inducing_inputs,
         )
 
     # Test init
     assert variational_family.num_inducing == n_inducing
     assert (variational_family.inducing_inputs == inducing_inputs).all()
-    assert variational_family.likelihood.obs_noise == 1.0
+    assert variational_family.posterior.likelihood.obs_noise == 1.0
 
     # Test predictions
     predictive_dist = variational_family(test_inputs, D)

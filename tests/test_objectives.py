@@ -1,14 +1,18 @@
-import jax
-import jax.numpy as jnp
-import jax.random as jr
-import pytest
-
+from gpjax.objectives import (
+    AbstractObjective,
+    LogPosteriorDensity,
+    ConjugateMLL,
+    NonConjugateMLL,
+    CollapsedELBO,
+    ELBO,
+)
 import gpjax as gpx
-from gpjax import Bernoulli, Gaussian, Prior
+import pytest
+import jax.random as jr
+import jax.numpy as jnp
+from gpjax import Prior, Gaussian, Bernoulli
+import jax
 from gpjax.dataset import Dataset
-from gpjax.objectives import (ELBO, AbstractObjective, CollapsedELBO,
-                              ConjugateMLL, LogPosteriorDensity,
-                              NonConjugateMLL)
 
 
 def test_abstract_objective():

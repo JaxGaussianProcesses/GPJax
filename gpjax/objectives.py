@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -7,25 +6,27 @@ if TYPE_CHECKING:
     from .variational_families import AbstractVariationalFamily
 
 from abc import abstractmethod
-from dataclasses import dataclass
 
+import distrax as dx
+from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
-import jax.tree_util as jtu
-from jax import vmap
+from .linops import identity
 from jaxtyping import Array, Float
-from simple_pytree import static_field
-import tensorflow_probability.substrates.jax as tfp
 
-from .base import Module
 from .dataset import Dataset
 from .gaussian_distribution import GaussianDistribution
-from .linops import identity
 from .quadrature import gauss_hermite_quadrature
-tfd = tfp.distributions
+
+from mytree import Mytree
+from dataclasses import dataclass
+from simple_pytree import static_field
+
+import jax.tree_util as jtu
+
 
 @dataclass
-class AbstractObjective(Module):
+class AbstractObjective(Mytree):
     """Abstract base class for objectives."""
 
     negative: bool = static_field(False)
@@ -37,17 +38,13 @@ class AbstractObjective(Module):
     def __hash__(self):
         return hash(tuple(jtu.tree_leaves(self)))  # Probably put this on the Module!
 
-    def __call__(self, *args, **kwargs) -> Float[Array, "1"]:
-        return self.step(*args, **kwargs)
-
     @abstractmethod
-    def step(self, *args, **kwargs) -> Float[Array, "1"]:
+    def __call__(self, *args, **kwargs) -> Float[Array, "1"]:
         raise NotImplementedError
 
 
-
 class ConjugateMLL(AbstractObjective):
-    def step(
+    def __call__(
         self, posterior: ConjugatePosterior, train_data: Dataset
     ) -> Float[Array, "1"]:
         """Compute the marginal log-likelihood function of the Gaussian process.
@@ -130,7 +127,7 @@ class ConjugateMLL(AbstractObjective):
 
 
 class NonConjugateMLL(AbstractObjective):
-    def step(
+    def __call__(
         self, posterior: NonConjugatePosterior, data: Dataset
     ) -> Float[Array, "1"]:
         """
@@ -181,7 +178,7 @@ class NonConjugateMLL(AbstractObjective):
         likelihood = posterior.likelihood.link_function(fx)
 
         # Whitened latent function values prior, p(wx | θ) = N(0, I)
-        latent_prior = tfd.Normal(loc=0.0, scale=1.0)
+        latent_prior = dx.Normal(loc=0.0, scale=1.0)
 
         return self.constant * (
             likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum()
@@ -189,7 +186,7 @@ class NonConjugateMLL(AbstractObjective):
 
 
 class ELBO(AbstractObjective):
-    def step(
+    def __call__(
         self, variational_family: AbstractVariationalFamily, train_data: Dataset
     ) -> Float[Array, "1"]:
         """Compute the evidence lower bound under this model. In short, this requires
@@ -278,7 +275,7 @@ class CollapsedELBO(AbstractObjective):
     in Sparse Gaussian Processes.
     """
 
-    def step(
+    def __call__(
         self, variational_family: AbstractVariationalFamily, train_data: Dataset
     ) -> Float[Array, "1"]:
         """Compute the evidence lower bound under this model. In short, this requires

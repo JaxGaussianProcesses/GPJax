@@ -17,7 +17,6 @@ import abc
 from typing import Any
 from .linops.utils import to_dense
 
-import deprecation
 import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp

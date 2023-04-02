@@ -13,11 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 
-from jaxutils.dataset import Dataset
-from jaxutils.fit import fit
-from jaxutils.bijectors import Identity
-from jaxutils.module import param, Module
-from jaxutils.objective import Objective
+from dataclasses import dataclass
+
+from gpjax.dataset import Dataset
+from gpjax.fit import fit
+from gpjax.parameters.bijectors import Identity
+from gpjax.parameters import param_field, Module
+from gpjax.objectives import AbstractObjective
 
 import jax.numpy as jnp
 import jax.random as jr
@@ -31,9 +33,10 @@ def test_simple_linear_model():
     D = Dataset(X, y)
 
     # (2) Define your model:
+    @dataclass
     class LinearModel(Module):
-        weight: float = param(Identity)
-        bias: float = param(Identity)
+        weight: float = param_field(bijector=Identity)
+        bias: float = param_field(bijector=Identity)
 
         def __call__(self, x):
             return self.weight * x + self.bias
@@ -41,8 +44,9 @@ def test_simple_linear_model():
     model = LinearModel(weight=1.0, bias=1.0)
 
     # (3) Define your loss function:
-    class MeanSqaureError(Objective):
-        def evaluate(self, model: LinearModel, train_data: Dataset) -> float:
+    @dataclass
+    class MeanSqaureError(AbstractObjective):
+        def __call__(self, model: LinearModel, train_data: Dataset) -> float:
             return jnp.mean((train_data.y - model(train_data.X)) ** 2)
 
     loss = MeanSqaureError()
