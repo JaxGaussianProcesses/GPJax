@@ -23,6 +23,8 @@
 # In this guide, we introduce the kernels available in GPJax and demonstrate how to create custom ones.
 
 
+from typing import Dict
+
 # %%
 import distrax as dx
 import jax.numpy as jnp
@@ -31,12 +33,11 @@ import matplotlib.pyplot as plt
 from jax import jit
 from jax.config import config
 from jaxtyping import Array, Float
-from optax import adam
-from typing import Dict
 from jaxutils import Dataset
-import gpjax.kernels as jk
+from optax import adam
 
 import gpjax as gpx
+import gpjax.kernels as jk
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -254,6 +255,7 @@ class Polar(jk.base.AbstractKernel):
 
 # %%
 from jax.nn import softplus
+
 from gpjax.config import add_parameter
 
 bij_fn = lambda x: softplus(x + jnp.array(4.0))

@@ -22,6 +22,7 @@
 # %%
 import blackjax
 import distrax as dx
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
@@ -30,10 +31,9 @@ import optax as ox
 from jax.config import config
 from jaxtyping import Array, Float
 from jaxutils import Dataset
-import gpjax.kernels as jk
-import jax
 
 import gpjax as gpx
+import gpjax.kernels as jk
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

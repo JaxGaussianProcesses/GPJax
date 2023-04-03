@@ -18,7 +18,7 @@ from typing import Any
 from .linops.utils import to_dense
 
 import distrax as dx
-import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax as tfp
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Array, Float
@@ -26,6 +26,8 @@ from simple_pytree import static_field
 
 from dataclasses import dataclass
 from .base import Module, param_field
+tfb = tfp.bijectors
+tfd = tfp.distributions
 
 @dataclass
 class AbstractLikelihood(Module):
@@ -86,7 +88,7 @@ class Gaussian(AbstractLikelihood):
         """
         return dx.Normal(loc=f, scale=self.obs_noise)
 
-    def predict(self, dist: dx.MultivariateNormalTri) -> dx.Distribution:
+    def predict(self, dist: tfd.MultivariateNormalTriL) -> tfd.MultivariateNormalFullCovariance:
         """
         Evaluate the Gaussian likelihood function at a given predictive
         distribution. Computationally, this is equivalent to summing the
@@ -105,7 +107,7 @@ class Gaussian(AbstractLikelihood):
         cov = to_dense(dist.covariance())
         noisy_cov = cov.at[jnp.diag_indices(n_data)].add(self.obs_noise)
 
-        return dx.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
+        return tfd.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
 
 
 @dataclass

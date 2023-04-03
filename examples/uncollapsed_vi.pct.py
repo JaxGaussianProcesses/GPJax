@@ -24,16 +24,17 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
+import tensorflow_probability.substrates.jax as tfp
 from jax import jit
 from jax.config import config
 from jaxutils import Dataset
-import gpjax.kernels as jk
 
-import tensorflow_probability.substrates.jax as tfp
+import gpjax.kernels as jk
 
 tfb = tfp.bijectors
 
 import distrax as dx
+
 import gpjax as gpx
 from gpjax.config import get_global_config, reset_global_config
 

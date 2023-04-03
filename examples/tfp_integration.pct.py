@@ -27,9 +27,9 @@ import jax.random as jr
 import matplotlib.pyplot as plt
 from jax.config import config
 from jaxutils import Dataset
-import gpjax.kernels as jk
 
 import gpjax as gpx
+import gpjax.kernels as jk
 from gpjax.utils import dict_array_coercion
 
 # Enable Float64 for more stable matrix inversions.

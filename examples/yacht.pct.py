@@ -20,6 +20,7 @@ import numpy as np
 import optax as ox
 from jax.config import config
 from jaxutils import Dataset
+
 import gpjax.kernels as jk
 
 # Enable Float64 for more stable matrix inversions.
@@ -196,9 +197,7 @@ ax[0].set(xlabel="Predicted", ylabel="Actual", title="Predicted vs Actual")
 ax[1].scatter(predictive_mean.squeeze(), residuals)
 ax[1].plot([0, 1], [0.5, 0.5], color="tab:orange", transform=ax[1].transAxes)
 ax[1].set_ylim([-1.0, 1.0])
-ax[1].set(
-    xlabel="Predicted", ylabel="Residuals", title="Predicted vs Residuals"
-)
+ax[1].set(xlabel="Predicted", ylabel="Residuals", title="Predicted vs Residuals")
 
 ax[2].hist(np.asarray(residuals), bins=30)
 ax[2].set_title("Residuals")

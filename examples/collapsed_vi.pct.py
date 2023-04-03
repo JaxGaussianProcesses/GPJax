@@ -27,9 +27,9 @@ import optax as ox
 from jax import jit
 from jax.config import config
 from jaxutils import Dataset
-import gpjax.kernels as jk
 
 import gpjax as gpx
+import gpjax.kernels as jk
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

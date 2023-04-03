@@ -21,6 +21,7 @@
 
 # %%
 import typing as tp
+from typing import Dict
 
 import haiku as hk
 import jax
@@ -29,14 +30,12 @@ import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
 from jax.config import config
-from scipy.signal import sawtooth
-from jaxtyping import Float, Array
-from typing import Dict
+from jaxtyping import Array, Float
 from jaxutils import Dataset
-import gpjax.kernels as jk
-
+from scipy.signal import sawtooth
 
 import gpjax as gpx
+import gpjax.kernels as jk
 from gpjax.kernels import DenseKernelComputation
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import AbstractKernelComputation

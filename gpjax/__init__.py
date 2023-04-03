@@ -27,6 +27,7 @@ from .variational_families import (
     VariationalGaussian,
     WhitenedVariationalGaussian,
 )
+from .objectives import ConjugateMLL, NonConjugateMLL, LogPosteriorDensity, CollapsedELBO, ELBO
 
 __version__ = _version.get_versions()["version"]
 __license__ = "MIT"
@@ -60,4 +61,9 @@ __all__ = [
     "WhitenedVariationalGaussian",
     "CollapsedVI",
     "StochasticVI",
+    "ConjugateMLL",
+    "NonConjugateMLL",
+    "LogPosteriorDensity",
+    "CollapsedELBO",
+    "ELBO"
 ]
