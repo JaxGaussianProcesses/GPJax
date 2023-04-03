@@ -88,11 +88,6 @@ def vscan(
     Returns:
         Tuple[Carry, List[Y]]: A tuple of the final carry and the outputs.
     """
-
-    # TODO: Scope out lower level API for jax.lax.scan, to avoid the need for finding
-    #   the length of the inputs / check inputs.
-    # TODO: Scope out lower level API for tqdm, for more control over the progress bar.
-    #   Need to check this.
     _xs_flat = jtu.tree_leaves(xs)
     _length = length if length is not None else len(_xs_flat[0])
     _iter_nums = jnp.arange(_length)

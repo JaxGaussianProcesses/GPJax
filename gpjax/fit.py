@@ -24,11 +24,10 @@ from jax._src.random import _check_prng_key
 from jaxtyping import Array, Float
 from typing import Any
 
+from .base import Module
 from .dataset import Dataset
 from .objectives import AbstractObjective
 from .scan import vscan
-
-Module = Any
 
 
 def fit(
@@ -50,17 +49,17 @@ def fit(
         >>> import jax.numpy as jnp
         >>> import jax.random as jr
         >>> import optax as ox
-        >>> import jaxutils as ju
+        >>> import gpjax as gpx
         >>>
         >>> # (1) Create a dataset:
         >>> X = jnp.linspace(0.0, 10.0, 100)[:, None]
         >>> y = 2.0 * X + 1.0 + 10 * jr.normal(jr.PRNGKey(0), X.shape)
-        >>> D = ju.Dataset(X, y)
+        >>> D = gpx.Dataset(X, y)
         >>>
         >>> # (2) Define your model:
-        >>> class LinearModel(ju.Module):
-        ...     weight: float = ju.param(ju.Identity)
-        ...     bias: float = ju.param(ju.Identity)
+        >>> class LinearModel(gpx.Module):
+        ...     weight: float = gpx.param_field()
+        ...     bias: float = gpx.param_field()
         ...
         ...     def __call__(self, x):
         ...         return self.weight * x + self.bias
@@ -68,14 +67,14 @@ def fit(
         >>> model = LinearModel(weight=1.0, bias=1.0)
         >>>
         >>> # (3) Define your loss function:
-        >>> class MeanSqaureError(ju.Objective):
-        ...     def evaluate(self, model: LinearModel, train_data: ju.Dataset) -> float:
+        >>> class MeanSqaureError(gpx.AbstractObjective):
+        ...     def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
         ...         return jnp.mean((train_data.y - model(train_data.X)) ** 2)
         ...
         >>> loss = MeanSqaureError()
         >>>
         >>> # (4) Train!
-        >>> trained_model, history = ju.fit(
+        >>> trained_model, history = gpx.fit(
         ...     model=model, objective=loss, train_data=D, optim=ox.sgd(0.001), num_iters=1000
         ... )
 
@@ -96,15 +95,15 @@ def fit(
     """
 
     # Check inputs.
-    # _check_model(model)
-    # _check_objective(objective)
-    # _check_train_data(train_data)
-    # _check_optim(optim)
-    # _check_num_iters(num_iters)
-    # _check_batch_size(batch_size)
-    # _check_prng_key(key)
-    # _check_log_rate(log_rate)
-    # _check_verbose(verbose)
+    _check_model(model)
+    _check_objective(objective)
+    _check_train_data(train_data)
+    _check_optim(optim)
+    _check_num_iters(num_iters)
+    _check_batch_size(batch_size)
+    _check_prng_key(key)
+    _check_log_rate(log_rate)
+    _check_verbose(verbose)
 
     # Unconstrained space loss function with stop-gradient rule for non-trainable params.
     def loss(model: Module, batch: Dataset) -> Float[Array, "1"]:
