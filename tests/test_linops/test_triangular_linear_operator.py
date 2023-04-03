@@ -25,9 +25,9 @@ jitter: float = 1e-6
 atol: float = 1e-6
 config.update("jax_enable_x64", True)
 
+from gpjax.linops.dense_linear_operator import DenseLinearOperator
+from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 from gpjax.linops.triangular_linear_operator import (
     LowerTriangularLinearOperator,
     UpperTriangularLinearOperator,
 )
-from gpjax.linops.dense_linear_operator import DenseLinearOperator
-from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator

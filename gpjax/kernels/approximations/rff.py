@@ -1,13 +1,19 @@
-from ..base import AbstractKernel
-from ..computations import BasisFunctionComputation
-from jax.random import KeyArray, PRNGKey
-from typing import Dict, Any
-from jaxtyping import Float, Array
 from dataclasses import dataclass
-from ...parameters import param_field
-from ..computations import DenseKernelComputation, AbstractKernelComputation
-from simple_pytree import static_field
+from typing import Any, Dict
+
 import tensorflow_probability.substrates.jax as tfp
+from jax.random import KeyArray, PRNGKey
+from jaxtyping import Array, Float
+from simple_pytree import static_field
+
+from ...parameters import param_field
+from ..base import AbstractKernel
+from ..computations import (
+    AbstractKernelComputation,
+    BasisFunctionComputation,
+    DenseKernelComputation,
+)
+
 tfb = tfp.bijectors
 
 
@@ -17,6 +23,7 @@ class AbstractFourierKernel:
     num_basis_fns: int
     frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity)
     key: KeyArray = static_field(PRNGKey(123))
+
 
 @dataclass
 class RFF(AbstractKernel, AbstractFourierKernel):
@@ -50,8 +57,8 @@ class RFF(AbstractKernel, AbstractFourierKernel):
         if self.frequencies is None:
             n_dims = self.base_kernel.ndims
             self.frequencies = self.base_kernel.spectral_density.sample(
-            seed=self.key, sample_shape=(self.num_basis_fns, n_dims)
-        )
+                seed=self.key, sample_shape=(self.num_basis_fns, n_dims)
+            )
 
     def __call__(self, x: Array, y: Array) -> Array:
         pass

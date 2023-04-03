@@ -13,6 +13,8 @@
 # limitations under the License.
 # ==============================================================================
 
+from dataclasses import dataclass
+
 import jax.numpy as jnp
 import pytest
 from jax.config import config
@@ -23,6 +25,7 @@ from gpjax.kernels.base import (
     ProductKernel,
     SumKernel,
 )
+from gpjax.kernels.nonstationary import Linear, Polynomial
 from gpjax.kernels.stationary import (
     RBF,
     Matern12,
@@ -54,7 +57,9 @@ def test_abstract_kernel():
         test_a: Float[Array, "1"] = jnp.array([1.0])
         test_b: Float[Array, "1"] = param_field(jnp.array([2.0]), bijector=tfb.Softplus())
 
-        def __call__(self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]) -> Float[Array, "1"]:
+        def __call__(
+            self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
+        ) -> Float[Array, "1"]:
             return x * self.test_b * y
 
     # Initialise dummy kernel class and test __call__ method:

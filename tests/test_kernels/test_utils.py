@@ -18,6 +18,7 @@ from typing import List
 import jax.numpy as jnp
 import pytest
 from jaxtyping import Array, Float
+
 from gpjax.kernels.stationary.utils import euclidean_distance
 
 
