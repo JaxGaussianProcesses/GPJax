@@ -24,6 +24,7 @@ from ..parameters import Module, param_field
 from simple_pytree import static_field
 from dataclasses import dataclass
 from functools import partial
+import tensorflow_probability.substrates.jax.distributions as tfd
 
 from .computations import AbstractKernelComputation, DenseKernelComputation
 
@@ -115,6 +116,10 @@ class AbstractKernel(Module):
             return ProductKernel(kernels=[self, other])
 
         return ProductKernel(kernels=[self, Constant(other)])
+
+    @property
+    def spectral_density(self) -> tfd.Distribution:
+        return None
 
 
 @dataclass

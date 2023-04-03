@@ -18,11 +18,11 @@ from jaxtyping import Array, Float
 
 from ..base import AbstractKernel
 from .utils import squared_distance
-import distrax as dx
+import tensorflow_probability.substrates.jax as tfp
 
 from dataclasses import dataclass
 from ...parameters import param_field, Softplus
-
+tfd = tfp.distributions
 
 @dataclass
 class RBF(AbstractKernel):
@@ -52,5 +52,5 @@ class RBF(AbstractKernel):
         return K.squeeze()
 
     @property
-    def spectral_density(self) -> dx.Normal:
-        return dx.Normal(loc=0.0, scale=1.0)
+    def spectral_density(self) -> tfd.Normal:
+        return tfd.Normal(loc=0.0, scale=1.0)
