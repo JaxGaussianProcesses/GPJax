@@ -13,14 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 
-import jax.numpy as jnp
-from jaxtyping import Array
-
-from ..base import AbstractKernel
-
 from dataclasses import dataclass
+
+import jax.numpy as jnp
 from jaxtyping import Array, Float
-from ...parameters import param_field, Softplus
+
+from ...parameters import Softplus, param_field
+from ..base import AbstractKernel
 
 
 @dataclass

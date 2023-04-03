@@ -4,13 +4,13 @@ __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
 
 import dataclasses
 from copy import copy, deepcopy
-from typing import Any, Callable, Dict, Iterable, Tuple, List
-from typing_extensions import Self
+from typing import Any, Callable, Dict, Iterable, List, Tuple
 
 import jax
 import jax.tree_util as jtu
 from jax._src.tree_util import _registry
 from simple_pytree import Pytree, static_field
+from typing_extensions import Self
 
 from .bijectors import Bijector, Identity
 

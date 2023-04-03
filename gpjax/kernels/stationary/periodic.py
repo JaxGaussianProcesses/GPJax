@@ -13,6 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
+from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 import jax
@@ -20,13 +21,9 @@ import jax.numpy as jnp
 from jax.random import KeyArray
 from jaxtyping import Array, Float
 
+from ...parameters import Softplus, param_field
 from ..base import AbstractKernel
-from ..computations import (
-    DenseKernelComputation,
-)
-
-from dataclasses import dataclass
-from ...parameters import param_field, Softplus
+from ..computations import DenseKernelComputation
 
 
 @dataclass

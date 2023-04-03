@@ -1,22 +1,24 @@
+from typing import Tuple
+
+import jax
+import jax.numpy as jnp
+import jax.random as jr
 import pytest
+from jax.config import config
+
 from gpjax.kernels.approximations import RFF
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.nonstationary import Linear, Polynomial
 from gpjax.kernels.stationary import (
+    RBF,
     Matern12,
     Matern32,
     Matern52,
-    RBF,
-    RationalQuadratic,
-    PoweredExponential,
     Periodic,
+    PoweredExponential,
+    RationalQuadratic,
 )
-from gpjax.kernels.nonstationary import Polynomial, Linear
-from gpjax.kernels.base import AbstractKernel
-import jax.random as jr
-from jax.config import config
-import jax.numpy as jnp
 from gpjax.linops import DenseLinearOperator
-from typing import Tuple
-import jax
 
 config.update("jax_enable_x64", True)
 _jitter = 1e-6
@@ -135,3 +137,11 @@ def test_exactness(kernel):
 def test_value_error(kernel):
     with pytest.raises(ValueError):
         RFF(kernel(), num_basis_fns=10)
+
+
+@pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
+def stochastic_init(kernel: AbstractKernel):
+    k1 = RFF(kernel, num_basis_fns=10, key=123)
+    k2 = RFF(kernel, num_basis_fns=10, key=42)
+
+    assert (k1.frequencies != k2.frequencies).any()

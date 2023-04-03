@@ -21,27 +21,27 @@ import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
 import pytest
-import distrax as dx
+import tensorflow_probability.substrates.jax.distributions as tfd
 from jax.config import config
-from gpjax.linops import LinearOperator, identity
 
 from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import (
+    ConstantDiagonalKernelComputation,
+    DenseKernelComputation,
+    DiagonalKernelComputation,
+)
 from gpjax.kernels.stationary import (
     RBF,
     Matern12,
     Matern32,
     Matern52,
-    White,
     Periodic,
     PoweredExponential,
     RationalQuadratic,
-)
-from gpjax.kernels.computations import (
-    DenseKernelComputation,
-    DiagonalKernelComputation,
-    ConstantDiagonalKernelComputation,
+    White,
 )
 from gpjax.kernels.stationary.utils import build_student_t_distribution
+from gpjax.linops import LinearOperator, identity
 from gpjax.parameters.bijectors import Identity, Softplus
 
 # Enable Float64 for more stable matrix inversions.
@@ -141,8 +141,7 @@ class BaseTestKernel:
         kernel: AbstractKernel = self.kernel()
 
         if self.kernel not in [RBF, Matern12, Matern32, Matern52]:
-            with pytest.raises(AttributeError):
-                kernel.spectral_density
+            assert not kernel.spectral_density
         else:
             sdensity = kernel.spectral_density
             assert sdensity.name == self.spectral_density_name
@@ -224,4 +223,4 @@ class TestRationalQuadratic(BaseTestKernel):
 @pytest.mark.parametrize("smoothness", [1, 2, 3])
 def test_build_studentt_dist(smoothness: int) -> None:
     dist = build_student_t_distribution(smoothness)
-    assert isinstance(dist, dx.Distribution)
+    assert isinstance(dist, tfd.Distribution)

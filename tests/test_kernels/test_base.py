@@ -13,10 +13,12 @@
 # limitations under the License.
 # ==============================================================================
 
+from dataclasses import dataclass
+
 import jax.numpy as jnp
 import pytest
 from jax.config import config
-from jaxlinop import identity
+from jaxtyping import Array, Float
 
 from gpjax.kernels.base import (
     AbstractKernel,
@@ -24,6 +26,7 @@ from gpjax.kernels.base import (
     ProductKernel,
     SumKernel,
 )
+from gpjax.kernels.nonstationary import Linear, Polynomial
 from gpjax.kernels.stationary import (
     RBF,
     Matern12,
@@ -31,11 +34,8 @@ from gpjax.kernels.stationary import (
     Matern52,
     RationalQuadratic,
 )
-from gpjax.kernels.nonstationary import Polynomial, Linear
-from jaxtyping import Array, Float
-from dataclasses import dataclass
-from mytree import param_field, Softplus
-
+from gpjax.linops import identity
+from gpjax.parameters import Softplus, param_field
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -52,15 +52,17 @@ def test_abstract_kernel():
         test_a: Float[Array, "1"] = jnp.array([1.0])
         test_b: Float[Array, "1"] = param_field(jnp.array([2.0]), bijector=Softplus)
 
-        def __call__(self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]) -> Float[Array, "1"]:
+        def __call__(
+            self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
+        ) -> Float[Array, "1"]:
             return x * self.test_b * y
 
     # Initialise dummy kernel class and test __call__ method:
     dummy_kernel = DummyKernel()
-    assert dummy_kernel.test_a ==  jnp.array([1.0])
+    assert dummy_kernel.test_a == jnp.array([1.0])
     assert dummy_kernel._pytree__meta["test_b"].get("bijector") == Softplus
-    assert dummy_kernel.test_b ==  jnp.array([2.0])
-    assert (dummy_kernel(jnp.array([1.0]), jnp.array([2.0])) == 4.0)
+    assert dummy_kernel.test_b == jnp.array([2.0])
+    assert dummy_kernel(jnp.array([1.0]), jnp.array([2.0])) == 4.0
 
 
 @pytest.mark.parametrize("combination_type", [SumKernel, ProductKernel])

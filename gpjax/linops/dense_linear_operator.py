@@ -20,10 +20,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .diagonal_linear_operator import DiagonalLinearOperator
 
+from dataclasses import dataclass
 from typing import Union
 
 import jax.numpy as jnp
-from dataclasses import dataclass
 from jaxtyping import Array, Float
 
 from .linear_operator import LinearOperator

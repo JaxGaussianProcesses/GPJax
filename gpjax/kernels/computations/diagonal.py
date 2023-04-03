@@ -14,10 +14,10 @@
 # ==============================================================================
 
 from jax import vmap
-from gpjax.linops import (
-    DiagonalLinearOperator,
-)
 from jaxtyping import Array, Float
+
+from gpjax.linops import DiagonalLinearOperator
+
 from .base import AbstractKernelComputation
 
 

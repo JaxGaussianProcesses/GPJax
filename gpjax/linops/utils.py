@@ -15,15 +15,14 @@
 
 from __future__ import annotations
 
-from typing import Union, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple, Union
 
 if TYPE_CHECKING:
     from .identity_linear_operator import IdentityLinearOperator
 
-from jaxtyping import Float, Array
-
-import jax.numpy as jnp
 import jax
+import jax.numpy as jnp
+from jaxtyping import Array, Float
 
 from .linear_operator import LinearOperator
 

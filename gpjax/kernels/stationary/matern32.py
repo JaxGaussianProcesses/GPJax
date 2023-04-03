@@ -17,15 +17,17 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 import jax.numpy as jnp
+import tensorflow_probability.substrates.jax as tfp
 from jax.random import KeyArray
 from jaxtyping import Array, Float
-import tensorflow_probability.substrates.jax as tfp
 
 from ...parameters import Softplus, param_field
 from ..base import AbstractKernel
 from ..computations import DenseKernelComputation
 from .utils import build_student_t_distribution, euclidean_distance
+
 tfd = tfp.distributions
+
 
 @dataclass
 class Matern32(AbstractKernel):

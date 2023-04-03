@@ -13,16 +13,18 @@
 # limitations under the License.
 # ==============================================================================
 
+from dataclasses import dataclass
+
 import jax.numpy as jnp
+import tensorflow_probability.substrates.jax as tfp
 from jaxtyping import Array, Float
 
+from ...parameters import Softplus, param_field
 from ..base import AbstractKernel
 from .utils import squared_distance
-import tensorflow_probability.substrates.jax as tfp
 
-from dataclasses import dataclass
-from ...parameters import param_field, Softplus
 tfd = tfp.distributions
+
 
 @dataclass
 class RBF(AbstractKernel):

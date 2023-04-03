@@ -17,9 +17,9 @@ import jax.numpy as jnp
 import jax.random as jr
 import networkx as nx
 from jax.config import config
-from jaxlinop import identity
 
 from gpjax.kernels.non_euclidean import GraphKernel
+from gpjax.linops import identity
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -41,23 +41,14 @@ def test_graph_kernel():
     kern = GraphKernel(laplacian=L)
     assert isinstance(kern, GraphKernel)
     assert kern.num_vertex == n_verticies
-    assert kern.evals.shape == (n_verticies, 1)
-    assert kern.evecs.shape == (n_verticies, n_verticies)
+    assert kern.eigenvalues.shape == (n_verticies, 1)
+    assert kern.eigenvectors.shape == (n_verticies, n_verticies)
 
     # Unpack kernel computation
     kern.gram
 
-    # Initialise default parameters
-    params = kern.init_params(_initialise_key)
-    assert isinstance(params, dict)
-    assert list(sorted(list(params.keys()))) == [
-        "lengthscale",
-        "smoothness",
-        "variance",
-    ]
-
     # Compute gram matrix
-    Kxx = kern.gram(params, x)
+    Kxx = kern.gram(x)
     assert Kxx.shape == (n_verticies, n_verticies)
 
     # Check positive definiteness

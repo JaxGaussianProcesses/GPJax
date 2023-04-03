@@ -15,13 +15,14 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from dataclasses import dataclass
-from .linear_operator import LinearOperator
+
 from .dense_linear_operator import DenseLinearOperator
+from .linear_operator import LinearOperator
 from .utils import to_linear_operator
 
 

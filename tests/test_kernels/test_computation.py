@@ -2,19 +2,19 @@ import jax.numpy as jnp
 import pytest
 
 from gpjax.kernels.computations import (
-    DiagonalKernelComputation,
     ConstantDiagonalKernelComputation,
+    DiagonalKernelComputation,
 )
+from gpjax.kernels.nonstationary import Linear, Polynomial
 from gpjax.kernels.stationary import (
     RBF,
     Matern12,
     Matern32,
     Matern52,
+    Periodic,
     PoweredExponential,
     RationalQuadratic,
-    Periodic,
 )
-from gpjax.kernels.nonstationary import Linear, Polynomial
 
 
 @pytest.mark.parametrize(
@@ -39,7 +39,7 @@ def test_change_computation(kernel):
     dense_diagonals = jnp.diag(dense_matrix)
 
     # Let's now change the computation to DiagonalKernelComputation
-    kernel = kernel.replace(compute_engine = DiagonalKernelComputation)
+    kernel = kernel.replace(compute_engine=DiagonalKernelComputation)
     diagonal_matrix = kernel.gram(x).to_dense()
     diag_entries = jnp.diag(diagonal_matrix)
 
@@ -50,7 +50,7 @@ def test_change_computation(kernel):
     assert jnp.allclose(diagonal_matrix - jnp.diag(diag_entries), 0.0)
 
     # Let's now change the computation to ConstantDiagonalKernelComputation
-    kernel = kernel.replace(compute_engine = ConstantDiagonalKernelComputation)
+    kernel = kernel.replace(compute_engine=ConstantDiagonalKernelComputation)
     constant_diagonal_matrix = kernel.gram(x).to_dense()
     constant_entries = jnp.diag(constant_diagonal_matrix)
 

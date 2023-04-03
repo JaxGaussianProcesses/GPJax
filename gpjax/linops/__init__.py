@@ -13,20 +13,17 @@
 # limitations under the License.
 # ==============================================================================
 
-from .linear_operator import LinearOperator
+from .constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
 from .dense_linear_operator import DenseLinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
-from .constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
 from .identity_linear_operator import IdentityLinearOperator
-from .zero_linear_operator import ZeroLinearOperator
+from .linear_operator import LinearOperator
 from .triangular_linear_operator import (
     LowerTriangularLinearOperator,
     UpperTriangularLinearOperator,
 )
-from .utils import (
-    identity,
-    to_dense,
-)
+from .utils import identity, to_dense
+from .zero_linear_operator import ZeroLinearOperator
 
 __all__ = [
     "LinearOperator",

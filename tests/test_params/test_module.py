@@ -350,11 +350,11 @@ def test_nested_Module_structure(is_dataclass):
     def loss(tree):
         t = tree.stop_gradient()
         return jnp.sum(
-            t.a**2
-            + t.sub_tree.c**2
-            + t.sub_tree.d**2
-            + t.sub_tree.e**2
-            + t.b**2
+            t.a ** 2
+            + t.sub_tree.c ** 2
+            + t.sub_tree.d ** 2
+            + t.sub_tree.e ** 2
+            + t.b ** 2
         )
 
     g = jax.grad(loss)(new_tree)
