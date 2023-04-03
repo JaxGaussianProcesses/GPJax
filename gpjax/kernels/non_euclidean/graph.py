@@ -16,23 +16,27 @@
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-import tensorflow_probability.substrates.jax as tfp
-from jaxtyping import Array, Float, Int
-from simple_pytree import static_field
-
-from ...base import param_field
+from jax.random import KeyArray
+from jaxtyping import Array, Float
+from dataclasses import dataclass
+from ..computations import EigenKernelComputation
 from ..base import AbstractKernel
-from ..computations import AbstractKernelComputation, EigenKernelComputation
+from ...parameters import param_field
 from .utils import jax_gather_nd
+import tensorflow_probability.substrates.jax as tfp
 
 tfb = tfp.bijectors
-
 
 ##########################################
 # Graph kernels
 ##########################################
 @dataclass
-class GraphKernel(AbstractKernel):
+class AbstractGraphKernel:
+    laplacian: Float[Array, "N N"]
+
+
+@dataclass
+class GraphKernel(AbstractKernel, AbstractGraphKernel):
     """A Matérn graph kernel defined on the vertices of a graph. The key reference for this object is borovitskiy et. al., (2020).
 
     Args:
@@ -40,28 +44,17 @@ class GraphKernel(AbstractKernel):
         compute_engine
     """
 
-    laplacian: Float[Array, "N N"] = static_field(None)
     lengthscale: Float[Array, "D"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
+        jnp.array([1.0]), bijector=tfb.Softplus
     )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    smoothness: Float[Array, "1"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
-    )
-    eigenvalues: Float[Array, "N"] = static_field(None)
-    eigenvectors: Float[Array, "N N"] = static_field(None)
-    num_vertex: Int[Array, "1"] = static_field(None)
-    compute_engine: AbstractKernelComputation = static_field(EigenKernelComputation)
-    name: str = "Graph Matérn"
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus)
+    smoothness: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus)
 
     def __post_init__(self):
-        if self.laplacian is None:
-            raise ValueError("Graph laplacian must be specified")
-
-        evals, self.eigenvectors = jnp.linalg.eigh(self.laplacian)
-        self.eigenvalues = evals.reshape(-1, 1)
-        if self.num_vertex is None:
-            self.num_vertex = self.eigenvalues.shape[0]
+        evals, self.evecs = jnp.linalg.eigh(self.laplacian)
+        self.evals = evals.reshape(-1, 1)
+        self.compute_engine.eigensystem = self.evals, self.evecs
+        self.compute_engine.num_vertex = self.laplacian.shape[0]
 
     def __call__(
         self,
@@ -83,3 +76,12 @@ class GraphKernel(AbstractKernel):
             jax_gather_nd(self.eigenvectors, y)
         )  # shape (n,n)
         return Kxx.squeeze()
+
+    @property
+    def num_vertex(self) -> int:
+        """The number of vertices within the graph.
+
+        Returns:
+            int: An integer representing the number of vertices within the graph.
+        """
+        return self.compute_engine.num_vertex

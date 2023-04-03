@@ -8,10 +8,28 @@ from simple_pytree import static_field
 from ...base import param_field
 from ..base import AbstractKernel
 from ..computations import BasisFunctionComputation
+from jax.random import KeyArray, PRNGKey
+from typing import Dict, Any
+from jaxtyping import Float, Array
+from dataclasses import dataclass
+from ...parameters import param_field
+from ..computations import DenseKernelComputation, AbstractKernelComputation
+from simple_pytree import static_field
+import tensorflow_probability.substrates.jax as tfp
+
+tfb = tfp.bijectors
 
 
 @dataclass
-class RFF(AbstractKernel):
+class AbstractFourierKernel:
+    base_kernel: AbstractKernel
+    num_basis_fns: int
+    frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity)
+    key: KeyArray = static_field(PRNGKey(123))
+
+
+@dataclass
+class RFF(AbstractKernel, AbstractFourierKernel):
     """Computes an approximation of the kernel using Random Fourier Features.
 
     All stationary kernels are equivalent to the Fourier transform of a probability
@@ -29,6 +47,7 @@ class RFF(AbstractKernel):
     Args:
         AbstractKernel (_type_): _description_
     """
+
     base_kernel: AbstractKernel = None
     num_basis_fns: int = static_field(50)
     frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity)
@@ -48,7 +67,6 @@ class RFF(AbstractKernel):
             self.frequencies = self.base_kernel.spectral_density.sample(
                 seed=self.key, sample_shape=(self.num_basis_fns, n_dims)
             )
-        self.name = f"{self.base_kernel.name} (RFF)"
 
     def __call__(self, x: Array, y: Array) -> Array:
         pass
