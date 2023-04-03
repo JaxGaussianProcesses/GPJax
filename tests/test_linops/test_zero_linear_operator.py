@@ -19,8 +19,6 @@ import jax.numpy as jnp
 import jax.random as jr
 import pytest
 from jax.config import config
-import jax.tree_util as jtu
-from dataclasses import is_dataclass
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -50,7 +48,7 @@ def test_init(n: int) -> None:
     assert zero.ndim == 2
 
     # Check pytree.
-    assert jtu.tree_leaves(zero) == [] # shape, dtype are static!
+    assert jtu.tree_leaves(zero) == []  # shape, dtype are static!
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])

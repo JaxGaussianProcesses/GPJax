@@ -17,12 +17,13 @@ import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 from jaxtyping import Array, Float
-import tensorflow_probability.substrates.jax as tfp
 
 from ...base import param_field
 from ..base import AbstractKernel
 from .utils import build_student_t_distribution, euclidean_distance
+
 tfd = tfp.distributions
+
 
 @dataclass
 class Matern52(AbstractKernel):

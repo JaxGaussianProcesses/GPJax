@@ -14,11 +14,10 @@
 # ==============================================================================
 import jax.numpy as jnp
 from jax import vmap
-from gpjax.linops import (
-    ConstantDiagonalLinearOperator,
-    DiagonalLinearOperator,
-)
 from jaxtyping import Array, Float
+
+from gpjax.linops import ConstantDiagonalLinearOperator, DiagonalLinearOperator
+
 from .base import AbstractKernelComputation
 
 

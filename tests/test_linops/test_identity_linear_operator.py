@@ -26,8 +26,9 @@ from dataclasses import is_dataclass
 config.update("jax_enable_x64", True)
 _PRNGKey = jr.PRNGKey(42)
 
-from gpjax.linops.constant_diagonal_linear_operator import \
-    ConstantDiagonalLinearOperator
+from gpjax.linops.constant_diagonal_linear_operator import (
+    ConstantDiagonalLinearOperator,
+)
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
 from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 from gpjax.linops.identity_linear_operator import IdentityLinearOperator
@@ -53,7 +54,7 @@ def test_init(n: int) -> None:
     assert id.size == n
 
     # Check pytree.
-    assert jtu.tree_leaves(id) == [1.0] # shape, dtype are static!
+    assert jtu.tree_leaves(id) == [1.0]  # shape, dtype are static!
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])

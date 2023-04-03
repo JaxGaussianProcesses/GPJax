@@ -23,7 +23,7 @@ from functools import partial
 from simple_pytree import static_field
 from dataclasses import dataclass
 from functools import partial
-import tensorflow_probability.substrates.jax.distributions as tfd
+from typing import Callable, List, Union
 
 from ..base import Module, param_field
 from .computations import AbstractKernelComputation, DenseKernelComputation

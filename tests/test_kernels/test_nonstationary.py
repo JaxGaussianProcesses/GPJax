@@ -20,7 +20,6 @@ import jax.random as jr
 import jax.tree_util as jtu
 import pytest
 from jax.config import config
-from gpjax.linops import LinearOperator, identity
 
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.nonstationary import Linear, Polynomial

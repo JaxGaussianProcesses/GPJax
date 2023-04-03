@@ -26,6 +26,7 @@ from gpjax.kernels.base import (
     ProductKernel,
     SumKernel,
 )
+from gpjax.kernels.nonstationary import Linear, Polynomial
 from gpjax.kernels.stationary import (
     RBF,
     Matern12,

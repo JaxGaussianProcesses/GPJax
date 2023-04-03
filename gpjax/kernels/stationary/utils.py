@@ -14,7 +14,6 @@
 # ==============================================================================
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
 import tensorflow_probability.substrates.jax as tfp
 from jaxtyping import Array, Float
 
