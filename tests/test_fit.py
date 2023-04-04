@@ -18,7 +18,6 @@ import jax.numpy as jnp
 import jax.random as jr
 import optax as ox
 import tensorflow_probability.substrates.jax.bijectors as tfb
-import tensorflow_probability.substrates.jax.distributions as tfd
 
 import pytest
 
@@ -34,6 +33,11 @@ from gpjax.kernels import RBF
 from gpjax.mean_functions import Constant
 from gpjax.objectives import ConjugateMLL, ELBO
 from gpjax.variational_families import VariationalGaussian
+
+from jax.config import config
+
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 
 
 def test_simple_linear_model() -> None:

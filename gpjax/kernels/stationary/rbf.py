@@ -13,6 +13,8 @@
 # limitations under the License.
 # ==============================================================================
 
+from dataclasses import dataclass
+
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd

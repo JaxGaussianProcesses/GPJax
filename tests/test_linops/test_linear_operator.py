@@ -13,17 +13,20 @@
 # limitations under the License.
 # ==============================================================================
 
-import pytest
-import jax.tree_util as jtu
-import jax.numpy as jnp
-from gpjax.linops.linear_operator import LinearOperator
 from dataclasses import dataclass
+
+import jax.numpy as jnp
+import jax.tree_util as jtu
+import pytest
 from simple_pytree import static_field
+
+from gpjax.linops.linear_operator import LinearOperator
 
 
 def test_covariance_operator() -> None:
     with pytest.raises(TypeError):
         LinearOperator()
+
 
 @pytest.mark.parametrize("is_dataclass", [True, False])
 @pytest.mark.parametrize("shape", [(1, 1), (2, 3), (4, 5, 6), [7, 8]])
@@ -66,7 +69,7 @@ def test_instantiate_no_attributes(is_dataclass, shape, dtype) -> None:
     assert linop.shape == shape
     assert linop.dtype == dtype
     assert linop.ndim == len(shape)
-    assert jtu.tree_leaves(linop) == [] # shape and dtype are static!
+    assert jtu.tree_leaves(linop) == []  # shape and dtype are static!
 
     # if not is_dataclass:
     #     assert linop.__repr__() == f"DummyLinearOperator(shape={shape}, dtype={dtype})"
@@ -80,7 +83,7 @@ def test_instantiate_with_attributes(is_dataclass, shape, dtype) -> None:
 
     class DummyLinearOperator(LinearOperator):
         a: int
-        b: int = static_field() # Lets have a static attribute here.
+        b: int = static_field()  # Lets have a static attribute here.
         c: int
 
         def __init__(self, shape, dtype, a=1, b=2, c=3):
@@ -124,7 +127,7 @@ def test_instantiate_with_attributes(is_dataclass, shape, dtype) -> None:
     assert linop.shape == shape
     assert linop.dtype == dtype
     assert linop.ndim == len(shape)
-    assert jtu.tree_leaves(linop) == [1, 3] # b, shape, dtype are static!
+    assert jtu.tree_leaves(linop) == [1, 3]  # b, shape, dtype are static!
 
     # if not is_dataclass:
     #     assert linop.__repr__() == f"DummyLinearOperator(shape={shape}, dtype={dtype})"

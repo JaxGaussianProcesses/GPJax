@@ -18,11 +18,12 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 
 from jaxtyping import Array, Float
-from dataclasses import dataclass
 
 from ...base import param_field
 from ..base import AbstractKernel
 from .utils import build_student_t_distribution, euclidean_distance
+
+from dataclasses import dataclass
 
 
 @dataclass

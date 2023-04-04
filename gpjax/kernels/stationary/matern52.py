@@ -18,11 +18,12 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 
 from jaxtyping import Array, Float
-from dataclasses import dataclass
 
 from ...base import param_field
 from ..base import AbstractKernel
 from .utils import build_student_t_distribution, euclidean_distance
+
+from dataclasses import dataclass
 
 
 @dataclass
@@ -32,9 +33,7 @@ class Matern52(AbstractKernel):
     lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
 
-    def __call__(
-        self, x: Float[Array, "D"], y: Float[Array, "D"]
-    ) -> Float[Array, "1"]:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
         lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
 

@@ -23,6 +23,8 @@ from dataclasses import dataclass
 from ...base import param_field
 from ..base import AbstractKernel
 
+from dataclasses import dataclass
+
 
 @dataclass
 class Periodic(AbstractKernel):
