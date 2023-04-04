@@ -1,20 +1,15 @@
-from dataclasses import dataclass
-from typing import Any, Dict
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
-import tensorflow_probability.substrates.jax as tfp
+from dataclasses import dataclass
+
 from jax.random import KeyArray, PRNGKey
 from jaxtyping import Array, Float
 from simple_pytree import static_field
 
-from ...parameters import param_field
+from ...base import param_field
 from ..base import AbstractKernel
-from ..computations import (
-    AbstractKernelComputation,
-    BasisFunctionComputation,
-    DenseKernelComputation,
-)
+from ..computations import BasisFunctionComputation
 
-tfb = tfp.bijectors
 
 
 @dataclass

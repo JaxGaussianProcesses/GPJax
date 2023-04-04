@@ -106,7 +106,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
     variational_mean: Float[Array, "N 1"] = param_field(None)
     variational_root_covariance: Float[Array, "N N"] = param_field(
-        None, bijector=tfb.FillScaleTriL(diag_shift=jnp.array(1e-6))
+        None, bijector=tfb.FillTriangular()
     )
 
     def __post_init__(self) -> None:

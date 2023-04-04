@@ -13,16 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass, replace
-from typing import Dict, List, Optional
+from dataclasses import dataclass
 
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax as tfp
-from jax.random import KeyArray
 from jaxtyping import Array, Float
 from simple_pytree import static_field
 
-from ...parameters import param_field
+from ...base import param_field
 from ..base import AbstractKernel
 from ..computations import AbstractKernelComputation, EigenKernelComputation
 from .utils import jax_gather_nd

@@ -107,12 +107,12 @@ def test_improvement(kernel, n_dim):
     better_approximation = RFF(base_kernel, num_basis_fns=50)
     b_linop = better_approximation.gram(x).to_dense()
 
-#     c_delta = jnp.linalg.norm(exact_linop - c_linop, ord="fro")
-#     b_delta = jnp.linalg.norm(exact_linop - b_linop, ord="fro")
+    c_delta = jnp.linalg.norm(exact_linop - c_linop, ord="fro")
+    b_delta = jnp.linalg.norm(exact_linop - b_linop, ord="fro")
 
-#     # The frobenius norm of the difference between the exact and approximate
-#     # should improve as we increase the number of basis functions
-#     assert c_delta > b_delta
+    # The frobenius norm of the difference between the exact and approximate
+    # should improve as we increase the number of basis functions
+    assert c_delta > b_delta
 
 
 @pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])

@@ -24,6 +24,8 @@ from ...base import param_field
 from ..base import AbstractKernel
 from .utils import euclidean_distance
 
+from dataclasses import dataclass
+
 
 @dataclass
 class PoweredExponential(AbstractKernel):
