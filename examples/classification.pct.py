@@ -33,6 +33,8 @@ import matplotlib.pyplot as plt
 import optax as ox
 from jax.config import config
 from jaxtyping import Array, Float
+import jax.tree_util as jtu
+
 
 import gpjax as gpx
 
@@ -412,14 +414,9 @@ thin_factor = 10
 samples = []
 
 for i in range(0, num_samples, thin_factor):
-    posterior.replace(states.position)
-    ps["kernel"]["lengthscale"] = states.position["kernel"]["lengthscale"][i]
-    ps["kernel"]["variance"] = states.position["kernel"]["variance"][i]
-    ps["latent"] = states.position["latent"][i, :, :]
-    ps = gpx.constrain(ps, bijectors)
-
-    latent_dist = posterior(ps, D)(xtest)
-    predictive_dist = likelihood(ps, latent_dist)
+    sample = jtu.tree_map(lambda samples: samples[0], states.position)
+    latent_dist = sample.predict(xtest, train_data=D)
+    predictive_dist = sample.likelihood(latent_dist)
     samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
 
 samples = jnp.vstack(samples)
