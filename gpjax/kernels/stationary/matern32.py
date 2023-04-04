@@ -23,7 +23,7 @@ from ...base import param_field
 from ..base import AbstractKernel
 from .utils import build_student_t_distribution, euclidean_distance
 
-tfd = tfp.distributions
+from dataclasses import dataclass
 
 
 @dataclass

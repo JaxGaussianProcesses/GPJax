@@ -30,7 +30,6 @@ from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
     ConstantDiagonalKernelComputation,
     DenseKernelComputation,
-    DiagonalKernelComputation,
 )
 from gpjax.kernels.stationary import (
     RBF,
@@ -40,6 +39,7 @@ from gpjax.kernels.stationary import (
     Periodic,
     PoweredExponential,
     RationalQuadratic,
+    White,
 )
 from gpjax.kernels.computations import (
     DenseKernelComputation,

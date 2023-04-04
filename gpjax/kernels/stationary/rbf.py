@@ -26,8 +26,6 @@ from ...base import param_field
 from ..base import AbstractKernel
 from .utils import squared_distance
 
-tfd = tfp.distributions
-
 
 @dataclass
 class RBF(AbstractKernel):
