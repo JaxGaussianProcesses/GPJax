@@ -233,7 +233,7 @@ laplace_approximation = tfd.MultivariateNormalFullCovariance(f_hat.squeeze(), H_
 def construct_laplace(test_inputs: Float[Array, "N D"]) -> tfd.MultivariateNormalTriL:
     map_latent_dist = opt_posterior.predict(xtest, train_data=D)
 
-    
+
     Kxt = opt_posterior.prior.kernel.cross_covariance(x, test_inputs)
     Kxx = opt_posterior.prior.kernel.gram(x)
     Kxx += I(D.n) * jitter
@@ -414,7 +414,7 @@ thin_factor = 10
 samples = []
 
 for i in range(0, num_samples, thin_factor):
-    sample = jtu.tree_map(lambda samples: samples[0], states.position)
+    sample = jtu.tree_map(lambda samples: samples[i], states.position)
     latent_dist = sample.predict(xtest, train_data=D)
     predictive_dist = sample.likelihood(latent_dist)
     samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
