@@ -13,54 +13,44 @@
 # # limitations under the License.
 # # ==============================================================================
 
-# import jax.numpy as jnp
-# import jax.random as jr
-# import networkx as nx
-# from jax.config import config
-# from jaxlinop import identity
+import jax.numpy as jnp
+import jax.random as jr
+import networkx as nx
+from jax.config import config
 
-# from gpjax.kernels.non_euclidean import GraphKernel
+from gpjax.kernels.non_euclidean import GraphKernel
+from gpjax.linops import identity
 
 # # Enable Float64 for more stable matrix inversions.
-# config.update("jax_enable_x64", True)
-# _initialise_key = jr.PRNGKey(123)
-# _jitter = 1e-6
+config.update("jax_enable_x64", True)
 
 
-# def test_graph_kernel():
-#     # Create a random graph, G, and verice labels, x,
-#     n_verticies = 20
-#     n_edges = 40
-#     G = nx.gnm_random_graph(n_verticies, n_edges, seed=123)
-#     x = jnp.arange(n_verticies).reshape(-1, 1)
 
-#     # Compute graph laplacian
-#     L = nx.laplacian_matrix(G).toarray() + jnp.eye(n_verticies) * 1e-12
+def test_graph_kernel():
+    # Create a random graph, G, and verice labels, x,
+    n_verticies = 20
+    n_edges = 40
+    G = nx.gnm_random_graph(n_verticies, n_edges, seed=123)
+    x = jnp.arange(n_verticies).reshape(-1, 1)
 
-#     # Create graph kernel
-#     kern = GraphKernel(laplacian=L)
-#     assert isinstance(kern, GraphKernel)
-#     assert kern.num_vertex == n_verticies
-#     assert kern.evals.shape == (n_verticies, 1)
-#     assert kern.evecs.shape == (n_verticies, n_verticies)
+    # Compute graph laplacian
+    L = nx.laplacian_matrix(G).toarray() + jnp.eye(n_verticies) * 1e-12
 
-#     # Unpack kernel computation
-#     kern.gram
+    # Create graph kernel
+    kern = GraphKernel(laplacian=L)
+    assert isinstance(kern, GraphKernel)
+    assert kern.num_vertex == n_verticies
+    assert kern.eigenvalues.shape == (n_verticies, 1)
+    assert kern.eigenvectors.shape == (n_verticies, n_verticies)
 
-#     # Initialise default parameters
-#     params = kern.init_params(_initialise_key)
-#     assert isinstance(params, dict)
-#     assert list(sorted(list(params.keys()))) == [
-#         "lengthscale",
-#         "smoothness",
-#         "variance",
-#     ]
+    # Unpack kernel computation
+    kern.gram
 
-#     # Compute gram matrix
-#     Kxx = kern.gram(params, x)
-#     assert Kxx.shape == (n_verticies, n_verticies)
+    # Compute gram matrix
+    Kxx = kern.gram(x)
+    assert Kxx.shape == (n_verticies, n_verticies)
 
-#     # Check positive definiteness
-#     Kxx += identity(n_verticies) * _jitter
-#     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
-#     assert all(eigen_values > 0)
+    # Check positive definiteness
+    Kxx += identity(n_verticies) * 1e-6
+    eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
+    assert all(eigen_values > 0)

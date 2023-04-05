@@ -15,7 +15,7 @@
 
 """JaxKern."""
 from .approximations import RFF
-from .base import ProductKernel, SumKernel, AbstractKernel
+from .base import AbstractKernel, ProductKernel, SumKernel
 from .computations import (
     BasisFunctionComputation,
     ConstantDiagonalKernelComputation,
@@ -23,18 +23,18 @@ from .computations import (
     DiagonalKernelComputation,
     EigenKernelComputation,
 )
+from .non_euclidean import GraphKernel
 from .nonstationary import Linear, Polynomial
 from .stationary import (
     RBF,
     Matern12,
     Matern32,
     Matern52,
-    RationalQuadratic,
     Periodic,
     PoweredExponential,
+    RationalQuadratic,
     White,
 )
-from .non_euclidean import GraphKernel
 
 __all__ = [
     "AbstractKernel",
