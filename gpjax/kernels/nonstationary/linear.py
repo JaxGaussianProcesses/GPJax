@@ -31,6 +31,7 @@ class Linear(AbstractKernel):
     """The linear kernel."""
 
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    name: str = "Linear"
 
     def __call__(
         self,

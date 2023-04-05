@@ -175,7 +175,7 @@ def _check_model(model: Any) -> None:
 def _check_objective(objective: Any) -> None:
     """Check that the objective is of type Objective."""
     if not isinstance(objective, AbstractObjective):
-        raise TypeError("objective must be of type jaxutils.Objective")
+        raise TypeError(f"objective of type {type(objective)} must be of type jaxutils.Objective.")
 
 
 def _check_train_data(train_data: Any) -> None:

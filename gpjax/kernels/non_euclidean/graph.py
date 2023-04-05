@@ -17,7 +17,7 @@ from dataclasses import dataclass
 
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax as tfp
-from jaxtyping import Array, Float
+from jaxtyping import Array, Float, Int
 from simple_pytree import static_field
 
 from ...base import param_field
@@ -32,7 +32,7 @@ tfb = tfp.bijectors
 ##########################################
 @dataclass
 class AbstractGraphKernel:
-    laplacian: Float[Array, "N N"]
+    laplacian: Float[Array, "N N"] = static_field()
 
 
 @dataclass
@@ -44,20 +44,19 @@ class GraphKernel(AbstractKernel, AbstractGraphKernel):
         compute_engine
     """
 
-    lengthscale: Float[Array, "D"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus
-    )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus)
-    smoothness: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus)
+    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    smoothness: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
     eigenvalues: Float[Array, "N"] = static_field(None)
     eigenvectors: Float[Array, "N N"] = static_field(None)
-    num_vertex: Float[Array, "1"] = static_field(None)
+    num_vertex: Int[Array, "1"] = static_field(None)
     compute_engine: AbstractKernelComputation = static_field(EigenKernelComputation)
-
+    name: str = "Graph Matérn"
     def __post_init__(self):
         evals, self.eigenvectors = jnp.linalg.eigh(self.laplacian)
         self.eigenvalues = evals.reshape(-1, 1)
-        self.num_vertex = self.eigenvalues.shape[0]
+        if self.num_vertex is None:
+            self.num_vertex = self.eigenvalues.shape[0]
 
     def __call__(
         self,

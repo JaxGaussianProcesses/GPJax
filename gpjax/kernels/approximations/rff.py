@@ -54,6 +54,7 @@ class RFF(AbstractKernel, AbstractFourierKernel):
             self.frequencies = self.base_kernel.spectral_density.sample(
                 seed=self.key, sample_shape=(self.num_basis_fns, n_dims)
             )
+        self.name = f"{self.base_kernel.name} (RFF)"
 
     def __call__(self, x: Array, y: Array) -> Array:
         pass

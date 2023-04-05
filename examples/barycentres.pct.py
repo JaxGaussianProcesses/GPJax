@@ -134,6 +134,7 @@ plt.show()
 # [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for
 # advice on selecting an appropriate kernel.
 
+
 # %%
 def fit_gp(x: jax.Array, y: jax.Array) -> tfd.MultivariateNormalFullCovariance:
     if y.ndim == 1:
@@ -165,6 +166,7 @@ posterior_preds = [fit_gp(x, i) for i in ys]
 # learning a barycentre. We implement the fixed point scheme given in (3) in the
 # following cell by utilising Jax's `vmap` operator to speed up large matrix operations
 # using broadcasting in `tensordot`.
+
 
 # %%
 def sqrtm(A: jax.Array):
@@ -218,6 +220,7 @@ barycentre_process = tfd.MultivariateNormalTriL(barycentre_mean, L)
 # With a barycentre learned, we can visualise the result. We can see that the result
 # looks reasonable as it follows the sinusoidal curve of all the inferred GPs, and the
 # uncertainty bands are sensible.
+
 
 # %%
 def plot(

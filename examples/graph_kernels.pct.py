@@ -100,25 +100,12 @@ L = nx.laplacian_matrix(G).toarray()
 x = jnp.arange(G.number_of_nodes()).reshape(-1, 1)
 
 kernel = gpx.GraphKernel(laplacian=L)
-prior = gpx.Prior(mean_function = gpx.Zero(), kernel=kernel)
+prior = gpx.Prior(mean_function=gpx.Zero(), kernel=kernel)
 
-true_params = prior.init_params(key)
-true_params["kernel"] = {
-    "lengthscale": jnp.array(2.3),
-    "variance": jnp.array(3.2),
-    "smoothness": jnp.array(6.1),
-}
-
-fx = prior(true_params)(x)
+fx = prior(x)
 y = fx.sample(seed=key).reshape(-1, 1)
 
-D = Dataset(X=x, y=y)
-
-# %%
-kernel.compute_engine.gram
-
-# %%
-kernel.gram(params=kernel.init_params(key), inputs=x)
+D = gpx.Dataset(X=x, y=y)
 
 # %% [markdown]
 #
@@ -148,21 +135,21 @@ cbar = plt.colorbar(sm)
 # We do this using the Adam optimiser provided in `optax`.
 
 # %%
-likelihood = gpx.Gaussian(num_datapoints=y.shape[0])
+from gpjax.base.module import meta_leaves
+
+meta_leaves(posterior)[1]
+
+# %%
+likelihood = gpx.Gaussian(num_datapoints=D.n)
 posterior = prior * likelihood
 
-parameter_state = gpx.initialise(posterior, key)
-negative_mll = jit(posterior.marginal_log_likelihood(train_data=D, negative=True))
-optimiser = ox.adam(learning_rate=0.01)
-
-inference_state = gpx.fit(
-    objective=negative_mll,
-    parameter_state=parameter_state,
-    optax_optim=optimiser,
+opt_posterior, training_history = gpx.fit(
+    model=posterior,
+    objective=gpx.ConjugateMLL(negative=True),
+    train_data=D,
+    optim=ox.adamw(learning_rate=0.01),
     num_iters=1000,
 )
-
-learned_params, training_history = inference_state.unpack()
 
 # %% [markdown]
 #

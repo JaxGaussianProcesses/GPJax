@@ -33,6 +33,7 @@ class White(AbstractKernel):
     compute_engine: AbstractKernelComputation = static_field(
         ConstantDiagonalKernelComputation
     )
+    name: str = "White"
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\\sigma`

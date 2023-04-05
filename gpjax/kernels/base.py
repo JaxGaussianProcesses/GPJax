@@ -35,6 +35,7 @@ class AbstractKernel(Module):
 
     compute_engine: AbstractKernelComputation = static_field(DenseKernelComputation)
     active_dims: List[int] = static_field(None)
+    name: str = static_field("AbstractKernel")
 
     @property
     def ndims(self):

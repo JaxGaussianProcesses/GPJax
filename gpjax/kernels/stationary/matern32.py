@@ -32,6 +32,7 @@ class Matern32(AbstractKernel):
 
     lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    name: str = "Matérn32"
 
     def __call__(
         self,

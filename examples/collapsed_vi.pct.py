@@ -98,9 +98,7 @@ posterior = prior * likelihood
 # noise, we pass this to the constructer.
 
 # %%
-q = gpx.CollapsedVariationalGaussian(
-   posterior=posterior, inducing_inputs=z
-)
+q = gpx.CollapsedVariationalGaussian(posterior=posterior, inducing_inputs=z)
 
 # %% [markdown]
 # We define our variational inference algorithm through `CollapsedVI`. This defines
@@ -183,10 +181,7 @@ ax.plot(
 
 
 ax.plot(xtest, samples.T, color="tab:blue", alpha=0.8, linewidth=0.2)
-[
-    ax.axvline(x=z_i, color="tab:gray", alpha=0.3, linewidth=1)
-    for z_i in inducing_points
-]
+[ax.axvline(x=z_i, color="tab:gray", alpha=0.3, linewidth=1) for z_i in inducing_points]
 ax.legend()
 plt.show()
 
@@ -200,7 +195,9 @@ plt.show()
 # full model.
 
 # %%
-full_rank_model = gpx.Prior(mean_function=gpx.Zero(), kernel=gpx.RBF()) * gpx.Gaussian(num_datapoints=D.n)
+full_rank_model = gpx.Prior(mean_function=gpx.Zero(), kernel=gpx.RBF()) * gpx.Gaussian(
+    num_datapoints=D.n
+)
 negative_mll = jit(gpx.ConjugateMLL(negative=True))
 # %timeit negative_mll(full_rank_model, D).block_until_ready()
 

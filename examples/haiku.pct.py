@@ -21,6 +21,7 @@
 
 # %%
 import typing as tp
+from dataclasses import dataclass
 from typing import Dict
 
 import haiku as hk
@@ -31,7 +32,6 @@ import matplotlib.pyplot as plt
 import optax as ox
 from jax.config import config
 from jaxtyping import Array, Float
-from jaxutils import Dataset
 from scipy.signal import sawtooth
 
 import gpjax as gpx
@@ -59,7 +59,7 @@ f = lambda x: jnp.asarray(sawtooth(2 * jnp.pi * x))
 signal = f(x)
 y = signal + jr.normal(subkey, shape=signal.shape) * noise
 
-D = Dataset(X=x, y=y)
+D = gpx.Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-2.0, 2.0, 500).reshape(-1, 1)
 ytest = f(xtest)
@@ -80,7 +80,9 @@ ax.legend(loc="best")
 #
 # Although deep kernels are not currently supported natively in GPJax, defining one is straightforward as we now demonstrate. Using the base `AbstractKernel` object given in GPJax, we provide a mixin class named `_DeepKernelFunction` to facilitate the user supplying the neural network and base kernel of their choice. Kernel matrices are then computed using the regular `gram` and `cross_covariance` functions.
 
+
 # %%
+@dataclass
 class DeepKernelFunction(AbstractKernel):
     def __init__(
         self,
@@ -121,6 +123,7 @@ class DeepKernelFunction(AbstractKernel):
 #
 # With a deep kernel object created, we proceed to define a neural network. Here we consider a small multi-layer perceptron with two linear hidden layers and ReLU activation functions between the layers. The first hidden layer contains 32 units, while the second layer contains 64 units. Finally, we'll make the output of our network a single unit. However, it would be possible to project our data into a $d-$dimensional space for $d>1$. In these instances, making the [base kernel ARD](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html#Active-dimensions) would be sensible.
 # Users may wish to design more intricate network structures for more complex tasks, which functionality is supported well in Haiku.
+
 
 # %%
 def forward(x):

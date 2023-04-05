@@ -24,17 +24,16 @@
 
 # %%
 import blackjax
-import tensorflow_probability.substrates.jax as tfp
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
+import jax.tree_util as jtu
 import matplotlib.pyplot as plt
 import optax as ox
+import tensorflow_probability.substrates.jax as tfp
 from jax.config import config
 from jaxtyping import Array, Float
-import jax.tree_util as jtu
-
 
 import gpjax as gpx
 
@@ -229,10 +228,10 @@ laplace_approximation = tfd.MultivariateNormalFullCovariance(f_hat.squeeze(), H_
 # We take the latent distribution computed in the previous section and add this term
 # to the covariance to construct $q_{Laplace}(f(\cdot))$.
 
+
 # %%
 def construct_laplace(test_inputs: Float[Array, "N D"]) -> tfd.MultivariateNormalTriL:
     map_latent_dist = opt_posterior.predict(xtest, train_data=D)
-
 
     Kxt = opt_posterior.prior.kernel.cross_covariance(x, test_inputs)
     Kxx = opt_posterior.prior.kernel.gram(x)
@@ -252,6 +251,7 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> tfd.MultivariateNorma
     covariance = map_latent_dist.covariance() + laplace_cov_term
     L = jnp.linalg.cholesky(covariance)
     return tfd.MultivariateNormalTriL(jnp.atleast_1d(mean.squeeze()), L)
+
 
 # %% [markdown]
 # From this we can construct the predictive distribution at the test points.

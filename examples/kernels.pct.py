@@ -15,33 +15,34 @@
 # ---
 
 # %% [markdown]
-# ```{note}
-# This notebook is a duplicate of the one found in the [JaxKern documentation](https://jaxkern.readthedocs.io/en/latest/nbs/kernels.html). It is included here for completeness.
-# ```
 # # Kernel Guide
 #
 # In this guide, we introduce the kernels available in GPJax and demonstrate how to create custom ones.
+#
+#
+# from typing import Dict
 
-
-from typing import Dict
+from dataclasses import dataclass
 
 # %%
 import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
+import optax as ox
+import tensorflow_probability.substrates.jax as tfp
 from jax import jit
 from jax.config import config
 from jaxtyping import Array, Float
-from jaxutils import Dataset
-from optax import adam
+from simple_pytree import static_field
 
 import gpjax as gpx
-import gpjax.kernels as jk
+from gpjax.base.param import param_field
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
+tfb = tfp.bijectors
 
 # %% [markdown]
 # ## Supported Kernels
@@ -59,21 +60,22 @@ key = jr.PRNGKey(123)
 
 # %%
 kernels = [
-    jk.Matern12(),
-    jk.Matern32(),
-    jk.Matern52(),
-    jk.RBF(),
-    jk.Polynomial(),
-    jk.Polynomial(degree=2),
+    gpx.kernels.Matern12(),
+    gpx.kernels.Matern32(),
+    gpx.kernels.Matern52(),
+    gpx.kernels.RBF(),
+    gpx.kernels.Polynomial(),
+    gpx.kernels.Polynomial(degree=2),
 ]
-fig, axes = plt.subplots(ncols=3, nrows=2, figsize=(20, 10))
+fig, axes = plt.subplots(ncols=3, nrows=2, figsize=(10, 6), tight_layout=True)
 
 x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 
+meanf = gpx.mean_functions.Zero()
+
 for k, ax in zip(kernels, axes.ravel()):
-    prior = gpx.Prior(kernel=k)
-    params, *_ = gpx.initialise(prior, key).unpack()
-    rv = prior(params)(x)
+    prior = gpx.Prior(mean_function=meanf, kernel=k)
+    rv = prior(x)
     y = rv.sample(seed=key, sample_shape=(10,))
     ax.plot(x, y.T, alpha=0.7)
     ax.set_title(k.name)
@@ -90,15 +92,14 @@ for k, ax in zip(kernels, axes.ravel()):
 # like our RBF kernel to act on the first, second and fourth dimensions.
 
 # %%
-slice_kernel = jk.RBF(active_dims=[0, 1, 3])
+slice_kernel = gpx.kernels.RBF(active_dims=[0, 1, 3])
 
 # %% [markdown]
 #
 # The resulting kernel has one length-scale parameter per input dimension --- an ARD kernel.
 
 # %%
-print(f"ARD: {slice_kernel.ard}")
-print(f"Lengthscales: {slice_kernel.init_params(key)['lengthscale']}")
+print(f"Lengthscales: {slice_kernel.lengthscale}")
 
 # %% [markdown]
 # We'll now simulate some data and evaluate the kernel on the previously selected input dimensions.
@@ -107,11 +108,8 @@ print(f"Lengthscales: {slice_kernel.init_params(key)['lengthscale']}")
 # Inputs
 x_matrix = jr.normal(key, shape=(50, 5))
 
-# Default parameter dictionary
-params = slice_kernel.init_params(key)
-
 # Compute the Gram matrix
-K = slice_kernel.gram(params, x_matrix)
+K = slice_kernel.gram(x_matrix)
 print(K.shape)
 
 # %% [markdown]
@@ -123,14 +121,14 @@ print(K.shape)
 # can be created by applying the `+` operator as follows.
 
 # %%
-k1 = jk.RBF()
-k2 = jk.Polynomial()
-sum_k = k1 + k2
+k1 = gpx.kernels.RBF()
+k2 = gpx.kernels.Polynomial()
+sum_k = gpx.kernels.ProductKernel(kernels=[k1, k2])
 
 fig, ax = plt.subplots(ncols=3, figsize=(20, 5))
-im0 = ax[0].matshow(k1.gram(k1.init_params(key), x).to_dense())
-im1 = ax[1].matshow(k2.gram(k2.init_params(key), x).to_dense())
-im2 = ax[2].matshow(sum_k.gram(sum_k.init_params(key), x).to_dense())
+im0 = ax[0].matshow(k1.gram(x).to_dense())
+im1 = ax[1].matshow(k2.gram(x).to_dense())
+im2 = ax[2].matshow(sum_k.gram(x).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
@@ -140,27 +138,20 @@ fig.colorbar(im2, ax=ax[2])
 # Similarily, products of kernels can be created through the `*` operator.
 
 # %%
-k3 = jk.Matern32()
+k3 = gpx.kernels.Matern32()
 
-prod_k = k1 * k2 * k3
+prod_k = gpx.kernels.ProductKernel(kernels=[k1, k2, k3])
 
 fig, ax = plt.subplots(ncols=4, figsize=(20, 5))
-im0 = ax[0].matshow(k1.gram(k1.init_params(key), x).to_dense())
-im1 = ax[1].matshow(k2.gram(k2.init_params(key), x).to_dense())
-im2 = ax[2].matshow(k3.gram(k3.init_params(key), x).to_dense())
-im3 = ax[3].matshow(prod_k.gram(prod_k.init_params(key), x).to_dense())
+im0 = ax[0].matshow(k1.gram(x).to_dense())
+im1 = ax[1].matshow(k2.gram(x).to_dense())
+im2 = ax[2].matshow(k3.gram(x).to_dense())
+im3 = ax[3].matshow(prod_k.gram(x).to_dense())
 
 fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
 fig.colorbar(im2, ax=ax[2])
 fig.colorbar(im3, ax=ax[3])
-
-# %% [markdown]
-# Alternatively kernel sums and multiplications can be created by passing a list of kernels into the `SumKernel` `ProductKernel` objects respectively.
-
-# %%
-sum_k = jk.SumKernel(kernel_set=[k1, k2])
-prod_k = jk.ProductKernel(kernel_set=[k1, k2, k3])
 
 
 # %% [markdown]
@@ -200,31 +191,31 @@ prod_k = jk.ProductKernel(kernel_set=[k1, k2, k3])
 #
 # To implement this, one must write the following class.
 
+
 # %%
 def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
 
 
-class Polar(jk.base.AbstractKernel):
-    def __init__(self) -> None:
-        super().__init__()
-        self.period: float = 2 * jnp.pi
-        self.c = self.period / 2.0  # in [0, \pi]
+@dataclass
+class _Polar:
+    period: float = static_field(2 * jnp.pi)
+    tau: float = param_field(jnp.array([4.0]), bijector=tfb.Softplus(low=4.0))
+
+
+@dataclass
+class Polar(gpx.kernels.AbstractKernel, _Polar):
+    def __post_init__(self):
+        self.c = self.period / 2.0
 
     def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
+        self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
-        tau = params["tau"]
         t = angular_distance(x, y, self.c)
-        K = (1 + tau * t / self.c) * jnp.clip(1 - t / self.c, 0, jnp.inf) ** tau
+        K = (1 + self.tau * t / self.c) * jnp.clip(
+            1 - t / self.c, 0, jnp.inf
+        ) ** self.tau
         return K.squeeze()
-
-    def init_params(self, key: jr.KeyArray) -> dict:
-        return {"tau": jnp.array([4.0])}
-
-    # This is depreciated. Can be removed once JaxKern is updated.
-    def _initialise_params(self, key: jr.KeyArray) -> Dict:
-        return self.init_params(key)
 
 
 # %% [markdown]
@@ -253,18 +244,6 @@ class Polar(jk.base.AbstractKernel):
 # transformation](https://jax.readthedocs.io/en/latest/_autosummary/jax.nn.softplus.html)
 # where the lower bound is shifted by $4$.
 
-# %%
-from jax.nn import softplus
-
-from gpjax.config import add_parameter
-
-bij_fn = lambda x: softplus(x + jnp.array(4.0))
-bij = dx.Lambda(
-    forward=bij_fn, inverse=lambda y: -jnp.log(-jnp.expm1(-y - 4.0)) + y - 4.0
-)
-
-add_parameter("tau", bij)
-
 # %% [markdown]
 # ### Using our polar kernel
 #
@@ -279,28 +258,23 @@ noise = 0.2
 X = jnp.sort(jr.uniform(key, minval=0.0, maxval=jnp.pi * 2, shape=(n, 1)), axis=0)
 y = 4 + jnp.cos(2 * X) + jr.normal(key, shape=X.shape) * noise
 
-D = Dataset(X=X, y=y)
+D = gpx.Dataset(X=X, y=y)
 
 # Define polar Gaussian process
 PKern = Polar()
+meanf = gpx.mean_functions.Zero()
 likelihood = gpx.Gaussian(num_datapoints=n)
-circlular_posterior = gpx.Prior(kernel=PKern) * likelihood
+circlular_posterior = gpx.Prior(mean_function=meanf, kernel=PKern) * likelihood
 
-# Initialise parameter state:
-parameter_state = gpx.initialise(circlular_posterior, key)
 
 # Optimise GP's marginal log-likelihood using Adam
-negative_mll = jit(circlular_posterior.marginal_log_likelihood(D, negative=True))
-optimiser = adam(learning_rate=0.05)
-
-inference_state = gpx.fit(
-    objective=negative_mll,
-    parameter_state=parameter_state,
-    optax_optim=optimiser,
-    num_iters=1000,
+opt_posterior, history = gpx.fit(
+    model=circlular_posterior,
+    objective=gpx.ConjugateMLL(negative=True),
+    train_data=D,
+    optim=ox.adamw(learning_rate=0.05),
+    num_iters=500,
 )
-
-learned_params, training_history = inference_state.unpack()
 
 # %% [markdown]
 # ### Prediction
@@ -309,9 +283,7 @@ learned_params, training_history = inference_state.unpack()
 # and illustrate the results.
 
 # %%
-posterior_rv = likelihood(
-    learned_params, circlular_posterior(learned_params, D)(angles)
-)
+posterior_rv = opt_posterior.likelihood(opt_posterior.predict(angles, train_data=D))
 mu = posterior_rv.mean()
 one_sigma = posterior_rv.stddev()
 

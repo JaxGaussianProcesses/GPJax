@@ -27,7 +27,6 @@ import matplotlib.pyplot as plt
 import optax as ox
 from jax import jit
 from jax.config import config
-from jaxutils import Dataset
 
 import gpjax as gpx
 
@@ -56,7 +55,7 @@ f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(subkey, shape=signal.shape) * noise
 
-D = Dataset(X=x, y=y)
+D = gpx.Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-3.5, 3.5, 500).reshape(-1, 1)
 ytest = f(xtest)

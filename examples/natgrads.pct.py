@@ -26,10 +26,8 @@ import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
 from jax.config import config
-from jaxutils import Dataset
 
 import gpjax as gpx
-import gpjax.kernels as jk
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -55,7 +53,7 @@ f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(subkey, shape=signal.shape) * noise
 
-D = Dataset(X=x, y=y)
+D = gpx.Dataset(X=x, y=y)
 xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 
 # %% [markdown]
@@ -78,15 +76,14 @@ plt.show()
 
 # %%
 likelihood = gpx.Gaussian(num_datapoints=n)
-kernel = jk.RBF()
-prior = gpx.Prior(kernel=kernel)
+meanf = gpx.mean_functions.Zero()
+kernel = gpx.RBF()
+prior = gpx.Prior(mean_function=meanf, kernel=kernel)
 p = prior * likelihood
 
 
-natural_q = gpx.NaturalVariationalGaussian(prior=prior, inducing_inputs=z)
-natural_svgp = gpx.StochasticVI(posterior=p, variational_family=natural_q)
-
-parameter_state = gpx.initialise(natural_svgp)
+natural_q = gpx.NaturalVariationalGaussian(posterior=p, inducing_inputs=z)
+natural_svgp = gpx.ELBO(negative=True)
 
 # %% [markdown]
 # Next, we can conduct natural gradients as follows:

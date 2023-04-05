@@ -135,7 +135,6 @@ from gpjax.parameters import evaluate_priors
 
 def build_log_pi(log_mll, unconstrained_priors, mapper_fn):
     def array_mll(parameter_array):
-
         # Convert parameter array to a dictionary:
         params_dict = mapper_fn([jnp.array(i) for i in parameter_array])
 
