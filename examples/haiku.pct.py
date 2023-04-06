@@ -29,7 +29,6 @@ import typing as tp
 from dataclasses import dataclass
 from typing import Dict
 
-import haiku as hk
 import jax
 import jax.numpy as jnp
 import jax.random as jr
@@ -101,19 +100,31 @@ ax.legend(loc="best")
 
 # %%
 import flax
+from dataclasses import field
+from typing import Any
+from simple_pytree import static_field
+    
 
 @dataclass
-class _DeepKernelFunction:
-    network: static_field(hk.Module)
-    base_kernel: AbstractKernel
+class DeepKernelFunction(AbstractKernel):
+    base_kernel: AbstractKernel = None
+    network: nn.Module = static_field(None)
     dummy_x: jax.Array = static_field(None)
     key: jr.PRNGKeyArray = static_field(jr.PRNGKey(123))
+    nn_params: Any = field(init=False, repr=False)
     
     def __post_init__(self):
-        self.nn_params = param_field(flax.core.unfreeze(self.network.init(key, self.dummy_x)), bijector=None)
 
-@dataclass
-class DeepKernelFunction(AbstractKernel, _DeepKernelFunction):
+        if self.base_kernel is None:
+            raise ValueError("base_kernel must be specified")
+        
+        if self.network is None:
+            raise ValueError("network must be specified")
+
+
+        self.nn_params = flax.core.unfreeze(self.network.init(key, self.dummy_x))
+
+
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         state = self.network.init(self.key, x)
         xt = self.network.apply(state, x)
@@ -141,9 +152,9 @@ class Network(nn.Module):
   """A simple MLP."""
   @nn.compact
   def __call__(self, x):
-      x = nn.Dense(features=128)(x)
+      x = nn.Dense(features=4)(x)
       x = nn.relu(x)
-      x = nn.Dense(features=64)(x)
+      x = nn.Dense(features=2)(x)
       x = nn.relu(x)
       x = nn.Dense(features=1)(x)
       return x
@@ -167,7 +178,6 @@ meanf = gpx.Zero()
 prior = gpx.Prior(mean_function=meanf, kernel=kernel)
 likelihood = gpx.Gaussian(num_datapoints=D.n)
 posterior = prior * likelihood
-
 # %% [markdown]
 # ### Optimisation
 #
