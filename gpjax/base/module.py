@@ -22,6 +22,7 @@ from copy import copy, deepcopy
 from typing import Any, Callable, Dict, Iterable, List, Tuple
 
 import jax
+from jax import lax
 import jax.tree_util as jtu
 from jax._src.tree_util import _registry
 from simple_pytree import Pytree, static_field
@@ -125,6 +126,10 @@ class Module(Pytree):
 
         def _apply_constrain(meta_leaf):
             meta, leaf = meta_leaf
+
+            if meta is None:
+                return leaf
+            
             return meta.get("bijector", tfb.Identity()).forward(leaf)
 
         return meta_map(_apply_constrain, self)
@@ -138,6 +143,10 @@ class Module(Pytree):
 
         def _apply_unconstrain(meta_leaf):
             meta, leaf = meta_leaf
+
+            if meta is None:
+                return leaf
+            
             return meta.get("bijector", tfb.Identity()).inverse(leaf)
 
         return meta_map(_apply_unconstrain, self)
@@ -155,6 +164,10 @@ class Module(Pytree):
 
         def _apply_stop_grad(meta_leaf):
             meta, leaf = meta_leaf
+
+            if meta is None:
+                return leaf
+            
             return _stop_grad(leaf, meta.get("trainable", True))
 
         return meta_map(_apply_stop_grad, self)
