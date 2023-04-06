@@ -18,7 +18,7 @@
 #
 # In this notebook we demonstate how to fit a Gaussian process regression model.
 
-# %%
+# %% vscode={"languageId": "python"}
 from pprint import PrettyPrinter
 
 import jax.numpy as jnp
@@ -45,7 +45,7 @@ key = jr.PRNGKey(123)
 #
 # We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs and labels for later.
 
-# %%
+# %% vscode={"languageId": "python"}
 n = 100
 noise = 0.3
 
@@ -64,7 +64,7 @@ ytest = f(xtest)
 # To better understand what we have simulated, we plot both the underlying latent
 # function and the observed data that is subject to Gaussian noise.
 
-# %%
+# %% vscode={"languageId": "python"}
 fig, ax = plt.subplots(figsize=(10, 5))
 ax.plot(xtest, ytest, label="Latent function")
 ax.plot(x, y, "o", label="Observations")
@@ -96,7 +96,7 @@ ax.legend(loc="best")
 # we can reciprocate this process in GPJax via defining a `Prior` with our chosen `RBF`
 # kernel.
 
-# %%
+# %% vscode={"languageId": "python"}
 kernel = gpx.kernels.RBF()
 meanf = gpx.mean_functions.Constant(constant=0.0)
 meanf = meanf.replace_trainable(constant=False)
@@ -109,7 +109,7 @@ prior = gpx.Prior(mean_function=meanf, kernel=kernel)
 # multivariate Gaussian distribution. Such functionality enables trivial sampling, and
 # mean and covariance evaluation of the GP.
 
-# %%
+# %% vscode={"languageId": "python"}
 prior_dist = prior.predict(xtest)
 
 prior_mean = prior_dist.mean()
@@ -138,7 +138,7 @@ plt.show()
 # $$p(\mathcal{D} | f(\cdot)) = \mathcal{N}(\boldsymbol{y}; f(\boldsymbol{x}), \textbf{I} \alpha^2).$$
 # This is defined in GPJax through calling a `Gaussian` instance.
 
-# %%
+# %% vscode={"languageId": "python"}
 likelihood = gpx.Gaussian(num_datapoints=D.n)
 
 # %% [markdown]
@@ -148,7 +148,7 @@ likelihood = gpx.Gaussian(num_datapoints=D.n)
 #
 # Mimicking this construct, the posterior is established in GPJax through the `*` operator.
 
-# %%
+# %% vscode={"languageId": "python"}
 posterior = prior * likelihood
 
 # %% [markdown]
@@ -176,8 +176,8 @@ posterior = prior * likelihood
 # in the following cell, we'll demonstrate how the kernel lengthscale can be
 # initialised to 0.5.
 
-# %%
-negative_mll = gpx.objectives.ConjugateMLL(negative=True)
+# %% vscode={"languageId": "python"}
+negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True))
 negative_mll(posterior, train_data=D)
 
 # %% [markdown]
@@ -189,7 +189,7 @@ negative_mll(posterior, train_data=D)
 # We can now define an optimiser with `optax`. For this example we'll use the `adam`
 # optimiser.
 
-# %%
+# %% vscode={"languageId": "python"}
 opt_posterior, history = gpx.fit(
     model=posterior,
     objective=gpx.ConjugateMLL(negative=True),
@@ -213,7 +213,7 @@ opt_posterior, history = gpx.fit(
 # the predictive distribution as a `Distrax` multivariate Gaussian upon which `mean`
 # and `stddev` can be used to extract the predictive mean and standard deviatation.
 
-# %%
+# %% vscode={"languageId": "python"}
 latent_dist = opt_posterior.predict(xtest, train_data=D)
 predictive_dist = opt_posterior.likelihood(latent_dist)
 
@@ -225,7 +225,7 @@ predictive_std = predictive_dist.stddev()
 # performance at explaining the data $\mathcal{D}$ and recovering the underlying
 # latent function of interest.
 
-# %%
+# %% vscode={"languageId": "python"}
 fig, ax = plt.subplots(figsize=(12, 5))
 ax.plot(x, y, "o", label="Observations", color="tab:red")
 ax.plot(xtest, predictive_mean, label="Predictive mean", color="tab:blue")
@@ -261,6 +261,6 @@ ax.legend()
 # %% [markdown]
 # ## System configuration
 
-# %%
+# %% vscode={"languageId": "python"}
 # %reload_ext watermark
 # %watermark -n -u -v -iv -w -a 'Thomas Pinder & Daniel Dodd'
