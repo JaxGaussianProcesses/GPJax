@@ -37,7 +37,7 @@ import optax as ox
 from jax.config import config
 from jaxtyping import Array, Float
 from scipy.signal import sawtooth
-from flax import linen as nn 
+from flax import linen as nn
 from simple_pytree import static_field
 
 import gpjax as gpx
@@ -103,7 +103,7 @@ import flax
 from dataclasses import field
 from typing import Any
 from simple_pytree import static_field
-    
+
 
 @dataclass
 class DeepKernelFunction(AbstractKernel):
@@ -112,18 +112,13 @@ class DeepKernelFunction(AbstractKernel):
     dummy_x: jax.Array = static_field(None)
     key: jr.PRNGKeyArray = static_field(jr.PRNGKey(123))
     nn_params: Any = field(init=False, repr=False)
-    
-    def __post_init__(self):
 
+    def __post_init__(self):
         if self.base_kernel is None:
             raise ValueError("base_kernel must be specified")
-        
         if self.network is None:
             raise ValueError("network must be specified")
-
-
         self.nn_params = flax.core.unfreeze(self.network.init(key, self.dummy_x))
-
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         state = self.network.init(self.key, x)
@@ -160,7 +155,7 @@ class Network(nn.Module):
       x = nn.relu(x)
       x = nn.Dense(features=feature_space_dim)(x)
       return x
-  
+
 
 forward_linear = Network()
 

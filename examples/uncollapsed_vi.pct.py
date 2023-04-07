@@ -19,7 +19,6 @@
 #
 # In this notebook we demonstrate how to implement sparse variational Gaussian
 # processes (SVGPs) of
-# <strong data-cite="hensman2013gaussian">Hensman et al. (2013)</strong>;
 # <strong data-cite="hensman2015gaussian">Hensman et al. (2015)</strong>. In
 # particular, this approximation framework provides a tractable option for working with
 # non-conjugate Gaussian processes with more than ~5000 data points. However, for

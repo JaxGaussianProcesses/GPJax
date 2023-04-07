@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: gpjax
 #     language: python
 #     name: python3
 # ---
@@ -99,8 +99,8 @@ L = nx.laplacian_matrix(G).toarray()
 # %%
 x = jnp.arange(G.number_of_nodes()).reshape(-1, 1)
 
-kernel = gpx.GraphKernel(laplacian=L)
-prior = gpx.Prior(mean_function=gpx.Zero(), kernel=kernel)
+true_kernel = gpx.GraphKernel(laplacian=L, lengthscale=jnp.array([2.3]), variance=jnp.array([3.2]), smoothness=jnp.array([6.1]))
+prior = gpx.Prior(mean_function=gpx.Zero(), kernel=true_kernel)
 
 fx = prior(x)
 y = fx.sample(seed=key).reshape(-1, 1)
@@ -135,12 +135,8 @@ cbar = plt.colorbar(sm)
 # We do this using the Adam optimiser provided in `optax`.
 
 # %%
-from gpjax.base.module import meta_leaves
-
-meta_leaves(posterior)[1]
-
-# %%
 likelihood = gpx.Gaussian(num_datapoints=D.n)
+prior = gpx.Prior(mean_function=gpx.Zero(), kernel=gpx.GraphKernel(laplacian=L))
 posterior = prior * likelihood
 
 opt_posterior, training_history = gpx.fit(
@@ -161,9 +157,8 @@ opt_posterior, training_history = gpx.fit(
 # (RMSE) of the model for the initialised parameters vs the optimised set.
 
 # %%
-initial_params = parameter_state.params
-initial_dist = likelihood(initial_params, posterior(initial_params, D)(x))
-predictive_dist = likelihood(learned_params, posterior(learned_params, D)(x))
+initial_dist = likelihood(posterior(x, D))
+predictive_dist = opt_posterior.likelihood(opt_posterior(x, D))
 
 initial_mean = initial_dist.mean()
 learned_mean = predictive_dist.mean()
@@ -204,3 +199,5 @@ cbar = plt.colorbar(sm)
 # %%
 # %reload_ext watermark
 # %watermark -n -u -v -iv -w -a 'Thomas Pinder (edited by Daniel Dodd)'
+
+# %%

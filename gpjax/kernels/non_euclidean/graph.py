@@ -31,19 +31,14 @@ tfb = tfp.bijectors
 # Graph kernels
 ##########################################
 @dataclass
-class AbstractGraphKernel:
-    laplacian: Float[Array, "N N"] = static_field()
-
-
-@dataclass
-class GraphKernel(AbstractKernel, AbstractGraphKernel):
+class GraphKernel(AbstractKernel):
     """A Matérn graph kernel defined on the vertices of a graph. The key reference for this object is borovitskiy et. al., (2020).
 
     Args:
         laplacian (Float[Array]): An N x N matrix representing the Laplacian matrix of a graph.
         compute_engine
     """
-
+    laplacian: Float[Array, "N N"] = static_field(None)
     lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
     smoothness: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
@@ -52,7 +47,11 @@ class GraphKernel(AbstractKernel, AbstractGraphKernel):
     num_vertex: Int[Array, "1"] = static_field(None)
     compute_engine: AbstractKernelComputation = static_field(EigenKernelComputation)
     name: str = "Graph Matérn"
+
     def __post_init__(self):
+        if self.laplacian is None:
+            raise ValueError("Graph laplacian must be specified")
+
         evals, self.eigenvectors = jnp.linalg.eigh(self.laplacian)
         self.eigenvalues = evals.reshape(-1, 1)
         if self.num_vertex is None:
