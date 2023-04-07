@@ -26,8 +26,8 @@
 
 # %%
 import typing as tp
-from dataclasses import dataclass
-from typing import Dict
+from dataclasses import dataclass, field
+from typing import Dict, Any
 
 import jax
 import jax.numpy as jnp
@@ -39,6 +39,7 @@ from jaxtyping import Array, Float
 from scipy.signal import sawtooth
 from flax import linen as nn
 from simple_pytree import static_field
+import flax
 
 import gpjax as gpx
 import gpjax.kernels as jk
@@ -92,19 +93,12 @@ ax.legend(loc="best")
 # ### Implementation
 #
 # Although deep kernels are not currently supported natively in GPJax, defining one is
-# straightforward as we now demonstrate. Using the base `AbstractKernel` object given
-# in GPJax, we provide a mixin class named `_DeepKernelFunction` to facilitate the
-# user supplying the neural network and base kernel of their choice. Kernel matrices
+# straightforward as we now demonstrate. Inheriting from the base `AbstractKernel`
+# in GPJax, we create the `DeepKernelFunction` object that allows the
+# user to supply the neural network and base kernel of their choice. Kernel matrices
 # are then computed using the regular `gram` and `cross_covariance` functions.
 
-
 # %%
-import flax
-from dataclasses import field
-from typing import Any
-from simple_pytree import static_field
-
-
 @dataclass
 class DeepKernelFunction(AbstractKernel):
     base_kernel: AbstractKernel = None
@@ -132,12 +126,11 @@ class DeepKernelFunction(AbstractKernel):
 #
 # With a deep kernel object created, we proceed to define a neural network. Here we
 # consider a small multi-layer perceptron with two linear hidden layers and ReLU
-# activation functions between the layers. The first hidden layer contains 32 units,
-# while the second layer contains 64 units. Finally, we'll make the output of our
-# network a single unit. However, it would be possible to project our data into a
-# $d-$dimensional space for $d>1$. In these instances, making the
-# [base kernel ARD](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html#Active-dimensions)
-# would be sensible.
+# activation functions between the layers. The first hidden layer contains 64 units,
+# while the second layer contains 32 units. Finally, we'll make the output of our
+# network a three units wide. The corresponding kernel that we define will then be of
+# [ARD form](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html#Active-dimensions)
+# to allow for different lengthscales in each dimension of the feature space.
 # Users may wish to design more intricate network structures for more complex tasks,
 # which functionality is supported well in Haiku.
 
@@ -164,8 +157,7 @@ forward_linear = Network()
 #
 # Having characterised the feature extraction network, we move to define a Gaussian
 # process parameterised by this deep kernel. We consider a third-order Matérn base
-# kernel and assume a Gaussian likelihood. Parameters, trainability status and
-# transformations are initialised in the usual manner.
+# kernel and assume a Gaussian likelihood.
 
 # %%
 base_kernel = gpx.Matern52(active_dims=list(range(feature_space_dim)))
@@ -186,13 +178,10 @@ posterior = prior * likelihood
 # [Optax](https://optax.readthedocs.io/en/latest/) for optimisation. In particular, we
 # showcase the ability to use a learning rate scheduler that decays the optimiser's
 # learning rate throughout the inference. We decrease the learning rate according to a
-# half-cosine curve over 1000 iterations, providing us with large step sizes early in
+# half-cosine curve over 700 iterations, providing us with large step sizes early in
 # the optimisation procedure before approaching more conservative values, ensuring we
 # do not step too far. We also consider a linear warmup, where the learning rate is
 # increased from 0 to 1 over 50 steps to get a reasonable initial learning rate value.
-
-# %%
-negative_mll = gpx.ConjugateMLL(negative=True)
 
 # %%
 schedule = ox.warmup_cosine_decay_schedule(

@@ -43,7 +43,8 @@ key = jr.PRNGKey(123)
 #
 # $$\boldsymbol{y} \sim \mathcal{N} \left(\sin(4\boldsymbol{x}) + \cos(2 \boldsymbol{x}), \textbf{I} * 0.3^2 \right).$$
 #
-# We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs and labels for later.
+# We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs and labels
+# for later.
 
 # %% vscode={"languageId": "python"}
 n = 100
@@ -75,7 +76,6 @@ ax.legend(loc="best")
 # observations $\mathcal{D}$ via Gaussian process regression. We begin by defining a
 # Gaussian process prior in the next section.
 
-# %% [markdown]
 # ## Defining the prior
 #
 # A zero-mean Gaussian process (GP) places a prior distribution over real-valued
@@ -98,16 +98,16 @@ ax.legend(loc="best")
 
 # %% vscode={"languageId": "python"}
 kernel = gpx.kernels.RBF()
-meanf = gpx.mean_functions.Constant(constant=0.0)
-meanf = meanf.replace_trainable(constant=False)
+meanf = gpx.mean_functions.Zero()
 prior = gpx.Prior(mean_function=meanf, kernel=kernel)
 
 # %% [markdown]
 #
 # The above construction forms the foundation for GPJax's models. Moreover, the GP prior
-# we have just defined can be represented by a [Distrax](https://github.com/deepmind/distrax)
+# we have just defined can be represented by a
+# [TensorFlow Probability](https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax)
 # multivariate Gaussian distribution. Such functionality enables trivial sampling, and
-# mean and covariance evaluation of the GP.
+# the evaluation of the GP's mean and covariance .
 
 # %% vscode={"languageId": "python"}
 prior_dist = prior.predict(xtest)
@@ -160,23 +160,15 @@ posterior = prior * likelihood
 #
 # ## Parameter state
 #
-# So far, all of the objects that we've defined have been stateless. To give our model
-# state, we can use the `initialise` function provided in GPJax. Upon calling this, a
-# `ParameterState` class is returned that contains four dictionaries:
-#
-# | Dictionary  | Description  |
-# |---|---|
-# |  `params` | Initial parameter values.  |
-# | `trainable`  | Boolean dictionary that determines the training status of parameters (`True` for being trained and `False` otherwise).  |
-# |  `bijectors` | Bijectors that can map parameters between the _unconstrained space_ and their original _constrained space_.  |
-#
-# Further, upon calling `initialise`, we can state specific initial values for some, or
-# all, of the parameters within our model. By default, the kernel lengthscale and
-# variance and the likelihood's variance parameter are all initialised to 1. However,
-# in the following cell, we'll demonstrate how the kernel lengthscale can be
-# initialised to 0.5.
+# As outlined in the [PyTrees](https://jax.readthedocs.io/en/latest/pytrees.html)
+# documentation, parameters are contained within the model and for the leaves of the
+# PyTree. Consequently, in this particular model, we have three parameters: the
+# kernel lengthscale, kernel variance and the observation noise variance. Whilst
+# we have initialised each of these to 1, we can learn Type 2 MLEs for each of
+# these parameters by optimising the marginal log-likelihood (MLL).
 
 # %% vscode={"languageId": "python"}
+# TODO: drop this once `step` is implemented into `Objectives`
 negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True))
 negative_mll(posterior, train_data=D)
 
@@ -199,10 +191,12 @@ opt_posterior, history = gpx.fit(
 )
 
 # %% [markdown]
-# Similar to the `ParameterState` object above, the returned variable from the `fit`
-# function is a class, namely an `InferenceState` object that contains the parameters'
-# final values and a tracked array of the evaluation of our objective function
-# throughout optimisation.
+# The calling of `fit` returns two objects: the optimised posterior and a history of
+# training losses. We can plot the training loss to see how the optimisation has
+# progressed.
+
+# %% vscode={"languageId": "python"}
+plt.plot(history)
 
 # %% [markdown]
 # ## Prediction

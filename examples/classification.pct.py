@@ -96,9 +96,7 @@ print(type(posterior))
 # marginal log-likelihood.
 
 # %% [markdown]
-# To begin we obtain an initial parameter state through the `initialise` callable (see
-# the [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)).
-# We can obtain a MAP estimate by optimising the marginal log-likelihood with
+# We can obtain a MAP estimate by optimising the log-posterior density with
 # Optax's optimisers.
 
 # %%
@@ -179,7 +177,7 @@ ax.legend()
 # \log\tilde{p}(\boldsymbol{f}|\mathcal{D}) = \log\tilde{p}(\hat{\boldsymbol{f}}|\mathcal{D}) + \left[\nabla \log\tilde{p}({\boldsymbol{f}}|\mathcal{D})|_{\hat{\boldsymbol{f}}}\right]^{T} (\boldsymbol{f}-\hat{\boldsymbol{f}}) + \frac{1}{2} (\boldsymbol{f}-\hat{\boldsymbol{f}})^{T} \left[\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} \right] (\boldsymbol{f}-\hat{\boldsymbol{f}}) + \mathcal{O}(\lVert \boldsymbol{f} - \hat{\boldsymbol{f}} \rVert^3).
 # \end{align}
 #
-# Now since $\nabla \log\tilde{p}({\boldsymbol{f}}|\mathcal{D})$ is zero at the mode,
+# Since $\nabla \log\tilde{p}({\boldsymbol{f}}|\mathcal{D})$ is zero at the mode,
 # this suggests the following approximation
 # \begin{align}
 # \tilde{p}(\boldsymbol{f}|\mathcal{D}) \approx \log\tilde{p}(\hat{\boldsymbol{f}}|\mathcal{D}) \exp\left\{ \frac{1}{2} (\boldsymbol{f}-\hat{\boldsymbol{f}})^{T} \left[-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} \right] (\boldsymbol{f}-\hat{\boldsymbol{f}}) \right\}
@@ -297,7 +295,7 @@ ax.legend()
 # %% [markdown]
 # ## MCMC inference
 #
-# At the high level, an MCMC sampler works by starting at an initial position and
+# An MCMC sampler works by starting at an initial position and
 # drawing a sample from a cheap-to-simulate distribution known as the _proposal_. The
 # next step is to determine whether this sample could be considered a draw from the
 # posterior. We accomplish this using an _acceptance probability_ determined via the
@@ -314,9 +312,7 @@ ax.legend()
 # Rather than implementing a suite of MCMC samplers, GPJax relies on MCMC-specific
 # libraries for sampling functionality. We focus on
 # [BlackJax](https://github.com/blackjax-devs/blackjax/) in this notebook, which we
-# recommend adopting for general applications. However, we also support TensorFlow
-# Probability as demonstrated in the
-# [TensorFlow Probability Integration notebook](https://gpjax.readthedocs.io/en/latest/nbs/tfp_integration.html).
+# recommend adopting for general applications.
 #
 # We'll use the No U-Turn Sampler (NUTS) implementation given in BlackJax for sampling.
 # For the interested reader, NUTS is a Hamiltonian Monte Carlo sampling scheme where

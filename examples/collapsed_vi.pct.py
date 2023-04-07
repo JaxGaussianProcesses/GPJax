@@ -83,7 +83,8 @@ ax.legend(loc="best")
 plt.show()
 
 # %% [markdown]
-# Next we define the posterior model for the data.
+# Next we define the true posterior model for the data - note that whilst we can define
+# this, it is intractable to evaluate.
 
 # %%
 meanf = gpx.Constant()
@@ -93,9 +94,10 @@ prior = gpx.Prior(mean_function=meanf, kernel=kernel)
 posterior = prior * likelihood
 
 # %% [markdown]
-# We now define the SGPR model through `CollapsedVariationalGaussian`. Since the form
-# of the collapsed optimal posterior depends on the Gaussian likelihood's observation
-# noise, we pass this to the constructer.
+# We now define the SGPR model through `CollapsedVariationalGaussian`. Through a
+# set of inducing points $\boldsymbol{z}$ this object builds an approximation to the
+# true posterior distribution. Consequently, we pass the true posterior and initial
+# inducing points into the constructor as arguments.
 
 # %%
 q = gpx.CollapsedVariationalGaussian(posterior=posterior, inducing_inputs=z)
@@ -129,8 +131,6 @@ plt.plot(history)
 
 # %% [markdown]
 # We show predictions of our model with the learned inducing points overlayed in grey.
-
-# %%
 
 # %%
 latent_dist = opt_posterior(xtest, train_data=D)

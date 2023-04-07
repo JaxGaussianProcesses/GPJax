@@ -28,7 +28,7 @@
 # significantly more favourable uncertainty estimation.
 #
 
-# %%
+# %% vscode={"languageId": "python"}
 import typing as tp
 
 import jax
@@ -99,7 +99,7 @@ key = jr.PRNGKey(123)
 # will be a sine function with a different vertical shift, periodicity, and quantity
 # of noise.
 
-# %%
+# %% vscode={"languageId": "python"}
 n = 100
 n_test = 200
 n_datasets = 5
@@ -135,7 +135,7 @@ plt.show()
 # advice on selecting an appropriate kernel.
 
 
-# %%
+# %% vscode={"languageId": "python"}
 def fit_gp(x: jax.Array, y: jax.Array) -> tfd.MultivariateNormalFullCovariance:
     if y.ndim == 1:
         y = y.reshape(-1, 1)
@@ -161,14 +161,15 @@ posterior_preds = [fit_gp(x, i) for i in ys]
 # ## Computing the barycentre
 #
 # In GPJax, the predictive distribution of a GP is given by a
-# [Distrax](https://github.com/deepmind/distrax) distribution, making it
+# [TensorFlow Probability](https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax)
+# distribution, making it
 # straightforward to extract the mean vector and covariance matrix of each GP for
 # learning a barycentre. We implement the fixed point scheme given in (3) in the
 # following cell by utilising Jax's `vmap` operator to speed up large matrix operations
 # using broadcasting in `tensordot`.
 
 
-# %%
+# %% vscode={"languageId": "python"}
 def sqrtm(A: jax.Array):
     return jnp.real(jsl.sqrtm(A))
 
@@ -198,7 +199,7 @@ def wasserstein_barycentres(
 # difference between the previous and current iteration that we can confirm by
 # inspecting the `sequence` array in the following cell.
 
-# %%
+# %% vscode={"languageId": "python"}
 weights = jnp.ones((n_datasets,)) / n_datasets
 
 means = jnp.stack([d.mean() for d in posterior_preds])
@@ -222,7 +223,7 @@ barycentre_process = tfd.MultivariateNormalTriL(barycentre_mean, L)
 # uncertainty bands are sensible.
 
 
-# %%
+# %% vscode={"languageId": "python"}
 def plot(
     dist: tfd.MultivariateNormalTriL,
     ax,
@@ -265,6 +266,6 @@ plot(
 # %% [markdown]
 # ## System configuration
 
-# %%
+# %% vscode={"languageId": "python"}
 # %reload_ext watermark
 # %watermark -n -u -v -iv -w -a 'Thomas Pinder (edited by Daniel Dodd)'

@@ -17,15 +17,13 @@
 # %% [markdown]
 # # Kernel Guide
 #
-# In this guide, we introduce the kernels available in GPJax and demonstrate how to create custom ones.
-#
-#
-# from typing import Dict
-
-from dataclasses import dataclass
+# In this guide, we introduce the kernels available in GPJax and demonstrate how to
+# create custom kernels.
 
 # %%
-import distrax as dx
+from typing import Dict
+
+from dataclasses import dataclass
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
@@ -51,6 +49,11 @@ tfb = tfp.bijectors
 #
 # * Matérn 1/2, 3/2 and 5/2.
 # * RBF (or squared exponential).
+# * Rational quadratic.
+# * Powered exponential.
+# * Polynomial.
+# * White noise
+# * Linear.
 # * Polynomial.
 # * [Graph kernels](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html).
 #
@@ -102,7 +105,8 @@ slice_kernel = gpx.kernels.RBF(active_dims=[0, 1, 3])
 print(f"Lengthscales: {slice_kernel.lengthscale}")
 
 # %% [markdown]
-# We'll now simulate some data and evaluate the kernel on the previously selected input dimensions.
+# We'll now simulate some data and evaluate the kernel on the previously selected
+# input dimensions.
 
 # %%
 # Inputs
@@ -117,13 +121,13 @@ print(K.shape)
 #
 # The product or sum of two positive definite matrices yields a positive
 # definite matrix. Consequently, summing or multiplying sets of kernels is a
-# valid operation that can give rich kernel functions. In GPJax, sums of kernels
-# can be created by applying the `+` operator as follows.
+# valid operation that can give rich kernel functions. In GPJax, functionality for
+# a sum kernel is provided by the `SumKernel` class.
 
 # %%
 k1 = gpx.kernels.RBF()
 k2 = gpx.kernels.Polynomial()
-sum_k = gpx.kernels.ProductKernel(kernels=[k1, k2])
+sum_k = gpx.kernels.SumKernel(kernels=[k1, k2])
 
 fig, ax = plt.subplots(ncols=3, figsize=(20, 5))
 im0 = ax[0].matshow(k1.gram(x).to_dense())
@@ -135,7 +139,7 @@ fig.colorbar(im1, ax=ax[1])
 fig.colorbar(im2, ax=ax[2])
 
 # %% [markdown]
-# Similarily, products of kernels can be created through the `*` operator.
+# Similarily, products of kernels can be created through the `ProductKernel` class.
 
 # %%
 k3 = gpx.kernels.Matern32()
@@ -152,7 +156,6 @@ fig.colorbar(im0, ax=ax[0])
 fig.colorbar(im1, ax=ax[1])
 fig.colorbar(im2, ax=ax[2])
 fig.colorbar(im3, ax=ax[3])
-
 
 # %% [markdown]
 # ## Custom kernel
@@ -171,7 +174,8 @@ fig.colorbar(im3, ax=ax[3])
 # ### Circular kernel
 #
 # When the underlying space is polar, typical Euclidean kernels such as Matérn
-# kernels are insufficient at the boundary as discontinuities will be present.
+# kernels are insufficient at the boundary where discontinuities will present
+# themselves.
 # This is due to the fact that for a polar space $\lvert 0, 2\pi\rvert=0$ i.e.,
 # the space wraps. Euclidean kernels have no mechanism in them to represent this
 # logic and will instead treat $0$ and $2\pi$ and elements far apart. Circular
@@ -198,13 +202,10 @@ def angular_distance(x, y, c):
 
 
 @dataclass
-class _Polar:
+class Polar(gpx.kernels.AbstractKernel):
     period: float = static_field(2 * jnp.pi)
     tau: float = param_field(jnp.array([4.0]), bijector=tfb.Softplus(low=4.0))
 
-
-@dataclass
-class Polar(gpx.kernels.AbstractKernel, _Polar):
     def __post_init__(self):
         self.c = self.period / 2.0
 
@@ -219,35 +220,25 @@ class Polar(gpx.kernels.AbstractKernel, _Polar):
 
 
 # %% [markdown]
-# We unpack this now to make better sense of it. In the kernel's `__init__`
-# function we simply specify the length of a single period. As the underlying
-# domain is a circle, this is $2\pi$. Next we define the kernel's `__call__`
-# function which is a direct implementation of Equation (1). Finally, we define
-# the Kernel's parameter property which contains just one value $\tau$ that we
-# initialise to 4 in the kernel's `__init__`.
+# We unpack this now to make better sense of it. In the kernel's initialiser
+# we specify the length of a single period. As the underlying
+# domain is a circle, this is $2\pi$. Next, we define
+# the Kernel's half-period parameter. As the kernel is a `dataclass` and `c` is
+# function of `period`, we must define it in the `__post_init__` method.
+# Finally, we define the kernel's `__call__`
+# function which is a direct implementation of Equation (1).
 #
-#
-# ### Custom Parameter Bijection
-#
-# The constraint on $\tau$ makes optimisation challenging with gradient descent.
-# It would be much easier if we could instead parameterise $\tau$ to be on the
-# real line. Fortunately, this can be taken care of with GPJax's `add parameter`
-# function, only requiring us to define the parameter's name and matching
-# bijection (either a Distrax of TensorFlow probability bijector). Under the
-# hood, calling this function updates a configuration object to register this
-# parameter and its corresponding transform.
-#
-# To define a bijector here we'll make use of the `Lambda` operator given in
-# Distrax. This lets us convert any regular Jax function into a bijection. Given
-# that we require $\tau$ to be strictly greater than $4.$, we'll apply a
-# [softplus
-# transformation](https://jax.readthedocs.io/en/latest/_autosummary/jax.nn.softplus.html)
-# where the lower bound is shifted by $4$.
+# To constrain $\tau$ to be greater than 4, we use a `Softplus` bijector with a
+# clipped lower bound of 4.0. This is done by specifying the `bijector` argument
+# when we define the parameter field.
 
 # %% [markdown]
 # ### Using our polar kernel
 #
-# We proceed to fit a GP with our custom circular kernel to a random sequence of points on a circle (see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for further details on this process).
+# We proceed to fit a GP with our custom circular kernel to a random sequence of
+# points on a circle (see the
+# [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)
+# for further details on this process).
 
 # %%
 # Simulate data

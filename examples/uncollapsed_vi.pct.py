@@ -110,13 +110,10 @@ xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 # We show a cost comparison between the approaches below, where $b$ is the mini-batch
 # size.
 #
-#
-#
 # |    | GPs | sparse GPs | SVGP |
 # | -- | -- | -- | -- |
 # | Inference cost | $\mathcal{O}(n^3)$ | $\mathcal{O}(n m^2)$ | $\mathcal{O}(b m^2 + m^3)$  |
 # | Memory cost    | $\mathcal{O}(n^2)$ | $\mathcal{O}(n m)$ | $\mathcal{O}(b m + m^2)$ |
-#
 #
 # To apply SVGP inference to our dataset, we begin by initialising $m = 50$ equally
 # spaced inducing inputs $\boldsymbol{z}$ across our observed data's support. These
