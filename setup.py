@@ -33,6 +33,7 @@ EXTRAS = {
         "pytest",
         "networkx",
         "pytest-cov",
+        "flax"
     ],
     "cuda": ["jax[cuda]"],
 }
