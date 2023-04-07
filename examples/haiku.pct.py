@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
+#     display_name: gpjax
 #     language: python
 #     name: python3
 # ---
@@ -148,20 +148,21 @@ class DeepKernelFunction(AbstractKernel):
 
 
 # %%
+feature_space_dim = 3
+
 class Network(nn.Module):
   """A simple MLP."""
   @nn.compact
   def __call__(self, x):
-      x = nn.Dense(features=4)(x)
+      x = nn.Dense(features=32)(x)
       x = nn.relu(x)
-      x = nn.Dense(features=2)(x)
+      x = nn.Dense(features=64)(x)
       x = nn.relu(x)
-      x = nn.Dense(features=1)(x)
+      x = nn.Dense(features=feature_space_dim)(x)
       return x
   
 
 forward_linear = Network()
-state = jax.jit(forward_linear.init)(key, jnp.ones(x.shape[-1]))
 
 # %% [markdown]
 # ## Defining a model
@@ -172,7 +173,7 @@ state = jax.jit(forward_linear.init)(key, jnp.ones(x.shape[-1]))
 # transformations are initialised in the usual manner.
 
 # %%
-base_kernel = gpx.RBF()
+base_kernel = gpx.Matern52(active_dims=list(range(feature_space_dim)))
 kernel = DeepKernelFunction(network=forward_linear, base_kernel=base_kernel, key=key, dummy_x=x)
 meanf = gpx.Zero()
 prior = gpx.Prior(mean_function=meanf, kernel=kernel)
@@ -202,8 +203,8 @@ negative_mll = gpx.ConjugateMLL(negative=True)
 schedule = ox.warmup_cosine_decay_schedule(
     init_value=0.0,
     peak_value=0.01,
-    warmup_steps=50,
-    decay_steps=1_000,
+    warmup_steps=75,
+    decay_steps=700,
     end_value=0.0,
 )
 
@@ -217,7 +218,7 @@ opt_posterior, history = gpx.fit(
     objective=gpx.ConjugateMLL(negative=True),
     train_data=D,
     optim=optimiser,
-    num_iters=2500,
+    num_iters=1000,
 )
 
 # %% [markdown]
@@ -227,8 +228,8 @@ opt_posterior, history = gpx.fit(
 # of the model. We can do this by simply applying the model to a test data set.
 
 # %%
-latent_dist = posterior(learned_params, D)(xtest)
-predictive_dist = likelihood(learned_params, latent_dist)
+latent_dist = opt_posterior(xtest, train_data=D)
+predictive_dist = opt_posterior.likelihood(latent_dist)
 
 predictive_mean = predictive_dist.mean()
 predictive_std = predictive_dist.stddev()
