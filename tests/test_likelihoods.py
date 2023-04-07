@@ -16,7 +16,7 @@
 from typing import Callable
 
 import jax.tree_util as jtu
-import distrax as dx
+import tensorflow_probability.substrates.jax as tfp
 import jax.numpy as jnp
 import jax.random as jr
 import numpy as np
@@ -32,6 +32,7 @@ from gpjax.likelihoods import (
     inv_probit,
 )
 
+tfd = tfp.distributions
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 
@@ -44,11 +45,11 @@ def test_abstract_likelihood():
     # Create a dummy likelihood class with abstract methods implemented.
     class DummyLikelihood(AbstractLikelihood):
 
-        def predict(self, dist: dx.Distribution) -> dx.Distribution:
-            return dx.Normal(0.0, 1.0)
+        def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+            return tfd.Normal(0.0, 1.0)
 
         def link_function(self, f: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
-            return dx.MultivariateNormalDiag(loc=f)
+            return tfd.MultivariateNormalDiag(loc=f)
 
     # Test that the dummy likelihood can be instantiated.
     dummy_likelihood = DummyLikelihood(num_datapoints=123)
@@ -60,7 +61,7 @@ def test_abstract_likelihood():
 def test_gaussian_init(n: int, noise: float) -> None:
 
     likelihood = Gaussian(num_datapoints=n, obs_noise=jnp.array([noise]))
-    
+
     assert likelihood.obs_noise == jnp.array([noise])
     assert likelihood.num_datapoints == n
     assert jtu.tree_leaves(likelihood) == [jnp.array([noise])]
@@ -86,7 +87,7 @@ def test_link_fns(lik: AbstractLikelihood, n: int) -> None:
 
     # Test likelihood link function.
     assert isinstance(likelihood.link_function, Callable)
-    assert isinstance(likelihood.link_function(f), dx.Distribution)
+    assert isinstance(likelihood.link_function(f), tfd.Distribution)
 
 
 @pytest.mark.parametrize("noise", [0.1, 0.5, 1.0])
@@ -101,20 +102,20 @@ def test_call_gaussian(noise: float, n: int) -> None:
     latent_mean = jr.uniform(key, shape=(n,))
     latent_sqrt = jr.uniform(key, shape=(n, n))
     latent_cov = jnp.matmul(latent_sqrt, latent_sqrt.T)
-    latent_dist = dx.MultivariateNormalFullCovariance(latent_mean, latent_cov)
+    latent_dist = tfd.MultivariateNormalFullCovariance(latent_mean, latent_cov)
 
     # Test call method.
     pred_dist = likelihood(latent_dist)
 
     # Check that the distribution is a MultivariateNormalFullCovariance.
-    assert isinstance(pred_dist, dx.MultivariateNormalFullCovariance)
+    assert isinstance(pred_dist, tfd.MultivariateNormalFullCovariance)
 
     # Check predictive mean and variance.
     assert (pred_dist.mean() == latent_mean).all()
 
     noise_matrix = jnp.eye(n) * noise
     assert np.allclose(
-        pred_dist.scale_tri, jnp.linalg.cholesky(latent_cov + noise_matrix)
+        pred_dist.scale_tril, jnp.linalg.cholesky(latent_cov + noise_matrix)
     )
 
 
@@ -129,13 +130,13 @@ def test_call_bernoulli(n: int) -> None:
     latent_mean = jr.uniform(key, shape=(n,))
     latent_sqrt = jr.uniform(key, shape=(n, n))
     latent_cov = jnp.matmul(latent_sqrt, latent_sqrt.T)
-    latent_dist = dx.MultivariateNormalFullCovariance(latent_mean, latent_cov)
+    latent_dist = tfd.MultivariateNormalFullCovariance(latent_mean, latent_cov)
 
     # Test call method.
     pred_dist = likelihood(latent_dist)
 
     # Check that the distribution is a Bernoulli.
-    assert isinstance(pred_dist, dx.Bernoulli)
+    assert isinstance(pred_dist, tfd.Bernoulli)
 
     # Check predictive mean and variance.
 

@@ -17,7 +17,6 @@ import abc
 from typing import Any
 from .linops.utils import to_dense
 
-import distrax as dx
 import tensorflow_probability.substrates.jax as tfp
 import jax.numpy as jnp
 import jax.scipy as jsp
@@ -35,7 +34,7 @@ class AbstractLikelihood(Module):
     num_datapoints: int = static_field()
 
 
-    def __call__(self, *args: Any, **kwargs: Any) -> dx.Distribution:
+    def __call__(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
         """Evaluate the likelihood function at a given predictive distribution.
 
         Args:
@@ -43,12 +42,12 @@ class AbstractLikelihood(Module):
             **kwargs (Any): Keyword arguments to be passed to the likelihood's `predict` method.
 
         Returns:
-            dx.Distribution: The predictive distribution.
+            tfd.Distribution: The predictive distribution.
         """
         return self.predict(*args, **kwargs)
 
     @abc.abstractmethod
-    def predict(self, *args: Any, **kwargs: Any) -> dx.Distribution:
+    def predict(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
         """Evaluate the likelihood function at a given predictive distribution.
 
         Args:
@@ -56,17 +55,17 @@ class AbstractLikelihood(Module):
             **kwargs (Any): Keyword arguments to be passed to the likelihood's `predict` method.
 
         Returns:
-            dx.Distribution: The predictive distribution.
+            tfd.Distribution: The predictive distribution.
         """
         raise NotImplementedError
 
     @property
     @abc.abstractmethod
-    def link_function(self) -> dx.Distribution:
+    def link_function(self) -> tfd.Distribution:
         """Return the link function of the likelihood function.
 
         Returns:
-            dx.Distribution: The distribution of observations, y, given values of the Gaussian process, f.
+            tfd.Distribution: The distribution of observations, y, given values of the Gaussian process, f.
         """
         raise NotImplementedError
 
@@ -76,7 +75,7 @@ class Gaussian(AbstractLikelihood):
     """Gaussian likelihood object."""
     obs_noise: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
 
-    def link_function(self, f: Float[Array, "N 1"]) -> dx.Normal:
+    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Normal:
         """The link function of the Gaussian likelihood.
 
         Args:
@@ -84,9 +83,9 @@ class Gaussian(AbstractLikelihood):
             f (Float[Array, "N 1"]): Function values.
 
         Returns:
-            dx.Normal: The likelihood function.
+            tfd.Normal: The likelihood function.
         """
-        return dx.Normal(loc=f, scale=self.obs_noise)
+        return tfd.Normal(loc=f, scale=self.obs_noise.astype(f.dtype))
 
     def predict(self, dist: tfd.MultivariateNormalTriL) -> tfd.MultivariateNormalFullCovariance:
         """
@@ -97,11 +96,11 @@ class Gaussian(AbstractLikelihood):
 
         Args:
             params (Dict): The parameters of the likelihood function.
-            dist (dx.Distribution): The Gaussian process posterior,
+            dist (tfd.Distribution): The Gaussian process posterior,
                 evaluated at a finite set of test points.
 
         Returns:
-            dx.Distribution: The predictive distribution.
+            tfd.Distribution: The predictive distribution.
         """
         n_data = dist.event_shape[0]
         cov = to_dense(dist.covariance())
@@ -113,28 +112,28 @@ class Gaussian(AbstractLikelihood):
 @dataclass
 class Bernoulli(AbstractLikelihood):
 
-    def link_function(self, f: Float[Array, "N 1"]) -> dx.Distribution:
+    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Distribution:
         """The probit link function of the Bernoulli likelihood.
 
         Args:
             f (Float[Array, "N 1"]): Function values.
 
         Returns:
-            dx.Distribution: The likelihood function.
+            tfd.Distribution: The likelihood function.
         """
-        return dx.Bernoulli(probs=inv_probit(f))
+        return tfd.Bernoulli(probs=inv_probit(f))
 
-    def predict(self, dist: dx.Distribution) -> dx.Distribution:
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
         """Evaluate the pointwise predictive distribution, given a Gaussian
         process posterior and likelihood parameters.
 
         Args:
             params (Dict): The parameters of the likelihood function.
-            dist (dx.Distribution): The Gaussian process posterior, evaluated
+            dist (tfd.Distribution): The Gaussian process posterior, evaluated
                 at a finite set of test points.
 
         Returns:
-            dx.Distribution: The pointwise predictive distribution.
+            tfd.Distribution: The pointwise predictive distribution.
         """
         variance = jnp.diag(dist.covariance())
         mean = dist.mean().ravel()
