@@ -13,17 +13,16 @@
 # limitations under the License.
 # ==============================================================================
 
-import jax.numpy as jnp
-from .linops import LinearOperator, IdentityLinearOperator
-
-from jaxtyping import Array, Float
-from jax import vmap
-
-from typing import Tuple, Optional, Any
+from typing import Any, Optional, Tuple
 
 import distrax as dx
+import jax.numpy as jnp
 import jax.random as jr
+from jax import vmap
 from jax.random import KeyArray
+from jaxtyping import Array, Float
+
+from .linops import IdentityLinearOperator, LinearOperator
 
 
 def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:

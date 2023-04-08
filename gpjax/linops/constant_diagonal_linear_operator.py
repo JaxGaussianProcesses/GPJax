@@ -15,15 +15,15 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 from simple_pytree import static_field
-from dataclasses import dataclass
 
-from .linear_operator import LinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
+from .linear_operator import LinearOperator
 
 
 def _check_args(value: Any, size: Any) -> None:
@@ -182,7 +182,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         Returns:
             ConstantDiagonalLinearOperator: Covariance operator.
         """
-        return ConstantDiagonalLinearOperator(value=root.value**2, size=root.size)
+        return ConstantDiagonalLinearOperator(value=root.value ** 2, size=root.size)
 
 
 __all__ = [

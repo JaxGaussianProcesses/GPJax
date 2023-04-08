@@ -15,10 +15,10 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
 import jax.numpy as jnp
-from dataclasses import dataclass
 from jaxtyping import Array, Float
 
 from .constant_diagonal_linear_operator import ConstantDiagonalLinearOperator

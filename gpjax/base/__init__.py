@@ -1,4 +1,4 @@
-# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+# Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,25 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-import jaxutils
-import deprecation
+from .module import Module, meta_leaves, meta_flatten, meta_map, meta
+from .param import param_field
 
-depreciate = deprecation.deprecated(
-    deprecated_in="0.5.6",
-    removed_in="0.6.0",
-    details="Use method from jaxutils.config instead.",
-)
-
-
-concat_dictionaries = depreciate(jaxutils.dict.concat_dictionaries)
-merge_dictionaries = depreciate(jaxutils.dict.merge_dictionaries)
-sort_dictionary = depreciate(jaxutils.dict.sort_dictionary)
-dict_array_coercion = depreciate(jaxutils.dict.dict_array_coercion)
-
-
-__all__ = [
-    "concat_dictionaries",
-    "merge_dictionaries",
-    "sort_dictionary",
-    "dict_array_coercion",
-]
+__all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta", "param_field"]

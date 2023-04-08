@@ -23,10 +23,9 @@ from jax.config import config
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 
+from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
 from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
-
-from gpjax.gaussian_distribution import GaussianDistribution
 
 _key = jr.PRNGKey(seed=42)
 
@@ -68,7 +67,7 @@ def test_diag_linear_operator(n: int) -> None:
     mean = jr.uniform(key_mean, shape=(n,))
     diag = jr.uniform(key_diag, shape=(n,))
 
-    dist_diag = GaussianDistribution(loc=mean, scale=DiagonalLinearOperator(diag**2))
+    dist_diag = GaussianDistribution(loc=mean, scale=DiagonalLinearOperator(diag ** 2))
     distrax_dist = MultivariateNormalDiag(loc=mean, scale_diag=diag)
 
     assert approx_equal(dist_diag.mean(), distrax_dist.mean())

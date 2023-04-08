@@ -13,20 +13,21 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Dict, List, Optional
-
-import jax
 import jax.numpy as jnp
-from jax.random import KeyArray
-from jaxtyping import Array
+import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax.distributions as tfd
 
+from jaxtyping import Array, Float
+from dataclasses import dataclass
+
+from ...base import param_field
 from ..base import AbstractKernel
-from ..computations import (
-    DenseKernelComputation,
-)
 from .utils import euclidean_distance
 
+from dataclasses import dataclass
 
+
+@dataclass
 class PoweredExponential(AbstractKernel):
     """The powered exponential family of kernels.
 
@@ -34,38 +35,25 @@ class PoweredExponential(AbstractKernel):
 
     """
 
-    def __init__(
-        self,
-        active_dims: Optional[List[int]] = None,
-        name: Optional[str] = "Powered exponential",
-    ) -> None:
-        super().__init__(
-            DenseKernelComputation, active_dims, spectral_density=None, name=name
-        )
-        self._stationary = True
+    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    power: Float[Array, "1"] = param_field(jnp.array([1.0]))
+    name: str = "Powered Exponential"
 
-    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell`, :math:`\\sigma` and power :math:`\\kappa`.
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( - \\Big( \\frac{\\lVert x - y \\rVert^2}{\\ell^2} \\Big)^\\kappa \\Bigg)
 
         Args:
-            x (jax.Array): The left hand argument of the kernel function's call.
-            y (jax.Array): The right hand argument of the kernel function's call
-            params (dict): Parameter set for which the kernel should be evaluated on.
+            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's call
 
         Returns:
-            Array: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The value of :math:`k(x, y)`
         """
-        x = self.slice_input(x) / params["lengthscale"]
-        y = self.slice_input(y) / params["lengthscale"]
-        K = params["variance"] * jnp.exp(-euclidean_distance(x, y) ** params["power"])
+        x = self.slice_input(x) / self.lengthscale
+        y = self.slice_input(y) / self.lengthscale
+        K = self.variance * jnp.exp(-euclidean_distance(x, y) ** self.power)
         return K.squeeze()
-
-    def init_params(self, key: KeyArray) -> Dict:
-        return {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-            "power": jnp.array([1.0]),
-        }

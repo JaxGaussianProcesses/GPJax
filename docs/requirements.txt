@@ -18,9 +18,9 @@ watermark
 sphinxext-opengraph
 blackjax>=0.8.2
 jaxopt
-dm-haiku
 ipywidgets
 pandas
 scikit-learn
+flax
 # Install GPJax istself
 .

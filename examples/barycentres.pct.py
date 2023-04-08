@@ -17,22 +17,28 @@
 # %% [markdown]
 # # Gaussian Processes Barycentres
 #
-# In this notebook we'll give an implementation of <strong data-cite="mallasto2017learning"></strong>. In this work, the existence of a Wasserstein barycentre between a collection of Gaussian processes is proven. When faced with trying to _average_ a set of probability distributions, the Wasserstein barycentre is an attractive choice as it enables uncertainty amongst the individual distributions to be incorporated into the averaged distribution. When compared to a naive _mean of means_ and _mean of variances_ approach to computing the average probability distributions, it can be seen that Wasserstein barycentres offer significantly more favourable uncertainty estimation.
+# In this notebook we'll give an implementation of
+# <strong data-cite="mallasto2017learning"></strong>. In this work, the existence of a
+# Wasserstein barycentre between a collection of Gaussian processes is proven. When
+# faced with trying to _average_ a set of probability distributions, the Wasserstein
+# barycentre is an attractive choice as it enables uncertainty amongst the individual
+# distributions to be incorporated into the averaged distribution. When compared to a
+# naive _mean of means_ and _mean of variances_ approach to computing the average
+# probability distributions, it can be seen that Wasserstein barycentres offer
+# significantly more favourable uncertainty estimation.
 #
 
-# %%
+# %% vscode={"languageId": "python"}
 import typing as tp
 
-import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy.linalg as jsl
 import matplotlib.pyplot as plt
 import optax as ox
+import tensorflow_probability.substrates.jax.distributions as tfd
 from jax.config import config
-from jaxutils import Dataset
-import gpjax.kernels as jk
 
 import gpjax as gpx
 
@@ -45,31 +51,55 @@ key = jr.PRNGKey(123)
 #
 # ### Wasserstein distance
 #
-# The 2-Wasserstein distance metric between two probability measures $\mu$ and $\nu$ quantifies the minimal cost required to transport the unit mass from $\mu$ to $\nu$, or vice-versa. Typically, computing this metric requires solving a linear program. However, when $\mu$ and $\nu$ both belong to the family of multivariate Gaussian distributions, the solution is analytically given by
+# The 2-Wasserstein distance metric between two probability measures $\mu$ and $\nu$
+# quantifies the minimal cost required to transport the unit mass from $\mu$ to $\nu$,
+# or vice-versa. Typically, computing this metric requires solving a linear program.
+# However, when $\mu$ and $\nu$ both belong to the family of multivariate Gaussian
+# distributions, the solution is analytically given by
 # $$W_2^2(\mu, \nu) = \lVert m_1- m_2 \rVert^2_2 + \operatorname{Tr}(S_1 + S_2 - 2(S_1^{1/2}S_2S_1^{1/2})^{1/2}),$$
 # where $\mu \sim \mathcal{N}(m_1, S_1)$ and $\nu\sim\mathcal{N}(m_2, S_2)$.
 #
 # ### Wasserstein barycentre
 #
-# For a collection of $T$ measures $\lbrace\mu_i\rbrace_{t=1}^T \in \mathcal{P}_2(\theta)$, the Wasserstein barycentre $\bar{\mu}$ is the measure that minimises the average Wasserstein distance to all other measures in the set. More formally, the Wasserstein barycentre is the Fréchet mean on a Wasserstein space that we can write as
+# For a collection of $T$ measures
+# $\lbrace\mu_i\rbrace_{t=1}^T \in \mathcal{P}_2(\theta)$, the Wasserstein barycentre
+# $\bar{\mu}$ is the measure that minimises the average Wasserstein distance to all
+# other measures in the set. More formally, the Wasserstein barycentre is the Fréchet
+# mean on a Wasserstein space that we can write as
 # $$\bar{\mu} = \operatorname{argmin}_{\mu\in\mathcal{P}_2(\theta)}\sum_{t=1}^T \alpha_t W_2^2(\mu, \mu_t),$$
 # where $\alpha\in\bbR^T$ is a weight vector that sums to 1.
 #
-# As with the Wasserstein distance, identifying the Wasserstein barycentre $\bar{\mu}$ is often an computationally demanding optimisation problem. However, when all the measures admit a multivariate Gaussian density, the barycentre $\bar{\mu} = \mathcal{N}(\bar{m}, \bar{S})$ has analytical solutions
+# As with the Wasserstein distance, identifying the Wasserstein barycentre $\bar{\mu}$
+# is often an computationally demanding optimisation problem. However, when all the
+# measures admit a multivariate Gaussian density, the barycentre
+# $\bar{\mu} = \mathcal{N}(\bar{m}, \bar{S})$ has analytical solutions
 # $$\bar{m} = \sum_{t=1}^T \alpha_t m_t\,, \quad \bar{S}=\sum_{t=1}^T\alpha_t (\bar{S}^{1/2}S_t\bar{S}^{1/2})^{1/2}\,. \qquad (\star)$$
 # Identifying $\bar{S}$ is achieved through a fixed-point iterative update.
 #
 # ## Barycentre of Gaussian processes
 #
-# It was shown in <strong data-cite="mallasto2017learning"></strong> that the barycentre $\bar{f}$ of a collection of Gaussian processes $\lbrace f_i\rbrace_{i=1}^T$ such that $f_i \sim \mathcal{GP}(m_i, K_i)$ can be found using the same solutions as in $(\star)$. For a full theoretical understanding, we recommend reading the original paper. However, the central argument to this result is that one can first show that the barycentre GP $\bar{f}\sim\mathcal{GP}(\bar{m}, \bar{S})$ is non-degenerate for any finite set of GPs $\lbrace f_t\rbrace_{t=1}^T$ i.e., $T<\infty$. With this established, one can show that for a $n$-dimensional finite Gaussian distribution $f_{i,n}$, the Wasserstein metric between any two Gaussian distributions $f_{i, n}, f_{j, n}$ converges to the Wasserstein metric between GPs as $n\to\infty$.
+# It was shown in <strong data-cite="mallasto2017learning"></strong> that the
+# barycentre $\bar{f}$ of a collection of Gaussian processes
+# $\lbrace f_i\rbrace_{i=1}^T$ such that $f_i \sim \mathcal{GP}(m_i, K_i)$ can be
+# found using the same solutions as in $(\star)$. For a full theoretical understanding,
+# we recommend reading the original paper. However, the central argument to this result
+# is that one can first show that the barycentre GP
+# $\bar{f}\sim\mathcal{GP}(\bar{m}, \bar{S})$ is non-degenerate for any finite set of
+# GPs $\lbrace f_t\rbrace_{t=1}^T$ i.e., $T<\infty$. With this established, one can
+# show that for a $n$-dimensional finite Gaussian distribution $f_{i,n}$, the
+# Wasserstein metric between any two Gaussian distributions $f_{i, n}, f_{j, n}$
+# converges to the Wasserstein metric between GPs as $n\to\infty$.
 #
 # In this notebook, we will demonstrate how this can be achieved in GPJax.
 #
 # ## Dataset
 #
-# We'll simulate five datasets and develop a Gaussian process posterior before identifying the Gaussian process barycentre at a set of test points. Each dataset will be a sine function with a different vertical shift, periodicity, and quantity of noise.
+# We'll simulate five datasets and develop a Gaussian process posterior before
+# identifying the Gaussian process barycentre at a set of test points. Each dataset
+# will be a sine function with a different vertical shift, periodicity, and quantity
+# of noise.
 
-# %%
+# %% vscode={"languageId": "python"}
 n = 100
 n_test = 200
 n_datasets = 5
@@ -96,30 +126,33 @@ plt.show()
 # %% [markdown]
 # ## Learning a posterior distribution
 #
-# We'll now independently learn Gaussian process posterior distributions for each dataset. We won't spend any time here discussing how GP hyperparameters are optimised. For advice on achieving this, see the [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html) for advice on optimisation and the [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for advice on selecting an appropriate kernel.
+# We'll now independently learn Gaussian process posterior distributions for each
+# dataset. We won't spend any time here discussing how GP hyperparameters are
+# optimised. For advice on achieving this, see the
+# [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)
+# for advice on optimisation and the
+# [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for
+# advice on selecting an appropriate kernel.
 
-# %%
-def fit_gp(x: jax.Array, y: jax.Array) -> dx.MultivariateNormalTri:
+
+# %% vscode={"languageId": "python"}
+def fit_gp(x: jax.Array, y: jax.Array) -> tfd.MultivariateNormalFullCovariance:
     if y.ndim == 1:
         y = y.reshape(-1, 1)
-    D = Dataset(X=x, y=y)
+    D = gpx.Dataset(X=x, y=y)
 
     likelihood = gpx.Gaussian(num_datapoints=n)
-    posterior = gpx.Prior(kernel=jk.RBF()) * likelihood
+    posterior = gpx.Prior(mean_function=gpx.Constant(), kernel=gpx.RBF()) * likelihood
 
-    parameter_state = gpx.initialise(posterior, key)
-    negative_mll = jax.jit(posterior.marginal_log_likelihood(D, negative=True))
-    optimiser = ox.adam(learning_rate=0.01)
-
-    inference_state = gpx.fit(
-        objective=negative_mll,
-        parameter_state=parameter_state,
-        optax_optim=optimiser,
-        num_iters=1000,
+    opt_posterior, _ = gpx.fit(
+        model=posterior,
+        objective=jax.jit(gpx.ConjugateMLL(negative=True)),
+        train_data=D,
+        optim=ox.adamw(learning_rate=0.01),
+        num_iters=500,
     )
-
-    learned_params, training_history = inference_state.unpack()
-    return likelihood(learned_params, posterior(learned_params, D)(xtest))
+    latent_dist = opt_posterior.predict(xtest, train_data=D)
+    return opt_posterior.likelihood(latent_dist)
 
 
 posterior_preds = [fit_gp(x, i) for i in ys]
@@ -127,15 +160,22 @@ posterior_preds = [fit_gp(x, i) for i in ys]
 # %% [markdown]
 # ## Computing the barycentre
 #
-# In GPJax, the predictive distribution of a GP is given by a [Distrax](https://github.com/deepmind/distrax) distribution, making it straightforward to extract the mean vector and covariance matrix of each GP for learning a barycentre. We implement the fixed point scheme given in (3) in the following cell by utilising Jax's `vmap` operator to speed up large matrix operations using broadcasting in `tensordot`.
+# In GPJax, the predictive distribution of a GP is given by a
+# [TensorFlow Probability](https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax)
+# distribution, making it
+# straightforward to extract the mean vector and covariance matrix of each GP for
+# learning a barycentre. We implement the fixed point scheme given in (3) in the
+# following cell by utilising Jax's `vmap` operator to speed up large matrix operations
+# using broadcasting in `tensordot`.
 
-# %%
+
+# %% vscode={"languageId": "python"}
 def sqrtm(A: jax.Array):
     return jnp.real(jsl.sqrtm(A))
 
 
 def wasserstein_barycentres(
-    distributions: tp.List[dx.MultivariateNormalTri], weights: jax.Array
+    distributions: tp.List[tfd.MultivariateNormalFullCovariance], weights: jax.Array
 ):
     covariances = [d.covariance() for d in distributions]
     cov_stack = jnp.stack(covariances)
@@ -152,9 +192,14 @@ def wasserstein_barycentres(
 
 
 # %% [markdown]
-# With a function defined for learning a barycentre, we'll now compute it using the `lax.scan` operator that drastically speeds up for loops in Jax (see the [Jax documentation](https://jax.readthedocs.io/en/latest/_autosummary/jax.lax.scan.html)). The iterative update will be executed 100 times, with convergence measured by the difference between the previous and current iteration that we can confirm by inspecting the `sequence` array in the following cell.
+# With a function defined for learning a barycentre, we'll now compute it using the
+# `lax.scan` operator that drastically speeds up for loops in Jax (see the
+# [Jax documentation](https://jax.readthedocs.io/en/latest/_autosummary/jax.lax.scan.html)).
+# The iterative update will be executed 100 times, with convergence measured by the
+# difference between the previous and current iteration that we can confirm by
+# inspecting the `sequence` array in the following cell.
 
-# %%
+# %% vscode={"languageId": "python"}
 weights = jnp.ones((n_datasets,)) / n_datasets
 
 means = jnp.stack([d.mean() for d in posterior_preds])
@@ -168,16 +213,19 @@ barycentre_covariance, sequence = jax.lax.scan(
 )
 L = jnp.linalg.cholesky(barycentre_covariance)
 
-barycentre_process = dx.MultivariateNormalTri(barycentre_mean, L)
+barycentre_process = tfd.MultivariateNormalTriL(barycentre_mean, L)
 
 # %% [markdown]
 # ## Plotting the result
 #
-# With a barycentre learned, we can visualise the result. We can see that the result looks reasonable as it follows the sinusoidal curve of all the inferred GPs, and the uncertainty bands are sensible.
+# With a barycentre learned, we can visualise the result. We can see that the result
+# looks reasonable as it follows the sinusoidal curve of all the inferred GPs, and the
+# uncertainty bands are sensible.
 
-# %%
+
+# %% vscode={"languageId": "python"}
 def plot(
-    dist: dx.MultivariateNormalTri,
+    dist: tfd.MultivariateNormalTriL,
     ax,
     color: str = "tab:blue",
     label: str = None,
@@ -206,13 +254,18 @@ plot(
 # %% [markdown]
 # ## Displacement interpolation
 #
-# In the above example, we assigned uniform weights to each of the posteriors within the barycentre. In practice, we may have prior knowledge of which posterior is most likely to be the correct one. Regardless of the weights chosen, the barycentre remains a Gaussian process. We can interpolate between a pair of posterior distributions $\mu_1$ and $\mu_2$ to visualise the corresponding barycentre $\bar{\mu}$.
+# In the above example, we assigned uniform weights to each of the posteriors within
+# the barycentre. In practice, we may have prior knowledge of which posterior is most
+# likely to be the correct one. Regardless of the weights chosen, the barycentre
+# remains a Gaussian process. We can interpolate between a pair of posterior
+# distributions $\mu_1$ and $\mu_2$ to visualise the corresponding barycentre
+# $\bar{\mu}$.
 #
 # ![](figs/barycentre_gp.gif)
 
 # %% [markdown]
 # ## System configuration
 
-# %%
+# %% vscode={"languageId": "python"}
 # %reload_ext watermark
 # %watermark -n -u -v -iv -w -a 'Thomas Pinder (edited by Daniel Dodd)'
