@@ -15,7 +15,7 @@ keywords = ["gaussian-processes jax machine-learning bayesian"]
 packages = [{include = "gpjax"}]
 
 [tool.poetry.dependencies]
-python = "~3.8"
+python = "^3.8"
 jax = ">=0.4.1"
 jaxlib = "^0.4.6"
 optax = "^0.1.4"
