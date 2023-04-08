@@ -167,21 +167,21 @@ def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
 def _check_model(model: Any) -> None:
     """Check that the model is of type Module. Check trainables and bijectors tree structure."""
     if not isinstance(model, Module):
-        raise TypeError("model must be of type jaxutils.Module")
+        raise TypeError("model must be of type gpjax.Module")
 
 
 def _check_objective(objective: Any) -> None:
     """Check that the objective is of type Objective."""
     if not isinstance(objective, AbstractObjective):
         raise TypeError(
-            f"objective of type {type(objective)} must be of type jaxutils.Objective."
+            f"objective of type {type(objective)} must be of type gpjax.Objective."
         )
 
 
 def _check_train_data(train_data: Any) -> None:
     """Check that the train_data is of type Dataset."""
     if not isinstance(train_data, Dataset):
-        raise TypeError("train_data must be of type jaxutils.Dataset")
+        raise TypeError("train_data must be of type gpjax.Dataset")
 
 
 def _check_optim(optim: Any) -> None:

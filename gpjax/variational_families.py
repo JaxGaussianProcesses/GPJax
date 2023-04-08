@@ -21,7 +21,6 @@ import jax.numpy as jnp
 import jax.scipy as jsp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from jaxtyping import Array, Float
-from jaxutils import Dataset, PyTree
 from simple_pytree import static_field
 
 from .base import Module, param_field
