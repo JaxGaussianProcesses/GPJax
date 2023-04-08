@@ -41,7 +41,7 @@ class AbstractPrior(Module):
 
     def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
         """Evaluate the Gaussian process at the given points. The output of this function
-        is a `Distrax distribution <https://github.com/deepmind/distrax>`_ from which the
+        is a `TensorFlow probability distribution <https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions>`_ from which the
         the latent function's mean and covariance can be evaluated and the distribution
         can be sampled.
 
@@ -151,7 +151,7 @@ class Prior(AbstractPrior):
     def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
         """Compute the predictive prior distribution for a given set of
         parameters. The output of this function is a function that computes
-        a Distrax distribution for a given set of inputs.
+        a TFP distribution for a given set of inputs.
 
         In the following example, we compute the predictive prior distribution
         and then evaluate it on the interval :math:`[0, 1]`:
@@ -197,7 +197,7 @@ class AbstractPosterior(Module):
 
     def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
         """Evaluate the Gaussian process at the given points. The output of this function
-        is a `Distrax distribution <https://github.com/deepmind/distrax>`_ from which the
+        is a `TFP distribution <https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions>`_ from which the
         the latent function's mean and covariance can be evaluated and the distribution
         can be sampled.
 

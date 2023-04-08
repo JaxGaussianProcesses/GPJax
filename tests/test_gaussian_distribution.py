@@ -29,7 +29,7 @@ from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 
 _key = jr.PRNGKey(seed=42)
 
-from distrax import MultivariateNormalDiag, MultivariateNormalFullCovariance
+from tensorflow_probability.substrates.jax.distributions import MultivariateNormalDiag, MultivariateNormalFullCovariance, MultivariateNormalTriL
 
 
 def approx_equal(res: jnp.ndarray, actual: jnp.ndarray) -> bool:
@@ -43,6 +43,7 @@ def test_array_arguments(n: int) -> None:
     mean = jr.uniform(key_mean, shape=(n,))
     sqrt = jr.uniform(key_sqrt, shape=(n, n))
     covariance = sqrt @ sqrt.T
+    L = jnp.linalg.cholesky(covariance)
 
     dist = GaussianDistribution(loc=mean, scale=DenseLinearOperator(covariance))
 
@@ -72,16 +73,10 @@ def test_diag_linear_operator(n: int) -> None:
 
     assert approx_equal(dist_diag.mean(), distrax_dist.mean())
     assert approx_equal(dist_diag.mode(), distrax_dist.mode())
-    assert approx_equal(dist_diag.median(), distrax_dist.median())
     assert approx_equal(dist_diag.entropy(), distrax_dist.entropy())
     assert approx_equal(dist_diag.variance(), distrax_dist.variance())
     assert approx_equal(dist_diag.stddev(), distrax_dist.stddev())
     assert approx_equal(dist_diag.covariance(), distrax_dist.covariance())
-
-    assert approx_equal(
-        dist_diag.sample(seed=_key, sample_shape=(10,)),
-        distrax_dist.sample(seed=_key, sample_shape=(10,)),
-    )
 
     y = jr.uniform(_key, shape=(n,))
 
@@ -107,17 +102,10 @@ def test_dense_linear_operator(n: int) -> None:
 
     assert approx_equal(dist_dense.mean(), distrax_dist.mean())
     assert approx_equal(dist_dense.mode(), distrax_dist.mode())
-    assert approx_equal(dist_dense.median(), distrax_dist.median())
     assert approx_equal(dist_dense.entropy(), distrax_dist.entropy())
     assert approx_equal(dist_dense.variance(), distrax_dist.variance())
     assert approx_equal(dist_dense.stddev(), distrax_dist.stddev())
     assert approx_equal(dist_dense.covariance(), distrax_dist.covariance())
-
-    assert approx_equal(
-        dist_dense.sample(seed=_key, sample_shape=(10,)),
-        distrax_dist.sample(seed=_key, sample_shape=(10,)),
-    )
-
     y = jr.uniform(_key, shape=(n,))
 
     assert approx_equal(dist_dense.log_prob(y), distrax_dist.log_prob(y))

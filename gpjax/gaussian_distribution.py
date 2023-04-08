@@ -15,15 +15,15 @@
 
 from typing import Any, Optional, Tuple
 
-import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 from jax import vmap
 from jax.random import KeyArray
 from jaxtyping import Array, Float
+import tensorflow_probability.substrates.jax as tfp
 
 from .linops import IdentityLinearOperator, LinearOperator
-
+tfd = tfp.distributions
 
 def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
     """Checks that the inputs are correct."""
@@ -60,7 +60,7 @@ def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
             )
 
 
-class GaussianDistribution(dx.Distribution):
+class GaussianDistribution(tfd.Distribution):
     """Multivariate Gaussian distribution with a linear operator scale matrix.
 
     Args:
