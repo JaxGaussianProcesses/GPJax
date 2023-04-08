@@ -63,6 +63,8 @@ from os.path import join, pardir, dirname
 sys.path.insert(0, join(dirname(__file__), pardir))
 
 
+version = "0.6.0"
+release = version
 
 
 # -- General configuration ---------------------------------------------------
