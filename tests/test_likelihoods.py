@@ -13,35 +13,24 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, Dict
+from typing import Callable
 
-import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
+import jax.tree_util as jtu
 import numpy as np
 import pytest
+import tensorflow_probability.substrates.jax as tfp
 from jax.config import config
 from jax.random import KeyArray
 from jaxtyping import Array, Float
 
-from gpjax.likelihoods import (
-    AbstractLikelihood,
-    Bernoulli,
-    Conjugate,
-    Gaussian,
-    NonConjugate,
-    inv_probit,
-)
+from gpjax.likelihoods import (AbstractLikelihood, Bernoulli, Gaussian,
+                               inv_probit)
 
+tfd = tfp.distributions
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
-_initialise_key = jr.PRNGKey(123)
-
-# Likelihood parameter names to test in initialisation.
-true_initialisation = {
-    "Gaussian": ["obs_noise"],
-    "Bernoulli": [],
-}
 
 
 def test_abstract_likelihood():
@@ -51,17 +40,11 @@ def test_abstract_likelihood():
 
     # Create a dummy likelihood class with abstract methods implemented.
     class DummyLikelihood(AbstractLikelihood):
-        def init_params(self, key: KeyArray) -> Dict:
-            return {}
+        def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+            return tfd.Normal(0.0, 1.0)
 
-        def predict(self, params: Dict, dist: dx.Distribution) -> dx.Distribution:
-            return dx.Normal(0.0, 1.0)
-
-        def link_function(self) -> Callable:
-            def link(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
-                return dx.MultivariateNormalDiag(loc=x)
-
-            return link
+        def link_function(self, f: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
+            return tfd.MultivariateNormalDiag(loc=f)
 
     # Test that the dummy likelihood can be instantiated.
     dummy_likelihood = DummyLikelihood(num_datapoints=123)
@@ -69,132 +52,86 @@ def test_abstract_likelihood():
 
 
 @pytest.mark.parametrize("n", [1, 10])
-@pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
-def test_initialisers(n: int, lik: AbstractLikelihood) -> None:
-    key = _initialise_key
+@pytest.mark.parametrize("noise", [0.1, 0.5, 1.0])
+def test_gaussian_init(n: int, noise: float) -> None:
+    likelihood = Gaussian(num_datapoints=n, obs_noise=jnp.array([noise]))
 
-    # Initialise the likelihood.
-    likelihood = lik(num_datapoints=n)
-
-    # Get default parameter dictionary.
-    params = likelihood.init_params(key)
-
-    # Check parameter dictionary
-    assert list(params.keys()) == true_initialisation[likelihood.name]
-    assert len(list(params.values())) == len(true_initialisation[likelihood.name])
+    assert likelihood.obs_noise == jnp.array([noise])
+    assert likelihood.num_datapoints == n
+    assert jtu.tree_leaves(likelihood) == [jnp.array([noise])]
 
 
 @pytest.mark.parametrize("n", [1, 10])
-def test_bernoulli_predictive_moment(n: int) -> None:
-    key = _initialise_key
-
-    # Initialise bernoulli likelihood.
+def test_beroulli_init(n: int) -> None:
     likelihood = Bernoulli(num_datapoints=n)
-
-    # Initialise parameters.
-    params = likelihood.init_params(key)
-
-    # Construct latent function mean and variance values
-    mean_key, var_key = jr.split(key)
-    fmean = jr.uniform(mean_key, shape=(n, 1))
-    fvar = jnp.exp(jr.normal(var_key, shape=(n, 1)))
-
-    # Test predictive moments.
-    assert isinstance(likelihood.predictive_moment_fn, Callable)
-
-    y = likelihood.predictive_moment_fn(params, fmean, fvar)
-    y_mean = y.mean()
-    y_var = y.variance()
-
-    assert y_mean.shape == (n, 1)
-    assert y_var.shape == (n, 1)
+    assert likelihood.num_datapoints == n
+    assert jtu.tree_leaves(likelihood) == []
 
 
 @pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
 @pytest.mark.parametrize("n", [1, 10])
 def test_link_fns(lik: AbstractLikelihood, n: int) -> None:
-    key = _initialise_key
-
-    # Create test inputs.
-    x = jnp.linspace(-3.0, 3.0).reshape(-1, 1)
+    # Create function values.
+    f = jnp.linspace(-3.0, 3.0).reshape(-1, 1)
 
     # Initialise likelihood.
     likelihood = lik(num_datapoints=n)
 
-    # Initialise parameters.
-    params = likelihood.init_params(key)
-
     # Test likelihood link function.
     assert isinstance(likelihood.link_function, Callable)
-    assert isinstance(likelihood.link_function(params, x), dx.Distribution)
+    assert isinstance(likelihood.link_function(f), tfd.Distribution)
 
 
 @pytest.mark.parametrize("noise", [0.1, 0.5, 1.0])
 @pytest.mark.parametrize("n", [1, 2, 10])
 def test_call_gaussian(noise: float, n: int) -> None:
-    key = _initialise_key
+    key = jr.PRNGKey(123)
 
     # Initialise likelihood and parameters.
-    likelihood = Gaussian(num_datapoints=n)
-    params = {"likelihood": {"obs_noise": noise}}
+    likelihood = Gaussian(num_datapoints=n, obs_noise=jnp.array([noise]))
 
     # Construct latent function distribution.
     latent_mean = jr.uniform(key, shape=(n,))
     latent_sqrt = jr.uniform(key, shape=(n, n))
     latent_cov = jnp.matmul(latent_sqrt, latent_sqrt.T)
-    latent_dist = dx.MultivariateNormalFullCovariance(latent_mean, latent_cov)
+    latent_dist = tfd.MultivariateNormalFullCovariance(latent_mean, latent_cov)
 
     # Test call method.
-    pred_dist = likelihood(params, latent_dist)
+    pred_dist = likelihood(latent_dist)
 
     # Check that the distribution is a MultivariateNormalFullCovariance.
-    assert isinstance(pred_dist, dx.MultivariateNormalFullCovariance)
+    assert isinstance(pred_dist, tfd.MultivariateNormalFullCovariance)
 
     # Check predictive mean and variance.
     assert (pred_dist.mean() == latent_mean).all()
 
     noise_matrix = jnp.eye(n) * noise
     assert np.allclose(
-        pred_dist.scale_tri, jnp.linalg.cholesky(latent_cov + noise_matrix)
+        pred_dist.scale_tril, jnp.linalg.cholesky(latent_cov + noise_matrix)
     )
 
 
 @pytest.mark.parametrize("n", [1, 2, 10])
 def test_call_bernoulli(n: int) -> None:
-    key = _initialise_key
+    key = jr.PRNGKey(123)
 
     # Initialise likelihood and parameters.
     likelihood = Bernoulli(num_datapoints=n)
-    params = {"likelihood": {}}
 
     # Construct latent function distribution.
     latent_mean = jr.uniform(key, shape=(n,))
     latent_sqrt = jr.uniform(key, shape=(n, n))
     latent_cov = jnp.matmul(latent_sqrt, latent_sqrt.T)
-    latent_dist = dx.MultivariateNormalFullCovariance(latent_mean, latent_cov)
+    latent_dist = tfd.MultivariateNormalFullCovariance(latent_mean, latent_cov)
 
     # Test call method.
-    pred_dist = likelihood(params, latent_dist)
+    pred_dist = likelihood(latent_dist)
 
     # Check that the distribution is a Bernoulli.
-    assert isinstance(pred_dist, dx.Bernoulli)
+    assert isinstance(pred_dist, tfd.Bernoulli)
 
     # Check predictive mean and variance.
 
     p = inv_probit(latent_mean / jnp.sqrt(1.0 + jnp.diagonal(latent_cov)))
     assert (pred_dist.mean() == p).all()
     assert (pred_dist.variance() == p * (1.0 - p)).all()
-
-
-@pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
-@pytest.mark.parametrize("n", [1, 2, 10])
-def test_conjugacy(lik: AbstractLikelihood, n: int) -> None:
-    likelihood = lik(num_datapoints=n)
-
-    # Gaussian likelihood is conjugate.
-    if isinstance(likelihood, Gaussian):
-        assert isinstance(likelihood, Conjugate)
-
-    # Bernoulli likelihood is non-conjugate.
-    elif isinstance(likelihood, Bernoulli):
-        assert isinstance(likelihood, NonConjugate)

@@ -13,56 +13,51 @@
 # limitations under the License.
 # ==============================================================================
 
+from dataclasses import dataclass
+
 import jax.numpy as jnp
-import jax.random as jr
 import pytest
+import tensorflow_probability.substrates.jax.bijectors as tfb
 from jax.config import config
-from jaxlinop import identity
-
-from gpjax.kernels.base import (
-    AbstractKernel,
-    CombinationKernel,
-    ProductKernel,
-    SumKernel,
-)
-from gpjax.kernels.stationary import (
-    RBF,
-    Matern12,
-    Matern32,
-    Matern52,
-    RationalQuadratic,
-)
-from gpjax.kernels.nonstationary import Polynomial, Linear
-from jax.random import KeyArray
 from jaxtyping import Array, Float
-from typing import Dict
 
+from gpjax.base import param_field
+from gpjax.kernels.base import (AbstractKernel, CombinationKernel,
+                                ProductKernel, SumKernel)
+from gpjax.kernels.nonstationary import Linear, Polynomial
+from gpjax.kernels.stationary import (RBF, Matern12, Matern32, Matern52,
+                                      RationalQuadratic)
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
-_initialise_key = jr.PRNGKey(123)
-_jitter = 1e-6
 
 
 def test_abstract_kernel():
-    # Test initialising abstract kernel raises TypeError with unimplemented __call__ and _init_params methods:
+    # Test initialising abstract kernel raises TypeError with unimplemented __call__ method:
     with pytest.raises(TypeError):
         AbstractKernel()
 
-    # Create a dummy kernel class with __call__ and _init_params methods implemented:
+    # Create a dummy kernel class with __call__ implemented:
+    @dataclass
     class DummyKernel(AbstractKernel):
+        test_a: Float[Array, "1"] = jnp.array([1.0])
+        test_b: Float[Array, "1"] = param_field(
+            jnp.array([2.0]), bijector=tfb.Softplus()
+        )
+
         def __call__(
-            self, x: Float[Array, "1 D"], y: Float[Array, "1 D"], params: Dict
+            self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
         ) -> Float[Array, "1"]:
-            return x * params["test"] * y
+            return x * self.test_b * y
 
-        def init_params(self, key: KeyArray) -> Dict:
-            return {"test": 1.0}
-
-    # Initialise dummy kernel class and test __call__ and _init_params methods:
+    # Initialise dummy kernel class and test __call__ method:
     dummy_kernel = DummyKernel()
-    assert dummy_kernel.init_params(_initialise_key) == {"test": 1.0}
-    assert dummy_kernel(jnp.array([1.0]), jnp.array([2.0]), {"test": 2.0}) == 4.0
+    assert dummy_kernel.test_a == jnp.array([1.0])
+    assert isinstance(
+        dummy_kernel._pytree__meta["test_b"].get("bijector"), tfb.Softplus
+    )
+    assert dummy_kernel.test_b == jnp.array([2.0])
+    assert dummy_kernel(jnp.array([1.0]), jnp.array([2.0])) == 4.0
 
 
 @pytest.mark.parametrize("combination_type", [SumKernel, ProductKernel])
@@ -79,35 +74,29 @@ def test_combination_kernel(
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
 
     # Create list of kernels
-    kernel_set = [kernel() for _ in range(n_kerns)]
+    kernels = [kernel() for _ in range(n_kerns)]
 
     # Create combination kernel
-    combination_kernel = combination_type(kernel_set=kernel_set)
-
-    # Initialise default parameters
-    params = combination_kernel.init_params(_initialise_key)
+    combination_kernel = combination_type(kernels=kernels)
 
     # Check params are a list of dictionaries
-    assert len(params) == n_kerns
-
-    for p in params:
-        assert isinstance(p, dict)
+    assert combination_kernel.kernels == kernels
 
     # Check combination kernel set
-    assert len(combination_kernel.kernel_set) == n_kerns
-    assert isinstance(combination_kernel.kernel_set, list)
-    assert isinstance(combination_kernel.kernel_set[0], AbstractKernel)
+    assert len(combination_kernel.kernels) == n_kerns
+    assert isinstance(combination_kernel.kernels, list)
+    assert isinstance(combination_kernel.kernels[0], AbstractKernel)
 
     # Compute gram matrix
-    Kxx = combination_kernel.gram(params, x)
+    Kxx = combination_kernel.gram(x)
 
     # Check shapes
     assert Kxx.shape[0] == Kxx.shape[1]
     assert Kxx.shape[1] == n
 
     # Check positive definiteness
-    Kxx += identity(n) * _jitter
-    eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
+    jitter = 1e-6
+    eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense() + jnp.eye(n) * jitter)
     assert (eigen_values > 0).all()
 
 
@@ -123,22 +112,14 @@ def test_sum_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
 
     # Create sum kernel
-    sum_kernel = SumKernel(kernel_set=[k1, k2])
-
-    # Initialise default parameters
-    params = sum_kernel.init_params(_initialise_key)
+    sum_kernel = SumKernel(kernels=[k1, k2])
 
     # Compute gram matrix
-    Kxx = sum_kernel.gram(params, x)
-
-    # NOW we do the same thing manually and check they are equal:
-    # Initialise default parameters
-    k1_params = k1.init_params(_initialise_key)
-    k2_params = k2.init_params(_initialise_key)
+    Kxx = sum_kernel.gram(x)
 
     # Compute gram matrix
-    Kxx_k1 = k1.gram(k1_params, x)
-    Kxx_k2 = k2.gram(k2_params, x)
+    Kxx_k1 = k1.gram(x)
+    Kxx_k2 = k2.gram(x)
 
     # Check manual and automatic gram matrices are equal
     assert jnp.all(Kxx.to_dense() == Kxx_k1.to_dense() + Kxx_k2.to_dense())
@@ -176,37 +157,14 @@ def test_prod_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
 
     # Create product kernel
-    prod_kernel = ProductKernel(kernel_set=[k1, k2])
-
-    # Initialise default parameters
-    params = prod_kernel.init_params(_initialise_key)
+    prod_kernel = ProductKernel(kernels=[k1, k2])
 
     # Compute gram matrix
-    Kxx = prod_kernel.gram(params, x)
-
-    # NOW we do the same thing manually and check they are equal:
-
-    # Initialise default parameters
-    k1_params = k1.init_params(_initialise_key)
-    k2_params = k2.init_params(_initialise_key)
+    Kxx = prod_kernel.gram(x)
 
     # Compute gram matrix
-    Kxx_k1 = k1.gram(k1_params, x)
-    Kxx_k2 = k2.gram(k2_params, x)
+    Kxx_k1 = k1.gram(x)
+    Kxx_k2 = k2.gram(x)
 
     # Check manual and automatic gram matrices are equal
     assert jnp.all(Kxx.to_dense() == Kxx_k1.to_dense() * Kxx_k2.to_dense())
-
-
-@pytest.mark.parametrize(
-    "kernel",
-    [RBF, Matern12, Matern32, Matern52, Polynomial, Linear, RationalQuadratic],
-)
-def test_combination_kernel_type(kernel: AbstractKernel) -> None:
-    prod_kern = kernel() * kernel()
-    assert isinstance(prod_kern, ProductKernel)
-    assert isinstance(prod_kern, CombinationKernel)
-
-    add_kern = kernel() + kernel()
-    assert isinstance(add_kern, SumKernel)
-    assert isinstance(add_kern, CombinationKernel)

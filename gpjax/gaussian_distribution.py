@@ -22,7 +22,7 @@ from jax import vmap
 from jax.random import KeyArray
 from jaxtyping import Array, Float
 
-from gpjax.linops import IdentityLinearOperator, LinearOperator
+from .linops import IdentityLinearOperator, LinearOperator
 
 
 def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:

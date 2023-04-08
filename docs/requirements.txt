@@ -1,0 +1,26 @@
+sphinx-book-theme
+myst-parser
+myst-nb
+linkify-it-py
+jinja2
+nbsphinx>=0.8.0
+nb-black==1.0.7
+sphinx-tabs
+matplotlib==3.3.3
+seaborn
+sphinx-copybutton
+networkx>=2.0.0
+sphinxcontrib.bibtex
+jupytext
+ipython
+ipykernel
+watermark
+sphinxext-opengraph
+blackjax>=0.8.2
+jaxopt
+ipywidgets
+pandas
+scikit-learn
+flax
+# Install GPJax istself
+.

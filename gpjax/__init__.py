@@ -13,22 +13,19 @@
 # limitations under the License.
 # ==============================================================================
 
-from gpjax import _version
-from gpjax.abstractions import fit, fit_batches, fit_natgrads
-from gpjax.gps import Prior, construct_posterior
-from gpjax.kernels import *
-from gpjax.likelihoods import Bernoulli, Gaussian
-from gpjax.mean_functions import Constant, Zero
-from gpjax.params import constrain, copy_dict_structure, initialise, unconstrain
-from gpjax.types import Dataset
-from gpjax.variational_families import (
-    CollapsedVariationalGaussian,
-    ExpectationVariationalGaussian,
-    NaturalVariationalGaussian,
-    VariationalGaussian,
-    WhitenedVariationalGaussian,
-)
-from gpjax.variational_inference import CollapsedVI, StochasticVI
+from .dataset import Dataset
+from .fit import fit
+from .gps import Prior, construct_posterior
+from .kernels import *
+from .likelihoods import Bernoulli, Gaussian
+from .mean_functions import Constant, Zero
+from .objectives import (ELBO, CollapsedELBO, ConjugateMLL,
+                         LogPosteriorDensity, NonConjugateMLL)
+from .variational_families import (CollapsedVariationalGaussian,
+                                   ExpectationVariationalGaussian,
+                                   NaturalVariationalGaussian,
+                                   VariationalGaussian,
+                                   WhitenedVariationalGaussian)
 
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
@@ -39,8 +36,6 @@ __contributors__ = "https://github.com/thomaspinder/GPJax/graphs/contributors"
 __all__ = [
     "kernels",
     "fit",
-    "fit_batches",
-    "fit_natgrads",
     "Prior",
     "construct_posterior",
     "RBF",
@@ -55,10 +50,6 @@ __all__ = [
     "Gaussian",
     "Constant",
     "Zero",
-    "constrain",
-    "copy_dict_structure",
-    "initialise",
-    "unconstrain",
     "Dataset",
     "CollapsedVariationalGaussian",
     "ExpectationVariationalGaussian",
@@ -67,4 +58,9 @@ __all__ = [
     "WhitenedVariationalGaussian",
     "CollapsedVI",
     "StochasticVI",
+    "ConjugateMLL",
+    "NonConjugateMLL",
+    "LogPosteriorDensity",
+    "CollapsedELBO",
+    "ELBO",
 ]

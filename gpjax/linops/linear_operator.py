@@ -14,16 +14,18 @@
 # ==============================================================================
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 
 import abc
-import jax.numpy as jnp
 from dataclasses import dataclass
+from typing import Any, Generic, Iterable, Mapping, Tuple, TypeVar, Union
+
+import jax.numpy as jnp
 from jaxtyping import Array, Float
-from typing import Any, TypeVar, Iterable, Mapping, Generic, Tuple, Union
 from simple_pytree import Pytree, static_field
 
 # Generic type.
@@ -152,9 +154,8 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
             Float[Array, "N N"]: Lower Cholesky decomposition of the linear operator.
         """
 
-        from gpjax.linops.triangular_linear_operator import (
-            LowerTriangularLinearOperator,
-        )
+        from gpjax.linops.triangular_linear_operator import \
+            LowerTriangularLinearOperator
 
         L = jnp.linalg.cholesky(self.to_dense())
 

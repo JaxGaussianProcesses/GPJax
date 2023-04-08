@@ -39,6 +39,7 @@ isort = "^5.12.0"
 pylint = "^2.17.1"
 nox = "^2022.11.21"
 ruff = "^0.0.259"
+flax = "^0.6.8"
 
 
 [tool.poetry.group.docs.dependencies]
@@ -60,10 +61,10 @@ watermark = "^2.3.1"
 sphinxext-opengraph = "^0.8.1"
 blackjax = "^0.9.6"
 jaxopt = "^0.6"
-dm-haiku = "^0.0.9"
 ipywidgets = "^8.0.5"
 pandas = "^1.5.3"
 scikit-learn = "^1.2.2"
+flax = "^0.6.8"
 
 [build-system]
 requires = ["poetry-core", "poetry-dynamic-versioning"]

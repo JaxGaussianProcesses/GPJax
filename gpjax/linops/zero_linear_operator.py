@@ -15,15 +15,15 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any, Tuple, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from dataclasses import dataclass
 
-from gpjax.linops.linear_operator import LinearOperator
-from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
-from gpjax.linops.utils import check_shapes_match, to_linear_operator, default_dtype
+from .diagonal_linear_operator import DiagonalLinearOperator
+from .linear_operator import LinearOperator
+from .utils import check_shapes_match, default_dtype, to_linear_operator
 
 
 def _check_size(shape: Any) -> None:

@@ -13,12 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-import pytest
-import jax.tree_util as jtu
-import jax.numpy as jnp
-from gpjax.linops.linear_operator import LinearOperator
 from dataclasses import dataclass
+
+import jax.numpy as jnp
+import jax.tree_util as jtu
+import pytest
 from simple_pytree import static_field
+
+from gpjax.linops.linear_operator import LinearOperator
 
 
 def test_covariance_operator() -> None:
@@ -127,3 +129,4 @@ def test_instantiate_with_attributes(is_dataclass, shape, dtype) -> None:
     assert jtu.tree_leaves(linop) == [1, 3]  # b, shape, dtype are static!
 
     # if not is_dataclass:
+    #     assert linop.__repr__() == f"DummyLinearOperator(shape={shape}, dtype={dtype})"

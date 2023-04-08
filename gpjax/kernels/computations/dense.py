@@ -15,7 +15,8 @@
 
 from jax import vmap
 from jaxtyping import Array, Float
-from gpjax.kernels.computations.base import AbstractKernelComputation
+
+from .base import AbstractKernelComputation
 
 
 class DenseKernelComputation(AbstractKernelComputation):

@@ -1,17 +1,33 @@
+# Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 from __future__ import annotations
 
 __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
 
 import dataclasses
 from copy import copy, deepcopy
-from typing import Any, Callable, Dict, Iterable, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Tuple
 
 import jax
 import jax.tree_util as jtu
+import tensorflow_probability.substrates.jax.bijectors as tfb
+from jax import lax
 from jax._src.tree_util import _registry
 from simple_pytree import Pytree, static_field
-
-from gpjax.parameters.bijectors import Bijector, Identity
+from typing_extensions import Self
 
 
 class Module(Pytree):
@@ -29,7 +45,7 @@ class Module(Pytree):
             ):
                 cls._pytree__meta[field] = {**value.metadata}
 
-    def replace(self, **kwargs: Any) -> Module:
+    def replace(self, **kwargs: Any) -> Self:
         """
         Replace the values of the fields of the object.
 
@@ -48,7 +64,7 @@ class Module(Pytree):
         pytree.__dict__.update(kwargs)
         return pytree
 
-    def replace_meta(self, **kwargs: Any) -> Module:
+    def replace_meta(self, **kwargs: Any) -> Self:
         """
         Replace the metadata of the fields.
 
@@ -67,7 +83,7 @@ class Module(Pytree):
         pytree.__dict__.update(_pytree__meta={**pytree._pytree__meta, **kwargs})
         return pytree
 
-    def update_meta(self, **kwargs: Any) -> Module:
+    def update_meta(self, **kwargs: Any) -> Self:
         """
         Update the metadata of the fields. The metadata must already exist.
 
@@ -92,15 +108,15 @@ class Module(Pytree):
         pytree.__dict__.update(_pytree__meta=new)
         return pytree
 
-    def replace_trainable(self: Module, **kwargs: Dict[str, bool]) -> Module:
+    def replace_trainable(self: Module, **kwargs: Dict[str, bool]) -> Self:
         """Replace the trainability status of local nodes of the Module."""
         return self.update_meta(**{k: {"trainable": v} for k, v in kwargs.items()})
 
-    def replace_bijector(self: Module, **kwargs: Dict[str, Bijector]) -> Module:
+    def replace_bijector(self: Module, **kwargs: Dict[str, tfb.Bijector]) -> Self:
         """Replace the bijectors of local nodes of the Module."""
         return self.update_meta(**{k: {"bijector": v} for k, v in kwargs.items()})
 
-    def constrain(self) -> Module:
+    def constrain(self) -> Self:
         """Transform model parameters to the constrained space according to their defined bijectors.
 
         Returns:
@@ -109,11 +125,15 @@ class Module(Pytree):
 
         def _apply_constrain(meta_leaf):
             meta, leaf = meta_leaf
-            return meta.get("bijector", Identity).forward(leaf)
+
+            if meta is None:
+                return leaf
+
+            return meta.get("bijector", tfb.Identity()).forward(leaf)
 
         return meta_map(_apply_constrain, self)
 
-    def unconstrain(self) -> Module:
+    def unconstrain(self) -> Self:
         """Transform model parameters to the unconstrained space according to their defined bijectors.
 
         Returns:
@@ -122,11 +142,15 @@ class Module(Pytree):
 
         def _apply_unconstrain(meta_leaf):
             meta, leaf = meta_leaf
-            return meta.get("bijector", Identity).inverse(leaf)
+
+            if meta is None:
+                return leaf
+
+            return meta.get("bijector", tfb.Identity()).inverse(leaf)
 
         return meta_map(_apply_unconstrain, self)
 
-    def stop_gradient(self) -> Module:
+    def stop_gradient(self) -> Self:
         """Stop gradients flowing through the Module.
 
         Returns:
@@ -139,6 +163,10 @@ class Module(Pytree):
 
         def _apply_stop_grad(meta_leaf):
             meta, leaf = meta_leaf
+
+            if meta is None:
+                return leaf
+
             return _stop_grad(leaf, meta.get("trainable", True))
 
         return meta_map(_apply_stop_grad, self)

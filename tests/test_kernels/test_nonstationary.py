@@ -17,12 +17,13 @@ from itertools import permutations
 
 import jax.numpy as jnp
 import jax.random as jr
+import jax.tree_util as jtu
 import pytest
 from jax.config import config
-from gpjax.linops import LinearOperator, identity
 
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.nonstationary import Linear, Polynomial
+from gpjax.linops import LinearOperator, identity
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -102,15 +103,6 @@ def test_pos_def(
     assert (eigen_values > 0.0).all()
 
 
-# @pytest.mark.parametrize(
-#     "kernel",
-#         Linear,
-#         Polynomial,
-#     ],
-# def test_dtype(kernel: AbstractKernel) -> None:
-#     for v in params_list:
-
-
 @pytest.mark.parametrize("degree", [1, 2, 3])
 @pytest.mark.parametrize("dim", [1, 2, 5])
 @pytest.mark.parametrize("variance", [0.1, 1.0, 2.0])
@@ -126,6 +118,7 @@ def test_polynomial(
     kern = Polynomial(degree=degree, active_dims=[i for i in range(dim)])
 
     # # Check name
+    # assert kern.name == f"Polynomial Degree: {degree}"
 
     # Initialise parameters
     kern = kern.replace(shift=kern.shift * shift, variance=kern.variance * variance)

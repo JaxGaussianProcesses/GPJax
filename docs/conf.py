@@ -62,10 +62,7 @@ from os.path import join, pardir, dirname
 
 sys.path.insert(0, join(dirname(__file__), pardir))
 
-import gpjax
 
-version = gpjax.__version__
-release = version
 
 
 # -- General configuration ---------------------------------------------------

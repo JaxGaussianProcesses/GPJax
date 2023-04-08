@@ -14,33 +14,29 @@
 # ==============================================================================
 
 import abc
-from typing import Any, Callable, Dict, Optional
+from dataclasses import dataclass
+from typing import Any
 
-import deprecation
-import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
-from jax.random import KeyArray
+import tensorflow_probability.substrates.jax as tfp
 from jaxtyping import Array, Float
-from jaxutils import PyTree
+from simple_pytree import static_field
 
-from gpjax.linops.utils import to_dense
+from .base import Module, param_field
+from .linops.utils import to_dense
+
+tfb = tfp.bijectors
+tfd = tfp.distributions
 
 
-class AbstractLikelihood(PyTree):
+@dataclass
+class AbstractLikelihood(Module):
     """Abstract base class for likelihoods."""
 
-    def __init__(self, num_datapoints: int, name: Optional[str] = None):
-        """Initialise the likelihood.
+    num_datapoints: int = static_field()
 
-        Args:
-            num_datapoints (int): The number of datapoints that the likelihood factorises over.
-            name (Optional[str]): The name of the likelihood. Defaults to None.
-        """
-        self.num_datapoints = num_datapoints
-        self.name = name
-
-    def __call__(self, *args: Any, **kwargs: Any) -> dx.Distribution:
+    def __call__(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
         """Evaluate the likelihood function at a given predictive distribution.
 
         Args:
@@ -48,12 +44,12 @@ class AbstractLikelihood(PyTree):
             **kwargs (Any): Keyword arguments to be passed to the likelihood's `predict` method.
 
         Returns:
-            dx.Distribution: The predictive distribution.
+            tfd.Distribution: The predictive distribution.
         """
         return self.predict(*args, **kwargs)
 
     @abc.abstractmethod
-    def predict(self, *args: Any, **kwargs: Any) -> dx.Distribution:
+    def predict(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
         """Evaluate the likelihood function at a given predictive distribution.
 
         Args:
@@ -61,101 +57,44 @@ class AbstractLikelihood(PyTree):
             **kwargs (Any): Keyword arguments to be passed to the likelihood's `predict` method.
 
         Returns:
-            dx.Distribution: The predictive distribution.
+            tfd.Distribution: The predictive distribution.
         """
         raise NotImplementedError
-
-    @abc.abstractmethod
-    def init_params(self, key: KeyArray) -> Dict:
-        """Return the parameters of the likelihood function.
-
-        Args:
-            key (KeyArray): A PRNG key.
-
-        Returns:
-            Dict: The parameters of the likelihood function.
-        """
-        raise NotImplementedError
-
-    @deprecation.deprecated(
-        deprecated_in="0.5.7",
-        removed_in="0.6.0",
-        details="Use the ``init_params`` method for parameter initialisation.",
-    )
-    def _initialise_params(self, key: KeyArray) -> Dict:
-        """Deprecated method for initialising the GP's parameters. Succeeded by ``init_params``."""
-        return self.init_params(key)
 
     @property
     @abc.abstractmethod
-    def link_function(self) -> Callable:
+    def link_function(self) -> tfd.Distribution:
         """Return the link function of the likelihood function.
 
         Returns:
-            Callable: The link function of the likelihood function.
+            tfd.Distribution: The distribution of observations, y, given values of the Gaussian process, f.
         """
         raise NotImplementedError
 
 
-class Conjugate:
-    """An abstract class for conjugate likelihoods with respect to a Gaussian process prior."""
-
-
-class NonConjugate:
-    """An abstract class for non-conjugate likelihoods with respect to a Gaussian process prior."""
-
-
-# TODO: revamp this with covariance operators.
-
-
-class Gaussian(AbstractLikelihood, Conjugate):
+@dataclass
+class Gaussian(AbstractLikelihood):
     """Gaussian likelihood object."""
 
-    def __init__(self, num_datapoints: int, name: Optional[str] = "Gaussian"):
-        """Initialise the Gaussian likelihood.
+    obs_noise: Float[Array, "1"] = param_field(
+        jnp.array([1.0]), bijector=tfb.Softplus()
+    )
+
+    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Normal:
+        """The link function of the Gaussian likelihood.
 
         Args:
-            num_datapoints (int): The number of datapoints that the likelihood factorises over.
-            name (Optional[str]): The name of the likelihood. Defaults to "Gaussian".
-        """
-        super().__init__(num_datapoints, name)
-
-    def init_params(self, key: KeyArray) -> Dict:
-        """Return the variance parameter of the likelihood function.
-
-        Args:
-            key (KeyArray): A PRNG key.
+            params (Dict): The parameters of the likelihood function.
+            f (Float[Array, "N 1"]): Function values.
 
         Returns:
-            Dict: The parameters of the likelihood function.
+            tfd.Normal: The likelihood function.
         """
-        return {"obs_noise": jnp.array([1.0])}
+        return tfd.Normal(loc=f, scale=self.obs_noise.astype(f.dtype))
 
-    @property
-    def link_function(self) -> Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]:
-        """Return the link function of the Gaussian likelihood. Here, this is
-        simply the identity function, but we include it for completeness.
-
-        Returns:
-            Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]: A link
-            function that maps the predictive distribution to the likelihood function.
-        """
-
-        def link_fn(params: Dict, f: Float[Array, "N 1"]) -> dx.Normal:
-            """The link function of the Gaussian likelihood.
-
-            Args:
-                params (Dict): The parameters of the likelihood function.
-                f (Float[Array, "N 1"]): Function values.
-
-            Returns:
-                dx.Normal: The likelihood function.
-            """
-            return dx.Normal(loc=f, scale=params["obs_noise"])
-
-        return link_fn
-
-    def predict(self, params: Dict, dist: dx.MultivariateNormalTri) -> dx.Distribution:
+    def predict(
+        self, dist: tfd.MultivariateNormalTriL
+    ) -> tfd.MultivariateNormalFullCovariance:
         """
         Evaluate the Gaussian likelihood function at a given predictive
         distribution. Computationally, this is equivalent to summing the
@@ -164,112 +103,47 @@ class Gaussian(AbstractLikelihood, Conjugate):
 
         Args:
             params (Dict): The parameters of the likelihood function.
-            dist (dx.Distribution): The Gaussian process posterior,
+            dist (tfd.Distribution): The Gaussian process posterior,
                 evaluated at a finite set of test points.
 
         Returns:
-            dx.Distribution: The predictive distribution.
+            tfd.Distribution: The predictive distribution.
         """
         n_data = dist.event_shape[0]
         cov = to_dense(dist.covariance())
-        noisy_cov = cov.at[jnp.diag_indices(n_data)].add(
-            params["likelihood"]["obs_noise"]
-        )
+        noisy_cov = cov.at[jnp.diag_indices(n_data)].add(self.obs_noise)
 
-        return dx.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
+        return tfd.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
 
 
-class Bernoulli(AbstractLikelihood, NonConjugate):
-    def __init__(self, num_datapoints: int, name: Optional[str] = "Bernoulli"):
-        """Initialise the Bernoulli likelihood.
-
-        Args:
-            num_datapoints (int): The number of datapoints that the likelihood factorises over.
-            name (Optional[str]): The name of the likelihood. Defaults to "Bernoulli".
-        """
-        super().__init__(num_datapoints, name)
-
-    def init_params(self, key: KeyArray) -> Dict:
-        """Initialise the parameter set of a Bernoulli likelihood.
+@dataclass
+class Bernoulli(AbstractLikelihood):
+    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Distribution:
+        """The probit link function of the Bernoulli likelihood.
 
         Args:
-            key (KeyArray): A PRNG key.
+            f (Float[Array, "N 1"]): Function values.
 
         Returns:
-            Dict: The parameters of the likelihood function (empty for the Bernoulli likelihood).
+            tfd.Distribution: The likelihood function.
         """
-        return {}
+        return tfd.Bernoulli(probs=inv_probit(f))
 
-    @property
-    def link_function(self) -> Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]:
-        """Return the probit link function of the Bernoulli likelihood.
-
-        Returns:
-            Callable[[Dict, Float[Array, "N 1"]], dx.Distribution]: A probit link
-                function that maps the predictive distribution to the likelihood function.
-        """
-
-        def link_fn(params: Dict, f: Float[Array, "N 1"]) -> dx.Distribution:
-            """The probit link function of the Bernoulli likelihood.
-
-            Args:
-                params (Dict): The parameters of the likelihood function.
-                f (Float[Array, "N 1"]): Function values.
-
-            Returns:
-                dx.Distribution: The likelihood function.
-            """
-            return dx.Bernoulli(probs=inv_probit(f))
-
-        return link_fn
-
-    @property
-    def predictive_moment_fn(
-        self,
-    ) -> Callable[[Dict, Float[Array, "N 1"]], Float[Array, "N 1"]]:
-        """Instantiate the predictive moment function of the Bernoulli likelihood
-        that is parameterised by a probit link function.
-
-        Returns:
-            Callable: A callable object that accepts a mean and variance term
-                from which the predictive random variable is computed.
-        """
-
-        def moment_fn(
-            params: Dict,
-            mean: Float[Array, "N 1"],
-            variance: Float[Array, "N 1"],
-        ):
-            """The predictive moment function of the Bernoulli likelihood.
-
-            Args:
-                params (Dict): The parameters of the likelihood function.
-                mean (Float[Array, "N 1"]): The mean of the latent function values.
-                variance (Float[Array, "N 1"]): The diagonal variance of the latent function values.
-
-            Returns:
-                Float[Array, "N 1"]: The pointwise predictive distribution.
-            """
-            rv = self.link_function(params, mean / jnp.sqrt(1.0 + variance))
-            return rv
-
-        return moment_fn
-
-    def predict(self, params: Dict, dist: dx.Distribution) -> dx.Distribution:
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
         """Evaluate the pointwise predictive distribution, given a Gaussian
         process posterior and likelihood parameters.
 
         Args:
             params (Dict): The parameters of the likelihood function.
-            dist (dx.Distribution): The Gaussian process posterior, evaluated
+            dist (tfd.Distribution): The Gaussian process posterior, evaluated
                 at a finite set of test points.
 
         Returns:
-            dx.Distribution: The pointwise predictive distribution.
+            tfd.Distribution: The pointwise predictive distribution.
         """
         variance = jnp.diag(dist.covariance())
         mean = dist.mean().ravel()
-        return self.predictive_moment_fn(params, mean, variance)
+        return self.link_function(mean / jnp.sqrt(1.0 + variance))
 
 
 def inv_probit(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:

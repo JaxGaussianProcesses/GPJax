@@ -13,36 +13,31 @@
 # limitations under the License.
 # ==============================================================================
 
+from dataclasses import dataclass
 from typing import Dict
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from gpjax.kernels.computations.base import AbstractKernelComputation
-from dataclasses import dataclass
+
+from .base import AbstractKernelComputation
 
 
 @dataclass
 class EigenKernelComputation(AbstractKernelComputation):
-    eigenvalues: Float[Array, "N"] = None
-    eigenvectors: Float[Array, "N N"] = None
-    num_verticies: int = None
-
     def cross_covariance(
-        self, params: Dict, x: Float[Array, "N D"], y: Float[Array, "M D"]
+        self, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
-        # Extract the graph Laplacian's eigenvalues
-        evals = self.eigenvalues
         # Transform the eigenvalues of the graph Laplacian according to the
         # RBF kernel's SPDE form.
         S = jnp.power(
-            evals
+            self.kernel.eigenvalues
             + 2
             * self.kernel.smoothness
             / self.kernel.lengthscale
             / self.kernel.lengthscale,
             -self.kernel.smoothness,
         )
-        S = jnp.multiply(S, self.num_vertex / jnp.sum(S))
+        S = jnp.multiply(S, self.kernel.num_vertex / jnp.sum(S))
         # Scale the transform eigenvalues by the kernel variance
-        S = jnp.multiply(S, params["variance"])
+        S = jnp.multiply(S, self.kernel.variance)
         return self.kernel(x, y, S=S)

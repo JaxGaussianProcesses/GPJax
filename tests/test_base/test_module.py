@@ -1,3 +1,18 @@
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import dataclasses
 from dataclasses import dataclass, field
 from typing import Any, Generic, Iterable, TypeVar
@@ -6,12 +21,12 @@ import jax
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import pytest
+import tensorflow_probability.substrates.jax.bijectors as tfb
 from flax import serialization
 from simple_pytree import Pytree, static_field
 
-from gpjax.bijectors import Identity, Softplus
-from gpjax.module import Module, meta
-from gpjax.param import param_field
+from gpjax.base.module import Module, meta
+from gpjax.base.param import param_field
 
 
 @pytest.mark.parametrize("is_dataclass", [True, False])
@@ -121,7 +136,7 @@ def test_scrambled_init(is_dataclass):
 @pytest.mark.parametrize("is_dataclass", [True, False])
 def test_simple_linear_model(is_dataclass):
     class SimpleModel(Module):
-        weight: float = param_field(bijector=Softplus, trainable=False)
+        weight: float = param_field(bijector=tfb.Softplus(), trainable=False)
         bias: float
 
         def __init__(self, weight, bias):
@@ -144,16 +159,16 @@ def test_simple_linear_model(is_dataclass):
 
     meta_model = meta(model)
 
-    assert meta_model.weight["bijector"] == Softplus
+    assert isinstance(meta_model.weight["bijector"], tfb.Softplus)
     assert meta_model.weight["trainable"] == False
     assert meta_model.bias == {}
 
     constrained_model = model.constrain()
-    assert constrained_model.weight == Softplus.forward(1.0)
-    assert constrained_model.bias == Identity.forward(2.0)
+    assert constrained_model.weight == tfb.Softplus().forward(1.0)
+    assert constrained_model.bias == tfb.Identity().forward(2.0)
 
     meta_constrained_model = meta(constrained_model)
-    assert meta_constrained_model.weight["bijector"] == Softplus
+    assert isinstance(meta_constrained_model.weight["bijector"], tfb.Softplus)
     assert meta_constrained_model.weight["trainable"] == False
     assert meta_constrained_model.bias == {}
 
@@ -162,7 +177,7 @@ def test_simple_linear_model(is_dataclass):
     assert unconstrained_model.bias == 2.0
 
     meta_unconstrained_model = meta(unconstrained_model)
-    assert meta_unconstrained_model.weight["bijector"] == Softplus
+    assert isinstance(meta_unconstrained_model.weight["bijector"], tfb.Softplus)
     assert meta_unconstrained_model.weight["trainable"] == False
     assert meta_unconstrained_model.bias == {}
 
@@ -200,9 +215,9 @@ def test_simple_linear_model(is_dataclass):
 @pytest.mark.parametrize("is_dataclass", [True, False])
 def test_nested_Module_structure(is_dataclass):
     class SubTree(Module):
-        c: float = param_field(bijector=Identity)
-        d: float = param_field(bijector=Softplus)
-        e: float = param_field(bijector=Softplus)
+        c: float = param_field(bijector=tfb.Identity())
+        d: float = param_field(bijector=tfb.Softplus())
+        e: float = param_field(bijector=tfb.Softplus())
 
         def __init__(self, c, d, e):
             self.c = c
@@ -210,9 +225,9 @@ def test_nested_Module_structure(is_dataclass):
             self.e = e
 
     class Tree(Module):
-        a: float = param_field(bijector=Identity)
+        a: float = param_field(bijector=tfb.Identity())
         sub_tree: SubTree
-        b: float = param_field(bijector=Softplus)
+        b: float = param_field(bijector=tfb.Softplus())
 
         def __init__(self, a, sub_tree, b):
             self.a = a
@@ -245,15 +260,15 @@ def test_nested_Module_structure(is_dataclass):
     assert isinstance(meta_tree, Module)
     assert isinstance(meta_tree, Pytree)
 
-    assert meta_tree.a["bijector"] == Identity
+    assert isinstance(meta_tree.a["bijector"], tfb.Identity)
     assert meta_tree.a["trainable"] == True
-    assert meta_tree.b["bijector"] == Softplus
+    assert isinstance(meta_tree.b["bijector"], tfb.Softplus)
     assert meta_tree.b["trainable"] == True
-    assert meta_tree.sub_tree.c["bijector"] == Identity
+    assert isinstance(meta_tree.sub_tree.c["bijector"], tfb.Identity)
     assert meta_tree.sub_tree.c["trainable"] == True
-    assert meta_tree.sub_tree.d["bijector"] == Softplus
+    assert isinstance(meta_tree.sub_tree.d["bijector"], tfb.Softplus)
     assert meta_tree.sub_tree.d["trainable"] == True
-    assert meta_tree.sub_tree.e["bijector"] == Softplus
+    assert isinstance(meta_tree.sub_tree.e["bijector"], tfb.Softplus)
     assert meta_tree.sub_tree.e["trainable"] == True
 
     # Test constrain and unconstrain
@@ -262,26 +277,26 @@ def test_nested_Module_structure(is_dataclass):
     assert isinstance(constrained, Module)
     assert isinstance(constrained, Pytree)
 
-    assert constrained.a == Identity.forward(1.0)
-    assert constrained.b == Softplus.forward(5.0)
-    assert constrained.sub_tree.c == Identity.forward(2.0)
-    assert constrained.sub_tree.d == Softplus.forward(3.0)
-    assert constrained.sub_tree.e == Softplus.forward(4.0)
+    assert constrained.a == tfb.Identity().forward(1.0)
+    assert constrained.b == tfb.Softplus().forward(5.0)
+    assert constrained.sub_tree.c == tfb.Identity().forward(2.0)
+    assert constrained.sub_tree.d == tfb.Softplus().forward(3.0)
+    assert constrained.sub_tree.e == tfb.Softplus().forward(4.0)
 
     meta_constrained = meta(constrained)
 
     assert isinstance(meta_constrained, Module)
     assert isinstance(meta_constrained, Pytree)
 
-    assert meta_constrained.a["bijector"] == Identity
+    assert isinstance(meta_constrained.a["bijector"], tfb.Identity)
     assert meta_constrained.a["trainable"] == True
-    assert meta_constrained.b["bijector"] == Softplus
+    assert isinstance(meta_constrained.b["bijector"], tfb.Softplus)
     assert meta_constrained.b["trainable"] == True
-    assert meta_constrained.sub_tree.c["bijector"] == Identity
+    assert isinstance(meta_constrained.sub_tree.c["bijector"], tfb.Identity)
     assert meta_constrained.sub_tree.c["trainable"] == True
-    assert meta_constrained.sub_tree.d["bijector"] == Softplus
+    assert isinstance(meta_constrained.sub_tree.d["bijector"], tfb.Softplus)
     assert meta_constrained.sub_tree.d["trainable"] == True
-    assert meta_constrained.sub_tree.e["bijector"] == Softplus
+    assert isinstance(meta_constrained.sub_tree.e["bijector"], tfb.Softplus)
     assert meta_constrained.sub_tree.e["trainable"] == True
 
     # Test constrain and unconstrain
@@ -290,34 +305,34 @@ def test_nested_Module_structure(is_dataclass):
     assert isinstance(unconstrained, Module)
     assert isinstance(unconstrained, Pytree)
 
-    assert unconstrained.a == Identity.inverse(1.0)
-    assert unconstrained.b == Softplus.inverse(5.0)
-    assert unconstrained.sub_tree.c == Identity.inverse(2.0)
-    assert unconstrained.sub_tree.d == Softplus.inverse(3.0)
-    assert unconstrained.sub_tree.e == Softplus.inverse(4.0)
+    assert unconstrained.a == tfb.Identity().inverse(1.0)
+    assert unconstrained.b == tfb.Softplus().inverse(5.0)
+    assert unconstrained.sub_tree.c == tfb.Identity().inverse(2.0)
+    assert unconstrained.sub_tree.d == tfb.Softplus().inverse(3.0)
+    assert unconstrained.sub_tree.e == tfb.Softplus().inverse(4.0)
 
     meta_unconstrained = meta(unconstrained)
 
     assert isinstance(meta_unconstrained, Module)
     assert isinstance(meta_unconstrained, Pytree)
 
-    assert meta_unconstrained.a["bijector"] == Identity
+    assert isinstance(meta_unconstrained.a["bijector"], tfb.Identity)
     assert meta_unconstrained.a["trainable"] == True
-    assert meta_unconstrained.b["bijector"] == Softplus
+    assert isinstance(meta_unconstrained.b["bijector"], tfb.Softplus)
     assert meta_unconstrained.b["trainable"] == True
-    assert meta_unconstrained.sub_tree.c["bijector"] == Identity
+    assert isinstance(meta_unconstrained.sub_tree.c["bijector"], tfb.Identity)
     assert meta_unconstrained.sub_tree.c["trainable"] == True
-    assert meta_unconstrained.sub_tree.d["bijector"] == Softplus
+    assert isinstance(meta_unconstrained.sub_tree.d["bijector"], tfb.Softplus)
     assert meta_unconstrained.sub_tree.d["trainable"] == True
-    assert meta_unconstrained.sub_tree.e["bijector"] == Softplus
+    assert isinstance(meta_unconstrained.sub_tree.e["bijector"], tfb.Softplus)
     assert meta_unconstrained.sub_tree.e["trainable"] == True
 
     # Test updating metadata
 
-    new_subtree = tree.sub_tree.replace_bijector(c=Softplus, e=Identity)
+    new_subtree = tree.sub_tree.replace_bijector(c=tfb.Softplus(), e=tfb.Identity())
     new_subtree = new_subtree.replace_trainable(c=False, e=False)
 
-    new_tree = tree.replace_bijector(b=Identity)
+    new_tree = tree.replace_bijector(b=tfb.Identity())
     new_tree = new_tree.replace_trainable(b=False)
     new_tree = new_tree.replace(sub_tree=new_subtree)
 
@@ -335,15 +350,15 @@ def test_nested_Module_structure(is_dataclass):
     assert isinstance(meta_new_tree, Module)
     assert isinstance(meta_new_tree, Pytree)
 
-    assert meta_new_tree.a["bijector"] == Identity
+    assert isinstance(meta_new_tree.a["bijector"], tfb.Identity)
     assert meta_new_tree.a["trainable"] == True
-    assert meta_new_tree.b["bijector"] == Identity
+    assert isinstance(meta_new_tree.b["bijector"], tfb.Identity)
     assert meta_new_tree.b["trainable"] == False
-    assert meta_new_tree.sub_tree.c["bijector"] == Softplus
+    assert isinstance(meta_new_tree.sub_tree.c["bijector"], tfb.Softplus)
     assert meta_new_tree.sub_tree.c["trainable"] == False
-    assert meta_new_tree.sub_tree.d["bijector"] == Softplus
+    assert isinstance(meta_new_tree.sub_tree.d["bijector"], tfb.Softplus)
     assert meta_new_tree.sub_tree.d["trainable"] == True
-    assert meta_new_tree.sub_tree.e["bijector"] == Identity
+    assert isinstance(meta_new_tree.sub_tree.e["bijector"], tfb.Identity)
     assert meta_new_tree.sub_tree.e["trainable"] == False
 
     # Test stop gradients
@@ -370,9 +385,9 @@ def test_nested_Module_structure(is_dataclass):
 @pytest.mark.parametrize("iterable", [list, tuple])
 def test_iterable_attribute(is_dataclass, iterable):
     class SubTree(Module):
-        a: int = param_field(bijector=Identity, default=1)
-        b: int = param_field(bijector=Softplus, default=2)
-        c: int = param_field(bijector=Identity, default=3, trainable=False)
+        a: int = param_field(bijector=tfb.Identity(), default=1)
+        b: int = param_field(bijector=tfb.Softplus(), default=2)
+        c: int = param_field(bijector=tfb.Identity(), default=3, trainable=False)
 
         def __init__(self, a=1.0, b=2.0, c=3.0):
             self.a = a
@@ -411,25 +426,25 @@ def test_iterable_attribute(is_dataclass, iterable):
     assert isinstance(meta_tree, Module)
     assert isinstance(meta_tree, Pytree)
 
-    assert meta_tree.trees[0].a["bijector"] == Identity
+    assert isinstance(meta_tree.trees[0].a["bijector"], tfb.Identity)
     assert meta_tree.trees[0].a["trainable"] == True
-    assert meta_tree.trees[0].b["bijector"] == Softplus
+    assert isinstance(meta_tree.trees[0].b["bijector"], tfb.Softplus)
     assert meta_tree.trees[0].b["trainable"] == True
-    assert meta_tree.trees[0].c["bijector"] == Identity
+    assert isinstance(meta_tree.trees[0].c["bijector"], tfb.Identity)
     assert meta_tree.trees[0].c["trainable"] == False
 
-    assert meta_tree.trees[1].a["bijector"] == Identity
+    assert isinstance(meta_tree.trees[1].a["bijector"], tfb.Identity)
     assert meta_tree.trees[1].a["trainable"] == True
-    assert meta_tree.trees[1].b["bijector"] == Softplus
+    assert isinstance(meta_tree.trees[1].b["bijector"], tfb.Softplus)
     assert meta_tree.trees[1].b["trainable"] == True
-    assert meta_tree.trees[1].c["bijector"] == Identity
+    assert isinstance(meta_tree.trees[1].c["bijector"], tfb.Identity)
     assert meta_tree.trees[1].c["trainable"] == False
 
-    assert meta_tree.trees[2].a["bijector"] == Identity
+    assert isinstance(meta_tree.trees[2].a["bijector"], tfb.Identity)
     assert meta_tree.trees[2].a["trainable"] == True
-    assert meta_tree.trees[2].b["bijector"] == Softplus
+    assert isinstance(meta_tree.trees[2].b["bijector"], tfb.Softplus)
     assert meta_tree.trees[2].b["trainable"] == True
-    assert meta_tree.trees[2].c["bijector"] == Identity
+    assert isinstance(meta_tree.trees[2].c["bijector"], tfb.Identity)
     assert meta_tree.trees[2].c["trainable"] == False
 
     # Test constrain and unconstrain
@@ -446,29 +461,29 @@ def test_iterable_attribute(is_dataclass, iterable):
     assert isinstance(unconstrained_tree, Module)
     assert isinstance(unconstrained_tree, Pytree)
 
-    assert constrained_tree.trees[0].a == Identity.forward(1.0)
-    assert constrained_tree.trees[0].b == Softplus.forward(2.0)
-    assert constrained_tree.trees[0].c == Identity.forward(3.0)
+    assert constrained_tree.trees[0].a == tfb.Identity().forward(1.0)
+    assert constrained_tree.trees[0].b == tfb.Softplus().forward(2.0)
+    assert constrained_tree.trees[0].c == tfb.Identity().forward(3.0)
 
-    assert constrained_tree.trees[1].a == Identity.forward(1.0)
-    assert constrained_tree.trees[1].b == Softplus.forward(2.0)
-    assert constrained_tree.trees[1].c == Identity.forward(3.0)
+    assert constrained_tree.trees[1].a == tfb.Identity().forward(1.0)
+    assert constrained_tree.trees[1].b == tfb.Softplus().forward(2.0)
+    assert constrained_tree.trees[1].c == tfb.Identity().forward(3.0)
 
-    assert constrained_tree.trees[2].a == Identity.forward(1.0)
-    assert constrained_tree.trees[2].b == Softplus.forward(2.0)
-    assert constrained_tree.trees[2].c == Identity.forward(3.0)
+    assert constrained_tree.trees[2].a == tfb.Identity().forward(1.0)
+    assert constrained_tree.trees[2].b == tfb.Softplus().forward(2.0)
+    assert constrained_tree.trees[2].c == tfb.Identity().forward(3.0)
 
-    assert unconstrained_tree.trees[0].a == Identity.inverse(1.0)
-    assert unconstrained_tree.trees[0].b == Softplus.inverse(2.0)
-    assert unconstrained_tree.trees[0].c == Identity.inverse(3.0)
+    assert unconstrained_tree.trees[0].a == tfb.Identity().inverse(1.0)
+    assert unconstrained_tree.trees[0].b == tfb.Softplus().inverse(2.0)
+    assert unconstrained_tree.trees[0].c == tfb.Identity().inverse(3.0)
 
-    assert unconstrained_tree.trees[1].a == Identity.inverse(1.0)
-    assert unconstrained_tree.trees[1].b == Softplus.inverse(2.0)
-    assert unconstrained_tree.trees[1].c == Identity.inverse(3.0)
+    assert unconstrained_tree.trees[1].a == tfb.Identity().inverse(1.0)
+    assert unconstrained_tree.trees[1].b == tfb.Softplus().inverse(2.0)
+    assert unconstrained_tree.trees[1].c == tfb.Identity().inverse(3.0)
 
-    assert unconstrained_tree.trees[2].a == Identity.inverse(1.0)
-    assert unconstrained_tree.trees[2].b == Softplus.inverse(2.0)
-    assert unconstrained_tree.trees[2].c == Identity.inverse(3.0)
+    assert unconstrained_tree.trees[2].a == tfb.Identity().inverse(1.0)
+    assert unconstrained_tree.trees[2].b == tfb.Softplus().inverse(2.0)
+    assert unconstrained_tree.trees[2].c == tfb.Identity().inverse(3.0)
 
 
 # The following tests are adapted from equinox 🏴‍☠️
@@ -477,14 +492,14 @@ def test_iterable_attribute(is_dataclass, iterable):
 def test_Module_not_enough_attributes():
     @dataclass
     class Tree1(Module):
-        weight: Any = param_field(bijector=Identity)
+        weight: Any = param_field(bijector=tfb.Identity())
 
     with pytest.raises(TypeError):
         Tree1()
 
     @dataclass
     class Tree2(Module):
-        weight: Any = param_field(bijector=Identity)
+        weight: Any = param_field(bijector=tfb.Identity())
 
         def __init__(self):
             return None
@@ -496,7 +511,7 @@ def test_Module_not_enough_attributes():
 def test_Module_too_many_attributes():
     @dataclass
     class Tree1(Module):
-        weight: Any = param_field(bijector=Identity)
+        weight: Any = param_field(bijector=tfb.Identity())
 
     with pytest.raises(TypeError):
         Tree1(1, 2)
@@ -505,7 +520,7 @@ def test_Module_too_many_attributes():
 def test_Module_setattr_after_init():
     @dataclass
     class Tree(Module):
-        weight: Any = param_field(bijector=Identity)
+        weight: Any = param_field(bijector=tfb.Identity())
 
     m = Tree(1)
     with pytest.raises(AttributeError):
@@ -518,11 +533,11 @@ def test_inheritance():
 
     @dataclass
     class Tree(Module):
-        weight: Any = param_field(bijector=Identity)
+        weight: Any = param_field(bijector=tfb.Identity())
 
     @dataclass
     class Tree2(Tree):
-        weight2: Any = param_field(bijector=Identity)
+        weight2: Any = param_field(bijector=tfb.Identity())
 
     m = Tree2(1, 2)
     assert m.weight == 1
@@ -540,7 +555,7 @@ def test_inheritance():
 
     @dataclass
     class Tree3(Tree):
-        weight3: Any = param_field(bijector=Identity)
+        weight3: Any = param_field(bijector=tfb.Identity())
 
         def __init__(self, *, weight3, **kwargs):
             self.weight3 = weight3
@@ -554,11 +569,11 @@ def test_inheritance():
 
     @dataclass
     class Tree4(Module):
-        weight4: Any = param_field(bijector=Identity)
+        weight4: Any = param_field(bijector=tfb.Identity())
 
     @dataclass
     class Tree5(Tree4):
-        weight5: Any = param_field(bijector=Identity)
+        weight5: Any = param_field(bijector=tfb.Identity())
 
     with pytest.raises(TypeError):
         m = Tree5(value4=1, weight5=2)
@@ -574,7 +589,7 @@ def test_inheritance():
 
     @dataclass
     class Tree7(Tree4):
-        weight7: Any = param_field(bijector=Identity)
+        weight7: Any = param_field(bijector=tfb.Identity())
 
         def __init__(self, value7, **kwargs):
             self.weight7 = value7
@@ -588,7 +603,7 @@ def test_inheritance():
 def test_static_field():
     @dataclass
     class Tree(Module):
-        field1: int = param_field(bijector=Identity)
+        field1: int = param_field(bijector=tfb.Identity())
         field2: int = static_field()
         field3: int = static_field(default=3)
 

@@ -13,40 +13,29 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Dict, List, Optional
+from dataclasses import dataclass
 
 import jax.numpy as jnp
-from jax.random import KeyArray
+import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax.distributions as tfd
 from jaxtyping import Array, Float
 
-from gpjax.kernels.base import AbstractKernel
-from gpjax.kernels.computations import (
-    DenseKernelComputation,
-)
-from gpjax.kernels.stationary.utils import (
-    euclidean_distance,
-    build_student_t_distribution,
-)
+from ...base import param_field
+from ..base import AbstractKernel
+from .utils import build_student_t_distribution, euclidean_distance
 
 
+@dataclass
 class Matern12(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 0.5."""
 
-    def __init__(
-        self,
-        active_dims: Optional[List[int]] = None,
-        name: Optional[str] = "Matérn 1/2 kernel",
-    ) -> None:
-        spectral_density = build_student_t_distribution(nu=1)
-        super().__init__(DenseKernelComputation, active_dims, spectral_density, name)
-        self._stationary = True
+    lengthscale: Float[Array, "D"] = param_field(
+        jnp.array([1.0]), bijector=tfb.Softplus()
+    )
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    name: str = "Matérn12"
 
-    def __call__(
-        self,
-        params: Dict,
-        x: Float[Array, "1 D"],
-        y: Float[Array, "1 D"],
-    ) -> Float[Array, "1"]:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
         lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
 
@@ -54,19 +43,16 @@ class Matern12(AbstractKernel):
             k(x, y) = \\sigma^2 \\exp \\Bigg( -\\frac{\\lvert x-y \\rvert}{2\\ell^2}  \\Bigg)
 
         Args:
-            params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
+            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's call
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`
         """
-        x = self.slice_input(x) / params["lengthscale"]
-        y = self.slice_input(y) / params["lengthscale"]
-        K = params["variance"] * jnp.exp(-euclidean_distance(x, y))
+        x = self.slice_input(x) / self.lengthscale
+        y = self.slice_input(y) / self.lengthscale
+        K = self.variance * jnp.exp(-euclidean_distance(x, y))
         return K.squeeze()
 
-    def init_params(self, key: KeyArray) -> Dict:
-        return {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-        }
+    @property
+    def spectral_density(self) -> tfd.Distribution:
+        return build_student_t_distribution(nu=1)

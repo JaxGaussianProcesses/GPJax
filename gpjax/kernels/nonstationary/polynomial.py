@@ -13,12 +13,15 @@
 # limitations under the License.
 # ==============================================================================
 
-import jax.numpy as jnp
-from jaxtyping import Array, Float
-from gpjax.kernels.base import AbstractKernel
 from dataclasses import dataclass
+
+import jax.numpy as jnp
+import tensorflow_probability.substrates.jax.bijectors as tfb
+from jaxtyping import Array, Float
 from simple_pytree import static_field
-from gpjax.parameters import param_field, Softplus
+
+from ...base import param_field
+from ..base import AbstractKernel
 
 
 @dataclass
@@ -26,18 +29,24 @@ class Polynomial(AbstractKernel):
     """The Polynomial kernel with variable degree."""
 
     degree: int = static_field(2)
-    shift: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=Softplus)
+    shift: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+
+    def __post_init__(self):
+        self.name = f"Polynomial (degree {self.degree})"
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\\alpha` and variance :math:`\\sigma^2` through
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter
+        :math:`\\alpha` and variance :math:`\\sigma^2` through
 
         .. math::
             k(x, y) = \\Big( \\alpha + \\sigma^2 xy \\Big)^{d}
 
         Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's call
+            x (Float[Array, "D"]): The left hand argument of the kernel function's
+                call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's
+                call
 
         Returns:
             Float[Array, "1"]: The value of :math:`k(x, y)`.

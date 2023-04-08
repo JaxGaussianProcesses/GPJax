@@ -20,10 +20,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 
+from dataclasses import dataclass
 from typing import Union
 
 import jax.numpy as jnp
-from dataclasses import dataclass
 from jaxtyping import Array, Float
 
 from gpjax.linops.linear_operator import LinearOperator
@@ -77,7 +77,8 @@ class DenseLinearOperator(LinearOperator):
             LinearOperator: linear operator plus the diagonal linear operator.
         """
 
-        from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+        from gpjax.linops.diagonal_linear_operator import \
+            DiagonalLinearOperator
         from gpjax.linops.zero_linear_operator import ZeroLinearOperator
 
         other = to_linear_operator(other)

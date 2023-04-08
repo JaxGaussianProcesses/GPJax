@@ -19,8 +19,8 @@ import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Array, Float
 
-from gpjax.linops.linear_operator import LinearOperator
-from gpjax.linops.dense_linear_operator import DenseLinearOperator
+from .dense_linear_operator import DenseLinearOperator
+from .linear_operator import LinearOperator
 
 
 class LowerTriangularLinearOperator(DenseLinearOperator):

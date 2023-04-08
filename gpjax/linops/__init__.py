@@ -13,22 +13,15 @@
 # limitations under the License.
 # ==============================================================================
 
-from gpjax.linops.linear_operator import LinearOperator
-from gpjax.linops.dense_linear_operator import DenseLinearOperator
-from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
-from gpjax.linops.constant_diagonal_linear_operator import (
-    ConstantDiagonalLinearOperator,
-)
-from gpjax.linops.identity_linear_operator import IdentityLinearOperator
-from gpjax.linops.zero_linear_operator import ZeroLinearOperator
-from gpjax.linops.triangular_linear_operator import (
-    LowerTriangularLinearOperator,
-    UpperTriangularLinearOperator,
-)
-from gpjax.linops.utils import (
-    identity,
-    to_dense,
-)
+from .constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
+from .dense_linear_operator import DenseLinearOperator
+from .diagonal_linear_operator import DiagonalLinearOperator
+from .identity_linear_operator import IdentityLinearOperator
+from .linear_operator import LinearOperator
+from .triangular_linear_operator import (LowerTriangularLinearOperator,
+                                         UpperTriangularLinearOperator)
+from .utils import identity, to_dense
+from .zero_linear_operator import ZeroLinearOperator
 
 __all__ = [
     "LinearOperator",

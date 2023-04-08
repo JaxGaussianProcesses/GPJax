@@ -14,20 +14,20 @@
 # ==============================================================================
 
 
+import jax
 import jax.numpy as jnp
 import jax.random as jr
-import jax
 import pytest
 from jax.config import config
-
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 _PRNGKey = jr.PRNGKey(42)
 
-from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
-from gpjax.linops.triangular_linear_operator import LowerTriangularLinearOperator
+from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+from gpjax.linops.triangular_linear_operator import \
+    LowerTriangularLinearOperator
 
 
 def approx_equal(res: jax.Array, actual: jax.Array) -> bool:

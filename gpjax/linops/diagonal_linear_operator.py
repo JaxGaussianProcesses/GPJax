@@ -15,14 +15,15 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from dataclasses import dataclass
-from gpjax.linops.linear_operator import LinearOperator
-from gpjax.linops.dense_linear_operator import DenseLinearOperator
-from gpjax.linops.utils import to_linear_operator
+
+from .dense_linear_operator import DenseLinearOperator
+from .linear_operator import LinearOperator
+from .utils import to_linear_operator
 
 
 def _check_diag(diag: Any) -> None:

@@ -17,6 +17,11 @@ import jax.random as jr
 from jax.config import config
 from jax.random import KeyArray
 
+from gpjax.linops.dense_linear_operator import DenseLinearOperator
+from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+from gpjax.linops.triangular_linear_operator import (
+    LowerTriangularLinearOperator, UpperTriangularLinearOperator)
+
 # Test settings:
 key: KeyArray = jr.PRNGKey(seed=42)
 jitter: float = 1e-6

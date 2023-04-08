@@ -10,8 +10,13 @@
 # %% [markdown]
 # # Sparse Gaussian Process Regression
 #
-# In this notebook we consider sparse Gaussian process regression (SGPR) <strong data-cite="titsias2009">Titsias (2009)</strong>. This is a solution for medium- to large-scale conjugate regression problems.
-# In order to arrive at a computationally tractable method, the approximate posterior is parameterized via a set of $m$ pseudo-points $\boldsymbol{z}$. Critically, the approach leads to $\mathcal{O}(nm^2)$ complexity for approximate maximum likelihood learning and $O(m^2)$ per test point for prediction.
+# In this notebook we consider sparse Gaussian process regression (SGPR)
+# <strong data-cite="titsias2009">Titsias (2009)</strong>. This is a solution for
+# medium to large-scale conjugate regression problems.
+# In order to arrive at a computationally tractable method, the approximate posterior
+# is parameterized via a set of $m$ pseudo-points $\boldsymbol{z}$. Critically, the
+# approach leads to $\mathcal{O}(nm^2)$ complexity for approximate maximum likelihood
+# learning and $O(m^2)$ per test point for prediction.
 
 # %%
 import jax.numpy as jnp
@@ -20,8 +25,6 @@ import matplotlib.pyplot as plt
 import optax as ox
 from jax import jit
 from jax.config import config
-from jaxutils import Dataset
-import gpjax.kernels as jk
 
 import gpjax as gpx
 
@@ -32,11 +35,15 @@ key = jr.PRNGKey(123)
 # %% [markdown]
 # ## Dataset
 #
-# With the necessary modules imported, we simulate a dataset $\mathcal{D} = (\boldsymbol{x}, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{500}$ with inputs $\boldsymbol{x}$ sampled uniformly on $(-3., 3)$ and corresponding independent noisy outputs
+# With the necessary modules imported, we simulate a dataset
+# $\mathcal{D} = (\boldsymbol{x}, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{500}$
+# with inputs $\boldsymbol{x}$ sampled uniformly on $(-3., 3)$ and corresponding
+# independent noisy outputs
 #
 # $$\boldsymbol{y} \sim \mathcal{N} \left(\sin(7\boldsymbol{x}) + x \cos(2 \boldsymbol{x}), \textbf{I} * 0.5^2 \right).$$
 #
-# We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs and labels for later.
+# We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs and
+# labels for later.
 
 # %%
 n = 2500
@@ -48,13 +55,15 @@ f = lambda x: jnp.sin(2 * x) + x * jnp.cos(5 * x)
 signal = f(x)
 y = signal + jr.normal(subkey, shape=signal.shape) * noise
 
-D = Dataset(X=x, y=y)
+D = gpx.Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-3.1, 3.1, 500).reshape(-1, 1)
 ytest = f(xtest)
 
 # %% [markdown]
-# To better understand what we have simulated, we plot both the underlying latent function and the observed data that is subject to Gaussian noise. We also plot an initial set of inducing points over the space.
+# To better understand what we have simulated, we plot both the underlying latent
+# function and the observed data that is subject to Gaussian noise. We also plot an
+# initial set of inducing points over the space.
 
 # %%
 n_inducing = 50
@@ -68,53 +77,60 @@ ax.legend(loc="best")
 plt.show()
 
 # %% [markdown]
-# Next we define the posterior model for the data.
+# Next we define the true posterior model for the data - note that whilst we can define
+# this, it is intractable to evaluate.
 
 # %%
-kernel = jk.RBF()
+meanf = gpx.Constant()
+kernel = gpx.RBF()
 likelihood = gpx.Gaussian(num_datapoints=D.n)
-prior = gpx.Prior(kernel=kernel)
-p = prior * likelihood
+prior = gpx.Prior(mean_function=meanf, kernel=kernel)
+posterior = prior * likelihood
 
 # %% [markdown]
-# We now define the SGPR model through `CollapsedVariationalGaussian`. Since the form of the collapsed optimal posterior depends on the Gaussian likelihood's observation noise, we pass this to the constructer.
+# We now define the SGPR model through `CollapsedVariationalGaussian`. Through a
+# set of inducing points $\boldsymbol{z}$ this object builds an approximation to the
+# true posterior distribution. Consequently, we pass the true posterior and initial
+# inducing points into the constructor as arguments.
 
 # %%
-q = gpx.CollapsedVariationalGaussian(
-    prior=prior, likelihood=likelihood, inducing_inputs=z
-)
+q = gpx.CollapsedVariationalGaussian(posterior=posterior, inducing_inputs=z)
 
 # %% [markdown]
-# We define our variational inference algorithm through `CollapsedVI`. This defines the collapsed variational free energy bound considered in <strong data-cite="titsias2009">Titsias (2009)</strong>.
+# We define our variational inference algorithm through `CollapsedVI`. This defines
+# the collapsed variational free energy bound considered in
+# <strong data-cite="titsias2009">Titsias (2009)</strong>.
 
 # %%
-sgpr = gpx.CollapsedVI(posterior=p, variational_family=q)
+elbo = jit(gpx.CollapsedELBO(negative=True))
 
 # %% [markdown]
-# We now train our model akin to a Gaussian process regression model via the `fit` abstraction. Unlike the regression example given in the [conjugate regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html), the inducing locations that induce our variational posterior distribution are now part of the model's parameters. Using a gradient-based optimiser, we can then _optimise_ their location such that the evidence lower bound is maximised.
+# We now train our model akin to a Gaussian process regression model via the `fit`
+# abstraction. Unlike the regression example given in the
+# [conjugate regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html),
+# the inducing locations that induce our variational posterior distribution are now
+# part of the model's parameters. Using a gradient-based optimiser, we can then
+# _optimise_ their location such that the evidence lower bound is maximised.
 
 # %%
-parameter_state = gpx.initialise(sgpr, key)
-
-negative_elbo = jit(sgpr.elbo(D, negative=True))
-
-optimiser = ox.adam(learning_rate=5e-3)
-
-inference_state = gpx.fit(
-    objective=negative_elbo,
-    parameter_state=parameter_state,
-    optax_optim=optimiser,
+opt_posterior, history = gpx.fit(
+    model=q,
+    objective=elbo,
+    train_data=D,
+    optim=ox.adamw(learning_rate=5e-3),
     num_iters=2000,
 )
 
-learned_params, training_history = inference_state.unpack()
+plt.plot(history)
 
 # %% [markdown]
 # We show predictions of our model with the learned inducing points overlayed in grey.
 
 # %%
-latent_dist = q(learned_params, D)(xtest)
-predictive_dist = likelihood(learned_params, latent_dist)
+latent_dist = opt_posterior(xtest, train_data=D)
+predictive_dist = opt_posterior.posterior.likelihood(latent_dist)
+
+inducing_points = opt_posterior.inducing_inputs
 
 samples = latent_dist.sample(seed=key, sample_shape=(20,))
 
@@ -159,33 +175,33 @@ ax.plot(
 
 
 ax.plot(xtest, samples.T, color="tab:blue", alpha=0.8, linewidth=0.2)
-[
-    ax.axvline(x=z_i, color="tab:gray", alpha=0.3, linewidth=1)
-    for z_i in learned_params["variational_family"]["inducing_inputs"]
-]
+[ax.axvline(x=z_i, color="tab:gray", alpha=0.3, linewidth=1) for z_i in inducing_points]
 ax.legend()
 plt.show()
 
 # %% [markdown]
 # ## Runtime comparison
 #
-# Given the size of the data being considered here, inference in a GP with a full-rank covariance matrix is possible, albeit quite slow. We can therefore compare the speedup that we get from using the above sparse approximation with corresponding bound on the marginal log-likelihood against the marginal log-likelihood in the full model.
+# Given the size of the data being considered here, inference in a GP with a full-rank
+# covariance matrix is possible, albeit quite slow. We can therefore compare the
+# speedup that we get from using the above sparse approximation with corresponding
+# bound on the marginal log-likelihood against the marginal log-likelihood in the
+# full model.
 
 # %%
-full_rank_model = gpx.Prior(kernel=gpx.RBF()) * gpx.Gaussian(num_datapoints=D.n)
-fr_params, *_ = gpx.initialise(full_rank_model, key).unpack()
-negative_mll = jit(full_rank_model.marginal_log_likelihood(D, negative=True))
-
-# %timeit negative_mll(fr_params).block_until_ready()
+full_rank_model = gpx.Prior(mean_function=gpx.Zero(), kernel=gpx.RBF()) * gpx.Gaussian(
+    num_datapoints=D.n
+)
+negative_mll = jit(gpx.ConjugateMLL(negative=True))
+# %timeit negative_mll(full_rank_model, D).block_until_ready()
 
 # %%
-params, *_ = gpx.initialise(sgpr, key).unpack()
-negative_elbo = jit(sgpr.elbo(D, negative=True))
-
-# %timeit negative_elbo(params).block_until_ready()
+negative_elbo = jit(gpx.CollapsedELBO(negative=True))
+# %timeit negative_elbo(q, D).block_until_ready()
 
 # %% [markdown]
-# As we can see, the sparse approximation given here is around 50 times faster when compared against a full-rank model.
+# As we can see, the sparse approximation given here is around 50 times faster when
+# compared against a full-rank model.
 
 # %% [markdown]
 # ## System configuration

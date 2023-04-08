@@ -14,15 +14,14 @@
 # ==============================================================================
 
 import abc
-from typing import Any
-from jax import vmap
-from gpjax.linops import (
-    DenseLinearOperator,
-    DiagonalLinearOperator,
-    LinearOperator,
-)
-from jaxtyping import Array, Float
 from dataclasses import dataclass
+from typing import Any
+
+from jax import vmap
+from jaxtyping import Array, Float
+
+from gpjax.linops import (DenseLinearOperator, DiagonalLinearOperator,
+                          LinearOperator)
 
 Kernel = Any
 
