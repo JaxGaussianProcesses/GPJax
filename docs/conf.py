@@ -18,7 +18,10 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))
 
-from importlib_metadata import version
+try:
+    from importlib.metadata import version
+except ImportError:
+    from importlib_metadata import version
 
 
 def read(*names, **kwargs):
@@ -62,10 +65,11 @@ from os.path import join, pardir, dirname
 
 sys.path.insert(0, join(dirname(__file__), pardir))
 
+# Get the version string.
+version = version("gpjax")
 
-version = "0.6.0"
+# The full version, including alpha/beta/rc tags.
 release = version
-
 
 # -- General configuration ---------------------------------------------------
 # Add any Sphinx extension module names here, as strings. They can be
