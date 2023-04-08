@@ -179,6 +179,10 @@ class GaussianDistribution(tfd.Distribution):
 
         return vmap(affine_transformation)(Z)
 
+    def sample(self,seed: KeyArray, sample_shape: Tuple[int, int]):  # pylint: disable=useless-super-delegation
+      """See `Distribution.sample`."""
+      return self._sample_n(seed, sample_shape[0])
+
     def kl_divergence(self, other: "GaussianDistribution") -> Float[Array, "1"]:
         return _kl_divergence(self, other)
 
