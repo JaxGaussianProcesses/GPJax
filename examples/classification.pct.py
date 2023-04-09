@@ -1,14 +1,3 @@
-# -*- coding: utf-8 -*-
-# ---
-# jupyter:
-#   jupytext:
-#     text_representation:
-#       extension: .py
-#       jupytext_version: 1.11.2
-#   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
-# ---
-
 # %% [markdown]
 # # Classification
 #
@@ -202,8 +191,8 @@ L = jnp.linalg.cholesky(H + I(D.n) * jitter)
 # H⁻¹ = H⁻¹ I = (LLᵀ)⁻¹ I = L⁻ᵀL⁻¹ I
 L_inv = jsp.linalg.solve_triangular(L, I(D.n), lower=True)
 H_inv = jsp.linalg.solve_triangular(L.T, L_inv, lower=False)
-
-laplace_approximation = tfd.MultivariateNormalFullCovariance(f_hat.squeeze(), H_inv)
+LH = jnp.linalg.cholesky(H_inv)
+laplace_approximation = tfd.MultivariateNormalTriL(f_hat.squeeze(), LH)
 
 
 # %% [markdown]
@@ -327,7 +316,7 @@ lpd(opt_posterior, D)
 num_adapt = 500
 num_samples = 500
 
-lpd = gpx.LogPosteriorDensity(negative=False)
+lpd = jax.jit(gpx.LogPosteriorDensity(negative=False))
 unconstrained_lpd = jax.jit(lambda tree: lpd(tree.constrain(), D))
 
 adapt = blackjax.window_adaptation(

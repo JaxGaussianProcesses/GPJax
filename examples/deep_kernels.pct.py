@@ -1,19 +1,3 @@
-# -*- coding: utf-8 -*-
-# ---
-# jupyter:
-#   jupytext:
-#     custom_cell_magics: kql
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.11.2
-#   kernelspec:
-#     display_name: gpjax
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # Deep Kernel Learning
 #
@@ -199,7 +183,7 @@ optimiser = ox.chain(
 
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=gpx.ConjugateMLL(negative=True),
+    objective=jax.jit(gpx.ConjugateMLL(negative=True)),
     train_data=D,
     optim=optimiser,
     num_iters=1000,

@@ -37,13 +37,17 @@ class AbstractObjective(Module):
     def __hash__(self):
         return hash(tuple(jtu.tree_leaves(self)))  # Probably put this on the Module!
 
-    @abstractmethod
     def __call__(self, *args, **kwargs) -> Float[Array, "1"]:
+        return self.step(*args, **kwargs)
+
+    @abstractmethod
+    def step(self, *args, **kwargs) -> Float[Array, "1"]:
         raise NotImplementedError
 
 
+
 class ConjugateMLL(AbstractObjective):
-    def __call__(
+    def step(
         self, posterior: ConjugatePosterior, train_data: Dataset
     ) -> Float[Array, "1"]:
         """Compute the marginal log-likelihood function of the Gaussian process.
@@ -126,7 +130,7 @@ class ConjugateMLL(AbstractObjective):
 
 
 class NonConjugateMLL(AbstractObjective):
-    def __call__(
+    def step(
         self, posterior: NonConjugatePosterior, data: Dataset
     ) -> Float[Array, "1"]:
         """
@@ -185,7 +189,7 @@ class NonConjugateMLL(AbstractObjective):
 
 
 class ELBO(AbstractObjective):
-    def __call__(
+    def step(
         self, variational_family: AbstractVariationalFamily, train_data: Dataset
     ) -> Float[Array, "1"]:
         """Compute the evidence lower bound under this model. In short, this requires
@@ -274,7 +278,7 @@ class CollapsedELBO(AbstractObjective):
     in Sparse Gaussian Processes.
     """
 
-    def __call__(
+    def step(
         self, variational_family: AbstractVariationalFamily, train_data: Dataset
     ) -> Float[Array, "1"]:
         """Compute the evidence lower bound under this model. In short, this requires

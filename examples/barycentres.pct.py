@@ -1,14 +1,3 @@
-# -*- coding: utf-8 -*-
-# ---
-# jupyter:
-#   jupytext:
-#     text_representation:
-#       extension: .py
-#       jupytext_version: 1.11.2
-#   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
-# ---
-
 # %% [markdown]
 # # Gaussian Processes Barycentres
 #

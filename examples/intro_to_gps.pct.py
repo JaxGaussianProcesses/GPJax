@@ -1,13 +1,3 @@
-# ---
-# jupyter:
-#   jupytext:
-#     text_representation:
-#       extension: .py
-#       jupytext_version: 1.11.2
-#   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
-# ---
-
 # %% [markdown]
 # # New to Gaussian Processes?
 #
@@ -108,17 +98,18 @@
 # We can plot three different parameterisations of this density.
 
 # %%
-import distrax as dx
+import tensorflow_probability.substrates.jax as tfp
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from utils import confidence_ellipse
+tfd = tfp.distributions
 
-ud1 = dx.Normal(0.0, 1.0)
-ud2 = dx.Normal(-1.0, 0.5)
-ud3 = dx.Normal(0.25, 1.5)
+ud1 = tfd.Normal(0.0, 1.0)
+ud2 = tfd.Normal(-1.0, 0.5)
+ud3 = tfd.Normal(0.25, 1.5)
 
 xs = jnp.linspace(-5.0, 5.0, 500)
 
@@ -161,11 +152,11 @@ ax.legend(loc="best")
 # %%
 key = jr.PRNGKey(123)
 
-d1 = dx.MultivariateNormalFullCovariance(jnp.zeros(2), jnp.eye(2))
-d2 = dx.MultivariateNormalTri(
+d1 = tfd.MultivariateNormalDiag(loc=jnp.zeros(2), scale_diag=jnp.ones(2))
+d2 = tfd.MultivariateNormalTriL(
     jnp.zeros(2), jnp.linalg.cholesky(jnp.array([[1.0, 0.9], [0.9, 1.0]]))
 )
-d3 = dx.MultivariateNormalTri(
+d3 = tfd.MultivariateNormalTriL(
     jnp.zeros(2), jnp.linalg.cholesky(jnp.array([[1.0, -0.5], [-0.5, 1.0]]))
 )
 
@@ -240,13 +231,13 @@ for a, t, d in zip([ax0, ax1, ax2], titles, dists):
 
 # %%
 n = 1000
-x = dx.Normal(loc=0.0, scale=1.0).sample(seed=key, sample_shape=(n,))
+x = tfd.Normal(loc=0.0, scale=1.0).sample(seed=key, sample_shape=(n,))
 key, subkey = jr.split(key)
-y = dx.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n,))
+y = tfd.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n,))
 key, subkey = jr.split(subkey)
-xfull = dx.Normal(loc=0.0, scale=1.0).sample(seed=subkey, sample_shape=(n * 10,))
+xfull = tfd.Normal(loc=0.0, scale=1.0).sample(seed=subkey, sample_shape=(n * 10,))
 key, subkey = jr.split(subkey)
-yfull = dx.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n * 10,))
+yfull = tfd.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n * 10,))
 key, subkey = jr.split(subkey)
 df = pd.DataFrame({"x": x, "y": y, "idx": jnp.ones(n)})
 

@@ -21,6 +21,8 @@ import optax as ox
 from jax._src.random import _check_prng_key
 from jax.random import KeyArray
 from jaxtyping import Array, Float
+from jaxlib.xla_extension import PjitFunction
+from warnings import warn
 
 from .base import Module
 from .dataset import Dataset
@@ -39,9 +41,11 @@ def fit(
     key: Optional[KeyArray] = jr.PRNGKey(42),
     log_rate: Optional[int] = 10,
     verbose: Optional[bool] = True,
-    unroll: int = 1,
+    unroll: Optional[int] = 1,
+    safe: Optional[bool] = True,
 ) -> Tuple[Module, Array]:
-    """Train a Module model with respect to a supplied Objective function. Optimisers used here should originate from Optax.
+    """Train a Module model with respect to a supplied Objective function.
+    Optimisers used here should originate from Optax.
 
     Example:
         >>> import jax.numpy as jnp
@@ -78,30 +82,39 @@ def fit(
 
     Args:
         model (Module): The model Module to be optimised.
-        objective (Objective): The objective function that we are optimising with respect to.
+        objective (Objective): The objective function that we are optimising with
+            respect to.
         train_data (Dataset): The training data to be used for the optimisation.
-        optim (GradientTransformation): The Optax optimiser that is to be used for learning a parameter set.
-        num_iters (Optional[int]): The number of optimisation steps to run. Defaults to 100.
-        batch_size (Optional[int]): The size of the mini-batch to use. Defaults to -1 (i.e. full batch).
-        key (Optional[KeyArray]): The random key to use for the optimisation batch selection. Defaults to jr.PRNGKey(42).
-        log_rate (Optional[int]): How frequently the objective function's value should be printed. Defaults to 10.
-        verbose (Optional[bool]): Whether to print the training loading bar. Defaults to True.
-        unroll (int): The number of unrolled steps to use for the optimisation. Defaults to 1.
+        optim (GradientTransformation): The Optax optimiser that is to be used for
+            learning a parameter set.
+        num_iters (Optional[int]): The number of optimisation steps to run. Defaults
+            to 100.
+        batch_size (Optional[int]): The size of the mini-batch to use. Defaults to -1
+            (i.e. full batch).
+        key (Optional[KeyArray]): The random key to use for the optimisation batch
+            selection. Defaults to jr.PRNGKey(42).
+        log_rate (Optional[int]): How frequently the objective function's value should
+        be printed. Defaults to 10.
+        verbose (Optional[bool]): Whether to print the training loading bar. Defaults
+            to True.
+        unroll (int): The number of unrolled steps to use for the optimisation.
+            Defaults to 1.
 
     Returns:
-        Tuple[Module, Array]: A Tuple comprising the optimised model and training history respectively.
+        Tuple[Module, Array]: A Tuple comprising the optimised model and training
+            history respectively.
     """
-
-    # Check inputs.
-    _check_model(model)
-    _check_objective(objective)
-    _check_train_data(train_data)
-    _check_optim(optim)
-    _check_num_iters(num_iters)
-    _check_batch_size(batch_size)
-    _check_prng_key(key)
-    _check_log_rate(log_rate)
-    _check_verbose(verbose)
+    if safe:
+        # Check inputs.
+        _check_model(model)
+        _check_objective(objective)
+        _check_train_data(train_data)
+        _check_optim(optim)
+        _check_num_iters(num_iters)
+        _check_batch_size(batch_size)
+        _check_prng_key(key)
+        _check_log_rate(log_rate)
+        _check_verbose(verbose)
 
     # Unconstrained space loss function with stop-gradient rule for non-trainable params.
     def loss(model: Module, batch: Dataset) -> Float[Array, "1"]:
@@ -173,9 +186,12 @@ def _check_model(model: Any) -> None:
 def _check_objective(objective: Any) -> None:
     """Check that the objective is of type Objective."""
     if not isinstance(objective, AbstractObjective):
-        raise TypeError(
-            f"objective of type {type(objective)} must be of type gpjax.Objective."
-        )
+        if isinstance(objective, PjitFunction):
+            warn("Objective is jit-compiled. Please ensure that the objective is of type gpjax.Objective.")
+        else:
+            raise TypeError(
+                f"objective of type {type(objective)} must be of type gpjax.Objective."
+            )
 
 
 def _check_train_data(train_data: Any) -> None:
