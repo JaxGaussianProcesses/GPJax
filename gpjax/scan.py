@@ -13,14 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, List, Optional, Tuple, TypeVar, Any
+from typing import Any, Callable, List, Optional, Tuple, TypeVar
+
+import jax
+import jax.numpy as jnp
+import jax.tree_util as jtu
 from jax import lax
 from jax.experimental import host_callback as hcb
 from tqdm.auto import trange
-
-import jax.tree_util as jtu
-import jax
-import jax.numpy as jnp
 
 Carry = TypeVar("Carry")
 X = TypeVar("X")
@@ -113,7 +113,6 @@ def vscan(
         _progress_bar.close()
 
     def _body_fun(carry: Carry, iter_num_and_x: Tuple[int, X]) -> Tuple[Carry, Y]:
-
         # Unpack iter_num and x.
         iter_num, x = iter_num_and_x
 

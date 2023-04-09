@@ -1,19 +1,3 @@
-# -*- coding: utf-8 -*-
-# ---
-# jupyter:
-#   jupytext:
-#     custom_cell_magics: kql
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.11.2
-#   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # Gaussian Processes Barycentres
 #
@@ -169,7 +153,7 @@ posterior_preds = [fit_gp(x, i) for i in ys]
 # using broadcasting in `tensordot`.
 
 
-# %% vscode={"languageId": "python"}
+# %%
 def sqrtm(A: jax.Array):
     return jnp.real(jsl.sqrtm(A))
 
@@ -223,7 +207,7 @@ barycentre_process = tfd.MultivariateNormalTriL(barycentre_mean, L)
 # uncertainty bands are sensible.
 
 
-# %% vscode={"languageId": "python"}
+# %%
 def plot(
     dist: tfd.MultivariateNormalTriL,
     ax,

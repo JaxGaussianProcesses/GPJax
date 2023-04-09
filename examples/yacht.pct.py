@@ -1,16 +1,10 @@
 # ---
 # jupyter:
 #   jupytext:
-#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
-#     language: python
-#     name: python3
 # ---
 
 # %%
@@ -163,7 +157,7 @@ posterior = prior * likelihood
 # %%
 training_data = gpx.Dataset(X=scaled_Xtr, y=scaled_ytr)
 
-negative_mll = gpx.ConjugateMLL(negative=True)
+negative_mll = jit(gpx.ConjugateMLL(negative=True))
 optimiser = ox.adamw(0.05)
 
 opt_posterior, history = gpx.fit(

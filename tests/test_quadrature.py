@@ -28,7 +28,7 @@ config.update("jax_enable_x64", True)
 @pytest.mark.parametrize("jit", [True, False])
 def test_quadrature(jit):
     def test():
-        fun = lambda x: x ** 2
+        fun = lambda x: x**2
         mean = jnp.array([[2.0]])
         var = jnp.array([[1.0]])
         fn_val = gauss_hermite_quadrature(fun, mean, var)

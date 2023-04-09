@@ -170,7 +170,7 @@ Clone a copy of the repository to your local machine and run the setup configura
 ```bash
 git clone https://github.com/JaxGaussianProcesses/GPJax.git
 cd GPJax
-python setup.py develop
+poetry install
 ```
 
 > **Note**
@@ -184,7 +184,7 @@ python setup.py develop
 > and recommend you check your installation passes the supplied unit tests:
 >
 > ```python
-> python -m pytest tests/
+> poetry run pytest
 > ```
 
 # Citing GPJax

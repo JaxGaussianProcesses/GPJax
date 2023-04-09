@@ -14,11 +14,13 @@
 # ==============================================================================
 
 import abc
+from dataclasses import dataclass
 from typing import Any
+
 import jax.numpy as jnp
 import jax.scipy as jsp
+import tensorflow_probability.substrates.jax.bijectors as tfb
 from jaxtyping import Array, Float
-
 from simple_pytree import static_field
 
 from .base import Module, param_field
@@ -26,12 +28,9 @@ from .dataset import Dataset
 from .gaussian_distribution import GaussianDistribution
 from .gps import AbstractPosterior
 from .likelihoods import Gaussian
-from .linops import DenseLinearOperator, LowerTriangularLinearOperator, identity
-from .gaussian_distribution import GaussianDistribution
+from .linops import (DenseLinearOperator, LowerTriangularLinearOperator,
+                     identity)
 
-from dataclasses import dataclass
-
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
 @dataclass
 class AbstractVariationalFamily(Module):
@@ -39,6 +38,7 @@ class AbstractVariationalFamily(Module):
     Abstract base class used to represent families of distributions that can be
     used within variational inference.
     """
+
     posterior: AbstractPosterior
 
     def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
@@ -54,7 +54,6 @@ class AbstractVariationalFamily(Module):
             GaussianDistribution: The output of the variational family's `predict` method.
         """
         return self.predict(*args, **kwargs)
-
 
     @abc.abstractmethod
     def predict(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
@@ -75,6 +74,7 @@ class AbstractVariationalFamily(Module):
 @dataclass
 class AbstractVariationalGaussian(AbstractVariationalFamily):
     """The variational Gaussian family of probability distributions."""
+
     inducing_inputs: Float[Array, "N D"]
     jitter: Float[Array, "1"] = static_field(1e-6)
 
@@ -94,9 +94,11 @@ class VariationalGaussian(AbstractVariationalGaussian):
     :math:`q(u) = \\mathcal{N}(\\mu, S)`.  We parameterise this over
     :math:`\\mu` and sqrt with S = sqrt sqrtᵀ.
     """
+
     variational_mean: Float[Array, "N 1"] = param_field(None)
-    variational_root_covariance: Float[Array, "N N"] = param_field(None, bijector=tfb.FillTriangular())
-    
+    variational_root_covariance: Float[Array, "N N"] = param_field(
+        None, bijector=tfb.FillTriangular()
+    )
 
     def __post_init__(self) -> None:
         if self.variational_mean is None:
@@ -104,7 +106,6 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         if self.variational_root_covariance is None:
             self.variational_root_covariance = jnp.eye(self.num_inducing)
-
 
     def prior_kl(self) -> Float[Array, "1"]:
         """
@@ -295,6 +296,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
         )
 
+
 @dataclass
 class NaturalVariationalGaussian(AbstractVariationalGaussian):
     """The natural variational Gaussian family of probability distributions.
@@ -304,16 +306,16 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
     exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the natural parameterisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2), to perform
     model inference, where T(u) = [u, uuᵀ] are the sufficient statistics.
     """
+
     natural_vector: Float[Array, "M 1"] = None
     natural_matrix: Float[Array, "M M"] = None
 
     def __post_init__(self):
         if self.natural_vector is None:
             self.natural_vector = jnp.zeros((self.num_inducing, 1))
-        
+
         if self.natural_matrix is None:
             self.natural_matrix = -0.5 * jnp.eye(self.num_inducing)
-
 
     def prior_kl(self) -> Float[Array, "1"]:
         """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
@@ -452,6 +454,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
     sufficient statistics T(u) = [u, uuᵀ]. The expectation parameters are given by η = ∫ T(u) q(u) du. This gives a parameterisation,
     η = (η₁, η₁) = (μ, S + uuᵀ) to perform model inference over.
     """
+
     expectation_vector: Float[Array, "M 1"] = None
     expectation_matrix: Float[Array, "M M"] = None
 
@@ -460,7 +463,6 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
             self.expectation_vector = jnp.zeros((self.num_inducing, 1))
         if self.expectation_matrix is None:
             self.expectation_matrix = jnp.eye(self.num_inducing)
-
 
     def prior_kl(self) -> Float[Array, "1"]:
         """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
@@ -573,16 +575,20 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
         )
 
+
 @dataclass
 class CollapsedVariationalGaussian(AbstractVariationalGaussian):
     """Collapsed variational Gaussian family of probability distributions.
-    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes."""
+    The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes.
+    """
 
     def __post_init__(self):
         if not isinstance(self.posterior.likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")
 
-    def predict(self, test_inputs: Float[Array, "N D"], train_data: Dataset) -> GaussianDistribution:
+    def predict(
+        self, test_inputs: Float[Array, "N D"], train_data: Dataset
+    ) -> GaussianDistribution:
         """Compute the predictive distribution of the GP at the test inputs.
 
         Args:
@@ -630,9 +636,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         diff = y - μx
 
         # Lz⁻¹ Kzx (y - μx)
-        Lz_inv_Kzx_diff = jsp.linalg.cho_solve(
-            (L, True), jnp.matmul(Lz_inv_Kzx, diff)
-        )
+        Lz_inv_Kzx_diff = jsp.linalg.cho_solve((L, True), jnp.matmul(Lz_inv_Kzx, diff))
 
         # Kzz⁻¹ Kzx (y - μx)
         Kzz_inv_Kzx_diff = Lz.T.solve(Lz_inv_Kzx_diff)

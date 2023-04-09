@@ -25,7 +25,8 @@ from .linear_operator import LinearOperator
 
 class LowerTriangularLinearOperator(DenseLinearOperator):
     """Current implementation of the following methods is inefficient.
-    We assume a dense matrix representation of the operator. But take advantage of the solve structure."""
+    We assume a dense matrix representation of the operator. But take advantage of the solve structure.
+    """
 
     @property
     def T(self) -> UpperTriangularLinearOperator:
@@ -58,7 +59,8 @@ class LowerTriangularLinearOperator(DenseLinearOperator):
 
 class UpperTriangularLinearOperator(DenseLinearOperator):
     """Current implementation of the following methods is inefficient.
-    We assume a dense matrix representation of the operator. But take advantage of the solve structure."""
+    We assume a dense matrix representation of the operator. But take advantage of the solve structure.
+    """
 
     @property
     def T(self) -> LowerTriangularLinearOperator:

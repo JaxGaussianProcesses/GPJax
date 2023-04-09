@@ -14,33 +14,34 @@
 # ==============================================================================
 
 from abc import abstractmethod
+from dataclasses import dataclass
 from typing import Any
 
 import jax.numpy as jnp
-from .kernels.base import AbstractKernel
-from jaxtyping import Array, Float
 from jax.random import KeyArray, PRNGKey, normal
-
+from jaxtyping import Array, Float
 from simple_pytree import static_field
-from dataclasses import dataclass
 
 from .base import Module, param_field
 from .dataset import Dataset
-from .linops import identity
 from .gaussian_distribution import GaussianDistribution
+from .kernels.base import AbstractKernel
 from .likelihoods import AbstractLikelihood, Gaussian
+from .linops import identity
 from .mean_functions import AbstractMeanFunction
+
 
 @dataclass
 class AbstractPrior(Module):
     """Abstract Gaussian process prior."""
+
     kernel: AbstractKernel
     mean_function: AbstractMeanFunction
     jitter: float = static_field(1e-6)
 
     def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
         """Evaluate the Gaussian process at the given points. The output of this function
-        is a `Distrax distribution <https://github.com/deepmind/distrax>`_ from which the
+        is a `TensorFlow probability distribution <https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions>`_ from which the
         the latent function's mean and covariance can be evaluated and the distribution
         can be sampled.
 
@@ -150,7 +151,7 @@ class Prior(AbstractPrior):
     def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
         """Compute the predictive prior distribution for a given set of
         parameters. The output of this function is a function that computes
-        a Distrax distribution for a given set of inputs.
+        a TFP distribution for a given set of inputs.
 
         In the following example, we compute the predictive prior distribution
         and then evaluate it on the interval :math:`[0, 1]`:
@@ -190,12 +191,13 @@ class Prior(AbstractPrior):
 class AbstractPosterior(Module):
     """The base GP posterior object conditioned on an observed dataset. All
     posterior objects should inherit from this class."""
+
     prior: AbstractPrior
     likelihood: AbstractLikelihood
 
     def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
         """Evaluate the Gaussian process at the given points. The output of this function
-        is a `Distrax distribution <https://github.com/deepmind/distrax>`_ from which the
+        is a `TFP distribution <https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions>`_ from which the
         the latent function's mean and covariance can be evaluated and the distribution
         can be sampled.
 
@@ -226,6 +228,7 @@ class AbstractPosterior(Module):
             GaussianDistribution: A multivariate normal random variable representation of the Gaussian process.
         """
         raise NotImplementedError
+
 
 @dataclass
 class ConjugatePosterior(AbstractPosterior):
@@ -260,6 +263,7 @@ class ConjugatePosterior(AbstractPosterior):
         >>>
         >>> posterior = prior * likelihood
     """
+
     def predict(
         self,
         test_inputs: Float[Array, "N D"],
@@ -325,7 +329,7 @@ class ConjugatePosterior(AbstractPosterior):
 
         # Σ = Kxx + Iσ²
         Sigma = Kxx + identity(n) * obs_noise
-        
+
         μt = self.prior.mean_function(t)
         Ktt = self.prior.kernel.gram(t)
         Kxt = self.prior.kernel.cross_covariance(x, t)
@@ -355,15 +359,17 @@ class NonConjugatePosterior(AbstractPosterior):
     variational inference, or Laplace approximations can then be used to sample
     from, or optimise an approximation to, the posterior distribution.
     """
+
     latent: Float[Array, "N 1"] = param_field(None)
     key: KeyArray = static_field(PRNGKey(42))
 
     def __post_init__(self):
         if self.latent is None:
             self.latent = normal(self.key, shape=(self.likelihood.num_datapoints, 1))
-    
 
-    def predict(self, test_inputs: Float[Array, "N D"], train_data: Dataset) -> GaussianDistribution:
+    def predict(
+        self, test_inputs: Float[Array, "N D"], train_data: Dataset
+    ) -> GaussianDistribution:
         """
         Conditional on a set of training data, compute the GP's posterior
         predictive distribution for a given set of parameters. The returned
@@ -417,7 +423,9 @@ class NonConjugatePosterior(AbstractPosterior):
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
 
-def construct_posterior(prior: Prior, likelihood: AbstractLikelihood) -> AbstractPosterior:
+def construct_posterior(
+    prior: Prior, likelihood: AbstractLikelihood
+) -> AbstractPosterior:
     """Utility function for constructing a posterior object from a prior and
     likelihood. The function will automatically select the correct posterior
     object based on the likelihood.

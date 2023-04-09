@@ -14,25 +14,27 @@
 # ==============================================================================
 
 import abc
+from dataclasses import dataclass
 from typing import Any
-from .linops.utils import to_dense
 
-import tensorflow_probability.substrates.jax as tfp
 import jax.numpy as jnp
 import jax.scipy as jsp
+import tensorflow_probability.substrates.jax as tfp
 from jaxtyping import Array, Float
 from simple_pytree import static_field
 
-from dataclasses import dataclass
 from .base import Module, param_field
+from .linops.utils import to_dense
+
 tfb = tfp.bijectors
 tfd = tfp.distributions
+
 
 @dataclass
 class AbstractLikelihood(Module):
     """Abstract base class for likelihoods."""
-    num_datapoints: int = static_field()
 
+    num_datapoints: int = static_field()
 
     def __call__(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
         """Evaluate the likelihood function at a given predictive distribution.
@@ -73,7 +75,10 @@ class AbstractLikelihood(Module):
 @dataclass
 class Gaussian(AbstractLikelihood):
     """Gaussian likelihood object."""
-    obs_noise: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+
+    obs_noise: Float[Array, "1"] = param_field(
+        jnp.array([1.0]), bijector=tfb.Softplus()
+    )
 
     def link_function(self, f: Float[Array, "N 1"]) -> tfd.Normal:
         """The link function of the Gaussian likelihood.
@@ -87,7 +92,9 @@ class Gaussian(AbstractLikelihood):
         """
         return tfd.Normal(loc=f, scale=self.obs_noise.astype(f.dtype))
 
-    def predict(self, dist: tfd.MultivariateNormalTriL) -> tfd.MultivariateNormalFullCovariance:
+    def predict(
+        self, dist: tfd.MultivariateNormalTriL
+    ) -> tfd.MultivariateNormalFullCovariance:
         """
         Evaluate the Gaussian likelihood function at a given predictive
         distribution. Computationally, this is equivalent to summing the
@@ -111,7 +118,6 @@ class Gaussian(AbstractLikelihood):
 
 @dataclass
 class Bernoulli(AbstractLikelihood):
-
     def link_function(self, f: Float[Array, "N 1"]) -> tfd.Distribution:
         """The probit link function of the Bernoulli likelihood.
 
@@ -137,7 +143,7 @@ class Bernoulli(AbstractLikelihood):
         """
         variance = jnp.diag(dist.covariance())
         mean = dist.mean().ravel()
-        return  self.link_function(mean / jnp.sqrt(1.0 + variance))
+        return self.link_function(mean / jnp.sqrt(1.0 + variance))
 
 
 def inv_probit(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:

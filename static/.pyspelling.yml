@@ -5,7 +5,7 @@ matrix:
     d: en_GB
   dictionary:
     wordlists:
-    - static/wordlist-custom.txt
+    - wordlist-custom.txt
   pipeline:
   - pyspelling.filters.context:
       context_visible_first: true

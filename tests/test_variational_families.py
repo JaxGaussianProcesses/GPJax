@@ -15,7 +15,7 @@
 
 from typing import Callable, Tuple
 
-import distrax as dx
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
@@ -23,17 +23,17 @@ from jax.config import config
 from jaxtyping import Array, Float
 
 import gpjax as gpx
-from gpjax.variational_families import (
-    AbstractVariationalFamily,
-    CollapsedVariationalGaussian,
-    ExpectationVariationalGaussian,
-    NaturalVariationalGaussian,
-    VariationalGaussian,
-    WhitenedVariationalGaussian,
-)
+from gpjax.variational_families import (AbstractVariationalFamily,
+                                        CollapsedVariationalGaussian,
+                                        ExpectationVariationalGaussian,
+                                        NaturalVariationalGaussian,
+                                        VariationalGaussian,
+                                        WhitenedVariationalGaussian)
+import tensorflow_probability.substrates.jax as tfp
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
+tfd = tfp.distributions
 
 
 def test_abstract_variational_family():
@@ -43,8 +43,8 @@ def test_abstract_variational_family():
 
     # Create a dummy variational family class with abstract methods implemented.
     class DummyVariationalFamily(AbstractVariationalFamily):
-        def predict(self, x: Float[Array, "N D"]) -> dx.Distribution:
-            return dx.MultivariateNormalDiag(loc=x)
+        def predict(self, x: Float[Array, "N D"]) -> tfd.Distribution:
+            return tfd.MultivariateNormalDiag(loc=x)
 
     # Test that the dummy variational family can be instantiated.
     dummy_variational_family = DummyVariationalFamily(posterior=None)
@@ -85,19 +85,28 @@ def diag_matrix_val(
 
 @pytest.mark.parametrize("n_test", [1, 10])
 @pytest.mark.parametrize("n_inducing", [1, 10, 20])
-@pytest.mark.parametrize("variational_family", [VariationalGaussian, WhitenedVariationalGaussian, NaturalVariationalGaussian, ExpectationVariationalGaussian])
+@pytest.mark.parametrize(
+    "variational_family",
+    [
+        VariationalGaussian,
+        WhitenedVariationalGaussian,
+        NaturalVariationalGaussian,
+        ExpectationVariationalGaussian,
+    ],
+)
 def test_variational_gaussians(
     n_test: int,
     n_inducing: int,
     variational_family: AbstractVariationalFamily,
 ) -> None:
-
     # Initialise variational family:
     prior = gpx.Prior(kernel=gpx.RBF(), mean_function=gpx.Constant())
     likelihood = gpx.Gaussian(123)
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
     test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
-    q = variational_family(posterior = prior*likelihood, inducing_inputs=inducing_inputs)
+    q = variational_family(
+        posterior=prior * likelihood, inducing_inputs=inducing_inputs
+    )
 
     # Test init:
     assert q.num_inducing == n_inducing
@@ -108,7 +117,7 @@ def test_variational_gaussians(
         assert q.variational_root_covariance.shape == matrix_shape(n_inducing)
         assert (q.variational_mean == vector_val(0.0)(n_inducing)).all()
         assert (q.variational_root_covariance == diag_matrix_val(1.0)(n_inducing)).all()
-    
+
     elif isinstance(q, WhitenedVariationalGaussian):
         assert q.variational_mean.shape == vector_shape(n_inducing)
         assert q.variational_root_covariance.shape == matrix_shape(n_inducing)
@@ -120,14 +129,12 @@ def test_variational_gaussians(
         assert q.natural_matrix.shape == matrix_shape(n_inducing)
         assert (q.natural_vector == vector_val(0.0)(n_inducing)).all()
         assert (q.natural_matrix == diag_matrix_val(-0.5)(n_inducing)).all()
-    
+
     elif isinstance(q, ExpectationVariationalGaussian):
         assert q.expectation_vector.shape == vector_shape(n_inducing)
         assert q.expectation_matrix.shape == matrix_shape(n_inducing)
         assert (q.expectation_vector == vector_val(0.0)(n_inducing)).all()
         assert (q.expectation_matrix == diag_matrix_val(1.0)(n_inducing)).all()
-
-    
 
     # Test KL
     kl = q.prior_kl()
@@ -137,7 +144,7 @@ def test_variational_gaussians(
 
     # Test predictions
     predictive_dist = q(test_inputs)
-    assert isinstance(predictive_dist, dx.Distribution)
+    assert isinstance(predictive_dist, tfd.Distribution)
 
     mu = predictive_dist.mean()
     sigma = predictive_dist.covariance()
@@ -168,14 +175,14 @@ def test_collapsed_variational_gaussian(
     test_inputs = jnp.hstack([test_inputs] * point_dim)
 
     variational_family = CollapsedVariationalGaussian(
-        posterior=prior*gpx.Gaussian(num_datapoints=D.n),
+        posterior=prior * gpx.Gaussian(num_datapoints=D.n),
         inducing_inputs=inducing_inputs,
     )
 
     # We should raise an error for non-Gaussian likelihoods:
     with pytest.raises(TypeError):
         CollapsedVariationalGaussian(
-            posterior= prior * gpx.Bernoulli(num_datapoints=D.n),
+            posterior=prior * gpx.Bernoulli(num_datapoints=D.n),
             inducing_inputs=inducing_inputs,
         )
 
@@ -186,7 +193,7 @@ def test_collapsed_variational_gaussian(
 
     # Test predictions
     predictive_dist = variational_family(test_inputs, D)
-    assert isinstance(predictive_dist, dx.Distribution)
+    assert isinstance(predictive_dist, tfd.Distribution)
 
     mu = predictive_dist.mean()
     sigma = predictive_dist.covariance()

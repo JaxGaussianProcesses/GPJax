@@ -27,6 +27,7 @@ from .utils import jax_gather_nd
 
 tfb = tfp.bijectors
 
+
 ##########################################
 # Graph kernels
 ##########################################
@@ -38,10 +39,15 @@ class GraphKernel(AbstractKernel):
         laplacian (Float[Array]): An N x N matrix representing the Laplacian matrix of a graph.
         compute_engine
     """
+
     laplacian: Float[Array, "N N"] = static_field(None)
-    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    lengthscale: Float[Array, "D"] = param_field(
+        jnp.array([1.0]), bijector=tfb.Softplus()
+    )
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    smoothness: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    smoothness: Float[Array, "1"] = param_field(
+        jnp.array([1.0]), bijector=tfb.Softplus()
+    )
     eigenvalues: Float[Array, "N"] = static_field(None)
     eigenvectors: Float[Array, "N N"] = static_field(None)
     num_vertex: Int[Array, "1"] = static_field(None)

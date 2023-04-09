@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, Any, Union
+from typing import Any, Callable, Union
 
 from jax import lax
 from jax.experimental import host_callback
@@ -98,7 +98,6 @@ def progress_bar(num_iters: int, log_rate: int) -> Callable:
         """Decorator that adds a progress bar to `body_fun` used in `jax.lax.scan`."""
 
         def wrapper_progress_bar(carry: Any, x: Union[tuple, int]) -> Any:
-
             # Get iteration number
             if type(x) is tuple:
                 iter_num, *_ = x

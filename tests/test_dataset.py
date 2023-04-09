@@ -13,18 +13,19 @@
 # limitations under the License.
 # ==============================================================================
 
-import jax.numpy as jnp
-import pytest
-import jax.tree_util as jtu
-
 from dataclasses import is_dataclass
+
+import jax.numpy as jnp
+import jax.tree_util as jtu
+import pytest
+
 from gpjax.dataset import Dataset
+
 
 @pytest.mark.parametrize("n", [1, 2, 10])
 @pytest.mark.parametrize("out_dim", [1, 2, 10])
 @pytest.mark.parametrize("in_dim", [1, 2, 10])
 def test_dataset_init(n: int, in_dim: int, out_dim: int) -> None:
-    
     # Create dataset
     x = jnp.ones((n, in_dim))
     y = jnp.ones((n, out_dim))
@@ -34,7 +35,7 @@ def test_dataset_init(n: int, in_dim: int, out_dim: int) -> None:
     assert D.n == n
     assert D.in_dim == in_dim
     assert D.out_dim == out_dim
-    
+
     # Test representation
     assert (
         D.__repr__()
@@ -58,7 +59,6 @@ def test_dataset_init(n: int, in_dim: int, out_dim: int) -> None:
 @pytest.mark.parametrize("out_dim", [1, 2, 10])
 @pytest.mark.parametrize("in_dim", [1, 2, 10])
 def test_dataset_add(n1: int, n2: int, in_dim: int, out_dim: int) -> None:
-    
     # Create first dataset
     x1 = jnp.ones((n1, in_dim))
     y1 = jnp.ones((n1, out_dim))
@@ -102,7 +102,6 @@ def test_dataset_add(n1: int, n2: int, in_dim: int, out_dim: int) -> None:
 @pytest.mark.parametrize("out_dim", [1, 2, 10])
 @pytest.mark.parametrize("in_dim", [1, 2, 10])
 def test_dataset_incorrect_lengths(nx: int, ny: int, out_dim: int, in_dim: int) -> None:
-    
     # Create input and output pairs of different lengths
     x = jnp.ones((nx, in_dim))
     y = jnp.ones((ny, out_dim))
@@ -116,7 +115,6 @@ def test_dataset_incorrect_lengths(nx: int, ny: int, out_dim: int, in_dim: int) 
 @pytest.mark.parametrize("out_dim", [1, 2, 10])
 @pytest.mark.parametrize("in_dim", [1, 2, 10])
 def test_2d_inputs(n: int, out_dim: int, in_dim: int) -> None:
-    
     # Create dataset where output dimension is incorrectly not 2D
     x = jnp.ones((n, in_dim))
     y = jnp.ones((n,))
@@ -137,7 +135,6 @@ def test_2d_inputs(n: int, out_dim: int, in_dim: int) -> None:
 @pytest.mark.parametrize("n", [1, 2, 10])
 @pytest.mark.parametrize("in_dim", [1, 2, 10])
 def test_y_none(n: int, in_dim: int) -> None:
-    
     # Create a dataset with no output
     x = jnp.ones((n, in_dim))
     D = Dataset(X=x)

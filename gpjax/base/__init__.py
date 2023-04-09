@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from .module import Module, meta_leaves, meta_flatten, meta_map, meta
+from .module import Module, meta, meta_flatten, meta_leaves, meta_map
 from .param import param_field
 
 __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta", "param_field"]

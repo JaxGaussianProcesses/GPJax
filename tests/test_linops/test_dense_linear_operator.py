@@ -26,7 +26,8 @@ _PRNGKey = jr.PRNGKey(42)
 
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
 from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
-from gpjax.linops.triangular_linear_operator import LowerTriangularLinearOperator
+from gpjax.linops.triangular_linear_operator import \
+    LowerTriangularLinearOperator
 
 
 def approx_equal(res: jax.Array, actual: jax.Array) -> bool:
@@ -61,7 +62,6 @@ def test_to_dense(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_add_diagonal(n: int) -> None:
-
     # Test adding generic diagonal linear operator.
     key_a, key_b = jr.split(_PRNGKey)
 

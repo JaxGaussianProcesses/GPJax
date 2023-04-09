@@ -22,6 +22,7 @@ from typing import Any, Mapping, Optional
 
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
+
 def param_field(
     default: Any = dataclasses.MISSING,
     *,

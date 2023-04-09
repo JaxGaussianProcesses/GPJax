@@ -17,30 +17,16 @@ from dataclasses import dataclass
 
 import jax.numpy as jnp
 import pytest
-from jax.config import config
-
-from gpjax.kernels.base import (
-    AbstractKernel,
-    CombinationKernel,
-    ProductKernel,
-    SumKernel,
-)
-from gpjax.kernels.nonstationary import Linear, Polynomial
-from gpjax.kernels.stationary import (
-    RBF,
-    Matern12,
-    Matern32,
-    Matern52,
-    RationalQuadratic,
-)
-from gpjax.kernels.nonstationary import Polynomial, Linear
-from jaxtyping import Array, Float
-from dataclasses import dataclass
-from gpjax.base import param_field
-
 import tensorflow_probability.substrates.jax.bijectors as tfb
+from jax.config import config
+from jaxtyping import Array, Float
 
-
+from gpjax.base import param_field
+from gpjax.kernels.base import (AbstractKernel, CombinationKernel,
+                                ProductKernel, SumKernel)
+from gpjax.kernels.nonstationary import Linear, Polynomial
+from gpjax.kernels.stationary import (RBF, Matern12, Matern32, Matern52,
+                                      RationalQuadratic)
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -55,7 +41,9 @@ def test_abstract_kernel():
     @dataclass
     class DummyKernel(AbstractKernel):
         test_a: Float[Array, "1"] = jnp.array([1.0])
-        test_b: Float[Array, "1"] = param_field(jnp.array([2.0]), bijector=tfb.Softplus())
+        test_b: Float[Array, "1"] = param_field(
+            jnp.array([2.0]), bijector=tfb.Softplus()
+        )
 
         def __call__(
             self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
@@ -64,10 +52,12 @@ def test_abstract_kernel():
 
     # Initialise dummy kernel class and test __call__ method:
     dummy_kernel = DummyKernel()
-    assert dummy_kernel.test_a ==  jnp.array([1.0])
-    assert isinstance(dummy_kernel._pytree__meta["test_b"].get("bijector"), tfb.Softplus)
-    assert dummy_kernel.test_b ==  jnp.array([2.0])
-    assert (dummy_kernel(jnp.array([1.0]), jnp.array([2.0])) == 4.0)
+    assert dummy_kernel.test_a == jnp.array([1.0])
+    assert isinstance(
+        dummy_kernel._pytree__meta["test_b"].get("bijector"), tfb.Softplus
+    )
+    assert dummy_kernel.test_b == jnp.array([2.0])
+    assert dummy_kernel(jnp.array([1.0]), jnp.array([2.0])) == 4.0
 
 
 @pytest.mark.parametrize("combination_type", [SumKernel, ProductKernel])
@@ -79,7 +69,6 @@ def test_abstract_kernel():
 def test_combination_kernel(
     combination_type: CombinationKernel, kernel: AbstractKernel, n_kerns: int
 ) -> None:
-
     # Create inputs
     n = 20
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
@@ -163,7 +152,6 @@ def test_sum_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
     ],
 )
 def test_prod_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
-
     # Create inputs
     n = 10
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)

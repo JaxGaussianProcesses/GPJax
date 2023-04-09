@@ -78,7 +78,7 @@ class DiagonalLinearOperator(LinearOperator):
             LinearOperator: linear operator plus the diagonal linear operator.
         """
 
-        from .zero_linear_operator import ZeroLinearOperator
+        from gpjax.linops.zero_linear_operator import ZeroLinearOperator
 
         other = to_linear_operator(other)
 

@@ -13,12 +13,12 @@
 # limitations under the License.
 # ==============================================================================
 
+from dataclasses import dataclass
+
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
-
 from jaxtyping import Array, Float
-from dataclasses import dataclass
 
 from ...base import param_field
 from ..base import AbstractKernel
@@ -27,8 +27,9 @@ from .utils import squared_distance
 
 @dataclass
 class RationalQuadratic(AbstractKernel):
-
-    lengthscale: Float[Array, "D"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    lengthscale: Float[Array, "D"] = param_field(
+        jnp.array([1.0]), bijector=tfb.Softplus()
+    )
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
     alpha: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
     name: str = "Rational Quadratic"

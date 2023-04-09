@@ -16,14 +16,13 @@
 from __future__ import annotations
 
 import abc
-import jax.numpy as jnp
-from typing import List, Callable, Union
-from jaxtyping import Array, Float
-from functools import partial
-from simple_pytree import static_field
 from dataclasses import dataclass
 from functools import partial
 from typing import Callable, List, Union
+
+import jax.numpy as jnp
+from jaxtyping import Array, Float
+from simple_pytree import static_field
 
 from ..base import Module, param_field
 from .computations import AbstractKernelComputation, DenseKernelComputation

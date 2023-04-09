@@ -1,18 +1,14 @@
-from gpjax.objectives import (
-    AbstractObjective,
-    LogPosteriorDensity,
-    ConjugateMLL,
-    NonConjugateMLL,
-    CollapsedELBO,
-    ELBO,
-)
-import gpjax as gpx
-import pytest
-import jax.random as jr
-import jax.numpy as jnp
-from gpjax import Prior, Gaussian, Bernoulli
 import jax
+import jax.numpy as jnp
+import jax.random as jr
+import pytest
+
+import gpjax as gpx
+from gpjax import Bernoulli, Gaussian, Prior
 from gpjax.dataset import Dataset
+from gpjax.objectives import (ELBO, AbstractObjective, CollapsedELBO,
+                              ConjugateMLL, LogPosteriorDensity,
+                              NonConjugateMLL)
 
 
 def test_abstract_objective():
@@ -54,7 +50,9 @@ def test_conjugate_mll(
     D = build_data(num_datapoints, num_dims, key, binary=False)
 
     # Build model
-    p = Prior(kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant())
+    p = Prior(
+        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+    )
     lik = Gaussian(num_datapoints=num_datapoints)
     post = p * lik
 
@@ -81,7 +79,9 @@ def test_non_conjugate_mll(
     D = build_data(num_datapoints, num_dims, key, binary=True)
 
     # Build model
-    p = Prior(kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant())
+    p = Prior(
+        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+    )
     lik = Bernoulli(num_datapoints=num_datapoints)
     post = p * lik
 
@@ -115,9 +115,11 @@ def test_collapsed_elbo(
         key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints // 2, num_dims)
     )
 
-    p = Prior(kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant())
+    p = Prior(
+        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+    )
     lik = Gaussian(num_datapoints=num_datapoints)
-    q = gpx.CollapsedVariationalGaussian(posterior= p * lik, inducing_inputs=z)
+    q = gpx.CollapsedVariationalGaussian(posterior=p * lik, inducing_inputs=z)
 
     negative_elbo = CollapsedELBO(negative=negative)
 
@@ -155,14 +157,16 @@ def test_elbo(
         key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints // 2, num_dims)
     )
 
-    p = Prior(kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant())
+    p = Prior(
+        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+    )
     if binary:
         lik = Bernoulli(num_datapoints=num_datapoints)
     else:
         lik = Gaussian(num_datapoints=num_datapoints)
     post = p * lik
 
-    q = gpx.VariationalGaussian(posterior= post, inducing_inputs=z)
+    q = gpx.VariationalGaussian(posterior=post, inducing_inputs=z)
 
     negative_elbo = ELBO(
         negative=negative,

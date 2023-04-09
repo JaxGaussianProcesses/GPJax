@@ -14,34 +14,30 @@
 # ==============================================================================
 
 
+from dataclasses import dataclass
+
 import jax.numpy as jnp
 import jax.random as jr
 import optax as ox
-import tensorflow_probability.substrates.jax.bijectors as tfb
-
 import pytest
+import tensorflow_probability.substrates.jax.bijectors as tfb
+from jax.config import config
 
-from dataclasses import dataclass
-
-from gpjax.base import param_field, Module
-from gpjax.objectives import AbstractObjective
+from gpjax.base import Module, param_field
 from gpjax.dataset import Dataset
 from gpjax.fit import fit, get_batch
-from gpjax.gps import Prior, ConjugatePosterior
-from gpjax.likelihoods import Gaussian
+from gpjax.gps import ConjugatePosterior, Prior
 from gpjax.kernels import RBF
+from gpjax.likelihoods import Gaussian
 from gpjax.mean_functions import Constant
-from gpjax.objectives import ConjugateMLL, ELBO
+from gpjax.objectives import ELBO, AbstractObjective, ConjugateMLL
 from gpjax.variational_families import VariationalGaussian
-
-from jax.config import config
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 
 
 def test_simple_linear_model() -> None:
-    
     # Create dataset:
     X = jnp.linspace(0.0, 10.0, 100).reshape(-1, 1)
     y = 2.0 * X + 1.0 + 10 * jr.normal(jr.PRNGKey(0), X.shape).reshape(-1, 1)
@@ -61,7 +57,7 @@ def test_simple_linear_model() -> None:
     # Define loss function:
     @dataclass
     class MeanSqaureError(AbstractObjective):
-        def __call__(self, model: LinearModel, train_data: Dataset) -> float:
+        def step(self, model: LinearModel, train_data: Dataset) -> float:
             return jnp.mean((train_data.y - model(train_data.X)) ** 2)
 
     loss = MeanSqaureError()
@@ -88,10 +84,11 @@ def test_simple_linear_model() -> None:
 @pytest.mark.parametrize("n_data", [1, 20])
 @pytest.mark.parametrize("verbose", [True, False])
 def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> None:
-    
     # Create dataset:
     key = jr.PRNGKey(123)
-    x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n_data, 1)), axis=0)
+    x = jnp.sort(
+        jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n_data, 1)), axis=0
+    )
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
     D = Dataset(X=x, y=y)
 
@@ -121,20 +118,23 @@ def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> N
 
     # Ensure we reduce the loss
     assert mll(trained_model, D) < mll(posterior, D)
-    
+
 
 @pytest.mark.parametrize("num_iters", [1, 5])
 @pytest.mark.parametrize("batch_size", [1, 20, 50])
 @pytest.mark.parametrize("n_data", [50])
 @pytest.mark.parametrize("verbose", [True, False])
-def test_batch_fitting(num_iters: int, batch_size: int, n_data: int, verbose: bool) -> None:
-    
+def test_batch_fitting(
+    num_iters: int, batch_size: int, n_data: int, verbose: bool
+) -> None:
     # Create dataset:
     key = jr.PRNGKey(123)
-    x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n_data, 1)), axis=0)
+    x = jnp.sort(
+        jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n_data, 1)), axis=0
+    )
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
     D = Dataset(X=x, y=y)
-    
+
     # Define GP model:
     prior = Prior(kernel=RBF(), mean_function=Constant())
     likelihood = Gaussian(num_datapoints=n_data)
@@ -168,14 +168,12 @@ def test_batch_fitting(num_iters: int, batch_size: int, n_data: int, verbose: bo
     assert elbo(trained_model, D) < elbo(q, D)
 
 
-
 @pytest.mark.parametrize("n_data", [50])
 @pytest.mark.parametrize("n_dim", [1, 2, 3])
 @pytest.mark.parametrize("batch_size", [1, 2, 50])
 def test_get_batch(n_data: int, n_dim: int, batch_size: int):
-    
     key = jr.PRNGKey(123)
-    
+
     # Create dataset:
     x = jnp.sort(
         jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n_data, n_dim)), axis=0

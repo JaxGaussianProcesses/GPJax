@@ -22,13 +22,13 @@ from copy import copy, deepcopy
 from typing import Any, Callable, Dict, Iterable, List, Tuple
 
 import jax
-from jax import lax
 import jax.tree_util as jtu
+import tensorflow_probability.substrates.jax.bijectors as tfb
+from jax import lax
 from jax._src.tree_util import _registry
 from simple_pytree import Pytree, static_field
 from typing_extensions import Self
 
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
 class Module(Pytree):
     _pytree__meta: Dict[str, Any] = static_field()
@@ -128,7 +128,7 @@ class Module(Pytree):
 
             if meta is None:
                 return leaf
-            
+
             return meta.get("bijector", tfb.Identity()).forward(leaf)
 
         return meta_map(_apply_constrain, self)
@@ -145,7 +145,7 @@ class Module(Pytree):
 
             if meta is None:
                 return leaf
-            
+
             return meta.get("bijector", tfb.Identity()).inverse(leaf)
 
         return meta_map(_apply_unconstrain, self)
@@ -166,7 +166,7 @@ class Module(Pytree):
 
             if meta is None:
                 return leaf
-            
+
             return _stop_grad(leaf, meta.get("trainable", True))
 
         return meta_map(_apply_stop_grad, self)

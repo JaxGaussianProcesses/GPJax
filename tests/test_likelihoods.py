@@ -15,22 +15,18 @@
 
 from typing import Callable
 
-import jax.tree_util as jtu
-import tensorflow_probability.substrates.jax as tfp
 import jax.numpy as jnp
 import jax.random as jr
+import jax.tree_util as jtu
 import numpy as np
 import pytest
+import tensorflow_probability.substrates.jax as tfp
 from jax.config import config
 from jax.random import KeyArray
 from jaxtyping import Array, Float
 
-from gpjax.likelihoods import (
-    AbstractLikelihood,
-    Bernoulli,
-    Gaussian,
-    inv_probit,
-)
+from gpjax.likelihoods import (AbstractLikelihood, Bernoulli, Gaussian,
+                               inv_probit)
 
 tfd = tfp.distributions
 # Enable Float64 for more stable matrix inversions.
@@ -44,7 +40,6 @@ def test_abstract_likelihood():
 
     # Create a dummy likelihood class with abstract methods implemented.
     class DummyLikelihood(AbstractLikelihood):
-
         def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
             return tfd.Normal(0.0, 1.0)
 
@@ -59,7 +54,6 @@ def test_abstract_likelihood():
 @pytest.mark.parametrize("n", [1, 10])
 @pytest.mark.parametrize("noise", [0.1, 0.5, 1.0])
 def test_gaussian_init(n: int, noise: float) -> None:
-
     likelihood = Gaussian(num_datapoints=n, obs_noise=jnp.array([noise]))
 
     assert likelihood.obs_noise == jnp.array([noise])
@@ -69,7 +63,6 @@ def test_gaussian_init(n: int, noise: float) -> None:
 
 @pytest.mark.parametrize("n", [1, 10])
 def test_beroulli_init(n: int) -> None:
-
     likelihood = Bernoulli(num_datapoints=n)
     assert likelihood.num_datapoints == n
     assert jtu.tree_leaves(likelihood) == []
@@ -78,7 +71,6 @@ def test_beroulli_init(n: int) -> None:
 @pytest.mark.parametrize("lik", [Gaussian, Bernoulli])
 @pytest.mark.parametrize("n", [1, 10])
 def test_link_fns(lik: AbstractLikelihood, n: int) -> None:
-
     # Create function values.
     f = jnp.linspace(-3.0, 3.0).reshape(-1, 1)
 

@@ -13,23 +13,20 @@
 # limitations under the License.
 # ==============================================================================
 
-from . import _version
+from .dataset import Dataset
 from .fit import fit
 from .gps import Prior, construct_posterior
 from .kernels import *
 from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
-from .dataset import Dataset
-from .variational_families import (
-    CollapsedVariationalGaussian,
-    ExpectationVariationalGaussian,
-    NaturalVariationalGaussian,
-    VariationalGaussian,
-    WhitenedVariationalGaussian,
-)
-from .objectives import ConjugateMLL, NonConjugateMLL, LogPosteriorDensity, CollapsedELBO, ELBO
+from .objectives import (ELBO, CollapsedELBO, ConjugateMLL,
+                         LogPosteriorDensity, NonConjugateMLL)
+from .variational_families import (CollapsedVariationalGaussian,
+                                   ExpectationVariationalGaussian,
+                                   NaturalVariationalGaussian,
+                                   VariationalGaussian,
+                                   WhitenedVariationalGaussian)
 
-__version__ = _version.get_versions()["version"]
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
 __url__ = "https://github.com/thomaspinder/GPJax"
@@ -65,5 +62,5 @@ __all__ = [
     "NonConjugateMLL",
     "LogPosteriorDensity",
     "CollapsedELBO",
-    "ELBO"
+    "ELBO",
 ]

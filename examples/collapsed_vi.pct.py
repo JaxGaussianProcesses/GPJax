@@ -1,18 +1,3 @@
-# ---
-# jupyter:
-#   jupytext:
-#     custom_cell_magics: kql
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.11.2
-#   kernelspec:
-#     display_name: base
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # Sparse Gaussian Process Regression
 #
@@ -123,8 +108,8 @@ opt_posterior, history = gpx.fit(
     model=q,
     objective=elbo,
     train_data=D,
-    optim=ox.adamw(learning_rate=5e-3),
-    num_iters=2000,
+    optim=ox.adamw(learning_rate=1e-2),
+    num_iters=500,
 )
 
 plt.plot(history)

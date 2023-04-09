@@ -13,27 +13,23 @@
 # limitations under the License.
 # ==============================================================================
 
-import distrax as dx
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
 from jax.config import config
 
-from gpjax.gps import (
-    AbstractPrior,
-    AbstractPosterior,
-    ConjugatePosterior,
-    NonConjugatePosterior,
-    Prior,
-    construct_posterior,
-)
-from gpjax.kernels import RBF
-from gpjax.mean_functions import Constant
-from gpjax.likelihoods import Bernoulli, Gaussian
 from gpjax.dataset import Dataset
+from gpjax.gps import (AbstractPosterior, AbstractPrior, ConjugatePosterior,
+                       NonConjugatePosterior, Prior, construct_posterior)
+from gpjax.kernels import RBF
+from gpjax.likelihoods import Bernoulli, Gaussian
+from gpjax.mean_functions import Constant
+import tensorflow_probability.substrates.jax as tfp
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
+tfd = tfp.distributions
 NonConjugateLikelihoods = [Bernoulli]
 
 
@@ -46,7 +42,7 @@ def test_prior(num_datapoints):
 
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
     predictive_dist = p(x)
-    assert isinstance(predictive_dist, dx.Distribution)
+    assert isinstance(predictive_dist, tfd.Distribution)
     mu = predictive_dist.mean()
     sigma = predictive_dist.covariance()
     assert mu.shape == (num_datapoints,)
@@ -76,7 +72,7 @@ def test_conjugate_posterior(num_datapoints, jit_compile):
     # Prediction
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
     predictive_dist = post(x, D)
-    assert isinstance(predictive_dist, dx.Distribution)
+    assert isinstance(predictive_dist, tfd.Distribution)
 
     mu = predictive_dist.mean()
     sigma = predictive_dist.covariance()
@@ -110,18 +106,17 @@ def test_nonconjugate_posterior(num_datapoints, likel, jit_compile):
     lik = likel(num_datapoints=num_datapoints)
     post = p * lik
     assert isinstance(post, NonConjugatePosterior)
-    assert (post.latent == jr.normal(post.key,(num_datapoints, 1))).all()
+    assert (post.latent == jr.normal(post.key, (num_datapoints, 1))).all()
 
     # Prediction
     x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
     predictive_dist = post(x, D)
-    assert isinstance(predictive_dist, dx.Distribution)
+    assert isinstance(predictive_dist, tfd.Distribution)
 
     mu = predictive_dist.mean()
     sigma = predictive_dist.covariance()
     assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
-    
 
     # # Loss function
     # loss_fn = post.loss_function()

@@ -1,7 +1,6 @@
-import tensorflow_probability.substrates.jax.bijectors as tfb
-
 from dataclasses import dataclass
 
+import tensorflow_probability.substrates.jax.bijectors as tfb
 from jax.random import KeyArray, PRNGKey
 from jaxtyping import Array, Float
 from simple_pytree import static_field
@@ -9,7 +8,6 @@ from simple_pytree import static_field
 from ...base import param_field
 from ..base import AbstractKernel
 from ..computations import BasisFunctionComputation
-
 
 
 @dataclass

@@ -2,11 +2,8 @@
 # ---
 # jupyter:
 #   jupytext:
-#     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: gpjax
@@ -99,11 +96,16 @@ L = nx.laplacian_matrix(G).toarray()
 # %%
 x = jnp.arange(G.number_of_nodes()).reshape(-1, 1)
 
-true_kernel = gpx.GraphKernel(laplacian=L, lengthscale=jnp.array([2.3]), variance=jnp.array([3.2]), smoothness=jnp.array([6.1]))
+true_kernel = gpx.GraphKernel(
+    laplacian=L,
+    lengthscale=jnp.array([2.3]),
+    variance=jnp.array([3.2]),
+    smoothness=jnp.array([6.1]),
+)
 prior = gpx.Prior(mean_function=gpx.Zero(), kernel=true_kernel)
 
 fx = prior(x)
-y = fx.sample(seed=key).reshape(-1, 1)
+y = fx.sample(seed=key, sample_shape=(1,)).reshape(-1, 1)
 
 D = gpx.Dataset(X=x, y=y)
 

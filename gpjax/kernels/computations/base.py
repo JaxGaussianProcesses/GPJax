@@ -20,7 +20,8 @@ from typing import Any
 from jax import vmap
 from jaxtyping import Array, Float
 
-from gpjax.linops import DenseLinearOperator, DiagonalLinearOperator, LinearOperator
+from gpjax.linops import (DenseLinearOperator, DiagonalLinearOperator,
+                          LinearOperator)
 
 Kernel = Any
 
@@ -35,7 +36,6 @@ class AbstractKernelComputation:
         self,
         x: Float[Array, "N D"],
     ) -> LinearOperator:
-
         """Compute Gram covariance operator of the kernel function.
 
         Args:

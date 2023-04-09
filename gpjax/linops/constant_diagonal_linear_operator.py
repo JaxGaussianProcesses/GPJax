@@ -27,7 +27,6 @@ from .linear_operator import LinearOperator
 
 
 def _check_args(value: Any, size: Any) -> None:
-
     if not isinstance(size, int):
         raise ValueError(f"`length` must be an integer, but `length = {size}`.")
 
@@ -182,7 +181,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         Returns:
             ConstantDiagonalLinearOperator: Covariance operator.
         """
-        return ConstantDiagonalLinearOperator(value=root.value ** 2, size=root.size)
+        return ConstantDiagonalLinearOperator(value=root.value**2, size=root.size)
 
 
 __all__ = [

@@ -1,18 +1,3 @@
-# ---
-# jupyter:
-#   jupytext:
-#     custom_cell_magics: kql
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.11.2
-#   kernelspec:
-#     display_name: Python 3.9.7 ('gpjax')
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # New to Gaussian Processes?
 #
@@ -75,7 +60,6 @@
 # from our posterior distribution through
 # $$
 # \begin{align}
-#     p(\mathbf{y}^{\star}\,|\, \mathbf{y}) & = \int p(\mathbf{y}^{\star},\theta \,|\,  \mathbf{y} )\mathrm{d}\theta \\
 #     & = \int p(\mathbf{y}^{\star} \,|\, \theta, \mathbf{y} ) p(\theta\,|\, \mathbf{y})\mathrm{d}\theta\,.
 # \end{align}
 # $$
@@ -90,7 +74,6 @@
 # $$
 # \begin{alignat}{2}
 #     \mu  = \mathbb{E}[\theta\,|\,\mathbf{y}]  & = \int \theta
-#     p(\theta\,|\,\mathbf{y})\mathrm{d}\theta &\\
 #     \sigma^2  = \mathbb{V}[\theta\,|\,\mathbf{y}] & = \int \left(\theta -
 #     \mathbb{E}[\theta\,|\,\mathbf{y}]\right)^2p(\theta\,|\,\mathbf{y})\mathrm{d}\theta&\,.
 # \end{alignat}
@@ -115,17 +98,18 @@
 # We can plot three different parameterisations of this density.
 
 # %%
-import distrax as dx
+import tensorflow_probability.substrates.jax as tfp
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from utils import confidence_ellipse
+tfd = tfp.distributions
 
-ud1 = dx.Normal(0.0, 1.0)
-ud2 = dx.Normal(-1.0, 0.5)
-ud3 = dx.Normal(0.25, 1.5)
+ud1 = tfd.Normal(0.0, 1.0)
+ud2 = tfd.Normal(-1.0, 0.5)
+ud3 = tfd.Normal(0.25, 1.5)
 
 xs = jnp.linspace(-5.0, 5.0, 500)
 
@@ -168,11 +152,11 @@ ax.legend(loc="best")
 # %%
 key = jr.PRNGKey(123)
 
-d1 = dx.MultivariateNormalFullCovariance(jnp.zeros(2), jnp.eye(2))
-d2 = dx.MultivariateNormalTri(
+d1 = tfd.MultivariateNormalDiag(loc=jnp.zeros(2), scale_diag=jnp.ones(2))
+d2 = tfd.MultivariateNormalTriL(
     jnp.zeros(2), jnp.linalg.cholesky(jnp.array([[1.0, 0.9], [0.9, 1.0]]))
 )
-d3 = dx.MultivariateNormalTri(
+d3 = tfd.MultivariateNormalTriL(
     jnp.zeros(2), jnp.linalg.cholesky(jnp.array([[1.0, -0.5], [-0.5, 1.0]]))
 )
 
@@ -215,8 +199,6 @@ for a, t, d in zip([ax0, ax1, ax2], titles, dists):
 # variables, we can obtain the mean and covariance by
 # $$
 # \begin{align}
-#     \mathbb{E}[\mathbf{y}] = \boldsymbol{\mu}\,, \quad \operatorname{Cov}(\mathbf{y}) & =\mathbb{E}\left[(\mathbf{y} - \boldsymbol{\mu})(\mathbf{y} - \boldsymbol{\mu})^{\top}\right] \\
-#     & = \mathbb{E}[\mathbf{y}^2] - \mathbb{E}[\mathbf{y}]^2 \\
 #     & = \boldsymbol{\Sigma}\,.
 # \end{align}
 # $$
@@ -249,13 +231,13 @@ for a, t, d in zip([ax0, ax1, ax2], titles, dists):
 
 # %%
 n = 1000
-x = dx.Normal(loc=0.0, scale=1.0).sample(seed=key, sample_shape=(n,))
+x = tfd.Normal(loc=0.0, scale=1.0).sample(seed=key, sample_shape=(n,))
 key, subkey = jr.split(key)
-y = dx.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n,))
+y = tfd.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n,))
 key, subkey = jr.split(subkey)
-xfull = dx.Normal(loc=0.0, scale=1.0).sample(seed=subkey, sample_shape=(n * 10,))
+xfull = tfd.Normal(loc=0.0, scale=1.0).sample(seed=subkey, sample_shape=(n * 10,))
 key, subkey = jr.split(subkey)
-yfull = dx.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n * 10,))
+yfull = tfd.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n * 10,))
 key, subkey = jr.split(subkey)
 df = pd.DataFrame({"x": x, "y": y, "idx": jnp.ones(n)})
 
@@ -324,7 +306,6 @@ confidence_ellipse(
 #     \end{bmatrix}\right) = \mathcal{N}\left(\begin{bmatrix}
 #         \boldsymbol{\mu}_{\mathbf{x}} \\ \boldsymbol{\mu}_{\mathbf{y}}
 #     \end{bmatrix}, \begin{bmatrix}
-#         \boldsymbol{\Sigma}_{\mathbf{xx}}, \boldsymbol{\Sigma}_{\mathbf{xy}} \\
 #         \boldsymbol{\Sigma}_{\mathbf{yx}}, \boldsymbol{\Sigma}_{\mathbf{yy}}
 #     \end{bmatrix} \right)\,,
 # \end{align}
@@ -348,7 +329,6 @@ confidence_ellipse(
 # \begin{alignat}{3}
 #     & \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{y} && = p(\mathbf{x})
 #     && = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}},
-#     \boldsymbol{\Sigma}_{\mathbf{xx}}) \\
 #     & \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{x} && = p(\mathbf{y})
 #     && = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{y}},
 #     \boldsymbol{\Sigma}_{\mathbf{yy}})\,.
@@ -357,7 +337,6 @@ confidence_ellipse(
 # The conditional distributions are given by
 # $$
 # \begin{align}
-#     p(\mathbf{x}\,|\, \mathbf{y}) & = \mathcal{N}\left(\boldsymbol{\mu}_{\mathbf{x}} + \boldsymbol{\Sigma}_{\mathbf{xy}}\boldsymbol{\Sigma}_{\mathbf{yy}}^{-1}(\mathbf{y}-\boldsymbol{\mu}_{\mathbf{y}}), \boldsymbol{\Sigma}_{\mathbf{xx}}-\boldsymbol{\Sigma}_{\mathbf{xy}}\boldsymbol{\Sigma}_{\mathbf{yy}}^{-1}\boldsymbol{\Sigma}_{\mathbf{yx}}\right)\\
 #     p(\mathbf{y}\,|\, \mathbf{x}) & = \mathcal{N}\left(\boldsymbol{\mu}_{\mathbf{y}} + \boldsymbol{\Sigma}_{\mathbf{yx}}\boldsymbol{\Sigma}_{\mathbf{xx}}^{-1}(\mathbf{x}-\boldsymbol{\mu}_{\mathbf{x}}), \boldsymbol{\Sigma}_{\mathbf{yy}}-\boldsymbol{\Sigma}_{\mathbf{yx}}\boldsymbol{\Sigma}_{\mathbf{xx}}^{-1}\boldsymbol{\Sigma}_{\mathbf{xy}}\right)\,.
 # \end{align}
 # $$
@@ -416,7 +395,6 @@ confidence_ellipse(
 # $$
 # \begin{align}
 #     p(\mathbf{f}, \mathbf{f}^{\star}) = \mathcal{N}\left(\mathbf{0}, \begin{bmatrix}
-#         \mathbf{K}_{ff} & \mathbf{K}_{fx} \\
 #         \mathbf{K}_{xf} & \mathbf{K}_{xx}
 #     \end{bmatrix}\right)\,,
 # \end{align}
@@ -465,14 +443,12 @@ confidence_ellipse(
 # the posterior predictive distribution is exact
 # $$
 # \begin{align}
-#     p(\mathbf{f}^{\star}\,|\,\mathbf{y}) & = \int p(\mathbf{f}, \mathbf{f}^{\star}\,|\, \mathbf{y})\mathrm{d}\mathbf{f} \\
 #     & = \mathcal{N}(\mathbf{f}^{\star}\,|\,\boldsymbol{\mu}_{\,|\,\mathbf{y}}, \Sigma_{\,|\,\mathbf{y}})\,,
 # \end{align}
 # $$
 # where
 # $$
 # \begin{align}
-#     \boldsymbol{\mu}_{\,|\,\mathbf{y}} & = \mathbf{K}_{xf}\left(\mathbf{K}_{ff} + \sigma_n\mathbf{I}_n \right)^{-1}\mathbf{y}\\
 #     \Sigma_{\,|\,\mathbf{y}} & = \mathbf{K}_{\star\star} - \mathbf{K}_{xf}\left(\mathbf{K}_{ff} + \sigma_n^2\mathbf{I}_n\right)^{-1}\mathbf{K}_{fx} \,.
 # \end{align}
 # $$
@@ -480,7 +456,6 @@ confidence_ellipse(
 # be analytically expressed as
 # $$
 # \begin{align}
-#         \log p(\mathbf{y}) & = \log\int p(\mathbf{y}\,|\, \mathbf{f})p(\mathbf{f},\mathbf{f}^{\star})\mathrm{d}\mathbf{f}^{\star}  \\
 #         & = 0.5\left(-\underbrace{\mathbf{y}^{\top}\left(\mathbf{K}_{ff} - \sigma_n^2\mathbf{I}_n \right)^{-1}\mathbf{y}}_{\text{Data fit}} -\underbrace{\log\lvert \mathbf{K}_{ff} + \sigma^2_n\rvert}_{\text{Complexity}} -\underbrace{n\log 2\pi}_{\text{Constant}} \right)\,.
 # \end{align}
 # $$

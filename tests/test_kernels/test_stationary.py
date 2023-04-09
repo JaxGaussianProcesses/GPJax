@@ -18,35 +18,19 @@ from itertools import product
 
 import jax.numpy as jnp
 import jax.tree_util as jtu
+import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
-
-import pytest
-import tensorflow_probability.substrates.jax.distributions as tfd
 from jax.config import config
-from gpjax.linops import LinearOperator
 
 from gpjax.kernels.base import AbstractKernel
-from gpjax.kernels.computations import (
-    ConstantDiagonalKernelComputation,
-    DenseKernelComputation,
-)
-from gpjax.kernels.stationary import (
-    RBF,
-    Matern12,
-    Matern32,
-    Matern52,
-    Periodic,
-    PoweredExponential,
-    RationalQuadratic,
-    White,
-)
-from gpjax.kernels.computations import (
-    DenseKernelComputation,
-    ConstantDiagonalKernelComputation,
-)
-
+from gpjax.kernels.computations import (ConstantDiagonalKernelComputation,
+                                        DenseKernelComputation)
+from gpjax.kernels.stationary import (RBF, Matern12, Matern32, Matern52,
+                                      Periodic, PoweredExponential,
+                                      RationalQuadratic, White)
 from gpjax.kernels.stationary.utils import build_student_t_distribution
+from gpjax.linops import LinearOperator
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -65,7 +49,6 @@ class BaseTestKernel:
         funcarglist = metafunc.cls.params.get(metafunc.function.__name__, None)
 
         if funcarglist is None:
-
             return
         else:
             argnames = sorted(funcarglist[0])
@@ -77,7 +60,6 @@ class BaseTestKernel:
 
     @pytest.mark.parametrize("dim", [None, 1, 3], ids=lambda x: f"dim={x}")
     def test_initialization(self, fields: dict, dim: int) -> None:
-
         fields = {k: jnp.array([v]) for k, v in fields.items()}
 
         # number of dimensions
@@ -130,7 +112,6 @@ class BaseTestKernel:
     @pytest.mark.parametrize("n_b", [1, 2, 5], ids=lambda x: f"n_b={x}")
     @pytest.mark.parametrize("dim", [1, 2, 5], ids=lambda x: f"dim={x}")
     def test_cross_covariance(self, n_a: int, n_b: int, dim: int) -> None:
-
         kernel: AbstractKernel = self.kernel()
         a = jnp.linspace(-1.0, 1.0, n_a * dim).reshape(n_a, dim)
         b = jnp.linspace(3.0, 4.0, n_b * dim).reshape(n_b, dim)
@@ -139,7 +120,6 @@ class BaseTestKernel:
         assert Kab.shape == (n_a, n_b)
 
     def test_spectral_density(self):
-
         kernel: AbstractKernel = self.kernel()
 
         if self.kernel not in [RBF, Matern12, Matern32, Matern52]:

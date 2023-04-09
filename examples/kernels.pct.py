@@ -2,6 +2,7 @@
 # ---
 # jupyter:
 #   jupytext:
+#     cell_metadata_filter: -all
 #     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
@@ -9,7 +10,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: gpjax
 #     language: python
 #     name: python3
 # ---
@@ -33,6 +34,7 @@ from jax import jit
 from jax.config import config
 from jaxtyping import Array, Float
 from simple_pytree import static_field
+import numpy as np
 
 import gpjax as gpx
 from gpjax.base.param import param_field
@@ -201,11 +203,12 @@ def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
 
 
+bij = tfb.Chain([tfb.Softplus(), tfb.Shift(np.array(4.).astype(np.float64))])
+
 @dataclass
 class Polar(gpx.kernels.AbstractKernel):
     period: float = static_field(2 * jnp.pi)
-    tau: float = param_field(jnp.array([4.0]), bijector=tfb.Softplus(low=4.0))
-
+    tau: float = param_field(jnp.array([4.0]), bijector=bij)
     def __post_init__(self):
         self.c = self.period / 2.0
 
@@ -257,11 +260,10 @@ meanf = gpx.mean_functions.Zero()
 likelihood = gpx.Gaussian(num_datapoints=n)
 circlular_posterior = gpx.Prior(mean_function=meanf, kernel=PKern) * likelihood
 
-
 # Optimise GP's marginal log-likelihood using Adam
 opt_posterior, history = gpx.fit(
     model=circlular_posterior,
-    objective=gpx.ConjugateMLL(negative=True),
+    objective=jit(gpx.ConjugateMLL(negative=True)),
     train_data=D,
     optim=ox.adamw(learning_rate=0.05),
     num_iters=500,

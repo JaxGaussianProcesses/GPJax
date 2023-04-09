@@ -1,6 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
+#     cell_metadata_filter: vscode,-all
 #     custom_cell_magics: kql
 #     text_representation:
 #       extension: .py
@@ -8,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: flax
 #     language: python
 #     name: python3
 # ---
@@ -18,7 +19,7 @@
 #
 # In this notebook we demonstate how to fit a Gaussian process regression model.
 
-# %% vscode={"languageId": "python"}
+# %%
 from pprint import PrettyPrinter
 
 import jax.numpy as jnp
@@ -46,7 +47,7 @@ key = jr.PRNGKey(123)
 # We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs and labels
 # for later.
 
-# %% vscode={"languageId": "python"}
+# %%
 n = 100
 noise = 0.3
 
@@ -65,7 +66,7 @@ ytest = f(xtest)
 # To better understand what we have simulated, we plot both the underlying latent
 # function and the observed data that is subject to Gaussian noise.
 
-# %% vscode={"languageId": "python"}
+# %%
 fig, ax = plt.subplots(figsize=(10, 5))
 ax.plot(xtest, ytest, label="Latent function")
 ax.plot(x, y, "o", label="Observations")
@@ -75,7 +76,7 @@ ax.legend(loc="best")
 # Our aim in this tutorial will be to reconstruct the latent function from our noisy
 # observations $\mathcal{D}$ via Gaussian process regression. We begin by defining a
 # Gaussian process prior in the next section.
-
+#
 # ## Defining the prior
 #
 # A zero-mean Gaussian process (GP) places a prior distribution over real-valued
@@ -96,7 +97,7 @@ ax.legend(loc="best")
 # we can reciprocate this process in GPJax via defining a `Prior` with our chosen `RBF`
 # kernel.
 
-# %% vscode={"languageId": "python"}
+# %%
 kernel = gpx.kernels.RBF()
 meanf = gpx.mean_functions.Zero()
 prior = gpx.Prior(mean_function=meanf, kernel=kernel)
@@ -109,7 +110,7 @@ prior = gpx.Prior(mean_function=meanf, kernel=kernel)
 # multivariate Gaussian distribution. Such functionality enables trivial sampling, and
 # the evaluation of the GP's mean and covariance .
 
-# %% vscode={"languageId": "python"}
+# %%
 prior_dist = prior.predict(xtest)
 
 prior_mean = prior_dist.mean()
@@ -138,7 +139,7 @@ plt.show()
 # $$p(\mathcal{D} | f(\cdot)) = \mathcal{N}(\boldsymbol{y}; f(\boldsymbol{x}), \textbf{I} \alpha^2).$$
 # This is defined in GPJax through calling a `Gaussian` instance.
 
-# %% vscode={"languageId": "python"}
+# %%
 likelihood = gpx.Gaussian(num_datapoints=D.n)
 
 # %% [markdown]
@@ -148,7 +149,7 @@ likelihood = gpx.Gaussian(num_datapoints=D.n)
 #
 # Mimicking this construct, the posterior is established in GPJax through the `*` operator.
 
-# %% vscode={"languageId": "python"}
+# %%
 posterior = prior * likelihood
 
 # %% [markdown]
@@ -167,8 +168,7 @@ posterior = prior * likelihood
 # we have initialised each of these to 1, we can learn Type 2 MLEs for each of
 # these parameters by optimising the marginal log-likelihood (MLL).
 
-# %% vscode={"languageId": "python"}
-# TODO: drop this once `step` is implemented into `Objectives`
+# %%
 negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True))
 negative_mll(posterior, train_data=D)
 
@@ -181,13 +181,14 @@ negative_mll(posterior, train_data=D)
 # We can now define an optimiser with `optax`. For this example we'll use the `adam`
 # optimiser.
 
-# %% vscode={"languageId": "python"}
+# %%
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=gpx.ConjugateMLL(negative=True),
+    objective=negative_mll,
     train_data=D,
     optim=ox.adam(learning_rate=0.01),
     num_iters=500,
+    safe=True
 )
 
 # %% [markdown]
@@ -195,7 +196,7 @@ opt_posterior, history = gpx.fit(
 # training losses. We can plot the training loss to see how the optimisation has
 # progressed.
 
-# %% vscode={"languageId": "python"}
+# %%
 plt.plot(history)
 
 # %% [markdown]
@@ -207,7 +208,7 @@ plt.plot(history)
 # the predictive distribution as a `Distrax` multivariate Gaussian upon which `mean`
 # and `stddev` can be used to extract the predictive mean and standard deviatation.
 
-# %% vscode={"languageId": "python"}
+# %%
 latent_dist = opt_posterior.predict(xtest, train_data=D)
 predictive_dist = opt_posterior.likelihood(latent_dist)
 
@@ -219,7 +220,7 @@ predictive_std = predictive_dist.stddev()
 # performance at explaining the data $\mathcal{D}$ and recovering the underlying
 # latent function of interest.
 
-# %% vscode={"languageId": "python"}
+# %%
 fig, ax = plt.subplots(figsize=(12, 5))
 ax.plot(x, y, "o", label="Observations", color="tab:red")
 ax.plot(xtest, predictive_mean, label="Predictive mean", color="tab:blue")
@@ -255,6 +256,6 @@ ax.legend()
 # %% [markdown]
 # ## System configuration
 
-# %% vscode={"languageId": "python"}
+# %%
 # %reload_ext watermark
 # %watermark -n -u -v -iv -w -a 'Thomas Pinder & Daniel Dodd'

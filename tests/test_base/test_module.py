@@ -13,9 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-import jax.numpy as jnp
-import tensorflow_probability.substrates.jax.bijectors as tfb
-
 import dataclasses
 from dataclasses import dataclass, field
 from typing import Any, Generic, Iterable, TypeVar
@@ -24,9 +21,9 @@ import jax
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import pytest
+import tensorflow_probability.substrates.jax.bijectors as tfb
 from flax import serialization
 from simple_pytree import Pytree, static_field
-
 
 from gpjax.base.module import Module, meta
 from gpjax.base.param import param_field
@@ -368,11 +365,11 @@ def test_nested_Module_structure(is_dataclass):
     def loss(tree):
         t = tree.stop_gradient()
         return jnp.sum(
-            t.a ** 2
-            + t.sub_tree.c ** 2
-            + t.sub_tree.d ** 2
-            + t.sub_tree.e ** 2
-            + t.b ** 2
+            t.a**2
+            + t.sub_tree.c**2
+            + t.sub_tree.d**2
+            + t.sub_tree.e**2
+            + t.b**2
         )
 
     g = jax.grad(loss)(new_tree)
