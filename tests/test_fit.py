@@ -57,7 +57,7 @@ def test_simple_linear_model() -> None:
     # Define loss function:
     @dataclass
     class MeanSqaureError(AbstractObjective):
-        def __call__(self, model: LinearModel, train_data: Dataset) -> float:
+        def step(self, model: LinearModel, train_data: Dataset) -> float:
             return jnp.mean((train_data.y - model(train_data.X)) ** 2)
 
     loss = MeanSqaureError()
