@@ -88,14 +88,6 @@ examples/kernels
 examples/yacht
 ```
 
-```{toctree}
----
-maxdepth: 1
-caption: Package Reference
-hidden:
----
-api
-```
 
 # Bibliography
 

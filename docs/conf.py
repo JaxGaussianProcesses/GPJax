@@ -87,7 +87,13 @@ extensions = [
     "sphinxext.opengraph",
     "myst_parser",
     "sphinx_tabs.tabs",
+    # 'autoapi.extension'
 ]
+
+# autoapi_dirs = ['../gpjax']
+# autoapi_type = "python"
+# autoapi_options = ["show-module-summary", "undoc-members"]
+# autodoc_typehints = "signature"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -209,7 +215,6 @@ html_theme = "sphinx_book_theme"
 html_logo = "_static/gpjax_logo.svg"
 html_favicon = "_static/gpjax_logo.svg"
 html_theme_options = {
-    "logo_only": True,
     "show_toc_level": 2,
     "repository_url": "https://github.com/thomaspinder/GPJax/",
     "launch_buttons": {
