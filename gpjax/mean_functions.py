@@ -107,7 +107,12 @@ class AbstractMeanFunction(Module):
 class Constant(AbstractMeanFunction):
     """
     A constant mean function. This function returns a repeated scalar value for all inputs.
+<<<<<<< HEAD
     The scalar value itself can be treated as a model hyperparameter and learned during training.
+=======
+    The scalar value itself can be treated as a model hyperparameter and learned during training but
+    defaults to 1.0.
+>>>>>>> origin/rff_sampler
     """
 
     constant: Float[Array, "1"] = param_field(jnp.array([0.0]))

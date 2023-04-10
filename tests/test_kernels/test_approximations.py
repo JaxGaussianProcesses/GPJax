@@ -24,7 +24,7 @@ _jitter = 1e-6
 def test_frequency_sampler(kernel: AbstractKernel, num_basis_fns: int, n_dims: int):
     key = jr.PRNGKey(123)
     base_kernel = kernel(active_dims=list(range(n_dims)))
-    approximate = RFF(base_kernel, num_basis_fns)
+    approximate = RFF(base_kernel=base_kernel, num_basis_fns=num_basis_fns)
     assert approximate.frequencies.shape == (num_basis_fns, n_dims)
 
 
@@ -38,7 +38,7 @@ def test_gram(kernel: AbstractKernel, num_basis_fns: int, n_dims: int, n_data: i
     if n_dims > 1:
         x = jnp.hstack([x] * n_dims)
     base_kernel = kernel(active_dims=list(range(n_dims)))
-    approximate = RFF(base_kernel, num_basis_fns)
+    approximate = RFF(base_kernel=base_kernel, num_basis_fns=num_basis_fns)
 
     linop = approximate.gram(x)
 
@@ -75,7 +75,7 @@ def test_cross_covariance(
         x2 = jnp.hstack([x2] * n_dims)
 
     base_kernel = kernel(active_dims=list(range(n_dims)))
-    approximate = RFF(base_kernel, num_basis_fns)
+    approximate = RFF(base_kernel=base_kernel, num_basis_fns=num_basis_fns)
     Kxx = approximate.cross_covariance(x1, x2)
 
     # Check the return type
@@ -95,10 +95,10 @@ def test_improvement(kernel, n_dim):
     base_kernel = kernel(active_dims=list(range(n_dim)))
     exact_linop = base_kernel.gram(x).to_dense()
 
-    crude_approximation = RFF(base_kernel, num_basis_fns=10)
+    crude_approximation = RFF(base_kernel=base_kernel, num_basis_fns=10)
     c_linop = crude_approximation.gram(x).to_dense()
 
-    better_approximation = RFF(base_kernel, num_basis_fns=50)
+    better_approximation = RFF(base_kernel=base_kernel, num_basis_fns=50)
     b_linop = better_approximation.gram(x).to_dense()
 
     c_delta = jnp.linalg.norm(exact_linop - c_linop, ord="fro")
@@ -117,7 +117,7 @@ def test_exactness(kernel):
     x = jr.uniform(key, minval=-3.0, maxval=3.0, shape=(n_data, 1))
     exact_linop = kernel.gram(x).to_dense()
 
-    better_approximation = RFF(kernel, num_basis_fns=500)
+    better_approximation = RFF(base_kernel=kernel, num_basis_fns=500)
     b_linop = better_approximation.gram(x).to_dense()
 
     max_delta = jnp.max(exact_linop - b_linop)

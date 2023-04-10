@@ -11,15 +11,7 @@ from ..computations import BasisFunctionComputation
 
 
 @dataclass
-class AbstractFourierKernel:
-    base_kernel: AbstractKernel
-    num_basis_fns: int
-    frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity)
-    key: KeyArray = static_field(PRNGKey(123))
-
-
-@dataclass
-class RFF(AbstractKernel, AbstractFourierKernel):
+class RFF(AbstractKernel):
     """Computes an approximation of the kernel using Random Fourier Features.
 
     All stationary kernels are equivalent to the Fourier transform of a probability
@@ -37,6 +29,10 @@ class RFF(AbstractKernel, AbstractFourierKernel):
     Args:
         AbstractKernel (_type_): _description_
     """
+    base_kernel: AbstractKernel = None
+    num_basis_fns: int = static_field(50)
+    frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity)
+    key: KeyArray = static_field(PRNGKey(123))
 
     def __post_init__(self) -> None:
         """Post-initialisation function.
@@ -63,9 +59,23 @@ class RFF(AbstractKernel, AbstractFourierKernel):
         Args:
             kernel (AbstractKernel): The kernel to be checked.
         """
+        if kernel is None:
+            raise ValueError("Base kernel must be specified.")
         error_msg = """
         Base kernel must have a spectral density. Currently, only Matérn
         and RBF kernels have implemented spectral densities.
         """
         if kernel.spectral_density is None:
             raise ValueError(error_msg)
+
+    def compute_features(self, x: Float[Array, "N D"]) -> Float[Array, "N L"]:
+        """Compute the features for the inputs.
+
+        Args:
+            x: A N x D array of inputs.
+            frequencies: A M x D array of frequencies.
+
+        Returns:
+            Float[Array, "N L"]: A N x L array of features where L = 2M.
+        """
+        return self.compute_engine(self).compute_features(x)

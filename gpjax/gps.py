@@ -15,7 +15,7 @@
 
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Callable, Optional, Dict
 
 import jax.numpy as jnp
 from jax.random import KeyArray, PRNGKey, normal
@@ -26,9 +26,17 @@ from .base import Module, param_field
 from .dataset import Dataset
 from .gaussian_distribution import GaussianDistribution
 from .kernels.base import AbstractKernel
+from .kernels import RFF
 from .likelihoods import AbstractLikelihood, Gaussian
 from .linops import identity
 from .mean_functions import AbstractMeanFunction
+
+
+FunctionalSample = Callable[[Float[Array, "N D"]], Float[Array, "N B"]]
+""" Type alias for functions representing `B` samples from a model, to be evaluated on
+any set of `N` inputs (of dimension `D`) and returning the evaluations of each
+(potentially approximate) sample draw across these inputs.
+"""
 
 
 @dataclass
@@ -183,6 +191,80 @@ class Prior(AbstractPrior):
 
         return GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Kxx)
 
+    def sample_approx(
+        self,
+        num_samples: int,
+        key: KeyArray,
+        num_features: Optional[int] = 100,
+    ) -> FunctionalSample:
+        r"""Build an approximate sample from the Gaussian process prior. This method
+        provides a function that returns the evaluations of a sample across any given
+        inputs.
+
+        In particular, we approximate the Gaussian processes' prior as the finite feature
+        approximation
+
+        .. math:: \hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i
+
+
+        where :math:`\phi_i` are m features sampled from the Fourier feature decomposition of
+        the model's kernel and :math:`\theta_i` are samples from a unit Gaussian.
+
+
+        A key property of such functional samples is that the same sample draw is
+        evaluated for all queries. Consistency is a property that is prohibitively costly
+        to ensure when sampling exactly from the GP prior, as the cost of exact sampling
+        scales cubically with the size of the sample. In contrast, finite feature representations
+        can be evaluated with constant cost regardless of the required number of queries.
+
+        In the following example, we build 10 such samples
+        and then evaluate them over the interval :math:`[0, 1]`:
+
+        Example:
+            For a ``prior`` distribution, the following code snippet will
+            build and evaluate an approximate sample.
+
+            >>> import gpjax as gpx
+            >>> import jax.numpy as jnp
+            >>>
+            >>> sample_fn = prior.sample_appox(10, key)
+            >>> sample_fn(jnp.linspace(0, 1, 100))
+
+        Args:
+            num_samples (int): The desired number of samples.
+            params (Dict): The specific set of parameters for which the sample
+            should be generated for.
+            key (KeyArray): The random seed used for the sample(s).
+            num_features (int): The number of features used when approximating the
+            kernel.
+
+
+        Returns:
+            FunctionalSample: A function representing an approximate sample from the Gaussian
+            process prior.
+        """
+        if (not isinstance(num_features, int)) or num_features <= 0:
+            raise ValueError(f"num_features must be a positive integer")
+        if (not isinstance(num_samples, int)) or num_samples <= 0:
+            raise ValueError(f"num_samples must be a positive integer")
+
+        approximate_kernel = RFF(base_kernel=self.kernel, num_basis_fns=num_features)
+        feature_weights = normal(key, [num_samples, 2 * num_features])  # [B, L]
+
+        def sample_fn(test_inputs: Float[Array, "N D"]) -> Float[Array, "N B"]:
+
+            feature_evals = (
+                approximate_kernel.compute_features(x=test_inputs)
+            )
+            feature_evals *= jnp.sqrt(self.kernel.variance / num_features)
+            evaluated_sample = jnp.inner(feature_evals, feature_weights)  # [N, B]
+            return (
+                self.mean_function(test_inputs)
+                + evaluated_sample
+            )
+
+        return sample_fn
+
 
 #######################
 # GP Posteriors
@@ -194,6 +276,7 @@ class AbstractPosterior(Module):
 
     prior: AbstractPrior
     likelihood: AbstractLikelihood
+    jitter: float = static_field(1e-6)
 
     def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
         """Evaluate the Gaussian process at the given points. The output of this function
@@ -346,6 +429,101 @@ class ConjugatePosterior(AbstractPosterior):
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
+    def sample_approx(
+        self,
+        num_samples: int,
+        train_data: Dataset,
+        key: KeyArray,
+        num_features: Optional[int] = 100,
+    ) -> FunctionalSample:
+        r"""Build an approximate sample from the Gaussian process posterior. This method
+        provides a function that returns the evaluations of a sample across any given
+        inputs.
+
+        Unlike when building approximate samples from a Gaussian process prior, decompositions
+        based on Fourier features alone rarely give accurate samples. Therefore, we must also
+        include an additional set of features (known as canonical features) to better model the
+        transition from Gaussian process prior to Gaussian process posterior. For more details
+        see https://arxiv.org/pdf/2002.09309.pdf
+
+        In particular, we approximate the Gaussian processes' posterior as the finite feature
+        approximation
+
+        .. math:: \hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i + \sum{j=1}^N v_jk(.,x_j)
+
+
+        where :math:`\phi_i` are m features sampled from the Fourier feature decomposition of
+        the model's kernel and :math:`k(., x_j)` are N canonical features. The Fourier
+        weights :math:`\theta_i` are samples from a unit Gaussian.
+        See https://arxiv.org/pdf/2002.09309.pdf for expressions for the canonical
+        weights :math:`v_j`.
+
+
+        A key property of such functional samples is that the same sample draw is
+        evaluated for all queries. Consistency is a property that is prohibitively costly
+        to ensure when sampling exactly from the GP prior, as the cost of exact sampling
+        scales cubically with the size of the sample. In contrast, finite feature representations
+        can be evaluated with constant cost regardless of the required number of queries.
+
+        Args:
+            num_samples (int): The desired number of samples.
+            key (KeyArray): The random seed used for the sample(s).
+            num_features (int): The number of features used when approximating the
+            kernel.
+
+
+        Returns:
+            FunctionalSample: A function representing an approximate sample from the Gaussian
+            process prior.
+        """
+        if (not isinstance(num_features, int)) or num_features <= 0:
+            raise ValueError(f"num_features must be a positive integer")
+        if (not isinstance(num_samples, int)) or num_samples <= 0:
+            raise ValueError(f"num_samples must be a positive integer")
+
+        # Approximate kernel with feature decomposition
+        approximate_kernel = RFF(base_kernel=self.prior.kernel, num_basis_fns=num_features)
+
+        def eval_fourier_features(
+            test_inputs: Float[Array, "N D"]
+        ) -> Float[Array, "N L"]:
+            Phi = approximate_kernel.compute_features(x=test_inputs)
+            Phi *= jnp.sqrt(self.prior.kernel.variance / num_features)
+            return Phi
+
+        # sample weights for Fourier features
+        fourier_weights = normal(key, [num_samples, 2 * num_features])  # [B, L]
+
+        # sample weights v for canonical features
+        # v = Σ⁻¹ (y + ε - ɸ⍵) for  Σ = Kxx + Iσ² and ε ᯈ N(0, σ²)
+        Kxx = self.prior.kernel.gram(train_data.X)  #  [N, N]
+        Sigma = Kxx + identity(train_data.n) * (self.likelihood.obs_noise + self.jitter)  #  [N, N]
+        eps = jnp.sqrt(self.likelihood.obs_noise) * normal(key, [train_data.n, num_samples])  #  [N, B]
+        y = train_data.y - self.prior.mean_function(train_data.X)  # account for mean
+        Phi = eval_fourier_features(train_data.X)
+        canonical_weights = Sigma.solve(
+            y + eps - jnp.inner(Phi, fourier_weights)
+        )  #  [N, B]
+
+        def sample_fn(test_inputs: Float[Array, "n D"]) -> Float[Array, "n B"]:
+            fourier_features = eval_fourier_features(test_inputs)
+            weight_space_contribution = jnp.inner(
+                fourier_features, fourier_weights
+            )  # [n, B]
+            canonical_features = self.prior.kernel.cross_covariance(
+                test_inputs, train_data.X
+            )  # [n, N]
+            function_space_contribution = jnp.matmul(
+                canonical_features, canonical_weights
+            )
+
+            return (
+                self.prior.mean_function(test_inputs)
+                + weight_space_contribution
+                + function_space_contribution
+            )
+
+        return sample_fn
 
 @dataclass
 class NonConjugatePosterior(AbstractPosterior):
