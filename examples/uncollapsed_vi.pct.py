@@ -197,7 +197,7 @@ q = gpx.VariationalGaussian(posterior=p, inducing_inputs=z)
 # its negative.
 
 # %%
-negative_elbo = jax.jit(gpx.ELBO(negative=True))
+negative_elbo = jit(gpx.ELBO(negative=True))
 
 # %% [markdown]
 # ### Mini-batching
