@@ -1,12 +1,3 @@
-# ---
-# jupyter:
-#   jupytext:
-#     text_representation:
-#       extension: .py
-#       jupytext_version: 1.11.2
-#   kernelspec:
-# ---
-
 # %%
 import jax.random as jr
 import matplotlib.pyplot as plt

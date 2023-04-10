@@ -1,19 +1,3 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: vscode,-all
-#     custom_cell_magics: kql
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.6.0
-#   kernelspec:
-#     display_name: flax
-#     language: python
-#     name: gpjax
-# ---
-
 # %% [markdown]
 # # Regression
 #
