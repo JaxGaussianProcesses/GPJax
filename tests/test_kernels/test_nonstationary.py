@@ -14,6 +14,7 @@
 # ==============================================================================
 
 from itertools import permutations, product
+from dataclasses import is_dataclass
 
 import jax
 import jax.numpy as jnp
@@ -43,21 +44,23 @@ class BaseTestKernel:
 
     def pytest_generate_tests(self, metafunc):
         """This is called automatically by pytest"""
-        id_func = lambda x: "-".join([f"{k}={v}" for k, v in x.items()])
-        funcarglist = metafunc.cls.params.get(metafunc.function.__name__, None)
 
+        # function for pretty test name
+        id_func = lambda x: "-".join([f"{k}={v}" for k, v in x.items()])
+
+        # get arguments for the test function
+        funcarglist = metafunc.cls.params.get(metafunc.function.__name__, None)
         if funcarglist is None:
             return
         else:
-            argnames = sorted(funcarglist[0])
-            metafunc.parametrize(
-                argnames,
-                [[funcargs[name] for name in argnames] for funcargs in funcarglist],
-                ids=id_func,
-            )
+            # equivalent of pytest.mark.parametrize applied on the metafunction
+            metafunc.parametrize("fields", funcarglist, ids=id_func)
 
     @pytest.mark.parametrize("dim", [None, 1, 3], ids=lambda x: f"dim={x}")
     def test_initialization(self, fields: dict, dim: int) -> None:
+
+        # Check that kernel is a dataclass
+        assert is_dataclass(self.kernel)
 
         # Input fields as JAX arrays
         fields = {k: jnp.array([v]) for k, v in fields.items()}
@@ -142,9 +145,7 @@ class BaseTestKernel:
         assert Kab.shape == (n_a, n_b)
 
 
-prod = lambda inp: [
-    {"fields": dict(zip(inp.keys(), values))} for values in product(*inp.values())
-]
+prod = lambda inp: [dict(zip(inp.keys(), values)) for values in product(*inp.values())]
 
 
 class TestLinear(BaseTestKernel):

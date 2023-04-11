@@ -15,6 +15,7 @@
 
 
 from itertools import product
+from dataclasses import is_dataclass
 
 import jax.numpy as jnp
 import jax.tree_util as jtu
@@ -78,6 +79,10 @@ class BaseTestKernel:
     @pytest.mark.parametrize("dim", [None, 1, 3], ids=lambda x: f"dim={x}")
     def test_initialization(self, fields: dict, dim: int) -> None:
 
+        # Check that kernel is a dataclass
+        assert is_dataclass(self.kernel)
+
+        # Input fields as JAX arrays
         fields = {k: jnp.array([v]) for k, v in fields.items()}
 
         # number of dimensions
