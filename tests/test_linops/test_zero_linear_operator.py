@@ -19,6 +19,8 @@ import jax.numpy as jnp
 import jax.random as jr
 import pytest
 from jax.config import config
+import jax.tree_util as jtu
+from dataclasses import is_dataclass
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -37,7 +39,18 @@ def approx_equal(res: jax.Array, actual: jax.Array) -> bool:
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_init(n: int) -> None:
     zero = ZeroLinearOperator(shape=(n, n))
+
+    # Check types.
+    assert isinstance(zero, ZeroLinearOperator)
+    assert is_dataclass(zero)
+
+    # Check properties.
     assert zero.shape == (n, n)
+    assert zero.dtype == jnp.float64
+    assert zero.ndim == 2
+
+    # Check pytree.
+    assert jtu.tree_leaves(zero) == [] # shape, dtype are static!
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])

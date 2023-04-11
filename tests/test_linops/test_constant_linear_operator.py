@@ -17,6 +17,9 @@
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
+import jax.tree_util as jtu
+from dataclasses import is_dataclass
+
 from jax.config import config
 
 # Enable Float64 for more stable matrix inversions.
@@ -38,8 +41,19 @@ def approx_equal(res: jnp.ndarray, actual: jnp.ndarray) -> bool:
 def test_init(n: int) -> None:
     value = jr.uniform(_PRNGKey, (1,))
     constant_diag = ConstantDiagonalLinearOperator(value=value, size=n)
+
+    # Check types.
+    assert isinstance(constant_diag, ConstantDiagonalLinearOperator)
+    assert is_dataclass(constant_diag)
+
+    # Check properties.
     assert constant_diag.shape == (n, n)
+    assert constant_diag.dtype == jnp.float64
+    assert constant_diag.ndim == 2
     assert constant_diag.size == n
+
+    # Check pytree.
+    assert jtu.tree_leaves(constant_diag) == [value] # shape, dtype are static!
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])
