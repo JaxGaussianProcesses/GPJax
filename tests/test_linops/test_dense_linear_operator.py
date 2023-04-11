@@ -20,6 +20,9 @@ import jax
 import pytest
 from jax.config import config
 
+import jax.tree_util as jtu
+from dataclasses import is_dataclass
+
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -34,12 +37,24 @@ def approx_equal(res: jax.Array, actual: jax.Array) -> bool:
     """Check if two arrays are approximately equal."""
     return jnp.linalg.norm(res - actual) < 1e-6
 
-
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_init(n: int) -> None:
     values = jr.uniform(_PRNGKey, (n, n))
     dense = DenseLinearOperator(values)
+
+    # Check types.
+    assert isinstance(dense, DenseLinearOperator)
+    assert is_dataclass(dense)
+
+    # Check properties.
     assert dense.shape == (n, n)
+    assert dense.dtype == jnp.float64
+    assert dense.ndim == 2
+
+    # Check pytree.
+    assert jtu.tree_leaves(dense) == [values] # shape, dtype are static!
+
+
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])

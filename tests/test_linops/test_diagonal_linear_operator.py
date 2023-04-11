@@ -18,6 +18,9 @@ import jax.numpy as jnp
 import jax.random as jr
 import pytest
 import jax
+import jax.tree_util as jtu
+from dataclasses import is_dataclass
+
 from jax.config import config
 
 
@@ -38,7 +41,18 @@ def approx_equal(res: jax.Array, actual: jax.Array) -> bool:
 def test_init(n: int) -> None:
     values = jr.uniform(_PRNGKey, (n,))
     diag = DiagonalLinearOperator(values)
+
+     # Check types.
+    assert isinstance(diag, DiagonalLinearOperator)
+    assert is_dataclass(diag)
+
+    # Check properties.
     assert diag.shape == (n, n)
+    assert diag.dtype == jnp.float64
+    assert diag.ndim == 2
+
+    # Check pytree.
+    assert jtu.tree_leaves(diag) == [values] # shape, dtype are static!
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])
