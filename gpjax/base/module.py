@@ -17,6 +17,7 @@ from __future__ import annotations
 
 __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
 
+import os
 import dataclasses
 from copy import copy, deepcopy
 from typing import Any, Callable, Dict, Iterable, List, Tuple
@@ -27,7 +28,9 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 from jax import lax
 from jax._src.tree_util import _registry
 from simple_pytree import Pytree, static_field
+from simple_pytree.pytree import PytreeMeta
 from typing_extensions import Self
+from orbax.checkpoint import PyTreeCheckpointer, SaveArgs, Checkpointer, PyTreeCheckpointHandler, ArrayRestoreArgs, RestoreArgs
 
 
 class Module(Pytree):
@@ -172,6 +175,7 @@ class Module(Pytree):
         return meta_map(_apply_stop_grad, self)
 
 
+
 def _toplevel_meta(pytree: Any) -> List[Dict[str, Any]]:
     """Unpacks a list of meta corresponding to the top-level nodes of the pytree.
 
@@ -284,3 +288,43 @@ def meta(pytree: Module, *, is_leaf: Callable[[Any], bool] | None = None) -> Mod
         return meta
 
     return meta_map(_filter_meta, pytree, is_leaf=is_leaf)
+
+
+def _is_multiprocess_array(value: Any) -> bool:
+    if isinstance(value, jax.Array):
+        return not value.is_fully_addressable
+    return False
+
+
+def save_tree(path: str, model: Module, overwrite: bool = False, iterate: int = None) -> None:
+    def save_args_from_target(target: Any) -> Any:
+        return jax.tree_util.tree_map(
+            lambda x: SaveArgs(aggregate=not _is_multiprocess_array(x)), target
+        )
+
+    # Include the optimiser's iterate to the checkpoint path.
+    if iterate:
+        path = os.path.join(path, f"step_{iterate}")
+
+    # Extract the static fields from the model.
+    save_args = save_args_from_target(model)
+
+    # Save the model.
+    orbax_checkpointer = Checkpointer(PyTreeCheckpointHandler())
+    orbax_checkpointer.save(path, model, save_args=save_args, force=overwrite)
+
+
+def load_tree(path: str, model: Module) -> Module:
+    def make_restore_args(x):
+        if _is_multiprocess_array(x):
+            return ArrayRestoreArgs(
+                restore_type=jax.Array,
+                sharding=x.sharding,
+            )
+        return RestoreArgs()
+
+
+    restore_args = jax.tree_util.tree_map(make_restore_args, model)
+    orbax_checkpointer = Checkpointer(PyTreeCheckpointHandler())
+    restored = orbax_checkpointer.restore(path, item=model, restore_args=restore_args)
+    return restored
