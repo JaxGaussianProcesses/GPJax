@@ -15,22 +15,40 @@
 
 
 from itertools import product
+from dataclasses import is_dataclass
 
+import jax
 import jax.numpy as jnp
 import jax.tree_util as jtu
-import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
+
+import pytest
+import tensorflow_probability.substrates.jax.distributions as tfd
 from jax.config import config
+from gpjax.linops import LinearOperator
 
 from gpjax.kernels.base import AbstractKernel
-from gpjax.kernels.computations import (ConstantDiagonalKernelComputation,
-                                        DenseKernelComputation)
-from gpjax.kernels.stationary import (RBF, Matern12, Matern32, Matern52,
-                                      Periodic, PoweredExponential,
-                                      RationalQuadratic, White)
+from gpjax.kernels.computations import (
+    ConstantDiagonalKernelComputation,
+    DenseKernelComputation,
+)
+from gpjax.kernels.stationary import (
+    RBF,
+    Matern12,
+    Matern32,
+    Matern52,
+    Periodic,
+    PoweredExponential,
+    RationalQuadratic,
+    White,
+)
+from gpjax.kernels.computations import (
+    DenseKernelComputation,
+    ConstantDiagonalKernelComputation,
+)
+
 from gpjax.kernels.stationary.utils import build_student_t_distribution
-from gpjax.linops import LinearOperator
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -45,24 +63,28 @@ class BaseTestKernel:
 
     def pytest_generate_tests(self, metafunc):
         """This is called automatically by pytest"""
-        id_func = lambda x: "-".join([f"{k}={v}" for k, v in x.items()])
-        funcarglist = metafunc.cls.params.get(metafunc.function.__name__, None)
 
+        # function for pretty test name
+        id_func = lambda x: "-".join([f"{k}={v}" for k, v in x.items()])
+
+        # get arguments for the test function
+        funcarglist = metafunc.cls.params.get(metafunc.function.__name__, None)
         if funcarglist is None:
             return
         else:
-            argnames = sorted(funcarglist[0])
-            metafunc.parametrize(
-                argnames,
-                [[funcargs[name] for name in argnames] for funcargs in funcarglist],
-                ids=id_func,
-            )
+            # equivalent of pytest.mark.parametrize applied on the metafunction
+            metafunc.parametrize("fields", funcarglist, ids=id_func)
 
     @pytest.mark.parametrize("dim", [None, 1, 3], ids=lambda x: f"dim={x}")
     def test_initialization(self, fields: dict, dim: int) -> None:
+
+        # Check that kernel is a dataclass
+        assert is_dataclass(self.kernel)
+
+        # Input fields as JAX arrays
         fields = {k: jnp.array([v]) for k, v in fields.items()}
 
-        # number of dimensions
+        # Test number of dimensions
         if dim is None:
             kernel: AbstractKernel = self.kernel(**fields)
             assert kernel.ndims == 1
@@ -72,37 +94,53 @@ class BaseTestKernel:
             )
             assert kernel.ndims == dim
 
-        # compute engine
+        # Check default compute engine
         assert kernel.compute_engine == self.default_compute_engine
 
-        # properties
+        # Check properties
         for field, value in fields.items():
             assert getattr(kernel, field) == value
 
-        # pytree
+        # Check pytree structure
         leaves = jtu.tree_leaves(kernel)
         assert len(leaves) == len(fields)
 
+        # Test dtype of params
+        for v in leaves:
+            assert v.dtype == jnp.float64
+
         # meta
-        meta_leaves = kernel._pytree__meta
-        assert meta_leaves.keys() == fields.keys()
+        meta = kernel._pytree__meta
+        assert meta.keys() == fields.keys()
         for field in fields:
+
+            # Bijectors
             if field in ["variance", "lengthscale", "period", "alpha"]:
-                assert isinstance(meta_leaves[field]["bijector"], tfb.Softplus)
+                assert isinstance(meta[field]["bijector"], tfb.Softplus)
             if field in ["power"]:
-                assert isinstance(meta_leaves[field]["bijector"], tfb.Identity)
-            assert meta_leaves[field]["trainable"] == True
+                assert isinstance(meta[field]["bijector"], tfb.Identity)
 
-        # call
+            # Trainability state
+            assert meta[field]["trainable"] == True
+
+        # Test kernel call
         x = jnp.linspace(0.0, 1.0, 10 * kernel.ndims).reshape(10, kernel.ndims)
-        kernel(x, x)
+        jax.vmap(kernel)(x, x)
 
-    @pytest.mark.parametrize("n", [1, 5], ids=lambda x: f"n={x}")
+    @pytest.mark.parametrize("n", [1, 2, 5], ids=lambda x: f"n={x}")
     @pytest.mark.parametrize("dim", [1, 3], ids=lambda x: f"dim={x}")
     def test_gram(self, dim: int, n: int) -> None:
+
+        # Initialise kernel
         kernel: AbstractKernel = self.kernel()
+
+        # Gram constructor static method
         kernel.gram
+
+        # Inputs
         x = jnp.linspace(0.0, 1.0, n * dim).reshape(n, dim)
+
+        # Test gram matrix
         Kxx = kernel.gram(x)
         assert isinstance(Kxx, LinearOperator)
         assert Kxx.shape == (n, n)
@@ -112,28 +150,37 @@ class BaseTestKernel:
     @pytest.mark.parametrize("n_b", [1, 2, 5], ids=lambda x: f"n_b={x}")
     @pytest.mark.parametrize("dim", [1, 2, 5], ids=lambda x: f"dim={x}")
     def test_cross_covariance(self, n_a: int, n_b: int, dim: int) -> None:
+
+        # Initialise kernel
         kernel: AbstractKernel = self.kernel()
+
+        # Inputs
         a = jnp.linspace(-1.0, 1.0, n_a * dim).reshape(n_a, dim)
         b = jnp.linspace(3.0, 4.0, n_b * dim).reshape(n_b, dim)
+
+        # Test cross-covariance
         Kab = kernel.cross_covariance(a, b)
         assert isinstance(Kab, jnp.ndarray)
         assert Kab.shape == (n_a, n_b)
 
     def test_spectral_density(self):
+
+        # Initialise kernel
         kernel: AbstractKernel = self.kernel()
 
         if self.kernel not in [RBF, Matern12, Matern32, Matern52]:
+            # Check that spectral_density property is None
             assert not kernel.spectral_density
         else:
+
+            # Check that spectral_density property is correct
             sdensity = kernel.spectral_density
             assert sdensity.name == self.spectral_density_name
             assert sdensity.loc == jnp.array(0.0)
             assert sdensity.scale == jnp.array(1.0)
 
 
-prod = lambda inp: [
-    {"fields": dict(zip(inp.keys(), values))} for values in product(*inp.values())
-]
+prod = lambda inp: [dict(zip(inp.keys(), values)) for values in product(*inp.values())]
 
 
 class TestRBF(BaseTestKernel):
