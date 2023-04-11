@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable
+from typing import Callable, List
 from itertools import product
 from dataclasses import is_dataclass
 
@@ -44,7 +44,7 @@ class BaseTestLikelihood:
     """A base class that contains all tests applied on likelihoods."""
 
     likelihood: AbstractLikelihood
-    static_fields: list[str] = ["num_datapoints"]
+    static_fields: List[str] = ["num_datapoints"]
 
     def pytest_generate_tests(self, metafunc):
         """This is called automatically by pytest"""

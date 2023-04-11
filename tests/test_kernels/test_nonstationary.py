@@ -23,6 +23,7 @@ import jax.tree_util as jtu
 import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from jax.config import config
+from typing import List
 
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import DenseKernelComputation
@@ -40,7 +41,7 @@ class BaseTestKernel:
 
     kernel: AbstractKernel
     default_compute_engine: type
-    static_fields: list[str]
+    static_fields: List[str]
 
     def pytest_generate_tests(self, metafunc):
         """This is called automatically by pytest"""
