@@ -15,6 +15,7 @@
 
 from typing import Callable
 from itertools import product
+from dataclasses import is_dataclass
 
 import jax.tree_util as jtu
 import distrax as dx
@@ -36,6 +37,7 @@ from gpjax.likelihoods import (
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
+_initialise_key = jr.PRNGKey(123)
 
 
 class BaseTestLikelihood:
@@ -46,21 +48,24 @@ class BaseTestLikelihood:
 
     def pytest_generate_tests(self, metafunc):
         """This is called automatically by pytest"""
+
+        # function for pretty test name
         id_func = lambda x: "-".join([f"{k}={v}" for k, v in x.items()])
+
+        # get arguments for the test function
         funcarglist = metafunc.cls.params.get(metafunc.function.__name__, None)
 
         if funcarglist is None:
             return
         else:
-            argnames = sorted(funcarglist[0])
-            metafunc.parametrize(
-                argnames,
-                [[funcargs[name] for name in argnames] for funcargs in funcarglist],
-                ids=id_func,
-            )
+            # equivalent of pytest.mark.parametrize applied on the metafunction
+            metafunc.parametrize("fields", funcarglist, ids=id_func)
 
     @pytest.mark.parametrize("n", [1, 2, 10], ids=lambda x: f"n={x}")
     def test_initialisation(self, fields: dict, n: int) -> None:
+
+        # Check that likelihood is a dataclass
+        assert is_dataclass(self.likelihood)
 
         # Input fields as JAX arrays
         fields = {k: jnp.array([v]) for k, v in fields.items()}
@@ -102,28 +107,84 @@ class BaseTestLikelihood:
 
         # Create input values
         x = jnp.linspace(-3.0, 3.0).reshape(-1, 1)
+
         # Test likelihood link function.
         assert isinstance(likelihood.link_function, Callable)
-        assert isinstance(likelihood.link_function(f), dx.Distribution)
+        assert isinstance(likelihood.link_function(x), dx.Distribution)
+
+    @pytest.mark.parametrize("n", [1, 2, 10], ids=lambda x: f"n={x}")
+    def test_call(self, fields: dict, n: int):
+
+        # Input fields as JAX arrays
+        fields = {k: jnp.array([v]) for k, v in fields.items()}
+
+        # Initialise
+        likelihood: AbstractLikelihood = self.likelihood(num_datapoints=n, **fields)
+
+        # Construct latent function distribution.
+        k1, k2 = jr.split(_initialise_key)
+        latent_mean = jr.uniform(k1, shape=(n,))
+        latent_sqrt = jr.uniform(k2, shape=(n, n))
+        latent_cov = jnp.matmul(latent_sqrt, latent_sqrt.T)
+        latent_dist = dx.MultivariateNormalFullCovariance(latent_mean, latent_cov)
+
+        # Perform checks specific to the given likelihood
+        self._test_call_check(likelihood, latent_mean, latent_cov, latent_dist)
+
+    @staticmethod
+    def _test_call_check(likelihood, latent_mean, latent_cov, latent_dist):
+        """Specific to each likelihood."""
+        raise NotImplementedError
 
 
-prod = lambda inp: [
-    {"fields": dict(zip(inp.keys(), values))} for values in product(*inp.values())
-]
+prod = lambda inp: [dict(zip(inp.keys(), values)) for values in product(*inp.values())]
 
 
 class TestGaussian(BaseTestLikelihood):
     likelihood = Gaussian
     fields = prod({"obs_noise": [0.1, 0.5, 1.0]})
-    params = {"test_initialisation": fields}
+    params = {"test_initialisation": fields, "test_call": fields}
     static_fields = ["num_datapoints"]
+
+    @staticmethod
+    def _test_call_check(likelihood: Gaussian, latent_mean, latent_cov, latent_dist):
+
+        # Test call method.
+        pred_dist = likelihood(latent_dist)
+
+        # Check that the distribution is a MultivariateNormalFullCovariance.
+        assert isinstance(pred_dist, dx.MultivariateNormalFullCovariance)
+
+        # Check predictive mean and variance.
+        assert (pred_dist.mean() == latent_mean).all()
+        noise_matrix = jnp.eye(likelihood.num_datapoints) * likelihood.obs_noise
+        assert np.allclose(
+            pred_dist.scale_tri, jnp.linalg.cholesky(latent_cov + noise_matrix)
+        )
 
 
 class TestBernoulli(BaseTestLikelihood):
     likelihood = Bernoulli
     fields = prod({})
-    params = {"test_initialisation": fields}
+    params = {"test_initialisation": fields, "test_call": fields}
     static_fields = ["num_datapoints"]
+
+    @staticmethod
+    def _test_call_check(
+        likelihood: AbstractLikelihood, latent_mean, latent_cov, latent_dist
+    ):
+
+        # Test call method.
+        pred_dist = likelihood(latent_dist)
+
+        # Check that the distribution is a Bernoulli.
+        assert isinstance(pred_dist, dx.Bernoulli)
+
+        # Check predictive mean and variance.
+
+        p = inv_probit(latent_mean / jnp.sqrt(1.0 + jnp.diagonal(latent_cov)))
+        assert (pred_dist.mean() == p).all()
+        assert (pred_dist.variance() == p * (1.0 - p)).all()
 
 
 class TestAbstract(BaseTestLikelihood):
@@ -136,8 +197,15 @@ class TestAbstract(BaseTestLikelihood):
 
     likelihood = DummyLikelihood
     fields = prod({})
-    params = {"test_initialisation": fields}
+    params = {"test_initialisation": fields, "test_call": fields}
     static_fields = ["num_datapoints"]
+
+    @staticmethod
+    def _test_call_check(
+        likelihood: AbstractLikelihood, latent_mean, latent_cov, latent_dist
+    ):
+        pred_dist = likelihood(latent_dist)
+        assert isinstance(pred_dist, dx.Normal)
 
 
 # def test_abstract_likelihood():
