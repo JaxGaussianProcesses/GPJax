@@ -18,7 +18,6 @@ from itertools import product
 from dataclasses import is_dataclass
 
 import jax.tree_util as jtu
-import distrax as dx
 import jax.numpy as jnp
 import jax.random as jr
 import tensorflow_probability.substrates.jax.bijectors as tfb
