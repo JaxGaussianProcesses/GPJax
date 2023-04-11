@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from jaxtyping import Num, Array, Int
+from jaxtyping import Array, Int, Num
 
 
 def jax_gather_nd(
@@ -22,8 +22,11 @@ def jax_gather_nd(
     """Slice a `params` array at a set of `indices`.
 
     Args:
-        params (Num[Array]): An arbitrary array with leading axes of length `N` upon which we shall slice.
-        indices (Float[Int]): An integer array of length M with values in the range [0, N) whose value at index `i` will be used to slice `params` at index `i`.
+        params (Num[Array]): An arbitrary array with leading axes of length `N` upon
+            which we shall slice.
+        indices (Float[Int]): An integer array of length M with values in the range
+            [0, N) whose value at index `i` will be used to slice `params` at
+            index `i`.
 
     Returns:
         Num[Array: An arbitrary array with leading axes of length `M`.

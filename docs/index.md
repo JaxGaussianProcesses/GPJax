@@ -60,6 +60,7 @@ installation
 design
 contributing
 examples/intro_to_gps
+examples/pytree
 ```
 
 ```{toctree}
@@ -74,8 +75,7 @@ examples/uncollapsed_vi
 examples/collapsed_vi
 examples/graph_kernels
 examples/barycentres
-examples/haiku
-examples/tfp_integration
+examples/deep_kernels
 ```
 
 ```{toctree}
@@ -88,23 +88,6 @@ examples/kernels
 examples/yacht
 ```
 
-```{toctree}
----
-maxdepth: 1
-caption: Experimental
-hidden:
----
-examples/natgrads
-```
-
-```{toctree}
----
-maxdepth: 1
-caption: Package Reference
-hidden:
----
-api
-```
 
 # Bibliography
 

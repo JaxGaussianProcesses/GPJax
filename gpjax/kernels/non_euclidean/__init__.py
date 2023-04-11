@@ -13,6 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-from .graph import GraphKernel
+from gpjax.kernels.non_euclidean.graph import GraphKernel
 
 __all__ = ["GraphKernel"]

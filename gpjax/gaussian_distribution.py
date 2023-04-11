@@ -13,18 +13,17 @@
 # limitations under the License.
 # ==============================================================================
 
+from typing import Any, Optional, Tuple
+
 import jax.numpy as jnp
-from .linops import LinearOperator, IdentityLinearOperator
-
-from jaxtyping import Array, Float
-from jax import vmap
-
-from typing import Tuple, Optional, Any
-
-import distrax as dx
 import jax.random as jr
+from jax import vmap
 from jax.random import KeyArray
+from jaxtyping import Array, Float
+import tensorflow_probability.substrates.jax as tfp
 
+from .linops import IdentityLinearOperator, LinearOperator
+tfd = tfp.distributions
 
 def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
     """Checks that the inputs are correct."""
@@ -61,7 +60,7 @@ def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
             )
 
 
-class GaussianDistribution(dx.Distribution):
+class GaussianDistribution(tfd.Distribution):
     """Multivariate Gaussian distribution with a linear operator scale matrix.
 
     Args:
@@ -179,6 +178,10 @@ class GaussianDistribution(dx.Distribution):
         affine_transformation = lambda x: self.loc + sqrt @ x
 
         return vmap(affine_transformation)(Z)
+
+    def sample(self,seed: KeyArray, sample_shape: Tuple[int, int]):  # pylint: disable=useless-super-delegation
+      """See `Distribution.sample`."""
+      return self._sample_n(seed, sample_shape[0])
 
     def kl_divergence(self, other: "GaussianDistribution") -> Float[Array, "1"]:
         return _kl_divergence(self, other)

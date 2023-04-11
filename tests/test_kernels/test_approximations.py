@@ -1,25 +1,21 @@
-import pytest
-from gpjax.kernels.approximations import RFF
-from gpjax.kernels.stationary import (
-    Matern12,
-    Matern32,
-    Matern52,
-    RBF,
-    RationalQuadratic,
-    PoweredExponential,
-    Periodic,
-)
-from gpjax.kernels.nonstationary import Polynomial, Linear
-from gpjax.kernels.base import AbstractKernel
-import jax.random as jr
-from jax.config import config
-import jax.numpy as jnp
-from gpjax.linops import DenseLinearOperator
 from typing import Tuple
+
 import jax
+import jax.numpy as jnp
+import jax.random as jr
+import pytest
+from jax.config import config
+
+from gpjax.kernels.approximations import RFF
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.nonstationary import Linear, Polynomial
+from gpjax.kernels.stationary import (RBF, Matern12, Matern32, Matern52,
+                                      Periodic, PoweredExponential,
+                                      RationalQuadratic)
+from gpjax.linops import DenseLinearOperator
 
 config.update("jax_enable_x64", True)
-_jitter = 1e-5
+_jitter = 1e-6
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
@@ -28,10 +24,8 @@ _jitter = 1e-5
 def test_frequency_sampler(kernel: AbstractKernel, num_basis_fns: int, n_dims: int):
     key = jr.PRNGKey(123)
     base_kernel = kernel(active_dims=list(range(n_dims)))
-    approximate = RFF(base_kernel, num_basis_fns)
-
-    params = approximate.init_params(key)
-    assert params["frequencies"].shape == (num_basis_fns, n_dims)
+    approximate = RFF(base_kernel=base_kernel, num_basis_fns=num_basis_fns)
+    assert approximate.frequencies.shape == (num_basis_fns, n_dims)
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
@@ -44,11 +38,9 @@ def test_gram(kernel: AbstractKernel, num_basis_fns: int, n_dims: int, n_data: i
     if n_dims > 1:
         x = jnp.hstack([x] * n_dims)
     base_kernel = kernel(active_dims=list(range(n_dims)))
-    approximate = RFF(base_kernel, num_basis_fns)
+    approximate = RFF(base_kernel=base_kernel, num_basis_fns=num_basis_fns)
 
-    params = approximate.init_params(key)
-
-    linop = approximate.gram(params, x)
+    linop = approximate.gram(x)
 
     # Check the return type
     assert isinstance(linop, DenseLinearOperator)
@@ -83,11 +75,8 @@ def test_cross_covariance(
         x2 = jnp.hstack([x2] * n_dims)
 
     base_kernel = kernel(active_dims=list(range(n_dims)))
-    approximate = RFF(base_kernel, num_basis_fns)
-
-    params = approximate.init_params(key)
-
-    Kxx = approximate.cross_covariance(params, x1, x2)
+    approximate = RFF(base_kernel=base_kernel, num_basis_fns=num_basis_fns)
+    Kxx = approximate.cross_covariance(x1, x2)
 
     # Check the return type
     assert isinstance(Kxx, jax.Array)
@@ -104,16 +93,13 @@ def test_improvement(kernel, n_dim):
 
     x = jr.uniform(key, minval=-3.0, maxval=3.0, shape=(n_data, n_dim))
     base_kernel = kernel(active_dims=list(range(n_dim)))
-    exact_params = base_kernel.init_params(key)
-    exact_linop = base_kernel.gram(exact_params, x).to_dense()
+    exact_linop = base_kernel.gram(x).to_dense()
 
-    crude_approximation = RFF(base_kernel, num_basis_fns=10)
-    c_params = crude_approximation.init_params(key)
-    c_linop = crude_approximation.gram(c_params, x).to_dense()
+    crude_approximation = RFF(base_kernel=base_kernel, num_basis_fns=10)
+    c_linop = crude_approximation.gram(x).to_dense()
 
-    better_approximation = RFF(base_kernel, num_basis_fns=50)
-    b_params = better_approximation.init_params(key)
-    b_linop = better_approximation.gram(b_params, x).to_dense()
+    better_approximation = RFF(base_kernel=base_kernel, num_basis_fns=50)
+    b_linop = better_approximation.gram(x).to_dense()
 
     c_delta = jnp.linalg.norm(exact_linop - c_linop, ord="fro")
     b_delta = jnp.linalg.norm(exact_linop - b_linop, ord="fro")
@@ -129,12 +115,10 @@ def test_exactness(kernel):
     key = jr.PRNGKey(123)
 
     x = jr.uniform(key, minval=-3.0, maxval=3.0, shape=(n_data, 1))
-    exact_params = kernel.init_params(key)
-    exact_linop = kernel.gram(exact_params, x).to_dense()
+    exact_linop = kernel.gram(x).to_dense()
 
-    better_approximation = RFF(kernel, num_basis_fns=500)
-    b_params = better_approximation.init_params(key)
-    b_linop = better_approximation.gram(b_params, x).to_dense()
+    better_approximation = RFF(base_kernel=kernel, num_basis_fns=500)
+    b_linop = better_approximation.gram(x).to_dense()
 
     max_delta = jnp.max(exact_linop - b_linop)
     assert max_delta < 0.1
@@ -147,3 +131,11 @@ def test_exactness(kernel):
 def test_value_error(kernel):
     with pytest.raises(ValueError):
         RFF(kernel(), num_basis_fns=10)
+
+
+@pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
+def stochastic_init(kernel: AbstractKernel):
+    k1 = RFF(kernel, num_basis_fns=10, key=123)
+    k2 = RFF(kernel, num_basis_fns=10, key=42)
+
+    assert (k1.frequencies != k2.frequencies).any()

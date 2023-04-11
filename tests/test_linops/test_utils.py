@@ -23,9 +23,8 @@ from jax.config import config
 config.update("jax_enable_x64", True)
 _PRNGKey = jr.PRNGKey(42)
 
-from gpjax.linops.identity_linear_operator import IdentityLinearOperator
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
-
+from gpjax.linops.identity_linear_operator import IdentityLinearOperator
 from gpjax.linops.utils import identity, to_dense
 
 

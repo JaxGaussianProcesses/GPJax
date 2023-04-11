@@ -22,14 +22,14 @@ from dataclasses import is_dataclass
 
 from jax.config import config
 
-
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 _PRNGKey = jr.PRNGKey(42)
 
-from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+from gpjax.linops.constant_diagonal_linear_operator import \
+    ConstantDiagonalLinearOperator
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
-from gpjax.linops.constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
+from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 
 
 def approx_equal(res: jnp.ndarray, actual: jnp.ndarray) -> bool:
@@ -76,7 +76,6 @@ def test_to_dense(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_add_diagonal(n: int) -> None:
-
     # Test adding two constant diagonal linear operators.
     key_a, key_b = jr.split(_PRNGKey)
 

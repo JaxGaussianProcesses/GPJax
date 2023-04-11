@@ -13,24 +13,20 @@
 # limitations under the License.
 # ==============================================================================
 
-from .abstractions import fit, fit_batches, fit_natgrads
+from .dataset import Dataset
+from .fit import fit
 from .gps import Prior, construct_posterior
 from .kernels import *
 from .likelihoods import Bernoulli, Gaussian
 from .mean_functions import Constant, Zero
-from .parameters import constrain, copy_dict_structure, initialise, unconstrain
-from .variational_families import (
-    CollapsedVariationalGaussian,
-    ExpectationVariationalGaussian,
-    NaturalVariationalGaussian,
-    VariationalGaussian,
-    WhitenedVariationalGaussian,
-)
-from .types import Dataset
-from .variational_inference import CollapsedVI, StochasticVI
-from . import _version
+from .objectives import (ELBO, CollapsedELBO, ConjugateMLL,
+                         LogPosteriorDensity, NonConjugateMLL)
+from .variational_families import (CollapsedVariationalGaussian,
+                                   ExpectationVariationalGaussian,
+                                   NaturalVariationalGaussian,
+                                   VariationalGaussian,
+                                   WhitenedVariationalGaussian)
 
-__version__ = _version.get_versions()["version"]
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
 __url__ = "https://github.com/thomaspinder/GPJax"
@@ -40,8 +36,6 @@ __contributors__ = "https://github.com/thomaspinder/GPJax/graphs/contributors"
 __all__ = [
     "kernels",
     "fit",
-    "fit_batches",
-    "fit_natgrads",
     "Prior",
     "construct_posterior",
     "RBF",
@@ -56,10 +50,6 @@ __all__ = [
     "Gaussian",
     "Constant",
     "Zero",
-    "constrain",
-    "copy_dict_structure",
-    "initialise",
-    "unconstrain",
     "Dataset",
     "CollapsedVariationalGaussian",
     "ExpectationVariationalGaussian",
@@ -68,4 +58,9 @@ __all__ = [
     "WhitenedVariationalGaussian",
     "CollapsedVI",
     "StochasticVI",
+    "ConjugateMLL",
+    "NonConjugateMLL",
+    "LogPosteriorDensity",
+    "CollapsedELBO",
+    "ELBO",
 ]

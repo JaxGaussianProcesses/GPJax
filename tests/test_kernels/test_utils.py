@@ -18,6 +18,7 @@ from typing import List
 import jax.numpy as jnp
 import pytest
 from jaxtyping import Array, Float
+
 from gpjax.kernels.stationary.utils import euclidean_distance
 
 
@@ -32,7 +33,6 @@ from gpjax.kernels.stationary.utils import euclidean_distance
 def test_euclidean_distance(
     a: List[float], b: List[float], distance_to_3dp: float
 ) -> None:
-
     # Convert lists to JAX arrays:
     a: Float[Array, "D"] = jnp.array(a)
     b: Float[Array, "D"] = jnp.array(b)

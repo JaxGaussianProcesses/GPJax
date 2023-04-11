@@ -14,103 +14,63 @@
 # ==============================================================================
 
 import abc
-from typing import Callable, Dict
+from dataclasses import dataclass
+from typing import Any
 
 from jax import vmap
 from jaxtyping import Array, Float
-from jaxutils import PyTree
 
-from ...linops import (
-    DenseLinearOperator,
-    DiagonalLinearOperator,
-    LinearOperator,
-)
+from gpjax.linops import (DenseLinearOperator, DiagonalLinearOperator,
+                          LinearOperator)
+
+Kernel = Any
 
 
-class AbstractKernelComputation(PyTree):
+@dataclass
+class AbstractKernelComputation:
     """Abstract class for kernel computations."""
 
-    def __init__(
-        self,
-        kernel_fn: Callable[
-            [Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array
-        ] = None,
-    ) -> None:
-        self._kernel_fn = kernel_fn
-
-    @property
-    def kernel_fn(
-        self,
-    ) -> Callable[[Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array]:
-        return self._kernel_fn
-
-    @kernel_fn.setter
-    def kernel_fn(
-        self,
-        kernel_fn: Callable[[Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array],
-    ) -> None:
-        self._kernel_fn = kernel_fn
+    kernel: Kernel
 
     def gram(
         self,
-        params: Dict,
-        inputs: Float[Array, "N D"],
+        x: Float[Array, "N D"],
     ) -> LinearOperator:
-
         """Compute Gram covariance operator of the kernel function.
 
         Args:
-            kernel (AbstractKernel): The kernel function to be evaluated.
-            params (Dict): The parameters of the kernel function.
-            inputs (Float[Array, "N N"]): The inputs to the kernel function.
+            x (Float[Array, "N N"]): The inputs to the kernel function.
 
         Returns:
             LinearOperator: Gram covariance operator of the kernel function.
         """
-
-        matrix = self.cross_covariance(params, inputs, inputs)
-
-        return DenseLinearOperator(matrix=matrix)
+        Kxx = self.cross_covariance(x, x)
+        return DenseLinearOperator(Kxx)
 
     @abc.abstractmethod
     def cross_covariance(
-        self,
-        params: Dict,
-        x: Float[Array, "N D"],
-        y: Float[Array, "M D"],
+        self, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
         """For a given kernel, compute the NxM gram matrix on an a pair
         of input matrices with shape NxD and MxD.
 
         Args:
-            kernel (AbstractKernel): The kernel for which the cross-covariance
-                matrix should be computed for.
-            params (Dict): The kernel's parameter set.
             x (Float[Array,"N D"]): The first input matrix.
             y (Float[Array,"M D"]): The second input matrix.
 
         Returns:
-            Float[Array, "N M"]: The computed square Gram matrix.
+            Float[Array, "N M"]: The computed cross-covariance.
         """
         raise NotImplementedError
 
-    def diagonal(
-        self,
-        params: Dict,
-        inputs: Float[Array, "N D"],
-    ) -> DiagonalLinearOperator:
+    def diagonal(self, inputs: Float[Array, "N D"]) -> DiagonalLinearOperator:
         """For a given kernel, compute the elementwise diagonal of the
         NxN gram matrix on an input matrix of shape NxD.
 
         Args:
-            kernel (AbstractKernel): The kernel for which the variance
-                vector should be computed for.
-            params (Dict): The kernel's parameter set.
             inputs (Float[Array, "N D"]): The input matrix.
 
         Returns:
-            LinearOperator: The computed diagonal variance entries.
+            DiagonalLinearOperator: The computed diagonal variance entries.
         """
-        diag = vmap(lambda x: self._kernel_fn(params, x, x))(inputs)
-
-        return DiagonalLinearOperator(diag=diag)
+        return DiagonalLinearOperator(diag=vmap(lambda x: self.kernel(x, x))(inputs))

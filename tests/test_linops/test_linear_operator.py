@@ -95,7 +95,7 @@ def test_instantiate_with_attributes(test_dataclass, shape, dtype) -> None:
 
     class DummyLinearOperator(LinearOperator):
         a: int
-        b: int = static_field() # Lets have a static attribute here.
+        b: int = static_field()  # Lets have a static attribute here.
         c: int
 
         def __init__(self, shape, dtype, a=1, b=2, c=3):
