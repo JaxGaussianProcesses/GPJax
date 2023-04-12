@@ -290,6 +290,8 @@ def meta(pytree: Module, *, is_leaf: Callable[[Any], bool] | None = None) -> Mod
     return meta_map(_filter_meta, pytree, is_leaf=is_leaf)
 
 
+# Model saving and loading. Based upon the Flax checkpointing code
+# https://github.com/google/flax/blob/main/flax/training/checkpoints.py
 def _is_multiprocess_array(value: Any) -> bool:
     if isinstance(value, jax.Array):
         return not value.is_fully_addressable
@@ -308,7 +310,7 @@ def save_tree(
     if iterate:
         path = os.path.join(path, f"step_{iterate}")
 
-    # Extract the static fields from the model.
+    # Extract the leaves from the model.
     save_args = save_args_from_target(model)
 
     # Save the model.
