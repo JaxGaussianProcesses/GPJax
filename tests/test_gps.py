@@ -20,6 +20,7 @@ from dataclasses import is_dataclass
 from typing import Callable
 from jax.config import config
 import jax.tree_util as jtu
+import shutil
 
 #from gpjax.dataset import Dataset
 from gpjax.dataset import Dataset
@@ -29,7 +30,7 @@ from gpjax.kernels import RBF, Matern12, Matern32, Matern52, AbstractKernel
 from gpjax.likelihoods import Bernoulli, Gaussian, AbstractLikelihood
 from gpjax.mean_functions import Constant, Zero, AbstractMeanFunction
 from gpjax.gaussian_distribution import GaussianDistribution
-
+from gpjax.base import save_tree, load_tree
 import tensorflow_probability.substrates.jax.distributions as tfd
 
 # Enable Float64 for more stable matrix inversions.
@@ -54,7 +55,7 @@ def test_abstract_posterior():
 @pytest.mark.parametrize("kernel", [RBF(), Matern52()])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
 def test_prior(num_datapoints: int, mean_function: AbstractMeanFunction, kernel: AbstractKernel) -> None:
-    
+
     # Create prior.
     prior = Prior(mean_function=mean_function, kernel=kernel)
 
@@ -73,7 +74,7 @@ def test_prior(num_datapoints: int, mean_function: AbstractMeanFunction, kernel:
     # Ensure that the marginal distribution is a Gaussian.
     assert isinstance(marginal_distribution, GaussianDistribution)
     assert isinstance(marginal_distribution, tfd.Distribution)
-    
+
     # Ensure that the marginal distribution has the correct shape.
     mu = marginal_distribution.mean()
     sigma = marginal_distribution.covariance()
@@ -85,7 +86,7 @@ def test_prior(num_datapoints: int, mean_function: AbstractMeanFunction, kernel:
 @pytest.mark.parametrize("kernel", [RBF(), Matern52()])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
 def test_conjugate_posterior(num_datapoints: int, mean_function: AbstractMeanFunction, kernel: AbstractKernel) -> None:
-    
+
     # Create a dataset.
     key = jr.PRNGKey(123)
     x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1))
@@ -115,7 +116,7 @@ def test_conjugate_posterior(num_datapoints: int, mean_function: AbstractMeanFun
     # Ensure that the marginal distribution is a Gaussian.
     assert isinstance(marginal_distribution, GaussianDistribution)
     assert isinstance(marginal_distribution, tfd.Distribution)
-    
+
     # Ensure that the marginal distribution has the correct shape.
     mu = marginal_distribution.mean()
     sigma = marginal_distribution.covariance()
@@ -127,7 +128,6 @@ def test_conjugate_posterior(num_datapoints: int, mean_function: AbstractMeanFun
 @pytest.mark.parametrize("kernel", [RBF(), Matern52()])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
 def test_nonconjugate_posterior(num_datapoints: int, mean_function: AbstractMeanFunction, kernel: AbstractKernel) -> None:
-    
     # Create a dataset.
     key = jr.PRNGKey(123)
     x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1))
@@ -165,13 +165,12 @@ def test_nonconjugate_posterior(num_datapoints: int, mean_function: AbstractMean
     # Ensure that the marginal distribution is a Gaussian.
     assert isinstance(marginal_distribution, GaussianDistribution)
     assert isinstance(marginal_distribution, tfd.Distribution)
-    
+
     # Ensure that the marginal distribution has the correct shape.
     mu = marginal_distribution.mean()
     sigma = marginal_distribution.covariance()
     assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
-
 
 @pytest.mark.parametrize("likelihood", [Bernoulli, Gaussian])
 @pytest.mark.parametrize("num_datapoints", [1, 10])
@@ -181,7 +180,7 @@ def test_posterior_construct(likelihood: AbstractLikelihood, num_datapoints: int
 
     # Define prior.
     prior = Prior(mean_function=mean_function, kernel=kernel)
-    
+
     # Construct the posterior via the three methods.
     posterior_mul = prior * likelihood(num_datapoints=num_datapoints)
     posterior_rmul =  likelihood(num_datapoints=num_datapoints) * prior
@@ -191,7 +190,7 @@ def test_posterior_construct(likelihood: AbstractLikelihood, num_datapoints: int
     assert is_dataclass(posterior_mul)
     assert is_dataclass(posterior_rmul)
     assert is_dataclass(posterior_manual)
-    
+
     # Ensure that the posterior is the same type in all three cases.
     assert type(posterior_mul) == type(posterior_rmul)
     assert type(posterior_mul) == type(posterior_manual)
@@ -212,7 +211,7 @@ def test_posterior_construct(likelihood: AbstractLikelihood, num_datapoints: int
     # If the likelihood is Gaussian, then the posterior should be conjugate.
     if isinstance(likelihood, Gaussian):
         assert isinstance(posterior_mul, ConjugatePosterior)
-    
+
     # If the likelihood is Bernoulli, then the posterior should be non-conjugate.
     if isinstance(likelihood, Bernoulli):
         assert isinstance(posterior_mul, NonConjugatePosterior)

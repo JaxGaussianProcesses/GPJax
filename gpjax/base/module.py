@@ -18,6 +18,7 @@ from __future__ import annotations
 __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
 
 import dataclasses
+import os
 from copy import copy, deepcopy
 from typing import Any, Callable, Dict, Iterable, List, Tuple
 
@@ -26,6 +27,9 @@ import jax.tree_util as jtu
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from jax import lax
 from jax._src.tree_util import _registry
+from orbax.checkpoint import (ArrayRestoreArgs, Checkpointer,
+                              PyTreeCheckpointer, PyTreeCheckpointHandler,
+                              RestoreArgs, SaveArgs)
 from simple_pytree import Pytree, static_field
 from typing_extensions import Self
 
@@ -284,3 +288,46 @@ def meta(pytree: Module, *, is_leaf: Callable[[Any], bool] | None = None) -> Mod
         return meta
 
     return meta_map(_filter_meta, pytree, is_leaf=is_leaf)
+
+
+# Model saving and loading. Based upon the Flax checkpointing code
+# https://github.com/google/flax/blob/main/flax/training/checkpoints.py
+def _is_multiprocess_array(value: Any) -> bool:
+    if isinstance(value, jax.Array):
+        return not value.is_fully_addressable
+    return False
+
+
+def save_tree(
+    path: str, model: Module, overwrite: bool = False, iterate: int = None
+) -> None:
+    def save_args_from_target(target: Any) -> Any:
+        return jax.tree_util.tree_map(
+            lambda x: SaveArgs(aggregate=not _is_multiprocess_array(x)), target
+        )
+
+    # Include the optimiser's iterate to the checkpoint path.
+    if iterate:
+        path = os.path.join(path, f"step_{iterate}")
+
+    # Extract the leaves from the model.
+    save_args = save_args_from_target(model)
+
+    # Save the model.
+    orbax_checkpointer = Checkpointer(PyTreeCheckpointHandler())
+    orbax_checkpointer.save(path, model, save_args=save_args, force=overwrite)
+
+
+def load_tree(path: str, model: Module) -> Module:
+    def make_restore_args(x):
+        if _is_multiprocess_array(x):
+            return ArrayRestoreArgs(
+                restore_type=jax.Array,
+                sharding=x.sharding,
+            )
+        return RestoreArgs()
+
+    restore_args = jax.tree_util.tree_map(make_restore_args, model)
+    orbax_checkpointer = Checkpointer(PyTreeCheckpointHandler())
+    restored = orbax_checkpointer.restore(path, item=model, restore_args=restore_args)
+    return restored
