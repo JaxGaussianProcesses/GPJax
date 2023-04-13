@@ -16,7 +16,7 @@
 from beartype.typing import Dict, List, Optional
 
 import jax.numpy as jnp
-from jax.random import KeyArray
+from gpjax.utils import KeyArray
 from jaxtyping import Array, Float
 
 from ..base import AbstractKernel

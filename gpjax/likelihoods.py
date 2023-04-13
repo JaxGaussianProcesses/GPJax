@@ -23,7 +23,7 @@ import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Array, Float
 
-from jax.random import KeyArray
+from gpjax.utils import KeyArray
 
 import deprecation
 

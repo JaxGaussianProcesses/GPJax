@@ -20,7 +20,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import optax as ox
 
-from jax.random import KeyArray
+from gpjax.utils import KeyArray
 from jax import lax
 from jax.experimental import host_callback
 from jaxtyping import Array, Float

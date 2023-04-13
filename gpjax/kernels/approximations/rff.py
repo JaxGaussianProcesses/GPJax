@@ -1,6 +1,6 @@
 from ..base import AbstractKernel
 from ..computations import BasisFunctionComputation
-from jax.random import KeyArray
+from gpjax.utils import KeyArray
 from beartype.typing import Dict, Any
 
 

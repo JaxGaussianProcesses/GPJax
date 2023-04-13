@@ -22,7 +22,7 @@ from jax import vmap
 from jaxtyping import Array, Float
 
 from .linops import identity
-from jax.random import KeyArray
+from gpjax.utils import KeyArray
 from jaxutils import PyTree
 
 from .config import get_global_config

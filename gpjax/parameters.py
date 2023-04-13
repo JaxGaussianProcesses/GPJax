@@ -22,7 +22,7 @@ import distrax as dx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-from jax.random import KeyArray
+from gpjax.utils import KeyArray
 from jaxtyping import Array, Float
 from jaxutils import PyTree
 

@@ -23,7 +23,7 @@ from beartype.typing import Tuple, Optional, Any
 
 import distrax as dx
 import jax.random as jr
-from jax.random import KeyArray
+from gpjax.utils import KeyArray
 
 
 def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:

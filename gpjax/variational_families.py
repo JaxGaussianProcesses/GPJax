@@ -19,7 +19,7 @@ from beartype.typing import Any, Callable, Dict, Optional
 import distrax as dx
 import jax.numpy as jnp
 import jax.scipy as jsp
-from jax.random import KeyArray
+from .utils import KeyArray
 from jaxtyping import Array, Float
 
 from .linops import identity

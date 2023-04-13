@@ -17,7 +17,7 @@ import abc
 from beartype.typing import Dict, Optional
 
 import jax.numpy as jnp
-from jax.random import KeyArray
+from gpjax.utils import KeyArray
 from jaxtyping import Array, Float
 from jaxutils import PyTree
 

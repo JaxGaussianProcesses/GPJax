@@ -16,6 +16,10 @@
 import jaxutils
 import deprecation
 
+from jaxtyping import UInt32, Array
+
+KeyArray = UInt32[Array, "2"]
+
 depreciate = deprecation.deprecated(
     deprecated_in="0.5.6",
     removed_in="0.6.0",
