@@ -38,7 +38,7 @@ class LowerTriangularLinearOperator(DenseLinearOperator):
         matrix = self.solve(jnp.eye(self.size))
         return DenseLinearOperator(matrix)
 
-    def solve(self, rhs: Float[Array, "N"]) -> Float[Array, "N"]:
+    def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
         return jsp.linalg.solve_triangular(self.to_dense(), rhs, lower=True)
 
     def __matmul__(self, other):

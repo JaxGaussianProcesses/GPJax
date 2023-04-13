@@ -144,7 +144,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         """
         return ConstantDiagonalLinearOperator(value=1.0 / self.value, size=self.size)
 
-    def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
         """Solve linear system.
 
         Args:

@@ -165,7 +165,7 @@ class DiagonalLinearOperator(LinearOperator):
         """
         return DiagonalLinearOperator(diag=1.0 / self.diagonal())
 
-    def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
         """Solve linear system.
 
         Args:

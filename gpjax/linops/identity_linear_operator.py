@@ -88,7 +88,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         """
         return self
 
-    def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
         """Solve linear system.
 
         Args:

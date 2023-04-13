@@ -167,7 +167,7 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
 
         return DenseLinearOperator(self.solve(jnp.eye(n)))
 
-    def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
         """Solve linear system. Default implementation uses dense Cholesky decomposition.
 
         Args:

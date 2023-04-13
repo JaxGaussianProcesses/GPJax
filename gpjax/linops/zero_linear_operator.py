@@ -146,7 +146,7 @@ class ZeroLinearOperator(LinearOperator):
         """
         raise RuntimeError("ZeroLinearOperator is not invertible.")
 
-    def solve(self, rhs: Float[Array, "N M"]) -> None:
+    def solve(self, rhs: Float[Array, "... M"]) -> None:
         """Solve linear system.
 
         Raises:
