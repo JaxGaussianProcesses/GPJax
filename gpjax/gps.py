@@ -25,12 +25,12 @@ from .linops import identity
 from .kernels.base import AbstractKernel
 from jaxutils import PyTree
 
-from .config import get_global_config
+from jaxutils.config import get_global_config
 from .kernels import AbstractKernel
 from .likelihoods import AbstractLikelihood, Conjugate, NonConjugate
 from .mean_functions import AbstractMeanFunction, Zero
 from jaxutils import Dataset
-from .utils import concat_dictionaries
+from jaxutils.dict import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
 
 import deprecation
@@ -116,7 +116,7 @@ class Prior(AbstractPrior):
 
     .. math::
 
-        p(f(\\cdot)) = \mathcal{GP}(m(\\cdot), k(\\cdot, \\cdot)).
+        p(f(\\cdot)) = \\mathcal{GP}(m(\\cdot), k(\\cdot, \\cdot)).
 
     To invoke a ``Prior`` distribution, only a kernel function is required. By
     default, the mean function will be set to zero. In general, this assumption
@@ -318,27 +318,27 @@ class AbstractPosterior(AbstractPrior):
 
 
 class ConjugatePosterior(AbstractPosterior):
-    """A Gaussian process posterior distribution when the constituent likelihood
+    r"""A Gaussian process posterior distribution when the constituent likelihood
     function is a Gaussian distribution. In such cases, the latent function values
     :math:`f` can be analytically integrated out of the posterior distribution.
     As such, many computational operations can be simplified; something we make use
     of in this object.
 
     For a Gaussian process prior :math:`p(\mathbf{f})` and a Gaussian likelihood
-    :math:`p(y | \\mathbf{f}) = \\mathcal{N}(y\\mid \mathbf{f}, \\sigma^2))` where
-    :math:`\mathbf{f} = f(\\mathbf{x})`, the predictive posterior distribution at
-    a set of inputs :math:`\\mathbf{x}` is given by
+    :math:`p(y | \mathbf{f}) = \mathcal{N}(y\mid \mathbf{f}, \sigma^2))` where
+    :math:`\mathbf{f} = f(\mathbf{x})`, the predictive posterior distribution at
+    a set of inputs :math:`\mathbf{x}` is given by
 
     .. math::
 
-        p(\\mathbf{f}^{\\star}\mid \mathbf{y}) & = \\int p(\\mathbf{f}^{\\star} \\mathbf{f} \\mid \\mathbf{y})\\\\
-        & =\\mathcal{N}(\\mathbf{f}^{\\star} \\boldsymbol{\mu}_{\mid \mathbf{y}}, \\boldsymbol{\Sigma}_{\mid \mathbf{y}}
+        p(\mathbf{f}^{\star}\mid \mathbf{y}) & = \int p(\mathbf{f}^{\star} \mathbf{f} \mid \mathbf{y})\\
+        & =\mathcal{N}(\mathbf{f}^{\star} \boldsymbol{\mu}_{\mid \mathbf{y}}, \boldsymbol{\Sigma}_{\mid \mathbf{y}}
     where
 
     .. math::
 
-        \\boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left(k(\\mathbf{x}, \\mathbf{x}')+\\sigma^2\\mathbf{I}_n\\right)^{-1}\\mathbf{y}  \\\\
-        \\boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\\mathbf{x}^{\\star}, \\mathbf{x}^{\\star\\prime}) -k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left( k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_n \\right)^{-1}k(\\mathbf{x}, \\mathbf{x}^{\\star}).
+        \boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\mathbf{x}^{\star}, \mathbf{x})\left(k(\mathbf{x}, \mathbf{x}')+\sigma^2\mathbf{I}_n\right)^{-1}\mathbf{y}  \\
+        \boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\mathbf{x}^{\star}, \mathbf{x}^{\star\prime}) -k(\mathbf{x}^{\star}, \mathbf{x})\left( k(\mathbf{x}, \mathbf{x}') + \sigma^2\mathbf{I}_n \right)^{-1}k(\mathbf{x}, \mathbf{x}^{\star}).
 
     Example:
         >>> import gpjax as gpx
@@ -372,7 +372,7 @@ class ConjugatePosterior(AbstractPosterior):
         params: Dict,
         train_data: Dataset,
     ) -> Callable[[Float[Array, "N D"]], GaussianDistribution]:
-        """Conditional on a training data set, compute the GP's posterior
+        r"""Conditional on a training data set, compute the GP's posterior
         predictive distribution for a given set of parameters. The returned
         function can be evaluated at a set of test inputs to compute the
         corresponding predictive density.
@@ -380,14 +380,14 @@ class ConjugatePosterior(AbstractPosterior):
         The predictive distribution of a conjugate GP is given by
         .. math::
 
-            p(\\mathbf{f}^{\\star}\mid \mathbf{y}) & = \\int p(\\mathbf{f}^{\\star} \\mathbf{f} \\mid \\mathbf{y})\\\\
-            & =\\mathcal{N}(\\mathbf{f}^{\\star} \\boldsymbol{\mu}_{\mid \mathbf{y}}, \\boldsymbol{\Sigma}_{\mid \mathbf{y}}
+            p(\mathbf{f}^{\star}\mid \mathbf{y}) & = \int p(\mathbf{f}^{\star} \mathbf{f} \mid \mathbf{y})\\
+            & =\mathcal{N}(\mathbf{f}^{\star} \boldsymbol{\mu}_{\mid \mathbf{y}}, \boldsymbol{\Sigma}_{\mid \mathbf{y}}
         where
 
         .. math::
 
-            \\boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left(k(\\mathbf{x}, \\mathbf{x}')+\\sigma^2\\mathbf{I}_n\\right)^{-1}\\mathbf{y}  \\\\
-            \\boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\\mathbf{x}^{\\star}, \\mathbf{x}^{\\star\\prime}) -k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left( k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_n \\right)^{-1}k(\\mathbf{x}, \\mathbf{x}^{\\star}).
+            \boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\mathbf{x}^{\star}, \mathbf{x})\left(k(\mathbf{x}, \mathbf{x}')+\sigma^2\mathbf{I}_n\right)^{-1}\mathbf{y}  \\
+            \boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\mathbf{x}^{\star}, \mathbf{x}^{\star\prime}) -k(\mathbf{x}^{\star}, \mathbf{x})\left( k(\mathbf{x}, \mathbf{x}') + \sigma^2\mathbf{I}_n \right)^{-1}k(\mathbf{x}, \mathbf{x}^{\star}).
 
         The conditioning set is a GPJax ``Dataset`` object, whilst predictions
         are made on a regular Jax array.

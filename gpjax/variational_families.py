@@ -32,7 +32,7 @@ from .linops import (
 from .config import get_global_config
 from .gps import Prior
 from .likelihoods import AbstractLikelihood, Gaussian
-from .utils import concat_dictionaries
+from jaxutils.dict import concat_dictionaries
 from .gaussian_distribution import GaussianDistribution
 
 import deprecation

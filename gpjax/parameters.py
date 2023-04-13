@@ -26,7 +26,7 @@ from gpjax.utils import KeyArray
 from jaxtyping import Array, Float
 from jaxutils import PyTree
 
-from .config import Identity, get_global_config
+from jaxutils.config import Identity, get_global_config
 from .utils import merge_dictionaries
 
 
