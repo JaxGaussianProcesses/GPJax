@@ -134,7 +134,6 @@ class Bernoulli(AbstractLikelihood):
         process posterior and likelihood parameters.
 
         Args:
-            params (Dict): The parameters of the likelihood function.
             dist (tfd.Distribution): The Gaussian process posterior, evaluated
                 at a finite set of test points.
 
@@ -144,6 +143,33 @@ class Bernoulli(AbstractLikelihood):
         variance = jnp.diag(dist.covariance())
         mean = dist.mean().ravel()
         return self.link_function(mean / jnp.sqrt(1.0 + variance))
+
+
+@dataclass
+class Poisson(AbstractLikelihood):
+    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Distribution:
+        """The link function of the Poisson likelihood.
+
+        Args:
+            f (Float[Array, "N 1"]): Function values.
+
+        Returns:
+            tfd.Distribution: The likelihood function.
+        """
+        return tfd.Poisson(rate=jnp.exp(f))
+
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        """Evaluate the pointwise predictive distribution, given a Gaussian
+        process posterior and likelihood parameters.
+
+        Args:
+            dist (tfd.Distribution): The Gaussian process posterior, evaluated
+                at a finite set of test points.
+
+        Returns:
+            tfd.Distribution: The pointwise predictive distribution.
+        """
+        return self.link_function(dist.mean())
 
 
 def inv_probit(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
