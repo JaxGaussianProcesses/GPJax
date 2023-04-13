@@ -17,6 +17,7 @@ from beartype.typing import Dict, Optional, List
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
+from gpjax.utils import KeyArray
 
 from ..base import AbstractKernel
 from ..computations import (
@@ -54,11 +55,11 @@ class White(AbstractKernel):
         K = jnp.all(jnp.equal(x, y)) * params["variance"]
         return K.squeeze()
 
-    def init_params(self, key: Float[Array, "1 D"]) -> Dict:
+    def init_params(self, key: KeyArray) -> Dict:
         """Initialise the kernel parameters.
 
         Args:
-            key (Float[Array, "1 D"]): The key to initialise the parameters with.
+            key (KeyArray): The key to initialise the parameters with.
 
         Returns:
             Dict: The initialised parameters.
