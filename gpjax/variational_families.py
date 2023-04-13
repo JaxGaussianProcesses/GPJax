@@ -155,7 +155,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
             },
         )
 
-    def prior_kl(self, params: Dict) -> Float[Array, "1"]:
+    def prior_kl(self, params: Dict) -> Float[Array, ""]:
         """
         Compute the KL-divergence between our variational approximation and the
         Gaussian process prior.
@@ -169,7 +169,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
                 and GP prior are to be evaluated.
 
         Returns:
-             Float[Array, "1"]: The KL-divergence between our variational
+             Float[Array, ""]: The KL-divergence between our variational
                 approximation and the GP prior.
         """
 
@@ -297,7 +297,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
         super().__init__(prior, inducing_inputs, name)
 
-    def prior_kl(self, params: Dict) -> Float[Array, "1"]:
+    def prior_kl(self, params: Dict) -> Float[Array, ""]:
         """Compute the KL-divergence between our variational approximation and
         the Gaussian process prior.
 
@@ -308,7 +308,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
                 and GP prior are to be evaluated.
 
         Returns:
-            Float[Array, "1"]: The KL-divergence between our variational
+            Float[Array, ""]: The KL-divergence between our variational
                 approximation and the GP prior.
         """
 
@@ -431,7 +431,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
             },
         )
 
-    def prior_kl(self, params: Dict) -> Float[Array, "1"]:
+    def prior_kl(self, params: Dict) -> Float[Array, ""]:
         """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],
@@ -442,7 +442,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
             params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
 
         Returns:
-            Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
+            Float[Array, ""]: The KL-divergence between our variational approximation and the GP prior.
         """
         jitter = get_global_config()["jitter"]
 
@@ -618,7 +618,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
             },
         )
 
-    def prior_kl(self, params: Dict) -> Float[Array, "1"]:
+    def prior_kl(self, params: Dict) -> Float[Array, ""]:
         """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],
@@ -629,7 +629,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
             params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
 
         Returns:
-            Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
+            Float[Array, ""]: The KL-divergence between our variational approximation and the GP prior.
         """
         jitter = get_global_config()["jitter"]
 

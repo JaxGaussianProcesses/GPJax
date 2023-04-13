@@ -92,7 +92,7 @@ def fit(
     params, trainables, bijectors = parameter_state.unpack()
 
     # Define optimisation loss function on unconstrained space, with a stop gradient rule for trainables that are set to False
-    def loss(params: Dict) -> Float[Array, "1"]:
+    def loss(params: Dict) -> Float[Array, ""]:
         params = trainable_params(params, trainables)
         params = constrain(params, bijectors)
         return objective(params)
