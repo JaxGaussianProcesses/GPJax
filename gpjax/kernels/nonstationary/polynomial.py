@@ -46,8 +46,8 @@ class Polynomial(AbstractKernel):
         self._stationary = False
 
     def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
-    ) -> Float[Array, "1"]:
+        self, params: Dict, x: Float[Array, "D"], y: Float[Array, "D"]
+    ) -> Float[Array, ""]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\\alpha` and variance :math:`\\sigma^2` through
 
         .. math::
@@ -55,14 +55,14 @@ class Polynomial(AbstractKernel):
 
         Args:
             params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
+            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's call
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`.
+            Float[Array, ""]: The value of :math:`k(x, y)`.
         """
-        x = self.slice_input(x).squeeze()
-        y = self.slice_input(y).squeeze()
+        x = self.slice_input(x)
+        y = self.slice_input(y)
         K = jnp.power(params["shift"] + jnp.dot(x * params["variance"], y), self.degree)
         return K.squeeze()
 

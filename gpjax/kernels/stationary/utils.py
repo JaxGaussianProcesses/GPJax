@@ -35,32 +35,32 @@ def build_student_t_distribution(nu: int) -> dx.Distribution:
 
 
 def squared_distance(
-    x: Float[Array, "1 D"], y: Float[Array, "1 D"]
-) -> Float[Array, "1"]:
+    x: Float[Array, "D"], y: Float[Array, "D"]
+) -> Float[Array, ""]:
     """Compute the squared distance between a pair of inputs.
 
     Args:
-        x (Float[Array, "1 D"]): First input.
-        y (Float[Array, "1 D"]): Second input.
+        x (Float[Array, "D"]): First input.
+        y (Float[Array, "D"]): Second input.
 
     Returns:
-        Float[Array, "1"]: The squared distance between the inputs.
+        Float[Array, ""]: The squared distance between the inputs.
     """
 
-    return jnp.sum((x - y) ** 2, axis=-1)
+    return jnp.sum((x - y) ** 2)
 
 
 def euclidean_distance(
-    x: Float[Array, "1 D"], y: Float[Array, "1 D"]
-) -> Float[Array, "1"]:
+    x: Float[Array, "D"], y: Float[Array, "D"]
+) -> Float[Array, ""]:
     """Compute the euclidean distance between a pair of inputs.
 
     Args:
-        x (Float[Array, "1 D"]): First input.
-        y (Float[Array, "1 D"]): Second input.
+        x (Float[Array, "D"]): First input.
+        y (Float[Array, "D"]): Second input.
 
     Returns:
-        Float[Array, "1"]: The euclidean distance between the inputs.
+        Float[Array, ""]: The euclidean distance between the inputs.
     """
 
     return jnp.sqrt(jnp.maximum(squared_distance(x, y), 1e-36))

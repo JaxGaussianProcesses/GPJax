@@ -81,18 +81,18 @@ class AbstractKernel(PyTree):
     def __call__(
         self,
         params: Dict,
-        x: Float[Array, "1 D"],
-        y: Float[Array, "1 D"],
-    ) -> Float[Array, "1"]:
+        x: Float[Array, "D"],
+        y: Float[Array, "D"],
+    ) -> Float[Array, ""]:
         """Evaluate the kernel on a pair of inputs.
 
         Args:
             params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
+            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's call
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`.
+            Float[Array, ""]: The value of :math:`k(x, y)`.
         """
         raise NotImplementedError
 
@@ -209,18 +209,18 @@ class CombinationKernel(AbstractKernel):
     def __call__(
         self,
         params: Dict,
-        x: Float[Array, "1 D"],
-        y: Float[Array, "1 D"],
-    ) -> Float[Array, "1"]:
+        x: Float[Array, "D"],
+        y: Float[Array, "D"],
+    ) -> Float:
         """Evaluate combination kernel on a pair of inputs.
 
         Args:
             params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
+            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's call
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`.
+            Float: The value of :math:`k(x, y)`.
         """
         return self.combination_fn(
             jnp.stack([k(p, x, y) for k, p in zip(self.kernel_set, params)])

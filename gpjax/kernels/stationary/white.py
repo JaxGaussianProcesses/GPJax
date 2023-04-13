@@ -36,8 +36,8 @@ class White(AbstractKernel):
         self._stationary = True
 
     def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
-    ) -> Float[Array, "1"]:
+        self, params: Dict, x: Float[Array, "D"], y: Float[Array, "D"]
+    ) -> Float[Array, ""]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\\sigma`
 
         .. math::
@@ -45,11 +45,11 @@ class White(AbstractKernel):
 
         Args:
             params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
+            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's call.
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`.
+            Float[Array, ""]: The value of :math:`k(x, y)`.
         """
         K = jnp.all(jnp.equal(x, y)) * params["variance"]
         return K.squeeze()

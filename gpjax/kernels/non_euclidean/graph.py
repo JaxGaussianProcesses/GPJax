@@ -61,19 +61,19 @@ class GraphKernel(AbstractKernel):
     def __call__(
         self,
         params: Dict,
-        x: Float[Array, "1 D"],
-        y: Float[Array, "1 D"],
+        x: Float[Array, "D"],
+        y: Float[Array, "D"],
         **kwargs,
-    ) -> Float[Array, "1"]:
+    ) -> Float[Array, ""]:
         """Evaluate the graph kernel on a pair of vertices :math:`v_i, v_j`.
 
         Args:
             params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, "1 D"]): Index of the ith vertex.
-            y (Float[Array, "1 D"]): Index of the jth vertex.
+            x (Float[Array, "D"]): Index of the ith vertex.
+            y (Float[Array, "D"]): Index of the jth vertex.
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(v_i, v_j)`.
+            Float[Array, ""]: The value of :math:`k(v_i, v_j)`.
         """
         S = kwargs["S"]
         Kxx = (jax_gather_nd(self.evecs, x) * S[None, :]) @ jnp.transpose(
