@@ -78,7 +78,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         else:
             return super().__add__(other)
 
-    def __mul__(self, other: float) -> LinearOperator:
+    def __mul__(self, other: Union[float, Float[Array, ""], Float[Array, "1"]]) -> LinearOperator:
         """Multiply covariance operator by scalar.
 
         Args:
