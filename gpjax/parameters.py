@@ -175,7 +175,7 @@ def build_bijectors(params: Dict) -> Dict:
     def recursive_bijectors_list(ps, bs):
         return [recursive_bijectors(ps[i], bs[i]) for i in range(len(bs))]
 
-    def recursive_bijectors(ps, bs) -> Tuple[Dict, Dict]:
+    def recursive_bijectors(ps, bs) -> Dict:
         if type(ps) is list:
             bs = recursive_bijectors_list(ps, bs)
 
