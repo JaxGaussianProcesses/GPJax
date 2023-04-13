@@ -15,10 +15,7 @@
 
 from __future__ import annotations
 
-from beartype.typing import Union, Tuple, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .identity_linear_operator import IdentityLinearOperator
+from beartype.typing import Union, Tuple, Type
 
 from jaxtyping import Float, Array
 
@@ -28,7 +25,7 @@ import jax
 from .linear_operator import LinearOperator
 
 
-def identity(n: int) -> IdentityLinearOperator:
+def identity(n: int) -> "gpjax.linops.identity_linear_operator.IdentityLinearOperator":
     """Identity matrix.
 
     Args:

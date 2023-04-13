@@ -117,7 +117,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         """Diagonal of the covariance operator."""
         return self.value * jnp.ones(self.size)
 
-    def to_root(self) -> ConstantDiagonalLinearOperator:
+    def to_root(self) -> "ConstantDiagonalLinearOperator":
         """
         Lower triangular.
 
@@ -136,7 +136,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         """
         return 2.0 * self.size * jnp.log(self.value)
 
-    def inverse(self) -> ConstantDiagonalLinearOperator:
+    def inverse(self) -> "ConstantDiagonalLinearOperator":
         """Inverse of the covariance operator.
 
         Returns:
@@ -157,7 +157,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         return rhs / self.value
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> ConstantDiagonalLinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "ConstantDiagonalLinearOperator":
         """Construct covariance operator from dense matrix.
 
         Args:
@@ -172,8 +172,8 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
 
     @classmethod
     def from_root(
-        cls, root: ConstantDiagonalLinearOperator
-    ) -> ConstantDiagonalLinearOperator:
+        cls, root: "ConstantDiagonalLinearOperator"
+    ) -> "ConstantDiagonalLinearOperator":
         """Construct covariance operator from root.
 
         Args:

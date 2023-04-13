@@ -63,7 +63,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         """
         return other
 
-    def to_root(self) -> IdentityLinearOperator:
+    def to_root(self) -> "IdentityLinearOperator":
         """
         Lower triangular.
 
@@ -80,7 +80,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         """
         return jnp.array(0.0)
 
-    def inverse(self) -> ConstantDiagonalLinearOperator:
+    def inverse(self) -> "IdentityLinearOperator":
         """Inverse of the covariance operator.
 
         Returns:
@@ -102,7 +102,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         return rhs
 
     @classmethod
-    def from_root(cls, root: IdentityLinearOperator) -> IdentityLinearOperator:
+    def from_root(cls, root: "IdentityLinearOperator") -> "IdentityLinearOperator":
         """Construct from root.
 
         Args:
@@ -114,7 +114,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         return root
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> IdentityLinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "IdentityLinearOperator":
         return IdentityLinearOperator(dense.shape[0])
 
 

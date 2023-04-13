@@ -140,7 +140,7 @@ class DiagonalLinearOperator(LinearOperator):
 
         return diag * other
 
-    def to_root(self) -> DiagonalLinearOperator:
+    def to_root(self) -> "DiagonalLinearOperator":
         """
         Lower triangular.
 
@@ -157,7 +157,7 @@ class DiagonalLinearOperator(LinearOperator):
         """
         return jnp.sum(jnp.log(self.diagonal()))
 
-    def inverse(self) -> DiagonalLinearOperator:
+    def inverse(self) -> "DiagonalLinearOperator":
         """Inverse of the covariance operator.
 
         Returns:
@@ -178,7 +178,7 @@ class DiagonalLinearOperator(LinearOperator):
         return self.inverse() @ rhs
 
     @classmethod
-    def from_root(cls, root: DiagonalLinearOperator) -> DiagonalLinearOperator:
+    def from_root(cls, root: "DiagonalLinearOperator") -> "DiagonalLinearOperator":
         """Construct covariance operator from the lower triangular matrix.
 
         Returns:
@@ -187,7 +187,7 @@ class DiagonalLinearOperator(LinearOperator):
         return DiagonalFromRootLinearOperator(root=root)
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> DiagonalLinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "DiagonalLinearOperator":
         """Construct covariance operator from its dense matrix representation.
 
         Returns:

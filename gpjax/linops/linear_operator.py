@@ -14,10 +14,6 @@
 # ==============================================================================
 
 from __future__ import annotations
-from beartype.typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .diagonal_linear_operator import DiagonalLinearOperator
 
 import abc
 import jax.numpy as jnp
@@ -58,58 +54,58 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
         return len(self.shape)
 
     @property
-    def T(self) -> LinearOperator:
+    def T(self) -> "LinearOperator":
         """Transpose linear operator. Currently, we assume all linear operators are square and symmetric."""
         return self
 
     def __sub__(
-        self, other: Union[LinearOperator, Float[Array, "N N"]]
-    ) -> LinearOperator:
+        self, other: Union["LinearOperator", Float[Array, "N N"]]
+    ) -> "LinearOperator":
         """Subtract linear operator."""
         return self + (other * -1)
 
     def __rsub__(
-        self, other: Union[LinearOperator, Float[Array, "N N"]]
-    ) -> LinearOperator:
+        self, other: Union["LinearOperator", Float[Array, "N N"]]
+    ) -> "LinearOperator":
         """Reimplimentation of subtract linear operator."""
         return (self * -1) + other
 
     def __add__(
-        self, other: Union[LinearOperator, Float[Array, "N N"]]
-    ) -> LinearOperator:
+        self, other: Union["LinearOperator", Float[Array, "N N"]]
+    ) -> "LinearOperator":
         """Add linear operator."""
         raise NotImplementedError
 
     def __radd__(
-        self, other: Union[LinearOperator, Float[Array, "N N"]]
-    ) -> LinearOperator:
+        self, other: Union["LinearOperator", Float[Array, "N N"]]
+    ) -> "LinearOperator":
         """Reimplimentation of add linear operator."""
         return self + other
 
     @abc.abstractmethod
-    def __mul__(self, other: float) -> LinearOperator:
+    def __mul__(self, other: float) -> "LinearOperator":
         """Multiply linear operator by scalar."""
         raise NotImplementedError
 
-    def __rmul__(self, other: float) -> LinearOperator:
+    def __rmul__(self, other: float) -> "LinearOperator":
         """Reimplimentation of multiply linear operator by scalar."""
         return self.__mul__(other)
 
     @abc.abstractmethod
-    def _add_diagonal(self, other: DiagonalLinearOperator) -> LinearOperator:
+    def _add_diagonal(self, other: "gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator") -> "LinearOperator":
         """Add diagonal linear operator to a linear operator, useful e.g., for adding jitter."""
         return NotImplementedError
 
     @abc.abstractmethod
     def __matmul__(
-        self, other: Union[LinearOperator, Float[Array, "N M"]]
-    ) -> Union[LinearOperator, Float[Array, "N M"]]:
+        self, other: Union["LinearOperator", Float[Array, "N M"]]
+    ) -> Union["LinearOperator", Float[Array, "N M"]]:
         """Matrix multiplication."""
         raise NotImplementedError
 
     def __rmatmul__(
-        self, other: Union[LinearOperator, Float[Array, "N M"]]
-    ) -> Union[LinearOperator, Float[Array, "N M"]]:
+        self, other: Union["LinearOperator", Float[Array, "N M"]]
+    ) -> Union["LinearOperator", Float[Array, "N M"]]:
         """Reimplimentation of matrix multiplication."""
         # Exploit the fact that linear operators are square and symmetric.
         if other.ndim == 1:
@@ -145,7 +141,7 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
 
         return 2.0 * jnp.sum(jnp.log(root.diagonal()))
 
-    def to_root(self) -> LinearOperator:
+    def to_root(self) -> "LinearOperator":
         """Compute the root of the linear operator via the Cholesky decomposition.
 
         Returns:
@@ -158,7 +154,7 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
 
         return LowerTriangularLinearOperator.from_dense(L)
 
-    def inverse(self) -> LinearOperator:
+    def inverse(self) -> "LinearOperator":
         """Inverse of the linear matrix. Default implementation uses dense Cholesky decomposition.
 
         Returns:
@@ -196,7 +192,7 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
         raise NotImplementedError
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> LinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "LinearOperator":
         """Construct linear operator from dense matrix.
 
         Args:

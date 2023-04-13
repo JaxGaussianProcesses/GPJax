@@ -15,11 +15,6 @@
 
 from __future__ import annotations
 
-from beartype.typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .diagonal_linear_operator import DiagonalLinearOperator
-
 from beartype.typing import Union
 
 import jax.numpy as jnp
@@ -106,7 +101,7 @@ class DenseLinearOperator(LinearOperator):
 
         return DenseLinearOperator(matrix=self.matrix * other)
 
-    def _add_diagonal(self, other: DiagonalLinearOperator) -> LinearOperator:
+    def _add_diagonal(self, other: "gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator") -> LinearOperator:
         """Add diagonal to the covariance operator,  useful for computing, Kxx + Iσ².
 
         Args:
@@ -151,7 +146,7 @@ class DenseLinearOperator(LinearOperator):
         return self.matrix
 
     @classmethod
-    def from_dense(cls, matrix: Float[Array, "N N"]) -> DenseLinearOperator:
+    def from_dense(cls, matrix: Float[Array, "N N"]) -> "DenseLinearOperator":
         """Construct covariance operator from dense covariance matrix.
 
         Args:
@@ -163,7 +158,7 @@ class DenseLinearOperator(LinearOperator):
         return DenseLinearOperator(matrix=matrix)
 
     @classmethod
-    def from_root(cls, root: LinearOperator) -> DenseLinearOperator:
+    def from_root(cls, root: LinearOperator) -> "DenseLinearOperator":
         """Construct covariance operator from the root of the covariance matrix.
 
         Args:
