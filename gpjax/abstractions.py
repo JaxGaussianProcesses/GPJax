@@ -20,7 +20,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import optax as ox
 
-from gpjax.utils import KeyArray
+from gpjax.utils import KeyArray, ScalarBool, ScalarInt
 from jax import lax
 from jax.experimental import host_callback
 from jaxtyping import Shaped, Array, Float, Int
@@ -107,7 +107,7 @@ def fit(
     iter_nums = jnp.arange(num_iters)
 
     # Optimisation step
-    def step(carry, iter_num: Union[int, Int[Array, ""]]):
+    def step(carry, iter_num: ScalarInt):
         params, opt_state = carry
         loss_val, loss_gradient = jax.value_and_grad(loss)(params)
         updates, opt_state = optax_optim.update(loss_gradient, opt_state, params)
@@ -328,7 +328,7 @@ def progress_bar_scan(num_iters: int, log_rate: int) -> Callable:
         """Close the tqdm progress bar."""
         tqdm_bars[0].close()
 
-    def _callback(cond: bool, func: Callable, arg: Any) -> None:
+    def _callback(cond: ScalarBool, func: Callable, arg: Any) -> None:
         """Callback a function for a given argument if a condition is true."""
         dummy_result = 0
 
@@ -342,7 +342,7 @@ def progress_bar_scan(num_iters: int, log_rate: int) -> Callable:
 
         _ = lax.cond(cond, _do_callback, _not_callback, operand=None)
 
-    def _update_progress_bar(loss_val: Float[Array, ""], iter_num: int) -> None:
+    def _update_progress_bar(loss_val: Float[Array, ""], iter_num: ScalarInt) -> None:
         """Updates tqdm progress bar of a JAX scan or loop."""
 
         # Conditions for iteration number
