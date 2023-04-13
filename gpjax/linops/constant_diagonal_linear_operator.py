@@ -65,7 +65,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
 
     def __add__(
         self, other: Union[Float[Array, "N N"], LinearOperator]
-    ) -> DiagonalLinearOperator:
+    ) -> LinearOperator:
         if isinstance(other, ConstantDiagonalLinearOperator):
             if other.size == self.size:
                 return ConstantDiagonalLinearOperator(

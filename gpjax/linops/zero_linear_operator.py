@@ -43,7 +43,7 @@ def _check_size(shape: Any) -> None:
 class ZeroLinearOperator(LinearOperator):
     """Zero linear operator."""
 
-    def __init__(self, shape: Tuple[int], dtype: jnp.dtype = None) -> None:
+    def __init__(self, shape: Tuple[int, ...], dtype: jnp.dtype = None) -> None:
 
         _check_size(shape)
 
