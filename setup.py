@@ -65,6 +65,7 @@ setup(
         "jaxtyping>=0.0.2",
         "deprecation",
         "simple-pytree",
+        "beartype",
     ],
     tests_require=EXTRAS["dev"],
     extras_require=EXTRAS,
