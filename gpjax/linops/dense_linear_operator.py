@@ -23,6 +23,7 @@ from jaxtyping import Array, Float
 
 from .linear_operator import LinearOperator
 from .utils import to_linear_operator
+from gpjax.utils import ScalarFloat
 
 
 def _check_matrix(matrix: Array) -> None:
@@ -89,7 +90,7 @@ class DenseLinearOperator(LinearOperator):
         else:
             raise NotImplementedError
 
-    def __mul__(self, other: float) -> LinearOperator:
+    def __mul__(self, other: ScalarFloat) -> LinearOperator:
         """Multiply covariance operator by scalar.
 
         Args:

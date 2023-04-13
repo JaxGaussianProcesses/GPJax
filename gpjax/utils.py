@@ -17,7 +17,7 @@ import jaxutils
 import deprecation
 
 from beartype.typing import Union
-from jaxtyping import Bool, UInt32, Int, Array
+from jaxtyping import Bool, UInt32, Int, Float, Array
 from jax.random import KeyArray as JAXKeyArray
 
 OldKeyArray = UInt32[Array, "2"]
@@ -25,6 +25,7 @@ KeyArray = Union[OldKeyArray, JAXKeyArray]  # for compatibility regardless of en
 
 ScalarBool = Union[bool, Bool[Array, ""]]
 ScalarInt = Union[int, Int[Array, ""]]
+ScalarFloat = Union[float, Float[Array, ""]]
 
 depreciate = deprecation.deprecated(
     deprecated_in="0.5.6",

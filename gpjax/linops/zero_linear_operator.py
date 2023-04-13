@@ -21,6 +21,7 @@ import jax.numpy as jnp
 from jaxtyping import Array, Float
 from dataclasses import dataclass
 
+from gpjax.utils import ScalarFloat
 from .linear_operator import LinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
 from .utils import check_shapes_match, to_linear_operator, default_dtype
@@ -87,7 +88,7 @@ class ZeroLinearOperator(LinearOperator):
         check_shapes_match(self.shape, other.shape)
         return other
 
-    def __mul__(self, other: float) -> ZeroLinearOperator:
+    def __mul__(self, other: ScalarFloat) -> ZeroLinearOperator:
         """Multiply covariance operator by scalar.
 
         Args:

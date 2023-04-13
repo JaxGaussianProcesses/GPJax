@@ -22,6 +22,7 @@ from jaxtyping import Array, Float
 from simple_pytree import static_field
 from dataclasses import dataclass
 
+from gpjax.utils import ScalarFloat
 from .linear_operator import LinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
 
@@ -78,7 +79,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         else:
             return super().__add__(other)
 
-    def __mul__(self, other: Union[float, Float[Array, ""], Float[Array, "1"]]) -> LinearOperator:
+    def __mul__(self, other: Union[ScalarFloat, Float[Array, "1"]]) -> LinearOperator:
         """Multiply covariance operator by scalar.
 
         Args:

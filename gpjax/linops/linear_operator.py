@@ -83,11 +83,11 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
         return self + other
 
     @abc.abstractmethod
-    def __mul__(self, other: float) -> "LinearOperator":
+    def __mul__(self, other: ScalarFloat) -> "LinearOperator":
         """Multiply linear operator by scalar."""
         raise NotImplementedError
 
-    def __rmul__(self, other: float) -> "LinearOperator":
+    def __rmul__(self, other: ScalarFloat) -> "LinearOperator":
         """Reimplimentation of multiply linear operator by scalar."""
         return self.__mul__(other)
 

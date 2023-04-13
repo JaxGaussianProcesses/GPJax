@@ -20,6 +20,7 @@ from beartype.typing import Any, Union
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 from dataclasses import dataclass
+from gpjax.utils import ScalarFloat
 from .linear_operator import LinearOperator
 from .dense_linear_operator import DenseLinearOperator
 from .utils import to_linear_operator
@@ -93,7 +94,7 @@ class DiagonalLinearOperator(LinearOperator):
         else:
             raise NotImplementedError
 
-    def __mul__(self, other: float) -> LinearOperator:
+    def __mul__(self, other: ScalarFloat) -> LinearOperator:
         """Multiply covariance operator by scalar.
 
         Args:
