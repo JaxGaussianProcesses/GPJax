@@ -23,7 +23,7 @@ import optax as ox
 from gpjax.utils import KeyArray
 from jax import lax
 from jax.experimental import host_callback
-from jaxtyping import Array, Float
+from jaxtyping import Shaped, Array, Float, Int
 from tqdm.auto import tqdm
 
 from .natural_gradients import natural_gradients
@@ -107,7 +107,7 @@ def fit(
     iter_nums = jnp.arange(num_iters)
 
     # Optimisation step
-    def step(carry, iter_num: int):
+    def step(carry, iter_num: Union[int, Int[Array, ""]]):
         params, opt_state = carry
         loss_val, loss_gradient = jax.value_and_grad(loss)(params)
         updates, opt_state = optax_optim.update(loss_gradient, opt_state, params)
@@ -342,7 +342,7 @@ def progress_bar_scan(num_iters: int, log_rate: int) -> Callable:
 
         _ = lax.cond(cond, _do_callback, _not_callback, operand=None)
 
-    def _update_progress_bar(loss_val: Float[Array, "1"], iter_num: int) -> None:
+    def _update_progress_bar(loss_val: Float[Array, ""], iter_num: int) -> None:
         """Updates tqdm progress bar of a JAX scan or loop."""
 
         # Conditions for iteration number
@@ -368,7 +368,7 @@ def progress_bar_scan(num_iters: int, log_rate: int) -> Callable:
     def _progress_bar_scan(body_fun: Callable) -> Callable:
         """Decorator that adds a progress bar to `body_fun` used in `lax.scan`."""
 
-        def wrapper_progress_bar(carry: Any, x: Union[tuple, int]) -> Any:
+        def wrapper_progress_bar(carry: Any, x: Union[tuple, Shaped[Array, "..."], int]) -> Any:
 
             # Get iteration number
             if type(x) is tuple:
