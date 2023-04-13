@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import abc
-from beartype.typing import Callable, Dict, List, Optional, Sequence
+from beartype.typing import Callable, Dict, List, Optional, Sequence, Type
 
 import deprecation
 import jax.numpy as jnp
@@ -37,7 +37,7 @@ class AbstractKernel(PyTree):
 
     def __init__(
         self,
-        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        compute_engine: Type[AbstractKernelComputation] = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
         spectral_density: Optional[dx.Distribution] = None,
         name: Optional[str] = "AbstractKernel",
@@ -62,7 +62,7 @@ class AbstractKernel(PyTree):
         return self._stationary
 
     @property
-    def compute_engine(self) -> AbstractKernelComputation:
+    def compute_engine(self) -> Type[AbstractKernelComputation]:
         """The compute engine that is used to perform the kernel computations.
 
         Returns:
@@ -71,7 +71,7 @@ class AbstractKernel(PyTree):
         return self._compute_engine
 
     @compute_engine.setter
-    def compute_engine(self, compute_engine: AbstractKernelComputation) -> None:
+    def compute_engine(self, compute_engine: Type[AbstractKernelComputation]) -> None:
         self._compute_engine = compute_engine
         compute_engine = self.compute_engine(kernel_fn=self.__call__)
         self.gram = compute_engine.gram
@@ -173,7 +173,7 @@ class CombinationKernel(AbstractKernel):
     def __init__(
         self,
         kernel_set: List[AbstractKernel],
-        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        compute_engine: Type[AbstractKernelComputation] = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
         name: Optional[str] = "AbstractKernel",
     ) -> None:
@@ -233,7 +233,7 @@ class SumKernel(CombinationKernel):
     def __init__(
         self,
         kernel_set: List[AbstractKernel],
-        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        compute_engine: Type[AbstractKernelComputation] = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
         name: Optional[str] = "Sum kernel",
     ) -> None:
@@ -247,7 +247,7 @@ class ProductKernel(CombinationKernel):
     def __init__(
         self,
         kernel_set: List[AbstractKernel],
-        compute_engine: AbstractKernelComputation = DenseKernelComputation,
+        compute_engine: Type[AbstractKernelComputation] = DenseKernelComputation,
         active_dims: Optional[List[int]] = None,
         name: Optional[str] = "Product kernel",
     ) -> None:
