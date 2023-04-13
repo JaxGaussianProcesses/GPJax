@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Dict, List, Optional
+from beartype.typing import Dict, List, Optional
 
 import jax
 import jax.numpy as jnp

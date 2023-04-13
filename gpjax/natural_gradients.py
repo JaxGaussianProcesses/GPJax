@@ -14,7 +14,7 @@
 # ==============================================================================
 
 from copy import deepcopy
-from typing import Callable, Dict, Tuple
+from beartype.typing import Callable, Dict, Tuple
 
 import jax.numpy as jnp
 import jax.scipy as jsp

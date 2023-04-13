@@ -1,4 +1,4 @@
-from typing import Callable, Dict
+from beartype.typing import Callable, Dict
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float

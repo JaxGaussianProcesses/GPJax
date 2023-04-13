@@ -15,7 +15,7 @@
 
 from __future__ import annotations
 
-from typing import Union, Tuple, TYPE_CHECKING
+from beartype.typing import Union, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .identity_linear_operator import IdentityLinearOperator

@@ -14,7 +14,7 @@
 # ==============================================================================
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from beartype.typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .diagonal_linear_operator import DiagonalLinearOperator
@@ -23,7 +23,7 @@ import abc
 import jax.numpy as jnp
 from dataclasses import dataclass
 from jaxtyping import Array, Float
-from typing import Any, TypeVar, Iterable, Mapping, Generic, Tuple, Union
+from beartype.typing import Any, TypeVar, Iterable, Mapping, Generic, Tuple, Union
 from simple_pytree import Pytree, static_field
 
 # Generic type.

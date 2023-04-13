@@ -15,12 +15,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from beartype.typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .diagonal_linear_operator import DiagonalLinearOperator
 
-from typing import Union
+from beartype.typing import Union
 
 import jax.numpy as jnp
 from dataclasses import dataclass

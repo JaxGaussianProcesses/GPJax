@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import abc
-from typing import Dict, Optional
+from beartype.typing import Dict, Optional
 
 import jax.numpy as jnp
 from jax.random import KeyArray

@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import abc
-from typing import Callable, Dict
+from beartype.typing import Callable, Dict
 
 import jax.numpy as jnp
 import jax.scipy as jsp

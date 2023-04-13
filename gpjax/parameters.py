@@ -15,7 +15,7 @@
 
 import warnings
 from copy import deepcopy
-from typing import Dict, Tuple
+from beartype.typing import Dict, Tuple
 from warnings import warn
 
 import distrax as dx

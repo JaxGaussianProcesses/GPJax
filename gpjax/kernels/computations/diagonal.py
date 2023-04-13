@@ -14,7 +14,7 @@
 # ==============================================================================
 
 from jax import vmap
-from typing import Callable, Dict
+from beartype.typing import Callable, Dict
 from jaxtyping import Array, Float
 
 from .base import AbstractKernelComputation

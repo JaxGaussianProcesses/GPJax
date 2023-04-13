@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, Optional
+from beartype.typing import Callable, Optional
 
 import jax.numpy as jnp
 import numpy as np

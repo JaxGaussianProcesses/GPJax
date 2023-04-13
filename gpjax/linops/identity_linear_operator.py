@@ -15,7 +15,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from beartype.typing import Any
 
 import jax.numpy as jnp
 from dataclasses import dataclass

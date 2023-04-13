@@ -1,7 +1,7 @@
 from ..base import AbstractKernel
 from ..computations import BasisFunctionComputation
 from jax.random import KeyArray
-from typing import Dict, Any
+from beartype.typing import Dict, Any
 
 
 class RFF(AbstractKernel):

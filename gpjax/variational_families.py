@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import abc
-from typing import Any, Callable, Dict, Optional
+from beartype.typing import Any, Callable, Dict, Optional
 
 import distrax as dx
 import jax.numpy as jnp

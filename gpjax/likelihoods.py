@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import abc
-from typing import Any, Callable, Dict, Optional
+from beartype.typing import Any, Callable, Dict, Optional
 from .linops.utils import to_dense
 from jaxutils import PyTree
 

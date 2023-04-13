@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import abc
-from typing import Callable, Dict, List, Optional, Sequence
+from beartype.typing import Callable, Dict, List, Optional, Sequence
 
 import deprecation
 import jax.numpy as jnp

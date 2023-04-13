@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, Dict
+from beartype.typing import Callable, Dict
 
 from jax import vmap
 from jaxtyping import Array, Float

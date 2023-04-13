@@ -19,7 +19,7 @@ from .linops import LinearOperator, IdentityLinearOperator
 from jaxtyping import Array, Float
 from jax import vmap
 
-from typing import Tuple, Optional, Any
+from beartype.typing import Tuple, Optional, Any
 
 import distrax as dx
 import jax.random as jr

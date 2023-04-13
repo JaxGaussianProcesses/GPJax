@@ -15,7 +15,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Union
+from beartype.typing import Any, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
