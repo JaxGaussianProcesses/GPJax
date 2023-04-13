@@ -104,7 +104,7 @@ class AbstractKernel(PyTree):
         Returns:
             Float[Array, "N Q"]: A sliced form of the input matrix.
         """
-        return x[..., self.active_dims]
+        return x[..., self.active_dims] if self.active_dims is not None else x
 
     def __add__(self, other: "AbstractKernel") -> "AbstractKernel":
         """Add two kernels together.
