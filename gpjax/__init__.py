@@ -13,22 +13,24 @@
 # limitations under the License.
 # ==============================================================================
 
-from .abstractions import fit, fit_batches, fit_natgrads
-from .gps import Prior, construct_posterior
-from .kernels import *
-from .likelihoods import Bernoulli, Gaussian
-from .mean_functions import Constant, Zero
-from .parameters import constrain, copy_dict_structure, initialise, unconstrain
-from .variational_families import (
-    CollapsedVariationalGaussian,
-    ExpectationVariationalGaussian,
-    NaturalVariationalGaussian,
-    VariationalGaussian,
-    WhitenedVariationalGaussian,
-)
-from .types import Dataset
-from .variational_inference import CollapsedVI, StochasticVI
-from . import _version
+from jaxtyping import install_import_hook
+with install_import_hook("gpjax", "beartype.beartype"):
+    from .abstractions import fit, fit_batches, fit_natgrads
+    from .gps import Prior, construct_posterior
+    from .kernels import *
+    from .likelihoods import Bernoulli, Gaussian
+    from .mean_functions import Constant, Zero
+    from .parameters import constrain, copy_dict_structure, initialise, unconstrain
+    from .variational_families import (
+        CollapsedVariationalGaussian,
+        ExpectationVariationalGaussian,
+        NaturalVariationalGaussian,
+        VariationalGaussian,
+        WhitenedVariationalGaussian,
+    )
+    from .types import Dataset
+    from .variational_inference import CollapsedVI, StochasticVI
+    from . import _version
 
 __version__ = _version.get_versions()["version"]
 __license__ = "MIT"
