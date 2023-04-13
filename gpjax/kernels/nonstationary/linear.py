@@ -13,56 +13,41 @@
 # limitations under the License.
 # ==============================================================================
 
-from beartype.typing import Dict, List, Optional
+from dataclasses import dataclass
 
-import jax
 import jax.numpy as jnp
-from gpjax.utils import KeyArray
-from jaxtyping import Array
+import tensorflow_probability.substrates.jax.bijectors as tfb
+from jaxtyping import Array, Float
 
+from ...base import param_field
 from ..base import AbstractKernel
-from ..computations import (
-    DenseKernelComputation,
-)
 
 
-##########################################
-# Euclidean kernels
-##########################################
+@dataclass
 class Linear(AbstractKernel):
     """The linear kernel."""
 
-    def __init__(
-        self,
-        active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = False,
-        name: Optional[str] = "Linear",
-    ) -> None:
-        super().__init__(
-            DenseKernelComputation,
-            active_dims,
-            spectral_density=None,
-            name=name,
-        )
-        self._stationary = False
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    name: str = "Linear"
 
-    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\\sigma`
+    def __call__(
+        self,
+        x: Float[Array, "D"],
+        y: Float[Array, "D"],
+    ) -> Float[Array, "1"]:
+        """Evaluate the linear kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\\sigma`
 
         .. math::
             k(x, y) = \\sigma^2 x^{T}y
 
         Args:
-            x (jax.Array): The left hand argument of the kernel function's call.
-            y (jax.Array): The right hand argument of the kernel function's call
-            params (dict): Parameter set for which the kernel should be evaluated on.
+            x (Float[Array, "D"]): The left hand input of the kernel function.
+            y (Float[Array, "D"]): The right hand input of the kernel function.
+
         Returns:
-            Array: The value of :math:`k(x, y)`
+            Float[Array, "1"]: The evaluated kernel function :math:`k(x, y)` at the supplied inputs.
         """
         x = self.slice_input(x)
         y = self.slice_input(y)
-        K = params["variance"] * jnp.matmul(x.T, y)
+        K = self.variance * jnp.matmul(x.T, y)
         return K.squeeze()
-
-    def init_params(self, key: KeyArray) -> Dict:
-        return {"variance": jnp.array([1.0])}

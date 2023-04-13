@@ -13,40 +13,29 @@
 # limitations under the License.
 # ==============================================================================
 
-from beartype.typing import Dict, List, Optional
+from dataclasses import dataclass
 
-import jax
 import jax.numpy as jnp
-from gpjax.utils import KeyArray
+import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax.distributions as tfd
 from jaxtyping import Array, Float
 
+from ...base import param_field
 from ..base import AbstractKernel
-from ..computations import (
-    DenseKernelComputation,
-)
 from .utils import squared_distance
-import distrax as dx
 
 
+@dataclass
 class RBF(AbstractKernel):
     """The Radial Basis Function (RBF) kernel."""
 
-    def __init__(
-        self,
-        active_dims: Optional[List[int]] = None,
-        name: Optional[str] = "Radial basis function kernel",
-    ) -> None:
-        super().__init__(
-            DenseKernelComputation,
-            active_dims,
-            spectral_density=dx.Normal(loc=0.0, scale=1.0),
-            name=name,
-        )
-        self._stationary = True
+    lengthscale: Float[Array, "D"] = param_field(
+        jnp.array([1.0]), bijector=tfb.Softplus()
+    )
+    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    name: str = "RBF"
 
-    def __call__(
-        self, params: Dict, x: Float[Array, "D"], y: Float[Array, "D"]
-    ) -> Float[Array, ""]:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, ""]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
         lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
 
@@ -61,14 +50,11 @@ class RBF(AbstractKernel):
         Returns:
             Float[Array, ""]: The value of :math:`k(x, y)`.
         """
-        x = self.slice_input(x) / params["lengthscale"]
-        y = self.slice_input(y) / params["lengthscale"]
-        K = params["variance"] * jnp.exp(-0.5 * squared_distance(x, y))
+        x = self.slice_input(x) / self.lengthscale
+        y = self.slice_input(y) / self.lengthscale
+        K = self.variance * jnp.exp(-0.5 * squared_distance(x, y))
         return K.squeeze()
 
-    def init_params(self, key: KeyArray) -> Dict:
-        params = {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-        }
-        return jax.tree_util.tree_map(lambda x: jnp.atleast_1d(x), params)
+    @property
+    def spectral_density(self) -> tfd.Normal:
+        return tfd.Normal(loc=0.0, scale=1.0)

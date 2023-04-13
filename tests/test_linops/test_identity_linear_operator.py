@@ -14,20 +14,23 @@
 # ==============================================================================
 
 
+import jax
 import jax.numpy as jnp
 import jax.random as jr
-import jax
 import pytest
 from jax.config import config
+import jax.tree_util as jtu
+from dataclasses import is_dataclass
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 _PRNGKey = jr.PRNGKey(42)
 
+from gpjax.linops.constant_diagonal_linear_operator import \
+    ConstantDiagonalLinearOperator
+from gpjax.linops.dense_linear_operator import DenseLinearOperator
 from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 from gpjax.linops.identity_linear_operator import IdentityLinearOperator
-from gpjax.linops.constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
-from gpjax.linops.dense_linear_operator import DenseLinearOperator
 
 
 def approx_equal(res: jax.Array, actual: jax.Array) -> bool:
@@ -38,8 +41,19 @@ def approx_equal(res: jax.Array, actual: jax.Array) -> bool:
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_init(n: int) -> None:
     id = IdentityLinearOperator(size=n)
+
+    # Check types.
+    assert isinstance(id, ConstantDiagonalLinearOperator)
+    assert is_dataclass(id)
+
+    # Check properties.
     assert id.shape == (n, n)
+    assert id.dtype == jnp.float64
+    assert id.ndim == 2
     assert id.size == n
+
+    # Check pytree.
+    assert jtu.tree_leaves(id) == [1.0] # shape, dtype are static!
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])
@@ -74,7 +88,6 @@ def test_add_diagonal(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_add(n: int) -> None:
-
     array = jr.uniform(_PRNGKey, shape=(n, n))
     entries = jr.uniform(_PRNGKey, shape=(n,))
     id = IdentityLinearOperator(size=n)

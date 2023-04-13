@@ -1,0 +1,114 @@
+[tool.poetry]
+name = "gpjax"
+version = "0.0.0" # Merely a placeholder, will be replaced by the dynamic versioning plugin
+description = "Gaussian processes in JAX."
+authors = ["Thomas Pinder <tompinder@live.co.uk>", "Daniel Dodd <daniel_dodd@icloud.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/JaxGaussianProcesses/GPJax"
+repository = "https://github.com/JaxGaussianProcesses/GPJax"
+include = [
+    "LICENSE",
+]
+documentation = "https://gpjax.readthedocs.io/en/latest/"
+keywords = ["gaussian-processes jax machine-learning bayesian"]
+packages = [{include = "gpjax"}]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.12"
+jax = ">=0.4.1"
+jaxlib = "^0.4.6"
+optax = "^0.1.4"
+jaxtyping = "^0.2.14"
+tqdm = "^4.65.0"
+simple-pytree = "^0.1.7"
+tensorflow-probability = "^0.19.0"
+orbax-checkpoint = "^0.2.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.2.2"
+pytest-cov = "^4.0.0"
+pytest-pretty = "^1.1.1"
+pytest-xdist = "^3.2.1"
+networkx = "^3.0"
+coverage = "^7.2.2"
+absolufy-imports = "^0.3.1"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+isort = "^5.12.0"
+pylint = "^2.17.1"
+nox = "^2022.11.21"
+ruff = "^0.0.259"
+flax = "^0.6.8"
+
+
+[tool.poetry.group.docs.dependencies]
+sphinx-book-theme = "^1.0.0"
+myst-parser = "^1.0.0"
+linkify-it-py = "^2.0.0"
+jinja2 = "^3.1.2"
+nbsphinx = "^0.9.1"
+sphinx-tabs = "^3.4.1"
+matplotlib = "^3.7.1"
+seaborn = "^0.12.2"
+sphinx-copybutton = "^0.5.1"
+networkx = "^3.0"
+sphinxcontrib-bibtex = "^2.5.0"
+jupytext = "^1.14.5"
+ipython = "^8.11.0"
+ipykernel = "^6.22.0"
+watermark = "^2.3.1"
+sphinxext-opengraph = "^0.8.1"
+blackjax = "^0.9.6"
+jaxopt = "^0.6"
+ipywidgets = "^8.0.5"
+pandas = "^1.5.3"
+scikit-learn = "^1.2.2"
+flax = "^0.6.8"
+
+[build-system]
+requires = ["poetry-core", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.black]  # https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-via-a-file
+line-length = 88
+target-version = ["py38"]
+
+[tool.pytest.ini_options]  # https://docs.pytest.org/en/latest/reference/reference.html#ini-options-ref
+# addopts = "--color=yes --doctest-modules --exitfirst --failed-first --strict-config --strict-markers --typeguard-packages=my_package --verbosity=2 --junitxml=reports/pytest.xml"
+filterwarnings = ["error", "ignore::DeprecationWarning"]
+testpaths = ["gpjax", "tests"]
+xfail_strict = true
+
+[tool.ruff]  # https://github.com/charliermarsh/ruff
+fix = true
+ignore-init-module-imports = true
+line-length = 88
+select = ["A", "B", "BLE", "C4", "C90", "D", "DTZ", "E", "ERA", "F", "G", "I", "INP", "ISC", "N", "NPY", "PGH", "PIE", "PLC", "PLE", "PLR", "PLW", "PT", "PTH", "PYI", "RET", "RSE", "RUF", "S", "SIM", "T10", "T20", "TID", "UP", "W", "YTT"]
+ignore = ["E501", "PGH001", "RET504", "S101"]
+unfixable = ["ERA001", "F401", "F841", "T201", "T203"]
+src = ["gpjax", "tests"]
+target-version = "py38"
+
+[tool.ruff.pydocstyle]
+convention = "numpy"
+
+[tool.coverage.report]  # https://coverage.readthedocs.io/en/latest/config.html#report
+fail_under = 50
+precision = 1
+show_missing = true
+skip_covered = true
+
+[tool.coverage.run]  # https://coverage.readthedocs.io/en/latest/config.html#run
+branch = true
+command_line = "--module pytest"
+data_file = "reports/.coverage"
+source = ["src"]
+
+[tool.coverage.xml]  # https://coverage.readthedocs.io/en/latest/config.html#xml
+output = "reports/coverage.xml"
+
+[tool.poetry-dynamic-versioning]
+enable = true

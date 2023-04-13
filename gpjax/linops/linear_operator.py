@@ -16,10 +16,11 @@
 from __future__ import annotations
 
 import abc
-import jax.numpy as jnp
 from dataclasses import dataclass
+from beartype.typing import Any, Generic, Iterable, Mapping, Tuple, TypeVar, Union
+
+import jax.numpy as jnp
 from jaxtyping import Array, Float
-from beartype.typing import Any, TypeVar, Iterable, Mapping, Generic, Tuple, Union
 from simple_pytree import Pytree, static_field
 
 # Generic type.
@@ -148,7 +149,8 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
             Float[Array, "N N"]: Lower Cholesky decomposition of the linear operator.
         """
 
-        from .triangular_linear_operator import LowerTriangularLinearOperator
+        from gpjax.linops.triangular_linear_operator import \
+            LowerTriangularLinearOperator
 
         L = jnp.linalg.cholesky(self.to_dense())
 
@@ -161,7 +163,7 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
             LinearOperator: Inverse of the linear matrix.
         """
 
-        from .dense_linear_operator import DenseLinearOperator
+        from gpjax.linops.dense_linear_operator import DenseLinearOperator
 
         n = self.shape[0]
 

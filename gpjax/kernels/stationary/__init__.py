@@ -13,14 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-from .matern12 import Matern12
-from .matern32 import Matern32
-from .matern52 import Matern52
-from .periodic import Periodic
-from .powered_exponential import PoweredExponential
-from .rational_quadratic import RationalQuadratic
-from .rbf import RBF
-from .white import White
+from gpjax.kernels.stationary.matern12 import Matern12
+from gpjax.kernels.stationary.matern32 import Matern32
+from gpjax.kernels.stationary.matern52 import Matern52
+from gpjax.kernels.stationary.periodic import Periodic
+from gpjax.kernels.stationary.powered_exponential import PoweredExponential
+from gpjax.kernels.stationary.rational_quadratic import RationalQuadratic
+from gpjax.kernels.stationary.rbf import RBF
+from gpjax.kernels.stationary.white import White
 
 __all__ = [
     "Matern12",

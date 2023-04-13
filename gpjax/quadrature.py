@@ -29,7 +29,7 @@ def gauss_hermite_quadrature(
     sd: Float[Array, "N D"],
     deg: Optional[int] = DEFAULT_NUM_GAUSS_HERMITE_POINTS,
     *args,
-    **kwargs
+    **kwargs,
 ) -> Float[Array, "N"]:
     """
     Compute Gaussian-Hermite quadrature for a given function. The quadrature

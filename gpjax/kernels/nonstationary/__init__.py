@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from .linear import Linear
-from .polynomial import Polynomial
+from gpjax.kernels.nonstationary.linear import Linear
+from gpjax.kernels.nonstationary.polynomial import Polynomial
 
 __all__ = ["Linear", "Polynomial"]

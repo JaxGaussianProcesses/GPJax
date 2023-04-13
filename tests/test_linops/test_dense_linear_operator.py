@@ -14,32 +14,49 @@
 # ==============================================================================
 
 
+import jax
 import jax.numpy as jnp
 import jax.random as jr
-import jax
 import pytest
 from jax.config import config
+
+import jax.tree_util as jtu
+from dataclasses import is_dataclass
+
 
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 _PRNGKey = jr.PRNGKey(42)
 
-from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
-from gpjax.linops.triangular_linear_operator import LowerTriangularLinearOperator
+from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+from gpjax.linops.triangular_linear_operator import \
+    LowerTriangularLinearOperator
 
 
 def approx_equal(res: jax.Array, actual: jax.Array) -> bool:
     """Check if two arrays are approximately equal."""
     return jnp.linalg.norm(res - actual) < 1e-6
 
-
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_init(n: int) -> None:
     values = jr.uniform(_PRNGKey, (n, n))
     dense = DenseLinearOperator(values)
+
+    # Check types.
+    assert isinstance(dense, DenseLinearOperator)
+    assert is_dataclass(dense)
+
+    # Check properties.
     assert dense.shape == (n, n)
+    assert dense.dtype == jnp.float64
+    assert dense.ndim == 2
+
+    # Check pytree.
+    assert jtu.tree_leaves(dense) == [values] # shape, dtype are static!
+
+
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])
@@ -62,7 +79,6 @@ def test_to_dense(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_add_diagonal(n: int) -> None:
-
     # Test adding generic diagonal linear operator.
     key_a, key_b = jr.split(_PRNGKey)
 

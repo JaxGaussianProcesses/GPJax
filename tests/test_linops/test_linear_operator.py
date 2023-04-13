@@ -17,20 +17,27 @@ import pytest
 import jax.tree_util as jtu
 import jax.numpy as jnp
 from gpjax.linops.linear_operator import LinearOperator
-from dataclasses import dataclass
+from dataclasses import dataclass, is_dataclass
 from simple_pytree import static_field
 
+def test_abstract_operator() -> None:
 
-def test_covariance_operator() -> None:
+    # Test abstract linear operator raises an error.
     with pytest.raises(TypeError):
         LinearOperator()
 
-@pytest.mark.parametrize("is_dataclass", [True, False])
+    # Test dataclass wrapped abstract linear operator raise an error.
+    with pytest.raises(TypeError):
+        dataclass(LinearOperator)()
+
+    
+
+@pytest.mark.parametrize("test_dataclass", [True, False])
 @pytest.mark.parametrize("shape", [(1, 1), (2, 3), (4, 5, 6), [7, 8]])
 @pytest.mark.parametrize("dtype", [jnp.float32, jnp.float64])
-def test_instantiate_no_attributes(is_dataclass, shape, dtype) -> None:
-    """Test if the abstract operator can be instantiated, given the abstract methods."""
+def test_instantiate_no_attributes(test_dataclass, shape, dtype) -> None:
 
+    # Test can instantiate a linear operator with the abstract methods defined.
     class DummyLinearOperator(LinearOperator):
         def diagonal(self, *args, **kwargs):
             pass
@@ -57,30 +64,38 @@ def test_instantiate_no_attributes(is_dataclass, shape, dtype) -> None:
         def from_dense(cls, *args, **kwargs):
             pass
 
-    if is_dataclass:
-        dataclass(DummyLinearOperator)
+    # Ensure we check dataclass case.
+    if test_dataclass:
+        DummyLinearOperator = dataclass(DummyLinearOperator)
 
+    # Initialise linear operator.
     linop = DummyLinearOperator(shape=shape, dtype=dtype)
+
+    # Check types.
     assert isinstance(linop, DummyLinearOperator)
     assert isinstance(linop, LinearOperator)
+
+    if test_dataclass:
+        assert is_dataclass(linop)
+
+    # Check properties.
     assert linop.shape == shape
     assert linop.dtype == dtype
     assert linop.ndim == len(shape)
+
+    # Check pytree.
     assert jtu.tree_leaves(linop) == [] # shape and dtype are static!
 
-    # if not is_dataclass:
-    #     assert linop.__repr__() == f"DummyLinearOperator(shape={shape}, dtype={dtype})"
 
-
-@pytest.mark.parametrize("is_dataclass", [True, False])
+@pytest.mark.parametrize("test_dataclass", [True, False])
 @pytest.mark.parametrize("shape", [(1, 1), (2, 3), (4, 5, 6), [7, 8]])
 @pytest.mark.parametrize("dtype", [jnp.float32, jnp.float64])
-def test_instantiate_with_attributes(is_dataclass, shape, dtype) -> None:
+def test_instantiate_with_attributes(test_dataclass, shape, dtype) -> None:
     """Test if the covariance operator can be instantiated with attribute annotations."""
 
     class DummyLinearOperator(LinearOperator):
         a: int
-        b: int = static_field() # Lets have a static attribute here.
+        b: int = static_field()  # Lets have a static attribute here.
         c: int
 
         def __init__(self, shape, dtype, a=1, b=2, c=3):
@@ -115,16 +130,24 @@ def test_instantiate_with_attributes(is_dataclass, shape, dtype) -> None:
         def from_dense(cls, *args, **kwargs):
             pass
 
-    if is_dataclass:
-        dataclass(DummyLinearOperator)
+    # Ensure we check dataclass case.
+    if test_dataclass:
+        DummyLinearOperator = dataclass(DummyLinearOperator)
 
+    # Initialise linear operator.
     linop = DummyLinearOperator(shape=shape, dtype=dtype)
+
+    # Check types.
     assert isinstance(linop, DummyLinearOperator)
     assert isinstance(linop, LinearOperator)
+
+    if test_dataclass:
+        assert is_dataclass(linop)
+
+    # Check properties.
     assert linop.shape == shape
     assert linop.dtype == dtype
     assert linop.ndim == len(shape)
-    assert jtu.tree_leaves(linop) == [1, 3] # b, shape, dtype are static!
 
-    # if not is_dataclass:
-    #     assert linop.__repr__() == f"DummyLinearOperator(shape={shape}, dtype={dtype})"
+    # Check pytree.
+    assert jtu.tree_leaves(linop) == [1, 3] # b, shape, dtype are static!

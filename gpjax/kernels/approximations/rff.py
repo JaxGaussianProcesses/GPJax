@@ -1,9 +1,17 @@
+from dataclasses import dataclass
+
+import tensorflow_probability.substrates.jax.bijectors as tfb
+from jax.random import PRNGKey
+from jaxtyping import Array, Float
+from simple_pytree import static_field
+
+from ...base import param_field
 from ..base import AbstractKernel
 from ..computations import BasisFunctionComputation
 from gpjax.utils import KeyArray
-from beartype.typing import Dict, Any
 
 
+@dataclass
 class RFF(AbstractKernel):
     """Computes an approximation of the kernel using Random Fourier Features.
 
@@ -22,40 +30,28 @@ class RFF(AbstractKernel):
     Args:
         AbstractKernel (_type_): _description_
     """
+    base_kernel: AbstractKernel = None
+    num_basis_fns: int = static_field(50)
+    frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity)
+    key: KeyArray = static_field(PRNGKey(123))
 
-    def __init__(self, base_kernel: AbstractKernel, num_basis_fns: int) -> None:
-        """Initialise the Random Fourier Features approximation.
+    def __post_init__(self) -> None:
+        """Post-initialisation function.
 
-        Args:
-            base_kernel (AbstractKernel): The kernel that is to be approximated. This kernel must be stationary.
-            num_basis_fns (int): The number of basis functions that should be used to approximate the kernel.
+        This function is called after the initialisation of the kernel. It is used to
+        set the computation engine to be the basis function computation engine.
         """
-        self._check_valid_base_kernel(base_kernel)
-        self.base_kernel = base_kernel
-        self.num_basis_fns = num_basis_fns
-        # Set the computation engine to be basis function computation engine
+        self._check_valid_base_kernel(self.base_kernel)
         self.compute_engine = BasisFunctionComputation
-        # Inform the compute engine of the number of basis functions
-        self.compute_engine.num_basis_fns = num_basis_fns
 
-    def init_params(self, key: KeyArray) -> Dict:
-        """Initialise the parameters of the RFF approximation.
+        if self.frequencies is None:
+            n_dims = self.base_kernel.ndims
+            self.frequencies = self.base_kernel.spectral_density.sample(
+                seed=self.key, sample_shape=(self.num_basis_fns, n_dims)
+            )
+        self.name = f"{self.base_kernel.name} (RFF)"
 
-        Args:
-            key (KeyArray): A pseudo-random number generator key.
-
-        Returns:
-            Dict: A dictionary containing the original kernel's parameters and the initial frequencies used in RFF approximation.
-        """
-        base_params = self.base_kernel.init_params(key)
-        n_dims = self.base_kernel.ndims
-        frequencies = self.base_kernel.spectral_density.sample(
-            seed=key, sample_shape=(self.num_basis_fns, n_dims)
-        )
-        base_params["frequencies"] = frequencies
-        return base_params
-
-    def __call__(self, *args: Any, **kwds: Any) -> Any:
+    def __call__(self, x: Array, y: Array) -> Array:
         pass
 
     def _check_valid_base_kernel(self, kernel: AbstractKernel):
@@ -64,9 +60,23 @@ class RFF(AbstractKernel):
         Args:
             kernel (AbstractKernel): The kernel to be checked.
         """
+        if kernel is None:
+            raise ValueError("Base kernel must be specified.")
         error_msg = """
         Base kernel must have a spectral density. Currently, only Matérn
         and RBF kernels have implemented spectral densities.
         """
         if kernel.spectral_density is None:
             raise ValueError(error_msg)
+
+    def compute_features(self, x: Float[Array, "N D"]) -> Float[Array, "N L"]:
+        """Compute the features for the inputs.
+
+        Args:
+            x: A N x D array of inputs.
+            frequencies: A M x D array of frequencies.
+
+        Returns:
+            Float[Array, "N L"]: A N x L array of features where L = 2M.
+        """
+        return self.compute_engine(self).compute_features(x)

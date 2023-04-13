@@ -16,19 +16,19 @@
 from __future__ import annotations
 
 from beartype.typing import Any, Union
+from dataclasses import dataclass
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 from simple_pytree import static_field
-from dataclasses import dataclass
 
 from gpjax.utils import ScalarFloat
 from .linear_operator import LinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
+from .linear_operator import LinearOperator
 
 
 def _check_args(value: Any, size: Any) -> None:
-
     if not isinstance(size, int):
         raise ValueError(f"`length` must be an integer, but `length = {size}`.")
 

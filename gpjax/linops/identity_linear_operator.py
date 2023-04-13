@@ -16,13 +16,14 @@
 from __future__ import annotations
 
 from beartype.typing import Any
+from dataclasses import dataclass
 
 import jax.numpy as jnp
-from dataclasses import dataclass
 from jaxtyping import Array, Float
 
-from .constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
-from .utils import default_dtype
+from gpjax.linops.constant_diagonal_linear_operator import \
+    ConstantDiagonalLinearOperator
+from gpjax.linops.utils import default_dtype
 
 
 def _check_size(size: Any) -> None:
