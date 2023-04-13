@@ -16,9 +16,12 @@
 import jaxutils
 import deprecation
 
+from beartype.typing import Union
 from jaxtyping import UInt32, Array
+from jax.random import KeyArray as JAXKeyArray
 
-KeyArray = UInt32[Array, "2"]
+OldKeyArray = UInt32[Array, "2"]
+KeyArray = Union[OldKeyArray, JAXKeyArray]  # for compatibility regardless of enable_custom_prng setting
 
 depreciate = deprecation.deprecated(
     deprecated_in="0.5.6",
