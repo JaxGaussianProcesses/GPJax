@@ -47,7 +47,7 @@ def squared_distance(
         Float[Array, "1"]: The squared distance between the inputs.
     """
 
-    return jnp.sum((x - y) ** 2)
+    return jnp.sum((x - y) ** 2, axis=-1)
 
 
 def euclidean_distance(
