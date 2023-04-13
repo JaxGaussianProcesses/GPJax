@@ -139,14 +139,14 @@ class GaussianDistribution(dx.Distribution):
             self.event_shape[0] * (1.0 + jnp.log(2.0 * jnp.pi)) + self.scale.log_det()
         )
 
-    def log_prob(self, y: Float[Array, "N"]) -> Float[Array, "1"]:
+    def log_prob(self, y: Float[Array, "N"]) -> Float[Array, ""]:
         """Calculates the log pdf of the multivariate Gaussian.
 
         Args:
             y (Float[Array, "N"]): The value to calculate the log probability of.
 
         Returns:
-            Float[Array, "1"]: The log probability of the value.
+            Float[Array, ""]: The log probability of the value.
         """
         mu = self.loc
         sigma = self.scale
