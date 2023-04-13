@@ -20,7 +20,8 @@ import pytest
 from jax.config import config
 
 import gpjax as gpx
-from gpjax import RBF, Dataset, Gaussian, Prior, initialise
+from jaxutils import Dataset
+from gpjax import RBF, Gaussian, Prior, initialise
 from gpjax.abstractions import InferenceState, fit, fit_batches, fit_natgrads, get_batch
 from gpjax.parameters import ParameterState, build_bijectors
 
