@@ -29,7 +29,7 @@ from .linops import (
     LowerTriangularLinearOperator
 )
 
-from .config import get_global_config
+from jaxutils.config import get_global_config
 from .gps import Prior
 from .likelihoods import AbstractLikelihood, Gaussian
 from jaxutils.dict import concat_dictionaries
