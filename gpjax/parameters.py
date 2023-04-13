@@ -365,7 +365,7 @@ def build_trainables(params: Dict, status: bool = True) -> Dict:
     return prior_container
 
 
-def _stop_grad(param: Dict, trainable: Dict) -> Dict:
+def _stop_grad(param, trainable):
     """
     When taking a gradient, we want to stop the gradient from flowing through a
     parameter if it is not trainable. This is achieved using the model's
