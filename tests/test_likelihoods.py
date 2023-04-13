@@ -32,6 +32,7 @@ from gpjax.likelihoods import (
     AbstractLikelihood,
     Bernoulli,
     Gaussian,
+    Poisson,
     inv_probit,
 )
 
@@ -185,6 +186,28 @@ class TestBernoulli(BaseTestLikelihood):
         p = inv_probit(latent_mean / jnp.sqrt(1.0 + jnp.diagonal(latent_cov)))
         assert (pred_dist.mean() == p).all()
         assert (pred_dist.variance() == p * (1.0 - p)).all()
+
+
+class TestPoisson(BaseTestLikelihood):
+    likelihood = Poisson
+    fields = prod({})
+    params = {"test_initialisation": fields, "test_call": fields}
+    static_fields = ["num_datapoints"]
+
+    @staticmethod
+    def _test_call_check(
+        likelihood: AbstractLikelihood, latent_mean, latent_cov, latent_dist
+    ):
+
+        # Test call method.
+        pred_dist = likelihood(latent_dist)
+
+        # Check that the distribution is a Poisson.
+        assert isinstance(pred_dist, tfd.Poisson)
+
+        # Check predictive mean and variance.
+        rate = jnp.exp(latent_mean)
+        assert (pred_dist.mean() == rate).all()
 
 
 class TestAbstract(BaseTestLikelihood):
