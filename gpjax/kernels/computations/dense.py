@@ -13,11 +13,11 @@
 # limitations under the License.
 # ==============================================================================
 
-from beartype.typing import Callable, Dict
+from beartype.typing import Dict
 
 from jax import vmap
 from jaxtyping import Array, Float
-from .base import AbstractKernelComputation
+from .base import AbstractKernelComputation, KernelCallable
 
 
 class DenseKernelComputation(AbstractKernelComputation):
@@ -27,9 +27,7 @@ class DenseKernelComputation(AbstractKernelComputation):
 
     def __init__(
         self,
-        kernel_fn: Callable[
-            [Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array
-        ] = None,
+        kernel_fn: KernelCallable = None,
     ) -> None:
         super().__init__(kernel_fn)
 

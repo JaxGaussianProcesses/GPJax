@@ -26,28 +26,29 @@ from ...linops import (
     LinearOperator,
 )
 
+KernelCallable = Callable[
+    [Dict, Float[Array, "D"], Float[Array, "D"]], Float[Array, ""]
+]
 
 class AbstractKernelComputation(PyTree):
     """Abstract class for kernel computations."""
 
     def __init__(
         self,
-        kernel_fn: Callable[
-            [Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array
-        ] = None,
+        kernel_fn: KernelCallable = None,
     ) -> None:
         self._kernel_fn = kernel_fn
 
     @property
     def kernel_fn(
         self,
-    ) -> Callable[[Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array]:
+    ) -> KernelCallable:
         return self._kernel_fn
 
     @kernel_fn.setter
     def kernel_fn(
         self,
-        kernel_fn: Callable[[Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array],
+        kernel_fn: KernelCallable,
     ) -> None:
         self._kernel_fn = kernel_fn
 

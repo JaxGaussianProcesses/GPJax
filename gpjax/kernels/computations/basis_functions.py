@@ -1,8 +1,8 @@
-from beartype.typing import Callable, Dict
+from beartype.typing import Dict
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from .base import AbstractKernelComputation
+from .base import AbstractKernelComputation, KernelCallable
 from ...linops import DenseLinearOperator
 
 
@@ -11,9 +11,7 @@ class BasisFunctionComputation(AbstractKernelComputation):
 
     def __init__(
         self,
-        kernel_fn: Callable[
-            [Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array
-        ] = None,
+        kernel_fn: KernelCallable = None,
     ) -> None:
         """Initialise the computation engine for a basis function approximation to a kernel.
 
