@@ -129,13 +129,13 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
             value=jnp.sqrt(self.value), size=self.size
         )
 
-    def log_det(self) -> Float[Array, "1"]:
+    def log_det(self) -> Float[Array, ""]:
         """Log determinant.
 
         Returns:
-            Float[Array, "1"]: Log determinant of the covariance matrix.
+            Float[Array, ""]: Log determinant of the covariance matrix.
         """
-        return 2.0 * self.size * jnp.log(self.value)
+        return 2.0 * self.size * jnp.log(self.value.squeeze())
 
     def inverse(self) -> "ConstantDiagonalLinearOperator":
         """Inverse of the covariance operator.

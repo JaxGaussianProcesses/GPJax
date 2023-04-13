@@ -150,11 +150,11 @@ class DiagonalLinearOperator(LinearOperator):
         """
         return DiagonalLinearOperator(diag=jnp.sqrt(self.diagonal()))
 
-    def log_det(self) -> Float[Array, "1"]:
+    def log_det(self) -> Float[Array, ""]:
         """Log determinant.
 
         Returns:
-            Float[Array, "1"]: Log determinant of the covariance matrix.
+            Float[Array, ""]: Log determinant of the covariance matrix.
         """
         return jnp.sum(jnp.log(self.diagonal()))
 

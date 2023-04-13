@@ -131,11 +131,11 @@ class ZeroLinearOperator(LinearOperator):
         """
         return self
 
-    def log_det(self) -> Float[Array, "1"]:
+    def log_det(self) -> Float[Array, ""]:
         """Log determinant.
 
         Returns:
-            Float[Array, "1"]: Log determinant of the covariance matrix.
+            Float[Array, ""]: Log determinant of the covariance matrix.
         """
         return jnp.log(jnp.array(0.0))
 
