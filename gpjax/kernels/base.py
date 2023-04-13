@@ -96,13 +96,13 @@ class AbstractKernel(PyTree):
         """
         raise NotImplementedError
 
-    def slice_input(self, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
+    def slice_input(self, x: Float[Array, "... D"]) -> Float[Array, "... Q"]:
         """Select the relevant columns of the supplied matrix to be used within the kernel's evaluation.
 
         Args:
-            x (Float[Array, "N D"]): The matrix or vector that is to be sliced.
+            x (Float[Array, "... D"]): The matrix or vector that is to be sliced.
         Returns:
-            Float[Array, "N Q"]: A sliced form of the input matrix.
+            Float[Array, "... Q"]: A sliced form of the input matrix.
         """
         return x[..., self.active_dims] if self.active_dims is not None else x
 
