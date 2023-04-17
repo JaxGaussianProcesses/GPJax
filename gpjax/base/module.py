@@ -31,7 +31,9 @@ from orbax.checkpoint import (ArrayRestoreArgs, Checkpointer,
                               PyTreeCheckpointer, PyTreeCheckpointHandler,
                               RestoreArgs, SaveArgs)
 from simple_pytree import Pytree, static_field
-from typing_extensions import Self
+
+
+Self = TypeVar('T')
 
 
 class Module(Pytree):
@@ -49,7 +51,7 @@ class Module(Pytree):
             ):
                 cls._pytree__meta[field] = {**value.metadata}
 
-    def replace(self, **kwargs: Any) -> Self:
+    def replace(self: Self, **kwargs: Any) -> Self:
         """
         Replace the values of the fields of the object.
 
@@ -68,7 +70,7 @@ class Module(Pytree):
         pytree.__dict__.update(kwargs)
         return pytree
 
-    def replace_meta(self, **kwargs: Any) -> Self:
+    def replace_meta(self: Self, **kwargs: Any) -> Self:
         """
         Replace the metadata of the fields.
 
@@ -87,7 +89,7 @@ class Module(Pytree):
         pytree.__dict__.update(_pytree__meta={**pytree._pytree__meta, **kwargs})
         return pytree
 
-    def update_meta(self, **kwargs: Any) -> Self:
+    def update_meta(self: Self, **kwargs: Any) -> Self:
         """
         Update the metadata of the fields. The metadata must already exist.
 
@@ -112,15 +114,15 @@ class Module(Pytree):
         pytree.__dict__.update(_pytree__meta=new)
         return pytree
 
-    def replace_trainable(self: Module, **kwargs: Dict[str, bool]) -> Self:
+    def replace_trainable(self: Self, **kwargs: Dict[str, bool]) -> Self:
         """Replace the trainability status of local nodes of the Module."""
         return self.update_meta(**{k: {"trainable": v} for k, v in kwargs.items()})
 
-    def replace_bijector(self: Module, **kwargs: Dict[str, tfb.Bijector]) -> Self:
+    def replace_bijector(self: Self, **kwargs: Dict[str, tfb.Bijector]) -> Self:
         """Replace the bijectors of local nodes of the Module."""
         return self.update_meta(**{k: {"bijector": v} for k, v in kwargs.items()})
 
-    def constrain(self) -> Self:
+    def constrain(self: Self) -> Self:
         """Transform model parameters to the constrained space according to their defined bijectors.
 
         Returns:
@@ -137,7 +139,7 @@ class Module(Pytree):
 
         return meta_map(_apply_constrain, self)
 
-    def unconstrain(self) -> Self:
+    def unconstrain(self: Self) -> Self:
         """Transform model parameters to the unconstrained space according to their defined bijectors.
 
         Returns:
@@ -154,7 +156,7 @@ class Module(Pytree):
 
         return meta_map(_apply_unconstrain, self)
 
-    def stop_gradient(self) -> Self:
+    def stop_gradient(self: Self) -> Self:
         """Stop gradients flowing through the Module.
 
         Returns:
