@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .gps import ConjugatePosterior, NonConjugatePosterior
-    from .variational_families import AbstractVariationalFamily
+from .gps import ConjugatePosterior, NonConjugatePosterior
+from .variational_families import AbstractVariationalFamily
 
 from abc import abstractmethod
 from dataclasses import dataclass
