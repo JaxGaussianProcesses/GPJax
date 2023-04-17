@@ -78,8 +78,8 @@ class AbstractKernel(Module):
         raise NotImplementedError
 
     def __add__(
-        self, other: Union[AbstractKernel, ScalarFloat]
-    ) -> AbstractKernel:
+        self, other: Union["AbstractKernel", ScalarFloat]
+    ) -> "AbstractKernel":
         """Add two kernels together.
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
@@ -94,8 +94,8 @@ class AbstractKernel(Module):
             return SumKernel(kernels=[self, Constant(other)])
 
     def __radd__(
-        self, other: Union[AbstractKernel, ScalarFloat]
-    ) -> AbstractKernel:
+        self, other: Union["AbstractKernel", ScalarFloat]
+    ) -> "AbstractKernel":
         """Add two kernels together.
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
@@ -106,8 +106,8 @@ class AbstractKernel(Module):
         return self.__add__(other)
 
     def __mul__(
-        self, other: Union[AbstractKernel, ScalarFloat]
-    ) -> AbstractKernel:
+        self, other: Union["AbstractKernel", ScalarFloat]
+    ) -> "AbstractKernel":
         """Multiply two kernels together.
 
         Args:
