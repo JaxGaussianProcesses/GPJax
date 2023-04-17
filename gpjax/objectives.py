@@ -1,11 +1,5 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .gps import ConjugatePosterior, NonConjugatePosterior
-    from .variational_families import AbstractVariationalFamily
-
 from abc import abstractmethod
 from dataclasses import dataclass
 
@@ -48,7 +42,7 @@ class AbstractObjective(Module):
 
 class ConjugateMLL(AbstractObjective):
     def step(
-        self, posterior: ConjugatePosterior, train_data: Dataset
+        self, posterior: "gpjax.gps.ConjugatePosterior", train_data: Dataset
     ) -> Float[Array, "1"]:
         """Compute the marginal log-likelihood function of the Gaussian process.
         The returned function can then be used for gradient based optimisation
@@ -131,7 +125,7 @@ class ConjugateMLL(AbstractObjective):
 
 class NonConjugateMLL(AbstractObjective):
     def step(
-        self, posterior: NonConjugatePosterior, data: Dataset
+        self, posterior: "gpjax.gps.NonConjugatePosterior", data: Dataset
     ) -> Float[Array, "1"]:
         """
         Compute the marginal log-likelihood function of the Gaussian process.
@@ -190,7 +184,7 @@ class NonConjugateMLL(AbstractObjective):
 
 class ELBO(AbstractObjective):
     def step(
-        self, variational_family: AbstractVariationalFamily, train_data: Dataset
+        self, variational_family: "gpjax.variational_families.AbstractVariationalFamily", train_data: Dataset
     ) -> Float[Array, "1"]:
         """Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
@@ -233,7 +227,7 @@ LogPosteriorDensity = NonConjugateMLL
 
 
 def variational_expectation(
-    variational_family: AbstractVariationalFamily,
+    variational_family: "gpjax.variational_families.AbstractVariationalFamily",
     train_data: Dataset,
 ) -> Float[Array, "N 1"]:
     """Compute the expectation of our model's log-likelihood under our variational
@@ -279,7 +273,7 @@ class CollapsedELBO(AbstractObjective):
     """
 
     def step(
-        self, variational_family: AbstractVariationalFamily, train_data: Dataset
+        self, variational_family: "gpjax.variational_families.AbstractVariationalFamily", train_data: Dataset
     ) -> Float[Array, "1"]:
         """Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
