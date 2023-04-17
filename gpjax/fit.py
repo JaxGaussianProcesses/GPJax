@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Any, Optional, Tuple
+from beartype.typing import Any, Optional, Tuple
 
 import jax
 import jax.random as jr

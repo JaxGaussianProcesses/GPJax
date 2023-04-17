@@ -18,7 +18,7 @@ from __future__ import annotations
 __all__ = ["param_field"]
 
 import dataclasses
-from typing import Any, Mapping, Optional
+from beartype.typing import Any, Mapping, Optional
 
 import tensorflow_probability.substrates.jax.bijectors as tfb
 

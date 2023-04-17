@@ -20,7 +20,7 @@ __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
 import dataclasses
 import os
 from copy import copy, deepcopy
-from typing import Any, Callable, Dict, Iterable, List, Tuple
+from beartype.typing import Any, Callable, Dict, Iterable, List, Tuple, TypeVar
 
 import jax
 import jax.tree_util as jtu
