@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from beartype.typing import Optional
+from beartype.typing import Optional, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
@@ -31,8 +31,8 @@ class Dataset(Pytree):
         y (Optional[Float[Array, "N Q"]]): Output data.
     """
 
-    X: Optional[Float[Array, "N D"]] = None
-    y: Optional[Float[Array, "N Q"]] = None
+    X: Optional[Union[Float[Array, "N D"], Float[Array, "..."]]] = None
+    y: Optional[Union[Float[Array, "N Q"], Float[Array, "..."]]] = None
 
     def __post_init__(self) -> None:
         """Checks that the shapes of X and y are compatible."""
@@ -84,7 +84,7 @@ class Dataset(Pytree):
         return self.y.shape[1]
 
 
-def _check_shape(X: Optional[Float[Array, "N D"]], y: Optional[Float[Array, "N Q"]]) -> None:
+def _check_shape(X: Optional[Float[Array, "..."]], y: Optional[Float[Array, "..."]]) -> None:
     """Checks that the shapes of X and y are compatible."""
     if X is not None and y is not None:
         if X.shape[0] != y.shape[0]:
