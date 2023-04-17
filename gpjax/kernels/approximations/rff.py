@@ -32,7 +32,7 @@ class RFF(AbstractKernel):
     """
     base_kernel: AbstractKernel = None
     num_basis_fns: int = static_field(50)
-    frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity)
+    frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity())
     key: KeyArray = static_field(PRNGKey(123))
 
     def __post_init__(self) -> None:
