@@ -17,7 +17,7 @@ from .dataset import Dataset
 from .fit import fit
 from .gps import Prior, construct_posterior
 from .kernels import *
-from .likelihoods import Bernoulli, Gaussian
+from .likelihoods import Bernoulli, Gaussian, Poisson
 from .mean_functions import Constant, Zero
 from .objectives import (ELBO, CollapsedELBO, ConjugateMLL,
                          LogPosteriorDensity, NonConjugateMLL)
@@ -48,6 +48,7 @@ __all__ = [
     "SumKernel",
     "Bernoulli",
     "Gaussian",
+    "Poisson",
     "Constant",
     "Zero",
     "Dataset",

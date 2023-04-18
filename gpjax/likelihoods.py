@@ -191,5 +191,6 @@ __all__ = [
     "NonConjugate",
     "Gaussian",
     "Bernoulli",
+    "Poisson",
     "inv_probit",
 ]
