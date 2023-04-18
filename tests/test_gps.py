@@ -27,7 +27,7 @@ from gpjax.dataset import Dataset
 from gpjax.gps import (AbstractPosterior, AbstractPrior, ConjugatePosterior,
                        NonConjugatePosterior, Prior, construct_posterior)
 from gpjax.kernels import RBF, Matern12, Matern32, Matern52, AbstractKernel
-from gpjax.likelihoods import Bernoulli, Gaussian, AbstractLikelihood
+from gpjax.likelihoods import Bernoulli, Gaussian, Poisson, AbstractLikelihood
 from gpjax.mean_functions import Constant, Zero, AbstractMeanFunction
 from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.base import save_tree, load_tree
@@ -212,8 +212,8 @@ def test_posterior_construct(likelihood: AbstractLikelihood, num_datapoints: int
     if isinstance(likelihood, Gaussian):
         assert isinstance(posterior_mul, ConjugatePosterior)
 
-    # If the likelihood is Bernoulli, then the posterior should be non-conjugate.
-    if isinstance(likelihood, Bernoulli):
+    # If the likelihood is Bernoulli or Poisson, then the posterior should be non-conjugate.
+    if isinstance(likelihood, (Bernoulli, Poisson)):
         assert isinstance(posterior_mul, NonConjugatePosterior)
 
 
