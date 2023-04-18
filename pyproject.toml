@@ -65,6 +65,7 @@ blackjax = "^0.9.6"
 jaxopt = "^0.6"
 ipywidgets = "^8.0.5"
 pandas = "^1.5.3"
+geopandas = "^0.12.2"
 scikit-learn = "^1.2.2"
 flax = "^0.6.8"
 
