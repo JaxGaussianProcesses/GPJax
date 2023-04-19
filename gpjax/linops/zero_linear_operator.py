@@ -85,7 +85,7 @@ class ZeroLinearOperator(LinearOperator):
         check_shapes_match(self.shape, other.shape)
         return other
 
-    def __mul__(self, other: ScalarFloat) -> ZeroLinearOperator:
+    def __mul__(self, other: ScalarFloat) -> "ZeroLinearOperator":
         """Multiply covariance operator by scalar.
 
         Args:
@@ -99,7 +99,7 @@ class ZeroLinearOperator(LinearOperator):
 
     def __matmul__(
         self, other: Union[LinearOperator, Float[Array, "N M"]]
-    ) -> ZeroLinearOperator:
+    ) -> "ZeroLinearOperator":
         """Matrix multiplication.
 
         Args:
@@ -119,7 +119,7 @@ class ZeroLinearOperator(LinearOperator):
         """
         return jnp.zeros(self.shape)
 
-    def to_root(self) -> ZeroLinearOperator:
+    def to_root(self) -> "ZeroLinearOperator":
         """
         Root of the covariance operator.
 
@@ -153,7 +153,7 @@ class ZeroLinearOperator(LinearOperator):
         raise RuntimeError("ZeroLinearOperator is not invertible.")
 
     @classmethod
-    def from_root(cls, root: ZeroLinearOperator) -> ZeroLinearOperator:
+    def from_root(cls, root: "ZeroLinearOperator") -> "ZeroLinearOperator":
         """Construct covariance operator from the root.
 
         Args:
@@ -165,7 +165,7 @@ class ZeroLinearOperator(LinearOperator):
         return root
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> ZeroLinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "ZeroLinearOperator":
         """Construct covariance operator from the dense matrix.
 
         Args:

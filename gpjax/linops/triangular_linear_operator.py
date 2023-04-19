@@ -28,7 +28,7 @@ class LowerTriangularLinearOperator(DenseLinearOperator):
     """
 
     @property
-    def T(self) -> UpperTriangularLinearOperator:
+    def T(self) -> "UpperTriangularLinearOperator":
         return UpperTriangularLinearOperator(matrix=self.matrix.T)
 
     def to_root(self) -> LinearOperator:
@@ -52,7 +52,7 @@ class LowerTriangularLinearOperator(DenseLinearOperator):
         raise ValueError("LowerTriangularLinearOperator does not have a root.")
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> LowerTriangularLinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "LowerTriangularLinearOperator":
         return LowerTriangularLinearOperator(matrix=dense)
 
 
@@ -86,7 +86,7 @@ class UpperTriangularLinearOperator(DenseLinearOperator):
         raise ValueError("LowerTriangularLinearOperator does not have a root.")
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> UpperTriangularLinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "UpperTriangularLinearOperator":
         return UpperTriangularLinearOperator(matrix=dense)
 
 

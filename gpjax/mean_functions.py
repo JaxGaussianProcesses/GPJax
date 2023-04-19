@@ -43,8 +43,8 @@ class AbstractMeanFunction(Module):
         raise NotImplementedError
 
     def __add__(
-        self, other: Union[AbstractMeanFunction, Float[Array, "1"]]
-    ) -> AbstractMeanFunction:
+        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]
+    ) -> "AbstractMeanFunction":
         """Add two mean functions.
 
         Args:
@@ -60,8 +60,8 @@ class AbstractMeanFunction(Module):
         return SumMeanFunction([self, Constant(other)])
 
     def __radd__(
-        self, other: Union[AbstractMeanFunction, Float[Array, "1"]]
-    ) -> AbstractMeanFunction:
+        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]
+    ) -> "AbstractMeanFunction":
         """Add two mean functions.
 
         Args:
@@ -73,8 +73,8 @@ class AbstractMeanFunction(Module):
         return self.__add__(other)
 
     def __mul__(
-        self, other: Union[AbstractMeanFunction, Float[Array, "1"]]
-    ) -> AbstractMeanFunction:
+        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]
+    ) -> "AbstractMeanFunction":
         """Multiply two mean functions.
 
         Args:
@@ -89,8 +89,8 @@ class AbstractMeanFunction(Module):
         return ProductMeanFunction([self, Constant(other)])
 
     def __rmul__(
-        self, other: Union[AbstractMeanFunction, Float[Array, "1"]]
-    ) -> AbstractMeanFunction:
+        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]
+    ) -> "AbstractMeanFunction":
         """Multiply two mean functions.
 
         Args:

@@ -21,6 +21,7 @@ from beartype.typing import Any, Generic, Iterable, Mapping, Tuple, TypeVar, Uni
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 from simple_pytree import Pytree, static_field
+from gpjax.utils import ScalarFloat
 
 # Generic type.
 T = TypeVar("T")

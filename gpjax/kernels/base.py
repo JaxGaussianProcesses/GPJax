@@ -25,6 +25,7 @@ import jax
 from gpjax.utils import KeyArray
 from jaxtyping import Array, Float
 from simple_pytree import static_field
+import tensorflow_probability.substrates.jax.distributions as tfd
 
 from gpjax.utils import ScalarFloat
 from ..base import Module, param_field

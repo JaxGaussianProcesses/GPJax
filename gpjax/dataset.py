@@ -53,7 +53,7 @@ class Dataset(Pytree):
         """Returns `True` if the dataset is unsupervised."""
         return self.X is None and self.y is not None
 
-    def __add__(self, other: Dataset) -> Dataset:
+    def __add__(self, other: "Dataset") -> "Dataset":
         """Combine two datasets. Right hand dataset is stacked beneath the left."""
 
         X = None
