@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
 from beartype.typing import Any
 from dataclasses import dataclass

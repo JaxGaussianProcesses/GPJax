@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
 from dataclasses import dataclass
 from beartype.typing import Any, Union

@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
 __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
 
