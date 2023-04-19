@@ -37,15 +37,15 @@ key = jr.PRNGKey(123)
 # where $y$ is the count and the parameter $\lambda$ is the rate of the Poisson distribution.
 
 # We than set $\lambda = \exp(f)$ where $f$ is the latent Gaussian process. The exponential function is the _link function_ for the Poisson distribution: it maps the output of a GP to the positive real line, which is suitable for modeling count data.
-# 
+#
 # We simulate a dataset $\mathcal{D} = \{(\mathbf{X}, \mathbf{y})\}$ with inputs $\mathbf{X} \in \mathbb{R}^d$ and corresponding count outputs $\mathbf{y}$.
 # We store our data $\mathcal{D}$ as a GPJax `Dataset`.
 
 # %%
 key, subkey = jr.split(key)
-n = 20
+n = 50
 x = jr.uniform(key, shape=(n, 1), minval=-2.0, maxval=2.0)
-f = lambda x: 2. * jnp.sin(3 * x) # latent function
+f = lambda x: 2.0 * jnp.sin(3 * x) + 0.5 * x  # latent function
 y = jr.poisson(key, jnp.exp(f(x)))
 
 D = gpx.Dataset(X=x, y=y)
@@ -95,7 +95,7 @@ opt_posterior, history = gpx.fit(
     model=posterior,
     objective=negative_lpd,
     train_data=D,
-    optim=ox.adabelief(learning_rate=0.001),
+    optim=ox.adabelief(learning_rate=0.01),
     num_iters=1000,
 )
 
@@ -142,9 +142,9 @@ ax.legend(loc=2)
 # $\boldsymbol{f}$ at the data points $\boldsymbol{x}$ to get predictions over the
 # whole domain,
 #
-# \begin{align}
+# $$
 # p(f(\cdot)| \mathcal{D})  \approx q_{map}(f(\cdot)) := \int p(f(\cdot)| \boldsymbol{f}) \delta(\boldsymbol{f} - \hat{\boldsymbol{f}}) d \boldsymbol{f} = \mathcal{N}(\mathbf{K}_{\boldsymbol{(\cdot)x}}  \mathbf{K}_{\boldsymbol{xx}}^{-1} \hat{\boldsymbol{f}},  \mathbf{K}_{\boldsymbol{(\cdot, \cdot)}} - \mathbf{K}_{\boldsymbol{(\cdot)\boldsymbol{x}}} \mathbf{K}_{\boldsymbol{xx}}^{-1} \mathbf{K}_{\boldsymbol{\boldsymbol{x}(\cdot)}}).
-# \end{align}
+# $$
 
 # %% [markdown]
 # However, as a point estimate, MAP estimation is severely limited for uncertainty
@@ -160,15 +160,16 @@ ax.legend(loc=2)
 # $\boldsymbol{x}$, we can expand the log of this about the posterior mode
 # $\hat{\boldsymbol{f}}$ via a Taylor expansion. This gives:
 #
-# \begin{align}
+# $$
 # \log\tilde{p}(\boldsymbol{f}|\mathcal{D}) = \log\tilde{p}(\hat{\boldsymbol{f}}|\mathcal{D}) + \left[\nabla \log\tilde{p}({\boldsymbol{f}}|\mathcal{D})|_{\hat{\boldsymbol{f}}}\right]^{T} (\boldsymbol{f}-\hat{\boldsymbol{f}}) + \frac{1}{2} (\boldsymbol{f}-\hat{\boldsymbol{f}})^{T} \left[\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} \right] (\boldsymbol{f}-\hat{\boldsymbol{f}}) + \mathcal{O}(\lVert \boldsymbol{f} - \hat{\boldsymbol{f}} \rVert^3).
-# \end{align}
+# $$
 #
 # Since $\nabla \log\tilde{p}({\boldsymbol{f}}|\mathcal{D})$ is zero at the mode,
 # this suggests the following approximation
-# \begin{align}
+#
+# $$
 # \tilde{p}(\boldsymbol{f}|\mathcal{D}) \approx \log\tilde{p}(\hat{\boldsymbol{f}}|\mathcal{D}) \exp\left\{ \frac{1}{2} (\boldsymbol{f}-\hat{\boldsymbol{f}})^{T} \left[-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} \right] (\boldsymbol{f}-\hat{\boldsymbol{f}}) \right\}
-# \end{align},
+# $$
 #
 # that we identify as a Gaussian distribution,
 # $p(\boldsymbol{f}| \mathcal{D}) \approx q(\boldsymbol{f}) := \mathcal{N}(\hat{\boldsymbol{f}}, [-\nabla^2 \tilde{p}(\boldsymbol{y}|\boldsymbol{f})|_{\hat{\boldsymbol{f}}} ]^{-1} )$.
@@ -316,18 +317,18 @@ lpd(opt_posterior, D)
 
 # %%
 # Adapted from BlackJax's introduction notebook.
-num_adapt = 300
-num_samples = 300
+num_adapt = 500
+num_samples = 500
 
 lpd = jax.jit(gpx.LogPosteriorDensity(negative=False))
 unconstrained_lpd = jax.jit(lambda tree: lpd(tree.constrain(), D))
 
 adapt = blackjax.window_adaptation(
-    blackjax.nuts, unconstrained_lpd, num_adapt, target_acceptance_rate=0.7, initial_step_size=2
+    blackjax.nuts, unconstrained_lpd, num_adapt, target_acceptance_rate=0.65
 )
 
 # Initialise the chain
-last_state, kernel, _ = adapt.run(key, opt_posterior.unconstrain())
+last_state, kernel, _ = adapt.run(key, posterior.unconstrain())
 
 
 def inference_loop(rng_key, kernel, initial_state, num_samples):
@@ -386,7 +387,7 @@ ax2.set_title("Latent Function (index = 1)")
 # An ideal Markov chain would have samples completely uncorrelated with their
 # neighbours after a single lag. However, in practice, correlations often exist
 # within our chain's sample set. A commonly used technique to try and reduce this
-# correlation is _thinning_ whereby we select every $n$th sample where $n$ is the
+# correlation is _thinning_ whereby we select every $n$-th sample where $n$ is the
 # minimum lag length at which we believe the samples are uncorrelated. Although further
 # analysis of the chain's autocorrelation is required to find appropriate thinning
 # factors, we employ a thin factor of 10 for demonstration purposes.
@@ -434,6 +435,6 @@ ax.fill_between(
 
 # %%
 # %load_ext watermark
-# %watermark -n -u -v -iv -w -a "Thomas Pinder & Daniel Dodd"
+# %watermark -n -u -v -iv -w -a "Thomas Pinder & Daniel Dodd (edited by Francesco Zanetta)"
 
 # %%
