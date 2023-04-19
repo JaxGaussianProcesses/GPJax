@@ -93,7 +93,11 @@ def initialise(model, key: KeyArray = None, **kwargs) -> ParameterState:
     if kwargs:
         _validate_kwargs(kwargs, params)
         for k, v in kwargs.items():
-            params[k] = merge_dictionaries(params[k], v)
+            if isinstance(params[k], dict):
+                params[k] = merge_dictionaries(params[k], v)
+            else:
+                for i in range(len(params[k])):
+                    params[k][i] = merge_dictionaries(params[k][i], v[i])
 
     bijectors = build_bijectors(params)
     trainables = build_trainables(params)
