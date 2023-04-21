@@ -18,6 +18,7 @@ from dataclasses import dataclass
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from jaxtyping import Array, Float
+from gpjax.utils import ScalarFloat
 
 from ...base import param_field
 from ..base import AbstractKernel
@@ -27,14 +28,14 @@ from ..base import AbstractKernel
 class Linear(AbstractKernel):
     """The linear kernel."""
 
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Linear"
 
     def __call__(
         self,
         x: Float[Array, "D"],
         y: Float[Array, "D"],
-    ) -> Float[Array, "1"]:
+    ) -> ScalarFloat:
         """Evaluate the linear kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\\sigma`
 
         .. math::

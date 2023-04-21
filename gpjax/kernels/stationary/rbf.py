@@ -15,6 +15,7 @@
 
 from dataclasses import dataclass
 
+from beartype.typing import Union
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
@@ -30,10 +31,10 @@ from .utils import squared_distance
 class RBF(AbstractKernel):
     """The Radial Basis Function (RBF) kernel."""
 
-    lengthscale: Float[Array, "D"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
+    lengthscale: Union[ScalarFloat, Float[Array, "D"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
     )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "RBF"
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:

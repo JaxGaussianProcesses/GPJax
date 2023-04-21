@@ -19,6 +19,7 @@ import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 from jaxtyping import Array, Float
+from beartype.typing import Union
 from gpjax.utils import ScalarFloat
 
 from ...base import param_field
@@ -30,10 +31,10 @@ from .utils import build_student_t_distribution, euclidean_distance
 class Matern52(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 2.5."""
 
-    lengthscale: Float[Array, "D"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
+    lengthscale: Union[ScalarFloat, Float[Array, "D"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
     )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Matérn52"
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
