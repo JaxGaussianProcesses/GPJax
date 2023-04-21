@@ -19,7 +19,7 @@ __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
 import dataclasses
 import os
 from copy import copy, deepcopy
-from beartype.typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar
+from beartype.typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar, Union
 
 import jax
 import jax.tree_util as jtu
@@ -213,7 +213,7 @@ def meta_leaves(
 
     def _unpack_metadata(
         meta_leaf: Any,
-        pytree: Module,
+        pytree: Union[Module, Any],
         is_leaf: Optional[Callable[[Any], bool]],
     ):
         """Recursively unpack leaf metadata."""
@@ -236,8 +236,8 @@ def meta_leaves(
 
 
 def meta_flatten(
-    pytree: Module, *, is_leaf: Optional[Callable[[Any], bool]] = None
-) -> Module:
+    pytree: Union[Module, Any], *, is_leaf: Optional[Callable[[Any], bool]] = None
+) -> Union[Module, Any]:
     """
     Returns the meta of the Module.
 
@@ -255,10 +255,10 @@ def meta_flatten(
 
 def meta_map(
     f: Callable[[Any, Dict[str, Any]], Any],
-    pytree: Module,
+    pytree: Union[Module, Any],
     *rest: Any,
     is_leaf: Optional[Callable[[Any], bool]] = None,
-) -> Module:
+) -> Union[Module, Any]:
     """Apply a function to a Module where the first argument are the pytree leaves, and the second argument are the Module metadata leaves.
     Args:
         f (Callable[[Any, Dict[str, Any]], Any]): The function to apply to the pytree.
