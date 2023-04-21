@@ -177,7 +177,7 @@ class Module(Pytree):
         return meta_map(_apply_stop_grad, self)
 
 
-def _toplevel_meta(pytree: Any) -> List[Dict[str, Any]]:
+def _toplevel_meta(pytree: Any) -> List[Optional[Dict[str, Any]]]:
     """Unpacks a list of meta corresponding to the top-level nodes of the pytree.
 
     Args:
