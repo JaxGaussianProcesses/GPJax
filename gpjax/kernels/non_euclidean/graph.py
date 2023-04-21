@@ -20,6 +20,7 @@ import jax.numpy as jnp
 import tensorflow_probability.substrates.jax as tfp
 from jaxtyping import Array, Float, Int
 from simple_pytree import static_field
+from gpjax.utils import ScalarFloat
 
 from ...base import param_field
 from ..base import AbstractKernel
@@ -69,7 +70,7 @@ class GraphKernel(AbstractKernel):
         x: Float[Array, "D"],
         y: Float[Array, "D"],
         **kwargs,
-    ) -> Float[Array, ""]:
+    ) -> ScalarFloat:
         """Evaluate the graph kernel on a pair of vertices :math:`v_i, v_j`.
 
         Args:
@@ -77,7 +78,7 @@ class GraphKernel(AbstractKernel):
             y (Float[Array, "D"]): Index of the jth vertex.
 
         Returns:
-            Float[Array, ""]: The value of :math:`k(v_i, v_j)`.
+            ScalarFloat: The value of :math:`k(v_i, v_j)`.
         """
         S = kwargs["S"]
         Kxx = (jax_gather_nd(self.eigenvectors, x) * S.squeeze()) @ jnp.transpose(

@@ -128,11 +128,11 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
             value=jnp.sqrt(self.value), size=self.size
         )
 
-    def log_det(self) -> Float[Array, ""]:
+    def log_det(self) -> ScalarFloat:
         """Log determinant.
 
         Returns:
-            Float[Array, ""]: Log determinant of the covariance matrix.
+            ScalarFloat: Log determinant of the covariance matrix.
         """
         return 2.0 * self.size * jnp.log(self.value.squeeze())
 

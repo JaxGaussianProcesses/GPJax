@@ -19,6 +19,7 @@ import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 from jaxtyping import Array, Float
+from gpjax.utils import ScalarFloat
 
 from ...base import param_field
 from ..base import AbstractKernel
@@ -35,7 +36,7 @@ class Matern12(AbstractKernel):
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
     name: str = "Matérn12"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, ""]:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
         lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
 
@@ -46,7 +47,7 @@ class Matern12(AbstractKernel):
             x (Float[Array, "D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "D"]): The right hand argument of the kernel function's call
         Returns:
-            Float[Array, ""]: The value of :math:`k(x, y)`
+            ScalarFloat: The value of :math:`k(x, y)`
         """
         x = self.slice_input(x) / self.lengthscale
         y = self.slice_input(y) / self.lengthscale

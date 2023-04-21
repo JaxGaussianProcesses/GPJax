@@ -19,6 +19,7 @@ from beartype.typing import Any, Optional, Tuple
 import jax.numpy as jnp
 import jax.random as jr
 from gpjax.utils import KeyArray
+from gpjax.utils import ScalarFloat
 from jax import vmap
 from jaxtyping import Array, Float
 import tensorflow_probability.substrates.jax as tfp
@@ -133,20 +134,20 @@ class GaussianDistribution(tfd.Distribution):
         """Returns the event shape."""
         return self.loc.shape[-1:]
 
-    def entropy(self) -> Float[Array, ""]:
+    def entropy(self) -> ScalarFloat:
         """Calculates the entropy of the distribution."""
         return 0.5 * (
             self.event_shape[0] * (1.0 + jnp.log(2.0 * jnp.pi)) + self.scale.log_det()
         )
 
-    def log_prob(self, y: Float[Array, "N"]) -> Float[Array, ""]:
+    def log_prob(self, y: Float[Array, "N"]) -> ScalarFloat:
         """Calculates the log pdf of the multivariate Gaussian.
 
         Args:
             y (Float[Array, "N"]): The value to calculate the log probability of.
 
         Returns:
-            Float[Array, ""]: The log probability of the value.
+            ScalarFloat: The log probability of the value.
         """
         mu = self.loc
         sigma = self.scale
@@ -184,7 +185,7 @@ class GaussianDistribution(tfd.Distribution):
         """See `Distribution.sample`."""
         return self._sample_n(seed, sample_shape[0])  # TODO this looks weird, why ignore the second entry?
 
-    def kl_divergence(self, other: "GaussianDistribution") -> Float[Array, ""]:
+    def kl_divergence(self, other: "GaussianDistribution") -> ScalarFloat:
         return _kl_divergence(self, other)
 
 
@@ -201,14 +202,14 @@ def _check_and_return_dimension(
     return q.event_shape[-1]
 
 
-def _frobenius_norm_squared(matrix: Float[Array, "N N"]) -> Float[Array, ""]:
+def _frobenius_norm_squared(matrix: Float[Array, "N N"]) -> ScalarFloat:
     """Calculates the squared Frobenius norm of a matrix."""
     return jnp.sum(jnp.square(matrix))
 
 
 def _kl_divergence(
     q: GaussianDistribution, p: GaussianDistribution
-) -> Float[Array, ""]:
+) -> ScalarFloat:
     """Computes the KL divergence, KL[q||p], between two multivariate Gaussian distributions
         q(x) = N(x; μq, Σq) and p(x) = N(x; μp, Σp).
 
@@ -217,7 +218,7 @@ def _kl_divergence(
         p (GaussianDistribution): A multivariate Gaussian distribution.
 
     Returns:
-        Float[Array, ""]: The KL divergence between q and p.
+        ScalarFloat: The KL divergence between q and p.
     """
 
     n_dim = _check_and_return_dimension(q, p)

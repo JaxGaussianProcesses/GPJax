@@ -30,6 +30,7 @@ from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .linops import (DenseLinearOperator, LowerTriangularLinearOperator,
                      identity)
+from gpjax.utils import ScalarFloat
 
 
 @dataclass
@@ -107,7 +108,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         if self.variational_root_covariance is None:
             self.variational_root_covariance = jnp.eye(self.num_inducing)
 
-    def prior_kl(self) -> Float[Array, ""]:
+    def prior_kl(self) -> ScalarFloat:
         """
         Compute the KL-divergence between our variational approximation and the
         Gaussian process prior.
@@ -117,7 +118,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         inputs.
 
         Returns:
-             Float[Array, ""]: The KL-divergence between our variational
+             ScalarFloat: The KL-divergence between our variational
                 approximation and the GP prior.
         """
 
@@ -217,14 +218,14 @@ class WhitenedVariationalGaussian(VariationalGaussian):
     over μ and sqrt with S = sqrt sqrtᵀ.
     """
 
-    def prior_kl(self) -> Float[Array, ""]:
+    def prior_kl(self) -> ScalarFloat:
         """Compute the KL-divergence between our variational approximation and
         the Gaussian process prior.
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(0, I)].
 
         Returns:
-            Float[Array, ""]: The KL-divergence between our variational
+            ScalarFloat: The KL-divergence between our variational
                 approximation and the GP prior.
         """
 
@@ -317,7 +318,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         if self.natural_matrix is None:
             self.natural_matrix = -0.5 * jnp.eye(self.num_inducing)
 
-    def prior_kl(self) -> Float[Array, ""]:
+    def prior_kl(self) -> ScalarFloat:
         """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],
@@ -325,7 +326,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         with μ and S computed from the natural parameterisation θ = (S⁻¹μ, -S⁻¹/2).
 
         Returns:
-            Float[Array, ""]: The KL-divergence between our variational approximation and the GP prior.
+            ScalarFloat: The KL-divergence between our variational approximation and the GP prior.
         """
 
         # Unpack variational parameters
@@ -464,7 +465,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         if self.expectation_matrix is None:
             self.expectation_matrix = jnp.eye(self.num_inducing)
 
-    def prior_kl(self) -> Float[Array, ""]:
+    def prior_kl(self) -> ScalarFloat:
         """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],
@@ -472,7 +473,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         with μ and S computed from the expectation parameterisation η = (μ, S + uuᵀ).
 
         Returns:
-            Float[Array, ""]: The KL-divergence between our variational approximation and the GP prior.
+            ScalarFloat: The KL-divergence between our variational approximation and the GP prior.
         """
 
         # Unpack variational parameters

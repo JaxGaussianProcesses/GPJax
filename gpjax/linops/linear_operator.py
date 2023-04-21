@@ -123,19 +123,19 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
 
         raise NotImplementedError
 
-    def trace(self) -> Float[Array, ""]:
+    def trace(self) -> ScalarFloat:
         """Trace of the linear matrix.
 
         Returns:
-            Float[Array, ""]: Trace of the linear matrix.
+            ScalarFloat: Trace of the linear matrix.
         """
         return jnp.sum(self.diagonal())
 
-    def log_det(self) -> Float[Array, ""]:
+    def log_det(self) -> ScalarFloat:
         """Log determinant of the linear matrix. Default implementation uses dense Cholesky decomposition.
 
         Returns:
-            Float[Array, ""]: Log determinant of the linear matrix.
+            ScalarFloat: Log determinant of the linear matrix.
         """
 
         root = self.to_root()

@@ -23,6 +23,7 @@ import jax.numpy as jnp
 import jax.random
 import jax
 from gpjax.utils import KeyArray
+from gpjax.utils import ScalarFloat
 from jaxtyping import Array, Float
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax.distributions as tfd
@@ -65,7 +66,7 @@ class AbstractKernel(Module):
         self,
         x: Float[Array, "D"],
         y: Float[Array, "D"],
-    ) -> Float[Array, ""]:
+    ) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs.
 
         Args:
@@ -73,7 +74,7 @@ class AbstractKernel(Module):
             y (Float[Array, "D"]): The right hand input of the kernel function.
 
         Returns:
-            Float[Array, ""]: The evaluated kernel function at the supplied inputs.
+            ScalarFloat: The evaluated kernel function at the supplied inputs.
         """
         raise NotImplementedError
 
@@ -135,7 +136,7 @@ class Constant(AbstractKernel):
 
     constant: Float[Array, "1"] = param_field(jnp.array(0.0))
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, ""]:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs.
 
         Args:
@@ -143,7 +144,7 @@ class Constant(AbstractKernel):
             y (Float[Array, "D"]): The right hand input of the kernel function.
 
         Returns:
-            Float[Array, ""]: The evaluated kernel function at the supplied inputs.
+            ScalarFloat: The evaluated kernel function at the supplied inputs.
         """
         return self.constant.squeeze()
 
@@ -174,7 +175,7 @@ class CombinationKernel(AbstractKernel):
         self,
         x: Float[Array, "D"],
         y: Float[Array, "D"],
-    ) -> Float[Array, ""]:
+    ) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs.
 
         Args:
@@ -182,7 +183,7 @@ class CombinationKernel(AbstractKernel):
             y (Float[Array, "D"]): The right hand input of the kernel function.
 
         Returns:
-            Float[Array, ""]: The evaluated kernel function at the supplied inputs.
+            ScalarFloat: The evaluated kernel function at the supplied inputs.
         """
         return self.operator(jnp.stack([k(x, y) for k in self.kernels]))
 

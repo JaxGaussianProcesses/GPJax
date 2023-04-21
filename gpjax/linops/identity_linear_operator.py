@@ -19,6 +19,7 @@ from dataclasses import dataclass
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
+from gpjax.utils import ScalarFloat
 
 from gpjax.linops.constant_diagonal_linear_operator import \
     ConstantDiagonalLinearOperator
@@ -72,11 +73,11 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         """
         return self
 
-    def log_det(self) -> Float[Array, ""]:
+    def log_det(self) -> ScalarFloat:
         """Log determinant.
 
         Returns:
-            Float[Array, ""]: Log determinant of the covariance matrix.
+            ScalarFloat: Log determinant of the covariance matrix.
         """
         return jnp.array(0.0)
 
