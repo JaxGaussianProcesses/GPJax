@@ -24,6 +24,8 @@ ScalarBool = Union[bool, Bool[Array, ""]]
 ScalarInt = Union[int, Int[Array, ""]]
 ScalarFloat = Union[float, Float[Array, ""]]
 
+VecNOrMatNM = Union[Float[Array, "N"], Float[Array, "N M"]]
+
 __all__ = [
     "KeyArray",
     "ScalarBool",

@@ -23,7 +23,7 @@ from jaxtyping import Array, Float
 
 from gpjax.linops.linear_operator import LinearOperator
 from gpjax.linops.utils import to_linear_operator
-from gpjax.utils import ScalarFloat
+from gpjax.utils import ScalarFloat, VecNOrMatNM
 
 
 def _check_matrix(matrix: Array) -> None:
@@ -127,7 +127,7 @@ class DenseLinearOperator(LinearOperator):
         """
         return jnp.diag(self.matrix)
 
-    def __matmul__(self, other: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def __matmul__(self, other: VecNOrMatNM) -> VecNOrMatNM:
         """Matrix multiplication.
 
         Args:

@@ -23,7 +23,7 @@ from jaxtyping import Array, Float
 from .dense_linear_operator import DenseLinearOperator
 from .linear_operator import LinearOperator
 from .utils import to_linear_operator
-from gpjax.utils import ScalarFloat
+from gpjax.utils import ScalarFloat, VecNOrMatNM
 
 
 def _check_diag(diag: Any) -> None:
@@ -126,7 +126,7 @@ class DiagonalLinearOperator(LinearOperator):
         """
         return jnp.diag(self.diagonal())
 
-    def __matmul__(self, other: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def __matmul__(self, other: VecNOrMatNM) -> VecNOrMatNM:
         """Matrix multiplication.
 
         Args:
@@ -166,7 +166,7 @@ class DiagonalLinearOperator(LinearOperator):
         """
         return DiagonalLinearOperator(diag=1.0 / self.diagonal())
 
-    def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
+    def solve(self, rhs: VecNOrMatNM) -> VecNOrMatNM:
         """Solve linear system.
 
         Args:
