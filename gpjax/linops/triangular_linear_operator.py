@@ -41,12 +41,6 @@ class LowerTriangularLinearOperator(DenseLinearOperator):
     def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
         return jsp.linalg.solve_triangular(self.to_dense(), rhs, lower=True)
 
-    def __matmul__(self, other):
-        return super().__matmul__(other)
-
-    def __add__(self, other):
-        return super().__matmul__(other)
-
     @classmethod
     def from_root(cls, root: LinearOperator) -> None:
         raise ValueError("LowerTriangularLinearOperator does not have a root.")
@@ -71,12 +65,6 @@ class UpperTriangularLinearOperator(DenseLinearOperator):
     def inverse(self) -> DenseLinearOperator:
         matrix = self.solve(jnp.eye(self.size))
         return DenseLinearOperator(matrix)
-
-    def __matmul__(self, other):
-        return super().__matmul__(other)
-
-    def __add__(self, other):
-        return super().__matmul__(other)
 
     def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
         return jsp.linalg.solve_triangular(self.to_dense(), rhs, lower=False)
