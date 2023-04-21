@@ -10,6 +10,7 @@ from jaxtyping import Array, Float
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax as tfp
 
+from gpjax.utils import ScalarFloat
 from .base import Module
 from .dataset import Dataset
 from .gaussian_distribution import GaussianDistribution
@@ -30,11 +31,11 @@ class AbstractObjective(Module):
     def __hash__(self):
         return hash(tuple(jtu.tree_leaves(self)))  # Probably put this on the Module!
 
-    def __call__(self, *args, **kwargs) -> Float[Array, "1"]:
+    def __call__(self, *args, **kwargs) -> ScalarFloat:
         return self.step(*args, **kwargs)
 
     @abstractmethod
-    def step(self, *args, **kwargs) -> Float[Array, "1"]:
+    def step(self, *args, **kwargs) -> ScalarFloat:
         raise NotImplementedError
 
 
@@ -42,7 +43,7 @@ class AbstractObjective(Module):
 class ConjugateMLL(AbstractObjective):
     def step(
         self, posterior: "gpjax.gps.ConjugatePosterior", train_data: Dataset
-    ) -> Float[Array, "1"]:
+    ) -> ScalarFloat:
         """Compute the marginal log-likelihood function of the Gaussian process.
         The returned function can then be used for gradient based optimisation
         of the model's parameters or for model comparison. The implementation
@@ -100,7 +101,7 @@ class ConjugateMLL(AbstractObjective):
                 Defaults to False.
 
         Returns:
-            Callable[[Parameters], Float[Array, "1"]]: A functional representation
+            Callable[[Parameters], ScalarFloat]: A functional representation
                 of the marginal log-likelihood that can be evaluated at a
                 given parameter set.
         """
@@ -125,7 +126,7 @@ class ConjugateMLL(AbstractObjective):
 class NonConjugateMLL(AbstractObjective):
     def step(
         self, posterior: "gpjax.gps.NonConjugatePosterior", data: Dataset
-    ) -> Float[Array, "1"]:
+    ) -> ScalarFloat:
         """
         Compute the marginal log-likelihood function of the Gaussian process.
         The returned function can then be used for gradient based optimisation
@@ -151,7 +152,7 @@ class NonConjugateMLL(AbstractObjective):
                 to maximisation of the marginal log-likelihood. Defaults to False.
 
         Returns:
-            Callable[[Parameters], Float[Array, "1"]]: A functional representation
+            Callable[[Parameters], ScalarFloat]: A functional representation
                 of the marginal log-likelihood that can be evaluated at a given
                 parameter set.
         """
@@ -184,7 +185,7 @@ class NonConjugateMLL(AbstractObjective):
 class ELBO(AbstractObjective):
     def step(
         self, variational_family: "gpjax.variational_families.AbstractVariationalFamily", train_data: Dataset
-    ) -> Float[Array, "1"]:
+    ) -> ScalarFloat:
         """Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
         approximation. To this, we sum the KL divergence from the variational posterior
@@ -273,7 +274,7 @@ class CollapsedELBO(AbstractObjective):
 
     def step(
         self, variational_family: "gpjax.variational_families.AbstractVariationalFamily", train_data: Dataset
-    ) -> Float[Array, "1"]:
+    ) -> ScalarFloat:
         """Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
         approximation. To this, we sum the KL divergence from the variational posterior

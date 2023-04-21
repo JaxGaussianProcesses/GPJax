@@ -24,6 +24,7 @@ from jaxtyping import Array, Float
 from jaxlib.xla_extension import PjitFunction
 from warnings import warn
 
+from gpjax.utils import ScalarFloat
 from .base import Module
 from .dataset import Dataset
 from .objectives import AbstractObjective
@@ -117,7 +118,7 @@ def fit(
         _check_verbose(verbose)
 
     # Unconstrained space loss function with stop-gradient rule for non-trainable params.
-    def loss(model: Module, batch: Dataset) -> Float[Array, "1"]:
+    def loss(model: Module, batch: Dataset) -> ScalarFloat:
         model = model.stop_gradient()
         return objective(model.constrain(), batch)
 
