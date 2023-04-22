@@ -1,4 +1,4 @@
-import matplotlib.transforms as transforms
+from matplotlib import transforms
 import numpy as np
 from matplotlib.patches import Ellipse
 import typing as tp
