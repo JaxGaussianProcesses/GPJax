@@ -15,17 +15,17 @@ nav:
     - 🔪 Sharp bits: sharp_bits.md
     - 📎 JAX 101 [External]: https://jax.readthedocs.io/en/latest/jax-101/index.html
   - 💡 Background:
-    - Intro to GPs: examples/intro_to_gps.ipynb
+    - Intro to GPs: examples/intro_to_gps.py
   - 🎓 Tutorials:
-    - Regression: examples/regression.ipynb
-    - Classification: examples/classification.ipynb
-    - Barycentres: examples/barycentres.ipynb
-    - Deep kernel learning: examples/deep_kernels.ipynb
-    - Graph kernels: examples/graph_kernels.ipynb
-    - Sparse GPs: examples/uncollapsed_vi.ipynb
-    - Stochastic sparse GPs: examples/collapsed_vi.ipynb
-    - Kernels: examples/kernels.ipynb
-    - UCI regression: examples/yacht.ipynb
+    - Regression: examples/regression.py
+    - Classification: examples/classification.py
+    - Barycentres: examples/barycentres.py
+    - Deep kernel learning: examples/deep_kernels.py
+    - Graph kernels: examples/graph_kernels.py
+    - Sparse GPs: examples/uncollapsed_vi.py
+    - Stochastic sparse GPs: examples/collapsed_vi.py
+    - Kernels: examples/kernels.py
+    - UCI regression: examples/yacht.py
   - 📕 Reference: api/
 
 theme:

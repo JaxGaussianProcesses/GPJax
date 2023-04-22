@@ -150,6 +150,7 @@ convention = "numpy"
 "tests/test_base/test_module.py" = ["PLR0915"]
 "tests/test_linops/test_linear_operator.py" = ["PLR0913"]
 "tests/test_objectives.py" = ["PLR0913"]
+"docs/examples/barycentres.py" = ["PLR0913"]
 
 [tool.isort]
 profile = "black"
