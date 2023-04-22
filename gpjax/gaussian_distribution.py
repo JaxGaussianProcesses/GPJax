@@ -17,17 +17,18 @@ from typing import Any, Optional, Tuple
 
 import jax.numpy as jnp
 import jax.random as jr
+import tensorflow_probability.substrates.jax as tfp
 from jax import vmap
 from jax.random import KeyArray
 from jaxtyping import Array, Float
-import tensorflow_probability.substrates.jax as tfp
 
-from .linops import IdentityLinearOperator, LinearOperator
+from gpjax.linops import IdentityLinearOperator, LinearOperator
+
 tfd = tfp.distributions
+
 
 def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
     """Checks that the inputs are correct."""
-
     if loc is None and scale is None:
         raise ValueError("At least one of `loc` or `scale` must be specified.")
 
@@ -67,7 +68,8 @@ class GaussianDistribution(tfd.Distribution):
         loc (Optional[Float[Array, "N"]]): The mean of the distribution. Defaults to None.
         scale (Optional[LinearOperator]): The scale matrix of the distribution. Defaults to None.
 
-    Returns:
+    Returns
+    -------
         GaussianDistribution: A multivariate Gaussian distribution with a linear operator scale matrix.
     """
 
@@ -82,7 +84,6 @@ class GaussianDistribution(tfd.Distribution):
         scale: Optional[LinearOperator] = None,
     ) -> None:
         """Initialises the distribution."""
-
         _check_loc_scale(loc, scale)
 
         # Find dimensionality of the distribution.
@@ -144,7 +145,8 @@ class GaussianDistribution(tfd.Distribution):
         Args:
             y (Float[Array, "N"]): The value to calculate the log probability of.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "1"]: The log probability of the value.
         """
         mu = self.loc
@@ -165,7 +167,8 @@ class GaussianDistribution(tfd.Distribution):
         Args:
             key (KeyArray): The key to use for sampling.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "n N"]: The samples.
         """
         # Obtain covariance root.
@@ -175,13 +178,16 @@ class GaussianDistribution(tfd.Distribution):
         Z = jr.normal(key, shape=(n, *self.event_shape))
 
         # xᵢ ~ N(loc, cov) <=> xᵢ = loc + sqrt zᵢ, where zᵢ ~ N(0, I).
-        affine_transformation = lambda x: self.loc + sqrt @ x
+        def affine_transformation(x):
+            return self.loc + sqrt @ x
 
         return vmap(affine_transformation)(Z)
 
-    def sample(self,seed: KeyArray, sample_shape: Tuple[int, int]):  # pylint: disable=useless-super-delegation
-      """See `Distribution.sample`."""
-      return self._sample_n(seed, sample_shape[0])
+    def sample(
+        self, seed: KeyArray, sample_shape: Tuple[int, int]
+    ):  # pylint: disable=useless-super-delegation
+        """See `Distribution.sample`."""
+        return self._sample_n(seed, sample_shape[0])
 
     def kl_divergence(self, other: "GaussianDistribution") -> Float[Array, "1"]:
         return _kl_divergence(self, other)
@@ -215,10 +221,10 @@ def _kl_divergence(
         q (GaussianDistribution): A multivariate Gaussian distribution.
         p (GaussianDistribution): A multivariate Gaussian distribution.
 
-    Returns:
+    Returns
+    -------
         Float[Array, "1"]: The KL divergence between q and p.
     """
-
     n_dim = _check_and_return_dimension(q, p)
 
     # Extract q mean and covariance.

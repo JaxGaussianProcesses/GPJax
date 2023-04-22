@@ -3,9 +3,8 @@ from dataclasses import dataclass
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 
+from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.linops import DenseLinearOperator
-
-from .base import AbstractKernelComputation
 
 
 @dataclass
@@ -19,11 +18,11 @@ class BasisFunctionComputation(AbstractKernelComputation):
     ) -> Float[Array, "N M"]:
         """For a pair of inputs, compute the cross covariance matrix between the inputs.
         Args:
-            params (Dict): A dictionary of parameters for which the cross-covariance matrix should be constructed with.
             x: A N x D array of inputs.
             y: A M x D array of inputs.
 
-        Returns:
+        Returns
+        -------
             _type_: A N x M array of cross-covariances.
         """
         z1 = self.compute_features(x)
@@ -35,10 +34,10 @@ class BasisFunctionComputation(AbstractKernelComputation):
         """For the Gram matrix, we can save computations by computing only one matrix multiplication between the inputs and the scaled frequencies.
 
         Args:
-            params (Dict): A dictionary of parameters for which the Gram matrix should be constructed with.
             inputs: A N x D array of inputs.
 
-        Returns:
+        Returns
+        -------
             DenseLinearOperator: A dense linear operator representing the N x N Gram matrix.
         """
         z1 = self.compute_features(inputs)
@@ -53,7 +52,8 @@ class BasisFunctionComputation(AbstractKernelComputation):
             x: A N x D array of inputs.
             frequencies: A M x D array of frequencies.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N L"]: A N x L array of features where L = 2M.
         """
         frequencies = self.kernel.frequencies

@@ -17,12 +17,11 @@ from dataclasses import dataclass
 
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
-import tensorflow_probability.substrates.jax.distributions as tfd
 from jaxtyping import Array, Float
 
-from ...base import param_field
-from ..base import AbstractKernel
-from .utils import euclidean_distance
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.utils import euclidean_distance
 
 
 @dataclass
@@ -50,7 +49,8 @@ class PoweredExponential(AbstractKernel):
             x (Float[Array, "D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "D"]): The right hand argument of the kernel function's call
 
-        Returns:
+        Returns
+        -------
             Float[Array, "1"]: The value of :math:`k(x, y)`
         """
         x = self.slice_input(x) / self.lengthscale

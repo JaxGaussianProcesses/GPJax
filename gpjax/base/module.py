@@ -20,25 +20,28 @@ __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
 import dataclasses
 import os
 from copy import copy, deepcopy
-from typing import Any, Callable, Dict, Iterable, List, Tuple
+from typing import Any, Callable, Iterable
 
 import jax
 import jax.tree_util as jtu
 import tensorflow_probability.substrates.jax.bijectors as tfb
-from jax import lax
 from jax._src.tree_util import _registry
-from orbax.checkpoint import (ArrayRestoreArgs, Checkpointer,
-                              PyTreeCheckpointer, PyTreeCheckpointHandler,
-                              RestoreArgs, SaveArgs)
+from orbax.checkpoint import (
+    ArrayRestoreArgs,
+    Checkpointer,
+    PyTreeCheckpointHandler,
+    RestoreArgs,
+    SaveArgs,
+)
 from simple_pytree import Pytree, static_field
 from typing_extensions import Self
 
 
 class Module(Pytree):
-    _pytree__meta: Dict[str, Any] = static_field()
+    _pytree__meta: dict[str, Any] = static_field()
 
     def __init_subclass__(cls, mutable: bool = False):
-        cls._pytree__meta = dict()
+        cls._pytree__meta = {}
         super().__init_subclass__(mutable=mutable)
         class_vars = vars(cls)
         for field, value in class_vars.items():
@@ -56,7 +59,8 @@ class Module(Pytree):
         Args:
             **kwargs: keyword arguments to replace the fields of the object.
 
-        Returns:
+        Returns
+        -------
             Module: with the fields replaced.
         """
         fields = vars(self)
@@ -75,7 +79,8 @@ class Module(Pytree):
         Args:
             **kwargs: keyword arguments to replace the metadata of the fields of the object.
 
-        Returns:
+        Returns
+        -------
             Module: with the metadata of the fields replaced.
         """
         fields = vars(self)
@@ -94,7 +99,8 @@ class Module(Pytree):
         Args:
             **kwargs: keyword arguments to replace the fields of the object.
 
-        Returns:
+        Returns
+        -------
             Module: with the fields replaced.
         """
         fields = vars(self)
@@ -112,18 +118,19 @@ class Module(Pytree):
         pytree.__dict__.update(_pytree__meta=new)
         return pytree
 
-    def replace_trainable(self: Module, **kwargs: Dict[str, bool]) -> Self:
+    def replace_trainable(self: Module, **kwargs: dict[str, bool]) -> Self:
         """Replace the trainability status of local nodes of the Module."""
         return self.update_meta(**{k: {"trainable": v} for k, v in kwargs.items()})
 
-    def replace_bijector(self: Module, **kwargs: Dict[str, tfb.Bijector]) -> Self:
+    def replace_bijector(self: Module, **kwargs: dict[str, tfb.Bijector]) -> Self:
         """Replace the bijectors of local nodes of the Module."""
         return self.update_meta(**{k: {"bijector": v} for k, v in kwargs.items()})
 
     def constrain(self) -> Self:
         """Transform model parameters to the constrained space according to their defined bijectors.
 
-        Returns:
+        Returns
+        -------
             Module: tranformed to the constrained space.
         """
 
@@ -140,7 +147,8 @@ class Module(Pytree):
     def unconstrain(self) -> Self:
         """Transform model parameters to the unconstrained space according to their defined bijectors.
 
-        Returns:
+        Returns
+        -------
             Module: tranformed to the unconstrained space.
         """
 
@@ -157,7 +165,8 @@ class Module(Pytree):
     def stop_gradient(self) -> Self:
         """Stop gradients flowing through the Module.
 
-        Returns:
+        Returns
+        -------
             Module: with gradients stopped.
         """
 
@@ -176,13 +185,14 @@ class Module(Pytree):
         return meta_map(_apply_stop_grad, self)
 
 
-def _toplevel_meta(pytree: Any) -> List[Dict[str, Any]]:
+def _toplevel_meta(pytree: Any) -> list[dict[str, Any]]:
     """Unpacks a list of meta corresponding to the top-level nodes of the pytree.
 
     Args:
         pytree (Any): pytree to unpack the meta from.
 
-    Returns:
+    Returns
+    -------
         List[Dict[str, Any]]: meta of the top-level nodes of the pytree.
     """
     if isinstance(pytree, Iterable):
@@ -198,7 +208,7 @@ def meta_leaves(
     pytree: Module,
     *,
     is_leaf: Callable[[Any], bool] | None = None,
-) -> List[Tuple[Dict[str, Any], Any]]:
+) -> list[tuple[dict[str, Any], Any]]:
     """
     Returns the meta of the leaves of the pytree.
 
@@ -206,7 +216,8 @@ def meta_leaves(
         pytree (Module): pytree to get the meta of.
         is_leaf (Callable[[Any], bool]): predicate to determine if a node is a leaf. Defaults to None.
 
-    Returns:
+    Returns
+    -------
         List[Tuple[Dict[str, Any], Any]]: meta of the leaves of the pytree.
     """
 
@@ -244,7 +255,8 @@ def meta_flatten(
         pytree (Module): Module to get the meta of.
         is_leaf (Callable[[Any], bool]): predicate to determine if a node is a leaf. Defaults to None.
 
-    Returns:
+    Returns
+    -------
         Module: meta of the Module.
     """
     return meta_leaves(pytree, is_leaf=is_leaf), jtu.tree_structure(
@@ -253,7 +265,7 @@ def meta_flatten(
 
 
 def meta_map(
-    f: Callable[[Any, Dict[str, Any]], Any],
+    f: Callable[[Any, dict[str, Any]], Any],
     pytree: Module,
     *rest: Any,
     is_leaf: Callable[[Any], bool] | None = None,
@@ -265,7 +277,8 @@ def meta_map(
         rest (Any, optional): Additional pytrees to apply the function to. Defaults to None.
         is_leaf (Callable[[Any], bool], optional): predicate to determine if a node is a leaf. Defaults to None.
 
-    Returns:
+    Returns
+    -------
         Module: The transformed pytree.
     """
     leaves, treedef = meta_flatten(pytree, is_leaf=is_leaf)
@@ -279,7 +292,8 @@ def meta(pytree: Module, *, is_leaf: Callable[[Any], bool] | None = None) -> Mod
     Args:
         pytree (Module): pytree to get the metadata of.
 
-    Returns:
+    Returns
+    -------
         Module: metadata of the pytree.
     """
 

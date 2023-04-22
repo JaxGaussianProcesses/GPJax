@@ -26,13 +26,14 @@ from simple_pytree import Pytree
 class Dataset(Pytree):
     """Base class for datasets.
 
-    Attributes:
+    Attributes
+    ----------
         X (Optional[Float[Array, "N D"]]): Input data.
         y (Optional[Float[Array, "N Q"]]): Output data.
     """
 
-    X: Optional[Float[Array, "N D"]] = None
-    y: Optional[Float[Array, "N Q"]] = None
+    X: Float[Array, "N D"] | None = None
+    y: Float[Array, "N Q"] | None = None
 
     def __post_init__(self) -> None:
         """Checks that the shapes of X and y are compatible."""
@@ -56,7 +57,6 @@ class Dataset(Pytree):
 
     def __add__(self, other: Dataset) -> Dataset:
         """Combine two datasets. Right hand dataset is stacked beneath the left."""
-
         X = None
         y = None
 
@@ -86,12 +86,11 @@ class Dataset(Pytree):
 
 def _check_shape(X: Float[Array, "N D"], y: Float[Array, "N Q"]) -> None:
     """Checks that the shapes of X and y are compatible."""
-    if X is not None and y is not None:
-        if X.shape[0] != y.shape[0]:
-            raise ValueError(
-                "Inputs, X, and outputs, y, must have the same number of rows."
-                f" Got X.shape={X.shape} and y.shape={y.shape}."
-            )
+    if X is not None and y is not None and X.shape[0] != y.shape[0]:
+        raise ValueError(
+            "Inputs, X, and outputs, y, must have the same number of rows."
+            f" Got X.shape={X.shape} and y.shape={y.shape}."
+        )
 
     if X is not None and X.ndim != 2:
         raise ValueError(

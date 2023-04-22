@@ -1,8 +1,7 @@
 import jax
 import pytest
-from jaxtyping import Array, Float
-
 from gpjax.mean_functions import AbstractMeanFunction, Constant
+from jaxtyping import Array, Float
 
 
 def test_abstract() -> None:

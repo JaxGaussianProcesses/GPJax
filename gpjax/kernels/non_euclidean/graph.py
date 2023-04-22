@@ -20,10 +20,10 @@ import tensorflow_probability.substrates.jax as tfp
 from jaxtyping import Array, Float, Int
 from simple_pytree import static_field
 
-from ...base import param_field
-from ..base import AbstractKernel
-from ..computations import AbstractKernelComputation, EigenKernelComputation
-from .utils import jax_gather_nd
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import AbstractKernelComputation, EigenKernelComputation
+from gpjax.kernels.non_euclidean.utils import jax_gather_nd
 
 tfb = tfp.bijectors
 
@@ -75,7 +75,8 @@ class GraphKernel(AbstractKernel):
             x (Float[Array, "1 D"]): Index of the ith vertex.
             y (Float[Array, "1 D"]): Index of the jth vertex.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "1"]: The value of :math:`k(v_i, v_j)`.
         """
         S = kwargs["S"]

@@ -1,14 +1,18 @@
+import gpjax as gpx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
-
-import gpjax as gpx
 from gpjax import Bernoulli, Gaussian, Prior
 from gpjax.dataset import Dataset
-from gpjax.objectives import (ELBO, AbstractObjective, CollapsedELBO,
-                              ConjugateMLL, LogPosteriorDensity,
-                              NonConjugateMLL)
+from gpjax.objectives import (
+    ELBO,
+    AbstractObjective,
+    CollapsedELBO,
+    ConjugateMLL,
+    LogPosteriorDensity,
+    NonConjugateMLL,
+)
 
 
 def test_abstract_objective():
@@ -132,9 +136,7 @@ def test_collapsed_elbo(
     assert isinstance(evaluation, jax.Array)
     assert evaluation.shape == ()
 
-    # bern_post = p * Bernoulli(num_datapoints=num_datapoints)
     # with pytest.raises(TypeError):
-    #     gpx.CollapsedELBO(posterior=bern_post, variational_family=q, negative=negative)
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])

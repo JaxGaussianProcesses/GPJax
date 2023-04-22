@@ -31,14 +31,11 @@ def param_field(
     default_factory: Any = dataclasses.MISSING,
     init: bool = True,
     repr: bool = True,
-    hash: Optional[bool] = None,
+    hash: bool | None = None,
     compare: bool = True,
-    metadata: Optional[Mapping[str, Any]] = None,
+    metadata: Mapping[str, Any] | None = None,
 ):
-    if metadata is None:
-        metadata = {}
-    else:
-        metadata = dict(metadata)
+    metadata = {} if metadata is None else dict(metadata)
 
     if "bijector" in metadata:
         raise ValueError("Cannot use metadata with `bijector` already set.")

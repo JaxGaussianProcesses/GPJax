@@ -17,14 +17,15 @@ from dataclasses import dataclass
 
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
-import tensorflow_probability.substrates.jax.distributions as tfd
 from jaxtyping import Array, Float
 from simple_pytree import static_field
 
-from ...base import param_field
-from ..base import AbstractKernel
-from ..computations import (AbstractKernelComputation,
-                            ConstantDiagonalKernelComputation)
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    ConstantDiagonalKernelComputation,
+)
 
 
 @dataclass
@@ -36,7 +37,7 @@ class White(AbstractKernel):
     name: str = "White"
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\\sigma`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\\sigma`.
 
         .. math::
             k(x, y) = \\sigma^2 \\delta(x-y)
@@ -45,7 +46,8 @@ class White(AbstractKernel):
             x (Float[Array, "D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "D"]): The right hand argument of the kernel function's call.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "1"]: The value of :math:`k(x, y)`.
         """
         K = jnp.all(jnp.equal(x, y)) * self.variance

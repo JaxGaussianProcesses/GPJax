@@ -14,20 +14,20 @@
 # ==============================================================================
 
 from typing import Any, Optional, Tuple
+from warnings import warn
 
 import jax
 import jax.random as jr
 import optax as ox
 from jax._src.random import _check_prng_key
 from jax.random import KeyArray
-from jaxtyping import Array, Float
 from jaxlib.xla_extension import PjitFunction
-from warnings import warn
+from jaxtyping import Array, Float
 
-from .base import Module
-from .dataset import Dataset
-from .objectives import AbstractObjective
-from .scan import vscan
+from gpjax.base import Module
+from gpjax.dataset import Dataset
+from gpjax.objectives import AbstractObjective
+from gpjax.scan import vscan
 
 
 def fit(
@@ -48,6 +48,7 @@ def fit(
     Optimisers used here should originate from Optax.
 
     Example:
+        ```python
         >>> import jax.numpy as jnp
         >>> import jax.random as jr
         >>> import optax as ox
@@ -79,6 +80,7 @@ def fit(
         >>> trained_model, history = gpx.fit(
         ...     model=model, objective=loss, train_data=D, optim=ox.sgd(0.001), num_iters=1000
         ... )
+        ```
 
     Args:
         model (Module): The model Module to be optimised.
@@ -94,13 +96,14 @@ def fit(
         key (Optional[KeyArray]): The random key to use for the optimisation batch
             selection. Defaults to jr.PRNGKey(42).
         log_rate (Optional[int]): How frequently the objective function's value should
-        be printed. Defaults to 10.
+            be printed. Defaults to 10.
         verbose (Optional[bool]): Whether to print the training loading bar. Defaults
             to True.
         unroll (int): The number of unrolled steps to use for the optimisation.
             Defaults to 1.
 
-    Returns:
+    Returns
+    -------
         Tuple[Module, Array]: A Tuple comprising the optimised model and training
             history respectively.
     """
@@ -166,7 +169,8 @@ def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
         batch_size (int): The batch size.
         key (KeyArray): The random key to use for the batch selection.
 
-    Returns:
+    Returns
+    -------
         Dataset: The batched dataset.
     """
     x, y, n = train_data.X, train_data.y, train_data.n
@@ -187,7 +191,10 @@ def _check_objective(objective: Any) -> None:
     """Check that the objective is of type Objective."""
     if not isinstance(objective, AbstractObjective):
         if isinstance(objective, PjitFunction):
-            warn("Objective is jit-compiled. Please ensure that the objective is of type gpjax.Objective.")
+            warn(
+                "Objective is jit-compiled. Please ensure that the objective is of type"
+                " gpjax.Objective."
+            )
         else:
             raise TypeError(
                 f"objective of type {type(objective)} must be of type gpjax.Objective."
@@ -235,9 +242,8 @@ def _check_batch_size(batch_size: Any) -> None:
     if not isinstance(batch_size, int):
         raise TypeError("batch_size must be of type int")
 
-    if not batch_size == -1:
-        if not batch_size > 0:
-            raise ValueError("batch_size must be positive")
+    if not batch_size == -1 and not batch_size > 0:
+        raise ValueError("batch_size must be positive")
 
 
 __all__ = [

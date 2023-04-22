@@ -42,7 +42,6 @@ def progress_bar(num_iters: int, log_rate: int) -> Callable:
     Might be nice in future to directly create a general purpose `verbose scan` inplace of a for a jax.lax.scan,
     that takes the same arguments as a jax.lax.scan, but prints a progress bar.
     """
-
     tqdm_bars = {}
     remainder = num_iters % log_rate
 
@@ -53,7 +52,7 @@ def progress_bar(num_iters: int, log_rate: int) -> Callable:
     def _update_tqdm(args: Any, transform: Any) -> None:
         """Update the tqdm progress bar with the latest objective value."""
         value, iter_num = args
-        tqdm_bars[0].set_description(f"Running", refresh=False)
+        tqdm_bars[0].set_description("Running", refresh=False)
         tqdm_bars[0].update(iter_num)
         tqdm_bars[0].set_postfix({"Value": f"{value: .2f}"})
 
@@ -77,7 +76,6 @@ def progress_bar(num_iters: int, log_rate: int) -> Callable:
 
     def _update_progress_bar(value: Float[Array, "1"], iter_num: int) -> None:
         """Update the tqdm progress bar."""
-
         # Conditions for iteration number
         is_multiple: bool = (iter_num % log_rate == 0) & (
             iter_num != num_iters - remainder

@@ -5,9 +5,9 @@ from jax.random import KeyArray, PRNGKey
 from jaxtyping import Array, Float
 from simple_pytree import static_field
 
-from ...base import param_field
-from ..base import AbstractKernel
-from ..computations import BasisFunctionComputation
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import BasisFunctionComputation
 
 
 @dataclass
@@ -29,6 +29,7 @@ class RFF(AbstractKernel):
     Args:
         AbstractKernel (_type_): _description_
     """
+
     base_kernel: AbstractKernel = None
     num_basis_fns: int = static_field(50)
     frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity)
@@ -75,7 +76,8 @@ class RFF(AbstractKernel):
             x: A N x D array of inputs.
             frequencies: A M x D array of frequencies.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N L"]: A N x L array of features where L = 2M.
         """
         return self.compute_engine(self).compute_features(x)

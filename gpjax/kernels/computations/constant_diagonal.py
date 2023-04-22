@@ -16,9 +16,8 @@ import jax.numpy as jnp
 from jax import vmap
 from jaxtyping import Array, Float
 
+from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.linops import ConstantDiagonalLinearOperator, DiagonalLinearOperator
-
-from .base import AbstractKernelComputation
 
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):
@@ -44,10 +43,10 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
             params (Dict): The kernel's parameter set.
             inputs (Float[Array, "N D"]): The input matrix.
 
-        Returns:
+        Returns
+        -------
             LinearOperator: The computed diagonal variance entries.
         """
-
         diag = vmap(lambda x: self.kernel(x, x))(inputs)
 
         return DiagonalLinearOperator(diag=diag)
@@ -62,7 +61,8 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
             x (Float[Array,"N D"]): The input matrix.
             y (Float[Array,"M D"]): The input matrix.
 
-        Returns:
+        Returns
+        -------
             CovarianceOperator: The computed square Gram matrix.
         """
         # TODO: This is currently a dense implementation. We should implement a sparse LinearOperator for non-square cross-covariance matrices.

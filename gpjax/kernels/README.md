@@ -21,7 +21,7 @@ JaxKern is Python library for working with kernel functions in JAX. We currently
     * White noise
     * Periodic
 * Non-stationary
-    * Linear 
+    * Linear
     * Polynomial
 * Non-Euclidean
     * Graph kernels
@@ -61,7 +61,7 @@ Qff = approx.gram(rff_params, X)
 
 ## Code Structure
 
-All kernels are supplied with a `gram` and `cross_covariance` method. When computing a Gram matrix, there is often some structure in the data (e.g., Markov) that can be exploited to yield a sparse matrix. To instruct JAX how to operate on this, the return type of `gram` is a Linear Operator from [JaxLinOp](https://github.com/JaxGaussianProcesses/JaxLinOp). 
+All kernels are supplied with a `gram` and `cross_covariance` method. When computing a Gram matrix, there is often some structure in the data (e.g., Markov) that can be exploited to yield a sparse matrix. To instruct JAX how to operate on this, the return type of `gram` is a Linear Operator from [JaxLinOp](https://github.com/JaxGaussianProcesses/JaxLinOp).
 
 Within [GPJax](https://github.com/JaxGaussianProcesses/GPJax), all kernel computations are handled using JaxKern.
 

@@ -20,8 +20,7 @@ from typing import Any
 from jax import vmap
 from jaxtyping import Array, Float
 
-from gpjax.linops import (DenseLinearOperator, DiagonalLinearOperator,
-                          LinearOperator)
+from gpjax.linops import DenseLinearOperator, DiagonalLinearOperator, LinearOperator
 
 Kernel = Any
 
@@ -41,7 +40,8 @@ class AbstractKernelComputation:
         Args:
             x (Float[Array, "N N"]): The inputs to the kernel function.
 
-        Returns:
+        Returns
+        -------
             LinearOperator: Gram covariance operator of the kernel function.
         """
         Kxx = self.cross_covariance(x, x)
@@ -58,7 +58,8 @@ class AbstractKernelComputation:
             x (Float[Array,"N D"]): The first input matrix.
             y (Float[Array,"M D"]): The second input matrix.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N M"]: The computed cross-covariance.
         """
         raise NotImplementedError
@@ -70,7 +71,8 @@ class AbstractKernelComputation:
         Args:
             inputs (Float[Array, "N D"]): The input matrix.
 
-        Returns:
+        Returns
+        -------
             DiagonalLinearOperator: The computed diagonal variance entries.
         """
         return DiagonalLinearOperator(diag=vmap(lambda x: self.kernel(x, x))(inputs))

@@ -20,9 +20,12 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 from jaxtyping import Array, Float
 
-from ...base import param_field
-from ..base import AbstractKernel
-from .utils import build_student_t_distribution, euclidean_distance
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.utils import (
+    build_student_t_distribution,
+    euclidean_distance,
+)
 
 
 @dataclass
@@ -37,7 +40,7 @@ class Matern12(AbstractKernel):
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
+        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`.
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( -\\frac{\\lvert x-y \\rvert}{2\\ell^2}  \\Bigg)

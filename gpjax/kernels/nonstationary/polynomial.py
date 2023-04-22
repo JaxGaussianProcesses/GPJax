@@ -20,8 +20,8 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 from jaxtyping import Array, Float
 from simple_pytree import static_field
 
-from ...base import param_field
-from ..base import AbstractKernel
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
 
 
 @dataclass
@@ -37,7 +37,7 @@ class Polynomial(AbstractKernel):
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter
-        :math:`\\alpha` and variance :math:`\\sigma^2` through
+        :math:`\\alpha` and variance :math:`\\sigma^2` through.
 
         .. math::
             k(x, y) = \\Big( \\alpha + \\sigma^2 xy \\Big)^{d}
@@ -48,7 +48,8 @@ class Polynomial(AbstractKernel):
             y (Float[Array, "D"]): The right hand argument of the kernel function's
                 call
 
-        Returns:
+        Returns
+        -------
             Float[Array, "1"]: The value of :math:`k(x, y)`.
         """
         x = self.slice_input(x).squeeze()

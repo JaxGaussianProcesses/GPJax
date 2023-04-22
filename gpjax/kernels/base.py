@@ -24,8 +24,8 @@ import jax.numpy as jnp
 from jaxtyping import Array, Float
 from simple_pytree import static_field
 
-from ..base import Module, param_field
-from .computations import AbstractKernelComputation, DenseKernelComputation
+from gpjax.base import Module, param_field
+from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 
 
 @dataclass
@@ -33,7 +33,7 @@ class AbstractKernel(Module):
     """Base kernel class."""
 
     compute_engine: AbstractKernelComputation = static_field(DenseKernelComputation)
-    active_dims: List[int] = static_field(None)
+    active_dims: list[int] = static_field(None)
     name: str = static_field("AbstractKernel")
 
     @property
@@ -51,7 +51,9 @@ class AbstractKernel(Module):
 
         Args:
             x (Float[Array, "N D"]): The matrix or vector that is to be sliced.
-        Returns:
+
+        Returns
+        -------
             Float[Array, "N S"]: A sliced form of the input matrix.
         """
         return x[..., self.active_dims]
@@ -59,57 +61,54 @@ class AbstractKernel(Module):
     @abc.abstractmethod
     def __call__(
         self,
-        x: Float[Array, "D"],
-        y: Float[Array, "D"],
-    ) -> Float[Array, "1"]:
+        x: Float[Array, D],
+        y: Float[Array, D],
+    ) -> Float[Array, 1]:
         """Evaluate the kernel on a pair of inputs.
 
         Args:
             x (Float[Array, "D"]): The left hand input of the kernel function.
             y (Float[Array, "D"]): The right hand input of the kernel function.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "1"]: The evaluated kernel function at the supplied inputs.
         """
         raise NotImplementedError
 
-    def __add__(
-        self, other: Union[AbstractKernel, Float[Array, "1"]]
-    ) -> AbstractKernel:
+    def __add__(self, other: AbstractKernel | Float[Array, 1]) -> AbstractKernel:
         """Add two kernels together.
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
 
-        Returns:
+        Returns
+        -------
             AbstractKernel: A new kernel that is the sum of the two kernels.
         """
-
         if isinstance(other, AbstractKernel):
             return SumKernel(kernels=[self, other])
 
         return SumKernel(kernels=[self, Constant(other)])
 
-    def __radd__(
-        self, other: Union[AbstractKernel, Float[Array, "1"]]
-    ) -> AbstractKernel:
+    def __radd__(self, other: AbstractKernel | Float[Array, 1]) -> AbstractKernel:
         """Add two kernels together.
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
 
-        Returns:
+        Returns
+        -------
             AbstractKernel: A new kernel that is the sum of the two kernels.
         """
         return self.__add__(other)
 
-    def __mul__(
-        self, other: Union[AbstractKernel, Float[Array, "1"]]
-    ) -> AbstractKernel:
+    def __mul__(self, other: AbstractKernel | Float[Array, 1]) -> AbstractKernel:
         """Multiply two kernels together.
 
         Args:
             other (AbstractKernel): The kernel to be multiplied with the current kernel.
 
-        Returns:
+        Returns
+        -------
             AbstractKernel: A new kernel that is the product of the two kernels.
         """
         if isinstance(other, AbstractKernel):
@@ -129,16 +128,17 @@ class Constant(AbstractKernel):
     The scalar value itself can be treated as a model hyperparameter and learned during training.
     """
 
-    constant: Float[Array, "1"] = param_field(jnp.array(0.0))
+    constant: Float[Array, 1] = param_field(jnp.array(0.0))
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
+    def __call__(self, x: Float[Array, D], y: Float[Array, D]) -> Float[Array, 1]:
         """Evaluate the kernel on a pair of inputs.
 
         Args:
             x (Float[Array, "D"]): The left hand input of the kernel function.
             y (Float[Array, "D"]): The right hand input of the kernel function.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "1"]: The evaluated kernel function at the supplied inputs.
         """
         return self.constant.squeeze()
@@ -148,12 +148,12 @@ class Constant(AbstractKernel):
 class CombinationKernel(AbstractKernel):
     """A base class for products or sums of MeanFunctions."""
 
-    kernels: List[AbstractKernel] = None
+    kernels: list[AbstractKernel] = None
     operator: Callable = static_field(None)
 
     def __post_init__(self):
         # Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
-        kernels_list: List[AbstractKernel] = []
+        kernels_list: list[AbstractKernel] = []
 
         for kernel in self.kernels:
             if not isinstance(kernel, AbstractKernel):
@@ -168,16 +168,17 @@ class CombinationKernel(AbstractKernel):
 
     def __call__(
         self,
-        x: Float[Array, "D"],
-        y: Float[Array, "D"],
-    ) -> Float[Array, "1"]:
+        x: Float[Array, D],
+        y: Float[Array, D],
+    ) -> Float[Array, 1]:
         """Evaluate the kernel on a pair of inputs.
 
         Args:
             x (Float[Array, "D"]): The left hand input of the kernel function.
             y (Float[Array, "D"]): The right hand input of the kernel function.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "1"]: The evaluated kernel function at the supplied inputs.
         """
         return self.operator(jnp.stack([k(x, y) for k in self.kernels]))

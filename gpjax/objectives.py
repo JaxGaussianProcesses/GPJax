@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .gps import ConjugatePosterior, NonConjugatePosterior
-    from .variational_families import AbstractVariationalFamily
+    from gpjax.gps import ConjugatePosterior, NonConjugatePosterior
+    from gpjax.variational_families import AbstractVariationalFamily
 
 from abc import abstractmethod
 from dataclasses import dataclass
@@ -12,17 +12,19 @@ from dataclasses import dataclass
 import jax.numpy as jnp
 import jax.scipy as jsp
 import jax.tree_util as jtu
+import tensorflow_probability.substrates.jax as tfp
 from jax import vmap
 from jaxtyping import Array, Float
 from simple_pytree import static_field
-import tensorflow_probability.substrates.jax as tfp
 
-from .base import Module
-from .dataset import Dataset
-from .gaussian_distribution import GaussianDistribution
-from .linops import identity
-from .quadrature import gauss_hermite_quadrature
+from gpjax.base import Module
+from gpjax.dataset import Dataset
+from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.linops import identity
+from gpjax.quadrature import gauss_hermite_quadrature
+
 tfd = tfp.distributions
+
 
 @dataclass
 class AbstractObjective(Module):
@@ -37,19 +39,18 @@ class AbstractObjective(Module):
     def __hash__(self):
         return hash(tuple(jtu.tree_leaves(self)))  # Probably put this on the Module!
 
-    def __call__(self, *args, **kwargs) -> Float[Array, "1"]:
+    def __call__(self, *args, **kwargs) -> Float[Array, 1]:
         return self.step(*args, **kwargs)
 
     @abstractmethod
-    def step(self, *args, **kwargs) -> Float[Array, "1"]:
+    def step(self, *args, **kwargs) -> Float[Array, 1]:
         raise NotImplementedError
-
 
 
 class ConjugateMLL(AbstractObjective):
     def step(
         self, posterior: ConjugatePosterior, train_data: Dataset
-    ) -> Float[Array, "1"]:
+    ) -> Float[Array, 1]:
         """Compute the marginal log-likelihood function of the Gaussian process.
         The returned function can then be used for gradient based optimisation
         of the model's parameters or for model comparison. The implementation
@@ -106,19 +107,19 @@ class ConjugateMLL(AbstractObjective):
                 equivalent to maximisation of the marginal log-likelihood.
                 Defaults to False.
 
-        Returns:
+        Returns
+        -------
             Callable[[Parameters], Float[Array, "1"]]: A functional representation
                 of the marginal log-likelihood that can be evaluated at a
                 given parameter set.
         """
-
         x, y, n = train_data.X, train_data.y, train_data.n
 
-        # Observation noise σ²
+        # Observation noise o²
         obs_noise = posterior.likelihood.obs_noise
         mx = posterior.prior.mean_function(x)
 
-        # Σ = (Kxx + Iσ²) = LLᵀ
+        # Σ = (Kxx + Io²) = LLᵀ
         Kxx = posterior.prior.kernel.gram(x)
         Kxx += identity(n) * posterior.prior.jitter
         Sigma = Kxx + identity(n) * obs_noise
@@ -130,9 +131,7 @@ class ConjugateMLL(AbstractObjective):
 
 
 class NonConjugateMLL(AbstractObjective):
-    def step(
-        self, posterior: NonConjugatePosterior, data: Dataset
-    ) -> Float[Array, "1"]:
+    def step(self, posterior: NonConjugatePosterior, data: Dataset) -> Float[Array, 1]:
         """
         Compute the marginal log-likelihood function of the Gaussian process.
         The returned function can then be used for gradient based optimisation
@@ -157,7 +156,8 @@ class NonConjugateMLL(AbstractObjective):
                 minimisation of the negative marginal log-likelihood is equivalent
                 to maximisation of the marginal log-likelihood. Defaults to False.
 
-        Returns:
+        Returns
+        -------
             Callable[[Parameters], Float[Array, "1"]]: A functional representation
                 of the marginal log-likelihood that can be evaluated at a given
                 parameter set.
@@ -191,7 +191,7 @@ class NonConjugateMLL(AbstractObjective):
 class ELBO(AbstractObjective):
     def step(
         self, variational_family: AbstractVariationalFamily, train_data: Dataset
-    ) -> Float[Array, "1"]:
+    ) -> Float[Array, 1]:
         """Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
         approximation. To this, we sum the KL divergence from the variational posterior
@@ -208,12 +208,12 @@ class ELBO(AbstractObjective):
                 function this argument should be true as minimisation of the negative
                 corresponds to maximisation of the ELBO. Defaults to False.
 
-        Returns:
+        Returns
+        -------
             Callable[[Parameters, Dataset], Array]: A callable function that accepts a
                 current parameter estimate and batch of data for which gradients should
                 be computed.
         """
-
         # KL[q(f(·)) || p(f(·))]
         kl = variational_family.prior_kl()
 
@@ -243,11 +243,11 @@ def variational_expectation(
         variational_family (AbstractVariationalFamily): The variational family that we are using to approximate the posterior.
         train_data (Dataset): The batch for which the expectation should be computed for.
 
-    Returns:
+    Returns
+    -------
         Array: The expectation of the model's log-likelihood under our variational
             distribution.
     """
-
     # Unpack training batch
     x, y = train_data.X, train_data.y
 
@@ -262,7 +262,6 @@ def variational_expectation(
 
     mean, variance = vmap(q_moments)(x[:, None])
 
-    # log(p(y|f(x)))
     link_function = variational_family.posterior.likelihood.link_function
     log_prob = vmap(lambda f, y: link_function(f).log_prob(y))
 
@@ -280,7 +279,7 @@ class CollapsedELBO(AbstractObjective):
 
     def step(
         self, variational_family: AbstractVariationalFamily, train_data: Dataset
-    ) -> Float[Array, "1"]:
+    ) -> Float[Array, 1]:
         """Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
         approximation. To this, we sum the KL divergence from the variational posterior
@@ -295,11 +294,11 @@ class CollapsedELBO(AbstractObjective):
                 function this argument should be true as minimisation of the negative
                 corresponds to maximisation of the ELBO. Defaults to False.
 
-        Returns:
+        Returns
+        -------
             Callable[[Parameters, Dataset], Array]: A callable function that accepts a
                 current parameter estimate for which gradients should be computed.
         """
-
         # Unpack training data
         x, y, n = train_data.X, train_data.y, train_data.n
 
@@ -323,25 +322,25 @@ class CollapsedELBO(AbstractObjective):
         #
         # Let Q = KxzKzz⁻¹Kzx, we must compute the log normal pdf:
         #
-        #   log N(y; μx, σ²I + Q) = -nπ - n/2 log|σ²I + Q|
-        #   - 1/2 (y - μx)ᵀ (σ²I + Q)⁻¹ (y - μx).
+        #   log N(y; μx, o²I + Q) = -nπ - n/2 log|o²I + Q|
+        #   - 1/2 (y - μx)ᵀ (o²I + Q)⁻¹ (y - μx).
         #
-        # The log determinant |σ²I + Q| is computed via applying the matrix determinant
+        # The log determinant |o²I + Q| is computed via applying the matrix determinant
         #   lemma
         #
-        #   |σ²I + Q| = log|σ²I| + log|I + Lz⁻¹ Kzx (σ²I)⁻¹ Kxz Lz⁻¹| = log(σ²) +  log|B|,
+        #   |o²I + Q| = log|o²I| + log|I + Lz⁻¹ Kzx (o²I)⁻¹ Kxz Lz⁻¹| = log(o²) +  log|B|,
         #
-        #   with B = I + AAᵀ and A = Lz⁻¹ Kzx / σ.
+        #   with B = I + AAᵀ and A = Lz⁻¹ Kzx / o.
         #
-        # Similarly we apply matrix inversion lemma to invert σ²I + Q
+        # Similarly we apply matrix inversion lemma to invert o²I + Q
         #
-        #   (σ²I + Q)⁻¹ = (Iσ²)⁻¹ - (Iσ²)⁻¹ Kxz Lz⁻ᵀ (I + Lz⁻¹ Kzx (Iσ²)⁻¹ Kxz Lz⁻ᵀ )⁻¹ Lz⁻¹ Kzx (Iσ²)⁻¹
-        #               = (Iσ²)⁻¹ - (Iσ²)⁻¹ σAᵀ (I + σA (Iσ²)⁻¹ σAᵀ)⁻¹ σA (Iσ²)⁻¹
-        #               = I/σ² - Aᵀ B⁻¹ A/σ²,
+        #   (o²I + Q)⁻¹ = (Io²)⁻¹ - (Io²)⁻¹ Kxz Lz⁻ᵀ (I + Lz⁻¹ Kzx (Io²)⁻¹ Kxz Lz⁻ᵀ )⁻¹ Lz⁻¹ Kzx (Io²)⁻¹
+        #               = (Io²)⁻¹ - (Io²)⁻¹ oAᵀ (I + oA (Io²)⁻¹ oAᵀ)⁻¹ oA (Io²)⁻¹
+        #               = I/o² - Aᵀ B⁻¹ A/o²,
         #
         # giving the quadratic term as
         #
-        #   (y - μx)ᵀ (σ²I + Q)⁻¹ (y - μx) = [(y - μx)ᵀ(y - µx)  - (y - μx)ᵀ Aᵀ B⁻¹ A (y - μx)]/σ²,
+        #   (y - μx)ᵀ (o²I + Q)⁻¹ (y - μx) = [(y - μx)ᵀ(y - µx)  - (y - μx)ᵀ Aᵀ B⁻¹ A (y - μx)]/o²,
         #
         #   with A and B defined as above.
 
@@ -350,10 +349,8 @@ class CollapsedELBO(AbstractObjective):
         # AAᵀ
         AAT = jnp.matmul(A, A.T)
 
-        # B = I + AAᵀ
         B = jnp.eye(m) + AAT
 
-        # LLᵀ = I + AAᵀ
         L = jnp.linalg.cholesky(B)
 
         # log|B| = 2 trace(log|L|) = 2 Σᵢ log Lᵢᵢ  [since |B| = |LLᵀ| = |L|²  => log|B| = 2 log|L|, and |L| = Πᵢ Lᵢᵢ]
@@ -364,14 +361,14 @@ class CollapsedELBO(AbstractObjective):
         # L⁻¹ A (y - μx)
         L_inv_A_diff = jsp.linalg.solve_triangular(L, jnp.matmul(A, diff), lower=True)
 
-        # (y - μx)ᵀ (Iσ² + Q)⁻¹ (y - μx)
+        # (y - μx)ᵀ (Io² + Q)⁻¹ (y - μx)
         quad = (jnp.sum(diff**2) - jnp.sum(L_inv_A_diff**2)) / noise
 
-        # 2 * log N(y; μx, Iσ² + Q)
+        # 2 * log N(y; μx, Io² + Q)
         two_log_prob = -n * jnp.log(2.0 * jnp.pi * noise) - log_det_B - quad
 
-        # 1/σ² tr(Kxx - Q) [Trace law tr(AB) = tr(BA) => tr(KxzKzz⁻¹Kzx) = tr(KxzLz⁻ᵀLz⁻¹Kzx) = tr(Lz⁻¹Kzx KxzLz⁻ᵀ) = trace(σ²AAᵀ)]
+        # 1/o² tr(Kxx - Q) [Trace law tr(AB) = tr(BA) => tr(KxzKzz⁻¹Kzx) = tr(KxzLz⁻ᵀLz⁻¹Kzx) = tr(Lz⁻¹Kzx KxzLz⁻ᵀ) = trace(o²AAᵀ)]
         two_trace = jnp.sum(Kxx_diag) / noise - jnp.trace(AAT)
 
-        # log N(y; μx, Iσ² + KxzKzz⁻¹Kzx) - 1/2σ² tr(Kxx - KxzKzz⁻¹Kzx)
+        # log N(y; μx, Io² + KxzKzz⁻¹Kzx) - 1/2o² tr(Kxx - KxzKzz⁻¹Kzx)
         return self.constant * (two_log_prob - two_trace).squeeze() / 2.0

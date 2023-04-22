@@ -16,7 +16,7 @@
 from jax import vmap
 from jaxtyping import Array, Float
 
-from .base import AbstractKernelComputation
+from gpjax.kernels.computations.base import AbstractKernelComputation
 
 
 class DenseKernelComputation(AbstractKernelComputation):
@@ -34,7 +34,8 @@ class DenseKernelComputation(AbstractKernelComputation):
             x (Float[Array,"N D"]): The input matrix.
             y (Float[Array,"M D"]): The input matrix.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N M"]: The computed cross-covariance.
         """
         cross_cov = vmap(lambda x: vmap(lambda y: self.kernel(x, y))(y))(x)

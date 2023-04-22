@@ -71,7 +71,7 @@ and push your code as usual.
    $ pip install -e .
    $ pip install -r requirements-dev.txt
    ```
-   
+
 5. Install the pre-commit hooks. Please **ensure you do this before commiting
    any files**. This can be done by executing the following:
    ```bash
@@ -84,14 +84,14 @@ and push your code as usual.
    ```bash
    $ poetry run pre-commit run --all-files --show-diff-on-failure
    ```
-   If any errors are reported, fix them and re-run the command. 
+   If any errors are reported, fix them and re-run the command.
 
 7. Check all tests are passing
    ```bash
    poetry run pytest tests --n auto
    ```
    If any tests fail, fix them and re-run the command.
-   
+
 8. Add changed files using `git add` and then `git commit` files:
 
    ```bash

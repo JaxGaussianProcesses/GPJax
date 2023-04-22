@@ -35,7 +35,6 @@ def _callback(cond: bool, func: Callable, *args: Any) -> None:
         func (Callable): The function to call.
         *args (Any): The arguments to pass to the function.
     """
-
     # lax.cond requires a result, so we use a dummy result.
     _dummy_result = 0
 
@@ -85,7 +84,8 @@ def vscan(
         log_rate (int): The rate at which to log the progress bar.
         log_value (bool): Whether to log the value of the objective function.
 
-    Returns:
+    Returns
+    -------
         Tuple[Carry, List[Y]]: A tuple of the final carry and the outputs.
     """
     _xs_flat = jtu.tree_leaves(xs)

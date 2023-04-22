@@ -14,16 +14,14 @@
 # ==============================================================================
 
 
+from dataclasses import is_dataclass
+
 import jax
 import jax.numpy as jnp
 import jax.random as jr
+import jax.tree_util as jtu
 import pytest
 from jax.config import config
-
-import jax.tree_util as jtu
-from dataclasses import is_dataclass
-
-
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -31,13 +29,13 @@ _PRNGKey = jr.PRNGKey(42)
 
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
 from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
-from gpjax.linops.triangular_linear_operator import \
-    LowerTriangularLinearOperator
+from gpjax.linops.triangular_linear_operator import LowerTriangularLinearOperator
 
 
 def approx_equal(res: jax.Array, actual: jax.Array) -> bool:
     """Check if two arrays are approximately equal."""
     return jnp.linalg.norm(res - actual) < 1e-6
+
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_init(n: int) -> None:
@@ -54,9 +52,7 @@ def test_init(n: int) -> None:
     assert dense.ndim == 2
 
     # Check pytree.
-    assert jtu.tree_leaves(dense) == [values] # shape, dtype are static!
-
-
+    assert jtu.tree_leaves(dense) == [values]  # shape, dtype are static!
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])

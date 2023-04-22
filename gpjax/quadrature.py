@@ -44,7 +44,8 @@ def gauss_hermite_quadrature(
         deg (int, optional): The number of quadrature points that are to be used.
             Defaults to 20.
 
-    Returns:
+    Returns
+    -------
         Float[Array, "N"]: The evaluated integrals value.
     """
     gh_points, gh_weights = np.polynomial.hermite.hermgauss(deg)

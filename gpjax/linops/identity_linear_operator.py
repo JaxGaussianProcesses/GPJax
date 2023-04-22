@@ -21,14 +21,14 @@ from typing import Any
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 
-from gpjax.linops.constant_diagonal_linear_operator import \
-    ConstantDiagonalLinearOperator
+from gpjax.linops.constant_diagonal_linear_operator import (
+    ConstantDiagonalLinearOperator,
+)
 from gpjax.linops.utils import default_dtype
 
 
 def _check_size(size: Any) -> None:
     """Check that size is an integer."""
-
     if not isinstance(size, int):
         raise ValueError(f"`size` must be an integer, but `size = {size}`.")
 
@@ -59,7 +59,8 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         Args:
             other (Float[Array, "N M"]): Matrix to multiply with.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N M"]: Result of matrix multiplication.
         """
         return other
@@ -68,15 +69,17 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         """
         Lower triangular.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N N"]: Lower triangular matrix.
         """
         return self
 
-    def log_det(self) -> Float[Array, "1"]:
+    def log_det(self) -> Float[Array, 1]:
         """Log determinant.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "1"]: Log determinant of the covariance matrix.
         """
         return jnp.array(0.0)
@@ -84,7 +87,8 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
     def inverse(self) -> ConstantDiagonalLinearOperator:
         """Inverse of the covariance operator.
 
-        Returns:
+        Returns
+        -------
             DiagonalLinearOperator: Inverse of the covariance operator.
         """
         return self
@@ -95,7 +99,8 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         Args:
             rhs (Float[Array, "N M"]): Right hand side of the linear system.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N M"]: Solution of the linear system.
         """
         # TODO: Check shapes.
@@ -109,7 +114,8 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         Args:
             root (IdentityLinearOperator): Root of the covariance operator.
 
-        Returns:
+        Returns
+        -------
             IdentityLinearOperator: Covariance operator.
         """
         return root

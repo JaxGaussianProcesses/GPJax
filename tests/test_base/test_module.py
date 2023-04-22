@@ -23,10 +23,9 @@ import jax.tree_util as jtu
 import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from flax import serialization
-from simple_pytree import Pytree, static_field
-
 from gpjax.base.module import Module, meta
 from gpjax.base.param import param_field
+from simple_pytree import Pytree, static_field
 
 
 @pytest.mark.parametrize("is_dataclass", [True, False])
@@ -160,7 +159,7 @@ def test_simple_linear_model(is_dataclass):
     meta_model = meta(model)
 
     assert isinstance(meta_model.weight["bijector"], tfb.Softplus)
-    assert meta_model.weight["trainable"] == False
+    assert meta_model.weight["trainable"] is False
     assert meta_model.bias == {}
 
     constrained_model = model.constrain()
@@ -169,7 +168,7 @@ def test_simple_linear_model(is_dataclass):
 
     meta_constrained_model = meta(constrained_model)
     assert isinstance(meta_constrained_model.weight["bijector"], tfb.Softplus)
-    assert meta_constrained_model.weight["trainable"] == False
+    assert meta_constrained_model.weight["trainable"] is False
     assert meta_constrained_model.bias == {}
 
     unconstrained_model = constrained_model.unconstrain()
@@ -178,7 +177,7 @@ def test_simple_linear_model(is_dataclass):
 
     meta_unconstrained_model = meta(unconstrained_model)
     assert isinstance(meta_unconstrained_model.weight["bijector"], tfb.Softplus)
-    assert meta_unconstrained_model.weight["trainable"] == False
+    assert meta_unconstrained_model.weight["trainable"] is False
     assert meta_unconstrained_model.bias == {}
 
     def loss_fn(model):
@@ -197,10 +196,10 @@ def test_simple_linear_model(is_dataclass):
     assert meta(new).bias == {"amazing": True}
     assert meta(model).bias == {}
 
-    with pytest.raises(ValueError, match=f"'cool' is not a field of SimpleModel"):
+    with pytest.raises(ValueError, match="'cool' is not a field of SimpleModel"):
         model.replace_meta(cool={"don't": "think so"})
 
-    with pytest.raises(ValueError, match=f"'cool' is not a field of SimpleModel"):
+    with pytest.raises(ValueError, match="'cool' is not a field of SimpleModel"):
         model.update_meta(cool={"don't": "think so"})
 
     new = model.update_meta(bias={"amazing": True})
@@ -261,15 +260,15 @@ def test_nested_Module_structure(is_dataclass):
     assert isinstance(meta_tree, Pytree)
 
     assert isinstance(meta_tree.a["bijector"], tfb.Identity)
-    assert meta_tree.a["trainable"] == True
+    assert meta_tree.a["trainable"] is True
     assert isinstance(meta_tree.b["bijector"], tfb.Softplus)
-    assert meta_tree.b["trainable"] == True
+    assert meta_tree.b["trainable"] is True
     assert isinstance(meta_tree.sub_tree.c["bijector"], tfb.Identity)
-    assert meta_tree.sub_tree.c["trainable"] == True
+    assert meta_tree.sub_tree.c["trainable"] is True
     assert isinstance(meta_tree.sub_tree.d["bijector"], tfb.Softplus)
-    assert meta_tree.sub_tree.d["trainable"] == True
+    assert meta_tree.sub_tree.d["trainable"] is True
     assert isinstance(meta_tree.sub_tree.e["bijector"], tfb.Softplus)
-    assert meta_tree.sub_tree.e["trainable"] == True
+    assert meta_tree.sub_tree.e["trainable"] is True
 
     # Test constrain and unconstrain
     constrained = tree.constrain()
@@ -289,15 +288,15 @@ def test_nested_Module_structure(is_dataclass):
     assert isinstance(meta_constrained, Pytree)
 
     assert isinstance(meta_constrained.a["bijector"], tfb.Identity)
-    assert meta_constrained.a["trainable"] == True
+    assert meta_constrained.a["trainable"] is True
     assert isinstance(meta_constrained.b["bijector"], tfb.Softplus)
-    assert meta_constrained.b["trainable"] == True
+    assert meta_constrained.b["trainable"] is True
     assert isinstance(meta_constrained.sub_tree.c["bijector"], tfb.Identity)
-    assert meta_constrained.sub_tree.c["trainable"] == True
+    assert meta_constrained.sub_tree.c["trainable"] is True
     assert isinstance(meta_constrained.sub_tree.d["bijector"], tfb.Softplus)
-    assert meta_constrained.sub_tree.d["trainable"] == True
+    assert meta_constrained.sub_tree.d["trainable"] is True
     assert isinstance(meta_constrained.sub_tree.e["bijector"], tfb.Softplus)
-    assert meta_constrained.sub_tree.e["trainable"] == True
+    assert meta_constrained.sub_tree.e["trainable"] is True
 
     # Test constrain and unconstrain
     unconstrained = tree.unconstrain()
@@ -317,15 +316,15 @@ def test_nested_Module_structure(is_dataclass):
     assert isinstance(meta_unconstrained, Pytree)
 
     assert isinstance(meta_unconstrained.a["bijector"], tfb.Identity)
-    assert meta_unconstrained.a["trainable"] == True
+    assert meta_unconstrained.a["trainable"] is True
     assert isinstance(meta_unconstrained.b["bijector"], tfb.Softplus)
-    assert meta_unconstrained.b["trainable"] == True
+    assert meta_unconstrained.b["trainable"] is True
     assert isinstance(meta_unconstrained.sub_tree.c["bijector"], tfb.Identity)
-    assert meta_unconstrained.sub_tree.c["trainable"] == True
+    assert meta_unconstrained.sub_tree.c["trainable"] is True
     assert isinstance(meta_unconstrained.sub_tree.d["bijector"], tfb.Softplus)
-    assert meta_unconstrained.sub_tree.d["trainable"] == True
+    assert meta_unconstrained.sub_tree.d["trainable"] is True
     assert isinstance(meta_unconstrained.sub_tree.e["bijector"], tfb.Softplus)
-    assert meta_unconstrained.sub_tree.e["trainable"] == True
+    assert meta_unconstrained.sub_tree.e["trainable"] is True
 
     # Test updating metadata
 
@@ -351,15 +350,15 @@ def test_nested_Module_structure(is_dataclass):
     assert isinstance(meta_new_tree, Pytree)
 
     assert isinstance(meta_new_tree.a["bijector"], tfb.Identity)
-    assert meta_new_tree.a["trainable"] == True
+    assert meta_new_tree.a["trainable"] is True
     assert isinstance(meta_new_tree.b["bijector"], tfb.Identity)
-    assert meta_new_tree.b["trainable"] == False
+    assert meta_new_tree.b["trainable"] is False
     assert isinstance(meta_new_tree.sub_tree.c["bijector"], tfb.Softplus)
-    assert meta_new_tree.sub_tree.c["trainable"] == False
+    assert meta_new_tree.sub_tree.c["trainable"] is False
     assert isinstance(meta_new_tree.sub_tree.d["bijector"], tfb.Softplus)
-    assert meta_new_tree.sub_tree.d["trainable"] == True
+    assert meta_new_tree.sub_tree.d["trainable"] is True
     assert isinstance(meta_new_tree.sub_tree.e["bijector"], tfb.Identity)
-    assert meta_new_tree.sub_tree.e["trainable"] == False
+    assert meta_new_tree.sub_tree.e["trainable"] is False
 
     # Test stop gradients
     def loss(tree):
@@ -427,25 +426,25 @@ def test_iterable_attribute(is_dataclass, iterable):
     assert isinstance(meta_tree, Pytree)
 
     assert isinstance(meta_tree.trees[0].a["bijector"], tfb.Identity)
-    assert meta_tree.trees[0].a["trainable"] == True
+    assert meta_tree.trees[0].a["trainable"] is True
     assert isinstance(meta_tree.trees[0].b["bijector"], tfb.Softplus)
-    assert meta_tree.trees[0].b["trainable"] == True
+    assert meta_tree.trees[0].b["trainable"] is True
     assert isinstance(meta_tree.trees[0].c["bijector"], tfb.Identity)
-    assert meta_tree.trees[0].c["trainable"] == False
+    assert meta_tree.trees[0].c["trainable"] is False
 
     assert isinstance(meta_tree.trees[1].a["bijector"], tfb.Identity)
-    assert meta_tree.trees[1].a["trainable"] == True
+    assert meta_tree.trees[1].a["trainable"] is True
     assert isinstance(meta_tree.trees[1].b["bijector"], tfb.Softplus)
-    assert meta_tree.trees[1].b["trainable"] == True
+    assert meta_tree.trees[1].b["trainable"] is True
     assert isinstance(meta_tree.trees[1].c["bijector"], tfb.Identity)
-    assert meta_tree.trees[1].c["trainable"] == False
+    assert meta_tree.trees[1].c["trainable"] is False
 
     assert isinstance(meta_tree.trees[2].a["bijector"], tfb.Identity)
-    assert meta_tree.trees[2].a["trainable"] == True
+    assert meta_tree.trees[2].a["trainable"] is True
     assert isinstance(meta_tree.trees[2].b["bijector"], tfb.Softplus)
-    assert meta_tree.trees[2].b["trainable"] == True
+    assert meta_tree.trees[2].b["trainable"] is True
     assert isinstance(meta_tree.trees[2].c["bijector"], tfb.Identity)
-    assert meta_tree.trees[2].c["trainable"] == False
+    assert meta_tree.trees[2].c["trainable"] is False
 
     # Test constrain and unconstrain
 

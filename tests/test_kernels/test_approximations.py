@@ -4,15 +4,20 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
-from jax.config import config
-
 from gpjax.kernels.approximations import RFF
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.nonstationary import Linear, Polynomial
-from gpjax.kernels.stationary import (RBF, Matern12, Matern32, Matern52,
-                                      Periodic, PoweredExponential,
-                                      RationalQuadratic)
+from gpjax.kernels.stationary import (
+    RBF,
+    Matern12,
+    Matern32,
+    Matern52,
+    Periodic,
+    PoweredExponential,
+    RationalQuadratic,
+)
 from gpjax.linops import DenseLinearOperator
+from jax.config import config
 
 config.update("jax_enable_x64", True)
 _jitter = 1e-6
@@ -22,7 +27,7 @@ _jitter = 1e-6
 @pytest.mark.parametrize("num_basis_fns", [2, 10, 20])
 @pytest.mark.parametrize("n_dims", [1, 2, 5])
 def test_frequency_sampler(kernel: AbstractKernel, num_basis_fns: int, n_dims: int):
-    key = jr.PRNGKey(123)
+    jr.PRNGKey(123)
     base_kernel = kernel(active_dims=list(range(n_dims)))
     approximate = RFF(base_kernel=base_kernel, num_basis_fns=num_basis_fns)
     assert approximate.frequencies.shape == (num_basis_fns, n_dims)

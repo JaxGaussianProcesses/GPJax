@@ -64,27 +64,19 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
         """Transpose linear operator. Currently, we assume all linear operators are square and symmetric."""
         return self
 
-    def __sub__(
-        self, other: Union[LinearOperator, Float[Array, "N N"]]
-    ) -> LinearOperator:
+    def __sub__(self, other: LinearOperator | Float[Array, "N N"]) -> LinearOperator:
         """Subtract linear operator."""
         return self + (other * -1)
 
-    def __rsub__(
-        self, other: Union[LinearOperator, Float[Array, "N N"]]
-    ) -> LinearOperator:
+    def __rsub__(self, other: LinearOperator | Float[Array, "N N"]) -> LinearOperator:
         """Reimplimentation of subtract linear operator."""
         return (self * -1) + other
 
-    def __add__(
-        self, other: Union[LinearOperator, Float[Array, "N N"]]
-    ) -> LinearOperator:
+    def __add__(self, other: LinearOperator | Float[Array, "N N"]) -> LinearOperator:
         """Add linear operator."""
         raise NotImplementedError
 
-    def __radd__(
-        self, other: Union[LinearOperator, Float[Array, "N N"]]
-    ) -> LinearOperator:
+    def __radd__(self, other: LinearOperator | Float[Array, "N N"]) -> LinearOperator:
         """Reimplimentation of add linear operator."""
         return self + other
 
@@ -104,14 +96,14 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
 
     @abc.abstractmethod
     def __matmul__(
-        self, other: Union[LinearOperator, Float[Array, "N M"]]
-    ) -> Union[LinearOperator, Float[Array, "N M"]]:
+        self, other: LinearOperator | Float[Array, "N M"]
+    ) -> LinearOperator | Float[Array, "N M"]:
         """Matrix multiplication."""
         raise NotImplementedError
 
     def __rmatmul__(
-        self, other: Union[LinearOperator, Float[Array, "N M"]]
-    ) -> Union[LinearOperator, Float[Array, "N M"]]:
+        self, other: LinearOperator | Float[Array, "N M"]
+    ) -> LinearOperator | Float[Array, "N M"]:
         """Reimplimentation of matrix multiplication."""
         # Exploit the fact that linear operators are square and symmetric.
         if other.ndim == 1:
@@ -119,30 +111,31 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
         return (self.T @ other.T).T
 
     @abc.abstractmethod
-    def diagonal(self) -> Float[Array, "N"]:
+    def diagonal(self) -> Float[Array, N]:
         """Diagonal of the linear operator.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N"]: Diagonal of the linear operator.
         """
-
         raise NotImplementedError
 
-    def trace(self) -> Float[Array, "1"]:
+    def trace(self) -> Float[Array, 1]:
         """Trace of the linear matrix.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "1"]: Trace of the linear matrix.
         """
         return jnp.sum(self.diagonal())
 
-    def log_det(self) -> Float[Array, "1"]:
+    def log_det(self) -> Float[Array, 1]:
         """Log determinant of the linear matrix. Default implementation uses dense Cholesky decomposition.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "1"]: Log determinant of the linear matrix.
         """
-
         root = self.to_root()
 
         return 2.0 * jnp.sum(jnp.log(root.diagonal()))
@@ -150,12 +143,13 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
     def to_root(self) -> LinearOperator:
         """Compute the root of the linear operator via the Cholesky decomposition.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N N"]: Lower Cholesky decomposition of the linear operator.
         """
-
-        from gpjax.linops.triangular_linear_operator import \
-            LowerTriangularLinearOperator
+        from gpjax.linops.triangular_linear_operator import (
+            LowerTriangularLinearOperator,
+        )
 
         L = jnp.linalg.cholesky(self.to_dense())
 
@@ -164,10 +158,10 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
     def inverse(self) -> LinearOperator:
         """Inverse of the linear matrix. Default implementation uses dense Cholesky decomposition.
 
-        Returns:
+        Returns
+        -------
             LinearOperator: Inverse of the linear matrix.
         """
-
         from gpjax.linops.dense_linear_operator import DenseLinearOperator
 
         n = self.shape[0]
@@ -180,10 +174,10 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
         Args:
             rhs (Float[Array, "N M"]): Right hand side of the linear system.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N M"]: Solution of the linear system.
         """
-
         root = self.to_root()
         rootT = root.T
 
@@ -193,7 +187,8 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
     def to_dense(self) -> Float[Array, "N N"]:
         """Construct dense matrix from the linear operator.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N N"]: Dense linear matrix.
         """
         raise NotImplementedError
@@ -205,7 +200,8 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
         Args:
             dense (Float[Array, "N N"]): Dense matrix.
 
-        Returns:
+        Returns
+        -------
             LinearOperator: Linear operator.
         """
         raise NotImplementedError
