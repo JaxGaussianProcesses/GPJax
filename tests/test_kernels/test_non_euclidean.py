@@ -37,9 +37,6 @@ def test_graph_kernel():
     assert kern.eigenvalues.shape == (n_verticies, 1)
     assert kern.eigenvectors.shape == (n_verticies, n_verticies)
 
-    # Unpack kernel computation
-    kern.gram
-
     # Compute gram matrix
     Kxx = kern.gram(x)
     assert Kxx.shape == (n_verticies, n_verticies)

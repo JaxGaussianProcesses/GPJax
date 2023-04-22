@@ -122,9 +122,6 @@ class BaseTestKernel:
         # Initialise kernel
         kernel: AbstractKernel = self.kernel()
 
-        # Gram constructor static method
-        kernel.gram
-
         # Inputs
         x = jnp.linspace(0.0, 1.0, n * dim).reshape(n, dim)
 
