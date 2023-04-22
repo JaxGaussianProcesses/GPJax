@@ -144,6 +144,7 @@ convention = "numpy"
 
 [tool.ruff.per-file-ignores]
 "gpjax/__init__.py" = ['I', 'F401', 'E402', 'D104']
+"gpjax/progress_bar.py" = ["TCH004"]
 "gpjax/scan.py" = ["PLR0913"]
 "tests/test_base/test_module.py" = ["PLR0915"]
 "tests/test_linops/test_linear_operator.py" = ["PLR0913"]
