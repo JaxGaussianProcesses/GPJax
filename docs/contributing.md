@@ -1,9 +1,9 @@
 # How can I contribute?
 
 GPJax welcomes contributions from interested individuals or groups. There are
-many ways to contibute, including:
+many ways to contribute, including:
 
-- Answering questions on our [dicussions
+- Answering questions on our [discussions
   page](https://github.com/JaxGaussianProcesses/GPJax/discussions).
 - Raising [issues](https://github.com/JaxGaussianProcesses/GPJax/issues) related to bugs
   or desired enhancements.
@@ -85,7 +85,7 @@ you through every detail!
   $ pre-commit install
   ```
 
-  Please ensure you have done this before commiting any files. If
+  Please ensure you have done this before committing any files. If
   successful, this will print the following output `pre-commit installed at
   .git/hooks/pre-commit`.
 

@@ -9,7 +9,7 @@ def test_abstract() -> None:
     with pytest.raises(TypeError):
         AbstractMeanFunction()
 
-    # Check a "dummy" mean funcion with defined abstract method, `__call__`, can be instantiated.
+    # Check a "dummy" mean function with defined abstract method, `__call__`, can be instantiated.
     class DummyMeanFunction(AbstractMeanFunction):
         def __call__(self, x: Float[Array, " D"]) -> Float[Array, "1"]:
             return jax.numpy.array([1.0])

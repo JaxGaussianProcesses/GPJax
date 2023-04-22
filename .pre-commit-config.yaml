@@ -1,10 +1,24 @@
+minimum_pre_commit_version: 2.15.0
+ci:
+  autofix_prs: false
 repos:
+  - repo: https://github.com/psf/black
+    rev: 23.3.0
+    hooks:
+    - id: black
+      language_version: python3.8
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
         exclude_types: [json, binary]
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.2
+    hooks:
+    -   id: codespell
+        types_or: [python, markdown]
+        additional_dependencies: [tomli]
   - repo: local
     hooks:
       - id: commitizen
@@ -24,12 +38,6 @@ repos:
         name: ruff
         entry: ruff
         args: ["--exit-non-zero-on-fix"]
-        require_serial: true
-        language: system
-        types: [python]
-      - id: black
-        name: black
-        entry: black
         require_serial: true
         language: system
         types: [python]

@@ -133,7 +133,7 @@ class Module(Pytree):
 
         Returns
         -------
-            Module: tranformed to the constrained space.
+            Module: transformed to the constrained space.
         """
 
         def _apply_constrain(meta_leaf):
@@ -151,7 +151,7 @@ class Module(Pytree):
 
         Returns
         -------
-            Module: tranformed to the unconstrained space.
+            Module: transformed to the unconstrained space.
         """
 
         def _apply_unconstrain(meta_leaf):

@@ -177,10 +177,10 @@ def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
     """
     x, y, n = train_data.X, train_data.y, train_data.n
 
-    # Subsample mini-batch indicies with replacement.
-    indicies = jr.choice(key, n, (batch_size,), replace=True)
+    # Subsample mini-batch indices with replacement.
+    indices = jr.choice(key, n, (batch_size,), replace=True)
 
-    return Dataset(X=x[indicies], y=y[indicies])
+    return Dataset(X=x[indices], y=y[indices])
 
 
 def _check_model(model: Any) -> None:

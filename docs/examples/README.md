@@ -35,7 +35,7 @@ documentation, then please either raise an issue or
 ## An example docstring
 
 An example docstring that adheres the principles of GPJax is given below.
-The docstring contains a simple, snappy introduction with links to auxillary
+The docstring contains a simple, snappy introduction with links to auxiliary
 components. More detail is then provided in the form of a mathematical
 description and a code example. The docstring is concluded with a description
 of the objects attributes with corresponding types.

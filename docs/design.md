@@ -1,8 +1,9 @@
 # Design Principles
 
-`GPJax` is designed to be a Gaussian process package that provides an
-accurate representation of the underlying maths. Variable names are chosen to closely match the notation in [@rasmussen2006gaussian].
-We here list the notation used in `GPJax` with its corresponding mathematical quantity.
+`GPJax` is designed to be a Gaussian process package that provides an accurate
+representation of the underlying maths. Variable names are chosen to closely
+match the notation in [@rasmussen2006gaussian]. We here list the notation used
+in `GPJax` with its corresponding mathematical quantity.
 
 ## Gaussian process notation
 
@@ -29,4 +30,9 @@ We here list the notation used in `GPJax` with its corresponding mathematical qu
 
 ## Package style
 
-Prior to building GPJax, the developers of GPJax have benefited greatly from the [GPFlow](https://github.com/GPflow/GPflow) and [GPyTorch](https://github.com/cornellius-gp/gpytorch) packages. As such, many of the design principles in GPJax are inspired by the excellent precursory pacakges. Documentation designs have been greatly inspired by the exceptional [Flax docs](https://flax.readthedocs.io/en/latest/index.html).
+Prior to building GPJax, the developers of GPJax have benefited greatly from the
+[GPFlow](https://github.com/GPflow/GPflow) and
+[GPyTorch](https://github.com/cornellius-gp/gpytorch) packages. As such, many of
+the design principles in GPJax are inspired by the excellent precursory
+packages. Documentation designs have been greatly inspired by the exceptional
+[Flax docs](https://flax.readthedocs.io/en/latest/index.html).
