@@ -1,7 +1,10 @@
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from jaxtyping import (
+    Array,
+    Float,
+)
 
 from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.linops import DenseLinearOperator

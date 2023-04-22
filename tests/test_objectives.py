@@ -1,9 +1,14 @@
-import gpjax as gpx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
-from gpjax import Bernoulli, Gaussian, Prior
+
+import gpjax as gpx
+from gpjax import (
+    Bernoulli,
+    Gaussian,
+    Prior,
+)
 from gpjax.dataset import Dataset
 from gpjax.objectives import (
     ELBO,

@@ -24,7 +24,10 @@ from gpjax.linops.triangular_linear_operator import (
     LowerTriangularLinearOperator,
     UpperTriangularLinearOperator,
 )
-from gpjax.linops.utils import identity, to_dense
+from gpjax.linops.utils import (
+    identity,
+    to_dense,
+)
 from gpjax.linops.zero_linear_operator import ZeroLinearOperator
 
 __all__ = [

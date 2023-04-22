@@ -16,7 +16,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    Any,
+)
 
 import jax.numpy as jnp
 
@@ -25,7 +28,11 @@ if TYPE_CHECKING:
     from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 
 from gpjax.linops.linear_operator import LinearOperator
-from gpjax.linops.utils import check_shapes_match, default_dtype, to_linear_operator
+from gpjax.linops.utils import (
+    check_shapes_match,
+    default_dtype,
+    to_linear_operator,
+)
 
 
 def _check_size(shape: Any) -> None:

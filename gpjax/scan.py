@@ -13,13 +13,20 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Any, Callable, List, Optional, Tuple, TypeVar
+from typing import (
+    Any,
+    Callable,
+    List,
+    Optional,
+    Tuple,
+    TypeVar,
+)
 
 import jax
-import jax.numpy as jnp
-import jax.tree_util as jtu
 from jax import lax
 from jax.experimental import host_callback as hcb
+import jax.numpy as jnp
+import jax.tree_util as jtu
 from tqdm.auto import trange
 
 Carry = TypeVar("Carry")

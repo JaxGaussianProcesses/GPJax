@@ -17,15 +17,22 @@ from __future__ import annotations
 
 __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
 
+from copy import (
+    copy,
+    deepcopy,
+)
 import dataclasses
 import os
-from copy import copy, deepcopy
-from typing import Any, Callable, Iterable, TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Iterable,
+)
 
 import jax
-import jax.tree_util as jtu
-import tensorflow_probability.substrates.jax.bijectors as tfb
 from jax._src.tree_util import _registry
+import jax.tree_util as jtu
 from orbax.checkpoint import (
     ArrayRestoreArgs,
     Checkpointer,
@@ -33,7 +40,11 @@ from orbax.checkpoint import (
     RestoreArgs,
     SaveArgs,
 )
-from simple_pytree import Pytree, static_field
+from simple_pytree import (
+    Pytree,
+    static_field,
+)
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
 if TYPE_CHECKING:
     from typing_extensions import Self

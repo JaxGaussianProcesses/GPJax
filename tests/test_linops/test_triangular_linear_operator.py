@@ -13,8 +13,8 @@
 # limitations under the License.
 # ==============================================================================
 
-import jax.random as jr
 from jax.config import config
+import jax.random as jr
 from jax.random import KeyArray
 
 # Test settings:

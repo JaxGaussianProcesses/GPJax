@@ -15,13 +15,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import jax.numpy as jnp
 from simple_pytree import Pytree
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from jaxtyping import Array, Float
+    from jaxtyping import (
+        Array,
+        Float,
+    )
 
 
 @dataclass

@@ -19,11 +19,17 @@ from typing import Any
 
 import jax.numpy as jnp
 import jax.scipy as jsp
-import tensorflow_probability.substrates.jax as tfp
-from jaxtyping import Array, Float
+from jaxtyping import (
+    Array,
+    Float,
+)
 from simple_pytree import static_field
+import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.base import Module, param_field
+from gpjax.base import (
+    Module,
+    param_field,
+)
 from gpjax.linops.utils import to_dense
 
 tfb = tfp.bijectors

@@ -15,9 +15,15 @@
 
 from dataclasses import dataclass
 
+from jax.config import config
 import jax.numpy as jnp
+from jaxtyping import (
+    Array,
+    Float,
+)
 import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
+
 from gpjax.base import param_field
 from gpjax.kernels.base import (
     AbstractKernel,
@@ -25,7 +31,10 @@ from gpjax.kernels.base import (
     ProductKernel,
     SumKernel,
 )
-from gpjax.kernels.nonstationary import Linear, Polynomial
+from gpjax.kernels.nonstationary import (
+    Linear,
+    Polynomial,
+)
 from gpjax.kernels.stationary import (
     RBF,
     Matern12,
@@ -33,8 +42,6 @@ from gpjax.kernels.stationary import (
     Matern52,
     RationalQuadratic,
 )
-from jax.config import config
-from jaxtyping import Array, Float
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

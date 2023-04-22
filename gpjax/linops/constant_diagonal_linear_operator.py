@@ -16,13 +16,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    Any,
+)
 
 import jax.numpy as jnp
 
 if TYPE_CHECKING:
     from jaxtyping import Array, Float
     from gpjax.linops.linear_operator import LinearOperator
+
 from simple_pytree import static_field
 
 from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator

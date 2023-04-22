@@ -15,23 +15,30 @@
 
 from dataclasses import is_dataclass
 from itertools import product
-from typing import Callable, List
+from typing import (
+    Callable,
+    List,
+)
 
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
+from jaxtyping import (
+    Array,
+    Float,
+)
 import numpy as np
 import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
+
 from gpjax.likelihoods import (
     AbstractLikelihood,
     Bernoulli,
     Gaussian,
     inv_probit,
 )
-from jax.config import config
-from jaxtyping import Array, Float
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

@@ -13,11 +13,17 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, Optional
+from typing import (
+    Callable,
+    Optional,
+)
 
 import jax.numpy as jnp
+from jaxtyping import (
+    Array,
+    Float,
+)
 import numpy as np
-from jaxtyping import Array, Float
 
 """The number of Gauss-Hermite points to use for quadrature"""
 DEFAULT_NUM_GAUSS_HERMITE_POINTS = 20

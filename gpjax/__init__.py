@@ -15,31 +15,40 @@
 
 from gpjax.dataset import Dataset
 from gpjax.fit import fit
-from gpjax.gps import Prior, construct_posterior
+from gpjax.gps import (
+    Prior,
+    construct_posterior,
+)
 from gpjax.kernels import (
-    AbstractKernel,
     RBF,
+    RFF,
+    AbstractKernel,
+    BasisFunctionComputation,
+    ConstantDiagonalKernelComputation,
+    DenseKernelComputation,
+    DiagonalKernelComputation,
+    EigenKernelComputation,
     GraphKernel,
+    Linear,
     Matern12,
     Matern32,
     Matern52,
-    Linear,
-    Polynomial,
-    ProductKernel,
-    SumKernel,
-    DenseKernelComputation,
-    DiagonalKernelComputation,
-    ConstantDiagonalKernelComputation,
-    EigenKernelComputation,
-    PoweredExponential,
     Periodic,
+    Polynomial,
+    PoweredExponential,
+    ProductKernel,
     RationalQuadratic,
+    SumKernel,
     White,
-    BasisFunctionComputation,
-    RFF,
 )
-from gpjax.likelihoods import Bernoulli, Gaussian
-from gpjax.mean_functions import Constant, Zero
+from gpjax.likelihoods import (
+    Bernoulli,
+    Gaussian,
+)
+from gpjax.mean_functions import (
+    Constant,
+    Zero,
+)
 from gpjax.objectives import (
     ELBO,
     CollapsedELBO,

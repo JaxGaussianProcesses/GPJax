@@ -13,16 +13,23 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Any, Optional, Tuple
+from typing import (
+    Any,
+    Optional,
+    Tuple,
+)
 from warnings import warn
 
 import jax
-import jax.random as jr
-import optax as ox
 from jax._src.random import _check_prng_key
+import jax.random as jr
 from jax.random import KeyArray
 from jaxlib.xla_extension import PjitFunction
-from jaxtyping import Array, Float
+from jaxtyping import (
+    Array,
+    Float,
+)
+import optax as ox
 
 from gpjax.base import Module
 from gpjax.dataset import Dataset

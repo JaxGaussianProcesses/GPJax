@@ -18,6 +18,7 @@ from dataclasses import is_dataclass
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import pytest
+
 from gpjax.dataset import Dataset
 
 

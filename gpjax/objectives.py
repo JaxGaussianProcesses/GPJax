@@ -11,12 +11,12 @@ if TYPE_CHECKING:
 from abc import abstractmethod
 from dataclasses import dataclass
 
+from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
 import jax.tree_util as jtu
-import tensorflow_probability.substrates.jax as tfp
-from jax import vmap
 from simple_pytree import static_field
+import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.base import Module
 from gpjax.gaussian_distribution import GaussianDistribution

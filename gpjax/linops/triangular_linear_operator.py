@@ -15,9 +15,10 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import jax.numpy as jnp
 import jax.scipy as jsp
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from jaxtyping import Array, Float

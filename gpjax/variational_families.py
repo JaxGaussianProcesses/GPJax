@@ -19,16 +19,26 @@ from typing import Any
 
 import jax.numpy as jnp
 import jax.scipy as jsp
-import tensorflow_probability.substrates.jax.bijectors as tfb
-from jaxtyping import Array, Float
+from jaxtyping import (
+    Array,
+    Float,
+)
 from simple_pytree import static_field
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import Module, param_field
+from gpjax.base import (
+    Module,
+    param_field,
+)
 from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.gps import AbstractPosterior
 from gpjax.likelihoods import Gaussian
-from gpjax.linops import DenseLinearOperator, LowerTriangularLinearOperator, identity
+from gpjax.linops import (
+    DenseLinearOperator,
+    LowerTriangularLinearOperator,
+    identity,
+)
 
 
 @dataclass

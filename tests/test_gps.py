@@ -16,11 +16,13 @@
 from dataclasses import is_dataclass
 from typing import Callable
 
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
 import pytest
 import tensorflow_probability.substrates.jax.distributions as tfd
+
 from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.gps import (
@@ -31,10 +33,21 @@ from gpjax.gps import (
     Prior,
     construct_posterior,
 )
-from gpjax.kernels import RBF, AbstractKernel, Matern52
-from gpjax.likelihoods import AbstractLikelihood, Bernoulli, Gaussian
-from gpjax.mean_functions import AbstractMeanFunction, Constant, Zero
-from jax.config import config
+from gpjax.kernels import (
+    RBF,
+    AbstractKernel,
+    Matern52,
+)
+from gpjax.likelihoods import (
+    AbstractLikelihood,
+    Bernoulli,
+    Gaussian,
+)
+from gpjax.mean_functions import (
+    AbstractMeanFunction,
+    Constant,
+    Zero,
+)
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

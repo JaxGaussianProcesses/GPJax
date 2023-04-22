@@ -16,9 +16,12 @@
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-import tensorflow_probability.substrates.jax.bijectors as tfb
-from jaxtyping import Array, Float
+from jaxtyping import (
+    Array,
+    Float,
+)
 from simple_pytree import static_field
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel

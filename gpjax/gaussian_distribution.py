@@ -13,16 +13,26 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Any, Optional, Tuple
+from typing import (
+    Any,
+    Optional,
+    Tuple,
+)
 
+from jax import vmap
 import jax.numpy as jnp
 import jax.random as jr
-import tensorflow_probability.substrates.jax as tfp
-from jax import vmap
 from jax.random import KeyArray
-from jaxtyping import Array, Float
+from jaxtyping import (
+    Array,
+    Float,
+)
+import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.linops import IdentityLinearOperator, LinearOperator
+from gpjax.linops import (
+    IdentityLinearOperator,
+    LinearOperator,
+)
 
 tfd = tfp.distributions
 

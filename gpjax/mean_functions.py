@@ -18,15 +18,22 @@ from __future__ import annotations
 import abc
 import dataclasses
 from functools import partial
-from typing import Callable, TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+)
 
 import jax.numpy as jnp
 
 if TYPE_CHECKING:
     from jaxtyping import Array, Float
+
 from simple_pytree import static_field
 
-from gpjax.base import Module, param_field
+from gpjax.base import (
+    Module,
+    param_field,
+)
 
 
 @dataclasses.dataclass

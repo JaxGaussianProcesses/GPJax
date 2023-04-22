@@ -15,19 +15,36 @@
 
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Any, Callable, Optional
+from typing import (
+    Any,
+    Callable,
+    Optional,
+)
 
 import jax.numpy as jnp
-from jax.random import KeyArray, PRNGKey, normal
-from jaxtyping import Array, Float
+from jax.random import (
+    KeyArray,
+    PRNGKey,
+    normal,
+)
+from jaxtyping import (
+    Array,
+    Float,
+)
 from simple_pytree import static_field
 
-from gpjax.base import Module, param_field
+from gpjax.base import (
+    Module,
+    param_field,
+)
 from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.kernels import RFF
 from gpjax.kernels.base import AbstractKernel
-from gpjax.likelihoods import AbstractLikelihood, Gaussian
+from gpjax.likelihoods import (
+    AbstractLikelihood,
+    Gaussian,
+)
 from gpjax.linops import identity
 from gpjax.mean_functions import AbstractMeanFunction
 

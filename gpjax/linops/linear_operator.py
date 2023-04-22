@@ -23,10 +23,21 @@ if TYPE_CHECKING:
 
 import abc
 from dataclasses import dataclass
-from typing import Any, Generic, Iterable, Mapping, Tuple, TypeVar, Union
+from typing import (
+    Any,
+    Generic,
+    Iterable,
+    Mapping,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 import jax.numpy as jnp
-from simple_pytree import Pytree, static_field
+from simple_pytree import (
+    Pytree,
+    static_field,
+)
 
 # Generic type.
 T = TypeVar("T")

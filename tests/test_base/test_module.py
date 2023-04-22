@@ -14,18 +14,33 @@
 # ==============================================================================
 
 import dataclasses
-from dataclasses import dataclass, field
-from typing import Any, Generic, Iterable, TypeVar
+from dataclasses import (
+    dataclass,
+    field,
+)
+from typing import (
+    Any,
+    Generic,
+    Iterable,
+    TypeVar,
+)
 
+from flax import serialization
 import jax
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import pytest
+from simple_pytree import (
+    Pytree,
+    static_field,
+)
 import tensorflow_probability.substrates.jax.bijectors as tfb
-from flax import serialization
-from gpjax.base.module import Module, meta
+
+from gpjax.base.module import (
+    Module,
+    meta,
+)
 from gpjax.base.param import param_field
-from simple_pytree import Pytree, static_field
 
 
 @pytest.mark.parametrize("is_dataclass", [True, False])

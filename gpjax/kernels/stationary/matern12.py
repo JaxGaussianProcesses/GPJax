@@ -16,9 +16,12 @@
 from dataclasses import dataclass
 
 import jax.numpy as jnp
+from jaxtyping import (
+    Array,
+    Float,
+)
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
-from jaxtyping import Array, Float
 
 from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel

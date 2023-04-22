@@ -13,7 +13,11 @@
 # limitations under the License.
 # ==============================================================================
 
-from jaxtyping import Array, Int, Num
+from jaxtyping import (
+    Array,
+    Int,
+    Num,
+)
 
 
 def jax_gather_nd(

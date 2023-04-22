@@ -18,16 +18,20 @@ from itertools import product
 from typing import List
 
 import jax
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
 import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
+
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import DenseKernelComputation
-from gpjax.kernels.nonstationary import Linear, Polynomial
+from gpjax.kernels.nonstationary import (
+    Linear,
+    Polynomial,
+)
 from gpjax.linops import LinearOperator
-from jax.config import config
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
