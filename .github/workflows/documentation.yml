@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest"]
-        python-version: ["3.9"]
+        python-version: ["3.8"]
 
     steps:
       # Grap the latest commit from the branch
@@ -46,5 +46,10 @@ jobs:
         run: |
           poetry install --all-extras --with docs
           conda install pandoc
-          cd docs
-          make html
+          poetry run mkdocs build
+
+      - name: Deploy Page 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.6
+        with:
+          branch: gh-pages
+          folder: site
