@@ -15,11 +15,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
 from simple_pytree import Pytree
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from jaxtyping import Array, Float
 
 
 @dataclass
@@ -28,8 +30,8 @@ class Dataset(Pytree):
 
     Attributes
     ----------
-        X (Optional[Float[Array, "N D"]]): Input data.
-        y (Optional[Float[Array, "N Q"]]): Output data.
+        X (Float[Array, "N D"]): Input data.
+        y (Float[Array, "N Q"]): Output data.
     """
 
     X: Float[Array, "N D"] | None = None

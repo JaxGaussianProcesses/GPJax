@@ -1,7 +1,6 @@
 from matplotlib import transforms
 import numpy as np
 from matplotlib.patches import Ellipse
-import typing as tp
 
 
 def confidence_ellipse(x, y, ax, n_std=3.0, facecolor="none", **kwargs):

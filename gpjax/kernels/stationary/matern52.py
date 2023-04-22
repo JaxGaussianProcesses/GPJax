@@ -32,13 +32,15 @@ from gpjax.kernels.stationary.utils import (
 class Matern52(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 2.5."""
 
-    lengthscale: Float[Array, "D"] = param_field(
+    lengthscale: Float[Array, " D"] = param_field(
         jnp.array([1.0]), bijector=tfb.Softplus()
     )
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
     name: str = "Matérn52"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
+    def __call__(
+        self, x: Float[Array, " D"], y: Float[Array, " D"]
+    ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
         lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`.
 
@@ -46,8 +48,8 @@ class Matern52(AbstractKernel):
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{5}\\lvert x-y \\rvert}{\\ell^2} + \\frac{5\\lvert x - y \\rvert^2}{3\\ell^2} \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{5}\\lvert x-y\\rvert}{\\ell^2} \\Bigg)
 
         Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's call.
+            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
 
         Returns
         -------

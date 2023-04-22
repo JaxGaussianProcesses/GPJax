@@ -16,12 +16,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Tuple, Union
+from typing import Any, TYPE_CHECKING
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
 
-from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+if TYPE_CHECKING:
+    from jaxtyping import Array, Float
+    from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+
 from gpjax.linops.linear_operator import LinearOperator
 from gpjax.linops.utils import check_shapes_match, default_dtype, to_linear_operator
 
@@ -50,7 +52,7 @@ class ZeroLinearOperator(LinearOperator):
         self.shape = shape
         self.dtype = dtype
 
-    def diagonal(self) -> Float[Array, N]:
+    def diagonal(self) -> Float[Array, " N"]:
         """
         Diagonal of the covariance operator.
 

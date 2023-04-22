@@ -3,8 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from gpjax.dataset import Dataset
     from gpjax.gps import ConjugatePosterior, NonConjugatePosterior
     from gpjax.variational_families import AbstractVariationalFamily
+    from jaxtyping import Array, Float
 
 from abc import abstractmethod
 from dataclasses import dataclass
@@ -14,11 +16,9 @@ import jax.scipy as jsp
 import jax.tree_util as jtu
 import tensorflow_probability.substrates.jax as tfp
 from jax import vmap
-from jaxtyping import Array, Float
 from simple_pytree import static_field
 
 from gpjax.base import Module
-from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.linops import identity
 from gpjax.quadrature import gauss_hermite_quadrature

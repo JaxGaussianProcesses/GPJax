@@ -11,7 +11,7 @@ def test_abstract() -> None:
 
     # Check a "dummy" mean funcion with defined abstract method, `__call__`, can be instantiated.
     class DummyMeanFunction(AbstractMeanFunction):
-        def __call__(self, x: Float[Array, "D"]) -> Float[Array, "1"]:
+        def __call__(self, x: Float[Array, " D"]) -> Float[Array, "1"]:
             return jax.numpy.array([1.0])
 
     mf = DummyMeanFunction()
@@ -23,7 +23,7 @@ def test_abstract() -> None:
 @pytest.mark.parametrize(
     "constant", [jax.numpy.array([0.0]), jax.numpy.array([1.0]), jax.numpy.array([3.0])]
 )
-def test_constant(constant: Float[Array, "Q"]) -> None:
+def test_constant(constant: Float[Array, " Q"]) -> None:
     mf = Constant(constant=constant)
 
     assert isinstance(mf, AbstractMeanFunction)

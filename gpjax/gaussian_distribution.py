@@ -37,7 +37,7 @@ def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
 
     if scale is not None and scale.ndim < 2:
         raise ValueError(
-            f"The `scale` must have at least two dimensions, but "
+            "The `scale` must have at least two dimensions, but "
             f"`scale.shape = {scale.shape}`."
         )
 
@@ -48,8 +48,7 @@ def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
 
     if scale is not None and (scale.shape[-1] != scale.shape[-2]):
         raise ValueError(
-            f"The `scale` must be a square matrix, but "
-            f"`scale.shape = {scale.shape}`."
+            f"The `scale` must be a square matrix, but `scale.shape = {scale.shape}`."
         )
 
     if loc is not None:
@@ -80,7 +79,7 @@ class GaussianDistribution(tfd.Distribution):
 
     def __init__(
         self,
-        loc: Optional[Float[Array, "N"]] = None,
+        loc: Optional[Float[Array, " N"]] = None,
         scale: Optional[LinearOperator] = None,
     ) -> None:
         """Initialises the distribution."""
@@ -104,15 +103,15 @@ class GaussianDistribution(tfd.Distribution):
         self.loc = loc
         self.scale = scale
 
-    def mean(self) -> Float[Array, "N"]:
+    def mean(self) -> Float[Array, " N"]:
         """Calculates the mean."""
         return self.loc
 
-    def median(self) -> Float[Array, "N"]:
+    def median(self) -> Float[Array, " N"]:
         """Calculates the median."""
         return self.loc
 
-    def mode(self) -> Float[Array, "N"]:
+    def mode(self) -> Float[Array, " N"]:
         """Calculates the mode."""
         return self.loc
 
@@ -120,11 +119,11 @@ class GaussianDistribution(tfd.Distribution):
         """Calculates the covariance matrix."""
         return self.scale.to_dense()
 
-    def variance(self) -> Float[Array, "N"]:
+    def variance(self) -> Float[Array, " N"]:
         """Calculates the variance."""
         return self.scale.diagonal()
 
-    def stddev(self) -> Float[Array, "N"]:
+    def stddev(self) -> Float[Array, " N"]:
         """Calculates the standard deviation."""
         return jnp.sqrt(self.scale.diagonal())
 
@@ -139,7 +138,7 @@ class GaussianDistribution(tfd.Distribution):
             self.event_shape[0] * (1.0 + jnp.log(2.0 * jnp.pi)) + self.scale.log_det()
         )
 
-    def log_prob(self, y: Float[Array, "N"]) -> Float[Array, "1"]:
+    def log_prob(self, y: Float[Array, " N"]) -> Float[Array, "1"]:
         """Calculates the log pdf of the multivariate Gaussian.
 
         Args:
@@ -199,8 +198,9 @@ def _check_and_return_dimension(
     """Checks that the dimensions of the distributions are compatible."""
     if q.event_shape != p.event_shape:
         raise ValueError(
-            f"Distribution event shapes are not compatible: `q.event_shape = {q.event_shape}` and "
-            f"`p.event_shape = {p.event_shape}`. Please check your mean and covariance shapes."
+            "Distribution event shapes are not compatible: `q.event_shape ="
+            f" {q.event_shape}` and `p.event_shape = {p.event_shape}`. Please check"
+            " your mean and covariance shapes."
         )
 
     return q.event_shape[-1]

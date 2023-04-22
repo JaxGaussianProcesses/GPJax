@@ -16,14 +16,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Union
+from typing import Any, TYPE_CHECKING
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+
+if TYPE_CHECKING:
+    from jaxtyping import Array, Float
+    from gpjax.linops.linear_operator import LinearOperator
 from simple_pytree import static_field
 
 from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
-from gpjax.linops.linear_operator import LinearOperator
 
 
 def _check_args(value: Any, size: Any) -> None:
@@ -32,7 +34,8 @@ def _check_args(value: Any, size: Any) -> None:
 
     if value.ndim != 1:
         raise ValueError(
-            f"`value` must be one dimensional scalar, but `value.shape = {value.shape}`."
+            "`value` must be one dimensional scalar, but `value.shape ="
+            f" {value.shape}`."
         )
 
 
@@ -70,7 +73,8 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
                 )
 
             raise ValueError(
-                f"`length` must be the same, but `length = {self.size}` and `length = {other.size}`."
+                f"`length` must be the same, but `length = {self.size}` and `length ="
+                f" {other.size}`."
             )
 
         else:
@@ -105,13 +109,14 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
                 )
 
             raise ValueError(
-                f"`length` must be the same, but `length = {self.size}` and `length = {other.size}`."
+                f"`length` must be the same, but `length = {self.size}` and `length ="
+                f" {other.size}`."
             )
 
         else:
             return super()._add_diagonal(other)
 
-    def diagonal(self) -> Float[Array, N]:
+    def diagonal(self) -> Float[Array, " N"]:
         """Diagonal of the covariance operator."""
         return self.value * jnp.ones(self.size)
 

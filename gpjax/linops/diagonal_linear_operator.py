@@ -16,10 +16,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Union
+from typing import Any, TYPE_CHECKING
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+
+if TYPE_CHECKING:
+    from jaxtyping import Array, Float
 
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
 from gpjax.linops.linear_operator import LinearOperator
@@ -30,7 +32,7 @@ def _check_diag(diag: Any) -> None:
     """Check if the diagonal is a vector."""
     if diag.ndim != 1:
         raise ValueError(
-            f"The `matrix` must be a one dimension vector, but "
+            "The `matrix` must be a one dimension vector, but "
             f"`diag.shape = {diag.shape}`."
         )
 
@@ -39,9 +41,9 @@ def _check_diag(diag: Any) -> None:
 class DiagonalLinearOperator(LinearOperator):
     """Diagonal covariance operator."""
 
-    diag: Float[Array, N]
+    diag: Float[Array, " N"]
 
-    def __init__(self, diag: Float[Array, N], dtype: jnp.dtype = None) -> None:
+    def __init__(self, diag: Float[Array, " N"], dtype: jnp.dtype = None) -> None:
         """Initialize the covariance operator.
 
         Args:
@@ -57,7 +59,7 @@ class DiagonalLinearOperator(LinearOperator):
         self.shape = (dim, dim)
         self.dtype = diag.dtype
 
-    def diagonal(self) -> Float[Array, N]:
+    def diagonal(self) -> Float[Array, " N"]:
         """Diagonal of the covariance operator.
 
         Returns
@@ -218,10 +220,10 @@ class DiagonalFromRootLinearOperator(DiagonalLinearOperator):
         return self.root
 
     @property
-    def diag(self) -> Float[Array, N]:
+    def diag(self) -> Float[Array, " N"]:
         return self.root.diagonal() ** 2
 
-    def diagonal(self) -> Float[Array, N]:
+    def diagonal(self) -> Float[Array, " N"]:
         return self.root.diagonal() ** 2
 
 

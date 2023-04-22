@@ -15,14 +15,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Tuple, Union
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from gpjax.linops.identity_linear_operator import IdentityLinearOperator
+    from jaxtyping import Array, Float
 
 import jax
 import jax.numpy as jnp
-from jaxtyping import Array, Float
 
 from gpjax.linops.linear_operator import LinearOperator
 

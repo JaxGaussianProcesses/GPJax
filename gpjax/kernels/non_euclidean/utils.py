@@ -17,7 +17,7 @@ from jaxtyping import Array, Int, Num
 
 
 def jax_gather_nd(
-    params: Num[Array, "N ..."], indices: Int[Array, "M"]
+    params: Num[Array, "N ..."], indices: Int[Array, " M"]
 ) -> Num[Array, "M ..."]:
     """Slice a `params` array at a set of `indices`.
 

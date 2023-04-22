@@ -43,6 +43,7 @@ nox = "^2022.11.21"
 ruff = "^0.0.259"
 flax = "^0.6.8"
 nbstripout = "^0.6.1"
+pydocstyle = "^6.3.0"
 
 
 [tool.poetry.group.docs.dependencies]
@@ -142,7 +143,11 @@ target-version = "py38"
 convention = "numpy"
 
 [tool.ruff.per-file-ignores]
-"__init__.py" = ['I', 'F401', 'E402', 'D104']
+"gpjax/__init__.py" = ['I', 'F401', 'E402', 'D104']
+"gpjax/scan.py" = ["PLR0913"]
+"tests/test_base/test_module.py" = ["PLR0915"]
+"tests/test_linops/test_linear_operator.py" = ["PLR0913"]
+"tests/test_objectives.py" = ["PLR0913"]
 
 [tool.coverage.report]  # https://coverage.readthedocs.io/en/latest/config.html#report
 fail_under = 50

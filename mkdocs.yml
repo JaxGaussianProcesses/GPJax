@@ -41,6 +41,8 @@ theme:
     - content.code.annotate # Allow individual lines of code to be annotated
   icon:
     repo: fontawesome/brands/github
+  logo: _static/favicon.ico
+  favicon: _static/favicon.ico
 
 markdown_extensions:
   - admonition
@@ -81,9 +83,13 @@ plugins:
       cite_inline: true
   - mkdocs-jupyter:
       execute: false
+#     binder: true
+#     binder_service_name: "gh"
+#     binder_branch: "main"
       watch:
         - gpjax
   - mkdocstrings:
+      default_handler: python
       handlers:
         python:
           selection:
@@ -96,6 +102,9 @@ plugins:
             show_source: false  # don't include source code
             members_order: source  # order methods according to their order of definition in the source code, not alphabetical order
             heading_level: 4
+          options:
+            docstring_style: "google"
+
   - git-authors:
       show_contribution: false
       show_line_count: true

@@ -20,7 +20,7 @@ __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
 import dataclasses
 import os
 from copy import copy, deepcopy
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, TYPE_CHECKING
 
 import jax
 import jax.tree_util as jtu
@@ -34,7 +34,9 @@ from orbax.checkpoint import (
     SaveArgs,
 )
 from simple_pytree import Pytree, static_field
-from typing_extensions import Self
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 
 class Module(Pytree):

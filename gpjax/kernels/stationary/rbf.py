@@ -29,13 +29,15 @@ from gpjax.kernels.stationary.utils import squared_distance
 class RBF(AbstractKernel):
     """The Radial Basis Function (RBF) kernel."""
 
-    lengthscale: Float[Array, "D"] = param_field(
+    lengthscale: Float[Array, " D"] = param_field(
         jnp.array([1.0]), bijector=tfb.Softplus()
     )
     variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
     name: str = "RBF"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
+    def __call__(
+        self, x: Float[Array, " D"], y: Float[Array, " D"]
+    ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
         lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`.
 
@@ -44,8 +46,8 @@ class RBF(AbstractKernel):
 
         Args:
             params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's call.
+            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
 
         Returns
         -------

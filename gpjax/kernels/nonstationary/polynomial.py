@@ -35,7 +35,9 @@ class Polynomial(AbstractKernel):
     def __post_init__(self):
         self.name = f"Polynomial (degree {self.degree})"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
+    def __call__(
+        self, x: Float[Array, " D"], y: Float[Array, " D"]
+    ) -> Float[Array, "1"]:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter
         :math:`\\alpha` and variance :math:`\\sigma^2` through.
 

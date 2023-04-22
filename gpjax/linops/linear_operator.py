@@ -19,13 +19,13 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+    from jaxtyping import Array, Float
 
 import abc
 from dataclasses import dataclass
 from typing import Any, Generic, Iterable, Mapping, Tuple, TypeVar, Union
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
 from simple_pytree import Pytree, static_field
 
 # Generic type.
@@ -111,7 +111,7 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
         return (self.T @ other.T).T
 
     @abc.abstractmethod
-    def diagonal(self) -> Float[Array, N]:
+    def diagonal(self) -> Float[Array, " N"]:
         """Diagonal of the linear operator.
 
         Returns

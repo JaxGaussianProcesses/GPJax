@@ -18,7 +18,7 @@ from __future__ import annotations
 __all__ = ["param_field"]
 
 import dataclasses
-from typing import Any, Mapping, Optional
+from typing import Any, Mapping
 
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
@@ -26,7 +26,7 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 def param_field(
     default: Any = dataclasses.MISSING,
     *,
-    bijector: tfb.Bijector = tfb.Identity(),
+    bijector: tfb.Bijector = None,
     trainable: bool = True,
     default_factory: Any = dataclasses.MISSING,
     init: bool = True,
@@ -45,7 +45,8 @@ def param_field(
 
     if "pytree_node" in metadata:
         raise ValueError("Cannot use metadata with `pytree_node` already set.")
-
+    if bijector is None:
+        bijector = tfb.Identity()
     metadata["bijector"] = bijector
     metadata["trainable"] = trainable
     metadata["pytree_node"] = True

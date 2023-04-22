@@ -169,8 +169,6 @@ def inv_probit(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
 
 __all__ = [
     "AbstractLikelihood",
-    "Conjugate",
-    "NonConjugate",
     "Gaussian",
     "Bernoulli",
     "inv_probit",

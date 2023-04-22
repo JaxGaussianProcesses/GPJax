@@ -19,12 +19,11 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+    from jaxtyping import Array, Float
 
 from dataclasses import dataclass
-from typing import Union
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
 
 from gpjax.linops.linear_operator import LinearOperator
 from gpjax.linops.utils import to_linear_operator
@@ -33,14 +32,13 @@ from gpjax.linops.utils import to_linear_operator
 def _check_matrix(matrix: Array) -> None:
     if matrix.ndim != 2:
         raise ValueError(
-            f"The `matrix` must have at two dimensions, but "
+            "The `matrix` must have at two dimensions, but "
             f"`scale.shape = {matrix.shape}`."
         )
 
     if matrix.shape[-1] != matrix.shape[-2]:
         raise ValueError(
-            f"The `matrix` must be a square matrix, but "
-            f"`scale.shape = {matrix.shape}`."
+            f"The `matrix` must be a square matrix, but `scale.shape = {matrix.shape}`."
         )
 
 
@@ -120,7 +118,7 @@ class DenseLinearOperator(LinearOperator):
 
         return DenseLinearOperator(matrix=new_matrix)
 
-    def diagonal(self) -> Float[Array, N]:
+    def diagonal(self) -> Float[Array, " N"]:
         """
         Diagonal of the covariance operator.
 

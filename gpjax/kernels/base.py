@@ -18,10 +18,13 @@ from __future__ import annotations
 import abc
 from dataclasses import dataclass
 from functools import partial
-from typing import Callable, List, Union
+from typing import Callable, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from jaxtyping import Array, Float
+    import tensorflow_probability.substrates.jax.distributions as tfd
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
 from simple_pytree import static_field
 
 from gpjax.base import Module, param_field
@@ -61,8 +64,8 @@ class AbstractKernel(Module):
     @abc.abstractmethod
     def __call__(
         self,
-        x: Float[Array, D],
-        y: Float[Array, D],
+        x: Float[Array, " D"],
+        y: Float[Array, " D"],
     ) -> Float[Array, 1]:
         """Evaluate the kernel on a pair of inputs.
 
@@ -130,7 +133,7 @@ class Constant(AbstractKernel):
 
     constant: Float[Array, 1] = param_field(jnp.array(0.0))
 
-    def __call__(self, x: Float[Array, D], y: Float[Array, D]) -> Float[Array, 1]:
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> Float[Array, 1]:
         """Evaluate the kernel on a pair of inputs.
 
         Args:
@@ -168,8 +171,8 @@ class CombinationKernel(AbstractKernel):
 
     def __call__(
         self,
-        x: Float[Array, D],
-        y: Float[Array, D],
+        x: Float[Array, " D"],
+        y: Float[Array, " D"],
     ) -> Float[Array, 1]:
         """Evaluate the kernel on a pair of inputs.
 

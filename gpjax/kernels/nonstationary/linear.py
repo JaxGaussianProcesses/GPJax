@@ -32,8 +32,8 @@ class Linear(AbstractKernel):
 
     def __call__(
         self,
-        x: Float[Array, "D"],
-        y: Float[Array, "D"],
+        x: Float[Array, " D"],
+        y: Float[Array, " D"],
     ) -> Float[Array, "1"]:
         """Evaluate the linear kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\\sigma`.
 

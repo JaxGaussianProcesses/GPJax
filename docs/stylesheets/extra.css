@@ -69,10 +69,17 @@ html {
     margin-bottom: 1.5rem;
   }
 
-  /* Indentation */
-  /* This makes the documentation much more readable */
-  div.doc-contents:not(.first) {
-    padding-left: 25px;
-    border-left: 4px solid rgba(230, 230, 230);
-    margin-bottom: 80px;
-  }
+/* Indentation */
+/* This makes the documentation much more readable */
+div.doc-contents:not(.first) {
+  padding-left: 25px;
+  border-left: 4px solid rgba(230, 230, 230);
+  margin-bottom: 80px;
+}
+
+/* prevent selection of chevron in example blocks
+ * cf. https://mkdocstrings.github.io/recipes/#prevent-selection-of-prompts-and-output-in-python-code-blocks
+ */
+ .highlight .gp, .highlight .go { /* Generic.Prompt, Generic.Output */
+  user-select: none;
+}

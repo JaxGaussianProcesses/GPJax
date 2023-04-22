@@ -13,11 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Any, Callable, Union
+from typing import Any, Callable, Union, TYPE_CHECKING
 
 from jax import lax
 from jax.experimental import host_callback
-from jaxtyping import Array, Float
+
+if TYPE_CHECKING:
+    from jaxtyping import Array, Float
 from tqdm.auto import tqdm
 
 
