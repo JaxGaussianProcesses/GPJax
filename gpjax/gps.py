@@ -414,7 +414,7 @@ class ConjugatePosterior(AbstractPosterior):
         # Σ = Kxx + Io²
         Sigma = Kxx + identity(n) * obs_noise
 
-        μt = self.prior.mean_function(t)
+        mean_t = self.prior.mean_function(t)
         Ktt = self.prior.kernel.gram(t)
         Kxt = self.prior.kernel.cross_covariance(x, t)
 
@@ -422,7 +422,7 @@ class ConjugatePosterior(AbstractPosterior):
         Sigma_inv_Kxt = Sigma.solve(Kxt)
 
         # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
-        mean = μt + jnp.matmul(Sigma_inv_Kxt.T, y - mx)
+        mean = mean_t + jnp.matmul(Sigma_inv_Kxt.T, y - mx)
 
         # Ktt  -  Ktx (Kxx + Io²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
         covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
@@ -593,7 +593,7 @@ class NonConjugatePosterior(AbstractPosterior):
         # Compute terms of the posterior predictive distribution
         Ktx = kernel.cross_covariance(t, x)
         Ktt = kernel.gram(t) + identity(n_test) * self.prior.jitter
-        μt = mean_function(t)
+        mean_t = mean_function(t)
 
         # Lx⁻¹ Kxt
         Lx_inv_Kxt = Lx.solve(Ktx.T)
@@ -602,7 +602,7 @@ class NonConjugatePosterior(AbstractPosterior):
         wx = self.latent
 
         # μt + Ktx Lx⁻¹ wx
-        mean = μt + jnp.matmul(Lx_inv_Kxt.T, wx)
+        mean = mean_t + jnp.matmul(Lx_inv_Kxt.T, wx)
 
         # Ktt - Ktx Kxx⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
         covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)

@@ -1,4 +1,4 @@
-name: Ruff
+name: Check linting
 on:
   push:
     branches:
