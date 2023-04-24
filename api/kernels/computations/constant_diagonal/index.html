@@ -1637,7 +1637,8 @@
 
   <div class="doc doc-contents ">
   
-      <p>Compute Gram covariance operator of the kernel function.</p>
+      <p>Compute the Gram matrix.</p>
+<p>Compute Gram covariance operator of the kernel function.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1679,8 +1680,9 @@
 
   <div class="doc doc-contents ">
   
-      <p>For a given kernel, compute the elementwise diagonal of the
-NxN gram matrix on an input matrix of shape NxD.</p>
+      <p>Compute the diagonal Gram matrix's entries.</p>
+<p>For a given kernel, compute the elementwise diagonal of the
+NxN gram matrix on an input matrix of shape <span class="arithmatex">\(N\times D\)</span>.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1698,18 +1700,8 @@ NxN gram matrix on an input matrix of shape NxD.</p>
           <td>
                 <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
           </td>
-          <td><p>The kernel for which the variance
-vector should be computed for.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>params</code></td>
-          <td>
-                <code>Dict</code>
-          </td>
-          <td><p>The kernel's parameter set.</p></td>
+          <td><p>The kernel for which the variance vector should be
+computed for.</p></td>
           <td>
               <em>required</em>
           </td>
@@ -1727,7 +1719,7 @@ vector should be computed for.</p></td>
     </tbody>
   </table>
       <h6 id="gpjax.kernels.computations.constant_diagonal.ConstantDiagonalKernelComputation.diagonal--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>LinearOperator: The computed diagonal variance entries.
+<div class="highlight"><pre><span></span><code>DiagonalLinearOperator: The computed diagonal variance entries.
 </code></pre></div>
 
   </div>
@@ -1746,7 +1738,8 @@ vector should be computed for.</p></td>
 
   <div class="doc doc-contents ">
   
-      <p>For a given kernel, compute the NxM covariance matrix on a pair of input
+      <p>Compute the cross-covariance matrix.</p>
+<p>For a given kernel, compute the NxM covariance matrix on a pair of input
 matrices of shape NxD and MxD.</p>
 
   <p><strong>Parameters:</strong></p>
@@ -1783,7 +1776,7 @@ matrices of shape NxD and MxD.</p>
     </tbody>
   </table>
       <h6 id="gpjax.kernels.computations.constant_diagonal.ConstantDiagonalKernelComputation.cross_covariance--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>CovarianceOperator: The computed square Gram matrix.
+<div class="highlight"><pre><span></span><code>Float[Array, &quot;N M&quot;]: The computed square Gram matrix.
 </code></pre></div>
 
   </div>

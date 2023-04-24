@@ -2711,7 +2711,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=7e88ea7b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=4d93cf2b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2726,7 +2726,7 @@ Carlo (MCMC). We focus on a classification task here and use
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=814ab944" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=73ec0981" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2749,10 +2749,14 @@ Carlo (MCMC). We focus on a classification task here and use
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
 
 <span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
 </pre></div>
 <div id="cell-1" class="clipboard-copy-txt">from jax.config import config
 
-config.update("jax_enable_x64", True)</div>
+config.update("jax_enable_x64", True)
+
+from time import time</div>
         
         </div>
     </div>
@@ -2762,7 +2766,7 @@ config.update("jax_enable_x64", True)</div>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=bfecb053" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=b1180c70" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2795,6 +2799,7 @@ config.update("jax_enable_x64", True)</div>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">optax</span> <span class="k">as</span> <span class="nn">ox</span>
 <span class="kn">import</span> <span class="nn">tensorflow_probability.substrates.jax</span> <span class="k">as</span> <span class="nn">tfp</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span>
 
 <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
 
@@ -2819,6 +2824,7 @@ from jaxtyping import (
 import matplotlib.pyplot as plt
 import optax as ox
 import tensorflow_probability.substrates.jax as tfp
+from tqdm import trange
 
 import gpjax as gpx
 
@@ -2838,7 +2844,7 @@ cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]</div>
 
 </div>
 </div>
-<div id="cell-id=133d34f3" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=7a654e7d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2854,7 +2860,7 @@ later.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=8fbcc9c2" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=e6446d95" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2904,7 +2910,7 @@ ax.scatter(x, y)</div>
 
 </div>
 </div>
-<div id="cell-id=77c99b63" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=1d56b5d1" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2918,7 +2924,7 @@ choose a Bernoulli likelihood with a probit link function.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=28e670ce" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=d85cecb2" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2956,7 +2962,7 @@ likelihood = gpx.Bernoulli(num_datapoints=D.n)</div>
 
 </div>
 </div>
-<div id="cell-id=989d06ac" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=5d3464fe" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2968,7 +2974,7 @@ likelihood = gpx.Bernoulli(num_datapoints=D.n)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=20353b8a" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=f83f4ea8" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3002,7 +3008,7 @@ print(type(posterior))</div>
 
 </div>
 </div>
-<div id="cell-id=d51fa7dc" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=337242b0" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3021,7 +3027,7 @@ marginal log-likelihood.</p>
 </div>
 </div>
 </div>
-<div id="cell-id=f195fa5b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=01f34c93" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3034,7 +3040,7 @@ Optax's optimisers.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=bcbb5f28" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=d148dc71" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3086,7 +3092,7 @@ opt_posterior, history = gpx.fit(
 
 </div>
 </div>
-<div id="cell-id=8300b2f7" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=90522e2e" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3098,7 +3104,7 @@ opt_posterior, history = gpx.fit(
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=6d5b82ca" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=b6baa7ab" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3129,22 +3135,22 @@ opt_posterior, history = gpx.fit(
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xtest</span><span class="p">,</span> <span class="n">predictive_mean</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Predictive mean&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
     <span class="n">xtest</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span>
-    <span class="n">predictive_mean</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">predictive_std</span><span class="p">,</span>
-    <span class="n">predictive_mean</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">predictive_std</span><span class="p">,</span>
+    <span class="n">predictive_mean</span> <span class="o">-</span> <span class="n">predictive_std</span><span class="p">,</span>
+    <span class="n">predictive_mean</span> <span class="o">+</span> <span class="n">predictive_std</span><span class="p">,</span>
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
     <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Two sigma&quot;</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;One sigma&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">xtest</span><span class="p">,</span>
-    <span class="n">predictive_mean</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">predictive_std</span><span class="p">,</span>
+    <span class="n">predictive_mean</span> <span class="o">-</span> <span class="n">predictive_std</span><span class="p">,</span>
     <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
     <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
     <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">xtest</span><span class="p">,</span>
-    <span class="n">predictive_mean</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">predictive_std</span><span class="p">,</span>
+    <span class="n">predictive_mean</span> <span class="o">+</span> <span class="n">predictive_std</span><span class="p">,</span>
     <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
     <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
     <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -3163,22 +3169,22 @@ ax.scatter(x, y, label="Observations", color=cols[0])
 ax.plot(xtest, predictive_mean, label="Predictive mean", color=cols[1])
 ax.fill_between(
     xtest.squeeze(),
-    predictive_mean - 2 * predictive_std,
-    predictive_mean + 2 * predictive_std,
+    predictive_mean - predictive_std,
+    predictive_mean + predictive_std,
     alpha=0.2,
     color=cols[1],
-    label="Two sigma",
+    label="One sigma",
 )
 ax.plot(
     xtest,
-    predictive_mean - 2 * predictive_std,
+    predictive_mean - predictive_std,
     color=cols[1],
     linestyle="--",
     linewidth=1,
 )
 ax.plot(
     xtest,
-    predictive_mean + 2 * predictive_std,
+    predictive_mean + predictive_std,
     color=cols[1],
     linestyle="--",
     linewidth=1,
@@ -3194,7 +3200,7 @@ ax.legend()</div>
 
 </div>
 </div>
-<div id="cell-id=ecb4c5aa" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=e9f4d3f1" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3210,7 +3216,7 @@ p(f(\cdot)| \mathcal{D})  \approx q_{map}(f(\cdot)) := \int p(f(\cdot)| \boldsym
 </div>
 </div>
 </div>
-<div id="cell-id=77e377a3" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=6bbfbc57" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3223,7 +3229,7 @@ quantification, providing only a single piece of information about the posterior
 </div>
 </div>
 </div>
-<div id="cell-id=247c40c3" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=1a55be67" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3253,7 +3259,7 @@ datapoints below.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=709b6a0a" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=7032f9f7" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3321,7 +3327,7 @@ laplace_approximation = tfd.MultivariateNormalTriL(f_hat.squeeze(), LH)</div>
 
 </div>
 </div>
-<div id="cell-id=c8d6d1b5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=d2659f90" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3341,7 +3347,7 @@ to the covariance to construct $q_{Laplace}(f(\cdot))$.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=8042d65b" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=53b70813" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3413,7 +3419,7 @@ to the covariance to construct $q_{Laplace}(f(\cdot))$.</p>
 
 </div>
 </div>
-<div id="cell-id=9fc37671" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=63d0f583" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3425,7 +3431,7 @@ to the covariance to construct $q_{Laplace}(f(\cdot))$.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=8ea9b563" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=0de7da96" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3519,7 +3525,7 @@ ax.legend()</div>
 
 </div>
 </div>
-<div id="cell-id=0b96de64" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=f70082ab" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3533,7 +3539,7 @@ MCMC methods allow us to learn all information about the posterior distribution.
 </div>
 </div>
 </div>
-<div id="cell-id=f25f5d7b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=15186109" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3567,7 +3573,7 @@ drawing more samples will be necessary.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=2e2140a6" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=b060fb57" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3588,7 +3594,7 @@ drawing more samples will be necessary.</p>
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">num_adapt</span> <span class="o">=</span> <span class="mi">500</span>
-<span class="n">num_samples</span> <span class="o">=</span> <span class="mi">600</span>
+<span class="n">num_samples</span> <span class="o">=</span> <span class="mi">500</span>
 
 <span class="n">lpd</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">gpx</span><span class="o">.</span><span class="n">LogPosteriorDensity</span><span class="p">(</span><span class="n">negative</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 <span class="n">unconstrained_lpd</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="k">lambda</span> <span class="n">tree</span><span class="p">:</span> <span class="n">lpd</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">constrain</span><span class="p">(),</span> <span class="n">D</span><span class="p">))</span>
@@ -3598,7 +3604,9 @@ drawing more samples will be necessary.</p>
 <span class="p">)</span>
 
 <span class="c1"># Initialise the chain</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
 <span class="n">last_state</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">adapt</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">opt_posterior</span><span class="o">.</span><span class="n">unconstrain</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adaption time taken: </span><span class="si">{</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="si">:</span><span class="s2"> .1f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">inference_loop</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">):</span>
@@ -3613,10 +3621,12 @@ drawing more samples will be necessary.</p>
 
 
 <span class="c1"># Sample from the posterior distribution</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
 <span class="n">states</span><span class="p">,</span> <span class="n">infos</span> <span class="o">=</span> <span class="n">inference_loop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">last_state</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sampling time taken: </span><span class="si">{</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="si">:</span><span class="s2"> .1f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
 </pre></div>
 <div id="cell-11" class="clipboard-copy-txt">num_adapt = 500
-num_samples = 600
+num_samples = 500
 
 lpd = jax.jit(gpx.LogPosteriorDensity(negative=False))
 unconstrained_lpd = jax.jit(lambda tree: lpd(tree.constrain(), D))
@@ -3626,7 +3636,9 @@ adapt = blackjax.window_adaptation(
 )
 
 # Initialise the chain
+start = time()
 last_state, kernel, _ = adapt.run(key, opt_posterior.unconstrain())
+print(f"Adaption time taken: {time() - start: .1f} seconds")
 
 
 def inference_loop(rng_key, kernel, initial_state, num_samples):
@@ -3641,7 +3653,9 @@ def inference_loop(rng_key, kernel, initial_state, num_samples):
 
 
 # Sample from the posterior distribution
-states, infos = inference_loop(key, kernel, last_state, num_samples)</div>
+start = time()
+states, infos = inference_loop(key, kernel, last_state, num_samples)
+print(f"Sampling time taken: {time() - start: .1f} seconds")</div>
         
         </div>
     </div>
@@ -3651,7 +3665,7 @@ states, infos = inference_loop(key, kernel, last_state, num_samples)</div>
 
 </div>
 </div>
-<div id="cell-id=58889ddd" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=3f301c4c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3668,7 +3682,7 @@ versus a chain that is too jumpy with frequent small steps.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=4b1c4c9b" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=710bc323" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3702,7 +3716,7 @@ print(f"Acceptance rate: {acceptance_rate:.2f}")</div>
 
 </div>
 </div>
-<div id="cell-id=105723ff" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=e62680cd" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3720,7 +3734,7 @@ for brevity.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=d2542c8b" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=6469d819" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3743,7 +3757,7 @@ for brevity.</p>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax0</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 <span class="n">ax0</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">states</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">kernel</span><span class="o">.</span><span class="n">lengthscale</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">states</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">kernel</span><span class="o">.</span><span class="n">variance</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">states</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">latent</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:])</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">states</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">latent</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
 <span class="n">ax0</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Kernel Lengthscale&quot;</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Kernel Variance&quot;</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Latent Function (index = 1)&quot;</span><span class="p">)</span>
@@ -3751,7 +3765,7 @@ for brevity.</p>
 <div id="cell-13" class="clipboard-copy-txt">fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(10, 3))
 ax0.plot(states.position.prior.kernel.lengthscale)
 ax1.plot(states.position.prior.kernel.variance)
-ax2.plot(states.position.latent[:, 0, :])
+ax2.plot(states.position.latent[:, 1, :])
 ax0.set_title("Kernel Lengthscale")
 ax1.set_title("Kernel Variance")
 ax2.set_title("Latent Function (index = 1)")</div>
@@ -3764,7 +3778,7 @@ ax2.set_title("Latent Function (index = 1)")</div>
 
 </div>
 </div>
-<div id="cell-id=965bc30d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=a8b55bc7" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3785,7 +3799,7 @@ factors, we employ a thin factor of 10 for demonstration purposes.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=292c7265" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=07e899f9" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3805,11 +3819,15 @@ factors, we employ a thin factor of 10 for demonstration purposes.</p>
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">thin_factor</span> <span class="o">=</span> <span class="mi">10</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">thin_factor</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">thin_factor</span><span class="p">):</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">trange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">thin_factor</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Drawing posterior samples&quot;</span><span class="p">):</span>
+    <span class="c1"># def set_state(samples):</span>
+    <span class="c1"># return lambda samples, i=i: samples[i]</span>
     <span class="n">sample</span> <span class="o">=</span> <span class="n">jtu</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">samples</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="p">:</span> <span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">states</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+    <span class="c1"># sample = jtu.tree_map(set_state, states.position)</span>
     <span class="n">sample</span><span class="o">.</span><span class="n">constrain</span><span class="p">()</span>
     <span class="n">latent_dist</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">xtest</span><span class="p">,</span> <span class="n">train_data</span><span class="o">=</span><span class="n">D</span><span class="p">)</span>
     <span class="n">predictive_dist</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="n">latent_dist</span><span class="p">)</span>
@@ -3820,11 +3838,15 @@ factors, we employ a thin factor of 10 for demonstration purposes.</p>
 <span class="n">lower_ci</span><span class="p">,</span> <span class="n">upper_ci</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">expected_val</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
-<div id="cell-14" class="clipboard-copy-txt">thin_factor = 10
+<div id="cell-14" class="clipboard-copy-txt">thin_factor = 20
 samples = []
 
-for i in range(0, num_samples, thin_factor):
+
+for i in trange(0, num_samples, thin_factor, desc="Drawing posterior samples"):
+    # def set_state(samples):
+    # return lambda samples, i=i: samples[i]
     sample = jtu.tree_map(lambda samples, i=i: samples[i], states.position)
+    # sample = jtu.tree_map(set_state, states.position)
     sample.constrain()
     latent_dist = sample.predict(xtest, train_data=D)
     predictive_dist = sample.likelihood(latent_dist)
@@ -3843,7 +3865,7 @@ expected_val = jnp.mean(samples, axis=0)</div>
 
 </div>
 </div>
-<div id="cell-id=d119eca2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=00b766b5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3856,7 +3878,7 @@ against the observed data.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=904327c6" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=19c4399b" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3885,7 +3907,7 @@ against the observed data.</p>
     <span class="n">upper_ci</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
     <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;95% CI&quot;</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;95</span><span class="se">\\</span><span class="s2">% CI&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">xtest</span><span class="p">,</span>
@@ -3912,7 +3934,7 @@ ax.fill_between(
     upper_ci.flatten(),
     alpha=0.2,
     color=cols[1],
-    label="95% CI",
+    label="95\\% CI",
 )
 ax.plot(
     xtest,
@@ -3938,7 +3960,7 @@ ax.legend()</div>
 
 </div>
 </div>
-<div id="cell-id=8b061041" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=0670fc50" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3949,7 +3971,7 @@ ax.legend()</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=f8ebb04f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=6fd8792d" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

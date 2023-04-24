@@ -1614,6 +1614,9 @@
       <p class="doc doc-class-bases">
         Bases: <code><a class="autorefs autorefs-internal" title="gpjax.kernels.computations.base.AbstractKernelComputation" href="../base/#gpjax.kernels.computations.base.AbstractKernelComputation">AbstractKernelComputation</a></code></p>
 
+  
+      <p>Eigen kernel computation class. Kernels who operate on an
+eigen-decomposed structure should use this computation object.</p>
 
 
 
@@ -1640,6 +1643,62 @@
 
 
   <div class="doc doc-contents ">
+  
+      <p>Compute the cross-covariance matrix.</p>
+<p>For an <span class="arithmatex">\(N\times D\)</span> and <span class="arithmatex">\(M\times D\)</span> pair of matrices, evaluate the <span class="arithmatex">\(N \times M\)</span>
+cross-covariance matrix.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N D]</code>
+          </td>
+          <td><p>The input matrix.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>y</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, M D]</code>
+          </td>
+          <td><p>The input matrix.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>_type_</code></td>          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N M]</code>
+          </td>
+          <td><p><em>description</em></p></td>
+        </tr>
+    </tbody>
+  </table>
 
   </div>
 

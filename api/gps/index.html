@@ -1738,8 +1738,9 @@ any set of <code>N</code> inputs (of dimension <code>D</code>) and returning the
 
   <div class="doc doc-contents ">
   
-      <p>Evaluate the Gaussian process at the given points. The output of this function
-is a <code>TensorFlow probability distribution &lt;https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions&gt;</code>_ from which the
+      <p>Evaluate the Gaussian process at the given points.
+The output of this function is a
+<a href="https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions">TensorFlow probability distribution</a> from which the
 the latent function's mean and covariance can be evaluated and the distribution
 can be sampled.</p>
 <p>Under the hood, <code>__call__</code> is calling the objects <code>predict</code> method. For this
@@ -1780,7 +1781,8 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
     </tbody>
   </table>
       <h6 id="gpjax.gps.AbstractPrior.__call__--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation of the Gaussian process.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
+    of the Gaussian process.
 </code></pre></div>
 
   </div>

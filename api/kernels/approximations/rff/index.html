@@ -1807,7 +1807,7 @@ set the computation engine to be the basis function computation engine.</p>
           <td>
                 <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N D]</code>
           </td>
-          <td><p>A N x D array of inputs.</p></td>
+          <td><p>A <span class="arithmatex">\(N \times D\)</span> array of inputs.</p></td>
           <td>
               <em>required</em>
           </td>
@@ -1816,7 +1816,7 @@ set the computation engine to be the basis function computation engine.</p>
           <td><code>frequencies</code></td>
           <td>
           </td>
-          <td><p>A M x D array of frequencies.</p></td>
+          <td><p>A <span class="arithmatex">\(M \times D\)</span> array of frequencies.</p></td>
           <td>
               <em>required</em>
           </td>
@@ -1824,7 +1824,7 @@ set the computation engine to be the basis function computation engine.</p>
     </tbody>
   </table>
       <h6 id="gpjax.kernels.approximations.rff.RFF.compute_features--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;N L&quot;]: A N x L array of features where L = 2M.
+<div class="highlight"><pre><span></span><code>Float[Array, &quot;N L&quot;]: A $N \times L$ array of features where $L = 2M$.
 </code></pre></div>
 
   </div>

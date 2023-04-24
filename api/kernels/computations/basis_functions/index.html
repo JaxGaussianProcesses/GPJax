@@ -1662,7 +1662,8 @@
 
   <div class="doc doc-contents ">
   
-      <p>For a pair of inputs, compute the cross covariance matrix between the inputs.</p>
+      <p>Compute an approximate cross-covariance matrix.</p>
+<p>For a pair of inputs, compute the cross covariance matrix between the inputs.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1680,7 +1681,7 @@
           <td>
                 <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N D]</code>
           </td>
-          <td><p>A N x D array of inputs.</p></td>
+          <td><p>(Float[Array, "N D"]): A <span class="arithmatex">\(N \times D\)</span> array of inputs.</p></td>
           <td>
               <em>required</em>
           </td>
@@ -1690,16 +1691,31 @@
           <td>
                 <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, M D]</code>
           </td>
-          <td><p>A M x D array of inputs.</p></td>
+          <td><p>(Float[Array, "M D"]): A <span class="arithmatex">\(M \times D\)</span> array of inputs.</p></td>
           <td>
               <em>required</em>
           </td>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.kernels.computations.basis_functions.BasisFunctionComputation.cross_covariance--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>_type_: A N x M array of cross-covariances.
-</code></pre></div>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N M]</code>
+          </td>
+          <td><p>Float[Array, "N M"]: A <span class="arithmatex">\(N \times M\)</span> array of cross-covariances.</p></td>
+        </tr>
+    </tbody>
+  </table>
 
   </div>
 
@@ -1717,7 +1733,9 @@
 
   <div class="doc doc-contents ">
   
-      <p>For the Gram matrix, we can save computations by computing only one matrix multiplication between the inputs and the scaled frequencies.</p>
+      <p>Compute an approximate Gram matrix.</p>
+<p>For the Gram matrix, we can save computations by computing only one matrix
+multiplication between the inputs and the scaled frequencies.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1742,9 +1760,25 @@
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.kernels.computations.basis_functions.BasisFunctionComputation.gram--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>DenseLinearOperator: A dense linear operator representing the N x N Gram matrix.
-</code></pre></div>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>DenseLinearOperator</code></td>          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.linops.DenseLinearOperator" href="../../../linops/dense_linear_operator/#gpjax.linops.dense_linear_operator.DenseLinearOperator">DenseLinearOperator</a></code>
+          </td>
+          <td><p>A dense linear operator representing the
+<span class="arithmatex">\(N \times N\)</span> Gram matrix.</p></td>
+        </tr>
+    </tbody>
+  </table>
 
   </div>
 
@@ -1780,16 +1814,7 @@
           <td>
                 <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N D]</code>
           </td>
-          <td><p>A N x D array of inputs.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>frequencies</code></td>
-          <td>
-          </td>
-          <td><p>A M x D array of frequencies.</p></td>
+          <td><p>A <span class="arithmatex">\(N \times D\)</span> array of inputs.</p></td>
           <td>
               <em>required</em>
           </td>
@@ -1797,7 +1822,7 @@
     </tbody>
   </table>
       <h6 id="gpjax.kernels.computations.basis_functions.BasisFunctionComputation.compute_features--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;N L&quot;]: A N x L array of features where L = 2M.
+<div class="highlight"><pre><span></span><code>Float[Array, &quot;N L&quot;]: A $N \times L$ array of features where $L = 2M$.
 </code></pre></div>
 
   </div>

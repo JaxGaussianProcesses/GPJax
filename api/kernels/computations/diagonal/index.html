@@ -1610,6 +1610,9 @@
       <p class="doc doc-class-bases">
         Bases: <code><a class="autorefs autorefs-internal" title="gpjax.kernels.computations.base.AbstractKernelComputation" href="../base/#gpjax.kernels.computations.base.AbstractKernelComputation">AbstractKernelComputation</a></code></p>
 
+  
+      <p>Diagonal kernel computation class. Operations with the kernel assume
+a diagonal Gram matrix.</p>
 
 
 
@@ -1637,8 +1640,9 @@
 
   <div class="doc doc-contents ">
   
-      <p>For a kernel with diagonal structure, compute the NxN gram matrix on
-an input matrix of shape NxD.</p>
+      <p>Compute the Gram matrix.</p>
+<p>For a kernel with diagonal structure, compute the <span class="arithmatex">\(N\times N\)</span> Gram matrix on
+an input matrix of shape <span class="arithmatex">\(N\times D\)</span>.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1664,7 +1668,7 @@ an input matrix of shape NxD.</p>
     </tbody>
   </table>
       <h6 id="gpjax.kernels.computations.diagonal.DiagonalKernelComputation.gram--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>CovarianceOperator: The computed square Gram matrix.
+<div class="highlight"><pre><span></span><code>DiagonalLinearOperator: The computed square Gram matrix.
 </code></pre></div>
 
   </div>
@@ -1683,8 +1687,9 @@ an input matrix of shape NxD.</p>
 
   <div class="doc doc-contents ">
   
-      <p>For a given kernel, compute the NxM covariance matrix on a pair of input
-matrices of shape NxD and MxD.</p>
+      <p>Compute the cross-covariance matrix.</p>
+<p>For a given kernel, compute the <span class="arithmatex">\(N\times M\)</span> covariance matrix on a pair of
+input matrices of shape <span class="arithmatex">\(N\times D\)</span> and <span class="arithmatex">\(M\times D\)</span>.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>

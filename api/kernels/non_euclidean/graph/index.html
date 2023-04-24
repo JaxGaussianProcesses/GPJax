@@ -1634,7 +1634,9 @@
         Bases: <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code></p>
 
   
-      <p>A Matérn graph kernel defined on the vertices of a graph. The key reference for this object is borovitskiy et. al., (2020).</p>
+      <p>The Matérn graph kernel defined on the vertex set of a graph.</p>
+<p>A Matérn graph kernel defined on the vertices of a graph. The key reference
+for this object is borovitskiy et. al., (2020).</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1652,7 +1654,8 @@
           <td>
                 <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>]</code>
           </td>
-          <td><p>An N x N matrix representing the Laplacian matrix of a graph.</p></td>
+          <td><p>An N x N matrix representing the Laplacian matrix
+of a graph.</p></td>
           <td>
                 <code>static_field(None)</code>
           </td>
@@ -1873,7 +1876,9 @@
 
   <div class="doc doc-contents ">
   
-      <p>Evaluate the graph kernel on a pair of vertices :math:<code>v_i, v_j</code>.</p>
+      <p>Compute the (co)variance between a vertex pair.</p>
+<p>For a graph <span class="arithmatex">\(\mathcal{G} = \{V, E\}\)</span> where $V = {v_1, v_2, \ldots v_n },
+evaluate the graph kernel on a pair of vertices <span class="arithmatex">\((v_i, v_j)\)</span> for any <span class="arithmatex">\(i,j&lt;n\)</span>.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1909,7 +1914,7 @@
     </tbody>
   </table>
       <h6 id="gpjax.kernels.non_euclidean.graph.GraphKernel.__call__--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: The value of :math:`k(v_i, v_j)`.
+<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: The value of $k(v_i, v_j)$.
 </code></pre></div>
 
   </div>

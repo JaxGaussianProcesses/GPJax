@@ -1495,6 +1495,21 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#motivation-gaussian-process-objects-as-data" class="md-nav__link">
+    Motivation…. Gaussian process objects as data:
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -2539,7 +2554,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=3552de32" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=4f021c76" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2550,31 +2565,59 @@ Licensed under the Apache License, Version 2.0.
 <li>We have a simple API with a <strong>TensorFlow / PyTorch feel</strong> …</li>
 <li>… that is <strong>fully compatible</strong> with JAX's functional paradigm.</li>
 </ul>
-<p>The core idea of our abstraction builds on the <em>Equinox</em> library, where we seek to provide the Bayesian/GP analogue to their neural network focused abstractions. However, we extend their abstraction further to permit users to write standard Python classes, and provide to readily define (and alter) domains and training statuses of parameter for optimisation, contained as a single model object, that is fully compatible with JAX autogradients out of the box - no filtering required, and provide functionality for applying dataclass metadata to Pytree’s.</p>
+<p>The core idea of our abstraction builds on the <em>Equinox</em> library, where we
+seek to provide the Bayesian/GP analogue to their neural network focused
+abstractions. However, we extend their abstraction further to permit users to
+write standard Python classes, and provide to readily define (and alter)
+domains and training statuses of parameter for optimisation, contained as a
+single model object, that is fully compatible with JAX autogradients out of
+the box - no filtering required, and provide functionality for applying
+dataclass metadata to Pytree’s.</p>
 
 </div>
 </div>
 </div>
 </div>
-<div id="cell-id=145b48f6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=af541b09" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="motivation-gaussian-process-objects-as-data">Motivation&#8230;. Gaussian process objects as data:<a class="anchor-link" href="#motivation-gaussian-process-objects-as-data">&#182;</a></h1><p>Just introduce the dataclass and its respective fields.</p>
-<div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<h2 id="motivation-gaussian-process-objects-as-data">Motivation&#8230;. Gaussian process objects as data:<a class="anchor-link" href="#motivation-gaussian-process-objects-as-data">&#182;</a></h2><p>Within this notebook, we'll be using the squared exponential, or RBF, kernel
+for illustratory purposes. For a pair of vectors $x, y \in \mathbb{R}^d$, its
+form can be mathematically given by
+$$ k(x, y) = \sigma^2\exp\left(\frac{\lVert x-y\rVert_{2}^2}{2\ell^2} \right) $$
+where $\sigma\in\mathbb{R}_{&gt;0}$ is a variance parameter and
+$\ell\in\mathbb{R}_{&gt;0}$ a lengthscale parameter. We call the evaluation of
+$k(x, y)$ the <em>covariance</em>.</p>
+<p>Using a <code>dataclass</code>, we can represent this object as follows</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">Array</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">RBF</span><span class="p">:</span>
-    <span class="n">lengthscale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span> <span class="c1"># &lt;- dataclasses are the thing you want.</span>
-    
+    <span class="n">lengthscale</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">variance</span><span class="p">:</span> <span class="nb">float</span>
 
-<span class="n">Equivariant</span> <span class="n">to</span>
-
-<span class="k">class</span> <span class="nc">RBF</span>
-    
-<span class="c1"># ... but it does it all without writing 100 lines of code.</span>
+    <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+    	<span class="k">pass</span>
 </pre></div>
-<p>Explain in a sentance what a dataclass is and a field is.</p>
+<p>For those users who have not seen a <code>dataclass</code> before, this statement is equivalent to writing</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RBF</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lengthscale</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">variance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    	<span class="bp">self</span><span class="o">.</span><span class="n">lengthscale</span> <span class="o">=</span> <span class="n">lengthscale</span>
+    	<span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="n">variance</span>
+
+    <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+    	<span class="k">pass</span>
+</pre></div>
+<p>However, it a dataclass allows us to significantly reduce the number of lines
+of code needed to represent such objects, particularly as the code's
+complexity increases, as we shall go on to see.</p>
+<p>To establish some terminology, within the above RBF <code>dataclass</code>, we refer to
+the lengthscale and variance as <em>fields</em>. Further, the <code>RBF.covariance()</code> is a
+<em>method</em>.</p>
 <h1 id="a-primer-on-pytrees">A primer on PyTree&#8217;s:<a class="anchor-link" href="#a-primer-on-pytrees">&#182;</a></h1><p>To efficiently represent data JAX provides a <code>*PyTree*</code> abstraction. PyTree’s as such, are immutable tree-like structure built out of <em>‘node’ types</em> —— container-like Python objects. For instance,</p>
 <div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">3.14</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Monte&quot;</span><span class="p">:</span> <span class="nb">object</span><span class="p">(),</span> <span class="s2">&quot;Carlo&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}]</span>
 </pre></div>
@@ -2606,6 +2649,17 @@ Licensed under the Apache License, Version 2.0.
 <li><em>We view all models as immutable trees.</em></li>
 <li><em>What is computation if you have it on a model?</em></li>
 </ul>
+
+</div>
+</div>
+</div>
+</div>
+<div id="cell-id=404895af" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 
 </div>
 </div>
