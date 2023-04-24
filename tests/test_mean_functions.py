@@ -1,4 +1,5 @@
 import jax
+import jax.numpy as jnp
 import pytest
 from jaxtyping import Array, Float
 
@@ -13,28 +14,28 @@ def test_abstract() -> None:
     # Check a "dummy" mean funcion with defined abstract method, `__call__`, can be instantiated.
     class DummyMeanFunction(AbstractMeanFunction):
         def __call__(self, x: Float[Array, "D"]) -> Float[Array, "1"]:
-            return jax.numpy.array([1.0])
+            return jnp.array([1.0])
 
     mf = DummyMeanFunction()
     assert isinstance(mf, AbstractMeanFunction)
-    assert (mf(jax.numpy.array([1.0])) == jax.numpy.array([1.0])).all()
-    assert (mf(jax.numpy.array([2.0, 3.0])) == jax.numpy.array([1.0])).all()
+    assert (mf(jnp.array([1.0])) == jnp.array([1.0])).all()
+    assert (mf(jnp.array([2.0, 3.0])) == jnp.array([1.0])).all()
 
 
 @pytest.mark.parametrize(
-    "constant", [jax.numpy.array([0.0]), jax.numpy.array([1.0]), jax.numpy.array([3.0])]
+    "constant", [jnp.array([0.0]), jnp.array([1.0]), jnp.array([3.0])]
 )
 def test_constant(constant: Float[Array, "Q"]) -> None:
     mf = Constant(constant=constant)
 
     assert isinstance(mf, AbstractMeanFunction)
-    assert (mf(jax.numpy.array([1.0])) == constant).all()
-    assert (mf(jax.numpy.array([2.0, 3.0])) == constant).all()
+    assert (mf(jnp.array([[1.0]])) == jnp.array([constant])).all()
+    assert (mf(jnp.array([[2.0, 3.0]])) == jnp.array([constant])).all()
     assert (
-        jax.vmap(mf)(jax.numpy.array([[1.0], [2.0]]))
-        == jax.numpy.array([constant, constant])
+        mf(jnp.array([[1.0], [2.0]]))
+        == jnp.array([constant, constant])
     ).all()
     assert (
-        jax.vmap(mf)(jax.numpy.array([[1.0, 2.0], [3.0, 4.0]]))
-        == jax.numpy.array([constant, constant])
+        mf(jnp.array([[1.0, 2.0], [3.0, 4.0]]))
+        == jnp.array([constant, constant])
     ).all()
