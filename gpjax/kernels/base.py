@@ -123,7 +123,7 @@ class AbstractKernel(Module):
             return ProductKernel(kernels=[self, Constant(other)])
 
     @property
-    def spectral_density(self) -> tfd.Distribution:
+    def spectral_density(self) -> Optional[tfd.Distribution]:
         return None
 
 
