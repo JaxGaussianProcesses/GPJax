@@ -22,6 +22,8 @@ from jax.config import config
 import jax.tree_util as jtu
 import shutil
 
+import beartype
+
 #from gpjax.dataset import Dataset
 from gpjax.dataset import Dataset
 from gpjax.gps import (AbstractPosterior, AbstractPrior, ConjugatePosterior,
@@ -229,13 +231,13 @@ def test_prior_sample_approx(num_datapoints, kernel, mean_function):
         p.sample_approx(-1, key)
     with pytest.raises(ValueError):
         p.sample_approx(0, key)
-    with pytest.raises(ValueError):
+    with pytest.raises((ValueError, beartype.roar.BeartypeCallHintParamViolation)):
         p.sample_approx(0.5, key)
     with pytest.raises(ValueError):
         p.sample_approx(1, key, -10)
     with pytest.raises(ValueError):
         p.sample_approx(1, key, 0)
-    with pytest.raises(ValueError):
+    with pytest.raises((ValueError, beartype.roar.BeartypeCallHintParamViolation)):
         p.sample_approx(1, key, 0.5)
 
     sampled_fn = p.sample_approx(1, key, 100)
@@ -290,13 +292,13 @@ def test_conjugate_posterior_sample_approx(num_datapoints, kernel, mean_function
         p.sample_approx(-1, D, key)
     with pytest.raises(ValueError):
         p.sample_approx(0, D, key)
-    with pytest.raises(ValueError):
+    with pytest.raises((ValueError, beartype.roar.BeartypeCallHintParamViolation)):
         p.sample_approx(0.5, D, key)
     with pytest.raises(ValueError):
         p.sample_approx(1, D, key, -10)
     with pytest.raises(ValueError):
         p.sample_approx(1, D, key, 0)
-    with pytest.raises(ValueError):
+    with pytest.raises((ValueError, beartype.roar.BeartypeCallHintParamViolation)):
         p.sample_approx(1, D, key, 0.5)
 
     sampled_fn = p.sample_approx(1, D, key, 100)
