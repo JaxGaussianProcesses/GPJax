@@ -1,5 +1,7 @@
 # Design Principles
 
+$\require{bm}$
+
 `GPJax` is designed to be a Gaussian process package that provides an accurate
 representation of the underlying maths. Variable names are chosen to closely
 match the notation in [@rasmussen2006gaussian]. We here list the notation used

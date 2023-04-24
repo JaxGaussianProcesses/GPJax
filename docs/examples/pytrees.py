@@ -12,7 +12,7 @@
 # ---
 
 # %% [markdown]
-# # GPJax’s `Module` backend:
+# # 🌳 GPJax PyTrees
 #
 # `GPJax` **represents all mathematical objects as PyTrees.** As a result
 #
@@ -53,7 +53,11 @@
 # 	def covariance(self, x: Array, y: Array) -> Array:
 # 		pass
 # ```
-# For those users who have not seen a `dataclass` before, this statement is equivalent to writing
+# We have for now left `covariance` empty; however, through this notebook, we shall
+# build up to a fully object that can compute covariances in a JAX-compatible way.
+#
+# For those users who have not seen a `dataclass` before, this statement is equivalent
+# to writing
 # ```python
 # class RBF:
 # 	def __init__(self, lengthscale: float, variance: float) -> None:
