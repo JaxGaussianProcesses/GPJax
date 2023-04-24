@@ -19,12 +19,11 @@ import jax
 import jax.random as jr
 import optax as ox
 from jax._src.random import _check_prng_key
-from jax.random import KeyArray
 from jaxtyping import Array, Float
 from jaxlib.xla_extension import PjitFunction
 from warnings import warn
 
-from gpjax.utils import ScalarFloat
+from gpjax.utils import ScalarFloat, KeyArray
 from .base import Module
 from .dataset import Dataset
 from .objectives import AbstractObjective
