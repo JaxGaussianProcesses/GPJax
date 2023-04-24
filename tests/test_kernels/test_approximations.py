@@ -130,12 +130,12 @@ def test_exactness(kernel):
 )
 def test_value_error(kernel):
     with pytest.raises(ValueError):
-        RFF(kernel(), num_basis_fns=10)
+        RFF(base_kernel=kernel(), num_basis_fns=10)
 
 
 @pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
 def stochastic_init(kernel: AbstractKernel):
-    k1 = RFF(kernel, num_basis_fns=10, key=123)
-    k2 = RFF(kernel, num_basis_fns=10, key=42)
+    k1 = RFF(base_kernel=kernel, num_basis_fns=10, key=123)
+    k2 = RFF(base_kernel=kernel, num_basis_fns=10, key=42)
 
     assert (k1.frequencies != k2.frequencies).any()
