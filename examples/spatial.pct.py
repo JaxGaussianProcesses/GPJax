@@ -3,7 +3,7 @@
 # In this example we demonstrate an application of Gaussian Processes
 # to a spatial interpolation problem. In particular, we will show you how
 # to create efficiently sample from a GP posterior as shown in <strong data-cite="wilson2020efficient"></strong>.
-# 
+#
 # ## Data loading
 # We'll be using open-source data from SwissMetNet, the surface weather monitoring network of the Swiss
 # national weather service,
@@ -17,15 +17,12 @@
 # (latitude and longitude) and elevation as input variables.
 #
 # %%
-from dataclasses import dataclass
-
 import fsspec
 import geopandas as gpd
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
-import optax as ox
 import pandas as pd
 import planetary_computer
 import pystac_client
@@ -34,8 +31,6 @@ import xarray as xr
 from rioxarray.merge import merge_arrays
 
 import gpjax as gpx
-from gpjax.base import param_field
-from gpjax.dataset import Dataset
 
 jax.config.update("jax_enable_x64", True)
 
@@ -71,7 +66,9 @@ dem = merge_arrays(tiles).coarsen(x=10, y=10).mean().rio.clip(ch_shp["geometry"]
 # %%
 
 fig, ax = plt.subplots(figsize=(8, 5), layout="constrained")
-dem.plot(cmap="terrain", cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Elevation [m]"})
+dem.plot(
+    cmap="terrain", cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Elevation [m]"}
+)
 temperature.plot("t_max", ax=ax, cmap="RdBu_r", vmin=-15, vmax=15, edgecolor="k", s=50)
 ax.set(title="Switzerland's topography and SwissMetNet stations", aspect="auto")
 cb = fig.colorbar(ax.collections[-1], aspect=50, pad=0.02)
@@ -81,6 +78,7 @@ cb.set_label("Max. daily temperature [°C]", labelpad=-2)
 # %% [markdown]
 # As always, we store our training data in a `Dataset` object.
 # %%
+from gpjax.dataset import Dataset
 
 x = temperature[["latitude", "longitude", "elevation"]].values
 y = temperature[["t_max"]].values
@@ -99,7 +97,8 @@ D = Dataset(
 
 # %%
 kernel = gpx.kernels.RBF(
-    active_dims=[0, 1, 2],  lengthscale=jnp.array([0.1, 0.1, 100.])
+    active_dims=[0, 1, 2],
+    lengthscale=jnp.array([0.1, 0.1, 100.0]),
 )
 
 # %% [markdown]
@@ -109,17 +108,22 @@ kernel = gpx.kernels.RBF(
 # easily: simply subclass `AbstractMeanFunction`.
 
 # %%
+from dataclasses import dataclass
+from jaxtyping import Float, Array
+from gpjax.base import param_field
+
+
 @dataclass
 class MeanFunction(gpx.gps.AbstractMeanFunction):
+    w: Float[Array, "1"] = param_field(jnp.array([0.0]))
+    b: Float[Array, "1"] = param_field(jnp.array([0.0]))
 
-    w: jax.Array = param_field(jnp.array([0.]))
-    b: jax.Array = param_field(jnp.array([0.]))
-    
-    def __call__(self, x):
-        elevation = x[:,2:3]
-        out = elevation * self.w + self.b 
+    def __call__(self, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:
+        elevation = x[:, 2:3]
+        out = elevation * self.w + self.b
         return out
-    
+
+
 # %% [markdown]
 # Now we can define our prior. We'll also choose a Gaussian likelihood.
 
@@ -147,6 +151,7 @@ negative_mll = jax.jit(gpx.objectives.ConjugateMLL(negative=True))
 negative_mll(posterior, train_data=D)
 
 # %%
+import optax as ox
 
 optim = ox.chain(ox.adam(learning_rate=0.1), ox.clip(1.0))
 posterior, history = gpx.fit(
@@ -168,43 +173,37 @@ posterior: gpx.gps.ConjugatePosterior
 # If these are `float64`s, as it is often the case in GPJax, it would be equivalent to more than 36 Gigabytes of memory. And
 # that's for a fairly coarse and tiny grid. If we were to make predictions on a 1000x1000 grid, the total memory required
 # would be 8 _Therabytes_ of memory, which is untractable.
-#
 # Fortunately, the pathwise conditioning method allows us to sample from our posterior with linear complexity,
-# O(n), with the number of pixels. TODO: explain a bit more of the theory
+# O(n), with the number of pixels.
 #
-#
-# We can use the `sample_approx` method to generate random conditioned samples from our posterior.
+# GPJax provides the `sample_approx` method to generate random conditioned samples from our posterior.
 
 # %%
-# select the target pixels exclude nans
+# select the target pixels and exclude nans
 xtest = dem.drop("spatial_ref").stack(p=["y", "x"]).to_dataframe(name="dem")
 mask = jnp.any(jnp.isnan(xtest.values), axis=-1)
 
-# generate 10 samples
+# generate 50 samples
 ytest = posterior.sample_approx(50, D, key, num_features=200)(
     jnp.array(xtest.values[~mask])
 )
-
 
 
 # %% [markdown]
 # Let's take a look at the results. We start with the mean and standard deviation.
 
 # %%
-# assign to a xarray DataArray
 predtest = xr.zeros_like(dem.stack(p=["y", "x"])) * jnp.nan
-predtest[~mask] = ytest.mean(
-    axis=-1
-)  # we compute the mean of the samples for simplicity
+predtest[~mask] = ytest.mean(axis=-1)
 predtest = predtest.unstack()
 
-# plot
 predtest.plot(
-    vmin=-15., vmax=15., cmap="RdBu_r",
-    cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Max. daily temperature [°C]"}
+    vmin=-15.0,
+    vmax=15.0,
+    cmap="RdBu_r",
+    cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Max. daily temperature [°C]"},
 )
 plt.gca().set_title("Interpolated maximum daily temperature")
-
 
 
 # %%
@@ -214,9 +213,9 @@ predtest = predtest.unstack()
 
 # plot
 predtest.plot(
-    cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Max. daily temperature [°C]"},
+    cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Standard deviation [°C]"},
 )
-plt.gca().set_title("Interpolated maximum daily temperature")
+plt.gca().set_title("Standard deviation")
 
 
 # %% [markdown]
@@ -231,8 +230,9 @@ predtest = (
 predtest[~mask] = ytest[:, :9]
 predtest = predtest.unstack()
 predtest.plot(
-    col="realization", col_wrap=3,
-    cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Max. daily temperature [°C]"}
+    col="realization",
+    col_wrap=3,
+    cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Max. daily temperature [°C]"},
 )
 
 # %% [markdown]
@@ -248,7 +248,6 @@ print(posterior.prior.mean_function)
 # interpolation for the exact same domain as here can be found in
 # [Frei 2014](https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.3786)),
 # but it is a nice showcase of GPJax's capabilities working with spatial modelling problems.
-#
 
 # %% [markdown]
 # ## System configuration
