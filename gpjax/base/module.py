@@ -32,7 +32,7 @@ from orbax.checkpoint import (ArrayRestoreArgs, Checkpointer,
 from simple_pytree import Pytree, static_field
 
 
-Self = TypeVar('T')
+Self = TypeVar('Self')
 
 
 class Module(Pytree):
