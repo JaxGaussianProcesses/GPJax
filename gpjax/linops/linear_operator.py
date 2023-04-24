@@ -16,7 +16,7 @@
 
 import abc
 from dataclasses import dataclass
-from beartype.typing import Any, Generic, Iterable, Mapping, Tuple, TypeVar, Union
+from beartype.typing import Any, Generic, Iterable, Mapping, Tuple, Type, TypeVar, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
@@ -30,8 +30,9 @@ T = TypeVar("T")
 NestedT = Union[T, Iterable["NestedT"], Mapping[Any, "NestedT"]]
 
 # Nested types.
+DTypes = Union[Type[jnp.float32], Type[jnp.float64], Type[jnp.int32], Type[jnp.int64]]
 ShapeT = TypeVar("ShapeT", bound=NestedT[Tuple[int, ...]])
-DTypeT = TypeVar("DTypeT", bound=NestedT[jnp.dtype])
+DTypeT = TypeVar("DTypeT", bound=NestedT[DTypes])
 
 # The Generic type is used for type checking the LinearOperator's shape and datatype.
 # `static_field` is used to mark nodes of the PyTree that don't change under JAX transformations.
