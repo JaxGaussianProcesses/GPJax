@@ -25,6 +25,7 @@ from jaxtyping import Array, Float
 import jax.tree_util as jtu
 
 import gpjax as gpx
+from gpjax.gps import AbstractPosterior
 from gpjax.variational_families import (AbstractVariationalFamily,
                                         CollapsedVariationalGaussian,
                                         ExpectationVariationalGaussian,
@@ -44,12 +45,16 @@ def test_abstract_variational_family():
         AbstractVariationalFamily()
 
     # Create a dummy variational family class with abstract methods implemented.
+    class DummyPosterior:
+        @property
+        def __class__(self) -> type: return AbstractPosterior
+
     class DummyVariationalFamily(AbstractVariationalFamily):
         def predict(self, x: Float[Array, "N D"]) -> tfd.Distribution:
             return tfd.MultivariateNormalDiag(loc=x)
 
     # Test that the dummy variational family can be instantiated.
-    dummy_variational_family = DummyVariationalFamily(posterior=None)
+    dummy_variational_family = DummyVariationalFamily(posterior=DummyPosterior())
     assert isinstance(dummy_variational_family, AbstractVariationalFamily)
 
 
