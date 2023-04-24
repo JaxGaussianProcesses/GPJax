@@ -23,7 +23,7 @@ from jaxtyping import Array, Float
 from gpjax.linops import (DenseLinearOperator, DiagonalLinearOperator,
                           LinearOperator)
 
-Kernel = Any
+Kernel = Any  # TODO: FIX
 
 
 @dataclass

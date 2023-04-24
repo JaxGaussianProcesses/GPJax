@@ -18,6 +18,7 @@ from dataclasses import dataclass
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
+from beartype.typing import Union
 from jaxtyping import Array, Float
 from gpjax.utils import ScalarFloat
 
@@ -28,11 +29,11 @@ from .utils import squared_distance
 
 @dataclass
 class RationalQuadratic(AbstractKernel):
-    lengthscale: Float[Array, "D"] = param_field(
+    lengthscale: Union[ScalarFloat, Float[Array, "D"]] = param_field(
         jnp.array([1.0]), bijector=tfb.Softplus()
     )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    alpha: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    alpha: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Rational Quadratic"
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:

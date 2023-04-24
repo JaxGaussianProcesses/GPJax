@@ -30,8 +30,8 @@ class Polynomial(AbstractKernel):
     """The Polynomial kernel with variable degree."""
 
     degree: int = static_field(2)
-    shift: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    shift: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
 
     def __post_init__(self):
         self.name = f"Polynomial (degree {self.degree})"
@@ -54,5 +54,5 @@ class Polynomial(AbstractKernel):
         """
         x = self.slice_input(x)
         y = self.slice_input(y)
-        K = jnp.power(self.shift + jnp.dot(x * self.variance, y), self.degree)
+        K = jnp.power(self.shift + self.variance * jnp.dot(x, y), self.degree)
         return K.squeeze()

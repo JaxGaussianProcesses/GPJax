@@ -14,6 +14,7 @@
 # ==============================================================================
 
 from dataclasses import dataclass
+from beartype.typing import Union
 
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
@@ -34,11 +35,11 @@ class PoweredExponential(AbstractKernel):
 
     """
 
-    lengthscale: Float[Array, "D"] = param_field(
+    lengthscale: Union[ScalarFloat, Float[Array, "D"]] = param_field(
         jnp.array([1.0]), bijector=tfb.Softplus()
     )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    power: Float[Array, "1"] = param_field(jnp.array([1.0]))
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    power: ScalarFloat = param_field(jnp.array(1.0))
     name: str = "Powered Exponential"
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:

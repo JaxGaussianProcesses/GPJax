@@ -30,7 +30,7 @@ from ..computations import (AbstractKernelComputation,
 
 @dataclass
 class White(AbstractKernel):
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     compute_engine: AbstractKernelComputation = static_field(
         ConstantDiagonalKernelComputation
     )
