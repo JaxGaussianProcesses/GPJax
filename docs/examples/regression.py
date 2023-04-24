@@ -1,12 +1,27 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # Regression
 #
 # In this notebook we demonstate how to fit a Gaussian process regression model.
 
+# %%
 from jax import jit
 from jax.config import config
-
-# %%
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib as mpl

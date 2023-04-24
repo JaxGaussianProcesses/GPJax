@@ -28,6 +28,8 @@ from jax.config import config
 
 config.update("jax_enable_x64", True)
 
+from time import time
+
 # %%
 import blackjax
 import jax
@@ -42,6 +44,7 @@ from jaxtyping import (
 import matplotlib.pyplot as plt
 import optax as ox
 import tensorflow_probability.substrates.jax as tfp
+from tqdm import trange
 
 import gpjax as gpx
 
@@ -139,22 +142,22 @@ ax.scatter(x, y, label="Observations", color=cols[0])
 ax.plot(xtest, predictive_mean, label="Predictive mean", color=cols[1])
 ax.fill_between(
     xtest.squeeze(),
-    predictive_mean - 2 * predictive_std,
-    predictive_mean + 2 * predictive_std,
+    predictive_mean - predictive_std,
+    predictive_mean + predictive_std,
     alpha=0.2,
     color=cols[1],
-    label="Two sigma",
+    label="One sigma",
 )
 ax.plot(
     xtest,
-    predictive_mean - 2 * predictive_std,
+    predictive_mean - predictive_std,
     color=cols[1],
     linestyle="--",
     linewidth=1,
 )
 ax.plot(
     xtest,
-    predictive_mean + 2 * predictive_std,
+    predictive_mean + predictive_std,
     color=cols[1],
     linestyle="--",
     linewidth=1,
@@ -337,7 +340,7 @@ ax.legend()
 
 # %%
 num_adapt = 500
-num_samples = 600
+num_samples = 500
 
 lpd = jax.jit(gpx.LogPosteriorDensity(negative=False))
 unconstrained_lpd = jax.jit(lambda tree: lpd(tree.constrain(), D))
@@ -347,7 +350,9 @@ adapt = blackjax.window_adaptation(
 )
 
 # Initialise the chain
+start = time()
 last_state, kernel, _ = adapt.run(key, opt_posterior.unconstrain())
+print(f"Adaption time taken: {time() - start: .1f} seconds")
 
 
 def inference_loop(rng_key, kernel, initial_state, num_samples):
@@ -362,7 +367,9 @@ def inference_loop(rng_key, kernel, initial_state, num_samples):
 
 
 # Sample from the posterior distribution
+start = time()
 states, infos = inference_loop(key, kernel, last_state, num_samples)
+print(f"Sampling time taken: {time() - start: .1f} seconds")
 
 # %% [markdown]
 # ### Sampler efficiency
@@ -391,7 +398,7 @@ print(f"Acceptance rate: {acceptance_rate:.2f}")
 fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(10, 3))
 ax0.plot(states.position.prior.kernel.lengthscale)
 ax1.plot(states.position.prior.kernel.variance)
-ax2.plot(states.position.latent[:, 0, :])
+ax2.plot(states.position.latent[:, 1, :])
 ax0.set_title("Kernel Lengthscale")
 ax1.set_title("Kernel Variance")
 ax2.set_title("Latent Function (index = 1)")
@@ -412,11 +419,15 @@ ax2.set_title("Latent Function (index = 1)")
 # factors, we employ a thin factor of 10 for demonstration purposes.
 
 # %%
-thin_factor = 10
+thin_factor = 20
 samples = []
 
-for i in range(0, num_samples, thin_factor):
+
+for i in trange(0, num_samples, thin_factor, desc="Drawing posterior samples"):
+    # def set_state(samples):
+    # return lambda samples, i=i: samples[i]
     sample = jtu.tree_map(lambda samples, i=i: samples[i], states.position)
+    # sample = jtu.tree_map(set_state, states.position)
     sample.constrain()
     latent_dist = sample.predict(xtest, train_data=D)
     predictive_dist = sample.likelihood(latent_dist)
@@ -442,7 +453,7 @@ ax.fill_between(
     upper_ci.flatten(),
     alpha=0.2,
     color=cols[1],
-    label="95% CI",
+    label="95\\% CI",
 )
 ax.plot(
     xtest,

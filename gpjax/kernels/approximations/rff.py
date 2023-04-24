@@ -76,14 +76,14 @@ class RFF(AbstractKernel):
             raise ValueError(error_msg)
 
     def compute_features(self, x: Float[Array, "N D"]) -> Float[Array, "N L"]:
-        """Compute the features for the inputs.
+        r"""Compute the features for the inputs.
 
         Args:
-            x: A N x D array of inputs.
-            frequencies: A M x D array of frequencies.
+            x: A $N \times D$ array of inputs.
+            frequencies: A $M \times D$ array of frequencies.
 
         Returns
         -------
-            Float[Array, "N L"]: A N x L array of features where L = 2M.
+            Float[Array, "N L"]: A $N \times L$ array of features where $L = 2M$.
         """
         return self.compute_engine(self).compute_features(x)

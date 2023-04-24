@@ -40,10 +40,14 @@ tfb = tfp.bijectors
 ##########################################
 @dataclass
 class GraphKernel(AbstractKernel):
-    """A Matérn graph kernel defined on the vertices of a graph. The key reference for this object is borovitskiy et. al., (2020).
+    """The Matérn graph kernel defined on the vertex set of a graph.
+
+    A Matérn graph kernel defined on the vertices of a graph. The key reference
+    for this object is borovitskiy et. al., (2020).
 
     Args:
-        laplacian (Float[Array]): An N x N matrix representing the Laplacian matrix of a graph.
+        laplacian (Float[Array]): An N x N matrix representing the Laplacian matrix
+            of a graph.
         compute_engine
     """
 
@@ -76,7 +80,10 @@ class GraphKernel(AbstractKernel):
         y: Float[Array, "1 D"],
         **kwargs,
     ) -> Float[Array, "1"]:
-        """Evaluate the graph kernel on a pair of vertices :math:`v_i, v_j`.
+        r"""Compute the (co)variance between a vertex pair.
+
+        For a graph $\mathcal{G} = \{V, E\}$ where $V = \{v_1, v_2, \ldots v_n \},
+        evaluate the graph kernel on a pair of vertices $(v_i, v_j)$ for any $i,j<n$.
 
         Args:
             x (Float[Array, "1 D"]): Index of the ith vertex.
@@ -84,7 +91,7 @@ class GraphKernel(AbstractKernel):
 
         Returns
         -------
-            Float[Array, "1"]: The value of :math:`k(v_i, v_j)`.
+            Float[Array, "1"]: The value of $k(v_i, v_j)$.
         """
         S = kwargs["S"]
         Kxx = (jax_gather_nd(self.eigenvectors, x) * S.squeeze()) @ jnp.transpose(

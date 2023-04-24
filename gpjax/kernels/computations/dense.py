@@ -30,7 +30,9 @@ class DenseKernelComputation(AbstractKernelComputation):
     def cross_covariance(
         self, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
-        """For a given kernel, compute the NxM covariance matrix on a pair of input
+        """Compute the cross-covariance matrix.
+
+        For a given kernel, compute the NxM covariance matrix on a pair of input
         matrices of shape NxD and MxD.
 
         Args:

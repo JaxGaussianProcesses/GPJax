@@ -24,24 +24,32 @@ from gpjax.linops import DiagonalLinearOperator
 
 
 class DiagonalKernelComputation(AbstractKernelComputation):
+    """Diagonal kernel computation class. Operations with the kernel assume
+    a diagonal Gram matrix.
+    """
+
     def gram(self, x: Float[Array, "N D"]) -> DiagonalLinearOperator:
-        """For a kernel with diagonal structure, compute the NxN gram matrix on
-        an input matrix of shape NxD.
+        r"""Compute the Gram matrix.
+
+        For a kernel with diagonal structure, compute the $N\times N$ Gram matrix on
+        an input matrix of shape $N\times D$.
 
         Args:
             inputs (Float[Array, "N D"]): The input matrix.
 
         Returns
         -------
-            CovarianceOperator: The computed square Gram matrix.
+            DiagonalLinearOperator: The computed square Gram matrix.
         """
         return DiagonalLinearOperator(diag=vmap(lambda x: self.kernel(x, x))(x))
 
     def cross_covariance(
         self, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
-        """For a given kernel, compute the NxM covariance matrix on a pair of input
-        matrices of shape NxD and MxD.
+        r"""Compute the cross-covariance matrix.
+
+        For a given kernel, compute the $N\times M$ covariance matrix on a pair of
+        input matrices of shape $N\times D$ and $M\times D$.
 
         Args:
             x (Float[Array,"N D"]): The input matrix.

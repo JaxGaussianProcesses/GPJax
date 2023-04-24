@@ -64,14 +64,15 @@ class AbstractPrior(Module):
     jitter: float = static_field(1e-6)
 
     def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
-        """Evaluate the Gaussian process at the given points. The output of this function
-        is a `TensorFlow probability distribution <https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions>`_ from which the
+        r"""Evaluate the Gaussian process at the given points.
+        The output of this function is a
+        [TensorFlow probability distribution](https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions) from which the
         the latent function's mean and covariance can be evaluated and the distribution
         can be sampled.
 
-        Under the hood, ``__call__`` is calling the objects ``predict`` method. For this
-        reasons, classes inheriting the ``AbstractPrior`` class, should not overwrite the
-        ``__call__`` method and should instead define a ``predict`` method.
+        Under the hood, `__call__` is calling the objects `predict` method. For this
+        reasons, classes inheriting the `AbstractPrior` class, should not overwrite the
+        `__call__` method and should instead define a `predict` method.
 
         Args:
             *args (Any): The arguments to pass to the GP's `predict` method.
@@ -79,7 +80,8 @@ class AbstractPrior(Module):
 
         Returns
         -------
-            GaussianDistribution: A multivariate normal random variable representation of the Gaussian process.
+            GaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process.
         """
         return self.predict(*args, **kwargs)
 

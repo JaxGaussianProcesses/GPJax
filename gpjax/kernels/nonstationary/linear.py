@@ -38,10 +38,11 @@ class Linear(AbstractKernel):
         x: Float[Array, " D"],
         y: Float[Array, " D"],
     ) -> Float[Array, "1"]:
-        """Evaluate the linear kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\\sigma`.
+        r"""Compute the linear kernel between a pair of arrays.
 
-        .. math::
-            k(x, y) = \\sigma^2 x^{T}y
+        For a pair of inputs $x, y \in \mathbb{R}^{D}$, let's evaluate the linear
+        kernel $k(x, y)=\sigma^2 x^{\top}y$ where $\sigma^\in \mathbb{R}_{>0}$ is the
+        kernel's variance parameter.
 
         Args:
             x (Float[Array, "D"]): The left hand input of the kernel function.
@@ -49,7 +50,8 @@ class Linear(AbstractKernel):
 
         Returns
         -------
-            Float[Array, "1"]: The evaluated kernel function :math:`k(x, y)` at the supplied inputs.
+            Float[Array, "1"]: The evaluated kernel function $k(x, y)$ at the
+                supplied inputs.
         """
         x = self.slice_input(x)
         y = self.slice_input(y)
