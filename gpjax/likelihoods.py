@@ -63,7 +63,7 @@ class AbstractLikelihood(Module):
 
     @property
     @abc.abstractmethod
-    def link_function(self) -> tfd.Distribution:
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         """Return the link function of the likelihood function.
 
         Returns:
@@ -80,11 +80,11 @@ class Gaussian(AbstractLikelihood):
         jnp.array([1.0]), bijector=tfb.Softplus()
     )
 
-    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Normal:
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Normal:
         """The link function of the Gaussian likelihood.
 
         Args:
-            f (Float[Array, "N 1"]): Function values.
+            f (Float[Array, "..."]): Function values.
 
         Returns:
             tfd.Normal: The likelihood function.
@@ -116,11 +116,11 @@ class Gaussian(AbstractLikelihood):
 
 @dataclass
 class Bernoulli(AbstractLikelihood):
-    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Distribution:
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         """The probit link function of the Bernoulli likelihood.
 
         Args:
-            f (Float[Array, "N 1"]): Function values.
+            f (Float[Array, "..."]): Function values.
 
         Returns:
             tfd.Distribution: The likelihood function.
@@ -143,14 +143,14 @@ class Bernoulli(AbstractLikelihood):
         return self.link_function(mean / jnp.sqrt(1.0 + variance))
 
 
-def inv_probit(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
+def inv_probit(x: Float[Array, "*N"]) -> Float[Array, "*N"]:
     """Compute the inverse probit function.
 
     Args:
-        x (Float[Array, "N 1"]): A vector of values.
+        x (Float[Array, "*N"]): A vector of values.
 
     Returns:
-        Float[Array, "N 1"]: The inverse probit of the input vector.
+        Float[Array, "*N"]: The inverse probit of the input vector.
     """
     jitter = 1e-3  # To ensure output is in interval (0, 1).
     return 0.5 * (1.0 + jsp.special.erf(x / jnp.sqrt(2.0))) * (1 - 2 * jitter) + jitter
