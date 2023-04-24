@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from beartype.typing import Any, Optional, Tuple
+from beartype.typing import Any, Optional, Tuple, Union, Callable
 
 import jax
 import jax.random as jr
@@ -33,7 +33,7 @@ from .scan import vscan
 def fit(
     *,
     model: Module,
-    objective: AbstractObjective,
+    objective: Union[AbstractObjective, Callable[[Module, Dataset], ScalarFloat]],
     train_data: Dataset,
     optim: ox.GradientTransformation,
     num_iters: Optional[int] = 100,
@@ -69,7 +69,7 @@ def fit(
         >>> model = LinearModel(weight=1.0, bias=1.0)
         >>>
         >>> # (3) Define your loss function:
-        >>> class MeanSqaureError(gpx.AbstractObjective):
+        >>> class MeanSquareError(gpx.AbstractObjective):
         ...     def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
         ...         return jnp.mean((train_data.y - model(train_data.X)) ** 2)
         ...
