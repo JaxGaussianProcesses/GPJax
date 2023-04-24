@@ -112,7 +112,7 @@ class Constant(AbstractMeanFunction):
 
     constant: Float[Array, "1"] = param_field(jnp.array([0.0]))
 
-    def __call__(self, x: Float[Array, "D"]) -> Float[Array, "1"]:
+    def __call__(self, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:
         """Evaluate the mean function at the given points.
 
         Args:
@@ -121,7 +121,7 @@ class Constant(AbstractMeanFunction):
         Returns:
             Float[Array, "1"]: The evaluated mean function.
         """
-        return self.constant
+        return jnp.ones((x.shape[0], 1)) * self.constant
 
 
 @dataclasses.dataclass
