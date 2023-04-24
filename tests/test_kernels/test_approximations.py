@@ -134,7 +134,7 @@ def test_value_error(kernel):
 
 
 @pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
-def stochastic_init(kernel: AbstractKernel):
+def test_stochastic_init(kernel: AbstractKernel):
     k1 = RFF(base_kernel=kernel, num_basis_fns=10, key=123)
     k2 = RFF(base_kernel=kernel, num_basis_fns=10, key=42)
 
