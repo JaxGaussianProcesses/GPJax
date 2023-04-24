@@ -19,7 +19,7 @@ import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from jaxtyping import Array, Float
 from simple_pytree import static_field
-from gpjax.utils import ScalarFloat
+from gpjax.utils import ScalarFloat, ScalarInt
 
 from ...base import param_field
 from ..base import AbstractKernel
@@ -29,7 +29,7 @@ from ..base import AbstractKernel
 class Polynomial(AbstractKernel):
     """The Polynomial kernel with variable degree."""
 
-    degree: int = static_field(2)
+    degree: ScalarInt = static_field(2)
     shift: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
 
