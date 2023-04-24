@@ -102,11 +102,13 @@ kernel = gpx.kernels.RBF(
     active_dims=[0, 1, 2],  lengthscale=jnp.array([0.1, 0.1, 100.])
 )
 
-# %%
+# %% [markdown]
 # ## Mean function
 # As stated before, we already know that temperature strongly depends on elevation.
 # So why not use it for our mean function? GPJax lets you define custom mean functions
 # easily: simply subclass `AbstractMeanFunction`.
+
+# %%
 @dataclass
 class MeanFunction(gpx.gps.AbstractMeanFunction):
 
@@ -118,8 +120,10 @@ class MeanFunction(gpx.gps.AbstractMeanFunction):
         out = elevation * self.w + self.b 
         return out
     
-# %%
+# %% [markdown]
 # Now we can define our prior. We'll also choose a Gaussian likelihood.
+
+# %%
 mean_function = MeanFunction()
 prior = gpx.Prior(kernel, mean_function)
 likelihood = gpx.Gaussian(D.n)
