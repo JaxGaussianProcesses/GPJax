@@ -19,8 +19,8 @@ from beartype.typing import Any, Callable, Dict, Optional
 
 import jax.numpy as jnp
 from jax.random import PRNGKey, normal
-from jaxtyping import Array, Float
-from gpjax.typing import KeyArray
+from jaxtyping import Float
+from gpjax.typing import KeyArray, Array
 
 from simple_pytree import static_field
 

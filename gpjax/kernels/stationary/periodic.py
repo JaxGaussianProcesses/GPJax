@@ -19,7 +19,8 @@ from beartype.typing import Union
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 from gpjax.typing import ScalarFloat
 
 from ...base import param_field

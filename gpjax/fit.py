@@ -19,7 +19,8 @@ import jax
 import jax.random as jr
 import optax as ox
 from jax._src.random import _check_prng_key
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 from jaxlib.xla_extension import PjitFunction
 from warnings import warn
 

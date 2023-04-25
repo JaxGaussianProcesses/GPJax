@@ -17,7 +17,8 @@ from beartype.typing import Callable, Optional
 
 import jax.numpy as jnp
 import numpy as np
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 
 """The number of Gauss-Hermite points to use for quadrature"""
 DEFAULT_NUM_GAUSS_HERMITE_POINTS = 20

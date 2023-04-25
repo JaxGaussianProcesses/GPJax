@@ -18,7 +18,8 @@ from dataclasses import dataclass
 from beartype.typing import Any, Union
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 
 from .dense_linear_operator import DenseLinearOperator
 from .linear_operator import LinearOperator

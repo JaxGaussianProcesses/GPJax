@@ -15,7 +15,8 @@
 
 import jax.numpy as jnp
 from jax import vmap
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 
 from gpjax.linops import ConstantDiagonalLinearOperator, DiagonalLinearOperator
 

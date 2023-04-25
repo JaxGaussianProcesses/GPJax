@@ -18,7 +18,8 @@ from beartype.typing import Union, Tuple, Type
 
 import jax
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 
 from gpjax.linops.linear_operator import LinearOperator
 

@@ -21,7 +21,8 @@ import jax.random as jr
 from gpjax.typing import KeyArray
 from gpjax.typing import ScalarFloat
 from jax import vmap
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
 
 from .linops import IdentityLinearOperator, LinearOperator

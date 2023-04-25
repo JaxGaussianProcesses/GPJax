@@ -17,9 +17,9 @@ from dataclasses import dataclass
 from beartype.typing import Optional, Union
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from jaxtyping import Float
 from simple_pytree import Pytree
-
+from gpjax.typing import Array
 
 @dataclass
 class Dataset(Pytree):

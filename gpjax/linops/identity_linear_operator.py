@@ -18,7 +18,8 @@ from beartype.typing import Any
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 from gpjax.typing import ScalarFloat
 
 from gpjax.linops.constant_diagonal_linear_operator import \

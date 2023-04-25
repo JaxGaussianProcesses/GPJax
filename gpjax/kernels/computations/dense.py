@@ -14,7 +14,8 @@
 # ==============================================================================
 
 from jax import vmap
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 
 from .base import AbstractKernelComputation
 

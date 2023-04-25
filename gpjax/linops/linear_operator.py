@@ -19,7 +19,8 @@ from dataclasses import dataclass
 from beartype.typing import Any, Generic, Iterable, Mapping, Tuple, Type, TypeVar, Union
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 from simple_pytree import Pytree, static_field
 from gpjax.typing import ScalarFloat
 

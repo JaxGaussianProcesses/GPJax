@@ -6,7 +6,8 @@ import jax.numpy as jnp
 import jax.scipy as jsp
 import jax.tree_util as jtu
 from jax import vmap
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax as tfp
 

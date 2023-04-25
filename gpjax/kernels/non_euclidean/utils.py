@@ -13,7 +13,8 @@
 # limitations under the License.
 # ==============================================================================
 
-from jaxtyping import Array, Int, Num
+from gpjax.typing import Array
+from jaxtyping import Int, Num
 
 
 def jax_gather_nd(

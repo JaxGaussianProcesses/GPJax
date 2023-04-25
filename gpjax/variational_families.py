@@ -20,7 +20,8 @@ from dataclasses import dataclass
 import jax.numpy as jnp
 import jax.scipy as jsp
 import tensorflow_probability.substrates.jax.bijectors as tfb
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 from simple_pytree import static_field
 
 from .base import Module, param_field
