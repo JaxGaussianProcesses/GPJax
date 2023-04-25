@@ -25,7 +25,7 @@ import jax
 from gpjax.typing import KeyArray
 from gpjax.typing import ScalarFloat
 from gpjax.typing import Array
-from jaxtyping import Float
+from jaxtyping import Float, Num
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax.distributions as tfd
 
@@ -46,10 +46,10 @@ class AbstractKernel(Module):
     def ndims(self):
         return 1 if not self.active_dims else len(self.active_dims)
 
-    def cross_covariance(self, x: Float[Array, "N D"], y: Float[Array, "M D"]):
+    def cross_covariance(self, x: Num[Array, "N D"], y: Num[Array, "M D"]):
         return self.compute_engine(self).cross_covariance(x, y)
 
-    def gram(self, x: Float[Array, "N D"]):
+    def gram(self, x: Num[Array, "N D"]):
         return self.compute_engine(self).gram(x)
 
     def slice_input(self, x: Float[Array, "... D"]) -> Float[Array, "... Q"]:

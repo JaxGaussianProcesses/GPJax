@@ -21,7 +21,7 @@ from beartype.typing import Callable, List, Union
 
 import jax.numpy as jnp
 from gpjax.typing import Array
-from jaxtyping import Float
+from jaxtyping import Float, Num
 from simple_pytree import static_field
 
 from .base import Module, param_field
@@ -32,7 +32,7 @@ class AbstractMeanFunction(Module):
     """Mean function that is used to parameterise the Gaussian process."""
 
     @abc.abstractmethod
-    def __call__(self, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:
+    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
         """Evaluate the mean function at the given points. This method is required for all subclasses.
 
         Args:
@@ -61,7 +61,7 @@ class AbstractMeanFunction(Module):
         return SumMeanFunction([self, Constant(other)])
 
     def __radd__(
-        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]
+        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
         """Add two mean functions.
 
@@ -74,7 +74,7 @@ class AbstractMeanFunction(Module):
         return self.__add__(other)
 
     def __mul__(
-        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]
+        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
         """Multiply two mean functions.
 
@@ -90,7 +90,7 @@ class AbstractMeanFunction(Module):
         return ProductMeanFunction([self, Constant(other)])
 
     def __rmul__(
-        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]
+        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
         """Multiply two mean functions.
 
@@ -113,7 +113,7 @@ class Constant(AbstractMeanFunction):
 
     constant: Float[Array, "1"] = param_field(jnp.array([0.0]))
 
-    def __call__(self, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:
+    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
         """Evaluate the mean function at the given points.
 
         Args:
@@ -157,7 +157,7 @@ class CombinationMeanFunction(AbstractMeanFunction):
         self.means = items_list
         self.operator = operator
 
-    def __call__(self, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:
+    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
         """Evaluate combination kernel on a pair of inputs.
 
         Args:

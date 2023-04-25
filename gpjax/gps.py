@@ -19,7 +19,7 @@ from beartype.typing import Any, Callable, Dict, Optional
 
 import jax.numpy as jnp
 from jax.random import PRNGKey, normal
-from jaxtyping import Float
+from jaxtyping import Float, Num
 from gpjax.typing import KeyArray, Array
 
 from simple_pytree import static_field
@@ -158,7 +158,7 @@ class Prior(AbstractPrior):
         """
         return self.__mul__(other)
 
-    def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
+    def predict(self, test_inputs: Num[Array, "N D"]) -> GaussianDistribution:
         """Compute the predictive prior distribution for a given set of
         parameters. The output of this function is a function that computes
         a TFP distribution for a given set of inputs.
@@ -351,7 +351,7 @@ class ConjugatePosterior(AbstractPosterior):
 
     def predict(
         self,
-        test_inputs: Float[Array, "N D"],
+        test_inputs: Num[Array, "N D"],
         train_data: Dataset,
     ) -> GaussianDistribution:
         r"""Conditional on a training data set, compute the GP's posterior
@@ -548,7 +548,7 @@ class NonConjugatePosterior(AbstractPosterior):
             self.latent = normal(self.key, shape=(self.likelihood.num_datapoints, 1))
 
     def predict(
-        self, test_inputs: Float[Array, "N D"], train_data: Dataset
+        self, test_inputs: Num[Array, "N D"], train_data: Dataset
     ) -> GaussianDistribution:
         """
         Conditional on a set of training data, compute the GP's posterior
