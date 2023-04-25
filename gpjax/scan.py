@@ -22,7 +22,7 @@ from jax import lax
 from jaxtyping import Shaped, Array
 from jax.experimental import host_callback as hcb
 from tqdm.auto import trange
-from gpjax.utils import ScalarInt, ScalarBool
+from gpjax.typing import ScalarInt, ScalarBool
 
 Carry = TypeVar("Carry")
 X = TypeVar("X")

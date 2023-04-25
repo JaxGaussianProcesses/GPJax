@@ -23,7 +23,7 @@ from jaxtyping import Array, Float
 from jaxlib.xla_extension import PjitFunction
 from warnings import warn
 
-from gpjax.utils import ScalarFloat, KeyArray
+from gpjax.typing import ScalarFloat, KeyArray
 from .base import Module
 from .dataset import Dataset
 from .objectives import AbstractObjective

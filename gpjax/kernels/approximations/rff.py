@@ -8,7 +8,7 @@ from simple_pytree import static_field
 from ...base import param_field
 from ..base import AbstractKernel
 from ..computations import BasisFunctionComputation
-from gpjax.utils import KeyArray
+from gpjax.typing import KeyArray
 
 
 @dataclass

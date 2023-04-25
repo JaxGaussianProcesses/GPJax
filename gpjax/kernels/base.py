@@ -22,13 +22,13 @@ from functools import partial
 import jax.numpy as jnp
 import jax.random
 import jax
-from gpjax.utils import KeyArray
-from gpjax.utils import ScalarFloat
+from gpjax.typing import KeyArray
+from gpjax.typing import ScalarFloat
 from jaxtyping import Array, Float
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.utils import ScalarFloat
+from gpjax.typing import ScalarFloat
 from ..base import Module, param_field
 from .computations import AbstractKernelComputation, DenseKernelComputation
 

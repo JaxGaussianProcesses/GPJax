@@ -18,8 +18,8 @@ from beartype.typing import Any, Optional, Tuple
 
 import jax.numpy as jnp
 import jax.random as jr
-from gpjax.utils import KeyArray
-from gpjax.utils import ScalarFloat
+from gpjax.typing import KeyArray
+from gpjax.typing import ScalarFloat
 from jax import vmap
 from jaxtyping import Array, Float
 import tensorflow_probability.substrates.jax as tfp

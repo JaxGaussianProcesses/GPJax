@@ -21,7 +21,7 @@ import jax.numpy as jnp
 from jaxtyping import Array, Float
 from simple_pytree import static_field
 
-from gpjax.utils import ScalarFloat
+from gpjax.typing import ScalarFloat
 from .linear_operator import LinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
 from .linear_operator import LinearOperator

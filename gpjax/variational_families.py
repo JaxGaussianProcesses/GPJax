@@ -30,7 +30,7 @@ from .gps import AbstractPosterior
 from .likelihoods import Gaussian
 from .linops import (DenseLinearOperator, LowerTriangularLinearOperator,
                      identity)
-from gpjax.utils import ScalarFloat
+from gpjax.typing import ScalarFloat
 
 
 @dataclass

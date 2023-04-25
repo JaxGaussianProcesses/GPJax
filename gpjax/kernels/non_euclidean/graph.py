@@ -20,7 +20,7 @@ import jax.numpy as jnp
 import tensorflow_probability.substrates.jax as tfp
 from jaxtyping import Array, Float, Int
 from simple_pytree import static_field
-from gpjax.utils import ScalarFloat
+from gpjax.typing import ScalarFloat
 
 from ...base import param_field
 from ..base import AbstractKernel

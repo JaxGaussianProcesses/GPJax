@@ -10,7 +10,7 @@ from jaxtyping import Array, Float
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.utils import ScalarFloat
+from gpjax.typing import ScalarFloat
 from .base import Module
 from .dataset import Dataset
 from .gaussian_distribution import GaussianDistribution

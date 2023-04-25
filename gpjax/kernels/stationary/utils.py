@@ -16,7 +16,7 @@
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax as tfp
 from jaxtyping import Array, Float
-from gpjax.utils import ScalarFloat
+from gpjax.typing import ScalarFloat
 
 tfd = tfp.distributions
 

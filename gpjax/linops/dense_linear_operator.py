@@ -23,7 +23,7 @@ from jaxtyping import Array, Float
 
 from gpjax.linops.linear_operator import LinearOperator
 from gpjax.linops.utils import to_linear_operator
-from gpjax.utils import ScalarFloat, VecNOrMatNM
+from gpjax.typing import ScalarFloat, VecNOrMatNM
 
 
 def _check_matrix(matrix: Array) -> None:

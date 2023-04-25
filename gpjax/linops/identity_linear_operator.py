@@ -19,7 +19,7 @@ from dataclasses import dataclass
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float
-from gpjax.utils import ScalarFloat
+from gpjax.typing import ScalarFloat
 
 from gpjax.linops.constant_diagonal_linear_operator import \
     ConstantDiagonalLinearOperator

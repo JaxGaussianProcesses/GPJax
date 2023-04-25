@@ -20,7 +20,7 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 from jaxtyping import Array, Float
 from beartype.typing import Union
-from gpjax.utils import ScalarFloat
+from gpjax.typing import ScalarFloat
 
 from ...base import param_field
 from ..base import AbstractKernel

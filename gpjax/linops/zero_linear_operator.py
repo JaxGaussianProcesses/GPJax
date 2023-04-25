@@ -20,7 +20,7 @@ from dataclasses import dataclass
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 
-from gpjax.utils import ScalarFloat
+from gpjax.typing import ScalarFloat
 from .diagonal_linear_operator import DiagonalLinearOperator
 from .linear_operator import LinearOperator
 from .utils import check_shapes_match, default_dtype, to_linear_operator

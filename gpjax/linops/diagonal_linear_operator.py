@@ -23,7 +23,7 @@ from jaxtyping import Array, Float
 from .dense_linear_operator import DenseLinearOperator
 from .linear_operator import LinearOperator
 from .utils import to_linear_operator
-from gpjax.utils import ScalarFloat, VecNOrMatNM
+from gpjax.typing import ScalarFloat, VecNOrMatNM
 
 
 def _check_diag(diag: Any) -> None:
