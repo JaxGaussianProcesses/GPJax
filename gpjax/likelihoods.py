@@ -20,7 +20,7 @@ from beartype.typing import Any, Union
 import jax.numpy as jnp
 import jax.scipy as jsp
 import tensorflow_probability.substrates.jax as tfp
-from gpjax.typing import Array
+from gpjax.typing import Array, ScalarFloat
 from jaxtyping import Float
 from simple_pytree import static_field
 
