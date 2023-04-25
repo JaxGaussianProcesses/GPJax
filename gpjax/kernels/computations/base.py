@@ -23,14 +23,12 @@ from jaxtyping import Array, Float
 from gpjax.linops import (DenseLinearOperator, DiagonalLinearOperator,
                           LinearOperator)
 
-Kernel = Any  # TODO: FIX
-
 
 @dataclass
 class AbstractKernelComputation:
     """Abstract class for kernel computations."""
 
-    kernel: Kernel
+    kernel: "gpjax.kernels.base.AbstractKernel"
 
     def gram(
         self,
