@@ -31,7 +31,7 @@ class Dataset(Pytree):
     """
 
     X: Optional[Union[Num[Array, "N D"], Num[Array, "..."]]] = None
-    y: Optional[Union[Float[Array, "N Q"], Float[Array, "..."]]] = None
+    y: Optional[Union[Num[Array, "N Q"], Num[Array, "..."]]] = None
 
     def __post_init__(self) -> None:
         """Checks that the shapes of X and y are compatible."""
