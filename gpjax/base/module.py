@@ -199,7 +199,7 @@ def meta_leaves(
     pytree: Module,
     *,
     is_leaf: Optional[Callable[[Any], bool]] = None,
-) -> List[Tuple[Dict[str, Any], Any]]:
+) -> List[Tuple[Optional[Dict[str, Any]], Any]]:
     """
     Returns the meta of the leaves of the pytree.
 
