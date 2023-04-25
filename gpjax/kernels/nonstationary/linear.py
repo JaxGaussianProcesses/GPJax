@@ -47,7 +47,7 @@ class Linear(AbstractKernel):
             y (Float[Array, "D"]): The right hand input of the kernel function.
 
         Returns:
-            Float[Array, "1"]: The evaluated kernel function :math:`k(x, y)` at the supplied inputs.
+            ScalarFloat: The evaluated kernel function :math:`k(x, y)` at the supplied inputs.
         """
         x = self.slice_input(x)
         y = self.slice_input(y)

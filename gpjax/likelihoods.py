@@ -78,8 +78,8 @@ class AbstractLikelihood(Module):
 class Gaussian(AbstractLikelihood):
     """Gaussian likelihood object."""
 
-    obs_noise: Float[Array, "1"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
+    obs_noise: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
     )
 
     def link_function(self, f: Float[Array, "..."]) -> tfd.Normal:

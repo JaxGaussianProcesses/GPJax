@@ -20,7 +20,7 @@ from dataclasses import dataclass
 import jax.numpy as jnp
 import jax.scipy as jsp
 import tensorflow_probability.substrates.jax.bijectors as tfb
-from gpjax.typing import Array
+from gpjax.typing import Array, ScalarFloat
 from jaxtyping import Float
 from simple_pytree import static_field
 
@@ -78,7 +78,7 @@ class AbstractVariationalGaussian(AbstractVariationalFamily):
     """The variational Gaussian family of probability distributions."""
 
     inducing_inputs: Float[Array, "N D"]
-    jitter: Float[Array, "1"] = static_field(1e-6)
+    jitter: ScalarFloat = static_field(1e-6)
 
     @property
     def num_inducing(self) -> int:

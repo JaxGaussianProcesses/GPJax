@@ -131,11 +131,11 @@ class AbstractKernel(Module):
 @dataclass
 class Constant(AbstractKernel):
     """
-    A constant mean function. This function returns a repeated scalar value for all inputs.
+    A constant kernel. This kernel evaluates to a constant for all inputs.
     The scalar value itself can be treated as a model hyperparameter and learned during training.
     """
 
-    constant: Float[Array, "1"] = param_field(jnp.array(0.0))
+    constant: ScalarFloat = param_field(jnp.array(0.0))
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs.

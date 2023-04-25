@@ -21,7 +21,7 @@ import tensorflow_probability.substrates.jax as tfp
 from gpjax.typing import Array
 from jaxtyping import Float, Num, Int
 from simple_pytree import static_field
-from gpjax.typing import ScalarFloat
+from gpjax.typing import ScalarFloat, ScalarInt
 
 from ...base import param_field
 from ..base import AbstractKernel
@@ -49,7 +49,7 @@ class GraphKernel(AbstractKernel):
     smoothness: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     eigenvalues: Float[Array, "N"] = static_field(None)
     eigenvectors: Float[Array, "N N"] = static_field(None)
-    num_vertex: Int[Array, "1"] = static_field(None)
+    num_vertex: ScalarInt = static_field(None)
     compute_engine: AbstractKernelComputation = static_field(EigenKernelComputation)
     name: str = "Graph Matérn"
 
