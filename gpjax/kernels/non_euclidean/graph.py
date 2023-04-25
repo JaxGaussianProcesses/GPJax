@@ -44,13 +44,9 @@ class GraphKernel(AbstractKernel):
     """
 
     laplacian: Float[Array, "N N"] = static_field(None)
-    lengthscale: Float[Array, "D"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
-    )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    smoothness: Float[Array, "1"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
-    )
+    lengthscale: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    smoothness: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     eigenvalues: Float[Array, "N"] = static_field(None)
     eigenvectors: Float[Array, "N N"] = static_field(None)
     num_vertex: Int[Array, "1"] = static_field(None)
