@@ -26,7 +26,6 @@ from gpjax.linops import identity
 config.update("jax_enable_x64", True)
 
 
-@pytest.mark.skip("Graph kernel is broken")
 def test_graph_kernel():
     # Create a random graph, G, and verice labels, x,
     n_verticies = 20

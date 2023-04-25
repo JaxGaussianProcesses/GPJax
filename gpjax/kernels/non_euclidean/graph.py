@@ -43,7 +43,7 @@ class GraphKernel(AbstractKernel):
         compute_engine
     """
 
-    laplacian: Float[Array, "N N"] = static_field(None)
+    laplacian: Num[Array, "N N"] = static_field(None)
     lengthscale: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     smoothness: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
@@ -62,22 +62,23 @@ class GraphKernel(AbstractKernel):
         if self.num_vertex is None:
             self.num_vertex = self.eigenvalues.shape[0]
 
-    def __call__(
+    def __call__(  # TODO not consistent with general kernel interface
         self,
-        x: Float[Array, "D"],
-        y: Float[Array, "D"],
+        x: Int[Array, "N 1"],
+        y: Int[Array, "N 1"],
+        *,
+        S,
         **kwargs,
-    ) -> ScalarFloat:
+    ):
         """Evaluate the graph kernel on a pair of vertices :math:`v_i, v_j`.
 
         Args:
-            x (Float[Array, "D"]): Index of the ith vertex.
-            y (Float[Array, "D"]): Index of the jth vertex.
+            x (Float[Array, "N 1"]): Index of the ith vertex.
+            y (Float[Array, "N 1"]): Index of the jth vertex.
 
         Returns:
             ScalarFloat: The value of :math:`k(v_i, v_j)`.
         """
-        S = kwargs["S"]
         Kxx = (jax_gather_nd(self.eigenvectors, x) * S.squeeze()) @ jnp.transpose(
             jax_gather_nd(self.eigenvectors, y)
         )  # shape (n,n)
