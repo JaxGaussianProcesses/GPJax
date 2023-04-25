@@ -15,7 +15,7 @@
 
 import abc
 from dataclasses import dataclass
-from beartype.typing import Any
+from beartype.typing import Any, Union
 
 import jax.numpy as jnp
 import jax.scipy as jsp
@@ -25,6 +25,7 @@ from simple_pytree import static_field
 
 from .base import Module, param_field
 from .linops.utils import to_dense
+from .gaussian_distribution import GaussianDistribution
 
 tfb = tfp.bijectors
 tfd = tfp.distributions
@@ -92,7 +93,7 @@ class Gaussian(AbstractLikelihood):
         return tfd.Normal(loc=f, scale=self.obs_noise.astype(f.dtype))
 
     def predict(
-        self, dist: tfd.MultivariateNormalTriL
+        self, dist: Union[tfd.MultivariateNormalTriL, GaussianDistribution]
     ) -> tfd.MultivariateNormalFullCovariance:
         """
         Evaluate the Gaussian likelihood function at a given predictive
