@@ -76,6 +76,7 @@ examples/collapsed_vi
 examples/graph_kernels
 examples/barycentres
 examples/deep_kernels
+examples/spatial
 ```
 
 ```{toctree}
