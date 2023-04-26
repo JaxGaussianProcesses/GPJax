@@ -19,8 +19,10 @@ from jaxtyping import Array, Float
 from simple_pytree import static_field
 import numpy as np
 
-import gpjax as gpx
-from gpjax.base.param import param_field
+from jaxtyping import install_import_hook
+with install_import_hook("gpjax", "beartype.beartype"):
+    import gpjax as gpx
+    from gpjax.base.param import param_field
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
