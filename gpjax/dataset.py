@@ -83,7 +83,7 @@ class Dataset(Pytree):
         return self.y.shape[1]
 
 
-def _check_shape(X: Optional[Num[Array, "..."]], y: Optional[Float[Array, "..."]]) -> None:
+def _check_shape(X: Optional[Num[Array, "..."]], y: Optional[Num[Array, "..."]]) -> None:
     """Checks that the shapes of X and y are compatible."""
     if X is not None and y is not None:
         if X.shape[0] != y.shape[0]:
