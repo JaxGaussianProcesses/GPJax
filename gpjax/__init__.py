@@ -13,21 +13,19 @@
 # limitations under the License.
 # ==============================================================================
 
-from jaxtyping import install_import_hook
-with install_import_hook("gpjax", "beartype.beartype"):
-    from .dataset import Dataset
-    from .fit import fit
-    from .gps import Prior, construct_posterior
-    from .kernels import *
-    from .likelihoods import Bernoulli, Gaussian
-    from .mean_functions import Constant, Zero
-    from .objectives import (ELBO, CollapsedELBO, ConjugateMLL,
-                             LogPosteriorDensity, NonConjugateMLL)
-    from .variational_families import (CollapsedVariationalGaussian,
-                                       ExpectationVariationalGaussian,
-                                       NaturalVariationalGaussian,
-                                       VariationalGaussian,
-                                       WhitenedVariationalGaussian)
+from .dataset import Dataset
+from .fit import fit
+from .gps import Prior, construct_posterior
+from .kernels import *
+from .likelihoods import Bernoulli, Gaussian
+from .mean_functions import Constant, Zero
+from .objectives import (ELBO, CollapsedELBO, ConjugateMLL,
+                         LogPosteriorDensity, NonConjugateMLL)
+from .variational_families import (CollapsedVariationalGaussian,
+                                   ExpectationVariationalGaussian,
+                                   NaturalVariationalGaussian,
+                                   VariationalGaussian,
+                                   WhitenedVariationalGaussian)
 
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
