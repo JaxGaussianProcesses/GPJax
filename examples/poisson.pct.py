@@ -1,3 +1,19 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: base
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # Count data regression (Poisson likelihood)
 #
@@ -29,13 +45,13 @@ key = jr.PRNGKey(123)
 
 # %% [markdown]
 # ## Dataset
-
+#
 # For count data regression, the Poisson distribution is a natural choice. The probability mass function of the Poisson distribution is given by
 #
 # $$ p(y \,|\, \lambda) = \frac{\lambda^{y} e^{-\lambda}}{y!},$$
 #
 # where $y$ is the count and the parameter $\lambda$ is the rate of the Poisson distribution.
-
+#
 # We than set $\lambda = \exp(f)$ where $f$ is the latent Gaussian process. The exponential function is the _link function_ for the Poisson distribution: it maps the output of a GP to the positive real line, which is suitable for modeling count data.
 #
 # We simulate a dataset $\mathcal{D} = \{(\mathbf{X}, \mathbf{y})\}$ with inputs $\mathbf{X} \in \mathbb{R}^d$ and corresponding count outputs $\mathbf{y}$.
@@ -118,10 +134,15 @@ num_warmup = 50
 num_iter = 500
 
 mll = gpx.NonConjugateMLL(negative=False)
-unconstrained_mll = jax.jit(lambda tree: mll(tree.unconstrain(), D))
+
+def unconstrained_mll(latent):
+    tree = posterior.replace(latent=latent)
+    return mll(tree.unconstrain(), D)
+
+
 init, _kernel = blackjax.elliptical_slice(
     unconstrained_mll, mean=prior.mean_function(x)[:,0]
-    , cov=kernel.gram(x).to_dense()
+    , cov=kernel.gram(x).to_dense() + 1e-6 * I(n)
 )
 
 def inference_loop(rng, kernel, init_state, n_iter):
@@ -135,7 +156,8 @@ def inference_loop(rng, kernel, init_state, n_iter):
     return states, info
 
 # Sample from the posterior distribution
-states, infos = inference_loop(key, _kernel, init(posterior), num_warmup + num_iter)
+states, infos = inference_loop(key, _kernel, init(posterior.latent), num_warmup + num_iter)
+
 
 # %% [markdown]
 # ### Sampler efficiency
@@ -150,12 +172,12 @@ print(f"Acceptance rate: {acceptance_rate:.2f}")
 
 # %%
 fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(15, 5), tight_layout=True)
-ax0.plot(states.position.prior.kernel.lengthscale)
-ax1.plot(states.position.prior.kernel.variance)
-ax2.plot(states.position.latent[:, 0, :])
-ax0.set_title("Kernel Lengthscale")
-ax1.set_title("Kernel Variance")
-ax2.set_title("Latent Function (index = 1)")
+ax0.plot(states.position[:, 0])
+ax1.plot(states.position[:, 1])
+ax2.plot(states.position[:, 2])
+ax0.set_title("Latent Function (index = 0)")
+ax1.set_title("Latent Function (index = 1)")
+ax2.set_title("Latent Function (index = 2)")
 
 # %% [markdown]
 # ## Prediction
@@ -177,8 +199,7 @@ thin_factor = 10
 samples = []
 
 for i in range(num_warmup, num_iter, thin_factor):
-    sample = jtu.tree_map(lambda samples: samples[i], states.position)
-    sample = sample.constrain()
+    sample = posterior.replace(latent=states.position[i])
     latent_dist = sample.predict(xtest, train_data=D)
     predictive_dist = sample.likelihood(latent_dist)
     samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
@@ -216,5 +237,3 @@ ax.fill_between(
 # %%
 # %load_ext watermark
 # %watermark -n -u -v -iv -w -a "Thomas Pinder & Daniel Dodd (edited by Francesco Zanetta)"
-
-# %%
