@@ -96,7 +96,7 @@ xtest = jnp.linspace(-5.5, 5.5, n_test).reshape(-1, 1)
 f = lambda x, a, b: a + jnp.sin(b * x)
 
 ys = []
-for i in range(n_datasets):
+for _i in range(n_datasets):
     key, subkey = jr.split(key)
     vertical_shift = jr.uniform(subkey, minval=0.0, maxval=2.0)
     period = jr.uniform(subkey, minval=0.75, maxval=1.25)

@@ -5,19 +5,19 @@
 # create custom kernels.
 
 # %%
+from dataclasses import dataclass
 from typing import Dict
 
-from dataclasses import dataclass
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
+import numpy as np
 import optax as ox
 import tensorflow_probability.substrates.jax as tfp
 from jax import jit
 from jax.config import config
 from jaxtyping import Array, Float
 from simple_pytree import static_field
-import numpy as np
 
 from jaxtyping import install_import_hook
 
@@ -45,7 +45,7 @@ tfb = tfp.bijectors
 # * Polynomial.
 # * [Graph kernels](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html).
 #
-# While the syntax is consistent, each kernel’s type influences the
+# While the syntax is consistent, each kernel's type influences the
 # characteristics of the sample paths drawn. We visualise this below with 10
 # function draws per kernel.
 
