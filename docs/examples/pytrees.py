@@ -9,6 +9,10 @@
 #       format_name: percent
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: base
+#     language: python
+#     name: python3
 # ---
 
 # %% [markdown]
@@ -23,6 +27,7 @@
 
 # %% [markdown]
 # # Gaussian process objects as data:
+#
 # Within this notebook, we'll be using the squared exponential, or RBF, kernel
 # for illustratory purposes. For a pair of vectors $x, y \in \mathbb{R}^d$, its
 # form can be mathematically given by
@@ -41,33 +46,37 @@
 # 2. Type hinting: Dataclasses provide native support for type annotations, which can help catch errors at compile-time and improve code readability.
 #
 # For the RBF kernel, we use a `dataclass` to represent this object as follows
-#
-# ```python
-# from jax import Array
-# from dataclasses import dataclass
-#
-# @dataclass
-# class RBF:
-# 	lengthscale: float
-# 	variance: float
-#
-# 	def covariance(self, x: Array, y: Array) -> Array:
-# 		pass
-# ```
+
+# %%
+from jax import Array
+from dataclasses import dataclass
+
+@dataclass
+class RBF:
+	lengthscale: float
+	variance: float
+
+	def covariance(self, x: Array, y: Array) -> Array:
+		pass
+
+
+# %% [markdown]
 # We have for now left `covariance` empty; however, through this notebook, we shall
 # build up to a fully object that can compute covariances in a JAX-compatible way.
 #
 # For those users who have not seen a `dataclass` before, this statement is equivalent
 # to writing
-# ```python
-# class RBF:
-# 	def __init__(self, lengthscale: float, variance: float) -> None:
-# 		self.lengthscale = lengthscale
-# 		self.variance = variance
-#
-# 	def covariance(self, x: Array, y: Array) -> Array:
-# 		pass
-# ```
+
+# %%
+class RBF:
+	def __init__(self, lengthscale: float, variance: float) -> None:
+		self.lengthscale = lengthscale
+		self.variance = variance
+
+	def covariance(self, x: Array, y: Array) -> Array:
+		pass
+
+# %% [markdown]
 # However, it a dataclass allows us to significantly reduce the number of lines
 # of code needed to represent such objects, particularly as the code's
 # complexity increases, as we shall go on to see.
@@ -78,7 +87,6 @@
 #
 # - Tom could you perhaps mention the `field` right here?
 # - Also feel free to define the covariance here -> maybe demonstrate it is not compatible with JAX out of the box, that leads into the next section - motivation for why we need to talk about PyTree's.
-
 
 # %% [markdown]
 # ## A primer on PyTree’s:
@@ -92,73 +100,75 @@
 # is a PyTree with structure `[*, {"Monte": *, "Carlo": *}]` and leaves `3.14`, `object()`, `False`. As such, most JAX functions operate over pytrees, e.g., `jax.lax.scan`, accepts as input and produces as output a pytrees of JAX arrays.
 #
 # While the default set of ‘node’ types that are regarded internal pytree nodes is limited to objects such as lists, tuples, and dicts, JAX permits custom types to be readily registered through a global registry, with the values of such traversed recursively (i.e., as a tree!). This is the functionality that we exploit, whereby we construct all Gaussian process models via a tree-structure through our `Module` object
-#
+
+# %% [markdown]
 # ## Module
 #
 # Our design, first and foremost, minimises additional abstractions on top of standard JAX: everything is just PyTrees and transformations on PyTrees, and secondly, provides full compatibility with the main JAX library itself, enhancing integrability with the broader ecosystem of third-party JAX libraries. To achieve this, our core idea is represent all model objects via an immutable tree-structure.
-
-
-# %% [markdown]
+#
+#
 # ### Defining a Module
 #
 # There are two main considerations for model parameters, their:
 #
 # - Trainability status.
 # - Domain.
-#
-# Why normalising flows don’t break the convention.
-#
-#
-# ```python
-# @dataclass
-# class RBF(Module):
-# 	lengthscale: float
-# 	variance: float
-#
-# 	def covariance(self, x: Array, y: Array) -> Array:
-# 		pass
-# ```
-#
-# ```python
-# class RBF(Module):
-# 	def __init__(self, lengthscale: float, variance: float) -> None:
-# 		self.lengthscale = lengthscale
-# 		self.variance = variance
-#
-# 	def covariance(self, x: Array, y: Array) -> Array:
-# 		pass
-# ```
-#
+# - Explain why normalising flows don’t break the convention.
+# - Mark leaf attributes with `param_field` to set a default bijector and trainable status.
+# - Unmarked leaf attributes default to an `Identity` bijector and trainablility set to `True`.
+# - Fully compatible with [Distrax](https://github.com/deepmind/distrax) and [TensorFlow Probability](https://www.tensorflow.org/probability) bijectors, so feel free to use these!
+
+# %%
+import tensorflow_probability.substrates.jax.bijectors as tfb
+from gpjax.base import Module, param_field
+
+@dataclass
+class RBF(Module):
+	lengthscale: float = param_field(1.0, bijector=tfb.Softplus())
+	variance: float = param_field(1.0, bijector=tfb.Softplus())
+
+	def covariance(self, x: Array, y: Array) -> Array:
+		pass
+
 # %% [markdown]
-# ### Replacing values
-# For consistency with JAX’s functional programming principles, `Module` instances are immutable. And parameters updates occur out-of- place via `replace`
 #
-# ```python
-# kernel = RBF()
-# kernel = kernel.replace(lengthscale=3.14) # Update e.g., the lengthscale.
-# print(kernel)
-# ```
+# ### Replacing values
+# For consistency with JAX’s functional programming principles, `Module` instances are immutable. And parameters updates occur out-of- place via `replace`.
+
+# %%
+kernel = RBF()
+kernel = kernel.replace(lengthscale=3.14) # Update e.g., the lengthscale.
+print(kernel)
 
 # %% [markdown]
 # ## Transformations 🤖
 #
 # ### Applying transformations
 # Use `constrain` / `unconstrain` to return a `Mytree` with each parameter's bijector `forward` / `inverse` operation applied!
-#     
-# ```python
-# kernel.constrain()
-# kernel.unconstrain()
-# ```
-#
+
+# %%
+# Tranform kernel to unconstrained space
+unconstrained_kernel = kernel.unconstrain()
+print(unconstrained_kernel)
+
+# Transform kernel back to constrained space
+kernel = unconstrained_kernel.constrain()
+print(kernel)
+
+# %% [markdown]
 # ### Replacing transformations
 # Default transformations can be replaced on an instance via the `replace_bijector` method.
-# ```python
-# new = model.replace_bijector(bias=Identity)
-# ```
-# ```python
-# new.constrain()
-# new.unconstrain()
-# ```
+
+# %%
+new_kernel = kernel.replace_bijector(lengthscale=tfb.Identity())
+
+# Tranform kernel to unconstrained space
+unconstrained_kernel = new_kernel.unconstrain()
+print(unconstrained_kernel)
+
+# Transform kernel back to constrained space
+new_kernel = unconstrained_kernel.constrain()
+print(new_kernel)
 
 # %% [markdown]
 # ## Trainability 🚂
@@ -198,8 +208,7 @@
 # SimpleModel(weight=-121.42676, bias=-188.37418)
 # ```
 # And we see that `weight`'s gradient is no longer zero.
-
-# %% [markdown]
+#
 # ## Metadata
 #
 # ### Viewing `field` metadata
@@ -244,10 +253,9 @@
 # SimpleModel(weight=1.0, bias=10.0)
 # ```
 # It is possible to define your own custom metadata and therefore your own metadata transformations in this vein.
-
-# %% [markdown]
+#
 # ## Static fields
-# Since `Mytree` inherits from [simple-pytree](https://github.com/cgarciae/simple-pytree)'s `Pytree`, fields can be marked as static via simple_pytree's `static_field`.
+# Fields can be marked as static via simple_pytree's `static_field`.
 #
 # ```python
 # import jax.tree_util as jtu
