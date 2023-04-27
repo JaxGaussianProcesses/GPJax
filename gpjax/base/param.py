@@ -17,9 +17,9 @@
 __all__ = ["param_field"]
 
 import dataclasses
-from beartype.typing import Any, Mapping, Optional
 
 import tensorflow_probability.substrates.jax.bijectors as tfb
+from beartype.typing import Any, Mapping, Optional
 
 
 def param_field(
@@ -34,10 +34,7 @@ def param_field(
     compare: bool = True,
     metadata: Optional[Mapping[str, Any]] = None,
 ):
-    if metadata is None:
-        metadata = {}
-    else:
-        metadata = dict(metadata)
+    metadata = {} if metadata is None else dict(metadata)
 
     if "bijector" in metadata:
         raise ValueError("Cannot use metadata with `bijector` already set.")

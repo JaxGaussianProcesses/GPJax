@@ -13,14 +13,13 @@
 # # limitations under the License.
 # # ==============================================================================
 
-import pytest
 import jax.numpy as jnp
 import jax.random as jr
 import networkx as nx
-from jax.config import config
-
+import pytest
 from gpjax.kernels.non_euclidean import GraphKernel
 from gpjax.linops import identity
+from jax.config import config
 
 # # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

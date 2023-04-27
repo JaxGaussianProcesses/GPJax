@@ -17,8 +17,8 @@ import networkx as nx
 import optax as ox
 from jax import jit
 from jax.config import config
-
 from jaxtyping import install_import_hook
+
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
@@ -154,7 +154,8 @@ predictive_dist = opt_posterior.likelihood(opt_posterior(x, D))
 initial_mean = initial_dist.mean()
 learned_mean = predictive_dist.mean()
 
-rmse = lambda ytrue, ypred: jnp.sum(jnp.sqrt(jnp.square(ytrue - ypred)))
+def rmse(ytrue, ypred):
+    return jnp.sum(jnp.sqrt(jnp.square(ytrue - ypred)))
 
 initial_rmse = jnp.sum(jnp.sqrt(jnp.square(y.squeeze() - initial_mean)))
 learned_rmse = jnp.sum(jnp.sqrt(jnp.square(y.squeeze() - learned_mean)))

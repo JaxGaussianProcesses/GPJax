@@ -29,7 +29,11 @@ from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 
 _key = jr.PRNGKey(seed=42)
 
-from tensorflow_probability.substrates.jax.distributions import MultivariateNormalDiag, MultivariateNormalFullCovariance, MultivariateNormalTriL
+from tensorflow_probability.substrates.jax.distributions import (
+    MultivariateNormalDiag,
+    MultivariateNormalFullCovariance,
+    MultivariateNormalTriL,
+)
 
 
 def approx_equal(res: jnp.ndarray, actual: jnp.ndarray) -> bool:
@@ -54,9 +58,7 @@ def test_array_arguments(n: int) -> None:
 
     y = jr.uniform(_key, shape=(n,))
 
-    tfp_dist = MultivariateNormalFullCovariance(
-        loc=mean, covariance_matrix=covariance
-    )
+    tfp_dist = MultivariateNormalFullCovariance(loc=mean, covariance_matrix=covariance)
 
     assert approx_equal(dist.log_prob(y), tfp_dist.log_prob(y))
     assert approx_equal(dist.kl_divergence(dist), 0.0)
@@ -100,9 +102,7 @@ def test_dense_linear_operator(n: int) -> None:
     sqrt = jnp.linalg.cholesky(covariance + jnp.eye(n) * 1e-10)
 
     dist_dense = GaussianDistribution(loc=mean, scale=DenseLinearOperator(covariance))
-    tfp_dist = MultivariateNormalFullCovariance(
-        loc=mean, covariance_matrix=covariance
-    )
+    tfp_dist = MultivariateNormalFullCovariance(loc=mean, covariance_matrix=covariance)
 
     assert approx_equal(dist_dense.mean(), tfp_dist.mean())
     assert approx_equal(dist_dense.mode(), tfp_dist.mode())

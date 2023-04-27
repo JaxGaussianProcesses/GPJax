@@ -4,15 +4,20 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
-from jax.config import config
-
 from gpjax.kernels.approximations import RFF
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.nonstationary import Linear, Polynomial
-from gpjax.kernels.stationary import (RBF, Matern12, Matern32, Matern52,
-                                      Periodic, PoweredExponential,
-                                      RationalQuadratic)
+from gpjax.kernels.stationary import (
+    RBF,
+    Matern12,
+    Matern32,
+    Matern52,
+    Periodic,
+    PoweredExponential,
+    RationalQuadratic,
+)
 from gpjax.linops import DenseLinearOperator
+from jax.config import config
 
 config.update("jax_enable_x64", True)
 _jitter = 1e-6

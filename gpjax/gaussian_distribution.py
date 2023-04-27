@@ -14,23 +14,21 @@
 # ==============================================================================
 
 
-from beartype.typing import Any, Optional, Tuple
-
 import jax.numpy as jnp
 import jax.random as jr
-from gpjax.typing import KeyArray
-from gpjax.typing import ScalarFloat
-from jax import vmap
-from gpjax.typing import Array
-from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
+from beartype.typing import Any, Optional, Tuple
+from jax import vmap
+from jaxtyping import Float
 
-from .linops import IdentityLinearOperator, LinearOperator
+from gpjax.linops import IdentityLinearOperator, LinearOperator
+from gpjax.typing import Array, KeyArray, ScalarFloat
+
 tfd = tfp.distributions
+
 
 def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
     """Checks that the inputs are correct."""
-
     if loc is None and scale is None:
         raise ValueError("At least one of `loc` or `scale` must be specified.")
 
@@ -70,7 +68,8 @@ class GaussianDistribution(tfd.Distribution):
         loc (Optional[Float[Array, "N"]]): The mean of the distribution. Defaults to None.
         scale (Optional[LinearOperator]): The scale matrix of the distribution. Defaults to None.
 
-    Returns:
+    Returns
+    -------
         GaussianDistribution: A multivariate Gaussian distribution with a linear operator scale matrix.
     """
 
@@ -85,7 +84,6 @@ class GaussianDistribution(tfd.Distribution):
         scale: Optional[LinearOperator] = None,
     ) -> None:
         """Initialises the distribution."""
-
         _check_loc_scale(loc, scale)
 
         # Find dimensionality of the distribution.
@@ -147,7 +145,8 @@ class GaussianDistribution(tfd.Distribution):
         Args:
             y (Float[Array, "N"]): The value to calculate the log probability of.
 
-        Returns:
+        Returns
+        -------
             ScalarFloat: The log probability of the value.
         """
         mu = self.loc
@@ -168,7 +167,8 @@ class GaussianDistribution(tfd.Distribution):
         Args:
             key (KeyArray): The key to use for sampling.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "n N"]: The samples.
         """
         # Obtain covariance root.
@@ -178,13 +178,18 @@ class GaussianDistribution(tfd.Distribution):
         Z = jr.normal(key, shape=(n, *self.event_shape))
 
         # xᵢ ~ N(loc, cov) <=> xᵢ = loc + sqrt zᵢ, where zᵢ ~ N(0, I).
-        affine_transformation = lambda x: self.loc + sqrt @ x
+        def affine_transformation(x):
+            return self.loc + sqrt @ x
 
         return vmap(affine_transformation)(Z)
 
-    def sample(self, seed: KeyArray, sample_shape: Tuple[int, ...]):  # pylint: disable=useless-super-delegation
+    def sample(
+        self, seed: KeyArray, sample_shape: Tuple[int, ...]
+    ):  # pylint: disable=useless-super-delegation
         """See `Distribution.sample`."""
-        return self._sample_n(seed, sample_shape[0])  # TODO this looks weird, why ignore the second entry?
+        return self._sample_n(
+            seed, sample_shape[0]
+        )  # TODO this looks weird, why ignore the second entry?
 
     def kl_divergence(self, other: "GaussianDistribution") -> ScalarFloat:
         return _kl_divergence(self, other)
@@ -208,9 +213,7 @@ def _frobenius_norm_squared(matrix: Float[Array, "N N"]) -> ScalarFloat:
     return jnp.sum(jnp.square(matrix))
 
 
-def _kl_divergence(
-    q: GaussianDistribution, p: GaussianDistribution
-) -> ScalarFloat:
+def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> ScalarFloat:
     """Computes the KL divergence, KL[q||p], between two multivariate Gaussian distributions
         q(x) = N(x; μq, Σq) and p(x) = N(x; μp, Σp).
 
@@ -218,10 +221,10 @@ def _kl_divergence(
         q (GaussianDistribution): A multivariate Gaussian distribution.
         p (GaussianDistribution): A multivariate Gaussian distribution.
 
-    Returns:
+    Returns
+    -------
         ScalarFloat: The KL divergence between q and p.
     """
-
     n_dim = _check_and_return_dimension(q, p)
 
     # Extract q mean and covariance.
@@ -245,9 +248,9 @@ def _kl_divergence(
     )  # TODO: Not most efficient, given the `to_dense()` call (e.g., consider diagonal p and q). Need to abstract solving linear operator against another linear operator.
 
     # Mahalanobis term, (μp - μq)ᵀ Σp⁻¹ (μp - μq) = tr [(μp - μq)ᵀ [LpLpᵀ]⁻¹ (μp - μq)] = (fr[Lp⁻¹(μp - μq)])²
-    mahalanobis = jnp.sum(jnp.square(
-        sqrt_p.solve(diff)
-    ))  # TODO: Need to improve this. Perhaps add a Mahalanobis method to ``LinearOperator``s.
+    mahalanobis = jnp.sum(
+        jnp.square(sqrt_p.solve(diff))
+    )  # TODO: Need to improve this. Perhaps add a Mahalanobis method to ``LinearOperator``s.
 
     # KL[q(x)||p(x)] = [ [(μp - μq)ᵀ Σp⁻¹ (μp - μq)] - n - log|Σq| + log|Σp| + tr[Σp⁻¹ Σq] ] / 2
     return (mahalanobis - n_dim - sigma_q.log_det() + sigma_p.log_det() + trace) / 2.0

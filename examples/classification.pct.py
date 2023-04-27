@@ -17,9 +17,8 @@ import matplotlib.pyplot as plt
 import optax as ox
 import tensorflow_probability.substrates.jax as tfp
 from jax.config import config
-from jaxtyping import Array, Float
+from jaxtyping import Array, Float, install_import_hook
 
-from jaxtyping import install_import_hook
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 

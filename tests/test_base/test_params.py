@@ -17,7 +17,6 @@ import dataclasses
 
 import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
-
 from gpjax.base import param_field
 
 

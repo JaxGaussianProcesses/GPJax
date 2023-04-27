@@ -15,24 +15,22 @@
 
 from abc import abstractmethod
 from dataclasses import dataclass
-from beartype.typing import Any, Callable, Dict, Optional
 
 import jax.numpy as jnp
+from beartype.typing import Any, Callable, Dict, Optional
 from jax.random import PRNGKey, normal
 from jaxtyping import Float, Num
-from gpjax.typing import KeyArray, Array
-
 from simple_pytree import static_field
 
-from .base import Module, param_field
-from .dataset import Dataset
-from .gaussian_distribution import GaussianDistribution
-from .kernels.base import AbstractKernel
-from .kernels import RFF
-from .likelihoods import AbstractLikelihood, Gaussian
-from .linops import identity
-from .mean_functions import AbstractMeanFunction
-
+from gpjax.base import Module, param_field
+from gpjax.dataset import Dataset
+from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.kernels import RFF
+from gpjax.kernels.base import AbstractKernel
+from gpjax.likelihoods import AbstractLikelihood, Gaussian
+from gpjax.linops import identity
+from gpjax.mean_functions import AbstractMeanFunction
+from gpjax.typing import Array, KeyArray
 
 FunctionalSample = Callable[[Float[Array, "N D"]], Float[Array, "N B"]]
 """ Type alias for functions representing `B` samples from a model, to be evaluated on
@@ -63,7 +61,8 @@ class AbstractPrior(Module):
             *args (Any): The arguments to pass to the GP's `predict` method.
             **kwargs (Any): The keyword arguments to pass to the GP's `predict` method.
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: A multivariate normal random variable representation of the Gaussian process.
         """
         return self.predict(*args, **kwargs)
@@ -78,7 +77,8 @@ class AbstractPrior(Module):
             *args (Any): Arguments to the predict method.
             **kwargs (Any): Keyword arguments to the predict method.
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: A multivariate normal random variable representation of the Gaussian process.
         """
         raise NotImplementedError
@@ -136,7 +136,8 @@ class Prior(AbstractPrior):
          Args:
              other (Likelihood): The likelihood distribution of the observed dataset.
 
-         Returns:
+        Returns
+        -------
              Posterior: The relevant GP posterior for the given prior and
                 likelihood. Special cases are accounted for where the model
                 is conjugate.
@@ -151,7 +152,8 @@ class Prior(AbstractPrior):
             other (Likelihood): The likelihood distribution of the observed
                 dataset.
 
-        Returns:
+        Returns
+        -------
             Posterior: The relevant GP posterior for the given prior and
                 likelihood. Special cases are accounted for where the model
                 is conjugate.
@@ -180,7 +182,8 @@ class Prior(AbstractPrior):
         Args:
             test_inputs (Float[Array, "N D"]): The inputs at which to evaluate the prior distribution.
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: A mean
             function that accepts an input array for where the mean function
             should be evaluated at. The mean function's value at these points is
@@ -241,29 +244,24 @@ class Prior(AbstractPrior):
             kernel.
 
 
-        Returns:
+        Returns
+        -------
             FunctionalSample: A function representing an approximate sample from the Gaussian
             process prior.
         """
         if (not isinstance(num_features, int)) or num_features <= 0:
-            raise ValueError(f"num_features must be a positive integer")
+            raise ValueError("num_features must be a positive integer")
         if (not isinstance(num_samples, int)) or num_samples <= 0:
-            raise ValueError(f"num_samples must be a positive integer")
+            raise ValueError("num_samples must be a positive integer")
 
         approximate_kernel = RFF(base_kernel=self.kernel, num_basis_fns=num_features)
         feature_weights = normal(key, [num_samples, 2 * num_features])  # [B, L]
 
         def sample_fn(test_inputs: Float[Array, "N D"]) -> Float[Array, "N B"]:
-
-            feature_evals = (
-                approximate_kernel.compute_features(x=test_inputs)
-            )
+            feature_evals = approximate_kernel.compute_features(x=test_inputs)
             feature_evals *= jnp.sqrt(self.kernel.variance / num_features)
             evaluated_sample = jnp.inner(feature_evals, feature_weights)  # [N, B]
-            return (
-                self.mean_function(test_inputs)
-                + evaluated_sample
-            )
+            return self.mean_function(test_inputs) + evaluated_sample
 
         return sample_fn
 
@@ -274,7 +272,8 @@ class Prior(AbstractPrior):
 @dataclass
 class AbstractPosterior(Module):
     """The base GP posterior object conditioned on an observed dataset. All
-    posterior objects should inherit from this class."""
+    posterior objects should inherit from this class.
+    """
 
     prior: AbstractPrior
     likelihood: AbstractLikelihood
@@ -294,7 +293,8 @@ class AbstractPosterior(Module):
             *args (Any): The arguments to pass to the GP's `predict` method.
             **kwargs (Any): The keyword arguments to pass to the GP's `predict` method.
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: A multivariate normal random variable representation of the Gaussian process.
         """
         return self.predict(*args, **kwargs)
@@ -309,7 +309,8 @@ class AbstractPosterior(Module):
             *args (Any): Arguments to the predict method.
             **kwargs (Any): Keyword arguments to the predict method.
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: A multivariate normal random variable representation of the Gaussian process.
         """
         raise NotImplementedError
@@ -394,7 +395,8 @@ class ConjugatePosterior(AbstractPosterior):
             train_data (Dataset): A `gpx.Dataset` object that contains the
                 input and output data used for training dataset.
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: A
                 function that accepts an input array and returns the predictive
                 distribution as a ``GaussianDistribution``.
@@ -405,14 +407,14 @@ class ConjugatePosterior(AbstractPosterior):
         # Unpack test inputs
         t, n_test = test_inputs, test_inputs.shape[0]
 
-        # Observation noise σ²
+        # Observation noise o²
         obs_noise = self.likelihood.obs_noise
         mx = self.prior.mean_function(x)
 
         # Precompute Gram matrix, Kxx, at training inputs, x
         Kxx = self.prior.kernel.gram(x) + (identity(n) * self.prior.jitter)
 
-        # Σ = Kxx + Iσ²
+        # Σ = Kxx + Io²
         Sigma = Kxx + identity(n) * obs_noise
 
         μt = self.prior.mean_function(t)
@@ -422,10 +424,10 @@ class ConjugatePosterior(AbstractPosterior):
         # Σ⁻¹ Kxt
         Sigma_inv_Kxt = Sigma.solve(Kxt)
 
-        # μt  +  Ktx (Kxx + Iσ²)⁻¹ (y  -  μx)
+        # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
         mean = μt + jnp.matmul(Sigma_inv_Kxt.T, y - mx)
 
-        # Ktt  -  Ktx (Kxx + Iσ²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
+        # Ktt  -  Ktx (Kxx + Io²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
         covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
         covariance += identity(n_test) * self.prior.jitter
 
@@ -474,17 +476,20 @@ class ConjugatePosterior(AbstractPosterior):
             kernel.
 
 
-        Returns:
+        Returns
+        -------
             FunctionalSample: A function representing an approximate sample from the Gaussian
             process prior.
         """
         if (not isinstance(num_features, int)) or num_features <= 0:
-            raise ValueError(f"num_features must be a positive integer")
+            raise ValueError("num_features must be a positive integer")
         if (not isinstance(num_samples, int)) or num_samples <= 0:
-            raise ValueError(f"num_samples must be a positive integer")
+            raise ValueError("num_samples must be a positive integer")
 
         # Approximate kernel with feature decomposition
-        approximate_kernel = RFF(base_kernel=self.prior.kernel, num_basis_fns=num_features)
+        approximate_kernel = RFF(
+            base_kernel=self.prior.kernel, num_basis_fns=num_features
+        )
 
         def eval_fourier_features(
             test_inputs: Float[Array, "N D"]
@@ -497,10 +502,14 @@ class ConjugatePosterior(AbstractPosterior):
         fourier_weights = normal(key, [num_samples, 2 * num_features])  # [B, L]
 
         # sample weights v for canonical features
-        # v = Σ⁻¹ (y + ε - ɸ⍵) for  Σ = Kxx + Iσ² and ε ᯈ N(0, σ²)
+        # v = Σ⁻¹ (y + ε - ɸ⍵) for  Σ = Kxx + Io² and ε ᯈ N(0, o²)
         Kxx = self.prior.kernel.gram(train_data.X)  #  [N, N]
-        Sigma = Kxx + identity(train_data.n) * (self.likelihood.obs_noise + self.jitter)  #  [N, N]
-        eps = jnp.sqrt(self.likelihood.obs_noise) * normal(key, [train_data.n, num_samples])  #  [N, B]
+        Sigma = Kxx + identity(train_data.n) * (
+            self.likelihood.obs_noise + self.jitter
+        )  #  [N, N]
+        eps = jnp.sqrt(self.likelihood.obs_noise) * normal(
+            key, [train_data.n, num_samples]
+        )  #  [N, B]
         y = train_data.y - self.prior.mean_function(train_data.X)  # account for mean
         Phi = eval_fourier_features(train_data.X)
         canonical_weights = Sigma.solve(
@@ -526,6 +535,7 @@ class ConjugatePosterior(AbstractPosterior):
             )
 
         return sample_fn
+
 
 @dataclass
 class NonConjugatePosterior(AbstractPosterior):
@@ -562,7 +572,8 @@ class NonConjugatePosterior(AbstractPosterior):
             train_data (Dataset): A `gpx.Dataset` object that contains the input
                 and output data used for training dataset.
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: A function that accepts an
                 input array and returns the predictive distribution as
                 a ``dx.Distribution``.
@@ -615,7 +626,8 @@ def construct_posterior(
         likelihood (AbstractLikelihood): The likelihood that represents our
             beliefs around the distribution of the data.
 
-    Returns:
+    Returns
+    -------
         AbstractPosterior: A posterior distribution. If the likelihood is
             Gaussian, then a ``ConjugatePosterior`` will be returned. Otherwise,
             a ``NonConjugatePosterior`` will be returned.

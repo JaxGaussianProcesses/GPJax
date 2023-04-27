@@ -17,9 +17,8 @@
 import jax
 import jax.numpy as jnp
 import pytest
-from jax.config import config
-
 from gpjax.quadrature import gauss_hermite_quadrature
+from jax.config import config
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -28,7 +27,8 @@ config.update("jax_enable_x64", True)
 @pytest.mark.parametrize("jit", [True, False])
 def test_quadrature(jit):
     def test():
-        fun = lambda x: x**2
+        def fun(x):
+            return x ** 2
         mean = jnp.array([[2.0]])
         var = jnp.array([[1.0]])
         fn_val = gauss_hermite_quadrature(fun, mean, var)

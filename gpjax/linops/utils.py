@@ -14,14 +14,13 @@
 # ==============================================================================
 
 
-from beartype.typing import Union, Tuple, Type
-
 import jax
 import jax.numpy as jnp
-from gpjax.typing import Array
+from beartype.typing import Tuple, Type, Union
 from jaxtyping import Float
 
 from gpjax.linops.linear_operator import LinearOperator
+from gpjax.typing import Array
 
 
 def identity(n: int) -> "gpjax.linops.identity_linear_operator.IdentityLinearOperator":
@@ -30,10 +29,10 @@ def identity(n: int) -> "gpjax.linops.identity_linear_operator.IdentityLinearOpe
     Args:
         n (int): Size of the identity matrix.
 
-    Returns:
+    Returns
+    -------
         IdentityLinearOperator: Identity matrix of shape [n, n].
     """
-
     from gpjax.linops.identity_linear_operator import IdentityLinearOperator
 
     return IdentityLinearOperator(size=n)
@@ -46,7 +45,8 @@ def to_dense(obj: Union[Float[Array, "..."], LinearOperator]):
     Args:
         obj (Union[Float[Array, "..."], LinearOperator]): Linear operator to convert.
 
-    Returns:
+    Returns
+    -------
         Float[Array, "..."]: Dense matrix.
     """
     if isinstance(obj, jnp.ndarray):
@@ -68,7 +68,8 @@ def to_linear_operator(obj: Union[Float[Array, "..."], LinearOperator]):
     Args:
         obj (Union[Float[Array, "..."], LinearOperator]): Linear operator to convert.
 
-    Returns:
+    Returns
+    -------
         LinearOperator: Linear operator.
     """
     if isinstance(obj, LinearOperator):
@@ -93,7 +94,8 @@ def check_shapes_match(shape1: Tuple[int, ...], shape2: Tuple[int, ...]) -> None
         shape1 (Tuple[int, ...]): Shape of the first object.
         shape2 (Tuple[int, ...]): Shape of the second object.
 
-    Raises:
+    Raises
+    ------
         ValueError: Shapes of the two objects do not match.
     """
     if shape1 != shape2:
@@ -105,7 +107,8 @@ def check_shapes_match(shape1: Tuple[int, ...], shape2: Tuple[int, ...]) -> None
 def default_dtype() -> Union[Type[jnp.float64], Type[jnp.float32]]:
     """Get the default dtype for the linear operator.
 
-    Returns:
+    Returns
+    -------
         jnp.dtype: Default dtype for the linear operator.
     """
     if jax.config.x64_enabled:

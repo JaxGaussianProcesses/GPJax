@@ -18,14 +18,16 @@ from dataclasses import dataclass
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
-from gpjax.typing import Array
-from jaxtyping import Float
 from beartype.typing import Union
-from gpjax.typing import ScalarFloat
+from jaxtyping import Float
 
-from ...base import param_field
-from ..base import AbstractKernel
-from .utils import build_student_t_distribution, euclidean_distance
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.utils import (
+    build_student_t_distribution,
+    euclidean_distance,
+)
+from gpjax.typing import Array, ScalarFloat
 
 
 @dataclass
@@ -44,7 +46,7 @@ class Matern32(AbstractKernel):
         y: Float[Array, "D"],
     ) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
+        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`.
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{3}\\lvert x-y \\rvert}{\\ell^2}  \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{3}\\lvert x-y\\rvert}{\\ell^2} \\Bigg)
@@ -53,7 +55,8 @@ class Matern32(AbstractKernel):
             x (Float[Array, "D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "D"]): The right hand argument of the kernel function's call.
 
-        Returns:
+        Returns
+        -------
             ScalarFloat: The value of :math:`k(x, y)`.
         """
         x = self.slice_input(x) / self.lengthscale

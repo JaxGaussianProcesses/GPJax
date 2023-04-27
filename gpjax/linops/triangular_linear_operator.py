@@ -16,11 +16,11 @@
 
 import jax.numpy as jnp
 import jax.scipy as jsp
-from gpjax.typing import Array
 from jaxtyping import Float
 
-from .dense_linear_operator import DenseLinearOperator
-from .linear_operator import LinearOperator
+from gpjax.linops.dense_linear_operator import DenseLinearOperator
+from gpjax.linops.linear_operator import LinearOperator
+from gpjax.typing import Array
 
 
 class LowerTriangularLinearOperator(DenseLinearOperator):

@@ -14,18 +14,16 @@
 # ==============================================================================
 
 
-from beartype.typing import Any, Union
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-from gpjax.typing import Array
+from beartype.typing import Any, Union
 from jaxtyping import Float
 from simple_pytree import static_field
 
-from gpjax.typing import ScalarFloat
-from .linear_operator import LinearOperator
-from .diagonal_linear_operator import DiagonalLinearOperator
-from .linear_operator import LinearOperator
+from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+from gpjax.linops.linear_operator import LinearOperator
+from gpjax.typing import Array, ScalarFloat
 
 
 def _check_args(value: Any, size: Any) -> None:
@@ -52,7 +50,6 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
             value (Float[Array, "1"]): Constant value of the diagonal.
             size (int): Size of the diagonal.
         """
-
         _check_args(value, size)
 
         if dtype is not None:
@@ -85,22 +82,22 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         Args:
             other (LinearOperator): Scalar.
 
-        Returns:
+        Returns
+        -------
             LinearOperator: Covariance operator multiplied by a scalar.
         """
-
         return ConstantDiagonalLinearOperator(value=self.value * other, size=self.size)
 
     def _add_diagonal(self, other: DiagonalLinearOperator) -> LinearOperator:
-        """Add diagonal to the covariance operator,  useful for computing, Kxx + Iσ².
+        """Add diagonal to the covariance operator,  useful for computing, Kxx + Io².
 
         Args:
             other (DiagonalLinearOperator): Diagonal covariance operator to add to the covariance operator.
 
-        Returns:
+        Returns
+        -------
             LinearOperator: Covariance operator with the diagonal added.
         """
-
         if isinstance(other, ConstantDiagonalLinearOperator):
             if other.size == self.size:
                 return ConstantDiagonalLinearOperator(
@@ -122,7 +119,8 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         """
         Lower triangular.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N N"]: Lower triangular matrix.
         """
         return ConstantDiagonalLinearOperator(
@@ -132,7 +130,8 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
     def log_det(self) -> ScalarFloat:
         """Log determinant.
 
-        Returns:
+        Returns
+        -------
             ScalarFloat: Log determinant of the covariance matrix.
         """
         return 2.0 * self.size * jnp.log(self.value.squeeze())
@@ -140,7 +139,8 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
     def inverse(self) -> "ConstantDiagonalLinearOperator":
         """Inverse of the covariance operator.
 
-        Returns:
+        Returns
+        -------
             DiagonalLinearOperator: Inverse of the covariance operator.
         """
         return ConstantDiagonalLinearOperator(value=1.0 / self.value, size=self.size)
@@ -151,10 +151,10 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         Args:
             rhs (Float[Array, "N M"]): Right hand side of the linear system.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N M"]: Solution of the linear system.
         """
-
         return rhs / self.value
 
     @classmethod
@@ -164,7 +164,8 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         Args:
             dense (Float[Array, "N N"]): Dense matrix.
 
-        Returns:
+        Returns
+        -------
             DiagonalLinearOperator: Covariance operator.
         """
         return ConstantDiagonalLinearOperator(
@@ -180,7 +181,8 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         Args:
             root (ConstantDiagonalLinearOperator): Root of the covariance operator.
 
-        Returns:
+        Returns
+        -------
             ConstantDiagonalLinearOperator: Covariance operator.
         """
         return ConstantDiagonalLinearOperator(value=root.value**2, size=root.size)

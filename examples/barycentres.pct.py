@@ -23,8 +23,8 @@ import matplotlib.pyplot as plt
 import optax as ox
 import tensorflow_probability.substrates.jax.distributions as tfd
 from jax.config import config
-
 from jaxtyping import install_import_hook
+
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
@@ -92,10 +92,11 @@ n_datasets = 5
 
 x = jnp.linspace(-5.0, 5.0, n).reshape(-1, 1)
 xtest = jnp.linspace(-5.5, 5.5, n_test).reshape(-1, 1)
-f = lambda x, a, b: a + jnp.sin(b * x)
+def f(x, a, b):
+    return a + jnp.sin(b * x)
 
 ys = []
-for i in range(n_datasets):
+for _i in range(n_datasets):
     key, subkey = jr.split(key)
     vertical_shift = jr.uniform(subkey, minval=0.0, maxval=2.0)
     period = jr.uniform(subkey, minval=0.75, maxval=1.25)

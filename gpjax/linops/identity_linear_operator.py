@@ -14,22 +14,21 @@
 # ==============================================================================
 
 
-from beartype.typing import Any
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-from gpjax.typing import Array
+from beartype.typing import Any
 from jaxtyping import Float
-from gpjax.typing import ScalarFloat
 
-from gpjax.linops.constant_diagonal_linear_operator import \
-    ConstantDiagonalLinearOperator
+from gpjax.linops.constant_diagonal_linear_operator import (
+    ConstantDiagonalLinearOperator,
+)
 from gpjax.linops.utils import default_dtype
+from gpjax.typing import Array, ScalarFloat
 
 
 def _check_size(size: Any) -> None:
     """Check that size is an integer."""
-
     if not isinstance(size, int):
         raise ValueError(f"`size` must be an integer, but `size = {size}`.")
 
@@ -60,7 +59,8 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         Args:
             other (Float[Array, "N M"]): Matrix to multiply with.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N M"]: Result of matrix multiplication.
         """
         return other
@@ -69,7 +69,8 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         """
         Lower triangular.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N N"]: Lower triangular matrix.
         """
         return self
@@ -77,7 +78,8 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
     def log_det(self) -> ScalarFloat:
         """Log determinant.
 
-        Returns:
+        Returns
+        -------
             ScalarFloat: Log determinant of the covariance matrix.
         """
         return jnp.array(0.0)
@@ -85,7 +87,8 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
     def inverse(self) -> "IdentityLinearOperator":
         """Inverse of the covariance operator.
 
-        Returns:
+        Returns
+        -------
             DiagonalLinearOperator: Inverse of the covariance operator.
         """
         return self
@@ -96,7 +99,8 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         Args:
             rhs (Float[Array, "N M"]): Right hand side of the linear system.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N M"]: Solution of the linear system.
         """
         # TODO: Check shapes.
@@ -110,7 +114,8 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         Args:
             root (IdentityLinearOperator): Root of the covariance operator.
 
-        Returns:
+        Returns
+        -------
             IdentityLinearOperator: Covariance operator.
         """
         return root

@@ -14,20 +14,15 @@
 # ==============================================================================
 
 
-from itertools import product
 from dataclasses import is_dataclass
+from itertools import product
 
 import jax
 import jax.numpy as jnp
 import jax.tree_util as jtu
+import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
-
-import pytest
-import tensorflow_probability.substrates.jax.distributions as tfd
-from jax.config import config
-from gpjax.linops import LinearOperator
-
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
     ConstantDiagonalKernelComputation,
@@ -43,12 +38,9 @@ from gpjax.kernels.stationary import (
     RationalQuadratic,
     White,
 )
-from gpjax.kernels.computations import (
-    DenseKernelComputation,
-    ConstantDiagonalKernelComputation,
-)
-
 from gpjax.kernels.stationary.utils import build_student_t_distribution
+from gpjax.linops import LinearOperator
+from jax.config import config
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -62,10 +54,10 @@ class BaseTestKernel:
     spectral_density_name: str
 
     def pytest_generate_tests(self, metafunc):
-        """This is called automatically by pytest"""
-
+        """This is called automatically by pytest."""
         # function for pretty test name
-        id_func = lambda x: "-".join([f"{k}={v}" for k, v in x.items()])
+        def id_func(x):
+            return "-".join([f"{k}={v}" for k, v in x.items()])
 
         # get arguments for the test function
         funcarglist = metafunc.cls.params.get(metafunc.function.__name__, None)
@@ -77,7 +69,6 @@ class BaseTestKernel:
 
     @pytest.mark.parametrize("dim", [None, 1, 3], ids=lambda x: f"dim={x}")
     def test_initialization(self, fields: dict, dim: int) -> None:
-
         # Check that kernel is a dataclass
         assert is_dataclass(self.kernel)
 
@@ -90,7 +81,7 @@ class BaseTestKernel:
             assert kernel.ndims == 1
         else:
             kernel: AbstractKernel = self.kernel(
-                active_dims=[i for i in range(dim)], **fields
+                active_dims=list(range(dim)), **fields
             )
             assert kernel.ndims == dim
 
@@ -113,7 +104,6 @@ class BaseTestKernel:
         meta = kernel._pytree__meta
         assert meta.keys() == fields.keys()
         for field in fields:
-
             # Bijectors
             if field in ["variance", "lengthscale", "period", "alpha"]:
                 assert isinstance(meta[field]["bijector"], tfb.Softplus)
@@ -121,7 +111,7 @@ class BaseTestKernel:
                 assert isinstance(meta[field]["bijector"], tfb.Identity)
 
             # Trainability state
-            assert meta[field]["trainable"] == True
+            assert meta[field]["trainable"] is True
 
         # Test kernel call
         x = jnp.linspace(0.0, 1.0, 10 * kernel.ndims).reshape(10, kernel.ndims)
@@ -130,7 +120,6 @@ class BaseTestKernel:
     @pytest.mark.parametrize("n", [1, 2, 5], ids=lambda x: f"n={x}")
     @pytest.mark.parametrize("dim", [1, 3], ids=lambda x: f"dim={x}")
     def test_gram(self, dim: int, n: int) -> None:
-
         # Initialise kernel
         kernel: AbstractKernel = self.kernel()
 
@@ -150,7 +139,6 @@ class BaseTestKernel:
     @pytest.mark.parametrize("n_b", [1, 2, 5], ids=lambda x: f"n_b={x}")
     @pytest.mark.parametrize("dim", [1, 2, 5], ids=lambda x: f"dim={x}")
     def test_cross_covariance(self, n_a: int, n_b: int, dim: int) -> None:
-
         # Initialise kernel
         kernel: AbstractKernel = self.kernel()
 
@@ -164,7 +152,6 @@ class BaseTestKernel:
         assert Kab.shape == (n_a, n_b)
 
     def test_spectral_density(self):
-
         # Initialise kernel
         kernel: AbstractKernel = self.kernel()
 
@@ -172,7 +159,6 @@ class BaseTestKernel:
             # Check that spectral_density property is None
             assert not kernel.spectral_density
         else:
-
             # Check that spectral_density property is correct
             sdensity = kernel.spectral_density
             assert sdensity.name == self.spectral_density_name
@@ -180,7 +166,8 @@ class BaseTestKernel:
             assert sdensity.scale == jnp.array(1.0)
 
 
-prod = lambda inp: [dict(zip(inp.keys(), values)) for values in product(*inp.values())]
+def prod(inp):
+    return [dict(zip(inp.keys(), values)) for values in product(*inp.values())]
 
 
 class TestRBF(BaseTestKernel):

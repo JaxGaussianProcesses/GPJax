@@ -13,22 +13,21 @@
 # limitations under the License.
 # ==============================================================================
 
-from beartype.typing import Any, Optional, Tuple, Union, Callable
+from warnings import warn
 
 import jax
 import jax.random as jr
 import optax as ox
+from beartype.typing import Any, Callable, Optional, Tuple, Union
 from jax._src.random import _check_prng_key
-from gpjax.typing import Array
-from jaxtyping import Float
 from jaxlib.xla_extension import PjitFunction
-from warnings import warn
+from jaxtyping import Float
 
-from gpjax.typing import ScalarFloat, KeyArray
-from .base import Module
-from .dataset import Dataset
-from .objectives import AbstractObjective
-from .scan import vscan
+from gpjax.base import Module
+from gpjax.dataset import Dataset
+from gpjax.objectives import AbstractObjective
+from gpjax.scan import vscan
+from gpjax.typing import Array, KeyArray, ScalarFloat
 
 
 def fit(
@@ -101,7 +100,8 @@ def fit(
         unroll (int): The number of unrolled steps to use for the optimisation.
             Defaults to 1.
 
-    Returns:
+    Returns
+    -------
         Tuple[Module, Array]: A Tuple comprising the optimised model and training
             history respectively.
     """
@@ -167,7 +167,8 @@ def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
         batch_size (int): The batch size.
         key (KeyArray): The random key to use for the batch selection.
 
-    Returns:
+    Returns
+    -------
         Dataset: The batched dataset.
     """
     x, y, n = train_data.X, train_data.y, train_data.n
@@ -188,7 +189,9 @@ def _check_objective(objective: Any) -> None:
     """Check that the objective is of type Objective."""
     if not isinstance(objective, AbstractObjective):
         if isinstance(objective, PjitFunction):
-            warn("Objective is jit-compiled. Please ensure that the objective is of type gpjax.Objective.")
+            warn(
+                "Objective is jit-compiled. Please ensure that the objective is of type gpjax.Objective."
+            )
         else:
             raise TypeError(
                 f"objective of type {type(objective)} must be of type gpjax.Objective."
@@ -236,9 +239,8 @@ def _check_batch_size(batch_size: Any) -> None:
     if not isinstance(batch_size, int):
         raise TypeError("batch_size must be of type int")
 
-    if not batch_size == -1:
-        if not batch_size > 0:
-            raise ValueError("batch_size must be positive")
+    if not batch_size == -1 and not batch_size > 0:
+        raise ValueError("batch_size must be positive")
 
 
 __all__ = [

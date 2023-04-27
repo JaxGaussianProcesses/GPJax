@@ -13,27 +13,21 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, List
-from itertools import product
 from dataclasses import is_dataclass
+from itertools import product
+from typing import Callable, List
 
-import jax.tree_util as jtu
 import jax.numpy as jnp
 import jax.random as jr
-import tensorflow_probability.substrates.jax.bijectors as tfb
-import tensorflow_probability.substrates.jax.distributions as tfd
+import jax.tree_util as jtu
 import numpy as np
 import pytest
+import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax.distributions as tfd
+from gpjax.likelihoods import AbstractLikelihood, Bernoulli, Gaussian, inv_probit
 from jax.config import config
 from jax.random import KeyArray
 from jaxtyping import Array, Float
-
-from gpjax.likelihoods import (
-    AbstractLikelihood,
-    Bernoulli,
-    Gaussian,
-    inv_probit,
-)
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -47,10 +41,10 @@ class BaseTestLikelihood:
     static_fields: List[str] = ["num_datapoints"]
 
     def pytest_generate_tests(self, metafunc):
-        """This is called automatically by pytest"""
-
+        """This is called automatically by pytest."""
         # function for pretty test name
-        id_func = lambda x: "-".join([f"{k}={v}" for k, v in x.items()])
+        def id_func(x):
+            return "-".join([f"{k}={v}" for k, v in x.items()])
 
         # get arguments for the test function
         funcarglist = metafunc.cls.params.get(metafunc.function.__name__, None)
@@ -63,7 +57,6 @@ class BaseTestLikelihood:
 
     @pytest.mark.parametrize("n", [1, 2, 10], ids=lambda x: f"n={x}")
     def test_initialisation(self, fields: dict, n: int) -> None:
-
         # Check that likelihood is a dataclass
         assert is_dataclass(self.likelihood)
 
@@ -87,21 +80,19 @@ class BaseTestLikelihood:
 
         # Check meta leaves
         meta = likelihood._pytree__meta
-        assert not any(f in meta.keys() for f in self.static_fields)
+        assert not any(f in meta for f in self.static_fields)
         assert list(meta.keys()) == sorted(set(fields) - set(self.static_fields))
 
         for field in meta:
-
             # Bijectors
             if field in ["obs_noise"]:
                 assert isinstance(meta[field]["bijector"], tfb.Softplus)
 
             # Trainability state
-            assert meta[field]["trainable"] == True
+            assert meta[field]["trainable"] is True
 
     @pytest.mark.parametrize("n", [1, 2, 10], ids=lambda x: f"n={x}")
     def test_link_functions(self, n: int):
-
         # Initialize likelihood with defaults
         likelihood: AbstractLikelihood = self.likelihood(num_datapoints=n)
 
@@ -114,7 +105,6 @@ class BaseTestLikelihood:
 
     @pytest.mark.parametrize("n", [1, 2, 10], ids=lambda x: f"n={x}")
     def test_call(self, fields: dict, n: int):
-
         # Input fields as JAX arrays
         fields = {k: jnp.array([v]) for k, v in fields.items()}
 
@@ -137,7 +127,8 @@ class BaseTestLikelihood:
         raise NotImplementedError
 
 
-prod = lambda inp: [dict(zip(inp.keys(), values)) for values in product(*inp.values())]
+def prod(inp):
+    return [dict(zip(inp.keys(), values)) for values in product(*inp.values())]
 
 
 class TestGaussian(BaseTestLikelihood):
@@ -148,7 +139,6 @@ class TestGaussian(BaseTestLikelihood):
 
     @staticmethod
     def _test_call_check(likelihood: Gaussian, latent_mean, latent_cov, latent_dist):
-
         # Test call method.
         pred_dist = likelihood(latent_dist)
 
@@ -173,7 +163,6 @@ class TestBernoulli(BaseTestLikelihood):
     def _test_call_check(
         likelihood: AbstractLikelihood, latent_mean, latent_cov, latent_dist
     ):
-
         # Test call method.
         pred_dist = likelihood(latent_dist)
 

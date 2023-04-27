@@ -1,23 +1,23 @@
-
 from abc import abstractmethod
 from dataclasses import dataclass
 
 import jax.numpy as jnp
 import jax.scipy as jsp
 import jax.tree_util as jtu
+import tensorflow_probability.substrates.jax as tfp
 from jax import vmap
-from gpjax.typing import Array
 from jaxtyping import Float
 from simple_pytree import static_field
-import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.typing import ScalarFloat
-from .base import Module
-from .dataset import Dataset
-from .gaussian_distribution import GaussianDistribution
-from .linops import identity
-from .quadrature import gauss_hermite_quadrature
+from gpjax.base import Module
+from gpjax.dataset import Dataset
+from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.linops import identity
+from gpjax.quadrature import gauss_hermite_quadrature
+from gpjax.typing import Array, ScalarFloat
+
 tfd = tfp.distributions
+
 
 @dataclass
 class AbstractObjective(Module):
@@ -38,7 +38,6 @@ class AbstractObjective(Module):
     @abstractmethod
     def step(self, *args, **kwargs) -> ScalarFloat:
         raise NotImplementedError
-
 
 
 class ConjugateMLL(AbstractObjective):
@@ -101,19 +100,19 @@ class ConjugateMLL(AbstractObjective):
                 equivalent to maximisation of the marginal log-likelihood.
                 Defaults to False.
 
-        Returns:
+        Returns
+        -------
             Callable[[Parameters], ScalarFloat]: A functional representation
                 of the marginal log-likelihood that can be evaluated at a
                 given parameter set.
         """
-
         x, y, n = train_data.X, train_data.y, train_data.n
 
-        # Observation noise σ²
+        # Observation noise o²
         obs_noise = posterior.likelihood.obs_noise
         mx = posterior.prior.mean_function(x)
 
-        # Σ = (Kxx + Iσ²) = LLᵀ
+        # Σ = (Kxx + Io²) = LLᵀ
         Kxx = posterior.prior.kernel.gram(x)
         Kxx += identity(n) * posterior.prior.jitter
         Sigma = Kxx + identity(n) * obs_noise
@@ -152,7 +151,8 @@ class NonConjugateMLL(AbstractObjective):
                 minimisation of the negative marginal log-likelihood is equivalent
                 to maximisation of the marginal log-likelihood. Defaults to False.
 
-        Returns:
+        Returns
+        -------
             Callable[[Parameters], ScalarFloat]: A functional representation
                 of the marginal log-likelihood that can be evaluated at a given
                 parameter set.
@@ -185,7 +185,9 @@ class NonConjugateMLL(AbstractObjective):
 
 class ELBO(AbstractObjective):
     def step(
-        self, variational_family: "gpjax.variational_families.AbstractVariationalFamily", train_data: Dataset
+        self,
+        variational_family: "gpjax.variational_families.AbstractVariationalFamily",
+        train_data: Dataset,
     ) -> ScalarFloat:
         """Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
@@ -203,12 +205,12 @@ class ELBO(AbstractObjective):
                 function this argument should be true as minimisation of the negative
                 corresponds to maximisation of the ELBO. Defaults to False.
 
-        Returns:
+        Returns
+        -------
             Callable[[Parameters, Dataset], Array]: A callable function that accepts a
                 current parameter estimate and batch of data for which gradients should
                 be computed.
         """
-
         # KL[q(f(·)) || p(f(·))]
         kl = variational_family.prior_kl()
 
@@ -238,11 +240,11 @@ def variational_expectation(
         variational_family (AbstractVariationalFamily): The variational family that we are using to approximate the posterior.
         train_data (Dataset): The batch for which the expectation should be computed for.
 
-    Returns:
+    Returns
+    -------
         Array: The expectation of the model's log-likelihood under our variational
             distribution.
     """
-
     # Unpack training batch
     x, y = train_data.X, train_data.y
 
@@ -274,7 +276,9 @@ class CollapsedELBO(AbstractObjective):
     """
 
     def step(
-        self, variational_family: "gpjax.variational_families.AbstractVariationalFamily", train_data: Dataset
+        self,
+        variational_family: "gpjax.variational_families.AbstractVariationalFamily",
+        train_data: Dataset,
     ) -> ScalarFloat:
         """Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
@@ -290,11 +294,11 @@ class CollapsedELBO(AbstractObjective):
                 function this argument should be true as minimisation of the negative
                 corresponds to maximisation of the ELBO. Defaults to False.
 
-        Returns:
+        Returns
+        -------
             Callable[[Parameters, Dataset], Array]: A callable function that accepts a
                 current parameter estimate for which gradients should be computed.
         """
-
         # Unpack training data
         x, y, n = train_data.X, train_data.y, train_data.n
 
@@ -318,25 +322,25 @@ class CollapsedELBO(AbstractObjective):
         #
         # Let Q = KxzKzz⁻¹Kzx, we must compute the log normal pdf:
         #
-        #   log N(y; μx, σ²I + Q) = -nπ - n/2 log|σ²I + Q|
-        #   - 1/2 (y - μx)ᵀ (σ²I + Q)⁻¹ (y - μx).
+        #   log N(y; μx, o²I + Q) = -nπ - n/2 log|o²I + Q|
+        #   - 1/2 (y - μx)ᵀ (o²I + Q)⁻¹ (y - μx).
         #
-        # The log determinant |σ²I + Q| is computed via applying the matrix determinant
+        # The log determinant |o²I + Q| is computed via applying the matrix determinant
         #   lemma
         #
-        #   |σ²I + Q| = log|σ²I| + log|I + Lz⁻¹ Kzx (σ²I)⁻¹ Kxz Lz⁻¹| = log(σ²) +  log|B|,
+        #   |o²I + Q| = log|o²I| + log|I + Lz⁻¹ Kzx (o²I)⁻¹ Kxz Lz⁻¹| = log(o²) +  log|B|,
         #
-        #   with B = I + AAᵀ and A = Lz⁻¹ Kzx / σ.
+        #   with B = I + AAᵀ and A = Lz⁻¹ Kzx / o.
         #
-        # Similarly we apply matrix inversion lemma to invert σ²I + Q
+        # Similarly we apply matrix inversion lemma to invert o²I + Q
         #
-        #   (σ²I + Q)⁻¹ = (Iσ²)⁻¹ - (Iσ²)⁻¹ Kxz Lz⁻ᵀ (I + Lz⁻¹ Kzx (Iσ²)⁻¹ Kxz Lz⁻ᵀ )⁻¹ Lz⁻¹ Kzx (Iσ²)⁻¹
-        #               = (Iσ²)⁻¹ - (Iσ²)⁻¹ σAᵀ (I + σA (Iσ²)⁻¹ σAᵀ)⁻¹ σA (Iσ²)⁻¹
-        #               = I/σ² - Aᵀ B⁻¹ A/σ²,
+        #   (o²I + Q)⁻¹ = (Io²)⁻¹ - (Io²)⁻¹ Kxz Lz⁻ᵀ (I + Lz⁻¹ Kzx (Io²)⁻¹ Kxz Lz⁻ᵀ )⁻¹ Lz⁻¹ Kzx (Io²)⁻¹
+        #               = (Io²)⁻¹ - (Io²)⁻¹ oAᵀ (I + oA (Io²)⁻¹ oAᵀ)⁻¹ oA (Io²)⁻¹
+        #               = I/o² - Aᵀ B⁻¹ A/o²,
         #
         # giving the quadratic term as
         #
-        #   (y - μx)ᵀ (σ²I + Q)⁻¹ (y - μx) = [(y - μx)ᵀ(y - µx)  - (y - μx)ᵀ Aᵀ B⁻¹ A (y - μx)]/σ²,
+        #   (y - μx)ᵀ (o²I + Q)⁻¹ (y - μx) = [(y - μx)ᵀ(y - µx)  - (y - μx)ᵀ Aᵀ B⁻¹ A (y - μx)]/o²,
         #
         #   with A and B defined as above.
 
@@ -359,14 +363,14 @@ class CollapsedELBO(AbstractObjective):
         # L⁻¹ A (y - μx)
         L_inv_A_diff = jsp.linalg.solve_triangular(L, jnp.matmul(A, diff), lower=True)
 
-        # (y - μx)ᵀ (Iσ² + Q)⁻¹ (y - μx)
+        # (y - μx)ᵀ (Io² + Q)⁻¹ (y - μx)
         quad = (jnp.sum(diff**2) - jnp.sum(L_inv_A_diff**2)) / noise
 
-        # 2 * log N(y; μx, Iσ² + Q)
+        # 2 * log N(y; μx, Io² + Q)
         two_log_prob = -n * jnp.log(2.0 * jnp.pi * noise) - log_det_B - quad
 
-        # 1/σ² tr(Kxx - Q) [Trace law tr(AB) = tr(BA) => tr(KxzKzz⁻¹Kzx) = tr(KxzLz⁻ᵀLz⁻¹Kzx) = tr(Lz⁻¹Kzx KxzLz⁻ᵀ) = trace(σ²AAᵀ)]
+        # 1/o² tr(Kxx - Q) [Trace law tr(AB) = tr(BA) => tr(KxzKzz⁻¹Kzx) = tr(KxzLz⁻ᵀLz⁻¹Kzx) = tr(Lz⁻¹Kzx KxzLz⁻ᵀ) = trace(o²AAᵀ)]
         two_trace = jnp.sum(Kxx_diag) / noise - jnp.trace(AAT)
 
-        # log N(y; μx, Iσ² + KxzKzz⁻¹Kzx) - 1/2σ² tr(Kxx - KxzKzz⁻¹Kzx)
+        # log N(y; μx, Io² + KxzKzz⁻¹Kzx) - 1/2o² tr(Kxx - KxzKzz⁻¹Kzx)
         return self.constant * (two_log_prob - two_trace).squeeze() / 2.0

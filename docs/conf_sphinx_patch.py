@@ -1,8 +1,9 @@
 # This file is credited to the Flax authors.
 
 from typing import Any, Dict, List, Set, Tuple
-import sphinx.ext.autosummary.generate as ag
+
 import sphinx.ext.autodoc
+import sphinx.ext.autosummary.generate as ag
 
 
 def generate_autosummary_content(
@@ -147,10 +148,7 @@ def generate_autosummary_content(
     if doc.objtype in ("method", "attribute", "property"):
         ns["class"] = qualname.rsplit(".", 1)[0]
 
-    if doc.objtype in ("class",):
-        shortname = qualname
-    else:
-        shortname = qualname.rsplit(".", 1)[-1]
+    shortname = qualname if doc.objtype in ("class",) else qualname.rsplit(".", 1)[-1]
 
     ns["fullname"] = name
     ns["module"] = modname

@@ -19,13 +19,12 @@ import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 from beartype.typing import Union
-from gpjax.typing import Array
 from jaxtyping import Float
-from gpjax.typing import ScalarFloat
 
-from ...base import param_field
-from ..base import AbstractKernel
-from .utils import squared_distance
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.utils import squared_distance
+from gpjax.typing import Array, ScalarFloat
 
 
 @dataclass
@@ -38,7 +37,7 @@ class RationalQuadratic(AbstractKernel):
     name: str = "Rational Quadratic"
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`.
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( 1 + \\frac{\\lVert x - y \\rVert^2_2}{2 \\alpha \\ell^2} \\Bigg)

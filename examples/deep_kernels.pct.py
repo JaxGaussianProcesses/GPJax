@@ -12,26 +12,25 @@
 from dataclasses import dataclass, field
 from typing import Any
 
+import flax
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
-from jax.config import config
-from jaxtyping import Array, Float
-from scipy.signal import sawtooth
 from flax import linen as nn
+from jax.config import config
+from jaxtyping import Array, Float, install_import_hook
+from scipy.signal import sawtooth
 from simple_pytree import static_field
-import flax
 
-from jaxtyping import install_import_hook
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     import gpjax.kernels as jk
+    from gpjax.base import param_field
     from gpjax.kernels import DenseKernelComputation
     from gpjax.kernels.base import AbstractKernel
     from gpjax.kernels.computations import AbstractKernelComputation
-    from gpjax.base import param_field
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -49,7 +48,8 @@ noise = 0.2
 
 key, subkey = jr.split(key)
 x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n,)).reshape(-1, 1)
-f = lambda x: jnp.asarray(sawtooth(2 * jnp.pi * x))
+def f(x):
+    return jnp.asarray(sawtooth(2 * jnp.pi * x))
 signal = f(x)
 y = signal + jr.normal(subkey, shape=signal.shape) * noise
 
@@ -82,6 +82,7 @@ ax.legend(loc="best")
 # in GPJax, we create the `DeepKernelFunction` object that allows the
 # user to supply the neural network and base kernel of their choice. Kernel matrices
 # are then computed using the regular `gram` and `cross_covariance` functions.
+
 
 # %%
 @dataclass
@@ -123,16 +124,18 @@ class DeepKernelFunction(AbstractKernel):
 # %%
 feature_space_dim = 3
 
+
 class Network(nn.Module):
-  """A simple MLP."""
-  @nn.compact
-  def __call__(self, x):
-      x = nn.Dense(features=32)(x)
-      x = nn.relu(x)
-      x = nn.Dense(features=64)(x)
-      x = nn.relu(x)
-      x = nn.Dense(features=feature_space_dim)(x)
-      return x
+    """A simple MLP."""
+
+    @nn.compact
+    def __call__(self, x):
+        x = nn.Dense(features=32)(x)
+        x = nn.relu(x)
+        x = nn.Dense(features=64)(x)
+        x = nn.relu(x)
+        x = nn.Dense(features=feature_space_dim)(x)
+        return x
 
 
 forward_linear = Network()
@@ -146,7 +149,9 @@ forward_linear = Network()
 
 # %%
 base_kernel = gpx.Matern52(active_dims=list(range(feature_space_dim)))
-kernel = DeepKernelFunction(network=forward_linear, base_kernel=base_kernel, key=key, dummy_x=x)
+kernel = DeepKernelFunction(
+    network=forward_linear, base_kernel=base_kernel, key=key, dummy_x=x
+)
 meanf = gpx.Zero()
 prior = gpx.Prior(mean_function=meanf, kernel=kernel)
 likelihood = gpx.Gaussian(num_datapoints=D.n)

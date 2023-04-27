@@ -1,9 +1,8 @@
 import jax
 import jax.numpy as jnp
 import pytest
-from jaxtyping import Array, Float
-
 from gpjax.mean_functions import AbstractMeanFunction, Constant
+from jaxtyping import Array, Float
 
 
 def test_abstract() -> None:
@@ -31,11 +30,7 @@ def test_constant(constant: Float[Array, "Q"]) -> None:
     assert isinstance(mf, AbstractMeanFunction)
     assert (mf(jnp.array([[1.0]])) == jnp.array([constant])).all()
     assert (mf(jnp.array([[2.0, 3.0]])) == jnp.array([constant])).all()
+    assert (mf(jnp.array([[1.0], [2.0]])) == jnp.array([constant, constant])).all()
     assert (
-        mf(jnp.array([[1.0], [2.0]]))
-        == jnp.array([constant, constant])
-    ).all()
-    assert (
-        mf(jnp.array([[1.0, 2.0], [3.0, 4.0]]))
-        == jnp.array([constant, constant])
+        mf(jnp.array([[1.0, 2.0], [3.0, 4.0]])) == jnp.array([constant, constant])
     ).all()

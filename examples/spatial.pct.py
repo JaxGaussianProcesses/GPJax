@@ -32,10 +32,9 @@ import planetary_computer
 import pystac_client
 import rioxarray as rio
 import xarray as xr
-from jaxtyping import Array, Float
+from jaxtyping import Array, Float, install_import_hook
 from rioxarray.merge import merge_arrays
 
-from jaxtyping import install_import_hook
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     from gpjax.base import param_field
@@ -117,6 +116,7 @@ kernel = gpx.kernels.RBF(
 # As stated before, we already know that temperature strongly depends on elevation.
 # So why not use it for our mean function? GPJax lets you define custom mean functions;
 # simply subclass `AbstractMeanFunction`.
+
 
 # %%
 @dataclass
