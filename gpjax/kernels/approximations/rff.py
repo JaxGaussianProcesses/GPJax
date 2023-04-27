@@ -1,14 +1,17 @@
 from dataclasses import dataclass
 
-import tensorflow_probability.substrates.jax.bijectors as tfb
 from jax.random import PRNGKey
 from jaxtyping import Float
 from simple_pytree import static_field
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import BasisFunctionComputation
-from gpjax.typing import Array, KeyArray
+from gpjax.typing import (
+    Array,
+    KeyArray,
+)
 
 
 @dataclass

@@ -17,7 +17,10 @@
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 
 from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.typing import Array

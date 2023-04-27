@@ -16,21 +16,41 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 
+from beartype.typing import (
+    Any,
+    Callable,
+    Dict,
+    Optional,
+)
 import jax.numpy as jnp
-from beartype.typing import Any, Callable, Dict, Optional
-from jax.random import PRNGKey, normal
-from jaxtyping import Float, Num
+from jax.random import (
+    PRNGKey,
+    normal,
+)
+from jaxtyping import (
+    Float,
+    Num,
+)
 from simple_pytree import static_field
 
-from gpjax.base import Module, param_field
+from gpjax.base import (
+    Module,
+    param_field,
+)
 from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.kernels import RFF
 from gpjax.kernels.base import AbstractKernel
-from gpjax.likelihoods import AbstractLikelihood, Gaussian
+from gpjax.likelihoods import (
+    AbstractLikelihood,
+    Gaussian,
+)
 from gpjax.linops import identity
 from gpjax.mean_functions import AbstractMeanFunction
-from gpjax.typing import Array, KeyArray
+from gpjax.typing import (
+    Array,
+    KeyArray,
+)
 
 FunctionalSample = Callable[[Float[Array, "N D"]], Float[Array, "N B"]]
 """ Type alias for functions representing `B` samples from a model, to be evaluated on

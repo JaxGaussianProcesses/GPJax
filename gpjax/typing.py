@@ -15,8 +15,13 @@
 
 from beartype.typing import Union
 from jax.random import KeyArray as JAXKeyArray
-from jaxtyping import Array as JAXArray
-from jaxtyping import Bool, Float, Int, UInt32
+from jaxtyping import (
+    Array as JAXArray,
+    Bool,
+    Float,
+    Int,
+    UInt32,
+)
 from numpy import ndarray as NumpyArray
 
 OldKeyArray = UInt32[JAXArray, "2"]

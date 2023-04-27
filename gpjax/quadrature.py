@@ -13,10 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 
+from beartype.typing import (
+    Callable,
+    Optional,
+)
 import jax.numpy as jnp
-import numpy as np
-from beartype.typing import Callable, Optional
 from jaxtyping import Float
+import numpy as np
 
 from gpjax.typing import Array
 

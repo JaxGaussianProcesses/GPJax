@@ -16,15 +16,18 @@
 
 from dataclasses import dataclass
 
-import jax.numpy as jnp
 from beartype.typing import Any
+import jax.numpy as jnp
 from jaxtyping import Float
 
 from gpjax.linops.constant_diagonal_linear_operator import (
     ConstantDiagonalLinearOperator,
 )
 from gpjax.linops.utils import default_dtype
-from gpjax.typing import Array, ScalarFloat
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 def _check_size(size: Any) -> None:

@@ -14,10 +14,13 @@
 # ==============================================================================
 
 import jax.numpy as jnp
-import tensorflow_probability.substrates.jax as tfp
 from jaxtyping import Float
+import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.typing import Array, ScalarFloat
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 tfd = tfp.distributions
 

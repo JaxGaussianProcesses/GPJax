@@ -15,19 +15,29 @@
 
 from warnings import warn
 
+from beartype.typing import (
+    Any,
+    Callable,
+    Optional,
+    Tuple,
+    Union,
+)
 import jax
-import jax.random as jr
-import optax as ox
-from beartype.typing import Any, Callable, Optional, Tuple, Union
 from jax._src.random import _check_prng_key
+import jax.random as jr
 from jaxlib.xla_extension import PjitFunction
 from jaxtyping import Float
+import optax as ox
 
 from gpjax.base import Module
 from gpjax.dataset import Dataset
 from gpjax.objectives import AbstractObjective
 from gpjax.scan import vscan
-from gpjax.typing import Array, KeyArray, ScalarFloat
+from gpjax.typing import (
+    Array,
+    KeyArray,
+    ScalarFloat,
+)
 
 
 def fit(

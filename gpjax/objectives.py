@@ -1,20 +1,23 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 
+from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
 import jax.tree_util as jtu
-import tensorflow_probability.substrates.jax as tfp
-from jax import vmap
 from jaxtyping import Float
 from simple_pytree import static_field
+import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.base import Module
 from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.linops import identity
 from gpjax.quadrature import gauss_hermite_quadrature
-from gpjax.typing import Array, ScalarFloat
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 tfd = tfp.distributions
 

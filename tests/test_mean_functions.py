@@ -1,8 +1,15 @@
 import jax
 import jax.numpy as jnp
+from jaxtyping import (
+    Array,
+    Float,
+)
 import pytest
-from gpjax.mean_functions import AbstractMeanFunction, Constant
-from jaxtyping import Array, Float
+
+from gpjax.mean_functions import (
+    AbstractMeanFunction,
+    Constant,
+)
 
 
 def test_abstract() -> None:

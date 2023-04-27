@@ -18,17 +18,38 @@ import abc
 from dataclasses import dataclass
 from functools import partial
 
+from beartype.typing import (
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Type,
+    Union,
+)
 import jax
 import jax.numpy as jnp
 import jax.random
-import tensorflow_probability.substrates.jax.distributions as tfd
-from beartype.typing import Callable, Dict, List, Optional, Sequence, Type, Union
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 from simple_pytree import static_field
+import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.base import Module, param_field
-from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
-from gpjax.typing import Array, KeyArray, ScalarFloat
+from gpjax.base import (
+    Module,
+    param_field,
+)
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
+from gpjax.typing import (
+    Array,
+    KeyArray,
+    ScalarFloat,
+)
 
 
 @dataclass

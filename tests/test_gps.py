@@ -20,16 +20,21 @@ try:
 except ImportError:
     ValidationErrors = ValueError
 
-import shutil
 from dataclasses import is_dataclass
+import shutil
 from typing import Callable
 
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
 import pytest
 import tensorflow_probability.substrates.jax.distributions as tfd
-from gpjax.base import load_tree, save_tree
+
+from gpjax.base import (
+    load_tree,
+    save_tree,
+)
 
 # from gpjax.dataset import Dataset
 from gpjax.dataset import Dataset
@@ -42,10 +47,23 @@ from gpjax.gps import (
     Prior,
     construct_posterior,
 )
-from gpjax.kernels import RBF, AbstractKernel, Matern12, Matern32, Matern52
-from gpjax.likelihoods import AbstractLikelihood, Bernoulli, Gaussian
-from gpjax.mean_functions import AbstractMeanFunction, Constant, Zero
-from jax.config import config
+from gpjax.kernels import (
+    RBF,
+    AbstractKernel,
+    Matern12,
+    Matern32,
+    Matern52,
+)
+from gpjax.likelihoods import (
+    AbstractLikelihood,
+    Bernoulli,
+    Gaussian,
+)
+from gpjax.mean_functions import (
+    AbstractMeanFunction,
+    Constant,
+    Zero,
+)
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

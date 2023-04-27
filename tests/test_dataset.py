@@ -25,6 +25,7 @@ except ImportError:
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import pytest
+
 from gpjax.dataset import Dataset
 
 

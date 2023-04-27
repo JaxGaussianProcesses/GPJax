@@ -13,12 +13,15 @@
 # limitations under the License.
 # ==============================================================================
 
-import jax.numpy as jnp
 from jax import vmap
+import jax.numpy as jnp
 from jaxtyping import Float
 
 from gpjax.kernels.computations.base import AbstractKernelComputation
-from gpjax.linops import ConstantDiagonalLinearOperator, DiagonalLinearOperator
+from gpjax.linops import (
+    ConstantDiagonalLinearOperator,
+    DiagonalLinearOperator,
+)
 from gpjax.typing import Array
 
 

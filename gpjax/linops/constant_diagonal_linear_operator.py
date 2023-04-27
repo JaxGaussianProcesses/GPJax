@@ -16,14 +16,20 @@
 
 from dataclasses import dataclass
 
+from beartype.typing import (
+    Any,
+    Union,
+)
 import jax.numpy as jnp
-from beartype.typing import Any, Union
 from jaxtyping import Float
 from simple_pytree import static_field
 
 from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 from gpjax.linops.linear_operator import LinearOperator
-from gpjax.typing import Array, ScalarFloat
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 def _check_args(value: Any, size: Any) -> None:

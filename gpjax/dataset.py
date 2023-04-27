@@ -15,9 +15,15 @@
 
 from dataclasses import dataclass
 
+from beartype.typing import (
+    Optional,
+    Union,
+)
 import jax.numpy as jnp
-from beartype.typing import Optional, Union
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 from simple_pytree import Pytree
 
 from gpjax.typing import Array

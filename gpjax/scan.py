@@ -13,16 +13,29 @@
 # limitations under the License.
 # ==============================================================================
 
+from beartype.typing import (
+    Any,
+    Callable,
+    List,
+    Optional,
+    Tuple,
+    TypeVar,
+)
 import jax
-import jax.numpy as jnp
-import jax.tree_util as jtu
-from beartype.typing import Any, Callable, List, Optional, Tuple, TypeVar
 from jax import lax
 from jax.experimental import host_callback as hcb
-from jaxtyping import Array, Shaped
+import jax.numpy as jnp
+import jax.tree_util as jtu
+from jaxtyping import (
+    Array,
+    Shaped,
+)
 from tqdm.auto import trange
 
-from gpjax.typing import ScalarBool, ScalarInt
+from gpjax.typing import (
+    ScalarBool,
+    ScalarInt,
+)
 
 Carry = TypeVar("Carry")
 X = TypeVar("X")

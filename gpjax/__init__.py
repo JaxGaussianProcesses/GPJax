@@ -15,10 +15,19 @@
 
 from gpjax.dataset import Dataset
 from gpjax.fit import fit
-from gpjax.gps import Prior, construct_posterior
+from gpjax.gps import (
+    Prior,
+    construct_posterior,
+)
 from gpjax.kernels import *
-from gpjax.likelihoods import Bernoulli, Gaussian
-from gpjax.mean_functions import Constant, Zero
+from gpjax.likelihoods import (
+    Bernoulli,
+    Gaussian,
+)
+from gpjax.mean_functions import (
+    Constant,
+    Zero,
+)
 from gpjax.objectives import (
     ELBO,
     CollapsedELBO,

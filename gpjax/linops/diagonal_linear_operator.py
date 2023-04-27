@@ -16,14 +16,21 @@
 
 from dataclasses import dataclass
 
+from beartype.typing import (
+    Any,
+    Union,
+)
 import jax.numpy as jnp
-from beartype.typing import Any, Union
 from jaxtyping import Float
 
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
 from gpjax.linops.linear_operator import LinearOperator
 from gpjax.linops.utils import to_linear_operator
-from gpjax.typing import Array, ScalarFloat, VecNOrMatNM
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+    VecNOrMatNM,
+)
 
 
 def _check_diag(diag: Any) -> None:

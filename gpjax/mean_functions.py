@@ -18,12 +18,22 @@ import abc
 import dataclasses
 from functools import partial
 
+from beartype.typing import (
+    Callable,
+    List,
+    Union,
+)
 import jax.numpy as jnp
-from beartype.typing import Callable, List, Union
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 from simple_pytree import static_field
 
-from gpjax.base import Module, param_field
+from gpjax.base import (
+    Module,
+    param_field,
+)
 from gpjax.typing import Array
 
 

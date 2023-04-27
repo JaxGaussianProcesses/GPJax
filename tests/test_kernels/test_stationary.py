@@ -18,11 +18,13 @@ from dataclasses import is_dataclass
 from itertools import product
 
 import jax
+from jax.config import config
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
+
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
     ConstantDiagonalKernelComputation,
@@ -40,7 +42,6 @@ from gpjax.kernels.stationary import (
 )
 from gpjax.kernels.stationary.utils import build_student_t_distribution
 from gpjax.linops import LinearOperator
-from jax.config import config
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

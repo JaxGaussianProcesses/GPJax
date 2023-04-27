@@ -18,9 +18,16 @@ from dataclasses import dataclass
 
 from beartype.typing import Any
 from jax import vmap
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 
-from gpjax.linops import DenseLinearOperator, DiagonalLinearOperator, LinearOperator
+from gpjax.linops import (
+    DenseLinearOperator,
+    DiagonalLinearOperator,
+    LinearOperator,
+)
 from gpjax.typing import Array
 
 

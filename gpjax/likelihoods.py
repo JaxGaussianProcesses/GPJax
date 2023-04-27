@@ -16,17 +16,26 @@
 import abc
 from dataclasses import dataclass
 
+from beartype.typing import (
+    Any,
+    Union,
+)
 import jax.numpy as jnp
 import jax.scipy as jsp
-import tensorflow_probability.substrates.jax as tfp
-from beartype.typing import Any, Union
 from jaxtyping import Float
 from simple_pytree import static_field
+import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.base import Module, param_field
+from gpjax.base import (
+    Module,
+    param_field,
+)
 from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.linops.utils import to_dense
-from gpjax.typing import Array, ScalarFloat
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 tfb = tfp.bijectors
 tfd = tfp.distributions

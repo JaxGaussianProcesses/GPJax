@@ -15,15 +15,18 @@
 
 from dataclasses import dataclass
 
+from beartype.typing import Union
 import jax.numpy as jnp
+from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
-from beartype.typing import Union
-from jaxtyping import Float
 
 from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
-from gpjax.typing import Array, ScalarFloat
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 @dataclass

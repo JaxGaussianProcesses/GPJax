@@ -13,15 +13,24 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, Tuple
+from typing import (
+    Callable,
+    Tuple,
+)
 
-import gpjax as gpx
 import jax
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
+from jaxtyping import (
+    Array,
+    Float,
+)
 import pytest
 import tensorflow_probability.substrates.jax as tfp
+
+import gpjax as gpx
 from gpjax.gps import AbstractPosterior
 from gpjax.variational_families import (
     AbstractVariationalFamily,
@@ -31,8 +40,6 @@ from gpjax.variational_families import (
     VariationalGaussian,
     WhitenedVariationalGaussian,
 )
-from jax.config import config
-from jaxtyping import Array, Float
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

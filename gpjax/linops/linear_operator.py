@@ -17,12 +17,27 @@
 import abc
 from dataclasses import dataclass
 
+from beartype.typing import (
+    Any,
+    Generic,
+    Iterable,
+    Mapping,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 import jax.numpy as jnp
-from beartype.typing import Any, Generic, Iterable, Mapping, Tuple, Type, TypeVar, Union
 from jaxtyping import Float
-from simple_pytree import Pytree, static_field
+from simple_pytree import (
+    Pytree,
+    static_field,
+)
 
-from gpjax.typing import Array, ScalarFloat
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 # Generic type.
 T = TypeVar("T")

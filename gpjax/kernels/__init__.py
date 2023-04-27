@@ -15,7 +15,11 @@
 
 """JaxKern."""
 from gpjax.kernels.approximations import RFF
-from gpjax.kernels.base import AbstractKernel, ProductKernel, SumKernel
+from gpjax.kernels.base import (
+    AbstractKernel,
+    ProductKernel,
+    SumKernel,
+)
 from gpjax.kernels.computations import (
     BasisFunctionComputation,
     ConstantDiagonalKernelComputation,
@@ -24,7 +28,10 @@ from gpjax.kernels.computations import (
     EigenKernelComputation,
 )
 from gpjax.kernels.non_euclidean import GraphKernel
-from gpjax.kernels.nonstationary import Linear, Polynomial
+from gpjax.kernels.nonstationary import (
+    Linear,
+    Polynomial,
+)
 from gpjax.kernels.stationary import (
     RBF,
     Matern12,

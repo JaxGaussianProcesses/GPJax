@@ -16,9 +16,13 @@
 from typing import List
 
 import jax.numpy as jnp
+from jaxtyping import (
+    Array,
+    Float,
+)
 import pytest
+
 from gpjax.kernels.stationary.utils import euclidean_distance
-from jaxtyping import Array, Float
 
 
 @pytest.mark.parametrize(

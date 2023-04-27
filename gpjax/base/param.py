@@ -18,8 +18,12 @@ __all__ = ["param_field"]
 
 import dataclasses
 
+from beartype.typing import (
+    Any,
+    Mapping,
+    Optional,
+)
 import tensorflow_probability.substrates.jax.bijectors as tfb
-from beartype.typing import Any, Mapping, Optional
 
 
 def param_field(

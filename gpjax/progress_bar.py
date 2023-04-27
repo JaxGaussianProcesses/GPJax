@@ -13,7 +13,11 @@
 # limitations under the License.
 # ==============================================================================
 
-from beartype.typing import Any, Callable, Union
+from beartype.typing import (
+    Any,
+    Callable,
+    Union,
+)
 from jax import lax
 from jax.experimental import host_callback
 from jaxtyping import Float

@@ -16,12 +16,15 @@
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-import tensorflow_probability.substrates.jax.bijectors as tfb
 from jaxtyping import Float
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
-from gpjax.typing import Array, ScalarFloat
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 @dataclass

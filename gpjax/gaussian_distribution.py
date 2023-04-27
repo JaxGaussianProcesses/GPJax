@@ -14,15 +14,26 @@
 # ==============================================================================
 
 
+from beartype.typing import (
+    Any,
+    Optional,
+    Tuple,
+)
+from jax import vmap
 import jax.numpy as jnp
 import jax.random as jr
-import tensorflow_probability.substrates.jax as tfp
-from beartype.typing import Any, Optional, Tuple
-from jax import vmap
 from jaxtyping import Float
+import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.linops import IdentityLinearOperator, LinearOperator
-from gpjax.typing import Array, KeyArray, ScalarFloat
+from gpjax.linops import (
+    IdentityLinearOperator,
+    LinearOperator,
+)
+from gpjax.typing import (
+    Array,
+    KeyArray,
+    ScalarFloat,
+)
 
 tfd = tfp.distributions
 

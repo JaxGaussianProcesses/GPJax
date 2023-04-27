@@ -13,7 +13,10 @@
 # limitations under the License.
 # ==============================================================================
 
-from jaxtyping import Int, Num
+from jaxtyping import (
+    Int,
+    Num,
+)
 
 from gpjax.typing import Array
 

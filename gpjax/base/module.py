@@ -16,13 +16,13 @@
 
 __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
 
+from copy import (
+    copy,
+    deepcopy,
+)
 import dataclasses
 import os
-from copy import copy, deepcopy
 
-import jax
-import jax.tree_util as jtu
-import tensorflow_probability.substrates.jax.bijectors as tfb
 from beartype.typing import (
     Any,
     Callable,
@@ -34,8 +34,10 @@ from beartype.typing import (
     TypeVar,
     Union,
 )
+import jax
 from jax import lax
 from jax._src.tree_util import _registry
+import jax.tree_util as jtu
 from orbax.checkpoint import (
     ArrayRestoreArgs,
     Checkpointer,
@@ -44,7 +46,11 @@ from orbax.checkpoint import (
     RestoreArgs,
     SaveArgs,
 )
-from simple_pytree import Pytree, static_field
+from simple_pytree import (
+    Pytree,
+    static_field,
+)
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
 Self = TypeVar("Self")
 

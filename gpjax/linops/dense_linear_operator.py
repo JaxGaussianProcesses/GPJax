@@ -16,13 +16,17 @@
 
 from dataclasses import dataclass
 
-import jax.numpy as jnp
 from beartype.typing import Union
+import jax.numpy as jnp
 from jaxtyping import Float
 
 from gpjax.linops.linear_operator import LinearOperator
 from gpjax.linops.utils import to_linear_operator
-from gpjax.typing import Array, ScalarFloat, VecNOrMatNM
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+    VecNOrMatNM,
+)
 
 
 def _check_matrix(matrix: Array) -> None:
