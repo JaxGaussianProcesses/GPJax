@@ -13,15 +13,15 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
 import abc
 import dataclasses
 from functools import partial
-from typing import Callable, List, Union
+from beartype.typing import Callable, List, Union
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float, Num
 from simple_pytree import static_field
 
 from .base import Module, param_field
@@ -32,7 +32,7 @@ class AbstractMeanFunction(Module):
     """Mean function that is used to parameterise the Gaussian process."""
 
     @abc.abstractmethod
-    def __call__(self, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:
+    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
         """Evaluate the mean function at the given points. This method is required for all subclasses.
 
         Args:
@@ -44,8 +44,8 @@ class AbstractMeanFunction(Module):
         raise NotImplementedError
 
     def __add__(
-        self, other: Union[AbstractMeanFunction, Float[Array, "1"]]
-    ) -> AbstractMeanFunction:
+        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]
+    ) -> "AbstractMeanFunction":
         """Add two mean functions.
 
         Args:
@@ -61,8 +61,8 @@ class AbstractMeanFunction(Module):
         return SumMeanFunction([self, Constant(other)])
 
     def __radd__(
-        self, other: Union[AbstractMeanFunction, Float[Array, "1"]]
-    ) -> AbstractMeanFunction:
+        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]  # TODO should this be ScalarFloat? or Num?
+    ) -> "AbstractMeanFunction":
         """Add two mean functions.
 
         Args:
@@ -74,8 +74,8 @@ class AbstractMeanFunction(Module):
         return self.__add__(other)
 
     def __mul__(
-        self, other: Union[AbstractMeanFunction, Float[Array, "1"]]
-    ) -> AbstractMeanFunction:
+        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]  # TODO should this be ScalarFloat? or Num?
+    ) -> "AbstractMeanFunction":
         """Multiply two mean functions.
 
         Args:
@@ -90,8 +90,8 @@ class AbstractMeanFunction(Module):
         return ProductMeanFunction([self, Constant(other)])
 
     def __rmul__(
-        self, other: Union[AbstractMeanFunction, Float[Array, "1"]]
-    ) -> AbstractMeanFunction:
+        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]  # TODO should this be ScalarFloat? or Num?
+    ) -> "AbstractMeanFunction":
         """Multiply two mean functions.
 
         Args:
@@ -107,17 +107,13 @@ class AbstractMeanFunction(Module):
 class Constant(AbstractMeanFunction):
     """
     A constant mean function. This function returns a repeated scalar value for all inputs.
-<<<<<<< HEAD
-    The scalar value itself can be treated as a model hyperparameter and learned during training.
-=======
     The scalar value itself can be treated as a model hyperparameter and learned during training but
     defaults to 1.0.
->>>>>>> origin/rff_sampler
     """
 
     constant: Float[Array, "1"] = param_field(jnp.array([0.0]))
 
-    def __call__(self, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:
+    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
         """Evaluate the mean function at the given points.
 
         Args:
@@ -161,7 +157,7 @@ class CombinationMeanFunction(AbstractMeanFunction):
         self.means = items_list
         self.operator = operator
 
-    def __call__(self, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:
+    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
         """Evaluate combination kernel on a pair of inputs.
 
         Args:

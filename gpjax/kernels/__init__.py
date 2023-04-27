@@ -14,8 +14,9 @@
 # ==============================================================================
 
 """JaxKern."""
-from .approximations import RFF
 from .base import AbstractKernel, ProductKernel, SumKernel
+
+from .approximations import RFF
 from .computations import (BasisFunctionComputation,
                            ConstantDiagonalKernelComputation,
                            DenseKernelComputation, DiagonalKernelComputation,

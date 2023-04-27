@@ -24,7 +24,9 @@ import optax as ox
 import tensorflow_probability.substrates.jax.distributions as tfd
 from jax.config import config
 
-import gpjax as gpx
+from jaxtyping import install_import_hook
+with install_import_hook("gpjax", "beartype.beartype"):
+    import gpjax as gpx
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

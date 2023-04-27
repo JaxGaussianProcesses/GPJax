@@ -13,17 +13,18 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Union
+from beartype.typing import Any, Union
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 
 from .dense_linear_operator import DenseLinearOperator
 from .linear_operator import LinearOperator
 from .utils import to_linear_operator
+from gpjax.typing import ScalarFloat, VecNOrMatNM
 
 
 def _check_diag(diag: Any) -> None:
@@ -94,7 +95,7 @@ class DiagonalLinearOperator(LinearOperator):
         else:
             raise NotImplementedError
 
-    def __mul__(self, other: float) -> LinearOperator:
+    def __mul__(self, other: ScalarFloat) -> LinearOperator:
         """Multiply covariance operator by scalar.
 
         Args:
@@ -126,7 +127,7 @@ class DiagonalLinearOperator(LinearOperator):
         """
         return jnp.diag(self.diagonal())
 
-    def __matmul__(self, other: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def __matmul__(self, other: VecNOrMatNM) -> VecNOrMatNM:
         """Matrix multiplication.
 
         Args:
@@ -141,7 +142,7 @@ class DiagonalLinearOperator(LinearOperator):
 
         return diag * other
 
-    def to_root(self) -> DiagonalLinearOperator:
+    def to_root(self) -> "DiagonalLinearOperator":
         """
         Lower triangular.
 
@@ -150,15 +151,15 @@ class DiagonalLinearOperator(LinearOperator):
         """
         return DiagonalLinearOperator(diag=jnp.sqrt(self.diagonal()))
 
-    def log_det(self) -> Float[Array, "1"]:
+    def log_det(self) -> ScalarFloat:
         """Log determinant.
 
         Returns:
-            Float[Array, "1"]: Log determinant of the covariance matrix.
+            ScalarFloat: Log determinant of the covariance matrix.
         """
         return jnp.sum(jnp.log(self.diagonal()))
 
-    def inverse(self) -> DiagonalLinearOperator:
+    def inverse(self) -> "DiagonalLinearOperator":
         """Inverse of the covariance operator.
 
         Returns:
@@ -166,7 +167,7 @@ class DiagonalLinearOperator(LinearOperator):
         """
         return DiagonalLinearOperator(diag=1.0 / self.diagonal())
 
-    def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def solve(self, rhs: VecNOrMatNM) -> VecNOrMatNM:
         """Solve linear system.
 
         Args:
@@ -179,7 +180,7 @@ class DiagonalLinearOperator(LinearOperator):
         return self.inverse() @ rhs
 
     @classmethod
-    def from_root(cls, root: DiagonalLinearOperator) -> DiagonalLinearOperator:
+    def from_root(cls, root: "DiagonalLinearOperator") -> "DiagonalLinearOperator":
         """Construct covariance operator from the lower triangular matrix.
 
         Returns:
@@ -188,7 +189,7 @@ class DiagonalLinearOperator(LinearOperator):
         return DiagonalFromRootLinearOperator(root=root)
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> DiagonalLinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "DiagonalLinearOperator":
         """Construct covariance operator from its dense matrix representation.
 
         Returns:

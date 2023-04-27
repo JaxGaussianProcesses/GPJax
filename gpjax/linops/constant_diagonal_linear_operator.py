@@ -13,15 +13,17 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
+from beartype.typing import Any, Union
 from dataclasses import dataclass
-from typing import Any, Union
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 from simple_pytree import static_field
 
+from gpjax.typing import ScalarFloat
+from .linear_operator import LinearOperator
 from .diagonal_linear_operator import DiagonalLinearOperator
 from .linear_operator import LinearOperator
 
@@ -63,7 +65,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
 
     def __add__(
         self, other: Union[Float[Array, "N N"], LinearOperator]
-    ) -> DiagonalLinearOperator:
+    ) -> LinearOperator:
         if isinstance(other, ConstantDiagonalLinearOperator):
             if other.size == self.size:
                 return ConstantDiagonalLinearOperator(
@@ -77,7 +79,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         else:
             return super().__add__(other)
 
-    def __mul__(self, other: float) -> LinearOperator:
+    def __mul__(self, other: Union[ScalarFloat, Float[Array, "1"]]) -> LinearOperator:
         """Multiply covariance operator by scalar.
 
         Args:
@@ -116,7 +118,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         """Diagonal of the covariance operator."""
         return self.value * jnp.ones(self.size)
 
-    def to_root(self) -> ConstantDiagonalLinearOperator:
+    def to_root(self) -> "ConstantDiagonalLinearOperator":
         """
         Lower triangular.
 
@@ -127,15 +129,15 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
             value=jnp.sqrt(self.value), size=self.size
         )
 
-    def log_det(self) -> Float[Array, "1"]:
+    def log_det(self) -> ScalarFloat:
         """Log determinant.
 
         Returns:
-            Float[Array, "1"]: Log determinant of the covariance matrix.
+            ScalarFloat: Log determinant of the covariance matrix.
         """
-        return 2.0 * self.size * jnp.log(self.value)
+        return 2.0 * self.size * jnp.log(self.value.squeeze())
 
-    def inverse(self) -> ConstantDiagonalLinearOperator:
+    def inverse(self) -> "ConstantDiagonalLinearOperator":
         """Inverse of the covariance operator.
 
         Returns:
@@ -143,7 +145,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         """
         return ConstantDiagonalLinearOperator(value=1.0 / self.value, size=self.size)
 
-    def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
         """Solve linear system.
 
         Args:
@@ -156,7 +158,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         return rhs / self.value
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> ConstantDiagonalLinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "ConstantDiagonalLinearOperator":
         """Construct covariance operator from dense matrix.
 
         Args:
@@ -171,8 +173,8 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
 
     @classmethod
     def from_root(
-        cls, root: ConstantDiagonalLinearOperator
-    ) -> ConstantDiagonalLinearOperator:
+        cls, root: "ConstantDiagonalLinearOperator"
+    ) -> "ConstantDiagonalLinearOperator":
         """Construct covariance operator from root.
 
         Args:

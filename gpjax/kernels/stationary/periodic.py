@@ -14,11 +14,14 @@
 # ==============================================================================
 
 from dataclasses import dataclass
+from beartype.typing import Union
 
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
+from gpjax.typing import ScalarFloat
 
 from ...base import param_field
 from ..base import AbstractKernel
@@ -31,14 +34,14 @@ class Periodic(AbstractKernel):
     Key reference is MacKay 1998 - "Introduction to Gaussian processes".
     """
 
-    lengthscale: Float[Array, "D"] = param_field(
+    lengthscale: Union[ScalarFloat, Float[Array, "D"]] = param_field(
         jnp.array([1.0]), bijector=tfb.Softplus()
     )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    period: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    period: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Periodic"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`
 
         TODO: update docstring
@@ -50,7 +53,7 @@ class Periodic(AbstractKernel):
             x (Float[Array, "D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "D"]): The right hand argument of the kernel function's call
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`
+            ScalarFloat: The value of :math:`k(x, y)`
         """
         x = self.slice_input(x)
         y = self.slice_input(y)

@@ -15,26 +15,25 @@
 
 import abc
 from dataclasses import dataclass
-from typing import Any
+from beartype.typing import Any
 
 from jax import vmap
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float, Num
 
 from gpjax.linops import (DenseLinearOperator, DiagonalLinearOperator,
                           LinearOperator)
-
-Kernel = Any
 
 
 @dataclass
 class AbstractKernelComputation:
     """Abstract class for kernel computations."""
 
-    kernel: Kernel
+    kernel: "gpjax.kernels.base.AbstractKernel"
 
     def gram(
         self,
-        x: Float[Array, "N D"],
+        x: Num[Array, "N D"],
     ) -> LinearOperator:
         """Compute Gram covariance operator of the kernel function.
 
@@ -49,7 +48,7 @@ class AbstractKernelComputation:
 
     @abc.abstractmethod
     def cross_covariance(
-        self, x: Float[Array, "N D"], y: Float[Array, "M D"]
+        self, x: Num[Array, "N D"], y: Num[Array, "M D"]
     ) -> Float[Array, "N M"]:
         """For a given kernel, compute the NxM gram matrix on an a pair
         of input matrices with shape NxD and MxD.
@@ -63,7 +62,7 @@ class AbstractKernelComputation:
         """
         raise NotImplementedError
 
-    def diagonal(self, inputs: Float[Array, "N D"]) -> DiagonalLinearOperator:
+    def diagonal(self, inputs: Num[Array, "N D"]) -> DiagonalLinearOperator:
         """For a given kernel, compute the elementwise diagonal of the
         NxN gram matrix on an input matrix of shape NxD.
 

@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+
 import jax.numpy as jnp
 from jax import vmap
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 
 from gpjax.linops import ConstantDiagonalLinearOperator, DiagonalLinearOperator
 
@@ -41,7 +43,6 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
         Args:
             kernel (AbstractKernel): The kernel for which the variance
                 vector should be computed for.
-            params (Dict): The kernel's parameter set.
             inputs (Float[Array, "N D"]): The input matrix.
 
         Returns:

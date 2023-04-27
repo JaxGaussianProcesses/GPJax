@@ -13,11 +13,12 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Any, Callable, Union
+from beartype.typing import Any, Callable, Union
 
 from jax import lax
 from jax.experimental import host_callback
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 from tqdm.auto import tqdm
 
 

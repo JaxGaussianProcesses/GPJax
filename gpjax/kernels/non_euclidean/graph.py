@@ -13,12 +13,15 @@
 # limitations under the License.
 # ==============================================================================
 
+
 from dataclasses import dataclass
 
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax as tfp
-from jaxtyping import Array, Float, Int
+from gpjax.typing import Array
+from jaxtyping import Float, Num, Int
 from simple_pytree import static_field
+from gpjax.typing import ScalarFloat, ScalarInt
 
 from ...base import param_field
 from ..base import AbstractKernel
@@ -40,17 +43,13 @@ class GraphKernel(AbstractKernel):
         compute_engine
     """
 
-    laplacian: Float[Array, "N N"] = static_field(None)
-    lengthscale: Float[Array, "D"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
-    )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    smoothness: Float[Array, "1"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
-    )
+    laplacian: Num[Array, "N N"] = static_field(None)
+    lengthscale: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    smoothness: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     eigenvalues: Float[Array, "N"] = static_field(None)
     eigenvectors: Float[Array, "N N"] = static_field(None)
-    num_vertex: Int[Array, "1"] = static_field(None)
+    num_vertex: ScalarInt = static_field(None)
     compute_engine: AbstractKernelComputation = static_field(EigenKernelComputation)
     name: str = "Graph Matérn"
 
@@ -63,22 +62,23 @@ class GraphKernel(AbstractKernel):
         if self.num_vertex is None:
             self.num_vertex = self.eigenvalues.shape[0]
 
-    def __call__(
+    def __call__(  # TODO not consistent with general kernel interface
         self,
-        x: Float[Array, "1 D"],
-        y: Float[Array, "1 D"],
+        x: Int[Array, "N 1"],
+        y: Int[Array, "N 1"],
+        *,
+        S,
         **kwargs,
-    ) -> Float[Array, "1"]:
+    ):
         """Evaluate the graph kernel on a pair of vertices :math:`v_i, v_j`.
 
         Args:
-            x (Float[Array, "1 D"]): Index of the ith vertex.
-            y (Float[Array, "1 D"]): Index of the jth vertex.
+            x (Float[Array, "N 1"]): Index of the ith vertex.
+            y (Float[Array, "N 1"]): Index of the jth vertex.
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(v_i, v_j)`.
+            ScalarFloat: The value of :math:`k(v_i, v_j)`.
         """
-        S = kwargs["S"]
         Kxx = (jax_gather_nd(self.eigenvectors, x) * S.squeeze()) @ jnp.transpose(
             jax_gather_nd(self.eigenvectors, y)
         )  # shape (n,n)

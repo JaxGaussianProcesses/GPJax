@@ -13,11 +13,12 @@
 # limitations under the License.
 # ==============================================================================
 
+
 from dataclasses import dataclass
-from typing import Dict
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float, Num
 
 from .base import AbstractKernelComputation
 
@@ -25,7 +26,7 @@ from .base import AbstractKernelComputation
 @dataclass
 class EigenKernelComputation(AbstractKernelComputation):
     def cross_covariance(
-        self, x: Float[Array, "N D"], y: Float[Array, "M D"]
+        self, x: Num[Array, "N D"], y: Num[Array, "M D"]
     ) -> Float[Array, "N M"]:
         # Transform the eigenvalues of the graph Laplacian according to the
         # RBF kernel's SPDE form.

@@ -9,9 +9,8 @@
 # Gaussian process model's kernel through a neural network can offer a solution to this.
 
 # %%
-import typing as tp
 from dataclasses import dataclass, field
-from typing import Dict, Any
+from typing import Any
 
 import jax
 import jax.numpy as jnp
@@ -25,12 +24,14 @@ from flax import linen as nn
 from simple_pytree import static_field
 import flax
 
-import gpjax as gpx
-import gpjax.kernels as jk
-from gpjax.kernels import DenseKernelComputation
-from gpjax.kernels.base import AbstractKernel
-from gpjax.kernels.computations import AbstractKernelComputation
-from gpjax.base import param_field
+from jaxtyping import install_import_hook
+with install_import_hook("gpjax", "beartype.beartype"):
+    import gpjax as gpx
+    import gpjax.kernels as jk
+    from gpjax.kernels import DenseKernelComputation
+    from gpjax.kernels.base import AbstractKernel
+    from gpjax.kernels.computations import AbstractKernelComputation
+    from gpjax.base import param_field
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

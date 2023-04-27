@@ -13,14 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
 __all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
 
 import dataclasses
 import os
 from copy import copy, deepcopy
-from typing import Any, Callable, Dict, Iterable, List, Tuple
+from beartype.typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar, Union
 
 import jax
 import jax.tree_util as jtu
@@ -31,7 +30,9 @@ from orbax.checkpoint import (ArrayRestoreArgs, Checkpointer,
                               PyTreeCheckpointer, PyTreeCheckpointHandler,
                               RestoreArgs, SaveArgs)
 from simple_pytree import Pytree, static_field
-from typing_extensions import Self
+
+
+Self = TypeVar('Self')
 
 
 class Module(Pytree):
@@ -49,7 +50,7 @@ class Module(Pytree):
             ):
                 cls._pytree__meta[field] = {**value.metadata}
 
-    def replace(self, **kwargs: Any) -> Self:
+    def replace(self: Self, **kwargs: Any) -> Self:
         """
         Replace the values of the fields of the object.
 
@@ -68,7 +69,7 @@ class Module(Pytree):
         pytree.__dict__.update(kwargs)
         return pytree
 
-    def replace_meta(self, **kwargs: Any) -> Self:
+    def replace_meta(self: Self, **kwargs: Any) -> Self:
         """
         Replace the metadata of the fields.
 
@@ -87,7 +88,7 @@ class Module(Pytree):
         pytree.__dict__.update(_pytree__meta={**pytree._pytree__meta, **kwargs})
         return pytree
 
-    def update_meta(self, **kwargs: Any) -> Self:
+    def update_meta(self: Self, **kwargs: Any) -> Self:
         """
         Update the metadata of the fields. The metadata must already exist.
 
@@ -112,15 +113,15 @@ class Module(Pytree):
         pytree.__dict__.update(_pytree__meta=new)
         return pytree
 
-    def replace_trainable(self: Module, **kwargs: Dict[str, bool]) -> Self:
+    def replace_trainable(self: Self, **kwargs: Dict[str, bool]) -> Self:
         """Replace the trainability status of local nodes of the Module."""
         return self.update_meta(**{k: {"trainable": v} for k, v in kwargs.items()})
 
-    def replace_bijector(self: Module, **kwargs: Dict[str, tfb.Bijector]) -> Self:
+    def replace_bijector(self: Self, **kwargs: Dict[str, tfb.Bijector]) -> Self:
         """Replace the bijectors of local nodes of the Module."""
         return self.update_meta(**{k: {"bijector": v} for k, v in kwargs.items()})
 
-    def constrain(self) -> Self:
+    def constrain(self: Self) -> Self:
         """Transform model parameters to the constrained space according to their defined bijectors.
 
         Returns:
@@ -137,7 +138,7 @@ class Module(Pytree):
 
         return meta_map(_apply_constrain, self)
 
-    def unconstrain(self) -> Self:
+    def unconstrain(self: Self) -> Self:
         """Transform model parameters to the unconstrained space according to their defined bijectors.
 
         Returns:
@@ -154,7 +155,7 @@ class Module(Pytree):
 
         return meta_map(_apply_unconstrain, self)
 
-    def stop_gradient(self) -> Self:
+    def stop_gradient(self: Self) -> Self:
         """Stop gradients flowing through the Module.
 
         Returns:
@@ -176,7 +177,7 @@ class Module(Pytree):
         return meta_map(_apply_stop_grad, self)
 
 
-def _toplevel_meta(pytree: Any) -> List[Dict[str, Any]]:
+def _toplevel_meta(pytree: Any) -> List[Optional[Dict[str, Any]]]:
     """Unpacks a list of meta corresponding to the top-level nodes of the pytree.
 
     Args:
@@ -197,8 +198,8 @@ def _toplevel_meta(pytree: Any) -> List[Dict[str, Any]]:
 def meta_leaves(
     pytree: Module,
     *,
-    is_leaf: Callable[[Any], bool] | None = None,
-) -> List[Tuple[Dict[str, Any], Any]]:
+    is_leaf: Optional[Callable[[Any], bool]] = None,
+) -> List[Tuple[Optional[Dict[str, Any]], Any]]:
     """
     Returns the meta of the leaves of the pytree.
 
@@ -212,8 +213,8 @@ def meta_leaves(
 
     def _unpack_metadata(
         meta_leaf: Any,
-        pytree: Module,
-        is_leaf: Callable[[Any], bool] | None,
+        pytree: Union[Module, Any],
+        is_leaf: Optional[Callable[[Any], bool]],
     ):
         """Recursively unpack leaf metadata."""
         if is_leaf and is_leaf(pytree):
@@ -235,8 +236,8 @@ def meta_leaves(
 
 
 def meta_flatten(
-    pytree: Module, *, is_leaf: Callable[[Any], bool] | None = None
-) -> Module:
+    pytree: Union[Module, Any], *, is_leaf: Optional[Callable[[Any], bool]] = None
+) -> Union[Module, Any]:
     """
     Returns the meta of the Module.
 
@@ -254,10 +255,10 @@ def meta_flatten(
 
 def meta_map(
     f: Callable[[Any, Dict[str, Any]], Any],
-    pytree: Module,
+    pytree: Union[Module, Any],
     *rest: Any,
-    is_leaf: Callable[[Any], bool] | None = None,
-) -> Module:
+    is_leaf: Optional[Callable[[Any], bool]] = None,
+) -> Union[Module, Any]:
     """Apply a function to a Module where the first argument are the pytree leaves, and the second argument are the Module metadata leaves.
     Args:
         f (Callable[[Any, Dict[str, Any]], Any]): The function to apply to the pytree.
@@ -273,7 +274,7 @@ def meta_map(
     return treedef.unflatten(f(*xs) for xs in zip(*all_leaves))
 
 
-def meta(pytree: Module, *, is_leaf: Callable[[Any], bool] | None = None) -> Module:
+def meta(pytree: Module, *, is_leaf: Optional[Callable[[Any], bool]] = None) -> Module:
     """Returns the metadata of the Module as a pytree.
 
     Args:

@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 
 from gpjax.linops import DenseLinearOperator
 
@@ -19,7 +20,6 @@ class BasisFunctionComputation(AbstractKernelComputation):
     ) -> Float[Array, "N M"]:
         """For a pair of inputs, compute the cross covariance matrix between the inputs.
         Args:
-            params (Dict): A dictionary of parameters for which the cross-covariance matrix should be constructed with.
             x: A N x D array of inputs.
             y: A M x D array of inputs.
 
@@ -35,7 +35,6 @@ class BasisFunctionComputation(AbstractKernelComputation):
         """For the Gram matrix, we can save computations by computing only one matrix multiplication between the inputs and the scaled frequencies.
 
         Args:
-            params (Dict): A dictionary of parameters for which the Gram matrix should be constructed with.
             inputs: A N x D array of inputs.
 
         Returns:

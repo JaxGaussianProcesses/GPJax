@@ -22,7 +22,6 @@ from dataclasses import dataclass
 
 import fsspec
 import geopandas as gpd
-import gpjax as gpx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
@@ -33,10 +32,14 @@ import planetary_computer
 import pystac_client
 import rioxarray as rio
 import xarray as xr
-from gpjax.base import param_field
-from gpjax.dataset import Dataset
 from jaxtyping import Array, Float
 from rioxarray.merge import merge_arrays
+
+from jaxtyping import install_import_hook
+with install_import_hook("gpjax", "beartype.beartype"):
+    import gpjax as gpx
+    from gpjax.base import param_field
+    from gpjax.dataset import Dataset
 
 jax.config.update("jax_enable_x64", True)
 

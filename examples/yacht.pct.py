@@ -10,7 +10,9 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-import gpjax as gpx
+from jaxtyping import install_import_hook
+with install_import_hook("gpjax", "beartype.beartype"):
+    import gpjax as gpx
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

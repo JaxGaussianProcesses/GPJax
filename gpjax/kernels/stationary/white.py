@@ -18,8 +18,10 @@ from dataclasses import dataclass
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 from simple_pytree import static_field
+from gpjax.typing import ScalarFloat
 
 from ...base import param_field
 from ..base import AbstractKernel
@@ -29,13 +31,13 @@ from ..computations import (AbstractKernelComputation,
 
 @dataclass
 class White(AbstractKernel):
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     compute_engine: AbstractKernelComputation = static_field(
         ConstantDiagonalKernelComputation
     )
     name: str = "White"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\\sigma`
 
         .. math::
@@ -46,7 +48,7 @@ class White(AbstractKernel):
             y (Float[Array, "D"]): The right hand argument of the kernel function's call.
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`.
+            ScalarFloat: The value of :math:`k(x, y)`.
         """
         K = jnp.all(jnp.equal(x, y)) * self.variance
         return K.squeeze()

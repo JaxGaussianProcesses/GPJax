@@ -13,6 +13,7 @@
 # # limitations under the License.
 # # ==============================================================================
 
+import pytest
 import jax.numpy as jnp
 import jax.random as jr
 import networkx as nx

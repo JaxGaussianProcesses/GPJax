@@ -17,8 +17,10 @@ from dataclasses import dataclass
 
 import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
 from simple_pytree import static_field
+from gpjax.typing import ScalarFloat, ScalarInt
 
 from ...base import param_field
 from ..base import AbstractKernel
@@ -28,14 +30,14 @@ from ..base import AbstractKernel
 class Polynomial(AbstractKernel):
     """The Polynomial kernel with variable degree."""
 
-    degree: int = static_field(2)
-    shift: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    degree: ScalarInt = static_field(2)
+    shift: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
 
     def __post_init__(self):
         self.name = f"Polynomial (degree {self.degree})"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter
         :math:`\\alpha` and variance :math:`\\sigma^2` through
 
@@ -49,9 +51,9 @@ class Polynomial(AbstractKernel):
                 call
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`.
+            ScalarFloat: The value of :math:`k(x, y)`.
         """
-        x = self.slice_input(x).squeeze()
-        y = self.slice_input(y).squeeze()
-        K = jnp.power(self.shift + jnp.dot(x * self.variance, y), self.degree)
+        x = self.slice_input(x)
+        y = self.slice_input(y)
+        K = jnp.power(self.shift + self.variance * jnp.dot(x, y), self.degree)
         return K.squeeze()

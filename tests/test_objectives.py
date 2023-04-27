@@ -23,7 +23,7 @@ def build_data(num_datapoints: int, num_dims: int, key, binary: bool):
             0.5
             * jnp.sign(
                 jnp.cos(
-                    3 * x[:, 1].reshape(-1, 1)
+                    3 * x[:, 0].reshape(-1, 1)
                     + jr.normal(key, shape=(num_datapoints, 1)) * 0.05
                 )
             )
@@ -31,7 +31,7 @@ def build_data(num_datapoints: int, num_dims: int, key, binary: bool):
         )
     else:
         y = (
-            jnp.sin(x[:, 1]).reshape(-1, 1)
+            jnp.sin(x[:, 0]).reshape(-1, 1)
             + jr.normal(key=key, shape=(num_datapoints, 1)) * 0.1
         )
     D = Dataset(X=x, y=y)

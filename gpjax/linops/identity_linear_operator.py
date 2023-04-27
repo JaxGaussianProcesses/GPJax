@@ -13,13 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
+from beartype.typing import Any
 from dataclasses import dataclass
-from typing import Any
 
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from gpjax.typing import Array
+from jaxtyping import Float
+from gpjax.typing import ScalarFloat
 
 from gpjax.linops.constant_diagonal_linear_operator import \
     ConstantDiagonalLinearOperator
@@ -64,7 +65,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         """
         return other
 
-    def to_root(self) -> IdentityLinearOperator:
+    def to_root(self) -> "IdentityLinearOperator":
         """
         Lower triangular.
 
@@ -73,15 +74,15 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         """
         return self
 
-    def log_det(self) -> Float[Array, "1"]:
+    def log_det(self) -> ScalarFloat:
         """Log determinant.
 
         Returns:
-            Float[Array, "1"]: Log determinant of the covariance matrix.
+            ScalarFloat: Log determinant of the covariance matrix.
         """
         return jnp.array(0.0)
 
-    def inverse(self) -> ConstantDiagonalLinearOperator:
+    def inverse(self) -> "IdentityLinearOperator":
         """Inverse of the covariance operator.
 
         Returns:
@@ -89,7 +90,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         """
         return self
 
-    def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
         """Solve linear system.
 
         Args:
@@ -103,7 +104,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         return rhs
 
     @classmethod
-    def from_root(cls, root: IdentityLinearOperator) -> IdentityLinearOperator:
+    def from_root(cls, root: "IdentityLinearOperator") -> "IdentityLinearOperator":
         """Construct from root.
 
         Args:
@@ -115,7 +116,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         return root
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> IdentityLinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "IdentityLinearOperator":
         return IdentityLinearOperator(dense.shape[0])
 
 

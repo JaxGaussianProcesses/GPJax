@@ -18,7 +18,9 @@ import optax as ox
 from jax import jit
 from jax.config import config
 
-import gpjax as gpx
+from jaxtyping import install_import_hook
+with install_import_hook("gpjax", "beartype.beartype"):
+    import gpjax as gpx
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -85,9 +87,9 @@ x = jnp.arange(G.number_of_nodes()).reshape(-1, 1)
 
 true_kernel = gpx.GraphKernel(
     laplacian=L,
-    lengthscale=jnp.array([2.3]),
-    variance=jnp.array([3.2]),
-    smoothness=jnp.array([6.1]),
+    lengthscale=2.3,
+    variance=3.2,
+    smoothness=6.1,
 )
 prior = gpx.Prior(mean_function=gpx.Zero(), kernel=true_kernel)
 
