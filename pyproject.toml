@@ -43,6 +43,7 @@ pylint = "^2.17.1"
 nox = "^2022.11.21"
 ruff = "^0.0.259"
 flax = "^0.6.8"
+pre-commit = "^3.2.2"
 
 
 [tool.poetry.group.docs.dependencies]
