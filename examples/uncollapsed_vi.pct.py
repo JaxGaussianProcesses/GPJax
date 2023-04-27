@@ -20,6 +20,7 @@ import optax as ox
 import tensorflow_probability.substrates.jax as tfp
 from jax import jit
 from jax.config import config
+
 from jaxtyping import install_import_hook
 
 with install_import_hook("gpjax", "beartype.beartype"):
@@ -48,8 +49,7 @@ noise = 0.2
 
 key, subkey = jr.split(key)
 x = jr.uniform(key=key, minval=-5.0, maxval=5.0, shape=(n,)).reshape(-1, 1)
-def f(x):
-    return jnp.sin(4 * x) + jnp.cos(2 * x)
+f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(subkey, shape=signal.shape) * noise
 

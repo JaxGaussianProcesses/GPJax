@@ -32,8 +32,10 @@ import planetary_computer
 import pystac_client
 import rioxarray as rio
 import xarray as xr
-from jaxtyping import Array, Float, install_import_hook
+from jaxtyping import Array, Float
 from rioxarray.merge import merge_arrays
+
+from jaxtyping import install_import_hook
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx

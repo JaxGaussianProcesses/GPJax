@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import optax as ox
 from jax import jit
 from jax.config import config
+
 from jaxtyping import install_import_hook
 
 with install_import_hook("gpjax", "beartype.beartype"):
@@ -39,8 +40,7 @@ noise = 0.3
 
 key, subkey = jr.split(key)
 x = jr.uniform(key=key, minval=-3.0, maxval=3.0, shape=(n,)).reshape(-1, 1)
-def f(x):
-    return jnp.sin(4 * x) + jnp.cos(2 * x)
+f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(subkey, shape=signal.shape) * noise
 

@@ -29,14 +29,14 @@ highly desirable.
 
 We are making an active effort within GPJax to improve our documentation. If you
 spot any areas where there is missing information within the existing
-documentation, then please either raise an issue or
+documentation, then please either raise an issue or 
 [create a pull request](https://gpjax.readthedocs.io/en/latest/contributing.html).
 
 ## An example docstring
 
-An example docstring that adheres the principles of GPJax is given below.
-The docstring contains a simple, snappy introduction with links to auxillary
-components. More detail is then provided in the form of a mathematical
+An example docstring that adheres the principles of GPJax is given below. 
+The docstring contains a simple, snappy introduction with links to auxillary 
+components. More detail is then provided in the form of a mathematical 
 description and a code example. The docstring is concluded with a description
 of the objects attributes with corresponding types.
 
@@ -76,7 +76,7 @@ class Prior(AbstractPrior):
 
 ### Documentation syntax
 
-A helpful cheatsheet for writing restructured text can be found
+A helpful cheatsheet for writing restructured text can be found 
 [here](https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst). In addition to that, we adopt the following convention when documenting
 `` objects.
 

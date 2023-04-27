@@ -28,7 +28,8 @@ config.update("jax_enable_x64", True)
 def test_quadrature(jit):
     def test():
         def fun(x):
-            return x ** 2
+            return x**2
+
         mean = jnp.array([[2.0]])
         var = jnp.array([[1.0]])
         fn_val = gauss_hermite_quadrature(fun, mean, var)

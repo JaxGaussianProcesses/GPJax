@@ -1,5 +1,5 @@
+import matplotlib.transforms as transforms
 import numpy as np
-from matplotlib import transforms
 from matplotlib.patches import Ellipse
 
 

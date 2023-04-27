@@ -6,10 +6,11 @@ import optax as ox
 import pandas as pd
 from jax import jit
 from jax.config import config
-from jaxtyping import install_import_hook
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+
+from jaxtyping import install_import_hook
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx

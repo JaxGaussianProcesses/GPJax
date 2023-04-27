@@ -97,14 +97,13 @@
 # $$
 # We can plot three different parameterisations of this density.
 
+# %%
+import tensorflow_probability.substrates.jax as tfp
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-
-# %%
-import tensorflow_probability.substrates.jax as tfp
 from utils import confidence_ellipse
 
 tfd = tfp.distributions
@@ -120,7 +119,7 @@ for d in [ud1, ud2, ud3]:
     ax.plot(
         xs,
         jnp.exp(d.log_prob(xs)),
-        label=f"$\\mathcal{{N}}({{{float(d.mean())}}},\\  {{{float(d.stddev())}}}^2)$",
+        label=f"$\mathcal{{N}}({{{float(d.mean())}}},\  {{{float(d.stddev())}}}^2)$",
     )
     ax.fill_between(xs, jnp.zeros_like(xs), jnp.exp(d.log_prob(xs)), alpha=0.2)
 ax.legend(loc="best")
@@ -169,7 +168,7 @@ yvals = jnp.linspace(-5.0, 5.0, 500)
 
 xx, yy = jnp.meshgrid(xvals, yvals)
 
-pos = jnp.empty((*xx.shape, 2))
+pos = jnp.empty(xx.shape + (2,))
 pos.at[:, :, 0].set(xx)
 pos.at[:, :, 1].set(yy)
 

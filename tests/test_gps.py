@@ -172,9 +172,12 @@ def test_nonconjugate_posterior(
     assert (posterior.latent == latent_values).all()
 
     # Check tree flattening.
-    true_leaves = (
-        [latent_values, *jtu.tree_leaves(likelihood), *jtu.tree_leaves(kernel), *jtu.tree_leaves(mean_function)]
-    )
+    true_leaves = [
+        latent_values,
+        *jtu.tree_leaves(likelihood),
+        *jtu.tree_leaves(kernel),
+        *jtu.tree_leaves(mean_function),
+    ]
     leaves = jtu.tree_leaves(posterior)
 
     for l1, l2 in zip(leaves, true_leaves):

@@ -42,6 +42,7 @@ class BaseTestLikelihood:
 
     def pytest_generate_tests(self, metafunc):
         """This is called automatically by pytest."""
+
         # function for pretty test name
         def id_func(x):
             return "-".join([f"{k}={v}" for k, v in x.items()])

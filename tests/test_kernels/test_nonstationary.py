@@ -44,6 +44,7 @@ class BaseTestKernel:
 
     def pytest_generate_tests(self, metafunc):
         """This is called automatically by pytest."""
+
         # function for pretty test name
         def id_func(x):
             return "-".join([f"{k}={v}" for k, v in x.items()])
@@ -69,9 +70,7 @@ class BaseTestKernel:
             kernel: AbstractKernel = self.kernel(**fields)
             assert kernel.ndims == 1
         else:
-            kernel: AbstractKernel = self.kernel(
-                active_dims=list(range(dim)), **fields
-            )
+            kernel: AbstractKernel = self.kernel(active_dims=list(range(dim)), **fields)
             assert kernel.ndims == dim
 
         # Check default compute engine

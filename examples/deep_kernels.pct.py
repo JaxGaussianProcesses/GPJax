@@ -12,25 +12,27 @@
 from dataclasses import dataclass, field
 from typing import Any
 
-import flax
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import optax as ox
-from flax import linen as nn
 from jax.config import config
-from jaxtyping import Array, Float, install_import_hook
+from jaxtyping import Array, Float
 from scipy.signal import sawtooth
+from flax import linen as nn
 from simple_pytree import static_field
+import flax
+
+from jaxtyping import install_import_hook
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     import gpjax.kernels as jk
-    from gpjax.base import param_field
     from gpjax.kernels import DenseKernelComputation
     from gpjax.kernels.base import AbstractKernel
     from gpjax.kernels.computations import AbstractKernelComputation
+    from gpjax.base import param_field
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -48,8 +50,7 @@ noise = 0.2
 
 key, subkey = jr.split(key)
 x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n,)).reshape(-1, 1)
-def f(x):
-    return jnp.asarray(sawtooth(2 * jnp.pi * x))
+f = lambda x: jnp.asarray(sawtooth(2 * jnp.pi * x))
 signal = f(x)
 y = signal + jr.normal(subkey, shape=signal.shape) * noise
 
