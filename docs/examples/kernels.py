@@ -1,9 +1,23 @@
+# -*- coding: utf-8 -*-
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+# ---
+
 # %% [markdown]
 # # Kernel Guide
 #
 # In this guide, we introduce the kernels available in GPJax and demonstrate how to
 # create custom kernels.
 
+# %%
 from dataclasses import dataclass
 
 from jax import jit
@@ -22,9 +36,6 @@ import tensorflow_probability.substrates.jax as tfp
 
 import gpjax as gpx
 from gpjax.base.param import param_field
-
-# %%
-
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

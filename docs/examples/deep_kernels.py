@@ -2,7 +2,7 @@
 # # Deep Kernel Learning
 #
 # In this notebook we demonstrate how GPJax can be used in conjunction with
-# [Haiku](https://github.com/deepmind/dm-haiku) to build deep kernel Gaussian
+# [Flax](https://flax.readthedocs.io/en/latest/) to build deep kernel Gaussian
 # processes. Modelling data with discontinuities is a challenging task for regular
 # Gaussian process models. However, as shown in
 # <strong data-cite="wilson2016deep"></strong>, transforming the inputs to our

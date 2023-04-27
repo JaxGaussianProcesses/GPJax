@@ -30,7 +30,7 @@
 #
 
 # %% [markdown]
-# ## Motivation…. Gaussian process objects as data:
+# ## The need for custom objects
 #
 # Within this notebook, we'll be using the squared exponential, or RBF, kernel
 # for illustratory purposes. For a pair of vectors $x, y \in \mathbb{R}^d$, its

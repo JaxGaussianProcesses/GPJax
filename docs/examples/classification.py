@@ -420,23 +420,18 @@ ax2.set_title("Latent Function (index = 1)")
 
 # %%
 thin_factor = 20
-samples = []
-
+posterior_samples = []
 
 for i in trange(0, num_samples, thin_factor, desc="Drawing posterior samples"):
-    # def set_state(samples):
-    # return lambda samples, i=i: samples[i]
     sample = jtu.tree_map(lambda samples, i=i: samples[i], states.position)
-    # sample = jtu.tree_map(set_state, states.position)
-    sample.constrain()
+    sample = sample.constrain()
     latent_dist = sample.predict(xtest, train_data=D)
     predictive_dist = sample.likelihood(latent_dist)
-    samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
+    posterior_samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
 
-samples = jnp.vstack(samples)
-
-lower_ci, upper_ci = jnp.percentile(samples, jnp.array([2.5, 97.5]), axis=0)
-expected_val = jnp.mean(samples, axis=0)
+posterior_samples = jnp.vstack(posterior_samples)
+lower_ci, upper_ci = jnp.percentile(posterior_samples, jnp.array([2.5, 97.5]), axis=0)
+expected_val = jnp.mean(posterior_samples, axis=0)
 
 # %% [markdown]
 #

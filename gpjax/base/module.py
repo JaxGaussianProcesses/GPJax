@@ -197,6 +197,16 @@ class Module(Pytree):
 
         return meta_map(_apply_stop_grad, self)
 
+    def trainables(self) -> Self:
+        def _get_trainables(meta_leaf):
+            meta, leaf = meta_leaf
+            if meta is None:
+                return True
+
+            return meta.get("trainable", True)
+
+        return meta_map(_get_trainables, self)
+
 
 def _toplevel_meta(pytree: Any) -> list[dict[str, Any]]:
     """Unpacks a list of meta corresponding to the top-level nodes of the pytree.
