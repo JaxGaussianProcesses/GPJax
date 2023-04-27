@@ -16,21 +16,34 @@
 
 from dataclasses import dataclass
 
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 import optax as ox
 import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
-from jax.config import config
 
-from gpjax.base import Module, param_field
+from gpjax.base import (
+    Module,
+    param_field,
+)
 from gpjax.dataset import Dataset
-from gpjax.fit import fit, get_batch
-from gpjax.gps import ConjugatePosterior, Prior
+from gpjax.fit import (
+    fit,
+    get_batch,
+)
+from gpjax.gps import (
+    ConjugatePosterior,
+    Prior,
+)
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Gaussian
 from gpjax.mean_functions import Constant
-from gpjax.objectives import ELBO, AbstractObjective, ConjugateMLL
+from gpjax.objectives import (
+    ELBO,
+    AbstractObjective,
+    ConjugateMLL,
+)
 from gpjax.variational_families import VariationalGaussian
 
 # Enable Float64 for more stable matrix inversions.

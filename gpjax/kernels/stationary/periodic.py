@@ -14,17 +14,19 @@
 # ==============================================================================
 
 from dataclasses import dataclass
-from beartype.typing import Union
 
+from beartype.typing import Union
 import jax.numpy as jnp
+from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
-from gpjax.typing import Array
-from jaxtyping import Float
-from gpjax.typing import ScalarFloat
 
-from ...base import param_field
-from ..base import AbstractKernel
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 @dataclass
@@ -42,7 +44,7 @@ class Periodic(AbstractKernel):
     name: str = "Periodic"
 
     def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`
+        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`.
 
         TODO: update docstring
 

@@ -5,21 +5,22 @@
 # create custom kernels.
 
 # %%
+from dataclasses import dataclass
 from typing import Dict
 
-from dataclasses import dataclass
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
+import numpy as np
 import optax as ox
 import tensorflow_probability.substrates.jax as tfp
 from jax import jit
 from jax.config import config
 from jaxtyping import Array, Float
 from simple_pytree import static_field
-import numpy as np
 
 from jaxtyping import install_import_hook
+
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     from gpjax.base.param import param_field
@@ -44,7 +45,7 @@ tfb = tfp.bijectors
 # * Polynomial.
 # * [Graph kernels](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html).
 #
-# While the syntax is consistent, each kernel’s type influences the
+# While the syntax is consistent, each kernel's type influences the
 # characteristics of the sample paths drawn. We visualise this below with 10
 # function draws per kernel.
 
@@ -188,12 +189,14 @@ def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
 
 
-bij = tfb.Chain([tfb.Softplus(), tfb.Shift(np.array(4.).astype(np.float64))])
+bij = tfb.Chain([tfb.Softplus(), tfb.Shift(np.array(4.0).astype(np.float64))])
+
 
 @dataclass
 class Polar(gpx.kernels.AbstractKernel):
     period: float = static_field(2 * jnp.pi)
     tau: float = param_field(jnp.array([4.0]), bijector=bij)
+
     def __post_init__(self):
         self.c = self.period / 2.0
 

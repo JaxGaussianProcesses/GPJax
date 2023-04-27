@@ -14,13 +14,20 @@
 # ==============================================================================
 
 from beartype.typing import Union
-from jaxtyping import Bool, UInt32, Int, Float
-from numpy import ndarray as NumpyArray
-from jaxtyping import Array as JAXArray
 from jax.random import KeyArray as JAXKeyArray
+from jaxtyping import (
+    Array as JAXArray,
+    Bool,
+    Float,
+    Int,
+    UInt32,
+)
+from numpy import ndarray as NumpyArray
 
 OldKeyArray = UInt32[JAXArray, "2"]
-KeyArray = Union[OldKeyArray, JAXKeyArray]  # for compatibility regardless of enable_custom_prng setting
+KeyArray = Union[
+    OldKeyArray, JAXKeyArray
+]  # for compatibility regardless of enable_custom_prng setting
 
 Array = Union[JAXArray, NumpyArray]
 

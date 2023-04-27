@@ -26,7 +26,7 @@ except ImportError:
 
 def read(*names, **kwargs):
     """Function to decode a read files. Credit GPyTorch."""
-    with io.open(
+    with open(
         os.path.join(os.path.dirname(__file__), "..", *names),
         encoding=kwargs.get("encoding", "utf8"),
     ) as fp:
@@ -61,7 +61,7 @@ author = "Thomas Pinder"
 
 # The full version, including alpha/beta/rc tags
 import sys
-from os.path import join, pardir, dirname
+from os.path import dirname, join, pardir
 
 sys.path.insert(0, join(dirname(__file__), pardir))
 
@@ -140,7 +140,7 @@ mathjax3_config = {
 }
 
 
-with open("latex_symbols.tex", "r") as f:
+with open("latex_symbols.tex") as f:
     for line in f:
         macros = re.findall(r"\\newcommand{\\(.*?)}(\[(\d)\])?{(.+)}", line)
         for macro in macros:

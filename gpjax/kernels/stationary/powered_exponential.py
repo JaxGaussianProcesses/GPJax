@@ -14,18 +14,20 @@
 # ==============================================================================
 
 from dataclasses import dataclass
-from beartype.typing import Union
 
+from beartype.typing import Union
 import jax.numpy as jnp
+from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
-from gpjax.typing import Array
-from jaxtyping import Float
-from gpjax.typing import ScalarFloat
 
-from ...base import param_field
-from ..base import AbstractKernel
-from .utils import euclidean_distance
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.utils import euclidean_distance
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 @dataclass
@@ -53,7 +55,8 @@ class PoweredExponential(AbstractKernel):
             x (Float[Array, "D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "D"]): The right hand argument of the kernel function's call
 
-        Returns:
+        Returns
+        -------
             ScalarFloat: The value of :math:`k(x, y)`
         """
         x = self.slice_input(x) / self.lengthscale

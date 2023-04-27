@@ -22,6 +22,7 @@ from jax import jit
 from jax.config import config
 
 from jaxtyping import install_import_hook
+
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     import gpjax.kernels as jk

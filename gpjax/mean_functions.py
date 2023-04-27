@@ -17,14 +17,24 @@
 import abc
 import dataclasses
 from functools import partial
-from beartype.typing import Callable, List, Union
 
+from beartype.typing import (
+    Callable,
+    List,
+    Union,
+)
 import jax.numpy as jnp
-from gpjax.typing import Array
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 from simple_pytree import static_field
 
-from .base import Module, param_field
+from gpjax.base import (
+    Module,
+    param_field,
+)
+from gpjax.typing import Array
 
 
 @dataclasses.dataclass
@@ -38,7 +48,8 @@ class AbstractMeanFunction(Module):
         Args:
             x (Float[Array, "D"]): The point at which to evaluate the mean function.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "1]: The evaluated mean function.
         """
         raise NotImplementedError
@@ -51,37 +62,45 @@ class AbstractMeanFunction(Module):
         Args:
             other (AbstractMeanFunction): The other mean function to add.
 
-        Returns:
+        Returns
+        -------
             AbstractMeanFunction: The sum of the two mean functions.
         """
-
         if isinstance(other, AbstractMeanFunction):
             return SumMeanFunction([self, other])
 
         return SumMeanFunction([self, Constant(other)])
 
     def __radd__(
-        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]  # TODO should this be ScalarFloat? or Num?
+        self,
+        other: Union[
+            "AbstractMeanFunction", Float[Array, "1"]
+        ],  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
         """Add two mean functions.
 
         Args:
             other (AbstractMeanFunction): The other mean function to add.
 
-        Returns:
+        Returns
+        -------
             AbstractMeanFunction: The sum of the two mean functions.
         """
         return self.__add__(other)
 
     def __mul__(
-        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]  # TODO should this be ScalarFloat? or Num?
+        self,
+        other: Union[
+            "AbstractMeanFunction", Float[Array, "1"]
+        ],  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
         """Multiply two mean functions.
 
         Args:
             other (AbstractMeanFunction): The other mean function to multiply.
 
-        Returns:
+        Returns
+        -------
             AbstractMeanFunction: The product of the two mean functions.
         """
         if isinstance(other, AbstractMeanFunction):
@@ -90,14 +109,18 @@ class AbstractMeanFunction(Module):
         return ProductMeanFunction([self, Constant(other)])
 
     def __rmul__(
-        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]  # TODO should this be ScalarFloat? or Num?
+        self,
+        other: Union[
+            "AbstractMeanFunction", Float[Array, "1"]
+        ],  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
         """Multiply two mean functions.
 
         Args:
             other (AbstractMeanFunction): The other mean function to multiply.
 
-        Returns:
+        Returns
+        -------
             AbstractMeanFunction: The product of the two mean functions.
         """
         return self.__mul__(other)
@@ -119,7 +142,8 @@ class Constant(AbstractMeanFunction):
         Args:
             x (Float[Array, "D"]): The point at which to evaluate the mean function.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "1"]: The evaluated mean function.
         """
         return jnp.ones((x.shape[0], 1)) * self.constant
@@ -163,7 +187,8 @@ class CombinationMeanFunction(AbstractMeanFunction):
         Args:
             x (Float[Array, "D"]): The point at which to evaluate the mean function.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "Q"]: The evaluated mean function.
         """
         return self.operator(jnp.stack([m(x) for m in self.means]))

@@ -13,9 +13,16 @@
 # limitations under the License.
 # ==============================================================================
 
-from .module import (Module, load_tree, meta, meta_flatten, meta_leaves,
-                     meta_map, save_tree)
-from .param import param_field
+from gpjax.base.module import (
+    Module,
+    load_tree,
+    meta,
+    meta_flatten,
+    meta_leaves,
+    meta_map,
+    save_tree,
+)
+from gpjax.base.param import param_field
 
 __all__ = [
     "Module",

@@ -1,12 +1,23 @@
 import jax.numpy as jnp
 import pytest
 
-from gpjax.kernels.computations import (ConstantDiagonalKernelComputation,
-                                        DiagonalKernelComputation)
-from gpjax.kernels.nonstationary import Linear, Polynomial
-from gpjax.kernels.stationary import (RBF, Matern12, Matern32, Matern52,
-                                      Periodic, PoweredExponential,
-                                      RationalQuadratic)
+from gpjax.kernels.computations import (
+    ConstantDiagonalKernelComputation,
+    DiagonalKernelComputation,
+)
+from gpjax.kernels.nonstationary import (
+    Linear,
+    Polynomial,
+)
+from gpjax.kernels.stationary import (
+    RBF,
+    Matern12,
+    Matern32,
+    Matern52,
+    Periodic,
+    PoweredExponential,
+    RationalQuadratic,
+)
 
 
 @pytest.mark.parametrize(

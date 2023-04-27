@@ -16,13 +16,15 @@
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-import tensorflow_probability.substrates.jax.bijectors as tfb
-from gpjax.typing import Array
 from jaxtyping import Float
-from gpjax.typing import ScalarFloat
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from ...base import param_field
-from ..base import AbstractKernel
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 @dataclass
@@ -37,7 +39,7 @@ class Linear(AbstractKernel):
         x: Float[Array, "D"],
         y: Float[Array, "D"],
     ) -> ScalarFloat:
-        """Evaluate the linear kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\\sigma`
+        """Evaluate the linear kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\\sigma`.
 
         .. math::
             k(x, y) = \\sigma^2 x^{T}y
@@ -46,7 +48,8 @@ class Linear(AbstractKernel):
             x (Float[Array, "D"]): The left hand input of the kernel function.
             y (Float[Array, "D"]): The right hand input of the kernel function.
 
-        Returns:
+        Returns
+        -------
             ScalarFloat: The evaluated kernel function :math:`k(x, y)` at the supplied inputs.
         """
         x = self.slice_input(x)

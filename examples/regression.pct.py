@@ -14,6 +14,7 @@ from jax import jit
 from jax.config import config
 
 from jaxtyping import install_import_hook
+
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
@@ -174,7 +175,7 @@ opt_posterior, history = gpx.fit(
     train_data=D,
     optim=ox.adam(learning_rate=0.01),
     num_iters=500,
-    safe=True
+    safe=True,
 )
 
 # %% [markdown]

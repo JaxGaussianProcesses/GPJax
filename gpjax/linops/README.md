@@ -21,10 +21,10 @@ Doing so is costly in large problems. Storing the matrix gives rise to memory co
 
 But hold on a second. Notice:
 
-- We only have to store the diagonal entries to determine the matrix $A$. Doing so, would reduce memory costs from $O(n^2)$ to $O(n)$. 
-- To invert $A$, we only need to take the reciprocal of the diagonal, reducing inversion costs from $O(n^3)$, to $O(n)$. 
+- We only have to store the diagonal entries to determine the matrix $A$. Doing so, would reduce memory costs from $O(n^2)$ to $O(n)$.
+- To invert $A$, we only need to take the reciprocal of the diagonal, reducing inversion costs from $O(n^3)$, to $O(n)$.
 
-`JaxLinOp` is designed to exploit stucture of this kind. 
+`JaxLinOp` is designed to exploit stucture of this kind.
 ```python
 from gpjax import linops
 
@@ -43,11 +43,11 @@ The flexible design of `linops` will allow users to impliment their own custom l
 from gpjax.linops import LinearOperator
 
 class MyLinearOperator(LinearOperator):
-  
+
   def __init__(self, ...)
     ...
 
-# There will be a minimal number methods that users need to impliment for their custom operator. 
-# For optimal efficiency, we'll make it easy for the user to add optional methods to their operator, 
+# There will be a minimal number methods that users need to impliment for their custom operator.
+# For optimal efficiency, we'll make it easy for the user to add optional methods to their operator,
 # if they give better performance than the defaults.
 ```

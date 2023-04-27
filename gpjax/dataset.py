@@ -14,18 +14,27 @@
 # ==============================================================================
 
 from dataclasses import dataclass
-from beartype.typing import Optional, Union
 
+from beartype.typing import (
+    Optional,
+    Union,
+)
 import jax.numpy as jnp
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 from simple_pytree import Pytree
+
 from gpjax.typing import Array
+
 
 @dataclass
 class Dataset(Pytree):
     """Base class for datasets.
 
-    Attributes:
+    Attributes
+    ----------
         X (Optional[Float[Array, "N D"]]): Input data.
         y (Optional[Float[Array, "N Q"]]): Output data.
     """
@@ -55,7 +64,6 @@ class Dataset(Pytree):
 
     def __add__(self, other: "Dataset") -> "Dataset":
         """Combine two datasets. Right hand dataset is stacked beneath the left."""
-
         X = None
         y = None
 
@@ -83,14 +91,15 @@ class Dataset(Pytree):
         return self.y.shape[1]
 
 
-def _check_shape(X: Optional[Num[Array, "..."]], y: Optional[Num[Array, "..."]]) -> None:
+def _check_shape(
+    X: Optional[Num[Array, "..."]], y: Optional[Num[Array, "..."]]
+) -> None:
     """Checks that the shapes of X and y are compatible."""
-    if X is not None and y is not None:
-        if X.shape[0] != y.shape[0]:
-            raise ValueError(
-                "Inputs, X, and outputs, y, must have the same number of rows."
-                f" Got X.shape={X.shape} and y.shape={y.shape}."
-            )
+    if X is not None and y is not None and X.shape[0] != y.shape[0]:
+        raise ValueError(
+            "Inputs, X, and outputs, y, must have the same number of rows."
+            f" Got X.shape={X.shape} and y.shape={y.shape}."
+        )
 
     if X is not None and X.ndim != 2:
         raise ValueError(

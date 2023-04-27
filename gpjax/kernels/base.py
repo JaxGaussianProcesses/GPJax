@@ -15,30 +15,50 @@
 
 
 import abc
-from beartype.typing import Callable, Dict, List, Optional, Sequence, Type, Union
 from dataclasses import dataclass
 from functools import partial
 
+from beartype.typing import (
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Type,
+    Union,
+)
+import jax
 import jax.numpy as jnp
 import jax.random
-import jax
-from gpjax.typing import KeyArray
-from gpjax.typing import ScalarFloat
-from gpjax.typing import Array
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.typing import ScalarFloat
-from ..base import Module, param_field
-from .computations import AbstractKernelComputation, DenseKernelComputation
+from gpjax.base import (
+    Module,
+    param_field,
+)
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
+from gpjax.typing import (
+    Array,
+    KeyArray,
+    ScalarFloat,
+)
 
 
 @dataclass
 class AbstractKernel(Module):
     """Base kernel class."""
 
-    compute_engine: Type[AbstractKernelComputation] = static_field(DenseKernelComputation)
+    compute_engine: Type[AbstractKernelComputation] = static_field(
+        DenseKernelComputation
+    )
     active_dims: Optional[List[int]] = static_field(None)
     name: str = static_field("AbstractKernel")
 
@@ -57,7 +77,9 @@ class AbstractKernel(Module):
 
         Args:
             x (Float[Array, "... D"]): The matrix or vector that is to be sliced.
-        Returns:
+
+        Returns
+        -------
             Float[Array, "... Q"]: A sliced form of the input matrix.
         """
         return x[..., self.active_dims] if self.active_dims is not None else x
@@ -74,48 +96,45 @@ class AbstractKernel(Module):
             x (Float[Array, "D"]): The left hand input of the kernel function.
             y (Float[Array, "D"]): The right hand input of the kernel function.
 
-        Returns:
+        Returns
+        -------
             ScalarFloat: The evaluated kernel function at the supplied inputs.
         """
         raise NotImplementedError
 
-    def __add__(
-        self, other: Union["AbstractKernel", ScalarFloat]
-    ) -> "AbstractKernel":
+    def __add__(self, other: Union["AbstractKernel", ScalarFloat]) -> "AbstractKernel":
         """Add two kernels together.
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
 
-        Returns:
+        Returns
+        -------
             AbstractKernel: A new kernel that is the sum of the two kernels.
         """
-
         if isinstance(other, AbstractKernel):
             return SumKernel(kernels=[self, other])
         else:
             return SumKernel(kernels=[self, Constant(other)])
 
-    def __radd__(
-        self, other: Union["AbstractKernel", ScalarFloat]
-    ) -> "AbstractKernel":
+    def __radd__(self, other: Union["AbstractKernel", ScalarFloat]) -> "AbstractKernel":
         """Add two kernels together.
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
 
-        Returns:
+        Returns
+        -------
             AbstractKernel: A new kernel that is the sum of the two kernels.
         """
         return self.__add__(other)
 
-    def __mul__(
-        self, other: Union["AbstractKernel", ScalarFloat]
-    ) -> "AbstractKernel":
+    def __mul__(self, other: Union["AbstractKernel", ScalarFloat]) -> "AbstractKernel":
         """Multiply two kernels together.
 
         Args:
             other (AbstractKernel): The kernel to be multiplied with the current kernel.
 
-        Returns:
+        Returns
+        -------
             AbstractKernel: A new kernel that is the product of the two kernels.
         """
         if isinstance(other, AbstractKernel):
@@ -144,7 +163,8 @@ class Constant(AbstractKernel):
             x (Float[Array, "D"]): The left hand input of the kernel function.
             y (Float[Array, "D"]): The right hand input of the kernel function.
 
-        Returns:
+        Returns
+        -------
             ScalarFloat: The evaluated kernel function at the supplied inputs.
         """
         return self.constant.squeeze()
@@ -183,7 +203,8 @@ class CombinationKernel(AbstractKernel):
             x (Float[Array, "D"]): The left hand input of the kernel function.
             y (Float[Array, "D"]): The right hand input of the kernel function.
 
-        Returns:
+        Returns
+        -------
             ScalarFloat: The evaluated kernel function at the supplied inputs.
         """
         return self.operator(jnp.stack([k(x, y) for k in self.kernels]))

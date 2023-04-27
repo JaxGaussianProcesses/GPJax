@@ -105,6 +105,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from utils import confidence_ellipse
+
 tfd = tfp.distributions
 
 ud1 = tfd.Normal(0.0, 1.0)
@@ -118,7 +119,7 @@ for d in [ud1, ud2, ud3]:
     ax.plot(
         xs,
         jnp.exp(d.log_prob(xs)),
-        label=f"$\mathcal{{N}}({{{float(d.mean())}}},\  {{{float(d.stddev())}}}^2)$",
+        label=f"$\\mathcal{{N}}({{{float(d.mean())}}},\\  {{{float(d.stddev())}}}^2)$",
     )
     ax.fill_between(xs, jnp.zeros_like(xs), jnp.exp(d.log_prob(xs)), alpha=0.2)
 ax.legend(loc="best")

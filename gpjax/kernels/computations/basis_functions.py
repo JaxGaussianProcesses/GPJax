@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-from gpjax.typing import Array
 from jaxtyping import Float
 
+from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.linops import DenseLinearOperator
-
-from .base import AbstractKernelComputation
+from gpjax.typing import Array
 
 
 @dataclass
@@ -23,7 +22,8 @@ class BasisFunctionComputation(AbstractKernelComputation):
             x: A N x D array of inputs.
             y: A M x D array of inputs.
 
-        Returns:
+        Returns
+        -------
             _type_: A N x M array of cross-covariances.
         """
         z1 = self.compute_features(x)
@@ -37,7 +37,8 @@ class BasisFunctionComputation(AbstractKernelComputation):
         Args:
             inputs: A N x D array of inputs.
 
-        Returns:
+        Returns
+        -------
             DenseLinearOperator: A dense linear operator representing the N x N Gram matrix.
         """
         z1 = self.compute_features(inputs)
@@ -52,7 +53,8 @@ class BasisFunctionComputation(AbstractKernelComputation):
             x: A N x D array of inputs.
             frequencies: A M x D array of frequencies.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N L"]: A N x L array of features where L = 2M.
         """
         frequencies = self.kernel.frequencies

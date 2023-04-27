@@ -13,11 +13,11 @@
 # # limitations under the License.
 # # ==============================================================================
 
-import pytest
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 import networkx as nx
-from jax.config import config
+import pytest
 
 from gpjax.kernels.non_euclidean import GraphKernel
 from gpjax.linops import identity

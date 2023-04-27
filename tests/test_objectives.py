@@ -4,11 +4,20 @@ import jax.random as jr
 import pytest
 
 import gpjax as gpx
-from gpjax import Bernoulli, Gaussian, Prior
+from gpjax import (
+    Bernoulli,
+    Gaussian,
+    Prior,
+)
 from gpjax.dataset import Dataset
-from gpjax.objectives import (ELBO, AbstractObjective, CollapsedELBO,
-                              ConjugateMLL, LogPosteriorDensity,
-                              NonConjugateMLL)
+from gpjax.objectives import (
+    ELBO,
+    AbstractObjective,
+    CollapsedELBO,
+    ConjugateMLL,
+    LogPosteriorDensity,
+    NonConjugateMLL,
+)
 
 
 def test_abstract_objective():

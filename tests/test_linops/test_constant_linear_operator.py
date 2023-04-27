@@ -14,20 +14,21 @@
 # ==============================================================================
 
 
-import jax.numpy as jnp
-import jax.random as jr
-import pytest
-import jax.tree_util as jtu
 from dataclasses import is_dataclass
 
 from jax.config import config
+import jax.numpy as jnp
+import jax.random as jr
+import jax.tree_util as jtu
+import pytest
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 _PRNGKey = jr.PRNGKey(42)
 
-from gpjax.linops.constant_diagonal_linear_operator import \
-    ConstantDiagonalLinearOperator
+from gpjax.linops.constant_diagonal_linear_operator import (
+    ConstantDiagonalLinearOperator,
+)
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
 from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 
@@ -53,7 +54,7 @@ def test_init(n: int) -> None:
     assert constant_diag.size == n
 
     # Check pytree.
-    assert jtu.tree_leaves(constant_diag) == [value] # shape, dtype are static!
+    assert jtu.tree_leaves(constant_diag) == [value]  # shape, dtype are static!
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])

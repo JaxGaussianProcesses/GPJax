@@ -14,10 +14,13 @@
 # ==============================================================================
 
 import jax.numpy as jnp
-import tensorflow_probability.substrates.jax as tfp
-from gpjax.typing import Array
 from jaxtyping import Float
-from gpjax.typing import ScalarFloat
+import tensorflow_probability.substrates.jax as tfp
+
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 tfd = tfp.distributions
 
@@ -28,7 +31,8 @@ def build_student_t_distribution(nu: int) -> tfd.Distribution:
     Args:
         nu (int): The smoothness parameter of the Matérn kernel.
 
-    Returns:
+    Returns
+    -------
         tfp.Distribution: A Student's t distribution with the same smoothness parameter.
     """
     dist = tfd.StudentT(df=nu, loc=0.0, scale=1.0)
@@ -42,10 +46,10 @@ def squared_distance(x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
         x (Float[Array, "D"]): First input.
         y (Float[Array, "D"]): Second input.
 
-    Returns:
+    Returns
+    -------
         ScalarFloat: The squared distance between the inputs.
     """
-
     return jnp.sum((x - y) ** 2)
 
 
@@ -56,8 +60,8 @@ def euclidean_distance(x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloa
         x (Float[Array, "D"]): First input.
         y (Float[Array, "D"]): Second input.
 
-    Returns:
+    Returns
+    -------
         ScalarFloat: The euclidean distance between the inputs.
     """
-
     return jnp.sqrt(jnp.maximum(squared_distance(x, y), 1e-36))

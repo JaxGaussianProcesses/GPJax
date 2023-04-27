@@ -59,7 +59,7 @@ process modelling.
 > - [**Deep Kernel Regression**](https://gpjax.readthedocs.io/en/latest/examples/haiku.html)
 
 ## Guides for customisation
-> 
+>
 > - [**Custom kernels**](https://gpjax.readthedocs.io/en/latest/examples/kernels.html#Custom-Kernel)
 > - [**UCI regression**](https://gpjax.readthedocs.io/en/latest/examples/yacht.html)
 
@@ -161,7 +161,7 @@ pip install gpjax
 ## Development version
 > **Warning**
 >
-> This version is possibly unstable and may contain bugs. 
+> This version is possibly unstable and may contain bugs.
 
 Clone a copy of the repository to your local machine and run the setup
 configuration in development mode.

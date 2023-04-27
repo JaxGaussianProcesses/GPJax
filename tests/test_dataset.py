@@ -17,6 +17,7 @@ from dataclasses import is_dataclass
 
 try:
     import beartype
+
     ValidationErrors = (ValueError, beartype.roar.BeartypeCallHintParamViolation)
 except ImportError:
     ValidationErrors = ValueError
@@ -104,7 +105,7 @@ def test_dataset_add(n1: int, n2: int, in_dim: int, out_dim: int) -> None:
     (jtu.tree_leaves(D)[1] == y).all()
 
 
-@pytest.mark.parametrize("nx, ny", [(1, 2), (2, 1), (10, 5), (5, 10)])
+@pytest.mark.parametrize(("nx", "ny"), [(1, 2), (2, 1), (10, 5), (5, 10)])
 @pytest.mark.parametrize("out_dim", [1, 2, 10])
 @pytest.mark.parametrize("in_dim", [1, 2, 10])
 def test_dataset_incorrect_lengths(nx: int, ny: int, out_dim: int, in_dim: int) -> None:
