@@ -14,24 +14,15 @@
 # %% [markdown]
 # # 🌳 GPJax PyTrees
 #
-# `GPJax` **represents all mathematical objects as PyTrees.** As a result
+# `GPJax` **represents all mathematical objects as PyTrees**, giving
 #
-# - We have a simple API with a **TensorFlow / PyTorch feel** …
+# - A simple API with a **TensorFlow / PyTorch feel** …
 # - … that is **fully compatible** with JAX's functional paradigm.
 #
-# The core idea of our abstraction builds on the _Equinox_ library, where we
-# seek to provide the Bayesian/GP analogue to their neural network focused
-# abstractions. However, we extend their abstraction further to permit users to
-# write standard Python classes, and provide to readily define (and alter)
-# domains and training statuses of parameter for optimisation, contained as a
-# single model object, that is fully compatible with JAX autogradients out of
-# the box - no filtering required, and provide functionality for applying
-# dataclass metadata to Pytree’s.
-#
+# Our abstraction is based on the Equinox library and aims to offer a Bayesian/GP equivalent to their neural network abstractions. However, we take it a step further by enabling users to create standard Python classes and easily define and modify parameter domains and training statuses for optimisation within a single model object. This object is fully compatible with JAX autogradients without the need for filtering.
 
 # %% [markdown]
-# ## The need for custom objects
-#
+# # Gaussian process objects as data:
 # Within this notebook, we'll be using the squared exponential, or RBF, kernel
 # for illustratory purposes. For a pair of vectors $x, y \in \mathbb{R}^d$, its
 # form can be mathematically given by
@@ -39,8 +30,18 @@
 # where $\sigma\in\mathbb{R}_{>0}$ is a variance parameter and
 # $\ell\in\mathbb{R}_{>0}$ a lengthscale parameter. We call the evaluation of
 # $k(x, y)$ the _covariance_.
+
+# %% [markdown]
+# ## Dataclasses
 #
-# Using a `dataclass`, we can represent this object as follows
+# A `dataclass` in Python can simplify the creation of classes for storing data and make the code more readable and maintainable. They offer several benefits over a regular class, including:
+#
+# 1. Conciseness: Dataclasses automatically generate default implementations for several common methods, such as __init__(), __repr__(), and __eq__(), which means less boilerplate code needs to be written.
+#
+# 2. Type hinting: Dataclasses provide native support for type annotations, which can help catch errors at compile-time and improve code readability.
+#
+# For the RBF kernel, we use a `dataclass` to represent this object as follows
+#
 # ```python
 # from jax import Array
 # from dataclasses import dataclass
@@ -75,7 +76,12 @@
 # the lengthscale and variance as _fields_. Further, the `RBF.covariance()` is a
 # _method_.
 #
-# # A primer on PyTree’s:
+# - Tom could you perhaps mention the `field` right here?
+# - Also feel free to define the covariance here -> maybe demonstrate it is not compatible with JAX out of the box, that leads into the next section - motivation for why we need to talk about PyTree's.
+
+
+# %% [markdown]
+# ## A primer on PyTree’s:
 #
 # To efficiently represent data JAX provides a `*PyTree*` abstraction. PyTree’s as such, are immutable tree-like structure built out of *‘node’ types* —— container-like Python objects. For instance,
 #
@@ -85,50 +91,177 @@
 #
 # is a PyTree with structure `[*, {"Monte": *, "Carlo": *}]` and leaves `3.14`, `object()`, `False`. As such, most JAX functions operate over pytrees, e.g., `jax.lax.scan`, accepts as input and produces as output a pytrees of JAX arrays.
 #
-# While the default set of ‘node’ types that are regarded internal pytree nodes is limited to objects such as lists, tuples, and dicts, JAX permits custom types to be readily registered through a global registry, with the values of such traversed recursively (i.e., as a tree!). This is the functionality that we exploit, whereby we construct all Gaussian process models via a tree-structure.
+# While the default set of ‘node’ types that are regarded internal pytree nodes is limited to objects such as lists, tuples, and dicts, JAX permits custom types to be readily registered through a global registry, with the values of such traversed recursively (i.e., as a tree!). This is the functionality that we exploit, whereby we construct all Gaussian process models via a tree-structure through our `Module` object
 #
-# - RBF
-# - (1) In GPJax, RBF we inherit from abstract kernel.
-# - (2) We don’t want to do this. We will do it from Module.
-# - (3) Do it like the old code, as a property → kernel.gram() → separate function. covariance.
-#
-# # Module
+# ## Module
 #
 # Our design, first and foremost, minimises additional abstractions on top of standard JAX: everything is just PyTrees and transformations on PyTrees, and secondly, provides full compatibility with the main JAX library itself, enhancing integrability with the broader ecosystem of third-party JAX libraries. To achieve this, our core idea is represent all model objects via an immutable tree-structure.
-#
-# Lets do an **RBF** kernel.
-#
-# ### Objects as immutable class instances:
-#
-# Equinox represents parameterised functions as class instances. These instances are immutable, for consistency with JAX’s functional programming principles. (And parameters updates occur out-of- place.)
-#
-# *Lets do an **RBF** kernel.*
-#
-# ```python
-#
-# ```
-#
-# ### Parameters and their metadata:
-#
-# We extend on Equinox’s functionality by consider the definition of parameters.
+
+
+# %% [markdown]
+# ### Defining a Module
 #
 # There are two main considerations for model parameters, their:
 #
 # - Trainability status.
 # - Domain.
 #
-# The former
-#
-#
-#
-# Equinox represents parameterised functions as class instances. These instances are immutable, for consistency with JAX’s functional programming principles. (And parameters updates occur out-of- place.)
-#
 # Why normalising flows don’t break the convention.
 #
-# **Our functional view:**
 #
-# - *We view all models as immutable trees.*
-# - *What is computation if you have it on a model?*
+# ```python
+# @dataclass
+# class RBF(Module):
+# 	lengthscale: float
+# 	variance: float
+#
+# 	def covariance(self, x: Array, y: Array) -> Array:
+# 		pass
+# ```
+#
+# ```python
+# class RBF(Module):
+# 	def __init__(self, lengthscale: float, variance: float) -> None:
+# 		self.lengthscale = lengthscale
+# 		self.variance = variance
+#
+# 	def covariance(self, x: Array, y: Array) -> Array:
+# 		pass
+# ```
+#
+# %% [markdown]
+# ### Replacing values
+# For consistency with JAX’s functional programming principles, `Module` instances are immutable. And parameters updates occur out-of- place via `replace`
+#
+# ```python
+# kernel = RBF()
+# kernel = kernel.replace(lengthscale=3.14) # Update e.g., the lengthscale.
+# print(kernel)
+# ```
 
 # %% [markdown]
+# ## Transformations 🤖
 #
+# ### Applying transformations
+# Use `constrain` / `unconstrain` to return a `Mytree` with each parameter's bijector `forward` / `inverse` operation applied!
+#     
+# ```python
+# kernel.constrain()
+# kernel.unconstrain()
+# ```
+#
+# ### Replacing transformations
+# Default transformations can be replaced on an instance via the `replace_bijector` method.
+# ```python
+# new = model.replace_bijector(bias=Identity)
+# ```
+# ```python
+# new.constrain()
+# new.unconstrain()
+# ```
+
+# %% [markdown]
+# ## Trainability 🚂
+#
+# ### Applying trainability
+#
+# Applying `stop_gradient` **within** the loss function, prevents the flow of gradients during forward or reverse-mode automatic differentiation.
+# ```python
+# import jax
+#
+# # Create simulated data.
+# n = 100
+# key = jax.random.PRNGKey(123)
+# x = jax.random.uniform(key, (n, ))
+# y = 3.0 * x + 2.0 + 1e-3 * jax.random.normal(key, (n, ))
+#
+#
+# # Define a mean-squared-error loss.
+# def loss(model: SimpleModel) -> float:
+#    model = model.stop_gradient() # 🛑 Stop gradients!
+#    return jax.numpy.sum((y - model(x))**2)
+#    
+# jax.grad(loss)(model)
+# ```
+# ```
+# SimpleModel(weight=0.0, bias=-188.37418)
+# ```
+# As `weight` trainability was set to `False`, it's gradient is zero as expected!
+#     
+# ### Replacing trainability
+# Default trainability status can be replaced via the `replace_trainable` method.
+# ```python
+# new = model.replace_trainable(weight=True)
+# jax.grad(loss)(model)
+# ```
+# ```
+# SimpleModel(weight=-121.42676, bias=-188.37418)
+# ```
+# And we see that `weight`'s gradient is no longer zero.
+
+# %% [markdown]
+# ## Metadata
+#
+# ### Viewing `field` metadata
+# View field metadata pytree via `meta`.
+# ```python
+# from mytree import meta
+# meta(model)
+# ```
+# ```
+# SimpleModel(weight=({'bijector': Bijector(forward=<function <lambda> at 0x17a024e50>, inverse=<function <lambda> at 0x17a024430>), 1.0), 'trainable': False, 'pytree_node': True}, bias=({}, 2.0))
+# ```
+#
+# Or the metadata pytree leaves via `meta_leaves`.
+# ```python
+# from mytree import meta_leaves
+# meta_leaves(model)
+# ```
+# ```
+# [({}, 2.0),
+#  ({'bijector': Bijector(forward=<function <lambda> at 0x17a024e50>, inverse=<function <lambda> at 0x17a024430>),
+#   'trainable': False,
+#   'pytree_node': True}, 1.0)]
+# ```
+# Note this shows any metadata defined via a `dataclasses.field` for the pytree leaves. So feel free to define your own.
+#
+# ### Applying `field` metadata
+# Leaf metadata can be applied via the `meta_map` function.
+# ```python
+# from mytree import meta_map
+#
+# # Function passed to `meta_map` has its argument as a `(meta, leaf)` tuple!
+# def if_trainable_then_10(meta_leaf):
+#     meta, leaf = meta_leaf
+#     if meta.get("trainable", True):
+#         return 10.0
+#     else:
+#         return leaf
+#
+# meta_map(if_trainable_then_10, model)
+# ```
+# ```
+# SimpleModel(weight=1.0, bias=10.0)
+# ```
+# It is possible to define your own custom metadata and therefore your own metadata transformations in this vein.
+
+# %% [markdown]
+# ## Static fields
+# Since `Mytree` inherits from [simple-pytree](https://github.com/cgarciae/simple-pytree)'s `Pytree`, fields can be marked as static via simple_pytree's `static_field`.
+#
+# ```python
+# import jax.tree_util as jtu
+# from simple_pytree import static_field
+#
+# class StaticExample(Mytree):
+#     b: float = static_field
+#     
+#     def __init__(self, a=1.0, b=2.0):
+#         self.a=a
+#         self.b=b
+#     
+# jtu.tree_leaves(StaticExample())
+# ```
+# ```
+# [1.0]
+# ```
