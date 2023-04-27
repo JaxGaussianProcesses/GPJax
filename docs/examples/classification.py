@@ -351,7 +351,7 @@ adapt = blackjax.window_adaptation(
 
 # Initialise the chain
 start = time()
-last_state, kernel, _ = adapt.run(key, opt_posterior.unconstrain())
+last_state, kernel, _ = adapt.run(key, posterior.unconstrain())
 print(f"Adaption time taken: {time() - start: .1f} seconds")
 
 
