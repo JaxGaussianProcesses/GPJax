@@ -169,12 +169,12 @@ class Constant(AbstractKernel):
 class CombinationKernel(AbstractKernel):
     """A base class for products or sums of MeanFunctions."""
 
-    kernels: list[AbstractKernel] = None
+    kernels: List[AbstractKernel] = None
     operator: Callable = static_field(None)
 
     def __post_init__(self):
         # Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
-        kernels_list: list[AbstractKernel] = []
+        kernels_list: List[AbstractKernel] = []
 
         for kernel in self.kernels:
             if not isinstance(kernel, AbstractKernel):

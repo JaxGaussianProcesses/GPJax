@@ -54,7 +54,7 @@ Self = TypeVar("Self")
 
 
 class Module(Pytree):
-    _pytree__meta: dict[str, Any] = static_field()
+    _pytree__meta: Dict[str, Any] = static_field()
 
     def __init_subclass__(cls, mutable: bool = False):
         cls._pytree__meta = {}
@@ -211,7 +211,7 @@ class Module(Pytree):
         return meta_map(_get_trainables, self)
 
 
-def _toplevel_meta(pytree: Any) -> list[Optional[dict[str, Any]]]:
+def _toplevel_meta(pytree: Any) -> List[Optional[Dict[str, Any]]]:
     """Unpacks a list of meta corresponding to the top-level nodes of the pytree.
 
     Args:

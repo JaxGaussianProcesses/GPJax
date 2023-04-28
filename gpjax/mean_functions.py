@@ -20,6 +20,7 @@ from functools import partial
 
 from beartype.typing import (
     Callable,
+    List,
     Union,
 )
 import jax.numpy as jnp
@@ -152,19 +153,19 @@ class Constant(AbstractMeanFunction):
 class CombinationMeanFunction(AbstractMeanFunction):
     """A base class for products or sums of AbstractMeanFunctions."""
 
-    means: list[AbstractMeanFunction]
+    means: List[AbstractMeanFunction]
     operator: Callable = static_field()
 
     def __init__(
         self,
-        means: list[AbstractMeanFunction],
+        means: List[AbstractMeanFunction],
         operator: Callable,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
 
         # Add means to a list, flattening out instances of this class therein, as in GPFlow kernels.
-        items_list: list[AbstractMeanFunction] = []
+        items_list: List[AbstractMeanFunction] = []
 
         for item in means:
             if not isinstance(item, AbstractMeanFunction):
