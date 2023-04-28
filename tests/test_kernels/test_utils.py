@@ -13,13 +13,19 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import List
+from typing import (
+    TYPE_CHECKING,
+    List,
+)
 
 import jax.numpy as jnp
-from jaxtyping import (
-    Array,
-    Float,
-)
+
+if TYPE_CHECKING:
+    from jaxtyping import (
+        Array,
+        Float,
+    )
+
 import pytest
 
 from gpjax.kernels.stationary.utils import euclidean_distance
