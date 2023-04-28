@@ -69,7 +69,7 @@ class DiagonalLinearOperator(LinearOperator):
 
         Returns
         -------
-            Float[Array, "N"]: Diagonal of the covariance operator.
+            Float[Array, " N"]: Diagonal of the covariance operator.
         """
         return self.diag
 

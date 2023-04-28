@@ -36,8 +36,8 @@ class Linear(AbstractKernel):
 
     def __call__(
         self,
-        x: Float[Array, "D"],
-        y: Float[Array, "D"],
+        x: Float[Array, " D"],
+        y: Float[Array, " D"],
     ) -> ScalarFloat:
         r"""Compute the linear kernel between a pair of arrays.
 

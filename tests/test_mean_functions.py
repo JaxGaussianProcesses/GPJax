@@ -18,7 +18,7 @@ def test_abstract() -> None:
 
     # Check a "dummy" mean function with defined abstract method, `__call__`, can be instantiated.
     class DummyMeanFunction(AbstractMeanFunction):
-        def __call__(self, x: Float[Array, "D"]) -> Float[Array, "1"]:
+        def __call__(self, x: Float[Array, " D"]) -> Float[Array, "1"]:
             return jnp.array([1.0])
 
     mf = DummyMeanFunction()

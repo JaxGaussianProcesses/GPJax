@@ -61,7 +61,7 @@ class GraphKernel(AbstractKernel):
     lengthscale: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     smoothness: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    eigenvalues: Float[Array, "N"] = static_field(None)
+    eigenvalues: Float[Array, " N"] = static_field(None)
     eigenvectors: Float[Array, "N N"] = static_field(None)
     num_vertex: ScalarInt = static_field(None)
     compute_engine: AbstractKernelComputation = static_field(EigenKernelComputation)

@@ -188,7 +188,7 @@ class CombinationMeanFunction(AbstractMeanFunction):
 
         Returns
         -------
-            Float[Array, "Q"]: The evaluated mean function.
+            Float[Array, " Q"]: The evaluated mean function.
         """
         return self.operator(jnp.stack([m(x) for m in self.means]))
 

@@ -109,7 +109,7 @@ class DeepKernelFunction(AbstractKernel):
             raise ValueError("network must be specified")
         self.nn_params = flax.core.unfreeze(self.network.init(key, self.dummy_x))
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> Float[Array, "1"]:
         state = self.network.init(self.key, x)
         xt = self.network.apply(state, x)
         yt = self.network.apply(state, y)

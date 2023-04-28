@@ -35,14 +35,14 @@ class Periodic(AbstractKernel):
     Key reference is MacKay 1998 - "Introduction to Gaussian processes".
     """
 
-    lengthscale: Union[ScalarFloat, Float[Array, "D"]] = param_field(
+    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
     )
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     period: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Periodic"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the Periodic kernel between a pair of arrays.
 
         TODO: update docstring

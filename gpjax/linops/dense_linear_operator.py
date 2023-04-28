@@ -127,7 +127,7 @@ class DenseLinearOperator(LinearOperator):
 
         Returns
         -------
-            Float[Array, "N"]: The diagonal of the covariance operator.
+            Float[Array, " N"]: The diagonal of the covariance operator.
         """
         return jnp.diag(self.matrix)
 

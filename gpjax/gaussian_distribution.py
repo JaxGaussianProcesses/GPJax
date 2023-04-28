@@ -149,7 +149,7 @@ class GaussianDistribution(tfd.Distribution):
             self.event_shape[0] * (1.0 + jnp.log(2.0 * jnp.pi)) + self.scale.log_det()
         )
 
-    def log_prob(self, y: Float[Array, "N"]) -> ScalarFloat:
+    def log_prob(self, y: Float[Array, " N"]) -> ScalarFloat:
         """Calculates the log pdf of the multivariate Gaussian.
 
         Args:

@@ -82,8 +82,8 @@ class AbstractKernel(Module):
     @abc.abstractmethod
     def __call__(
         self,
-        x: Float[Array, "D"],
-        y: Float[Array, "D"],
+        x: Float[Array, " D"],
+        y: Float[Array, " D"],
     ) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs.
 
@@ -151,7 +151,7 @@ class Constant(AbstractKernel):
 
     constant: ScalarFloat = param_field(jnp.array(0.0))
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs.
 
         Args:
@@ -189,8 +189,8 @@ class CombinationKernel(AbstractKernel):
 
     def __call__(
         self,
-        x: Float[Array, "D"],
-        y: Float[Array, "D"],
+        x: Float[Array, " D"],
+        y: Float[Array, " D"],
     ) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs.
 
