@@ -1698,7 +1698,8 @@ used within variational inference.</p>
 
   <div class="doc doc-contents ">
   
-      <p>For a given set of parameters, compute the latent function's prediction
+      <p>Evaluate the variational family's density.</p>
+<p>For a given set of parameters, compute the latent function's prediction
 under the variational approximation.</p>
 
   <p><strong>Parameters:</strong></p>
@@ -1777,7 +1778,8 @@ method.</p></td>
           <td>
                 <code><span title="beartype.typing.Any">Any</span></code>
           </td>
-          <td><p>Arguments of the variational family's <code>predict</code></p></td>
+          <td><p>Arguments of the variational family's <code>predict</code>
+method.</p></td>
           <td>
                 <code>()</code>
           </td>
@@ -1787,7 +1789,8 @@ method.</p></td>
           <td>
                 <code><span title="beartype.typing.Any">Any</span></code>
           </td>
-          <td><p>Keyword arguments of the variational family's</p></td>
+          <td><p>Keyword arguments of the variational family's
+<code>predict</code> method.</p></td>
           <td>
                 <code>{}</code>
           </td>
@@ -1935,10 +1938,10 @@ method.</p></td>
   
       <p>The variational Gaussian family of probability distributions.</p>
 <p>The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where
-:math:<code>u = f(z)</code> are the function values at the inducing inputs z
+<span class="arithmatex">\(u = f(z)\)</span> are the function values at the inducing inputs z
 and the distribution over the inducing inputs is
-:math:<code>q(u) = \mathcal{N}(\mu, S)</code>.  We parameterise this over
-:math:<code>\mu</code> and sqrt with S = sqrt sqrtᵀ.</p>
+<span class="arithmatex">\(q(u) = \mathcal{N}(\mu, S)\)</span>.  We parameterise this over
+<span class="arithmatex">\(\mu\)</span> and sqrt with S = sqrt sqrtᵀ.</p>
 
 
 
@@ -2020,7 +2023,8 @@ and the distribution over the inducing inputs is
 
   <div class="doc doc-contents ">
   
-      <p>Compute the KL-divergence between our variational approximation and the
+      <p>Compute the prior KL divergence.</p>
+<p>Compute the KL-divergence between our variational approximation and the
 Gaussian process prior.</p>
 <p>For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)]
 = KL[ N(μ, S) || N(μz, Kzz) ], where u = f(z) and z are the inducing
@@ -2069,7 +2073,8 @@ inputs.</p>
           <td>
                 <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, N D]</code>
           </td>
-          <td><p>The test inputs at which we wish to make a prediction.</p></td>
+          <td><p>The test inputs at which we wish to
+make a prediction.</p></td>
           <td>
               <em>required</em>
           </td>
@@ -2077,7 +2082,8 @@ inputs.</p>
     </tbody>
   </table>
       <h6 id="gpjax.variational_families.VariationalGaussian.predict--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>GaussianDistribution: The predictive distribution of the low-rank GP at the test inputs.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: The predictive distribution of the low-rank GP at
+    the test inputs.
 </code></pre></div>
 
   </div>
@@ -2146,7 +2152,8 @@ over μ and sqrt with S = sqrt sqrtᵀ.</p>
   
       <p>Compute the KL-divergence between our variational approximation and
 the Gaussian process prior.</p>
-<p>For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(0, I)].</p>
+<p>For this variational family, we have
+KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(0, I)].</p>
 <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.prior_kl--returns">Returns</h6>
 <div class="highlight"><pre><span></span><code>ScalarFloat: The KL-divergence between our variational
     approximation and the GP prior.
@@ -2169,7 +2176,8 @@ the Gaussian process prior.</p>
   <div class="doc doc-contents ">
   
       <p>Compute the predictive distribution of the GP at the test inputs t.</p>
-<p>This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as</p>
+<p>This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in
+closed form as</p>
 <div class="highlight"><pre><span></span><code>N[f(t); μt  +  Ktz Lz⁻ᵀ μ,  Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻ᵀ S Lz⁻¹ Kzt].
 </code></pre></div>
 
@@ -2189,7 +2197,8 @@ the Gaussian process prior.</p>
           <td>
                 <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, N D]</code>
           </td>
-          <td><p>The test inputs at which we wish to make a prediction.</p></td>
+          <td><p>The test inputs at which we wish to
+make a prediction.</p></td>
           <td>
               <em>required</em>
           </td>
@@ -2197,7 +2206,8 @@ the Gaussian process prior.</p>
     </tbody>
   </table>
       <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.predict--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>GaussianDistribution: The predictive distribution of the low-rank GP at the test inputs.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: The predictive distribution of the low-rank GP at
+    the test inputs.
 </code></pre></div>
 
   </div>
@@ -2233,10 +2243,12 @@ the Gaussian process prior.</p>
 
   
       <p>The natural variational Gaussian family of probability distributions.</p>
-<p>The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
-and the distribution over the inducing inputs is q(u) = N(μ, S). Expressing the variational distribution, in the form of the
-exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the natural parameterisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2), to perform
-model inference, where T(u) = [u, uuᵀ] are the sufficient statistics.</p>
+<p>The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are
+the function values at the inducing inputs z and the distribution over the
+inducing inputs is q(u) = N(μ, S). Expressing the variational distribution, in
+the form of the exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the
+natural parameterisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2), to perform model inference,
+where T(u) = [u, uuᵀ] are the sufficient statistics.</p>
 
 
 
@@ -2318,11 +2330,14 @@ model inference, where T(u) = [u, uuᵀ] are the sufficient statistics.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Compute the KL-divergence between our current variational approximation and the Gaussian process prior.</p>
-<p>For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],</p>
+      <p>Compute the KL-divergence between our current variational approximation
+and the Gaussian process prior.</p>
+<p>For this variational family, we have
+KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],</p>
 <p>with μ and S computed from the natural parameterisation θ = (S⁻¹μ, -S⁻¹/2).</p>
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.prior_kl--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>ScalarFloat: The KL-divergence between our variational approximation and the GP prior.
+<div class="highlight"><pre><span></span><code>ScalarFloat: The KL-divergence between our variational approximation and
+    the GP prior.
 </code></pre></div>
 
   </div>
@@ -2341,8 +2356,9 @@ model inference, where T(u) = [u, uuᵀ] are the sufficient statistics.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Compute the predictive distribution of the GP at the test inputs t.</p>
-<p>This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as</p>
+      <p>Compute the predictive distribution of the GP at the test inputs <span class="arithmatex">\(t\)</span>.</p>
+<p>This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in
+closed form as</p>
 <div class="highlight"><pre><span></span><code> N[f(t); μt + Ktz Kzz⁻¹ (μ - μz),  Ktt - Ktz Kzz⁻¹ Kzt + Ktz Kzz⁻¹ S Kzz⁻¹ Kzt ],
 </code></pre></div>
 <p>with μ and S computed from the natural parameterisation θ = (S⁻¹μ, -S⁻¹/2).</p>
@@ -2383,11 +2399,14 @@ model inference, where T(u) = [u, uuᵀ] are the sufficient statistics.</p>
 
   
       <p>The natural variational Gaussian family of probability distributions.</p>
-<p>The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the function values at the inducing inputs z
-and the distribution over the inducing inputs is q(u) = N(μ, S). Expressing the variational distribution, in the form of the
-exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the natural parameterisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2) and
-sufficient statistics T(u) = [u, uuᵀ]. The expectation parameters are given by η = ∫ T(u) q(u) du. This gives a parameterisation,
-η = (η₁, η₁) = (μ, S + uuᵀ) to perform model inference over.</p>
+<p>The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the
+function values at the inducing inputs z and the distribution over the inducing
+inputs is q(u) = N(μ, S). Expressing the variational distribution, in the form of
+the exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the natural
+parameterisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2) and sufficient statistics
+T(u) = [u, uuᵀ]. The expectation parameters are given by η = ∫ T(u) q(u) du.
+This gives a parameterisation, η = (η₁, η₁) = (μ, S + uuᵀ) to perform model
+inference over.</p>
 
 
 
@@ -2469,10 +2488,14 @@ sufficient statistics T(u) = [u, uuᵀ]. The expectation parameters are given by
 
   <div class="doc doc-contents ">
   
-      <p>Compute the KL-divergence between our current variational approximation and
+      <p>Evaluate the prior KL-divergence.</p>
+<p>Compute the KL-divergence between our current variational approximation and
 the Gaussian process prior.</p>
-<p>For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],</p>
-<p>with μ and S computed from the expectation parameterisation η = (μ, S + uuᵀ).</p>
+<p>For this variational family, we have
+<span class="arithmatex">\(\operatorname{KL}(q(f(·))||p(·)) = \operatorname{KL}(q(u)||p(u)) =\operatorname{KL}(\mathcal{N}(\mu, S)\mid\mid \mathcal{N}(m_z, K_{zz}))\)</span>,
+where <span class="arithmatex">\(\mu\)</span> and <span class="arithmatex">\(S\)</span> are the expectation parameters of the variational
+distribution and <span class="arithmatex">\(m_z\)</span> and <span class="arithmatex">\(K_{zz}\)</span> are the mean and covariance of the prior
+distribution.</p>
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.prior_kl--returns">Returns</h6>
 <div class="highlight"><pre><span></span><code>ScalarFloat: The KL-divergence between our variational approximation and
     the GP prior.
@@ -2494,13 +2517,16 @@ the Gaussian process prior.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Compute the predictive distribution of the GP at the test inputs t.</p>
-<p>This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in closed form as</p>
-<div class="highlight"><pre><span></span><code> N[f(t); μt + Ktz Kzz⁻¹ (μ - μz),  Ktt - Ktz Kzz⁻¹ Kzt + Ktz Kzz⁻¹ S Kzz⁻¹ Kzt ],
-</code></pre></div>
-<p>with μ and S computed from the expectation parameterisation η = (μ, S + uuᵀ).</p>
+      <p>Evaluate the predictive distribution.</p>
+<p>Compute the predictive distribution of the GP at the test inputs <span class="arithmatex">\(t\)</span>.</p>
+<p>This is the integral <span class="arithmatex">\(q(f(t)) = \int p(f(t)\mid u)q(u)\mathrm{d}u\)</span>, which can
+be computed in closed form as  which can be computed in closed form as
+<span class="arithmatex">\(<span class="arithmatex">\(\mathcal{N}(f(t); \mu_t + K_{tz}K_{zz}^{-1}(\mu - \mu_z), K_{tt} - K_{tz}K_{zz}^{-1}K_{zt} + K_{tz}K_{zz}^{-1}S K_{zz}^{-1}K_{zt}),\)</span>\)</span></p>
+<p>with <span class="arithmatex">\(\mu\)</span> and <span class="arithmatex">\(S\)</span> computed from the expectation parameterisation
+<span class="arithmatex">\(\eta = (\mu, S + uu^\top)\)</span>.</p>
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.predict--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>GaussianDistribution: The predictive distribution of the GP at the test inputs t.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: The predictive distribution of the GP at the
+    test inputs $t$.
 </code></pre></div>
 
   </div>
@@ -2535,8 +2561,10 @@ the Gaussian process prior.</p>
         Bases: <code><a class="autorefs autorefs-internal" title="gpjax.variational_families.AbstractVariationalGaussian" href="#gpjax.variational_families.AbstractVariationalGaussian">AbstractVariationalGaussian</a></code></p>
 
   
-      <p>Collapsed variational Gaussian family of probability distributions.
-The key reference is Titsias, (2009) - Variational Learning of Inducing Variables in Sparse Gaussian Processes.</p>
+      <p>Collapsed variational Gaussian.</p>
+<p>Collapsed variational Gaussian family of probability distributions.
+The key reference is Titsias, (2009) - Variational Learning of Inducing Variables
+in Sparse Gaussian Processes.</p>
 
 
 
@@ -2594,6 +2622,17 @@ The key reference is Titsias, (2009) - Variational Learning of Inducing Variable
     </thead>
     <tbody>
         <tr>
+          <td><code>test_inputs</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, N D]</code>
+          </td>
+          <td><p>The test inputs <span class="arithmatex">\(t\)</span> at which to make
+predictions.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
           <td><code>train_data</code></td>
           <td>
                 <code><a class="autorefs autorefs-internal" title="gpjax.dataset.Dataset" href="../dataset/#gpjax.dataset.Dataset">Dataset</a></code>
@@ -2606,7 +2645,8 @@ The key reference is Titsias, (2009) - Variational Learning of Inducing Variable
     </tbody>
   </table>
       <h6 id="gpjax.variational_families.CollapsedVariationalGaussian.predict--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>GaussianDistribution: The predictive distribution of the collapsed variational Gaussian process at the test inputs t.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: The predictive distribution of the collapsed
+    variational Gaussian process at the test inputs $t$.
 </code></pre></div>
 
   </div>

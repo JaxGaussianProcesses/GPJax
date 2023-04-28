@@ -2759,7 +2759,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=52e503be" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=4b89868b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2776,7 +2776,7 @@ Gaussian process model's kernel through a neural network can offer a solution to
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=489fcb35" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=ea54314d" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2796,76 +2796,80 @@ Gaussian process model's kernel through a neural network can offer a solution to
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Enable Float64 for more stable matrix inversions.</span>
+<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
+
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">dataclass</span><span class="p">,</span>
+    <span class="n">field</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span> <span class="nn">flax</span>
+<span class="kn">from</span> <span class="nn">flax</span> <span class="kn">import</span> <span class="n">linen</span> <span class="k">as</span> <span class="n">nn</span>
 <span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
 <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
 <span class="kn">import</span> <span class="nn">jax.random</span> <span class="k">as</span> <span class="nn">jr</span>
 <span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Array</span><span class="p">,</span>
     <span class="n">Float</span><span class="p">,</span>
+    <span class="n">install_import_hook</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">optax</span> <span class="k">as</span> <span class="nn">ox</span>
-<span class="kn">from</span> <span class="nn">flax</span> <span class="kn">import</span> <span class="n">linen</span> <span class="k">as</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
-<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span>
 <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">sawtooth</span>
 <span class="kn">from</span> <span class="nn">simple_pytree</span> <span class="kn">import</span> <span class="n">static_field</span>
 
-<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">install_import_hook</span>
-
 <span class="k">with</span> <span class="n">install_import_hook</span><span class="p">(</span><span class="s2">&quot;gpjax&quot;</span><span class="p">,</span> <span class="s2">&quot;beartype.beartype&quot;</span><span class="p">):</span>
     <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
-    <span class="kn">import</span> <span class="nn">gpjax.kernels</span> <span class="k">as</span> <span class="nn">jk</span>
     <span class="kn">from</span> <span class="nn">gpjax.base</span> <span class="kn">import</span> <span class="n">param_field</span>
+    <span class="kn">import</span> <span class="nn">gpjax.kernels</span> <span class="k">as</span> <span class="nn">jk</span>
     <span class="kn">from</span> <span class="nn">gpjax.kernels</span> <span class="kn">import</span> <span class="n">DenseKernelComputation</span>
     <span class="kn">from</span> <span class="nn">gpjax.kernels.base</span> <span class="kn">import</span> <span class="n">AbstractKernel</span>
     <span class="kn">from</span> <span class="nn">gpjax.kernels.computations</span> <span class="kn">import</span> <span class="n">AbstractKernelComputation</span>
 
-<span class="c1"># Enable Float64 for more stable matrix inversions.</span>
-<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 <span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;./gpjax.mplstyle&quot;</span><span class="p">)</span>
 <span class="n">cols</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;axes.prop_cycle&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span>
 </pre></div>
-<div id="cell-1" class="clipboard-copy-txt">from dataclasses import dataclass, field
+<div id="cell-1" class="clipboard-copy-txt"># Enable Float64 for more stable matrix inversions.
+from jax.config import config
+
+config.update("jax_enable_x64", True)
+
+from dataclasses import (
+    dataclass,
+    field,
+)
 from typing import Any
 
 import flax
+from flax import linen as nn
 import jax
-from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (
     Array,
     Float,
+    install_import_hook,
 )
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
-from flax import linen as nn
-from jax.config import config
-from jaxtyping import Array, Float
 from scipy.signal import sawtooth
 from simple_pytree import static_field
 
-from jaxtyping import install_import_hook
-
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
-    import gpjax.kernels as jk
     from gpjax.base import param_field
+    import gpjax.kernels as jk
     from gpjax.kernels import DenseKernelComputation
     from gpjax.kernels.base import AbstractKernel
     from gpjax.kernels.computations import AbstractKernelComputation
 
-# Enable Float64 for more stable matrix inversions.
-config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
 plt.style.use("./gpjax.mplstyle")
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]</div>
@@ -2878,7 +2882,7 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]</div>
 
 </div>
 </div>
-<div id="cell-id=a2e131aa" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=1b230933" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2891,7 +2895,7 @@ discontinuities. To highlight this, we will use a sawtooth function as our data.
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=3762d8e7" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=62d7c213" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2957,7 +2961,7 @@ ax.legend(loc="best")</div>
 
 </div>
 </div>
-<div id="cell-id=97f7efb0" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=d8675aa3" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2979,7 +2983,7 @@ are then computed using the regular <code>gram</code> and <code>cross_covariance
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=457a918c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=55caa158" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3053,7 +3057,7 @@ class DeepKernelFunction(AbstractKernel):
 
 </div>
 </div>
-<div id="cell-id=54411a87" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=14db7179" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3073,7 +3077,7 @@ which functionality is supported well in Haiku.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=fef17f70" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=344f0324" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3137,7 +3141,7 @@ forward_linear = Network()</div>
 
 </div>
 </div>
-<div id="cell-id=5a20aebc" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=e07c6c8d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3151,7 +3155,7 @@ kernel and assume a Gaussian likelihood.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=98b7f09b" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=10a65d6e" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3197,7 +3201,7 @@ posterior = prior * likelihood</div>
 
 </div>
 </div>
-<div id="cell-id=efcf510e" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=5236807c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3220,7 +3224,7 @@ increased from 0 to 1 over 50 steps to get a reasonable initial learning rate va
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=7370f95a" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=d3b8a4f9" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3292,7 +3296,7 @@ opt_posterior, history = gpx.fit(
 
 </div>
 </div>
-<div id="cell-id=9632d30a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=548c2349" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3305,7 +3309,7 @@ of the model. We can do this by simply applying the model to a test data set.</p
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=18bfa30e" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=f0982bd8" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3399,7 +3403,7 @@ ax.legend()</div>
 
 </div>
 </div>
-<div id="cell-id=0f1061a2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=a2227442" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3410,7 +3414,7 @@ ax.legend()</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=1f33b927" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=dc66aeea" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

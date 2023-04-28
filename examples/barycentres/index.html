@@ -2761,7 +2761,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=bd7e1707" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=d35ce090" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2781,7 +2781,7 @@ significantly more favourable uncertainty estimation.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=3efa6655" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=5e9603db" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2801,46 +2801,50 @@ significantly more favourable uncertainty estimation.</p>
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">tp</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Enable Float64 for more stable matrix inversions.</span>
+<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
+
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">tp</span>
 
 <span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
 <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
 <span class="kn">import</span> <span class="nn">jax.random</span> <span class="k">as</span> <span class="nn">jr</span>
 <span class="kn">import</span> <span class="nn">jax.scipy.linalg</span> <span class="k">as</span> <span class="nn">jsl</span>
+<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">install_import_hook</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">optax</span> <span class="k">as</span> <span class="nn">ox</span>
 <span class="kn">import</span> <span class="nn">tensorflow_probability.substrates.jax.distributions</span> <span class="k">as</span> <span class="nn">tfd</span>
 
-<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">install_import_hook</span>
-
 <span class="k">with</span> <span class="n">install_import_hook</span><span class="p">(</span><span class="s2">&quot;gpjax&quot;</span><span class="p">,</span> <span class="s2">&quot;beartype.beartype&quot;</span><span class="p">):</span>
     <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
 
-<span class="c1"># Enable Float64 for more stable matrix inversions.</span>
-<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
 <span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;./gpjax.mplstyle&quot;</span><span class="p">)</span>
 <span class="n">cols</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;axes.prop_cycle&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span>
 </pre></div>
-<div id="cell-1" class="clipboard-copy-txt">import typing as tp
+<div id="cell-1" class="clipboard-copy-txt"># Enable Float64 for more stable matrix inversions.
+from jax.config import config
+
+config.update("jax_enable_x64", True)
+
+import typing as tp
 
 import jax
-from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy.linalg as jsl
+from jaxtyping import install_import_hook
 import matplotlib.pyplot as plt
 import optax as ox
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from jaxtyping import install_import_hook
-
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-# Enable Float64 for more stable matrix inversions.
-config.update("jax_enable_x64", True)
+
 key = jr.PRNGKey(123)
 plt.style.use("./gpjax.mplstyle")
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]</div>
@@ -2853,7 +2857,7 @@ cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]</div>
 
 </div>
 </div>
-<div id="cell-id=0a4c5bf2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=8a42add7" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2900,7 +2904,7 @@ of noise.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=a6bbe8b8" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=96c1fd5b" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2974,7 +2978,7 @@ plt.show()</div>
 
 </div>
 </div>
-<div id="cell-id=82d694c8" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=c242943a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2992,7 +2996,7 @@ advice on selecting an appropriate kernel.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=c7c397a0" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=ed004c40" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3064,7 +3068,7 @@ posterior_preds = [fit_gp(x, i) for i in ys]</div>
 
 </div>
 </div>
-<div id="cell-id=2854ec80" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=84bc43ef" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3082,7 +3086,7 @@ using broadcasting in <code>tensordot</code>.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=bcb94a22" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=0ec06c4c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3150,7 +3154,7 @@ def wasserstein_barycentres(
 
 </div>
 </div>
-<div id="cell-id=80403880" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=c81dcedb" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3167,7 +3171,7 @@ inspecting the <code>sequence</code> array in the following cell.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=26be913f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=dd4f8ed2" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3225,7 +3229,7 @@ barycentre_process = tfd.MultivariateNormalTriL(barycentre_mean, L)</div>
 
 </div>
 </div>
-<div id="cell-id=ad659805" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=55b55784" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3239,7 +3243,7 @@ uncertainty bands are sensible.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=135a0d51" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=33f3e3a9" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3337,7 +3341,7 @@ ax.legend()</div>
 
 </div>
 </div>
-<div id="cell-id=895a2a8c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=cddd31a1" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3355,7 +3359,7 @@ $\bar{\mu}$.</p>
 </div>
 </div>
 </div>
-<div id="cell-id=0a7d328d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=f8309c1a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3366,7 +3370,7 @@ $\bar{\mu}$.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=28633b70" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=c8617fac" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

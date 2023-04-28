@@ -2705,7 +2705,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=1db7abcf" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=9b645b59" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2721,7 +2721,7 @@ kernels supported within GPJax, see the
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=4e987b3a" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=fa2d1b5c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2741,46 +2741,48 @@ kernels supported within GPJax, see the
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Enable Float64 for more stable matrix inversions.</span>
+<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
+
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
 
 <span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">jit</span>
-<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
 <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
 <span class="kn">import</span> <span class="nn">jax.random</span> <span class="k">as</span> <span class="nn">jr</span>
+<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">install_import_hook</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
 <span class="kn">import</span> <span class="nn">optax</span> <span class="k">as</span> <span class="nn">ox</span>
 
-<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">install_import_hook</span>
-
 <span class="k">with</span> <span class="n">install_import_hook</span><span class="p">(</span><span class="s2">&quot;gpjax&quot;</span><span class="p">,</span> <span class="s2">&quot;beartype.beartype&quot;</span><span class="p">):</span>
     <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
 
-<span class="c1"># Enable Float64 for more stable matrix inversions.</span>
-<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 <span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;./gpjax.mplstyle&quot;</span><span class="p">)</span>
 <span class="n">cols</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;axes.prop_cycle&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span>
 </pre></div>
-<div id="cell-1" class="clipboard-copy-txt">import random
+<div id="cell-1" class="clipboard-copy-txt"># Enable Float64 for more stable matrix inversions.
+from jax.config import config
+
+config.update("jax_enable_x64", True)
+
+import random
 
 from jax import jit
-from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
+from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import networkx as nx
 import optax as ox
 
-from jaxtyping import install_import_hook
-
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-# Enable Float64 for more stable matrix inversions.
-config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
 plt.style.use("./gpjax.mplstyle")
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]</div>
@@ -2793,7 +2795,7 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]</div>
 
 </div>
 </div>
-<div id="cell-id=4f65469a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=97d4d7cc" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2813,7 +2815,7 @@ in 351 edges as shown below.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=1d3d9f63" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=b7181513" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2871,7 +2873,7 @@ nx.draw(
 
 </div>
 </div>
-<div id="cell-id=b357d3ba" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=6e8aaa06" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2889,7 +2891,7 @@ way to compute this.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=45314d0c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=4c0cbf09" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2921,7 +2923,7 @@ way to compute this.</p>
 
 </div>
 </div>
-<div id="cell-id=59acca13" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=9fbb7a46" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2940,7 +2942,7 @@ index set of the graph's vertices.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=f049c4c0" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=6566c9ff" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2998,7 +3000,7 @@ D = gpx.Dataset(X=x, y=y)</div>
 
 </div>
 </div>
-<div id="cell-id=58930529" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=60d42e9b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3010,7 +3012,7 @@ D = gpx.Dataset(X=x, y=y)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=0b4afd2c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=901cb66f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3056,7 +3058,7 @@ cbar = plt.colorbar(sm)</div>
 
 </div>
 </div>
-<div id="cell-id=492ad8d9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=3a8c476c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3075,7 +3077,7 @@ We do this using the Adam optimiser provided in <code>optax</code>.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=fd80a45d" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=16c80fd5" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3129,7 +3131,7 @@ opt_posterior, training_history = gpx.fit(
 
 </div>
 </div>
-<div id="cell-id=f5c9832b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=e7f23b2d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3144,7 +3146,7 @@ the predictive posterior for the full graph to compare the root-mean-squared err
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=ca241f72" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=2f9e0976" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3202,7 +3204,7 @@ print(
 
 </div>
 </div>
-<div id="cell-id=0cbb2116" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=eaa1ca0c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3215,7 +3217,7 @@ following.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=db601c66" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=c2c7ab2c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3265,7 +3267,7 @@ cbar = plt.colorbar(sm)</div>
 
 </div>
 </div>
-<div id="cell-id=a84bde1f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=498c0682" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3277,7 +3279,7 @@ cbar = plt.colorbar(sm)</div>
 </div>
 </div>
 </div>
-<div id="cell-id=d3feb792" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=8aff011c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3288,7 +3290,7 @@ cbar = plt.colorbar(sm)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=86ef2917" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=d8105d2f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

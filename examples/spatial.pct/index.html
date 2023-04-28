@@ -2611,7 +2611,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=f2face44" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=deeb6bbe" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2635,7 +2635,7 @@ We will coarsen this data by a factor of 10 (going from 90m to 900m resolution),
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=3bb6eafb" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=cbb0e6b5" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2655,31 +2655,37 @@ We will coarsen this data by a factor of 10 (going from 90m to 900m resolution),
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Enable Float64 for more stable matrix inversions.</span>
+<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
+
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 
 <span class="kn">import</span> <span class="nn">fsspec</span>
 <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 <span class="kn">import</span> <span class="nn">jax</span>
 <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
 <span class="kn">import</span> <span class="nn">jax.random</span> <span class="k">as</span> <span class="nn">jr</span>
+<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Array</span><span class="p">,</span>
+    <span class="n">Float</span><span class="p">,</span>
+    <span class="n">install_import_hook</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">optax</span> <span class="k">as</span> <span class="nn">ox</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">planetary_computer</span>
 <span class="kn">import</span> <span class="nn">pystac_client</span>
 <span class="kn">import</span> <span class="nn">rioxarray</span> <span class="k">as</span> <span class="nn">rio</span>
-<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
-<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span>
 <span class="kn">from</span> <span class="nn">rioxarray.merge</span> <span class="kn">import</span> <span class="n">merge_arrays</span>
-
-<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">install_import_hook</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
 <span class="k">with</span> <span class="n">install_import_hook</span><span class="p">(</span><span class="s2">&quot;gpjax&quot;</span><span class="p">,</span> <span class="s2">&quot;beartype.beartype&quot;</span><span class="p">):</span>
     <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
     <span class="kn">from</span> <span class="nn">gpjax.base</span> <span class="kn">import</span> <span class="n">param_field</span>
     <span class="kn">from</span> <span class="nn">gpjax.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
-<span class="n">jax</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
 <span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
 
@@ -2706,31 +2712,37 @@ We will coarsen this data by a factor of 10 (going from 90m to 900m resolution),
 <span class="n">tiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">rio</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">assets</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">href</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;band&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span><span class="p">]</span>
 <span class="n">dem</span> <span class="o">=</span> <span class="n">merge_arrays</span><span class="p">(</span><span class="n">tiles</span><span class="p">)</span><span class="o">.</span><span class="n">coarsen</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">ch_shp</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">])</span>
 </pre></div>
-<div id="cell-1" class="clipboard-copy-txt">from dataclasses import dataclass
+<div id="cell-1" class="clipboard-copy-txt"># Enable Float64 for more stable matrix inversions.
+from jax.config import config
+
+config.update("jax_enable_x64", True)
+
+from dataclasses import dataclass
 
 import fsspec
 import geopandas as gpd
 import jax
 import jax.numpy as jnp
 import jax.random as jr
+from jaxtyping import (
+    Array,
+    Float,
+    install_import_hook,
+)
 import matplotlib.pyplot as plt
 import optax as ox
 import pandas as pd
 import planetary_computer
 import pystac_client
 import rioxarray as rio
-import xarray as xr
-from jaxtyping import Array, Float
 from rioxarray.merge import merge_arrays
-
-from jaxtyping import install_import_hook
+import xarray as xr
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     from gpjax.base import param_field
     from gpjax.dataset import Dataset
 
-jax.config.update("jax_enable_x64", True)
 
 key = jr.PRNGKey(123)
 
@@ -2765,7 +2777,7 @@ dem = merge_arrays(tiles).coarsen(x=10, y=10).mean().rio.clip(ch_shp["geometry"]
 
 </div>
 </div>
-<div id="cell-id=abcdc96c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=f675a1bd" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2779,7 +2791,7 @@ and you may already notice that there's a dependency between maximum daily tempe
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=fbd1c1fb" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=72d5ecbc" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2826,7 +2838,7 @@ cb.set_label("Max. daily temperature [°C]", labelpad=-2)</div>
 
 </div>
 </div>
-<div id="cell-id=1168566f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=240d3a3b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2838,7 +2850,7 @@ cb.set_label("Max. daily temperature [°C]", labelpad=-2)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=11b585f4" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=a15c6284" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2882,7 +2894,7 @@ D = Dataset(
 
 </div>
 </div>
-<div id="cell-id=6d5b92ee" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=a887ca10" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2900,7 +2912,7 @@ kernels in GPJax.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=b80fb10d" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=3ed11a08" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2938,7 +2950,7 @@ kernels in GPJax.</p>
 
 </div>
 </div>
-<div id="cell-id=15c43ed6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=5c686a90" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2952,7 +2964,7 @@ simply subclass <code>AbstractMeanFunction</code>.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=2f662a59" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=6e60ff1c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3000,7 +3012,7 @@ class MeanFunction(gpx.gps.AbstractMeanFunction):
 
 </div>
 </div>
-<div id="cell-id=eee0624e" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=f5df7a1c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3012,7 +3024,7 @@ class MeanFunction(gpx.gps.AbstractMeanFunction):
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=01323b27" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=ea0a0a72" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3048,7 +3060,7 @@ likelihood = gpx.Gaussian(D.n)</div>
 
 </div>
 </div>
-<div id="cell-id=997b457f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=674b102c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3060,7 +3072,7 @@ likelihood = gpx.Gaussian(D.n)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=8d912ee1" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=19592f6e" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3092,7 +3104,7 @@ likelihood = gpx.Gaussian(D.n)</div>
 
 </div>
 </div>
-<div id="cell-id=38da2a7f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=888bd140" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3106,7 +3118,7 @@ a <code>ConjugatePosterior</code>, which allows us to optimize the analytically 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=cf6a19eb" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=13a34115" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3141,7 +3153,7 @@ negative_mll(posterior, train_data=D)</div>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=3acdbe8f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=38eeb36a" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3195,7 +3207,7 @@ posterior: gpx.gps.ConjugatePosterior</div>
 
 </div>
 </div>
-<div id="cell-id=6ca11c63" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=35fef9bd" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3215,7 +3227,7 @@ $\mathcal{O}(n)$, with the number of pixels.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=7bde334c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=9b5191fe" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3261,7 +3273,7 @@ ytest = posterior.sample_approx(50, D, key, num_features=200)(
 
 </div>
 </div>
-<div id="cell-id=9038be59" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=b8aa7477" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3273,7 +3285,7 @@ ytest = posterior.sample_approx(50, D, key, num_features=200)(
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=b9235e98" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=b535bf2d" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3325,7 +3337,7 @@ plt.gca().set_title("Interpolated maximum daily temperature")</div>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=6534ee4a" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=22a7307f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3373,7 +3385,7 @@ plt.gca().set_title("Standard deviation")</div>
 
 </div>
 </div>
-<div id="cell-id=012f7b0c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=e62ad266" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3385,7 +3397,7 @@ plt.gca().set_title("Standard deviation")</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=4e9e229d" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=97a499ce" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3441,7 +3453,7 @@ predtest.plot(
 
 </div>
 </div>
-<div id="cell-id=ca7daa8a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=ba4b18ee" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3455,7 +3467,7 @@ is very close: we have learned the environmental lapse rate!</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=053b3fed" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=6cdd679d" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3487,7 +3499,7 @@ is very close: we have learned the environmental lapse rate!</p>
 
 </div>
 </div>
-<div id="cell-id=ead840c9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=b2de2061" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3506,7 +3518,7 @@ to <a href="https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.3786">Fre
 </div>
 </div>
 </div>
-<div id="cell-id=b1ffba9f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=6c1ad291" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3517,7 +3529,7 @@ to <a href="https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.3786">Fre
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=87dfad48" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=4f788861" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3551,7 +3563,7 @@ to <a href="https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.3786">Fre
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=ef4a74a3" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=53b274bb" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

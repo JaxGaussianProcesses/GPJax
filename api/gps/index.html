@@ -2152,16 +2152,6 @@ sample_fn(jnp.linspace(0, 1, 100))</p>
           </td>
         </tr>
         <tr>
-          <td><code>params</code></td>
-          <td>
-                <code>dict</code>
-          </td>
-          <td><p>The specific set of parameters for which the sample</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
           <td><code>key</code></td>
           <td>
                 <code><a class="autorefs autorefs-internal" title="gpjax.typing.KeyArray" href="../typing/#gpjax.typing.KeyArray">KeyArray</a></code>
@@ -2176,7 +2166,8 @@ sample_fn(jnp.linspace(0, 1, 100))</p>
           <td>
                 <code>int</code>
           </td>
-          <td><p>The number of features used when approximating the</p></td>
+          <td><p>The number of features used when approximating the
+kernel.</p></td>
           <td>
                 <code>100</code>
           </td>
@@ -2550,12 +2541,12 @@ predictive_dist(xtest)</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>params</code></td>
+          <td><code>test_inputs</code></td>
           <td>
-                <code>Dict</code>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, N D]</code>
           </td>
-          <td><p>A dictionary of parameters that should be used to
-compute the posterior.</p></td>
+          <td><p>A Jax array of test inputs at which the
+predictive distribution is evaluated.</p></td>
           <td>
               <em>required</em>
           </td>
@@ -2653,7 +2644,8 @@ can be evaluated with constant cost regardless of the required number of queries
           <td>
                 <code>int</code>
           </td>
-          <td><p>The number of features used when approximating the</p></td>
+          <td><p>The number of features used when approximating the
+kernel.</p></td>
           <td>
                 <code>100</code>
           </td>

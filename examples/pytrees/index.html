@@ -2577,7 +2577,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=7e6915b1" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=03f85632" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2594,7 +2594,7 @@ Licensed under the Apache License, Version 2.0.
 </div>
 </div>
 </div>
-<div id="cell-id=732de66d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=30bfe286" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2612,7 +2612,7 @@ $k(x, y)$ the <em>covariance</em>.</p>
 </div>
 </div>
 </div>
-<div id="cell-id=6e21c8ac" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=f7de3239" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2626,12 +2626,36 @@ $k(x, y)$ the <em>covariance</em>.</p>
 </li>
 </ol>
 <p>For the RBF kernel, we use a <code>dataclass</code> to represent this object as follows</p>
+<p>from dataclasses import dataclass
+from jax import Array</p>
+<p>@dataclass
+class RBF:
+    lengthscale: float
+    variance: float</p>
+<pre><code>def covariance(self, x: Array, y: Array) -&gt; Array:
+    pass
+</code></pre>
+
+</div>
+</div>
+</div>
+</div>
+<div id="cell-id=715a7b7d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We have for now left <code>covariance</code> empty; however, through this notebook, we shall
+build up to a fully object that can compute covariances in a JAX-compatible way.</p>
+<p>For those users who have not seen a <code>dataclass</code> before, this statement is equivalent
+to writing</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=529f3db2" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=8655bd7e" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2651,73 +2675,6 @@ $k(x, y)$ the <em>covariance</em>.</p>
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">Array</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-
-
-<span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">RBF</span><span class="p">:</span>
-    <span class="n">lengthscale</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="n">variance</span><span class="p">:</span> <span class="nb">float</span>
-
-    <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
-        <span class="k">pass</span>
-</pre></div>
-<div id="cell-1" class="clipboard-copy-txt">from jax import Array
-from dataclasses import dataclass
-
-
-@dataclass
-class RBF:
-    lengthscale: float
-    variance: float
-
-    def covariance(self, x: Array, y: Array) -> Array:
-        pass</div>
-        
-        </div>
-    </div>
-
-</div>
-</div>
-
-</div>
-</div>
-<div id="cell-id=7319ccb5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>We have for now left <code>covariance</code> empty; however, through this notebook, we shall
-build up to a fully object that can compute covariances in a JAX-compatible way.</p>
-<p>For those users who have not seen a <code>dataclass</code> before, this statement is equivalent
-to writing</p>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=177a5446" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-        
-        
-        <div class="CodeMirror cm-s-jupyter">
-            <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-2">
-                <div>
-                    <span class="notice" hidden>Copied!</span>
-                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
-                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
-                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
-                    </svg>
-                    </div>
-                </clipboard-copy>
-            </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="k">class</span> <span class="nc">RBF</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lengthscale</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">variance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lengthscale</span> <span class="o">=</span> <span class="n">lengthscale</span>
@@ -2726,7 +2683,7 @@ to writing</p>
     <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
         <span class="k">pass</span>
 </pre></div>
-<div id="cell-2" class="clipboard-copy-txt">class RBF:
+<div id="cell-1" class="clipboard-copy-txt">class RBF:
     def __init__(self, lengthscale: float, variance: float) -> None:
         self.lengthscale = lengthscale
         self.variance = variance
@@ -2742,7 +2699,7 @@ to writing</p>
 
 </div>
 </div>
-<div id="cell-id=5e81ca12" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=f2bbb1b2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2763,7 +2720,7 @@ the lengthscale and variance as <em>fields</em>. Further, the <code>RBF.covarian
 </div>
 </div>
 </div>
-<div id="cell-id=c13df0d3" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=e808c95b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2779,7 +2736,7 @@ the lengthscale and variance as <em>fields</em>. Further, the <code>RBF.covarian
 </div>
 </div>
 </div>
-<div id="cell-id=cacf1f39" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=b1685230" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2800,7 +2757,79 @@ the lengthscale and variance as <em>fields</em>. Further, the <code>RBF.covarian
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=68f4740d" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=edbf1d56" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-2">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow_probability.substrates.jax.bijectors</span> <span class="k">as</span> <span class="nn">tfb</span>
+
+<span class="kn">from</span> <span class="nn">gpjax.base</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Module</span><span class="p">,</span>
+    <span class="n">param_field</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">RBF</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    <span class="n">lengthscale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span>
+    <span class="n">variance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+        <span class="k">pass</span>
+</pre></div>
+<div id="cell-2" class="clipboard-copy-txt">import tensorflow_probability.substrates.jax.bijectors as tfb
+
+from gpjax.base import (
+    Module,
+    param_field,
+)
+
+
+@dataclass
+class RBF(Module):
+    lengthscale: float = param_field(1.0, bijector=tfb.Softplus())
+    variance: float = param_field(1.0, bijector=tfb.Softplus())
+
+    def covariance(self, x: Array, y: Array) -> Array:
+        pass</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=be10962d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="replacing-values">Replacing values<a class="anchor-link" href="#replacing-values">&#182;</a></h3><p>For consistency with JAX’s functional programming principles, <code>Module</code> instances are immutable. And parameters updates occur out-of- place via <code>replace</code>.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=a325fa4c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2820,29 +2849,13 @@ the lengthscale and variance as <em>fields</em>. Further, the <code>RBF.covarian
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow_probability.substrates.jax.bijectors</span> <span class="k">as</span> <span class="nn">tfb</span>
-<span class="kn">from</span> <span class="nn">gpjax.base</span> <span class="kn">import</span> <span class="n">Module</span><span class="p">,</span> <span class="n">param_field</span>
-
-
-<span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">RBF</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
-    <span class="n">lengthscale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span>
-    <span class="n">variance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span>
-
-    <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
-        <span class="k">pass</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">kernel</span> <span class="o">=</span> <span class="n">RBF</span><span class="p">()</span>
+<span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">lengthscale</span><span class="o">=</span><span class="mf">3.14</span><span class="p">)</span>  <span class="c1"># Update e.g., the lengthscale.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
 </pre></div>
-<div id="cell-3" class="clipboard-copy-txt">import tensorflow_probability.substrates.jax.bijectors as tfb
-from gpjax.base import Module, param_field
-
-
-@dataclass
-class RBF(Module):
-    lengthscale: float = param_field(1.0, bijector=tfb.Softplus())
-    variance: float = param_field(1.0, bijector=tfb.Softplus())
-
-    def covariance(self, x: Array, y: Array) -> Array:
-        pass</div>
+<div id="cell-3" class="clipboard-copy-txt">kernel = RBF()
+kernel = kernel.replace(lengthscale=3.14)  # Update e.g., the lengthscale.
+print(kernel)</div>
         
         </div>
     </div>
@@ -2852,19 +2865,19 @@ class RBF(Module):
 
 </div>
 </div>
-<div id="cell-id=f8fe2a83" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=447ddca0" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="replacing-values">Replacing values<a class="anchor-link" href="#replacing-values">&#182;</a></h3><p>For consistency with JAX’s functional programming principles, <code>Module</code> instances are immutable. And parameters updates occur out-of- place via <code>replace</code>.</p>
+<h2 id="transformations">Transformations &#129302;<a class="anchor-link" href="#transformations">&#182;</a></h2><h3 id="applying-transformations">Applying transformations<a class="anchor-link" href="#applying-transformations">&#182;</a></h3><p>Use <code>constrain</code> / <code>unconstrain</code> to return a <code>Mytree</code> with each parameter's bijector <code>forward</code> / <code>inverse</code> operation applied!</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=4f72049a" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=4b8a23d4" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2884,12 +2897,20 @@ class RBF(Module):
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">kernel</span> <span class="o">=</span> <span class="n">RBF</span><span class="p">()</span>
-<span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">lengthscale</span><span class="o">=</span><span class="mf">3.14</span><span class="p">)</span>  <span class="c1"># Update e.g., the lengthscale.</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Transform kernel to unconstrained space</span>
+<span class="n">unconstrained_kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">unconstrain</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">unconstrained_kernel</span><span class="p">)</span>
+
+<span class="c1"># Transform kernel back to constrained space</span>
+<span class="n">kernel</span> <span class="o">=</span> <span class="n">unconstrained_kernel</span><span class="o">.</span><span class="n">constrain</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
 </pre></div>
-<div id="cell-4" class="clipboard-copy-txt">kernel = RBF()
-kernel = kernel.replace(lengthscale=3.14)  # Update e.g., the lengthscale.
+<div id="cell-4" class="clipboard-copy-txt"># Transform kernel to unconstrained space
+unconstrained_kernel = kernel.unconstrain()
+print(unconstrained_kernel)
+
+# Transform kernel back to constrained space
+kernel = unconstrained_kernel.constrain()
 print(kernel)</div>
         
         </div>
@@ -2900,19 +2921,19 @@ print(kernel)</div>
 
 </div>
 </div>
-<div id="cell-id=a6c6f9ff" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=31b6e852" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="transformations">Transformations &#129302;<a class="anchor-link" href="#transformations">&#182;</a></h2><h3 id="applying-transformations">Applying transformations<a class="anchor-link" href="#applying-transformations">&#182;</a></h3><p>Use <code>constrain</code> / <code>unconstrain</code> to return a <code>Mytree</code> with each parameter's bijector <code>forward</code> / <code>inverse</code> operation applied!</p>
+<h3 id="replacing-transformations">Replacing transformations<a class="anchor-link" href="#replacing-transformations">&#182;</a></h3><p>Default transformations can be replaced on an instance via the <code>replace_bijector</code> method.</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=273ca9c3" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=77b148c4" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2932,62 +2953,6 @@ print(kernel)</div>
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Transform kernel to unconstrained space</span>
-<span class="n">unconstrained_kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">unconstrain</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">unconstrained_kernel</span><span class="p">)</span>
-
-<span class="c1"># Transform kernel back to constrained space</span>
-<span class="n">kernel</span> <span class="o">=</span> <span class="n">unconstrained_kernel</span><span class="o">.</span><span class="n">constrain</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
-</pre></div>
-<div id="cell-5" class="clipboard-copy-txt"># Transform kernel to unconstrained space
-unconstrained_kernel = kernel.unconstrain()
-print(unconstrained_kernel)
-
-# Transform kernel back to constrained space
-kernel = unconstrained_kernel.constrain()
-print(kernel)</div>
-        
-        </div>
-    </div>
-
-</div>
-</div>
-
-</div>
-</div>
-<div id="cell-id=9ee8d2e9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="replacing-transformations">Replacing transformations<a class="anchor-link" href="#replacing-transformations">&#182;</a></h3><p>Default transformations can be replaced on an instance via the <code>replace_bijector</code> method.</p>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=b64d5fc0" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-        
-        
-        <div class="CodeMirror cm-s-jupyter">
-            <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-6">
-                <div>
-                    <span class="notice" hidden>Copied!</span>
-                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
-                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
-                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
-                    </svg>
-                    </div>
-                </clipboard-copy>
-            </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">new_kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">replace_bijector</span><span class="p">(</span><span class="n">lengthscale</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Identity</span><span class="p">())</span>
 
 <span class="c1"># Transform kernel to unconstrained space</span>
@@ -2998,7 +2963,7 @@ print(kernel)</div>
 <span class="n">new_kernel</span> <span class="o">=</span> <span class="n">unconstrained_kernel</span><span class="o">.</span><span class="n">constrain</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">new_kernel</span><span class="p">)</span>
 </pre></div>
-<div id="cell-6" class="clipboard-copy-txt">new_kernel = kernel.replace_bijector(lengthscale=tfb.Identity())
+<div id="cell-5" class="clipboard-copy-txt">new_kernel = kernel.replace_bijector(lengthscale=tfb.Identity())
 
 # Transform kernel to unconstrained space
 unconstrained_kernel = new_kernel.unconstrain()
@@ -3016,7 +2981,7 @@ print(new_kernel)</div>
 
 </div>
 </div>
-<div id="cell-id=88be2350" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=f65e516c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
