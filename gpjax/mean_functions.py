@@ -134,7 +134,7 @@ class Constant(AbstractMeanFunction):
     defaults to 1.0.
     """
 
-    constant: Float[Array, 1] = param_field(jnp.array([0.0]))
+    constant: Float[Array, "1"] = param_field(jnp.array([0.0]))
 
     def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
         """Evaluate the mean function at the given points.

@@ -45,11 +45,11 @@ def _check_args(value: Any, size: Any) -> None:
 
 @dataclass
 class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
-    value: Float[Array, 1]
+    value: Float[Array, "1"]
     size: int = static_field()
 
     def __init__(
-        self, value: Float[Array, 1], size: int, dtype: jnp.dtype = None
+        self, value: Float[Array, "1"], size: int, dtype: jnp.dtype = None
     ) -> None:
         """Initialize the constant diagonal linear operator.
 

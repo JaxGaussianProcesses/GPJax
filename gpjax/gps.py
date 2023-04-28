@@ -18,7 +18,6 @@ from dataclasses import dataclass
 
 from beartype.typing import (
     Any,
-    Callable,
     Optional,
 )
 import jax.numpy as jnp
@@ -48,14 +47,9 @@ from gpjax.linops import identity
 from gpjax.mean_functions import AbstractMeanFunction
 from gpjax.typing import (
     Array,
+    FunctionalSample,
     KeyArray,
 )
-
-FunctionalSample = Callable[[Float[Array, "N D"]], Float[Array, "N B"]]
-""" Type alias for functions representing `B` samples from a model, to be evaluated on
-any set of `N` inputs (of dimension `D`) and returning the evaluations of each
-(potentially approximate) sample draw across these inputs.
-"""
 
 
 @dataclass

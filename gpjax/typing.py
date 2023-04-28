@@ -13,7 +13,10 @@
 # limitations under the License.
 # ==============================================================================
 
-from beartype.typing import Union
+from beartype.typing import (
+    Callable,
+    Union,
+)
 from jax.random import KeyArray as JAXKeyArray
 from jaxtyping import (
     Array as JAXArray,
@@ -37,9 +40,10 @@ ScalarFloat = Union[float, Float[Array, ""]]
 
 VecNOrMatNM = Union[Float[Array, " N"], Float[Array, "N M"]]
 
-__all__ = [
-    "KeyArray",
-    "ScalarBool",
-    "ScalarInt",
-    "ScalarFloat",
-]
+FunctionalSample = Callable[[Float[Array, "N D"]], Float[Array, "N B"]]
+""" Type alias for functions representing `B` samples from a model, to be evaluated on
+any set of `N` inputs (of dimension `D`) and returning the evaluations of each
+(potentially approximate) sample draw across these inputs.
+"""
+
+__all__ = ["KeyArray", "ScalarBool", "ScalarInt", "ScalarFloat", "FunctionalSample"]
