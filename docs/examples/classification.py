@@ -128,6 +128,7 @@ opt_posterior, history = gpx.fit(
     train_data=D,
     optim=ox.adamw(learning_rate=0.01),
     num_iters=1000,
+    key=key,
 )
 
 # %% [markdown]

@@ -63,7 +63,9 @@ class DenseLinearOperator(LinearOperator):
         self.shape = matrix.shape
         self.dtype = matrix.dtype
 
-    def __add__(self, other: Union[LinearOperator, Float[Array, "N N"]]) -> LinearOperator:
+    def __add__(
+        self, other: Union[LinearOperator, Float[Array, "N N"]]
+    ) -> LinearOperator:
         """Add diagonal to another linear operator.
 
         Args:
@@ -144,7 +146,7 @@ class DenseLinearOperator(LinearOperator):
         return jnp.matmul(self.matrix, other)
 
     def to_dense(self) -> Float[Array, "N N"]:
-        """Construct dense Covaraince matrix from the covariance operator.
+        """Construct dense Covariance matrix from the covariance operator.
 
         Returns
         -------

@@ -181,6 +181,12 @@ posterior = prior * likelihood
 negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True))
 negative_mll(posterior, train_data=D)
 
+
+# static_tree = jax.tree_map(lambda x: not(x), posterior.trainables)
+# optim = ox.chain(
+#     ox.adam(learning_rate=0.01),
+#     ox.masked(ox.set_to_zero(), static_tree)
+#     )
 # %% [markdown]
 # Since most optimisers (including here) minimise a given function, we have realised
 # the negative marginal log-likelihood and just-in-time (JIT) compiled this to
@@ -198,6 +204,7 @@ opt_posterior, history = gpx.fit(
     optim=ox.adam(learning_rate=0.01),
     num_iters=500,
     safe=True,
+    key=key,
 )
 
 # %% [markdown]

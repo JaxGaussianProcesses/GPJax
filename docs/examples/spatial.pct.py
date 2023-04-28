@@ -168,6 +168,7 @@ posterior, history = gpx.fit(
     optim=optim,
     num_iters=3000,
     safe=True,
+    key=key,
 )
 posterior: gpx.gps.ConjugatePosterior
 # %% [markdown]

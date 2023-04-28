@@ -29,7 +29,7 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 def param_field(
     default: Any = dataclasses.MISSING,
     *,
-    bijector: tfb.Bijector = None,
+    bijector: Optional[tfb.Bijector] = None,
     trainable: bool = True,
     default_factory: Any = dataclasses.MISSING,
     init: bool = True,

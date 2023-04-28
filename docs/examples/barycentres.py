@@ -139,6 +139,7 @@ def fit_gp(x: jax.Array, y: jax.Array) -> tfd.MultivariateNormalFullCovariance:
         train_data=D,
         optim=ox.adamw(learning_rate=0.01),
         num_iters=500,
+        key=key,
     )
     latent_dist = opt_posterior.predict(xtest, train_data=D)
     return opt_posterior.likelihood(latent_dist)

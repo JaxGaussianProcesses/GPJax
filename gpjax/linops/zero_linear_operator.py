@@ -128,7 +128,7 @@ class ZeroLinearOperator(LinearOperator):
         return self
 
     def to_dense(self) -> Float[Array, "N N"]:
-        """Construct dense Covaraince matrix from the covariance operator.
+        """Construct dense Covariance matrix from the covariance operator.
 
         Returns
         -------

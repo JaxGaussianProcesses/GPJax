@@ -45,9 +45,9 @@ def fit(
     objective: Union[AbstractObjective, Callable[[Module, Dataset], ScalarFloat]],
     train_data: Dataset,
     optim: ox.GradientTransformation,
+    key: KeyArray,
     num_iters: Optional[int] = 100,
     batch_size: Optional[int] = -1,
-    key: Optional[KeyArray] = None,
     log_rate: Optional[int] = 10,
     verbose: Optional[bool] = True,
     unroll: Optional[int] = 1,
@@ -116,8 +116,6 @@ def fit(
         Tuple[Module, Array]: A Tuple comprising the optimised model and training
             history respectively.
     """
-    if key is None:
-        key = jr.PRNGKey(42)
     if safe:
         # Check inputs.
         _check_model(model)

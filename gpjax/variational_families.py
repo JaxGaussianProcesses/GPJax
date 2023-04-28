@@ -640,6 +640,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         # AAᵀ
         AAT = jnp.matmul(A, A.T)
 
+        # LLᵀ = I + AAᵀ
         L = jnp.linalg.cholesky(jnp.eye(m) + AAT)
 
         μx = mean_function(x)

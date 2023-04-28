@@ -352,8 +352,10 @@ class CollapsedELBO(AbstractObjective):
         # AAᵀ
         AAT = jnp.matmul(A, A.T)
 
+        # B = I + AAᵀ
         B = jnp.eye(m) + AAT
 
+        # LLᵀ = I + AAᵀ
         L = jnp.linalg.cholesky(B)
 
         # log|B| = 2 trace(log|L|) = 2 Σᵢ log Lᵢᵢ  [since |B| = |LLᵀ| = |L|²  => log|B| = 2 log|L|, and |L| = Πᵢ Lᵢᵢ]
