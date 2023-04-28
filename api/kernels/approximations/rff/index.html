@@ -19,7 +19,7 @@
         <link rel="next" href="../../base/">
       
       <link rel="icon" href="../../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -28,9 +28,6 @@
     
     
       <link rel="stylesheet" href="../../../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -60,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -308,6 +302,20 @@
     <li class="md-nav__item">
       <a href="../../../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1503,6 +1511,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1706,7 +1728,7 @@ transform of the data.</p>
 
 
 <h6 id="gpjax.kernels.approximations.rff.RFF.frequencies" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">frequencies</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">M</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Identity</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">frequencies</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">M</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Identity</span><span class="p">())</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -1805,7 +1827,7 @@ set the computation engine to be the basis function computation engine.</p>
         <tr>
           <td><code>x</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N D]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, N D]</code>
           </td>
           <td><p>A <span class="arithmatex">\(N \times D\)</span> array of inputs.</p></td>
           <td>

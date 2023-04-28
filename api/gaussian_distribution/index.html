@@ -19,7 +19,7 @@
         <link rel="next" href="../gps/">
       
       <link rel="icon" href="../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -28,9 +28,6 @@
     
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -60,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -308,6 +302,20 @@
     <li class="md-nav__item">
       <a href="../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1499,6 +1507,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1661,7 +1683,7 @@
         <tr>
           <td><code>loc</code></td>
           <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N]]</code>
+                <code><span title="beartype.typing.Optional">Optional</span>[<span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>,  N]]</code>
           </td>
           <td><p>The mean of the distribution. Defaults to None.</p></td>
           <td>
@@ -1671,7 +1693,7 @@
         <tr>
           <td><code>scale</code></td>
           <td>
-                <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="gpjax.linops.LinearOperator" href="../linops/linear_operator/#gpjax.linops.linear_operator.LinearOperator">LinearOperator</a>]</code>
+                <code><span title="beartype.typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="gpjax.linops.LinearOperator" href="../linops/linear_operator/#gpjax.linops.linear_operator.LinearOperator">LinearOperator</a>]</code>
           </td>
           <td><p>The scale matrix of the distribution. Defaults to None.</p></td>
           <td>
@@ -1888,7 +1910,7 @@
 
 
 <h6 id="gpjax.gaussian_distribution.GaussianDistribution.entropy" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">entropy</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">entropy</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -1906,7 +1928,7 @@
 
 
 <h6 id="gpjax.gaussian_distribution.GaussianDistribution.log_prob" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">N</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">N</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -1929,7 +1951,7 @@
         <tr>
           <td><code>y</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>,  N]</code>
           </td>
           <td><p>The value to calculate the log probability of.</p></td>
           <td>
@@ -1939,7 +1961,7 @@
     </tbody>
   </table>
       <h6 id="gpjax.gaussian_distribution.GaussianDistribution.log_prob--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: The log probability of the value.
+<div class="highlight"><pre><span></span><code>ScalarFloat: The log probability of the value.
 </code></pre></div>
 
   </div>
@@ -1951,7 +1973,7 @@
 
 
 <h6 id="gpjax.gaussian_distribution.GaussianDistribution.sample" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">,</span> <span class="n">sample_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span></code>
+<code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">,</span> <span class="n">sample_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span></code>
 
 </h6>
 
@@ -1969,7 +1991,7 @@
 
 
 <h6 id="gpjax.gaussian_distribution.GaussianDistribution.kl_divergence" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">kl_divergence</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">GaussianDistribution</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">kl_divergence</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">GaussianDistribution</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 

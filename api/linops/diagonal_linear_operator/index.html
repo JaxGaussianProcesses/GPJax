@@ -19,7 +19,7 @@
         <link rel="next" href="../identity_linear_operator/">
       
       <link rel="icon" href="../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -28,9 +28,6 @@
     
     
       <link rel="stylesheet" href="../../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -60,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -308,6 +302,20 @@
     <li class="md-nav__item">
       <a href="../../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1501,6 +1509,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1654,8 +1676,8 @@
 <code class="highlight language-python"><span class="n">diag</span> <span class="o">=</span> <span class="n">diag</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
 </h6>
@@ -1734,7 +1756,7 @@
         <tr>
           <td><code>diag</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>,  N]</code>
           </td>
           <td><p>Diagonal of the covariance operator.</p></td>
           <td>
@@ -1762,7 +1784,7 @@
   
       <p>Diagonal of the covariance operator.</p>
 <h6 id="gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator.diagonal--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;N&quot;]: Diagonal of the covariance operator.
+<div class="highlight"><pre><span></span><code>Float[Array, &quot; N&quot;]: Diagonal of the covariance operator.
 </code></pre></div>
 
   </div>
@@ -1774,7 +1796,7 @@
 
 
 <h6 id="gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator.__add__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">LinearOperator</span> <span class="o">|</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">N</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
+<code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">LinearOperator</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">N</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
 
 </h6>
 
@@ -1797,7 +1819,7 @@
         <tr>
           <td><code>other</code></td>
           <td>
-                <code>Union[<a class="autorefs autorefs-internal" title="gpjax.linops.linear_operator.LinearOperator" href="../linear_operator/#gpjax.linops.linear_operator.LinearOperator">LinearOperator</a>, <span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N N]]</code>
+                <code><span title="beartype.typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="gpjax.linops.linear_operator.LinearOperator" href="../linear_operator/#gpjax.linops.linear_operator.LinearOperator">LinearOperator</a>, <span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, N N]]</code>
           </td>
           <td><p>Other linear operator. Dimension of both operators must match. If the other linear operator is not a DiagonalLinearOperator, dense matrix addition is used.</p></td>
           <td>
@@ -1819,7 +1841,7 @@
 
 
 <h6 id="gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator.__mul__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
+<code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">ScalarFloat</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
 
 </h6>
 
@@ -1885,7 +1907,7 @@
 
 
 <h6 id="gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator.__matmul__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__matmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="fm">__matmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">VecNOrMatNM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VecNOrMatNM</span></code>
 
 </h6>
 
@@ -1908,7 +1930,7 @@
         <tr>
           <td><code>x</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N M]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, N M]</code>
           </td>
           <td><p>Matrix to multiply with.</p></td>
           <td>
@@ -1951,7 +1973,7 @@
 
 
 <h6 id="gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator.log_det" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">log_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">log_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -1960,7 +1982,7 @@
   
       <p>Log determinant.</p>
 <h6 id="gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator.log_det--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: Log determinant of the covariance matrix.
+<div class="highlight"><pre><span></span><code>ScalarFloat: Log determinant of the covariance matrix.
 </code></pre></div>
 
   </div>
@@ -1993,7 +2015,7 @@
 
 
 <h6 id="gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator.solve" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">:</span> <span class="n">VecNOrMatNM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VecNOrMatNM</span></code>
 
 </h6>
 
@@ -2016,7 +2038,7 @@
         <tr>
           <td><code>rhs</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N M]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, N M]</code>
           </td>
           <td><p>Right hand side of the linear system.</p></td>
           <td>
@@ -2127,8 +2149,8 @@
 <code class="highlight language-python"><span class="n">root</span> <span class="o">=</span> <span class="n">root</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
 </h6>

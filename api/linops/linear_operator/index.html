@@ -19,7 +19,7 @@
         <link rel="next" href="../triangular_linear_operator/">
       
       <link rel="icon" href="../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -28,9 +28,6 @@
     
     
       <link rel="stylesheet" href="../../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -60,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -308,6 +302,20 @@
     <li class="md-nav__item">
       <a href="../../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1501,6 +1509,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1634,6 +1656,25 @@
 
 
 
+<h5 id="gpjax.linops.linear_operator.DTypes" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">DTypes</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">float32</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">int32</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">int64</span><span class="p">]]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h5 id="gpjax.linops.linear_operator.ShapeT" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">ShapeT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;ShapeT&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">NestedT</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="bp">Ellipsis</span><span class="p">]])</span></code>
   
@@ -1654,7 +1695,7 @@
 
 
 <h5 id="gpjax.linops.linear_operator.DTypeT" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">DTypeT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;DTypeT&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">NestedT</span><span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">dtype</span><span class="p">])</span></code>
+<code class="highlight language-python"><span class="n">DTypeT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;DTypeT&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">NestedT</span><span class="p">[</span><span class="n">DTypes</span><span class="p">])</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
@@ -1705,7 +1746,7 @@
 
   <div class="doc doc-contents ">
       <p class="doc doc-class-bases">
-        Bases: <code><span title="simple_pytree.Pytree">Pytree</span></code>, <code><span title="typing.Generic">Generic</span>[<a class="autorefs autorefs-internal" title="gpjax.linops.linear_operator.ShapeT" href="#gpjax.linops.linear_operator.ShapeT">ShapeT</a>, <a class="autorefs autorefs-internal" title="gpjax.linops.linear_operator.DTypeT" href="#gpjax.linops.linear_operator.DTypeT">DTypeT</a>]</code></p>
+        Bases: <code><span title="simple_pytree.Pytree">Pytree</span></code>, <code><span title="beartype.typing.Generic">Generic</span>[<a class="autorefs autorefs-internal" title="gpjax.linops.linear_operator.ShapeT" href="#gpjax.linops.linear_operator.ShapeT">ShapeT</a>, <a class="autorefs autorefs-internal" title="gpjax.linops.linear_operator.DTypeT" href="#gpjax.linops.linear_operator.DTypeT">DTypeT</a>]</code></p>
 
   
       <p>Linear operator base class.</p>
@@ -1827,7 +1868,7 @@
 
 
 <h6 id="gpjax.linops.linear_operator.LinearOperator.__sub__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__sub__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">LinearOperator</span> <span class="o">|</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">N</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
+<code class="highlight language-python"><span class="fm">__sub__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">LinearOperator</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">N</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
 
 </h6>
 
@@ -1845,7 +1886,7 @@
 
 
 <h6 id="gpjax.linops.linear_operator.LinearOperator.__rsub__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__rsub__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">LinearOperator</span> <span class="o">|</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">N</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
+<code class="highlight language-python"><span class="fm">__rsub__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">LinearOperator</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">N</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
 
 </h6>
 
@@ -1863,7 +1904,7 @@
 
 
 <h6 id="gpjax.linops.linear_operator.LinearOperator.__add__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">LinearOperator</span> <span class="o">|</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">N</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
+<code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">LinearOperator</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">N</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
 
 </h6>
 
@@ -1881,7 +1922,7 @@
 
 
 <h6 id="gpjax.linops.linear_operator.LinearOperator.__radd__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">LinearOperator</span> <span class="o">|</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">N</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
+<code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">LinearOperator</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">N</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
 
 </h6>
 
@@ -1899,7 +1940,7 @@
 
 
 <h6 id="gpjax.linops.linear_operator.LinearOperator.__mul__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
+<code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">ScalarFloat</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -1921,7 +1962,7 @@
 
 
 <h6 id="gpjax.linops.linear_operator.LinearOperator.__rmul__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
+<code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">ScalarFloat</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
 
 </h6>
 
@@ -1939,7 +1980,7 @@
 
 
 <h6 id="gpjax.linops.linear_operator.LinearOperator.__matmul__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__matmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">LinearOperator</span> <span class="o">|</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span> <span class="o">|</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="fm">__matmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">LinearOperator</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">LinearOperator</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">]]</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -1961,7 +2002,7 @@
 
 
 <h6 id="gpjax.linops.linear_operator.LinearOperator.__rmatmul__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__rmatmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">LinearOperator</span> <span class="o">|</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span> <span class="o">|</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="fm">__rmatmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">LinearOperator</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">LinearOperator</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">]]</span></code>
 
 </h6>
 
@@ -1992,7 +2033,7 @@
   
       <p>Diagonal of the linear operator.</p>
 <h6 id="gpjax.linops.linear_operator.LinearOperator.diagonal--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;N&quot;]: Diagonal of the linear operator.
+<div class="highlight"><pre><span></span><code>Float[Array, &quot; N&quot;]: Diagonal of the linear operator.
 </code></pre></div>
 
   </div>
@@ -2004,7 +2045,7 @@
 
 
 <h6 id="gpjax.linops.linear_operator.LinearOperator.trace" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">trace</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">trace</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -2013,7 +2054,7 @@
   
       <p>Trace of the linear matrix.</p>
 <h6 id="gpjax.linops.linear_operator.LinearOperator.trace--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: Trace of the linear matrix.
+<div class="highlight"><pre><span></span><code>ScalarFloat: Trace of the linear matrix.
 </code></pre></div>
 
   </div>
@@ -2025,7 +2066,7 @@
 
 
 <h6 id="gpjax.linops.linear_operator.LinearOperator.log_det" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">log_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">log_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -2034,7 +2075,7 @@
   
       <p>Log determinant of the linear matrix. Default implementation uses dense Cholesky decomposition.</p>
 <h6 id="gpjax.linops.linear_operator.LinearOperator.log_det--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: Log determinant of the linear matrix.
+<div class="highlight"><pre><span></span><code>ScalarFloat: Log determinant of the linear matrix.
 </code></pre></div>
 
   </div>
@@ -2088,7 +2129,7 @@
 
 
 <h6 id="gpjax.linops.linear_operator.LinearOperator.solve" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span> <span class="n">M</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span> <span class="n">M</span><span class="p">]</span></code>
 
 </h6>
 
@@ -2111,7 +2152,7 @@
         <tr>
           <td><code>rhs</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N M]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, N M]</code>
           </td>
           <td><p>Right hand side of the linear system.</p></td>
           <td>
@@ -2185,7 +2226,7 @@
         <tr>
           <td><code>dense</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N N]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, N N]</code>
           </td>
           <td><p>Dense matrix.</p></td>
           <td>

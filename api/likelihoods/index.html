@@ -19,7 +19,7 @@
         <link rel="next" href="../linops/constant_diagonal_linear_operator/">
       
       <link rel="icon" href="../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -28,9 +28,6 @@
     
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -60,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -308,6 +302,20 @@
     <li class="md-nav__item">
       <a href="../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1499,6 +1507,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1701,31 +1723,6 @@
 
 </div>
 
-<div class="doc doc-object doc-attribute">
-
-
-
-<h6 id="gpjax.likelihoods.AbstractLikelihood.link_function" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">link_function</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Return the link function of the likelihood function.</p>
-<h6 id="gpjax.likelihoods.AbstractLikelihood.link_function--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>tfd.Distribution: The distribution of observations, y, given values of the Gaussian process, f.
-</code></pre></div>
-  </div>
-
-</div>
-
 
 
 <div class="doc doc-object doc-function">
@@ -1756,7 +1753,7 @@
         <tr>
           <td><code>*args</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>Arguments to be passed to the likelihood's <code>predict</code> method.</p></td>
           <td>
@@ -1766,7 +1763,7 @@
         <tr>
           <td><code>**kwargs</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>Keyword arguments to be passed to the likelihood's <code>predict</code> method.</p></td>
           <td>
@@ -1815,7 +1812,7 @@
         <tr>
           <td><code>*args</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>Arguments to be passed to the likelihood's <code>predict</code> method.</p></td>
           <td>
@@ -1825,7 +1822,7 @@
         <tr>
           <td><code>**kwargs</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>Keyword arguments to be passed to the likelihood's <code>predict</code> method.</p></td>
           <td>
@@ -1836,6 +1833,31 @@
   </table>
       <h6 id="gpjax.likelihoods.AbstractLikelihood.predict--returns">Returns</h6>
 <div class="highlight"><pre><span></span><code>tfd.Distribution: The predictive distribution.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.likelihoods.AbstractLikelihood.link_function" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Return the link function of the likelihood function.</p>
+<h6 id="gpjax.likelihoods.AbstractLikelihood.link_function--returns">Returns</h6>
+<div class="highlight"><pre><span></span><code>tfd.Distribution: The distribution of observations, y, given values of the Gaussian process, f.
 </code></pre></div>
 
   </div>
@@ -1889,7 +1911,7 @@
 
 
 <h6 id="gpjax.likelihoods.Gaussian.obs_noise" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">obs_noise</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
+<code class="highlight language-python"><span class="n">obs_noise</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ScalarFloat</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="c1">#N]] = param_field(jnp.array(1.0), bijector=tfb.Softplus())</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -1910,7 +1932,7 @@
 
 
 <h6 id="gpjax.likelihoods.Gaussian.link_function" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="mi">1</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span></code>
+<code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span></code>
 
 </h6>
 
@@ -1931,19 +1953,9 @@
     </thead>
     <tbody>
         <tr>
-          <td><code>params</code></td>
-          <td>
-                <code>Dict</code>
-          </td>
-          <td><p>The parameters of the likelihood function.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
           <td><code>f</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N 1]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, <span title="..."></span>]</code>
           </td>
           <td><p>Function values.</p></td>
           <td>
@@ -1965,7 +1977,7 @@
 
 
 <h6 id="gpjax.likelihoods.Gaussian.predict" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">dist</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalTriL</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalFullCovariance</span></code>
+<code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">dist</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalTriL</span><span class="p">,</span> <span class="n">GaussianDistribution</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalFullCovariance</span></code>
 
 </h6>
 
@@ -1988,16 +2000,6 @@ distribution's covariance matrix.</p>
       </tr>
     </thead>
     <tbody>
-        <tr>
-          <td><code>params</code></td>
-          <td>
-                <code>Dict</code>
-          </td>
-          <td><p>The parameters of the likelihood function.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
         <tr>
           <td><code>dist</code></td>
           <td>
@@ -2066,7 +2068,7 @@ evaluated at a finite set of test points.</p></td>
 
 
 <h6 id="gpjax.likelihoods.Bernoulli.link_function" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="mi">1</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
+<code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
 
 </h6>
 
@@ -2089,7 +2091,7 @@ evaluated at a finite set of test points.</p></td>
         <tr>
           <td><code>f</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N 1]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, <span title="..."></span>]</code>
           </td>
           <td><p>Function values.</p></td>
           <td>
@@ -2133,16 +2135,6 @@ process posterior and likelihood parameters.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>params</code></td>
-          <td>
-                <code>Dict</code>
-          </td>
-          <td><p>The parameters of the likelihood function.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
           <td><code>dist</code></td>
           <td>
                 <code><a class="autorefs autorefs-internal" title="gpjax.likelihoods.tfd" href="#gpjax.likelihoods.tfd">tfd</a>.<span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
@@ -2177,7 +2169,7 @@ at a finite set of test points.</p></td>
 
 
 <h5 id="gpjax.likelihoods.inv_probit" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">inv_probit</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="mi">1</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">inv_probit</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="o">*</span><span class="n">N</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="o">*</span><span class="n">N</span><span class="p">]</span></code>
 
 </h5>
 
@@ -2200,7 +2192,7 @@ at a finite set of test points.</p></td>
         <tr>
           <td><code>x</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N 1]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, *N]</code>
           </td>
           <td><p>A vector of values.</p></td>
           <td>
@@ -2210,7 +2202,7 @@ at a finite set of test points.</p></td>
     </tbody>
   </table>
       <h6 id="gpjax.likelihoods.inv_probit--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;N 1&quot;]: The inverse probit of the input vector.
+<div class="highlight"><pre><span></span><code>Float[Array, &quot;*N&quot;]: The inverse probit of the input vector.
 </code></pre></div>
 
   </div>

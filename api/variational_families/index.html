@@ -13,11 +13,11 @@
         <link rel="canonical" href="https://example.com/api/variational_families/">
       
       
-        <link rel="prev" href="../scan/">
+        <link rel="prev" href="../typing/">
       
       
       <link rel="icon" href="../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -26,9 +26,6 @@
     
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -58,14 +55,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -306,6 +300,20 @@
     <li class="md-nav__item">
       <a href="../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1458,6 +1466,20 @@
               
   
   
+  
+    <li class="md-nav__item">
+      <a href="../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
     
   
   
@@ -1693,7 +1715,7 @@ under the variational approximation.</p>
         <tr>
           <td><code>*args</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>Arguments of the variational family's <code>predict</code> method.</p></td>
           <td>
@@ -1703,7 +1725,7 @@ under the variational approximation.</p>
         <tr>
           <td><code>**kwargs</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>Keyword arguments of the variational family's <code>predict</code>
 method.</p></td>
@@ -1753,7 +1775,7 @@ method.</p></td>
         <tr>
           <td><code>*args</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>Arguments of the variational family's <code>predict</code></p></td>
           <td>
@@ -1763,7 +1785,7 @@ method.</p></td>
         <tr>
           <td><code>**kwargs</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>Keyword arguments of the variational family's</p></td>
           <td>
@@ -1846,7 +1868,7 @@ method.</p></td>
 
 
 <h6 id="gpjax.variational_families.AbstractVariationalGaussian.jitter" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">jitter</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">jitter</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">)</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -1991,7 +2013,7 @@ and the distribution over the inducing inputs is
 
 
 <h6 id="gpjax.variational_families.VariationalGaussian.prior_kl" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">prior_kl</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">prior_kl</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -2004,7 +2026,7 @@ Gaussian process prior.</p>
 = KL[ N(μ, S) || N(μz, Kzz) ], where u = f(z) and z are the inducing
 inputs.</p>
 <h6 id="gpjax.variational_families.VariationalGaussian.prior_kl--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code> Float[Array, &quot;1&quot;]: The KL-divergence between our variational
+<div class="highlight"><pre><span></span><code> ScalarFloat: The KL-divergence between our variational
     approximation and the GP prior.
 </code></pre></div>
 
@@ -2045,7 +2067,7 @@ inputs.</p>
         <tr>
           <td><code>test_inputs</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N D]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, N D]</code>
           </td>
           <td><p>The test inputs at which we wish to make a prediction.</p></td>
           <td>
@@ -2115,7 +2137,7 @@ over μ and sqrt with S = sqrt sqrtᵀ.</p>
 
 
 <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.prior_kl" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">prior_kl</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">prior_kl</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -2126,7 +2148,7 @@ over μ and sqrt with S = sqrt sqrtᵀ.</p>
 the Gaussian process prior.</p>
 <p>For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(0, I)].</p>
 <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.prior_kl--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: The KL-divergence between our variational
+<div class="highlight"><pre><span></span><code>ScalarFloat: The KL-divergence between our variational
     approximation and the GP prior.
 </code></pre></div>
 
@@ -2165,7 +2187,7 @@ the Gaussian process prior.</p>
         <tr>
           <td><code>test_inputs</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N D]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, N D]</code>
           </td>
           <td><p>The test inputs at which we wish to make a prediction.</p></td>
           <td>
@@ -2289,7 +2311,7 @@ model inference, where T(u) = [u, uuᵀ] are the sufficient statistics.</p>
 
 
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.prior_kl" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">prior_kl</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">prior_kl</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -2300,7 +2322,7 @@ model inference, where T(u) = [u, uuᵀ] are the sufficient statistics.</p>
 <p>For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],</p>
 <p>with μ and S computed from the natural parameterisation θ = (S⁻¹μ, -S⁻¹/2).</p>
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.prior_kl--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: The KL-divergence between our variational approximation and the GP prior.
+<div class="highlight"><pre><span></span><code>ScalarFloat: The KL-divergence between our variational approximation and the GP prior.
 </code></pre></div>
 
   </div>
@@ -2440,42 +2462,20 @@ sufficient statistics T(u) = [u, uuᵀ]. The expectation parameters are given by
 
 
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.prior_kl" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">prior_kl</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">prior_kl</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
 
   <div class="doc doc-contents ">
   
-      <p>Compute the KL-divergence between our current variational approximation and the Gaussian process prior.</p>
+      <p>Compute the KL-divergence between our current variational approximation and
+the Gaussian process prior.</p>
 <p>For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],</p>
 <p>with μ and S computed from the expectation parameterisation η = (μ, S + uuᵀ).</p>
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>params</code></td>
-          <td>
-                <code>Dict</code>
-          </td>
-          <td><p>The parameters at which our variational distribution and GP prior are to be evaluated.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.prior_kl--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: The KL-divergence between our variational approximation and the GP prior.
+<h6 id="gpjax.variational_families.ExpectationVariationalGaussian.prior_kl--returns">Returns</h6>
+<div class="highlight"><pre><span></span><code>ScalarFloat: The KL-divergence between our variational approximation and
+    the GP prior.
 </code></pre></div>
 
   </div>

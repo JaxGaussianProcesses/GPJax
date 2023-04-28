@@ -10,20 +10,16 @@
       
       
       
-        <link rel="canonical" href="https://example.com/examples/intro_to_gps/">
+        <link rel="canonical" href="https://example.com/examples/spatial.pct/">
       
       
-        <link rel="prev" href="../pytrees/">
-      
-      
-        <link rel="next" href="../regression/">
       
       <link rel="icon" href="../../_static/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
-        <title>New to Gaussian Processes? - GPJax</title>
+        <title>Spatial modelling: efficient sampling via pathwise conditioning - GPJax</title>
       
     
     
@@ -69,7 +65,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#new-to-gaussian-processes" class="md-skip">
+        <a href="#spatial-modelling-efficient-sampling-via-pathwise-conditioning" class="md-skip">
           Skip to content
         </a>
       
@@ -103,7 +99,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              New to Gaussian Processes?
+              Spatial modelling: efficient sampling via pathwise conditioning
             
           </span>
         </div>
@@ -348,18 +344,16 @@
 
   
   
-    
-  
   
     
       
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
       
       
       
@@ -368,7 +362,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_3">
           <span class="md-nav__icon md-icon"></span>
           💡 Background
@@ -379,87 +373,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          New to Gaussian Processes?
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../intro_to_gps/" class="md-nav__link">
         New to Gaussian Processes?
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#bayes-theorem" class="md-nav__link">
-    Bayes' Theorem
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gaussian-random-variables" class="md-nav__link">
-    Gaussian random variables
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gaussian-processes" class="md-nav__link">
-    Gaussian processes
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gaussian-process-regression" class="md-nav__link">
-    Gaussian process regression
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#conclusions" class="md-nav__link">
-    Conclusions
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#system-configuration" class="md-nav__link">
-    System Configuration
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1606,43 +1524,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#bayes-theorem" class="md-nav__link">
-    Bayes' Theorem
+  <a href="#data-loading" class="md-nav__link">
+    Data loading
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#gaussian-random-variables" class="md-nav__link">
-    Gaussian random variables
+  <a href="#ard-kernel" class="md-nav__link">
+    ARD Kernel
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#gaussian-processes" class="md-nav__link">
-    Gaussian processes
+  <a href="#mean-function" class="md-nav__link">
+    Mean function
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#gaussian-process-regression" class="md-nav__link">
-    Gaussian process regression
+  <a href="#model-fitting" class="md-nav__link">
+    Model fitting
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#conclusions" class="md-nav__link">
-    Conclusions
+  <a href="#sampling-on-a-grid" class="md-nav__link">
+    Sampling on a grid
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#system-configuration" class="md-nav__link">
-    System Configuration
+    System configuration
   </a>
   
 </li>
@@ -2693,161 +2611,31 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=075fad36" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=b680c163" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="new-to-gaussian-processes">New to Gaussian Processes?<a class="anchor-link" href="#new-to-gaussian-processes">&#182;</a></h1><p>Fantastic that you're here! This notebook is designed to be a gentle
-introduction to the mathematics of Gaussian processes (GPs). No prior
-knowledge of Bayesian inference or GPs is assumed, and this notebook is
-self-contained. At a high level, we begin by introducing Bayes' theorem and
-its implications within probabilistic modelling. We then proceed to introduce
-the Gaussian random variable along with its multivariate form. We conclude by
-showing how this notion can be extended to GPs.</p>
-<h2 id="bayes-theorem">Bayes' Theorem<a class="anchor-link" href="#bayes-theorem">&#182;</a></h2><p>A probabilistic modelling task is comprised of an observed dataset
-$\mathbf{y}$ for which we construct a model. The parameters $\theta$ of our
-model are unknown, and our goal is to conduct inference to determine their
-range of likely values. To achieve this, we apply Bayes' theorem
-$$
-\begin{align}
-    \label{eq:BayesTheorem}
-    p(\theta\,|\, \mathbf{y}) = \frac{p(\theta)p(\mathbf{y}\,|\,\theta)}{p(\mathbf{y})} = \frac{p(\theta)p(\mathbf{y}\,|\,\theta)}{\int_{\theta}p(\mathbf{y}, \theta)\mathrm{d}\theta}\,,
-\end{align}
-$$
-where $p(\mathbf{y}\,|\,\theta)$ denotes the <em>likelihood</em>, or model, and
-quantifies how likely the observed dataset $\mathbf{y}$ is, given the
-parameter estimate $\theta$. The <em>prior</em> distribution $p(\theta)$ reflects our
-initial beliefs about the value of $\theta$ before observing data, whilst the
-<em>posterior</em> $p(\theta\,|\, \mathbf{y})$ gives an updated estimate of the
-parameters' value, after observing $\mathbf{y}$. The <em>marginal likelihood</em>, or
-Bayesian model evidence, $p(\mathbf{y})$ is the probability of the observed
-data under all possible hypotheses that our prior model can generate. Within
-Bayesian model selection, this property makes the marginal log-likelihood an
-indispensable tool. Selecting models under this criterion places a higher
-emphasis on models that can generalise better to new data points.</p>
-<p>When the posterior distribution belongs to the same family of probability
-distributions as the prior, we describe the prior and the likelihood as
-<em>conjugate</em> to each other. Such a scenario is convenient in Bayesian inference
-as it allows us to derive closed-form expressions for the posterior
-distribution. When the likelihood function is a member of the exponential
-family, then there exists a conjugate prior. However, the conjugate prior may
-not have a form that precisely reflects the practitioner's belief surrounding
-the parameter. For this reason, conjugate models seldom appear; one exception
-to this is GP regression that we present fully in our <a href="https://gpjax.readthedocs.io/en/latest/examples/regression.html">Regression notebook</a>.</p>
-<p>For models that do not contain a conjugate prior, the marginal log-likelihood
-must be calculated to normalise the posterior distribution and ensure it
-integrates to 1. For models with a single, 1-dimensional parameter, it may be
-possible to compute this integral analytically or through a quadrature scheme,
-such as Gauss-Hermite. However, in machine learning, the dimensionality of
-$\theta$ is often large and the corresponding integral required to compute
-$p(\mathbf{y})$ quickly becomes intractable as the dimension grows. Techniques
-such as Markov Chain Monte Carlo and variational inference allow us to
-approximate integrals such as the one seen in $p(\mathbf{y})$.</p>
-<p>Once a posterior distribution has been obtained, we can make predictions at
-new points $\mathbf{y}^{\star}$ through the <em>posterior predictive
-distribution</em>. This is achieved by integrating out the parameter set $\theta$
-from our posterior distribution through
-$$
-\begin{align}
-    &amp; = \int p(\mathbf{y}^{\star} \,|\, \theta, \mathbf{y} ) p(\theta\,|\, \mathbf{y})\mathrm{d}\theta\,.
-\end{align}
-$$
-As with the marginal log-likelihood, evaluating this quantity requires
-computing an integral which may not be tractable, particularly when $\theta$
-is high-dimensional.</p>
-<p>It is difficult to communicate statistics directly through a posterior
-distribution, so we often compute and report moments of the posterior
-distribution. Most commonly, we report the first moment and the centred second
-moment
-$$
-\begin{alignat}{2}
-    \mu  = \mathbb{E}[\theta\,|\,\mathbf{y}]  &amp; = \int \theta
-    \sigma^2  = \mathbb{V}[\theta\,|\,\mathbf{y}] &amp; = \int \left(\theta -
-    \mathbb{E}[\theta\,|\,\mathbf{y}]\right)^2p(\theta\,|\,\mathbf{y})\mathrm{d}\theta&amp;\,.
-\end{alignat}
-$$
-Through this pair of statistics, we can communicate our beliefs about the most
-likely value of $\theta$ i.e., $\mu$, and the uncertainty $\sigma$ around the
-expected value. However, as with the marginal log-likelihood and predictive
-posterior distribution, computing these statistics again requires a
-potentially intractable integral.</p>
-<h2 id="gaussian-random-variables">Gaussian random variables<a class="anchor-link" href="#gaussian-random-variables">&#182;</a></h2><p>We begin our review with the simplest case; a univariate Gaussian random
-variable. For a random variable $y$, let $\mu\in\mathbb{R}$ be a mean scalar
-and $\sigma^2\in\mathbb{R}_{&gt;0}$ a variance scalar. If $y$ is a Gaussian
-random variable, then the density of $y$ is
-$$
-\begin{align}
-    \mathcal{N}(y\,|\, \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(y-\mu)^2}{2\sigma^{2}}\right)\,.
-\end{align}
-$$
-We can plot three different parameterisations of this density.</p>
-<p>import warnings</p>
-<p>import jax.numpy as jnp
-import jax.random as jr
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
-import tensorflow_probability.substrates.jax as tfp
-from utils import confidence_ellipse</p>
-<p>plt.style.use(&quot;./gpjax.mplstyle&quot;)
-cols = mpl.rcParams[&quot;axes.prop_cycle&quot;].by_key()[&quot;color&quot;]
-tfd = tfp.distributions</p>
-<p>ud1 = tfd.Normal(0.0, 1.0)
-ud2 = tfd.Normal(-1.0, 0.5)
-ud3 = tfd.Normal(0.25, 1.5)</p>
-<p>xs = jnp.linspace(-5.0, 5.0, 500)</p>
-<p>fig, ax = plt.subplots()
-for d in [ud1, ud2, ud3]:
-    ax.plot(
-        xs,
-        jnp.exp(d.log_prob(xs)),
-        label=f&quot;$\\mathcal{{N}}({{{float(d.mean())}}},\\  {{{float(d.stddev())}}}^2)$&quot;,
-    )
-    ax.fill_between(xs, jnp.zeros_like(xs), jnp.exp(d.log_prob(xs)), alpha=0.2)
-ax.legend(loc=&quot;best&quot;)</p>
-
-</div>
-</div>
-</div>
-</div>
-<div id="cell-id=106242d4" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>A Gaussian random variable is uniquely defined in distribution by its mean
-$\mu$ and variance $\sigma^2$ and we therefore write $y\sim\mathcal{N}(\mu,
-\sigma^2)$ when describing a Gaussian random variable. We can compute
-these two quantities by
-$$
-\begin{align}
-    \mathbb{E}[y] = \mu\,, \quad \quad \mathbb{E}\left[(y-\mu)^2\right] =\sigma^2\,.
-\end{align}
-$$
-Extending this concept to vector-valued random variables reveals the
-multivariate Gaussian random variables which brings us closer to the full
-definition of a GP.</p>
-<p>Let $\mathbf{y}$ be a $D$-dimensional random variable, $\boldsymbol{\mu}$ be a
-$D$-dimensional mean vector and $\boldsymbol{\Sigma}$ be a $D\times D$
-covariance matrix. If $\mathbf{y}$ is a Gaussian random variable, then the
-density of $\mathbf{y}$ is
-$$
-\begin{align}
-    \mathcal{N}(\mathbf{y}\,|\, \boldsymbol{\mu}, \boldsymbol{\Sigma}) = \frac{1}{\sqrt{2\pi}^{D/2} \lvert\boldsymbol{\Sigma}\rvert^{1/2}} \exp\left(-\frac{1}{2} \left(\mathbf{y} - \boldsymbol{\mu}\right)^T \boldsymbol{\Sigma}^{-1} \left(\mathbf{y}-\boldsymbol{\mu}\right) \right) \,.
-\end{align}
-$$
-Three example parameterisations of this can be visualised below where $\rho$
-determines the correlation of the multivariate Gaussian.</p>
+<h1 id="spatial-modelling-efficient-sampling-via-pathwise-conditioning">Spatial modelling: efficient sampling via pathwise conditioning<a class="anchor-link" href="#spatial-modelling-efficient-sampling-via-pathwise-conditioning">&#182;</a></h1><p>In this notebook, we demonstrate an application of Gaussian Processes
+to a spatial interpolation problem. We will show how
+to efficiently sample from a GP posterior as shown in <strong data-cite="wilson2020efficient"></strong>.</p>
+<h2 id="data-loading">Data loading<a class="anchor-link" href="#data-loading">&#182;</a></h2><p>We'll use open-source data from
+<a href="https://www.meteoswiss.admin.ch/services-and-publications/applications/measurement-values-and-measuring-networks.html#lang=en%C2%B6m=messnetz-automatisch">SwissMetNet</a>,
+the surface weather monitoring network of the Swiss national weather service,
+and digital elevation model (DEM) data from Copernicus, accessible
+<a href="https://planetarycomputer.microsoft.com/dataset/cop-dem-glo-90">here</a>
+via the Planetary Computer data catalog.
+We will coarsen this data by a factor of 10 (going from 90m to 900m resolution), but feel free to change this.</p>
+<p>Our variable of interest is the maximum daily temperature, observed on the 4th of April 2023 at
+150 weather stations, and we'll try to interpolate it on a spatial grid using geographical coordinates
+(latitude and longitude) and elevation as input variables.</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=79df8a74" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=31a0d266" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2867,97 +2655,107 @@ determines the correlation of the multivariate Gaussian.</p>
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 
-<span class="n">d1</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalDiag</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">scale_diag</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
-<span class="n">d2</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalTriL</span><span class="p">(</span>
-    <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]))</span>
+<span class="kn">import</span> <span class="nn">fsspec</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">import</span> <span class="nn">jax.random</span> <span class="k">as</span> <span class="nn">jr</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">optax</span> <span class="k">as</span> <span class="nn">ox</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">planetary_computer</span>
+<span class="kn">import</span> <span class="nn">pystac_client</span>
+<span class="kn">import</span> <span class="nn">rioxarray</span> <span class="k">as</span> <span class="nn">rio</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span>
+<span class="kn">from</span> <span class="nn">rioxarray.merge</span> <span class="kn">import</span> <span class="n">merge_arrays</span>
+
+<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">install_import_hook</span>
+
+<span class="k">with</span> <span class="n">install_import_hook</span><span class="p">(</span><span class="s2">&quot;gpjax&quot;</span><span class="p">,</span> <span class="s2">&quot;beartype.beartype&quot;</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
+    <span class="kn">from</span> <span class="nn">gpjax.base</span> <span class="kn">import</span> <span class="n">param_field</span>
+    <span class="kn">from</span> <span class="nn">gpjax.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+
+<span class="n">jax</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+
+<span class="c1"># Observed temperature data</span>
+<span class="n">temperature</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data/max_tempeature_switzerland.csv&quot;</span><span class="p">)</span>
+<span class="n">temperature</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+    <span class="n">temperature</span><span class="p">,</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">temperature</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">temperature</span><span class="o">.</span><span class="n">latitude</span><span class="p">),</span>
+<span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;any&quot;</span><span class="p">)</span>
+
+<span class="c1"># Country borders shapefile</span>
+<span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;simplecache::https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_admin_0_countries.zip&quot;</span>
+<span class="k">with</span> <span class="n">fsspec</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+    <span class="n">ch_shp</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;ADMIN == &#39;Switzerland&#39;&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># Read DEM data and clip it to switzerland</span>
+<span class="n">catalog</span> <span class="o">=</span> <span class="n">pystac_client</span><span class="o">.</span><span class="n">Client</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+    <span class="s2">&quot;https://planetarycomputer.microsoft.com/api/stac/v1&quot;</span><span class="p">,</span>
+    <span class="n">modifier</span><span class="o">=</span><span class="n">planetary_computer</span><span class="o">.</span><span class="n">sign_inplace</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">d3</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalTriL</span><span class="p">(</span>
-    <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]))</span>
-<span class="p">)</span>
-
-<span class="n">dists</span> <span class="o">=</span> <span class="p">[</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">]</span>
-
-<span class="n">xvals</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
-<span class="n">yvals</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
-
-<span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">yvals</span><span class="p">)</span>
-
-<span class="n">pos</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">xx</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
-<span class="n">pos</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span>
-<span class="n">pos</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">yy</span><span class="p">)</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax0</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tight_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s2">&quot;$\rho = 0$&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;$\rho = 0.9$&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;$\rho = -0.5$&quot;</span><span class="p">]</span>
-
-<span class="n">cmap</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="s2">&quot;custom&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">N</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">ax0</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">],</span> <span class="n">titles</span><span class="p">,</span> <span class="n">dists</span><span class="p">):</span>
-    <span class="n">d_prob</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">prob</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">xx</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">yy</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
-        <span class="n">xx</span><span class="o">.</span><span class="n">shape</span>
-    <span class="p">)</span>
-    <span class="n">cntf</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">d_prob</span><span class="p">),</span> <span class="n">levels</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">antialiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cntf</span><span class="o">.</span><span class="n">collections</span><span class="p">:</span>
-        <span class="n">c</span><span class="o">.</span><span class="n">set_edgecolor</span><span class="p">(</span><span class="s2">&quot;face&quot;</span><span class="p">)</span>
-    <span class="n">a</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">2.75</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">)</span>
-    <span class="n">a</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">2.75</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">)</span>
-    <span class="n">samples</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">5000</span><span class="p">,))</span>
-    <span class="n">xsample</span><span class="p">,</span> <span class="n">ysample</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
-    <span class="n">confidence_ellipse</span><span class="p">(</span>
-        <span class="n">xsample</span><span class="p">,</span> <span class="n">ysample</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;#3f3f3f&quot;</span><span class="p">,</span> <span class="n">n_std</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span>
-    <span class="p">)</span>
-    <span class="n">confidence_ellipse</span><span class="p">(</span>
-        <span class="n">xsample</span><span class="p">,</span> <span class="n">ysample</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;#3f3f3f&quot;</span><span class="p">,</span> <span class="n">n_std</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span>
-    <span class="p">)</span>
-    <span class="n">a</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">mew</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+<span class="n">search</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">collections</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cop-dem-glo-90&quot;</span><span class="p">],</span> <span class="n">bbox</span><span class="o">=</span><span class="p">[</span><span class="mf">5.5</span><span class="p">,</span> <span class="mf">45.5</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">48.5</span><span class="p">])</span>
+<span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">())</span>
+<span class="n">tiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">rio</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">assets</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">href</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;band&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span><span class="p">]</span>
+<span class="n">dem</span> <span class="o">=</span> <span class="n">merge_arrays</span><span class="p">(</span><span class="n">tiles</span><span class="p">)</span><span class="o">.</span><span class="n">coarsen</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">ch_shp</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">])</span>
 </pre></div>
-<div id="cell-1" class="clipboard-copy-txt">key = jr.PRNGKey(123)
+<div id="cell-1" class="clipboard-copy-txt">from dataclasses import dataclass
 
-d1 = tfd.MultivariateNormalDiag(loc=jnp.zeros(2), scale_diag=jnp.ones(2))
-d2 = tfd.MultivariateNormalTriL(
-    jnp.zeros(2), jnp.linalg.cholesky(jnp.array([[1.0, 0.9], [0.9, 1.0]]))
+import fsspec
+import geopandas as gpd
+import jax
+import jax.numpy as jnp
+import jax.random as jr
+import matplotlib.pyplot as plt
+import optax as ox
+import pandas as pd
+import planetary_computer
+import pystac_client
+import rioxarray as rio
+import xarray as xr
+from jaxtyping import Array, Float
+from rioxarray.merge import merge_arrays
+
+from jaxtyping import install_import_hook
+
+with install_import_hook("gpjax", "beartype.beartype"):
+    import gpjax as gpx
+    from gpjax.base import param_field
+    from gpjax.dataset import Dataset
+
+jax.config.update("jax_enable_x64", True)
+
+key = jr.PRNGKey(123)
+
+# Observed temperature data
+temperature = pd.read_csv("data/max_tempeature_switzerland.csv")
+temperature = gpd.GeoDataFrame(
+    temperature,
+    geometry=gpd.points_from_xy(temperature.longitude, temperature.latitude),
+).dropna(how="any")
+
+# Country borders shapefile
+path = "simplecache::https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_admin_0_countries.zip"
+with fsspec.open(path) as file:
+    ch_shp = gpd.read_file(file).query("ADMIN == 'Switzerland'")
+
+
+# Read DEM data and clip it to switzerland
+catalog = pystac_client.Client.open(
+    "https://planetarycomputer.microsoft.com/api/stac/v1",
+    modifier=planetary_computer.sign_inplace,
 )
-d3 = tfd.MultivariateNormalTriL(
-    jnp.zeros(2), jnp.linalg.cholesky(jnp.array([[1.0, -0.5], [-0.5, 1.0]]))
-)
-
-dists = [d1, d2, d3]
-
-xvals = jnp.linspace(-5.0, 5.0, 500)
-yvals = jnp.linspace(-5.0, 5.0, 500)
-
-xx, yy = jnp.meshgrid(xvals, yvals)
-
-pos = jnp.empty(xx.shape + (2,))
-pos.at[:, :, 0].set(xx)
-pos.at[:, :, 1].set(yy)
-
-fig, (ax0, ax1, ax2) = plt.subplots(figsize=(10, 3), ncols=3, tight_layout=True)
-titles = [r"$\rho = 0$", r"$\rho = 0.9$", r"$\rho = -0.5$"]
-
-cmap = mpl.colors.LinearSegmentedColormap.from_list("custom", ["white", cols[1]], N=256)
-
-for a, t, d in zip([ax0, ax1, ax2], titles, dists):
-    d_prob = d.prob(jnp.hstack([xx.reshape(-1, 1), yy.reshape(-1, 1)])).reshape(
-        xx.shape
-    )
-    cntf = a.contourf(xx, yy, jnp.exp(d_prob), levels=20, antialiased=True, cmap=cmap)
-    for c in cntf.collections:
-        c.set_edgecolor("face")
-    a.set_xlim(-2.75, 2.75)
-    a.set_ylim(-2.75, 2.75)
-    samples = d.sample(seed=key, sample_shape=(5000,))
-    xsample, ysample = samples[:, 0], samples[:, 1]
-    confidence_ellipse(
-        xsample, ysample, a, edgecolor="#3f3f3f", n_std=1.0, linestyle="--", alpha=0.8
-    )
-    confidence_ellipse(
-        xsample, ysample, a, edgecolor="#3f3f3f", n_std=2.0, linestyle="--"
-    )
-    a.plot(0, 0, "x", color=cols[0], markersize=8, mew=2)
-    a.set(xlabel="x", ylabel="y", title=t)</div>
+search = catalog.search(collections=["cop-dem-glo-90"], bbox=[5.5, 45.5, 10.0, 48.5])
+items = list(search.get_all_items())
+tiles = [rio.open_rasterio(i.assets["data"].href).squeeze().drop("band") for i in items]
+dem = merge_arrays(tiles).coarsen(x=10, y=10).mean().rio.clip(ch_shp["geometry"])</div>
         
         </div>
     </div>
@@ -2967,48 +2765,21 @@ for a, t, d in zip([ax0, ax1, ax2], titles, dists):
 
 </div>
 </div>
-<div id="cell-id=fe59eee0" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=6823eb4e" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Extending the intuition given for the moments of a univariate Gaussian random
-variables, we can obtain the mean and covariance by
-$$
-\begin{align}
-    &amp; = \boldsymbol{\Sigma}\,.
-\end{align}
-$$
-The covariance matrix is a symmetric positive definite matrix that generalises
-the notion of variance to multiple dimensions. The matrix's diagonal entries
-contain the variance of each element, whilst the off-diagonal entries quantify
-the degree to which the respective pair of random variables are linearly
-related; this quantity is called the <em>covariance</em>.</p>
-<p>Assuming a Gaussian likelihood function in a Bayesian model is attractive as
-the mean and variance parameters are highly interpretable. This makes prior
-elicitation straightforward as the parameters' value can be intuitively
-contextualised within the scope of the problem at hand. Further, in models
-where the posterior distribution is Gaussian, we again use the distribution's
-mean and variance to describe our prediction and corresponding uncertainty
-around a given event occurring.</p>
-<p>Not only are Gaussian random variables highly interpretable, but linear
-operations involving them lead to analytical solutions. An example of this
-that will be useful in the sequel is the marginalisation and conditioning
-property of sets of Gaussian random variables. We will present these two
-results now for a pair of Gaussian random variables, but it should be stressed
-that these results hold for any finite set of Gaussian random variables.</p>
-<p>For a pair of random variables $\mathbf{x}$ and $\mathbf{y}$ defined on the
-same support, the distribution over them both is known as the <em>joint
-distribution</em>. The joint distribution $p(\mathbf{x}, \mathbf{y})$ quantifies
-the probability of two events, one from $p(\mathbf{x})$ and another from
-$p(\mathbf{y})$, occurring at the same time. We visualise this idea below.</p>
+<p>Let us take a look at the data. The topography of Switzerland is quite complex, and there
+are sometimes very large height differences over short distances. This measuring network is fairly dense,
+and you may already notice that there's a dependency between maximum daily temperature and elevation.</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=79428b4a" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=2721a0ff" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3028,139 +2799,24 @@ $p(\mathbf{y})$, occurring at the same time. We visualise this idea below.</p>
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">1000</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,))</span>
-<span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">subkey</span><span class="p">,</span> <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,))</span>
-<span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">subkey</span><span class="p">)</span>
-<span class="n">xfull</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">subkey</span><span class="p">,</span> <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,))</span>
-<span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">subkey</span><span class="p">)</span>
-<span class="n">yfull</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">subkey</span><span class="p">,</span> <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,))</span>
-<span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">subkey</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;idx&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)})</span>
-
-<span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
-        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
-        <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span>
-        <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;idx&quot;</span><span class="p">,</span>
-        <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
-        <span class="n">space</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span>
-        <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span>
-        <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-        <span class="n">marginal_ticks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;inferno&quot;</span><span class="p">,</span>
-        <span class="n">marginal_kws</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;fill&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="s2">&quot;linewidth&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-            <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
-            <span class="s2">&quot;bw_adjust&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="s2">&quot;cmap&quot;</span><span class="p">:</span> <span class="n">cmap</span><span class="p">,</span>
-        <span class="p">},</span>
-        <span class="n">joint_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s2">&quot;cmap&quot;</span><span class="p">:</span> <span class="n">cmap</span><span class="p">},</span>
-    <span class="p">)</span>
-    <span class="n">g</span><span class="o">.</span><span class="n">ax_joint</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$p(\mathbf</span><span class="si">{x}</span><span class="s2">, \mathbf</span><span class="si">{y}</span><span class="s2">)$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.75</span><span class="p">))</span>
-    <span class="n">g</span><span class="o">.</span><span class="n">ax_marg_x</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$p(\mathbf</span><span class="si">{x}</span><span class="s2">)$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">))</span>
-    <span class="n">g</span><span class="o">.</span><span class="n">ax_marg_y</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$p(\mathbf</span><span class="si">{y}</span><span class="s2">)$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.78</span><span class="p">))</span>
-    <span class="n">confidence_ellipse</span><span class="p">(</span>
-        <span class="n">xfull</span><span class="p">,</span>
-        <span class="n">yfull</span><span class="p">,</span>
-        <span class="n">g</span><span class="o">.</span><span class="n">ax_joint</span><span class="p">,</span>
-        <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;#3f3f3f&quot;</span><span class="p">,</span>
-        <span class="n">n_std</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-        <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
-        <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">confidence_ellipse</span><span class="p">(</span>
-        <span class="n">xfull</span><span class="p">,</span>
-        <span class="n">yfull</span><span class="p">,</span>
-        <span class="n">g</span><span class="o">.</span><span class="n">ax_joint</span><span class="p">,</span>
-        <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;#3f3f3f&quot;</span><span class="p">,</span>
-        <span class="n">n_std</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
-        <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
-        <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">confidence_ellipse</span><span class="p">(</span>
-        <span class="n">xfull</span><span class="p">,</span>
-        <span class="n">yfull</span><span class="p">,</span>
-        <span class="n">g</span><span class="o">.</span><span class="n">ax_joint</span><span class="p">,</span>
-        <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;#3f3f3f&quot;</span><span class="p">,</span>
-        <span class="n">n_std</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
-        <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
-        <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="p">)</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;constrained&quot;</span><span class="p">)</span>
+<span class="n">dem</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">,</span> <span class="n">cbar_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;aspect&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;pad&quot;</span><span class="p">:</span> <span class="mf">0.02</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Elevation [m]&quot;</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="n">temperature</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;t_max&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdBu_r&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">15</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Switzerland&#39;s topography and SwissMetNet stations&quot;</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+<span class="n">cb</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">collections</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+<span class="n">cb</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">&quot;Max. daily temperature [°C]&quot;</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
-<div id="cell-2" class="clipboard-copy-txt">n = 1000
-x = tfd.Normal(loc=0.0, scale=1.0).sample(seed=key, sample_shape=(n,))
-key, subkey = jr.split(key)
-y = tfd.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n,))
-key, subkey = jr.split(subkey)
-xfull = tfd.Normal(loc=0.0, scale=1.0).sample(seed=subkey, sample_shape=(n * 10,))
-key, subkey = jr.split(subkey)
-yfull = tfd.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n * 10,))
-key, subkey = jr.split(subkey)
-df = pd.DataFrame({"x": x, "y": y, "idx": jnp.ones(n)})
-
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    g = sns.jointplot(
-        data=df,
-        x="x",
-        y="y",
-        hue="idx",
-        marker=".",
-        space=0.0,
-        xlim=(-4.0, 4.0),
-        ylim=(-4.0, 4.0),
-        height=4,
-        marginal_ticks=False,
-        legend=False,
-        palette="inferno",
-        marginal_kws={
-            "fill": True,
-            "linewidth": 1,
-            "color": cols[1],
-            "alpha": 0.3,
-            "bw_adjust": 2,
-            "cmap": cmap,
-        },
-        joint_kws={"color": cols[1], "size": 3.5, "alpha": 0.4, "cmap": cmap},
-    )
-    g.ax_joint.annotate(text=r"$p(\mathbf{x}, \mathbf{y})$", xy=(-3, -1.75))
-    g.ax_marg_x.annotate(text=r"$p(\mathbf{x})$", xy=(-2.0, 0.225))
-    g.ax_marg_y.annotate(text=r"$p(\mathbf{y})$", xy=(0.4, -0.78))
-    confidence_ellipse(
-        xfull,
-        yfull,
-        g.ax_joint,
-        edgecolor="#3f3f3f",
-        n_std=1.0,
-        linestyle="--",
-        linewidth=0.5,
-    )
-    confidence_ellipse(
-        xfull,
-        yfull,
-        g.ax_joint,
-        edgecolor="#3f3f3f",
-        n_std=2.0,
-        linestyle="--",
-        linewidth=0.5,
-    )
-    confidence_ellipse(
-        xfull,
-        yfull,
-        g.ax_joint,
-        edgecolor="#3f3f3f",
-        n_std=3.0,
-        linestyle="--",
-        linewidth=0.5,
-    )</div>
+<div id="cell-2" class="clipboard-copy-txt">
+fig, ax = plt.subplots(figsize=(8, 5), layout="constrained")
+dem.plot(
+    cmap="terrain", cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Elevation [m]"}
+)
+temperature.plot("t_max", ax=ax, cmap="RdBu_r", vmin=-15, vmax=15, edgecolor="k", s=50)
+ax.set(title="Switzerland's topography and SwissMetNet stations", aspect="auto")
+cb = fig.colorbar(ax.collections[-1], aspect=50, pad=0.02)
+cb.set_label("Max. daily temperature [°C]", labelpad=-2)</div>
         
         </div>
     </div>
@@ -3170,201 +2826,19 @@ with warnings.catch_warnings():
 
 </div>
 </div>
-<div id="cell-id=aa29db81" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=3b13d10d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Formmally, we can define this by letting $p(\mathbf{x}, \mathbf{y})$ be the
-joint probability distribution defined over
-$\mathbf{x}\sim\mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}}, \boldsymbol{\Sigma}_{\mathbf{xx}})$ and
-$\mathbf{y}\sim\mathcal{N}(\boldsymbol{\mu}_{\mathbf{y}}, \boldsymbol{\Sigma}_{\mathbf{yy}})$.
-We define the joint distribution as
-$$
-\begin{align}
-    p\left(\begin{bmatrix}
-        \mathbf{x} \\ \mathbf{y}
-    \end{bmatrix}\right) = \mathcal{N}\left(\begin{bmatrix}
-        \boldsymbol{\mu}_{\mathbf{x}} \\ \boldsymbol{\mu}_{\mathbf{y}}
-    \end{bmatrix}, \begin{bmatrix}
-        \boldsymbol{\Sigma}_{\mathbf{yx}}, \boldsymbol{\Sigma}_{\mathbf{yy}}
-    \end{bmatrix} \right)\,,
-\end{align}
-$$
-where $\boldsymbol{\Sigma}_{\mathbf{x}\mathbf{y}}$ is the cross-covariance
-matrix of $\mathbf{x}$ and $\mathbf{y}$.</p>
-<p>When presented with a joint distribution, two tasks that we may wish to
-perform are <em>marginalisation</em> and <em>conditioning</em>. For a joint distribution
-$p(\mathbf{x}, \mathbf{y})$ where we are interested only in $p(\mathbf{x})$,
-we must integrate over all possible values of $\mathbf{y}$ to obtain
-$p(\mathbf{x})$. This process is marginalisation. Conditioning allows us to
-evaluate the probability of one random variable, given that the other random
-variable is fixed. For a joint Gaussian distribution, marginalisation and
-conditioning have analytical expressions where the resulting distribution is
-also a Gaussian random variable.</p>
-<p>For a joint Gaussian random variable, the marginalisation of $\mathbf{x}$ or
-$\mathbf{y}$ is given by
-$$
-\begin{alignat}{3}
-    &amp; \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{y} &amp;&amp; = p(\mathbf{x})
-    &amp;&amp; = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}},
-    &amp; \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{x} &amp;&amp; = p(\mathbf{y})
-    &amp;&amp; = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{y}},
-    \boldsymbol{\Sigma}_{\mathbf{yy}})\,.
-\end{alignat}
-$$
-The conditional distributions are given by
-$$
-\begin{align}
-    p(\mathbf{y}\,|\, \mathbf{x}) &amp; = \mathcal{N}\left(\boldsymbol{\mu}_{\mathbf{y}} + \boldsymbol{\Sigma}_{\mathbf{yx}}\boldsymbol{\Sigma}_{\mathbf{xx}}^{-1}(\mathbf{x}-\boldsymbol{\mu}_{\mathbf{x}}), \boldsymbol{\Sigma}_{\mathbf{yy}}-\boldsymbol{\Sigma}_{\mathbf{yx}}\boldsymbol{\Sigma}_{\mathbf{xx}}^{-1}\boldsymbol{\Sigma}_{\mathbf{xy}}\right)\,.
-\end{align}
-$$</p>
-<p>Within this section, we have introduced the idea of multivariate Gaussian
-random variables and presented some key results concerning their properties.
-In the following section, we will lift our presentation of Gaussian random
-variables to GPs.</p>
-<h2 id="gaussian-processes">Gaussian processes<a class="anchor-link" href="#gaussian-processes">&#182;</a></h2><p>When transitioning from Gaussian random variables to GP there is a shift in
-thought required to parse the forthcoming material. Firstly, to be consistent
-with the general literature, we hereon use $\mathbf{X}$ to denote an observed
-vector of data points, not a random variable as has been true up until now. To
-distinguish between matrices and vectors, we use bold upper case characters
-e.g., $\mathbf{X}$ for matrices, and bold lower case characters for vectors
-e.g., $\mathbf{x}$.</p>
-<p>We are interested in modelling supervised learning problems, where we have $n$
-observations $\mathbf{y}=\{y_1, y_2,\ldots ,y_n\}\subset\mathcal{Y}$ at
-corresponding inputs
-$\mathbf{X}=\{\mathbf{x}_1,\mathbf{x}_2,\ldots,\mathbf{x}_n\}\subset\mathcal{X}$.
-We aim to capture the relationship between $\mathbf{X}$ and $\mathbf{y}$ using
-a model $f$ with which we may make predictions at an unseen set of test points
-$\mathbf{X}^{\star}\subset\mathcal{X}$. We formalise this by
-$$
-\begin{align}
-    y = f(\mathbf{X}) + \varepsilon\,,
-\end{align}
-$$
-where $\varepsilon$ is an observational noise term. We collectively refer to
-$(\mathbf{X}, \mathbf{y})$ as the <em>training data</em> and $\mathbf{X}^{\star}$ as
-the set of <em>test points</em>.
-This process is visualised below</p>
-<p><img src="figs/generating_process.png" alt="" /></p>
-<p>As we shall go on to see, GPs offer an appealing workflow for scenarios such
-as this, all under a Bayesian framework.</p>
-<p>We write a GP $f(\cdot) \sim \mathcal{GP}(\mu(\cdot), k(\cdot, \cdot))$ with
-mean function $\mu: \mathcal{X} \rightarrow \mathbb{R}$ and
-$\boldsymbol{\theta}$-parameterised kernel
-$k: \mathcal{X} \times \mathcal{X}\rightarrow \mathbb{R}$.
-When evaluating the GP on a finite set of points
-$\mathbf{X}\subset\mathcal{X}$, $k$ gives rise to the Gram matrix
-$\mathbf{K}_{ff}$ such that the $(i, j)^{\text{th}}$ entry of the matrix is
-given by $[\mathbf{K}_{ff}]_{i, j} = k(\mathbf{x}_i, \mathbf{x}_j)$. As is
-conventional within the literature, we centre our training data and assume
-$\mu(\mathbf{X}):= 0$ for all $\mathbf{X}\in\mathbf{X}$. We further drop
-dependency on $\boldsymbol{\theta}$ and $\mathbf{X}$ for notational
-convenience in the remainder of this article.</p>
-<p>We define a joint GP prior over the latent function
-$$
-\begin{align}
-    p(\mathbf{f}, \mathbf{f}^{\star}) = \mathcal{N}\left(\mathbf{0}, \begin{bmatrix}
-        \mathbf{K}_{xf} &amp; \mathbf{K}_{xx}
-    \end{bmatrix}\right)\,,
-\end{align}
-$$
-where $\mathbf{f}^{\star} = f(\mathbf{X}^{\star})$. Conditional on the GP's
-latent function $f$, we assume a factorising likelihood generates our
-observations
-$$
-\begin{align}
-    p(\mathbf{y}\,|\,\mathbf{f}) = \prod_{i=1}^n p(y_i\,|\, f_i)\,.
-\end{align}
-$$
-Strictly speaking, the likelihood function is
-$p(\mathbf{y}\,|\,\phi(\mathbf{f}))$ where $\phi$ is the likelihood function's
-associated link function. Example link functions include the probit or
-logistic functions for a Bernoulli likelihood and the identity function for a
-Gaussian likelihood. We eschew this notation for now as this section primarily
-considers Gaussian likelihood functions where the role of $\phi$ is
-superfluous. However, this intuition will be helpful for models with a
-non-Gaussian likelihood, such as those encountered in
-<a href="https://gpjax.readthedocs.io/en/latest/examples/classification.html">classification</a>.</p>
-<p>Applying Bayes' theorem \eqref{eq:BayesTheorem} yields the joint posterior distribution over the
-latent function
-$$
-\begin{align}
-    p(\mathbf{f}, \mathbf{f}^{\star}\,|\,\mathbf{y}) = \frac{p(\mathbf{y}\,|\,\mathbf{f})p(\mathbf{f},\mathbf{f}^{\star})}{p(\mathbf{y})}\,.
-\end{align}
-$$</p>
-<p>The choice of kernel function that we use to parameterise our GP is an
-important modelling decision as the choice of kernel dictates properties such
-as differentiability, variance and characteristic lengthscale of the functions
-that are admissible under the GP prior. A kernel is a positive-definite
-function with parameters $\boldsymbol{\theta}$ that maps pairs of inputs
-$\mathbf{X}, \mathbf{X}' \in \mathcal{X}$ onto the real line. We dedicate the
-entirety of the <a href="https://gpjax.readthedocs.io/en/latest/examples/kernels.html">Kernel Guide
-notebook</a> to
-exploring the different GPs each kernel can yield.</p>
-<h2 id="gaussian-process-regression">Gaussian process regression<a class="anchor-link" href="#gaussian-process-regression">&#182;</a></h2><p>When the likelihood function is a Gaussian distribution
-$p(y_i\,|\, f_i) = \mathcal{N}(y_i\,|\, f_i, \sigma_n^2)$,
-marginalising $\mathbf{f}$ from the joint posterior to obtain
-the posterior predictive distribution is exact
-$$
-\begin{align}
-    &amp; = \mathcal{N}(\mathbf{f}^{\star}\,|\,\boldsymbol{\mu}_{\,|\,\mathbf{y}}, \Sigma_{\,|\,\mathbf{y}})\,,
-\end{align}
-$$
-where
-$$
-\begin{align}
-    \Sigma_{\,|\,\mathbf{y}} &amp; = \mathbf{K}_{\star\star} - \mathbf{K}_{xf}\left(\mathbf{K}_{ff} + \sigma_n^2\mathbf{I}_n\right)^{-1}\mathbf{K}_{fx} \,.
-\end{align}
-$$
-Further, the log of the  marginal likelihood of the GP can
-be analytically expressed as
-$$
-\begin{align}
-        &amp; = 0.5\left(-\underbrace{\mathbf{y}^{\top}\left(\mathbf{K}_{ff} - \sigma_n^2\mathbf{I}_n \right)^{-1}\mathbf{y}}_{\text{Data fit}} -\underbrace{\log\lvert \mathbf{K}_{ff} + \sigma^2_n\rvert}_{\text{Complexity}} -\underbrace{n\log 2\pi}_{\text{Constant}} \right)\,.
-\end{align}
-$$</p>
-<p>Model selection can be performed for a GP through gradient-based optimisation
-of $\log p(\mathbf{y})$ with respect to the kernel's parameters
-$\boldsymbol{\theta}$ and the observational noise $\sigma^2_n$. Collectively,
-we call these terms the model hyperparameters
-$\boldsymbol{\xi} = \{\boldsymbol{\theta},\sigma_n^2\}$
-from which the maximum likelihood estimate is given by
-$$
-\begin{align*}
-    \boldsymbol{\xi}^{\star} = \operatorname{argmax}_{\boldsymbol{\xi} \in \Xi} \log p(\mathbf{y})\,.
-\end{align*}
-$$</p>
-<p>Observing the individual terms in the marginal log-likelihood can help
-understand exactly why optimising the marginal log-likelihood gives reasonable
-solutions. The <em>data fit</em> term is the only component of the marginal
-log-likelihood that includes the observed response $\mathbf{y}$ and will
-therefore encourage solutions that model the data well. Conversely, the
-<em>complexity</em> term contains a determinant operator and therefore measures the
-<em>volume</em> of the function space covered by the GP. Whilst a more complex
-function has a better chance of modelling the observed data well, this is only
-true to a point and functions that are overly complex will overfit the data.
-Optimising with respect to the marginal log-likelihood balances these two
-objectives when identifying the optimal solution, as visualised below.</p>
-<p><img src="figs/decomposed_mll.png" alt="" /></p>
-<h2 id="conclusions">Conclusions<a class="anchor-link" href="#conclusions">&#182;</a></h2><p>Within this notebook we have built up the concept of a GP, starting from
-Bayes' theorem and the definition of a Gaussian random variable. Using the
-ideas presented in this notebook, the user should be in a position to dive
-into our <a href="https://gpjax.readthedocs.io/en/latest/examples/regression.html">Regression
-notebook</a> and
-start getting their hands on some code. For those looking to learn more about
-the underling theory of GPs, an excellent starting point is the <a href="http://gaussianprocess.org/gpml/">Gaussian
-Processes for Machine Learning</a> textbook.
-Alternatively, the <a href="https://arxiv.org/abs/2202.10613">thesis of Alexander
-Terenin</a> provides a rigorous exposition of
-GPs that served as the inspiration for this notebook.</p>
-<h2 id="system-configuration">System Configuration<a class="anchor-link" href="#system-configuration">&#182;</a></h2>
+<p>As always, we store our training data in a <code>Dataset</code> object.</p>
+
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=065d8118" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=b176cb09" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3384,11 +2858,720 @@ GPs that served as the inspiration for this notebook.</p>
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="o">%</span><span class="n">reload_ext</span> <span class="n">watermark</span>
-<span class="o">%</span><span class="n">watermark</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">iv</span> <span class="o">-</span><span class="n">w</span> <span class="o">-</span><span class="n">a</span> <span class="s1">&#39;Thomas Pinder&#39;</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">temperature</span><span class="p">[[</span><span class="s2">&quot;latitude&quot;</span><span class="p">,</span> <span class="s2">&quot;longitude&quot;</span><span class="p">,</span> <span class="s2">&quot;elevation&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">temperature</span><span class="p">[[</span><span class="s2">&quot;t_max&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span>
+    <span class="n">X</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
-<div id="cell-3" class="clipboard-copy-txt">%reload_ext watermark
-%watermark -n -u -v -iv -w -a 'Thomas Pinder'</div>
+<div id="cell-3" class="clipboard-copy-txt">
+
+x = temperature[["latitude", "longitude", "elevation"]].values
+y = temperature[["t_max"]].values
+D = Dataset(
+    X=jnp.array(x),
+    y=jnp.array(y),
+)</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=a47aabf2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="ard-kernel">ARD Kernel<a class="anchor-link" href="#ard-kernel">&#182;</a></h2><p>As temperature decreases with height
+(at a rate of approximately -6.5 °C/km in average conditions), we can expect that using the geographical distance
+alone isn't enough to to a decent job at interpolating this data. Therefore, we can also use elevation and optimize
+the parameters of our kernel such that more relevance should be given to elevation. This is possible by using a
+kernel that has one length-scale parameter per input dimension: an automatic relevance determination (ARD) kernel.
+See our <a href="https://gpjax.readthedocs.io/en/latest/examples/kernels.html">kernel notebook</a> for more an introduction to
+kernels in GPJax.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=ae61c5c0" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-4">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">kernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">(</span>
+    <span class="n">active_dims</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="n">lengthscale</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">]),</span>
+<span class="p">)</span>
+</pre></div>
+<div id="cell-4" class="clipboard-copy-txt">kernel = gpx.kernels.RBF(
+    active_dims=[0, 1, 2],
+    lengthscale=jnp.array([0.1, 0.1, 100.0]),
+)</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=4aca132b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="mean-function">Mean function<a class="anchor-link" href="#mean-function">&#182;</a></h2><p>As stated before, we already know that temperature strongly depends on elevation.
+So why not use it for our mean function? GPJax lets you define custom mean functions;
+simply subclass <code>AbstractMeanFunction</code>.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=8f6b81cb" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-5">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">MeanFunction</span><span class="p">(</span><span class="n">gpx</span><span class="o">.</span><span class="n">gps</span><span class="o">.</span><span class="n">AbstractMeanFunction</span><span class="p">):</span>
+    <span class="n">w</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]))</span>
+    <span class="n">b</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]))</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N D&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N 1&quot;</span><span class="p">]:</span>
+        <span class="n">elevation</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">elevation</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+        <span class="k">return</span> <span class="n">out</span>
+</pre></div>
+<div id="cell-5" class="clipboard-copy-txt">@dataclass
+class MeanFunction(gpx.gps.AbstractMeanFunction):
+    w: Float[Array, "1"] = param_field(jnp.array([0.0]))
+    b: Float[Array, "1"] = param_field(jnp.array([0.0]))
+
+    def __call__(self, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:
+        elevation = x[:, 2:3]
+        out = elevation * self.w + self.b
+        return out</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=616a78fc" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Now we can define our prior. We'll also choose a Gaussian likelihood.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=7ee6e3fe" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-6">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">mean_function</span> <span class="o">=</span> <span class="n">MeanFunction</span><span class="p">()</span>
+<span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span> <span class="n">mean_function</span><span class="o">=</span><span class="n">mean_function</span><span class="p">)</span>
+<span class="n">likelihood</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+<div id="cell-6" class="clipboard-copy-txt">mean_function = MeanFunction()
+prior = gpx.Prior(kernel=kernel, mean_function=mean_function)
+likelihood = gpx.Gaussian(D.n)</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=b5907ab9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Finally, we construct the posterior.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=bcf3d677" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-7">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">posterior</span> <span class="o">=</span> <span class="n">prior</span> <span class="o">*</span> <span class="n">likelihood</span>
+</pre></div>
+<div id="cell-7" class="clipboard-copy-txt">posterior = prior * likelihood</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=69856d9c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="model-fitting">Model fitting<a class="anchor-link" href="#model-fitting">&#182;</a></h2><p>We proceed to train our model. Because we used a Gaussian likelihood, the resulting posterior is
+a <code>ConjugatePosterior</code>, which allows us to optimize the analytically expressed marginal loglikelihood.</p>
+<p>As always, we can jit-compile the objective function to speed things up.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=bef09ac1" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-8">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">negative_mll</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">gpx</span><span class="o">.</span><span class="n">objectives</span><span class="o">.</span><span class="n">ConjugateMLL</span><span class="p">(</span><span class="n">negative</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">negative_mll</span><span class="p">(</span><span class="n">posterior</span><span class="p">,</span> <span class="n">train_data</span><span class="o">=</span><span class="n">D</span><span class="p">)</span>
+</pre></div>
+<div id="cell-8" class="clipboard-copy-txt">
+negative_mll = jax.jit(gpx.objectives.ConjugateMLL(negative=True))
+negative_mll(posterior, train_data=D)</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=72d28e94" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-9">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">optim</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="n">ox</span><span class="o">.</span><span class="n">adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">),</span> <span class="n">ox</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="n">posterior</span><span class="p">,</span> <span class="n">history</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">posterior</span><span class="p">,</span>
+    <span class="n">objective</span><span class="o">=</span><span class="n">negative_mll</span><span class="p">,</span>
+    <span class="n">train_data</span><span class="o">=</span><span class="n">D</span><span class="p">,</span>
+    <span class="n">optim</span><span class="o">=</span><span class="n">optim</span><span class="p">,</span>
+    <span class="n">num_iters</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span>
+    <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">posterior</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">gps</span><span class="o">.</span><span class="n">ConjugatePosterior</span>
+</pre></div>
+<div id="cell-9" class="clipboard-copy-txt">
+
+optim = ox.chain(ox.adam(learning_rate=0.1), ox.clip(1.0))
+posterior, history = gpx.fit(
+    model=posterior,
+    objective=negative_mll,
+    train_data=D,
+    optim=optim,
+    num_iters=3000,
+    safe=True,
+)
+posterior: gpx.gps.ConjugatePosterior</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=5cf0c75d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="sampling-on-a-grid">Sampling on a grid<a class="anchor-link" href="#sampling-on-a-grid">&#182;</a></h2><p>Now comes the cool part. In a standard GP implementation, for n test points, we have a $\mathcal{O}(n^2)$
+computational complexity and $\mathcal{O}(n^2)$ memory requirement. We want to make predictions on a total
+of roughly 70'000 pixels, and that would require us to compute a covariance matrix of <code>70000 ** 2 = 4900000000</code> elements.
+If these are <code>float64</code>s, as it is often the case in GPJax, it would be equivalent to more than 36 Gigabytes of memory. And
+that's for a fairly coarse and tiny grid. If we were to make predictions on a 1000x1000 grid, the total memory required
+would be 8 <em>Terabytes</em> of memory, which is intractable.
+Fortunately, the pathwise conditioning method allows us to sample from our posterior in linear complexity,
+$\mathcal{O}(n)$, with the number of pixels.</p>
+<p>GPJax provides the <code>sample_approx</code> method to generate random conditioned samples from our posterior.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=56a600c0" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-10">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># select the target pixels and exclude nans</span>
+<span class="n">xtest</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;spatial_ref&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;dem&quot;</span><span class="p">)</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">xtest</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># generate 50 samples</span>
+<span class="n">ytest</span> <span class="o">=</span> <span class="n">posterior</span><span class="o">.</span><span class="n">sample_approx</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">num_features</span><span class="o">=</span><span class="mi">200</span><span class="p">)(</span>
+    <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">xtest</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">])</span>
+<span class="p">)</span>
+</pre></div>
+<div id="cell-10" class="clipboard-copy-txt"># select the target pixels and exclude nans
+xtest = dem.drop("spatial_ref").stack(p=["y", "x"]).to_dataframe(name="dem")
+mask = jnp.any(jnp.isnan(xtest.values), axis=-1)
+
+# generate 50 samples
+ytest = posterior.sample_approx(50, D, key, num_features=200)(
+    jnp.array(xtest.values[~mask])
+)</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=8ec8a5d8" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Let's take a look at the results. We start with the mean and standard deviation.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=4c394949" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-11">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">predtest</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">dem</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">]))</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">nan</span>
+<span class="n">predtest</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">ytest</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">predtest</span> <span class="o">=</span> <span class="n">predtest</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+
+<span class="n">predtest</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">vmin</span><span class="o">=-</span><span class="mf">15.0</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="mf">15.0</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdBu_r&quot;</span><span class="p">,</span>
+    <span class="n">cbar_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;aspect&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;pad&quot;</span><span class="p">:</span> <span class="mf">0.02</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Max. daily temperature [°C]&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Interpolated maximum daily temperature&quot;</span><span class="p">)</span>
+</pre></div>
+<div id="cell-11" class="clipboard-copy-txt">predtest = xr.zeros_like(dem.stack(p=["y", "x"])) * jnp.nan
+predtest[~mask] = ytest.mean(axis=-1)
+predtest = predtest.unstack()
+
+predtest.plot(
+    vmin=-15.0,
+    vmax=15.0,
+    cmap="RdBu_r",
+    cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Max. daily temperature [°C]"},
+)
+plt.gca().set_title("Interpolated maximum daily temperature")</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=47e07bf8" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-12">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">predtest</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">dem</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">]))</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">nan</span>
+<span class="n">predtest</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">ytest</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">predtest</span> <span class="o">=</span> <span class="n">predtest</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+
+<span class="c1"># plot</span>
+<span class="n">predtest</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">cbar_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;aspect&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;pad&quot;</span><span class="p">:</span> <span class="mf">0.02</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Standard deviation [°C]&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Standard deviation&quot;</span><span class="p">)</span>
+</pre></div>
+<div id="cell-12" class="clipboard-copy-txt">predtest = xr.zeros_like(dem.stack(p=["y", "x"])) * jnp.nan
+predtest[~mask] = ytest.std(axis=-1)
+predtest = predtest.unstack()
+
+# plot
+predtest.plot(
+    cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Standard deviation [°C]"},
+)
+plt.gca().set_title("Standard deviation")</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=e2ee6191" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>And now some individual realizations of our GP posterior.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=fdf91613" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-13">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">predtest</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">xr</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">dem</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">]))</span>
+    <span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">realization</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">&quot;realization&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">predtest</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">ytest</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">9</span><span class="p">]</span>
+<span class="n">predtest</span> <span class="o">=</span> <span class="n">predtest</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+<span class="n">predtest</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">col</span><span class="o">=</span><span class="s2">&quot;realization&quot;</span><span class="p">,</span>
+    <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">cbar_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;aspect&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;pad&quot;</span><span class="p">:</span> <span class="mf">0.02</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Max. daily temperature [°C]&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+<div id="cell-13" class="clipboard-copy-txt">predtest = (
+    xr.zeros_like(dem.stack(p=["y", "x"]))
+    .expand_dims(realization=range(9))
+    .transpose("p", "realization")
+    .copy()
+)
+predtest[~mask] = ytest[:, :9]
+predtest = predtest.unstack()
+predtest.plot(
+    col="realization",
+    col_wrap=3,
+    cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Max. daily temperature [°C]"},
+)</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=8db8c45d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Remember when we said that on average the temperature decreases with height at a rate
+of approximately -6.5°C/km? That's -0.0065°C/m. The <code>w</code> parameter of our mean function
+is very close: we have learned the environmental lapse rate!</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=cf553dfa" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-14">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">posterior</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">mean_function</span><span class="p">)</span>
+</pre></div>
+<div id="cell-14" class="clipboard-copy-txt">print(posterior.prior.mean_function)</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=8604d3eb" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>That's it! We've successfully interpolated an observed meteorological parameter on a grid.
+We have used several components of GPJax and adapted them to our needs: a custom mean function
+that modelled the average temperature lapse rate; an ARD kernel that learned to give more relevance
+to elevation rather than horizontal distance; an efficient sampling technique to produce
+probabilistic realizations of our posterior on a large number of test points, which is important for
+many spatiotemporal modelling applications.
+If you're interested in a more elaborate work on temperature interpolation for the same domain used here, refer
+to <a href="https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.3786">Frei 2014</a>.</p>
+
+</div>
+</div>
+</div>
+</div>
+<div id="cell-id=2e67784d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="system-configuration">System configuration<a class="anchor-link" href="#system-configuration">&#182;</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=d450df90" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-15">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="o">%</span><span class="n">reload_ext</span> <span class="n">watermark</span>
+<span class="o">%</span><span class="n">watermark</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">iv</span> <span class="o">-</span><span class="n">w</span> <span class="o">-</span><span class="n">a</span> <span class="s1">&#39;Francesco Zanetta&#39;</span>
+</pre></div>
+<div id="cell-15" class="clipboard-copy-txt">%reload_ext watermark
+%watermark -n -u -v -iv -w -a 'Francesco Zanetta'</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=21f1856a" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-16">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span>
+</pre></div>
+<div id="cell-16" class="clipboard-copy-txt"></div>
         
         </div>
     </div>

@@ -19,7 +19,7 @@
         <link rel="next" href="../white/">
       
       <link rel="icon" href="../../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -28,9 +28,6 @@
     
     
       <link rel="stylesheet" href="../../../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -60,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -308,6 +302,20 @@
     <li class="md-nav__item">
       <a href="../../../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1503,6 +1511,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1665,7 +1687,7 @@
 
 
 <h5 id="gpjax.kernels.stationary.utils.squared_distance" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">squared_distance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">D</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">squared_distance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">D</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h5>
 
@@ -1688,7 +1710,7 @@
         <tr>
           <td><code>x</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>,  D]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>,  D]</code>
           </td>
           <td><p>First input.</p></td>
           <td>
@@ -1698,7 +1720,7 @@
         <tr>
           <td><code>y</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>,  D]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>,  D]</code>
           </td>
           <td><p>Second input.</p></td>
           <td>
@@ -1708,7 +1730,7 @@
     </tbody>
   </table>
       <h6 id="gpjax.kernels.stationary.utils.squared_distance--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: The squared distance between the inputs.
+<div class="highlight"><pre><span></span><code>ScalarFloat: The squared distance between the inputs.
 </code></pre></div>
 
   </div>
@@ -1720,7 +1742,7 @@
 
 
 <h5 id="gpjax.kernels.stationary.utils.euclidean_distance" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">euclidean_distance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">D</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">euclidean_distance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">D</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h5>
 
@@ -1743,7 +1765,7 @@
         <tr>
           <td><code>x</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>,  D]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>,  D]</code>
           </td>
           <td><p>First input.</p></td>
           <td>
@@ -1753,7 +1775,7 @@
         <tr>
           <td><code>y</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>,  D]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>,  D]</code>
           </td>
           <td><p>Second input.</p></td>
           <td>
@@ -1763,7 +1785,7 @@
     </tbody>
   </table>
       <h6 id="gpjax.kernels.stationary.utils.euclidean_distance--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: The euclidean distance between the inputs.
+<div class="highlight"><pre><span></span><code>ScalarFloat: The euclidean distance between the inputs.
 </code></pre></div>
 
   </div>

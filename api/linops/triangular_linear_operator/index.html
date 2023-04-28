@@ -19,7 +19,7 @@
         <link rel="next" href="../utils/">
       
       <link rel="icon" href="../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -28,9 +28,6 @@
     
     
       <link rel="stylesheet" href="../../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -60,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -308,6 +302,20 @@
     <li class="md-nav__item">
       <a href="../../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1501,6 +1509,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1701,39 +1723,7 @@ We assume a dense matrix representation of the operator. But take advantage of t
 
 
 <h6 id="gpjax.linops.triangular_linear_operator.LowerTriangularLinearOperator.solve" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">N</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">N</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
-<h6 id="gpjax.linops.triangular_linear_operator.LowerTriangularLinearOperator.__matmul__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__matmul__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
-<h6 id="gpjax.linops.triangular_linear_operator.LowerTriangularLinearOperator.__add__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span> <span class="n">M</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span> <span class="n">M</span><span class="p">]</span></code>
 
 </h6>
 
@@ -1880,40 +1870,8 @@ We assume a dense matrix representation of the operator. But take advantage of t
 
 
 
-<h6 id="gpjax.linops.triangular_linear_operator.UpperTriangularLinearOperator.__matmul__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__matmul__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
-<h6 id="gpjax.linops.triangular_linear_operator.UpperTriangularLinearOperator.__add__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
 <h6 id="gpjax.linops.triangular_linear_operator.UpperTriangularLinearOperator.solve" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">N</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">N</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span> <span class="n">M</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span> <span class="n">M</span><span class="p">]</span></code>
 
 </h6>
 

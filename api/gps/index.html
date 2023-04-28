@@ -19,7 +19,7 @@
         <link rel="next" href="../kernels/approximations/rff/">
       
       <link rel="icon" href="../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -28,9 +28,6 @@
     
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -60,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -308,6 +302,20 @@
     <li class="md-nav__item">
       <a href="../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1499,6 +1507,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1589,29 +1611,6 @@
 
 
 
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h5 id="gpjax.gps.FunctionalSample" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">FunctionalSample</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">]],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N B&#39;</span><span class="p">]]</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h5>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Type alias for functions representing <code>B</code> samples from a model, to be evaluated on
-any set of <code>N</code> inputs (of dimension <code>D</code>) and returning the evaluations of each
-(potentially approximate) sample draw across these inputs.</p>
-  </div>
-
-</div>
 
 <div class="doc doc-object doc-attribute">
 
@@ -1761,7 +1760,7 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
         <tr>
           <td><code>*args</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>The arguments to pass to the GP's <code>predict</code> method.</p></td>
           <td>
@@ -1771,7 +1770,7 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
         <tr>
           <td><code>**kwargs</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>The keyword arguments to pass to the GP's <code>predict</code> method.</p></td>
           <td>
@@ -1823,7 +1822,7 @@ this method must be implemented.</p>
         <tr>
           <td><code>*args</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>Arguments to the predict method.</p></td>
           <td>
@@ -1833,7 +1832,7 @@ this method must be implemented.</p>
         <tr>
           <td><code>**kwargs</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>Keyword arguments to the predict method.</p></td>
           <td>
@@ -2025,7 +2024,7 @@ dataset.</p></td>
 
 
 <h6 id="gpjax.gps.Prior.predict" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
+<code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
 
 </h6>
 
@@ -2068,7 +2067,7 @@ prior_predictive(jnp.linspace(0, 1, 100))</p>
         <tr>
           <td><code>test_inputs</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, N D]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, N D]</code>
           </td>
           <td><p>The inputs at which to evaluate the prior distribution.</p></td>
           <td>
@@ -2155,7 +2154,7 @@ sample_fn(jnp.linspace(0, 1, 100))</p>
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>Dict</code>
+                <code>dict</code>
           </td>
           <td><p>The specific set of parameters for which the sample</p></td>
           <td>
@@ -2165,7 +2164,7 @@ sample_fn(jnp.linspace(0, 1, 100))</p>
         <tr>
           <td><code>key</code></td>
           <td>
-                <code><span title="jax.random.KeyArray">KeyArray</span></code>
+                <code><a class="autorefs autorefs-internal" title="gpjax.typing.KeyArray" href="../typing/#gpjax.typing.KeyArray">KeyArray</a></code>
           </td>
           <td><p>The random seed used for the sample(s).</p></td>
           <td>
@@ -2329,7 +2328,7 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
         <tr>
           <td><code>*args</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>The arguments to pass to the GP's <code>predict</code> method.</p></td>
           <td>
@@ -2339,7 +2338,7 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
         <tr>
           <td><code>**kwargs</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>The keyword arguments to pass to the GP's <code>predict</code> method.</p></td>
           <td>
@@ -2390,7 +2389,7 @@ this method must be implemented.</p>
         <tr>
           <td><code>*args</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>Arguments to the predict method.</p></td>
           <td>
@@ -2400,7 +2399,7 @@ this method must be implemented.</p>
         <tr>
           <td><code>**kwargs</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>Keyword arguments to the predict method.</p></td>
           <td>
@@ -2497,7 +2496,7 @@ likelihood = gpx.likelihoods.Gaussian()</p>
 
 
 <h6 id="gpjax.gps.ConjugatePosterior.predict" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">],</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
+<code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">],</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
 
 </h6>
 
@@ -2642,7 +2641,7 @@ can be evaluated with constant cost regardless of the required number of queries
         <tr>
           <td><code>key</code></td>
           <td>
-                <code><span title="jax.random.KeyArray">KeyArray</span></code>
+                <code><a class="autorefs autorefs-internal" title="gpjax.typing.KeyArray" href="../typing/#gpjax.typing.KeyArray">KeyArray</a></code>
           </td>
           <td><p>The random seed used for the sample(s).</p></td>
           <td>
@@ -2780,7 +2779,7 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 <h6 id="gpjax.gps.NonConjugatePosterior.predict" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">],</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
+<code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">],</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
 
 </h6>
 

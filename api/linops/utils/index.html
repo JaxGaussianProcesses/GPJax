@@ -19,7 +19,7 @@
         <link rel="next" href="../zero_linear_operator/">
       
       <link rel="icon" href="../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -28,9 +28,6 @@
     
     
       <link rel="stylesheet" href="../../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -60,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -308,6 +302,20 @@
     <li class="md-nav__item">
       <a href="../../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1501,6 +1509,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1618,7 +1640,7 @@
 
 
 <h5 id="gpjax.linops.utils.identity" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">identity</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IdentityLinearOperator</span></code>
+<code class="highlight language-python"><span class="n">identity</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpjax</span><span class="o">.</span><span class="n">linops</span><span class="o">.</span><span class="n">identity_linear_operator</span><span class="o">.</span><span class="n">IdentityLinearOperator</span></code>
 
 </h5>
 
@@ -1663,7 +1685,7 @@
 
 
 <h5 id="gpjax.linops.utils.to_dense" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">to_dense</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">LinearOperator</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">to_dense</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">LinearOperator</span><span class="p">])</span></code>
 
 </h5>
 
@@ -1686,7 +1708,7 @@
         <tr>
           <td><code>obj</code></td>
           <td>
-                <code>Union[<span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, <span title="..."></span>], <a class="autorefs autorefs-internal" title="gpjax.linops.linear_operator.LinearOperator" href="../linear_operator/#gpjax.linops.linear_operator.LinearOperator">LinearOperator</a>]</code>
+                <code><span title="beartype.typing.Union">Union</span>[<span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, <span title="..."></span>], <a class="autorefs autorefs-internal" title="gpjax.linops.linear_operator.LinearOperator" href="../linear_operator/#gpjax.linops.linear_operator.LinearOperator">LinearOperator</a>]</code>
           </td>
           <td><p>Linear operator to convert.</p></td>
           <td>
@@ -1708,7 +1730,7 @@
 
 
 <h5 id="gpjax.linops.utils.to_linear_operator" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">to_linear_operator</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">LinearOperator</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">to_linear_operator</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">LinearOperator</span><span class="p">])</span></code>
 
 </h5>
 
@@ -1731,7 +1753,7 @@
         <tr>
           <td><code>obj</code></td>
           <td>
-                <code>Union[<span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, <span title="..."></span>], <a class="autorefs autorefs-internal" title="gpjax.linops.linear_operator.LinearOperator" href="../linear_operator/#gpjax.linops.linear_operator.LinearOperator">LinearOperator</a>]</code>
+                <code><span title="beartype.typing.Union">Union</span>[<span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, <span title="..."></span>], <a class="autorefs autorefs-internal" title="gpjax.linops.linear_operator.LinearOperator" href="../linear_operator/#gpjax.linops.linear_operator.LinearOperator">LinearOperator</a>]</code>
           </td>
           <td><p>Linear operator to convert.</p></td>
           <td>
@@ -1753,7 +1775,7 @@
 
 
 <h5 id="gpjax.linops.utils.check_shapes_match" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">check_shapes_match</span><span class="p">(</span><span class="n">shape1</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">shape2</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+<code class="highlight language-python"><span class="n">check_shapes_match</span><span class="p">(</span><span class="n">shape1</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">shape2</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
 
 </h5>
 
@@ -1776,7 +1798,7 @@
         <tr>
           <td><code>shape1</code></td>
           <td>
-                <code>Tuple[int, ...]</code>
+                <code><span title="beartype.typing.Tuple">Tuple</span>[int, <span title="..."></span>]</code>
           </td>
           <td><p>Shape of the first object.</p></td>
           <td>
@@ -1786,7 +1808,7 @@
         <tr>
           <td><code>shape2</code></td>
           <td>
-                <code>Tuple[int, ...]</code>
+                <code><span title="beartype.typing.Tuple">Tuple</span>[int, <span title="..."></span>]</code>
           </td>
           <td><p>Shape of the second object.</p></td>
           <td>
@@ -1808,7 +1830,7 @@
 
 
 <h5 id="gpjax.linops.utils.default_dtype" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">default_dtype</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">dtype</span></code>
+<code class="highlight language-python"><span class="n">default_dtype</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">float32</span><span class="p">]]</span></code>
 
 </h5>
 

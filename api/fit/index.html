@@ -19,7 +19,7 @@
         <link rel="next" href="../gaussian_distribution/">
       
       <link rel="icon" href="../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -28,9 +28,6 @@
     
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -60,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -308,6 +302,20 @@
     <li class="md-nav__item">
       <a href="../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1499,6 +1507,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1616,7 +1638,7 @@
 
 
 <h5 id="gpjax.fit.fit" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">fit</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="n">objective</span><span class="p">:</span> <span class="n">AbstractObjective</span><span class="p">,</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">optim</span><span class="p">:</span> <span class="n">ox</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">num_iters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">KeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">log_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">unroll</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">safe</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Module</span><span class="p">,</span> <span class="n">Array</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">fit</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="n">objective</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractObjective</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Module</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">],</span> <span class="n">ScalarFloat</span><span class="p">]],</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">optim</span><span class="p">:</span> <span class="n">ox</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">num_iters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">KeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">log_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">unroll</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">safe</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Module</span><span class="p">,</span> <span class="n">Array</span><span class="p">]</span></code>
 
 </h5>
 
@@ -1649,7 +1671,7 @@ Optimisers used here should originate from Optax.</p>
 <a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">model</span> <span class="o">=</span> <span class="n">LinearModel</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 <a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="o">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="o">&gt;&gt;&gt;</span> <span class="c1"># (3) Define your loss function:</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">MeanSqaureError</span><span class="p">(</span><span class="n">gpx</span><span class="o">.</span><span class="n">AbstractObjective</span><span class="p">):</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">MeanSquareError</span><span class="p">(</span><span class="n">gpx</span><span class="o">.</span><span class="n">AbstractObjective</span><span class="p">):</span>
 <a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="o">...</span>     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">LinearModel</span><span class="p">,</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="o">...</span>         <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">train_data</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">model</span><span class="p">(</span><span class="n">train_data</span><span class="o">.</span><span class="n">X</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 <a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="o">...</span>
@@ -1717,7 +1739,7 @@ learning a parameter set.</p></td>
         <tr>
           <td><code>num_iters</code></td>
           <td>
-                <code><span title="typing.Optional">Optional</span>[int]</code>
+                <code><span title="beartype.typing.Optional">Optional</span>[int]</code>
           </td>
           <td><p>The number of optimisation steps to run. Defaults
 to 100.</p></td>
@@ -1728,7 +1750,7 @@ to 100.</p></td>
         <tr>
           <td><code>batch_size</code></td>
           <td>
-                <code><span title="typing.Optional">Optional</span>[int]</code>
+                <code><span title="beartype.typing.Optional">Optional</span>[int]</code>
           </td>
           <td><p>The size of the mini-batch to use. Defaults to -1
 (i.e. full batch).</p></td>
@@ -1739,7 +1761,7 @@ to 100.</p></td>
         <tr>
           <td><code>key</code></td>
           <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="jax.random.KeyArray">KeyArray</span>]</code>
+                <code><span title="beartype.typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.KeyArray" href="../typing/#gpjax.typing.KeyArray">KeyArray</a>]</code>
           </td>
           <td><p>The random key to use for the optimisation batch
 selection. Defaults to jr.PRNGKey(42).</p></td>
@@ -1750,7 +1772,7 @@ selection. Defaults to jr.PRNGKey(42).</p></td>
         <tr>
           <td><code>log_rate</code></td>
           <td>
-                <code><span title="typing.Optional">Optional</span>[int]</code>
+                <code><span title="beartype.typing.Optional">Optional</span>[int]</code>
           </td>
           <td><p>How frequently the objective function's value should
 be printed. Defaults to 10.</p></td>
@@ -1761,7 +1783,7 @@ be printed. Defaults to 10.</p></td>
         <tr>
           <td><code>verbose</code></td>
           <td>
-                <code><span title="typing.Optional">Optional</span>[bool]</code>
+                <code><span title="beartype.typing.Optional">Optional</span>[bool]</code>
           </td>
           <td><p>Whether to print the training loading bar. Defaults
 to True.</p></td>
@@ -1839,7 +1861,7 @@ Defaults to 1.</p></td>
         <tr>
           <td><code>key</code></td>
           <td>
-                <code><span title="jax.random.KeyArray">KeyArray</span></code>
+                <code><a class="autorefs autorefs-internal" title="gpjax.typing.KeyArray" href="../typing/#gpjax.typing.KeyArray">KeyArray</a></code>
           </td>
           <td><p>The random key to use for the batch selection.</p></td>
           <td>

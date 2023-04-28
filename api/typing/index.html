@@ -10,20 +10,20 @@
       
       
       
-        <link rel="canonical" href="https://example.com/api/dataset/">
+        <link rel="canonical" href="https://example.com/api/typing/">
       
       
-        <link rel="prev" href="../base/param/">
+        <link rel="prev" href="../scan/">
       
       
-        <link rel="next" href="../fit/">
+        <link rel="next" href="../variational_families/">
       
       <link rel="icon" href="../../_static/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
-        <title>dataset - GPJax</title>
+        <title>typing - GPJax</title>
       
     
     
@@ -69,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#gpjax.dataset" class="md-skip">
+        <a href="#gpjax.typing" class="md-skip">
           Skip to content
         </a>
       
@@ -103,7 +103,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              dataset
+              typing
             
           </span>
         </div>
@@ -684,48 +684,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          dataset
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../dataset/" class="md-nav__link">
         dataset
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#gpjax.dataset" class="md-nav__link">
-    dataset
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1505,11 +1468,48 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../typing/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          typing
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         typing
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.typing" class="md-nav__link">
+    typing
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1567,8 +1567,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gpjax.dataset" class="md-nav__link">
-    dataset
+  <a href="#gpjax.typing" class="md-nav__link">
+    typing
   </a>
   
 </li>
@@ -1588,14 +1588,14 @@
                   
 
 
-  <h1>dataset</h1>
+  <h1>typing</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h4 id="gpjax.dataset" class="doc doc-heading">
-          <code>gpjax.dataset</code>
+<h4 id="gpjax.typing" class="doc doc-heading">
+          <code>gpjax.typing</code>
 
 
 </h4>
@@ -1616,8 +1616,8 @@
 
 
 
-<h5 id="gpjax.dataset.__all__" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Dataset&#39;</span><span class="p">]</span></code>
+<h5 id="gpjax.typing.OldKeyArray" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">OldKeyArray</span> <span class="o">=</span> <span class="n">UInt32</span><span class="p">[</span><span class="n">JAXArray</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">]</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
@@ -1631,57 +1631,37 @@
 
 </div>
 
-
-<div class="doc doc-object doc-class">
-
+<div class="doc doc-object doc-attribute">
 
 
-<h5 id="gpjax.dataset.Dataset" class="doc doc-heading">
-        <code>Dataset</code>
 
+<h5 id="gpjax.typing.KeyArray" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">KeyArray</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">OldKeyArray</span><span class="p">,</span> <span class="n">JAXKeyArray</span><span class="p">]</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
 </h5>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="simple_pytree.Pytree">Pytree</span></code></p>
+  </div>
 
-  
-      <p>Base class for datasets.</p>
-<h6 id="gpjax.dataset.Dataset--attributes">Attributes</h6>
-<div class="highlight"><pre><span></span><code>X (Optional[Num[Array, &quot;N D&quot;]]): Input data.
-y (Optional[Num[Array, &quot;N Q&quot;]]): Output data.
-</code></pre></div>
-
-
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
+</div>
 
 <div class="doc doc-object doc-attribute">
 
 
 
-<h6 id="gpjax.dataset.Dataset.X" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">X</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></code>
+<h5 id="gpjax.typing.Array" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">Array</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">JAXArray</span><span class="p">,</span> <span class="n">NumpyArray</span><span class="p">]</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
-</h6>
+</h5>
 
 
   <div class="doc doc-contents ">
@@ -1693,14 +1673,14 @@ y (Optional[Num[Array, &quot;N Q&quot;]]): Output data.
 
 
 
-<h6 id="gpjax.dataset.Dataset.y" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">Q</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></code>
+<h5 id="gpjax.typing.ScalarBool" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">ScalarBool</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Bool</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]]</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
-</h6>
+</h5>
 
 
   <div class="doc doc-contents ">
@@ -1712,19 +1692,17 @@ y (Optional[Num[Array, &quot;N Q&quot;]]): Output data.
 
 
 
-<h6 id="gpjax.dataset.Dataset.n" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">n</span><span class="p">:</span> <span class="nb">int</span></code>
+<h5 id="gpjax.typing.ScalarInt" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">ScalarInt</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Int</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]]</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
-</h6>
+</h5>
 
 
   <div class="doc doc-contents ">
-  
-      <p>Number of observations.</p>
   </div>
 
 </div>
@@ -1733,19 +1711,17 @@ y (Optional[Num[Array, &quot;N Q&quot;]]): Output data.
 
 
 
-<h6 id="gpjax.dataset.Dataset.in_dim" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">in_dim</span><span class="p">:</span> <span class="nb">int</span></code>
+<h5 id="gpjax.typing.ScalarFloat" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]]</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
-</h6>
+</h5>
 
 
   <div class="doc doc-contents ">
-  
-      <p>Dimension of the inputs, X.</p>
   </div>
 
 </div>
@@ -1754,122 +1730,63 @@ y (Optional[Num[Array, &quot;N Q&quot;]]): Output data.
 
 
 
-<h6 id="gpjax.dataset.Dataset.out_dim" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">out_dim</span><span class="p">:</span> <span class="nb">int</span></code>
+<h5 id="gpjax.typing.VecNOrMatNM" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">VecNOrMatNM</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N M&#39;</span><span class="p">]]</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
-</h6>
+</h5>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h5 id="gpjax.typing.FunctionalSample" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">FunctionalSample</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">]],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N B&#39;</span><span class="p">]]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h5>
 
 
   <div class="doc doc-contents ">
   
-      <p>Dimension of the outputs, y.</p>
+      <p>Type alias for functions representing <code>B</code> samples from a model, to be evaluated on
+any set of <code>N</code> inputs (of dimension <code>D</code>) and returning the evaluations of each
+(potentially approximate) sample draw across these inputs.</p>
   </div>
 
 </div>
 
-
-
-<div class="doc doc-object doc-function">
+<div class="doc doc-object doc-attribute">
 
 
 
-<h6 id="gpjax.dataset.Dataset.__post_init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+<h5 id="gpjax.typing.__all__" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KeyArray&#39;</span><span class="p">,</span> <span class="s1">&#39;ScalarBool&#39;</span><span class="p">,</span> <span class="s1">&#39;ScalarInt&#39;</span><span class="p">,</span> <span class="s1">&#39;ScalarFloat&#39;</span><span class="p">,</span> <span class="s1">&#39;FunctionalSample&#39;</span><span class="p">]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
 
-</h6>
+</h5>
 
 
   <div class="doc doc-contents ">
-  
-      <p>Checks that the shapes of X and y are compatible.</p>
-
   </div>
 
 </div>
 
-<div class="doc doc-object doc-function">
-
-
-
-<h6 id="gpjax.dataset.Dataset.__repr__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__repr__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Returns a string representation of the dataset.</p>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
-<h6 id="gpjax.dataset.Dataset.is_supervised" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">is_supervised</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Returns <code>True</code> if the dataset is supervised.</p>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
-<h6 id="gpjax.dataset.Dataset.is_unsupervised" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">is_unsupervised</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Returns <code>True</code> if the dataset is unsupervised.</p>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
-<h6 id="gpjax.dataset.Dataset.__add__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Combine two datasets. Right hand dataset is stacked beneath the left.</p>
-
-  </div>
-
-</div>
-
-
-
-  </div>
-
-  </div>
-
-</div>
 
 
 

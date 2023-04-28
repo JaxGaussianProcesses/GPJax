@@ -19,7 +19,7 @@
         <link rel="next" href="../progress_bar/">
       
       <link rel="icon" href="../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -28,9 +28,6 @@
     
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -60,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -308,6 +302,20 @@
     <li class="md-nav__item">
       <a href="../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1499,6 +1507,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1740,7 +1762,7 @@
 
 
 <h6 id="gpjax.objectives.AbstractObjective.__call__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -1756,7 +1778,7 @@
 
 
 <h6 id="gpjax.objectives.AbstractObjective.step" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">step</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">step</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -1814,7 +1836,7 @@
 
 
 <h6 id="gpjax.objectives.ConjugateMLL.step" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">step</span><span class="p">(</span><span class="n">posterior</span><span class="p">:</span> <span class="n">ConjugatePosterior</span><span class="p">,</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">step</span><span class="p">(</span><span class="n">posterior</span><span class="p">:</span> <span class="n">gpjax</span><span class="o">.</span><span class="n">gps</span><span class="o">.</span><span class="n">ConjugatePosterior</span><span class="p">,</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -1918,7 +1940,7 @@ Defaults to False.</p></td>
     </tbody>
   </table>
       <h6 id="gpjax.objectives.ConjugateMLL.step--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Callable[[Parameters], Float[Array, &quot;1&quot;]]: A functional representation
+<div class="highlight"><pre><span></span><code>ScalarFloat: A functional representation
     of the marginal log-likelihood that can be evaluated at a
     given parameter set.
 </code></pre></div>
@@ -1970,7 +1992,7 @@ Defaults to False.</p></td>
 
 
 <h6 id="gpjax.objectives.NonConjugateMLL.step" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">step</span><span class="p">(</span><span class="n">posterior</span><span class="p">:</span> <span class="n">NonConjugatePosterior</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">step</span><span class="p">(</span><span class="n">posterior</span><span class="p">:</span> <span class="n">gpjax</span><span class="o">.</span><span class="n">gps</span><span class="o">.</span><span class="n">NonConjugatePosterior</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -2029,9 +2051,8 @@ to maximisation of the marginal log-likelihood. Defaults to False.</p></td>
     </tbody>
   </table>
       <h6 id="gpjax.objectives.NonConjugateMLL.step--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Callable[[Parameters], Float[Array, &quot;1&quot;]]: A functional representation
-    of the marginal log-likelihood that can be evaluated at a given
-    parameter set.
+<div class="highlight"><pre><span></span><code>ScalarFloat: A functional representation of the marginal log-likelihood
+that can be evaluated at a given parameter set.
 </code></pre></div>
 
   </div>
@@ -2081,7 +2102,7 @@ to maximisation of the marginal log-likelihood. Defaults to False.</p></td>
 
 
 <h6 id="gpjax.objectives.ELBO.step" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">step</span><span class="p">(</span><span class="n">variational_family</span><span class="p">:</span> <span class="n">AbstractVariationalFamily</span><span class="p">,</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">step</span><span class="p">(</span><span class="n">variational_family</span><span class="p">:</span> <span class="n">gpjax</span><span class="o">.</span><span class="n">variational_families</span><span class="o">.</span><span class="n">AbstractVariationalFamily</span><span class="p">,</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -2199,7 +2220,7 @@ in Sparse Gaussian Processes.</p>
 
 
 <h6 id="gpjax.objectives.CollapsedELBO.step" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">step</span><span class="p">(</span><span class="n">variational_family</span><span class="p">:</span> <span class="n">AbstractVariationalFamily</span><span class="p">,</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">step</span><span class="p">(</span><span class="n">variational_family</span><span class="p">:</span> <span class="n">gpjax</span><span class="o">.</span><span class="n">variational_families</span><span class="o">.</span><span class="n">AbstractVariationalFamily</span><span class="p">,</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -2272,7 +2293,7 @@ corresponds to maximisation of the ELBO. Defaults to False.</p></td>
 
 
 <h5 id="gpjax.objectives.variational_expectation" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">variational_expectation</span><span class="p">(</span><span class="n">variational_family</span><span class="p">:</span> <span class="n">AbstractVariationalFamily</span><span class="p">,</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="mi">1</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">variational_expectation</span><span class="p">(</span><span class="n">variational_family</span><span class="p">:</span> <span class="n">gpjax</span><span class="o">.</span><span class="n">variational_families</span><span class="o">.</span><span class="n">AbstractVariationalFamily</span><span class="p">,</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">N</span><span class="p">]</span></code>
 
 </h5>
 
@@ -2296,7 +2317,7 @@ distribution. Batching can be done here to speed up computation.</p>
         <tr>
           <td><code>variational_family</code></td>
           <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.variational_families.AbstractVariationalFamily" href="../variational_families/#gpjax.variational_families.AbstractVariationalFamily">AbstractVariationalFamily</a></code>
+                <code>AbstractVariationalFamily</code>
           </td>
           <td><p>The variational family that we are using to approximate the posterior.</p></td>
           <td>

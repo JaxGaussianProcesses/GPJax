@@ -13,20 +13,21 @@
         <link rel="canonical" href="https://example.com/examples/pytrees/">
       
       
+        <link rel="prev" href="../../sharp_bits/">
+      
+      
+        <link rel="next" href="../intro_to_gps/">
       
       <link rel="icon" href="../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
-        <title>GPJax’s Module backend: - GPJax</title>
+        <title>🌳 GPJax PyTrees - GPJax</title>
       
     
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -56,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -71,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#gpjaxs-module-backend" class="md-skip">
+        <a href="#gpjax-pytrees" class="md-skip">
           Skip to content
         </a>
       
@@ -105,7 +103,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              GPJax’s Module backend:
+              🌳 GPJax PyTrees
             
           </span>
         </div>
@@ -229,16 +227,18 @@
 
   
   
+    
+  
   
     
       
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
       
       
       
@@ -247,7 +247,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_2">
           <span class="md-nav__icon md-icon"></span>
           Getting started
@@ -305,6 +305,30 @@
       <a href="../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        🌳 GPJax PyTrees
+      </a>
+      
     </li>
   
 
@@ -1454,6 +1478,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../api/typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../api/variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1494,21 +1532,6 @@
   
     
   
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#motivation-gaussian-process-objects-as-data" class="md-nav__link">
-    Motivation…. Gaussian process objects as data:
-  </a>
-  
-</li>
-      
-    </ul>
   
 </nav>
                   </div>
@@ -2554,46 +2577,83 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=4f021c76" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=386a8068" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="gpjaxs-module-backend">GPJax&#8217;s <code>Module</code> backend:<a class="anchor-link" href="#gpjaxs-module-backend">&#182;</a></h1><p><code>GPJax</code> <strong>represents all mathematical objects as PyTrees.</strong> As a result</p>
+<h1 id="gpjax-pytrees">&#127795; GPJax PyTrees<a class="anchor-link" href="#gpjax-pytrees">&#182;</a></h1><p><code>GPJax</code> <strong>represents all mathematical objects as PyTrees</strong>, giving</p>
 <ul>
-<li>We have a simple API with a <strong>TensorFlow / PyTorch feel</strong> …</li>
+<li>A simple API with a <strong>TensorFlow / PyTorch feel</strong> …</li>
 <li>… that is <strong>fully compatible</strong> with JAX's functional paradigm.</li>
 </ul>
-<p>The core idea of our abstraction builds on the <em>Equinox</em> library, where we
-seek to provide the Bayesian/GP analogue to their neural network focused
-abstractions. However, we extend their abstraction further to permit users to
-write standard Python classes, and provide to readily define (and alter)
-domains and training statuses of parameter for optimisation, contained as a
-single model object, that is fully compatible with JAX autogradients out of
-the box - no filtering required, and provide functionality for applying
-dataclass metadata to Pytree’s.</p>
+<p>Our abstraction is based on the Equinox library and aims to offer a Bayesian/GP equivalent to their neural network abstractions. However, we take it a step further by enabling users to create standard Python classes and easily define and modify parameter domains and training statuses for optimisation within a single model object. This object is fully compatible with JAX autogradients without the need for filtering.</p>
 
 </div>
 </div>
 </div>
 </div>
-<div id="cell-id=af541b09" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=853e9db5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="motivation-gaussian-process-objects-as-data">Motivation&#8230;. Gaussian process objects as data:<a class="anchor-link" href="#motivation-gaussian-process-objects-as-data">&#182;</a></h2><p>Within this notebook, we'll be using the squared exponential, or RBF, kernel
+<h1 id="gaussian-process-objects-as-data">Gaussian process objects as data:<a class="anchor-link" href="#gaussian-process-objects-as-data">&#182;</a></h1><p>Within this notebook, we'll be using the squared exponential, or RBF, kernel
 for illustratory purposes. For a pair of vectors $x, y \in \mathbb{R}^d$, its
 form can be mathematically given by
 $$ k(x, y) = \sigma^2\exp\left(\frac{\lVert x-y\rVert_{2}^2}{2\ell^2} \right) $$
 where $\sigma\in\mathbb{R}_{&gt;0}$ is a variance parameter and
 $\ell\in\mathbb{R}_{&gt;0}$ a lengthscale parameter. We call the evaluation of
 $k(x, y)$ the <em>covariance</em>.</p>
-<p>Using a <code>dataclass</code>, we can represent this object as follows</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">Array</span>
+
+</div>
+</div>
+</div>
+</div>
+<div id="cell-id=03e6dbaf" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="dataclasses">Dataclasses<a class="anchor-link" href="#dataclasses">&#182;</a></h2><p>A <code>dataclass</code> in Python can simplify the creation of classes for storing data and make the code more readable and maintainable. They offer several benefits over a regular class, including:</p>
+<ol>
+<li><p>Conciseness: Dataclasses automatically generate default implementations for several common methods, such as <strong>init</strong>(), <strong>repr</strong>(), and <strong>eq</strong>(), which means less boilerplate code needs to be written.</p>
+</li>
+<li><p>Type hinting: Dataclasses provide native support for type annotations, which can help catch errors at compile-time and improve code readability.</p>
+</li>
+</ol>
+<p>For the RBF kernel, we use a <code>dataclass</code> to represent this object as follows</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=826bd91b" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-1">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">Array</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
 
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">RBF</span><span class="p">:</span>
@@ -2601,65 +2661,441 @@ $k(x, y)$ the <em>covariance</em>.</p>
     <span class="n">variance</span><span class="p">:</span> <span class="nb">float</span>
 
     <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
-    	<span class="k">pass</span>
+        <span class="k">pass</span>
 </pre></div>
-<p>For those users who have not seen a <code>dataclass</code> before, this statement is equivalent to writing</p>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RBF</span><span class="p">:</span>
+<div id="cell-1" class="clipboard-copy-txt">from jax import Array
+from dataclasses import dataclass
+
+
+@dataclass
+class RBF:
+    lengthscale: float
+    variance: float
+
+    def covariance(self, x: Array, y: Array) -> Array:
+        pass</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=99e5da3f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We have for now left <code>covariance</code> empty; however, through this notebook, we shall
+build up to a fully object that can compute covariances in a JAX-compatible way.</p>
+<p>For those users who have not seen a <code>dataclass</code> before, this statement is equivalent
+to writing</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=4c287cad" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-2">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="k">class</span> <span class="nc">RBF</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lengthscale</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">variance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    	<span class="bp">self</span><span class="o">.</span><span class="n">lengthscale</span> <span class="o">=</span> <span class="n">lengthscale</span>
-    	<span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="n">variance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lengthscale</span> <span class="o">=</span> <span class="n">lengthscale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="n">variance</span>
 
     <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
-    	<span class="k">pass</span>
+        <span class="k">pass</span>
 </pre></div>
+<div id="cell-2" class="clipboard-copy-txt">class RBF:
+    def __init__(self, lengthscale: float, variance: float) -> None:
+        self.lengthscale = lengthscale
+        self.variance = variance
+
+    def covariance(self, x: Array, y: Array) -> Array:
+        pass</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=85d7e886" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>However, it a dataclass allows us to significantly reduce the number of lines
 of code needed to represent such objects, particularly as the code's
 complexity increases, as we shall go on to see.</p>
 <p>To establish some terminology, within the above RBF <code>dataclass</code>, we refer to
 the lengthscale and variance as <em>fields</em>. Further, the <code>RBF.covariance()</code> is a
 <em>method</em>.</p>
-<h1 id="a-primer-on-pytrees">A primer on PyTree&#8217;s:<a class="anchor-link" href="#a-primer-on-pytrees">&#182;</a></h1><p>To efficiently represent data JAX provides a <code>*PyTree*</code> abstraction. PyTree’s as such, are immutable tree-like structure built out of <em>‘node’ types</em> —— container-like Python objects. For instance,</p>
-<div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">3.14</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Monte&quot;</span><span class="p">:</span> <span class="nb">object</span><span class="p">(),</span> <span class="s2">&quot;Carlo&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}]</span>
-</pre></div>
-<p>is a PyTree with structure <code>[*, {&quot;Monte&quot;: *, &quot;Carlo&quot;: *}]</code> and leaves <code>3.14</code>, <code>object()</code>, <code>False</code>. As such, most JAX functions operate over pytrees, e.g., <code>jax.lax.scan</code>, accepts as input and produces as output a pytrees of JAX arrays.</p>
-<p>While the default set of ‘node’ types that are regarded internal pytree nodes is limited to objects such as lists, tuples, and dicts, JAX permits custom types to be readily registered through a global registry, with the values of such traversed recursively (i.e., as a tree!). This is the functionality that we exploit, whereby we construct all Gaussian process models via a tree-structure.</p>
 <ul>
-<li>RBF</li>
-<li>(1) In GPJax, RBF we inherit from abstract kernel.</li>
-<li>(2) We don’t want to do this. We will do it from Module.</li>
-<li>(3) Do it like the old code, as a property → kernel.gram() → separate function. covariance.</li>
-</ul>
-<h1 id="module">Module<a class="anchor-link" href="#module">&#182;</a></h1><p>Our design, first and foremost, minimises additional abstractions on top of standard JAX: everything is just PyTrees and transformations on PyTrees, and secondly, provides full compatibility with the main JAX library itself, enhancing integrability with the broader ecosystem of third-party JAX libraries. To achieve this, our core idea is represent all model objects via an immutable tree-structure.</p>
-<p>Lets do an <strong>RBF</strong> kernel.</p>
-<h3 id="objects-as-immutable-class-instances">Objects as immutable class instances:<a class="anchor-link" href="#objects-as-immutable-class-instances">&#182;</a></h3><p>Equinox represents parameterised functions as class instances. These instances are immutable, for consistency with JAX’s functional programming principles. (And parameters updates occur out-of- place.)</p>
-<p><em>Lets do an </em><em>RBF</em>* kernel.*</p>
-<div class="highlight"><pre><span></span>
-</pre></div>
-<h3 id="parameters-and-their-metadata">Parameters and their metadata:<a class="anchor-link" href="#parameters-and-their-metadata">&#182;</a></h3><p>We extend on Equinox’s functionality by consider the definition of parameters.</p>
-<p>There are two main considerations for model parameters, their:</p>
-<ul>
-<li>Trainability status.</li>
-<li>Domain.</li>
-</ul>
-<p>The former</p>
-<p>Equinox represents parameterised functions as class instances. These instances are immutable, for consistency with JAX’s functional programming principles. (And parameters updates occur out-of- place.)</p>
-<p>Why normalising flows don’t break the convention.</p>
-<p><strong>Our functional view:</strong></p>
-<ul>
-<li><em>We view all models as immutable trees.</em></li>
-<li><em>What is computation if you have it on a model?</em></li>
+<li>Tom could you perhaps mention the <code>field</code> right here?</li>
+<li>Also feel free to define the covariance here -&gt; maybe demonstrate it is not compatible with JAX out of the box, that leads into the next section - motivation for why we need to talk about PyTree's.</li>
 </ul>
 
 </div>
 </div>
 </div>
 </div>
-<div id="cell-id=404895af" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=2d37f62b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="a-primer-on-pytrees">A primer on PyTree&#8217;s:<a class="anchor-link" href="#a-primer-on-pytrees">&#182;</a></h2><p>To efficiently represent data JAX provides a <code>*PyTree*</code> abstraction. PyTree’s as such, are immutable tree-like structure built out of <em>‘node’ types</em> —— container-like Python objects. For instance,</p>
+<div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">3.14</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Monte&quot;</span><span class="p">:</span> <span class="nb">object</span><span class="p">(),</span> <span class="s2">&quot;Carlo&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}]</span>
+</pre></div>
+<p>is a PyTree with structure <code>[*, {&quot;Monte&quot;: *, &quot;Carlo&quot;: *}]</code> and leaves <code>3.14</code>, <code>object()</code>, <code>False</code>. As such, most JAX functions operate over pytrees, e.g., <code>jax.lax.scan</code>, accepts as input and produces as output a pytrees of JAX arrays.</p>
+<p>While the default set of ‘node’ types that are regarded internal pytree nodes is limited to objects such as lists, tuples, and dicts, JAX permits custom types to be readily registered through a global registry, with the values of such traversed recursively (i.e., as a tree!). This is the functionality that we exploit, whereby we construct all Gaussian process models via a tree-structure through our <code>Module</code> object</p>
+
+</div>
+</div>
+</div>
+</div>
+<div id="cell-id=3cb54078" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="module">Module<a class="anchor-link" href="#module">&#182;</a></h2><p>Our design, first and foremost, minimises additional abstractions on top of standard JAX: everything is just PyTrees and transformations on PyTrees, and secondly, provides full compatibility with the main JAX library itself, enhancing integrability with the broader ecosystem of third-party JAX libraries. To achieve this, our core idea is represent all model objects via an immutable tree-structure.</p>
+<h3 id="defining-a-module">Defining a Module<a class="anchor-link" href="#defining-a-module">&#182;</a></h3><p>There are two main considerations for model parameters, their:</p>
+<ul>
+<li>Trainability status.</li>
+<li>Domain.</li>
+<li>Explain why normalising flows don’t break the convention.</li>
+<li>Mark leaf attributes with <code>param_field</code> to set a default bijector and trainable status.</li>
+<li>Unmarked leaf attributes default to an <code>Identity</code> bijector and trainablility set to <code>True</code>.</li>
+<li>Fully compatible with <a href="https://github.com/deepmind/distrax">Distrax</a> and <a href="https://www.tensorflow.org/probability">TensorFlow Probability</a> bijectors, so feel free to use these!</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=0f96d8e1" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-3">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow_probability.substrates.jax.bijectors</span> <span class="k">as</span> <span class="nn">tfb</span>
+<span class="kn">from</span> <span class="nn">gpjax.base</span> <span class="kn">import</span> <span class="n">Module</span><span class="p">,</span> <span class="n">param_field</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">RBF</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    <span class="n">lengthscale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span>
+    <span class="n">variance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+        <span class="k">pass</span>
+</pre></div>
+<div id="cell-3" class="clipboard-copy-txt">import tensorflow_probability.substrates.jax.bijectors as tfb
+from gpjax.base import Module, param_field
+
+
+@dataclass
+class RBF(Module):
+    lengthscale: float = param_field(1.0, bijector=tfb.Softplus())
+    variance: float = param_field(1.0, bijector=tfb.Softplus())
+
+    def covariance(self, x: Array, y: Array) -> Array:
+        pass</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=1c8e41fd" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="replacing-values">Replacing values<a class="anchor-link" href="#replacing-values">&#182;</a></h3><p>For consistency with JAX’s functional programming principles, <code>Module</code> instances are immutable. And parameters updates occur out-of- place via <code>replace</code>.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=c9f5991f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-4">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">kernel</span> <span class="o">=</span> <span class="n">RBF</span><span class="p">()</span>
+<span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">lengthscale</span><span class="o">=</span><span class="mf">3.14</span><span class="p">)</span>  <span class="c1"># Update e.g., the lengthscale.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
+</pre></div>
+<div id="cell-4" class="clipboard-copy-txt">kernel = RBF()
+kernel = kernel.replace(lengthscale=3.14)  # Update e.g., the lengthscale.
+print(kernel)</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=12a2c171" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="transformations">Transformations &#129302;<a class="anchor-link" href="#transformations">&#182;</a></h2><h3 id="applying-transformations">Applying transformations<a class="anchor-link" href="#applying-transformations">&#182;</a></h3><p>Use <code>constrain</code> / <code>unconstrain</code> to return a <code>Mytree</code> with each parameter's bijector <code>forward</code> / <code>inverse</code> operation applied!</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=1d6c2edd" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-5">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Transform kernel to unconstrained space</span>
+<span class="n">unconstrained_kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">unconstrain</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">unconstrained_kernel</span><span class="p">)</span>
+
+<span class="c1"># Transform kernel back to constrained space</span>
+<span class="n">kernel</span> <span class="o">=</span> <span class="n">unconstrained_kernel</span><span class="o">.</span><span class="n">constrain</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
+</pre></div>
+<div id="cell-5" class="clipboard-copy-txt"># Transform kernel to unconstrained space
+unconstrained_kernel = kernel.unconstrain()
+print(unconstrained_kernel)
+
+# Transform kernel back to constrained space
+kernel = unconstrained_kernel.constrain()
+print(kernel)</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=fd71bbfb" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="replacing-transformations">Replacing transformations<a class="anchor-link" href="#replacing-transformations">&#182;</a></h3><p>Default transformations can be replaced on an instance via the <code>replace_bijector</code> method.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=f8844ff1" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-6">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">new_kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">replace_bijector</span><span class="p">(</span><span class="n">lengthscale</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Identity</span><span class="p">())</span>
+
+<span class="c1"># Transform kernel to unconstrained space</span>
+<span class="n">unconstrained_kernel</span> <span class="o">=</span> <span class="n">new_kernel</span><span class="o">.</span><span class="n">unconstrain</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">unconstrained_kernel</span><span class="p">)</span>
+
+<span class="c1"># Transform kernel back to constrained space</span>
+<span class="n">new_kernel</span> <span class="o">=</span> <span class="n">unconstrained_kernel</span><span class="o">.</span><span class="n">constrain</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">new_kernel</span><span class="p">)</span>
+</pre></div>
+<div id="cell-6" class="clipboard-copy-txt">new_kernel = kernel.replace_bijector(lengthscale=tfb.Identity())
+
+# Transform kernel to unconstrained space
+unconstrained_kernel = new_kernel.unconstrain()
+print(unconstrained_kernel)
+
+# Transform kernel back to constrained space
+new_kernel = unconstrained_kernel.constrain()
+print(new_kernel)</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=b6ce3f54" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="trainability">Trainability &#128642;<a class="anchor-link" href="#trainability">&#182;</a></h2><h3 id="applying-trainability">Applying trainability<a class="anchor-link" href="#applying-trainability">&#182;</a></h3><p>Applying <code>stop_gradient</code> <strong>within</strong> the loss function, prevents the flow of gradients during forward or reverse-mode automatic differentiation.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jax</span>
+
+<span class="c1"># Create simulated data.</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="p">))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="mf">1e-3</span> <span class="o">*</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="p">))</span>
+
+
+<span class="c1"># Define a mean-squared-error loss.</span>
+<span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">SimpleModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+   <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">stop_gradient</span><span class="p">()</span> <span class="c1"># 🛑 Stop gradients!</span>
+   <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">loss</span><span class="p">)(</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+<pre><code>SimpleModel(weight=0.0, bias=-188.37418)
+</code></pre>
+<p>As <code>weight</code> trainability was set to <code>False</code>, it's gradient is zero as expected!</p>
+<h3 id="replacing-trainability">Replacing trainability<a class="anchor-link" href="#replacing-trainability">&#182;</a></h3><p>Default trainability status can be replaced via the <code>replace_trainable</code> method.</p>
+<div class="highlight"><pre><span></span><span class="n">new</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">replace_trainable</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">loss</span><span class="p">)(</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+<pre><code>SimpleModel(weight=-121.42676, bias=-188.37418)
+</code></pre>
+<p>And we see that <code>weight</code>'s gradient is no longer zero.</p>
+<h2 id="metadata">Metadata<a class="anchor-link" href="#metadata">&#182;</a></h2><h3 id="viewing-field-metadata">Viewing <code>field</code> metadata<a class="anchor-link" href="#viewing-field-metadata">&#182;</a></h3><p>View field metadata pytree via <code>meta</code>.</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mytree</span> <span class="kn">import</span> <span class="n">meta</span>
+<span class="n">meta</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+<pre><code>SimpleModel(weight=({'bijector': Bijector(forward=&lt;function &lt;lambda&gt; at 0x17a024e50&gt;, inverse=&lt;function &lt;lambda&gt; at 0x17a024430&gt;), 1.0), 'trainable': False, 'pytree_node': True}, bias=({}, 2.0))
+</code></pre>
+<p>Or the metadata pytree leaves via <code>meta_leaves</code>.</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mytree</span> <span class="kn">import</span> <span class="n">meta_leaves</span>
+<span class="n">meta_leaves</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+<pre><code>[({}, 2.0),
+ ({'bijector': Bijector(forward=&lt;function &lt;lambda&gt; at 0x17a024e50&gt;, inverse=&lt;function &lt;lambda&gt; at 0x17a024430&gt;),
+  'trainable': False,
+  'pytree_node': True}, 1.0)]
+</code></pre>
+<p>Note this shows any metadata defined via a <code>dataclasses.field</code> for the pytree leaves. So feel free to define your own.</p>
+<h3 id="applying-field-metadata">Applying <code>field</code> metadata<a class="anchor-link" href="#applying-field-metadata">&#182;</a></h3><p>Leaf metadata can be applied via the <code>meta_map</code> function.</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mytree</span> <span class="kn">import</span> <span class="n">meta_map</span>
+
+<span class="c1"># Function passed to `meta_map` has its argument as a `(meta, leaf)` tuple!</span>
+<span class="k">def</span> <span class="nf">if_trainable_then_10</span><span class="p">(</span><span class="n">meta_leaf</span><span class="p">):</span>
+    <span class="n">meta</span><span class="p">,</span> <span class="n">leaf</span> <span class="o">=</span> <span class="n">meta_leaf</span>
+    <span class="k">if</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;trainable&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">10.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">leaf</span>
+
+<span class="n">meta_map</span><span class="p">(</span><span class="n">if_trainable_then_10</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+</pre></div>
+<pre><code>SimpleModel(weight=1.0, bias=10.0)
+</code></pre>
+<p>It is possible to define your own custom metadata and therefore your own metadata transformations in this vein.</p>
+<h2 id="static-fields">Static fields<a class="anchor-link" href="#static-fields">&#182;</a></h2><p>Fields can be marked as static via simple_pytree's <code>static_field</code>.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jax.tree_util</span> <span class="k">as</span> <span class="nn">jtu</span>
+<span class="kn">from</span> <span class="nn">simple_pytree</span> <span class="kn">import</span> <span class="n">static_field</span>
+
+<span class="k">class</span> <span class="nc">StaticExample</span><span class="p">(</span><span class="n">Mytree</span><span class="p">):</span>
+    <span class="n">b</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">static_field</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">2.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">=</span><span class="n">a</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">=</span><span class="n">b</span>
+
+<span class="n">jtu</span><span class="o">.</span><span class="n">tree_leaves</span><span class="p">(</span><span class="n">StaticExample</span><span class="p">())</span>
+</pre></div>
+<pre><code>[1.0]
+</code></pre>
 
 </div>
 </div>

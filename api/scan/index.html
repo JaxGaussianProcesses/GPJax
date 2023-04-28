@@ -16,10 +16,10 @@
         <link rel="prev" href="../quadrature/">
       
       
-        <link rel="next" href="../variational_families/">
+        <link rel="next" href="../typing/">
       
       <link rel="icon" href="../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -28,9 +28,6 @@
     
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -60,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -308,6 +302,20 @@
     <li class="md-nav__item">
       <a href="../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1499,6 +1507,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1673,7 +1695,7 @@
 
 
 <h5 id="gpjax.scan.vscan" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">vscan</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Carry</span><span class="p">,</span> <span class="n">X</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Carry</span><span class="p">,</span> <span class="n">Y</span><span class="p">]],</span> <span class="n">init</span><span class="p">:</span> <span class="n">Carry</span><span class="p">,</span> <span class="n">xs</span><span class="p">:</span> <span class="n">X</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">unroll</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">log_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">log_value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Carry</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Y</span><span class="p">]]</span></code>
+<code class="highlight language-python"><span class="n">vscan</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Carry</span><span class="p">,</span> <span class="n">X</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Carry</span><span class="p">,</span> <span class="n">Y</span><span class="p">]],</span> <span class="n">init</span><span class="p">:</span> <span class="n">Carry</span><span class="p">,</span> <span class="n">xs</span><span class="p">:</span> <span class="n">X</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">unroll</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">log_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">log_value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Carry</span><span class="p">,</span> <span class="n">Shaped</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span></code>
 
 </h5>
 
@@ -1713,7 +1735,7 @@ vscan(f, init, xs)
         <tr>
           <td><code>f</code></td>
           <td>
-                <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="gpjax.scan.Carry" href="#gpjax.scan.Carry">Carry</a>, <a class="autorefs autorefs-internal" title="gpjax.scan.X" href="#gpjax.scan.X">X</a>], <span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="gpjax.scan.Carry" href="#gpjax.scan.Carry">Carry</a>, <a class="autorefs autorefs-internal" title="gpjax.scan.Y" href="#gpjax.scan.Y">Y</a>]]</code>
+                <code><span title="beartype.typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="gpjax.scan.Carry" href="#gpjax.scan.Carry">Carry</a>, <a class="autorefs autorefs-internal" title="gpjax.scan.X" href="#gpjax.scan.X">X</a>], <span title="beartype.typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="gpjax.scan.Carry" href="#gpjax.scan.Carry">Carry</a>, <a class="autorefs autorefs-internal" title="gpjax.scan.Y" href="#gpjax.scan.Y">Y</a>]]</code>
           </td>
           <td><p>A function that takes in a carry and
 an input and returns a tuple of a new carry and an output.</p></td>
@@ -1744,7 +1766,7 @@ an input and returns a tuple of a new carry and an output.</p></td>
         <tr>
           <td><code>length</code></td>
           <td>
-                <code><span title="typing.Optional">Optional</span>[int]</code>
+                <code><span title="beartype.typing.Optional">Optional</span>[int]</code>
           </td>
           <td><p>The length of the inputs. If None, then the length of
 the inputs is inferred.</p></td>
@@ -1795,7 +1817,7 @@ the inputs is inferred.</p></td>
     </tbody>
   </table>
       <h6 id="gpjax.scan.vscan--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Tuple[Carry, List[Y]]: A tuple of the final carry and the outputs.
+<div class="highlight"><pre><span></span><code>Tuple[Carry, list[Y]]: A tuple of the final carry and the outputs.
 </code></pre></div>
 
   </div>

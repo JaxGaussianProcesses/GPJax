@@ -19,7 +19,7 @@
         <link rel="next" href="../param/">
       
       <link rel="icon" href="../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
     
     
       
@@ -28,9 +28,6 @@
     
     
       <link rel="stylesheet" href="../../../assets/stylesheets/main.ded33207.min.css">
-      
-        
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -60,14 +57,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -308,6 +302,20 @@
     <li class="md-nav__item">
       <a href="../../../sharp_bits/" class="md-nav__link">
         🔪 Sharp bits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/pytrees/" class="md-nav__link">
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -1501,6 +1509,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../typing/" class="md-nav__link">
+        typing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../variational_families/" class="md-nav__link">
         variational_families
       </a>
@@ -1611,6 +1633,25 @@
 
 </div>
 
+<div class="doc doc-object doc-attribute">
+
+
+
+<h5 id="gpjax.base.module.Self" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">Self</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Self&#39;</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
 
 <div class="doc doc-object doc-class">
 
@@ -1686,7 +1727,7 @@
         <tr>
           <td><code>**kwargs</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>keyword arguments to replace the fields of the object.</p></td>
           <td>
@@ -1731,7 +1772,7 @@
         <tr>
           <td><code>**kwargs</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>keyword arguments to replace the metadata of the fields of the object.</p></td>
           <td>
@@ -1776,7 +1817,7 @@
         <tr>
           <td><code>**kwargs</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>keyword arguments to replace the fields of the object.</p></td>
           <td>
@@ -1798,7 +1839,7 @@
 
 
 <h6 id="gpjax.base.module.Module.replace_trainable" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+<code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
 </h6>
 
@@ -1816,7 +1857,7 @@
 
 
 <h6 id="gpjax.base.module.Module.replace_bijector" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+<code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
 </h6>
 
@@ -1892,6 +1933,22 @@
 
 </div>
 
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.base.module.Module.trainables" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
 
 
   </div>
@@ -1906,7 +1963,7 @@
 
 
 <h5 id="gpjax.base.module.meta_leaves" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">meta_leaves</span><span class="p">(</span><span class="n">pytree</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_leaf</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span></code>
+<code class="highlight language-python"><span class="n">meta_leaves</span><span class="p">(</span><span class="n">pytree</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_leaf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">]]</span></code>
 
 </h5>
 
@@ -1939,7 +1996,7 @@
         <tr>
           <td><code>is_leaf</code></td>
           <td>
-                <code><span title="typing.Callable">Callable</span>[[<span title="typing.Any">Any</span>], bool]</code>
+                <code><span title="beartype.typing.Callable">Callable</span>[[<span title="beartype.typing.Any">Any</span>], bool]</code>
           </td>
           <td><p>predicate to determine if a node is a leaf. Defaults to None.</p></td>
           <td>
@@ -1961,7 +2018,7 @@
 
 
 <h5 id="gpjax.base.module.meta_flatten" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">meta_flatten</span><span class="p">(</span><span class="n">pytree</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_leaf</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span></code>
+<code class="highlight language-python"><span class="n">meta_flatten</span><span class="p">(</span><span class="n">pytree</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Module</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_leaf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Module</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></code>
 
 </h5>
 
@@ -1994,7 +2051,7 @@
         <tr>
           <td><code>is_leaf</code></td>
           <td>
-                <code><span title="typing.Callable">Callable</span>[[<span title="typing.Any">Any</span>], bool]</code>
+                <code><span title="beartype.typing.Callable">Callable</span>[[<span title="beartype.typing.Any">Any</span>], bool]</code>
           </td>
           <td><p>predicate to determine if a node is a leaf. Defaults to None.</p></td>
           <td>
@@ -2016,7 +2073,7 @@
 
 
 <h5 id="gpjax.base.module.meta_map" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">meta_map</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">pytree</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="o">*</span><span class="n">rest</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">is_leaf</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span></code>
+<code class="highlight language-python"><span class="n">meta_map</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">pytree</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Module</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="n">rest</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">is_leaf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Module</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></code>
 
 </h5>
 
@@ -2039,7 +2096,7 @@
         <tr>
           <td><code>f</code></td>
           <td>
-                <code><span title="typing.Callable">Callable</span>[[<span title="typing.Any">Any</span>, Dict[str, <span title="typing.Any">Any</span>]], <span title="typing.Any">Any</span>]</code>
+                <code><span title="beartype.typing.Callable">Callable</span>[[<span title="beartype.typing.Any">Any</span>, <span title="beartype.typing.Dict">Dict</span>[str, <span title="beartype.typing.Any">Any</span>]], <span title="beartype.typing.Any">Any</span>]</code>
           </td>
           <td><p>The function to apply to the pytree.</p></td>
           <td>
@@ -2059,7 +2116,7 @@
         <tr>
           <td><code>rest</code></td>
           <td>
-                <code><span title="typing.Any">Any</span></code>
+                <code><span title="beartype.typing.Any">Any</span></code>
           </td>
           <td><p>Additional pytrees to apply the function to. Defaults to None.</p></td>
           <td>
@@ -2069,7 +2126,7 @@
         <tr>
           <td><code>is_leaf</code></td>
           <td>
-                <code><span title="typing.Callable">Callable</span>[[<span title="typing.Any">Any</span>], bool]</code>
+                <code><span title="beartype.typing.Callable">Callable</span>[[<span title="beartype.typing.Any">Any</span>], bool]</code>
           </td>
           <td><p>predicate to determine if a node is a leaf. Defaults to None.</p></td>
           <td>
@@ -2091,7 +2148,7 @@
 
 
 <h5 id="gpjax.base.module.meta" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">meta</span><span class="p">(</span><span class="n">pytree</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_leaf</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span></code>
+<code class="highlight language-python"><span class="n">meta</span><span class="p">(</span><span class="n">pytree</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_leaf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span></code>
 
 </h5>
 
