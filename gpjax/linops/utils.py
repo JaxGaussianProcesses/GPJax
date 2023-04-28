@@ -13,21 +13,22 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from gpjax.linops.identity_linear_operator import IdentityLinearOperator
-    from jaxtyping import Array, Float
-
+from beartype.typing import (
+    Type,
+    Union,
+)
 import jax
 import jax.numpy as jnp
+from jaxtyping import Float
 
 from gpjax.linops.linear_operator import LinearOperator
+from gpjax.typing import Array
 
 
-def identity(n: int) -> IdentityLinearOperator:
+def identity(
+    n: int,
+) -> "gpjax.linops.identity_linear_operator.IdentityLinearOperator":  # noqa: F821
     """Identity matrix.
 
     Args:
@@ -108,7 +109,7 @@ def check_shapes_match(shape1: tuple[int, ...], shape2: tuple[int, ...]) -> None
         )
 
 
-def default_dtype() -> jnp.dtype:
+def default_dtype() -> Union[Type[jnp.float64], Type[jnp.float32]]:
     """Get the default dtype for the linear operator.
 
     Returns

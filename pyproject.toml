@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gpjax"
-version = "0.5.9.post33.dev0+4853ebf" # Merely a placeholder, will be replaced by the dynamic versioning plugin
+version = "0.0.0" # Merely a placeholder, will be replaced by the dynamic versioning plugin
 description = "Gaussian processes in JAX."
 authors = ["Thomas Pinder <tompinder@live.co.uk>", "Daniel Dodd <daniel_dodd@icloud.com>"]
 license = "Apache-2.0"
@@ -19,11 +19,12 @@ python = ">=3.8,<3.12"
 jax = ">=0.4.1"
 jaxlib = "^0.4.6"
 optax = "^0.1.4"
-jaxtyping = "^0.2.14"
+jaxtyping = "^0.2.15"
 tqdm = "^4.65.0"
 simple-pytree = "^0.1.7"
 tensorflow-probability = "^0.19.0"
 orbax-checkpoint = "^0.2.0"
+beartype = "^0.13.1"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.2"
@@ -42,39 +43,42 @@ pylint = "^2.17.1"
 nox = "^2022.11.21"
 ruff = "^0.0.259"
 flax = "^0.6.8"
+pre-commit = "^3.2.2"
 nbstripout = "^0.6.1"
 pydocstyle = "^6.3.0"
 codespell = "^2.2.4"
 
 
 [tool.poetry.group.docs.dependencies]
+sphinx-book-theme = "^1.0.0"
+myst-parser = "^1.0.0"
 linkify-it-py = "^2.0.0"
 jinja2 = "^3.1.2"
+nbsphinx = "^0.9.1"
+sphinx-tabs = "^3.4.1"
 matplotlib = "^3.7.1"
 seaborn = "^0.12.2"
+sphinx-copybutton = "^0.5.1"
 networkx = "^3.0"
+sphinxcontrib-bibtex = "^2.5.0"
 jupytext = "^1.14.5"
 ipython = "^8.11.0"
+ipykernel = "^6.22.0"
 watermark = "^2.3.1"
+sphinxext-opengraph = "^0.8.1"
 blackjax = "^0.9.6"
+jaxopt = "^0.6"
 ipywidgets = "^8.0.5"
 pandas = "^1.5.3"
+geopandas = "^0.12.2"
 scikit-learn = "^1.2.2"
 flax = "^0.6.8"
-mkdocs = "^1.4.2"
-mkdocs-material = "^9.1.6"
-pymdown-extensions = "^9.11"
-mknotebooks = "^0.7.1"
-pygments = "^2.15.1"
-mkdocs-bibtex = "^2.8.16"
-mkdocs-jupyter = "^0.24.1"
-ipykernel = "^6.22.0"
-mdx-truly-sane-lists = "^1.3"
-mkdocstrings = {version = "^0.21.2", extras = ["python"]}
-pytkdocs = "^0.16.1"
-mkdocs-gen-files = "^0.4.0"
-mkdocs-literate-nav = "^0.6.0"
-mkdocs-git-authors-plugin = "^0.7.0"
+xarray = "^2023.1"
+pystac-client = "^0.6.1"
+planetary-computer = "^0.5.1"
+fsspec = "^2023.4.0"
+aiohttp = "^3.8.4"
+rioxarray = "^0.13"
 
 [build-system]
 requires = ["poetry-core", "poetry-dynamic-versioning"]
@@ -174,7 +178,7 @@ source = ["src"]
 output = "reports/coverage.xml"
 
 [tool.poetry-dynamic-versioning]
-enable = false
+enable = true
 
 [tool.codespell]
 ignore-words-list = "fro"

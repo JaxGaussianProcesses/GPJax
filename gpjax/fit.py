@@ -13,34 +13,36 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import (
-    Any,
-    Optional,
-    Tuple,
-)
 from warnings import warn
 
+from beartype.typing import (
+    Any,
+    Callable,
+    Optional,
+    Tuple,
+    Union,
+)
 import jax
 from jax._src.random import _check_prng_key
 import jax.random as jr
-from jax.random import KeyArray
 from jaxlib.xla_extension import PjitFunction
-from jaxtyping import (
-    Array,
-    Float,
-)
 import optax as ox
 
 from gpjax.base import Module
 from gpjax.dataset import Dataset
 from gpjax.objectives import AbstractObjective
 from gpjax.scan import vscan
+from gpjax.typing import (
+    Array,
+    KeyArray,
+    ScalarFloat,
+)
 
 
 def fit(
     *,
     model: Module,
-    objective: AbstractObjective,
+    objective: Union[AbstractObjective, Callable[[Module, Dataset], ScalarFloat]],
     train_data: Dataset,
     optim: ox.GradientTransformation,
     num_iters: Optional[int] = 100,
@@ -77,7 +79,7 @@ def fit(
         >>> model = LinearModel(weight=1.0, bias=1.0)
         >>>
         >>> # (3) Define your loss function:
-        >>> class MeanSqaureError(gpx.AbstractObjective):
+        >>> class MeanSquareError(gpx.AbstractObjective):
         ...     def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
         ...         return jnp.mean((train_data.y - model(train_data.X)) ** 2)
         ...
@@ -129,7 +131,7 @@ def fit(
         _check_verbose(verbose)
 
     # Unconstrained space loss function with stop-gradient rule for non-trainable params.
-    def loss(model: Module, batch: Dataset) -> Float[Array, "1"]:
+    def loss(model: Module, batch: Dataset) -> ScalarFloat:
         model = model.stop_gradient()
         return objective(model.constrain(), batch)
 
@@ -205,7 +207,7 @@ def _check_objective(objective: Any) -> None:
                     "Objective is jit-compiled. Please ensure that the objective is of"
                     " type gpjax.Objective."
                 ),
-                stacklevel=1,
+                stacklevel=2,
             )
         else:
             raise TypeError(

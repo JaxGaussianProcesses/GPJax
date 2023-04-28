@@ -19,23 +19,24 @@
 
 # %%
 from dataclasses import dataclass
+from typing import Dict
 
-from jax import jit
-from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
-from jaxtyping import (
-    Array,
-    Float,
-)
 import matplotlib.pyplot as plt
 import numpy as np
 import optax as ox
-from simple_pytree import static_field
 import tensorflow_probability.substrates.jax as tfp
+from jax import jit
+from jax.config import config
+from jaxtyping import Array, Float
+from simple_pytree import static_field
 
-import gpjax as gpx
-from gpjax.base.param import param_field
+from jaxtyping import install_import_hook
+
+with install_import_hook("gpjax", "beartype.beartype"):
+    import gpjax as gpx
+    from gpjax.base.param import param_field
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -59,7 +60,7 @@ cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 # * Polynomial.
 # * [Graph kernels](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html).
 #
-# While the syntax is consistent, each kernel’s type influences the
+# While the syntax is consistent, each kernel's type influences the
 # characteristics of the sample paths drawn. We visualise this below with 10
 # function draws per kernel.
 

@@ -23,6 +23,7 @@ repos:
     rev: 5.12.0
     hooks:
     -   id: isort
+        exclude: examples/
   - repo: local
     hooks:
       - id: commitizen
@@ -45,3 +46,4 @@ repos:
         require_serial: true
         language: system
         types: [python]
+        exclude: examples/

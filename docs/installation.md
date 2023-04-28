@@ -58,5 +58,5 @@ print(jaxlib.__version__)
     and recommend you check your installation passes the supplied unit tests:
 
     ```bash
-    poetry pytest tests/
+    poetry run pytest tests/
     ```

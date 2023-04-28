@@ -14,16 +14,17 @@
 # ==============================================================================
 
 from jaxtyping import (
-    Array,
     Int,
     Num,
 )
 
+from gpjax.typing import Array
+
 
 def jax_gather_nd(
-    params: Num[Array, "N ..."], indices: Int[Array, " M"]
-) -> Num[Array, "M ..."]:
-    r"""Slice a `params` array at a set of `indices`.
+    params: Num[Array, " N *rest"], indices: Int[Array, "M 1"]
+) -> Num[Array, " M *rest"]:
+    """Slice a `params` array at a set of `indices`.
 
     This is a reimplementation of TensorFlow's `gather_nd` function:
     [link](https://www.tensorflow.org/api_docs/python/tf/gather_nd)

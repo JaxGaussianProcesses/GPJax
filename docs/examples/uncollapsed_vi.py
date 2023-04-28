@@ -24,8 +24,11 @@ import optax as ox
 import tensorflow_probability.substrates.jax as tfp
 from utils import clean_legend
 
-import gpjax as gpx
-import gpjax.kernels as jk
+from jaxtyping import install_import_hook
+
+with install_import_hook("gpjax", "beartype.beartype"):
+    import gpjax as gpx
+    import gpjax.kernels as jk
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

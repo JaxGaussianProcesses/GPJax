@@ -8,16 +8,11 @@
 # <strong data-cite="wilson2016deep"></strong>, transforming the inputs to our
 # Gaussian process model's kernel through a neural network can offer a solution to this.
 
-from dataclasses import (
-    dataclass,
-    field,
-)
-
 # %%
+from dataclasses import dataclass, field
 from typing import Any
 
 import flax
-from flax import linen as nn
 import jax
 from jax.config import config
 import jax.numpy as jnp
@@ -29,11 +24,21 @@ from jaxtyping import (
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
+from flax import linen as nn
+from jax.config import config
+from jaxtyping import Array, Float
 from scipy.signal import sawtooth
 from simple_pytree import static_field
 
-import gpjax as gpx
-from gpjax.kernels.base import AbstractKernel
+from jaxtyping import install_import_hook
+
+with install_import_hook("gpjax", "beartype.beartype"):
+    import gpjax as gpx
+    import gpjax.kernels as jk
+    from gpjax.base import param_field
+    from gpjax.kernels import DenseKernelComputation
+    from gpjax.kernels.base import AbstractKernel
+    from gpjax.kernels.computations import AbstractKernelComputation
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

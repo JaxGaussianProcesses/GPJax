@@ -13,15 +13,17 @@
 # limitations under the License.
 # ==============================================================================
 
+
 from dataclasses import dataclass
 
 import jax.numpy as jnp
 from jaxtyping import (
-    Array,
     Float,
+    Num,
 )
 
 from gpjax.kernels.computations.base import AbstractKernelComputation
+from gpjax.typing import Array
 
 
 @dataclass
@@ -31,7 +33,7 @@ class EigenKernelComputation(AbstractKernelComputation):
     """
 
     def cross_covariance(
-        self, x: Float[Array, "N D"], y: Float[Array, "M D"]
+        self, x: Num[Array, "N D"], y: Num[Array, "M D"]
     ) -> Float[Array, "N M"]:
         r"""Compute the cross-covariance matrix.
 

@@ -15,16 +15,18 @@
 
 from dataclasses import dataclass
 
+from beartype.typing import Union
 import jax.numpy as jnp
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.stationary.utils import euclidean_distance
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 @dataclass
@@ -35,20 +37,19 @@ class PoweredExponential(AbstractKernel):
 
     """
 
-    lengthscale: Float[Array, " D"] = param_field(
+    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
         jnp.array([1.0]), bijector=tfb.Softplus()
     )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    power: Float[Array, "1"] = param_field(jnp.array([1.0]))
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    power: ScalarFloat = param_field(jnp.array(1.0))
     name: str = "Powered Exponential"
 
-    def __call__(
-        self, x: Float[Array, " D"], y: Float[Array, " D"]
-    ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell`, :math:`\\sigma` and power :math:`\\kappa`.
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+        r"""Compute the Powered Exponential kernel between a pair of arrays.
 
-        .. math::
-            k(x, y) = \\sigma^2 \\exp \\Bigg( - \\Big( \\frac{\\lVert x - y \\rVert^2}{\\ell^2} \\Big)^\\kappa \\Bigg)
+        Evaluate the kernel on a pair of inputs $(x, y)$ with length-scale parameter
+        $\ell$, $\sigma$ and power $\kappa$.
+        $$k(x, y)=\sigma^2\exp\Bigg(-\Big(\frac{\lVert x-y\rVert^2}{\ell^2}\Big)^\kappa\Bigg)$$
 
         Args:
             x (Float[Array, " D"]): The left hand argument of the kernel function's call.
@@ -56,7 +57,7 @@ class PoweredExponential(AbstractKernel):
 
         Returns
         -------
-            Float[Array, "1"]: The value of :math:`k(x, y)`
+            ScalarFloat: The value of $k(x, y)$.
         """
         x = self.slice_input(x) / self.lengthscale
         y = self.slice_input(y) / self.lengthscale

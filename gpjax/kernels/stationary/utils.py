@@ -14,11 +14,13 @@
 # ==============================================================================
 
 import jax.numpy as jnp
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
+
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 tfd = tfp.distributions
 
@@ -37,7 +39,7 @@ def build_student_t_distribution(nu: int) -> tfd.Distribution:
     return dist
 
 
-def squared_distance(x: Float[Array, " D"], y: Float[Array, " D"]) -> Float[Array, "1"]:
+def squared_distance(x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
     """Compute the squared distance between a pair of inputs.
 
     Args:
@@ -46,14 +48,12 @@ def squared_distance(x: Float[Array, " D"], y: Float[Array, " D"]) -> Float[Arra
 
     Returns
     -------
-        Float[Array, "1"]: The squared distance between the inputs.
+        ScalarFloat: The squared distance between the inputs.
     """
     return jnp.sum((x - y) ** 2)
 
 
-def euclidean_distance(
-    x: Float[Array, " D"], y: Float[Array, " D"]
-) -> Float[Array, "1"]:
+def euclidean_distance(x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
     """Compute the euclidean distance between a pair of inputs.
 
     Args:
@@ -62,6 +62,6 @@ def euclidean_distance(
 
     Returns
     -------
-        Float[Array, "1"]: The euclidean distance between the inputs.
+        ScalarFloat: The euclidean distance between the inputs.
     """
     return jnp.sqrt(jnp.maximum(squared_distance(x, y), 1e-36))

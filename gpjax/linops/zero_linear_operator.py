@@ -13,25 +13,27 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import (
-    TYPE_CHECKING,
+
+from beartype.typing import (
     Any,
+    Tuple,
+    Union,
 )
-
 import jax.numpy as jnp
+from jaxtyping import Float
 
-if TYPE_CHECKING:
-    from jaxtyping import Array, Float
-    from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
-
+from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 from gpjax.linops.linear_operator import LinearOperator
 from gpjax.linops.utils import (
     check_shapes_match,
     default_dtype,
     to_linear_operator,
+)
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
 )
 
 
@@ -50,7 +52,7 @@ def _check_size(shape: Any) -> None:
 class ZeroLinearOperator(LinearOperator):
     """Zero linear operator."""
 
-    def __init__(self, shape: tuple[int], dtype: jnp.dtype = None) -> None:
+    def __init__(self, shape: Tuple[int, ...], dtype: jnp.dtype = None) -> None:
         _check_size(shape)
 
         if dtype is None:
@@ -65,7 +67,7 @@ class ZeroLinearOperator(LinearOperator):
 
         Returns
         -------
-            Float[Array, "N"]: The diagonal of the covariance operator.
+            Float[Array, " N"]: The diagonal of the covariance operator.
         """
         return jnp.zeros(self.shape[0])
 
@@ -97,7 +99,7 @@ class ZeroLinearOperator(LinearOperator):
         check_shapes_match(self.shape, other.shape)
         return other
 
-    def __mul__(self, other: float) -> ZeroLinearOperator:
+    def __mul__(self, other: ScalarFloat) -> "ZeroLinearOperator":
         """Multiply covariance operator by scalar.
 
         Args:
@@ -111,8 +113,8 @@ class ZeroLinearOperator(LinearOperator):
         return self
 
     def __matmul__(
-        self, other: LinearOperator | Float[Array, "N M"]
-    ) -> ZeroLinearOperator:
+        self, other: Union[LinearOperator, Float[Array, "N M"]]
+    ) -> "ZeroLinearOperator":
         """Matrix multiplication.
 
         Args:
@@ -134,7 +136,7 @@ class ZeroLinearOperator(LinearOperator):
         """
         return jnp.zeros(self.shape)
 
-    def to_root(self) -> ZeroLinearOperator:
+    def to_root(self) -> "ZeroLinearOperator":
         """
         Root of the covariance operator.
 
@@ -144,12 +146,12 @@ class ZeroLinearOperator(LinearOperator):
         """
         return self
 
-    def log_det(self) -> Float[Array, 1]:
+    def log_det(self) -> ScalarFloat:
         """Log determinant.
 
         Returns
         -------
-            Float[Array, "1"]: Log determinant of the covariance matrix.
+            ScalarFloat: Log determinant of the covariance matrix.
         """
         return jnp.log(jnp.array(0.0))
 
@@ -162,7 +164,7 @@ class ZeroLinearOperator(LinearOperator):
         """
         raise RuntimeError("ZeroLinearOperator is not invertible.")
 
-    def solve(self, rhs: Float[Array, "N M"]) -> None:
+    def solve(self, rhs: Float[Array, "... M"]) -> None:
         """Solve linear system.
 
         Raises
@@ -172,7 +174,7 @@ class ZeroLinearOperator(LinearOperator):
         raise RuntimeError("ZeroLinearOperator is not invertible.")
 
     @classmethod
-    def from_root(cls, root: ZeroLinearOperator) -> ZeroLinearOperator:
+    def from_root(cls, root: "ZeroLinearOperator") -> "ZeroLinearOperator":
         """Construct covariance operator from the root.
 
         Args:
@@ -185,7 +187,7 @@ class ZeroLinearOperator(LinearOperator):
         return root
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> ZeroLinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "ZeroLinearOperator":
         """Construct covariance operator from the dense matrix.
 
         Args:

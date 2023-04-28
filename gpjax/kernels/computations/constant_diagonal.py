@@ -12,18 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+
 from jax import vmap
 import jax.numpy as jnp
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jaxtyping import Float
 
 from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.linops import (
     ConstantDiagonalLinearOperator,
     DiagonalLinearOperator,
 )
+from gpjax.typing import Array
 
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):

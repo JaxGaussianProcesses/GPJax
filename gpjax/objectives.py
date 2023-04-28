@@ -1,13 +1,3 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from gpjax.dataset import Dataset
-    from gpjax.gps import ConjugatePosterior, NonConjugatePosterior
-    from gpjax.variational_families import AbstractVariationalFamily
-    from jaxtyping import Array, Float
-
 from abc import abstractmethod
 from dataclasses import dataclass
 
@@ -15,13 +5,19 @@ from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
 import jax.tree_util as jtu
+from jaxtyping import Float
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.base import Module
+from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.linops import identity
 from gpjax.quadrature import gauss_hermite_quadrature
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 tfd = tfp.distributions
 
@@ -39,18 +35,20 @@ class AbstractObjective(Module):
     def __hash__(self):
         return hash(tuple(jtu.tree_leaves(self)))  # Probably put this on the Module!
 
-    def __call__(self, *args, **kwargs) -> Float[Array, 1]:
+    def __call__(self, *args, **kwargs) -> ScalarFloat:
         return self.step(*args, **kwargs)
 
     @abstractmethod
-    def step(self, *args, **kwargs) -> Float[Array, 1]:
+    def step(self, *args, **kwargs) -> ScalarFloat:
         raise NotImplementedError
 
 
 class ConjugateMLL(AbstractObjective):
     def step(
-        self, posterior: ConjugatePosterior, train_data: Dataset
-    ) -> Float[Array, 1]:
+        self,
+        posterior: "gpjax.gps.ConjugatePosterior",  # noqa: F821
+        train_data: Dataset,  # noqa: F821
+    ) -> ScalarFloat:
         """Compute the marginal log-likelihood function of the Gaussian process.
         The returned function can then be used for gradient based optimisation
         of the model's parameters or for model comparison. The implementation
@@ -109,7 +107,7 @@ class ConjugateMLL(AbstractObjective):
 
         Returns
         -------
-            Callable[[Parameters], Float[Array, "1"]]: A functional representation
+            ScalarFloat: A functional representation
                 of the marginal log-likelihood that can be evaluated at a
                 given parameter set.
         """
@@ -131,7 +129,9 @@ class ConjugateMLL(AbstractObjective):
 
 
 class NonConjugateMLL(AbstractObjective):
-    def step(self, posterior: NonConjugatePosterior, data: Dataset) -> Float[Array, 1]:
+    def step(
+        self, posterior: "gpjax.gps.NonConjugatePosterior", data: Dataset  # noqa: F821
+    ) -> ScalarFloat:
         """
         Compute the marginal log-likelihood function of the Gaussian process.
         The returned function can then be used for gradient based optimisation
@@ -158,9 +158,8 @@ class NonConjugateMLL(AbstractObjective):
 
         Returns
         -------
-            Callable[[Parameters], Float[Array, "1"]]: A functional representation
-                of the marginal log-likelihood that can be evaluated at a given
-                parameter set.
+            ScalarFloat: A functional representation of the marginal log-likelihood
+            that can be evaluated at a given parameter set.
         """
         # Unpack the training data
         x, y, n = data.X, data.y, data.n
@@ -190,8 +189,10 @@ class NonConjugateMLL(AbstractObjective):
 
 class ELBO(AbstractObjective):
     def step(
-        self, variational_family: AbstractVariationalFamily, train_data: Dataset
-    ) -> Float[Array, 1]:
+        self,
+        variational_family: "gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
+        train_data: Dataset,
+    ) -> ScalarFloat:
         """Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
         approximation. To this, we sum the KL divergence from the variational posterior
@@ -233,9 +234,9 @@ LogPosteriorDensity = NonConjugateMLL
 
 
 def variational_expectation(
-    variational_family: AbstractVariationalFamily,
+    variational_family: "gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
     train_data: Dataset,
-) -> Float[Array, "N 1"]:
+) -> Float[Array, " N"]:
     """Compute the expectation of our model's log-likelihood under our variational
     distribution. Batching can be done here to speed up computation.
 
@@ -278,8 +279,10 @@ class CollapsedELBO(AbstractObjective):
     """
 
     def step(
-        self, variational_family: AbstractVariationalFamily, train_data: Dataset
-    ) -> Float[Array, 1]:
+        self,
+        variational_family: "gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
+        train_data: Dataset,
+    ) -> ScalarFloat:
         """Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
         approximation. To this, we sum the KL divergence from the variational posterior

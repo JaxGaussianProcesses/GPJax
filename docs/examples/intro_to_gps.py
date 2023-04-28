@@ -105,8 +105,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-
-# %%
 import tensorflow_probability.substrates.jax as tfp
 from utils import confidence_ellipse
 

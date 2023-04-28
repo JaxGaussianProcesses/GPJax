@@ -16,10 +16,7 @@
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jaxtyping import Float
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
@@ -29,23 +26,25 @@ from gpjax.kernels.computations import (
     AbstractKernelComputation,
     ConstantDiagonalKernelComputation,
 )
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 @dataclass
 class White(AbstractKernel):
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     compute_engine: AbstractKernelComputation = static_field(
         ConstantDiagonalKernelComputation
     )
     name: str = "White"
 
-    def __call__(
-        self, x: Float[Array, " D"], y: Float[Array, " D"]
-    ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance :math:`\\sigma`.
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+        r"""Compute the White noise kernel between a pair of arrays.
 
-        .. math::
-            k(x, y) = \\sigma^2 \\delta(x-y)
+        Evaluate the kernel on a pair of inputs $(x, y)$ with variance $\sigma^2$:
+        $$k(x, y) = \sigma^2 \delta(x-y)$$
 
         Args:
             x (Float[Array, " D"]): The left hand argument of the kernel function's call.
@@ -53,7 +52,7 @@ class White(AbstractKernel):
 
         Returns
         -------
-            Float[Array, "1"]: The value of :math:`k(x, y)`.
+            ScalarFloat: The value of $k(x, y)$.
         """
         K = jnp.all(jnp.equal(x, y)) * self.variance
         return K.squeeze()

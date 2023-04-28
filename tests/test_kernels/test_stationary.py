@@ -75,7 +75,7 @@ class BaseTestKernel:
         assert is_dataclass(self.kernel)
 
         # Input fields as JAX arrays
-        fields = {k: jnp.array([v]) for k, v in fields.items()}
+        fields = {k: jnp.array(v) for k, v in fields.items()}
 
         # Test number of dimensions
         if dim is None:

@@ -15,11 +15,9 @@
 
 from dataclasses import dataclass
 
+from beartype.typing import Union
 import jax.numpy as jnp
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 
@@ -29,25 +27,31 @@ from gpjax.kernels.stationary.utils import (
     build_student_t_distribution,
     euclidean_distance,
 )
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 @dataclass
 class Matern32(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 1.5."""
 
-    lengthscale: Float[Array, " D"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
+    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
     )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Matérn32"
 
     def __call__(
         self,
         x: Float[Array, " D"],
         y: Float[Array, " D"],
-    ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`.
+    ) -> ScalarFloat:
+        r"""Compute the Matérn 3/2 kernel between a pair of arrays.
+
+        Evaluate the kernel on a pair of inputs $(x, y)$ with
+        lengthscale parameter $\ell$ and variance $\sigma^2$.
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{3}\\lvert x-y \\rvert}{\\ell^2}  \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{3}\\lvert x-y\\rvert}{\\ell^2} \\Bigg)
@@ -58,7 +62,7 @@ class Matern32(AbstractKernel):
 
         Returns
         -------
-            Float[Array, "1"]: The value of :math:`k(x, y)`.
+            ScalarFloat: The value of $k(x, y)$.
         """
         x = self.slice_input(x) / self.lengthscale
         y = self.slice_input(y) / self.lengthscale

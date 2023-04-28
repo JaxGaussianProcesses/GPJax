@@ -13,22 +13,21 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import (
-    TYPE_CHECKING,
-    Any,
-)
 
+from beartype.typing import Any
 import jax.numpy as jnp
-
-if TYPE_CHECKING:
-    from jaxtyping import Array, Float
+from jaxtyping import Float
 
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
 from gpjax.linops.linear_operator import LinearOperator
 from gpjax.linops.utils import to_linear_operator
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+    VecNOrMatNM,
+)
 
 
 def _check_diag(diag: Any) -> None:
@@ -50,7 +49,7 @@ class DiagonalLinearOperator(LinearOperator):
         """Initialize the covariance operator.
 
         Args:
-            diag (Float[Array, "N"]): Diagonal of the covariance operator.
+            diag (Float[Array, " N"]): Diagonal of the covariance operator.
         """
         _check_diag(diag)
 
@@ -67,7 +66,7 @@ class DiagonalLinearOperator(LinearOperator):
 
         Returns
         -------
-            Float[Array, "N"]: Diagonal of the covariance operator.
+            Float[Array, " N"]: Diagonal of the covariance operator.
         """
         return self.diag
 
@@ -97,7 +96,7 @@ class DiagonalLinearOperator(LinearOperator):
         else:
             raise NotImplementedError
 
-    def __mul__(self, other: float) -> LinearOperator:
+    def __mul__(self, other: ScalarFloat) -> LinearOperator:
         """Multiply covariance operator by scalar.
 
         Args:
@@ -109,7 +108,7 @@ class DiagonalLinearOperator(LinearOperator):
         """
         return DiagonalLinearOperator(diag=self.diagonal() * other)
 
-    def _add_diagonal(self, other: DiagonalLinearOperator) -> LinearOperator:
+    def _add_diagonal(self, other: "DiagonalLinearOperator") -> LinearOperator:
         """Add diagonal to the covariance operator,  useful for computing, Kxx + Io².
 
         Args:
@@ -130,7 +129,7 @@ class DiagonalLinearOperator(LinearOperator):
         """
         return jnp.diag(self.diagonal())
 
-    def __matmul__(self, other: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def __matmul__(self, other: VecNOrMatNM) -> VecNOrMatNM:
         """Matrix multiplication.
 
         Args:
@@ -146,7 +145,7 @@ class DiagonalLinearOperator(LinearOperator):
 
         return diag * other
 
-    def to_root(self) -> DiagonalLinearOperator:
+    def to_root(self) -> "DiagonalLinearOperator":
         """
         Lower triangular.
 
@@ -156,16 +155,16 @@ class DiagonalLinearOperator(LinearOperator):
         """
         return DiagonalLinearOperator(diag=jnp.sqrt(self.diagonal()))
 
-    def log_det(self) -> Float[Array, 1]:
+    def log_det(self) -> ScalarFloat:
         """Log determinant.
 
         Returns
         -------
-            Float[Array, "1"]: Log determinant of the covariance matrix.
+            ScalarFloat: Log determinant of the covariance matrix.
         """
         return jnp.sum(jnp.log(self.diagonal()))
 
-    def inverse(self) -> DiagonalLinearOperator:
+    def inverse(self) -> "DiagonalLinearOperator":
         """Inverse of the covariance operator.
 
         Returns
@@ -174,7 +173,7 @@ class DiagonalLinearOperator(LinearOperator):
         """
         return DiagonalLinearOperator(diag=1.0 / self.diagonal())
 
-    def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def solve(self, rhs: VecNOrMatNM) -> VecNOrMatNM:
         """Solve linear system.
 
         Args:
@@ -187,7 +186,7 @@ class DiagonalLinearOperator(LinearOperator):
         return self.inverse() @ rhs
 
     @classmethod
-    def from_root(cls, root: DiagonalLinearOperator) -> DiagonalLinearOperator:
+    def from_root(cls, root: "DiagonalLinearOperator") -> "DiagonalLinearOperator":
         """Construct covariance operator from the lower triangular matrix.
 
         Returns
@@ -197,7 +196,7 @@ class DiagonalLinearOperator(LinearOperator):
         return DiagonalFromRootLinearOperator(root=root)
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> DiagonalLinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "DiagonalLinearOperator":
         """Construct covariance operator from its dense matrix representation.
 
         Returns

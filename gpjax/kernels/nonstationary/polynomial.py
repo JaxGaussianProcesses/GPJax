@@ -16,31 +16,31 @@
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jaxtyping import Float
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+    ScalarInt,
+)
 
 
 @dataclass
 class Polynomial(AbstractKernel):
     """The Polynomial kernel with variable degree."""
 
-    degree: int = static_field(2)
-    shift: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    degree: ScalarInt = static_field(2)
+    shift: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
 
     def __post_init__(self):
         self.name = f"Polynomial (degree {self.degree})"
 
-    def __call__(
-        self, x: Float[Array, " D"], y: Float[Array, " D"]
-    ) -> Float[Array, "1"]:
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the polynomial kernel of degree $d$ between a pair of arrays.
 
         For a pair of inputs $x, y \in \mathbb{R}^{D}$, let's evaluate the polynomial
@@ -49,16 +49,16 @@ class Polynomial(AbstractKernel):
         parameter $\alpha$ and integer degree $d$.
 
         Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's
+            x (Float[Array, " D"]): The left hand argument of the kernel function's
                 call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's
+            y (Float[Array, " D"]): The right hand argument of the kernel function's
                 call
 
         Returns
         -------
-            Float[Array, "1"]: The value of $k(x, y)$.
+            ScalarFloat: The value of $k(x, y)$.
         """
-        x = self.slice_input(x).squeeze()
-        y = self.slice_input(y).squeeze()
-        K = jnp.power(self.shift + jnp.dot(x * self.variance, y), self.degree)
+        x = self.slice_input(x)
+        y = self.slice_input(y)
+        K = jnp.power(self.shift + self.variance * jnp.dot(x, y), self.degree)
         return K.squeeze()

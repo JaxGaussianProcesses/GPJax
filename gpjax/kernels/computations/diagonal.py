@@ -14,13 +14,11 @@
 # ==============================================================================
 
 from jax import vmap
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jaxtyping import Float
 
 from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.linops import DiagonalLinearOperator
+from gpjax.typing import Array
 
 
 class DiagonalKernelComputation(AbstractKernelComputation):

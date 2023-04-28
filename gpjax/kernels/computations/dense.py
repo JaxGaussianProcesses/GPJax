@@ -14,12 +14,10 @@
 # ==============================================================================
 
 from jax import vmap
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jaxtyping import Float
 
 from gpjax.kernels.computations.base import AbstractKernelComputation
+from gpjax.typing import Array
 
 
 class DenseKernelComputation(AbstractKernelComputation):

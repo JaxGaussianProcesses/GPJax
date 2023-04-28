@@ -15,14 +15,14 @@
 
 import abc
 from dataclasses import dataclass
-from typing import Any
 
+from beartype.typing import (
+    Any,
+    Union,
+)
 import jax.numpy as jnp
 import jax.scipy as jsp
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jaxtyping import Float
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax as tfp
 
@@ -30,7 +30,12 @@ from gpjax.base import (
     Module,
     param_field,
 )
+from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.linops.utils import to_dense
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 tfb = tfp.bijectors
 tfd = tfp.distributions
@@ -69,9 +74,8 @@ class AbstractLikelihood(Module):
         """
         raise NotImplementedError
 
-    @property
     @abc.abstractmethod
-    def link_function(self) -> tfd.Distribution:
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         """Return the link function of the likelihood function.
 
         Returns
@@ -85,16 +89,15 @@ class AbstractLikelihood(Module):
 class Gaussian(AbstractLikelihood):
     """Gaussian likelihood object."""
 
-    obs_noise: Float[Array, "1"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
+    obs_noise: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
     )
 
-    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Normal:
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Normal:
         """The link function of the Gaussian likelihood.
 
         Args:
-            params (Dict): The parameters of the likelihood function.
-            f (Float[Array, "N 1"]): Function values.
+            f (Float[Array, "..."]): Function values.
 
         Returns
         -------
@@ -103,7 +106,7 @@ class Gaussian(AbstractLikelihood):
         return tfd.Normal(loc=f, scale=self.obs_noise.astype(f.dtype))
 
     def predict(
-        self, dist: tfd.MultivariateNormalTriL
+        self, dist: Union[tfd.MultivariateNormalTriL, GaussianDistribution]
     ) -> tfd.MultivariateNormalFullCovariance:
         """
         Evaluate the Gaussian likelihood function at a given predictive
@@ -112,7 +115,6 @@ class Gaussian(AbstractLikelihood):
         distribution's covariance matrix.
 
         Args:
-            params (Dict): The parameters of the likelihood function.
             dist (tfd.Distribution): The Gaussian process posterior,
                 evaluated at a finite set of test points.
 
@@ -129,11 +131,11 @@ class Gaussian(AbstractLikelihood):
 
 @dataclass
 class Bernoulli(AbstractLikelihood):
-    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Distribution:
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         """The probit link function of the Bernoulli likelihood.
 
         Args:
-            f (Float[Array, "N 1"]): Function values.
+            f (Float[Array, "..."]): Function values.
 
         Returns
         -------
@@ -146,7 +148,6 @@ class Bernoulli(AbstractLikelihood):
         process posterior and likelihood parameters.
 
         Args:
-            params (Dict): The parameters of the likelihood function.
             dist (tfd.Distribution): The Gaussian process posterior, evaluated
                 at a finite set of test points.
 
@@ -159,15 +160,15 @@ class Bernoulli(AbstractLikelihood):
         return self.link_function(mean / jnp.sqrt(1.0 + variance))
 
 
-def inv_probit(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
+def inv_probit(x: Float[Array, " *N"]) -> Float[Array, " *N"]:
     """Compute the inverse probit function.
 
     Args:
-        x (Float[Array, "N 1"]): A vector of values.
+        x (Float[Array, "*N"]): A vector of values.
 
     Returns
     -------
-        Float[Array, "N 1"]: The inverse probit of the input vector.
+        Float[Array, "*N"]: The inverse probit of the input vector.
     """
     jitter = 1e-3  # To ensure output is in interval (0, 1).
     return 0.5 * (1.0 + jsp.special.erf(x / jnp.sqrt(2.0))) * (1 - 2 * jitter) + jitter

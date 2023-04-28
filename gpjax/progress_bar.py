@@ -13,22 +13,17 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import (
-    TYPE_CHECKING,
+from beartype.typing import (
     Any,
     Callable,
     Union,
 )
-
 from jax import lax
 from jax.experimental import host_callback
+from jaxtyping import Float  # noqa: TCH002
 from tqdm.auto import tqdm
 
-if TYPE_CHECKING:
-    from jaxtyping import (
-        Array,
-        Float,
-    )
+from gpjax.typing import Array  # noqa: TCH001
 
 
 def progress_bar(num_iters: int, log_rate: int) -> Callable:

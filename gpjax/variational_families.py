@@ -15,14 +15,11 @@
 
 import abc
 from dataclasses import dataclass
-from typing import Any
 
+from beartype.typing import Any
 import jax.numpy as jnp
 import jax.scipy as jsp
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jaxtyping import Float
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
@@ -38,6 +35,10 @@ from gpjax.linops import (
     DenseLinearOperator,
     LowerTriangularLinearOperator,
     identity,
+)
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
 )
 
 
@@ -87,7 +88,7 @@ class AbstractVariationalGaussian(AbstractVariationalFamily):
     """The variational Gaussian family of probability distributions."""
 
     inducing_inputs: Float[Array, "N D"]
-    jitter: Float[Array, "1"] = static_field(1e-6)
+    jitter: ScalarFloat = static_field(1e-6)
 
     @property
     def num_inducing(self) -> int:
@@ -118,7 +119,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         if self.variational_root_covariance is None:
             self.variational_root_covariance = jnp.eye(self.num_inducing)
 
-    def prior_kl(self) -> Float[Array, "1"]:
+    def prior_kl(self) -> ScalarFloat:
         """
         Compute the KL-divergence between our variational approximation and the
         Gaussian process prior.
@@ -129,7 +130,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         Returns
         -------
-             Float[Array, "1"]: The KL-divergence between our variational
+             ScalarFloat: The KL-divergence between our variational
                 approximation and the GP prior.
         """
         # Unpack variational parameters
@@ -228,7 +229,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
     over μ and sqrt with S = sqrt sqrtᵀ.
     """
 
-    def prior_kl(self) -> Float[Array, "1"]:
+    def prior_kl(self) -> ScalarFloat:
         """Compute the KL-divergence between our variational approximation and
         the Gaussian process prior.
 
@@ -236,7 +237,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
         Returns
         -------
-            Float[Array, "1"]: The KL-divergence between our variational
+            ScalarFloat: The KL-divergence between our variational
                 approximation and the GP prior.
         """
         # Unpack variational parameters
@@ -328,7 +329,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         if self.natural_matrix is None:
             self.natural_matrix = -0.5 * jnp.eye(self.num_inducing)
 
-    def prior_kl(self) -> Float[Array, "1"]:
+    def prior_kl(self) -> ScalarFloat:
         """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],
@@ -337,7 +338,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         Returns
         -------
-            Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
+            ScalarFloat: The KL-divergence between our variational approximation and the GP prior.
         """
         # Unpack variational parameters
         natural_vector = self.natural_vector
@@ -475,19 +476,18 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         if self.expectation_matrix is None:
             self.expectation_matrix = jnp.eye(self.num_inducing)
 
-    def prior_kl(self) -> Float[Array, "1"]:
-        """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
+    def prior_kl(self) -> ScalarFloat:
+        """Compute the KL-divergence between our current variational approximation and
+        the Gaussian process prior.
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],
 
         with μ and S computed from the expectation parameterisation η = (μ, S + uuᵀ).
 
-        Args:
-            params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
-
         Returns
         -------
-            Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
+            ScalarFloat: The KL-divergence between our variational approximation and
+                the GP prior.
         """
         # Unpack variational parameters
         expectation_vector = self.expectation_vector

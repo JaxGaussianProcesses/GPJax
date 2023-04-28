@@ -15,6 +15,13 @@
 
 from dataclasses import is_dataclass
 
+try:
+    import beartype
+
+    ValidationErrors = (ValueError, beartype.roar.BeartypeCallHintParamViolation)
+except ImportError:
+    ValidationErrors = ValueError
+
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import pytest
@@ -107,7 +114,7 @@ def test_dataset_incorrect_lengths(nx: int, ny: int, out_dim: int, in_dim: int) 
     y = jnp.ones((ny, out_dim))
 
     # Ensure error is raised upon dataset creation
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationErrors):
         Dataset(X=x, y=y)
 
 
@@ -120,7 +127,7 @@ def test_2d_inputs(n: int, out_dim: int, in_dim: int) -> None:
     y = jnp.ones((n,))
 
     # Ensure error is raised upon dataset creation
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationErrors):
         Dataset(X=x, y=y)
 
     # Create dataset where input dimension is incorrectly not 2D
@@ -128,7 +135,7 @@ def test_2d_inputs(n: int, out_dim: int, in_dim: int) -> None:
     y = jnp.ones((n, out_dim))
 
     # Ensure error is raised upon dataset creation
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationErrors):
         Dataset(X=x, y=y)
 
 

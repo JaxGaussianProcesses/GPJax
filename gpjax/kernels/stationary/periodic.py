@@ -15,15 +15,17 @@
 
 from dataclasses import dataclass
 
+from beartype.typing import Union
 import jax.numpy as jnp
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 @dataclass
@@ -33,28 +35,25 @@ class Periodic(AbstractKernel):
     Key reference is MacKay 1998 - "Introduction to Gaussian processes".
     """
 
-    lengthscale: Float[Array, " D"] = param_field(
+    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
         jnp.array([1.0]), bijector=tfb.Softplus()
     )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
-    period: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    period: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Periodic"
 
-    def __call__(
-        self, x: Float[Array, " D"], y: Float[Array, " D"]
-    ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`.
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+        r"""Compute the Periodic kernel between a pair of arrays.
 
         TODO: update docstring
-
-        .. math::
-            k(x, y) = \\sigma^2 \\exp \\Bigg( -0.5 \\sum_{i=1}^{d} \\Bigg)
+        Evaluate the kernel on a pair of inputs $(x, y)$ with length-scale parameter $\ell$ and variance $\sigma$.
+        $$k(x, y) = \sigma^2 \exp \Bigg( -0.5 \sum_{i=1}^{d} \Bigg)$$
 
         Args:
             x (Float[Array, " D"]): The left hand argument of the kernel function's call.
             y (Float[Array, " D"]): The right hand argument of the kernel function's call
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`
+            ScalarFloat: The value of $k(x, y)$.
         """
         x = self.slice_input(x)
         y = self.slice_input(y)

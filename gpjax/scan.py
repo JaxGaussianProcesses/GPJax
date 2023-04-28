@@ -13,28 +13,35 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import (
+from beartype.typing import (
     Any,
     Callable,
-    List,
     Optional,
     Tuple,
     TypeVar,
 )
-
 import jax
 from jax import lax
 from jax.experimental import host_callback as hcb
 import jax.numpy as jnp
 import jax.tree_util as jtu
+from jaxtyping import (
+    Array,
+    Shaped,
+)
 from tqdm.auto import trange
+
+from gpjax.typing import (
+    ScalarBool,
+    ScalarInt,
+)
 
 Carry = TypeVar("Carry")
 X = TypeVar("X")
 Y = TypeVar("Y")
 
 
-def _callback(cond: bool, func: Callable, *args: Any) -> None:
+def _callback(cond: ScalarBool, func: Callable, *args: Any) -> None:
     """Callback a function for a given argument if a condition is true.
 
     Args:
@@ -65,7 +72,9 @@ def vscan(
     unroll: Optional[int] = 1,
     log_rate: Optional[int] = 10,
     log_value: Optional[bool] = True,
-) -> Tuple[Carry, List[Y]]:
+) -> Tuple[
+    Carry, Shaped[Array, "..."]
+]:  # return type should be Tuple[Carry, Y[Array]]...
     """Scan with verbose output.
 
     This is based on code from the excellent blog post:
@@ -119,7 +128,7 @@ def vscan(
         """Close the tqdm progress bar."""
         _progress_bar.close()
 
-    def _body_fun(carry: Carry, iter_num_and_x: Tuple[int, X]) -> Tuple[Carry, Y]:
+    def _body_fun(carry: Carry, iter_num_and_x: Tuple[ScalarInt, X]) -> Tuple[Carry, Y]:
         # Unpack iter_num and x.
         iter_num, x = iter_num_and_x
 

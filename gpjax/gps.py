@@ -15,21 +15,20 @@
 
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import (
+
+from beartype.typing import (
     Any,
     Callable,
     Optional,
 )
-
 import jax.numpy as jnp
 from jax.random import (
-    KeyArray,
     PRNGKey,
     normal,
 )
 from jaxtyping import (
-    Array,
     Float,
+    Num,
 )
 from simple_pytree import static_field
 
@@ -47,6 +46,10 @@ from gpjax.likelihoods import (
 )
 from gpjax.linops import identity
 from gpjax.mean_functions import AbstractMeanFunction
+from gpjax.typing import (
+    Array,
+    KeyArray,
+)
 
 FunctionalSample = Callable[[Float[Array, "N D"]], Float[Array, "N B"]]
 """ Type alias for functions representing `B` samples from a model, to be evaluated on
@@ -176,7 +179,7 @@ class Prior(AbstractPrior):
         """
         return self.__mul__(other)
 
-    def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
+    def predict(self, test_inputs: Num[Array, "N D"]) -> GaussianDistribution:
         """Compute the predictive prior distribution for a given set of
         parameters. The output of this function is a function that computes
         a TFP distribution for a given set of inputs.
@@ -334,7 +337,7 @@ class AbstractPosterior(Module):
 
 @dataclass
 class ConjugatePosterior(AbstractPosterior):
-    """A Gaussian process posterior distribution when the constituent likelihood
+    r"""A Gaussian process posterior distribution when the constituent likelihood
     function is a Gaussian distribution. In such cases, the latent function values
     :math:`f` can be analytically integrated out of the posterior distribution.
     As such, many computational operations can be simplified; something we make use
@@ -368,10 +371,10 @@ class ConjugatePosterior(AbstractPosterior):
 
     def predict(
         self,
-        test_inputs: Float[Array, "N D"],
+        test_inputs: Num[Array, "N D"],
         train_data: Dataset,
     ) -> GaussianDistribution:
-        """Conditional on a training data set, compute the GP's posterior
+        r"""Conditional on a training data set, compute the GP's posterior
         predictive distribution for a given set of parameters. The returned
         function can be evaluated at a set of test inputs to compute the
         corresponding predictive density.
@@ -379,14 +382,14 @@ class ConjugatePosterior(AbstractPosterior):
         The predictive distribution of a conjugate GP is given by
         .. math::
 
-            p(\\mathbf{f}^{\\star}\\mid \\mathbf{y}) & = \\int p(\\mathbf{f}^{\\star} \\mathbf{f} \\mid \\mathbf{y})\\\\
-            & =\\mathcal{N}(\\mathbf{f}^{\\star} \\boldsymbol{\\mu}_{\\mid \\mathbf{y}}, \\boldsymbol{\\Sigma}_{\\mid \\mathbf{y}}
+            p(\mathbf{f}^{\star}\mid \mathbf{y}) & = \int p(\mathbf{f}^{\star} \mathbf{f} \mid \mathbf{y})\\
+            & =\mathcal{N}(\mathbf{f}^{\star} \boldsymbol{\mu}_{\mid \mathbf{y}}, \boldsymbol{\Sigma}_{\mid \mathbf{y}}
         where
 
         .. math::
 
-            \\boldsymbol{\\mu}_{\\mid \\mathbf{y}} & = k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left(k(\\mathbf{x}, \\mathbf{x}')+\\sigma^2\\mathbf{I}_n\\right)^{-1}\\mathbf{y}  \\\\
-            \\boldsymbol{\\Sigma}_{\\mid \\mathbf{y}} & =k(\\mathbf{x}^{\\star}, \\mathbf{x}^{\\star\\prime}) -k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left( k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_n \\right)^{-1}k(\\mathbf{x}, \\mathbf{x}^{\\star}).
+            \boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\mathbf{x}^{\star}, \mathbf{x})\left(k(\mathbf{x}, \mathbf{x}')+\sigma^2\mathbf{I}_n\right)^{-1}\mathbf{y}  \\
+            \boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\mathbf{x}^{\star}, \mathbf{x}^{\star\prime}) -k(\mathbf{x}^{\star}, \mathbf{x})\left( k(\mathbf{x}, \mathbf{x}') + \sigma^2\mathbf{I}_n \right)^{-1}k(\mathbf{x}, \mathbf{x}^{\star}).
 
         The conditioning set is a GPJax ``Dataset`` object, whilst predictions
         are made on a regular Jax array.
@@ -574,7 +577,7 @@ class NonConjugatePosterior(AbstractPosterior):
             self.latent = normal(self.key, shape=(self.likelihood.num_datapoints, 1))
 
     def predict(
-        self, test_inputs: Float[Array, "N D"], train_data: Dataset
+        self, test_inputs: Num[Array, "N D"], train_data: Dataset
     ) -> GaussianDistribution:
         """
         Conditional on a set of training data, compute the GP's posterior

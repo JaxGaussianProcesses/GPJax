@@ -13,6 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 
+try:
+    import beartype
+
+    ValidationErrors = (ValueError, beartype.roar.BeartypeCallHintParamViolation)
+except ImportError:
+    ValidationErrors = ValueError
+
 from dataclasses import is_dataclass
 from typing import Callable
 
@@ -23,6 +30,7 @@ import jax.tree_util as jtu
 import pytest
 import tensorflow_probability.substrates.jax.distributions as tfd
 
+# from gpjax.dataset import Dataset
 from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.gps import (
@@ -263,13 +271,13 @@ def test_prior_sample_approx(num_datapoints, kernel, mean_function):
         p.sample_approx(-1, key)
     with pytest.raises(ValueError):
         p.sample_approx(0, key)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationErrors):
         p.sample_approx(0.5, key)
     with pytest.raises(ValueError):
         p.sample_approx(1, key, -10)
     with pytest.raises(ValueError):
         p.sample_approx(1, key, 0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationErrors):
         p.sample_approx(1, key, 0.5)
 
     sampled_fn = p.sample_approx(1, key, 100)
@@ -324,13 +332,13 @@ def test_conjugate_posterior_sample_approx(num_datapoints, kernel, mean_function
         p.sample_approx(-1, D, key)
     with pytest.raises(ValueError):
         p.sample_approx(0, D, key)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationErrors):
         p.sample_approx(0.5, D, key)
     with pytest.raises(ValueError):
         p.sample_approx(1, D, key, -10)
     with pytest.raises(ValueError):
         p.sample_approx(1, D, key, 0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationErrors):
         p.sample_approx(1, D, key, 0.5)
 
     sampled_fn = p.sample_approx(1, D, key, 100)

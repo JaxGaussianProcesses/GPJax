@@ -1,19 +1,17 @@
 from dataclasses import dataclass
 
-from jax.random import (
-    KeyArray,
-    PRNGKey,
-)
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jax.random import PRNGKey
+from jaxtyping import Float
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import BasisFunctionComputation
+from gpjax.typing import (
+    Array,
+    KeyArray,
+)
 
 
 @dataclass
@@ -38,7 +36,7 @@ class RFF(AbstractKernel):
 
     base_kernel: AbstractKernel = None
     num_basis_fns: int = static_field(50)
-    frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity)
+    frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity())
     key: KeyArray = static_field(PRNGKey(123))
 
     def __post_init__(self) -> None:

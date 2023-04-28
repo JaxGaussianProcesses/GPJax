@@ -16,28 +16,29 @@
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 @dataclass
 class Linear(AbstractKernel):
     """The linear kernel."""
 
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Linear"
 
     def __call__(
         self,
         x: Float[Array, " D"],
         y: Float[Array, " D"],
-    ) -> Float[Array, "1"]:
+    ) -> ScalarFloat:
         r"""Compute the linear kernel between a pair of arrays.
 
         For a pair of inputs $x, y \in \mathbb{R}^{D}$, let's evaluate the linear
@@ -45,13 +46,12 @@ class Linear(AbstractKernel):
         kernel's variance parameter.
 
         Args:
-            x (Float[Array, "D"]): The left hand input of the kernel function.
-            y (Float[Array, "D"]): The right hand input of the kernel function.
+            x (Float[Array, " D"]): The left hand input of the kernel function.
+            y (Float[Array, " D"]): The right hand input of the kernel function.
 
         Returns
         -------
-            Float[Array, "1"]: The evaluated kernel function $k(x, y)$ at the
-                supplied inputs.
+            ScalarFloat: The evaluated kernel function $k(x, y)$ at the supplied inputs.
         """
         x = self.slice_input(x)
         y = self.slice_input(y)
