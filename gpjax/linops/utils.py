@@ -43,7 +43,7 @@ def identity(
     return IdentityLinearOperator(size=n)
 
 
-def to_dense(obj: Float[Array, ...] | LinearOperator):
+def to_dense(obj: Union[Float[Array, ...], LinearOperator]):
     """
     Ensure an object is a dense matrix.
 
@@ -66,7 +66,7 @@ def to_dense(obj: Float[Array, ...] | LinearOperator):
         )
 
 
-def to_linear_operator(obj: Float[Array, ...] | LinearOperator):
+def to_linear_operator(obj: Union[Float[Array, ...], LinearOperator]):
     """
     Ensure an object is a linear operator.
 

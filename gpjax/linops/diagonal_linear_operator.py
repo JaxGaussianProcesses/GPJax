@@ -73,7 +73,7 @@ class DiagonalLinearOperator(LinearOperator):
         """
         return self.diag
 
-    def __add__(self, other: LinearOperator | Float[Array, "N N"]) -> LinearOperator:
+    def __add__(self, other: Union[LinearOperator, Float[Array, "N N"]]) -> LinearOperator:
         """Add diagonal to another linear operator.
 
         Args:

@@ -72,8 +72,8 @@ class ZeroLinearOperator(LinearOperator):
         return jnp.zeros(self.shape[0])
 
     def __add__(
-        self, other: Float[Array, "N N"] | LinearOperator
-    ) -> Float[Array, "N N"] | LinearOperator:
+        self, other: Union[Float[Array, "N N"], LinearOperator]
+    ) -> Union[Float[Array, "N N"], LinearOperator]:
         """Add covariance operator to another covariance operator.
 
         Args:
