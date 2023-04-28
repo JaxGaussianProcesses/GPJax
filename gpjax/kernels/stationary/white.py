@@ -40,7 +40,7 @@ class White(AbstractKernel):
     )
     name: str = "White"
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
         r"""Compute the White noise kernel between a pair of arrays.
 
         Evaluate the kernel on a pair of inputs $(x, y)$ with variance $\sigma^2$:

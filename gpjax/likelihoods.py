@@ -1,5 +1,3 @@
-# Copyright 2022 The GPJax Contributors. All Rights Reserved.
-#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -160,7 +158,7 @@ class Bernoulli(AbstractLikelihood):
         return self.link_function(mean / jnp.sqrt(1.0 + variance))
 
 
-def inv_probit(x: Float[Array, " *N"]) -> Float[Array, " *N"]:
+def inv_probit(x: Float[Array, "*N"]) -> Float[Array, "*N"]:
     """Compute the inverse probit function.
 
     Args:

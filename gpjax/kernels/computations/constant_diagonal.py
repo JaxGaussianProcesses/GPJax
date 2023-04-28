@@ -48,7 +48,7 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
 
         Args:
             kernel (AbstractKernel): The kernel for which the variance vector should be
-                computed for.
+                computed.
             inputs (Float[Array, "N D"]): The input matrix.
 
         Returns

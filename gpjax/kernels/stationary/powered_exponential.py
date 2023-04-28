@@ -37,14 +37,14 @@ class PoweredExponential(AbstractKernel):
 
     """
 
-    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
+    lengthscale: Union[ScalarFloat, Float[Array, "D"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
     )
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     power: ScalarFloat = param_field(jnp.array(1.0))
     name: str = "Powered Exponential"
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
         r"""Compute the Powered Exponential kernel between a pair of arrays.
 
         Evaluate the kernel on a pair of inputs $(x, y)$ with length-scale parameter

@@ -96,8 +96,8 @@ def check_shapes_match(shape1: tuple[int, ...], shape2: tuple[int, ...]) -> None
     """Check shapes of two objects.
 
     Args:
-        shape1 (Tuple[int, ...]): Shape of the first object.
-        shape2 (Tuple[int, ...]): Shape of the second object.
+        shape1 (tuple[int, ...]): Shape of the first object.
+        shape2 (tuple[int, ...]): Shape of the second object.
 
     Raises
     ------

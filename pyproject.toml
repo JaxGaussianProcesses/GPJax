@@ -179,6 +179,3 @@ output = "reports/coverage.xml"
 
 [tool.poetry-dynamic-versioning]
 enable = true
-
-[tool.codespell]
-ignore-words-list = "fro"

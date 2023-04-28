@@ -50,7 +50,7 @@ def gauss_hermite_quadrature(
 
     Returns
     -------
-        Float[Array, " N"]: The evaluated integrals value.
+        Float[Array, "N"]: The evaluated integrals value.
     """
     gh_points, gh_weights = np.polynomial.hermite.hermgauss(deg)
     X = mean + jnp.sqrt(2.0) * sd * gh_points

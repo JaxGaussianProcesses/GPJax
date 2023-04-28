@@ -29,8 +29,8 @@ class Dataset(Pytree):
 
     Attributes
     ----------
-        X (Optional[Float[Array, "N D"]]): Input data.
-        y (Optional[Float[Array, "N Q"]]): Output data.
+        X (Optional[Num[Array, "N D"]]): Input data.
+        y (Optional[Num[Array, "N Q"]]): Output data.
     """
 
     X: Optional[Num[Array, "N D"]] = None
