@@ -51,13 +51,14 @@
 from jax import Array
 from dataclasses import dataclass
 
+
 @dataclass
 class RBF:
-	lengthscale: float
-	variance: float
+    lengthscale: float
+    variance: float
 
-	def covariance(self, x: Array, y: Array) -> Array:
-		pass
+    def covariance(self, x: Array, y: Array) -> Array:
+        pass
 
 
 # %% [markdown]
@@ -67,14 +68,16 @@ class RBF:
 # For those users who have not seen a `dataclass` before, this statement is equivalent
 # to writing
 
+
 # %%
 class RBF:
-	def __init__(self, lengthscale: float, variance: float) -> None:
-		self.lengthscale = lengthscale
-		self.variance = variance
+    def __init__(self, lengthscale: float, variance: float) -> None:
+        self.lengthscale = lengthscale
+        self.variance = variance
 
-	def covariance(self, x: Array, y: Array) -> Array:
-		pass
+    def covariance(self, x: Array, y: Array) -> Array:
+        pass
+
 
 # %% [markdown]
 # However, it a dataclass allows us to significantly reduce the number of lines
@@ -122,13 +125,15 @@ class RBF:
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from gpjax.base import Module, param_field
 
+
 @dataclass
 class RBF(Module):
-	lengthscale: float = param_field(1.0, bijector=tfb.Softplus())
-	variance: float = param_field(1.0, bijector=tfb.Softplus())
+    lengthscale: float = param_field(1.0, bijector=tfb.Softplus())
+    variance: float = param_field(1.0, bijector=tfb.Softplus())
 
-	def covariance(self, x: Array, y: Array) -> Array:
-		pass
+    def covariance(self, x: Array, y: Array) -> Array:
+        pass
+
 
 # %% [markdown]
 #
@@ -137,7 +142,7 @@ class RBF(Module):
 
 # %%
 kernel = RBF()
-kernel = kernel.replace(lengthscale=3.14) # Update e.g., the lengthscale.
+kernel = kernel.replace(lengthscale=3.14)  # Update e.g., the lengthscale.
 print(kernel)
 
 # %% [markdown]
@@ -147,7 +152,7 @@ print(kernel)
 # Use `constrain` / `unconstrain` to return a `Mytree` with each parameter's bijector `forward` / `inverse` operation applied!
 
 # %%
-# Tranform kernel to unconstrained space
+# Transform kernel to unconstrained space
 unconstrained_kernel = kernel.unconstrain()
 print(unconstrained_kernel)
 
@@ -162,7 +167,7 @@ print(kernel)
 # %%
 new_kernel = kernel.replace_bijector(lengthscale=tfb.Identity())
 
-# Tranform kernel to unconstrained space
+# Transform kernel to unconstrained space
 unconstrained_kernel = new_kernel.unconstrain()
 print(unconstrained_kernel)
 
@@ -190,14 +195,14 @@ print(new_kernel)
 # def loss(model: SimpleModel) -> float:
 #    model = model.stop_gradient() # 🛑 Stop gradients!
 #    return jax.numpy.sum((y - model(x))**2)
-#    
+#
 # jax.grad(loss)(model)
 # ```
 # ```
 # SimpleModel(weight=0.0, bias=-188.37418)
 # ```
 # As `weight` trainability was set to `False`, it's gradient is zero as expected!
-#     
+#
 # ### Replacing trainability
 # Default trainability status can be replaced via the `replace_trainable` method.
 # ```python
@@ -263,11 +268,11 @@ print(new_kernel)
 #
 # class StaticExample(Mytree):
 #     b: float = static_field
-#     
+#
 #     def __init__(self, a=1.0, b=2.0):
 #         self.a=a
 #         self.b=b
-#     
+#
 # jtu.tree_leaves(StaticExample())
 # ```
 # ```
