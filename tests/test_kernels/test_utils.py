@@ -13,10 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import (
-    TYPE_CHECKING,
-    List,
-)
+from typing import List
 
 import jax.numpy as jnp
 from jaxtyping import (
@@ -26,12 +23,6 @@ from jaxtyping import (
 import pytest
 
 from gpjax.kernels.stationary.utils import euclidean_distance
-
-if TYPE_CHECKING:
-    from jaxtyping import (
-        Array,
-        Float,
-    )
 
 
 @pytest.mark.parametrize(

@@ -158,7 +158,7 @@ class Bernoulli(AbstractLikelihood):
         return self.link_function(mean / jnp.sqrt(1.0 + variance))
 
 
-def inv_probit(x: Float[Array, "*N"]) -> Float[Array, "*N"]:
+def inv_probit(x: Float[Array, " *N"]) -> Float[Array, " *N"]:
     """Compute the inverse probit function.
 
     Args:

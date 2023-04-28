@@ -22,8 +22,8 @@ from gpjax.typing import Array
 
 
 def jax_gather_nd(
-    params: Num[Array, "N *rest"], indices: Int[Array, "M 1"]
-) -> Num[Array, "M *rest"]:
+    params: Num[Array, " N *rest"], indices: Int[Array, " M 1"]
+) -> Num[Array, " M *rest"]:
     """Slice a `params` array at a set of `indices`.
 
     This is a reimplementation of TensorFlow's `gather_nd` function:

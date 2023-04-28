@@ -21,7 +21,6 @@ except ImportError:
     ValidationErrors = ValueError
 
 from dataclasses import is_dataclass
-import shutil
 from typing import Callable
 
 from jax.config import config

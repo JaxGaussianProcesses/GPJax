@@ -16,7 +16,6 @@
 import abc
 from dataclasses import dataclass
 
-from beartype.typing import Any
 from jax import vmap
 from jaxtyping import (
     Float,
