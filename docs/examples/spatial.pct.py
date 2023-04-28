@@ -18,6 +18,11 @@
 # (latitude and longitude) and elevation as input variables.
 #
 # %%
+# Enable Float64 for more stable matrix inversions.
+from jax.config import config
+
+config.update("jax_enable_x64", True)
+
 from dataclasses import dataclass
 
 import fsspec
@@ -25,24 +30,25 @@ import geopandas as gpd
 import jax
 import jax.numpy as jnp
 import jax.random as jr
+from jaxtyping import (
+    Array,
+    Float,
+    install_import_hook,
+)
 import matplotlib.pyplot as plt
 import optax as ox
 import pandas as pd
 import planetary_computer
 import pystac_client
 import rioxarray as rio
-import xarray as xr
-from jaxtyping import Array, Float
 from rioxarray.merge import merge_arrays
-
-from jaxtyping import install_import_hook
+import xarray as xr
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     from gpjax.base import param_field
     from gpjax.dataset import Dataset
 
-jax.config.update("jax_enable_x64", True)
 
 key = jr.PRNGKey(123)
 

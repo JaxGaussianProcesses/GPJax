@@ -20,22 +20,23 @@
 # In this notebook we demonstate how to fit a Gaussian process regression model.
 
 # %%
-from jax import jit
+# Enable Float64 for more stable matrix inversions.
 from jax.config import config
+
+config.update("jax_enable_x64", True)
+
+from jax import jit
 import jax.numpy as jnp
 import jax.random as jr
+from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
 from utils import clean_legend
 
-from jaxtyping import install_import_hook
-
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-# Enable Float64 for more stable matrix inversions.
-config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
 plt.style.use("./gpjax.mplstyle")
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]

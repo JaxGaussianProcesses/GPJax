@@ -18,28 +18,32 @@
 # create custom kernels.
 
 # %%
+# Enable Float64 for more stable matrix inversions.
+from jax.config import config
+
+config.update("jax_enable_x64", True)
+
 from dataclasses import dataclass
 from typing import Dict
 
+from jax import jit
 import jax.numpy as jnp
 import jax.random as jr
+from jaxtyping import (
+    Array,
+    Float,
+    install_import_hook,
+)
 import matplotlib.pyplot as plt
 import numpy as np
 import optax as ox
-import tensorflow_probability.substrates.jax as tfp
-from jax import jit
-from jax.config import config
-from jaxtyping import Array, Float
 from simple_pytree import static_field
-
-from jaxtyping import install_import_hook
+import tensorflow_probability.substrates.jax as tfp
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     from gpjax.base.param import param_field
 
-# Enable Float64 for more stable matrix inversions.
-config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
 tfb = tfp.bijectors
 plt.style.use("./gpjax.mplstyle")

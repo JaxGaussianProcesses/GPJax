@@ -49,67 +49,65 @@ class ConjugateMLL(AbstractObjective):
         posterior: "gpjax.gps.ConjugatePosterior",  # noqa: F821
         train_data: Dataset,  # noqa: F821
     ) -> ScalarFloat:
-        """Compute the marginal log-likelihood function of the Gaussian process.
+        r"""Evaluate the marginal log-likelihood of the Gaussian process.
+
+        Compute the marginal log-likelihood function of the Gaussian process.
         The returned function can then be used for gradient based optimisation
         of the model's parameters or for model comparison. The implementation
         given here enables exact estimation of the Gaussian process' latent
         function values.
 
-        For a training dataset :math:`\\{x_n, y_n\\}_{n=1}^N`, set of test
-        inputs :math:`\\mathbf{x}^{\\star}` the corresponding latent function
-        evaluations are given by :math:`\\mathbf{f} = f(\\mathbf{x})`
-        and :math:`\\mathbf{f}^{\\star} = f(\\mathbf{x}^{\\star})`, the marginal
-        log-likelihood is given by:
-
-        .. math::
-
-            \\log p(\\mathbf{y}) & = \\int p(\\mathbf{y}\\mid\\mathbf{f})p(\\mathbf{f}, \\mathbf{f}^{\\star}\\mathrm{d}\\mathbf{f}^{\\star}\\\\
-            &=0.5\\left(-\\mathbf{y}^{\\top}\\left(k(\\mathbf{x}, \\mathbf{x}') +\\sigma^2\\mathbf{I}_N  \\right)^{-1}\\mathbf{y}-\\log\\lvert k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_N\\rvert - n\\log 2\\pi \\right).
+        For a training dataset $\{x_n, y_n\}_{n=1}^N$, set of test inputs
+        $\mathbf{x}^{\star}$ the corresponding latent function evaluations are given
+        by $\mathbf{f}=f(\mathbf{x})$ and $\mathbf{f}^{\star}f(\mathbf{x}^{\star})$,
+        the marginal log-likelihood is given by:
+        $$
+        \begin{align}
+            \log p(\mathbf{y}) & = \int p(\mathbf{y}\mid\mathbf{f})p(\mathbf{f}, \mathbf{f}^{\star}\mathrm{d}\mathbf{f}^{\star}\\
+            &=0.5\left(-\mathbf{y}^{\top}\left(k(\mathbf{x}, \mathbf{x}') +\sigma^2\mathbf{I}_N  \right)^{-1}\mathbf{y}-\log\lvert k(\mathbf{x}, \mathbf{x}') + \sigma^2\mathbf{I}_N\rvert - n\log 2\pi \right).
+        \end{align}
+        $$
 
         Example:
 
         For a given ``ConjugatePosterior`` object, the following code snippet shows
         how the marginal log-likelihood can be evaluated.
 
-        >>> import gpjax as gpx
-        >>>
-        >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
-        >>> ytrain = jnp.sin(xtrain)
-        >>> D = gpx.Dataset(X=xtrain, y=ytrain)
-        >>>
-        >>> params = gpx.initialise(posterior)
-        >>> mll = posterior.marginal_log_likelihood(train_data = D)
-        >>> mll(params)
+        ```python
+            import gpjax as gpx
 
-        Our goal is to maximise the marginal log-likelihood. Therefore, when
-        optimising the model's parameters with respect to the parameters, we
-        use the negative marginal log-likelihood. This can be realised through
+            xtrain = jnp.linspace(0, 1).reshape(-1, 1)
+            ytrain = jnp.sin(xtrain)
+            D = gpx.Dataset(X=xtrain, y=ytrain)
 
-        >>> mll = posterior.marginal_log_likelihood(train_data = D, negative=True)
+            mll = gpx.ConjugateMLL(negative=True)
+            mll(posterior, train_data = D)
+        ```
 
-        Further, prior distributions can be passed into the marginal log-likelihood
+        Our goal is to maximise the marginal log-likelihood. Therefore, when optimising
+        the model's parameters with respect to the parameters, we use the negative
+        marginal log-likelihood. This can be realised through
 
-        >>> mll = posterior.marginal_log_likelihood(train_data = D)
+        ```python
+            mll = gpx.ConjugateMLL(negative=True)
+        ```
 
         For optimal performance, the marginal log-likelihood should be ``jax.jit``
         compiled.
-
-        >>> mll = jit(posterior.marginal_log_likelihood(train_data = D))
+        ```python
+            mll = jit(gpx.ConjugateMLL(negative=True))
+        ```
 
         Args:
+            posterior (ConjugatePosterior): The posterior distribution for which
+                we want to compute the marginal log-likelihood.
             train_data (Dataset): The training dataset used to compute the
                 marginal log-likelihood.
-            negative (Optional[bool]): Whether or not the returned function
-                should be negative. For optimisation, the negative is useful
-                as minimisation of the negative marginal log-likelihood is
-                equivalent to maximisation of the marginal log-likelihood.
-                Defaults to False.
 
         Returns
         -------
-            ScalarFloat: A functional representation
-                of the marginal log-likelihood that can be evaluated at a
-                given parameter set.
+            ScalarFloat: The marginal log-likelihood of the Gaussian process for the
+                current parameter set.
         """
         x, y, n = train_data.X, train_data.y, train_data.n
 
@@ -128,38 +126,39 @@ class ConjugateMLL(AbstractObjective):
         return self.constant * (mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze())
 
 
-class NonConjugateMLL(AbstractObjective):
+class LogPosteriorDensity(AbstractObjective):
+    r"""The log-posterior density of a non-conjugate Gaussian process. This is
+    sometimes referred to as the marginal log-likelihood.
+    """
+
     def step(
         self, posterior: "gpjax.gps.NonConjugatePosterior", data: Dataset  # noqa: F821
     ) -> ScalarFloat:
-        """
-        Compute the marginal log-likelihood function of the Gaussian process.
-        The returned function can then be used for gradient based optimisation
-        of the model's parameters or for model comparison. The implementation
-        given here is general and will work for any likelihood support by GPJax.
+        r"""Evaluate the log-posterior density of a Gaussian process.
 
-        Unlike the marginal_log_likelihood function of the ConjugatePosterior
-        object, the marginal_log_likelihood function of the
-        ``NonConjugatePosterior`` object does not provide an exact marginal
-        log-likelihood function. Instead, the ``NonConjugatePosterior`` object
-        represents the posterior distributions as a function of the model's
-        hyperparameters and the latent function. Markov chain Monte Carlo,
-        variational inference, or Laplace approximations can then be used to
-        sample from, or optimise an approximation to, the posterior
-        distribution.
+        Compute the marginal log-likelihood, or log-posterior density of the Gaussian
+        process. The returned function can then be used for gradient based optimisation
+        of the model's parameters or for model comparison. The implementation given
+        here is general and will work for any likelihood support by GPJax.
+
+        Unlike the marginal_log_likelihood function of the `ConjugatePosterior` object,
+        the marginal_log_likelihood function of the `NonConjugatePosterior` object does
+        not provide an exact marginal log-likelihood function. Instead, the
+        `NonConjugatePosterior` object represents the posterior distributions as a
+        function of the model's hyperparameters and the latent function. Markov chain
+        Monte Carlo, variational inference, or Laplace approximations can then be used
+        to sample from, or optimise an approximation to, the posterior distribution.
 
         Args:
-            train_data (Dataset): The training dataset used to compute the
+            posterior (NonConjugatePosterior): The posterior distribution for which
+                we want to compute the marginal log-likelihood.
+            data (Dataset): The training dataset used to compute the
                 marginal log-likelihood.
-            negative (Optional[bool]): Whether or not the returned function
-                should be negative. For optimisation, the negative is useful as
-                minimisation of the negative marginal log-likelihood is equivalent
-                to maximisation of the marginal log-likelihood. Defaults to False.
 
         Returns
         -------
-            ScalarFloat: A functional representation of the marginal log-likelihood
-            that can be evaluated at a given parameter set.
+            ScalarFloat: The log-posterior density of the Gaussian process for the
+                current parameter set.
         """
         # Unpack the training data
         x, y, n = data.X, data.y, data.n
@@ -187,33 +186,34 @@ class NonConjugateMLL(AbstractObjective):
         )
 
 
+NonConjugateMLL = LogPosteriorDensity
+
+
 class ELBO(AbstractObjective):
     def step(
         self,
         variational_family: "gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
         train_data: Dataset,
     ) -> ScalarFloat:
-        """Compute the evidence lower bound under this model. In short, this requires
+        r"""Compute the evidence lower bound of a variational approximation.
+
+        Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
         approximation. To this, we sum the KL divergence from the variational posterior
         to the prior. When batching occurs, the result is scaled by the batch size
         relative to the full dataset size.
 
         Args:
-            params (Parameters): The set of parameters that induce our variational
-                approximation.
+            variational_family (AbstractVariationalFamily): The variational
+                approximation for whose parameters we should maximise the ELBO with
+                respect to.
             train_data (Dataset): The training data for which we should maximise the
                 ELBO with respect to.
-            negative (bool, optional): Whether or not the resultant elbo function should
-                be negative. For gradient descent where we optimise our objective
-                function this argument should be true as minimisation of the negative
-                corresponds to maximisation of the ELBO. Defaults to False.
 
         Returns
         -------
-            Callable[[Parameters, Dataset], Array]: A callable function that accepts a
-                current parameter estimate and batch of data for which gradients should
-                be computed.
+            ScalarFloat: The evidence lower bound of the variational approximation for
+                the current model parameter set.
         """
         # KL[q(f(·)) || p(f(·))]
         kl = variational_family.prior_kl()
@@ -230,14 +230,13 @@ class ELBO(AbstractObjective):
         )
 
 
-LogPosteriorDensity = NonConjugateMLL
-
-
 def variational_expectation(
     variational_family: "gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
     train_data: Dataset,
 ) -> Float[Array, " N"]:
-    """Compute the expectation of our model's log-likelihood under our variational
+    r"""Compute the variational expectation.
+
+    Compute the expectation of our model's log-likelihood under our variational
     distribution. Batching can be done here to speed up computation.
 
     Args:
@@ -273,7 +272,9 @@ def variational_expectation(
 
 
 class CollapsedELBO(AbstractObjective):
-    """Collapsed variational inference for a sparse Gaussian process regression model.
+    r"""The collapsed evidence lower bound.
+
+    Collapsed variational inference for a sparse Gaussian process regression model.
     The key reference is Titsias, (2009) - Variational Learning of Inducing Variables
     in Sparse Gaussian Processes.
     """
@@ -283,24 +284,25 @@ class CollapsedELBO(AbstractObjective):
         variational_family: "gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
         train_data: Dataset,
     ) -> ScalarFloat:
-        """Compute the evidence lower bound under this model. In short, this requires
+        r"""Compute a single step of the collapsed evidence lower bound.
+
+        Compute the evidence lower bound under this model. In short, this requires
         evaluating the expectation of the model's log-likelihood under the variational
         approximation. To this, we sum the KL divergence from the variational posterior
         to the prior. When batching occurs, the result is scaled by the batch size
         relative to the full dataset size.
 
         Args:
+            variational_family (AbstractVariationalFamily): The variational
+                approximation for whose parameters we should maximise the ELBO with
+                respect to.
             train_data (Dataset): The training data for which we should maximise the
                 ELBO with respect to.
-            negative (bool, optional): Whether or not the resultant elbo function should
-                be negative. For gradient descent where we optimise our objective
-                function this argument should be true as minimisation of the negative
-                corresponds to maximisation of the ELBO. Defaults to False.
 
         Returns
         -------
-            Callable[[Parameters, Dataset], Array]: A callable function that accepts a
-                current parameter estimate for which gradients should be computed.
+            ScalarFloat: The evidence lower bound of the variational approximation for
+                the current model parameter set.
         """
         # Unpack training data
         x, y, n = train_data.X, train_data.y, train_data.n

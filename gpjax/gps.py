@@ -250,11 +250,9 @@ class Prior(AbstractPrior):
 
         Args:
             num_samples (int): The desired number of samples.
-            params (dict): The specific set of parameters for which the sample
-            should be generated for.
             key (KeyArray): The random seed used for the sample(s).
             num_features (int): The number of features used when approximating the
-            kernel.
+                kernel.
 
 
         Returns
@@ -403,8 +401,8 @@ class ConjugatePosterior(AbstractPosterior):
             >>> predictive_dist(xtest)
 
         Args:
-            params (Dict): A dictionary of parameters that should be used to
-                compute the posterior.
+            test_inputs (Num[Array, "N D"]): A Jax array of test inputs at which the
+                predictive distribution is evaluated.
             train_data (Dataset): A `gpx.Dataset` object that contains the
                 input and output data used for training dataset.
 
@@ -486,7 +484,7 @@ class ConjugatePosterior(AbstractPosterior):
             num_samples (int): The desired number of samples.
             key (KeyArray): The random seed used for the sample(s).
             num_features (int): The number of features used when approximating the
-            kernel.
+                kernel.
 
 
         Returns

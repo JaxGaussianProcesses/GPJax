@@ -47,8 +47,6 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
         NxN gram matrix on an input matrix of shape $N\times D$.
 
         Args:
-            kernel (AbstractKernel): The kernel for which the variance vector should be
-                computed.
             inputs (Float[Array, "N D"]): The input matrix.
 
         Returns

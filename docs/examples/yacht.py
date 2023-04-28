@@ -1,7 +1,21 @@
+# %% [markdown]
+# # UCI Data Benchmarking
+#
+# In this notebook, we will show how to apply GPJax on a benchmark UCI regression
+# problem. These kind of tasks are often used in the research community to benchmark
+# and assess new techniques against those already in the literature. Much of the code
+# contained in this notebook can be adapted to applied problems concerning datasets
+# other than the one presented here.
+
 # %%
-from jax import jit
+# Enable Float64 for more stable matrix inversions.
 from jax.config import config
+
+config.update("jax_enable_x64", True)
+
+from jax import jit
 import jax.random as jr
+from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,24 +28,14 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-from jaxtyping import install_import_hook
-
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
 # Enable Float64 for more stable matrix inversions.
-config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
 plt.style.use("./gpjax.mplstyle")
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
-# %% [markdown]
-# # UCI Data Benchmarking
-#
-# In this notebook, we will show how to apply GPJax on a benchmark UCI regression
-# problem. These kind of tasks are often used in the research community to benchmark
-# and assess new techniques against those already in the literature. Much of the code
-# contained in this notebook can be adapted to applied problems concerning datasets
-# other than the one presented here.
+
 # %% [markdown]
 # ## Data Loading
 #

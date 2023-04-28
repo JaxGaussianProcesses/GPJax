@@ -138,7 +138,7 @@ class DiagonalLinearOperator(LinearOperator):
         """Matrix multiplication.
 
         Args:
-            x (Float[Array, "N M"]): Matrix to multiply with.
+            other (Float[Array, "N M"]): Matrix to multiply with.
 
         Returns
         -------

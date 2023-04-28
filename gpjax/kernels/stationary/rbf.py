@@ -48,7 +48,6 @@ class RBF(AbstractKernel):
         $$k(x,y)=\sigma^2\exp\Bigg(\frac{\lVert x - y \rVert^2_2}{2 \ell^2} \Bigg)$$
 
         Args:
-            params (Dict): Parameter set for which the kernel should be evaluated on.
             x (Float[Array, " D"]): The left hand argument of the kernel function's call.
             y (Float[Array, " D"]): The right hand argument of the kernel function's call.
 

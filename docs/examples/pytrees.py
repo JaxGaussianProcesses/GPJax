@@ -47,9 +47,8 @@
 #
 # For the RBF kernel, we use a `dataclass` to represent this object as follows
 
-# %%
-from jax import Array
 from dataclasses import dataclass
+from jax import Array
 
 
 @dataclass
@@ -123,7 +122,11 @@ class RBF:
 
 # %%
 import tensorflow_probability.substrates.jax.bijectors as tfb
-from gpjax.base import Module, param_field
+
+from gpjax.base import (
+    Module,
+    param_field,
+)
 
 
 @dataclass

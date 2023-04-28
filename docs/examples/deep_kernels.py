@@ -9,39 +9,41 @@
 # Gaussian process model's kernel through a neural network can offer a solution to this.
 
 # %%
-from dataclasses import dataclass, field
+# Enable Float64 for more stable matrix inversions.
+from jax.config import config
+
+config.update("jax_enable_x64", True)
+
+from dataclasses import (
+    dataclass,
+    field,
+)
 from typing import Any
 
 import flax
+from flax import linen as nn
 import jax
-from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (
     Array,
     Float,
+    install_import_hook,
 )
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
-from flax import linen as nn
-from jax.config import config
-from jaxtyping import Array, Float
 from scipy.signal import sawtooth
 from simple_pytree import static_field
 
-from jaxtyping import install_import_hook
-
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
-    import gpjax.kernels as jk
     from gpjax.base import param_field
+    import gpjax.kernels as jk
     from gpjax.kernels import DenseKernelComputation
     from gpjax.kernels.base import AbstractKernel
     from gpjax.kernels.computations import AbstractKernelComputation
 
-# Enable Float64 for more stable matrix inversions.
-config.update("jax_enable_x64", True)
 key = jr.PRNGKey(123)
 plt.style.use("./gpjax.mplstyle")
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]

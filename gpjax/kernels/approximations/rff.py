@@ -29,9 +29,6 @@ class RFF(AbstractKernel):
     The key reference for this implementation is the following papers:
     - 'Random Features for Large-Scale Kernel Machines' by Rahimi and Recht (2008).
     - 'On the Error of Random Fourier Features' by Sutherland and Schneider (2015).
-
-    Args:
-        AbstractKernel (_type_): _description_
     """
 
     base_kernel: AbstractKernel = None
@@ -78,7 +75,6 @@ class RFF(AbstractKernel):
 
         Args:
             x: A $N \times D$ array of inputs.
-            frequencies: A $M \times D$ array of frequencies.
 
         Returns
         -------

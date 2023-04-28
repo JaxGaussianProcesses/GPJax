@@ -1,4 +1,3 @@
-import numpy as np
 from matplotlib import transforms
 from matplotlib.patches import Ellipse
 import numpy as np

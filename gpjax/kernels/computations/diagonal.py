@@ -33,7 +33,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
         an input matrix of shape $N\times D$.
 
         Args:
-            inputs (Float[Array, "N D"]): The input matrix.
+            x (Float[Array, "N D"]): The input matrix.
 
         Returns
         -------

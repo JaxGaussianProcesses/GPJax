@@ -13,24 +13,26 @@
 #
 
 # %%
+# Enable Float64 for more stable matrix inversions.
+from jax.config import config
+
+config.update("jax_enable_x64", True)
+
 import typing as tp
 
 import jax
-from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy.linalg as jsl
+from jaxtyping import install_import_hook
 import matplotlib.pyplot as plt
 import optax as ox
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from jaxtyping import install_import_hook
-
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-# Enable Float64 for more stable matrix inversions.
-config.update("jax_enable_x64", True)
+
 key = jr.PRNGKey(123)
 plt.style.use("./gpjax.mplstyle")
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]

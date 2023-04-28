@@ -46,7 +46,7 @@ tfb = tfp.bijectors
 ##########################################
 @dataclass
 class GraphKernel(AbstractKernel):
-    """The Matérn graph kernel defined on the vertex set of a graph.
+    r"""The Matérn graph kernel defined on the vertex set of a graph.
 
     A Matérn graph kernel defined on the vertices of a graph. The key reference
     for this object is borovitskiy et. al., (2020).
@@ -54,7 +54,6 @@ class GraphKernel(AbstractKernel):
     Args:
         laplacian (Float[Array]): An N x N matrix representing the Laplacian matrix
             of a graph.
-        compute_engine
     """
 
     laplacian: Num[Array, "N N"] = static_field(None)

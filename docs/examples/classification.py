@@ -24,13 +24,12 @@
 # [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
 
 # %%
+# Enable Float64 for more stable matrix inversions.
 from jax.config import config
 
 config.update("jax_enable_x64", True)
 
 from time import time
-
-# %%
 import blackjax
 import jax
 import jax.numpy as jnp
@@ -40,18 +39,15 @@ import jax.tree_util as jtu
 from jaxtyping import (
     Array,
     Float,
+    install_import_hook,
 )
 import matplotlib.pyplot as plt
 import optax as ox
 import tensorflow_probability.substrates.jax as tfp
 from tqdm import trange
 
-from jaxtyping import install_import_hook
-
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
-
-# Enable Float64 for more stable matrix inversions.
 
 tfd = tfp.distributions
 identity_matrix = jnp.eye
