@@ -21,6 +21,7 @@ import dataclasses
 from beartype.typing import (
     Any,
     Mapping,
+    Optional,
 )
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
@@ -33,9 +34,9 @@ def param_field(
     default_factory: Any = dataclasses.MISSING,
     init: bool = True,
     repr: bool = True,
-    hash: bool | None = None,
+    hash: Optional[bool] = None,
     compare: bool = True,
-    metadata: Mapping[str, Any] | None = None,
+    metadata: Optional[Mapping[str, Any]] = None,
 ):
     metadata = {} if metadata is None else dict(metadata)
 
