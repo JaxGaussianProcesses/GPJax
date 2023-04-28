@@ -45,7 +45,7 @@ class AbstractMeanFunction(Module):
         """Evaluate the mean function at the given points. This method is required for all subclasses.
 
         Args:
-            x (Float[Array, "D"]): The point at which to evaluate the mean function.
+            x (Float[Array, " D"]): The point at which to evaluate the mean function.
 
         Returns
         -------
@@ -139,7 +139,7 @@ class Constant(AbstractMeanFunction):
         """Evaluate the mean function at the given points.
 
         Args:
-            x (Float[Array, "D"]): The point at which to evaluate the mean function.
+            x (Float[Array, " D"]): The point at which to evaluate the mean function.
 
         Returns
         -------
@@ -184,7 +184,7 @@ class CombinationMeanFunction(AbstractMeanFunction):
         """Evaluate combination kernel on a pair of inputs.
 
         Args:
-            x (Float[Array, "D"]): The point at which to evaluate the mean function.
+            x (Float[Array, " D"]): The point at which to evaluate the mean function.
 
         Returns
         -------

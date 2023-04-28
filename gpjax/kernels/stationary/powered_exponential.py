@@ -52,8 +52,8 @@ class PoweredExponential(AbstractKernel):
         $$k(x, y)=\sigma^2\exp\Bigg(-\Big(\frac{\lVert x-y\rVert^2}{\ell^2}\Big)^\kappa\Bigg)$$
 
         Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's call
+            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, " D"]): The right hand argument of the kernel function's call
 
         Returns
         -------

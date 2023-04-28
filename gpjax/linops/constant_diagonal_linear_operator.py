@@ -120,7 +120,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         else:
             return super()._add_diagonal(other)
 
-    def diagonal(self) -> Float[Array, "N"]:
+    def diagonal(self) -> Float[Array, " N"]:
         """Diagonal of the covariance operator."""
         return self.value * jnp.ones(self.size)
 

@@ -75,7 +75,7 @@ class GaussianDistribution(tfd.Distribution):
     """Multivariate Gaussian distribution with a linear operator scale matrix.
 
     Args:
-        loc (Optional[Float[Array, "N"]]): The mean of the distribution. Defaults to None.
+        loc (Optional[Float[Array, " N"]]): The mean of the distribution. Defaults to None.
         scale (Optional[LinearOperator]): The scale matrix of the distribution. Defaults to None.
 
     Returns
@@ -90,7 +90,7 @@ class GaussianDistribution(tfd.Distribution):
 
     def __init__(
         self,
-        loc: Optional[Float[Array, "N"]] = None,
+        loc: Optional[Float[Array, " N"]] = None,
         scale: Optional[LinearOperator] = None,
     ) -> None:
         """Initialises the distribution."""
@@ -114,15 +114,15 @@ class GaussianDistribution(tfd.Distribution):
         self.loc = loc
         self.scale = scale
 
-    def mean(self) -> Float[Array, "N"]:
+    def mean(self) -> Float[Array, " N"]:
         """Calculates the mean."""
         return self.loc
 
-    def median(self) -> Float[Array, "N"]:
+    def median(self) -> Float[Array, " N"]:
         """Calculates the median."""
         return self.loc
 
-    def mode(self) -> Float[Array, "N"]:
+    def mode(self) -> Float[Array, " N"]:
         """Calculates the mode."""
         return self.loc
 
@@ -130,11 +130,11 @@ class GaussianDistribution(tfd.Distribution):
         """Calculates the covariance matrix."""
         return self.scale.to_dense()
 
-    def variance(self) -> Float[Array, "N"]:
+    def variance(self) -> Float[Array, " N"]:
         """Calculates the variance."""
         return self.scale.diagonal()
 
-    def stddev(self) -> Float[Array, "N"]:
+    def stddev(self) -> Float[Array, " N"]:
         """Calculates the standard deviation."""
         return jnp.sqrt(self.scale.diagonal())
 
@@ -153,7 +153,7 @@ class GaussianDistribution(tfd.Distribution):
         """Calculates the log pdf of the multivariate Gaussian.
 
         Args:
-            y (Float[Array, "N"]): The value to calculate the log probability of.
+            y (Float[Array, " N"]): The value to calculate the log probability of.
 
         Returns
         -------

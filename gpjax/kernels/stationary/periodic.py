@@ -50,8 +50,8 @@ class Periodic(AbstractKernel):
         $$k(x, y) = \sigma^2 \exp \Bigg( -0.5 \sum_{i=1}^{d} \Bigg)$$
 
         Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's call
+            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, " D"]): The right hand argument of the kernel function's call
         Returns:
             ScalarFloat: The value of $k(x, y)$.
         """

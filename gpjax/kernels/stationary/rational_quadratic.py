@@ -46,8 +46,8 @@ class RationalQuadratic(AbstractKernel):
         $$k(x,y)=\sigma^2\exp\Bigg(1+\frac{\lVert x-y\rVert^2_2}{2\alpha\ell^2}\Bigg)$$
 
         Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's call.
+            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
 
         Returns:
             ScalarFloat: The value of :math:`k(x, y)`
