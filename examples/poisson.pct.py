@@ -15,7 +15,7 @@
 # ---
 
 # %% [markdown]
-# # Count data regression (Poisson likelihood)
+# # Count data regression with the Poisson likelihood
 #
 # In this notebook we demonstrate how to perform inference for Gaussian process models
 # with non-Gaussian likelihoods via Markov chain Monte
@@ -121,43 +121,39 @@ print(type(posterior))
 # [BlackJax](https://github.com/blackjax-devs/blackjax/) in this notebook, which we
 # recommend adopting for general applications.
 #
-# We'll use the Elliptical Slice Sampler
-# TODO: briefly explain the algorithm 
-#
 # We begin by generating _sensible_ initial positions for our sampler before defining
-# an inference loop and sampling 500 values from our Markov chain. In practice,
+# an inference loop and sampling 200 values from our Markov chain. In practice,
 # drawing more samples will be necessary.
 
 # %%
-# TODO: fix this
-num_warmup = 50
-num_iter = 500
+# Adapted from BlackJax's introduction notebook.
+num_adapt = 100
+num_samples = 200
 
-mll = gpx.NonConjugateMLL(negative=False)
+lpd = jax.jit(gpx.LogPosteriorDensity(negative=False))
+unconstrained_lpd = jax.jit(lambda tree: lpd(tree.constrain(), D))
 
-def unconstrained_mll(latent):
-    tree = posterior.replace(latent=latent)
-    return mll(tree.unconstrain(), D)
-
-
-init, _kernel = blackjax.elliptical_slice(
-    unconstrained_mll, mean=prior.mean_function(x)[:,0]
-    , cov=kernel.gram(x).to_dense() + 1e-6 * I(n)
+adapt = blackjax.window_adaptation(
+    blackjax.nuts, unconstrained_lpd, num_adapt, target_acceptance_rate=0.65
 )
 
-def inference_loop(rng, kernel, init_state, n_iter):
-    keys = jr.split(rng, n_iter)
+# Initialise the chain
+last_state, kernel, _ = adapt.run(key, posterior.unconstrain())
 
-    def step(state, key):
-        state, info = kernel(key, state)
+
+def inference_loop(rng_key, kernel, initial_state, num_samples):
+    def one_step(state, rng_key):
+        state, info = kernel(rng_key, state)
         return state, (state, info)
 
-    _, (states, info) = jax.lax.scan(step, init_state, keys)
-    return states, info
+    keys = jax.random.split(rng_key, num_samples)
+    _, (states, infos) = jax.lax.scan(one_step, initial_state, keys)
+
+    return states, infos
+
 
 # Sample from the posterior distribution
-states, infos = inference_loop(key, _kernel, init(posterior.latent), num_warmup + num_iter)
-
+states, infos = inference_loop(key, kernel, last_state, num_samples)
 
 # %% [markdown]
 # ### Sampler efficiency
@@ -172,12 +168,12 @@ print(f"Acceptance rate: {acceptance_rate:.2f}")
 
 # %%
 fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(15, 5), tight_layout=True)
-ax0.plot(states.position[:, 0])
-ax1.plot(states.position[:, 1])
-ax2.plot(states.position[:, 2])
-ax0.set_title("Latent Function (index = 0)")
-ax1.set_title("Latent Function (index = 1)")
-ax2.set_title("Latent Function (index = 2)")
+ax0.plot(states.position.constrain().prior.kernel.variance)
+ax1.plot(states.position.constrain().prior.kernel.lengthscale)
+ax2.plot(states.position.constrain().prior.mean_function.constant)
+ax0.set_title("Kernel variance")
+ax1.set_title("Kernel lengthscale")
+ax2.set_title("Mean function constant")
 
 # %% [markdown]
 # ## Prediction
@@ -198,8 +194,9 @@ ax2.set_title("Latent Function (index = 2)")
 thin_factor = 10
 samples = []
 
-for i in range(num_warmup, num_iter, thin_factor):
-    sample = posterior.replace(latent=states.position[i])
+for i in range(num_adapt, num_samples + num_adapt, thin_factor):
+    sample = jtu.tree_map(lambda samples: samples[i], states.position)
+    sample = sample.constrain()
     latent_dist = sample.predict(xtest, train_data=D)
     predictive_dist = sample.likelihood(latent_dist)
     samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
