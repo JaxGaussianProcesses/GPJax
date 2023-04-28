@@ -46,8 +46,8 @@ class Linear(AbstractKernel):
         kernel's variance parameter.
 
         Args:
-            x (Float[Array, " D"]): The left hand input of the kernel function.
-            y (Float[Array, " D"]): The right hand input of the kernel function.
+            x (Float[Array, "D"]): The left hand input of the kernel function.
+            y (Float[Array, "D"]): The right hand input of the kernel function.
 
         Returns
         -------

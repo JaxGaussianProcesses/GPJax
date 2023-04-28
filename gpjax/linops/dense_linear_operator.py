@@ -121,7 +121,7 @@ class DenseLinearOperator(LinearOperator):
 
         return DenseLinearOperator(matrix=new_matrix)
 
-    def diagonal(self) -> Float[Array, " N"]:
+    def diagonal(self) -> Float[Array, "N"]:
         """
         Diagonal of the covariance operator.
 

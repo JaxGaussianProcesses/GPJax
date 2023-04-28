@@ -61,7 +61,7 @@ class ZeroLinearOperator(LinearOperator):
         self.shape = shape
         self.dtype = dtype
 
-    def diagonal(self) -> Float[Array, " N"]:
+    def diagonal(self) -> Float[Array, "N"]:
         """
         Diagonal of the covariance operator.
 

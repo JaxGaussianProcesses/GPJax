@@ -30,7 +30,7 @@ def test_abstract() -> None:
 @pytest.mark.parametrize(
     "constant", [jnp.array([0.0]), jnp.array([1.0]), jnp.array([3.0])]
 )
-def test_constant(constant: Float[Array, " Q"]) -> None:
+def test_constant(constant: Float[Array, "Q"]) -> None:
     mf = Constant(constant=constant)
 
     assert isinstance(mf, AbstractMeanFunction)

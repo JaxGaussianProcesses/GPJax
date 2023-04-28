@@ -46,8 +46,8 @@ def test_euclidean_distance(
     a: List[float], b: List[float], distance_to_3dp: float
 ) -> None:
     # Convert lists to JAX arrays:
-    a: Float[Array, " D"] = jnp.array(a)
-    b: Float[Array, " D"] = jnp.array(b)
+    a: Float[Array, "D"] = jnp.array(a)
+    b: Float[Array, "D"] = jnp.array(b)
 
     # Test distance is correct to 3dp:
     assert jnp.round(euclidean_distance(a, b), 3) == distance_to_3dp

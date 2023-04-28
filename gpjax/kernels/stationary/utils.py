@@ -43,8 +43,8 @@ def squared_distance(x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
     """Compute the squared distance between a pair of inputs.
 
     Args:
-        x (Float[Array, " D"]): First input.
-        y (Float[Array, " D"]): Second input.
+        x (Float[Array, "D"]): First input.
+        y (Float[Array, "D"]): Second input.
 
     Returns
     -------
@@ -57,8 +57,8 @@ def euclidean_distance(x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloa
     """Compute the euclidean distance between a pair of inputs.
 
     Args:
-        x (Float[Array, " D"]): First input.
-        y (Float[Array, " D"]): Second input.
+        x (Float[Array, "D"]): First input.
+        y (Float[Array, "D"]): Second input.
 
     Returns
     -------

@@ -49,8 +49,8 @@ class RBF(AbstractKernel):
 
         Args:
             params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
+            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's call.
 
         Returns:
             ScalarFloat: The value of $k(x, y)$.

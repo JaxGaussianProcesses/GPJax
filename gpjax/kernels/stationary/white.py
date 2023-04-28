@@ -47,8 +47,8 @@ class White(AbstractKernel):
         $$k(x, y) = \sigma^2 \delta(x-y)$$
 
         Args:
-            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
+            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, "D"]): The right hand argument of the kernel function's call.
 
         Returns
         -------

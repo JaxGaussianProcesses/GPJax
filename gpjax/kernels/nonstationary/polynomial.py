@@ -49,9 +49,9 @@ class Polynomial(AbstractKernel):
         parameter $\alpha$ and integer degree $d$.
 
         Args:
-            x (Float[Array, " D"]): The left hand argument of the kernel function's
+            x (Float[Array, "D"]): The left hand argument of the kernel function's
                 call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's
+            y (Float[Array, "D"]): The right hand argument of the kernel function's
                 call
 
         Returns
