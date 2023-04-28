@@ -25,9 +25,9 @@ points $n$.
 But hold on a second. Notice:
 
 - We only have to store the diagonal entries to determine the matrix $A$. Doing
-  so, would reduce memory costs from $O(n^2)$ to $O(n)$.
+  so would reduce memory costs from $O(n^2)$ to $O(n)$.
 - To invert $A$, we only need to take the reciprocal of the diagonal, reducing
-  inversion costs from $O(n^3)$, to $O(n)$.
+  inversion costs from $O(n^3)$ to $O(n)$.
 
 `JaxLinOp` is designed to exploit structure of this kind.
 ```python

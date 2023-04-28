@@ -37,7 +37,7 @@ from gpjax.typing import (
 class Matern32(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 1.5."""
 
-    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
+    lengthscale: Union[ScalarFloat, Float[Array, "D"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
     )
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
@@ -45,8 +45,8 @@ class Matern32(AbstractKernel):
 
     def __call__(
         self,
-        x: Float[Array, " D"],
-        y: Float[Array, " D"],
+        x: Float[Array, "D"],
+        y: Float[Array, "D"],
     ) -> ScalarFloat:
         r"""Compute the Matérn 3/2 kernel between a pair of arrays.
 

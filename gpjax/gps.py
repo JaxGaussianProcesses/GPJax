@@ -256,7 +256,7 @@ class Prior(AbstractPrior):
 
         Args:
             num_samples (int): The desired number of samples.
-            params (Dict): The specific set of parameters for which the sample
+            params (dict): The specific set of parameters for which the sample
             should be generated for.
             key (KeyArray): The random seed used for the sample(s).
             num_features (int): The number of features used when approximating the
@@ -343,21 +343,21 @@ class ConjugatePosterior(AbstractPosterior):
     As such, many computational operations can be simplified; something we make use
     of in this object.
 
-    For a Gaussian process prior :math:`p(\\mathbf{f})` and a Gaussian likelihood
-    :math:`p(y | \\mathbf{f}) = \\mathcal{N}(y\\mid \\mathbf{f}, \\sigma^2))` where
-    :math:`\\mathbf{f} = f(\\mathbf{x})`, the predictive posterior distribution at
-    a set of inputs :math:`\\mathbf{x}` is given by
+    For a Gaussian process prior :math:`p(\mathbf{f})` and a Gaussian likelihood
+    :math:`p(y | \mathbf{f}) = \mathcal{N}(y\mid \mathbf{f}, \sigma^2))` where
+    :math:`\mathbf{f} = f(\mathbf{x})`, the predictive posterior distribution at
+    a set of inputs :math:`\mathbf{x}` is given by
 
     .. math::
 
-        p(\\mathbf{f}^{\\star}\\mid \\mathbf{y}) & = \\int p(\\mathbf{f}^{\\star} \\mathbf{f} \\mid \\mathbf{y})\\\\
-        & =\\mathcal{N}(\\mathbf{f}^{\\star} \\boldsymbol{\\mu}_{\\mid \\mathbf{y}}, \\boldsymbol{\\Sigma}_{\\mid \\mathbf{y}}
+        p(\mathbf{f}^{\star}\mid \mathbf{y}) & = \int p(\mathbf{f}^{\star} \mathbf{f} \mid \mathbf{y})\\
+        & =\mathcal{N}(\mathbf{f}^{\star} \boldsymbol{\mu}_{\mid \mathbf{y}}, \boldsymbol{\Sigma}_{\mid \mathbf{y}}
     where
 
     .. math::
 
-        \\boldsymbol{\\mu}_{\\mid \\mathbf{y}} & = k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left(k(\\mathbf{x}, \\mathbf{x}')+\\sigma^2\\mathbf{I}_n\\right)^{-1}\\mathbf{y}  \\\\
-        \\boldsymbol{\\Sigma}_{\\mid \\mathbf{y}} & =k(\\mathbf{x}^{\\star}, \\mathbf{x}^{\\star\\prime}) -k(\\mathbf{x}^{\\star}, \\mathbf{x})\\left( k(\\mathbf{x}, \\mathbf{x}') + \\sigma^2\\mathbf{I}_n \\right)^{-1}k(\\mathbf{x}, \\mathbf{x}^{\\star}).
+        \boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\mathbf{x}^{\star}, \mathbf{x})\left(k(\mathbf{x}, \mathbf{x}')+\sigma^2\mathbf{I}_n\right)^{-1}\mathbf{y}  \\
+        \boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\mathbf{x}^{\star}, \mathbf{x}^{\star\prime}) -k(\mathbf{x}^{\star}, \mathbf{x})\left( k(\mathbf{x}, \mathbf{x}') + \sigma^2\mathbf{I}_n \right)^{-1}k(\mathbf{x}, \mathbf{x}^{\star}).
 
     Example:
         >>> import gpjax as gpx

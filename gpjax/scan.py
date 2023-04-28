@@ -102,7 +102,7 @@ def vscan(
 
     Returns
     -------
-        Tuple[Carry, List[Y]]: A tuple of the final carry and the outputs.
+        Tuple[Carry, list[Y]]: A tuple of the final carry and the outputs.
     """
     _xs_flat = jtu.tree_leaves(xs)
     _length = length if length is not None else len(_xs_flat[0])

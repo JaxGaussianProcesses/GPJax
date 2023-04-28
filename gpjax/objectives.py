@@ -236,7 +236,7 @@ LogPosteriorDensity = NonConjugateMLL
 def variational_expectation(
     variational_family: "gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
     train_data: Dataset,
-) -> Float[Array, " N"]:
+) -> Float[Array, "N"]:
     """Compute the expectation of our model's log-likelihood under our variational
     distribution. Batching can be done here to speed up computation.
 

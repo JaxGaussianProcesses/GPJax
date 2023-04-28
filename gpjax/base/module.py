@@ -211,7 +211,7 @@ class Module(Pytree):
         return meta_map(_get_trainables, self)
 
 
-def _toplevel_meta(pytree: Any) -> list[dict[str, Any]]:
+def _toplevel_meta(pytree: Any) -> list[Optional[dict[str, Any]]]:
     """Unpacks a list of meta corresponding to the top-level nodes of the pytree.
 
     Args:

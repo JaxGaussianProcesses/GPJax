@@ -16,7 +16,10 @@
 
 from dataclasses import dataclass
 
-from beartype.typing import Any
+from beartype.typing import (
+    Any,
+    Union,
+)
 import jax.numpy as jnp
 from jaxtyping import Float
 
@@ -66,7 +69,7 @@ class DiagonalLinearOperator(LinearOperator):
 
         Returns
         -------
-            Float[Array, " N"]: Diagonal of the covariance operator.
+            Float[Array, "N"]: Diagonal of the covariance operator.
         """
         return self.diag
 

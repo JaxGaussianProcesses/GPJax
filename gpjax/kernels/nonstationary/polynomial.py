@@ -40,7 +40,7 @@ class Polynomial(AbstractKernel):
     def __post_init__(self):
         self.name = f"Polynomial (degree {self.degree})"
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
         r"""Compute the polynomial kernel of degree $d$ between a pair of arrays.
 
         For a pair of inputs $x, y \in \mathbb{R}^{D}$, let's evaluate the polynomial

@@ -61,7 +61,7 @@ class GraphKernel(AbstractKernel):
     lengthscale: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     smoothness: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    eigenvalues: Float[Array, " N"] = static_field(None)
+    eigenvalues: Float[Array, "N"] = static_field(None)
     eigenvectors: Float[Array, "N N"] = static_field(None)
     num_vertex: ScalarInt = static_field(None)
     compute_engine: AbstractKernelComputation = static_field(EigenKernelComputation)
@@ -90,8 +90,8 @@ class GraphKernel(AbstractKernel):
         evaluate the graph kernel on a pair of vertices $(v_i, v_j)$ for any $i,j<n$.
 
         Args:
-            x (Float[Array, "N 1"]): Index of the ith vertex.
-            y (Float[Array, "N 1"]): Index of the jth vertex.
+            x (Float[Array, "N 1"]): Index of the $i$th vertex.
+            y (Float[Array, "N 1"]): Index of the $j$th vertex.
 
         Returns
         -------
