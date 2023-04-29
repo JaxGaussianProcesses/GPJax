@@ -163,11 +163,11 @@ class Bernoulli(AbstractLikelihood):
 
 @dataclass
 class Poisson(AbstractLikelihood):
-    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Distribution:
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         """The link function of the Poisson likelihood.
 
         Args:
-            f (Float[Array, "N 1"]): Function values.
+            f (Float[Array, "..."]): Function values.
 
         Returns:
             tfd.Distribution: The likelihood function.
@@ -188,7 +188,7 @@ class Poisson(AbstractLikelihood):
         return self.link_function(dist.mean())
 
 
-def inv_probit(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
+def inv_probit(x: Float[Array, "*N"]) -> Float[Array, "*N"]:
     """Compute the inverse probit function.
 
     Args:

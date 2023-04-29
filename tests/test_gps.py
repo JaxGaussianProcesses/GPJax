@@ -58,6 +58,7 @@ from gpjax.likelihoods import (
     AbstractLikelihood,
     Bernoulli,
     Gaussian,
+    Poisson
 )
 from gpjax.mean_functions import (
     AbstractMeanFunction,

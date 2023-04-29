@@ -23,6 +23,7 @@ from gpjax.kernels import *
 from gpjax.likelihoods import (
     Bernoulli,
     Gaussian,
+    Poisson
 )
 from gpjax.mean_functions import (
     Constant,
