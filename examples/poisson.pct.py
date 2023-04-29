@@ -15,7 +15,7 @@
 # ---
 
 # %% [markdown]
-# # Count data regression with the Poisson likelihood
+# # Count data regression
 #
 # In this notebook we demonstrate how to perform inference for Gaussian process models
 # with non-Gaussian likelihoods via Markov chain Monte
@@ -27,30 +27,28 @@ import blackjax
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-import jax.scipy as jsp
 import jax.tree_util as jtu
 import matplotlib.pyplot as plt
-import optax as ox
 import tensorflow_probability.substrates.jax as tfp
 from jax.config import config
-from jaxtyping import Array, Float
+from jaxtyping import install_import_hook
 
-import gpjax as gpx
+with install_import_hook("gpjax", "beartype.beartype"):
+    import gpjax as gpx
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 tfd = tfp.distributions
-I = jnp.eye
 key = jr.PRNGKey(123)
 
 # %% [markdown]
 # ## Dataset
 #
-# For count data regression, the Poisson distribution is a natural choice. The probability mass function of the Poisson distribution is given by
+# For count data regression, the Poisson distribution is a natural choice for the likelihood function. The probability mass function of the Poisson distribution is given by
 #
 # $$ p(y \,|\, \lambda) = \frac{\lambda^{y} e^{-\lambda}}{y!},$$
 #
-# where $y$ is the count and the parameter $\lambda$ is the rate of the Poisson distribution.
+# where $y$ is the count and the parameter $\lambda \in \mathbb{R}_{>0}$ is the rate of the Poisson distribution.
 #
 # We than set $\lambda = \exp(f)$ where $f$ is the latent Gaussian process. The exponential function is the _link function_ for the Poisson distribution: it maps the output of a GP to the positive real line, which is suitable for modeling count data.
 #
@@ -233,4 +231,6 @@ ax.fill_between(
 
 # %%
 # %load_ext watermark
-# %watermark -n -u -v -iv -w -a "Thomas Pinder & Daniel Dodd (edited by Francesco Zanetta)"
+# %watermark -n -u -v -iv -w -a "Francesco Zanetta"
+
+# %%
