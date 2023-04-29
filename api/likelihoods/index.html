@@ -1655,7 +1655,7 @@
 
 
 <h5 id="gpjax.likelihoods.__all__" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AbstractLikelihood&#39;</span><span class="p">,</span> <span class="s1">&#39;Gaussian&#39;</span><span class="p">,</span> <span class="s1">&#39;Bernoulli&#39;</span><span class="p">,</span> <span class="s1">&#39;inv_probit&#39;</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AbstractLikelihood&#39;</span><span class="p">,</span> <span class="s1">&#39;Gaussian&#39;</span><span class="p">,</span> <span class="s1">&#39;Bernoulli&#39;</span><span class="p">,</span> <span class="s1">&#39;Poisson&#39;</span><span class="p">,</span> <span class="s1">&#39;inv_probit&#39;</span><span class="p">]</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
@@ -2150,6 +2150,170 @@ at a finite set of test points.</p></td>
       <h6 id="gpjax.likelihoods.Bernoulli.predict--returns">Returns</h6>
 <div class="highlight"><pre><span></span><code>tfd.Distribution: The pointwise predictive distribution.
 </code></pre></div>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h5 id="gpjax.likelihoods.Poisson" class="doc doc-heading">
+        <code>Poisson</code>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><a class="autorefs autorefs-internal" title="gpjax.likelihoods.AbstractLikelihood" href="#gpjax.likelihoods.AbstractLikelihood">AbstractLikelihood</a></code></p>
+
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.likelihoods.Poisson.link_function" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The link function of the Poisson likelihood.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>f</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, <span title="..."></span>]</code>
+          </td>
+          <td><p>Function values.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.likelihoods.tfd" href="#gpjax.likelihoods.tfd">tfd</a>.<span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+          </td>
+          <td><p>tfd.Distribution: The likelihood function.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.likelihoods.Poisson.predict" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">dist</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Evaluate the pointwise predictive distribution, given a Gaussian
+process posterior and likelihood parameters.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>dist</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.likelihoods.tfd" href="#gpjax.likelihoods.tfd">tfd</a>.<span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+          </td>
+          <td><p>The Gaussian process posterior, evaluated
+at a finite set of test points.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.likelihoods.tfd" href="#gpjax.likelihoods.tfd">tfd</a>.<span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+          </td>
+          <td><p>tfd.Distribution: The pointwise predictive distribution.</p></td>
+        </tr>
+    </tbody>
+  </table>
 
   </div>
 
