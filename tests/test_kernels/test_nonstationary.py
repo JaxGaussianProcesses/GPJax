@@ -13,22 +13,31 @@
 # limitations under the License.
 # ==============================================================================
 
-from itertools import permutations, product
 from dataclasses import is_dataclass
+from itertools import (
+    permutations,
+    product,
+)
+from typing import List
 
 import jax
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
 import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
-from jax.config import config
-from typing import List
 
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import DenseKernelComputation
-from gpjax.kernels.nonstationary import Linear, Polynomial
-from gpjax.linops import LinearOperator, identity
+from gpjax.kernels.nonstationary import (
+    Linear,
+    Polynomial,
+)
+from gpjax.linops import (
+    LinearOperator,
+    identity,
+)
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -44,10 +53,11 @@ class BaseTestKernel:
     static_fields: List[str]
 
     def pytest_generate_tests(self, metafunc):
-        """This is called automatically by pytest"""
+        """This is called automatically by pytest."""
 
         # function for pretty test name
-        id_func = lambda x: "-".join([f"{k}={v}" for k, v in x.items()])
+        def id_func(x):
+            return "-".join([f"{k}={v}" for k, v in x.items()])
 
         # get arguments for the test function
         funcarglist = metafunc.cls.params.get(metafunc.function.__name__, None)
@@ -59,21 +69,18 @@ class BaseTestKernel:
 
     @pytest.mark.parametrize("dim", [None, 1, 3], ids=lambda x: f"dim={x}")
     def test_initialization(self, fields: dict, dim: int) -> None:
-
         # Check that kernel is a dataclass
         assert is_dataclass(self.kernel)
 
         # Input fields as JAX arrays
-        fields = {k: jnp.array([v]) for k, v in fields.items()}
+        fields = {k: jnp.array(v) for k, v in fields.items()}
 
         # Test number of dimensions
         if dim is None:
             kernel: AbstractKernel = self.kernel(**fields)
             assert kernel.ndims == 1
         else:
-            kernel: AbstractKernel = self.kernel(
-                active_dims=[i for i in range(dim)], **fields
-            )
+            kernel: AbstractKernel = self.kernel(active_dims=list(range(dim)), **fields)
             assert kernel.ndims == dim
 
         # Check default compute engine
@@ -93,17 +100,16 @@ class BaseTestKernel:
 
         # Check meta leaves
         meta = kernel._pytree__meta
-        assert not any(f in meta.keys() for f in self.static_fields)
+        assert not any(f in meta for f in self.static_fields)
         assert list(meta.keys()) == sorted(set(fields) - set(self.static_fields))
 
         for field in meta:
-
             # Bijectors
             if field in ["variance", "shift"]:
                 assert isinstance(meta[field]["bijector"], tfb.Softplus)
 
             # Trainability state
-            assert meta[field]["trainable"] == True
+            assert meta[field]["trainable"] is True
 
         # Test kernel call
         x = jnp.linspace(0.0, 1.0, 10 * kernel.ndims).reshape(10, kernel.ndims)
@@ -112,7 +118,6 @@ class BaseTestKernel:
     @pytest.mark.parametrize("n", [1, 2, 5], ids=lambda x: f"n={x}")
     @pytest.mark.parametrize("dim", [1, 3], ids=lambda x: f"dim={x}")
     def test_gram(self, dim: int, n: int) -> None:
-
         # Initialise kernel
         kernel: AbstractKernel = self.kernel()
 
@@ -132,7 +137,6 @@ class BaseTestKernel:
     @pytest.mark.parametrize("n_b", [1, 2, 5], ids=lambda x: f"n_b={x}")
     @pytest.mark.parametrize("dim", [1, 2, 5], ids=lambda x: f"dim={x}")
     def test_cross_covariance(self, n_a: int, n_b: int, dim: int) -> None:
-
         # Initialise kernel
         kernel: AbstractKernel = self.kernel()
 
@@ -146,7 +150,8 @@ class BaseTestKernel:
         assert Kab.shape == (n_a, n_b)
 
 
-prod = lambda inp: [dict(zip(inp.keys(), values)) for values in product(*inp.values())]
+def prod(inp):
+    return [dict(zip(inp.keys(), values)) for values in product(*inp.values())]
 
 
 class TestLinear(BaseTestKernel):

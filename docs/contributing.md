@@ -11,7 +11,7 @@ many ways to contibute, including:
   [docs](https://github.com/thomaspinder/GPJax/tree/master/docs) or
   [examples](https://github.com/thomaspinder/GPJax/tree/master/docs/nbs).
 - Fixing outstanding [issues](https://github.com/thomaspinder/GPJax/issues)
-  (bugs). 
+  (bugs).
 - Extending or improving our [codebase](https://github.com/thomaspinder/GPJax).
 
 
@@ -25,7 +25,7 @@ Conduct](https://github.com/thomaspinder/GPJax/blob/master/.github/CODE_OF_CONDU
 
 Please open issues on [Github Issue
 Tracker](https://github.com/thomaspinder/GPJax/issues/new/choose). Here you can
-mention 
+mention
 
 You can ask a question or start a discussion in the [Discussion
 section](https://github.com/thomaspinder/GPJax/discussions) on Github.
@@ -37,13 +37,13 @@ request](https://docs.github.com/en/pull-requests/collaborating-with-pull-reques
 Our preferred workflow is to first fork the [GitHub
 repository](https://github.com/thomaspinder/GPJax), clone it to your local
 machine, and develop on a _feature branch_. Once you're happy with your changes,
-install our `pre-commit hooks`, `commit` and `push` your code. 
+install our `pre-commit hooks`, `commit` and `push` your code.
 
 **New to this?** Don't panic, our [guide](#step-by-step-guide) below will walk
 you through every detail!
 
 :::{attention} Before opening a pull request we recommend you check our [pull
-request checklist](#pull-request-checklist). 
+request checklist](#pull-request-checklist).
 
 
 ## Step-by-step guide:
@@ -68,7 +68,7 @@ request checklist](#pull-request-checklist).
     ```
 
     :::{attention} Always use a `feature` branch. It's good practice to avoid
-    work on the ``main`` branch of any repository. 
+    work on the ``main`` branch of any repository.
 
 4.  Project requirements are in ``requirements.txt``. We suggest using a
     [virtual environment](https://docs.python-guide.org/dev/virtualenvs/) for
@@ -86,7 +86,7 @@ request checklist](#pull-request-checklist).
     ```
     :::{warning} Please ensure you have done this before commiting any files. If
     successful, this will print the following output `pre-commit installed at
-    .git/hooks/pre-commit`. 
+    .git/hooks/pre-commit`.
 
 6.  Add changed files using `git add` and then `git commit` files to record your
     changes locally:
@@ -117,13 +117,13 @@ request checklist](#pull-request-checklist).
 
 We welcome both complete or "work in progress" pull requests. Before opening
 one, we recommended you check the following guidelines to ensure a smooth review
-process. 
+process.
 
 **My contribution is a "work in progress":**
 
 Please prefix the title of incomplete contributions with `[WIP]` (to indicate a
-work in progress). WIPs are useful to: 
-  
+work in progress). WIPs are useful to:
+
   1. Indicate you are working on something to avoid duplicated work.
   2. Request broad review of functionality or API.
   3. Seek collaborators.

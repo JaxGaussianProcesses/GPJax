@@ -13,19 +13,35 @@
 # limitations under the License.
 # ==============================================================================
 
-from .dataset import Dataset
-from .fit import fit
-from .gps import Prior, construct_posterior
-from .kernels import *
-from .likelihoods import Bernoulli, Gaussian, Poisson
-from .mean_functions import Constant, Zero
-from .objectives import (ELBO, CollapsedELBO, ConjugateMLL,
-                         LogPosteriorDensity, NonConjugateMLL)
-from .variational_families import (CollapsedVariationalGaussian,
-                                   ExpectationVariationalGaussian,
-                                   NaturalVariationalGaussian,
-                                   VariationalGaussian,
-                                   WhitenedVariationalGaussian)
+from gpjax.dataset import Dataset
+from gpjax.fit import fit
+from gpjax.gps import (
+    Prior,
+    construct_posterior,
+)
+from gpjax.kernels import *
+from gpjax.likelihoods import (
+    Bernoulli,
+    Gaussian,
+)
+from gpjax.mean_functions import (
+    Constant,
+    Zero,
+)
+from gpjax.objectives import (
+    ELBO,
+    CollapsedELBO,
+    ConjugateMLL,
+    LogPosteriorDensity,
+    NonConjugateMLL,
+)
+from gpjax.variational_families import (
+    CollapsedVariationalGaussian,
+    ExpectationVariationalGaussian,
+    NaturalVariationalGaussian,
+    VariationalGaussian,
+    WhitenedVariationalGaussian,
+)
 
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"

@@ -15,29 +15,37 @@
 
 from dataclasses import dataclass
 
+from beartype.typing import Union
 import jax.numpy as jnp
+from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
-from jaxtyping import Array, Float
 
-from ...base import param_field
-from ..base import AbstractKernel
-from .utils import build_student_t_distribution, euclidean_distance
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.utils import (
+    build_student_t_distribution,
+    euclidean_distance,
+)
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 @dataclass
 class Matern12(AbstractKernel):
     """The Matérn kernel with smoothness parameter fixed at 0.5."""
 
-    lengthscale: Float[Array, "D"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
+    lengthscale: Union[ScalarFloat, Float[Array, "D"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
     )
-    variance: Float[Array, "1"] = param_field(jnp.array([1.0]), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Matérn12"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> Float[Array, "1"]:
+    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
+        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`.
 
         .. math::
             k(x, y) = \\sigma^2 \\exp \\Bigg( -\\frac{\\lvert x-y \\rvert}{2\\ell^2}  \\Bigg)
@@ -46,7 +54,7 @@ class Matern12(AbstractKernel):
             x (Float[Array, "D"]): The left hand argument of the kernel function's call.
             y (Float[Array, "D"]): The right hand argument of the kernel function's call
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`
+            ScalarFloat: The value of :math:`k(x, y)`
         """
         x = self.slice_input(x) / self.lengthscale
         y = self.slice_input(y) / self.lengthscale

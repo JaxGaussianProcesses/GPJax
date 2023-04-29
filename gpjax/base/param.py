@@ -13,13 +13,16 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
 __all__ = ["param_field"]
 
 import dataclasses
-from typing import Any, Mapping, Optional
 
+from beartype.typing import (
+    Any,
+    Mapping,
+    Optional,
+)
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 
@@ -35,10 +38,7 @@ def param_field(
     compare: bool = True,
     metadata: Optional[Mapping[str, Any]] = None,
 ):
-    if metadata is None:
-        metadata = {}
-    else:
-        metadata = dict(metadata)
+    metadata = {} if metadata is None else dict(metadata)
 
     if "bijector" in metadata:
         raise ValueError("Cannot use metadata with `bijector` already set.")

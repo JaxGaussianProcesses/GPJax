@@ -15,16 +15,27 @@
 
 import abc
 from dataclasses import dataclass
-from typing import Any
 
+from beartype.typing import (
+    Any,
+    Union,
+)
 import jax.numpy as jnp
 import jax.scipy as jsp
-import tensorflow_probability.substrates.jax as tfp
-from jaxtyping import Array, Float
+from jaxtyping import Float
 from simple_pytree import static_field
+import tensorflow_probability.substrates.jax as tfp
 
-from .base import Module, param_field
-from .linops.utils import to_dense
+from gpjax.base import (
+    Module,
+    param_field,
+)
+from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.linops.utils import to_dense
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 tfb = tfp.bijectors
 tfd = tfp.distributions
@@ -43,7 +54,8 @@ class AbstractLikelihood(Module):
             *args (Any): Arguments to be passed to the likelihood's `predict` method.
             **kwargs (Any): Keyword arguments to be passed to the likelihood's `predict` method.
 
-        Returns:
+        Returns
+        -------
             tfd.Distribution: The predictive distribution.
         """
         return self.predict(*args, **kwargs)
@@ -56,17 +68,19 @@ class AbstractLikelihood(Module):
             *args (Any): Arguments to be passed to the likelihood's `predict` method.
             **kwargs (Any): Keyword arguments to be passed to the likelihood's `predict` method.
 
-        Returns:
+        Returns
+        -------
             tfd.Distribution: The predictive distribution.
         """
         raise NotImplementedError
 
     @property
     @abc.abstractmethod
-    def link_function(self) -> tfd.Distribution:
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         """Return the link function of the likelihood function.
 
-        Returns:
+        Returns
+        -------
             tfd.Distribution: The distribution of observations, y, given values of the Gaussian process, f.
         """
         raise NotImplementedError
@@ -76,24 +90,24 @@ class AbstractLikelihood(Module):
 class Gaussian(AbstractLikelihood):
     """Gaussian likelihood object."""
 
-    obs_noise: Float[Array, "1"] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
+    obs_noise: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
     )
 
-    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Normal:
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Normal:
         """The link function of the Gaussian likelihood.
 
         Args:
-            params (Dict): The parameters of the likelihood function.
-            f (Float[Array, "N 1"]): Function values.
+            f (Float[Array, "..."]): Function values.
 
-        Returns:
+        Returns
+        -------
             tfd.Normal: The likelihood function.
         """
         return tfd.Normal(loc=f, scale=self.obs_noise.astype(f.dtype))
 
     def predict(
-        self, dist: tfd.MultivariateNormalTriL
+        self, dist: Union[tfd.MultivariateNormalTriL, GaussianDistribution]
     ) -> tfd.MultivariateNormalFullCovariance:
         """
         Evaluate the Gaussian likelihood function at a given predictive
@@ -102,11 +116,11 @@ class Gaussian(AbstractLikelihood):
         distribution's covariance matrix.
 
         Args:
-            params (Dict): The parameters of the likelihood function.
             dist (tfd.Distribution): The Gaussian process posterior,
                 evaluated at a finite set of test points.
 
-        Returns:
+        Returns
+        -------
             tfd.Distribution: The predictive distribution.
         """
         n_data = dist.event_shape[0]
@@ -118,13 +132,14 @@ class Gaussian(AbstractLikelihood):
 
 @dataclass
 class Bernoulli(AbstractLikelihood):
-    def link_function(self, f: Float[Array, "N 1"]) -> tfd.Distribution:
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         """The probit link function of the Bernoulli likelihood.
 
         Args:
-            f (Float[Array, "N 1"]): Function values.
+            f (Float[Array, "..."]): Function values.
 
-        Returns:
+        Returns
+        -------
             tfd.Distribution: The likelihood function.
         """
         return tfd.Bernoulli(probs=inv_probit(f))
@@ -137,7 +152,8 @@ class Bernoulli(AbstractLikelihood):
             dist (tfd.Distribution): The Gaussian process posterior, evaluated
                 at a finite set of test points.
 
-        Returns:
+        Returns
+        -------
             tfd.Distribution: The pointwise predictive distribution.
         """
         variance = jnp.diag(dist.covariance())
@@ -176,10 +192,11 @@ def inv_probit(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
     """Compute the inverse probit function.
 
     Args:
-        x (Float[Array, "N 1"]): A vector of values.
+        x (Float[Array, "*N"]): A vector of values.
 
-    Returns:
-        Float[Array, "N 1"]: The inverse probit of the input vector.
+    Returns
+    -------
+        Float[Array, "*N"]: The inverse probit of the input vector.
     """
     jitter = 1e-3  # To ensure output is in interval (0, 1).
     return 0.5 * (1.0 + jsp.special.erf(x / jnp.sqrt(2.0))) * (1 - 2 * jitter) + jitter

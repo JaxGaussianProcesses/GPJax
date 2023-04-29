@@ -14,10 +14,10 @@
 # ==============================================================================
 
 
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
-from jax.config import config
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -25,7 +25,10 @@ _PRNGKey = jr.PRNGKey(42)
 
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
 from gpjax.linops.identity_linear_operator import IdentityLinearOperator
-from gpjax.linops.utils import identity, to_dense
+from gpjax.linops.utils import (
+    identity,
+    to_dense,
+)
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])

@@ -13,12 +13,17 @@
 # limitations under the License.
 # ==============================================================================
 
-from jaxtyping import Array, Int, Num
+from jaxtyping import (
+    Int,
+    Num,
+)
+
+from gpjax.typing import Array
 
 
 def jax_gather_nd(
-    params: Num[Array, "N ..."], indices: Int[Array, "M"]
-) -> Num[Array, "M ..."]:
+    params: Num[Array, "N *rest"], indices: Int[Array, "M 1"]
+) -> Num[Array, "M *rest"]:
     """Slice a `params` array at a set of `indices`.
 
     Args:
@@ -28,7 +33,8 @@ def jax_gather_nd(
             [0, N) whose value at index `i` will be used to slice `params` at
             index `i`.
 
-    Returns:
+    Returns
+    -------
         Num[Array: An arbitrary array with leading axes of length `M`.
     """
     tuple_indices = tuple(indices[..., i] for i in range(indices.shape[-1]))

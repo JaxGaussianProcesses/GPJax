@@ -15,33 +15,39 @@
 
 import abc
 from dataclasses import dataclass
-from typing import Any
 
+from beartype.typing import Any
 from jax import vmap
-from jaxtyping import Array, Float
+from jaxtyping import (
+    Float,
+    Num,
+)
 
-from gpjax.linops import (DenseLinearOperator, DiagonalLinearOperator,
-                          LinearOperator)
-
-Kernel = Any
+from gpjax.linops import (
+    DenseLinearOperator,
+    DiagonalLinearOperator,
+    LinearOperator,
+)
+from gpjax.typing import Array
 
 
 @dataclass
 class AbstractKernelComputation:
     """Abstract class for kernel computations."""
 
-    kernel: Kernel
+    kernel: "gpjax.kernels.base.AbstractKernel"
 
     def gram(
         self,
-        x: Float[Array, "N D"],
+        x: Num[Array, "N D"],
     ) -> LinearOperator:
         """Compute Gram covariance operator of the kernel function.
 
         Args:
             x (Float[Array, "N N"]): The inputs to the kernel function.
 
-        Returns:
+        Returns
+        -------
             LinearOperator: Gram covariance operator of the kernel function.
         """
         Kxx = self.cross_covariance(x, x)
@@ -49,7 +55,7 @@ class AbstractKernelComputation:
 
     @abc.abstractmethod
     def cross_covariance(
-        self, x: Float[Array, "N D"], y: Float[Array, "M D"]
+        self, x: Num[Array, "N D"], y: Num[Array, "M D"]
     ) -> Float[Array, "N M"]:
         """For a given kernel, compute the NxM gram matrix on an a pair
         of input matrices with shape NxD and MxD.
@@ -58,19 +64,21 @@ class AbstractKernelComputation:
             x (Float[Array,"N D"]): The first input matrix.
             y (Float[Array,"M D"]): The second input matrix.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N M"]: The computed cross-covariance.
         """
         raise NotImplementedError
 
-    def diagonal(self, inputs: Float[Array, "N D"]) -> DiagonalLinearOperator:
+    def diagonal(self, inputs: Num[Array, "N D"]) -> DiagonalLinearOperator:
         """For a given kernel, compute the elementwise diagonal of the
         NxN gram matrix on an input matrix of shape NxD.
 
         Args:
             inputs (Float[Array, "N D"]): The input matrix.
 
-        Returns:
+        Returns
+        -------
             DiagonalLinearOperator: The computed diagonal variance entries.
         """
         return DiagonalLinearOperator(diag=vmap(lambda x: self.kernel(x, x))(inputs))

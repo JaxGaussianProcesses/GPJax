@@ -1,9 +1,10 @@
-import gpjax.kernels as jk
 import jax.numpy as jnp
 import jax.random as jr
-import matplotlib.pyplot as plt
-import matplotlib.patheffects as path_effects
 import matplotlib as mpl
+import matplotlib.patheffects as path_effects
+import matplotlib.pyplot as plt
+
+import gpjax.kernels as jk
 
 key = jr.PRNGKey(123)
 

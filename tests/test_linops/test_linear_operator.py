@@ -13,15 +13,20 @@
 # limitations under the License.
 # ==============================================================================
 
-import pytest
-import jax.tree_util as jtu
+from dataclasses import (
+    dataclass,
+    is_dataclass,
+)
+
 import jax.numpy as jnp
-from gpjax.linops.linear_operator import LinearOperator
-from dataclasses import dataclass, is_dataclass
+import jax.tree_util as jtu
+import pytest
 from simple_pytree import static_field
 
-def test_abstract_operator() -> None:
+from gpjax.linops.linear_operator import LinearOperator
 
+
+def test_abstract_operator() -> None:
     # Test abstract linear operator raises an error.
     with pytest.raises(TypeError):
         LinearOperator()
@@ -30,13 +35,11 @@ def test_abstract_operator() -> None:
     with pytest.raises(TypeError):
         dataclass(LinearOperator)()
 
-    
 
 @pytest.mark.parametrize("test_dataclass", [True, False])
 @pytest.mark.parametrize("shape", [(1, 1), (2, 3), (4, 5, 6), [7, 8]])
 @pytest.mark.parametrize("dtype", [jnp.float32, jnp.float64])
 def test_instantiate_no_attributes(test_dataclass, shape, dtype) -> None:
-
     # Test can instantiate a linear operator with the abstract methods defined.
     class DummyLinearOperator(LinearOperator):
         def diagonal(self, *args, **kwargs):
@@ -84,7 +87,7 @@ def test_instantiate_no_attributes(test_dataclass, shape, dtype) -> None:
     assert linop.ndim == len(shape)
 
     # Check pytree.
-    assert jtu.tree_leaves(linop) == [] # shape and dtype are static!
+    assert jtu.tree_leaves(linop) == []  # shape and dtype are static!
 
 
 @pytest.mark.parametrize("test_dataclass", [True, False])
@@ -150,4 +153,4 @@ def test_instantiate_with_attributes(test_dataclass, shape, dtype) -> None:
     assert linop.ndim == len(shape)
 
     # Check pytree.
-    assert jtu.tree_leaves(linop) == [1, 3] # b, shape, dtype are static!
+    assert jtu.tree_leaves(linop) == [1, 3]  # b, shape, dtype are static!

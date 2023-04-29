@@ -15,21 +15,31 @@
 
 import abc
 from dataclasses import dataclass
-from typing import Any
 
+from beartype.typing import Any
 import jax.numpy as jnp
 import jax.scipy as jsp
-import tensorflow_probability.substrates.jax.bijectors as tfb
-from jaxtyping import Array, Float
+from jaxtyping import Float
 from simple_pytree import static_field
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from .base import Module, param_field
-from .dataset import Dataset
-from .gaussian_distribution import GaussianDistribution
-from .gps import AbstractPosterior
-from .likelihoods import Gaussian
-from .linops import (DenseLinearOperator, LowerTriangularLinearOperator,
-                     identity)
+from gpjax.base import (
+    Module,
+    param_field,
+)
+from gpjax.dataset import Dataset
+from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.gps import AbstractPosterior
+from gpjax.likelihoods import Gaussian
+from gpjax.linops import (
+    DenseLinearOperator,
+    LowerTriangularLinearOperator,
+    identity,
+)
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 @dataclass
@@ -50,7 +60,8 @@ class AbstractVariationalFamily(Module):
             **kwargs (Any): Keyword arguments of the variational family's `predict`
                 method.
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: The output of the variational family's `predict` method.
         """
         return self.predict(*args, **kwargs)
@@ -65,7 +76,8 @@ class AbstractVariationalFamily(Module):
             **kwargs (Any): Keyword arguments of the variational family's
             ``predict`` method.
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: The output of the variational family's ``predict`` method.
         """
         raise NotImplementedError
@@ -76,7 +88,7 @@ class AbstractVariationalGaussian(AbstractVariationalFamily):
     """The variational Gaussian family of probability distributions."""
 
     inducing_inputs: Float[Array, "N D"]
-    jitter: Float[Array, "1"] = static_field(1e-6)
+    jitter: ScalarFloat = static_field(1e-6)
 
     @property
     def num_inducing(self) -> int:
@@ -107,7 +119,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         if self.variational_root_covariance is None:
             self.variational_root_covariance = jnp.eye(self.num_inducing)
 
-    def prior_kl(self) -> Float[Array, "1"]:
+    def prior_kl(self) -> ScalarFloat:
         """
         Compute the KL-divergence between our variational approximation and the
         Gaussian process prior.
@@ -116,11 +128,11 @@ class VariationalGaussian(AbstractVariationalGaussian):
         = KL[ N(μ, S) || N(μz, Kzz) ], where u = f(z) and z are the inducing
         inputs.
 
-        Returns:
-             Float[Array, "1"]: The KL-divergence between our variational
+        Returns
+        -------
+             ScalarFloat: The KL-divergence between our variational
                 approximation and the GP prior.
         """
-
         # Unpack variational parameters
         mu = self.variational_mean
         sqrt = self.variational_root_covariance
@@ -155,10 +167,10 @@ class VariationalGaussian(AbstractVariationalGaussian):
         Args:
             test_inputs (Float[Array, "N D"]): The test inputs at which we wish to make a prediction.
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: The predictive distribution of the low-rank GP at the test inputs.
         """
-
         # Unpack variational parameters
         mu = self.variational_mean
         sqrt = self.variational_root_covariance
@@ -217,17 +229,17 @@ class WhitenedVariationalGaussian(VariationalGaussian):
     over μ and sqrt with S = sqrt sqrtᵀ.
     """
 
-    def prior_kl(self) -> Float[Array, "1"]:
+    def prior_kl(self) -> ScalarFloat:
         """Compute the KL-divergence between our variational approximation and
         the Gaussian process prior.
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(0, I)].
 
-        Returns:
-            Float[Array, "1"]: The KL-divergence between our variational
+        Returns
+        -------
+            ScalarFloat: The KL-divergence between our variational
                 approximation and the GP prior.
         """
-
         # Unpack variational parameters
         mu = self.variational_mean
         sqrt = self.variational_root_covariance
@@ -250,10 +262,10 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         Args:
             test_inputs (Float[Array, "N D"]): The test inputs at which we wish to make a prediction.
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: The predictive distribution of the low-rank GP at the test inputs.
         """
-
         # Unpack variational parameters
         mu = self.variational_mean
         sqrt = self.variational_root_covariance
@@ -317,17 +329,17 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         if self.natural_matrix is None:
             self.natural_matrix = -0.5 * jnp.eye(self.num_inducing)
 
-    def prior_kl(self) -> Float[Array, "1"]:
+    def prior_kl(self) -> ScalarFloat:
         """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],
 
         with μ and S computed from the natural parameterisation θ = (S⁻¹μ, -S⁻¹/2).
 
-        Returns:
-            Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
+        Returns
+        -------
+            ScalarFloat: The KL-divergence between our variational approximation and the GP prior.
         """
-
         # Unpack variational parameters
         natural_vector = self.natural_vector
         natural_matrix = self.natural_matrix
@@ -375,10 +387,10 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         with μ and S computed from the natural parameterisation θ = (S⁻¹μ, -S⁻¹/2).
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: A function that accepts a set of test points and will return the predictive distribution at those points.
         """
-
         # Unpack variational parameters
         natural_vector = self.natural_vector
         natural_matrix = self.natural_matrix
@@ -464,20 +476,17 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         if self.expectation_matrix is None:
             self.expectation_matrix = jnp.eye(self.num_inducing)
 
-    def prior_kl(self) -> Float[Array, "1"]:
+    def prior_kl(self) -> ScalarFloat:
         """Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
 
         For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],
 
         with μ and S computed from the expectation parameterisation η = (μ, S + uuᵀ).
 
-        Args:
-            params (Dict): The parameters at which our variational distribution and GP prior are to be evaluated.
-
-        Returns:
-            Float[Array, "1"]: The KL-divergence between our variational approximation and the GP prior.
+        Returns
+        -------
+            ScalarFloat: The KL-divergence between our variational approximation and the GP prior.
         """
-
         # Unpack variational parameters
         expectation_vector = self.expectation_vector
         expectation_matrix = self.expectation_matrix
@@ -514,10 +523,10 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         with μ and S computed from the expectation parameterisation η = (μ, S + uuᵀ).
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: The predictive distribution of the GP at the test inputs t.
         """
-
         # Unpack variational parameters
         expectation_vector = self.expectation_vector
         expectation_matrix = self.expectation_matrix
@@ -594,10 +603,10 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         Args:
             train_data (Dataset): The training data that was used to fit the GP.
 
-        Returns:
+        Returns
+        -------
             GaussianDistribution: The predictive distribution of the collapsed variational Gaussian process at the test inputs t.
         """
-
         # Unpack test inputs
         t, n_test = test_inputs, test_inputs.shape[0]
 
@@ -623,7 +632,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         # Lz⁻¹ Kzx
         Lz_inv_Kzx = Lz.solve(Kzx)
 
-        # A = Lz⁻¹ Kzt / σ
+        # A = Lz⁻¹ Kzt / o
         A = Lz_inv_Kzx / jnp.sqrt(noise)
 
         # AAᵀ
@@ -651,7 +660,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         # L⁻¹ Lz⁻¹ Kzt
         L_inv_Lz_inv_Kzt = jsp.linalg.solve_triangular(L, Lz_inv_Kzt, lower=True)
 
-        # μt + 1/σ² Ktz Kzz⁻¹ Kzx (y - μx)
+        # μt + 1/o² Ktz Kzz⁻¹ Kzx (y - μx)
         mean = μt + jnp.matmul(Kzt.T / noise, Kzz_inv_Kzx_diff)
 
         # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻¹ (I + AAᵀ)⁻¹ Lz⁻¹ Kzt

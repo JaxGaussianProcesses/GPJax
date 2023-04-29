@@ -14,17 +14,14 @@
 # ==============================================================================
 
 
-import jax
-import jax.numpy as jnp
-import jax.random as jr
-import pytest
-
-import jax
-import jax.tree_util as jtu
 from dataclasses import is_dataclass
 
-
+import jax
 from jax.config import config
+import jax.numpy as jnp
+import jax.random as jr
+import jax.tree_util as jtu
+import pytest
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -44,7 +41,7 @@ def test_init(n: int) -> None:
     values = jr.uniform(_PRNGKey, (n,))
     diag = DiagonalLinearOperator(values)
 
-     # Check types.
+    # Check types.
     assert isinstance(diag, DiagonalLinearOperator)
     assert is_dataclass(diag)
 
@@ -54,7 +51,7 @@ def test_init(n: int) -> None:
     assert diag.ndim == 2
 
     # Check pytree.
-    assert jtu.tree_leaves(diag) == [values] # shape, dtype are static!
+    assert jtu.tree_leaves(diag) == [values]  # shape, dtype are static!
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])
