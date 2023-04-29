@@ -58,6 +58,7 @@ from gpjax.likelihoods import (
     AbstractLikelihood,
     Bernoulli,
     Gaussian,
+    Poisson
 )
 from gpjax.mean_functions import (
     AbstractMeanFunction,
@@ -262,8 +263,8 @@ def test_posterior_construct(
     if isinstance(likelihood, Gaussian):
         assert isinstance(posterior_mul, ConjugatePosterior)
 
-    # If the likelihood is Bernoulli, then the posterior should be non-conjugate.
-    if isinstance(likelihood, Bernoulli):
+    # If the likelihood is Bernoulli or Poisson, then the posterior should be non-conjugate.
+    if isinstance(likelihood, (Bernoulli, Poisson)):
         assert isinstance(posterior_mul, NonConjugatePosterior)
 
 
