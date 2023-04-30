@@ -2605,7 +2605,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=8e2d0dda" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=206de7f6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2621,38 +2621,49 @@ Licensed under the Apache License, Version 2.0.
 </div>
 </div>
 </div>
-<div id="cell-id=8b7a5a80" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=ce4e2fbf" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="gaussian-process-objects-as-data">Gaussian process objects as data:<a class="anchor-link" href="#gaussian-process-objects-as-data">&#182;</a></h1><p>Our abstraction is based on the Equinox library and aims to offer a Bayesian/GP equivalent to their neural network abstractions. However, we take it a step further by enabling users to create standard Python classes and easily define and modify parameter domains and training statuses for optimisation within a single model object. This object is fully compatible with JAX autogradients without the need for filtering.</p>
-<p>The core idea is to represent all mathemtaical objects as immutable tree's...</p>
-<p>In the following we will consider an academic example, but which should be enough to understand the mechanics of how to write custom objects in GPJax.</p>
+<h1 id="gaussian-process-objects-as-data">Gaussian process objects as data:<a class="anchor-link" href="#gaussian-process-objects-as-data">&#182;</a></h1><p>Our abstraction is based on the Equinox library and aims to offer a
+Bayesian/GP equivalent to their neural network abstractions. However, we take
+it a step further by enabling users to create standard Python classes and
+easily define and modify parameter domains and training statuses for
+optimisation within a single model object. This object is fully compatible
+with JAX autogradients without the need for filtering.</p>
+<p>The core idea is to represent all mathematical objects as immutable tree's...</p>
+<p>In the following we will consider an academic example, but which should be
+enough to understand the mechanics of how to write custom objects in GPJax.</p>
 
 </div>
 </div>
 </div>
 </div>
-<div id="cell-id=b82cf86e" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=8d64a04c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="the-rbf-kernel">The RBF kernel<a class="anchor-link" href="#the-rbf-kernel">&#182;</a></h2><p>The kernel in Gaussian process modeling is a mathematical function that defines the covariance structure between data points, allowing us to model complex relationships and make predictions based on the observed data. The radial basis function (RBF, or <em>squared exponential</em>) kernel is a popular choice. For a pair of vectors $x, y \in \mathbb{R}^d$, its
-form can be mathematically given by
+<h2 id="the-rbf-kernel">The RBF kernel<a class="anchor-link" href="#the-rbf-kernel">&#182;</a></h2><p>The kernel in Gaussian process modeling is a mathematical function that
+defines the covariance structure between data points, allowing us to model
+complex relationships and make predictions based on the observed data. The
+radial basis function (RBF, or <em>squared exponential</em>) kernel is a popular
+choice. For a pair of vectors $x, y \in \mathbb{R}^d$, its form can be
+mathematically given by
 $$ k(x, y) = \sigma^2\exp\left(\frac{\lVert x-y\rVert_{2}^2}{2\ell^2} \right) $$
 where $\sigma^2\in\mathbb{R}_{&gt;0}$ is a variance parameter and
 $\ell^2\in\mathbb{R}_{&gt;0}$ a lengthscale parameter. Terming the evaluation of
-$k(x, y)$ the <em>covariance</em>, we can crudely represent this object in Python as follows:</p>
+$k(x, y)$ the <em>covariance</em>, we can crudely represent this object in Python as
+follows:</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=751e05eb" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=d2e1b90e" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2675,20 +2686,23 @@ $k(x, y)$ the <em>covariance</em>, we can crudely represent this object in Pytho
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">import</span> <span class="nn">jax</span>
 <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
 
+
 <span class="k">class</span> <span class="nc">RBF</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lengthscale</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">variance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lengthscale</span> <span class="o">=</span> <span class="n">lengthscale</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="n">variance</span>
 
     <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
-
         <span class="n">l_squared</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lengthscale</span>
         <span class="n">sigma_sqaured</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variance</span>
 
-        <span class="k">return</span> <span class="n">sigma_sqaured</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span>  <span class="mf">2.0</span> <span class="o">*</span> <span class="n">l_squared</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sigma_sqaured</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+            <span class="o">-</span><span class="p">((</span><span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">l_squared</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
 </pre></div>
 <div id="cell-1" class="clipboard-copy-txt">import jax
 import jax.numpy as jnp
+
 
 class RBF:
     def __init__(self, lengthscale: float, variance: float) -> None:
@@ -2696,11 +2710,12 @@ class RBF:
         self.variance = variance
 
     def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
-
         l_squared = self.lengthscale
         sigma_sqaured = self.variance
 
-        return sigma_sqaured * jnp.exp(-(jnp.linalg.norm(x, y) /  2.0 * l_squared)**2)</div>
+        return sigma_sqaured * jnp.exp(
+            -((jnp.linalg.norm(x, y) / 2.0 * l_squared) ** 2)
+        )</div>
         
         </div>
     </div>
@@ -2710,19 +2725,20 @@ class RBF:
 
 </div>
 </div>
-<div id="cell-id=024234a1" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=67eb005c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>However, asserting equivalence between two class instances with exactly the same parameters</p>
+<p>However, asserting equivalence between two class instances with exactly the
+same parameters</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=1899db07" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=bc40a534" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2760,19 +2776,20 @@ print(kernel_1 == kernel_2)</div>
 
 </div>
 </div>
-<div id="cell-id=ccb14ffc" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=7eff1bfd" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>The assertion is <code>False</code>. Yet the lengthscale and variance are certainly the same.</p>
+<p>The assertion is <code>False</code>. Yet the lengthscale and variance are certainly the
+same.</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=f8bcd233" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=897f25e8" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2806,17 +2823,22 @@ print(kernel_1.variance == kernel_2.variance)</div>
 
 </div>
 </div>
-<div id="cell-id=c2e7b7c0" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=1cbde31d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="dataclasses">Dataclasses<a class="anchor-link" href="#dataclasses">&#182;</a></h2><p>A <code>dataclass</code> in Python can simplify the creation of classes for storing data and make the code more readable and maintainable. They offer several benefits over a regular class, including:</p>
+<h2 id="dataclasses">Dataclasses<a class="anchor-link" href="#dataclasses">&#182;</a></h2><p>A <code>dataclass</code> in Python can simplify the creation of classes for storing data
+and make the code more readable and maintainable. They offer several benefits
+over a regular class, including:</p>
 <ol>
-<li><p>Conciseness: Dataclasses automatically generate default implementations for several common methods, such as <strong>init</strong>(), <strong>repr</strong>(), and <strong>eq</strong>(), which means less boilerplate code needs to be written.</p>
+<li><p>Conciseness: Dataclasses automatically generate default implementations for
+several common methods, such as <strong>init</strong>(), <strong>repr</strong>(), and <strong>eq</strong>(), which
+means less boilerplate code needs to be written.</p>
 </li>
-<li><p>Type hinting: Dataclasses provide native support for type annotations, which can help catch errors at compile-time and improve code readability.</p>
+<li><p>Type hinting: Dataclasses provide native support for type annotations,
+which can help catch errors at compile-time and improve code readability.</p>
 </li>
 </ol>
 <p>For the RBF kernel, we use a <code>dataclass</code> to represent this object as follows</p>
@@ -2825,7 +2847,7 @@ print(kernel_1.variance == kernel_2.variance)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=2fd19c2b" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=0ad3373f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2854,7 +2876,9 @@ print(kernel_1.variance == kernel_2.variance)</div>
     <span class="n">variance</span><span class="p">:</span> <span class="nb">float</span>
 
     <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">lengthscale</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+            <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">lengthscale</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="p">)</span>
 </pre></div>
 <div id="cell-4" class="clipboard-copy-txt">from dataclasses import dataclass
 
@@ -2865,7 +2889,9 @@ class RBF:
     variance: float
 
     def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
-        return self.variance * jnp.exp(-0.5 * (jnp.linalg.norm(x, y) / self.lengthscale)**2)</div>
+        return self.variance * jnp.exp(
+            -0.5 * (jnp.linalg.norm(x, y) / self.lengthscale) ** 2
+        )</div>
         
         </div>
     </div>
@@ -2875,7 +2901,7 @@ class RBF:
 
 </div>
 </div>
-<div id="cell-id=5ada8d7b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=d2c345ca" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2887,7 +2913,7 @@ class RBF:
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=833bedca" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=e7466a64" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2925,7 +2951,7 @@ print(kernel_1 == kernel_2)</div>
 
 </div>
 </div>
-<div id="cell-id=a6f9ca68" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=f42b8782" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2939,56 +2965,76 @@ the lengthscale and variance as <em>fields</em>. Further, the <code>RBF.covarian
 </div>
 </div>
 </div>
-<div id="cell-id=524ffea4" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=0ffa3441" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>However, the object we have defined are not yet compatible with JAX, for this we must consider PyTree's.</p>
+<p>However, the object we have defined are not yet compatible with JAX, for this
+we must consider PyTree's.</p>
 
 </div>
 </div>
 </div>
 </div>
-<div id="cell-id=7aba474b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=f5811e14" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="pytrees">PyTree&#8217;s<a class="anchor-link" href="#pytrees">&#182;</a></h2><p>To efficiently represent data JAX provides a <em>PyTree</em> abstraction. PyTree’s as such, are immutable tree-like structure built out of ‘node’ types — container-like Python objects. For instance,</p>
+<h2 id="pytrees">PyTree&#8217;s<a class="anchor-link" href="#pytrees">&#182;</a></h2><p>To efficiently represent data JAX provides a <em>PyTree</em> abstraction. PyTree’s as
+such, are immutable tree-like structure built out of ‘node’ types —
+container-like Python objects. For instance,</p>
 <div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">3.14</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Monte&quot;</span><span class="p">:</span> <span class="nb">object</span><span class="p">(),</span> <span class="s2">&quot;Carlo&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}]</span>
 </pre></div>
-<p>is a PyTree with structure <code>[*, {&quot;Monte&quot;: *, &quot;Carlo&quot;: *}]</code> and leaves <code>3.14</code>, <code>object()</code>, <code>False</code>. As such, most JAX functions operate over pytrees, e.g., <code>jax.lax.scan</code>, accepts as input and produces as output a pytrees of JAX arrays.</p>
-<p>While the default set of ‘node’ types that are regarded internal pytree nodes is limited to objects such as lists, tuples, and dicts, JAX permits custom types to be readily registered through a global registry, with the values of such traversed recursively (i.e., as a tree!). This is the functionality that we exploit, whereby we construct all Gaussian process models via a tree-structure through our <code>Module</code> object.</p>
+<p>is a PyTree with structure <code>[*, {&quot;Monte&quot;: *, &quot;Carlo&quot;: *}]</code> and leaves <code>3.14</code>,
+<code>object()</code>, <code>False</code>. As such, most JAX functions operate over pytrees, e.g.,
+<code>jax.lax.scan</code>, accepts as input and produces as output a pytrees of JAX
+arrays.</p>
+<p>While the default set of ‘node’ types that are regarded internal pytree nodes
+is limited to objects such as lists, tuples, and dicts, JAX permits custom
+types to be readily registered through a global registry, with the values of
+such traversed recursively (i.e., as a tree!). This is the functionality that
+we exploit, whereby we construct all Gaussian process models via a
+tree-structure through our <code>Module</code> object.</p>
 
 </div>
 </div>
 </div>
 </div>
-<div id="cell-id=3d58c17c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=76be3eef" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="module">Module<a class="anchor-link" href="#module">&#182;</a></h1><p>Our design, first and foremost, minimises additional abstractions on top of standard JAX: everything is just PyTrees and transformations on PyTrees, and secondly, provides full compatibility with the main JAX library itself, enhancing integrability with the broader ecosystem of third-party JAX libraries. To achieve this, our core idea is represent all model objects via an immutable tree-structure.</p>
+<h1 id="module">Module<a class="anchor-link" href="#module">&#182;</a></h1><p>Our design, first and foremost, minimises additional abstractions on top of
+standard JAX: everything is just PyTrees and transformations on PyTrees, and
+secondly, provides full compatibility with the main JAX library itself,
+enhancing integrability with the broader ecosystem of third-party JAX
+libraries. To achieve this, our core idea is represent all model objects via
+an immutable tree-structure.</p>
 <h3 id="defining-a-module">Defining a Module<a class="anchor-link" href="#defining-a-module">&#182;</a></h3><p>There are two main considerations for model parameters, their:</p>
 <ul>
 <li>Trainability status.</li>
 <li>Domain.</li>
 <li>Explain why normalising flows don’t break the convention.</li>
-<li>Mark leaf attributes with <code>param_field</code> to set a default bijector and trainable status.</li>
-<li>Unmarked leaf attributes default to an <code>Identity</code> bijector and trainablility set to <code>True</code>.</li>
-<li>Fully compatible with <a href="https://github.com/deepmind/distrax">Distrax</a> and <a href="https://www.tensorflow.org/probability">TensorFlow Probability</a> bijectors, so feel free to use these!</li>
+<li>Mark leaf attributes with <code>param_field</code> to set a default bijector and
+    trainable status.</li>
+<li>Unmarked leaf attributes default to an <code>Identity</code> bijector and trainablility
+    set to <code>True</code>.</li>
+<li>Fully compatible with <a href="https://github.com/deepmind/distrax">Distrax</a> and
+    <a href="https://www.tensorflow.org/probability">TensorFlow Probability</a> bijectors,
+    so feel free to use these!</li>
 </ul>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=e9fd41c2" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=737bd266" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3018,7 +3064,9 @@ the lengthscale and variance as <em>fields</em>. Further, the <code>RBF.covarian
     <span class="n">variance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">param_field</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">(),</span> <span class="n">trainable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">lengthscale</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+            <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">lengthscale</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="p">)</span>
 </pre></div>
 <div id="cell-6" class="clipboard-copy-txt">import tensorflow_probability.substrates.jax.bijectors as tfb
 from gpjax import base
@@ -3030,7 +3078,9 @@ class RBF(base.Module):
     variance: float = base.param_field(1.0, bijector=tfb.Softplus(), trainable=True)
 
     def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
-        return self.variance * jnp.exp(-0.5 * (jnp.linalg.norm(x, y) / self.lengthscale)**2)</div>
+        return self.variance * jnp.exp(
+            -0.5 * (jnp.linalg.norm(x, y) / self.lengthscale) ** 2
+        )</div>
         
         </div>
     </div>
@@ -3040,19 +3090,21 @@ class RBF(base.Module):
 
 </div>
 </div>
-<div id="cell-id=6556b4f2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=5f26d435" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="replacing-values">Replacing values<a class="anchor-link" href="#replacing-values">&#182;</a></h3><p>For consistency with JAX’s functional programming principles, <code>Module</code> instances are immutable. Parameter updates can be achieved out-of-place via <code>replace</code>.</p>
+<h3 id="replacing-values">Replacing values<a class="anchor-link" href="#replacing-values">&#182;</a></h3><p>For consistency with JAX’s functional programming principles, <code>Module</code>
+instances are immutable. Parameter updates can be achieved out-of-place via
+<code>replace</code>.</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=30edd97d" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=40b2f7d3" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3088,19 +3140,20 @@ print(kernel)</div>
 
 </div>
 </div>
-<div id="cell-id=14c2c539" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=c34b1263" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="transformations">Transformations &#129302;<a class="anchor-link" href="#transformations">&#182;</a></h2><h3 id="applying-transformations">Applying transformations<a class="anchor-link" href="#applying-transformations">&#182;</a></h3><p>Use <code>constrain</code> / <code>unconstrain</code> to return a <code>Mytree</code> with each parameter's bijector <code>forward</code> / <code>inverse</code> operation applied!</p>
+<h2 id="transformations">Transformations &#129302;<a class="anchor-link" href="#transformations">&#182;</a></h2><h3 id="applying-transformations">Applying transformations<a class="anchor-link" href="#applying-transformations">&#182;</a></h3><p>Use <code>constrain</code> / <code>unconstrain</code> to return a <code>Mytree</code> with each parameter's
+bijector <code>forward</code> / <code>inverse</code> operation applied!</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=03fcd11d" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=bc52f149" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3144,19 +3197,20 @@ print(kernel)</div>
 
 </div>
 </div>
-<div id="cell-id=3a11f9db" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=2edb2177" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="replacing-transformations">Replacing transformations<a class="anchor-link" href="#replacing-transformations">&#182;</a></h3><p>Default transformations can be replaced on an instance via the <code>replace_bijector</code> method.</p>
+<h3 id="replacing-transformations">Replacing transformations<a class="anchor-link" href="#replacing-transformations">&#182;</a></h3><p>Default transformations can be replaced on an instance via the
+<code>replace_bijector</code> method.</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=004c2064" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=483153cf" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3204,13 +3258,14 @@ print(new_kernel)</div>
 
 </div>
 </div>
-<div id="cell-id=7df03cae" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=bb54afe7" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="trainability">Trainability &#128642;<a class="anchor-link" href="#trainability">&#182;</a></h2><h3 id="applying-trainability">Applying trainability<a class="anchor-link" href="#applying-trainability">&#182;</a></h3><p>Applying <code>stop_gradient</code> <strong>within</strong> the loss function, prevents the flow of gradients during forward or reverse-mode automatic differentiation.</p>
+<h2 id="trainability">Trainability &#128642;<a class="anchor-link" href="#trainability">&#182;</a></h2><h3 id="applying-trainability">Applying trainability<a class="anchor-link" href="#applying-trainability">&#182;</a></h3><p>Applying <code>stop_gradient</code> <strong>within</strong> the loss function, prevents the flow of
+gradients during forward or reverse-mode automatic differentiation.</p>
 <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jax</span>
 
 <span class="c1"># Create simulated data.</span>
@@ -3252,7 +3307,8 @@ print(new_kernel)</div>
   'trainable': False,
   'pytree_node': True}, 1.0)]
 </code></pre>
-<p>Note this shows any metadata defined via a <code>dataclasses.field</code> for the pytree leaves. So feel free to define your own.</p>
+<p>Note this shows any metadata defined via a <code>dataclasses.field</code> for the pytree
+leaves. So feel free to define your own.</p>
 <h3 id="applying-field-metadata">Applying <code>field</code> metadata<a class="anchor-link" href="#applying-field-metadata">&#182;</a></h3><p>Leaf metadata can be applied via the <code>meta_map</code> function.</p>
 <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mytree</span> <span class="kn">import</span> <span class="n">meta_map</span>
 
@@ -3268,7 +3324,8 @@ print(new_kernel)</div>
 </pre></div>
 <pre><code>SimpleModel(weight=1.0, bias=10.0)
 </code></pre>
-<p>It is possible to define your own custom metadata and therefore your own metadata transformations in this vein.</p>
+<p>It is possible to define your own custom metadata and therefore your own
+metadata transformations in this vein.</p>
 <h2 id="static-fields">Static fields<a class="anchor-link" href="#static-fields">&#182;</a></h2><p>Fields can be marked as static via simple_pytree's <code>static_field</code>.</p>
 <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jax.tree_util</span> <span class="k">as</span> <span class="nn">jtu</span>
 <span class="kn">from</span> <span class="nn">simple_pytree</span> <span class="kn">import</span> <span class="n">static_field</span>
