@@ -16,18 +16,21 @@
 # ---
 
 # %% [markdown]
-# # 🌳 GPJax PyTrees
+# # 🌳 GPJax Module
 #
 # `GPJax` **represents all objects as JAX [_PyTrees_](https://jax.readthedocs.io/en/latest/pytrees.html)**, giving
 #
-# - A simple API with a **TensorFlow / PyTorch feel** …
-# - … whilst **fully compatible** with JAX's functional paradigm.
+# - A simple API with a **TensorFlow / PyTorch feel** ...
+# - ... whilst **fully compatible** with JAX's functional paradigm ...
+# - ... And **works out of the box** (no filtering) with JAX's transformations such as `grad`.
+#
+# We achive this through providing a base `Module` abstraction to cleanly handles parameter trainability and optimising transformations for JAX models.
 #
 
 # %% [markdown]
 # # Gaussian process objects as data:
 #
-# Our abstraction is based on the Equinox library and aims to offer a Bayesian/GP equivalent to their neural network abstractions. However, we take it a step further by enabling users to create standard Python classes and easily define and modify parameter domains and training statuses for optimisation within a single model object. This object is fully compatible with JAX autogradients without the need for filtering.
+# Our abstraction is inspired by the Equinox library and aims to offer a Bayesian/GP equivalent to their neural network abstractions. However, we take it a step further by enabling users to create standard Python classes and easily define and modify parameter domains and training statuses for optimisation within a single model object. This object is fully compatible with JAX autogradients without the need for filtering.
 #
 # The core idea is to represent all mathemtaical objects as immutable tree's...
 #
@@ -43,87 +46,57 @@
 # $$ k(x, y) = \sigma^2\exp\left(\frac{\lVert x-y\rVert_{2}^2}{2\ell^2} \right) $$
 # where $\sigma^2\in\mathbb{R}_{>0}$ is a variance parameter and
 # $\ell^2\in\mathbb{R}_{>0}$ a lengthscale parameter. Terming the evaluation of
-# $k(x, y)$ the _covariance_, we can crudely represent this object in Python as follows:
+# $k(x, y)$ the _covariance_, we can crudely represent this object as a Python `dataclass` as follows:
 
 # %%
 import jax
 import jax.numpy as jnp
-
-class RBF:
-    def __init__(self, lengthscale: float, variance: float) -> None:
-        self.lengthscale = lengthscale
-        self.variance = variance
-
-    def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
-
-        l_squared = self.lengthscale
-        sigma_sqaured = self.variance
-
-        return sigma_sqaured * jnp.exp(-(jnp.linalg.norm(x, y) /  2.0 * l_squared)**2)
-
-
-# %% [markdown]
-# However, asserting equivalence between two class instances with exactly the same parameters
-
-# %%
-kernel_1 = RBF(1.0, 1.0)
-kernel_2 = RBF(1.0, 1.0)
-
-print(kernel_1 == kernel_2)
-
-# %% [markdown]
-# The assertion is `False`. Yet the lengthscale and variance are certainly the same.
-
-# %%
-print(kernel_1.lengthscale == kernel_2.lengthscale)
-print(kernel_1.variance == kernel_2.variance)
-
-# %% [markdown]
-# ## Dataclasses
-#
-# A `dataclass` in Python can simplify the creation of classes for storing data and make the code more readable and maintainable. They offer several benefits over a regular class, including:
-#
-# 1. Conciseness: Dataclasses automatically generate default implementations for several common methods, such as __init__(), __repr__(), and __eq__(), which means less boilerplate code needs to be written.
-#
-# 2. Type hinting: Dataclasses provide native support for type annotations, which can help catch errors at compile-time and improve code readability.
-#
-# For the RBF kernel, we use a `dataclass` to represent this object as follows
-
-
-# %%
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
 class RBF:
-    lengthscale: float
-    variance: float
+    lengthscale: float = field(default=1.0)
+    variance: float = field(default=1.0)
 
-    def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
-        return self.variance * jnp.exp(-0.5 * (jnp.linalg.norm(x, y) / self.lengthscale)**2)
+    def covariance(self, x: float, y: float) -> jax.Array:
+        return self.variance * jnp.exp(-0.5 * ((x-y)/self.lengthscale)**2)
 
 
 # %% [markdown]
-# This time we now have equality between instances.
-
-# %%
-kernel_1 = RBF(1.0, 1.0)
-kernel_2 = RBF(1.0, 1.0)
-
-print(kernel_1 == kernel_2)
+# Here, the Python `dataclass` is a class that simplifies the process of creating classes that primarily store data. It reduces boilerplate code and provides convenient methods for initialising and representing the data. An equivalent class could be written as:
+#
+# ```python
+# class RBF:
+#
+#     def __init__(self, lengthscale: float = 1.0, variance: float = 1.0) -> None:
+#         self.lengthscale = lengthscale
+#         self.variance = variance
+#
+#     def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
+#         return self.variance * jnp.exp(-0.5 * (jnp.linalg.norm(x, y) / self.lengthscale)**2)
+# ```
 
 # %% [markdown]
 # To establish some terminology, within the above RBF `dataclass`, we refer to
-# the lengthscale and variance as _fields_. Further, the `RBF.covariance()` is a
-# _method_.
+# the lengthscale and variance as _fields_. Further, the `RBF.covariance` is a
+# _method_. So far so good. However, if e.g., we wanted to take the gradient of the kernel with repsect to its parameters $\nabla_{\ell, \sigma^2} k(1.0, 2.0; \ell, \sigma^2)$ at inputs $x=1.0$ and $y=2.0$:
+
+# %%
+kernel = RBF()
+
+try:
+    jax.grad(lambda kern: kern.covariance(1.0, 2.0))(kernel)
+except TypeError as e:
+    print(e)
 
 # %% [markdown]
-# However, the object we have defined are not yet compatible with JAX, for this we must consider PyTree's.
+# We get an error. This is since, the object we have defined is not yet compatible with JAX. To achieve this we must consider JAX's _PyTree_ abstraction.
 
 # %% [markdown]
 # ## PyTree’s
 #
-# To efficiently represent data JAX provides a _PyTree_ abstraction. PyTree’s as such, are immutable tree-like structure built out of ‘node’ types — container-like Python objects. For instance,
+# To efficiently represent data, JAX provides a _PyTree_ abstraction. PyTree’s as such, are immutable tree-like structures built from ‘node’ types — container-like Python objects. For instance,
 #
 # ```python
 # [3.14, {"Monte": object(), "Carlo": False}]
@@ -136,33 +109,26 @@ print(kernel_1 == kernel_2)
 # %% [markdown]
 # # Module
 #
-# Our design, first and foremost, minimises additional abstractions on top of standard JAX: everything is just PyTrees and transformations on PyTrees, and secondly, provides full compatibility with the main JAX library itself, enhancing integrability with the broader ecosystem of third-party JAX libraries. To achieve this, our core idea is represent all model objects via an immutable tree-structure.
+# Our design, first and foremost, minimises additional abstractions on top of standard JAX: everything is just PyTrees and transformations on PyTrees, and secondly, provides full compatibility with the main JAX library itself, enhancing integrability with the broader ecosystem of third-party JAX libraries. To achieve this, our core idea is represent all model objects via an immutable PyTree. Here the leaves of the PyTree represent the parameters that are to be trained, and we descibe their domain and trainable status as `dataclass` metadata.
 #
-#
-# ### Defining a Module
-#
-# There are two main considerations for model parameters, their:
-#
-# - Trainability status.
-# - Domain.
-# - Explain why normalising flows don’t break the convention.
-# - Mark leaf attributes with `param_field` to set a default bijector and trainable status.
-# - Unmarked leaf attributes default to an `Identity` bijector and trainablility set to `True`.
-# - Fully compatible with [Distrax](https://github.com/deepmind/distrax) and [TensorFlow Probability](https://www.tensorflow.org/probability) bijectors, so feel free to use these!
+# For our RBF kernel we have two parameters; the lengthscale and the variance. Both of these have positive domains, and by default we want to train both of these parameters. To encode this we use a `param_field`, where we can define the domain of both parameters via a `Softplus` bijector (that restricts them to the positive domain), and define their trainble status to `True`.
 
 # %%
 import tensorflow_probability.substrates.jax.bijectors as tfb
-from gpjax import base
+from gpjax.base import Module, param_field
 
 
 @dataclass
-class RBF(base.Module):
-    lengthscale: float = base.param_field(1.0, bijector=tfb.Softplus(), trainable=True)
-    variance: float = base.param_field(1.0, bijector=tfb.Softplus(), trainable=True)
+class RBF(Module):
+    lengthscale: float = param_field(1.0, bijector=tfb.Softplus(), trainable=True)
+    variance: float = param_field(1.0, bijector=tfb.Softplus(), trainable=True)
 
     def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
-        return self.variance * jnp.exp(-0.5 * (jnp.linalg.norm(x, y) / self.lengthscale)**2)
+        return self.variance * jnp.exp(-0.5 * ((x-y)/self.lengthscale)**2)
 
+
+# %% [markdown]
+# Here `param_field` is just a special type of `dataclasses.field`. By default unmarked leaf attributes default to an `Identity` bijector and trainablility set to `True`.
 
 # %% [markdown]
 #
@@ -177,8 +143,7 @@ print(kernel)
 # %% [markdown]
 # ## Transformations 🤖
 #
-# ### Applying transformations
-# Use `constrain` / `unconstrain` to return a `Mytree` with each parameter's bijector `forward` / `inverse` operation applied!
+# Use `constrain` / `unconstrain` to return a `Module` with each parameter's bijector `forward` / `inverse` operation applied!
 
 # %%
 # Transform kernel to unconstrained space
@@ -190,7 +155,6 @@ kernel = unconstrained_kernel.constrain()
 print(kernel)
 
 # %% [markdown]
-# ### Replacing transformations
 # Default transformations can be replaced on an instance via the `replace_bijector` method.
 
 # %%
@@ -207,43 +171,50 @@ print(new_kernel)
 # %% [markdown]
 # ## Trainability 🚂
 #
-# ### Applying trainability
-#
-# Applying `stop_gradient` **within** the loss function, prevents the flow of gradients during forward or reverse-mode automatic differentiation.
-# ```python
-# import jax
-#
-# # Create simulated data.
-# n = 100
-# key = jax.random.PRNGKey(123)
-# x = jax.random.uniform(key, (n, ))
-# y = 3.0 * x + 2.0 + 1e-3 * jax.random.normal(key, (n, ))
+# Recall the example earlier, where we wanted to take the gradient of the kernel with repsect to its parameters $\nabla_{\ell, \sigma^2} k(1.0, 2.0; \ell, \sigma^2)$ at inputs $x=1.0$ and $y=2.0$. We can now confirm we can do this with the new `Module`.
 #
 #
-# # Define a mean-squared-error loss.
-# def loss(model: SimpleModel) -> float:
-#    model = model.stop_gradient() # 🛑 Stop gradients!
-#    return jax.numpy.sum((y - model(x))**2)
+
+# %%
+kernel = RBF()
+
+jax.grad(lambda kern: kern.covariance(1.0, 2.0))(kernel)
+
+# %% [markdown]
+# During gradient learning of models, it can sometimes be useful to fix certain parameters during the optimisation routine. For this, JAX provides a `stop_gradient` operand to prevent the flow of gradients during forward or reverse-mode automatic differentiation, as illustrated below for a function $f(x) = x^2$.
+
+# %%
+from jax import lax
+
+def f(x):
+    x = lax.stop_gradient(x)
+    return x ** 2
+
+jax.grad(f)(1.0)
+
+# %% [markdown]
+# We see that gradient return is `0.0` instead of `2.0` due to the stoping of the gradient. Analagous to this, we provide this functionality to gradient flows on our `Module` class, via a `stop_gradient` method.
 #
-# jax.grad(loss)(model)
-# ```
-# ```
-# SimpleModel(weight=0.0, bias=-188.37418)
-# ```
-# As `weight` trainability was set to `False`, it's gradient is zero as expected!
-#
-# ### Replacing trainability
-# Default trainability status can be replaced via the `replace_trainable` method.
-# ```python
-# new = model.replace_trainable(weight=True)
-# jax.grad(loss)(model)
-# ```
-# ```
-# SimpleModel(weight=-121.42676, bias=-188.37418)
-# ```
-# And we see that `weight`'s gradient is no longer zero.
-#
+# Setting a (leaf) parameter's trainability to false can be achived via the `replace_trainable` method.
+
+# %%
+
+kernel = RBF()
+kernel = kernel.replace_trainable(lengthscale=False)
+
+jax.grad(lambda kern: kern.stop_gradient().covariance(1.0, 2.0))(kernel)
+
+# %% [markdown]
+# As expected, the gradient is zero for the lengthscale parameter.
+
+# %% [markdown]
 # ## Metadata
+
+# %% [markdown]
+# Under the hood of the `Module` we utilise a leaf "metadata" abstraction....
+
+# %% [markdown]
+#
 #
 # ### Viewing `field` metadata
 # View field metadata pytree via `meta`.
