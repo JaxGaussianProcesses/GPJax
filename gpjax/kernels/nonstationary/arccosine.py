@@ -15,6 +15,7 @@
 
 from dataclasses import dataclass
 
+from beartype.typing import Union
 import jax.numpy as jnp
 from jaxtyping import Float
 from simple_pytree import static_field
@@ -38,7 +39,9 @@ class ArcCosine(AbstractKernel):
 
     order: ScalarInt = static_field(0)
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    weight_variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    weight_variance: Union[ScalarFloat, Float[Array, " D"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
+    )
     bias_variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
 
     def __post_init__(self):
@@ -47,7 +50,7 @@ class ArcCosine(AbstractKernel):
 
         self.name = f"ArcCosine (order {self.order})"
 
-    def __call__(self, x: Float[Array, "1"], y: Float[Array, "1"]) -> ScalarFloat:
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         """Evaluate the kernel on a pair of inputs :math:`(x, y)`
 
         Args:
@@ -79,7 +82,9 @@ class ArcCosine(AbstractKernel):
 
         return K.squeeze()
 
-    def _weighted_prod(self, x: Float[Array, "1"], y: Float[Array, "1"]) -> ScalarFloat:
+    def _weighted_prod(
+        self, x: Float[Array, " D"], y: Float[Array, " D"]
+    ) -> ScalarFloat:
         """Calculate the weighted product between two arguments.
 
         Args:

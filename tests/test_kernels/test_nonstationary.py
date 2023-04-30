@@ -187,3 +187,32 @@ class TestArcCosine(BaseTestKernel):
     def test_defaults(self, order: int) -> None:
         with pytest.raises(ValueError):
             self.kernel(order=order)
+
+    @pytest.mark.parametrize("order", [0, 1, 2], ids=lambda x: f"order={x}")
+    def test_values_by_monte_carlo_in_special_case(self, order: int) -> None:
+        """For certain values of weight variance (1.0) and bias variance (0.0), we can test
+        our calculations using the Monte Carlo expansion of the arccosine kernel, e.g.
+        see Eq. (1) of https://cseweb.ucsd.edu/~saul/papers/nips09_kernel.pdf.
+        """
+        kernel: AbstractKernel = self.kernel(
+            weight_variance=jnp.array([1.0, 1.0]), bias_variance=1e-25, order=order
+        )
+        key = jr.PRNGKey(123)
+
+        # Inputs close(ish) together
+        a = jnp.array([[0.0, 0.0]])
+        b = jnp.array([[2.0, 2.0]])
+
+        # calc cross-covariance exactly
+        Kab_exact = kernel.cross_covariance(a, b)
+
+        # calc cross-covariance using samples
+        weights = jax.random.normal(key, (10_000, 2))  # [S, d]
+        weights_a = jnp.matmul(weights, a.T)  # [S, 1]
+        weights_b = jnp.matmul(weights, b.T)  # [S, 1]
+        H_a = jnp.heaviside(weights_a, 0.5)
+        H_b = jnp.heaviside(weights_b, 0.5)
+        integrands = H_a * H_b * (weights_a**order) * (weights_b**order)
+        Kab_approx = 2.0 * jnp.mean(integrands)
+
+        assert jnp.max(Kab_approx - Kab_exact) < 1e-4
