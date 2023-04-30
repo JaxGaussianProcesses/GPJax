@@ -133,7 +133,7 @@ class RBF(Module):
 # %% [markdown]
 #
 # ### Replacing values
-# For consistency with JAX’s functional programming principles, `Module` instances are immutable. Parameter updates can be achieved out-of-place via `replace`.
+# For consistency with JAX’s functional programming principles, `Module` instances are immutable. PyTree nodes can be changed out-of-place via the `replace` method.
 
 # %%
 kernel = RBF()
@@ -208,73 +208,112 @@ jax.grad(lambda kern: kern.stop_gradient().covariance(1.0, 2.0))(kernel)
 # As expected, the gradient is zero for the lengthscale parameter.
 
 # %% [markdown]
+# ## Static fields
+
+# %% [markdown]
+# Fields can be marked as static via simple_pytree's `static_field`.
+
+# %%
+# TO UPDATE TO THE RBF EXAMPLE.
+from gpjax.base import Module, param_field
+from simple_pytree import static_field
+
+class StaticExample(Module):
+    b: float = static_field()
+
+    def __init__(self, a=1.0, b=2.0):
+        self.a=a
+        self.b=b
+
+
+# %% [markdown]
 # ## Metadata
 
 # %% [markdown]
-# Under the hood of the `Module` we utilise a leaf "metadata" abstraction....
+# Under the hood of the `Module`, we utilise a leaf "metadata" abstraction. As such the following:
+#
+# ```python
+# param_field(1.0, bijector= tfb.Identity(), trainable=False) 
+# ```
+#
+# Having a parameter field with default value `1.0`, `Identity` bijector and trainable set to `False`, is equivalent to the following `dataclasses.field`
+#
+# ```python
+# field(default=1.0, metadata={"trainable": False, "bijector": tfb.Identity()})
+# ```
+#
+# Here, we attach `metadata` to the parameter. This is the abstraction the `Module` exploits. The `metadata`, in general can be a dictionary of anything:
+
+# %%
+# TO UPDATE TO THE RBF EXAMPLE.
+
+from dataclasses import field
+
+@dataclass 
+class MyModule(Module):
+    a: float = field(default=1.0, metadata={"trainable": True, "bijector": tfb.Softplus()})
+    b: float = field(default=2.0, metadata={"name": "Bayes", "trainable": False})
+
+module = MyModule()
 
 # %% [markdown]
-#
-#
-# ### Viewing `field` metadata
-# View field metadata pytree via `meta`.
-# ```python
-# from mytree import meta
-# meta(model)
-# ```
-# ```
-# SimpleModel(weight=({'bijector': Bijector(forward=<function <lambda> at 0x17a024e50>, inverse=<function <lambda> at 0x17a024430>), 1.0), 'trainable': False, 'pytree_node': True}, bias=({}, 2.0))
-# ```
-#
-# Or the metadata pytree leaves via `meta_leaves`.
-# ```python
-# from mytree import meta_leaves
-# meta_leaves(model)
-# ```
-# ```
-# [({}, 2.0),
-#  ({'bijector': Bijector(forward=<function <lambda> at 0x17a024e50>, inverse=<function <lambda> at 0x17a024430>),
-#   'trainable': False,
-#   'pytree_node': True}, 1.0)]
-# ```
-# Note this shows any metadata defined via a `dataclasses.field` for the pytree leaves. So feel free to define your own.
-#
-# ### Applying `field` metadata
-# Leaf metadata can be applied via the `meta_map` function.
-# ```python
-# from mytree import meta_map
-#
-# # Function passed to `meta_map` has its argument as a `(meta, leaf)` tuple!
-# def if_trainable_then_10(meta_leaf):
-#     meta, leaf = meta_leaf
-#     if meta.get("trainable", True):
-#         return 10.0
-#     else:
-#         return leaf
-#
-# meta_map(if_trainable_then_10, model)
-# ```
-# ```
-# SimpleModel(weight=1.0, bias=10.0)
-# ```
-# It is possible to define your own custom metadata and therefore your own metadata transformations in this vein.
-#
-# ## Static fields
-# Fields can be marked as static via simple_pytree's `static_field`.
-#
-# ```python
-# import jax.tree_util as jtu
-# from simple_pytree import static_field
-#
-# class StaticExample(Mytree):
-#     b: float = static_field
-#
-#     def __init__(self, a=1.0, b=2.0):
-#         self.a=a
-#         self.b=b
-#
-# jtu.tree_leaves(StaticExample())
-# ```
-# ```
-# [1.0]
-# ```
+# We can trace the metadata defined on the class via `meta_leaves`.
+
+# %%
+from gpjax.base import meta_leaves
+
+meta_leaves(module)
+
+import jax.tree_util as jtu
+
+# %% [markdown]
+# Akin, to `jax.tree_utils.tree_leaves`, this returns a flattend pytree - however, this time a list of tuples comprising the `(metadata, value)` of each PyTree leaf. This traced metadata can be exploited for applying maps, as explained in the next section. 
+
+# %% [markdown]
+# ## Metamap
+
+# %% [markdown]
+# - This is how constrain/unconstrain, stop_gradients work under the hood.
+
+# %% [markdown]
+# - reimpliment constrain.
+# - Do custom metamap transform.
+
+# %%
+from gpjax.base import meta_map
+
+# This is how constrain works.
+def _apply_constrain(meta_leaf):
+    meta, leaf = meta_leaf
+
+    if meta is None:
+        return leaf
+
+    return meta.get("bijector", tfb.Identity()).forward(leaf)
+
+meta_map(_apply_constrain, module)
+
+
+# %%
+# Can filter on trainable status, e.g., for stop gradients:
+def if_trainable_then_10(meta_leaf):
+    meta, leaf = meta_leaf
+    if meta.get("trainable", True):
+        return 10.0
+    else:
+        return leaf
+
+meta_map(if_trainable_then_10, module)
+
+
+# %%
+# Can filter on name metadata:
+
+def if_name_is_bayes_zero(meta_leaf):
+    meta, leaf = meta_leaf
+    if meta.get("name", "NotBayes") == "Bayes":
+        return 0.0
+    else:
+        return leaf
+
+meta_map(if_name_is_bayes_zero, module)
