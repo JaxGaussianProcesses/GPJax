@@ -14,10 +14,7 @@
 # ==============================================================================
 
 from dataclasses import is_dataclass
-from itertools import (
-    permutations,
-    product,
-)
+from itertools import product
 from typing import List
 
 import jax
@@ -31,13 +28,11 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import DenseKernelComputation
 from gpjax.kernels.nonstationary import (
+    ArcCosine,
     Linear,
     Polynomial,
 )
-from gpjax.linops import (
-    LinearOperator,
-    identity,
-)
+from gpjax.linops import LinearOperator
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -101,7 +96,9 @@ class BaseTestKernel:
         # Check meta leaves
         meta = kernel._pytree__meta
         assert not any(f in meta for f in self.static_fields)
-        assert list(meta.keys()) == sorted(set(fields) - set(self.static_fields))
+        assert sorted(list(meta.keys())) == sorted(
+            set(fields) - set(self.static_fields)
+        )
 
         for field in meta:
             # Bijectors
@@ -170,3 +167,23 @@ class TestPolynomial(BaseTestKernel):
     static_fields = ["degree"]
     params = {"test_initialization": fields}
     default_compute_engine = DenseKernelComputation
+
+
+class TestArcCosine(BaseTestKernel):
+    kernel = ArcCosine
+    fields = prod(
+        {
+            "variance": [0.1, 1.0],
+            "order": [0, 1, 2],
+            "weight_variance": [0.1, 1.0],
+            "bias_variance": [0.1, 1.0],
+        }
+    )
+    static_fields = ["order"]
+    params = {"test_initialization": fields}
+    default_compute_engine = DenseKernelComputation
+
+    @pytest.mark.parametrize("order", [-1, 3], ids=lambda x: f"order={x}")
+    def test_defaults(self, order: int) -> None:
+        with pytest.raises(ValueError):
+            self.kernel(order=order)

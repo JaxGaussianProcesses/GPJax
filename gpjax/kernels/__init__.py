@@ -29,6 +29,7 @@ from gpjax.kernels.computations import (
 )
 from gpjax.kernels.non_euclidean import GraphKernel
 from gpjax.kernels.nonstationary import (
+    ArcCosine,
     Linear,
     Polynomial,
 )
@@ -45,6 +46,7 @@ from gpjax.kernels.stationary import (
 
 __all__ = [
     "AbstractKernel",
+    "ArcCosine",
     "RBF",
     "GraphKernel",
     "Matern12",
