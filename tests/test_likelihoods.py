@@ -200,7 +200,6 @@ class TestPoisson(BaseTestLikelihood):
     def _test_call_check(
         likelihood: AbstractLikelihood, latent_mean, latent_cov, latent_dist
     ):
-
         # Test call method.
         pred_dist = likelihood(latent_dist)
 

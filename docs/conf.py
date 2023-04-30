@@ -59,9 +59,14 @@ project = "GPJax"
 copyright = "2021, Thomas Pinder"
 author = "Thomas Pinder"
 
+from os.path import (
+    dirname,
+    join,
+    pardir,
+)
+
 # The full version, including alpha/beta/rc tags
 import sys
-from os.path import dirname, join, pardir
 
 sys.path.insert(0, join(dirname(__file__), pardir))
 
