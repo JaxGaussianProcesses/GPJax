@@ -6,7 +6,7 @@ import jax.numpy as jnp
 import jax.scipy as jsp
 import jax.tree_util as jtu
 from jaxtyping import Float
-from simple_pytree import static_field
+from gpjax.base import static_field
 import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.base import Module

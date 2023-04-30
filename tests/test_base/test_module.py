@@ -32,13 +32,13 @@ import jax.tree_util as jtu
 import pytest
 from simple_pytree import (
     Pytree,
-    static_field,
 )
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base.module import (
     Module,
     meta,
+    static_field,
 )
 from gpjax.base.param import param_field
 
