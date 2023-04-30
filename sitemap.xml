@@ -2,347 +2,347 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://example.com/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/CODE_OF_CONDUCT/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/contributing/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/design/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/index%20copy/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/installation/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/sharp_bits/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/_static/jaxkern/main/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>None</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/dataset/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/fit/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/gaussian_distribution/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/gps/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/likelihoods/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/mean_functions/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/objectives/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/progress_bar/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/quadrature/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/scan/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/typing/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/variational_families/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/base/module/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/base/param/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/base/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/approximations/rff/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/computations/base/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/computations/basis_functions/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/computations/constant_diagonal/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/computations/dense/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/computations/diagonal/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/computations/eigen/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/non_euclidean/graph/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/non_euclidean/utils/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/nonstationary/linear/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/nonstationary/polynomial/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/stationary/matern12/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/stationary/matern32/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/stationary/matern52/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/stationary/periodic/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/stationary/powered_exponential/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/stationary/rational_quadratic/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/stationary/rbf/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/stationary/utils/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/kernels/stationary/white/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/linops/constant_diagonal_linear_operator/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/linops/dense_linear_operator/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/linops/diagonal_linear_operator/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/linops/identity_linear_operator/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/linops/linear_operator/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/linops/triangular_linear_operator/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/linops/utils/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/api/linops/zero_linear_operator/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/barycentres/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/classification/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/collapsed_vi/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/deep_kernels/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/graph_kernels/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/intro_to_gps/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/kernels/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/poisson.pct/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/pytrees/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/regression/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/regression/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/spatial.pct/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/uncollapsed_vi/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/utils/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/examples/yacht/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/scripts/gen_pages/</loc>
-         <lastmod>2023-04-29</lastmod>
+         <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
