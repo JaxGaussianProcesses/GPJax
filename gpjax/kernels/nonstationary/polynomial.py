@@ -17,7 +17,7 @@ from dataclasses import dataclass
 
 import jax.numpy as jnp
 from jaxtyping import Float
-from simple_pytree import static_field
+from gpjax.base import static_field
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import param_field

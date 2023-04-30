@@ -22,7 +22,7 @@ from flax import linen as nn
 from jax.config import config
 from jaxtyping import Array, Float
 from scipy.signal import sawtooth
-from simple_pytree import static_field
+from gpjax.base import static_field
 
 from jaxtyping import install_import_hook
 

@@ -34,7 +34,7 @@ from jaxtyping import (
     Float,
     Num,
 )
-from simple_pytree import static_field
+from gpjax.base import static_field
 import tensorflow_probability.substrates.jax.distributions as tfd
 
 from gpjax.base import (
