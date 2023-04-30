@@ -73,14 +73,19 @@ def static_field(
 
     metadata["pytree_node"] = False
 
+    if default is not dataclasses.MISSING and default_factory is not dataclasses.MISSING:
+        raise ValueError("Cannot specify both default and default_factory.")
+    
+    if default is not dataclasses.MISSING:
+        default_factory = lambda: default
+
     return dataclasses.field(
-        default=default,
-        default_factory=default_factory,
-        init=init,
-        repr=repr,
-        hash=hash,
-        compare=compare,
-        metadata=metadata,
+    default_factory=default_factory,
+    init=init,
+    repr=repr,
+    hash=hash,
+    compare=compare,
+    metadata=metadata,
     )
 
 
