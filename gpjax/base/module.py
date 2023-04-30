@@ -14,7 +14,7 @@
 # ==============================================================================
 
 
-__all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
+__all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta", "static_field"]
 
 from copy import (
     copy,
