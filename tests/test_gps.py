@@ -21,7 +21,6 @@ except ImportError:
     ValidationErrors = ValueError
 
 from dataclasses import is_dataclass
-import shutil
 from typing import Callable
 
 from jax.config import config
@@ -30,11 +29,6 @@ import jax.random as jr
 import jax.tree_util as jtu
 import pytest
 import tensorflow_probability.substrates.jax.distributions as tfd
-
-from gpjax.base import (
-    load_tree,
-    save_tree,
-)
 
 # from gpjax.dataset import Dataset
 from gpjax.dataset import Dataset
@@ -50,15 +44,13 @@ from gpjax.gps import (
 from gpjax.kernels import (
     RBF,
     AbstractKernel,
-    Matern12,
-    Matern32,
     Matern52,
 )
 from gpjax.likelihoods import (
     AbstractLikelihood,
     Bernoulli,
     Gaussian,
-    Poisson
+    Poisson,
 )
 from gpjax.mean_functions import (
     AbstractMeanFunction,
@@ -272,7 +264,7 @@ def test_posterior_construct(
 @pytest.mark.parametrize("kernel", [RBF, Matern52])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
 def test_prior_sample_approx(num_datapoints, kernel, mean_function):
-    kern = kernel(lengthscale=5.0, variance=0.1)
+    kern = kernel(lengthscale=jnp.array([5.0, 1.0]), variance=0.1)
     p = Prior(kernel=kern, mean_function=mean_function)
     key = jr.PRNGKey(123)
 
@@ -292,7 +284,7 @@ def test_prior_sample_approx(num_datapoints, kernel, mean_function):
     sampled_fn = p.sample_approx(1, key, 100)
     assert isinstance(sampled_fn, Callable)  # check type
 
-    x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
+    x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 2))
     evals = sampled_fn(x)
     assert evals.shape == (num_datapoints, 1.0)  # check shape
 
@@ -325,16 +317,17 @@ def test_prior_sample_approx(num_datapoints, kernel, mean_function):
 @pytest.mark.parametrize("kernel", [RBF, Matern52])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
 def test_conjugate_posterior_sample_approx(num_datapoints, kernel, mean_function):
-    kern = kernel(lengthscale=5.0, variance=0.1)
+    kern = kernel(lengthscale=jnp.array([5.0, 1.0]), variance=0.1)
     p = Prior(kernel=kern, mean_function=mean_function) * Gaussian(
         num_datapoints=num_datapoints
     )
     key = jr.PRNGKey(123)
-    x = jnp.sort(
-        jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1)),
-        axis=0,
+
+    x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 2))
+    y = (
+        jnp.mean(jnp.sin(x), 1, keepdims=True)
+        + jr.normal(key=key, shape=(num_datapoints, 1)) * 0.1
     )
-    y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
     D = Dataset(X=x, y=y)
 
     with pytest.raises(ValueError):
@@ -353,7 +346,7 @@ def test_conjugate_posterior_sample_approx(num_datapoints, kernel, mean_function
     sampled_fn = p.sample_approx(1, D, key, 100)
     assert isinstance(sampled_fn, Callable)  # check type
 
-    x = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
+    x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 2))
     evals = sampled_fn(x)
     assert evals.shape == (num_datapoints, 1.0)  # check shape
 

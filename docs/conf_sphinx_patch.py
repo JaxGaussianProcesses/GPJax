@@ -1,6 +1,12 @@
 # This file is credited to the Flax authors.
 
-from typing import Any, Dict, List, Set, Tuple
+from typing import (
+    Any,
+    Dict,
+    List,
+    Set,
+    Tuple,
+)
 
 import sphinx.ext.autodoc
 import sphinx.ext.autosummary.generate as ag
