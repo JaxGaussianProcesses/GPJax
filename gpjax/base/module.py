@@ -33,6 +33,7 @@ from beartype.typing import (
     Tuple,
     TypeVar,
     Union,
+    Mapping,
 )
 import jax
 from jax import lax
@@ -48,11 +49,39 @@ from orbax.checkpoint import (
 )
 from simple_pytree import (
     Pytree,
-    static_field,
 )
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 Self = TypeVar("Self")
+
+
+def static_field(
+    default: Any = dataclasses.MISSING,
+    *,
+    default_factory: Any = dataclasses.MISSING,
+    init: bool = True,
+    repr: bool = True,
+    hash: Optional[bool] = None,
+    compare: bool = True,
+    metadata: Optional[Mapping[str, Any]] = None,
+):
+
+    metadata = {} if metadata is None else dict(metadata)
+
+    if "pytree_node" in metadata:
+        raise ValueError("Cannot use metadata with `pytree_node` already set.")
+
+    metadata["pytree_node"] = False
+
+    return dataclasses.field(
+        default=default,
+        default_factory=default_factory,
+        init=init,
+        repr=repr,
+        hash=hash,
+        compare=compare,
+        metadata=metadata,
+    )
 
 
 class Module(Pytree):
