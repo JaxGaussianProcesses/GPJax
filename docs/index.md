@@ -38,14 +38,22 @@ would write on paper, as shown below.
 
 ## Quick start
 
-!!! Note
+!!! Install
 
-    New to GPs? Then why not check out our [introduction to GPs notebook](https://gpjax.readthedocs.io/en/latest/examples/intro_to_gps.html) that starts from Bayes' theorem and univariate Gaussian distributions?
+    GPJax can be installed via pip. See our [installation guide](https://gpjax.readthedocs.io/en/latest/installation.html) for further details.
+    
+    ```bash
+    pip install gpjax
+    ```
 
-!!! Note
+!!! New
+
+    New to GPs? Then why not check out our [introductory notebook](https://gpjax.readthedocs.io/en/latest/examples/intro_to_gps.html) that starts from Bayes' theorem and univariate Gaussian distributions.
+
+!!! Begin
 
     Looking for a good place to start? Then why not begin with our [regression
-    notebook](https://gpjax.readthedocs.io/en/latest/examples/regression.html)?
+    notebook](https://gpjax.readthedocs.io/en/latest/examples/regression.html).
 
 ## Citing GPJax
 
