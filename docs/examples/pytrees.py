@@ -96,15 +96,67 @@ except TypeError as e:
 # %% [markdown]
 # ## PyTree’s
 #
-# To efficiently represent data, JAX provides a _PyTree_ abstraction. PyTree’s as such, are immutable tree-like structures built from ‘node’ types — container-like Python objects. For instance,
+# JAX pytrees are a powerful tool in the JAX library that enables you to work with complex data structures in a way that is efficient, flexible, and easy to use. A PyTree is simply a data structure that is composed of other data structures, and it can be thought of as a tree where each 'node' is either a leaf (a simple data structure) or another PyTree. By default, the default set of 'node' types that are regarded a PyTree are Python lists, tuples, and dicts.
 #
-# ```python
-# [3.14, {"Monte": object(), "Carlo": False}]
-# ```
+# For instance,
+
+# %%
+tree = [3.14, {"Monte": object(), "Carlo": False}]
+print(tree)
+
+# %% [markdown]
+# is a PyTree with structure
+
+# %%
+import jax.tree_util as jtu
+print(jtu.tree_structure(tree))
+
+# %% [markdown]
+# with the following leaves
+
+# %%
+print(jtu.tree_leaves(tree))
+
+# %% [markdown]
+# Consider a second example, a _PyTree of JAX arrays_
+
+# %%
+tree = (jnp.array([1.0, 2.0, 3.0]), jnp.array([4.0, 5.0, 6.0]), jnp.array([7.0, 8.0, 9.0]))
+
+# %% [markdown]
+# You can use this template to perform various operations on the data, such as applying a function to each leaf of the PyTree. 
 #
-# is a PyTree with structure `[*, {"Monte": *, "Carlo": *}]` and leaves `3.14`, `object()`, `False`. As such, most JAX functions operate over pytrees, e.g., `jax.lax.scan`, accepts as input and produces as output a pytrees of JAX arrays.
 #
-# While the default set of ‘node’ types that are regarded internal pytree nodes is limited to objects such as lists, tuples, and dicts, JAX permits custom types to be readily registered through a global registry, with the values of such traversed recursively (i.e., as a tree!). This is the functionality that we exploit, whereby we construct all Gaussian process models via a tree-structure through our `Module` object.
+#
+# For example, suppose you want to square each element of the arrays. You can then apply this using the `tree_map` function from the `jax.tree_util` module:
+
+# %%
+print(jtu.tree_map(lambda x: x ** 2, tree))
+
+
+# %% [markdown]
+# In this example, the PyTree makes it easy to apply a function to each leaf of a complex data structure, without having to manually traverse the data structure and handle each leaf individually. JAX PyTrees, therefore, are a powerful tool that can simplify many tasks in machine learning and scientific computing. As such, most JAX functions operate over _PyTrees of JAX arrays_. For instance, `jax.lax.scan`, accepts as input and produces as output a pytrees of JAX arrays.
+#
+# Another key advantages of using JAX PyTrees is that they are designed to work efficiently with JAX's automatic differentiation and compilation features. For example, suppose you have a function that takes a PyTree as input and returns a scalar value:
+
+# %%
+def sum_squares(x):
+    return jnp.sum(x[0] ** 2 + x[1] ** 2 + x[2] ** 2)
+
+sum_squares(tree)
+
+# %% [markdown]
+# You can use JAX's `grad` function to automatically compute the gradient of this function with respect to the input pytree:
+
+# %%
+gradient = jax.grad(sum_squares)(tree)
+print(gradient)
+
+# %% [markdown]
+# This computes the gradient of the `sum_squares` function with respect to the input pytree, and returns a new pytree with the same shape and structure.
+
+# %% [markdown]
+# JAX PyTrees are also designed to be highly extensible, where custom types can be readily registered through a global registry with the values of such traversed recursively (i.e., as a tree!). This means we can define our own custom data structures and use them as PyTrees. This is the functionality that we exploit, whereby we construct all Gaussian process models via a tree-structure through our `Module` object.
 
 # %% [markdown]
 # # Module
@@ -211,7 +263,9 @@ jax.grad(lambda kern: kern.stop_gradient().covariance(1.0, 2.0))(kernel)
 # ## Static fields
 
 # %% [markdown]
-# Fields can be marked as static via simple_pytree's `static_field`.
+# When a PyTree field is marked as static, it is not modified by any of the functions that operate on the PyTree. This can be useful if a field is not differentiable. Fields as such can marked as static via a `static_field`.
+#
+# For instance,
 
 # %%
 # TO UPDATE TO THE RBF EXAMPLE.
