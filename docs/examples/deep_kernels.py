@@ -254,4 +254,4 @@ ax.legend()
 
 # %%
 # %reload_ext watermark
-# %watermark -n -u -v -iv -w -a 'Thomas Pinder (edited by Daniel Dodd)'
+# %watermark -n -u -v -iv -w -a 'Thomas Pinder'
