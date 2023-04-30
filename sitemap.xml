@@ -166,6 +166,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://example.com/api/kernels/nonstationary/arccosine/</loc>
+         <lastmod>2023-04-30</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://example.com/api/kernels/nonstationary/linear/</loc>
          <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
@@ -301,7 +306,7 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://example.com/examples/poisson.pct/</loc>
+         <loc>https://example.com/examples/poisson/</loc>
          <lastmod>2023-04-30</lastmod>
          <changefreq>daily</changefreq>
     </url>
