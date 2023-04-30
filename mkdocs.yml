@@ -20,6 +20,7 @@ nav:
   - 🎓 Tutorials:
     - Regression: examples/regression.py
     - Classification: examples/classification.py
+    - Poisson regression: examples/poisson.py
     - Barycentres: examples/barycentres.py
     - Deep kernel learning: examples/deep_kernels.py
     - Graph kernels: examples/graph_kernels.py

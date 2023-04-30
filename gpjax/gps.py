@@ -18,6 +18,7 @@ from dataclasses import dataclass
 
 from beartype.typing import (
     Any,
+    Callable,
     Optional,
 )
 import jax.numpy as jnp
@@ -260,17 +261,18 @@ class Prior(AbstractPrior):
             FunctionalSample: A function representing an approximate sample from the Gaussian
             process prior.
         """
-        if (not isinstance(num_features, int)) or num_features <= 0:
-            raise ValueError("num_features must be a positive integer")
+
         if (not isinstance(num_samples, int)) or num_samples <= 0:
             raise ValueError("num_samples must be a positive integer")
 
-        approximate_kernel = RFF(base_kernel=self.kernel, num_basis_fns=num_features)
+        # sample fourier features
+        fourier_feature_fn = _build_fourier_features_fn(self, num_features, key)
+
+        # sample fourier weights
         feature_weights = normal(key, [num_samples, 2 * num_features])  # [B, L]
 
         def sample_fn(test_inputs: Float[Array, "N D"]) -> Float[Array, "N B"]:
-            feature_evals = approximate_kernel.compute_features(x=test_inputs)
-            feature_evals *= jnp.sqrt(self.kernel.variance / num_features)
+            feature_evals = fourier_feature_fn(test_inputs)  # [N, L]
             evaluated_sample = jnp.inner(feature_evals, feature_weights)  # [N, B]
             return self.mean_function(test_inputs) + evaluated_sample
 
@@ -492,24 +494,13 @@ class ConjugatePosterior(AbstractPosterior):
             FunctionalSample: A function representing an approximate sample from the Gaussian
             process prior.
         """
-        if (not isinstance(num_features, int)) or num_features <= 0:
-            raise ValueError("num_features must be a positive integer")
         if (not isinstance(num_samples, int)) or num_samples <= 0:
             raise ValueError("num_samples must be a positive integer")
 
-        # Approximate kernel with feature decomposition
-        approximate_kernel = RFF(
-            base_kernel=self.prior.kernel, num_basis_fns=num_features
-        )
+        # sample fourier features
+        fourier_feature_fn = _build_fourier_features_fn(self.prior, num_features, key)
 
-        def eval_fourier_features(
-            test_inputs: Float[Array, "N D"]
-        ) -> Float[Array, "N L"]:
-            Phi = approximate_kernel.compute_features(x=test_inputs)
-            Phi *= jnp.sqrt(self.prior.kernel.variance / num_features)
-            return Phi
-
-        # sample weights for Fourier features
+        # sample fourier weights
         fourier_weights = normal(key, [num_samples, 2 * num_features])  # [B, L]
 
         # sample weights v for canonical features
@@ -522,13 +513,13 @@ class ConjugatePosterior(AbstractPosterior):
             key, [train_data.n, num_samples]
         )  #  [N, B]
         y = train_data.y - self.prior.mean_function(train_data.X)  # account for mean
-        Phi = eval_fourier_features(train_data.X)
+        Phi = fourier_feature_fn(train_data.X)
         canonical_weights = Sigma.solve(
             y + eps - jnp.inner(Phi, fourier_weights)
         )  #  [N, B]
 
         def sample_fn(test_inputs: Float[Array, "n D"]) -> Float[Array, "n B"]:
-            fourier_features = eval_fourier_features(test_inputs)
+            fourier_features = fourier_feature_fn(test_inputs)  # [n, L]
             weight_space_contribution = jnp.inner(
                 fourier_features, fourier_weights
             )  # [n, B]
@@ -625,6 +616,9 @@ class NonConjugatePosterior(AbstractPosterior):
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
 
+#######################
+# Utils
+#######################
 def construct_posterior(
     prior: Prior, likelihood: AbstractLikelihood
 ) -> AbstractPosterior:
@@ -647,6 +641,37 @@ def construct_posterior(
         return ConjugatePosterior(prior=prior, likelihood=likelihood)
 
     return NonConjugatePosterior(prior=prior, likelihood=likelihood)
+
+
+def _build_fourier_features_fn(
+    prior: Prior, num_features: int, key: KeyArray
+) -> Callable[[Float[Array, "N D"]], Float[Array, "N L"]]:
+    """Return a function that evaluates features sampled from the Fourier feature
+    decomposition of the prior's kernel.
+
+    Args:
+        prior (Prior): The Prior distribution.
+        num_features (int): The number of feature functions to be sampled.
+        key (KeyArray): The random seed used.
+
+    Returns
+    -------
+        Callable: A callable function evaluation the sampled feature functions.
+    """
+    if (not isinstance(num_features, int)) or num_features <= 0:
+        raise ValueError("num_features must be a positive integer")
+
+    # Approximate kernel with feature decomposition
+    approximate_kernel = RFF(
+        base_kernel=prior.kernel, num_basis_fns=num_features, key=key
+    )
+
+    def eval_fourier_features(test_inputs: Float[Array, "N D"]) -> Float[Array, "N L"]:
+        Phi = approximate_kernel.compute_features(x=test_inputs)
+        Phi *= jnp.sqrt(prior.kernel.variance / num_features)
+        return Phi
+
+    return eval_fourier_features
 
 
 __all__ = [
