@@ -2605,7 +2605,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=e64de06e" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=d0eae4e9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2623,7 +2623,7 @@ Licensed under the Apache License, Version 2.0.
 </div>
 </div>
 </div>
-<div id="cell-id=f1584d1b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=31ea1f22" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2637,7 +2637,7 @@ Licensed under the Apache License, Version 2.0.
 </div>
 </div>
 </div>
-<div id="cell-id=c354a387" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=167666f7" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2654,7 +2654,7 @@ $k(x, y)$ the <em>covariance</em>, we can crudely represent this object as a Pyt
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=ed5a12ef" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=5da9eb94" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2708,7 +2708,7 @@ class RBF:
 
 </div>
 </div>
-<div id="cell-id=dca345df" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=9daf1450" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2729,7 +2729,7 @@ class RBF:
 </div>
 </div>
 </div>
-<div id="cell-id=efee9091" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=6299f052" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2743,7 +2743,7 @@ the lengthscale and variance as <em>fields</em>. Further, the <code>RBF.covarian
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=66223da7" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=635fd5d7" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2785,7 +2785,7 @@ except TypeError as e:
 
 </div>
 </div>
-<div id="cell-id=a00bcd66" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=d855c0eb" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2797,23 +2797,354 @@ except TypeError as e:
 </div>
 </div>
 </div>
-<div id="cell-id=ce19e87e" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=1ae73d23" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="pytrees">PyTree&#8217;s<a class="anchor-link" href="#pytrees">&#182;</a></h2><p>To efficiently represent data, JAX provides a <em>PyTree</em> abstraction. PyTree’s as such, are immutable tree-like structures built from ‘node’ types — container-like Python objects. For instance,</p>
-<div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">3.14</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Monte&quot;</span><span class="p">:</span> <span class="nb">object</span><span class="p">(),</span> <span class="s2">&quot;Carlo&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}]</span>
+<h2 id="pytrees">PyTree&#8217;s<a class="anchor-link" href="#pytrees">&#182;</a></h2><p>JAX pytrees are a powerful tool in the JAX library that enables you to work with complex data structures in a way that is efficient, flexible, and easy to use. A PyTree is simply a data structure that is composed of other data structures, and it can be thought of as a tree where each 'node' is either a leaf (a simple data structure) or another PyTree. By default, the default set of 'node' types that are regarded a PyTree are Python lists, tuples, and dicts.</p>
+<p>For instance,</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=38a19227" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-3">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">tree</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3.14</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Monte&quot;</span><span class="p">:</span> <span class="nb">object</span><span class="p">(),</span> <span class="s2">&quot;Carlo&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
 </pre></div>
-<p>is a PyTree with structure <code>[*, {&quot;Monte&quot;: *, &quot;Carlo&quot;: *}]</code> and leaves <code>3.14</code>, <code>object()</code>, <code>False</code>. As such, most JAX functions operate over pytrees, e.g., <code>jax.lax.scan</code>, accepts as input and produces as output a pytrees of JAX arrays.</p>
-<p>While the default set of ‘node’ types that are regarded internal pytree nodes is limited to objects such as lists, tuples, and dicts, JAX permits custom types to be readily registered through a global registry, with the values of such traversed recursively (i.e., as a tree!). This is the functionality that we exploit, whereby we construct all Gaussian process models via a tree-structure through our <code>Module</code> object.</p>
+<div id="cell-3" class="clipboard-copy-txt">tree = [3.14, {"Monte": object(), "Carlo": False}]
+print(tree)</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=c09cb835" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>is a PyTree with structure</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=b8aef69f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-4">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">import</span> <span class="nn">jax.tree_util</span> <span class="k">as</span> <span class="nn">jtu</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">jtu</span><span class="o">.</span><span class="n">tree_structure</span><span class="p">(</span><span class="n">tree</span><span class="p">))</span>
+</pre></div>
+<div id="cell-4" class="clipboard-copy-txt">import jax.tree_util as jtu
+print(jtu.tree_structure(tree))</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=85943ecf" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>with the following leaves</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=6a6e287a" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-5">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">jtu</span><span class="o">.</span><span class="n">tree_leaves</span><span class="p">(</span><span class="n">tree</span><span class="p">))</span>
+</pre></div>
+<div id="cell-5" class="clipboard-copy-txt">print(jtu.tree_leaves(tree))</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=9971955f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Consider a second example, a <em>PyTree of JAX arrays</em></p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=dd66cc1c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-6">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">tree</span> <span class="o">=</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">]),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">]))</span>
+</pre></div>
+<div id="cell-6" class="clipboard-copy-txt">tree = (jnp.array([1.0, 2.0, 3.0]), jnp.array([4.0, 5.0, 6.0]), jnp.array([7.0, 8.0, 9.0]))</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=df80ef26" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>You can use this template to perform various operations on the data, such as applying a function to each leaf of the PyTree.</p>
+<p>For example, suppose you want to square each element of the arrays. You can then apply this using the <code>tree_map</code> function from the <code>jax.tree_util</code> module:</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=925be40f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-7">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">jtu</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">tree</span><span class="p">))</span>
+</pre></div>
+<div id="cell-7" class="clipboard-copy-txt">print(jtu.tree_map(lambda x: x ** 2, tree))</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=305a1725" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>In this example, the PyTree makes it easy to apply a function to each leaf of a complex data structure, without having to manually traverse the data structure and handle each leaf individually. JAX PyTrees, therefore, are a powerful tool that can simplify many tasks in machine learning and scientific computing. As such, most JAX functions operate over <em>PyTrees of JAX arrays</em>. For instance, <code>jax.lax.scan</code>, accepts as input and produces as output a pytrees of JAX arrays.</p>
+<p>Another key advantages of using JAX PyTrees is that they are designed to work efficiently with JAX's automatic differentiation and compilation features. For example, suppose you have a function that takes a PyTree as input and returns a scalar value:</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=20e2042b" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-8">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="k">def</span> <span class="nf">sum_squares</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">sum_squares</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+</pre></div>
+<div id="cell-8" class="clipboard-copy-txt">def sum_squares(x):
+    return jnp.sum(x[0] ** 2 + x[1] ** 2 + x[2] ** 2)
+
+sum_squares(tree)</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=34afc78b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>You can use JAX's <code>grad</code> function to automatically compute the gradient of this function with respect to the input pytree:</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=fc6cb339" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-9">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">gradient</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">sum_squares</span><span class="p">)(</span><span class="n">tree</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">gradient</span><span class="p">)</span>
+</pre></div>
+<div id="cell-9" class="clipboard-copy-txt">gradient = jax.grad(sum_squares)(tree)
+print(gradient)</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+</div>
+</div>
+<div id="cell-id=85a796fe" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>This computes the gradient of the <code>sum_squares</code> function with respect to the input pytree, and returns a new pytree with the same shape and structure.</p>
 
 </div>
 </div>
 </div>
 </div>
-<div id="cell-id=aafd41a9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=bceec331" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>JAX PyTrees are also designed to be highly extensible, where custom types can be readily registered through a global registry with the values of such traversed recursively (i.e., as a tree!). This means we can define our own custom data structures and use them as PyTrees. This is the functionality that we exploit, whereby we construct all Gaussian process models via a tree-structure through our <code>Module</code> object.</p>
+
+</div>
+</div>
+</div>
+</div>
+<div id="cell-id=1eb6011f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2826,7 +3157,7 @@ except TypeError as e:
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=70427267" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=c9623575" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2836,7 +3167,7 @@ except TypeError as e:
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-3">
+                <clipboard-copy for="cell-10">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -2858,7 +3189,7 @@ except TypeError as e:
     <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">x</span><span class="o">-</span><span class="n">y</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">lengthscale</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
-<div id="cell-3" class="clipboard-copy-txt">import tensorflow_probability.substrates.jax.bijectors as tfb
+<div id="cell-10" class="clipboard-copy-txt">import tensorflow_probability.substrates.jax.bijectors as tfb
 from gpjax.base import Module, param_field
 
 
@@ -2878,7 +3209,7 @@ class RBF(Module):
 
 </div>
 </div>
-<div id="cell-id=e1047798" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=8b475b8f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2890,7 +3221,7 @@ class RBF(Module):
 </div>
 </div>
 </div>
-<div id="cell-id=d1e543a7" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=491c4438" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2902,7 +3233,7 @@ class RBF(Module):
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=8d992005" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=246073c6" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2912,7 +3243,7 @@ class RBF(Module):
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-4">
+                <clipboard-copy for="cell-11">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -2926,7 +3257,7 @@ class RBF(Module):
 <span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">lengthscale</span><span class="o">=</span><span class="mf">3.14</span><span class="p">)</span>  <span class="c1"># Update e.g., the lengthscale.</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
 </pre></div>
-<div id="cell-4" class="clipboard-copy-txt">kernel = RBF()
+<div id="cell-11" class="clipboard-copy-txt">kernel = RBF()
 kernel = kernel.replace(lengthscale=3.14)  # Update e.g., the lengthscale.
 print(kernel)</div>
         
@@ -2938,7 +3269,7 @@ print(kernel)</div>
 
 </div>
 </div>
-<div id="cell-id=b2aced43" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=1bc412c5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2950,7 +3281,7 @@ print(kernel)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=543ece04" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=48325396" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2960,7 +3291,7 @@ print(kernel)</div>
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-5">
+                <clipboard-copy for="cell-12">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -2978,7 +3309,7 @@ print(kernel)</div>
 <span class="n">kernel</span> <span class="o">=</span> <span class="n">unconstrained_kernel</span><span class="o">.</span><span class="n">constrain</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
 </pre></div>
-<div id="cell-5" class="clipboard-copy-txt"># Transform kernel to unconstrained space
+<div id="cell-12" class="clipboard-copy-txt"># Transform kernel to unconstrained space
 unconstrained_kernel = kernel.unconstrain()
 print(unconstrained_kernel)
 
@@ -2994,7 +3325,7 @@ print(kernel)</div>
 
 </div>
 </div>
-<div id="cell-id=010bc8ae" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=dc523668" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3006,7 +3337,7 @@ print(kernel)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=7a5b86d7" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=1511acb0" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3016,7 +3347,7 @@ print(kernel)</div>
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-6">
+                <clipboard-copy for="cell-13">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -3036,7 +3367,7 @@ print(kernel)</div>
 <span class="n">new_kernel</span> <span class="o">=</span> <span class="n">unconstrained_kernel</span><span class="o">.</span><span class="n">constrain</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">new_kernel</span><span class="p">)</span>
 </pre></div>
-<div id="cell-6" class="clipboard-copy-txt">new_kernel = kernel.replace_bijector(lengthscale=tfb.Identity())
+<div id="cell-13" class="clipboard-copy-txt">new_kernel = kernel.replace_bijector(lengthscale=tfb.Identity())
 
 # Transform kernel to unconstrained space
 unconstrained_kernel = new_kernel.unconstrain()
@@ -3054,7 +3385,7 @@ print(new_kernel)</div>
 
 </div>
 </div>
-<div id="cell-id=3f588dfd" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=a6a5f0ed" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3066,7 +3397,7 @@ print(new_kernel)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=8e3849e3" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=d3225632" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3076,7 +3407,7 @@ print(new_kernel)</div>
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-7">
+                <clipboard-copy for="cell-14">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -3090,7 +3421,7 @@ print(new_kernel)</div>
 
 <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="k">lambda</span> <span class="n">kern</span><span class="p">:</span> <span class="n">kern</span><span class="o">.</span><span class="n">covariance</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))(</span><span class="n">kernel</span><span class="p">)</span>
 </pre></div>
-<div id="cell-7" class="clipboard-copy-txt">kernel = RBF()
+<div id="cell-14" class="clipboard-copy-txt">kernel = RBF()
 
 jax.grad(lambda kern: kern.covariance(1.0, 2.0))(kernel)</div>
         
@@ -3102,7 +3433,7 @@ jax.grad(lambda kern: kern.covariance(1.0, 2.0))(kernel)</div>
 
 </div>
 </div>
-<div id="cell-id=5ef1be96" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=62f683e6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3114,7 +3445,7 @@ jax.grad(lambda kern: kern.covariance(1.0, 2.0))(kernel)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=f81efece" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=e8f4b4b4" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3124,7 +3455,7 @@ jax.grad(lambda kern: kern.covariance(1.0, 2.0))(kernel)</div>
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-8">
+                <clipboard-copy for="cell-15">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -3142,7 +3473,7 @@ jax.grad(lambda kern: kern.covariance(1.0, 2.0))(kernel)</div>
 
 <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">f</span><span class="p">)(</span><span class="mf">1.0</span><span class="p">)</span>
 </pre></div>
-<div id="cell-8" class="clipboard-copy-txt">from jax import lax
+<div id="cell-15" class="clipboard-copy-txt">from jax import lax
 
 def f(x):
     x = lax.stop_gradient(x)
@@ -3158,7 +3489,7 @@ jax.grad(f)(1.0)</div>
 
 </div>
 </div>
-<div id="cell-id=b5e0c193" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=cb4e0fc6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3171,7 +3502,7 @@ jax.grad(f)(1.0)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=a458de2b" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=5476306f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3181,7 +3512,7 @@ jax.grad(f)(1.0)</div>
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-9">
+                <clipboard-copy for="cell-16">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -3196,7 +3527,7 @@ jax.grad(f)(1.0)</div>
 
 <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="k">lambda</span> <span class="n">kern</span><span class="p">:</span> <span class="n">kern</span><span class="o">.</span><span class="n">stop_gradient</span><span class="p">()</span><span class="o">.</span><span class="n">covariance</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))(</span><span class="n">kernel</span><span class="p">)</span>
 </pre></div>
-<div id="cell-9" class="clipboard-copy-txt">
+<div id="cell-16" class="clipboard-copy-txt">
 kernel = RBF()
 kernel = kernel.replace_trainable(lengthscale=False)
 
@@ -3210,7 +3541,7 @@ jax.grad(lambda kern: kern.stop_gradient().covariance(1.0, 2.0))(kernel)</div>
 
 </div>
 </div>
-<div id="cell-id=8ef7d5ff" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=0ce8bc69" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3222,7 +3553,7 @@ jax.grad(lambda kern: kern.stop_gradient().covariance(1.0, 2.0))(kernel)</div>
 </div>
 </div>
 </div>
-<div id="cell-id=93993058" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=af014d7d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3233,19 +3564,20 @@ jax.grad(lambda kern: kern.stop_gradient().covariance(1.0, 2.0))(kernel)</div>
 </div>
 </div>
 </div>
-<div id="cell-id=2a115a9a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=d9de8599" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Fields can be marked as static via simple_pytree's <code>static_field</code>.</p>
+<p>When a PyTree field is marked as static, it is not modified by any of the functions that operate on the PyTree. This can be useful if a field is not differentiable. Fields as such can marked as static via a <code>static_field</code>.</p>
+<p>For instance,</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=66a8815a" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=bb52832b" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3255,7 +3587,7 @@ jax.grad(lambda kern: kern.stop_gradient().covariance(1.0, 2.0))(kernel)</div>
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-10">
+                <clipboard-copy for="cell-17">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -3276,7 +3608,7 @@ jax.grad(lambda kern: kern.stop_gradient().covariance(1.0, 2.0))(kernel)</div>
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">=</span><span class="n">a</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">=</span><span class="n">b</span>
 </pre></div>
-<div id="cell-10" class="clipboard-copy-txt"># TO UPDATE TO THE RBF EXAMPLE.
+<div id="cell-17" class="clipboard-copy-txt"># TO UPDATE TO THE RBF EXAMPLE.
 from gpjax.base import Module, param_field
 from simple_pytree import static_field
 
@@ -3295,7 +3627,7 @@ class StaticExample(Module):
 
 </div>
 </div>
-<div id="cell-id=e98f877a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=e534f182" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3306,7 +3638,7 @@ class StaticExample(Module):
 </div>
 </div>
 </div>
-<div id="cell-id=b528f236" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=af225fb9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3324,7 +3656,7 @@ class StaticExample(Module):
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=23d1c3b7" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=813f89cc" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3334,7 +3666,7 @@ class StaticExample(Module):
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-11">
+                <clipboard-copy for="cell-18">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -3355,7 +3687,7 @@ class StaticExample(Module):
 
 <span class="n">module</span> <span class="o">=</span> <span class="n">MyModule</span><span class="p">()</span>
 </pre></div>
-<div id="cell-11" class="clipboard-copy-txt"># TO UPDATE TO THE RBF EXAMPLE.
+<div id="cell-18" class="clipboard-copy-txt"># TO UPDATE TO THE RBF EXAMPLE.
 
 from dataclasses import field
 
@@ -3374,7 +3706,7 @@ module = MyModule()</div>
 
 </div>
 </div>
-<div id="cell-id=34699ad2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=4625e343" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3386,7 +3718,7 @@ module = MyModule()</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=f095b947" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=bf354524" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3396,7 +3728,7 @@ module = MyModule()</div>
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-12">
+                <clipboard-copy for="cell-19">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -3412,7 +3744,7 @@ module = MyModule()</div>
 
 <span class="kn">import</span> <span class="nn">jax.tree_util</span> <span class="k">as</span> <span class="nn">jtu</span>
 </pre></div>
-<div id="cell-12" class="clipboard-copy-txt">from gpjax.base import meta_leaves
+<div id="cell-19" class="clipboard-copy-txt">from gpjax.base import meta_leaves
 
 meta_leaves(module)
 
@@ -3426,7 +3758,7 @@ import jax.tree_util as jtu</div>
 
 </div>
 </div>
-<div id="cell-id=ff24899a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=9bc2ee0f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3438,7 +3770,7 @@ import jax.tree_util as jtu</div>
 </div>
 </div>
 </div>
-<div id="cell-id=f88d881c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=2800153d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3449,7 +3781,7 @@ import jax.tree_util as jtu</div>
 </div>
 </div>
 </div>
-<div id="cell-id=1e13eccd" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=0083d0a2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3463,7 +3795,7 @@ import jax.tree_util as jtu</div>
 </div>
 </div>
 </div>
-<div id="cell-id=e7d83abc" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=d1a2292f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3478,7 +3810,7 @@ import jax.tree_util as jtu</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=2828fe66" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=6d9d0c35" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3488,7 +3820,7 @@ import jax.tree_util as jtu</div>
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-13">
+                <clipboard-copy for="cell-20">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -3511,7 +3843,7 @@ import jax.tree_util as jtu</div>
 
 <span class="n">meta_map</span><span class="p">(</span><span class="n">_apply_constrain</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
 </pre></div>
-<div id="cell-13" class="clipboard-copy-txt">from gpjax.base import meta_map
+<div id="cell-20" class="clipboard-copy-txt">from gpjax.base import meta_map
 
 # This is how constrain works.
 def _apply_constrain(meta_leaf):
@@ -3532,7 +3864,7 @@ meta_map(_apply_constrain, module)</div>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=47cd3980" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=f46a2215" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3542,7 +3874,7 @@ meta_map(_apply_constrain, module)</div>
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-14">
+                <clipboard-copy for="cell-21">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -3562,7 +3894,7 @@ meta_map(_apply_constrain, module)</div>
 
 <span class="n">meta_map</span><span class="p">(</span><span class="n">if_trainable_then_10</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
 </pre></div>
-<div id="cell-14" class="clipboard-copy-txt"># Can filter on trainable status, e.g., for stop gradients:
+<div id="cell-21" class="clipboard-copy-txt"># Can filter on trainable status, e.g., for stop gradients:
 def if_trainable_then_10(meta_leaf):
     meta, leaf = meta_leaf
     if meta.get("trainable", True):
@@ -3580,7 +3912,7 @@ meta_map(if_trainable_then_10, module)</div>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=002eccfe" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=7da3998c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3590,7 +3922,7 @@ meta_map(if_trainable_then_10, module)</div>
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-15">
+                <clipboard-copy for="cell-22">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -3611,7 +3943,7 @@ meta_map(if_trainable_then_10, module)</div>
 
 <span class="n">meta_map</span><span class="p">(</span><span class="n">if_name_is_bayes_zero</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
 </pre></div>
-<div id="cell-15" class="clipboard-copy-txt"># Can filter on name metadata:
+<div id="cell-22" class="clipboard-copy-txt"># Can filter on name metadata:
 
 def if_name_is_bayes_zero(meta_leaf):
     meta, leaf = meta_leaf
