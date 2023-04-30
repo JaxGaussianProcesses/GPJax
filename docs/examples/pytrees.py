@@ -27,27 +27,39 @@
 # %% [markdown]
 # # Gaussian process objects as data:
 #
-# Our abstraction is based on the Equinox library and aims to offer a Bayesian/GP equivalent to their neural network abstractions. However, we take it a step further by enabling users to create standard Python classes and easily define and modify parameter domains and training statuses for optimisation within a single model object. This object is fully compatible with JAX autogradients without the need for filtering.
+# Our abstraction is based on the Equinox library and aims to offer a
+# Bayesian/GP equivalent to their neural network abstractions. However, we take
+# it a step further by enabling users to create standard Python classes and
+# easily define and modify parameter domains and training statuses for
+# optimisation within a single model object. This object is fully compatible
+# with JAX autogradients without the need for filtering.
 #
-# The core idea is to represent all mathemtaical objects as immutable tree's...
+# The core idea is to represent all mathematical objects as immutable tree's...
 #
-# In the following we will consider an academic example, but which should be enough to understand the mechanics of how to write custom objects in GPJax.
+# In the following we will consider an academic example, but which should be
+# enough to understand the mechanics of how to write custom objects in GPJax.
 #
 
 # %% [markdown]
 # ## The RBF kernel
 #
 #
-# The kernel in Gaussian process modeling is a mathematical function that defines the covariance structure between data points, allowing us to model complex relationships and make predictions based on the observed data. The radial basis function (RBF, or _squared exponential_) kernel is a popular choice. For a pair of vectors $x, y \in \mathbb{R}^d$, its
-# form can be mathematically given by
+# The kernel in Gaussian process modeling is a mathematical function that
+# defines the covariance structure between data points, allowing us to model
+# complex relationships and make predictions based on the observed data. The
+# radial basis function (RBF, or _squared exponential_) kernel is a popular
+# choice. For a pair of vectors $x, y \in \mathbb{R}^d$, its form can be
+# mathematically given by
 # $$ k(x, y) = \sigma^2\exp\left(\frac{\lVert x-y\rVert_{2}^2}{2\ell^2} \right) $$
 # where $\sigma^2\in\mathbb{R}_{>0}$ is a variance parameter and
 # $\ell^2\in\mathbb{R}_{>0}$ a lengthscale parameter. Terming the evaluation of
-# $k(x, y)$ the _covariance_, we can crudely represent this object in Python as follows:
+# $k(x, y)$ the _covariance_, we can crudely represent this object in Python as
+# follows:
 
 # %%
 import jax
 import jax.numpy as jnp
+
 
 class RBF:
     def __init__(self, lengthscale: float, variance: float) -> None:
@@ -55,15 +67,17 @@ class RBF:
         self.variance = variance
 
     def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
-
         l_squared = self.lengthscale
         sigma_sqaured = self.variance
 
-        return sigma_sqaured * jnp.exp(-(jnp.linalg.norm(x, y) /  2.0 * l_squared)**2)
+        return sigma_sqaured * jnp.exp(
+            -((jnp.linalg.norm(x, y) / 2.0 * l_squared) ** 2)
+        )
 
 
 # %% [markdown]
-# However, asserting equivalence between two class instances with exactly the same parameters
+# However, asserting equivalence between two class instances with exactly the
+# same parameters
 
 # %%
 kernel_1 = RBF(1.0, 1.0)
@@ -72,7 +86,8 @@ kernel_2 = RBF(1.0, 1.0)
 print(kernel_1 == kernel_2)
 
 # %% [markdown]
-# The assertion is `False`. Yet the lengthscale and variance are certainly the same.
+# The assertion is `False`. Yet the lengthscale and variance are certainly the
+# same.
 
 # %%
 print(kernel_1.lengthscale == kernel_2.lengthscale)
@@ -81,11 +96,16 @@ print(kernel_1.variance == kernel_2.variance)
 # %% [markdown]
 # ## Dataclasses
 #
-# A `dataclass` in Python can simplify the creation of classes for storing data and make the code more readable and maintainable. They offer several benefits over a regular class, including:
+# A `dataclass` in Python can simplify the creation of classes for storing data
+# and make the code more readable and maintainable. They offer several benefits
+# over a regular class, including:
 #
-# 1. Conciseness: Dataclasses automatically generate default implementations for several common methods, such as __init__(), __repr__(), and __eq__(), which means less boilerplate code needs to be written.
+# 1. Conciseness: Dataclasses automatically generate default implementations for
+#    several common methods, such as __init__(), __repr__(), and __eq__(), which
+#    means less boilerplate code needs to be written.
 #
-# 2. Type hinting: Dataclasses provide native support for type annotations, which can help catch errors at compile-time and improve code readability.
+# 2. Type hinting: Dataclasses provide native support for type annotations,
+#    which can help catch errors at compile-time and improve code readability.
 #
 # For the RBF kernel, we use a `dataclass` to represent this object as follows
 
@@ -100,7 +120,9 @@ class RBF:
     variance: float
 
     def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
-        return self.variance * jnp.exp(-0.5 * (jnp.linalg.norm(x, y) / self.lengthscale)**2)
+        return self.variance * jnp.exp(
+            -0.5 * (jnp.linalg.norm(x, y) / self.lengthscale) ** 2
+        )
 
 
 # %% [markdown]
@@ -118,25 +140,41 @@ print(kernel_1 == kernel_2)
 # _method_.
 
 # %% [markdown]
-# However, the object we have defined are not yet compatible with JAX, for this we must consider PyTree's.
+# However, the object we have defined are not yet compatible with JAX, for this
+# we must consider PyTree's.
 
 # %% [markdown]
 # ## PyTree’s
 #
-# To efficiently represent data JAX provides a _PyTree_ abstraction. PyTree’s as such, are immutable tree-like structure built out of ‘node’ types — container-like Python objects. For instance,
+# To efficiently represent data JAX provides a _PyTree_ abstraction. PyTree’s as
+# such, are immutable tree-like structure built out of ‘node’ types —
+# container-like Python objects. For instance,
 #
 # ```python
 # [3.14, {"Monte": object(), "Carlo": False}]
 # ```
 #
-# is a PyTree with structure `[*, {"Monte": *, "Carlo": *}]` and leaves `3.14`, `object()`, `False`. As such, most JAX functions operate over pytrees, e.g., `jax.lax.scan`, accepts as input and produces as output a pytrees of JAX arrays.
+# is a PyTree with structure `[*, {"Monte": *, "Carlo": *}]` and leaves `3.14`,
+# `object()`, `False`. As such, most JAX functions operate over pytrees, e.g.,
+# `jax.lax.scan`, accepts as input and produces as output a pytrees of JAX
+# arrays.
 #
-# While the default set of ‘node’ types that are regarded internal pytree nodes is limited to objects such as lists, tuples, and dicts, JAX permits custom types to be readily registered through a global registry, with the values of such traversed recursively (i.e., as a tree!). This is the functionality that we exploit, whereby we construct all Gaussian process models via a tree-structure through our `Module` object.
+# While the default set of ‘node’ types that are regarded internal pytree nodes
+# is limited to objects such as lists, tuples, and dicts, JAX permits custom
+# types to be readily registered through a global registry, with the values of
+# such traversed recursively (i.e., as a tree!). This is the functionality that
+# we exploit, whereby we construct all Gaussian process models via a
+# tree-structure through our `Module` object.
 
 # %% [markdown]
 # # Module
 #
-# Our design, first and foremost, minimises additional abstractions on top of standard JAX: everything is just PyTrees and transformations on PyTrees, and secondly, provides full compatibility with the main JAX library itself, enhancing integrability with the broader ecosystem of third-party JAX libraries. To achieve this, our core idea is represent all model objects via an immutable tree-structure.
+# Our design, first and foremost, minimises additional abstractions on top of
+# standard JAX: everything is just PyTrees and transformations on PyTrees, and
+# secondly, provides full compatibility with the main JAX library itself,
+# enhancing integrability with the broader ecosystem of third-party JAX
+# libraries. To achieve this, our core idea is represent all model objects via
+# an immutable tree-structure.
 #
 #
 # ### Defining a Module
@@ -146,9 +184,13 @@ print(kernel_1 == kernel_2)
 # - Trainability status.
 # - Domain.
 # - Explain why normalising flows don’t break the convention.
-# - Mark leaf attributes with `param_field` to set a default bijector and trainable status.
-# - Unmarked leaf attributes default to an `Identity` bijector and trainablility set to `True`.
-# - Fully compatible with [Distrax](https://github.com/deepmind/distrax) and [TensorFlow Probability](https://www.tensorflow.org/probability) bijectors, so feel free to use these!
+# - Mark leaf attributes with `param_field` to set a default bijector and
+#       trainable status.
+# - Unmarked leaf attributes default to an `Identity` bijector and trainablility
+#       set to `True`.
+# - Fully compatible with [Distrax](https://github.com/deepmind/distrax) and
+#       [TensorFlow Probability](https://www.tensorflow.org/probability) bijectors,
+#       so feel free to use these!
 
 # %%
 import tensorflow_probability.substrates.jax.bijectors as tfb
@@ -161,13 +203,17 @@ class RBF(base.Module):
     variance: float = base.param_field(1.0, bijector=tfb.Softplus(), trainable=True)
 
     def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
-        return self.variance * jnp.exp(-0.5 * (jnp.linalg.norm(x, y) / self.lengthscale)**2)
+        return self.variance * jnp.exp(
+            -0.5 * (jnp.linalg.norm(x, y) / self.lengthscale) ** 2
+        )
 
 
 # %% [markdown]
 #
 # ### Replacing values
-# For consistency with JAX’s functional programming principles, `Module` instances are immutable. Parameter updates can be achieved out-of-place via `replace`.
+# For consistency with JAX’s functional programming principles, `Module`
+# instances are immutable. Parameter updates can be achieved out-of-place via
+# `replace`.
 
 # %%
 kernel = RBF()
@@ -178,7 +224,8 @@ print(kernel)
 # ## Transformations 🤖
 #
 # ### Applying transformations
-# Use `constrain` / `unconstrain` to return a `Mytree` with each parameter's bijector `forward` / `inverse` operation applied!
+# Use `constrain` / `unconstrain` to return a `Mytree` with each parameter's
+# bijector `forward` / `inverse` operation applied!
 
 # %%
 # Transform kernel to unconstrained space
@@ -191,7 +238,8 @@ print(kernel)
 
 # %% [markdown]
 # ### Replacing transformations
-# Default transformations can be replaced on an instance via the `replace_bijector` method.
+# Default transformations can be replaced on an instance via the
+# `replace_bijector` method.
 
 # %%
 new_kernel = kernel.replace_bijector(lengthscale=tfb.Identity())
@@ -209,7 +257,8 @@ print(new_kernel)
 #
 # ### Applying trainability
 #
-# Applying `stop_gradient` **within** the loss function, prevents the flow of gradients during forward or reverse-mode automatic differentiation.
+# Applying `stop_gradient` **within** the loss function, prevents the flow of
+# gradients during forward or reverse-mode automatic differentiation.
 # ```python
 # import jax
 #
@@ -266,7 +315,8 @@ print(new_kernel)
 #   'trainable': False,
 #   'pytree_node': True}, 1.0)]
 # ```
-# Note this shows any metadata defined via a `dataclasses.field` for the pytree leaves. So feel free to define your own.
+# Note this shows any metadata defined via a `dataclasses.field` for the pytree
+# leaves. So feel free to define your own.
 #
 # ### Applying `field` metadata
 # Leaf metadata can be applied via the `meta_map` function.
@@ -286,7 +336,8 @@ print(new_kernel)
 # ```
 # SimpleModel(weight=1.0, bias=10.0)
 # ```
-# It is possible to define your own custom metadata and therefore your own metadata transformations in this vein.
+# It is possible to define your own custom metadata and therefore your own
+# metadata transformations in this vein.
 #
 # ## Static fields
 # Fields can be marked as static via simple_pytree's `static_field`.
