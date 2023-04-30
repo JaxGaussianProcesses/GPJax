@@ -21,7 +21,6 @@ except ImportError:
     ValidationErrors = ValueError
 
 from dataclasses import is_dataclass
-import shutil
 from typing import Callable
 
 from jax.config import config
@@ -30,11 +29,6 @@ import jax.random as jr
 import jax.tree_util as jtu
 import pytest
 import tensorflow_probability.substrates.jax.distributions as tfd
-
-from gpjax.base import (
-    load_tree,
-    save_tree,
-)
 
 # from gpjax.dataset import Dataset
 from gpjax.dataset import Dataset
@@ -50,15 +44,13 @@ from gpjax.gps import (
 from gpjax.kernels import (
     RBF,
     AbstractKernel,
-    Matern12,
-    Matern32,
     Matern52,
 )
 from gpjax.likelihoods import (
     AbstractLikelihood,
     Bernoulli,
     Gaussian,
-    Poisson
+    Poisson,
 )
 from gpjax.mean_functions import (
     AbstractMeanFunction,
@@ -332,7 +324,10 @@ def test_conjugate_posterior_sample_approx(num_datapoints, kernel, mean_function
     key = jr.PRNGKey(123)
 
     x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 2))
-    y = jnp.mean(jnp.sin(x),1, keepdims=True) + jr.normal(key=key, shape=(num_datapoints, 1)) * 0.1
+    y = (
+        jnp.mean(jnp.sin(x), 1, keepdims=True)
+        + jr.normal(key=key, shape=(num_datapoints, 1)) * 0.1
+    )
     D = Dataset(X=x, y=y)
 
     with pytest.raises(ValueError):
