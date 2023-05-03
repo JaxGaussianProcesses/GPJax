@@ -30,12 +30,11 @@
 # %% [markdown]
 # # Gaussian process objects as data:
 #
-# Our abstraction is inspired by the Equinox library and aims to offer a Bayesian/GP equivalent to their neural network abstractions. However, we take it a step further by enabling users to create standard Python classes and easily define and modify parameter domains and training statuses for optimisation within a single model object. This object is fully compatible with JAX autogradients without the need for filtering.
+# Our abstraction is inspired by the Equinox library and aims to offer a Bayesian/Gaussian process equivalent to their neural network abstractions. Our approach goes further by allowing users to easily create Python classes and define parameter domains and training statuses for optimisation within a single model object. This object can be used with JAX autogradients without any filtering.
 #
-# The core idea is to represent all mathemtaical objects as immutable tree's...
+# The fundamental concept is to describe every model object as an immutable tree structure, where every method is a function of the state (represented by the tree's leaves).
 #
-# In the following we will consider an academic example, but which should be enough to understand the mechanics of how to write custom objects in GPJax.
-#
+# To help you understand how to create custom objects in GPJax, we will look at an academic example in the following section.
 
 # %% [markdown]
 # ## The RBF kernel
@@ -180,7 +179,20 @@ class RBF(Module):
 
 
 # %% [markdown]
-# Here `param_field` is just a special type of `dataclasses.field`. By default unmarked leaf attributes default to an `Identity` bijector and trainablility set to `True`.
+# Here `param_field` is just a special type of `dataclasses.field`. As such the following:
+#
+# ```python
+# param_field(1.0, bijector= tfb.Identity(), trainable=False) 
+# ```
+#
+# is equivalent to the following `dataclasses.field`
+#
+# ```python
+# field(default=1.0, metadata={"trainable": False, "bijector": tfb.Identity()})
+# ```
+#
+#
+# By default unmarked leaf attributes default to an `Identity` bijector and trainablility set to `True`.
 
 # %% [markdown]
 #
@@ -263,9 +275,11 @@ jax.grad(lambda kern: kern.stop_gradient().covariance(1.0, 2.0))(kernel)
 # ## Static fields
 
 # %% [markdown]
-# When a PyTree field is marked as static, it is not modified by any of the functions that operate on the PyTree. This can be useful if a field is not differentiable. Fields as such can marked as static via a `static_field`.
-#
-# For instance,
+# - GIVE EXAMPLE IN THE CONTEXT OF THE RBF KERNEL and SHOW THAT IT BREAKS using autodiff.
+# - FOR EXAMPLE THIS COULD BE RFF APPROXIMATION INSPIRED.
+
+# %% [markdown]
+# When a PyTree field is marked as static, it is not modified by any of the functions that operate on the PyTree. This can be useful if a field is not differentiable. Fields as such can marked as static via a `static_field`. For instance,
 
 # %%
 # TO UPDATE TO THE RBF EXAMPLE.
@@ -284,31 +298,34 @@ class StaticExample(Module):
 # ## Metadata
 
 # %% [markdown]
-# Under the hood of the `Module`, we utilise a leaf "metadata" abstraction. As such the following:
-#
-# ```python
-# param_field(1.0, bijector= tfb.Identity(), trainable=False) 
-# ```
-#
-# Having a parameter field with default value `1.0`, `Identity` bijector and trainable set to `False`, is equivalent to the following `dataclasses.field`
-#
-# ```python
-# field(default=1.0, metadata={"trainable": False, "bijector": tfb.Identity()})
-# ```
-#
-# Here, we attach `metadata` to the parameter. This is the abstraction the `Module` exploits. The `metadata`, in general can be a dictionary of anything:
+# To determine the parameter domain and trainable statuses of each parameter, the `Module` stores metadata for each leaf of the PyTree. This metadata is defined through a `dataclasses.field`. Thus, under the hood, we can define our `RBF` kernel object (equivalent to before) manually as follows:
 
 # %%
-# TO UPDATE TO THE RBF EXAMPLE.
-
 from dataclasses import field
 
-@dataclass 
-class MyModule(Module):
-    a: float = field(default=1.0, metadata={"trainable": True, "bijector": tfb.Softplus()})
-    b: float = field(default=2.0, metadata={"name": "Bayes", "trainable": False})
+@dataclass
+class RBF(Module):
+    lengthscale: float = field(default=1.0, metadata= {"bijector": tfb.Softplus(), "trainable": True})
+    variance: float = field(default=1.0, metadata= {"bijector": tfb.Softplus(), "trainable": True})
 
-module = MyModule()
+    def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
+        return self.variance * jnp.exp(-0.5 * ((x-y)/self.lengthscale)**2)
+
+
+# %% [markdown]
+# Here the `metadata` in the `dataclasses.field`, defines the metadata we associate with each PyTree leaf. This metadata can be a dictionary of any attributes we wish to store about each leaf. For example, we could extend this further by introducing a `name` attribute:
+
+# %%
+from dataclasses import field
+
+@dataclass
+class RBF(Module):
+    lengthscale: float = field(default=1.0, metadata= {"bijector": tfb.Softplus(), "trainable": True, "name": "lengthscale"})
+    variance: float = field(default=1.0, metadata= {"bijector": tfb.Softplus(), "trainable": True, "name": "variance"})
+
+    def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
+        return self.variance * jnp.exp(-0.5 * ((x-y)/self.lengthscale)**2)
+
 
 # %% [markdown]
 # We can trace the metadata defined on the class via `meta_leaves`.
@@ -316,25 +333,47 @@ module = MyModule()
 # %%
 from gpjax.base import meta_leaves
 
-meta_leaves(module)
+rbf = RBF()
 
-import jax.tree_util as jtu
+meta_leaves(rbf)
 
 # %% [markdown]
-# Akin, to `jax.tree_utils.tree_leaves`, this returns a flattend pytree - however, this time a list of tuples comprising the `(metadata, value)` of each PyTree leaf. This traced metadata can be exploited for applying maps, as explained in the next section. 
+# Similar to `jax.tree_utils.tree_leaves`, this function returns a flattened PyTree. However, instead of just the values, it returns a list of tuples that contain both the metadata and value of each PyTree leaf. This traced metadata can be utilised for applying maps (how `constrain`, `unconstrain`, `stop_gradient` work), as described in the next section.
 
 # %% [markdown]
 # ## Metamap
 
 # %% [markdown]
-# - This is how constrain/unconstrain, stop_gradients work under the hood.
+# The `constrain`, `unconstrain`, and `stop_gradient` methods on the `Module` use a `meta_map` function under the hood. This function enables us to apply metadata functions to the PyTree leaves, making it a powerful tool.
+#
+# To achieve this, the function involves the same tracing as `meta_leaves` to create a flattened list of tuples consisting of (metadata, leaf value). However, it also allows us to apply a function to this list and return a new transformed PyTree, as demonstrated in the examples that follow.
 
 # %% [markdown]
-# - reimpliment constrain.
-# - Do custom metamap transform.
+# ### Filter example:
+
+# %% [markdown]
+# A `meta_map` works similarly to `jax.tree_utils.tree_map`. However, it differs in that it allows us to define a function that operates on the tuple (metadata, leaf value). For example, we could use a function to filter based on a `name` attribute.
 
 # %%
 from gpjax.base import meta_map
+
+def filter_lengthscale(meta_leaf):
+    meta, leaf = meta_leaf
+    if meta.get("name", None) == "lengthscale":
+        return 3.14
+    else:
+        return leaf
+
+print(meta_map(filter_lengthscale, rbf))
+
+# %% [markdown]
+# ### How `constrain` works:
+
+# %% [markdown]
+# To apply a constrain, we filter on the attribute "bijector", and apply a forward transformation to the PyTree leaf:
+
+# %%
+
 
 # This is how constrain works.
 def _apply_constrain(meta_leaf):
@@ -345,29 +384,7 @@ def _apply_constrain(meta_leaf):
 
     return meta.get("bijector", tfb.Identity()).forward(leaf)
 
-meta_map(_apply_constrain, module)
+meta_map(_apply_constrain, rbf)
 
-
-# %%
-# Can filter on trainable status, e.g., for stop gradients:
-def if_trainable_then_10(meta_leaf):
-    meta, leaf = meta_leaf
-    if meta.get("trainable", True):
-        return 10.0
-    else:
-        return leaf
-
-meta_map(if_trainable_then_10, module)
-
-
-# %%
-# Can filter on name metadata:
-
-def if_name_is_bayes_zero(meta_leaf):
-    meta, leaf = meta_leaf
-    if meta.get("name", "NotBayes") == "Bayes":
-        return 0.0
-    else:
-        return leaf
-
-meta_map(if_name_is_bayes_zero, module)
+# %% [markdown]
+# As expected, we find the same result as calling `rbf.constrain()`.
