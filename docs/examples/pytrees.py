@@ -275,24 +275,87 @@ jax.grad(lambda kern: kern.stop_gradient().covariance(1.0, 2.0))(kernel)
 # ## Static fields
 
 # %% [markdown]
-# - GIVE EXAMPLE IN THE CONTEXT OF THE RBF KERNEL and SHOW THAT IT BREAKS using autodiff.
-# - FOR EXAMPLE THIS COULD BE RFF APPROXIMATION INSPIRED.
-
-# %% [markdown]
-# When a PyTree field is marked as static, it is not modified by any of the functions that operate on the PyTree. This can be useful if a field is not differentiable. Fields as such can marked as static via a `static_field`. For instance,
+# In machine learning, initialising model parameters from random points is a common practice because it helps to break the symmetry in the model and allows the optimization algorithm to explore different regions of the parameter space.
+#
+# We could cleanly do this within the RBF class via a `post_init` method as follows:
 
 # %%
-# TO UPDATE TO THE RBF EXAMPLE.
-from gpjax.base import Module, param_field
-from simple_pytree import static_field
+import jax.random as jr
+import tensorflow_probability.substrates.jax.distributions as tfd
 
-class StaticExample(Module):
-    b: float = static_field()
+@dataclass
+class RBF(Module):
+    lengthscale: float = param_field(init=False, bijector=tfb.Softplus(), trainable=True)
+    variance: float = param_field(init=False, bijector=tfb.Softplus(), trainable=True)
+    key: jr.KeyArray = jr.PRNGKey(42)
 
-    def __init__(self, a=1.0, b=2.0):
-        self.a=a
-        self.b=b
+    def __post_init__(self):
 
+        # Split key into two keys
+        key1, key2 = jr.split(self.key)
+
+        # Sample from Gamma distribution to initialise lengthscale and variance
+        self.lengthscale = tfd.Gamma(1.0, 0.1).sample(seed=key1)
+        self.variance = tfd.Gamma(1.0, 0.1).sample(seed=key2)
+
+    def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
+        return self.variance * jnp.exp(-0.5 * ((x-y)/self.lengthscale)**2)
+    
+kernel = RBF()
+print(kernel)
+
+# %% [markdown]
+# So far so good. But however, if we now took our gradient again
+
+# %%
+try: 
+    jax.grad(lambda kern: kern.stop_gradient().covariance(1.0, 2.0))(kernel)
+except TypeError as e:
+    print(e)
+
+# %% [markdown]
+# We observe that we get a TypeError because the key is not differentiable. We can fix this by using a `static_field` for defining our key attribute.
+
+# %%
+#from gpjax.base import static_field
+from simple_pytree import static_field #<- need to rebase and replace with above line.
+
+@dataclass
+class RBF(Module):
+    lengthscale: float = param_field(init=False, bijector=tfb.Softplus(), trainable=True)
+    variance: float = param_field(init=False, bijector=tfb.Softplus(), trainable=True)
+    key: jr.KeyArray = static_field(jr.PRNGKey(42))
+
+    def __post_init__(self):
+
+        # Split key into two keys
+        key1, key2 = jr.split(self.key)
+
+        # Sample from Gamma distribution to initialise lengthscale and variance
+        self.lengthscale = tfd.Gamma(1.0, 0.1).sample(seed=key1)
+        self.variance = tfd.Gamma(1.0, 0.1).sample(seed=key2)
+
+    def covariance(self, x: jax.Array, y: jax.Array) -> jax.Array:
+        return self.variance * jnp.exp(-0.5 * ((x-y)/self.lengthscale)**2)
+    
+fixed_kernel = RBF()
+print(fixed_kernel)
+
+# %% [markdown]
+# So we get the same class as before. But this time
+
+# %%
+jax.grad(lambda kern: kern.stop_gradient().covariance(1.0, 2.0))(fixed_kernel)
+
+# %% [markdown]
+# What happened to get the result we wanted? The difference lies in the treatment of the key attribute as a PyTree leaf in the first example, which caused the gradient computation to fail. Examining the flattened PyTree's of both cases:
+
+# %%
+print(jax.tree_util.tree_flatten(fixed_kernel))
+print(jax.tree_util.tree_flatten(kernel))
+
+# %% [markdown]
+# We see that assigning `static_field` tells JAX not to regard the attribute as leaf of the PyTree.
 
 # %% [markdown]
 # ## Metadata
