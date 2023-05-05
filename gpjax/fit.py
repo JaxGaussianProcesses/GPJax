@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-from warnings import warn
 
 from beartype.typing import (
     Any,
@@ -25,7 +24,6 @@ from beartype.typing import (
 import jax
 from jax._src.random import _check_prng_key
 import jax.random as jr
-from jaxlib.xla_extension import PjitFunction
 import optax as ox
 
 from gpjax.base import Module
@@ -119,7 +117,6 @@ def fit(
     if safe:
         # Check inputs.
         _check_model(model)
-        _check_objective(objective)
         _check_train_data(train_data)
         _check_optim(optim)
         _check_num_iters(num_iters)
@@ -194,23 +191,6 @@ def _check_model(model: Any) -> None:
     """Check that the model is of type Module. Check trainables and bijectors tree structure."""
     if not isinstance(model, Module):
         raise TypeError("model must be of type gpjax.Module")
-
-
-def _check_objective(objective: Any) -> None:
-    """Check that the objective is of type Objective."""
-    if not isinstance(objective, AbstractObjective):
-        if isinstance(objective, PjitFunction):
-            warn(
-                (
-                    "Objective is jit-compiled. Please ensure that the objective is of"
-                    " type gpjax.Objective."
-                ),
-                stacklevel=2,
-            )
-        else:
-            raise TypeError(
-                f"objective of type {type(objective)} must be of type gpjax.Objective."
-            )
 
 
 def _check_train_data(train_data: Any) -> None:

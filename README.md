@@ -102,7 +102,7 @@ y = f(x) + jr.normal(key, shape=(n,1))
 D = gpx.Dataset(X=x, y=y)
 
 # Construct the prior
-meanf = gpx.neab.mean_functions.Zero()
+meanf = gpx.mean_functions.Zero()
 kernel = gpx.kernels.RBF()
 prior = gpx.Prior(mean_function=meanf, kernel = kernel)
 

@@ -41,8 +41,15 @@ description and a code example. The docstring is concluded with a description
 of the objects attributes with corresponding types.
 
 ```python
+from gpjax.gps import AbstractPrior
+from gpjax.mean_functions import AbstractMeanFunction
+from gpjax.kernels import AbstractKernel
+from typing import Optional
+
 class Prior(AbstractPrior):
-    """A Gaussian process prior object. The GP is parameterised by a
+    """A Gaussian process prior object.
+
+    The GP is parameterised by a
     `mean <https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.mean_functions>`_
     and `kernel <https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.kernels>`_ function.
 
@@ -60,8 +67,9 @@ class Prior(AbstractPrior):
     Example:
         >>> import gpjax as gpx
         >>>
+        >>> meanf = gpx.mean_functions.Zero()
         >>> kernel = gpx.kernels.RBF()
-        >>> prior = gpx.Prior(kernel = kernel)
+        >>> prior = gpx.Prior(mean_functions=meanf, kernel = kernel)
 
     Attributes:
         kernel (Kernel): The kernel function used to parameterise the prior.
@@ -69,8 +77,8 @@ class Prior(AbstractPrior):
         name (str): The name of the GP prior. Defaults to "GP prior".
     """
 
-    kernel: Kernel
-    mean_function: Optional[AbstractMeanFunction] = Zero()
+    kernel: AbstractKernel
+    mean_function: AbstractMeanFunction
     name: Optional[str] = "GP prior"
 ```
 

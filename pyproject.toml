@@ -35,6 +35,7 @@ networkx = "^3.0"
 coverage = "^7.2.2"
 absolufy-imports = "^0.3.1"
 xdoctest = "^1.1.1"
+mktestdocs = "^0.2.1"
 
 
 [tool.poetry.group.dev.dependencies]

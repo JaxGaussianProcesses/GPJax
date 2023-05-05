@@ -1465,6 +1465,17 @@ mkdocs = ">=1.1"
 nbconvert = ">=6.0.0"
 
 [[package]]
+name = "mktestdocs"
+version = "0.2.1"
+description = ""
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.extras]
+test = ["pytest (>=4.0.2)"]
+
+[[package]]
 name = "ml-dtypes"
 version = "0.1.0"
 description = ""
@@ -2846,7 +2857,7 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.12"
-content-hash = "e0f2b39c7946d77ca81ac3a1429cd6aa1507ca404cccb67b21517a0ccddf8c12"
+content-hash = "52334f1618c5575ef1a6cefffcbb6dd9dfbf1addc80d37c671b5db5fa126f988"
 
 [metadata.files]
 absl-py = [
@@ -3962,6 +3973,10 @@ mkdocstrings-python = [
 ]
 mknotebooks = [
     {file = "mknotebooks-0.7.1-py3-none-any.whl", hash = "sha256:e2fa000b706683fc56b93adada7190a0da22ad85c4f1bfd5c4468cc3552b78e5"},
+]
+mktestdocs = [
+    {file = "mktestdocs-0.2.1-py2.py3-none-any.whl", hash = "sha256:55ad757e83227d5ba217eb285b8e44dc490601c4bbef52bc3331fea4510b72ec"},
+    {file = "mktestdocs-0.2.1.tar.gz", hash = "sha256:44142b98223f02c7ba4629790d9ee83031fd4d8855577c6fbfc23103421d3872"},
 ]
 ml-dtypes = [
     {file = "ml_dtypes-0.1.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:377f2d5cfbf809b59188e0bfda4a0774e658541f575b637fee4850d99c2f9fdc"},
