@@ -13,7 +13,7 @@ nav:
     - 🎨 Design principles: design.md
     - 🤝 Contributing: contributing.md
     - 🔪 Sharp bits: sharp_bits.md
-    - 🌳 GPJax PyTrees: examples/pytrees.py
+    - 🌳 GPJax PyTrees: examples/pytrees.md
     - 📎 JAX 101 [External]: https://jax.readthedocs.io/en/latest/jax-101/index.html
   - 💡 Background:
     - Intro to GPs: examples/intro_to_gps.py

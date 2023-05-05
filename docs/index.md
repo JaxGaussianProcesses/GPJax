@@ -41,7 +41,7 @@ would write on paper, as shown below.
 !!! Install
 
     GPJax can be installed via pip. See our [installation guide](https://gpjax.readthedocs.io/en/latest/installation.html) for further details.
-    
+
     ```bash
     pip install gpjax
     ```
