@@ -33,6 +33,15 @@ jobs:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
 
+      # Install katex for math support
+      - name: Install NPM
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - name: Install KaTeX
+        run: |
+          npm install katex
+
       # Install Poetry and build the documentation
       - name: Install and configure Poetry
         uses: snok/install-poetry@v1
