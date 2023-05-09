@@ -200,7 +200,7 @@ class Module(Pytree):
 
         return meta_map(_apply_stop_grad, self)
 
-    def trainables(self) -> Self:
+    def trainables(self: Self) -> Self:
         def _get_trainables(meta_leaf):
             meta, leaf = meta_leaf
             if meta is None:
