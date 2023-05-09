@@ -1,9 +1,11 @@
 name: Run Tests
 on:
+  pull_request:
+  pull_request_target:
   push:
     branches:
       - main
-  pull_request:
+
 jobs:
   test:
     name: Run Tests

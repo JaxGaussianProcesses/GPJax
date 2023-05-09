@@ -1,9 +1,10 @@
 name: Check linting
 on:
+  pull_request:
+  pull_request_target:
   push:
     branches:
       - main
-  pull_request:
 jobs:
   ruff:
     runs-on: ubuntu-latest
