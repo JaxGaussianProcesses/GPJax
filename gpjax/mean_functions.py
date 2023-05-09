@@ -28,11 +28,11 @@ from jaxtyping import (
     Float,
     Num,
 )
-from simple_pytree import static_field
 
 from gpjax.base import (
     Module,
     param_field,
+    static_field,
 )
 from gpjax.typing import Array
 

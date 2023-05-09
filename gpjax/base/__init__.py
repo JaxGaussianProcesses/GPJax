@@ -20,6 +20,7 @@ from gpjax.base.module import (
     meta_flatten,
     meta_leaves,
     meta_map,
+    static_field,
     save_tree,
 )
 from gpjax.base.param import param_field
@@ -31,6 +32,7 @@ __all__ = [
     "meta_map",
     "meta",
     "param_field",
+    "static_field",
     "save_tree",
     "load_tree",
 ]

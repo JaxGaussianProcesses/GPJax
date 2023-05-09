@@ -54,8 +54,16 @@ def param_field(
     metadata["trainable"] = trainable
     metadata["pytree_node"] = True
 
+    if (
+        default is not dataclasses.MISSING
+        and default_factory is not dataclasses.MISSING
+    ):
+        raise ValueError("Cannot specify both default and default_factory.")
+
+    if default is not dataclasses.MISSING:
+        default_factory = lambda: default
+
     return dataclasses.field(
-        default=default,
         default_factory=default_factory,
         init=init,
         repr=repr,

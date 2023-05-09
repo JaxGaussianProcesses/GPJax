@@ -14,7 +14,7 @@
 # ==============================================================================
 
 
-__all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta"]
+__all__ = ["Module", "meta_leaves", "meta_flatten", "meta_map", "meta", "static_field"]
 
 from copy import (
     copy,
@@ -29,6 +29,7 @@ from beartype.typing import (
     Dict,
     Iterable,
     List,
+    Mapping,
     Optional,
     Tuple,
     TypeVar,
@@ -44,13 +45,46 @@ from orbax.checkpoint import (
     RestoreArgs,
     SaveArgs,
 )
-from simple_pytree import (
-    Pytree,
-    static_field,
-)
+from simple_pytree import Pytree
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 Self = TypeVar("Self")
+
+
+def static_field(
+    default: Any = dataclasses.MISSING,
+    *,
+    default_factory: Any = dataclasses.MISSING,
+    init: bool = True,
+    repr: bool = True,
+    hash: Optional[bool] = None,
+    compare: bool = True,
+    metadata: Optional[Mapping[str, Any]] = None,
+):
+    metadata = {} if metadata is None else dict(metadata)
+
+    if "pytree_node" in metadata:
+        raise ValueError("Cannot use metadata with `pytree_node` already set.")
+
+    metadata["pytree_node"] = False
+
+    if (
+        default is not dataclasses.MISSING
+        and default_factory is not dataclasses.MISSING
+    ):
+        raise ValueError("Cannot specify both default and default_factory.")
+
+    if default is not dataclasses.MISSING:
+        default_factory = lambda: default
+
+    return dataclasses.field(
+        default_factory=default_factory,
+        init=init,
+        repr=repr,
+        hash=hash,
+        compare=compare,
+        metadata=metadata,
+    )
 
 
 class Module(Pytree):

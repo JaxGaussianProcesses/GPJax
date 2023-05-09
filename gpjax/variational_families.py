@@ -20,12 +20,12 @@ from beartype.typing import Any
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Float
-from simple_pytree import static_field
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import (
     Module,
     param_field,
+    static_field,
 )
 from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution

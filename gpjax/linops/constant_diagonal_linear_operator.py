@@ -22,8 +22,8 @@ from beartype.typing import (
 )
 import jax.numpy as jnp
 from jaxtyping import Float
-from simple_pytree import static_field
 
+from gpjax.base import static_field
 from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 from gpjax.linops.linear_operator import LinearOperator
 from gpjax.typing import (

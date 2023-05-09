@@ -30,12 +30,12 @@ from jaxtyping import (
     Float,
     Num,
 )
-from simple_pytree import static_field
 import tensorflow_probability.substrates.jax.distributions as tfd
 
 from gpjax.base import (
     Module,
     param_field,
+    static_field,
 )
 from gpjax.kernels.computations import (
     AbstractKernelComputation,

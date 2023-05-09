@@ -34,7 +34,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
 from scipy.signal import sawtooth
-from simple_pytree import static_field
+from gpjax.base import static_field
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx

@@ -22,10 +22,12 @@ from jaxtyping import (
     Int,
     Num,
 )
-from simple_pytree import static_field
 import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.base import param_field
+from gpjax.base import (
+    param_field,
+    static_field,
+)
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
