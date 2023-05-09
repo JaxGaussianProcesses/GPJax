@@ -52,7 +52,7 @@ class GraphKernel(AbstractKernel):
     for this object is borovitskiy et. al., (2020).
 
     Args:
-        laplacian (Float[Array]): An N x N matrix representing the Laplacian matrix
+        laplacian (Float[Array]): An $`N \times N`$ matrix representing the Laplacian matrix
             of a graph.
     """
 
@@ -85,12 +85,12 @@ class GraphKernel(AbstractKernel):
     ):
         r"""Compute the (co)variance between a vertex pair.
 
-        For a graph $\mathcal{G} = \{V, E\}$ where $V = \{v_1, v_2, \ldots v_n \},
-        evaluate the graph kernel on a pair of vertices $(v_i, v_j)$ for any $i,j<n$.
+        For a graph $`\mathcal{G} = \{V, E\}`$ where $`V = \{v_1, v_2, \ldots v_n \}`$,
+        evaluate the graph kernel on a pair of vertices $`(v_i, v_j)`$ for any $`i,j<n`$.
 
         Args:
-            x (Float[Array, "N 1"]): Index of the $i$th vertex.
-            y (Float[Array, "N 1"]): Index of the $j$th vertex.
+            x (Float[Array, "N 1"]): Index of the $`i`$th vertex.
+            y (Float[Array, "N 1"]): Index of the $`j`$th vertex.
 
         Returns
         -------

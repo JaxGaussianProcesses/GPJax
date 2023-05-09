@@ -41,12 +41,12 @@ tfd = tfp.distributions
 
 @dataclass
 class AbstractLikelihood(Module):
-    """Abstract base class for likelihoods."""
+    r"""Abstract base class for likelihoods."""
 
     num_datapoints: int = static_field()
 
     def __call__(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
-        """Evaluate the likelihood function at a given predictive distribution.
+        r"""Evaluate the likelihood function at a given predictive distribution.
 
         Args:
             *args (Any): Arguments to be passed to the likelihood's `predict` method.
@@ -60,7 +60,7 @@ class AbstractLikelihood(Module):
 
     @abc.abstractmethod
     def predict(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
-        """Evaluate the likelihood function at a given predictive distribution.
+        r"""Evaluate the likelihood function at a given predictive distribution.
 
         Args:
             *args (Any): Arguments to be passed to the likelihood's `predict` method.
@@ -74,7 +74,7 @@ class AbstractLikelihood(Module):
 
     @abc.abstractmethod
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
-        """Return the link function of the likelihood function.
+        r"""Return the link function of the likelihood function.
 
         Returns
         -------
@@ -85,14 +85,14 @@ class AbstractLikelihood(Module):
 
 @dataclass
 class Gaussian(AbstractLikelihood):
-    """Gaussian likelihood object."""
+    r"""Gaussian likelihood object."""
 
     obs_noise: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
     )
 
     def link_function(self, f: Float[Array, "..."]) -> tfd.Normal:
-        """The link function of the Gaussian likelihood.
+        r"""The link function of the Gaussian likelihood.
 
         Args:
             f (Float[Array, "..."]): Function values.
@@ -106,7 +106,8 @@ class Gaussian(AbstractLikelihood):
     def predict(
         self, dist: Union[tfd.MultivariateNormalTriL, GaussianDistribution]
     ) -> tfd.MultivariateNormalFullCovariance:
-        """
+        r"""Evaluate the Gaussian likelihood.
+
         Evaluate the Gaussian likelihood function at a given predictive
         distribution. Computationally, this is equivalent to summing the
         observation noise term to the diagonal elements of the predictive
@@ -130,7 +131,7 @@ class Gaussian(AbstractLikelihood):
 @dataclass
 class Bernoulli(AbstractLikelihood):
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
-        """The probit link function of the Bernoulli likelihood.
+        r"""The probit link function of the Bernoulli likelihood.
 
         Args:
             f (Float[Array, "..."]): Function values.
@@ -142,7 +143,9 @@ class Bernoulli(AbstractLikelihood):
         return tfd.Bernoulli(probs=inv_probit(f))
 
     def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
-        """Evaluate the pointwise predictive distribution, given a Gaussian
+        r"""Evaluate the pointwise predictive distribution.
+
+        Evaluate the pointwise predictive distribution, given a Gaussian
         process posterior and likelihood parameters.
 
         Args:
@@ -161,7 +164,7 @@ class Bernoulli(AbstractLikelihood):
 @dataclass
 class Poisson(AbstractLikelihood):
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
-        """The link function of the Poisson likelihood.
+        r"""The link function of the Poisson likelihood.
 
         Args:
             f (Float[Array, "..."]): Function values.
@@ -172,7 +175,9 @@ class Poisson(AbstractLikelihood):
         return tfd.Poisson(rate=jnp.exp(f))
 
     def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
-        """Evaluate the pointwise predictive distribution, given a Gaussian
+        r"""Evaluate the pointwise predictive distribution.
+
+        Evaluate the pointwise predictive distribution, given a Gaussian
         process posterior and likelihood parameters.
 
         Args:
@@ -186,7 +191,7 @@ class Poisson(AbstractLikelihood):
 
 
 def inv_probit(x: Float[Array, " *N"]) -> Float[Array, " *N"]:
-    """Compute the inverse probit function.
+    r"""Compute the inverse probit function.
 
     Args:
         x (Float[Array, "*N"]): A vector of values.

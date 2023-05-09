@@ -43,8 +43,10 @@ class White(AbstractKernel):
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the White noise kernel between a pair of arrays.
 
-        Evaluate the kernel on a pair of inputs $(x, y)$ with variance $\sigma^2$:
-        $$k(x, y) = \sigma^2 \delta(x-y)$$
+        Evaluate the kernel on a pair of inputs $`(x, y)`$ with variance $`\sigma^2`$:
+        ```math
+        k(x, y) = \sigma^2 \delta(x-y)
+        ```
 
         Args:
             x (Float[Array, " D"]): The left hand argument of the kernel function's call.
@@ -52,7 +54,7 @@ class White(AbstractKernel):
 
         Returns
         -------
-            ScalarFloat: The value of $k(x, y)$.
+            ScalarFloat: The value of $`k(x, y)`$.
         """
         K = jnp.all(jnp.equal(x, y)) * self.variance
         return K.squeeze()

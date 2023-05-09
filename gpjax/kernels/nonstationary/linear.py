@@ -29,7 +29,7 @@ from gpjax.typing import (
 
 @dataclass
 class Linear(AbstractKernel):
-    """The linear kernel."""
+    r"""The linear kernel."""
 
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Linear"
@@ -41,8 +41,8 @@ class Linear(AbstractKernel):
     ) -> ScalarFloat:
         r"""Compute the linear kernel between a pair of arrays.
 
-        For a pair of inputs $x, y \in \mathbb{R}^{D}$, let's evaluate the linear
-        kernel $k(x, y)=\sigma^2 x^{\top}y$ where $\sigma^\in \mathbb{R}_{>0}$ is the
+        For a pair of inputs $`x, y \in \mathbb{R}^{D}`$, let's evaluate the linear
+        kernel $`k(x, y)=\sigma^2 x^{\top}y`$ where $`\sigma^\in \mathbb{R}_{>0}`$ is the
         kernel's variance parameter.
 
         Args:
@@ -51,7 +51,7 @@ class Linear(AbstractKernel):
 
         Returns
         -------
-            ScalarFloat: The evaluated kernel function $k(x, y)$ at the supplied inputs.
+            ScalarFloat: The evaluated kernel function $`k(x, y)`$ at the supplied inputs.
         """
         x = self.slice_input(x)
         y = self.slice_input(y)

@@ -31,7 +31,7 @@ from gpjax.typing import (
 
 @dataclass
 class PoweredExponential(AbstractKernel):
-    """The powered exponential family of kernels.
+    r"""The powered exponential family of kernels.
 
     Key reference is Diggle and Ribeiro (2007) - "Model-based Geostatistics".
 
@@ -47,9 +47,11 @@ class PoweredExponential(AbstractKernel):
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the Powered Exponential kernel between a pair of arrays.
 
-        Evaluate the kernel on a pair of inputs $(x, y)$ with length-scale parameter
-        $\ell$, $\sigma$ and power $\kappa$.
-        $$k(x, y)=\sigma^2\exp\Bigg(-\Big(\frac{\lVert x-y\rVert^2}{\ell^2}\Big)^\kappa\Bigg)$$
+        Evaluate the kernel on a pair of inputs $`(x, y)`$ with length-scale parameter
+        $`\ell`$, $`\sigma`$ and power $`\kappa`$.
+        ```math
+        k(x, y)=\sigma^2\exp\Bigg(-\Big(\frac{\lVert x-y\rVert^2}{\ell^2}\Big)^\kappa\Bigg)
+        ```
 
         Args:
             x (Float[Array, " D"]): The left hand argument of the kernel function's call.
@@ -57,7 +59,7 @@ class PoweredExponential(AbstractKernel):
 
         Returns
         -------
-            ScalarFloat: The value of $k(x, y)$.
+            ScalarFloat: The value of $`k(x, y)`$.
         """
         x = self.slice_input(x) / self.lengthscale
         y = self.slice_input(y) / self.lengthscale

@@ -16,7 +16,7 @@ from gpjax.typing import (
 
 @dataclass
 class RFF(AbstractKernel):
-    """Computes an approximation of the kernel using Random Fourier Features.
+    r"""Computes an approximation of the kernel using Random Fourier Features.
 
     All stationary kernels are equivalent to the Fourier transform of a probability
     distribution. We call the corresponding distribution the spectral density. Using
@@ -37,7 +37,7 @@ class RFF(AbstractKernel):
     key: KeyArray = static_field(PRNGKey(123))
 
     def __post_init__(self) -> None:
-        """Post-initialisation function.
+        r"""Post-initialisation function.
 
         This function is called after the initialisation of the kernel. It is used to
         set the computation engine to be the basis function computation engine.
@@ -56,7 +56,7 @@ class RFF(AbstractKernel):
         pass
 
     def _check_valid_base_kernel(self, kernel: AbstractKernel):
-        """Verify that the base kernel is valid for RFF approximation.
+        r"""Verify that the base kernel is valid for RFF approximation.
 
         Args:
             kernel (AbstractKernel): The kernel to be checked.
@@ -74,10 +74,10 @@ class RFF(AbstractKernel):
         r"""Compute the features for the inputs.
 
         Args:
-            x: A $N \times D$ array of inputs.
+            x: A $`N \times D`$ array of inputs.
 
         Returns
         -------
-            Float[Array, "N L"]: A $N \times L$ array of features where $L = 2M$.
+            Float[Array, "N L"]: A $`N \times L`$ array of features where $`L = 2M`$.
         """
         return self.compute_engine(self).compute_features(x)

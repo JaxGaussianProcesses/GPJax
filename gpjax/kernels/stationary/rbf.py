@@ -32,7 +32,7 @@ from gpjax.typing import (
 
 @dataclass
 class RBF(AbstractKernel):
-    """The Radial Basis Function (RBF) kernel."""
+    r"""The Radial Basis Function (RBF) kernel."""
 
     lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
@@ -43,16 +43,18 @@ class RBF(AbstractKernel):
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the RBF kernel between a pair of arrays.
 
-        Evaluate the kernel on a pair of inputs$(x, y)$ with lengthscale parameter
-        $\ell$ and variance $\sigma^2$:
-        $$k(x,y)=\sigma^2\exp\Bigg(\frac{\lVert x - y \rVert^2_2}{2 \ell^2} \Bigg)$$
+        Evaluate the kernel on a pair of inputs $`(x, y)`$ with lengthscale parameter
+        $`\ell`$ and variance $`\sigma^2`$:
+        ```math
+        k(x,y)=\sigma^2\exp\Bigg(\frac{\lVert x - y \rVert^2_2}{2 \ell^2} \Bigg)
+        ```
 
         Args:
             x (Float[Array, " D"]): The left hand argument of the kernel function's call.
             y (Float[Array, " D"]): The right hand argument of the kernel function's call.
 
         Returns:
-            ScalarFloat: The value of $k(x, y)$.
+            ScalarFloat: The value of $`k(x, y)`$.
         """
         x = self.slice_input(x) / self.lengthscale
         y = self.slice_input(y) / self.lengthscale

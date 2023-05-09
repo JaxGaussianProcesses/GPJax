@@ -102,11 +102,11 @@ class AbstractVariationalGaussian(AbstractVariationalFamily):
 class VariationalGaussian(AbstractVariationalGaussian):
     r"""The variational Gaussian family of probability distributions.
 
-    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where
-    $u = f(z)$ are the function values at the inducing inputs z
+    The variational family is $`q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u`$, where
+    $`u = f(z)`$ are the function values at the inducing inputs $`z`$
     and the distribution over the inducing inputs is
-    $q(u) = \mathcal{N}(\mu, S)$.  We parameterise this over
-    $\mu$ and sqrt with S = sqrt sqrtᵀ.
+    $`q(u) = \mathcal{N}(\mu, S)`$.  We parameterise this over
+    $`\mu`$ and $`sqrt`$ with $`S = sqrt sqrt^{\top}`$.
     """
 
     variational_mean: Float[Array, "N 1"] = param_field(None)
@@ -127,9 +127,14 @@ class VariationalGaussian(AbstractVariationalGaussian):
         Compute the KL-divergence between our variational approximation and the
         Gaussian process prior.
 
-        For this variational family, we have KL[q(f(·))||p(·)] = KL[q(u)||p(u)]
-        = KL[ N(μ, S) || N(μz, Kzz) ], where u = f(z) and z are the inducing
-        inputs.
+        For this variational family, we have
+        ```math
+        \begin{align}
+        \operatorname{KL}[q(f(\cdot))\mid\mid p(\cdot)] & = \operatorname{KL}[q(u)\mid\mid p(u)]\\
+        & = \operatorname{KL}[ \mathcal{N}(\mu, S) \mid\mid N(\mu z, \mathbf{K}_{zz}) ],
+        \end{align}
+        ```
+        where $`u = f(z)`$ and $`z`$ are the inducing inputs.
 
         Returns
         -------
@@ -146,7 +151,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         mean_function = self.posterior.prior.mean_function
         kernel = self.posterior.prior.kernel
 
-        μz = mean_function(z)
+        muz = mean_function(z)
         Kzz = kernel.gram(z)
         Kzz += identity(m) * self.jitter
 
@@ -154,17 +159,18 @@ class VariationalGaussian(AbstractVariationalGaussian):
         S = DenseLinearOperator.from_root(sqrt)
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
-        pu = GaussianDistribution(loc=jnp.atleast_1d(μz.squeeze()), scale=Kzz)
+        pu = GaussianDistribution(loc=jnp.atleast_1d(muz.squeeze()), scale=Kzz)
 
         return qu.kl_divergence(pu)
 
     def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
         r"""Compute the predictive distribution of the GP at the test inputs t.
 
-        This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be
-        computed in closed form as:
-
-            N[f(t); μt + Ktz Kzz⁻¹ (μ - μz),  Ktt - Ktz Kzz⁻¹ Kzt + Ktz Kzz⁻¹ S Kzz⁻¹ Kzt ].
+        This is the integral $`q(f(t)) = \int p(f(t)\mid u) q(u) \mathrm{d}u`$, which
+        can be computed in closed form as:
+        ```math
+            \mathcal{N}\left(f(t); \mu t + \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} (\mu - \mu z),  \mathbf{K}_{tt} - \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} \mathbf{K}_{zt} + \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} S \mathbf{K}_{zz}^{-1} \mathbf{K}_{zt}\right).
+        ```
 
         Args:
             test_inputs (Float[Array, "N D"]): The test inputs at which we wish to
@@ -188,14 +194,14 @@ class VariationalGaussian(AbstractVariationalGaussian):
         Kzz = kernel.gram(z)
         Kzz += identity(m) * self.jitter
         Lz = Kzz.to_root()
-        μz = mean_function(z)
+        muz = mean_function(z)
 
         # Unpack test inputs
         t, n_test = test_inputs, test_inputs.shape[0]
 
         Ktt = kernel.gram(t)
         Kzt = kernel.cross_covariance(z, t)
-        μt = mean_function(t)
+        mut = mean_function(t)
 
         # Lz⁻¹ Kzt
         Lz_inv_Kzt = Lz.solve(Kzt)
@@ -207,7 +213,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         Ktz_Kzz_inv_sqrt = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
 
         # μt + Ktz Kzz⁻¹ (μ - μz)
-        mean = μt + jnp.matmul(Kzz_inv_Kzt.T, mu - μz)
+        mean = mut + jnp.matmul(Kzz_inv_Kzt.T, mu - muz)
 
         # Ktt - Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
         covariance = (
@@ -226,10 +232,11 @@ class VariationalGaussian(AbstractVariationalGaussian):
 class WhitenedVariationalGaussian(VariationalGaussian):
     r"""The whitened variational Gaussian family of probability distributions.
 
-    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z)
-    are the function values at the inducing inputs z and the distribution over
-    the inducing inputs is q(u) = N(Lz μ + mz, Lz S Lzᵀ). We parameterise this
-    over μ and sqrt with S = sqrt sqrtᵀ.
+    The variational family is $`q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u`$,
+    where $`u = f(z)`$
+    are the function values at the inducing inputs $`z`$ and the distribution over
+    the inducing inputs is $`q(u) = \mathcal{N}(Lz \mu + mz, Lz S Lz^{\top})`$. We parameterise this
+    over $`\mu`$ and $`sqrt`$ with $`S = sqrt sqrt^{\top}`$.
     """
 
     def prior_kl(self) -> ScalarFloat:
@@ -237,7 +244,12 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         the Gaussian process prior.
 
         For this variational family, we have
-        KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(0, I)].
+        ```math
+        \begin{align}
+        \operatorname{KL}[q(f(\cdot))\mid\mid p(\cdot)] & = \operatorname{KL}[q(u)\mid\mid p(u)]\\
+            & = \operatorname{KL}[N(\mu  , S)\mid\mid N(0, I)].
+        \end{align}
+        ```
 
         Returns
         -------
@@ -259,10 +271,11 @@ class WhitenedVariationalGaussian(VariationalGaussian):
     def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
         r"""Compute the predictive distribution of the GP at the test inputs t.
 
-        This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in
+        This is the integral q(f(t)) = \int p(f(t)\midu) q(u) du, which can be computed in
         closed form as
-
-            N[f(t); μt  +  Ktz Lz⁻ᵀ μ,  Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻ᵀ S Lz⁻¹ Kzt].
+        ```math
+            \mathcal{N}\left(f(t); \mu t  +  \mathbf{K}_{tz} \mathbf{L}z^{\top} \mu  ,  \mathbf{K}_{tt}  -  \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} \mathbf{K}_{zt}  +  \mathbf{K}_{tz} \mathbf{L}z^{\top} S \mathbf{L}z^{-1} \mathbf{K}_{zt} \right).
+        ```
 
         Args:
             test_inputs (Float[Array, "N D"]): The test inputs at which we wish to
@@ -292,7 +305,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
         Ktt = kernel.gram(t)
         Kzt = kernel.cross_covariance(z, t)
-        μt = mean_function(t)
+        mut = mean_function(t)
 
         # Lz⁻¹ Kzt
         Lz_inv_Kzt = Lz.solve(Kzt)
@@ -301,7 +314,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         Ktz_Lz_invT_sqrt = jnp.matmul(Lz_inv_Kzt.T, sqrt)
 
         # μt  +  Ktz Lz⁻ᵀ μ
-        mean = μt + jnp.matmul(Lz_inv_Kzt.T, mu)
+        mean = mut + jnp.matmul(Lz_inv_Kzt.T, mu)
 
         # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻ᵀ S Lz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
         covariance = (
@@ -320,12 +333,13 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 class NaturalVariationalGaussian(AbstractVariationalGaussian):
     r"""The natural variational Gaussian family of probability distributions.
 
-    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are
-    the function values at the inducing inputs z and the distribution over the
-    inducing inputs is q(u) = N(μ, S). Expressing the variational distribution, in
-    the form of the exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the
-    natural parameterisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2), to perform model inference,
-    where T(u) = [u, uuᵀ] are the sufficient statistics.
+    The variational family is $`q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u`$,
+    where $`u = f(z)`$ are
+    the function values at the inducing inputs $`z`$ and the distribution over the
+    inducing inputs is $`q(u) = N(\mu, S)`$. Expressing the variational distribution, in
+    the form of the exponential family, $`q(u) = exp(\theta^{\top} T(u) - a(\theta))`$, gives rise to the
+    natural parameterisation $`\theta  = (\theta_{1}, \theta_{2}) = (S^{-1}\mu, -S^{-1}/2)`$, to perform model inference,
+    where $`T(u) = [u, uu^{\top}]`$ are the sufficient statistics.
     """
 
     natural_vector: Float[Array, "M 1"] = None
@@ -343,9 +357,13 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         and the Gaussian process prior.
 
         For this variational family, we have
-        KL[q(f(·))||p(·)] = KL[q(u)||p(u)] = KL[N(μ, S)||N(mz, Kzz)],
-
-        with μ and S computed from the natural parameterisation θ = (S⁻¹μ, -S⁻¹/2).
+        ```math
+        \begin{align}
+        \operatorname{KL}[q(f(\cdot))\mid\mid p(\cdot)] & = \operatorname{KL}[q(u)\mid\mid p(u)] \\
+            & = \operatorname{KL}[N(\mu, S)\mid\mid N(mz, \mathbf{K}_{zz})],
+        \end{align}
+        ```
+        with $\mu$ and $S$ computed from the natural parameterisation $\theta  = (S^{-1}\mu  , -S^{-1}/2)$.
 
         Returns
         -------
@@ -381,28 +399,30 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         # μ = Sθ₁
         mu = S @ natural_vector
 
-        μz = mean_function(z)
+        muz = mean_function(z)
         Kzz = kernel.gram(z)
         Kzz += identity(m) * self.jitter
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
-        pu = GaussianDistribution(loc=jnp.atleast_1d(μz.squeeze()), scale=Kzz)
+        pu = GaussianDistribution(loc=jnp.atleast_1d(muz.squeeze()), scale=Kzz)
 
         return qu.kl_divergence(pu)
 
     def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
         r"""Compute the predictive distribution of the GP at the test inputs $t$.
 
-        This is the integral q(f(t)) = ∫ p(f(t)|u) q(u) du, which can be computed in
-        closed form as
-
-             N[f(t); μt + Ktz Kzz⁻¹ (μ - μz),  Ktt - Ktz Kzz⁻¹ Kzt + Ktz Kzz⁻¹ S Kzz⁻¹ Kzt ],
-
-        with μ and S computed from the natural parameterisation θ = (S⁻¹μ, -S⁻¹/2).
+        This is the integral $`q(f(t)) = \int p(f(t)\mid u) q(u) \mathrm{d}u`$, which
+        can be computed in closed form as
+        ```math
+             \mathcal{N}\left(f(t); \mu  t + \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} (\mu   - \mu  z),  \mathbf{K}_{tt} - \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} \mathbf{K}_{zt} + \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} S \mathbf{K}_{zz}^{-1} \mathbf{K}_{zt} \right),
+        ```
+        with $`\mu`$ and $`S`$ computed from the natural parameterisation
+        $`\theta = (S^{-1}\mu  , -S^{-1}/2)`$.
 
         Returns
         -------
-            GaussianDistribution: A function that accepts a set of test points and will return the predictive distribution at those points.
+            GaussianDistribution: A function that accepts a set of test points and will
+                return the predictive distribution at those points.
         """
         # Unpack variational parameters
         natural_vector = self.natural_vector
@@ -435,14 +455,14 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         Kzz = kernel.gram(z)
         Kzz += identity(m) * self.jitter
         Lz = Kzz.to_root()
-        μz = mean_function(z)
+        muz = mean_function(z)
 
         # Unpack test inputs
         t, n_test = test_inputs, test_inputs.shape[0]
 
         Ktt = kernel.gram(t)
         Kzt = kernel.cross_covariance(z, t)
-        μt = mean_function(t)
+        mut = mean_function(t)
 
         # Lz⁻¹ Kzt
         Lz_inv_Kzt = Lz.solve(Kzt)
@@ -454,7 +474,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         Ktz_Kzz_inv_L = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
 
         # μt  +  Ktz Kzz⁻¹ (μ  -  μz)
-        mean = μt + jnp.matmul(Kzz_inv_Kzt.T, mu - μz)
+        mean = mut + jnp.matmul(Kzz_inv_Kzt.T, mu - muz)
 
         # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = LLᵀ]
         covariance = (
@@ -473,13 +493,13 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 class ExpectationVariationalGaussian(AbstractVariationalGaussian):
     r"""The natural variational Gaussian family of probability distributions.
 
-    The variational family is q(f(·)) = ∫ p(f(·)|u) q(u) du, where u = f(z) are the
-    function values at the inducing inputs z and the distribution over the inducing
-    inputs is q(u) = N(μ, S). Expressing the variational distribution, in the form of
-    the exponential family, q(u) = exp(θᵀ T(u) - a(θ)), gives rise to the natural
-    parameterisation θ = (θ₁, θ₂) = (S⁻¹μ, -S⁻¹/2) and sufficient statistics
-    T(u) = [u, uuᵀ]. The expectation parameters are given by η = ∫ T(u) q(u) du.
-    This gives a parameterisation, η = (η₁, η₁) = (μ, S + uuᵀ) to perform model
+    The variational family is $`q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u`$, where $`u = f(z)`$ are the
+    function values at the inducing inputs $`z`$ and the distribution over the inducing
+    inputs is $`q(u) = \mathcal{N}(\mu, S)`$. Expressing the variational distribution, in the form of
+    the exponential family, $`q(u) = exp(\theta^{\top} T(u) - a(\theta))`$, gives rise to the natural
+    parameterisation $`\theta  = (\theta_{1}, \theta_{2}) = (S^{-1}\mu  , -S^{-1}/2)`$ and sufficient statistics
+    $`T(u) = [u, uu^{\top}]`$. The expectation parameters are given by $`\nu = \int T(u) q(u) \mathrm{d}u`$.
+    This gives a parameterisation, $`\nu = (\nu_{1}, \nu_{2}) = (\mu  , S + uu^{\top})`$ to perform model
     inference over.
     """
 
@@ -499,7 +519,12 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         the Gaussian process prior.
 
         For this variational family, we have
-        $\operatorname{KL}(q(f(·))||p(·)) = \operatorname{KL}(q(u)||p(u)) =\operatorname{KL}(\mathcal{N}(\mu, S)\mid\mid \mathcal{N}(m_z, K_{zz}))$,
+        ```math
+        \begin{align}
+        \operatorname{KL}(q(f(\cdot))\mid\mid p(\cdot)) & = \operatorname{KL}(q(u)\mid\mid p(u)) \\
+            & =\operatorname{KL}(\mathcal{N}(\mu, S)\mid\mid \mathcal{N}(m_z, K_{zz})),
+        \end{align}
+        ```
         where $\mu$ and $S$ are the expectation parameters of the variational
         distribution and $m_z$ and $K_{zz}$ are the mean and covariance of the prior
         distribution.
@@ -527,12 +552,12 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         S = DenseLinearOperator(S)
         S += identity(m) * self.jitter
 
-        μz = mean_function(z)
+        muz = mean_function(z)
         Kzz = kernel.gram(z)
         Kzz += identity(m) * self.jitter
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
-        pu = GaussianDistribution(loc=jnp.atleast_1d(μz.squeeze()), scale=Kzz)
+        pu = GaussianDistribution(loc=jnp.atleast_1d(muz.squeeze()), scale=Kzz)
 
         return qu.kl_divergence(pu)
 
@@ -543,7 +568,9 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         This is the integral $q(f(t)) = \int p(f(t)\mid u)q(u)\mathrm{d}u$, which can
         be computed in closed form as  which can be computed in closed form as
-        $$\mathcal{N}(f(t); \mu_t + K_{tz}K_{zz}^{-1}(\mu - \mu_z), K_{tt} - K_{tz}K_{zz}^{-1}K_{zt} + K_{tz}K_{zz}^{-1}S K_{zz}^{-1}K_{zt}),$$
+        ```math
+        \mathcal{N}(f(t); \mu_t + \mathbf{K}_{tz}\mathbf{K}_{zz}^{-1}(\mu - \mu_z), \mathbf{K}_{tt} - \mathbf{K}_{tz}\mathbf{K}_{zz}^{-1}\mathbf{K}_{zt} + \mathbf{K}_{tz}\mathbf{K}_{zz}^{-1}\mathbf{S} \mathbf{K}_{zz}^{-1}\mathbf{K}_{zt})
+        ```
 
         with $\mu$ and $S$ computed from the expectation parameterisation
         $\eta = (\mu, S + uu^\top)$.
@@ -577,14 +604,14 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         Kzz = kernel.gram(z)
         Kzz += identity(m) * self.jitter
         Lz = Kzz.to_root()
-        μz = mean_function(z)
+        muz = mean_function(z)
 
         # Unpack test inputs
         t, n_test = test_inputs, test_inputs.shape[0]
 
         Ktt = kernel.gram(t)
         Kzt = kernel.cross_covariance(z, t)
-        μt = mean_function(t)
+        mut = mean_function(t)
 
         # Lz⁻¹ Kzt
         Lz_inv_Kzt = Lz.solve(Kzt)
@@ -596,7 +623,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         Ktz_Kzz_inv_sqrt = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
 
         # μt  +  Ktz Kzz⁻¹ (μ  -  μz)
-        mean = μt + jnp.matmul(Kzz_inv_Kzt.T, mu - μz)
+        mean = mut + jnp.matmul(Kzz_inv_Kzt.T, mu - muz)
 
         # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
         covariance = (
@@ -673,8 +700,8 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         # LLᵀ = I + AAᵀ
         L = jnp.linalg.cholesky(jnp.eye(m) + AAT)
 
-        μx = mean_function(x)
-        diff = y - μx
+        mux = mean_function(x)
+        diff = y - mux
 
         # Lz⁻¹ Kzx (y - μx)
         Lz_inv_Kzx_diff = jsp.linalg.cho_solve((L, True), jnp.matmul(Lz_inv_Kzx, diff))
@@ -684,7 +711,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
 
         Ktt = kernel.gram(t)
         Kzt = kernel.cross_covariance(z, t)
-        μt = mean_function(t)
+        mut = mean_function(t)
 
         # Lz⁻¹ Kzt
         Lz_inv_Kzt = Lz.solve(Kzt)
@@ -693,7 +720,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         L_inv_Lz_inv_Kzt = jsp.linalg.solve_triangular(L, Lz_inv_Kzt, lower=True)
 
         # μt + 1/o² Ktz Kzz⁻¹ Kzx (y - μx)
-        mean = μt + jnp.matmul(Kzt.T / noise, Kzz_inv_Kzx_diff)
+        mean = mut + jnp.matmul(Kzt.T / noise, Kzz_inv_Kzx_diff)
 
         # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻¹ (I + AAᵀ)⁻¹ Lz⁻¹ Kzt
         covariance = (

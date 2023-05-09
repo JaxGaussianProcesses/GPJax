@@ -28,6 +28,7 @@ nav:
     - Stochastic sparse GPs: examples/collapsed_vi.py
     - Kernels: examples/kernels.py
     - UCI regression: examples/yacht.py
+    - Pathwise Sampling for Spatial Modelling: examples/spatial.py
   - 📕 Reference: api/
 
 theme:
@@ -49,9 +50,9 @@ theme:
 markdown_extensions:
   - admonition
   - pymdownx.details # Enhance admonitions with collapse/expand
-  # - markdown_katex:
-  #     no_inline_svg: True
-  #     insert_fonts_css: True
+  - markdown_katex:
+      no_inline_svg: True
+      insert_fonts_css: True
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.highlight:
@@ -65,8 +66,8 @@ markdown_extensions:
   - toc:
       toc_depth: 4
   - footnotes
-  - pymdownx.arithmatex:
-      generic: true
+  # - pymdownx.arithmatex:
+  #     generic: true
   - attr_list
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
@@ -88,23 +89,22 @@ plugins:
 #     binder: true
 #     binder_service_name: "gh"
 #     binder_branch: "main"
+  - mkdocstrings:
       watch:
         - gpjax
-  - mkdocstrings:
       default_handler: python
       handlers:
         python:
-          selection:
-            inherited_members: true  # Allow looking up inherited methods
           rendering:
-            show_root_heading: true  # actually display anything at all...
-            show_root_full_path: true  # display "diffrax.asdf" not just "asdf"
+            show_root_heading: true
+            show_root_full_path: true
             show_if_no_docstring: true
             show_signature_annotations: true
-            show_source: false  # don't include source code
+            show_source: false
             members_order: source  # order methods according to their order of definition in the source code, not alphabetical order
             heading_level: 4
           options:
+            inherited_members: true  # Allow looking up inherited methods
             docstring_style: "google"
 
   - git-authors:
@@ -118,8 +118,11 @@ plugins:
 
 extra_css:
   - stylesheets/extra.css
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css
 
 extra_javascript:
-  - javascripts/mathjax.js
+  # - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  # - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js
+  - javascripts/katex.js

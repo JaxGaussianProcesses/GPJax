@@ -32,7 +32,7 @@ from gpjax.typing import Array
 
 @dataclass
 class AbstractKernelComputation:
-    """Abstract class for kernel computations."""
+    r"""Abstract class for kernel computations."""
 
     kernel: "gpjax.kernels.base.AbstractKernel"  # noqa: F821
 
@@ -40,7 +40,7 @@ class AbstractKernelComputation:
         self,
         x: Num[Array, "N D"],
     ) -> LinearOperator:
-        """Compute Gram covariance operator of the kernel function.
+        r"""Compute Gram covariance operator of the kernel function.
 
         Args:
             x (Float[Array, "N N"]): The inputs to the kernel function.
@@ -56,7 +56,7 @@ class AbstractKernelComputation:
     def cross_covariance(
         self, x: Num[Array, "N D"], y: Num[Array, "M D"]
     ) -> Float[Array, "N M"]:
-        """For a given kernel, compute the NxM gram matrix on an a pair
+        r"""For a given kernel, compute the NxM gram matrix on an a pair
         of input matrices with shape NxD and MxD.
 
         Args:
@@ -70,7 +70,7 @@ class AbstractKernelComputation:
         raise NotImplementedError
 
     def diagonal(self, inputs: Num[Array, "N D"]) -> DiagonalLinearOperator:
-        """For a given kernel, compute the elementwise diagonal of the
+        r"""For a given kernel, compute the elementwise diagonal of the
         NxN gram matrix on an input matrix of shape NxD.
 
         Args:

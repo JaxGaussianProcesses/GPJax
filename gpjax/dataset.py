@@ -25,7 +25,7 @@ from gpjax.typing import Array
 
 @dataclass
 class Dataset(Pytree):
-    """Base class for datasets.
+    r"""Base class for datasets.
 
     Attributes
     ----------
@@ -37,11 +37,11 @@ class Dataset(Pytree):
     y: Optional[Num[Array, "N Q"]] = None
 
     def __post_init__(self) -> None:
-        """Checks that the shapes of X and y are compatible."""
+        r"""Checks that the shapes of $`X`$ and $`y`$ are compatible."""
         _check_shape(self.X, self.y)
 
     def __repr__(self) -> str:
-        """Returns a string representation of the dataset."""
+        r"""Returns a string representation of the dataset."""
         repr = (
             f"- Number of observations: {self.n}\n- Input dimension:"
             f" {self.in_dim}\n- Output dimension: {self.out_dim}"
@@ -49,15 +49,15 @@ class Dataset(Pytree):
         return repr
 
     def is_supervised(self) -> bool:
-        """Returns `True` if the dataset is supervised."""
+        r"""Returns `True` if the dataset is supervised."""
         return self.X is not None and self.y is not None
 
     def is_unsupervised(self) -> bool:
-        """Returns `True` if the dataset is unsupervised."""
+        r"""Returns `True` if the dataset is unsupervised."""
         return self.X is None and self.y is not None
 
     def __add__(self, other: "Dataset") -> "Dataset":
-        """Combine two datasets. Right hand dataset is stacked beneath the left."""
+        r"""Combine two datasets. Right hand dataset is stacked beneath the left."""
         X = None
         y = None
 
@@ -71,24 +71,24 @@ class Dataset(Pytree):
 
     @property
     def n(self) -> int:
-        """Number of observations."""
+        r"""Number of observations."""
         return self.X.shape[0]
 
     @property
     def in_dim(self) -> int:
-        """Dimension of the inputs, X."""
+        r"""Dimension of the inputs, $`X`$."""
         return self.X.shape[1]
 
     @property
     def out_dim(self) -> int:
-        """Dimension of the outputs, y."""
+        r"""Dimension of the outputs, $`y`$."""
         return self.y.shape[1]
 
 
 def _check_shape(
     X: Optional[Num[Array, "..."]], y: Optional[Num[Array, "..."]]
 ) -> None:
-    """Checks that the shapes of X and y are compatible."""
+    r"""Checks that the shapes of $`X`$ and $`y`$ are compatible."""
     if X is not None and y is not None and X.shape[0] != y.shape[0]:
         raise ValueError(
             "Inputs, X, and outputs, y, must have the same number of rows."

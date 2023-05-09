@@ -41,12 +41,12 @@ class Polynomial(AbstractKernel):
         self.name = f"Polynomial (degree {self.degree})"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
-        r"""Compute the polynomial kernel of degree $d$ between a pair of arrays.
+        r"""Compute the polynomial kernel of degree $`d`$ between a pair of arrays.
 
-        For a pair of inputs $x, y \in \mathbb{R}^{D}$, let's evaluate the polynomial
-        kernel $k(x, y)=\left( \alpha + \sigma^2 x y\right)^{d}$ where
-        $\sigma^\in \mathbb{R}_{>0}$ is the kernel's variance parameter, shift
-        parameter $\alpha$ and integer degree $d$.
+        For a pair of inputs $`x, y \in \mathbb{R}^{D}`$, let's evaluate the polynomial
+        kernel $`k(x, y)=\left( \alpha + \sigma^2 x y\right)^{d}`$ where
+        $`\sigma^\in \mathbb{R}_{>0}`$ is the kernel's variance parameter, shift
+        parameter $`\alpha`$ and integer degree $`d`$.
 
         Args:
             x (Float[Array, " D"]): The left hand argument of the kernel function's
@@ -56,7 +56,7 @@ class Polynomial(AbstractKernel):
 
         Returns
         -------
-            ScalarFloat: The value of $k(x, y)$.
+            ScalarFloat: The value of $`k(x, y)`$.
         """
         x = self.slice_input(x)
         y = self.slice_input(y)

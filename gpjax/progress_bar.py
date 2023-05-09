@@ -27,25 +27,28 @@ from gpjax.typing import Array  # noqa: TCH001
 
 
 def progress_bar(num_iters: int, log_rate: int) -> Callable:
-    """Progress bar decorator for the body function of a `jax.lax.scan`.
+    r"""Progress bar decorator for the body function of a `jax.lax.scan`.
 
-    !!! example
-        ```python
+    Example:
+    ```python
+        >>> import jax.numpy as jnp
+        >>> import jax
+        >>>
+        >>> carry = jnp.array(0.0)
+        >>> iteration_numbers = jnp.arange(100)
 
-        carry = jnp.array(0.0)
-        iteration_numbers = jnp.arange(100)
+        >>> @progress_bar(num_iters=iteration_numbers.shape[0], log_rate=10)
+        >>> def body_func(carry, x):
+        ...    return carry, x
+        >>>
+        >>> carry, _ = jax.lax.scan(body_func, carry, iteration_numbers)
+    ```
 
-        @progress_bar(num_iters=x.shape[0], log_rate=10)
-        def body_func(carry, x):
-            return carry, x
+    Adapted from this [excellent blog post](https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/).
 
-        carry, _ = jax.lax.scan(body_func, carry, iteration_numbers)
-        ```
-
-    Adapted from the excellent blog post: https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/.
-
-    Might be nice in future to directly create a general purpose `verbose scan` inplace of a for a jax.lax.scan,
-    that takes the same arguments as a jax.lax.scan, but prints a progress bar.
+    Might be nice in future to directly create a general purpose `verbose scan`
+    inplace of a for a jax.lax.scan, that takes the same arguments as a jax.lax.scan,
+    but prints a progress bar.
     """
     tqdm_bars = {}
     remainder = num_iters % log_rate
@@ -55,18 +58,18 @@ def progress_bar(num_iters: int, log_rate: int) -> Callable:
     tqdm_bars[0].set_description("Compiling...", refresh=True)
 
     def _update_tqdm(args: Any, transform: Any) -> None:
-        """Update the tqdm progress bar with the latest objective value."""
+        r"""Update the tqdm progress bar with the latest objective value."""
         value, iter_num = args
         tqdm_bars[0].set_description("Running", refresh=False)
         tqdm_bars[0].update(iter_num)
         tqdm_bars[0].set_postfix({"Value": f"{value: .2f}"})
 
     def _close_tqdm(args: Any, transform: Any) -> None:
-        """Close the tqdm progress bar."""
+        r"""Close the tqdm progress bar."""
         tqdm_bars[0].close()
 
     def _callback(cond: bool, func: Callable, arg: Any) -> None:
-        """Callback a function for a given argument if a condition is true."""
+        r"""Callback a function for a given argument if a condition is true."""
         dummy_result = 0
 
         def _do_callback(_) -> int:
@@ -80,7 +83,7 @@ def progress_bar(num_iters: int, log_rate: int) -> Callable:
         _ = lax.cond(cond, _do_callback, _not_callback, operand=None)
 
     def _update_progress_bar(value: Float[Array, "1"], iter_num: int) -> None:
-        """Update the tqdm progress bar."""
+        r"""Update the tqdm progress bar."""
         # Conditions for iteration number
         is_multiple: bool = (iter_num % log_rate == 0) & (
             iter_num != num_iters - remainder
@@ -98,7 +101,7 @@ def progress_bar(num_iters: int, log_rate: int) -> Callable:
         _callback(is_last, _close_tqdm, None)
 
     def _progress_bar(body_fun: Callable) -> Callable:
-        """Decorator that adds a progress bar to `body_fun` used in `jax.lax.scan`."""
+        r"""Decorator that adds a progress bar to `body_fun` used in `jax.lax.scan`."""
 
         def wrapper_progress_bar(carry: Any, x: Union[tuple, int]) -> Any:
             # Get iteration number

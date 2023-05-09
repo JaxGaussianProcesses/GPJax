@@ -1,5 +1,5 @@
 # %% [markdown]
-# # Spatial modelling: efficient sampling via pathwise conditioning
+# # Pathwise Sampling for Spatial Modelling
 # In this notebook, we demonstrate an application of Gaussian Processes
 # to a spatial interpolation problem. We will show how
 # to efficiently sample from a GP posterior as shown in <strong data-cite="wilson2020efficient"></strong>.

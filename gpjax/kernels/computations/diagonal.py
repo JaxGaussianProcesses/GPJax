@@ -22,15 +22,15 @@ from gpjax.typing import Array
 
 
 class DiagonalKernelComputation(AbstractKernelComputation):
-    """Diagonal kernel computation class. Operations with the kernel assume
+    r"""Diagonal kernel computation class. Operations with the kernel assume
     a diagonal Gram matrix.
     """
 
     def gram(self, x: Float[Array, "N D"]) -> DiagonalLinearOperator:
         r"""Compute the Gram matrix.
 
-        For a kernel with diagonal structure, compute the $N\times N$ Gram matrix on
-        an input matrix of shape $N\times D$.
+        For a kernel with diagonal structure, compute the $`N\times N`$ Gram matrix on
+        an input matrix of shape $`N\times D`$.
 
         Args:
             x (Float[Array, "N D"]): The input matrix.
@@ -46,8 +46,8 @@ class DiagonalKernelComputation(AbstractKernelComputation):
     ) -> Float[Array, "N M"]:
         r"""Compute the cross-covariance matrix.
 
-        For a given kernel, compute the $N\times M$ covariance matrix on a pair of
-        input matrices of shape $N\times D$ and $M\times D$.
+        For a given kernel, compute the $`N\times M`$ covariance matrix on a pair of
+        input matrices of shape $`N\times D`$ and $`M\times D`$.
 
         Args:
             x (Float[Array,"N D"]): The input matrix.

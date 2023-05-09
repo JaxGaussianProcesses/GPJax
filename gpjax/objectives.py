@@ -24,7 +24,7 @@ tfd = tfp.distributions
 
 @dataclass
 class AbstractObjective(Module):
-    """Abstract base class for objectives."""
+    r"""Abstract base class for objectives."""
 
     negative: bool = static_field(False)
     constant: float = static_field(init=False, repr=False)
@@ -57,31 +57,36 @@ class ConjugateMLL(AbstractObjective):
         given here enables exact estimation of the Gaussian process' latent
         function values.
 
-        For a training dataset $\{x_n, y_n\}_{n=1}^N$, set of test inputs
-        $\mathbf{x}^{\star}$ the corresponding latent function evaluations are given
-        by $\mathbf{f}=f(\mathbf{x})$ and $\mathbf{f}^{\star}f(\mathbf{x}^{\star})$,
+        For a training dataset $`\{x_n, y_n\}_{n=1}^N`$, set of test inputs
+        $`\mathbf{x}^{\star}`$ the corresponding latent function evaluations are given
+        by $`\mathbf{f}=f(\mathbf{x})`$ and $`\mathbf{f}^{\star}f(\mathbf{x}^{\star})`$,
         the marginal log-likelihood is given by:
-        $$
+        ```math
         \begin{align}
             \log p(\mathbf{y}) & = \int p(\mathbf{y}\mid\mathbf{f})p(\mathbf{f}, \mathbf{f}^{\star}\mathrm{d}\mathbf{f}^{\star}\\
             &=0.5\left(-\mathbf{y}^{\top}\left(k(\mathbf{x}, \mathbf{x}') +\sigma^2\mathbf{I}_N  \right)^{-1}\mathbf{y}-\log\lvert k(\mathbf{x}, \mathbf{x}') + \sigma^2\mathbf{I}_N\rvert - n\log 2\pi \right).
         \end{align}
-        $$
-
-        Example:
+        ```
 
         For a given ``ConjugatePosterior`` object, the following code snippet shows
         how the marginal log-likelihood can be evaluated.
 
+        Example:
         ```python
-            import gpjax as gpx
-
-            xtrain = jnp.linspace(0, 1).reshape(-1, 1)
-            ytrain = jnp.sin(xtrain)
-            D = gpx.Dataset(X=xtrain, y=ytrain)
-
-            mll = gpx.ConjugateMLL(negative=True)
-            mll(posterior, train_data = D)
+            >>> import gpjax as gpx
+            >>>
+            >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
+            >>> ytrain = jnp.sin(xtrain)
+            >>> D = gpx.Dataset(X=xtrain, y=ytrain)
+            >>>
+            >>> meanf = gpx.mean_functions.Constant()
+            >>> kernel = gpx.kernels.RBF()
+            >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
+            >>> prior = gpx.Prior(mean_function = meanf, kernel=kernel)
+            >>> posterior = prior * likelihood
+            >>>
+            >>> mll = gpx.ConjugateMLL(negative=True)
+            >>> mll(posterior, train_data = D)
         ```
 
         Our goal is to maximise the marginal log-likelihood. Therefore, when optimising
@@ -240,8 +245,10 @@ def variational_expectation(
     distribution. Batching can be done here to speed up computation.
 
     Args:
-        variational_family (AbstractVariationalFamily): The variational family that we are using to approximate the posterior.
-        train_data (Dataset): The batch for which the expectation should be computed for.
+        variational_family (AbstractVariationalFamily): The variational family that we
+            are using to approximate the posterior.
+        train_data (Dataset): The batch for which the expectation should be computed
+            for.
 
     Returns
     -------

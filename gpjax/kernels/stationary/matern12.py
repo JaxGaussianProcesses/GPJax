@@ -35,7 +35,7 @@ from gpjax.typing import (
 
 @dataclass
 class Matern12(AbstractKernel):
-    """The Matérn kernel with smoothness parameter fixed at 0.5."""
+    r"""The Matérn kernel with smoothness parameter fixed at 0.5."""
 
     lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
@@ -46,15 +46,17 @@ class Matern12(AbstractKernel):
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the Matérn 1/2 kernel between a pair of arrays.
 
-        Evaluate the kernel on a pair of inputs $(x, y)$ with
-        lengthscale parameter $\ell$ and variance $\sigma^2$.
-        $$k(x, y) = \sigma^2\exp\Bigg(-\frac{\lvert x-y \rvert}{2\ell^2}\Bigg)$$
+        Evaluate the kernel on a pair of inputs $`(x, y)`$ with
+        lengthscale parameter $`\ell`$ and variance $`\sigma^2`$.
+        ```math
+        (x, y) = \sigma^2\exp\Bigg(-\frac{\lvert x-y \rvert}{2\ell^2}\Bigg)
+        ```
 
         Args:
             x (Float[Array, " D"]): The left hand argument of the kernel function's call.
             y (Float[Array, " D"]): The right hand argument of the kernel function's call
         Returns:
-            ScalarFloat: The value of :math:`k(x, y)`
+            ScalarFloat: The value of $`k(x, y)`$
         """
         x = self.slice_input(x) / self.lengthscale
         y = self.slice_input(y) / self.lengthscale

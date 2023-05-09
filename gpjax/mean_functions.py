@@ -39,11 +39,11 @@ from gpjax.typing import Array
 
 @dataclasses.dataclass
 class AbstractMeanFunction(Module):
-    """Mean function that is used to parameterise the Gaussian process."""
+    r"""Mean function that is used to parameterise the Gaussian process."""
 
     @abc.abstractmethod
     def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
-        """Evaluate the mean function at the given points. This method is required for all subclasses.
+        r"""Evaluate the mean function at the given points. This method is required for all subclasses.
 
         Args:
             x (Float[Array, " D"]): The point at which to evaluate the mean function.
@@ -57,7 +57,7 @@ class AbstractMeanFunction(Module):
     def __add__(
         self, other: Union["AbstractMeanFunction", Float[Array, "1"]]
     ) -> "AbstractMeanFunction":
-        """Add two mean functions.
+        r"""Add two mean functions.
 
         Args:
             other (AbstractMeanFunction): The other mean function to add.
@@ -77,7 +77,7 @@ class AbstractMeanFunction(Module):
             "AbstractMeanFunction", Float[Array, "1"]
         ],  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
-        """Add two mean functions.
+        r"""Add two mean functions.
 
         Args:
             other (AbstractMeanFunction): The other mean function to add.
@@ -94,7 +94,7 @@ class AbstractMeanFunction(Module):
             "AbstractMeanFunction", Float[Array, "1"]
         ],  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
-        """Multiply two mean functions.
+        r"""Multiply two mean functions.
 
         Args:
             other (AbstractMeanFunction): The other mean function to multiply.
@@ -114,7 +114,7 @@ class AbstractMeanFunction(Module):
             "AbstractMeanFunction", Float[Array, "1"]
         ],  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
-        """Multiply two mean functions.
+        r"""Multiply two mean functions.
 
         Args:
             other (AbstractMeanFunction): The other mean function to multiply.
@@ -128,16 +128,17 @@ class AbstractMeanFunction(Module):
 
 @dataclasses.dataclass
 class Constant(AbstractMeanFunction):
-    """
-    A constant mean function. This function returns a repeated scalar value for all inputs.
-    The scalar value itself can be treated as a model hyperparameter and learned during training but
-    defaults to 1.0.
+    r"""Constant mean function.
+
+    A constant mean function. This function returns a repeated scalar value for all
+    inputs.  The scalar value itself can be treated as a model hyperparameter and
+    learned during training but defaults to 1.0.
     """
 
     constant: Float[Array, "1"] = param_field(jnp.array([0.0]))
 
     def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
-        """Evaluate the mean function at the given points.
+        r"""Evaluate the mean function at the given points.
 
         Args:
             x (Float[Array, " D"]): The point at which to evaluate the mean function.
@@ -151,7 +152,7 @@ class Constant(AbstractMeanFunction):
 
 @dataclasses.dataclass
 class CombinationMeanFunction(AbstractMeanFunction):
-    """A base class for products or sums of AbstractMeanFunctions."""
+    r"""A base class for products or sums of AbstractMeanFunctions."""
 
     means: List[AbstractMeanFunction]
     operator: Callable = static_field()
@@ -182,7 +183,7 @@ class CombinationMeanFunction(AbstractMeanFunction):
         self.operator = operator
 
     def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
-        """Evaluate combination kernel on a pair of inputs.
+        r"""Evaluate combination kernel on a pair of inputs.
 
         Args:
             x (Float[Array, " D"]): The point at which to evaluate the mean function.

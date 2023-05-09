@@ -27,7 +27,7 @@ from gpjax.typing import Array
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):
     def gram(self, x: Float[Array, "N D"]) -> ConstantDiagonalLinearOperator:
-        """Compute the Gram matrix.
+        r"""Compute the Gram matrix.
 
         Compute Gram covariance operator of the kernel function.
 
@@ -44,7 +44,7 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
         r"""Compute the diagonal Gram matrix's entries.
 
         For a given kernel, compute the elementwise diagonal of the
-        NxN gram matrix on an input matrix of shape $N\times D$.
+        NxN gram matrix on an input matrix of shape $`N\times D`$.
 
         Args:
             inputs (Float[Array, "N D"]): The input matrix.

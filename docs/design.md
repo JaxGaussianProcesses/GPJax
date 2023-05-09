@@ -11,7 +11,7 @@ in `GPJax` with its corresponding mathematical quantity.
 
 | On paper                                    | GPJax code | Description                                                                     |
 | ------------------------------------------- | ---------- | ------------------------------------------------------------------------------- |
-| $n$                                         | n          | Number of train inputs                                                          |
+| $ n $                                         | n          | Number of train inputs                                                          |
 | $\boldsymbol{x} = (x_1,\dotsc,x_{n})$       | x          | Train inputs                                                                    |
 | $\boldsymbol{y} = (y_1,\dotsc,y_{n})$       | y          | Train labels                                                                    |
 | $\boldsymbol{t}$                            | t          | Test inputs                                                                     |

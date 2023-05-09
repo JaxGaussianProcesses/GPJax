@@ -28,7 +28,7 @@ from gpjax.typing import Array
 
 @dataclass
 class EigenKernelComputation(AbstractKernelComputation):
-    """Eigen kernel computation class. Kernels who operate on an
+    r"""Eigen kernel computation class. Kernels who operate on an
     eigen-decomposed structure should use this computation object.
     """
 
@@ -37,7 +37,7 @@ class EigenKernelComputation(AbstractKernelComputation):
     ) -> Float[Array, "N M"]:
         r"""Compute the cross-covariance matrix.
 
-        For an $N\times D$ and $M\times D$ pair of matrices, evaluate the $N \times M$
+        For an $`N\times D`$ and $`M\times D`$ pair of matrices, evaluate the $`N \times M`$
         cross-covariance matrix.
 
         Args:

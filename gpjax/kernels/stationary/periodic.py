@@ -30,7 +30,7 @@ from gpjax.typing import (
 
 @dataclass
 class Periodic(AbstractKernel):
-    """The periodic kernel.
+    r"""The periodic kernel.
 
     Key reference is MacKay 1998 - "Introduction to Gaussian processes".
     """
@@ -46,14 +46,16 @@ class Periodic(AbstractKernel):
         r"""Compute the Periodic kernel between a pair of arrays.
 
         TODO: update docstring
-        Evaluate the kernel on a pair of inputs $(x, y)$ with length-scale parameter $\ell$ and variance $\sigma$.
-        $$k(x, y) = \sigma^2 \exp \Bigg( -0.5 \sum_{i=1}^{d} \Bigg)$$
+        Evaluate the kernel on a pair of inputs $`(x, y)`$ with length-scale parameter $\ell$ and variance $\sigma$.
+        ```math
+        k(x, y) = \sigma^2 \exp \Bigg( -0.5 \sum_{i=1}^{d} \Bigg)
+        ```
 
         Args:
             x (Float[Array, " D"]): The left hand argument of the kernel function's call.
             y (Float[Array, " D"]): The right hand argument of the kernel function's call
         Returns:
-            ScalarFloat: The value of $k(x, y)$.
+            ScalarFloat: The value of $`k(x, y)`$.
         """
         x = self.slice_input(x)
         y = self.slice_input(y)

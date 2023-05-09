@@ -21,17 +21,17 @@ from gpjax.typing import Array
 
 
 class DenseKernelComputation(AbstractKernelComputation):
-    """Dense kernel computation class. Operations with the kernel assume
+    r"""Dense kernel computation class. Operations with the kernel assume
     a dense gram matrix structure.
     """
 
     def cross_covariance(
         self, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
-        """Compute the cross-covariance matrix.
+        r"""Compute the cross-covariance matrix.
 
         For a given kernel, compute the NxM covariance matrix on a pair of input
-        matrices of shape NxD and MxD.
+        matrices of shape $`NxD`$ and $`MxD`$.
 
         Args:
             x (Float[Array,"N D"]): The input matrix.
