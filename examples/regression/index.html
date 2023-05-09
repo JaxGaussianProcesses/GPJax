@@ -47,6 +47,8 @@
     
       <link rel="stylesheet" href="../../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+    
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -315,7 +317,7 @@
   
     <li class="md-nav__item">
       <a href="../pytrees/" class="md-nav__link">
-        🌳 GPJax Module
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -636,6 +638,20 @@
     <li class="md-nav__item">
       <a href="../yacht/" class="md-nav__link">
         UCI Data Benchmarking
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spatial/" class="md-nav__link">
+        Pathwise Sampling for Spatial Modelling
       </a>
     </li>
   
@@ -2721,7 +2737,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=7d8b6a5d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=3cd18c84" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2733,7 +2749,7 @@ Licensed under the Apache License, Version 2.0.
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=5d4c68fb" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=1e86ec41" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2803,7 +2819,7 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]</div>
 
 </div>
 </div>
-<div id="cell-id=98317f85" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=68f448c9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2819,7 +2835,7 @@ for later.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=929e26f8" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=0850c33f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2875,7 +2891,7 @@ ytest = f(xtest)</div>
 
 </div>
 </div>
-<div id="cell-id=5ee4d840" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=302fc103" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2888,7 +2904,7 @@ function and the observed data that is subject to Gaussian noise.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=68054ea0" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=4e70871d" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2926,7 +2942,7 @@ ax.legend(loc="best")</div>
 
 </div>
 </div>
-<div id="cell-id=77303994" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=2f10fba2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2954,7 +2970,7 @@ kernel.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=cd20895f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=91c5d091" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2990,7 +3006,7 @@ prior = gpx.Prior(mean_function=meanf, kernel=kernel)</div>
 
 </div>
 </div>
-<div id="cell-id=b25ff4c3" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=33cdd167" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3006,7 +3022,7 @@ the evaluation of the GP's mean and covariance .</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=bdfdabd4" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=eee99bd9" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3076,7 +3092,7 @@ ax = clean_legend(ax)</div>
 
 </div>
 </div>
-<div id="cell-id=759cf67c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=cb4b929a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3094,7 +3110,7 @@ This is defined in GPJax through calling a <code>Gaussian</code> instance.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=96b7510c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=7157fc30" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3126,7 +3142,7 @@ This is defined in GPJax through calling a <code>Gaussian</code> instance.</p>
 
 </div>
 </div>
-<div id="cell-id=387fd30e" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=fe2a57a0" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3140,7 +3156,7 @@ This is defined in GPJax through calling a <code>Gaussian</code> instance.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=0e48ce84" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=7540d297" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3172,7 +3188,7 @@ This is defined in GPJax through calling a <code>Gaussian</code> instance.</p>
 
 </div>
 </div>
-<div id="cell-id=64a4cd9a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=7d5973f8" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3194,7 +3210,7 @@ these parameters by optimising the marginal log-likelihood (MLL).</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=2d5c9c64" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=388713f7" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3242,7 +3258,7 @@ negative_mll(posterior, train_data=D)
 
 </div>
 </div>
-<div id="cell-id=31c7509b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=12089cfc" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3256,7 +3272,7 @@ accelerate training.</p>
 </div>
 </div>
 </div>
-<div id="cell-id=68cf216f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=0ca873d1" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3269,7 +3285,7 @@ optimiser.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=56fea367" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=a6e5a16b" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3317,7 +3333,7 @@ optimiser.</p>
 
 </div>
 </div>
-<div id="cell-id=ba6d9409" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=ac23b0ed" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3331,7 +3347,7 @@ progressed.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=0b3b766e" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=0c2023b7" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3367,7 +3383,7 @@ ax.set(xlabel="Training iteration", ylabel="Negative marginal log likelihood")</
 
 </div>
 </div>
-<div id="cell-id=742bb7ea" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=f49a9f86" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3383,7 +3399,7 @@ and <code>stddev</code> can be used to extract the predictive mean and standard 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=d8ade955" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=a4d01a56" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3423,7 +3439,7 @@ predictive_std = predictive_dist.stddev()</div>
 
 </div>
 </div>
-<div id="cell-id=5d104ecf" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=30a6dc7f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3437,7 +3453,7 @@ latent function of interest.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=a81603e0" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=bdaf079f" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3525,7 +3541,7 @@ ax.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))</div>
 
 </div>
 </div>
-<div id="cell-id=e06dc642" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=e4912b7c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3536,7 +3552,7 @@ ax.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=f7009c3d" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=d8aad81e" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3620,11 +3636,11 @@ ax.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))</div>
     
       <script src="../../assets/javascripts/bundle.51198bba.min.js"></script>
       
-        <script src="../../javascripts/mathjax.js"></script>
-      
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+      
+        <script src="../../javascripts/katex.js"></script>
       
     
   </body>

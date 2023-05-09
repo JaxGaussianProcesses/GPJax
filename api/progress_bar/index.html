@@ -47,6 +47,8 @@
     
       <link rel="stylesheet" href="../../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+    
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -315,7 +317,7 @@
   
     <li class="md-nav__item">
       <a href="../../examples/pytrees/" class="md-nav__link">
-        🌳 GPJax Module
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -558,6 +560,20 @@
     <li class="md-nav__item">
       <a href="../../examples/yacht/" class="md-nav__link">
         UCI Data Benchmarking
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/spatial/" class="md-nav__link">
+        Pathwise Sampling for Spatial Modelling
       </a>
     </li>
   
@@ -1674,21 +1690,23 @@
   <div class="doc doc-contents ">
   
       <p>Progress bar decorator for the body function of a <code>jax.lax.scan</code>.</p>
-<div class="admonition example">
-<p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">carry</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">iteration_numbers</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nd">@progress_bar</span><span class="p">(</span><span class="n">num_iters</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">log_rate</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">def</span> <span class="nf">body_func</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="k">return</span> <span class="n">carry</span><span class="p">,</span> <span class="n">x</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">carry</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">body_func</span><span class="p">,</span> <span class="n">carry</span><span class="p">,</span> <span class="n">iteration_numbers</span><span class="p">)</span>
-</code></pre></div>
-</div>
-<p>Adapted from the excellent blog post: https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/.</p>
-<p>Might be nice in future to directly create a general purpose <code>verbose scan</code> inplace of a for a jax.lax.scan,
-that takes the same arguments as a jax.lax.scan, but prints a progress bar.</p>
+<p>Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">jax</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">carry</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">iteration_numbers</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="nd">@progress_bar</span><span class="p">(</span><span class="n">num_iters</span><span class="o">=</span><span class="n">iteration_numbers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">log_rate</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">body_func</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="o">...</span>    <span class="k">return</span> <span class="n">carry</span><span class="p">,</span> <span class="n">x</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">carry</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">body_func</span><span class="p">,</span> <span class="n">carry</span><span class="p">,</span> <span class="n">iteration_numbers</span><span class="p">)</span>
+</code></pre></div></p>
+<p>Adapted from this <a href="https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/">excellent blog post</a>.</p>
+<p>Might be nice in future to directly create a general purpose <code>verbose scan</code>
+inplace of a for a jax.lax.scan, that takes the same arguments as a jax.lax.scan,
+but prints a progress bar.</p>
 
   </div>
 
@@ -1748,11 +1766,11 @@ that takes the same arguments as a jax.lax.scan, but prints a progress bar.</p>
     
       <script src="../../assets/javascripts/bundle.51198bba.min.js"></script>
       
-        <script src="../../javascripts/mathjax.js"></script>
-      
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+      
+        <script src="../../javascripts/katex.js"></script>
       
     
   </body>

@@ -47,6 +47,8 @@
     
       <link rel="stylesheet" href="../../../../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+    
     <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -315,7 +317,7 @@
   
     <li class="md-nav__item">
       <a href="../../../../examples/pytrees/" class="md-nav__link">
-        🌳 GPJax Module
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -558,6 +560,20 @@
     <li class="md-nav__item">
       <a href="../../../../examples/yacht/" class="md-nav__link">
         UCI Data Benchmarking
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../examples/spatial/" class="md-nav__link">
+        Pathwise Sampling for Spatial Modelling
       </a>
     </li>
   
@@ -1665,8 +1681,10 @@
         Bases: <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code></p>
 
   
-      <p>The ArCosine kernel. This kernel is non-stationary and resembles the behavior
-of neural networks. See Section 3.1 of https://arxiv.org/pdf/1112.3712.pdf for
+      <p>The ArCosine kernel.</p>
+<p>This kernel is non-stationary and resembles the behavior of neural networks.
+See Section 3.1 of
+<a href="https://arxiv.org/abs/1112.3712">Cho and Saul (2011)</a> for
 additional details.</p>
 
 
@@ -1787,7 +1805,22 @@ additional details.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Evaluate the kernel on a pair of inputs :math:<code>(x, y)</code></p>
+      <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>Evaluate the kernel on a pair of inputs <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(x, y)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span></span></p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1824,8 +1857,23 @@ call</p></td>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__call__--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>ScalarFloat: The value of :math:`k(x, y)`.
+      <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__call__--returns">Returns</h6>
+<div class="highlight"><pre><span></span><code>ScalarFloat: The value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">k(x, y)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span></span>.
 </code></pre></div>
 
   </div>
@@ -1895,11 +1943,11 @@ call</p></td>
     
       <script src="../../../../assets/javascripts/bundle.51198bba.min.js"></script>
       
-        <script src="../../../../javascripts/mathjax.js"></script>
-      
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+      
+        <script src="../../../../javascripts/katex.js"></script>
       
     
   </body>

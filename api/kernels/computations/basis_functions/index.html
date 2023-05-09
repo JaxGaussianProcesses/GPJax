@@ -47,6 +47,8 @@
     
       <link rel="stylesheet" href="../../../../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+    
     <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -315,7 +317,7 @@
   
     <li class="md-nav__item">
       <a href="../../../../examples/pytrees/" class="md-nav__link">
-        🌳 GPJax Module
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -558,6 +560,20 @@
     <li class="md-nav__item">
       <a href="../../../../examples/yacht/" class="md-nav__link">
         UCI Data Benchmarking
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../examples/spatial/" class="md-nav__link">
+        Pathwise Sampling for Spatial Modelling
       </a>
     </li>
   
@@ -1731,7 +1747,22 @@
           <td>
                 <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, N D]</code>
           </td>
-          <td><p>(Float[Array, "N D"]): A <span class="arithmatex">\(N \times D\)</span> array of inputs.</p></td>
+          <td><link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>(Float[Array, "N D"]): A <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>×</mo><mi>D</mi></mrow><annotation encoding="application/x-tex">N \times D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span> array of inputs.</p></td>
           <td>
               <em>required</em>
           </td>
@@ -1741,7 +1772,22 @@
           <td>
                 <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, M D]</code>
           </td>
-          <td><p>(Float[Array, "M D"]): A <span class="arithmatex">\(M \times D\)</span> array of inputs.</p></td>
+          <td><link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>(Float[Array, "M D"]): A <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo>×</mo><mi>D</mi></mrow><annotation encoding="application/x-tex">M \times D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span> array of inputs.</p></td>
           <td>
               <em>required</em>
           </td>
@@ -1762,7 +1808,7 @@
           <td>
                 <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, N M]</code>
           </td>
-          <td><p>Float[Array, "N M"]: A <span class="arithmatex">\(N \times M\)</span> array of cross-covariances.</p></td>
+          <td><p>Float[Array, "N M"]: A $N \times M$ array of cross-covariances.</p></td>
         </tr>
     </tbody>
   </table>
@@ -1803,7 +1849,22 @@ multiplication between the inputs and the scaled frequencies.</p>
           <td>
                 <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, N D]</code>
           </td>
-          <td><p>A N x D array of inputs.</p></td>
+          <td><link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>A <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>x</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">N x D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mord mathnormal">x</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span> array of inputs.</p></td>
           <td>
               <em>required</em>
           </td>
@@ -1824,8 +1885,23 @@ multiplication between the inputs and the scaled frequencies.</p>
 <td><code>DenseLinearOperator</code></td>          <td>
                 <code><a class="autorefs autorefs-internal" title="gpjax.linops.DenseLinearOperator" href="../../../linops/dense_linear_operator/#gpjax.linops.dense_linear_operator.DenseLinearOperator">DenseLinearOperator</a></code>
           </td>
-          <td><p>A dense linear operator representing the
-<span class="arithmatex">\(N \times N\)</span> Gram matrix.</p></td>
+          <td><link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>A dense linear operator representing the
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>×</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">N \times N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span> Gram matrix.</p></td>
         </tr>
     </tbody>
   </table>
@@ -1864,15 +1940,45 @@ multiplication between the inputs and the scaled frequencies.</p>
           <td>
                 <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, N D]</code>
           </td>
-          <td><p>A <span class="arithmatex">\(N \times D\)</span> array of inputs.</p></td>
+          <td><link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>A <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>×</mo><mi>D</mi></mrow><annotation encoding="application/x-tex">N \times D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span> array of inputs.</p></td>
           <td>
               <em>required</em>
           </td>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.kernels.computations.basis_functions.BasisFunctionComputation.compute_features--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;N L&quot;]: A $N \times L$ array of features where $L = 2M$.
+      <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<h6 id="gpjax.kernels.computations.basis_functions.BasisFunctionComputation.compute_features--returns">Returns</h6>
+<div class="highlight"><pre><span></span><code>Float[Array, &quot;N L&quot;]: A <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>×</mo><mi>L</mi></mrow><annotation encoding="application/x-tex">N \times L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> array of features where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><mn>2</mn><mi>M</mi></mrow><annotation encoding="application/x-tex">L = 2M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span></span></span></span>.
 </code></pre></div>
 
   </div>
@@ -1942,11 +2048,11 @@ multiplication between the inputs and the scaled frequencies.</p>
     
       <script src="../../../../assets/javascripts/bundle.51198bba.min.js"></script>
       
-        <script src="../../../../javascripts/mathjax.js"></script>
-      
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+      
+        <script src="../../../../javascripts/katex.js"></script>
       
     
   </body>

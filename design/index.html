@@ -47,6 +47,8 @@
     
       <link rel="stylesheet" href="../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -372,7 +374,7 @@
   
     <li class="md-nav__item">
       <a href="../examples/pytrees/" class="md-nav__link">
-        🌳 GPJax Module
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -615,6 +617,20 @@
     <li class="md-nav__item">
       <a href="../examples/yacht/" class="md-nav__link">
         UCI Data Benchmarking
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/spatial/" class="md-nav__link">
+        Pathwise Sampling for Spatial Modelling
       </a>
     </li>
   
@@ -1649,7 +1665,7 @@
 
 
 <h1 id="design-principles">Design Principles</h1>
-<p><span class="arithmatex">\(\require{bm}\)</span></p>
+<p>$\require{bm}$</p>
 <p><code>GPJax</code> is designed to be a Gaussian process package that provides an accurate
 representation of the underlying maths. Variable names are chosen to closely
 match the notation in (Rasmussen and Williams, 2006)<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>. We here list the notation used
@@ -1665,54 +1681,54 @@ in <code>GPJax</code> with its corresponding mathematical quantity.</p>
 </thead>
 <tbody>
 <tr>
-<td><span class="arithmatex">\(n\)</span></td>
+<td>$ n $</td>
 <td>n</td>
 <td>Number of train inputs</td>
 </tr>
 <tr>
-<td><span class="arithmatex">\(\boldsymbol{x} = (x_1,\dotsc,x_{n})\)</span></td>
+<td>$\boldsymbol{x} = (x_1,\dotsc,x_{n})$</td>
 <td>x</td>
 <td>Train inputs</td>
 </tr>
 <tr>
-<td><span class="arithmatex">\(\boldsymbol{y} = (y_1,\dotsc,y_{n})\)</span></td>
+<td>$\boldsymbol{y} = (y_1,\dotsc,y_{n})$</td>
 <td>y</td>
 <td>Train labels</td>
 </tr>
 <tr>
-<td><span class="arithmatex">\(\boldsymbol{t}\)</span></td>
+<td>$\boldsymbol{t}$</td>
 <td>t</td>
 <td>Test inputs</td>
 </tr>
 <tr>
-<td><span class="arithmatex">\(f(\cdot)\)</span></td>
+<td>$f(\cdot)$</td>
 <td>f</td>
 <td>Latent function modelled as a GP</td>
 </tr>
 <tr>
-<td><span class="arithmatex">\(f({\boldsymbol{x}})\)</span></td>
+<td>$f({\boldsymbol{x}})$</td>
 <td>fx</td>
-<td>Latent function at inputs <span class="arithmatex">\(\boldsymbol{x}\)</span></td>
+<td>Latent function at inputs $\boldsymbol{x}$</td>
 </tr>
 <tr>
-<td><span class="arithmatex">\(\boldsymbol{\mu}_{\boldsymbol{x}}\)</span></td>
+<td>$\boldsymbol{\mu}_{\boldsymbol{x}}$</td>
 <td>μx</td>
-<td>Prior mean at inputs <span class="arithmatex">\(\boldsymbol{x}\)</span></td>
+<td>Prior mean at inputs $\boldsymbol{x}$</td>
 </tr>
 <tr>
-<td><span class="arithmatex">\(\mathbf{K}_{\boldsymbol{x}\boldsymbol{x}}\)</span></td>
+<td>$\mathbf{K}_{\boldsymbol{x}\boldsymbol{x}}$</td>
 <td>Kxx</td>
-<td>Kernel Gram matrix at inputs <span class="arithmatex">\(\boldsymbol{x}\)</span></td>
+<td>Kernel Gram matrix at inputs $\boldsymbol{x}$</td>
 </tr>
 <tr>
-<td><span class="arithmatex">\(\mathbf{L}_{\boldsymbol{x}}\)</span></td>
+<td>$\mathbf{L}_{\boldsymbol{x}}$</td>
 <td>Lx</td>
-<td>Lower Cholesky decomposition of <span class="arithmatex">\(\boldsymbol{K}_{\boldsymbol{x}\boldsymbol{x}}\)</span></td>
+<td>Lower Cholesky decomposition of $\boldsymbol{K}_{\boldsymbol{x}\boldsymbol{x}}$</td>
 </tr>
 <tr>
-<td><span class="arithmatex">\(\mathbf{K}_{\boldsymbol{t}\boldsymbol{x}}\)</span></td>
+<td>$\mathbf{K}_{\boldsymbol{t}\boldsymbol{x}}$</td>
 <td>Ktx</td>
-<td>Cross-covariance between inputs <span class="arithmatex">\(\boldsymbol{t}\)</span> and <span class="arithmatex">\(\boldsymbol{x}\)</span></td>
+<td>Cross-covariance between inputs $\boldsymbol{t}$ and $\boldsymbol{x}$</td>
 </tr>
 </tbody>
 </table>
@@ -1727,17 +1743,17 @@ in <code>GPJax</code> with its corresponding mathematical quantity.</p>
 </thead>
 <tbody>
 <tr>
-<td><span class="arithmatex">\(m\)</span></td>
+<td>$m$</td>
 <td>m</td>
 <td>Number of inducing inputs</td>
 </tr>
 <tr>
-<td><span class="arithmatex">\(\boldsymbol{z} = (z_1,\dotsc,z_{m})\)</span></td>
+<td>$\boldsymbol{z} = (z_1,\dotsc,z_{m})$</td>
 <td>z</td>
 <td>Inducing inputs</td>
 </tr>
 <tr>
-<td><span class="arithmatex">\(\boldsymbol{u} = (u_1,\dotsc,u_{m})\)</span></td>
+<td>$\boldsymbol{u} = (u_1,\dotsc,u_{m})$</td>
 <td>u</td>
 <td>Inducing outputs</td>
 </tr>
@@ -1805,11 +1821,11 @@ packages. Documentation designs have been greatly inspired by the exceptional
     
       <script src="../assets/javascripts/bundle.51198bba.min.js"></script>
       
-        <script src="../javascripts/mathjax.js"></script>
-      
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+      
+        <script src="../javascripts/katex.js"></script>
       
     
   </body>

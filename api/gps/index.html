@@ -47,6 +47,8 @@
     
       <link rel="stylesheet" href="../../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+    
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -315,7 +317,7 @@
   
     <li class="md-nav__item">
       <a href="../../examples/pytrees/" class="md-nav__link">
-        🌳 GPJax Module
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -558,6 +560,20 @@
     <li class="md-nav__item">
       <a href="../../examples/yacht/" class="md-nav__link">
         UCI Data Benchmarking
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/spatial/" class="md-nav__link">
+        Pathwise Sampling for Spatial Modelling
       </a>
     </li>
   
@@ -1765,8 +1781,8 @@
 
   <div class="doc doc-contents ">
   
-      <p>Evaluate the Gaussian process at the given points.
-The output of this function is a
+      <p>Evaluate the Gaussian process at the given points.</p>
+<p>The output of this function is a
 <a href="https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions">TensorFlow probability distribution</a> from which the
 the latent function's mean and covariance can be evaluated and the distribution
 can be sampled.</p>
@@ -1832,7 +1848,8 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
 
   <div class="doc doc-contents ">
   
-      <p>Compute the latent function's multivariate normal distribution for a
+      <p>Evaluate the predictive distribution.</p>
+<p>Compute the latent function's multivariate normal distribution for a
 given set of parameters. For any class inheriting the <code>AbstractPrior</code> class,
 this method must be implemented.</p>
 
@@ -1870,7 +1887,8 @@ this method must be implemented.</p>
     </tbody>
   </table>
       <h6 id="gpjax.gps.AbstractPrior.predict--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation of the Gaussian process.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
+    of the Gaussian process.
 </code></pre></div>
 
   </div>
@@ -1905,21 +1923,38 @@ this method must be implemented.</p>
         Bases: <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPrior" href="#gpjax.gps.AbstractPrior">AbstractPrior</a></code></p>
 
   
-      <p>A Gaussian process prior object. The GP is parameterised by a
+      <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>A Gaussian process prior object.</p>
+<p>The GP is parameterised by a
 <a href="https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.mean_functions">mean</a>
-and <a href="https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.kernels">kernel</a> function.</p>
-<p>A Gaussian process prior parameterised by a mean function <span class="arithmatex">\(m(\cdot)\)</span> and a kernel
-function <span class="arithmatex">\(k(\cdot, \cdot)\)</span> is given by
-<span class="arithmatex">\(p(f(\cdot)) = \mathcal{GP}(m(\cdot), k(\cdot, \cdot))\)</span>.</p>
+and <a href="https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.kernels">kernel</a>
+function.</p>
+<p>A Gaussian process prior parameterised by a mean function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">m(\cdot)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">m</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">)</span></span></span></span> and a kernel
+function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo separator="true">,</mo><mo>⋅</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">k(\cdot, \cdot)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">⋅</span><span class="mclose">)</span></span></span></span> is given by
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><mrow><mi mathvariant="script">G</mi><mi mathvariant="script">P</mi></mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo separator="true">,</mo><mi>k</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo separator="true">,</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(f(\cdot)) = \mathcal{GP}(m(\cdot), k(\cdot, \cdot))</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">))</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathcal" style="margin-right:0.0593em;">G</span><span class="mord mathcal" style="margin-right:0.08222em;">P</span></span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">⋅</span><span class="mclose">))</span></span></span></span>.</p>
 <p>To invoke a <code>Prior</code> distribution, only a kernel function is required. By
 default, the mean function will be set to zero. In general, this assumption
 will be reasonable assuming the data being modelled has been centred.</p>
 <p>Example:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">kernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">()</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">meanf</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">mean_functions</span><span class="o">.</span><span class="n">Zero</span><span class="p">()</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">mean_function</span><span class="o">=</span><span class="n">meanf</span><span class="p">,</span> <span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="p">)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">kernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">()</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">meanf</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">mean_functions</span><span class="o">.</span><span class="n">Zero</span><span class="p">()</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">mean_function</span><span class="o">=</span><span class="n">meanf</span><span class="p">,</span> <span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="p">)</span>
 </code></pre></div></p>
 
 
@@ -1948,21 +1983,39 @@ will be reasonable assuming the data being modelled has been centred.</p>
 
   <div class="doc doc-contents ">
   
-      <p>The product of a prior and likelihood is proportional to the
-posterior distribution. By computing the product of a GP prior and a
-likelihood object, a posterior GP object will be returned. Mathematically,
-this can be described by:
-<span class="arithmatex">\(p(f(\cdot) \mid y) \propto p(y \mid f(\cdot)) p(f(\cdot))\)</span>, where
-<span class="arithmatex">\(p(y | f(\cdot))\)</span> is the likelihood and <span class="arithmatex">\(p(f(\cdot))\)</span> is the prior.</p>
+      <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>Combine the prior with a likelihood to form a posterior distribution.</p>
+<p>The product of a prior and likelihood is proportional to the posterior
+distribution. By computing the product of a GP prior and a likelihood
+object, a posterior GP object will be returned. Mathematically, this can
+be described by:
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo>∣</mo><mi>y</mi><mo stretchy="false">)</mo><mo>∝</mo><mi>p</mi><mo stretchy="false">(</mo><mi>y</mi><mo>∣</mo><mi>f</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi>p</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">
+p(f(\cdot) \mid y) \propto p(y \mid f(\cdot))p(f(\cdot)),
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∝</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">))</span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">))</span><span class="mpunct">,</span></span></span></span></span></p>
+where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>y</mi><mi mathvariant="normal">∣</mi><mi>f</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(y | f(\cdot))</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">))</span></span></span></span> is the likelihood and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(f(\cdot))</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">))</span></span></span></span> is the prior.</p>
 <p>Example:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    import gpjax as gpx
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    meanf = gpx.mean_functions.Zero()
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    kernel = gpx.kernels.RBF()
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    prior = gpx.Prior(mean_function=meanf, kernel = kernel)
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    likelihood = gpx.likelihoods.Gaussian(num_datapoints=100)
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    prior * likelihood
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">meanf</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">mean_functions</span><span class="o">.</span><span class="n">Zero</span><span class="p">()</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">kernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">()</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">mean_function</span><span class="o">=</span><span class="n">meanf</span><span class="p">,</span> <span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">likelihood</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">likelihoods</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">num_datapoints</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">prior</span> <span class="o">*</span> <span class="n">likelihood</span>
 </code></pre></div></p>
 
   <p><strong>Parameters:</strong></p>
@@ -2010,7 +2063,8 @@ this can be described by:
 
   <div class="doc doc-contents ">
   
-      <p>Reimplement the multiplication operator to allow for order-invariant
+      <p>Combine the prior with a likelihood to form a posterior distribution.</p>
+<p>Reimplement the multiplication operator to allow for order-invariant
 product of a likelihood and a prior i.e., likelihood * prior.</p>
 
   <p><strong>Parameters:</strong></p>
@@ -2064,23 +2118,17 @@ parameters. The output of this function is a function that computes
 a TFP distribution for a given set of inputs.</p>
 <p>In the following example, we compute the predictive prior distribution
 and then evaluate it on the interval :math:<code>[0, 1]</code>:</p>
+<p>Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">kernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">()</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">meanf</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">mean_functions</span><span class="o">.</span><span class="n">Zero</span><span class="p">()</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">mean_function</span><span class="o">=</span><span class="n">meanf</span><span class="p">,</span> <span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="p">)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">prior</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+</code></pre></div></p>
 
-<details class="example">
-  <summary>Example</summary>
-  <blockquote>
-<blockquote>
-<blockquote>
-<p>import gpjax as gpx
-import jax.numpy as jnp</p>
-<p>kernel = gpx.kernels.RBF()
-prior = gpx.Prior(kernel = kernel)</p>
-<p>parameter_state = gpx.initialise(prior)
-prior_predictive = prior.predict(parameter_state.params)
-prior_predictive(jnp.linspace(0, 1, 100))</p>
-</blockquote>
-</blockquote>
-</blockquote>
-</details>
   <p><strong>Parameters:</strong></p>
   <table>
     <thead>
@@ -2097,7 +2145,8 @@ prior_predictive(jnp.linspace(0, 1, 100))</p>
           <td>
                 <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, N D]</code>
           </td>
-          <td><p>The inputs at which to evaluate the prior distribution.</p></td>
+          <td><p>The inputs at which to evaluate the
+prior distribution.</p></td>
           <td>
               <em>required</em>
           </td>
@@ -2105,10 +2154,8 @@ prior_predictive(jnp.linspace(0, 1, 100))</p>
     </tbody>
   </table>
       <h6 id="gpjax.gps.Prior.predict--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>GaussianDistribution: A mean
-function that accepts an input array for where the mean function
-should be evaluated at. The mean function&#39;s value at these points is
-then returned.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
+    of the Gaussian process.
 </code></pre></div>
 
   </div>
@@ -2127,37 +2174,53 @@ then returned.
 
   <div class="doc doc-contents ">
   
-      <p>Build an approximate sample from the Gaussian process prior. This method
-provides a function that returns the evaluations of a sample across any given
-inputs.</p>
-<p>In particular, we approximate the Gaussian processes' prior as the finite feature
-approximation</p>
-<p>.. math:: \hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i</p>
-<p>where :math:<code>\phi_i</code> are m features sampled from the Fourier feature decomposition of
-the model's kernel and :math:<code>\theta_i</code> are samples from a unit Gaussian.</p>
+      <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>Approximate samples from the Gaussian process prior.</p>
+<p>Build an approximate sample from the Gaussian process prior. This method
+provides a function that returns the evaluations of a sample across any
+given inputs.</p>
+<p>In particular, we approximate the Gaussian processes' prior as the
+finite feature approximation
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>f</mi><mo>^</mo></mover><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>m</mi></msubsup><msub><mi>ϕ</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><msub><mi>θ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\hat{f}(x) = \sum_{i=1}^m\phi_i(x)\theta_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.104em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8043em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">ϕ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ϕ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\phi_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">ϕ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> are <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> features
+sampled from the Fourier feature decomposition of the model's kernel and
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\theta_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> are samples from a unit Gaussian.</p>
 <p>A key property of such functional samples is that the same sample draw is
 evaluated for all queries. Consistency is a property that is prohibitively costly
 to ensure when sampling exactly from the GP prior, as the cost of exact sampling
 scales cubically with the size of the sample. In contrast, finite feature representations
 can be evaluated with constant cost regardless of the required number of queries.</p>
-<p>In the following example, we build 10 such samples
-and then evaluate them over the interval :math:<code>[0, 1]</code>:</p>
-
-<details class="example">
-  <summary>Example</summary>
-  <p>For a <code>prior</code> distribution, the following code snippet will
+<p>In the following example, we build 10 such samples and then evaluate them
+over the interval <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0, 1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span>:</p>
+<p>For a <code>prior</code> distribution, the following code snippet will
 build and evaluate an approximate sample.</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>import gpjax as gpx
-import jax.numpy as jnp</p>
-<p>sample_fn = prior.sample_appox(10, key)
-sample_fn(jnp.linspace(0, 1, 100))</p>
-</blockquote>
-</blockquote>
-</blockquote>
-</details>
+<p>Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">jax.random</span> <span class="k">as</span> <span class="nn">jr</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">meanf</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">mean_functions</span><span class="o">.</span><span class="n">Zero</span><span class="p">()</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">kernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">()</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">mean_function</span><span class="o">=</span><span class="n">meanf</span><span class="p">,</span> <span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="p">)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">sample_fn</span> <span class="o">=</span> <span class="n">prior</span><span class="o">.</span><span class="n">sample_approx</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">sample_fn</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</code></pre></div></p>
+
   <p><strong>Parameters:</strong></p>
   <table>
     <thead>
@@ -2203,8 +2266,8 @@ kernel.</p></td>
     </tbody>
   </table>
       <h6 id="gpjax.gps.Prior.sample_approx--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>FunctionalSample: A function representing an approximate sample from the Gaussian
-process prior.
+<div class="highlight"><pre><span></span><code>FunctionalSample: A function representing an approximate sample from the
+    Gaussian process prior.
 </code></pre></div>
 
   </div>
@@ -2239,7 +2302,8 @@ process prior.
         Bases: <code><a class="autorefs autorefs-internal" title="gpjax.base.Module" href="../base/module/#gpjax.base.module.Module">Module</a></code></p>
 
   
-      <p>The base GP posterior object conditioned on an observed dataset. All
+      <p>Abstract Gaussian process posterior.</p>
+<p>The base GP posterior object conditioned on an observed dataset. All
 posterior objects should inherit from this class.</p>
 
 
@@ -2325,10 +2389,11 @@ posterior objects should inherit from this class.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Evaluate the Gaussian process at the given points. The output of this function
-is a <code>TFP distribution &lt;https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions&gt;</code>_ from which the
-the latent function's mean and covariance can be evaluated and the distribution
-can be sampled.</p>
+      <p>Evaluate the Gaussian process posterior at the given points.</p>
+<p>The output of this function is a
+<a href="https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions">TFP distribution</a>
+from which the the latent function's mean and covariance can be
+evaluated and the distribution can be sampled.</p>
 <p>Under the hood, <code>__call__</code> is calling the objects <code>predict</code> method. For this
 reasons, classes inheriting the <code>AbstractPrior</code> class, should not overwrite the
 <code>__call__</code> method and should instead define a <code>predict</code> method.</p>
@@ -2367,7 +2432,8 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
     </tbody>
   </table>
       <h6 id="gpjax.gps.AbstractPosterior.__call__--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation of the Gaussian process.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
+    of the Gaussian process.
 </code></pre></div>
 
   </div>
@@ -2428,7 +2494,8 @@ this method must be implemented.</p>
     </tbody>
   </table>
       <h6 id="gpjax.gps.AbstractPosterior.predict--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation of the Gaussian process.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
+    of the Gaussian process.
 </code></pre></div>
 
   </div>
@@ -2463,38 +2530,58 @@ this method must be implemented.</p>
         Bases: <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPosterior" href="#gpjax.gps.AbstractPosterior">AbstractPosterior</a></code></p>
 
   
-      <p>A Gaussian process posterior distribution when the constituent likelihood
+      <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>A Conjuate Gaussian process posterior object.</p>
+<p>A Gaussian process posterior distribution when the constituent likelihood
 function is a Gaussian distribution. In such cases, the latent function values
-:math:<code>f</code> can be analytically integrated out of the posterior distribution.
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi></mrow><annotation encoding="application/x-tex">f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span></span></span> can be analytically integrated out of the posterior distribution.
 As such, many computational operations can be simplified; something we make use
 of in this object.</p>
-<p>For a Gaussian process prior :math:<code>p(\mathbf{f})</code> and a Gaussian likelihood
-:math:<code>p(y | \mathbf{f}) = \mathcal{N}(y\mid \mathbf{f}, \sigma^2))</code> where
-:math:<code>\mathbf{f} = f(\mathbf{x})</code>, the predictive posterior distribution at
-a set of inputs :math:<code>\mathbf{x}</code> is given by</p>
-<p>.. math::</p>
-<div class="highlight"><pre><span></span><code>p(\mathbf{f}^{\star}\mid \mathbf{y}) &amp; = \int p(\mathbf{f}^{\star} \mathbf{f} \mid \mathbf{y})\\
-&amp; =\mathcal{N}(\mathbf{f}^{\star} \boldsymbol{\mu}_{\mid \mathbf{y}}, \boldsymbol{\Sigma}_{\mid \mathbf{y}}
-</code></pre></div>
-<p>where</p>
-<p>.. math::</p>
-<div class="highlight"><pre><span></span><code>\boldsymbol{\mu}_{\mid \mathbf{y}} &amp; = k(\mathbf{x}^{\star}, \mathbf{x})\left(k(\mathbf{x}, \mathbf{x}&#39;)+\sigma^2\mathbf{I}_n\right)^{-1}\mathbf{y}  \\
-\boldsymbol{\Sigma}_{\mid \mathbf{y}} &amp; =k(\mathbf{x}^{\star}, \mathbf{x}^{\star\prime}) -k(\mathbf{x}^{\star}, \mathbf{x})\left( k(\mathbf{x}, \mathbf{x}&#39;) + \sigma^2\mathbf{I}_n \right)^{-1}k(\mathbf{x}, \mathbf{x}^{\star}).
-</code></pre></div>
+<p>For a Gaussian process prior <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi mathvariant="bold">f</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(\mathbf{f})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathbf" style="margin-right:0.10903em;">f</span><span class="mclose">)</span></span></span></span> and a Gaussian likelihood
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>y</mi><mi mathvariant="normal">∣</mi><mi mathvariant="bold">f</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><mi>y</mi><mo>∣</mo><mi mathvariant="bold">f</mi><mo separator="true">,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(y | \mathbf{f}) = \mathcal{N}(y\mid \mathbf{f}, \sigma^2))</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord">∣</span><span class="mord mathbf" style="margin-right:0.10903em;">f</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.14736em;">N</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathbf" style="margin-right:0.10903em;">f</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">))</span></span></span></span> where
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">f</mi><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathbf{f} = f(\mathbf{x})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathbf" style="margin-right:0.10903em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span>, the predictive posterior distribution at
+a set of inputs <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">x</mi></mrow><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4444em;"></span><span class="mord mathbf">x</span></span></span></span> is given by
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>p</mi><mo stretchy="false">(</mo><msup><mi mathvariant="bold">f</mi><mo lspace="0em" rspace="0em">⋆</mo></msup><mo>∣</mo><mi mathvariant="bold">y</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>∫</mo><mi>p</mi><mo stretchy="false">(</mo><msup><mi mathvariant="bold">f</mi><mo lspace="0em" rspace="0em">⋆</mo></msup><mo separator="true">,</mo><mi mathvariant="bold">f</mi><mo>∣</mo><mi mathvariant="bold">y</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><msup><mi mathvariant="bold">f</mi><mo lspace="0em" rspace="0em">⋆</mo></msup><msub><mi mathvariant="bold-italic">μ</mi><mrow><mo>∣</mo><mi mathvariant="bold">y</mi></mrow></msub><mo separator="true">,</mo><msub><mi mathvariant="bold">Σ</mi><mrow><mo>∣</mo><mi mathvariant="bold">y</mi></mrow></msub></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{align}
+p(\mathbf{f}^{\star}\mid \mathbf{y}) &amp; = \int p(\mathbf{f}^{\star}, \mathbf{f} \mid \mathbf{y})\\
+    &amp; =\mathcal{N}(\mathbf{f}^{\star} \boldsymbol{\mu}_{\mid \mathbf{y}}, \boldsymbol{\Sigma}_{\mid \mathbf{y}}
+\end{align}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:4.0814em;vertical-align:-1.7907em;"></span><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.2907em;"><span style="top:-4.2907em;"><span class="pstrut" style="height:3.36em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf" style="margin-right:0.10903em;">f</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⋆</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathbf" style="margin-right:0.01597em;">y</span><span class="mclose">)</span></span></span><span style="top:-2.2884em;"><span class="pstrut" style="height:3.36em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.7907em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.2907em;"><span style="top:-4.2907em;"><span class="pstrut" style="height:3.36em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mop op-symbol large-op" style="margin-right:0.44445em;position:relative;top:-0.0011em;">∫</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf" style="margin-right:0.10903em;">f</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⋆</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathbf" style="margin-right:0.10903em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathbf" style="margin-right:0.01597em;">y</span><span class="mclose">)</span></span></span><span style="top:-2.2884em;"><span class="pstrut" style="height:3.36em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathcal" style="margin-right:0.14736em;">N</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf" style="margin-right:0.10903em;">f</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⋆</span></span></span></span></span></span></span></span></span><span class="mord"><span class="mord"><span class="mord"><span class="mord boldsymbol">μ</span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2809em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">∣</span><span class="mord mathbf mtight" style="margin-right:0.01597em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4191em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord"><span class="mord"><span class="mord mathbf">Σ</span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.5198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">∣</span><span class="mord mathbf mtight" style="margin-right:0.01597em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3552em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.7907em;"><span></span></span></span></span></span></span></span><span class="tag"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.2907em;"><span style="top:-4.2907em;"><span class="pstrut" style="height:3.36em;"></span><span class="eqn-num"></span></span><span style="top:-2.2884em;"><span class="pstrut" style="height:3.36em;"></span><span class="eqn-num"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.7907em;"><span></span></span></span></span></span></span></span></span></p>
+where
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi mathvariant="bold-italic">μ</mi><mrow><mo>∣</mo><mi mathvariant="bold">y</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>k</mi><mo stretchy="false">(</mo><msup><mi mathvariant="bold">x</mi><mo lspace="0em" rspace="0em">⋆</mo></msup><mo separator="true">,</mo><mi mathvariant="bold">x</mi><mo stretchy="false">)</mo><msup><mrow><mo fence="true">(</mo><mi>k</mi><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo separator="true">,</mo><msup><mi mathvariant="bold">x</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>+</mo><msup><mi>σ</mi><mn>2</mn></msup><msub><mi mathvariant="bold">I</mi><mi>n</mi></msub><mo fence="true">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi mathvariant="bold">y</mi></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi mathvariant="bold">Σ</mi><mrow><mo>∣</mo><mi mathvariant="bold">y</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>k</mi><mo stretchy="false">(</mo><msup><mi mathvariant="bold">x</mi><mo lspace="0em" rspace="0em">⋆</mo></msup><mo separator="true">,</mo><msup><mi mathvariant="bold">x</mi><mrow><mo>⋆</mo><mo mathvariant="normal">′</mo></mrow></msup><mo stretchy="false">)</mo><mo>−</mo><mi>k</mi><mo stretchy="false">(</mo><msup><mi mathvariant="bold">x</mi><mo lspace="0em" rspace="0em">⋆</mo></msup><mo separator="true">,</mo><mi mathvariant="bold">x</mi><mo stretchy="false">)</mo><msup><mrow><mo fence="true">(</mo><mi>k</mi><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo separator="true">,</mo><msup><mi mathvariant="bold">x</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>+</mo><msup><mi>σ</mi><mn>2</mn></msup><msub><mi mathvariant="bold">I</mi><mi>n</mi></msub><mo fence="true">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>k</mi><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo separator="true">,</mo><msup><mi mathvariant="bold">x</mi><mo lspace="0em" rspace="0em">⋆</mo></msup><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{align}
+\boldsymbol{\mu}_{\mid \mathbf{y}} &amp; = k(\mathbf{x}^{\star}, \mathbf{x})\left(k(\mathbf{x}, \mathbf{x}&#x27;)+\sigma^2\mathbf{I}_n\right)^{-1}\mathbf{y}  \\
+\boldsymbol{\Sigma}_{\mid \mathbf{y}} &amp; =k(\mathbf{x}^{\star}, \mathbf{x}^{\star\prime}) -k(\mathbf{x}^{\star}, \mathbf{x})\left( k(\mathbf{x}, \mathbf{x}&#x27;) + \sigma^2\mathbf{I}_n \right)^{-1}k(\mathbf{x}, \mathbf{x}^{\star}).
+\end{align}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:3.5154em;vertical-align:-1.5077em;"></span><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.0077em;"><span style="top:-4.0077em;"><span class="pstrut" style="height:3.0681em;"></span><span class="mord"><span class="mord"><span class="mord"><span class="mord"><span class="mord boldsymbol">μ</span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2809em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">∣</span><span class="mord mathbf mtight" style="margin-right:0.01597em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4191em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.2204em;"><span class="pstrut" style="height:3.0681em;"></span><span class="mord"><span class="mord"><span class="mord"><span class="mord"><span class="mord mathbf">Σ</span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.5198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">∣</span><span class="mord mathbf mtight" style="margin-right:0.01597em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3552em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.5077em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.0077em;"><span style="top:-4.0077em;"><span class="pstrut" style="height:3.0681em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⋆</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathbf">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size1">(</span></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathbf">I</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size1">)</span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.0681em;"><span style="top:-3.317em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathbf" style="margin-right:0.01597em;">y</span></span></span><span style="top:-2.2204em;"><span class="pstrut" style="height:3.0681em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⋆</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⋆</span><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⋆</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathbf">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size1">(</span></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathbf">I</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size1">)</span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.0681em;"><span style="top:-3.317em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⋆</span></span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord">.</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.5077em;"><span></span></span></span></span></span></span></span><span class="tag"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.0077em;"><span style="top:-4.0077em;"><span class="pstrut" style="height:3.0681em;"></span><span class="eqn-num"></span></span><span style="top:-2.2204em;"><span class="pstrut" style="height:3.0681em;"></span><span class="eqn-num"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.5077em;"><span></span></span></span></span></span></span></span></span></p></p>
 
 <details class="example">
   <summary>Example</summary>
-  <blockquote>
-<blockquote>
-<blockquote>
-<p>import gpjax as gpx
-import jax.numpy as jnp</p>
-<p>prior = gpx.Prior(kernel = gpx.kernels.RBF())
-likelihood = gpx.likelihoods.Gaussian()</p>
-<p>posterior = prior * likelihood</p>
-</blockquote>
-</blockquote>
-</blockquote>
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>            <span class="n">mean_function</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">mean_functions</span><span class="o">.</span><span class="n">Zero</span><span class="p">(),</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>            <span class="n">kernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">()</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="p">)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">likelihood</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">likelihoods</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">num_datapoints</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">posterior</span> <span class="o">=</span> <span class="n">prior</span> <span class="o">*</span> <span class="n">likelihood</span>
+</code></pre></div>
 </details>
 
 
@@ -2522,40 +2609,40 @@ likelihood = gpx.likelihoods.Gaussian()</p>
 
   <div class="doc doc-contents ">
   
-      <p>Conditional on a training data set, compute the GP's posterior
-predictive distribution for a given set of parameters. The returned
-function can be evaluated at a set of test inputs to compute the
-corresponding predictive density.</p>
+      <p>Query the predictive posterior distribution.</p>
+<p>Conditional on a training data set, compute the GP's posterior
+predictive distribution for a given set of parameters. The returned function
+can be evaluated at a set of test inputs to compute the corresponding
+predictive density.</p>
 <p>The predictive distribution of a conjugate GP is given by
-.. math::</p>
-<div class="highlight"><pre><span></span><code>p(\mathbf{f}^{\star}\mid \mathbf{y}) &amp; = \int p(\mathbf{f}^{\star} \mathbf{f} \mid \mathbf{y})\\
-&amp; =\mathcal{N}(\mathbf{f}^{\star} \boldsymbol{\mu}_{\mid \mathbf{y}}, \boldsymbol{\Sigma}_{\mid \mathbf{y}}
-</code></pre></div>
-<p>where</p>
-<p>.. math::</p>
-<div class="highlight"><pre><span></span><code>\boldsymbol{\mu}_{\mid \mathbf{y}} &amp; = k(\mathbf{x}^{\star}, \mathbf{x})\left(k(\mathbf{x}, \mathbf{x}&#39;)+\sigma^2\mathbf{I}_n\right)^{-1}\mathbf{y}  \\
-\boldsymbol{\Sigma}_{\mid \mathbf{y}} &amp; =k(\mathbf{x}^{\star}, \mathbf{x}^{\star\prime}) -k(\mathbf{x}^{\star}, \mathbf{x})\left( k(\mathbf{x}, \mathbf{x}&#39;) + \sigma^2\mathbf{I}_n \right)^{-1}k(\mathbf{x}, \mathbf{x}^{\star}).
-</code></pre></div>
+$$
+    p(\mathbf{f}^{\star}\mid \mathbf{y}) &amp; = \int p(\mathbf{f}^{\star} \mathbf{f} \mid \mathbf{y})\
+    &amp; =\mathcal{N}(\mathbf{f}^{\star} \boldsymbol{\mu}<em _mathbf_y="\mathbf{y" _mid="\mid">{\mid \mathbf{y}}, \boldsymbol{\Sigma}</em>}
+$$
+where
+$$
+    \boldsymbol{\mu}<em _mathbf_y="\mathbf{y" _mid="\mid">{\mid \mathbf{y}} &amp; = k(\mathbf{x}^{\star}, \mathbf{x})\left(k(\mathbf{x}, \mathbf{x}')+\sigma^2\mathbf{I}_n\right)^{-1}\mathbf{y}  \
+    \boldsymbol{\Sigma}</em>} &amp; =k(\mathbf{x}^{\star}, \mathbf{x}^{\star\prime}) -k(\mathbf{x}^{\star}, \mathbf{x})\left( k(\mathbf{x}, \mathbf{x}') + \sigma^2\mathbf{I}_n \right)^{-1}k(\mathbf{x}, \mathbf{x}^{\star}).
+$$</p>
 <p>The conditioning set is a GPJax <code>Dataset</code> object, whilst predictions
 are made on a regular Jax array.</p>
 
 <details class="example">
   <summary>Example</summary>
   <p>For a <code>posterior</code> distribution, the following code snippet will
-evaluate the predictive distribution.</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>import gpjax as gpx</p>
-<p>xtrain = jnp.linspace(0, 1).reshape(-1, 1)
-ytrain = jnp.sin(xtrain)
-xtest = jnp.linspace(0, 1).reshape(-1, 1)</p>
-<p>params = gpx.initialise(posterior)
-predictive_dist = posterior.predict(params, gpx.Dataset(X=xtrain, y=ytrain))
-predictive_dist(xtest)</p>
-</blockquote>
-</blockquote>
-</blockquote>
+evaluate the predictive distribution.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">xtrain</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">ytrain</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">xtrain</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">D</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">xtrain</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">ytrain</span><span class="p">)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">xtest</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">mean_function</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Zero</span><span class="p">(),</span> <span class="n">kernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">RBF</span><span class="p">())</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">posterior</span> <span class="o">=</span> <span class="n">prior</span> <span class="o">*</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">num_datapoints</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">predictive_dist</span> <span class="o">=</span> <span class="n">posterior</span><span class="p">(</span><span class="n">xtest</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+</code></pre></div></p>
 </details>
   <p><strong>Parameters:</strong></p>
   <table>
@@ -2584,8 +2671,8 @@ predictive distribution is evaluated.</p></td>
           <td>
                 <code><a class="autorefs autorefs-internal" title="gpjax.dataset.Dataset" href="../dataset/#gpjax.dataset.Dataset">Dataset</a></code>
           </td>
-          <td><p>A <code>gpx.Dataset</code> object that contains the
-input and output data used for training dataset.</p></td>
+          <td><p>A <code>gpx.Dataset</code> object that contains the input and
+output data used for training dataset.</p></td>
           <td>
               <em>required</em>
           </td>
@@ -2595,7 +2682,7 @@ input and output data used for training dataset.</p></td>
       <h6 id="gpjax.gps.ConjugatePosterior.predict--returns">Returns</h6>
 <div class="highlight"><pre><span></span><code>GaussianDistribution: A
     function that accepts an input array and returns the predictive
-    distribution as a ``GaussianDistribution``.
+        distribution as a `GaussianDistribution`.
 </code></pre></div>
 
   </div>
@@ -2614,75 +2701,80 @@ input and output data used for training dataset.</p></td>
 
   <div class="doc doc-contents ">
   
-      <p>Build an approximate sample from the Gaussian process posterior. This method
-provides a function that returns the evaluations of a sample across any given
-inputs.</p>
-<p>Unlike when building approximate samples from a Gaussian process prior, decompositions
-based on Fourier features alone rarely give accurate samples. Therefore, we must also
-include an additional set of features (known as canonical features) to better model the
-transition from Gaussian process prior to Gaussian process posterior. For more details
-see https://arxiv.org/pdf/2002.09309.pdf</p>
-<p>In particular, we approximate the Gaussian processes' posterior as the finite feature
-approximation</p>
-<p>.. math:: \hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i + \sum{j=1}^N v_jk(.,x_j)</p>
-<p>where :math:<code>\phi_i</code> are m features sampled from the Fourier feature decomposition of
-the model's kernel and :math:<code>k(., x_j)</code> are N canonical features. The Fourier
-weights :math:<code>\theta_i</code> are samples from a unit Gaussian.
-See https://arxiv.org/pdf/2002.09309.pdf for expressions for the canonical
-weights :math:<code>v_j</code>.</p>
-<p>A key property of such functional samples is that the same sample draw is
-evaluated for all queries. Consistency is a property that is prohibitively costly
-to ensure when sampling exactly from the GP prior, as the cost of exact sampling
-scales cubically with the size of the sample. In contrast, finite feature representations
-can be evaluated with constant cost regardless of the required number of queries.</p>
+      <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
 
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>num_samples</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td><p>The desired number of samples.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>key</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.typing.KeyArray" href="../typing/#gpjax.typing.KeyArray">KeyArray</a></code>
-          </td>
-          <td><p>The random seed used for the sample(s).</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>num_features</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td><p>The number of features used when approximating the
-kernel.</p></td>
-          <td>
-                <code>100</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.gps.ConjugatePosterior.sample_approx--returns">Returns</h6>
-<div class="highlight"><pre><span></span><code>FunctionalSample: A function representing an approximate sample from the Gaussian
-process prior.
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>Draw approximate samples from the Gaussian process posterior.</p>
+<div class="highlight"><pre><span></span><code>    Build an approximate sample from the Gaussian process posterior. This method
+    provides a function that returns the evaluations of a sample across any given
+    inputs.
+
+    Unlike when building approximate samples from a Gaussian process prior, decompositions
+    based on Fourier features alone rarely give accurate samples. Therefore, we must also
+    include an additional set of features (known as canonical features) to better model the
+    transition from Gaussian process prior to Gaussian process posterior. For more details
+    see [Wilson et. al. (2020)](https://arxiv.org/abs/2002.09309).
+
+    In particular, we approximate the Gaussian processes&#39; posterior as the finite
+    feature approximation
+</code></pre></div>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+        <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>f</mi><mo>^</mo></mover><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>m</mi></msubsup><msub><mi>ϕ</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><msub><mi>θ</mi><mi>i</mi></msub><mo>+</mo><mo>∑</mo><msup><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></msup><msub><mi>v</mi><mi>j</mi></msub><mi>k</mi><mo stretchy="false">(</mo><mi mathvariant="normal">.</mi><mo separator="true">,</mo><msub><mi>x</mi><mi>j</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i + \sum{j=1}^N v_jk(.,x_j)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.104em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8043em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">ϕ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.1769em;vertical-align:-0.2861em;"></span><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8908em;"><span style="top:-3.1124em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.10903em;">N</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord">.</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>
+        where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ϕ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\phi_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">ϕ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> are m features sampled from the Fourier feature decomposition of
+        the model's kernel and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo stretchy="false">(</mo><mi mathvariant="normal">.</mi><mo separator="true">,</mo><msub><mi>x</mi><mi>j</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">k(., x_j)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord">.</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> are N canonical features. The Fourier
+        weights <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\theta_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> are samples from a unit Gaussian. See
+        <a href="https://arxiv.org/abs/2002.09309">Wilson et. al. (2020)</a> for expressions
+        for the canonical weights <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>v</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">v_j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>.
+=======
+        $\hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i + \sum{j=1}^N v_jk(.,x_j)$
+        where $\phi_i$ are m features sampled from the Fourier feature decomposition of
+        the model's kernel and $k(., x_j)$ are N canonical features. The Fourier
+        weights $\theta_i$ are samples from a unit Gaussian. See
+        <a href="https://arxiv.org/abs/2002.09309">Wilson et. al. (2020)</a> for expressions
+        for the canonical weights $v_j$.</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>40b9a3b23c487221dacde900ad79e4d94a1c5d17</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+<div class="highlight"><pre><span></span><code>    A key property of such functional samples is that the same sample draw is
+    evaluated for all queries. Consistency is a property that is prohibitively costly
+    to ensure when sampling exactly from the GP prior, as the cost of exact sampling
+    scales cubically with the size of the sample. In contrast, finite feature representations
+    can be evaluated with constant cost regardless of the required number of queries.
+
+    Args:
+        num_samples (int): The desired number of samples.
+        key (KeyArray): The random seed used for the sample(s).
+        num_features (int): The number of features used when approximating the
+            kernel.
+
+    Returns
+    -------
+        FunctionalSample: A function representing an approximate sample from the Gaussian
+        process prior.
 </code></pre></div>
 
   </div>
@@ -2717,7 +2809,8 @@ process prior.
         Bases: <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPosterior" href="#gpjax.gps.AbstractPosterior">AbstractPosterior</a></code></p>
 
   
-      <p>A Gaussian process posterior object for models where the likelihood is
+      <p>A non-conjugate Gaussian process posterior object.</p>
+<p>A Gaussian process posterior object for models where the likelihood is
 non-Gaussian. Unlike the <code>ConjugatePosterior</code> object, the
 <code>NonConjugatePosterior</code> object does not provide an exact marginal
 log-likelihood function. Instead, the <code>NonConjugatePosterior</code> object
@@ -2806,7 +2899,8 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Conditional on a set of training data, compute the GP's posterior
+      <p>Query the predictive posterior distribution.</p>
+<p>Conditional on a set of training data, compute the GP's posterior
 predictive distribution for a given set of parameters. The returned
 function can be evaluated at a set of test inputs to compute the
 corresponding predictive density. Note, to gain predictions on the scale
@@ -2840,7 +2934,7 @@ and output data used for training dataset.</p></td>
       <h6 id="gpjax.gps.NonConjugatePosterior.predict--returns">Returns</h6>
 <div class="highlight"><pre><span></span><code>GaussianDistribution: A function that accepts an
     input array and returns the predictive distribution as
-    a ``dx.Distribution``.
+    a `dx.Distribution`.
 </code></pre></div>
 
   </div>
@@ -2908,8 +3002,8 @@ beliefs around the distribution of the data.</p></td>
   </table>
       <h6 id="gpjax.gps.construct_posterior--returns">Returns</h6>
 <div class="highlight"><pre><span></span><code>AbstractPosterior: A posterior distribution. If the likelihood is
-    Gaussian, then a ``ConjugatePosterior`` will be returned. Otherwise,
-    a ``NonConjugatePosterior`` will be returned.
+    Gaussian, then a `ConjugatePosterior` will be returned. Otherwise,
+    a `NonConjugatePosterior` will be returned.
 </code></pre></div>
 
   </div>
@@ -2970,11 +3064,11 @@ beliefs around the distribution of the data.</p></td>
     
       <script src="../../assets/javascripts/bundle.51198bba.min.js"></script>
       
-        <script src="../../javascripts/mathjax.js"></script>
-      
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+      
+        <script src="../../javascripts/katex.js"></script>
       
     
   </body>

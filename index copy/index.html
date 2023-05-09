@@ -43,6 +43,8 @@
     
       <link rel="stylesheet" href="../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -311,7 +313,7 @@
   
     <li class="md-nav__item">
       <a href="../examples/pytrees/" class="md-nav__link">
-        🌳 GPJax Module
+        🌳 GPJax PyTrees
       </a>
     </li>
   
@@ -554,6 +556,20 @@
     <li class="md-nav__item">
       <a href="../examples/yacht/" class="md-nav__link">
         UCI Data Benchmarking
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/spatial/" class="md-nav__link">
+        Pathwise Sampling for Spatial Modelling
       </a>
     </li>
   
@@ -1606,14 +1622,14 @@ would write on paper. To see this, consider the following example.</p>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="arithmatex">\[
+<p>$$
 \begin{align}
-k(\cdot, \cdot') &amp; = \sigma^2\exp\left(-\frac{\lVert \cdot- \cdot'\rVert_2^2}{2\ell^2}\right)\\
-p(f(\cdot)) &amp; = \mathcal{GP}(\mathbf{0}, k(\cdot, \cdot')) \\
-p(y\,|\, f(\cdot)) &amp; = \mathcal{N}(y\,|\, f(\cdot), \sigma_n^2) \\
+k(\cdot, \cdot') &amp; = \sigma^2\exp\left(-\frac{\lVert \cdot- \cdot'\rVert_2^2}{2\ell^2}\right)\
+p(f(\cdot)) &amp; = \mathcal{GP}(\mathbf{0}, k(\cdot, \cdot')) \
+p(y\,|\, f(\cdot)) &amp; = \mathcal{N}(y\,|\, f(\cdot), \sigma_n^2) \
 p(f(\cdot) \,|\, y) &amp; \propto p(f(\cdot))p(y\,|\, f(\cdot))\,.
 \end{align}
-\]</div>
+$$</p>
 </div>
 </div>
 </div>
@@ -1688,11 +1704,11 @@ notebook</a>.</p>
     
       <script src="../assets/javascripts/bundle.51198bba.min.js"></script>
       
-        <script src="../javascripts/mathjax.js"></script>
-      
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+      
+        <script src="../javascripts/katex.js"></script>
       
     
   </body>
