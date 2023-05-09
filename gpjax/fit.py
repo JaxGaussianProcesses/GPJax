@@ -51,11 +51,11 @@ def fit(
     unroll: Optional[int] = 1,
     safe: Optional[bool] = True,
 ) -> Tuple[Module, Array]:
-    """Train a Module model with respect to a supplied Objective function.
+    r"""Train a Module model with respect to a supplied Objective function.
     Optimisers used here should originate from Optax.
 
     Example:
-        ```python
+    ```python
         >>> import jax.numpy as jnp
         >>> import jax.random as jr
         >>> import optax as ox
@@ -68,26 +68,26 @@ def fit(
         >>>
         >>> # (2) Define your model:
         >>> class LinearModel(gpx.Module):
-        ...     weight: float = gpx.param_field()
-        ...     bias: float = gpx.param_field()
-        ...
-        ...     def __call__(self, x):
-        ...         return self.weight * x + self.bias
-        ...
+                weight: float = gpx.param_field()
+                bias: float = gpx.param_field()
+
+                def __call__(self, x):
+                    return self.weight * x + self.bias
+
         >>> model = LinearModel(weight=1.0, bias=1.0)
         >>>
         >>> # (3) Define your loss function:
         >>> class MeanSquareError(gpx.AbstractObjective):
-        ...     def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
-        ...         return jnp.mean((train_data.y - model(train_data.X)) ** 2)
-        ...
+                def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
+                    return jnp.mean((train_data.y - model(train_data.X)) ** 2)
+        >>>
         >>> loss = MeanSqaureError()
         >>>
         >>> # (4) Train!
         >>> trained_model, history = gpx.fit(
-        ...     model=model, objective=loss, train_data=D, optim=ox.sgd(0.001), num_iters=1000
-        ... )
-        ```
+                model=model, objective=loss, train_data=D, optim=ox.sgd(0.001), num_iters=1000
+            )
+    ```
 
     Args:
         model (Module): The model Module to be optimised.

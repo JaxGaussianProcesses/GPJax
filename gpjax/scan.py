@@ -42,7 +42,7 @@ Y = TypeVar("Y")
 
 
 def _callback(cond: ScalarBool, func: Callable, *args: Any) -> None:
-    """Callback a function for a given argument if a condition is true.
+    r"""Callback a function for a given argument if a condition is true.
 
     Args:
         cond (bool): The condition.
@@ -75,19 +75,23 @@ def vscan(
 ) -> Tuple[
     Carry, Shaped[Array, "..."]
 ]:  # return type should be Tuple[Carry, Y[Array]]...
-    """Scan with verbose output.
+    r"""Scan with verbose output.
 
-    This is based on code from the excellent blog post:
-    https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/.
+    This is based on code from this [excellent blog post](https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/).
 
     Example:
-        >>> def f(carry, x):
-        ...     return carry + x, carry + x
-        >>> init = 0
-        >>> xs = jnp.arange(10)
-        >>> vscan(f, init, xs)
-        (45, DeviceArray([ 0,  1,  3,  6, 10, 15, 21, 28, 36, 45], dtype=int32))
-
+        ```python
+            >>> import jax.numpy as jnp
+            >>>
+            >>> def f(carry, x):
+                    return carry + x, carry + x
+            >>> init = 0
+            >>> xs = jnp.arange(10)
+            >>> vscan(f, init, xs)
+        ```
+        ```console
+            (45, DeviceArray([ 0,  1,  3,  6, 10, 15, 21, 28, 36, 45], dtype=int32))
+        ```
     Args:
         f (Callable[[Carry, X], Tuple[Carry, Y]]): A function that takes in a carry and
             an input and returns a tuple of a new carry and an output.

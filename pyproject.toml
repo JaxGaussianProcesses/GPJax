@@ -86,6 +86,7 @@ mkdocs-gen-files = "^0.5.0"
 mkdocs-literate-nav = "^0.6.0"
 mkdocs-git-authors-plugin = "^0.7.0"
 mkdocstrings = {version = "^0.21.2", extras = ["python"]}
+markdown-katex = "^202112.1034"
 
 [build-system]
 requires = ["poetry-core", "poetry-dynamic-versioning"]
