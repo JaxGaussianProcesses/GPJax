@@ -183,7 +183,6 @@ a scalar value:
 def sum_squares(x):
     return jnp.sum(x[0] ** 2 + x[1] ** 2 + x[2] ** 2)
 
-
 sum_squares(tree)
 ```
 ```console

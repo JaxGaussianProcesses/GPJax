@@ -63,6 +63,7 @@ class AbstractPrior(Module):
 
     def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
         r"""Evaluate the Gaussian process at the given points.
+
         The output of this function is a
         [TensorFlow probability distribution](https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions) from which the
         the latent function's mean and covariance can be evaluated and the distribution
@@ -85,8 +86,10 @@ class AbstractPrior(Module):
 
     @abstractmethod
     def predict(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
-        """Compute the latent function's multivariate normal distribution for a
-        given set of parameters. For any class inheriting the ``AbstractPrior`` class,
+        r"""Evaluate the predictive distribution.
+
+        Compute the latent function's multivariate normal distribution for a
+        given set of parameters. For any class inheriting the `AbstractPrior` class,
         this method must be implemented.
 
         Args:
@@ -95,7 +98,8 @@ class AbstractPrior(Module):
 
         Returns
         -------
-            GaussianDistribution: A multivariate normal random variable representation of the Gaussian process.
+            GaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process.
         """
         raise NotImplementedError
 
@@ -105,9 +109,12 @@ class AbstractPrior(Module):
 #######################
 @dataclass
 class Prior(AbstractPrior):
-    r"""A Gaussian process prior object. The GP is parameterised by a
+    r"""A Gaussian process prior object.
+
+    The GP is parameterised by a
     [mean](https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.mean_functions)
-    and [kernel](https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.kernels) function.
+    and [kernel](https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.kernels)
+    function.
 
     A Gaussian process prior parameterised by a mean function $m(\cdot)$ and a kernel
     function $k(\cdot, \cdot)$ is given by
@@ -128,16 +135,18 @@ class Prior(AbstractPrior):
     """
 
     def __mul__(self, other: AbstractLikelihood):
-        r"""The product of a prior and likelihood is proportional to the
-        posterior distribution. By computing the product of a GP prior and a
-        likelihood object, a posterior GP object will be returned. Mathematically,
-        this can be described by:
-        $p(f(\cdot) \mid y) \propto p(y \mid f(\cdot)) p(f(\cdot))$, where
-        $p(y | f(\cdot))$ is the likelihood and $p(f(\cdot))$ is the prior.
+        r"""Combine the prior with a likelihood to form a posterior distribution.
+
+        The product of a prior and likelihood is proportional to the posterior
+        distribution. By computing the product of a GP prior and a likelihood
+        object, a posterior GP object will be returned. Mathematically, this can
+        be described by: $p(f(\cdot) \mid y) \propto p(y \mid f(\cdot))
+        p(f(\cdot))$, where $p(y | f(\cdot))$ is the likelihood and
+        $p(f(\cdot))$ is the prior.
 
 
         Example:
-        ```
+        ```python
             import gpjax as gpx
 
             meanf = gpx.mean_functions.Zero()
@@ -159,7 +168,9 @@ class Prior(AbstractPrior):
         return construct_posterior(prior=self, likelihood=other)
 
     def __rmul__(self, other: AbstractLikelihood):
-        """Reimplement the multiplication operator to allow for order-invariant
+        r"""Combine the prior with a likelihood to form a posterior distribution.
+
+        Reimplement the multiplication operator to allow for order-invariant
         product of a likelihood and a prior i.e., likelihood * prior.
 
         Args:
@@ -175,7 +186,7 @@ class Prior(AbstractPrior):
         return self.__mul__(other)
 
     def predict(self, test_inputs: Num[Array, "N D"]) -> GaussianDistribution:
-        """Compute the predictive prior distribution for a given set of
+        r"""Compute the predictive prior distribution for a given set of
         parameters. The output of this function is a function that computes
         a TFP distribution for a given set of inputs.
 
@@ -183,25 +194,25 @@ class Prior(AbstractPrior):
         and then evaluate it on the interval :math:`[0, 1]`:
 
         Example:
-            >>> import gpjax as gpx
-            >>> import jax.numpy as jnp
-            >>>
-            >>> kernel = gpx.kernels.RBF()
-            >>> prior = gpx.Prior(kernel = kernel)
-            >>>
-            >>> parameter_state = gpx.initialise(prior)
-            >>> prior_predictive = prior.predict(parameter_state.params)
-            >>> prior_predictive(jnp.linspace(0, 1, 100))
+        ```python
+            import gpjax as gpx
+            import jax.numpy as jnp
+
+            kernel = gpx.kernels.RBF()
+            meanf = gpx.mean_functions.Zero()
+            prior = gpx.Prior(mean_function=meanf, kernel = kernel)
+
+            prior.predict(jnp.linspace(0, 1, 100))
+        ```
 
         Args:
-            test_inputs (Float[Array, "N D"]): The inputs at which to evaluate the prior distribution.
+            test_inputs (Float[Array, "N D"]): The inputs at which to evaluate the
+                prior distribution.
 
         Returns
         -------
-            GaussianDistribution: A mean
-            function that accepts an input array for where the mean function
-            should be evaluated at. The mean function's value at these points is
-            then returned.
+            GaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process.
         """
         x = test_inputs
         mx = self.mean_function(x)
@@ -216,19 +227,17 @@ class Prior(AbstractPrior):
         key: KeyArray,
         num_features: Optional[int] = 100,
     ) -> FunctionalSample:
-        r"""Build an approximate sample from the Gaussian process prior. This method
-        provides a function that returns the evaluations of a sample across any given
-        inputs.
+        r"""Approximate samples from the Gaussian process prior.
 
-        In particular, we approximate the Gaussian processes' prior as the finite feature
-        approximation
+        Build an approximate sample from the Gaussian process prior. This method
+        provides a function that returns the evaluations of a sample across any
+        given inputs.
 
-        .. math:: \hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i
-
-
-        where :math:`\phi_i` are m features sampled from the Fourier feature decomposition of
-        the model's kernel and :math:`\theta_i` are samples from a unit Gaussian.
-
+        In particular, we approximate the Gaussian processes' prior as the
+        finite feature approximation
+        $\hat{f}(x) = \sum_{i=1}^m\phi_i(x)\theta_i$ where $\phi_i$ are $m$ features
+        sampled from the Fourier feature decomposition of the model's kernel and
+        $\theta_i$ are samples from a unit Gaussian.
 
         A key property of such functional samples is that the same sample draw is
         evaluated for all queries. Consistency is a property that is prohibitively costly
@@ -236,18 +245,20 @@ class Prior(AbstractPrior):
         scales cubically with the size of the sample. In contrast, finite feature representations
         can be evaluated with constant cost regardless of the required number of queries.
 
-        In the following example, we build 10 such samples
-        and then evaluate them over the interval :math:`[0, 1]`:
+        In the following example, we build 10 such samples and then evaluate them
+        over the interval $[0, 1]$:
 
         Example:
-            For a ``prior`` distribution, the following code snippet will
+            For a `prior` distribution, the following code snippet will
             build and evaluate an approximate sample.
 
-            >>> import gpjax as gpx
-            >>> import jax.numpy as jnp
-            >>>
-            >>> sample_fn = prior.sample_appox(10, key)
-            >>> sample_fn(jnp.linspace(0, 1, 100))
+        ```python
+            import gpjax as gpx
+            import jax.numpy as jnp
+
+            sample_fn = prior.sample_appox(10, key)
+            sample_fn(jnp.linspace(0, 1, 100))
+        ```
 
         Args:
             num_samples (int): The desired number of samples.
@@ -255,11 +266,10 @@ class Prior(AbstractPrior):
             num_features (int): The number of features used when approximating the
                 kernel.
 
-
         Returns
         -------
             FunctionalSample: A function representing an approximate sample from the Gaussian
-            process prior.
+                process prior.
         """
 
         if (not isinstance(num_samples, int)) or num_samples <= 0:
@@ -293,14 +303,16 @@ class AbstractPosterior(Module):
     jitter: float = static_field(1e-6)
 
     def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
-        """Evaluate the Gaussian process at the given points. The output of this function
-        is a `TFP distribution <https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions>`_ from which the
-        the latent function's mean and covariance can be evaluated and the distribution
-        can be sampled.
+        r"""Evaluate the Gaussian process posterior at the given points.
 
-        Under the hood, ``__call__`` is calling the objects ``predict`` method. For this
-        reasons, classes inheriting the ``AbstractPrior`` class, should not overwrite the
-        ``__call__`` method and should instead define a ``predict`` method.
+        The output of this function is a
+        [TFP distribution](https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions)
+        from which the the latent function's mean and covariance can be
+        evaluated and the distribution can be sampled.
+
+        Under the hood, `__call__` is calling the objects `predict` method. For this
+        reasons, classes inheriting the `AbstractPrior` class, should not overwrite the
+        `__call__` method and should instead define a `predict` method.
 
         Args:
             *args (Any): The arguments to pass to the GP's `predict` method.
@@ -308,14 +320,15 @@ class AbstractPosterior(Module):
 
         Returns
         -------
-            GaussianDistribution: A multivariate normal random variable representation of the Gaussian process.
+            GaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process.
         """
         return self.predict(*args, **kwargs)
 
     @abstractmethod
     def predict(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
         """Compute the latent function's multivariate normal distribution for a
-        given set of parameters. For any class inheriting the ``AbstractPrior`` class,
+        given set of parameters. For any class inheriting the `AbstractPrior` class,
         this method must be implemented.
 
         Args:
@@ -333,34 +346,35 @@ class AbstractPosterior(Module):
 class ConjugatePosterior(AbstractPosterior):
     r"""A Gaussian process posterior distribution when the constituent likelihood
     function is a Gaussian distribution. In such cases, the latent function values
-    :math:`f` can be analytically integrated out of the posterior distribution.
+    $f$ can be analytically integrated out of the posterior distribution.
     As such, many computational operations can be simplified; something we make use
     of in this object.
 
-    For a Gaussian process prior :math:`p(\mathbf{f})` and a Gaussian likelihood
-    :math:`p(y | \mathbf{f}) = \mathcal{N}(y\mid \mathbf{f}, \sigma^2))` where
-    :math:`\mathbf{f} = f(\mathbf{x})`, the predictive posterior distribution at
-    a set of inputs :math:`\mathbf{x}` is given by
-
-    .. math::
-
-        p(\mathbf{f}^{\star}\mid \mathbf{y}) & = \int p(\mathbf{f}^{\star} \mathbf{f} \mid \mathbf{y})\\
-        & =\mathcal{N}(\mathbf{f}^{\star} \boldsymbol{\mu}_{\mid \mathbf{y}}, \boldsymbol{\Sigma}_{\mid \mathbf{y}}
-    where
-
-    .. math::
-
-        \boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\mathbf{x}^{\star}, \mathbf{x})\left(k(\mathbf{x}, \mathbf{x}')+\sigma^2\mathbf{I}_n\right)^{-1}\mathbf{y}  \\
-        \boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\mathbf{x}^{\star}, \mathbf{x}^{\star\prime}) -k(\mathbf{x}^{\star}, \mathbf{x})\left( k(\mathbf{x}, \mathbf{x}') + \sigma^2\mathbf{I}_n \right)^{-1}k(\mathbf{x}, \mathbf{x}^{\star}).
+    For a Gaussian process prior $p(\mathbf{f})$ and a Gaussian likelihood
+    $p(y | \mathbf{f}) = \mathcal{N}(y\mid \mathbf{f}, \sigma^2))$ where
+    $\mathbf{f} = f(\mathbf{x})$, the predictive posterior distribution at
+    a set of inputs $\mathbf{x}$ is given by $$
+    p(\mathbf{f}^{\star}\mid \mathbf{y}) & = \int p(\mathbf{f}^{\star} \mathbf{f} \mid \mathbf{y})\\
+    & =\mathcal{N}(\mathbf{f}^{\star} \boldsymbol{\mu}_{\mid \mathbf{y}}, \boldsymbol{\Sigma}_{\mid \mathbf{y}}
+    $$
+    where $$
+    \boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\mathbf{x}^{\star}, \mathbf{x})\left(k(\mathbf{x}, \mathbf{x}')+\sigma^2\mathbf{I}_n\right)^{-1}\mathbf{y}  \\
+    \boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\mathbf{x}^{\star}, \mathbf{x}^{\star\prime}) -k(\mathbf{x}^{\star}, \mathbf{x})\left( k(\mathbf{x}, \mathbf{x}') + \sigma^2\mathbf{I}_n \right)^{-1}k(\mathbf{x}, \mathbf{x}^{\star}).
+    $$
 
     Example:
-        >>> import gpjax as gpx
-        >>> import jax.numpy as jnp
-        >>>
-        >>> prior = gpx.Prior(kernel = gpx.kernels.RBF())
-        >>> likelihood = gpx.likelihoods.Gaussian()
-        >>>
-        >>> posterior = prior * likelihood
+        ```python
+        import gpjax as gpx
+        import jax.numpy as jnp
+
+        prior = gpx.Prior(
+            mean_function = gpx.mean_functions.Zero(),
+            kernel = gpx.kernels.RBF()
+            )
+        likelihood = gpx.likelihoods.Gaussian(num_datapoints=100)
+
+        posterior = prior * likelihood
+        ```
     """
 
     def predict(
@@ -385,11 +399,11 @@ class ConjugatePosterior(AbstractPosterior):
             \boldsymbol{\mu}_{\mid \mathbf{y}} & = k(\mathbf{x}^{\star}, \mathbf{x})\left(k(\mathbf{x}, \mathbf{x}')+\sigma^2\mathbf{I}_n\right)^{-1}\mathbf{y}  \\
             \boldsymbol{\Sigma}_{\mid \mathbf{y}} & =k(\mathbf{x}^{\star}, \mathbf{x}^{\star\prime}) -k(\mathbf{x}^{\star}, \mathbf{x})\left( k(\mathbf{x}, \mathbf{x}') + \sigma^2\mathbf{I}_n \right)^{-1}k(\mathbf{x}, \mathbf{x}^{\star}).
 
-        The conditioning set is a GPJax ``Dataset`` object, whilst predictions
+        The conditioning set is a GPJax `Dataset` object, whilst predictions
         are made on a regular Jax array.
 
         Example:
-            For a ``posterior`` distribution, the following code snippet will
+            For a `posterior` distribution, the following code snippet will
             evaluate the predictive distribution.
 
             >>> import gpjax as gpx
@@ -412,7 +426,7 @@ class ConjugatePosterior(AbstractPosterior):
         -------
             GaussianDistribution: A
                 function that accepts an input array and returns the predictive
-                distribution as a ``GaussianDistribution``.
+                distribution as a `GaussianDistribution`.
         """
         # Unpack training data
         x, y, n = train_data.X, train_data.y, train_data.n
@@ -543,9 +557,9 @@ class ConjugatePosterior(AbstractPosterior):
 class NonConjugatePosterior(AbstractPosterior):
     """
     A Gaussian process posterior object for models where the likelihood is
-    non-Gaussian. Unlike the ``ConjugatePosterior`` object, the
-    ``NonConjugatePosterior`` object does not provide an exact marginal
-    log-likelihood function. Instead, the ``NonConjugatePosterior`` object
+    non-Gaussian. Unlike the `ConjugatePosterior` object, the
+    `NonConjugatePosterior` object does not provide an exact marginal
+    log-likelihood function. Instead, the `NonConjugatePosterior` object
     represents the posterior distributions as a function of the model's
     hyperparameters and the latent function. Markov chain Monte Carlo,
     variational inference, or Laplace approximations can then be used to sample
@@ -578,7 +592,7 @@ class NonConjugatePosterior(AbstractPosterior):
         -------
             GaussianDistribution: A function that accepts an
                 input array and returns the predictive distribution as
-                a ``dx.Distribution``.
+                a `dx.Distribution`.
         """
         # Unpack training data
         x, n = train_data.X, train_data.n
@@ -634,8 +648,8 @@ def construct_posterior(
     Returns
     -------
         AbstractPosterior: A posterior distribution. If the likelihood is
-            Gaussian, then a ``ConjugatePosterior`` will be returned. Otherwise,
-            a ``NonConjugatePosterior`` will be returned.
+            Gaussian, then a `ConjugatePosterior` will be returned. Otherwise,
+            a `NonConjugatePosterior` will be returned.
     """
     if isinstance(likelihood, Gaussian):
         return ConjugatePosterior(prior=prior, likelihood=likelihood)
