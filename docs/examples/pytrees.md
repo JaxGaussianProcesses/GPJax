@@ -386,7 +386,7 @@ follows:
 ```python
 import jax.random as jr
 import tensorflow_probability.substrates.jax.distributions as tfd
-
+from dataclasses import field
 
 @dataclass
 class RBF(Module):
@@ -394,7 +394,9 @@ class RBF(Module):
         init=False, bijector=tfb.Softplus(), trainable=True
     )
     variance: float = param_field(init=False, bijector=tfb.Softplus(), trainable=True)
-    key: jr.KeyArray = jr.PRNGKey(42)
+    key: jr.KeyArray = field(default_factory = lambda: jr.PRNGKey(42))
+    # Note, for Python <3.11 you may use the following:
+    # key: jr.KeyArray = jr.PRNGKey(42)
 
     def __post_init__(self):
         # Split key into two keys
@@ -431,9 +433,7 @@ We observe that we get a TypeError because the key is not differentiable. We
 can fix this by using a `static_field` for defining our key attribute.
 
 ```python
-# from gpjax.base import static_field
-from simple_pytree import static_field  # <- need to rebase and replace with above line.
-
+from gpjax.base import static_field
 
 @dataclass
 class RBF(Module):
@@ -441,7 +441,7 @@ class RBF(Module):
         init=False, bijector=tfb.Softplus(), trainable=True
     )
     variance: float = param_field(init=False, bijector=tfb.Softplus(), trainable=True)
-    key: jr.KeyArray = static_field(jr.PRNGKey(42))
+    key: jr.KeyArray = static_field(default_factory=jr.PRNGKey(42))
 
     def __post_init__(self):
         # Split key into two keys

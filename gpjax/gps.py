@@ -491,50 +491,41 @@ class ConjugatePosterior(AbstractPosterior):
     ) -> FunctionalSample:
         r"""Draw approximate samples from the Gaussian process posterior.
 
-                Build an approximate sample from the Gaussian process posterior. This method
-                provides a function that returns the evaluations of a sample across any given
-                inputs.
+        Build an approximate sample from the Gaussian process posterior. This method
+        provides a function that returns the evaluations of a sample across any given
+        inputs.
 
-                Unlike when building approximate samples from a Gaussian process prior, decompositions
-                based on Fourier features alone rarely give accurate samples. Therefore, we must also
-                include an additional set of features (known as canonical features) to better model the
-                transition from Gaussian process prior to Gaussian process posterior. For more details
-                see [Wilson et. al. (2020)](https://arxiv.org/abs/2002.09309).
+        Unlike when building approximate samples from a Gaussian process prior, decompositions
+        based on Fourier features alone rarely give accurate samples. Therefore, we must also
+        include an additional set of features (known as canonical features) to better model the
+        transition from Gaussian process prior to Gaussian process posterior. For more details
+        see [Wilson et. al. (2020)](https://arxiv.org/abs/2002.09309).
 
-                In particular, we approximate the Gaussian processes' posterior as the finite
-                feature approximation
-        <<<<<<< HEAD
-                $`\hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i + \sum{j=1}^N v_jk(.,x_j)`$
-                where $`\phi_i`$ are m features sampled from the Fourier feature decomposition of
-                the model's kernel and $`k(., x_j)`$ are N canonical features. The Fourier
-                weights $`\theta_i`$ are samples from a unit Gaussian. See
-                [Wilson et. al. (2020)](https://arxiv.org/abs/2002.09309) for expressions
-                for the canonical weights $`v_j`$.
-        =======
-                $\hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i + \sum{j=1}^N v_jk(.,x_j)$
-                where $\phi_i$ are m features sampled from the Fourier feature decomposition of
-                the model's kernel and $k(., x_j)$ are N canonical features. The Fourier
-                weights $\theta_i$ are samples from a unit Gaussian. See
-                [Wilson et. al. (2020)](https://arxiv.org/abs/2002.09309) for expressions
-                for the canonical weights $v_j$.
-        >>>>>>> 40b9a3b23c487221dacde900ad79e4d94a1c5d17
+        In particular, we approximate the Gaussian processes' posterior as the finite
+        feature approximation
+        $`\hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i + \sum{j=1}^N v_jk(.,x_j)`$
+        where $`\phi_i`$ are m features sampled from the Fourier feature decomposition of
+        the model's kernel and $`k(., x_j)`$ are N canonical features. The Fourier
+        weights $`\theta_i`$ are samples from a unit Gaussian. See
+        [Wilson et. al. (2020)](https://arxiv.org/abs/2002.09309) for expressions
+        for the canonical weights $`v_j`$.
 
-                A key property of such functional samples is that the same sample draw is
-                evaluated for all queries. Consistency is a property that is prohibitively costly
-                to ensure when sampling exactly from the GP prior, as the cost of exact sampling
-                scales cubically with the size of the sample. In contrast, finite feature representations
-                can be evaluated with constant cost regardless of the required number of queries.
+        A key property of such functional samples is that the same sample draw is
+        evaluated for all queries. Consistency is a property that is prohibitively costly
+        to ensure when sampling exactly from the GP prior, as the cost of exact sampling
+        scales cubically with the size of the sample. In contrast, finite feature representations
+        can be evaluated with constant cost regardless of the required number of queries.
 
-                Args:
-                    num_samples (int): The desired number of samples.
-                    key (KeyArray): The random seed used for the sample(s).
-                    num_features (int): The number of features used when approximating the
-                        kernel.
+        Args:
+            num_samples (int): The desired number of samples.
+            key (KeyArray): The random seed used for the sample(s).
+            num_features (int): The number of features used when approximating the
+                kernel.
 
-                Returns
-                -------
-                    FunctionalSample: A function representing an approximate sample from the Gaussian
-                    process prior.
+        Returns
+        -------
+            FunctionalSample: A function representing an approximate sample from the Gaussian
+            process prior.
         """
         if (not isinstance(num_samples, int)) or num_samples <= 0:
             raise ValueError("num_samples must be a positive integer")
