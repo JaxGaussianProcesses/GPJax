@@ -51,7 +51,7 @@ jobs:
           virtualenvs-in-project: false
           installer-parallel: true
 
-      - name: Build the documentation with Sphinx
+      - name: Build the documentation with MKDocs
         run: |
           poetry install --all-extras --with docs
           conda install pandoc
