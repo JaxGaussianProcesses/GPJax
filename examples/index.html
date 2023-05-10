@@ -1634,7 +1634,7 @@ of the objects attributes with corresponding types.</p>
 <a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="sd">        &gt;&gt;&gt; meanf = gpx.mean_functions.Zero()</span>
 <a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="sd">        &gt;&gt;&gt; kernel = gpx.kernels.RBF()</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="sd">        &gt;&gt;&gt; prior = gpx.Prior(mean_functions=meanf, kernel = kernel)</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="sd">        &gt;&gt;&gt; prior = gpx.Prior(mean_function=meanf, kernel = kernel)</span>
 <a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>
 <a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="sd">        kernel (Kernel): The kernel function used to parameterise the prior.</span>
