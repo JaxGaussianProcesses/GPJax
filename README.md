@@ -126,7 +126,7 @@ opt_posterior, history = gpx.fit(
     optim=optimiser,
     num_iters=500,
     safe=True,
-    key = key
+    key=key,
 )
 
 # Infer the predictive posterior distribution
