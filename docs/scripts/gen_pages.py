@@ -24,8 +24,14 @@ class CustomNav(Nav):
                     title = "GPJax"
                 elif key == "gps":
                     title = "GPs"
+                elif key == "rbf":
+                    title = "RBF"
                 else:
                     title = key.title()
+
+                title = title.replace("_", " ")
+                title = title.replace("Matern", "Matérn")
+
                 yield cls.Item(level=level, title=title, filename=value.get(None))
                 yield from cls._items(value, level + 1)
 
