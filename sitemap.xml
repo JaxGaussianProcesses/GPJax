@@ -21,11 +21,6 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://example.com/index%20copy/</loc>
-         <lastmod>2023-05-10</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://example.com/installation/</loc>
          <lastmod>2023-05-10</lastmod>
          <changefreq>daily</changefreq>
@@ -307,6 +302,11 @@
     </url>
     <url>
          <loc>https://example.com/examples/poisson/</loc>
+         <lastmod>2023-05-10</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://example.com/examples/pytrees/</loc>
          <lastmod>2023-05-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
