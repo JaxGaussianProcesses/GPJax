@@ -374,7 +374,6 @@ As expected, the gradient is zero for the lengthscale parameter.
 
 ## Static fields
 
-
 In machine learning, initialising model parameters from random points is a
 common practice because it helps to break the symmetry in the model and allows
 the optimization algorithm to explore different regions of the parameter
@@ -441,7 +440,7 @@ class RBF(Module):
         init=False, bijector=tfb.Softplus(), trainable=True
     )
     variance: float = param_field(init=False, bijector=tfb.Softplus(), trainable=True)
-    key: jr.KeyArray = static_field(default_factory=jr.PRNGKey(42))
+    key: jr.KeyArray = static_field(default_factory=lambda: jr.PRNGKey(42))
 
     def __post_init__(self):
         # Split key into two keys
