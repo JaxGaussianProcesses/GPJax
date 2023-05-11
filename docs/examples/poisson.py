@@ -68,9 +68,11 @@ y = jr.poisson(key, jnp.exp(f(x)))
 D = gpx.Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-2.0, 2.0, 500).reshape(-1, 1)
-plt.plot(x, y, "o", label="Observations", color=cols[1])
-plt.plot(xtest, jnp.exp(f(xtest)), label=r"Rate $\lambda$")
-plt.legend()
+
+fig, ax = plt.subplots()
+ax.plot(x, y, "o", label="Observations", color=cols[1])
+ax.plot(xtest, jnp.exp(f(xtest)), label=r"Rate $\lambda$")
+ax.legend()
 
 # %% [markdown]
 # ## Gaussian Process definition
@@ -168,7 +170,7 @@ acceptance_rate = jnp.mean(infos.acceptance_probability)
 print(f"Acceptance rate: {acceptance_rate:.2f}")
 
 # %%
-fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(15, 5), tight_layout=True)
+fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(10, 3))
 ax0.plot(states.position.constrain().prior.kernel.variance)
 ax1.plot(states.position.constrain().prior.kernel.lengthscale)
 ax2.plot(states.position.constrain().prior.mean_function.constant)
@@ -213,7 +215,7 @@ expected_val = jnp.mean(samples, axis=0)
 # against the observed data.
 
 # %%
-fig, ax = plt.subplots(figsize=(16, 5), tight_layout=True)
+fig, ax = plt.subplots()
 ax.plot(
     x, y, "o", markersize=5, color=cols[1], label="Observations", zorder=2, alpha=0.7
 )
