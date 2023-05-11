@@ -41,7 +41,7 @@ with install_import_hook("gpjax", "beartype.beartype"):
 config.update("jax_enable_x64", True)
 tfd = tfp.distributions
 key = jr.PRNGKey(123)
-plt.style.use("docs/examples/gpjax.mplstyle")
+plt.style.use("./gpjax.mplstyle")
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]

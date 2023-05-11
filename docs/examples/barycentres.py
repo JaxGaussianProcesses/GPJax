@@ -34,7 +34,7 @@ with install_import_hook("gpjax", "beartype.beartype"):
 
 
 key = jr.PRNGKey(123)
-plt.style.use("docs/examples/gpjax.mplstyle")
+plt.style.use("./gpjax.mplstyle")
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
@@ -58,7 +58,7 @@ cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 # other measures in the set. More formally, the Wasserstein barycentre is the Fréchet
 # mean on a Wasserstein space that we can write as
 # $$\bar{\mu} = \operatorname{argmin}_{\mu\in\mathcal{P}_2(\theta)}\sum_{t=1}^T \alpha_t W_2^2(\mu, \mu_t),$$
-# where $\alpha\in\bbR^T$ is a weight vector that sums to 1.
+# where $\alpha\in\mathbb{R}^T$ is a weight vector that sums to 1.
 #
 # As with the Wasserstein distance, identifying the Wasserstein barycentre $\bar{\mu}$
 # is often an computationally demanding optimisation problem. However, when all the

@@ -52,6 +52,7 @@ jobs:
 
       - name: Build the documentation with MKDocs
         run: |
+          cp docs/examples/.gpjax.mplstyle .
           poetry install --all-extras --with docs
           conda install pandoc
           poetry run mkdocs build
