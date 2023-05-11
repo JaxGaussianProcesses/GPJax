@@ -23,7 +23,6 @@ from typing import (
 from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
-from jax.random import KeyArray
 import jax.tree_util as jtu
 from jaxtyping import (
     Array,

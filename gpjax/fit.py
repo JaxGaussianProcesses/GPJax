@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-from warnings import warn
 
 from beartype.typing import (
     Any,
@@ -25,8 +24,6 @@ from beartype.typing import (
 import jax
 from jax._src.random import _check_prng_key
 import jax.random as jr
-from jaxlib.xla_extension import PjitFunction
-from jaxtyping import Float
 import optax as ox
 
 from gpjax.base import Module
@@ -46,18 +43,19 @@ def fit(
     objective: Union[AbstractObjective, Callable[[Module, Dataset], ScalarFloat]],
     train_data: Dataset,
     optim: ox.GradientTransformation,
+    key: KeyArray,
     num_iters: Optional[int] = 100,
     batch_size: Optional[int] = -1,
-    key: Optional[KeyArray] = jr.PRNGKey(42),
     log_rate: Optional[int] = 10,
     verbose: Optional[bool] = True,
     unroll: Optional[int] = 1,
     safe: Optional[bool] = True,
 ) -> Tuple[Module, Array]:
-    """Train a Module model with respect to a supplied Objective function.
+    r"""Train a Module model with respect to a supplied Objective function.
     Optimisers used here should originate from Optax.
 
     Example:
+    ```python
         >>> import jax.numpy as jnp
         >>> import jax.random as jr
         >>> import optax as ox
@@ -70,25 +68,26 @@ def fit(
         >>>
         >>> # (2) Define your model:
         >>> class LinearModel(gpx.Module):
-        ...     weight: float = gpx.param_field()
-        ...     bias: float = gpx.param_field()
-        ...
-        ...     def __call__(self, x):
-        ...         return self.weight * x + self.bias
-        ...
+                weight: float = gpx.param_field()
+                bias: float = gpx.param_field()
+
+                def __call__(self, x):
+                    return self.weight * x + self.bias
+
         >>> model = LinearModel(weight=1.0, bias=1.0)
         >>>
         >>> # (3) Define your loss function:
         >>> class MeanSquareError(gpx.AbstractObjective):
-        ...     def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
-        ...         return jnp.mean((train_data.y - model(train_data.X)) ** 2)
-        ...
+                def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
+                    return jnp.mean((train_data.y - model(train_data.X)) ** 2)
+        >>>
         >>> loss = MeanSqaureError()
         >>>
         >>> # (4) Train!
         >>> trained_model, history = gpx.fit(
-        ...     model=model, objective=loss, train_data=D, optim=ox.sgd(0.001), num_iters=1000
-        ... )
+                model=model, objective=loss, train_data=D, optim=ox.sgd(0.001), num_iters=1000
+            )
+    ```
 
     Args:
         model (Module): The model Module to be optimised.
@@ -104,7 +103,7 @@ def fit(
         key (Optional[KeyArray]): The random key to use for the optimisation batch
             selection. Defaults to jr.PRNGKey(42).
         log_rate (Optional[int]): How frequently the objective function's value should
-        be printed. Defaults to 10.
+            be printed. Defaults to 10.
         verbose (Optional[bool]): Whether to print the training loading bar. Defaults
             to True.
         unroll (int): The number of unrolled steps to use for the optimisation.
@@ -118,7 +117,6 @@ def fit(
     if safe:
         # Check inputs.
         _check_model(model)
-        _check_objective(objective)
         _check_train_data(train_data)
         _check_optim(optim)
         _check_num_iters(num_iters)
@@ -183,29 +181,16 @@ def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
     """
     x, y, n = train_data.X, train_data.y, train_data.n
 
-    # Subsample mini-batch indicies with replacement.
-    indicies = jr.choice(key, n, (batch_size,), replace=True)
+    # Subsample mini-batch indices with replacement.
+    indices = jr.choice(key, n, (batch_size,), replace=True)
 
-    return Dataset(X=x[indicies], y=y[indicies])
+    return Dataset(X=x[indices], y=y[indices])
 
 
 def _check_model(model: Any) -> None:
     """Check that the model is of type Module. Check trainables and bijectors tree structure."""
     if not isinstance(model, Module):
         raise TypeError("model must be of type gpjax.Module")
-
-
-def _check_objective(objective: Any) -> None:
-    """Check that the objective is of type Objective."""
-    if not isinstance(objective, AbstractObjective):
-        if isinstance(objective, PjitFunction):
-            warn(
-                "Objective is jit-compiled. Please ensure that the objective is of type gpjax.Objective."
-            )
-        else:
-            raise TypeError(
-                f"objective of type {type(objective)} must be of type gpjax.Objective."
-            )
 
 
 def _check_train_data(train_data: Any) -> None:

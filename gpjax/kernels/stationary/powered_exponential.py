@@ -19,7 +19,6 @@ from beartype.typing import Union
 import jax.numpy as jnp
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
-import tensorflow_probability.substrates.jax.distributions as tfd
 
 from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
@@ -32,32 +31,35 @@ from gpjax.typing import (
 
 @dataclass
 class PoweredExponential(AbstractKernel):
-    """The powered exponential family of kernels.
+    r"""The powered exponential family of kernels.
 
     Key reference is Diggle and Ribeiro (2007) - "Model-based Geostatistics".
 
     """
 
-    lengthscale: Union[ScalarFloat, Float[Array, "D"]] = param_field(
-        jnp.array([1.0]), bijector=tfb.Softplus()
+    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
     )
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     power: ScalarFloat = param_field(jnp.array(1.0))
     name: str = "Powered Exponential"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell`, :math:`\\sigma` and power :math:`\\kappa`.
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+        r"""Compute the Powered Exponential kernel between a pair of arrays.
 
-        .. math::
-            k(x, y) = \\sigma^2 \\exp \\Bigg( - \\Big( \\frac{\\lVert x - y \\rVert^2}{\\ell^2} \\Big)^\\kappa \\Bigg)
+        Evaluate the kernel on a pair of inputs $`(x, y)`$ with length-scale parameter
+        $`\ell`$, $`\sigma`$ and power $`\kappa`$.
+        ```math
+        k(x, y)=\sigma^2\exp\Bigg(-\Big(\frac{\lVert x-y\rVert^2}{\ell^2}\Big)^\kappa\Bigg)
+        ```
 
         Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's call
+            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, " D"]): The right hand argument of the kernel function's call
 
         Returns
         -------
-            ScalarFloat: The value of :math:`k(x, y)`
+            ScalarFloat: The value of $`k(x, y)`$.
         """
         x = self.slice_input(x) / self.lengthscale
         y = self.slice_input(y) / self.lengthscale

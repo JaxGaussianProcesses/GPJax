@@ -1,4 +1,3 @@
-# Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -117,9 +116,6 @@ class BaseTestKernel:
     def test_gram(self, dim: int, n: int) -> None:
         # Initialise kernel
         kernel: AbstractKernel = self.kernel()
-
-        # Gram constructor static method
-        kernel.gram
 
         # Inputs
         x = jnp.linspace(0.0, 1.0, n * dim).reshape(n, dim)

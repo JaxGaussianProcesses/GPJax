@@ -143,8 +143,10 @@ cython_debug/
 .idea/
 examples/_debug*
 examples/testing/*
-examples/*.ipynb
 _debug/
 workspace.code-workspace
 scratch_nbs/
 .DS_store
+package.json
+package-lock.json
+node_modules/

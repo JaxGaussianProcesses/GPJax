@@ -39,7 +39,7 @@ tfd = tfp.distributions
 
 
 def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
-    """Checks that the inputs are correct."""
+    r"""Checks that the inputs are correct."""
     if loc is None and scale is None:
         raise ValueError("At least one of `loc` or `scale` must be specified.")
 
@@ -48,7 +48,7 @@ def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
 
     if scale is not None and scale.ndim < 2:
         raise ValueError(
-            f"The `scale` must have at least two dimensions, but "
+            "The `scale` must have at least two dimensions, but "
             f"`scale.shape = {scale.shape}`."
         )
 
@@ -59,8 +59,7 @@ def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
 
     if scale is not None and (scale.shape[-1] != scale.shape[-2]):
         raise ValueError(
-            f"The `scale` must be a square matrix, but "
-            f"`scale.shape = {scale.shape}`."
+            f"The `scale` must be a square matrix, but `scale.shape = {scale.shape}`."
         )
 
     if loc is not None:
@@ -73,10 +72,10 @@ def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
 
 
 class GaussianDistribution(tfd.Distribution):
-    """Multivariate Gaussian distribution with a linear operator scale matrix.
+    r"""Multivariate Gaussian distribution with a linear operator scale matrix.
 
     Args:
-        loc (Optional[Float[Array, "N"]]): The mean of the distribution. Defaults to None.
+        loc (Optional[Float[Array, " N"]]): The mean of the distribution. Defaults to None.
         scale (Optional[LinearOperator]): The scale matrix of the distribution. Defaults to None.
 
     Returns
@@ -91,10 +90,10 @@ class GaussianDistribution(tfd.Distribution):
 
     def __init__(
         self,
-        loc: Optional[Float[Array, "N"]] = None,
+        loc: Optional[Float[Array, " N"]] = None,
         scale: Optional[LinearOperator] = None,
     ) -> None:
-        """Initialises the distribution."""
+        r"""Initialises the distribution."""
         _check_loc_scale(loc, scale)
 
         # Find dimensionality of the distribution.
@@ -115,46 +114,46 @@ class GaussianDistribution(tfd.Distribution):
         self.loc = loc
         self.scale = scale
 
-    def mean(self) -> Float[Array, "N"]:
-        """Calculates the mean."""
+    def mean(self) -> Float[Array, " N"]:
+        r"""Calculates the mean."""
         return self.loc
 
-    def median(self) -> Float[Array, "N"]:
-        """Calculates the median."""
+    def median(self) -> Float[Array, " N"]:
+        r"""Calculates the median."""
         return self.loc
 
-    def mode(self) -> Float[Array, "N"]:
-        """Calculates the mode."""
+    def mode(self) -> Float[Array, " N"]:
+        r"""Calculates the mode."""
         return self.loc
 
     def covariance(self) -> Float[Array, "N N"]:
-        """Calculates the covariance matrix."""
+        r"""Calculates the covariance matrix."""
         return self.scale.to_dense()
 
-    def variance(self) -> Float[Array, "N"]:
-        """Calculates the variance."""
+    def variance(self) -> Float[Array, " N"]:
+        r"""Calculates the variance."""
         return self.scale.diagonal()
 
-    def stddev(self) -> Float[Array, "N"]:
-        """Calculates the standard deviation."""
+    def stddev(self) -> Float[Array, " N"]:
+        r"""Calculates the standard deviation."""
         return jnp.sqrt(self.scale.diagonal())
 
     @property
     def event_shape(self) -> Tuple:
-        """Returns the event shape."""
+        r"""Returns the event shape."""
         return self.loc.shape[-1:]
 
     def entropy(self) -> ScalarFloat:
-        """Calculates the entropy of the distribution."""
+        r"""Calculates the entropy of the distribution."""
         return 0.5 * (
             self.event_shape[0] * (1.0 + jnp.log(2.0 * jnp.pi)) + self.scale.log_det()
         )
 
-    def log_prob(self, y: Float[Array, "N"]) -> ScalarFloat:
-        """Calculates the log pdf of the multivariate Gaussian.
+    def log_prob(self, y: Float[Array, " N"]) -> ScalarFloat:
+        r"""Calculates the log pdf of the multivariate Gaussian.
 
         Args:
-            y (Float[Array, "N"]): The value to calculate the log probability of.
+            y (Float[Array, " N"]): The value to calculate the log probability of.
 
         Returns
         -------
@@ -173,7 +172,7 @@ class GaussianDistribution(tfd.Distribution):
         )
 
     def _sample_n(self, key: KeyArray, n: int) -> Float[Array, "n N"]:
-        """Samples from the distribution.
+        r"""Samples from the distribution.
 
         Args:
             key (KeyArray): The key to use for sampling.
@@ -197,7 +196,7 @@ class GaussianDistribution(tfd.Distribution):
     def sample(
         self, seed: KeyArray, sample_shape: Tuple[int, ...]
     ):  # pylint: disable=useless-super-delegation
-        """See `Distribution.sample`."""
+        r"""See `Distribution.sample`."""
         return self._sample_n(
             seed, sample_shape[0]
         )  # TODO this looks weird, why ignore the second entry?
@@ -209,24 +208,28 @@ class GaussianDistribution(tfd.Distribution):
 def _check_and_return_dimension(
     q: GaussianDistribution, p: GaussianDistribution
 ) -> int:
-    """Checks that the dimensions of the distributions are compatible."""
+    r"""Checks that the dimensions of the distributions are compatible."""
     if q.event_shape != p.event_shape:
         raise ValueError(
-            f"Distribution event shapes are not compatible: `q.event_shape = {q.event_shape}` and "
-            f"`p.event_shape = {p.event_shape}`. Please check your mean and covariance shapes."
+            "Distribution event shapes are not compatible: `q.event_shape ="
+            f" {q.event_shape}` and `p.event_shape = {p.event_shape}`. Please check"
+            " your mean and covariance shapes."
         )
 
     return q.event_shape[-1]
 
 
 def _frobenius_norm_squared(matrix: Float[Array, "N N"]) -> ScalarFloat:
-    """Calculates the squared Frobenius norm of a matrix."""
+    r"""Calculates the squared Frobenius norm of a matrix."""
     return jnp.sum(jnp.square(matrix))
 
 
 def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> ScalarFloat:
-    """Computes the KL divergence, KL[q||p], between two multivariate Gaussian distributions
-        q(x) = N(x; μq, Σq) and p(x) = N(x; μp, Σp).
+    r"""KL-divergence between two Gaussians.
+
+    Computes the KL divergence, $`\operatorname{KL}[q\mid\mid p]`$, between two
+    multivariate Gaussian distributions $`q(x) = \mathcal{N}(x; \mu_q, \Sigma_q)`$
+    and $`p(x) = \mathcal{N}(x; \mu_p, \Sigma_p)`$.
 
     Args:
         q (GaussianDistribution): A multivariate Gaussian distribution.

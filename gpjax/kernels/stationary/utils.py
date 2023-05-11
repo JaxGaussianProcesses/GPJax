@@ -26,7 +26,10 @@ tfd = tfp.distributions
 
 
 def build_student_t_distribution(nu: int) -> tfd.Distribution:
-    """For a fixed half-integer smoothness parameter, compute the spectral density of a Matérn kernel; a Student's t distribution.
+    r"""Build a Student's t distribution with a fixed smoothness parameter.
+
+    For a fixed half-integer smoothness parameter, compute the spectral density of a
+    Matérn kernel; a Student's t distribution.
 
     Args:
         nu (int): The smoothness parameter of the Matérn kernel.
@@ -39,12 +42,12 @@ def build_student_t_distribution(nu: int) -> tfd.Distribution:
     return dist
 
 
-def squared_distance(x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
-    """Compute the squared distance between a pair of inputs.
+def squared_distance(x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+    r"""Compute the squared distance between a pair of inputs.
 
     Args:
-        x (Float[Array, "D"]): First input.
-        y (Float[Array, "D"]): Second input.
+        x (Float[Array, " D"]): First input.
+        y (Float[Array, " D"]): Second input.
 
     Returns
     -------
@@ -53,12 +56,12 @@ def squared_distance(x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
     return jnp.sum((x - y) ** 2)
 
 
-def euclidean_distance(x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
-    """Compute the euclidean distance between a pair of inputs.
+def euclidean_distance(x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+    r"""Compute the euclidean distance between a pair of inputs.
 
     Args:
-        x (Float[Array, "D"]): First input.
-        y (Float[Array, "D"]): Second input.
+        x (Float[Array, " D"]): First input.
+        y (Float[Array, " D"]): Second input.
 
     Returns
     -------

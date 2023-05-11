@@ -1,9 +1,10 @@
 name: Run Tests
 on:
+  pull_request:
   push:
     branches:
       - main
-  pull_request:
+
 jobs:
   test:
     name: Run Tests
@@ -39,6 +40,10 @@ jobs:
       - name: Install Package
         run: |
           poetry install --with tests
+
+      - name: Check docstrings
+        run: |
+          poetry run xdoctest ./gpjax
 
       # Run the unit tests and build the coverage report
       - name: Run Tests

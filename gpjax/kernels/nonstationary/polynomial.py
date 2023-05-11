@@ -17,10 +17,12 @@ from dataclasses import dataclass
 
 import jax.numpy as jnp
 from jaxtyping import Float
-from gpjax.base import static_field
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import param_field
+from gpjax.base import (
+    param_field,
+    static_field,
+)
 from gpjax.kernels.base import AbstractKernel
 from gpjax.typing import (
     Array,
@@ -40,22 +42,23 @@ class Polynomial(AbstractKernel):
     def __post_init__(self):
         self.name = f"Polynomial (degree {self.degree})"
 
-    def __call__(self, x: Float[Array, "D"], y: Float[Array, "D"]) -> ScalarFloat:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter
-        :math:`\\alpha` and variance :math:`\\sigma^2` through.
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+        r"""Compute the polynomial kernel of degree $`d`$ between a pair of arrays.
 
-        .. math::
-            k(x, y) = \\Big( \\alpha + \\sigma^2 xy \\Big)^{d}
+        For a pair of inputs $`x, y \in \mathbb{R}^{D}`$, let's evaluate the polynomial
+        kernel $`k(x, y)=\left( \alpha + \sigma^2 x y\right)^{d}`$ where
+        $`\sigma^\in \mathbb{R}_{>0}`$ is the kernel's variance parameter, shift
+        parameter $`\alpha`$ and integer degree $`d`$.
 
         Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's
+            x (Float[Array, " D"]): The left hand argument of the kernel function's
                 call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's
+            y (Float[Array, " D"]): The right hand argument of the kernel function's
                 call
 
         Returns
         -------
-            ScalarFloat: The value of :math:`k(x, y)`.
+            ScalarFloat: The value of $`k(x, y)`$.
         """
         x = self.slice_input(x)
         y = self.slice_input(y)

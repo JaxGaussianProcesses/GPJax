@@ -23,7 +23,7 @@ import numpy as np
 
 from gpjax.typing import Array
 
-"""The number of Gauss-Hermite points to use for quadrature"""
+r"""The number of Gauss-Hermite points to use for quadrature"""
 DEFAULT_NUM_GAUSS_HERMITE_POINTS = 20
 
 
@@ -34,8 +34,9 @@ def gauss_hermite_quadrature(
     deg: Optional[int] = DEFAULT_NUM_GAUSS_HERMITE_POINTS,
     *args,
     **kwargs,
-) -> Float[Array, "N"]:
-    """
+) -> Float[Array, " N"]:
+    r"""Compute Gauss-Hermite quadrature.
+
     Compute Gaussian-Hermite quadrature for a given function. The quadrature
     points are adjusted through the supplied mean and variance arrays.
 
@@ -50,7 +51,7 @@ def gauss_hermite_quadrature(
 
     Returns
     -------
-        Float[Array, "N"]: The evaluated integrals value.
+        Float[Array, " N"]: The evaluated integrals value.
     """
     gh_points, gh_weights = np.polynomial.hermite.hermgauss(deg)
     X = mean + jnp.sqrt(2.0) * sd * gh_points

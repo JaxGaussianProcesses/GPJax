@@ -27,7 +27,9 @@ from gpjax.typing import Array
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):
     def gram(self, x: Float[Array, "N D"]) -> ConstantDiagonalLinearOperator:
-        """Compute Gram covariance operator of the kernel function.
+        r"""Compute the Gram matrix.
+
+        Compute Gram covariance operator of the kernel function.
 
         Args:
             x (Float[Array, "N N"]): The inputs to the kernel function.
@@ -39,17 +41,17 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
         )
 
     def diagonal(self, inputs: Float[Array, "N D"]) -> DiagonalLinearOperator:
-        """For a given kernel, compute the elementwise diagonal of the
-        NxN gram matrix on an input matrix of shape NxD.
+        r"""Compute the diagonal Gram matrix's entries.
+
+        For a given kernel, compute the elementwise diagonal of the
+        NxN gram matrix on an input matrix of shape $`N\times D`$.
 
         Args:
-            kernel (AbstractKernel): The kernel for which the variance
-                vector should be computed for.
             inputs (Float[Array, "N D"]): The input matrix.
 
         Returns
         -------
-            LinearOperator: The computed diagonal variance entries.
+            DiagonalLinearOperator: The computed diagonal variance entries.
         """
         diag = vmap(lambda x: self.kernel(x, x))(inputs)
 
@@ -58,7 +60,9 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
     def cross_covariance(
         self, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
-        """For a given kernel, compute the NxM covariance matrix on a pair of input
+        r"""Compute the cross-covariance matrix.
+
+        For a given kernel, compute the NxM covariance matrix on a pair of input
         matrices of shape NxD and MxD.
 
         Args:
@@ -67,8 +71,9 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
 
         Returns
         -------
-            CovarianceOperator: The computed square Gram matrix.
+            Float[Array, "N M"]: The computed square Gram matrix.
         """
-        # TODO: This is currently a dense implementation. We should implement a sparse LinearOperator for non-square cross-covariance matrices.
+        # TODO: This is currently a dense implementation. We should implement
+        # a sparse LinearOperator for non-square cross-covariance matrices.
         cross_cov = vmap(lambda x: vmap(lambda y: self.kernel(x, y))(y))(x)
         return cross_cov

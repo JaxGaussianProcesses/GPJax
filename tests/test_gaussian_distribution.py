@@ -32,7 +32,6 @@ _key = jr.PRNGKey(seed=42)
 from tensorflow_probability.substrates.jax.distributions import (
     MultivariateNormalDiag,
     MultivariateNormalFullCovariance,
-    MultivariateNormalTriL,
 )
 
 
@@ -47,7 +46,8 @@ def test_array_arguments(n: int) -> None:
     mean = jr.uniform(key_mean, shape=(n,))
     sqrt = jr.uniform(key_sqrt, shape=(n, n))
     covariance = sqrt @ sqrt.T
-    L = jnp.linalg.cholesky(covariance)
+    # check that cholesky does not error
+    _L = jnp.linalg.cholesky(covariance)  # noqa: F841
 
     dist = GaussianDistribution(loc=mean, scale=DenseLinearOperator(covariance))
 

@@ -16,7 +16,6 @@
 from beartype.typing import (
     Any,
     Callable,
-    List,
     Optional,
     Tuple,
     TypeVar,
@@ -43,7 +42,7 @@ Y = TypeVar("Y")
 
 
 def _callback(cond: ScalarBool, func: Callable, *args: Any) -> None:
-    """Callback a function for a given argument if a condition is true.
+    r"""Callback a function for a given argument if a condition is true.
 
     Args:
         cond (bool): The condition.
@@ -76,18 +75,23 @@ def vscan(
 ) -> Tuple[
     Carry, Shaped[Array, "..."]
 ]:  # return type should be Tuple[Carry, Y[Array]]...
-    """Scan with verbose output.
+    r"""Scan with verbose output.
 
-    This is based on code from the excellent blog post:
-    https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/.
+    This is based on code from this [excellent blog post](https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/).
 
     Example:
+    ```python
+        >>> import jax.numpy as jnp
+        >>>
         >>> def f(carry, x):
-        ...     return carry + x, carry + x
+                return carry + x, carry + x
         >>> init = 0
         >>> xs = jnp.arange(10)
         >>> vscan(f, init, xs)
+    ```
+    ```console
         (45, DeviceArray([ 0,  1,  3,  6, 10, 15, 21, 28, 36, 45], dtype=int32))
+    ```
 
     Args:
         f (Callable[[Carry, X], Tuple[Carry, Y]]): A function that takes in a carry and
@@ -103,7 +107,7 @@ def vscan(
 
     Returns
     -------
-        Tuple[Carry, List[Y]]: A tuple of the final carry and the outputs.
+        Tuple[Carry, list[Y]]: A tuple of the final carry and the outputs.
     """
     _xs_flat = jtu.tree_leaves(xs)
     _length = length if length is not None else len(_xs_flat[0])

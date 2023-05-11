@@ -22,10 +22,12 @@ from jaxtyping import (
     Int,
     Num,
 )
-from gpjax.base import static_field
 import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.base import param_field
+from gpjax.base import (
+    param_field,
+    static_field,
+)
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
@@ -46,18 +48,21 @@ tfb = tfp.bijectors
 ##########################################
 @dataclass
 class GraphKernel(AbstractKernel):
-    """A Matérn graph kernel defined on the vertices of a graph. The key reference for this object is borovitskiy et. al., (2020).
+    r"""The Matérn graph kernel defined on the vertex set of a graph.
+
+    A Matérn graph kernel defined on the vertices of a graph. The key reference
+    for this object is borovitskiy et. al., (2020).
 
     Args:
-        laplacian (Float[Array]): An N x N matrix representing the Laplacian matrix of a graph.
-        compute_engine
+        laplacian (Float[Array]): An $`N \times N`$ matrix representing the Laplacian matrix
+            of a graph.
     """
 
     laplacian: Num[Array, "N N"] = static_field(None)
     lengthscale: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     smoothness: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    eigenvalues: Float[Array, "N"] = static_field(None)
+    eigenvalues: Float[Array, " N"] = static_field(None)
     eigenvectors: Float[Array, "N N"] = static_field(None)
     num_vertex: ScalarInt = static_field(None)
     compute_engine: AbstractKernelComputation = static_field(EigenKernelComputation)
@@ -80,15 +85,18 @@ class GraphKernel(AbstractKernel):
         S,
         **kwargs,
     ):
-        """Evaluate the graph kernel on a pair of vertices :math:`v_i, v_j`.
+        r"""Compute the (co)variance between a vertex pair.
+
+        For a graph $`\mathcal{G} = \{V, E\}`$ where $`V = \{v_1, v_2, \ldots v_n \}`$,
+        evaluate the graph kernel on a pair of vertices $`(v_i, v_j)`$ for any $`i,j<n`$.
 
         Args:
-            x (Float[Array, "N 1"]): Index of the ith vertex.
-            y (Float[Array, "N 1"]): Index of the jth vertex.
+            x (Float[Array, "N 1"]): Index of the $`i`$th vertex.
+            y (Float[Array, "N 1"]): Index of the $`j`$th vertex.
 
         Returns
         -------
-            ScalarFloat: The value of :math:`k(v_i, v_j)`.
+            ScalarFloat: The value of $k(v_i, v_j)$.
         """
         Kxx = (jax_gather_nd(self.eigenvectors, x) * S.squeeze()) @ jnp.transpose(
             jax_gather_nd(self.eigenvectors, y)

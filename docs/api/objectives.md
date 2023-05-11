@@ -1,0 +1,3 @@
+# Objectives
+
+::: gpjax.objectives

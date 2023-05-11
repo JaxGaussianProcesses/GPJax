@@ -79,4 +79,4 @@ class UpperTriangularLinearOperator(DenseLinearOperator):
         return UpperTriangularLinearOperator(matrix=dense)
 
 
-__all__ = ["TriangularLinearOperator"]
+__all__ = ["LowerTriangularLinearOperator", "UpperTriangularLinearOperator"]

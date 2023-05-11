@@ -29,7 +29,7 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 def param_field(
     default: Any = dataclasses.MISSING,
     *,
-    bijector: tfb.Bijector = tfb.Identity(),
+    bijector: Optional[tfb.Bijector] = None,
     trainable: bool = True,
     default_factory: Any = dataclasses.MISSING,
     init: bool = True,
@@ -48,22 +48,26 @@ def param_field(
 
     if "pytree_node" in metadata:
         raise ValueError("Cannot use metadata with `pytree_node` already set.")
-
+    if bijector is None:
+        bijector = tfb.Identity()
     metadata["bijector"] = bijector
     metadata["trainable"] = trainable
     metadata["pytree_node"] = True
 
-    if default is not dataclasses.MISSING and default_factory is not dataclasses.MISSING:
+    if (
+        default is not dataclasses.MISSING
+        and default_factory is not dataclasses.MISSING
+    ):
         raise ValueError("Cannot specify both default and default_factory.")
-    
+
     if default is not dataclasses.MISSING:
         default_factory = lambda: default
 
     return dataclasses.field(
-    default_factory=default_factory,
-    init=init,
-    repr=repr,
-    hash=hash,
-    compare=compare,
-    metadata=metadata,
+        default_factory=default_factory,
+        init=init,
+        repr=repr,
+        hash=hash,
+        compare=compare,
+        metadata=metadata,
     )

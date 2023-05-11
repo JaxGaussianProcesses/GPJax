@@ -29,27 +29,23 @@ from beartype.typing import (
     Dict,
     Iterable,
     List,
+    Mapping,
     Optional,
     Tuple,
     TypeVar,
     Union,
-    Mapping,
 )
 import jax
-from jax import lax
 from jax._src.tree_util import _registry
 import jax.tree_util as jtu
 from orbax.checkpoint import (
     ArrayRestoreArgs,
     Checkpointer,
-    PyTreeCheckpointer,
     PyTreeCheckpointHandler,
     RestoreArgs,
     SaveArgs,
 )
-from simple_pytree import (
-    Pytree,
-)
+from simple_pytree import Pytree
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 Self = TypeVar("Self")
@@ -65,7 +61,6 @@ def static_field(
     compare: bool = True,
     metadata: Optional[Mapping[str, Any]] = None,
 ):
-
     metadata = {} if metadata is None else dict(metadata)
 
     if "pytree_node" in metadata:
@@ -73,19 +68,22 @@ def static_field(
 
     metadata["pytree_node"] = False
 
-    if default is not dataclasses.MISSING and default_factory is not dataclasses.MISSING:
+    if (
+        default is not dataclasses.MISSING
+        and default_factory is not dataclasses.MISSING
+    ):
         raise ValueError("Cannot specify both default and default_factory.")
-    
+
     if default is not dataclasses.MISSING:
         default_factory = lambda: default
 
     return dataclasses.field(
-    default_factory=default_factory,
-    init=init,
-    repr=repr,
-    hash=hash,
-    compare=compare,
-    metadata=metadata,
+        default_factory=default_factory,
+        init=init,
+        repr=repr,
+        hash=hash,
+        compare=compare,
+        metadata=metadata,
     )
 
 
@@ -183,7 +181,7 @@ class Module(Pytree):
 
         Returns
         -------
-            Module: tranformed to the constrained space.
+            Module: transformed to the constrained space.
         """
 
         def _apply_constrain(meta_leaf):
@@ -201,7 +199,7 @@ class Module(Pytree):
 
         Returns
         -------
-            Module: tranformed to the unconstrained space.
+            Module: transformed to the unconstrained space.
         """
 
         def _apply_unconstrain(meta_leaf):
@@ -235,6 +233,16 @@ class Module(Pytree):
             return _stop_grad(leaf, meta.get("trainable", True))
 
         return meta_map(_apply_stop_grad, self)
+
+    def trainables(self: Self) -> Self:
+        def _get_trainables(meta_leaf):
+            meta, leaf = meta_leaf
+            if meta is None:
+                return True
+
+            return meta.get("trainable", True)
+
+        return meta_map(_get_trainables, self)
 
 
 def _toplevel_meta(pytree: Any) -> List[Optional[Dict[str, Any]]]:

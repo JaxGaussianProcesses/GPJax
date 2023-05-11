@@ -111,7 +111,8 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
 
     @abc.abstractmethod
     def _add_diagonal(
-        self, other: "gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator"
+        self,
+        other: "gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator",  # noqa: F821
     ) -> "LinearOperator":
         """Add diagonal linear operator to a linear operator, useful e.g., for adding jitter."""
         return NotImplementedError
@@ -133,12 +134,12 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
         return (self.T @ other.T).T
 
     @abc.abstractmethod
-    def diagonal(self) -> Float[Array, "N"]:
+    def diagonal(self) -> Float[Array, " N"]:
         """Diagonal of the linear operator.
 
         Returns
         -------
-            Float[Array, "N"]: Diagonal of the linear operator.
+            Float[Array, " N"]: Diagonal of the linear operator.
         """
         raise NotImplementedError
 

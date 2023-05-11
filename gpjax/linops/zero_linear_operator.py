@@ -61,13 +61,13 @@ class ZeroLinearOperator(LinearOperator):
         self.shape = shape
         self.dtype = dtype
 
-    def diagonal(self) -> Float[Array, "N"]:
+    def diagonal(self) -> Float[Array, " N"]:
         """
         Diagonal of the covariance operator.
 
         Returns
         -------
-            Float[Array, "N"]: The diagonal of the covariance operator.
+            Float[Array, " N"]: The diagonal of the covariance operator.
         """
         return jnp.zeros(self.shape[0])
 
@@ -128,7 +128,7 @@ class ZeroLinearOperator(LinearOperator):
         return self
 
     def to_dense(self) -> Float[Array, "N N"]:
-        """Construct dense Covaraince matrix from the covariance operator.
+        """Construct dense Covariance matrix from the covariance operator.
 
         Returns
         -------

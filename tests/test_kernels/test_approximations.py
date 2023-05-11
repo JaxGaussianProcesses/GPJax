@@ -31,7 +31,6 @@ _jitter = 1e-6
 @pytest.mark.parametrize("num_basis_fns", [2, 10, 20])
 @pytest.mark.parametrize("n_dims", [1, 2, 5])
 def test_frequency_sampler(kernel: AbstractKernel, num_basis_fns: int, n_dims: int):
-    key = jr.PRNGKey(123)
     base_kernel = kernel(active_dims=list(range(n_dims)))
     approximate = RFF(base_kernel=base_kernel, num_basis_fns=num_basis_fns)
     assert approximate.frequencies.shape == (num_basis_fns, n_dims)

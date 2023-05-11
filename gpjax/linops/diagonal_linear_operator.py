@@ -37,7 +37,7 @@ def _check_diag(diag: Any) -> None:
     """Check if the diagonal is a vector."""
     if diag.ndim != 1:
         raise ValueError(
-            f"The `matrix` must be a one dimension vector, but "
+            "The `matrix` must be a one dimension vector, but "
             f"`diag.shape = {diag.shape}`."
         )
 
@@ -46,13 +46,13 @@ def _check_diag(diag: Any) -> None:
 class DiagonalLinearOperator(LinearOperator):
     """Diagonal covariance operator."""
 
-    diag: Float[Array, "N"]
+    diag: Float[Array, " N"]
 
-    def __init__(self, diag: Float[Array, "N"], dtype: jnp.dtype = None) -> None:
+    def __init__(self, diag: Float[Array, " N"], dtype: jnp.dtype = None) -> None:
         """Initialize the covariance operator.
 
         Args:
-            diag (Float[Array, "N"]): Diagonal of the covariance operator.
+            diag (Float[Array, " N"]): Diagonal of the covariance operator.
         """
         _check_diag(diag)
 
@@ -64,12 +64,12 @@ class DiagonalLinearOperator(LinearOperator):
         self.shape = (dim, dim)
         self.dtype = diag.dtype
 
-    def diagonal(self) -> Float[Array, "N"]:
+    def diagonal(self) -> Float[Array, " N"]:
         """Diagonal of the covariance operator.
 
         Returns
         -------
-            Float[Array, "N"]: Diagonal of the covariance operator.
+            Float[Array, " N"]: Diagonal of the covariance operator.
         """
         return self.diag
 
@@ -126,7 +126,7 @@ class DiagonalLinearOperator(LinearOperator):
         return DiagonalLinearOperator(diag=self.diagonal() + other.diagonal())
 
     def to_dense(self) -> Float[Array, "N N"]:
-        """Construct dense Covaraince matrix from the covariance operator.
+        """Construct dense Covariance matrix from the covariance operator.
 
         Returns
         -------
@@ -138,7 +138,7 @@ class DiagonalLinearOperator(LinearOperator):
         """Matrix multiplication.
 
         Args:
-            x (Float[Array, "N M"]): Matrix to multiply with.
+            other (Float[Array, "N M"]): Matrix to multiply with.
 
         Returns
         -------
@@ -227,10 +227,10 @@ class DiagonalFromRootLinearOperator(DiagonalLinearOperator):
         return self.root
 
     @property
-    def diag(self) -> Float[Array, "N"]:
+    def diag(self) -> Float[Array, " N"]:
         return self.root.diagonal() ** 2
 
-    def diagonal(self) -> Float[Array, "N"]:
+    def diagonal(self) -> Float[Array, " N"]:
         return self.root.diagonal() ** 2
 
 

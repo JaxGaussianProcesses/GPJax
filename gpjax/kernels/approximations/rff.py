@@ -2,10 +2,12 @@ from dataclasses import dataclass
 
 from jax.random import PRNGKey
 from jaxtyping import Float
-from gpjax.base import static_field
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import param_field
+from gpjax.base import (
+    param_field,
+    static_field,
+)
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import BasisFunctionComputation
 from gpjax.typing import (
@@ -16,7 +18,7 @@ from gpjax.typing import (
 
 @dataclass
 class RFF(AbstractKernel):
-    """Computes an approximation of the kernel using Random Fourier Features.
+    r"""Computes an approximation of the kernel using Random Fourier Features.
 
     All stationary kernels are equivalent to the Fourier transform of a probability
     distribution. We call the corresponding distribution the spectral density. Using
@@ -29,9 +31,6 @@ class RFF(AbstractKernel):
     The key reference for this implementation is the following papers:
     - 'Random Features for Large-Scale Kernel Machines' by Rahimi and Recht (2008).
     - 'On the Error of Random Fourier Features' by Sutherland and Schneider (2015).
-
-    Args:
-        AbstractKernel (_type_): _description_
     """
 
     base_kernel: AbstractKernel = None
@@ -40,7 +39,7 @@ class RFF(AbstractKernel):
     key: KeyArray = static_field(PRNGKey(123))
 
     def __post_init__(self) -> None:
-        """Post-initialisation function.
+        r"""Post-initialisation function.
 
         This function is called after the initialisation of the kernel. It is used to
         set the computation engine to be the basis function computation engine.
@@ -59,7 +58,7 @@ class RFF(AbstractKernel):
         pass
 
     def _check_valid_base_kernel(self, kernel: AbstractKernel):
-        """Verify that the base kernel is valid for RFF approximation.
+        r"""Verify that the base kernel is valid for RFF approximation.
 
         Args:
             kernel (AbstractKernel): The kernel to be checked.
@@ -74,14 +73,13 @@ class RFF(AbstractKernel):
             raise ValueError(error_msg)
 
     def compute_features(self, x: Float[Array, "N D"]) -> Float[Array, "N L"]:
-        """Compute the features for the inputs.
+        r"""Compute the features for the inputs.
 
         Args:
-            x: A N x D array of inputs.
-            frequencies: A M x D array of frequencies.
+            x: A $`N \times D`$ array of inputs.
 
         Returns
         -------
-            Float[Array, "N L"]: A N x L array of features where L = 2M.
+            Float[Array, "N L"]: A $`N \times L`$ array of features where $`L = 2M`$.
         """
         return self.compute_engine(self).compute_features(x)

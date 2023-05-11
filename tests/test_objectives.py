@@ -62,8 +62,8 @@ def test_conjugate_mll(
     p = Prior(
         kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
     )
-    lik = Gaussian(num_datapoints=num_datapoints)
-    post = p * lik
+    likelihood = Gaussian(num_datapoints=num_datapoints)
+    post = p * likelihood
 
     mll = ConjugateMLL(negative=negative)
     assert isinstance(mll, AbstractObjective)
@@ -91,8 +91,8 @@ def test_non_conjugate_mll(
     p = Prior(
         kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
     )
-    lik = Bernoulli(num_datapoints=num_datapoints)
-    post = p * lik
+    likelihood = Bernoulli(num_datapoints=num_datapoints)
+    post = p * likelihood
 
     mll = NonConjugateMLL(negative=negative)
     assert isinstance(mll, AbstractObjective)
@@ -127,8 +127,8 @@ def test_collapsed_elbo(
     p = Prior(
         kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
     )
-    lik = Gaussian(num_datapoints=num_datapoints)
-    q = gpx.CollapsedVariationalGaussian(posterior=p * lik, inducing_inputs=z)
+    likelihood = Gaussian(num_datapoints=num_datapoints)
+    q = gpx.CollapsedVariationalGaussian(posterior=p * likelihood, inducing_inputs=z)
 
     negative_elbo = CollapsedELBO(negative=negative)
 
@@ -141,9 +141,7 @@ def test_collapsed_elbo(
     assert isinstance(evaluation, jax.Array)
     assert evaluation.shape == ()
 
-    # bern_post = p * Bernoulli(num_datapoints=num_datapoints)
     # with pytest.raises(TypeError):
-    #     gpx.CollapsedELBO(posterior=bern_post, variational_family=q, negative=negative)
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])
@@ -170,10 +168,10 @@ def test_elbo(
         kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
     )
     if binary:
-        lik = Bernoulli(num_datapoints=num_datapoints)
+        likelihood = Bernoulli(num_datapoints=num_datapoints)
     else:
-        lik = Gaussian(num_datapoints=num_datapoints)
-    post = p * lik
+        likelihood = Gaussian(num_datapoints=num_datapoints)
+    post = p * likelihood
 
     q = gpx.VariationalGaussian(posterior=post, inducing_inputs=z)
 

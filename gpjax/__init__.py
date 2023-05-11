@@ -12,14 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
+from gpjax.base import (
+    Module,
+    param_field,
+)
 from gpjax.dataset import Dataset
 from gpjax.fit import fit
 from gpjax.gps import (
     Prior,
     construct_posterior,
 )
-from gpjax.kernels import *
+from gpjax.kernels import (
+    RBF,
+    RFF,
+    AbstractKernel,
+    BasisFunctionComputation,
+    ConstantDiagonalKernelComputation,
+    DenseKernelComputation,
+    DiagonalKernelComputation,
+    EigenKernelComputation,
+    GraphKernel,
+    Linear,
+    Matern12,
+    Matern32,
+    Matern52,
+    Periodic,
+    Polynomial,
+    PoweredExponential,
+    ProductKernel,
+    RationalQuadratic,
+    SumKernel,
+    White,
+)
 from gpjax.likelihoods import (
     Bernoulli,
     Gaussian,
@@ -51,6 +75,8 @@ __contributors__ = "https://github.com/thomaspinder/GPJax/graphs/contributors"
 
 
 __all__ = [
+    "Module",
+    "param_field",
     "kernels",
     "fit",
     "Prior",
@@ -81,4 +107,16 @@ __all__ = [
     "LogPosteriorDensity",
     "CollapsedELBO",
     "ELBO",
+    "AbstractKernel",
+    "Linear",
+    "DenseKernelComputation",
+    "DiagonalKernelComputation",
+    "ConstantDiagonalKernelComputation",
+    "EigenKernelComputation",
+    "PoweredExponential",
+    "Periodic",
+    "RationalQuadratic",
+    "White",
+    "BasisFunctionComputation",
+    "RFF",
 ]

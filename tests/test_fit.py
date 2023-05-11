@@ -77,7 +77,12 @@ def test_simple_linear_model() -> None:
 
     # Train!
     trained_model, hist = fit(
-        model=model, objective=loss, train_data=D, optim=ox.sgd(0.001), num_iters=100
+        model=model,
+        objective=loss,
+        train_data=D,
+        optim=ox.sgd(0.001),
+        num_iters=100,
+        key=jr.PRNGKey(123),
     )
 
     # Ensure we return a history of the correct length
@@ -121,6 +126,7 @@ def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> N
         optim=ox.adam(0.1),
         num_iters=num_iters,
         verbose=verbose,
+        key=jr.PRNGKey(123),
     )
 
     # Ensure the trained model is a Gaussian process posterior
@@ -169,6 +175,7 @@ def test_batch_fitting(
         num_iters=num_iters,
         batch_size=batch_size,
         verbose=verbose,
+        key=jr.PRNGKey(123),
     )
 
     # Ensure the trained model is a Gaussian process posterior

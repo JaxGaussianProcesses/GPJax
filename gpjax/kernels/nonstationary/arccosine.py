@@ -18,10 +18,12 @@ from dataclasses import dataclass
 from beartype.typing import Union
 import jax.numpy as jnp
 from jaxtyping import Float
-from gpjax.base import static_field
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import param_field
+from gpjax.base import (
+    param_field,
+    static_field,
+)
 from gpjax.kernels.base import AbstractKernel
 from gpjax.typing import (
     Array,
@@ -32,8 +34,11 @@ from gpjax.typing import (
 
 @dataclass
 class ArcCosine(AbstractKernel):
-    """The ArCosine kernel. This kernel is non-stationary and resembles the behavior
-    of neural networks. See Section 3.1 of https://arxiv.org/pdf/1112.3712.pdf for
+    r"""The ArCosine kernel.
+
+    This kernel is non-stationary and resembles the behavior of neural networks.
+    See Section 3.1 of
+    [Cho and Saul (2011)](https://arxiv.org/abs/1112.3712) for
     additional details.
     """
 
@@ -51,7 +56,7 @@ class ArcCosine(AbstractKernel):
         self.name = f"ArcCosine (order {self.order})"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)`
+        r"""Evaluate the kernel on a pair of inputs $`(x, y)`$
 
         Args:
             x (Float[Array, "D"]): The left hand argument of the kernel function's
@@ -61,7 +66,7 @@ class ArcCosine(AbstractKernel):
 
         Returns
         -------
-            ScalarFloat: The value of :math:`k(x, y)`.
+            ScalarFloat: The value of $`k(x, y)`$.
         """
 
         x = self.slice_input(x)
@@ -85,7 +90,7 @@ class ArcCosine(AbstractKernel):
     def _weighted_prod(
         self, x: Float[Array, " D"], y: Float[Array, " D"]
     ) -> ScalarFloat:
-        """Calculate the weighted product between two arguments.
+        r"""Calculate the weighted product between two arguments.
 
         Args:
             x (Float[Array, "D"]): The left hand argument.
@@ -97,7 +102,7 @@ class ArcCosine(AbstractKernel):
         return jnp.inner(self.weight_variance * x, y) + self.bias_variance
 
     def _J(self, theta: ScalarFloat) -> ScalarFloat:
-        """Evaluate the angular dependency function corresponding to the desired order.
+        r"""Evaluate the angular dependency function corresponding to the desired order.
 
         Args:
             theta (Float[Array, "1"]): The weighted angle between inputs.

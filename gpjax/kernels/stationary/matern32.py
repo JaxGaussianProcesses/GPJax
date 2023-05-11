@@ -35,9 +35,9 @@ from gpjax.typing import (
 
 @dataclass
 class Matern32(AbstractKernel):
-    """The Matérn kernel with smoothness parameter fixed at 1.5."""
+    r"""The Matérn kernel with smoothness parameter fixed at 1.5."""
 
-    lengthscale: Union[ScalarFloat, Float[Array, "D"]] = param_field(
+    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
     )
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
@@ -45,22 +45,25 @@ class Matern32(AbstractKernel):
 
     def __call__(
         self,
-        x: Float[Array, "D"],
-        y: Float[Array, "D"],
+        x: Float[Array, " D"],
+        y: Float[Array, " D"],
     ) -> ScalarFloat:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`.
+        r"""Compute the Matérn 3/2 kernel between a pair of arrays.
 
-        .. math::
+        Evaluate the kernel on a pair of inputs $`(x, y)`$ with
+        lengthscale parameter $\ell$ and variance $`\sigma^2`$.
+
+        ```math
             k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{3}\\lvert x-y \\rvert}{\\ell^2}  \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{3}\\lvert x-y\\rvert}{\\ell^2} \\Bigg)
+        ```
 
         Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's call.
+            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
 
         Returns
         -------
-            ScalarFloat: The value of :math:`k(x, y)`.
+            ScalarFloat: The value of $k(x, y)$.
         """
         x = self.slice_input(x) / self.lengthscale
         y = self.slice_input(y) / self.lengthscale

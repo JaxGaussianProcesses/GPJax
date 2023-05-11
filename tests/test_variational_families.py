@@ -18,7 +18,6 @@ from typing import (
     Tuple,
 )
 
-import jax
 from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr

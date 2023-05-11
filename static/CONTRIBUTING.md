@@ -72,7 +72,7 @@ and push your code as usual.
    $ pip install -r requirements-dev.txt
    ```
 
-5. Install the pre-commit hooks. Please **ensure you do this before commiting
+5. Install the pre-commit hooks. Please **ensure you do this before committing
    any files**. This can be done by executing the following:
    ```bash
    $ pre-commit install

@@ -29,28 +29,29 @@ from gpjax.typing import (
 
 @dataclass
 class Linear(AbstractKernel):
-    """The linear kernel."""
+    r"""The linear kernel."""
 
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Linear"
 
     def __call__(
         self,
-        x: Float[Array, "D"],
-        y: Float[Array, "D"],
+        x: Float[Array, " D"],
+        y: Float[Array, " D"],
     ) -> ScalarFloat:
-        """Evaluate the linear kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\\sigma`.
+        r"""Compute the linear kernel between a pair of arrays.
 
-        .. math::
-            k(x, y) = \\sigma^2 x^{T}y
+        For a pair of inputs $`x, y \in \mathbb{R}^{D}`$, let's evaluate the linear
+        kernel $`k(x, y)=\sigma^2 x^{\top}y`$ where $`\sigma^\in \mathbb{R}_{>0}`$ is the
+        kernel's variance parameter.
 
         Args:
-            x (Float[Array, "D"]): The left hand input of the kernel function.
-            y (Float[Array, "D"]): The right hand input of the kernel function.
+            x (Float[Array, " D"]): The left hand input of the kernel function.
+            y (Float[Array, " D"]): The right hand input of the kernel function.
 
         Returns
         -------
-            ScalarFloat: The evaluated kernel function :math:`k(x, y)` at the supplied inputs.
+            ScalarFloat: The evaluated kernel function $`k(x, y)`$ at the supplied inputs.
         """
         x = self.slice_input(x)
         y = self.slice_input(y)

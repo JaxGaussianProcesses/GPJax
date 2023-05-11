@@ -32,14 +32,13 @@ from gpjax.typing import (
 def _check_matrix(matrix: Array) -> None:
     if matrix.ndim != 2:
         raise ValueError(
-            f"The `matrix` must have at two dimensions, but "
+            "The `matrix` must have at two dimensions, but "
             f"`scale.shape = {matrix.shape}`."
         )
 
     if matrix.shape[-1] != matrix.shape[-2]:
         raise ValueError(
-            f"The `matrix` must be a square matrix, but "
-            f"`scale.shape = {matrix.shape}`."
+            f"The `matrix` must be a square matrix, but `scale.shape = {matrix.shape}`."
         )
 
 
@@ -106,7 +105,8 @@ class DenseLinearOperator(LinearOperator):
         return DenseLinearOperator(matrix=self.matrix * other)
 
     def _add_diagonal(
-        self, other: "gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator"
+        self,
+        other: "gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator",  # noqa: F821
     ) -> LinearOperator:
         """Add diagonal to the covariance operator,  useful for computing, Kxx + Io².
 
@@ -123,13 +123,13 @@ class DenseLinearOperator(LinearOperator):
 
         return DenseLinearOperator(matrix=new_matrix)
 
-    def diagonal(self) -> Float[Array, "N"]:
+    def diagonal(self) -> Float[Array, " N"]:
         """
         Diagonal of the covariance operator.
 
         Returns
         -------
-            Float[Array, "N"]: The diagonal of the covariance operator.
+            Float[Array, " N"]: The diagonal of the covariance operator.
         """
         return jnp.diag(self.matrix)
 
@@ -146,7 +146,7 @@ class DenseLinearOperator(LinearOperator):
         return jnp.matmul(self.matrix, other)
 
     def to_dense(self) -> Float[Array, "N N"]:
-        """Construct dense Covaraince matrix from the covariance operator.
+        """Construct dense Covariance matrix from the covariance operator.
 
         Returns
         -------

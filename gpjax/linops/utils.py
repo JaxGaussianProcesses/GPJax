@@ -27,7 +27,9 @@ from gpjax.linops.linear_operator import LinearOperator
 from gpjax.typing import Array
 
 
-def identity(n: int) -> "gpjax.linops.identity_linear_operator.IdentityLinearOperator":
+def identity(
+    n: int,
+) -> "gpjax.linops.identity_linear_operator.IdentityLinearOperator":  # noqa: F821
     """Identity matrix.
 
     Args:
@@ -95,8 +97,8 @@ def check_shapes_match(shape1: Tuple[int, ...], shape2: Tuple[int, ...]) -> None
     """Check shapes of two objects.
 
     Args:
-        shape1 (Tuple[int, ...]): Shape of the first object.
-        shape2 (Tuple[int, ...]): Shape of the second object.
+        shape1 (Tuple[int, "..."]): Shape of the first object.
+        shape2 (Tuple[int, "..."]): Shape of the second object.
 
     Raises
     ------
