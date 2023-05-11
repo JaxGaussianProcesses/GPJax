@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax_beartype
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # Pathwise Sampling for Spatial Modelling
 # In this notebook, we demonstrate an application of Gaussian Processes
@@ -87,7 +104,6 @@ dem = merge_arrays(tiles).coarsen(x=10, y=10).mean().rio.clip(ch_shp["geometry"]
 # are sometimes very large height differences over short distances. This measuring network is fairly dense,
 # and you may already notice that there's a dependency between maximum daily temperature and elevation.
 # %%
-
 fig, ax = plt.subplots(figsize=(8, 5), layout="constrained")
 dem.plot(
     cmap="terrain", cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Elevation [m]"}
@@ -101,8 +117,6 @@ cb.set_label("Max. daily temperature [°C]", labelpad=-2)
 # %% [markdown]
 # As always, we store our training data in a `Dataset` object.
 # %%
-
-
 x = temperature[["latitude", "longitude", "elevation"]].values
 y = temperature[["t_max"]].values
 D = Dataset(
@@ -166,13 +180,10 @@ posterior = prior * likelihood
 #
 # As always, we can jit-compile the objective function to speed things up.
 # %%
-
 negative_mll = jax.jit(gpx.objectives.ConjugateMLL(negative=True))
 negative_mll(posterior, train_data=D)
 
 # %%
-
-
 optim = ox.chain(ox.adam(learning_rate=0.1), ox.clip(1.0))
 posterior, history = gpx.fit(
     model=posterior,
@@ -206,8 +217,6 @@ mask = jnp.any(jnp.isnan(xtest.values), axis=-1)
 ytest = posterior.sample_approx(50, D, key, num_features=200)(
     jnp.array(xtest.values[~mask])
 )
-
-
 # %% [markdown]
 # Let's take a look at the results. We start with the mean and standard deviation.
 
@@ -223,8 +232,6 @@ predtest.plot(
     cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Max. daily temperature [°C]"},
 )
 plt.gca().set_title("Interpolated maximum daily temperature")
-
-
 # %%
 predtest = xr.zeros_like(dem.stack(p=["y", "x"])) * jnp.nan
 predtest[~mask] = ytest.std(axis=-1)
@@ -235,8 +242,6 @@ predtest.plot(
     cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Standard deviation [°C]"},
 )
 plt.gca().set_title("Standard deviation")
-
-
 # %% [markdown]
 # And now some individual realizations of our GP posterior.
 # %%
@@ -253,7 +258,6 @@ predtest.plot(
     col_wrap=3,
     cbar_kwargs={"aspect": 50, "pad": 0.02, "label": "Max. daily temperature [°C]"},
 )
-
 # %% [markdown]
 # Remember when we said that on average the temperature decreases with height at a rate
 # of approximately -6.5°C/km? That's -0.0065°C/m. The `w` parameter of our mean function
