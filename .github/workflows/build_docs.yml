@@ -52,6 +52,11 @@ jobs:
           virtualenvs-in-project: false
           installer-parallel: true
 
+      - name: Install LaTex
+        run: |
+          sudo aptitude install texlive-fonts-recommended texlive-fonts-extra
+          sudo apt-get install dvipng
+
       - name: Build the documentation with MKDocs
         run: |
           cp docs/examples/gpjax.mplstyle .
