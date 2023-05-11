@@ -1,7 +1,9 @@
 name: Build the documentation
 
 on:
-  # pull_request:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
