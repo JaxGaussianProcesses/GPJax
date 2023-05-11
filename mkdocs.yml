@@ -1,6 +1,6 @@
 site_name: GPJax
 site_description: The documentation for the GPJax software library.
-site_url: https://example.com/
+site_url: https://docs.jaxgaussianprocesses.com/
 repo_url: https://github.com/JaxGaussianProcesses/GPJax
 repo_name: JaxGaussianProcesses/GPJax
 
@@ -72,7 +72,9 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
-
+----
+This project has now been incorporated into [GPJax](https://github.com/JaxGaussianProcesses/GPJax).
+----
 plugins:
   - search
   - gen-files:

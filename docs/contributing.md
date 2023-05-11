@@ -8,7 +8,7 @@ many ways to contribute, including:
 - Raising [issues](https://github.com/JaxGaussianProcesses/GPJax/issues) related to bugs
   or desired enhancements.
 - Contributing or improving the
-  [docs](https://github.com/JaxGaussianProcesses/GPJax/tree/master/docs) or
+  [docs](https://github.com/JaxGaussianProcesses/GPJax/tree/main/docs) or
   [examples](https://github.com/JaxGaussianProcesses/GPJax/tree/master/docs/nbs).
 - Fixing outstanding [issues](https://github.com/JaxGaussianProcesses/GPJax/issues)
   (bugs).

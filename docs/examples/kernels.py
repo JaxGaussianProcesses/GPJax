@@ -176,7 +176,7 @@ fig.colorbar(im3, ax=ax[3], fraction=0.05)
 # We'll demonstrate this process now for a circular kernel --- an adaption of
 # the excellent guide given in the PYMC3 documentation. We encourage curious
 # readers to visit their notebook
-# [here](https://docs.pymc.io/pymc-examples/examples/gaussian_processes/GP-Circular.html).
+# [here](https://www.pymc.io/projects/docs/en/v3/pymc-examples/examples/gaussian_processes/GP-Circular.html).
 #
 # ### Circular kernel
 #
