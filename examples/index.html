@@ -1562,7 +1562,7 @@
 
 <h1 id="where-to-find-the-docs">Where to find the docs</h1>
 <p>The GPJax documentation can be found here:
-https://gpjax.readthedocs.io/en/latest/</p>
+https://docs.jaxgaussianprocesses.com/</p>
 <h1 id="how-to-build-the-docs">How to build the docs</h1>
 <ol>
 <li>Install the requirements using <code>pip install -r docs/requirements.txt</code></li>
@@ -1585,7 +1585,7 @@ highly desirable.</p>
 <p>We are making an active effort within GPJax to improve our documentation. If you
 spot any areas where there is missing information within the existing
 documentation, then please either raise an issue or
-<a href="https://gpjax.readthedocs.io/en/latest/contributing.html">create a pull request</a>.</p>
+<a href="https://docs.jaxgaussianprocesses.com/contributing/">create a pull request</a>.</p>
 <h2 id="an-example-docstring">An example docstring</h2>
 <p>An example docstring that adheres the principles of GPJax is given below.
 The docstring contains a simple, snappy introduction with links to auxiliary
@@ -1598,11 +1598,11 @@ of the objects attributes with corresponding types.</p>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">class</span> <span class="nc">Prior</span><span class="p">(</span><span class="n">AbstractPrior</span><span class="p">):</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A Gaussian process prior object.</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A Gaussian process prior object.</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="sd">    The GP is parameterised by a</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="sd">    `mean &lt;https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.mean_functions&gt;`_</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="sd">    and `kernel &lt;https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.kernels&gt;`_ function.</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="sd">    [mean](https://docs.jaxgaussianprocesses.com/api/mean_functions/)</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="sd">    and [kernel](https://docs.jaxgaussianprocesses.com/api/kernels/base/) function.</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="sd">    A Gaussian process prior parameterised by a mean function :math:`m(\\cdot)` and a kernel</span>
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="sd">    function :math:`k(\\cdot, \\cdot)` is given by</span>

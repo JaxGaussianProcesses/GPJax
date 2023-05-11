@@ -2750,7 +2750,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=2b4f4988" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=9d677ff6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2774,7 +2774,7 @@ We will coarsen this data by a factor of 10 (going from 90m to 900m resolution),
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=28dcb0b0" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=a3d9bde8" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2951,7 +2951,7 @@ dem = merge_arrays(tiles).coarsen(x=10, y=10).mean().rio.clip(ch_shp["geometry"]
 
 </div>
 </div>
-<div id="cell-id=1f7ab0b5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=0db18369" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2965,7 +2965,7 @@ and you may already notice that there's a dependency between maximum daily tempe
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=fcefba1a" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=ab726fa5" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3037,7 +3037,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=a33431f6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=b77a0426" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3049,7 +3049,7 @@ class="
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=ebd29f1d" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=feed776c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3091,7 +3091,7 @@ D = Dataset(
 
 </div>
 </div>
-<div id="cell-id=3709d2aa" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=1a3171b4" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3102,14 +3102,14 @@ D = Dataset(
 alone isn't enough to to a decent job at interpolating this data. Therefore, we can also use elevation and optimize
 the parameters of our kernel such that more relevance should be given to elevation. This is possible by using a
 kernel that has one length-scale parameter per input dimension: an automatic relevance determination (ARD) kernel.
-See our <a href="https://gpjax.readthedocs.io/en/latest/examples/kernels.html">kernel notebook</a> for more an introduction to
+See our <a href="https://docs.jaxgaussianprocesses.com/examples/kernels/">kernel notebook</a> for more an introduction to
 kernels in GPJax.</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=33b49c01" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=6fa40142" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3147,7 +3147,7 @@ kernels in GPJax.</p>
 
 </div>
 </div>
-<div id="cell-id=ff8c7e50" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=863def9b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3161,7 +3161,7 @@ simply subclass <code>AbstractMeanFunction</code>.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=0ef0d23c" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=2686e4b9" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3209,7 +3209,7 @@ class MeanFunction(gpx.gps.AbstractMeanFunction):
 
 </div>
 </div>
-<div id="cell-id=7ffa751d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=e3287c8a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3221,7 +3221,7 @@ class MeanFunction(gpx.gps.AbstractMeanFunction):
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=335c06dc" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=88eaeada" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3257,7 +3257,7 @@ likelihood = gpx.Gaussian(D.n)</div>
 
 </div>
 </div>
-<div id="cell-id=f5d15120" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=8634b392" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3269,7 +3269,7 @@ likelihood = gpx.Gaussian(D.n)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=04016fb7" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=1005ea23" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3301,7 +3301,7 @@ likelihood = gpx.Gaussian(D.n)</div>
 
 </div>
 </div>
-<div id="cell-id=bac731ee" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=c98c3a74" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3315,7 +3315,7 @@ a <code>ConjugatePosterior</code>, which allows us to optimize the analytically 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=f5946a2d" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=4f07d91b" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3372,7 +3372,7 @@ negative_mll(posterior, train_data=D)</div>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=91c003db" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=46c9aa91" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3447,7 +3447,7 @@ posterior: gpx.gps.ConjugatePosterior</div>
 
 </div>
 </div>
-<div id="cell-id=5c169b7b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=1827ab71" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3467,7 +3467,7 @@ $\mathcal{O}(n)$, with the number of pixels.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=87077659" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=dcb2e346" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3513,7 +3513,7 @@ ytest = posterior.sample_approx(50, D, key, num_features=200)(
 
 </div>
 </div>
-<div id="cell-id=551ccc4a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=174860a8" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3525,7 +3525,7 @@ ytest = posterior.sample_approx(50, D, key, num_features=200)(
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=e3b2f29a" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=83d50601" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3615,7 +3615,7 @@ class="
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=1f9ca4cc" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=2241ecf1" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3701,7 +3701,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=fb3827e4" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=28fc7825" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3713,7 +3713,7 @@ class="
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=fda4ef32" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=376660d0" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3792,7 +3792,7 @@ predtest.plot(
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;xarray.plot.facetgrid.FacetGrid at 0x7f33cfe67040&gt;</pre>
+<pre>&lt;xarray.plot.facetgrid.FacetGrid at 0x7f01e07da430&gt;</pre>
 </div>
 
 </div>
@@ -3818,7 +3818,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=ec82770b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=34caad4f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3832,7 +3832,7 @@ is very close: we have learned the environmental lapse rate!</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=f0f0606b" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=a3a4854d" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3885,7 +3885,7 @@ is very close: we have learned the environmental lapse rate!</p>
 
 </div>
 </div>
-<div id="cell-id=42c448e6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=74a70588" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3904,7 +3904,7 @@ to <a href="https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.3786">Fre
 </div>
 </div>
 </div>
-<div id="cell-id=2532bb8a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=fcda6854" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3915,7 +3915,7 @@ to <a href="https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.3786">Fre
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=1b1dd423" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=0e2fb8d6" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3967,17 +3967,17 @@ Python implementation: CPython
 Python version       : 3.8.16
 IPython version      : 8.12.2
 
-gpjax             : 0.0.0
+matplotlib        : 3.7.1
 xarray            : 2023.1.0
 jax               : 0.4.9
-geopandas         : 0.12.2
-optax             : 0.1.5
-matplotlib        : 3.7.1
-fsspec            : 2023.5.0
 pandas            : 1.5.3
+fsspec            : 2023.5.0
 planetary_computer: 0.5.1
-pystac_client     : 0.6.1
+optax             : 0.1.5
+geopandas         : 0.12.2
+gpjax             : 0.0.0
 rioxarray         : 0.13.4
+pystac_client     : 0.6.1
 
 Watermark: 2.3.1
 
@@ -3991,7 +3991,7 @@ Watermark: 2.3.1
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=11c4362b" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=e3612827" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

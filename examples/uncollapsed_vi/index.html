@@ -2804,7 +2804,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=ba3b3973" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=21bba6ee" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2817,7 +2817,7 @@ particular, this approximation framework provides a tractable option for working
 non-conjugate Gaussian processes with more than ~5000 data points. However, for
 conjugate models of less than 5000 data points, we recommend using the marginal
 log-likelihood approach presented in the
-<a href="https://gpjax.readthedocs.io/en/latest/nbs/regression.html">regression notebook</a>.
+<a href="https://docs.jaxgaussianprocesses.com/examples/regression/">regression notebook</a>.
 Though we illustrate SVGPs here with a conjugate regression example, the same GPJax
 code works for general likelihoods, such as a Bernoulli for classification.</p>
 
@@ -2825,7 +2825,7 @@ code works for general likelihoods, such as a Bernoulli for classification.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=87098477" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=e92d7474" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2922,7 +2922,7 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]</div>
 
 </div>
 </div>
-<div id="cell-id=ce5ff6cf" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=5b64e6c3" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2937,7 +2937,7 @@ $$\boldsymbol{y} \sim \mathcal{N} \left(\sin(4 * \boldsymbol{x}) + \sin(2 * \bol
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=973bd24a" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=c25010fb" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2991,7 +2991,7 @@ xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)</div>
 
 </div>
 </div>
-<div id="cell-id=b9b4fc30" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=b4474529" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3063,7 +3063,7 @@ are depicted below via horizontal black lines.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=174096fa" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=6c681559" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3155,7 +3155,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=cc955470" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=138c2207" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3169,7 +3169,7 @@ to define a variational family.</p>
 </div>
 </div>
 </div>
-<div id="cell-id=6b5719b8" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=46c9b2b8" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3215,7 +3215,7 @@ GPJax by the following.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=74da2bf6" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=d8e6d021" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3255,7 +3255,7 @@ q = gpx.VariationalGaussian(posterior=p, inducing_inputs=z)</div>
 
 </div>
 </div>
-<div id="cell-id=c942968d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=7bcde6b7" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3268,7 +3268,7 @@ $p(f(\cdot)|f(\boldsymbol{z}))$ in $(\times)$.</p>
 </div>
 </div>
 </div>
-<div id="cell-id=833e3231" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=df7e7a6c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3291,7 +3291,7 @@ its negative.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=53971da9" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=ec0fe593" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3323,7 +3323,7 @@ its negative.</p>
 
 </div>
 </div>
-<div id="cell-id=3ccc8f86" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=53819cd4" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3337,7 +3337,7 @@ stochastic mini-batches.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=b19cf6f9" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=2f5ce50e" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3424,7 +3424,7 @@ opt_posterior, history = gpx.fit(
 
 </div>
 </div>
-<div id="cell-id=c6de9a2c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=e17cd5e2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3434,13 +3434,13 @@ opt_posterior, history = gpx.fit(
 predictions at novel inputs akin
 to all other models within GPJax on our variational process object $q(\cdot)$ (for
 example, see the
-<a href="https://gpjax.readthedocs.io/en/latest/nbs/regression.html">regression notebook</a>).</p>
+<a href="https://docs.jaxgaussianprocesses.com/examples/regression/">regression notebook</a>).</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=adfcff15" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=d8c7b63d" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3542,7 +3542,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=73dcd129" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=2f078f25" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3559,7 +3559,7 @@ transformation on the diagonal can also serve the purpose.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=6be433ee" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=6be2e977" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3597,7 +3597,7 @@ reparameterised_q = q.replace_bijector(variational_root_covariance=triangular_tr
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=bc7d2995" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=cc553d3a" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3668,7 +3668,7 @@ reparameterised_q = q.replace_bijector(variational_root_covariance=triangular_tr
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=d47b6b10" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=451cf2fa" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3770,7 +3770,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=e09b203e" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=c5d33114" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3784,7 +3784,7 @@ recommended over <code>Square</code> for stability of optimisation.</p>
 </div>
 </div>
 </div>
-<div id="cell-id=704db0af" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=a307b855" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3795,7 +3795,7 @@ recommended over <code>Square</code> for stability of optimisation.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=0d0709db" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=1ce5c82f" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3847,11 +3847,11 @@ Python implementation: CPython
 Python version       : 3.8.16
 IPython version      : 8.12.2
 
-gpjax                 : 0.0.0
+matplotlib            : 3.7.1
 optax                 : 0.1.5
 jax                   : 0.4.9
-matplotlib            : 3.7.1
 tensorflow_probability: 0.19.0
+gpjax                 : 0.0.0
 
 Watermark: 2.3.1
 
