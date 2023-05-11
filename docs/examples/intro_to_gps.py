@@ -60,7 +60,7 @@
 # from our posterior distribution through
 # $$
 # \begin{align}
-#     & = \int p(\mathbf{y}^{\star} \,|\, \theta, \mathbf{y} ) p(\theta\,|\, \mathbf{y})\mathrm{d}\theta\,.
+#     p(\mathbf{y}^{\star}\mid \mathbf{y}) = \int p(\mathbf{y}^{\star} \,|\, \theta, \mathbf{y} ) p(\theta\,|\, \mathbf{y})\mathrm{d}\theta\,.
 # \end{align}
 # $$
 # As with the marginal log-likelihood, evaluating this quantity requires
@@ -73,7 +73,7 @@
 # moment
 # $$
 # \begin{alignat}{2}
-#     \mu  = \mathbb{E}[\theta\,|\,\mathbf{y}]  & = \int \theta
+#     \mu  = \mathbb{E}[\theta\,|\,\mathbf{y}]  & = \int \theta p(\theta\mid\mathbf{y})\mathrm{d}\theta\\
 #     \sigma^2  = \mathbb{V}[\theta\,|\,\mathbf{y}] & = \int \left(\theta -
 #     \mathbb{E}[\theta\,|\,\mathbf{y}]\right)^2p(\theta\,|\,\mathbf{y})\mathrm{d}\theta&\,.
 # \end{alignat}
@@ -97,6 +97,7 @@
 # $$
 # We can plot three different parameterisations of this density.
 
+# %%
 import warnings
 
 import jax.numpy as jnp
@@ -106,9 +107,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import tensorflow_probability.substrates.jax as tfp
-from utils import confidence_ellipse
+from docs.examples.utils import confidence_ellipse
 
-plt.style.use("./gpjax.mplstyle")
+plt.style.use("docs/examples/gpjax.mplstyle")
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 tfd = tfp.distributions
 
@@ -206,7 +207,9 @@ for a, t, d in zip([ax0, ax1, ax2], titles, dists):
 # variables, we can obtain the mean and covariance by
 # $$
 # \begin{align}
-#     & = \boldsymbol{\Sigma}\,.
+#    \mathbb{E}[\mathbf{y}] = \mathbf{\mu}, \quad \operatorname{Cov}(\mathbf{y}) & = \mathbf{E}\left[(\mathbf{y} - \mathbf{\mu)(\mathbf{y} - \mathbf{\mu)^{\top} \right]\\
+#       & =\mathbf{E}[\mathbf{y}\mathbf{y}^{\top}] - \mathbf{E}[\mathbf{y}]\mathbf{E}[\mathbf{y}]^{\top} \\
+#       & =\boldsymbol{\Sigma}\,.
 # \end{align}
 # $$
 # The covariance matrix is a symmetric positive definite matrix that generalises
@@ -384,7 +387,7 @@ with warnings.catch_warnings():
 # the set of _test points_.
 # This process is visualised below
 #
-# ![](figs/generating_process.png)
+# ![](generating_process.png)
 #
 # As we shall go on to see, GPs offer an appealing workflow for scenarios such
 # as this, all under a Bayesian framework.
@@ -454,12 +457,13 @@ with warnings.catch_warnings():
 # the posterior predictive distribution is exact
 # $$
 # \begin{align}
-#     & = \mathcal{N}(\mathbf{f}^{\star}\,|\,\boldsymbol{\mu}_{\,|\,\mathbf{y}}, \Sigma_{\,|\,\mathbf{y}})\,,
+#     p(\mathbf{f}^{\star}\mid \mathbf{y}) = \mathcal{N}(\mathbf{f}^{\star}\,|\,\boldsymbol{\mu}_{\,|\,\mathbf{y}}, \Sigma_{\,|\,\mathbf{y}})\,,
 # \end{align}
 # $$
 # where
 # $$
 # \begin{align}
+#     \mathbf{\mu}_{\mid \mathbf{y}} & = \mathbf{K}_{\star f}\left( \mathbf{K}_{ff}+\sigma^2_n\mathbf{I}_n\right)^{-1}\mathbf{y} \\
 #     \Sigma_{\,|\,\mathbf{y}} & = \mathbf{K}_{\star\star} - \mathbf{K}_{xf}\left(\mathbf{K}_{ff} + \sigma_n^2\mathbf{I}_n\right)^{-1}\mathbf{K}_{fx} \,.
 # \end{align}
 # $$
@@ -496,7 +500,7 @@ with warnings.catch_warnings():
 # Optimising with respect to the marginal log-likelihood balances these two
 # objectives when identifying the optimal solution, as visualised below.
 #
-# ![](figs/decomposed_mll.png)
+# ![](decomposed_mll.png)
 #
 # ## Conclusions
 #

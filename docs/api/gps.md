@@ -1,0 +1,3 @@
+# GPs
+
+::: gpjax.gps

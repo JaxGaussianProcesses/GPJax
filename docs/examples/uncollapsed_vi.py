@@ -27,7 +27,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
 import tensorflow_probability.substrates.jax as tfp
-from utils import clean_legend
+from docs.examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -35,7 +35,7 @@ with install_import_hook("gpjax", "beartype.beartype"):
 
 key = jr.PRNGKey(123)
 tfb = tfp.bijectors
-plt.style.use("./gpjax.mplstyle")
+plt.style.use("docs/examples/gpjax.mplstyle")
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]

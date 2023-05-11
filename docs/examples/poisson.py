@@ -28,6 +28,7 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax as tfp
 from jax.config import config
@@ -40,6 +41,8 @@ with install_import_hook("gpjax", "beartype.beartype"):
 config.update("jax_enable_x64", True)
 tfd = tfp.distributions
 key = jr.PRNGKey(123)
+plt.style.use("docs/examples/gpjax.mplstyle")
+cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
 # ## Dataset
@@ -65,7 +68,7 @@ y = jr.poisson(key, jnp.exp(f(x)))
 D = gpx.Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-2.0, 2.0, 500).reshape(-1, 1)
-plt.plot(x, y, "o", label="Observations", color="tab:red")
+plt.plot(x, y, "o", label="Observations", color=cols[1])
 plt.plot(xtest, jnp.exp(f(xtest)), label=r"Rate $\lambda$")
 plt.legend()
 
@@ -212,17 +215,17 @@ expected_val = jnp.mean(samples, axis=0)
 # %%
 fig, ax = plt.subplots(figsize=(16, 5), tight_layout=True)
 ax.plot(
-    x, y, "o", markersize=5, color="tab:red", label="Observations", zorder=2, alpha=0.7
+    x, y, "o", markersize=5, color=cols[1], label="Observations", zorder=2, alpha=0.7
 )
 ax.plot(
-    xtest, expected_val, linewidth=2, color="tab:blue", label="Predicted mean", zorder=1
+    xtest, expected_val, linewidth=2, color=cols[0], label="Predicted mean", zorder=1
 )
 ax.fill_between(
     xtest.flatten(),
     lower_ci.flatten(),
     upper_ci.flatten(),
     alpha=0.2,
-    color="tab:blue",
+    color=cols[0],
     label="95% CI",
 )
 

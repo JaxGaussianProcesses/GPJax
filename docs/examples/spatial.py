@@ -35,6 +35,7 @@ from jaxtyping import (
     Float,
     install_import_hook,
 )
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
 import pandas as pd
@@ -51,6 +52,8 @@ with install_import_hook("gpjax", "beartype.beartype"):
 
 
 key = jr.PRNGKey(123)
+plt.style.use("docs/examples/gpjax.mplstyle")
+cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # Observed temperature data
 temperature = pd.read_csv("data/max_tempeature_switzerland.csv")

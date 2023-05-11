@@ -34,7 +34,7 @@ with install_import_hook("gpjax", "beartype.beartype"):
 
 
 key = jr.PRNGKey(123)
-plt.style.use("./gpjax.mplstyle")
+plt.style.use("docs/examples/gpjax.mplstyle")
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
@@ -261,7 +261,7 @@ ax.legend()
 # distributions $\mu_1$ and $\mu_2$ to visualise the corresponding barycentre
 # $\bar{\mu}$.
 #
-# ![](figs/barycentre_gp.gif)
+# ![](barycentre_gp.gif)
 
 # %% [markdown]
 # ## System configuration

@@ -33,7 +33,7 @@ with install_import_hook("gpjax", "beartype.beartype"):
 
 # Enable Float64 for more stable matrix inversions.
 key = jr.PRNGKey(123)
-plt.style.use("./gpjax.mplstyle")
+plt.style.use("docs/examples/gpjax.mplstyle")
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
@@ -49,7 +49,9 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 # [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)).
 
 # %%
-yacht = pd.read_fwf("data/yacht_hydrodynamics.data", header=None).values[:-1, :]
+yacht = pd.read_fwf("docs/examples/data/yacht_hydrodynamics.data", header=None).values[
+    :-1, :
+]
 X = yacht[:, :-1]
 y = yacht[:, -1].reshape(-1, 1)
 

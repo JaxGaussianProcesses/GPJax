@@ -45,7 +45,7 @@ with install_import_hook("gpjax", "beartype.beartype"):
     from gpjax.kernels.computations import AbstractKernelComputation
 
 key = jr.PRNGKey(123)
-plt.style.use("./gpjax.mplstyle")
+plt.style.use("docs/examples/gpjax.mplstyle")
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]

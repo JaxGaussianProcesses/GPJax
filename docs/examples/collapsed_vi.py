@@ -22,13 +22,13 @@ from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
-from utils import clean_legend
+from docs.examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
 key = jr.PRNGKey(123)
-plt.style.use("./gpjax.mplstyle")
+plt.style.use("docs/examples/gpjax.mplstyle")
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
