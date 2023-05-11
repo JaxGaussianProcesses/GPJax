@@ -19,7 +19,7 @@
         <link rel="next" href="../objectives/">
       
       <link rel="icon" href="../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.8">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.11">
     
     
       
@@ -27,7 +27,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ded33207.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.85bb2934.min.css">
       
       
 
@@ -2025,6 +2025,7 @@ learned during training but defaults to 1.0.</p>
 <code class="highlight language-python"><span class="n">constant</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]))</span></code>
   
   <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
@@ -2130,11 +2131,10 @@ learned during training but defaults to 1.0.</p>
 
 
 <h6 id="gpjax.mean_functions.CombinationMeanFunction.means" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">means</span> <span class="o">=</span> <span class="n">items_list</span></code>
+<code class="highlight language-python"><span class="n">means</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">]</span> <span class="o">=</span> <span class="n">items_list</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
 </h6>
@@ -2150,7 +2150,7 @@ learned during training but defaults to 1.0.</p>
 
 
 <h6 id="gpjax.mean_functions.CombinationMeanFunction.operator" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span></code>
+<code class="highlight language-python"><span class="n">operator</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">operator</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -2172,7 +2172,7 @@ learned during training but defaults to 1.0.</p>
 
 
 <h6 id="gpjax.mean_functions.CombinationMeanFunction.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">means</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">],</span> <span class="n">operator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">means</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">],</span> <span class="n">operator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
 
 </h6>
 
@@ -2289,7 +2289,7 @@ learned during training but defaults to 1.0.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.51198bba.min.js"></script>
+      <script src="../../assets/javascripts/bundle.fac441b0.min.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       

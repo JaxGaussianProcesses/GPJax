@@ -36,11 +36,6 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>None</loc>
-         <lastmod>2023-05-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://example.com/api/dataset/</loc>
          <lastmod>2023-05-11</lastmod>
          <changefreq>daily</changefreq>
