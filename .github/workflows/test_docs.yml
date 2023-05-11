@@ -44,7 +44,7 @@ jobs:
 
       - name: Install LaTex
         run: |
-          sudo aptitude install texlive-fonts-recommended texlive-fonts-extra
+          sudo apt-get install texlive-fonts-recommended texlive-fonts-extra
           sudo apt-get install dvipng
 
       # Install Poetry and build the documentation
