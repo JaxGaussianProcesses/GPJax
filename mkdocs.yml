@@ -72,9 +72,7 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
-----
-This project has now been incorporated into [GPJax](https://github.com/JaxGaussianProcesses/GPJax).
-----
+
 plugins:
   - search
   - gen-files:
