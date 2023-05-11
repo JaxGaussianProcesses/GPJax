@@ -910,14 +910,14 @@ requirements-deprecated-finder = ["pip-api", "pipreqs"]
 
 [[package]]
 name = "jax"
-version = "0.4.8"
+version = "0.4.9"
 description = "Differentiate, compile, and transform Numpy code."
 category = "main"
 optional = false
 python-versions = ">=3.8"
 
 [package.dependencies]
-ml_dtypes = ">=0.0.3"
+ml_dtypes = ">=0.1.0"
 numpy = ">=1.21"
 opt_einsum = "*"
 scipy = ">=1.7"
@@ -925,16 +925,16 @@ scipy = ">=1.7"
 [package.extras]
 australis = ["protobuf (>=3.13,<4)"]
 ci = ["jaxlib (==0.4.7)"]
-cpu = ["jaxlib (==0.4.7)"]
-cuda = ["jaxlib (==0.4.7+cuda11.cudnn86)"]
-cuda11-cudnn82 = ["jaxlib (==0.4.7+cuda11.cudnn82)"]
-cuda11-cudnn86 = ["jaxlib (==0.4.7+cuda11.cudnn86)"]
-cuda11-local = ["jaxlib (==0.4.7+cuda11.cudnn86)"]
-cuda11-pip = ["jaxlib (==0.4.7+cuda11.cudnn86)", "nvidia-cublas-cu11 (>=11.11)", "nvidia-cuda-nvcc-cu11 (>=11.8)", "nvidia-cuda-runtime-cu11 (>=11.8)", "nvidia-cudnn-cu11 (>=8.6)", "nvidia-cufft-cu11 (>=10.9)", "nvidia-cusolver-cu11 (>=11.4)", "nvidia-cusparse-cu11 (>=11.7)"]
-cuda12-local = ["jaxlib (==0.4.7+cuda12.cudnn88)"]
-cuda12-pip = ["jaxlib (==0.4.7+cuda12.cudnn88)", "nvidia-cublas-cu12", "nvidia-cuda-nvcc-cu12", "nvidia-cuda-runtime-cu12", "nvidia-cudnn-cu12", "nvidia-cufft-cu12", "nvidia-cusolver-cu12", "nvidia-cusparse-cu12"]
+cpu = ["jaxlib (==0.4.9)"]
+cuda = ["jaxlib (==0.4.9+cuda11.cudnn86)"]
+cuda11-cudnn82 = ["jaxlib (==0.4.9+cuda11.cudnn82)"]
+cuda11-cudnn86 = ["jaxlib (==0.4.9+cuda11.cudnn86)"]
+cuda11-local = ["jaxlib (==0.4.9+cuda11.cudnn86)"]
+cuda11-pip = ["jaxlib (==0.4.9+cuda11.cudnn86)", "nvidia-cublas-cu11 (>=11.11)", "nvidia-cuda-cupti-cu11 (>=11.8)", "nvidia-cuda-nvcc-cu11 (>=11.8)", "nvidia-cuda-runtime-cu11 (>=11.8)", "nvidia-cudnn-cu11 (>=8.6)", "nvidia-cufft-cu11 (>=10.9)", "nvidia-cusolver-cu11 (>=11.4)", "nvidia-cusparse-cu11 (>=11.7)"]
+cuda12-local = ["jaxlib (==0.4.9+cuda12.cudnn88)"]
+cuda12-pip = ["jaxlib (==0.4.9+cuda12.cudnn88)", "nvidia-cublas-cu12", "nvidia-cuda-cupti-cu12", "nvidia-cuda-nvcc-cu12", "nvidia-cuda-runtime-cu12", "nvidia-cudnn-cu12", "nvidia-cufft-cu12", "nvidia-cusolver-cu12", "nvidia-cusparse-cu12"]
 minimum-jaxlib = ["jaxlib (==0.4.7)"]
-tpu = ["jaxlib (==0.4.7)", "libtpu-nightly (==0.1.dev20230327)", "requests"]
+tpu = ["jaxlib (==0.4.9)", "libtpu-nightly (==0.1.dev20230509)", "requests"]
 
 [[package]]
 name = "jaxlib"
@@ -2881,7 +2881,7 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.12"
-content-hash = "52f3a0b712877413ca1972535fc420256469a04e7b13056e99267b0fc57065e9"
+content-hash = "397c6251bf8b04715b7904788f8e0224c3f3467185b0f9c81f9021284880955f"
 
 [metadata.files]
 absl-py = [
@@ -3645,7 +3645,7 @@ isort = [
     {file = "isort-5.12.0.tar.gz", hash = "sha256:8bef7dde241278824a6d83f44a544709b065191b95b6e50894bdc722fcba0504"},
 ]
 jax = [
-    {file = "jax-0.4.8.tar.gz", hash = "sha256:08116481f7336db16c24812bfb5e6f9786915f4c2f6ff4028331fa69e7535202"},
+    {file = "jax-0.4.9.tar.gz", hash = "sha256:1ed135cd08f48e4baf10f6eafdb4a4cdae781f9052b5838c09c91a9f4fa75f09"},
 ]
 jaxlib = [
     {file = "jaxlib-0.4.7-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:63c2890978e8646516db3d8a680b43d2bed8b63543a70556391f589a261bd85f"},
