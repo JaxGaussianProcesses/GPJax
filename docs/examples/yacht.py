@@ -49,9 +49,13 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 # [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)).
 
 # %%
-yacht = pd.read_fwf("docs/examples/data/yacht_hydrodynamics.data", header=None).values[
-    :-1, :
-]
+try:
+    yacht = pd.read_fwf("data/yacht_hydrodynamics.data", header=None).values[:-1, :]
+except FileNotFoundError:
+    yacht = pd.read_fwf(
+        "docs/examples/data/yacht_hydrodynamics.data", header=None
+    ).values[:-1, :]
+
 X = yacht[:, :-1]
 y = yacht[:, -1].reshape(-1, 1)
 

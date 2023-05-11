@@ -56,7 +56,11 @@ plt.style.use("./gpjax.mplstyle")
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # Observed temperature data
-temperature = pd.read_csv("data/max_tempeature_switzerland.csv")
+try:
+    temperature = pd.read_csv("data/max_tempeature_switzerland.csv")
+except FileNotFoundError:
+    temperature = pd.read_csv("docs/examples/data/max_tempeature_switzerland.csv")
+
 temperature = gpd.GeoDataFrame(
     temperature,
     geometry=gpd.points_from_xy(temperature.longitude, temperature.latitude),
