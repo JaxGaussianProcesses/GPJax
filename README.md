@@ -14,7 +14,7 @@
 
 [**Quickstart**](#simple-example)
 | [**Install guide**](#installation)
-| [**Documentation**](https://gpjax.readthedocs.io/en/latest/)
+| [**Documentation**](https://docs.jaxgaussianprocesses.com/)
 | [**Slack Community**](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw)
 
 GPJax aims to provide a low-level interface to Gaussian process (GP) models in
@@ -48,20 +48,23 @@ process modelling.
 
 ## Notebook examples
 
-> - [**Conjugate Inference**](https://gpjax.readthedocs.io/en/latest/examples/regression.html)
-> - [**Classification with MCMC**](https://gpjax.readthedocs.io/en/latest/examples/classification.html)
-> - [**Sparse Variational Inference**](https://gpjax.readthedocs.io/en/latest/examples/uncollapsed_vi.html)
-> - [**BlackJax Integration**](https://gpjax.readthedocs.io/en/latest/examples/classification.html)
-> - [**Laplace Approximation**](https://gpjax.readthedocs.io/en/latest/examples/classification.html#Laplace-approximation)
-> - [**Inference on Non-Euclidean Spaces**](https://gpjax.readthedocs.io/en/latest/examples/kernels.html#Custom-Kernel)
-> - [**Inference on Graphs**](https://gpjax.readthedocs.io/en/latest/examples/graph_kernels.html)
-> - [**Learning Gaussian Process Barycentres**](https://gpjax.readthedocs.io/en/latest/examples/barycentres.html)
-> - [**Deep Kernel Regression**](https://gpjax.readthedocs.io/en/latest/examples/haiku.html)
+> - [**Conjugate Inference**](https://docs.jaxgaussianprocesses.com/examples/regression/)
+> - [**Classification with MCMC**](https://docs.jaxgaussianprocesses.com/examples/classification/)
+> - [**Sparse Variational Inference**](https://docs.jaxgaussianprocesses.com/examples/collapsed_vi/)
+> - [**Stochastic Variational Inference**](https://docs.jaxgaussianprocesses.com/examples/uncollapsed_vi/)
+> - [**BlackJax Integration**](https://docs.jaxgaussianprocesses.com/examples/classification/#mcmc-inference)
+> - [**Laplace Approximation**](https://docs.jaxgaussianprocesses.com/examples/classification/#laplace-approximation)
+> - [**Inference on Non-Euclidean Spaces**](https://docs.jaxgaussianprocesses.com/examples/kernels/#custom-kernel)
+> - [**Inference on Graphs**](https://docs.jaxgaussianprocesses.com/examples/graph_kernels/)
+> - [**Pathwise Sampling**](https://docs.jaxgaussianprocesses.com/examples/spatial/)
+> - [**Learning Gaussian Process Barycentres**](https://docs.jaxgaussianprocesses.com/examples/barycentres/)
+> - [**Deep Kernel Regression**](https://docs.jaxgaussianprocesses.com/examples/deep_kernels/)
+> - [**Poisson Regression**](https://docs.jaxgaussianprocesses.com/examples/poisson/)
 
 ## Guides for customisation
 >
-> - [**Custom kernels**](https://gpjax.readthedocs.io/en/latest/examples/kernels.html#Custom-Kernel)
-> - [**UCI regression**](https://gpjax.readthedocs.io/en/latest/examples/yacht.html)
+> - [**Custom kernels**](https://docs.jaxgaussianprocesses.com/examples/kernels/#custom-kernel)
+> - [**UCI regression**](https://docs.jaxgaussianprocesses.com/examples/yacht/)
 
 ## Conversion between `.ipynb` and `.py`
 Above examples are stored in [examples](examples) directory in the double
