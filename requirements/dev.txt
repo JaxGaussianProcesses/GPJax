@@ -1,7 +1,0 @@
-black
-isort
-pylint
-flake8
-pytest
-networkx
-pytest-cov

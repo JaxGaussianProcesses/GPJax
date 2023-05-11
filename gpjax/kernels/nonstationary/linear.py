@@ -13,56 +13,47 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Dict, List, Optional
+from dataclasses import dataclass
 
-import jax
 import jax.numpy as jnp
-from jax.random import KeyArray
-from jaxtyping import Array
+from jaxtyping import Float
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from ..base import AbstractKernel
-from ..computations import (
-    DenseKernelComputation,
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
 )
 
 
-##########################################
-# Euclidean kernels
-##########################################
+@dataclass
 class Linear(AbstractKernel):
-    """The linear kernel."""
+    r"""The linear kernel."""
 
-    def __init__(
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    name: str = "Linear"
+
+    def __call__(
         self,
-        active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = False,
-        name: Optional[str] = "Linear",
-    ) -> None:
-        super().__init__(
-            DenseKernelComputation,
-            active_dims,
-            spectral_density=None,
-            name=name,
-        )
-        self._stationary = False
+        x: Float[Array, " D"],
+        y: Float[Array, " D"],
+    ) -> ScalarFloat:
+        r"""Compute the linear kernel between a pair of arrays.
 
-    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with variance parameter :math:`\\sigma`
-
-        .. math::
-            k(x, y) = \\sigma^2 x^{T}y
+        For a pair of inputs $`x, y \in \mathbb{R}^{D}`$, let's evaluate the linear
+        kernel $`k(x, y)=\sigma^2 x^{\top}y`$ where $`\sigma^\in \mathbb{R}_{>0}`$ is the
+        kernel's variance parameter.
 
         Args:
-            x (jax.Array): The left hand argument of the kernel function's call.
-            y (jax.Array): The right hand argument of the kernel function's call
-            params (dict): Parameter set for which the kernel should be evaluated on.
-        Returns:
-            Array: The value of :math:`k(x, y)`
+            x (Float[Array, " D"]): The left hand input of the kernel function.
+            y (Float[Array, " D"]): The right hand input of the kernel function.
+
+        Returns
+        -------
+            ScalarFloat: The evaluated kernel function $`k(x, y)`$ at the supplied inputs.
         """
         x = self.slice_input(x)
         y = self.slice_input(y)
-        K = params["variance"] * jnp.matmul(x.T, y)
+        K = self.variance * jnp.matmul(x.T, y)
         return K.squeeze()
-
-    def init_params(self, key: KeyArray) -> Dict:
-        return {"variance": jnp.array([1.0])}

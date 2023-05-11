@@ -13,16 +13,26 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import List
+from typing import (
+    TYPE_CHECKING,
+    List,
+)
 
 import jax.numpy as jnp
+
+if TYPE_CHECKING:
+    from jaxtyping import (
+        Array,
+        Float,
+    )
+
 import pytest
-from jaxtyping import Array, Float
+
 from gpjax.kernels.stationary.utils import euclidean_distance
 
 
 @pytest.mark.parametrize(
-    "a, b, distance_to_3dp",
+    ("a", "b", "distance_to_3dp"),
     [
         ([1.0], [-4.0], 5.0),
         ([1.0, -2.0], [-4.0, 3.0], 7.071),
@@ -32,10 +42,9 @@ from gpjax.kernels.stationary.utils import euclidean_distance
 def test_euclidean_distance(
     a: List[float], b: List[float], distance_to_3dp: float
 ) -> None:
-
     # Convert lists to JAX arrays:
-    a: Float[Array, "D"] = jnp.array(a)
-    b: Float[Array, "D"] = jnp.array(b)
+    a: Float[Array, " D"] = jnp.array(a)
+    b: Float[Array, " D"] = jnp.array(b)
 
     # Test distance is correct to 3dp:
     assert jnp.round(euclidean_distance(a, b), 3) == distance_to_3dp

@@ -13,54 +13,50 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import List, Optional
+from dataclasses import dataclass
 
-import jax
+from beartype.typing import Union
 import jax.numpy as jnp
-from jax.random import KeyArray
-from jaxtyping import Array
+from jaxtyping import Float
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from ..base import AbstractKernel
-from ..computations import (
-    DenseKernelComputation,
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.utils import squared_distance
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
 )
-from .utils import squared_distance
 
 
+@dataclass
 class RationalQuadratic(AbstractKernel):
-    def __init__(
-        self,
-        active_dims: Optional[List[int]] = None,
-        name: Optional[str] = "Rational Quadratic",
-    ) -> None:
-        super().__init__(
-            DenseKernelComputation, active_dims, spectral_density=None, name=name
-        )
-        self._stationary = True
+    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
+    )
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    alpha: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    name: str = "Rational Quadratic"
 
-    def __call__(self, params: dict, x: jax.Array, y: jax.Array) -> Array:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with length-scale parameter :math:`\\ell` and variance :math:`\\sigma`
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+        r"""Compute the Powered Exponential kernel between a pair of arrays.
 
-        .. math::
-            k(x, y) = \\sigma^2 \\exp \\Bigg( 1 + \\frac{\\lVert x - y \\rVert^2_2}{2 \\alpha \\ell^2} \\Bigg)
+        Evaluate the kernel on a pair of inputs $`(x, y)`$ with lengthscale parameter
+        $`\ell`$ and variance $`\sigma^2`$.
+        ```math
+        k(x,y)=\sigma^2\exp\Bigg(1+\frac{\lVert x-y\rVert^2_2}{2\alpha\ell^2}\Bigg)
+        ```
 
         Args:
-            x (jax.Array): The left hand argument of the kernel function's call.
-            y (jax.Array): The right hand argument of the kernel function's call
-            params (dict): Parameter set for which the kernel should be evaluated on.
-        Returns:
-            Array: The value of :math:`k(x, y)`
-        """
-        x = self.slice_input(x) / params["lengthscale"]
-        y = self.slice_input(y) / params["lengthscale"]
-        K = params["variance"] * (
-            1 + 0.5 * squared_distance(x, y) / params["alpha"]
-        ) ** (-params["alpha"])
-        return K.squeeze()
+            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
 
-    def init_params(self, key: KeyArray) -> dict:
-        return {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-            "alpha": jnp.array([1.0]),
-        }
+        Returns:
+            ScalarFloat: The value of $`k(x, y)`$.
+        """
+        x = self.slice_input(x) / self.lengthscale
+        y = self.slice_input(y) / self.lengthscale
+        K = self.variance * (1 + 0.5 * squared_distance(x, y) / self.alpha) ** (
+            -self.alpha
+        )
+        return K.squeeze()

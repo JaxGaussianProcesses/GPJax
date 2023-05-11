@@ -14,59 +14,49 @@
 # ==============================================================================
 
 from jax import vmap
-from typing import Callable, Dict
-from jaxtyping import Array, Float
+from jaxtyping import Float
 
-from .base import AbstractKernelComputation
-from ...linops import DiagonalLinearOperator
+from gpjax.kernels.computations.base import AbstractKernelComputation
+from gpjax.linops import DiagonalLinearOperator
+from gpjax.typing import Array
+
 
 class DiagonalKernelComputation(AbstractKernelComputation):
-    def __init__(
-        self,
-        kernel_fn: Callable[
-            [Dict, Float[Array, "1 D"], Float[Array, "1 D"]], Array
-        ] = None,
-    ) -> None:
-        super().__init__(kernel_fn)
+    r"""Diagonal kernel computation class. Operations with the kernel assume
+    a diagonal Gram matrix.
+    """
 
-    def gram(
-        self,
-        params: Dict,
-        inputs: Float[Array, "N D"],
-    ) -> DiagonalLinearOperator:
-        """For a kernel with diagonal structure, compute the NxN gram matrix on
-        an input matrix of shape NxD.
+    def gram(self, x: Float[Array, "N D"]) -> DiagonalLinearOperator:
+        r"""Compute the Gram matrix.
+
+        For a kernel with diagonal structure, compute the $`N\times N`$ Gram matrix on
+        an input matrix of shape $`N\times D`$.
 
         Args:
-            kernel (AbstractKernel): The kernel for which the Gram matrix
-                should be computed for.
-            params (Dict): The kernel's parameter set.
-            inputs (Float[Array, "N D"]): The input matrix.
+            x (Float[Array, "N D"]): The input matrix.
 
-        Returns:
-            CovarianceOperator: The computed square Gram matrix.
+        Returns
+        -------
+            DiagonalLinearOperator: The computed square Gram matrix.
         """
-
-        diag = vmap(lambda x: self.kernel_fn(params, x, x))(inputs)
-
-        return DiagonalLinearOperator(diag=diag)
+        return DiagonalLinearOperator(diag=vmap(lambda x: self.kernel(x, x))(x))
 
     def cross_covariance(
-        self, params: Dict, x: Float[Array, "N D"], y: Float[Array, "M D"]
+        self, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
-        """For a given kernel, compute the NxM covariance matrix on a pair of input
-        matrices of shape NxD and MxD.
+        r"""Compute the cross-covariance matrix.
+
+        For a given kernel, compute the $`N\times M`$ covariance matrix on a pair of
+        input matrices of shape $`N\times D`$ and $`M\times D`$.
 
         Args:
-            kernel (AbstractKernel): The kernel for which the Gram
-                matrix should be computed for.
-            params (Dict): The kernel's parameter set.
             x (Float[Array,"N D"]): The input matrix.
             y (Float[Array,"M D"]): The input matrix.
 
-        Returns:
-            CovarianceOperator: The computed square Gram matrix.
+        Returns
+        -------
+            Float[Array, "N M"]: The computed cross-covariance.
         """
         # TODO: This is currently a dense implementation. We should implement a sparse LinearOperator for non-square cross-covariance matrices.
-        cross_cov = vmap(lambda x: vmap(lambda y: self.kernel_fn(params, x, y))(y))(x)
+        cross_cov = vmap(lambda x: vmap(lambda y: self.kernel(x, y))(y))(x)
         return cross_cov

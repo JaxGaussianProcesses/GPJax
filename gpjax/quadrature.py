@@ -13,13 +13,17 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, Optional
-
+from beartype.typing import (
+    Callable,
+    Optional,
+)
 import jax.numpy as jnp
+from jaxtyping import Float
 import numpy as np
-from jaxtyping import Array, Float
 
-"""The number of Gauss-Hermite points to use for quadrature"""
+from gpjax.typing import Array
+
+r"""The number of Gauss-Hermite points to use for quadrature"""
 DEFAULT_NUM_GAUSS_HERMITE_POINTS = 20
 
 
@@ -29,9 +33,10 @@ def gauss_hermite_quadrature(
     sd: Float[Array, "N D"],
     deg: Optional[int] = DEFAULT_NUM_GAUSS_HERMITE_POINTS,
     *args,
-    **kwargs
-) -> Float[Array, "N"]:
-    """
+    **kwargs,
+) -> Float[Array, " N"]:
+    r"""Compute Gauss-Hermite quadrature.
+
     Compute Gaussian-Hermite quadrature for a given function. The quadrature
     points are adjusted through the supplied mean and variance arrays.
 
@@ -44,8 +49,9 @@ def gauss_hermite_quadrature(
         deg (int, optional): The number of quadrature points that are to be used.
             Defaults to 20.
 
-    Returns:
-        Float[Array, "N"]: The evaluated integrals value.
+    Returns
+    -------
+        Float[Array, " N"]: The evaluated integrals value.
     """
     gh_points, gh_weights = np.polynomial.hermite.hermgauss(deg)
     X = mean + jnp.sqrt(2.0) * sd * gh_points

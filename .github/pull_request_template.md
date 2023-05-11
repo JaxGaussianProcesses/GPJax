@@ -1,33 +1,19 @@
-<!--- Please provide a general summary of your changes in the title above -->
+## Type of changes
 
-## Pull request type
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Documentation / docstrings
+- [ ] Tests
+- [ ] Other
 
-<!-- Please try to limit your pull request to one type, submit multiple pull requests if needed. -->
+## Checklist
 
-Please check the type of change your PR introduces:
+- [ ] I've formatted the new code by running `poetry run pre-commit run --all-files --show-diff-on-failure` before committing.
+- [ ] I've added tests for new code.
+- [ ] I've added docstrings for the new code.
 
-- [ ] Bugfix
-- [ ] Feature
-- [ ] Code style update (formatting, renaming)
-- [ ] Refactoring (no functional changes, no api changes)
-- [ ] Build related changes
-- [ ] Documentation content changes
-- [ ] Other (please describe):
+## Description
 
-## What is the current behavior?
-
-<!-- Please describe the current behavior that you are modifying, or link to a relevant issue. -->
+Please describe your changes here. If this fixes a bug, please link to the issue, if possible.
 
 Issue Number: N/A
-
-## What is the new behavior?
-
-<!-- Please describe the behavior or changes that are being added by this PR. -->
-
--
--
--
-
-## Other information
-
-<!-- Any other information that is important to this PR such as screenshots of how the component looks before and after the change. -->

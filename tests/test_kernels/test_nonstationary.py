@@ -1,4 +1,3 @@
-# Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,17 +12,26 @@
 # limitations under the License.
 # ==============================================================================
 
-from itertools import permutations
+from dataclasses import is_dataclass
+from itertools import product
+from typing import List
 
+import jax
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
+import jax.tree_util as jtu
 import pytest
-from jax.config import config
-from gpjax.linops import LinearOperator, identity
-from jaxutils.parameters import initialise
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.kernels.base import AbstractKernel
-from gpjax.kernels.nonstationary import Linear, Polynomial
+from gpjax.kernels.computations import DenseKernelComputation
+from gpjax.kernels.nonstationary import (
+    ArcCosine,
+    Linear,
+    Polynomial,
+)
+from gpjax.linops import LinearOperator
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -31,163 +39,176 @@ _initialise_key = jr.PRNGKey(123)
 _jitter = 1e-6
 
 
-@pytest.mark.parametrize(
-    "kernel",
-    [
-        Linear(),
-        Polynomial(),
-    ],
-)
-@pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize("n", [1, 2, 10])
-def test_gram(kernel: AbstractKernel, dim: int, n: int) -> None:
+class BaseTestKernel:
+    """A base class that contains all tests applied on non-stationary kernels."""
 
-    # Gram constructor static method:
-    kernel.gram
+    kernel: AbstractKernel
+    default_compute_engine: type
+    static_fields: List[str]
 
-    # Inputs x:
-    x = jnp.linspace(0.0, 1.0, n * dim).reshape(n, dim)
+    def pytest_generate_tests(self, metafunc):
+        """This is called automatically by pytest."""
 
-    # Default kernel parameters:
-    params = kernel.init_params(_initialise_key)
+        # function for pretty test name
+        def id_func(x):
+            return "-".join([f"{k}={v}" for k, v in x.items()])
 
-    # Test gram matrix:
-    Kxx = kernel.gram(params, x)
-    assert isinstance(Kxx, LinearOperator)
-    assert Kxx.shape == (n, n)
+        # get arguments for the test function
+        funcarglist = metafunc.cls.params.get(metafunc.function.__name__, None)
+        if funcarglist is None:
+            return
+        else:
+            # equivalent of pytest.mark.parametrize applied on the metafunction
+            metafunc.parametrize("fields", funcarglist, ids=id_func)
 
+    @pytest.mark.parametrize("dim", [None, 1, 3], ids=lambda x: f"dim={x}")
+    def test_initialization(self, fields: dict, dim: int) -> None:
+        # Check that kernel is a dataclass
+        assert is_dataclass(self.kernel)
 
-@pytest.mark.parametrize(
-    "kernel",
-    [
-        Linear(),
-        Polynomial(),
-    ],
-)
-@pytest.mark.parametrize("num_a", [1, 2, 5])
-@pytest.mark.parametrize("num_b", [1, 2, 5])
-@pytest.mark.parametrize("dim", [1, 2, 5])
-def test_cross_covariance(
-    kernel: AbstractKernel, num_a: int, num_b: int, dim: int
-) -> None:
-    # Inputs a, b:
-    a = jnp.linspace(-1.0, 1.0, num_a * dim).reshape(num_a, dim)
-    b = jnp.linspace(3.0, 4.0, num_b * dim).reshape(num_b, dim)
+        # Input fields as JAX arrays
+        fields = {k: jnp.array(v) for k, v in fields.items()}
 
-    # Default kernel parameters:
-    params = kernel.init_params(_initialise_key)
+        # Test number of dimensions
+        if dim is None:
+            kernel: AbstractKernel = self.kernel(**fields)
+            assert kernel.ndims == 1
+        else:
+            kernel: AbstractKernel = self.kernel(active_dims=list(range(dim)), **fields)
+            assert kernel.ndims == dim
 
-    # Test cross covariance, Kab:
-    Kab = kernel.cross_covariance(params, a, b)
-    assert isinstance(Kab, jnp.ndarray)
-    assert Kab.shape == (num_a, num_b)
+        # Check default compute engine
+        assert kernel.compute_engine == self.default_compute_engine
 
+        # Check properties
+        for field, value in fields.items():
+            assert getattr(kernel, field) == value
 
-@pytest.mark.parametrize("kern", [Linear, Polynomial])
-@pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize("shift", [0.0, 0.5, 2.0])
-@pytest.mark.parametrize("sigma", [0.1, 0.2, 0.5])
-@pytest.mark.parametrize("n", [1, 2, 5])
-def test_pos_def(
-    kern: AbstractKernel, dim: int, shift: float, sigma: float, n: int
-) -> None:
-    kern = kern(active_dims=list(range(dim)))
-    # Gram constructor static method:
-    kern.gram
+        # Test that pytree returns param_field objects (and not static_field)
+        leaves = jtu.tree_leaves(kernel)
+        assert len(leaves) == len(set(fields) - set(self.static_fields))
 
-    # Create inputs x:
-    x = jr.uniform(_initialise_key, (n, dim))
-    params = {"variance": jnp.array([sigma]), "shift": jnp.array([shift])}
+        # Test dtype of params
+        for v in leaves:
+            assert v.dtype == jnp.float64
 
-    # Test gram matrix eigenvalues are positive:
-    Kxx = kern.gram(params, x)
-    Kxx += identity(n) * _jitter
-    eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
-    assert (eigen_values > 0.0).all()
+        # Check meta leaves
+        meta = kernel._pytree__meta
+        assert not any(f in meta for f in self.static_fields)
+        assert sorted(list(meta.keys())) == sorted(
+            set(fields) - set(self.static_fields)
+        )
 
+        for field in meta:
+            # Bijectors
+            if field in ["variance", "shift"]:
+                assert isinstance(meta[field]["bijector"], tfb.Softplus)
 
-@pytest.mark.parametrize(
-    "kernel",
-    [
-        Linear,
-        Polynomial,
-    ],
-)
-def test_dtype(kernel: AbstractKernel) -> None:
-    parameter_state = initialise(kernel(), _initialise_key)
-    params, *_ = parameter_state.unpack()
-    for k, v in params.items():
-        assert v.dtype == jnp.float64
-        assert isinstance(k, str)
+            # Trainability state
+            assert meta[field]["trainable"] is True
 
+        # Test kernel call
+        x = jnp.linspace(0.0, 1.0, 10 * kernel.ndims).reshape(10, kernel.ndims)
+        jax.vmap(kernel)(x, x)
 
-@pytest.mark.parametrize("degree", [1, 2, 3])
-@pytest.mark.parametrize("dim", [1, 2, 5])
-@pytest.mark.parametrize("variance", [0.1, 1.0, 2.0])
-@pytest.mark.parametrize("shift", [1e-6, 0.1, 1.0])
-@pytest.mark.parametrize("n", [1, 2, 5])
-def test_polynomial(
-    degree: int, dim: int, variance: float, shift: float, n: int
-) -> None:
+    @pytest.mark.parametrize("n", [1, 2, 5], ids=lambda x: f"n={x}")
+    @pytest.mark.parametrize("dim", [1, 3], ids=lambda x: f"dim={x}")
+    def test_gram(self, dim: int, n: int) -> None:
+        # Initialise kernel
+        kernel: AbstractKernel = self.kernel()
 
-    # Define inputs
-    x = jnp.linspace(0.0, 1.0, n * dim).reshape(n, dim)
+        # Inputs
+        x = jnp.linspace(0.0, 1.0, n * dim).reshape(n, dim)
 
-    # Define kernel
-    kern = Polynomial(degree=degree, active_dims=[i for i in range(dim)])
+        # Test gram matrix
+        Kxx = kernel.gram(x)
+        assert isinstance(Kxx, LinearOperator)
+        assert Kxx.shape == (n, n)
+        assert jnp.all(jnp.linalg.eigvalsh(Kxx.to_dense() + jnp.eye(n) * 1e-6) > 0.0)
 
-    # Check name
-    assert kern.name == f"Polynomial Degree: {degree}"
+    @pytest.mark.parametrize("n_a", [1, 2, 5], ids=lambda x: f"n_a={x}")
+    @pytest.mark.parametrize("n_b", [1, 2, 5], ids=lambda x: f"n_b={x}")
+    @pytest.mark.parametrize("dim", [1, 2, 5], ids=lambda x: f"dim={x}")
+    def test_cross_covariance(self, n_a: int, n_b: int, dim: int) -> None:
+        # Initialise kernel
+        kernel: AbstractKernel = self.kernel()
 
-    # Initialise parameters
-    params = kern.init_params(_initialise_key)
-    params["shift"] * shift
-    params["variance"] * variance
+        # Inputs
+        a = jnp.linspace(-1.0, 1.0, n_a * dim).reshape(n_a, dim)
+        b = jnp.linspace(3.0, 4.0, n_b * dim).reshape(n_b, dim)
 
-    # Check parameter keys
-    assert list(params.keys()) == ["shift", "variance"]
-
-    # Compute gram matrix
-    Kxx = kern.gram(params, x)
-
-    # Check shapes
-    assert Kxx.shape[0] == x.shape[0]
-    assert Kxx.shape[0] == Kxx.shape[1]
-
-    # Test positive definiteness
-    Kxx += identity(n) * _jitter
-    eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
-    assert (eigen_values > 0).all()
+        # Test cross-covariance
+        Kab = kernel.cross_covariance(a, b)
+        assert isinstance(Kab, jnp.ndarray)
+        assert Kab.shape == (n_a, n_b)
 
 
-@pytest.mark.parametrize(
-    "kernel",
-    [Linear, Polynomial],
-)
-def test_active_dim(kernel: AbstractKernel) -> None:
-    dim_list = [0, 1, 2, 3]
-    perm_length = 2
-    dim_pairs = list(permutations(dim_list, r=perm_length))
-    n_dims = len(dim_list)
+def prod(inp):
+    return [dict(zip(inp.keys(), values)) for values in product(*inp.values())]
 
-    # Generate random inputs
-    x = jr.normal(_initialise_key, shape=(20, n_dims))
 
-    for dp in dim_pairs:
-        # Take slice of x
-        slice = x[..., dp]
+class TestLinear(BaseTestKernel):
+    kernel = Linear
+    fields = prod({"variance": [0.1, 1.0, 2.0]})
+    params = {"test_initialization": fields}
+    static_fields = []
+    default_compute_engine = DenseKernelComputation
 
-        # Define kernels
-        ad_kern = kernel(active_dims=dp)
-        manual_kern = kernel(active_dims=[i for i in range(perm_length)])
 
-        # Get initial parameters
-        ad_params = ad_kern.init_params(_initialise_key)
-        manual_params = manual_kern.init_params(_initialise_key)
+class TestPolynomial(BaseTestKernel):
+    kernel = Polynomial
+    fields = prod(
+        {"variance": [0.1, 1.0, 2.0], "degree": [1, 2, 3], "shift": [1e-6, 0.1, 1.0]}
+    )
+    static_fields = ["degree"]
+    params = {"test_initialization": fields}
+    default_compute_engine = DenseKernelComputation
 
-        # Compute gram matrices
-        ad_Kxx = ad_kern.gram(ad_params, x)
-        manual_Kxx = manual_kern.gram(manual_params, slice)
 
-        # Test gram matrices are equal
-        assert jnp.all(ad_Kxx.to_dense() == manual_Kxx.to_dense())
+class TestArcCosine(BaseTestKernel):
+    kernel = ArcCosine
+    fields = prod(
+        {
+            "variance": [0.1, 1.0],
+            "order": [0, 1, 2],
+            "weight_variance": [0.1, 1.0],
+            "bias_variance": [0.1, 1.0],
+        }
+    )
+    static_fields = ["order"]
+    params = {"test_initialization": fields}
+    default_compute_engine = DenseKernelComputation
+
+    @pytest.mark.parametrize("order", [-1, 3], ids=lambda x: f"order={x}")
+    def test_defaults(self, order: int) -> None:
+        with pytest.raises(ValueError):
+            self.kernel(order=order)
+
+    @pytest.mark.parametrize("order", [0, 1, 2], ids=lambda x: f"order={x}")
+    def test_values_by_monte_carlo_in_special_case(self, order: int) -> None:
+        """For certain values of weight variance (1.0) and bias variance (0.0), we can test
+        our calculations using the Monte Carlo expansion of the arccosine kernel, e.g.
+        see Eq. (1) of https://cseweb.ucsd.edu/~saul/papers/nips09_kernel.pdf.
+        """
+        kernel: AbstractKernel = self.kernel(
+            weight_variance=jnp.array([1.0, 1.0]), bias_variance=1e-25, order=order
+        )
+        key = jr.PRNGKey(123)
+
+        # Inputs close(ish) together
+        a = jnp.array([[0.0, 0.0]])
+        b = jnp.array([[2.0, 2.0]])
+
+        # calc cross-covariance exactly
+        Kab_exact = kernel.cross_covariance(a, b)
+
+        # calc cross-covariance using samples
+        weights = jax.random.normal(key, (10_000, 2))  # [S, d]
+        weights_a = jnp.matmul(weights, a.T)  # [S, 1]
+        weights_b = jnp.matmul(weights, b.T)  # [S, 1]
+        H_a = jnp.heaviside(weights_a, 0.5)
+        H_b = jnp.heaviside(weights_b, 0.5)
+        integrands = H_a * H_b * (weights_a**order) * (weights_b**order)
+        Kab_approx = 2.0 * jnp.mean(integrands)
+
+        assert jnp.max(Kab_approx - Kab_exact) < 1e-4

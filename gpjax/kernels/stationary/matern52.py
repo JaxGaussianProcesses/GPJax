@@ -13,59 +13,63 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Dict, List, Optional
+from dataclasses import dataclass
 
+from beartype.typing import Union
 import jax.numpy as jnp
-from jax.random import KeyArray
-from jaxtyping import Array, Float
+from jaxtyping import Float
+import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax.distributions as tfd
 
-from ..base import AbstractKernel
-from ..computations import (
-    DenseKernelComputation,
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.utils import (
+    build_student_t_distribution,
+    euclidean_distance,
 )
-from .utils import euclidean_distance, build_student_t_distribution
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
+@dataclass
 class Matern52(AbstractKernel):
-    """The Matérn kernel with smoothness parameter fixed at 2.5."""
+    r"""The Matérn kernel with smoothness parameter fixed at 2.5."""
 
-    def __init__(
-        self,
-        active_dims: Optional[List[int]] = None,
-        name: Optional[str] = "Matern 5/2",
-    ) -> None:
-        spectral_density = build_student_t_distribution(nu=5)
-        super().__init__(DenseKernelComputation, active_dims, spectral_density, name)
+    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
+    )
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    name: str = "Matérn52"
 
-    def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
-    ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+        r"""Compute the Matérn 5/2 kernel between a pair of arrays.
 
-        .. math::
-            k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{5}\\lvert x-y \\rvert}{\\ell^2} + \\frac{5\\lvert x - y \\rvert^2}{3\\ell^2} \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{5}\\lvert x-y\\rvert}{\\ell^2} \\Bigg)
+        Evaluate the kernel on a pair of inputs $`(x, y)`$ with
+        lengthscale parameter $`\ell`$ and variance $`\sigma^2`$.
+        ```math
+        k(x, y) = \sigma^2 \exp \Bigg(1+ \frac{\sqrt{5}\lvert x-y \rvert}{\ell^2} + \frac{5\lvert x - y \rvert^2}{3\ell^2} \Bigg)\exp\Bigg(-\frac{\sqrt{5}\lvert x-y\rvert}{\ell^2} \Bigg)
+        ```
 
         Args:
-            params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
+            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
 
-        Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`.
+        Returns
+        -------
+            ScalarFloat: The value of $`k(x, y)`$.
         """
-        x = self.slice_input(x) / params["lengthscale"]
-        y = self.slice_input(y) / params["lengthscale"]
+        x = self.slice_input(x) / self.lengthscale
+        y = self.slice_input(y) / self.lengthscale
         tau = euclidean_distance(x, y)
         K = (
-            params["variance"]
+            self.variance
             * (1.0 + jnp.sqrt(5.0) * tau + 5.0 / 3.0 * jnp.square(tau))
             * jnp.exp(-jnp.sqrt(5.0) * tau)
         )
         return K.squeeze()
 
-    def init_params(self, key: KeyArray) -> Dict:
-        return {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-        }
+    @property
+    def spectral_density(self) -> tfd.Distribution:
+        return build_student_t_distribution(nu=5)

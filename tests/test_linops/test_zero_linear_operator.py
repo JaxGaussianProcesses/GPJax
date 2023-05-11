@@ -14,19 +14,21 @@
 # ==============================================================================
 
 
+from dataclasses import is_dataclass
+
+import jax
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
-import jax
+import jax.tree_util as jtu
 import pytest
-from jax.config import config
-
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 _PRNGKey = jr.PRNGKey(42)
 
-from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
+from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 from gpjax.linops.zero_linear_operator import ZeroLinearOperator
 
 
@@ -38,7 +40,18 @@ def approx_equal(res: jax.Array, actual: jax.Array) -> bool:
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_init(n: int) -> None:
     zero = ZeroLinearOperator(shape=(n, n))
+
+    # Check types.
+    assert isinstance(zero, ZeroLinearOperator)
+    assert is_dataclass(zero)
+
+    # Check properties.
     assert zero.shape == (n, n)
+    assert zero.dtype == jnp.float64
+    assert zero.ndim == 2
+
+    # Check pytree.
+    assert jtu.tree_leaves(zero) == []  # shape, dtype are static!
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])
@@ -73,7 +86,6 @@ def test_add_diagonal(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_add(n: int) -> None:
-
     array = jr.uniform(_PRNGKey, shape=(n, n))
     entries = jr.uniform(_PRNGKey, shape=(n,))
     zero = ZeroLinearOperator(shape=(n, n))

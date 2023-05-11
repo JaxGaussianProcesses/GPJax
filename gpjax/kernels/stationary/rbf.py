@@ -13,62 +13,54 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Dict, List, Optional
+from dataclasses import dataclass
 
-import jax
+from beartype.typing import Union
 import jax.numpy as jnp
-from jax.random import KeyArray
-from jaxtyping import Array, Float
+from jaxtyping import Float
+import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax.distributions as tfd
 
-from ..base import AbstractKernel
-from ..computations import (
-    DenseKernelComputation,
+from gpjax.base import param_field
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.utils import squared_distance
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
 )
-from .utils import squared_distance
-import distrax as dx
 
 
+@dataclass
 class RBF(AbstractKernel):
-    """The Radial Basis Function (RBF) kernel."""
+    r"""The Radial Basis Function (RBF) kernel."""
 
-    def __init__(
-        self,
-        active_dims: Optional[List[int]] = None,
-        name: Optional[str] = "Radial basis function kernel",
-    ) -> None:
-        super().__init__(
-            DenseKernelComputation,
-            active_dims,
-            spectral_density=dx.Normal(loc=0.0, scale=1.0),
-            name=name,
-        )
-        self._stationary = True
+    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
+    )
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    name: str = "RBF"
 
-    def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
-    ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with
-        lengthscale parameter :math:`\\ell` and variance :math:`\\sigma^2`
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+        r"""Compute the RBF kernel between a pair of arrays.
 
-        .. math::
-            k(x, y) = \\sigma^2 \\exp \\Bigg( \\frac{\\lVert x - y \\rVert^2_2}{2 \\ell^2} \\Bigg)
+        Evaluate the kernel on a pair of inputs $`(x, y)`$ with lengthscale parameter
+        $`\ell`$ and variance $`\sigma^2`$:
+        ```math
+        k(x,y)=\sigma^2\exp\Bigg(\frac{\lVert x - y \rVert^2_2}{2 \ell^2} \Bigg)
+        ```
 
         Args:
-            params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call.
+            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
 
         Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`.
+            ScalarFloat: The value of $`k(x, y)`$.
         """
-        x = self.slice_input(x) / params["lengthscale"]
-        y = self.slice_input(y) / params["lengthscale"]
-        K = params["variance"] * jnp.exp(-0.5 * squared_distance(x, y))
+        x = self.slice_input(x) / self.lengthscale
+        y = self.slice_input(y) / self.lengthscale
+        K = self.variance * jnp.exp(-0.5 * squared_distance(x, y))
         return K.squeeze()
 
-    def init_params(self, key: KeyArray) -> Dict:
-        params = {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-        }
-        return jax.tree_util.tree_map(lambda x: jnp.atleast_1d(x), params)
+    @property
+    def spectral_density(self) -> tfd.Normal:
+        return tfd.Normal(loc=0.0, scale=1.0)

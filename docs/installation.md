@@ -8,12 +8,11 @@ The latest stable release of `GPJax` can be installed via `pip`:
 pip install gpjax
 ```
 
-:::{note}
-We recommend you check your installation version:
-```
-python -c 'import gpjax; print(gpjax.__version__)'
-```
-:::
+!!! note "Check your installation"
+    We recommend you check your installation version:
+    ```
+    python -c 'import gpjax; print(gpjax.__version__)'
+    ```
 
 ## GPU support
 
@@ -37,28 +36,27 @@ print(jaxlib.__version__)
 
 ## Development version
 
-:::{warning}
-This version is possibly unstable and may contain bugs.
-:::
+!!! warning
+    This version is possibly unstable and may contain bugs.
 
-The latest development version of `GPJax` can be installed via running following:
+    The latest development version of `GPJax` can be installed via running following:
 
-```bash
-git clone https://github.com/thomaspinder/GPJax.git
-cd GPJax
-python setup.py develop
-```
-:::{tip}
-We advise you create virtual environment before installing:
+    ```bash
+    git clone https://github.com/thomaspinder/GPJax.git
+    cd GPJax
+    poetry install
+    ```
 
-```bash
-conda create -n gpjax_experimental python=3.10.0
-conda activate gpjax_experimental
-```
+!!! tip
+    We advise you create virtual environment before installing:
 
-and recommend you check your installation passes the supplied unit tests:
+    ```bash
+    conda create -n gpjax_experimental python=3.10.0
+    conda activate gpjax_experimental
+    ```
 
-```bash
-python -m pytest tests/
-```
-:::
+    and recommend you check your installation passes the supplied unit tests:
+
+    ```bash
+    poetry run pytest tests/
+    ```

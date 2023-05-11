@@ -13,152 +13,190 @@
 # limitations under the License.
 # ==============================================================================
 
+
 import abc
-from typing import Dict, Optional
+import dataclasses
+from functools import partial
 
+from beartype.typing import (
+    Callable,
+    List,
+    Union,
+)
 import jax.numpy as jnp
-from jax.random import KeyArray
-from jaxtyping import Array, Float
-from jaxutils import PyTree
+from jaxtyping import (
+    Float,
+    Num,
+)
 
-import deprecation
+from gpjax.base import (
+    Module,
+    param_field,
+    static_field,
+)
+from gpjax.typing import Array
 
 
-class AbstractMeanFunction(PyTree):
-    """Abstract mean function that is used to parameterise the Gaussian process."""
-
-    def __init__(
-        self, output_dim: Optional[int] = 1, name: Optional[str] = "Mean function"
-    ):
-        """Initialise the mean function.
-
-        Args:
-            output_dim (Optional[int]): The output dimension of the mean function. Defaults to 1.
-            name (Optional[str]): The name of the mean function. Defaults to "Mean function".
-        """
-        self.output_dim = output_dim
-        self.name = name
+@dataclasses.dataclass
+class AbstractMeanFunction(Module):
+    r"""Mean function that is used to parameterise the Gaussian process."""
 
     @abc.abstractmethod
-    def __call__(self, params: Dict, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
-        """Evaluate the mean function at the given points. This method is required for all subclasses.
+    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
+        r"""Evaluate the mean function at the given points. This method is required for all subclasses.
 
         Args:
-            params (Dict): The parameters of the mean function.
-            x (Float[Array, "N D"]): The input points at which to evaluate the mean function.
+            x (Float[Array, " D"]): The point at which to evaluate the mean function.
 
-        Returns:
-            Float[Array, "N Q"]: The mean function evaluated point-wise on the inputs.
+        Returns
+        -------
+            Float[Array, "1]: The evaluated mean function.
         """
         raise NotImplementedError
 
-    @abc.abstractmethod
-    def init_params(self, key: KeyArray) -> Dict:
-        """Return the parameters of the mean function. This method is required for all subclasses.
+    def __add__(
+        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]
+    ) -> "AbstractMeanFunction":
+        r"""Add two mean functions.
 
         Args:
-            key (KeyArray): The PRNG key to use for initialising the parameters.
+            other (AbstractMeanFunction): The other mean function to add.
 
-        Returns:
-            Dict: The parameters of the mean function.
+        Returns
+        -------
+            AbstractMeanFunction: The sum of the two mean functions.
         """
-        raise NotImplementedError
+        if isinstance(other, AbstractMeanFunction):
+            return SumMeanFunction([self, other])
 
-    @deprecation.deprecated(
-        deprecated_in="0.5.7",
-        removed_in="0.6.0",
-        details="Use the ``init_params`` method for parameter initialisation.",
-    )
-    def _initialise_params(self, key: KeyArray) -> Dict:
-        """Deprecated method for initialising the GP's parameters. Succeeded by ``init_params``."""
-        return self.init_params(key)
+        return SumMeanFunction([self, Constant(other)])
 
-
-class Zero(AbstractMeanFunction):
-    """
-    A zero mean function. This function returns zero for all inputs.
-    """
-
-    def __init__(
-        self, output_dim: Optional[int] = 1, name: Optional[str] = "Mean function"
-    ):
-        """Initialise the zero-mean function.
+    def __radd__(
+        self,
+        other: Union[
+            "AbstractMeanFunction", Float[Array, "1"]
+        ],  # TODO should this be ScalarFloat? or Num?
+    ) -> "AbstractMeanFunction":
+        r"""Add two mean functions.
 
         Args:
-            output_dim (Optional[int]): The output dimension of the mean function. Defaults to 1.
-            name (Optional[str]): The name of the mean function. Defaults to "Mean function".
-        """
-        super().__init__(output_dim, name)
+            other (AbstractMeanFunction): The other mean function to add.
 
-    def __call__(self, params: Dict, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
-        """Evaluate the mean function at the given points.
+        Returns
+        -------
+            AbstractMeanFunction: The sum of the two mean functions.
+        """
+        return self.__add__(other)
+
+    def __mul__(
+        self,
+        other: Union[
+            "AbstractMeanFunction", Float[Array, "1"]
+        ],  # TODO should this be ScalarFloat? or Num?
+    ) -> "AbstractMeanFunction":
+        r"""Multiply two mean functions.
 
         Args:
-            params (Dict): The parameters of the mean function.
-            x (Float[Array, "N D"]): The input points at which to evaluate the mean function.
+            other (AbstractMeanFunction): The other mean function to multiply.
 
-        Returns:
-            Float[Array, "N Q"]: A vector of zeros.
+        Returns
+        -------
+            AbstractMeanFunction: The product of the two mean functions.
         """
-        out_shape = (x.shape[0], self.output_dim)
-        return jnp.zeros(shape=out_shape)
+        if isinstance(other, AbstractMeanFunction):
+            return ProductMeanFunction([self, other])
 
-    def init_params(self, key: KeyArray) -> Dict:
-        """The parameters of the mean function. For the zero-mean function, this is an empty dictionary.
+        return ProductMeanFunction([self, Constant(other)])
+
+    def __rmul__(
+        self,
+        other: Union[
+            "AbstractMeanFunction", Float[Array, "1"]
+        ],  # TODO should this be ScalarFloat? or Num?
+    ) -> "AbstractMeanFunction":
+        r"""Multiply two mean functions.
 
         Args:
-            key (KeyArray): The PRNG key to use for initialising the parameters.
+            other (AbstractMeanFunction): The other mean function to multiply.
 
-        Returns:
-            Dict: The parameters of the mean function.
+        Returns
+        -------
+            AbstractMeanFunction: The product of the two mean functions.
         """
-        return {}
+        return self.__mul__(other)
 
 
+@dataclasses.dataclass
 class Constant(AbstractMeanFunction):
+    r"""Constant mean function.
+
+    A constant mean function. This function returns a repeated scalar value for all
+    inputs.  The scalar value itself can be treated as a model hyperparameter and
+    learned during training but defaults to 1.0.
     """
-    A zero mean function. This function returns a repeated scalar value for all inputs.
-    The scalar value itself can be treated as a model hyperparameter and learned during training.
-    """
+
+    constant: Float[Array, "1"] = param_field(jnp.array([0.0]))
+
+    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
+        r"""Evaluate the mean function at the given points.
+
+        Args:
+            x (Float[Array, " D"]): The point at which to evaluate the mean function.
+
+        Returns
+        -------
+            Float[Array, "1"]: The evaluated mean function.
+        """
+        return jnp.ones((x.shape[0], 1)) * self.constant
+
+
+@dataclasses.dataclass
+class CombinationMeanFunction(AbstractMeanFunction):
+    r"""A base class for products or sums of AbstractMeanFunctions."""
+
+    means: List[AbstractMeanFunction]
+    operator: Callable = static_field()
 
     def __init__(
-        self, output_dim: Optional[int] = 1, name: Optional[str] = "Mean function"
-    ):
-        """Initialise the constant-mean function.
+        self,
+        means: List[AbstractMeanFunction],
+        operator: Callable,
+        **kwargs,
+    ) -> None:
+        super().__init__(**kwargs)
+
+        # Add means to a list, flattening out instances of this class therein, as in GPFlow kernels.
+        items_list: List[AbstractMeanFunction] = []
+
+        for item in means:
+            if not isinstance(item, AbstractMeanFunction):
+                raise TypeError(
+                    "can only combine AbstractMeanFunction instances"
+                )  # pragma: no cover
+
+            if isinstance(item, self.__class__):
+                items_list.extend(item.means)
+            else:
+                items_list.append(item)
+
+        self.means = items_list
+        self.operator = operator
+
+    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
+        r"""Evaluate combination kernel on a pair of inputs.
 
         Args:
-            output_dim (Optional[int]): The output dimension of the mean function. Defaults to 1.
-            name (Optional[str]): The name of the mean function. Defaults to "Mean function".
+            x (Float[Array, " D"]): The point at which to evaluate the mean function.
+
+        Returns
+        -------
+            Float[Array, " Q"]: The evaluated mean function.
         """
-        super().__init__(output_dim, name)
-
-    def __call__(self, params: Dict, x: Float[Array, "N D"]) -> Float[Array, "N Q"]:
-        """Evaluate the mean function at the given points.
-
-        Args:
-            params (Dict): The parameters of the mean function.
-            x (Float[Array, "N D"]): The input points at which to evaluate the mean function.
-
-        Returns:
-            Float[Array, "N Q"]: A vector of repeated constant values.
-        """
-        out_shape = (x.shape[0], self.output_dim)
-        return jnp.ones(shape=out_shape) * params["constant"]
-
-    def init_params(self, key: KeyArray) -> Dict:
-        """The parameters of the mean function. For the constant-mean function, this is a dictionary with a single value.
-
-        Args:
-            key (KeyArray): The PRNG key to use for initialising the parameters.
-
-        Returns:
-            Dict: The parameters of the mean function.
-        """
-        return {"constant": jnp.array([1.0])}
+        return self.operator(jnp.stack([m(x) for m in self.means]))
 
 
-__all__ = [
-    "AbstractMeanFunction",
-    "Zero",
-    "Constant",
-]
+SumMeanFunction = partial(CombinationMeanFunction, operator=partial(jnp.sum, axis=0))
+ProductMeanFunction = partial(
+    CombinationMeanFunction, operator=partial(jnp.sum, axis=0)
+)
+Zero = partial(Constant, constant=jnp.array([0.0]))

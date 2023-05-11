@@ -13,18 +13,31 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .diagonal_linear_operator import DiagonalLinearOperator
 
 import abc
-import jax.numpy as jnp
 from dataclasses import dataclass
-from jaxtyping import Array, Float
-from typing import Any, TypeVar, Iterable, Mapping, Generic, Tuple, Union
-from simple_pytree import Pytree, static_field
+
+from beartype.typing import (
+    Any,
+    Generic,
+    Iterable,
+    Mapping,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
+import jax.numpy as jnp
+from jaxtyping import Float
+from simple_pytree import (
+    Pytree,
+    static_field,
+)
+
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 # Generic type.
 T = TypeVar("T")
@@ -33,8 +46,9 @@ T = TypeVar("T")
 NestedT = Union[T, Iterable["NestedT"], Mapping[Any, "NestedT"]]
 
 # Nested types.
+DTypes = Union[Type[jnp.float32], Type[jnp.float64], Type[jnp.int32], Type[jnp.int64]]
 ShapeT = TypeVar("ShapeT", bound=NestedT[Tuple[int, ...]])
-DTypeT = TypeVar("DTypeT", bound=NestedT[jnp.dtype])
+DTypeT = TypeVar("DTypeT", bound=NestedT[DTypes])
 
 # The Generic type is used for type checking the LinearOperator's shape and datatype.
 # `static_field` is used to mark nodes of the PyTree that don't change under JAX transformations.
@@ -58,58 +72,61 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
         return len(self.shape)
 
     @property
-    def T(self) -> LinearOperator:
+    def T(self) -> "LinearOperator":
         """Transpose linear operator. Currently, we assume all linear operators are square and symmetric."""
         return self
 
     def __sub__(
-        self, other: Union[LinearOperator, Float[Array, "N N"]]
-    ) -> LinearOperator:
+        self, other: Union["LinearOperator", Float[Array, "N N"]]
+    ) -> "LinearOperator":
         """Subtract linear operator."""
         return self + (other * -1)
 
     def __rsub__(
-        self, other: Union[LinearOperator, Float[Array, "N N"]]
-    ) -> LinearOperator:
+        self, other: Union["LinearOperator", Float[Array, "N N"]]
+    ) -> "LinearOperator":
         """Reimplimentation of subtract linear operator."""
         return (self * -1) + other
 
     def __add__(
-        self, other: Union[LinearOperator, Float[Array, "N N"]]
-    ) -> LinearOperator:
+        self, other: Union["LinearOperator", Float[Array, "N N"]]
+    ) -> "LinearOperator":
         """Add linear operator."""
         raise NotImplementedError
 
     def __radd__(
-        self, other: Union[LinearOperator, Float[Array, "N N"]]
-    ) -> LinearOperator:
+        self, other: Union["LinearOperator", Float[Array, "N N"]]
+    ) -> "LinearOperator":
         """Reimplimentation of add linear operator."""
         return self + other
 
     @abc.abstractmethod
-    def __mul__(self, other: float) -> LinearOperator:
+    def __mul__(self, other: ScalarFloat) -> "LinearOperator":
         """Multiply linear operator by scalar."""
         raise NotImplementedError
 
-    def __rmul__(self, other: float) -> LinearOperator:
+    def __rmul__(self, other: ScalarFloat) -> "LinearOperator":
         """Reimplimentation of multiply linear operator by scalar."""
         return self.__mul__(other)
 
     @abc.abstractmethod
-    def _add_diagonal(self, other: DiagonalLinearOperator) -> LinearOperator:
+    def _add_diagonal(
+        self,
+        other: "gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator",  # noqa: F821
+    ) -> "LinearOperator":
         """Add diagonal linear operator to a linear operator, useful e.g., for adding jitter."""
         return NotImplementedError
 
     @abc.abstractmethod
     def __matmul__(
-        self, other: Union[LinearOperator, Float[Array, "N M"]]
-    ) -> Union[LinearOperator, Float[Array, "N M"]]:
+        self, other: Union["LinearOperator", Float[Array, "N M"]]
+    ) -> Union["LinearOperator", Float[Array, "N M"]]:
         """Matrix multiplication."""
         raise NotImplementedError
 
     def __rmatmul__(
-        self, other: Union[LinearOperator, Float[Array, "N M"]]
-    ) -> Union[LinearOperator, Float[Array, "N M"]]:
+        self, other: Union["LinearOperator", Float[Array, "N M"]]
+    ) -> Union["LinearOperator", Float[Array, "N M"]]:
         """Reimplimentation of matrix multiplication."""
         # Exploit the fact that linear operators are square and symmetric.
         if other.ndim == 1:
@@ -117,70 +134,73 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
         return (self.T @ other.T).T
 
     @abc.abstractmethod
-    def diagonal(self) -> Float[Array, "N"]:
+    def diagonal(self) -> Float[Array, " N"]:
         """Diagonal of the linear operator.
 
-        Returns:
-            Float[Array, "N"]: Diagonal of the linear operator.
+        Returns
+        -------
+            Float[Array, " N"]: Diagonal of the linear operator.
         """
-
         raise NotImplementedError
 
-    def trace(self) -> Float[Array, "1"]:
+    def trace(self) -> ScalarFloat:
         """Trace of the linear matrix.
 
-        Returns:
-            Float[Array, "1"]: Trace of the linear matrix.
+        Returns
+        -------
+            ScalarFloat: Trace of the linear matrix.
         """
         return jnp.sum(self.diagonal())
 
-    def log_det(self) -> Float[Array, "1"]:
+    def log_det(self) -> ScalarFloat:
         """Log determinant of the linear matrix. Default implementation uses dense Cholesky decomposition.
 
-        Returns:
-            Float[Array, "1"]: Log determinant of the linear matrix.
+        Returns
+        -------
+            ScalarFloat: Log determinant of the linear matrix.
         """
-
         root = self.to_root()
 
         return 2.0 * jnp.sum(jnp.log(root.diagonal()))
 
-    def to_root(self) -> LinearOperator:
+    def to_root(self) -> "LinearOperator":
         """Compute the root of the linear operator via the Cholesky decomposition.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N N"]: Lower Cholesky decomposition of the linear operator.
         """
-
-        from .triangular_linear_operator import LowerTriangularLinearOperator
+        from gpjax.linops.triangular_linear_operator import (
+            LowerTriangularLinearOperator,
+        )
 
         L = jnp.linalg.cholesky(self.to_dense())
 
         return LowerTriangularLinearOperator.from_dense(L)
 
-    def inverse(self) -> LinearOperator:
+    def inverse(self) -> "LinearOperator":
         """Inverse of the linear matrix. Default implementation uses dense Cholesky decomposition.
 
-        Returns:
+        Returns
+        -------
             LinearOperator: Inverse of the linear matrix.
         """
-
-        from .dense_linear_operator import DenseLinearOperator
+        from gpjax.linops.dense_linear_operator import DenseLinearOperator
 
         n = self.shape[0]
 
         return DenseLinearOperator(self.solve(jnp.eye(n)))
 
-    def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
         """Solve linear system. Default implementation uses dense Cholesky decomposition.
 
         Args:
             rhs (Float[Array, "N M"]): Right hand side of the linear system.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N M"]: Solution of the linear system.
         """
-
         root = self.to_root()
         rootT = root.T
 
@@ -190,19 +210,21 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
     def to_dense(self) -> Float[Array, "N N"]:
         """Construct dense matrix from the linear operator.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N N"]: Dense linear matrix.
         """
         raise NotImplementedError
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> LinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "LinearOperator":
         """Construct linear operator from dense matrix.
 
         Args:
             dense (Float[Array, "N N"]): Dense matrix.
 
-        Returns:
+        Returns
+        -------
             LinearOperator: Linear operator.
         """
         raise NotImplementedError

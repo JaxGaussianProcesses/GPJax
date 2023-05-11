@@ -13,27 +13,33 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
-from typing import Any, Union
-
-import jax.numpy as jnp
-from jaxtyping import Array, Float
-from simple_pytree import static_field
 from dataclasses import dataclass
 
-from .linear_operator import LinearOperator
-from .diagonal_linear_operator import DiagonalLinearOperator
+from beartype.typing import (
+    Any,
+    Union,
+)
+import jax.numpy as jnp
+from jaxtyping import Float
+
+from gpjax.base import static_field
+from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+from gpjax.linops.linear_operator import LinearOperator
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 def _check_args(value: Any, size: Any) -> None:
-
     if not isinstance(size, int):
         raise ValueError(f"`length` must be an integer, but `length = {size}`.")
 
     if value.ndim != 1:
         raise ValueError(
-            f"`value` must be one dimensional scalar, but `value.shape = {value.shape}`."
+            "`value` must be one dimensional scalar, but `value.shape ="
+            f" {value.shape}`."
         )
 
 
@@ -51,7 +57,6 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
             value (Float[Array, "1"]): Constant value of the diagonal.
             size (int): Size of the diagonal.
         """
-
         _check_args(value, size)
 
         if dtype is not None:
@@ -64,7 +69,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
 
     def __add__(
         self, other: Union[Float[Array, "N N"], LinearOperator]
-    ) -> DiagonalLinearOperator:
+    ) -> LinearOperator:
         if isinstance(other, ConstantDiagonalLinearOperator):
             if other.size == self.size:
                 return ConstantDiagonalLinearOperator(
@@ -72,34 +77,35 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
                 )
 
             raise ValueError(
-                f"`length` must be the same, but `length = {self.size}` and `length = {other.size}`."
+                f"`length` must be the same, but `length = {self.size}` and `length ="
+                f" {other.size}`."
             )
 
         else:
             return super().__add__(other)
 
-    def __mul__(self, other: float) -> LinearOperator:
+    def __mul__(self, other: Union[ScalarFloat, Float[Array, "1"]]) -> LinearOperator:
         """Multiply covariance operator by scalar.
 
         Args:
             other (LinearOperator): Scalar.
 
-        Returns:
+        Returns
+        -------
             LinearOperator: Covariance operator multiplied by a scalar.
         """
-
         return ConstantDiagonalLinearOperator(value=self.value * other, size=self.size)
 
     def _add_diagonal(self, other: DiagonalLinearOperator) -> LinearOperator:
-        """Add diagonal to the covariance operator,  useful for computing, Kxx + Iσ².
+        """Add diagonal to the covariance operator,  useful for computing, Kxx + Io².
 
         Args:
             other (DiagonalLinearOperator): Diagonal covariance operator to add to the covariance operator.
 
-        Returns:
+        Returns
+        -------
             LinearOperator: Covariance operator with the diagonal added.
         """
-
         if isinstance(other, ConstantDiagonalLinearOperator):
             if other.size == self.size:
                 return ConstantDiagonalLinearOperator(
@@ -107,63 +113,68 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
                 )
 
             raise ValueError(
-                f"`length` must be the same, but `length = {self.size}` and `length = {other.size}`."
+                f"`length` must be the same, but `length = {self.size}` and `length ="
+                f" {other.size}`."
             )
 
         else:
             return super()._add_diagonal(other)
 
-    def diagonal(self) -> Float[Array, "N"]:
+    def diagonal(self) -> Float[Array, " N"]:
         """Diagonal of the covariance operator."""
         return self.value * jnp.ones(self.size)
 
-    def to_root(self) -> ConstantDiagonalLinearOperator:
+    def to_root(self) -> "ConstantDiagonalLinearOperator":
         """
         Lower triangular.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N N"]: Lower triangular matrix.
         """
         return ConstantDiagonalLinearOperator(
             value=jnp.sqrt(self.value), size=self.size
         )
 
-    def log_det(self) -> Float[Array, "1"]:
+    def log_det(self) -> ScalarFloat:
         """Log determinant.
 
-        Returns:
-            Float[Array, "1"]: Log determinant of the covariance matrix.
+        Returns
+        -------
+            ScalarFloat: Log determinant of the covariance matrix.
         """
-        return 2.0 * self.size * jnp.log(self.value)
+        return 2.0 * self.size * jnp.log(self.value.squeeze())
 
-    def inverse(self) -> ConstantDiagonalLinearOperator:
+    def inverse(self) -> "ConstantDiagonalLinearOperator":
         """Inverse of the covariance operator.
 
-        Returns:
+        Returns
+        -------
             DiagonalLinearOperator: Inverse of the covariance operator.
         """
         return ConstantDiagonalLinearOperator(value=1.0 / self.value, size=self.size)
 
-    def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
         """Solve linear system.
 
         Args:
             rhs (Float[Array, "N M"]): Right hand side of the linear system.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N M"]: Solution of the linear system.
         """
-
         return rhs / self.value
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> ConstantDiagonalLinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "ConstantDiagonalLinearOperator":
         """Construct covariance operator from dense matrix.
 
         Args:
             dense (Float[Array, "N N"]): Dense matrix.
 
-        Returns:
+        Returns
+        -------
             DiagonalLinearOperator: Covariance operator.
         """
         return ConstantDiagonalLinearOperator(
@@ -172,14 +183,15 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
 
     @classmethod
     def from_root(
-        cls, root: ConstantDiagonalLinearOperator
-    ) -> ConstantDiagonalLinearOperator:
+        cls, root: "ConstantDiagonalLinearOperator"
+    ) -> "ConstantDiagonalLinearOperator":
         """Construct covariance operator from root.
 
         Args:
             root (ConstantDiagonalLinearOperator): Root of the covariance operator.
 
-        Returns:
+        Returns
+        -------
             ConstantDiagonalLinearOperator: Covariance operator.
         """
         return ConstantDiagonalLinearOperator(value=root.value**2, size=root.size)

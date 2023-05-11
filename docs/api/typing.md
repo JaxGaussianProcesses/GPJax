@@ -1,0 +1,3 @@
+# Typing
+
+::: gpjax.typing

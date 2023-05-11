@@ -13,87 +13,92 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Dict, List, Optional
+
+from dataclasses import dataclass
 
 import jax.numpy as jnp
-from jax.random import KeyArray
-from jaxtyping import Array, Float
+from jaxtyping import (
+    Float,
+    Int,
+    Num,
+)
+import tensorflow_probability.substrates.jax as tfp
 
-from ..computations import EigenKernelComputation
-from ..base import AbstractKernel
-from .utils import jax_gather_nd
+from gpjax.base import (
+    param_field,
+    static_field,
+)
+from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    EigenKernelComputation,
+)
+from gpjax.kernels.non_euclidean.utils import jax_gather_nd
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+    ScalarInt,
+)
+
+tfb = tfp.bijectors
 
 
 ##########################################
 # Graph kernels
 ##########################################
+@dataclass
 class GraphKernel(AbstractKernel):
-    """A Matérn graph kernel defined on the vertices of a graph. The key reference for this object is borovitskiy et. al., (2020)."""
+    r"""The Matérn graph kernel defined on the vertex set of a graph.
 
-    def __init__(
+    A Matérn graph kernel defined on the vertices of a graph. The key reference
+    for this object is borovitskiy et. al., (2020).
+
+    Args:
+        laplacian (Float[Array]): An $`N \times N`$ matrix representing the Laplacian matrix
+            of a graph.
+    """
+
+    laplacian: Num[Array, "N N"] = static_field(None)
+    lengthscale: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    smoothness: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    eigenvalues: Float[Array, " N"] = static_field(None)
+    eigenvectors: Float[Array, "N N"] = static_field(None)
+    num_vertex: ScalarInt = static_field(None)
+    compute_engine: AbstractKernelComputation = static_field(EigenKernelComputation)
+    name: str = "Graph Matérn"
+
+    def __post_init__(self):
+        if self.laplacian is None:
+            raise ValueError("Graph laplacian must be specified")
+
+        evals, self.eigenvectors = jnp.linalg.eigh(self.laplacian)
+        self.eigenvalues = evals.reshape(-1, 1)
+        if self.num_vertex is None:
+            self.num_vertex = self.eigenvalues.shape[0]
+
+    def __call__(  # TODO not consistent with general kernel interface
         self,
-        laplacian: Float[Array, "N N"],
-        active_dims: Optional[List[int]] = None,
-        name: Optional[str] = "Matérn Graph kernel",
-    ) -> None:
-        """Initialize a Matérn graph kernel.
-
-        Args:
-            laplacian (Float[Array]): An N x N matrix representing the Laplacian matrix of a graph.
-            compute_engine (EigenKernelComputation, optional): The compute engine that should be used in the kernel to compute covariance matrices. Defaults to EigenKernelComputation.
-            active_dims (Optional[List[int]], optional): The dimensions of the input data for which the kernel should be evaluated on. Defaults to None.
-            stationary (Optional[bool], optional): _description_. Defaults to False.
-            name (Optional[str], optional): _description_. Defaults to "Graph kernel".
-        """
-        super().__init__(
-            EigenKernelComputation,
-            active_dims,
-            spectral_density=None,
-            name=name,
-        )
-        self.laplacian = laplacian
-        evals, self.evecs = jnp.linalg.eigh(self.laplacian)
-        self.evals = evals.reshape(-1, 1)
-        self.compute_engine.eigensystem = self.evals, self.evecs
-        self.compute_engine.num_vertex = self.laplacian.shape[0]
-        self._stationary = True
-
-    def __call__(
-        self,
-        params: Dict,
-        x: Float[Array, "1 D"],
-        y: Float[Array, "1 D"],
+        x: Int[Array, "N 1"],
+        y: Int[Array, "N 1"],
+        *,
+        S,
         **kwargs,
-    ) -> Float[Array, "1"]:
-        """Evaluate the graph kernel on a pair of vertices :math:`v_i, v_j`.
+    ):
+        r"""Compute the (co)variance between a vertex pair.
+
+        For a graph $`\mathcal{G} = \{V, E\}`$ where $`V = \{v_1, v_2, \ldots v_n \}`$,
+        evaluate the graph kernel on a pair of vertices $`(v_i, v_j)`$ for any $`i,j<n`$.
 
         Args:
-            params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, "1 D"]): Index of the ith vertex.
-            y (Float[Array, "1 D"]): Index of the jth vertex.
+            x (Float[Array, "N 1"]): Index of the $`i`$th vertex.
+            y (Float[Array, "N 1"]): Index of the $`j`$th vertex.
 
-        Returns:
-            Float[Array, "1"]: The value of :math:`k(v_i, v_j)`.
+        Returns
+        -------
+            ScalarFloat: The value of $k(v_i, v_j)$.
         """
-        S = kwargs["S"]
-        Kxx = (jax_gather_nd(self.evecs, x) * S[None, :]) @ jnp.transpose(
-            jax_gather_nd(self.evecs, y)
+        Kxx = (jax_gather_nd(self.eigenvectors, x) * S.squeeze()) @ jnp.transpose(
+            jax_gather_nd(self.eigenvectors, y)
         )  # shape (n,n)
         return Kxx.squeeze()
-
-    def init_params(self, key: KeyArray) -> Dict:
-        """Initialise the lengthscale, variance and smoothness parameters of the kernel"""
-        return {
-            "lengthscale": jnp.array([1.0] * self.ndims),
-            "variance": jnp.array([1.0]),
-            "smoothness": jnp.array([1.0]),
-        }
-
-    @property
-    def num_vertex(self) -> int:
-        """The number of vertices within the graph.
-
-        Returns:
-            int: An integer representing the number of vertices within the graph.
-        """
-        return self.compute_engine.num_vertex

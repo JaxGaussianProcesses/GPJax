@@ -14,19 +14,23 @@
 # ==============================================================================
 
 
+from dataclasses import is_dataclass
+
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
+import jax.tree_util as jtu
 import pytest
-from jax.config import config
-
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 _PRNGKey = jr.PRNGKey(42)
 
-from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+from gpjax.linops.constant_diagonal_linear_operator import (
+    ConstantDiagonalLinearOperator,
+)
 from gpjax.linops.dense_linear_operator import DenseLinearOperator
-from gpjax.linops.constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
+from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 
 
 def approx_equal(res: jnp.ndarray, actual: jnp.ndarray) -> bool:
@@ -38,8 +42,19 @@ def approx_equal(res: jnp.ndarray, actual: jnp.ndarray) -> bool:
 def test_init(n: int) -> None:
     value = jr.uniform(_PRNGKey, (1,))
     constant_diag = ConstantDiagonalLinearOperator(value=value, size=n)
+
+    # Check types.
+    assert isinstance(constant_diag, ConstantDiagonalLinearOperator)
+    assert is_dataclass(constant_diag)
+
+    # Check properties.
     assert constant_diag.shape == (n, n)
+    assert constant_diag.dtype == jnp.float64
+    assert constant_diag.ndim == 2
     assert constant_diag.size == n
+
+    # Check pytree.
+    assert jtu.tree_leaves(constant_diag) == [value]  # shape, dtype are static!
 
 
 @pytest.mark.parametrize("n", [1, 2, 5])
@@ -62,7 +77,6 @@ def test_to_dense(n: int) -> None:
 
 @pytest.mark.parametrize("n", [1, 2, 5])
 def test_add_diagonal(n: int) -> None:
-
     # Test adding two constant diagonal linear operators.
     key_a, key_b = jr.split(_PRNGKey)
 

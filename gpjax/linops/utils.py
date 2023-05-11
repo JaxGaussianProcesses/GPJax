@@ -13,32 +13,33 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
-from typing import Union, Tuple, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .identity_linear_operator import IdentityLinearOperator
-
-from jaxtyping import Float, Array
-
-import jax.numpy as jnp
+from beartype.typing import (
+    Tuple,
+    Type,
+    Union,
+)
 import jax
+import jax.numpy as jnp
+from jaxtyping import Float
 
-from .linear_operator import LinearOperator
+from gpjax.linops.linear_operator import LinearOperator
+from gpjax.typing import Array
 
 
-def identity(n: int) -> IdentityLinearOperator:
+def identity(
+    n: int,
+) -> "gpjax.linops.identity_linear_operator.IdentityLinearOperator":  # noqa: F821
     """Identity matrix.
 
     Args:
         n (int): Size of the identity matrix.
 
-    Returns:
+    Returns
+    -------
         IdentityLinearOperator: Identity matrix of shape [n, n].
     """
-
-    from .identity_linear_operator import IdentityLinearOperator
+    from gpjax.linops.identity_linear_operator import IdentityLinearOperator
 
     return IdentityLinearOperator(size=n)
 
@@ -50,7 +51,8 @@ def to_dense(obj: Union[Float[Array, "..."], LinearOperator]):
     Args:
         obj (Union[Float[Array, "..."], LinearOperator]): Linear operator to convert.
 
-    Returns:
+    Returns
+    -------
         Float[Array, "..."]: Dense matrix.
     """
     if isinstance(obj, jnp.ndarray):
@@ -72,14 +74,15 @@ def to_linear_operator(obj: Union[Float[Array, "..."], LinearOperator]):
     Args:
         obj (Union[Float[Array, "..."], LinearOperator]): Linear operator to convert.
 
-    Returns:
+    Returns
+    -------
         LinearOperator: Linear operator.
     """
     if isinstance(obj, LinearOperator):
         return obj
 
     elif isinstance(obj, jnp.ndarray):
-        from .dense_linear_operator import DenseLinearOperator
+        from gpjax.linops.dense_linear_operator import DenseLinearOperator
 
         return DenseLinearOperator.from_dense(obj)
     else:
@@ -94,10 +97,11 @@ def check_shapes_match(shape1: Tuple[int, ...], shape2: Tuple[int, ...]) -> None
     """Check shapes of two objects.
 
     Args:
-        shape1 (Tuple[int, ...]): Shape of the first object.
-        shape2 (Tuple[int, ...]): Shape of the second object.
+        shape1 (Tuple[int, "..."]): Shape of the first object.
+        shape2 (Tuple[int, "..."]): Shape of the second object.
 
-    Raises:
+    Raises
+    ------
         ValueError: Shapes of the two objects do not match.
     """
     if shape1 != shape2:
@@ -106,10 +110,11 @@ def check_shapes_match(shape1: Tuple[int, ...], shape2: Tuple[int, ...]) -> None
         )
 
 
-def default_dtype() -> jnp.dtype:
+def default_dtype() -> Union[Type[jnp.float64], Type[jnp.float32]]:
     """Get the default dtype for the linear operator.
 
-    Returns:
+    Returns
+    -------
         jnp.dtype: Default dtype for the linear operator.
     """
     if jax.config.x64_enabled:

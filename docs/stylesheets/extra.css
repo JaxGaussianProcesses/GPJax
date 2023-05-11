@@ -1,0 +1,85 @@
+:root {
+    --md-primary-fg-color:        #b5121b;
+    --md-primary-fg-color--light: #ECB7B7;
+    --md-primary-fg-color--dark:  #7d030b;
+  }
+
+html {
+    /* Decrease font size for overall webpage
+       Down from 137.5% which is the Material default */
+    font-size: 130%;
+}
+
+.md-typeset .admonition {
+    /* Increase font size in admonitions */
+    font-size: 90% !important;
+}
+
+.md-typeset details {
+    /* Increase font size in details */
+    font-size: 120% !important;
+}
+
+.md-typeset h1 {
+    font-size: 1.7rem;
+}
+
+.md-typeset h2 {
+    font-size: 1.6rem;
+}
+
+.md-typeset h3 {
+    font-size: 1.4rem;
+}
+
+.md-typeset h4 {
+    font-size: 1.2rem;
+}
+
+.md-typeset h5 {
+    font-size: 1rem;
+}
+
+.md-typeset h6 {
+    font-size: 0.9rem;
+}
+
+
+:root {
+    --md-admonition-icon--see-also: url(https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/material/.icons/fontawesome/solid/circle-info.svg)
+  }
+
+.md-typeset .admonition.see-also,
+.md-typeset details.see-also {
+    border-color: rgb(43, 155, 70);
+  }
+.md-typeset .see-also > .admonition-title,
+.md-typeset .see-also > summary {
+    background-color: rgba(43, 155, 70, 0.1);
+  }
+.md-typeset .see-also > .admonition-title::before,
+.md-typeset .see-also > summary::before {
+    background-color: rgb(43, 155, 70);
+    -webkit-mask-image: var(--md-admonition-icon--see-also);
+            mask-image: var(--md-admonition-icon--see-also);
+  }
+
+/* More space at the bottom of the page. */
+.md-main__inner {
+    margin-bottom: 1.5rem;
+  }
+
+/* Indentation */
+/* This makes the documentation much more readable */
+div.doc-contents:not(.first) {
+  padding-left: 25px;
+  border-left: 4px solid rgba(230, 230, 230);
+  margin-bottom: 80px;
+}
+
+/* prevent selection of chevron in example blocks
+ * cf. https://mkdocstrings.github.io/recipes/#prevent-selection-of-prompts-and-output-in-python-code-blocks
+ */
+ .highlight .gp, .highlight .go { /* Generic.Prompt, Generic.Output */
+  user-select: none;
+}

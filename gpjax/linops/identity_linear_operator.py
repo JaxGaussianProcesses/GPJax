@@ -13,21 +13,25 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import annotations
 
-from typing import Any
-
-import jax.numpy as jnp
 from dataclasses import dataclass
-from jaxtyping import Array, Float
 
-from .constant_diagonal_linear_operator import ConstantDiagonalLinearOperator
-from .utils import default_dtype
+from beartype.typing import Any
+import jax.numpy as jnp
+from jaxtyping import Float
+
+from gpjax.linops.constant_diagonal_linear_operator import (
+    ConstantDiagonalLinearOperator,
+)
+from gpjax.linops.utils import default_dtype
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 def _check_size(size: Any) -> None:
     """Check that size is an integer."""
-
     if not isinstance(size, int):
         raise ValueError(f"`size` must be an integer, but `size = {size}`.")
 
@@ -58,43 +62,48 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         Args:
             other (Float[Array, "N M"]): Matrix to multiply with.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N M"]: Result of matrix multiplication.
         """
         return other
 
-    def to_root(self) -> IdentityLinearOperator:
+    def to_root(self) -> "IdentityLinearOperator":
         """
         Lower triangular.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N N"]: Lower triangular matrix.
         """
         return self
 
-    def log_det(self) -> Float[Array, "1"]:
+    def log_det(self) -> ScalarFloat:
         """Log determinant.
 
-        Returns:
-            Float[Array, "1"]: Log determinant of the covariance matrix.
+        Returns
+        -------
+            ScalarFloat: Log determinant of the covariance matrix.
         """
         return jnp.array(0.0)
 
-    def inverse(self) -> ConstantDiagonalLinearOperator:
+    def inverse(self) -> "IdentityLinearOperator":
         """Inverse of the covariance operator.
 
-        Returns:
+        Returns
+        -------
             DiagonalLinearOperator: Inverse of the covariance operator.
         """
         return self
 
-    def solve(self, rhs: Float[Array, "N M"]) -> Float[Array, "N M"]:
+    def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
         """Solve linear system.
 
         Args:
             rhs (Float[Array, "N M"]): Right hand side of the linear system.
 
-        Returns:
+        Returns
+        -------
             Float[Array, "N M"]: Solution of the linear system.
         """
         # TODO: Check shapes.
@@ -102,19 +111,20 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         return rhs
 
     @classmethod
-    def from_root(cls, root: IdentityLinearOperator) -> IdentityLinearOperator:
+    def from_root(cls, root: "IdentityLinearOperator") -> "IdentityLinearOperator":
         """Construct from root.
 
         Args:
             root (IdentityLinearOperator): Root of the covariance operator.
 
-        Returns:
+        Returns
+        -------
             IdentityLinearOperator: Covariance operator.
         """
         return root
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> IdentityLinearOperator:
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "IdentityLinearOperator":
         return IdentityLinearOperator(dense.shape[0])
 
 

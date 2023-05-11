@@ -13,17 +13,24 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable, Dict, Tuple
+from typing import (
+    Callable,
+    Tuple,
+)
 
-import jax
-import distrax as dx
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
+import jax.tree_util as jtu
+from jaxtyping import (
+    Array,
+    Float,
+)
 import pytest
-from jax.config import config
-from jaxtyping import Float, Array
+import tensorflow_probability.substrates.jax as tfp
 
 import gpjax as gpx
+from gpjax.gps import AbstractPosterior
 from gpjax.variational_families import (
     AbstractVariationalFamily,
     CollapsedVariationalGaussian,
@@ -35,6 +42,7 @@ from gpjax.variational_families import (
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
+tfd = tfp.distributions
 
 
 def test_abstract_variational_family():
@@ -43,32 +51,34 @@ def test_abstract_variational_family():
         AbstractVariationalFamily()
 
     # Create a dummy variational family class with abstract methods implemented.
-    class DummyVariationalFamily(AbstractVariationalFamily):
-        def predict(self, params: Dict, x: Float[Array, "N D"]) -> dx.Distribution:
-            return dx.MultivariateNormalDiag(loc=x)
+    class DummyPosterior:
+        @property
+        def __class__(self) -> type:
+            return AbstractPosterior
 
-        def init_params(self, key: jr.PRNGKey) -> dict:
-            return {}
+    class DummyVariationalFamily(AbstractVariationalFamily):
+        def predict(self, x: Float[Array, "N D"]) -> tfd.Distribution:
+            return tfd.MultivariateNormalDiag(loc=x)
 
     # Test that the dummy variational family can be instantiated.
-    dummy_variational_family = DummyVariationalFamily()
+    dummy_variational_family = DummyVariationalFamily(posterior=DummyPosterior())
     assert isinstance(dummy_variational_family, AbstractVariationalFamily)
 
 
 # Functions to test variational family parameter shapes upon initialisation.
 def vector_shape(n_inducing: int) -> Tuple[int, int]:
-    """Shape of a vector with n_inducing rows and 1 column"""
+    """Shape of a vector with n_inducing rows and 1 column."""
     return (n_inducing, 1)
 
 
 def matrix_shape(n_inducing: int) -> Tuple[int, int]:
-    """Shape of a matrix with n_inducing rows and 1 column"""
+    """Shape of a matrix with n_inducing rows and 1 column."""
     return (n_inducing, n_inducing)
 
 
 # Functions to test variational parameter values upon initialisation.
 def vector_val(val: float) -> Callable[[int], Float[Array, "n_inducing 1"]]:
-    """Vector of shape (n_inducing, 1) filled with val"""
+    """Vector of shape (n_inducing, 1) filled with val."""
 
     def vector_val_fn(n_inducing: int):
         return val * jnp.ones(vector_shape(n_inducing))
@@ -79,7 +89,7 @@ def vector_val(val: float) -> Callable[[int], Float[Array, "n_inducing 1"]]:
 def diag_matrix_val(
     val: float,
 ) -> Callable[[int], Float[Array, "n_inducing n_inducing"]]:
-    """Diagonal matrix of shape (n_inducing, n_inducing) filled with val"""
+    """Diagonal matrix of shape (n_inducing, n_inducing) filled with val."""
 
     def diag_matrix_fn(n_inducing: int) -> Float[Array, "n_inducing n_inducing"]:
         return jnp.eye(n_inducing) * val
@@ -90,87 +100,107 @@ def diag_matrix_val(
 @pytest.mark.parametrize("n_test", [1, 10])
 @pytest.mark.parametrize("n_inducing", [1, 10, 20])
 @pytest.mark.parametrize(
-    "variational_family, moment_names, shapes, values",
+    "variational_family",
     [
-        (
-            VariationalGaussian,
-            ["variational_mean", "variational_root_covariance"],
-            [vector_shape, matrix_shape],
-            [vector_val(0.0), diag_matrix_val(1.0)],
-        ),
-        (
-            WhitenedVariationalGaussian,
-            ["variational_mean", "variational_root_covariance"],
-            [vector_shape, matrix_shape],
-            [vector_val(0.0), diag_matrix_val(1.0)],
-        ),
-        (
-            NaturalVariationalGaussian,
-            ["natural_vector", "natural_matrix"],
-            [vector_shape, matrix_shape],
-            [vector_val(0.0), diag_matrix_val(-0.5)],
-        ),
-        (
-            ExpectationVariationalGaussian,
-            ["expectation_vector", "expectation_matrix"],
-            [vector_shape, matrix_shape],
-            [vector_val(0.0), diag_matrix_val(1.0)],
-        ),
+        VariationalGaussian,
+        WhitenedVariationalGaussian,
+        NaturalVariationalGaussian,
+        ExpectationVariationalGaussian,
     ],
 )
 def test_variational_gaussians(
     n_test: int,
     n_inducing: int,
     variational_family: AbstractVariationalFamily,
-    moment_names: Tuple[str, str],
-    shapes: Tuple,
-    values: Tuple,
 ) -> None:
-
     # Initialise variational family:
-    prior = gpx.Prior(kernel=gpx.RBF())
+    prior = gpx.Prior(kernel=gpx.RBF(), mean_function=gpx.Constant())
+    likelihood = gpx.Gaussian(123)
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
     test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
-    q = variational_family(prior=prior, inducing_inputs=inducing_inputs)
+
+    posterior = prior * likelihood
+    q = variational_family(posterior=posterior, inducing_inputs=inducing_inputs)
 
     # Test init:
     assert q.num_inducing == n_inducing
     assert isinstance(q, AbstractVariationalFamily)
 
-    # Test params and keys:
-    params = q.init_params(jr.PRNGKey(123))
-    assert isinstance(params, dict)
+    if isinstance(q, VariationalGaussian):
+        assert q.variational_mean.shape == vector_shape(n_inducing)
+        assert q.variational_root_covariance.shape == matrix_shape(n_inducing)
+        assert (q.variational_mean == vector_val(0.0)(n_inducing)).all()
+        assert (q.variational_root_covariance == diag_matrix_val(1.0)(n_inducing)).all()
 
-    config_params = gpx.config.get_global_config()
+        # Test pytree structure (nodes are alphabetically flattened, hence the ordering)
+        true_leaves = (
+            [inducing_inputs, *jtu.tree_leaves(posterior)]
+            + [vector_val(0.0)(n_inducing)]
+            + [diag_matrix_val(1.0)(n_inducing)]
+        )
 
-    # Test inducing induput parameters:
-    assert "inducing_inputs" in params["variational_family"].keys()
-    assert "inducing_inputs" in config_params["transformations"].keys()
+        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves):
+            assert (l1 == l2).all()
 
-    for moment_name, shape, value in zip(moment_names, shapes, values):
+    elif isinstance(q, WhitenedVariationalGaussian):
+        assert q.variational_mean.shape == vector_shape(n_inducing)
+        assert q.variational_root_covariance.shape == matrix_shape(n_inducing)
+        assert (q.variational_mean == vector_val(0.0)(n_inducing)).all()
+        assert (q.variational_root_covariance == diag_matrix_val(1.0)(n_inducing)).all()
 
-        moment_params = params["variational_family"]["moments"]
+        # Test pytree structure (nodes are alphabetically flattened, hence the ordering)
+        true_leaves = (
+            [inducing_inputs, *jtu.tree_leaves(posterior)]
+            + [vector_val(0.0)(n_inducing)]
+            + [diag_matrix_val(1.0)(n_inducing)]
+        )
 
-        assert moment_name in moment_params.keys()
-        assert moment_name in config_params["transformations"].keys()
+        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves):
+            assert (l1 == l2).all()
 
-        # Test moment shape and values:
-        moment = moment_params[moment_name]
-        assert isinstance(moment, jnp.ndarray)
-        assert moment.shape == shape(n_inducing)
-        assert (moment == value(n_inducing)).all()
+    elif isinstance(q, NaturalVariationalGaussian):
+        assert q.natural_vector.shape == vector_shape(n_inducing)
+        assert q.natural_matrix.shape == matrix_shape(n_inducing)
+        assert (q.natural_vector == vector_val(0.0)(n_inducing)).all()
+        assert (q.natural_matrix == diag_matrix_val(-0.5)(n_inducing)).all()
+
+        # Test pytree structure (nodes are alphabetically flattened, hence the ordering)
+        true_leaves = (
+            [inducing_inputs]
+            + [diag_matrix_val(-0.5)(n_inducing)]
+            + [vector_val(0.0)(n_inducing)]
+            + jtu.tree_leaves(posterior)
+        )
+
+        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves):
+            assert (l1 == l2).all()
+
+    elif isinstance(q, ExpectationVariationalGaussian):
+        assert q.expectation_vector.shape == vector_shape(n_inducing)
+        assert q.expectation_matrix.shape == matrix_shape(n_inducing)
+        assert (q.expectation_vector == vector_val(0.0)(n_inducing)).all()
+        assert (q.expectation_matrix == diag_matrix_val(1.0)(n_inducing)).all()
+
+        # Test pytree structure (nodes are alphabetically flattened, hence the ordering)
+        true_leaves = (
+            [diag_matrix_val(1.0)(n_inducing)]
+            + [vector_val(0.0)(n_inducing)]
+            + [inducing_inputs]
+            + jtu.tree_leaves(posterior)
+        )
+
+        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves):
+            assert (l1 == l2).all()
 
     # Test KL
-    params = q.init_params(jr.PRNGKey(123))
-    kl = q.prior_kl(params)
+    kl = q.prior_kl()
     assert isinstance(kl, jnp.ndarray)
+    assert kl.shape == ()
+    assert kl >= 0.0
 
     # Test predictions
-    predictive_dist_fn = q(params)
-    assert isinstance(predictive_dist_fn, Callable)
-
-    predictive_dist = predictive_dist_fn(test_inputs)
-    assert isinstance(predictive_dist, dx.Distribution)
+    predictive_dist = q(test_inputs)
+    assert isinstance(predictive_dist, tfd.Distribution)
 
     mu = predictive_dist.mean()
     sigma = predictive_dist.covariance()
@@ -193,52 +223,35 @@ def test_collapsed_variational_gaussian(
     x = jnp.hstack([x] * point_dim)
     D = gpx.Dataset(X=x, y=y)
 
-    prior = gpx.Prior(kernel=gpx.RBF())
+    prior = gpx.Prior(kernel=gpx.RBF(), mean_function=gpx.Constant())
 
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
     inducing_inputs = jnp.hstack([inducing_inputs] * point_dim)
     test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
     test_inputs = jnp.hstack([test_inputs] * point_dim)
 
+    posterior = prior * gpx.Gaussian(num_datapoints=D.n)
+
     variational_family = CollapsedVariationalGaussian(
-        prior=prior,
-        likelihood=gpx.Gaussian(num_datapoints=D.n),
+        posterior=posterior,
         inducing_inputs=inducing_inputs,
     )
 
     # We should raise an error for non-Gaussian likelihoods:
     with pytest.raises(TypeError):
         CollapsedVariationalGaussian(
-            prior=prior,
-            likelihood=gpx.Bernoulli(num_datapoints=D.n),
+            posterior=prior * gpx.Bernoulli(num_datapoints=D.n),
             inducing_inputs=inducing_inputs,
         )
 
     # Test init
     assert variational_family.num_inducing == n_inducing
-    params = gpx.config.get_global_config()
-    assert "inducing_inputs" in params["transformations"].keys()
     assert (variational_family.inducing_inputs == inducing_inputs).all()
-
-    # Test params
-    params = variational_family.init_params(jr.PRNGKey(123))
-    assert isinstance(params, dict)
-    assert "likelihood" in params.keys()
-    assert "obs_noise" in params["likelihood"].keys()
-    assert "inducing_inputs" in params["variational_family"].keys()
-    assert params["variational_family"]["inducing_inputs"].shape == (
-        n_inducing,
-        point_dim,
-    )
-    assert isinstance(params["variational_family"]["inducing_inputs"], jax.Array)
+    assert variational_family.posterior.likelihood.obs_noise == 1.0
 
     # Test predictions
-    params = variational_family.init_params(jr.PRNGKey(123))
-    predictive_dist_fn = variational_family(params, D)
-    assert isinstance(predictive_dist_fn, Callable)
-
-    predictive_dist = predictive_dist_fn(test_inputs)
-    assert isinstance(predictive_dist, dx.Distribution)
+    predictive_dist = variational_family(test_inputs, D)
+    assert isinstance(predictive_dist, tfd.Distribution)
 
     mu = predictive_dist.mean()
     sigma = predictive_dist.covariance()
@@ -247,3 +260,10 @@ def test_collapsed_variational_gaussian(
     assert isinstance(sigma, jnp.ndarray)
     assert mu.shape == (n_test,)
     assert sigma.shape == (n_test, n_test)
+
+    # Test pytree structure (nodes are alphabetically flattened, hence the ordering)
+    true_leaves = [inducing_inputs, *jtu.tree_leaves(posterior)]
+
+    for l1, l2 in zip(jtu.tree_leaves(variational_family), true_leaves):
+        assert l1.shape == l2.shape
+        assert (l1 == l2).all()

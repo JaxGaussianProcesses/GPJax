@@ -13,61 +13,54 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Dict, List, Optional
+from dataclasses import dataclass
 
 import jax.numpy as jnp
-from jax.random import KeyArray
-from jaxtyping import Array, Float
+from jaxtyping import Float
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from ..base import AbstractKernel
-from ..computations import (
-    DenseKernelComputation,
+from gpjax.base import (
+    param_field,
+    static_field,
+)
+from gpjax.kernels.base import AbstractKernel
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+    ScalarInt,
 )
 
 
+@dataclass
 class Polynomial(AbstractKernel):
     """The Polynomial kernel with variable degree."""
 
-    def __init__(
-        self,
-        degree: int = 1,
-        active_dims: Optional[List[int]] = None,
-        stationary: Optional[bool] = False,
-        name: Optional[str] = "Polynomial",
-    ) -> None:
-        super().__init__(
-            DenseKernelComputation,
-            active_dims,
-            spectral_density=None,
-            name=name,
-        )
-        self.degree = degree
-        self.name = f"Polynomial Degree: {self.degree}"
-        self._stationary = False
+    degree: ScalarInt = static_field(2)
+    shift: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
 
-    def __call__(
-        self, params: Dict, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
-    ) -> Float[Array, "1"]:
-        """Evaluate the kernel on a pair of inputs :math:`(x, y)` with shift parameter :math:`\\alpha` and variance :math:`\\sigma^2` through
+    def __post_init__(self):
+        self.name = f"Polynomial (degree {self.degree})"
 
-        .. math::
-            k(x, y) = \\Big( \\alpha + \\sigma^2 xy \\Big)^{d}
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+        r"""Compute the polynomial kernel of degree $`d`$ between a pair of arrays.
+
+        For a pair of inputs $`x, y \in \mathbb{R}^{D}`$, let's evaluate the polynomial
+        kernel $`k(x, y)=\left( \alpha + \sigma^2 x y\right)^{d}`$ where
+        $`\sigma^\in \mathbb{R}_{>0}`$ is the kernel's variance parameter, shift
+        parameter $`\alpha`$ and integer degree $`d`$.
 
         Args:
-            params (Dict): Parameter set for which the kernel should be evaluated on.
-            x (Float[Array, "1 D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, "1 D"]): The right hand argument of the kernel function's call
+            x (Float[Array, " D"]): The left hand argument of the kernel function's
+                call.
+            y (Float[Array, " D"]): The right hand argument of the kernel function's
+                call
 
-        Returns:
-            Float[Array, "1"]: The value of :math:`k(x, y)`.
+        Returns
+        -------
+            ScalarFloat: The value of $`k(x, y)`$.
         """
-        x = self.slice_input(x).squeeze()
-        y = self.slice_input(y).squeeze()
-        K = jnp.power(params["shift"] + jnp.dot(x * params["variance"], y), self.degree)
+        x = self.slice_input(x)
+        y = self.slice_input(y)
+        K = jnp.power(self.shift + self.variance * jnp.dot(x, y), self.degree)
         return K.squeeze()
-
-    def init_params(self, key: KeyArray) -> Dict:
-        return {
-            "shift": jnp.array([1.0]),
-            "variance": jnp.array([1.0] * self.ndims),
-        }

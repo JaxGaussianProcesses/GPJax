@@ -13,12 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-from .base import AbstractKernelComputation
-from .constant_diagonal import ConstantDiagonalKernelComputation
-from .dense import DenseKernelComputation
-from .diagonal import DiagonalKernelComputation
-from .eigen import EigenKernelComputation
-from .basis_functions import BasisFunctionComputation
+from gpjax.kernels.computations.base import AbstractKernelComputation
+from gpjax.kernels.computations.basis_functions import BasisFunctionComputation
+from gpjax.kernels.computations.constant_diagonal import (
+    ConstantDiagonalKernelComputation,
+)
+from gpjax.kernels.computations.dense import DenseKernelComputation
+from gpjax.kernels.computations.diagonal import DiagonalKernelComputation
+from gpjax.kernels.computations.eigen import EigenKernelComputation
 
 __all__ = [
     "AbstractKernelComputation",

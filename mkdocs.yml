@@ -1,0 +1,129 @@
+site_name: GPJax
+site_description: The documentation for the GPJax software library.
+site_url: https://example.com/
+repo_url: https://github.com/JaxGaussianProcesses/GPJax
+repo_name: JaxGaussianProcesses/GPJax
+
+edit_uri: ""
+
+nav:
+  - 🏡 Home: index.md
+  - Getting started:
+    - 🛠️ Installation: installation.md
+    - 🎨 Design principles: design.md
+    - 🤝 Contributing: contributing.md
+    # - 🔪 Sharp bits: sharp_bits.md
+    - 🌳 GPJax PyTrees: examples/pytrees.md
+    - 📎 JAX 101 [External]: https://jax.readthedocs.io/en/latest/jax-101/index.html
+  - 💡 Background:
+    - Intro to GPs: examples/intro_to_gps.py
+  - 🎓 Tutorials:
+    - Regression: examples/regression.py
+    - Classification: examples/classification.py
+    - Poisson regression: examples/poisson.py
+    - Barycentres: examples/barycentres.py
+    - Deep kernel learning: examples/deep_kernels.py
+    - Graph kernels: examples/graph_kernels.py
+    - Sparse GPs: examples/uncollapsed_vi.py
+    - Stochastic sparse GPs: examples/collapsed_vi.py
+    - Kernels: examples/kernels.py
+    - UCI regression: examples/yacht.py
+    - Pathwise Sampling for Spatial Modelling: examples/spatial.py
+  - 📕 Reference: api/
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top # Show a back to top button
+    - content.code.copy
+    - search.suggest # Show search suggestions
+    - search.highlight # Highlight search results in results
+    - content.code.annotate # Allow individual lines of code to be annotated
+  icon:
+    repo: fontawesome/brands/github
+  logo: _static/favicon.ico
+  favicon: _static/favicon.ico
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details # Enhance admonitions with collapse/expand
+  - markdown_katex:
+      no_inline_svg: True
+      insert_fonts_css: True
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.tabbed
+  - toc:
+      permalink: true
+  - toc:
+      toc_depth: 4
+  - footnotes
+  # - pymdownx.arithmatex:
+  #     generic: true
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+plugins:
+  - search
+  - gen-files:
+      scripts:
+        - docs/scripts/gen_pages.py  # or any other name or path
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - bibtex:
+      bib_file: "docs/refs.bib"
+      csl_file: "https://raw.githubusercontent.com/citation-style-language/styles/af38aba0e9b08406c8827abfc888e5f3e3fa1d65/journal-of-the-royal-statistical-society.csl"
+      cite_inline: true
+  - mkdocs-jupyter:
+      execute: true
+      allow_errors: false
+#     binder: true
+#     binder_service_name: "gh"
+#     binder_branch: "main"
+  - mkdocstrings:
+      watch:
+        - gpjax
+      default_handler: python
+      handlers:
+        python:
+          rendering:
+            show_root_heading: true
+            show_root_full_path: true
+            show_if_no_docstring: true
+            show_signature_annotations: true
+            show_source: false
+            members_order: source  # order methods according to their order of definition in the source code, not alphabetical order
+            heading_level: 4
+          options:
+            inherited_members: true  # Allow looking up inherited methods
+            docstring_style: "google"
+
+  - git-authors:
+      show_contribution: false
+      show_line_count: true
+      show_email_address: false
+      count_empty_lines: true
+      fallback_to_empty: false
+      sort_authors_by: contribution
+      enabled: true
+
+extra_css:
+  - stylesheets/extra.css
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css
+
+extra_javascript:
+  # - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  # - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js
+  - javascripts/katex.js

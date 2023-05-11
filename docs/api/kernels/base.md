@@ -1,0 +1,3 @@
+# Base
+
+::: gpjax.kernels.base
