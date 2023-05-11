@@ -50,7 +50,8 @@ class AbstractLikelihood(Module):
 
         Args:
             *args (Any): Arguments to be passed to the likelihood's `predict` method.
-            **kwargs (Any): Keyword arguments to be passed to the likelihood's `predict` method.
+            **kwargs (Any): Keyword arguments to be passed to the likelihood's
+                `predict` method.
 
         Returns
         -------
@@ -64,7 +65,8 @@ class AbstractLikelihood(Module):
 
         Args:
             *args (Any): Arguments to be passed to the likelihood's `predict` method.
-            **kwargs (Any): Keyword arguments to be passed to the likelihood's `predict` method.
+            **kwargs (Any): Keyword arguments to be passed to the likelihood's
+                `predict` method.
 
         Returns
         -------
@@ -78,7 +80,8 @@ class AbstractLikelihood(Module):
 
         Returns
         -------
-            tfd.Distribution: The distribution of observations, y, given values of the Gaussian process, f.
+            tfd.Distribution: The distribution of observations, y, given values of the
+                Gaussian process, f.
         """
         raise NotImplementedError
 
