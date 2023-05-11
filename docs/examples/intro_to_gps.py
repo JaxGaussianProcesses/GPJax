@@ -42,7 +42,7 @@
 # family, then there exists a conjugate prior. However, the conjugate prior may
 # not have a form that precisely reflects the practitioner's belief surrounding
 # the parameter. For this reason, conjugate models seldom appear; one exception
-# to this is GP regression that we present fully in our [Regression notebook](https://gpjax.readthedocs.io/en/latest/examples/regression.html).
+# to this is GP regression that we present fully in our [Regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/).
 #
 # For models that do not contain a conjugate prior, the marginal log-likelihood
 # must be calculated to normalise the posterior distribution and ensure it
@@ -429,7 +429,7 @@ with warnings.catch_warnings():
 # considers Gaussian likelihood functions where the role of $\phi$ is
 # superfluous. However, this intuition will be helpful for models with a
 # non-Gaussian likelihood, such as those encountered in
-# [classification](https://gpjax.readthedocs.io/en/latest/examples/classification.html).
+# [classification](https://docs.jaxgaussianprocesses.com/examples/classification).
 #
 # Applying Bayes' theorem \eqref{eq:BayesTheorem} yields the joint posterior distribution over the
 # latent function
@@ -446,7 +446,7 @@ with warnings.catch_warnings():
 # function with parameters $\boldsymbol{\theta}$ that maps pairs of inputs
 # $\mathbf{X}, \mathbf{X}' \in \mathcal{X}$ onto the real line. We dedicate the
 # entirety of the [Kernel Guide
-# notebook](https://gpjax.readthedocs.io/en/latest/examples/kernels.html) to
+# notebook](https://docs.jaxgaussianprocesses.com/examples/kernels) to
 # exploring the different GPs each kernel can yield.
 #
 # ## Gaussian process regression
@@ -508,7 +508,7 @@ with warnings.catch_warnings():
 # Bayes' theorem and the definition of a Gaussian random variable. Using the
 # ideas presented in this notebook, the user should be in a position to dive
 # into our [Regression
-# notebook](https://gpjax.readthedocs.io/en/latest/examples/regression.html) and
+# notebook](https://docs.jaxgaussianprocesses.com/examples/regression/) and
 # start getting their hands on some code. For those looking to learn more about
 # the underling theory of GPs, an excellent starting point is the [Gaussian
 # Processes for Machine Learning](http://gaussianprocess.org/gpml/) textbook.

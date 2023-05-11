@@ -131,7 +131,7 @@ D = Dataset(
 # alone isn't enough to to a decent job at interpolating this data. Therefore, we can also use elevation and optimize
 # the parameters of our kernel such that more relevance should be given to elevation. This is possible by using a
 # kernel that has one length-scale parameter per input dimension: an automatic relevance determination (ARD) kernel.
-# See our [kernel notebook](https://gpjax.readthedocs.io/en/latest/examples/kernels.html) for more an introduction to
+# See our [kernel notebook](https://docs.jaxgaussianprocesses.com/examples/kernels/) for more an introduction to
 # kernels in GPJax.
 
 # %%

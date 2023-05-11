@@ -110,7 +110,7 @@ elbo = jit(gpx.CollapsedELBO(negative=True))
 # %% [markdown]
 # We now train our model akin to a Gaussian process regression model via the `fit`
 # abstraction. Unlike the regression example given in the
-# [conjugate regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html),
+# [conjugate regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/),
 # the inducing locations that induce our variational posterior distribution are now
 # part of the model's parameters. Using a gradient-based optimiser, we can then
 # _optimise_ their location such that the evidence lower bound is maximised.

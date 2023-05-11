@@ -112,8 +112,8 @@ class Prior(AbstractPrior):
     r"""A Gaussian process prior object.
 
     The GP is parameterised by a
-    [mean](https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.mean_functions)
-    and [kernel](https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.kernels)
+    [mean](https://docs.jaxgaussianprocesses.com/api/mean_functions/)
+    and [kernel](https://docs.jaxgaussianprocesses.com/api/kernels/base/)
     function.
 
     A Gaussian process prior parameterised by a mean function $`m(\cdot)`$ and a kernel

@@ -120,9 +120,9 @@ plt.show()
 # We'll now independently learn Gaussian process posterior distributions for each
 # dataset. We won't spend any time here discussing how GP hyperparameters are
 # optimised. For advice on achieving this, see the
-# [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)
+# [Regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/)
 # for advice on optimisation and the
-# [Kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html) for
+# [Kernels notebook](https://docs.jaxgaussianprocesses.com/examples/kernels/) for
 # advice on selecting an appropriate kernel.
 
 

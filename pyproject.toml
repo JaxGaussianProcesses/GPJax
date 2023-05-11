@@ -10,7 +10,7 @@ repository = "https://github.com/JaxGaussianProcesses/GPJax"
 include = [
     "LICENSE",
 ]
-documentation = "https://gpjax.readthedocs.io/en/latest/"
+documentation = "https://docs.jaxgaussianprocesses.com/"
 keywords = ["gaussian-processes jax machine-learning bayesian"]
 packages = [{include = "gpjax"}]
 

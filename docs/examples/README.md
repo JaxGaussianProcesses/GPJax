@@ -1,7 +1,7 @@
 # Where to find the docs
 
 The GPJax documentation can be found here:
-https://gpjax.readthedocs.io/en/latest/
+https://docs.jaxgaussianprocesses.com/
 
 # How to build the docs
 
@@ -30,7 +30,7 @@ highly desirable.
 We are making an active effort within GPJax to improve our documentation. If you
 spot any areas where there is missing information within the existing
 documentation, then please either raise an issue or
-[create a pull request](https://gpjax.readthedocs.io/en/latest/contributing.html).
+[create a pull request](https://docs.jaxgaussianprocesses.com/contributing/).
 
 ## An example docstring
 
@@ -47,11 +47,11 @@ from gpjax.kernels import AbstractKernel
 from typing import Optional
 
 class Prior(AbstractPrior):
-    """A Gaussian process prior object.
+    r"""A Gaussian process prior object.
 
     The GP is parameterised by a
-    `mean <https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.mean_functions>`_
-    and `kernel <https://gpjax.readthedocs.io/en/latest/api.html#module-gpjax.kernels>`_ function.
+    [mean](https://docs.jaxgaussianprocesses.com/api/mean_functions/)
+    and [kernel](https://docs.jaxgaussianprocesses.com/api/kernels/base/) function.
 
     A Gaussian process prior parameterised by a mean function :math:`m(\\cdot)` and a kernel
     function :math:`k(\\cdot, \\cdot)` is given by

@@ -62,7 +62,7 @@ cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 # * White noise
 # * Linear.
 # * Polynomial.
-# * [Graph kernels](https://gpjax.readthedocs.io/en/latest/nbs/graph_kernels.html).
+# * [Graph kernels](https://docs.jaxgaussianprocesses.com/examples/graph_kernels/).
 #
 # While the syntax is consistent, each kernel's type influences the
 # characteristics of the sample paths drawn. We visualise this below with 10
@@ -247,7 +247,7 @@ class Polar(gpx.kernels.AbstractKernel):
 #
 # We proceed to fit a GP with our custom circular kernel to a random sequence of
 # points on a circle (see the
-# [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)
+# [Regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/)
 # for further details on this process).
 
 # %%

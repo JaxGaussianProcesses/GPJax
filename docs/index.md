@@ -40,7 +40,7 @@ would write on paper, as shown below.
 
 !!! Install
 
-    GPJax can be installed via pip. See our [installation guide](https://gpjax.readthedocs.io/en/latest/installation.html) for further details.
+    GPJax can be installed via pip. See our [installation guide](https://docs.jaxgaussianprocesses.com/installation/) for further details.
 
     ```bash
     pip install gpjax
@@ -48,12 +48,12 @@ would write on paper, as shown below.
 
 !!! New
 
-    New to GPs? Then why not check out our [introductory notebook](https://gpjax.readthedocs.io/en/latest/examples/intro_to_gps.html) that starts from Bayes' theorem and univariate Gaussian distributions.
+    New to GPs? Then why not check out our [introductory notebook](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/) that starts from Bayes' theorem and univariate Gaussian distributions.
 
 !!! Begin
 
     Looking for a good place to start? Then why not begin with our [regression
-    notebook](https://gpjax.readthedocs.io/en/latest/examples/regression.html).
+    notebook](https://docs.jaxgaussianprocesses.com/examples/regression/).
 
 ## Citing GPJax
 

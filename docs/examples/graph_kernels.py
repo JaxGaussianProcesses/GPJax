@@ -5,7 +5,7 @@
 # of a graph using a Gaussian process with a Matérn kernel presented in
 # <strong data-cite="borovitskiy2021matern"></strong>. For a general discussion of the
 # kernels supported within GPJax, see the
-# [kernels notebook](https://gpjax.readthedocs.io/en/latest/nbs/kernels.html).
+# [kernels notebook](https://docs.jaxgaussianprocesses.com/examples/kernels).
 
 # %%
 # Enable Float64 for more stable matrix inversions.
@@ -129,7 +129,7 @@ cbar = plt.colorbar(sm)
 # non-Euclidean, our likelihood is still Gaussian and the model is still conjugate.
 # For this reason, we simply perform gradient descent on the GP's marginal
 # log-likelihood term as in the
-# [regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html).
+# [regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/).
 # We do this using the Adam optimiser provided in `optax`.
 
 # %%

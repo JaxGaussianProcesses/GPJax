@@ -46,7 +46,7 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 # covariates and a single positive, real valued response variable. There are 308
 # observations in the dataset, so we can comfortably use a conjugate regression
 # Gaussian process here (for more more details, checkout the
-# [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)).
+# [Regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/)).
 
 # %%
 try:
@@ -130,9 +130,9 @@ scaled_Xte = x_scaler.transform(Xte)
 # With data now loaded and preprocessed, we'll proceed to defining a Gaussian process
 # model and optimising its parameters. This notebook purposefully does not go into
 # great detail on this process, so please see notebooks such as the
-# [Regression notebook](https://gpjax.readthedocs.io/en/latest/nbs/regression.html)
+# [Regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/)
 # and
-# [Classification notebook](https://gpjax.readthedocs.io/en/latest/nbs/classification.html)
+# [Classification notebook](https://docs.jaxgaussianprocesses.com/examples/classification)
 # for further information.
 #
 # ### Model specification
