@@ -43,9 +43,7 @@ jobs:
           npm install katex
 
       - name: Install LaTex
-        run: |
-          sudo apt-get install texlive-fonts-recommended texlive-fonts-extra
-          sudo apt-get install dvipng
+        run: sudo apt-get install texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra dvipng cm-super
 
       # Install Poetry and build the documentation
       - name: Install and configure Poetry
