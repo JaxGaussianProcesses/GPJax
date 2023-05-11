@@ -12,7 +12,7 @@ nav:
     - 🛠️ Installation: installation.md
     - 🎨 Design principles: design.md
     - 🤝 Contributing: contributing.md
-    - 🔪 Sharp bits: sharp_bits.md
+    # - 🔪 Sharp bits: sharp_bits.md
     - 🌳 GPJax PyTrees: examples/pytrees.md
     - 📎 JAX 101 [External]: https://jax.readthedocs.io/en/latest/jax-101/index.html
   - 💡 Background:
