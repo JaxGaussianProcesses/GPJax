@@ -75,9 +75,6 @@ markdown_extensions:
 
 plugins:
   - search
-  - analytics:
-      provider: google
-      property: G-L15440C0N0
   - gen-files:
       scripts:
         - docs/scripts/gen_pages.py  # or any other name or path
@@ -119,6 +116,11 @@ plugins:
       fallback_to_empty: false
       sort_authors_by: contribution
       enabled: true
+
+extra:
+  analytics:
+    provider: google
+    property: G-L15440C0N0
 
 extra_css:
   - stylesheets/extra.css

@@ -207,9 +207,9 @@ for a, t, d in zip([ax0, ax1, ax2], titles, dists):
 # variables, we can obtain the mean and covariance by
 # $$
 # \begin{align}
-#    \mathbb{E}[\mathbf{y}] = \mathbf{\mu}, \quad \operatorname{Cov}(\mathbf{y}) & = \mathbf{E}\left[(\mathbf{y} - \mathbf{\mu)(\mathbf{y} - \mathbf{\mu)^{\top} \right]\\
-#       & =\mathbf{E}[\mathbf{y}\mathbf{y}^{\top}] - \mathbf{E}[\mathbf{y}]\mathbf{E}[\mathbf{y}]^{\top} \\
-#       & =\boldsymbol{\Sigma}\,.
+#    \mathbb{E}[\mathbf{y}] = \mathbf{\mu}, \quad \operatorname{Cov}(\mathbf{y}) & = \mathbf{E}\left[(\mathbf{y} - \mathbf{\mu)}(\mathbf{y} - \mathbf{\mu)}^{\top} \right]\\
+#       & =\mathbb{E}[\mathbf{y}\mathbf{y}^{\top}] - \mathbb{E}[\mathbf{y}]\mathbb{E}[\mathbf{y}]^{\top} \\
+#       & =\mathbf{\Sigma}\,.
 # \end{align}
 # $$
 # The covariance matrix is a symmetric positive definite matrix that generalises
