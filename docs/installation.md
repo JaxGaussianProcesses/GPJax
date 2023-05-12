@@ -14,25 +14,12 @@ pip install gpjax
     python -c 'import gpjax; print(gpjax.__version__)'
     ```
 
-## GPU support
+## GPU/TPU support
 
-GPU support is enabled through proper configuration of the underlying
-[Jax](https://github.com/google/jax) installation. CPU enabled forms of
-both packages are installed as part of the `GPJax` installation. For GPU
-Jax support, the following commands should be run:
+Fancy using GPJax on GPU/TPU? Then you'll need to install JAX with the relevant 
+hardware acceleration support as detailed in the 
+[JAX installation guide](https://github.com/google/jax#installation).
 
-```bash
-# Specify your installed CUDA version.
-CUDA_VERSION=11.0
-pip install jaxlib
-```
-
-Then, within a Python shell run
-
-```python
-import jaxlib
-print(jaxlib.__version__)
-```
 
 ## Development version
 
