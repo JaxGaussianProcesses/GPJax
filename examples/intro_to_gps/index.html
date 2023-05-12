@@ -52,6 +52,18 @@
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
+  
+
+
+  
+  
+
+
+  <script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config","G-L15440C0N0"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document$.subscribe(function(){var a=document.forms.feedback;if(void 0!==a)for(var e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}),location$.subscribe(function(e){n("config","G-L15440C0N0",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=G-L15440C0N0",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
+
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
 
     
     
@@ -2723,7 +2735,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=07a3bf3a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=e5fb1d9a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2818,7 +2830,7 @@ We can plot three different parameterisations of this density.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=354cdce5" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=2a66198e" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2930,7 +2942,7 @@ ax.legend(loc="best")</div>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.legend.Legend at 0x7f783cf7d5b0&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7f7a34030550&gt;</pre>
 </div>
 
 </div>
@@ -2956,7 +2968,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=4720d80d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=13a7afcb" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2990,7 +3002,7 @@ determines the correlation of the multivariate Gaussian.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=3f3e29f5" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=ef69022c" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3136,7 +3148,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=6281041f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=c186068f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3146,9 +3158,9 @@ class="
 variables, we can obtain the mean and covariance by
 $$
 \begin{align}
-   \mathbb{E}[\mathbf{y}] = \mathbf{\mu}, \quad \operatorname{Cov}(\mathbf{y}) &amp; = \mathbf{E}\left[(\mathbf{y} - \mathbf{\mu)(\mathbf{y} - \mathbf{\mu)^{\top} \right]\\
-      &amp; =\mathbf{E}[\mathbf{y}\mathbf{y}^{\top}] - \mathbf{E}[\mathbf{y}]\mathbf{E}[\mathbf{y}]^{\top} \\
-      &amp; =\boldsymbol{\Sigma}\,.
+   \mathbb{E}[\mathbf{y}] = \mathbf{\mu}, \quad \operatorname{Cov}(\mathbf{y}) &amp; = \mathbf{E}\left[(\mathbf{y} - \mathbf{\mu)}(\mathbf{y} - \mathbf{\mu)}^{\top} \right]\\
+      &amp; =\mathbb{E}[\mathbf{y}\mathbf{y}^{\top}] - \mathbb{E}[\mathbf{y}]\mathbb{E}[\mathbf{y}]^{\top} \\
+      &amp; =\mathbf{\Sigma}\,.
 \end{align}
 $$
 The covariance matrix is a symmetric positive definite matrix that generalises
@@ -3179,7 +3191,7 @@ $p(\mathbf{y})$, occurring at the same time. We visualise this idea below.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=f9f29cfe" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=e9bba7e9" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3380,7 +3392,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=46859507" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=70929d68" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3575,7 +3587,7 @@ GPs that served as the inspiration for this notebook.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=70a7fdfe" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=5152bbbd" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3621,17 +3633,17 @@ GPs that served as the inspiration for this notebook.</p>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>Author: Thomas Pinder
 
-Last updated: Thu May 11 2023
+Last updated: Fri May 12 2023
 
 Python implementation: CPython
 Python version       : 3.8.16
 IPython version      : 8.12.2
 
+jax                   : 0.4.9
+matplotlib            : 3.7.1
 seaborn               : 0.12.2
 tensorflow_probability: 0.19.0
 pandas                : 1.5.3
-jax                   : 0.4.9
-matplotlib            : 3.7.1
 
 Watermark: 2.3.1
 
@@ -3649,6 +3661,8 @@ Watermark: 2.3.1
 
 
 
+
+  
 
 
 
