@@ -75,6 +75,9 @@ markdown_extensions:
 
 plugins:
   - search
+  - analytics:
+      provider: google
+      property: G-L15440C0N0
   - gen-files:
       scripts:
         - docs/scripts/gen_pages.py  # or any other name or path
