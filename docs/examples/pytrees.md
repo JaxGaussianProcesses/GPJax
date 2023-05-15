@@ -322,8 +322,7 @@ RBF(lengthscale=Array(3.14, dtype=float32), variance=Array(1., dtype=float32))
 ## Trainability 🚂
 
 Recall the example earlier, where we wanted to take the gradient of the kernel
-with respect to its parameters $`\nabla_{\ell, \sigma^2} k(1.0, 2.0; \ell,
-\sigma^2)`$ at inputs $`x=1.0`$ and $`y=2.0`$. We can now confirm we can do this
+with respect to its parameters $`\nabla_{\ell, \sigma^2} k(1.0, 2.0; \ell,\sigma^2)`$ at inputs $`x=1.0`$ and $`y=2.0`$. We can now confirm we can do this
 with the new `Module`.
 
 ```python
