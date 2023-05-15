@@ -62,8 +62,7 @@ markdown_extensions:
       check_paths: true
   - pymdownx.tabbed
   - toc:
-      permalink: true
-  - toc:
+      permalink: ''
       toc_depth: 4
   - footnotes
   # - pymdownx.arithmatex:
@@ -124,6 +123,7 @@ extra:
 
 extra_css:
   - stylesheets/extra.css
+  - stylesheets/permalinks.css
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css
 
 extra_javascript:
