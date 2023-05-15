@@ -26,7 +26,7 @@ from beartype.typing import (
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 
-def param_field(
+def param_field(  # noqa: PLR0913
     default: Any = dataclasses.MISSING,
     *,
     bijector: Optional[tfb.Bijector] = None,

@@ -37,7 +37,7 @@ from gpjax.typing import (
 )
 
 
-def fit(
+def fit(  # noqa: PLR0913
     *,
     model: Module,
     objective: Union[AbstractObjective, Callable[[Module, Dataset], ScalarFloat]],

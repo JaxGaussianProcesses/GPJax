@@ -51,7 +51,7 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 Self = TypeVar("Self")
 
 
-def static_field(
+def static_field(  # noqa: PLR0913
     default: Any = dataclasses.MISSING,
     *,
     default_factory: Any = dataclasses.MISSING,
