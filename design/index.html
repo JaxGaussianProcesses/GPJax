@@ -47,6 +47,8 @@
     
       <link rel="stylesheet" href="../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="../stylesheets/permalinks.css">
+    
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
     
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
@@ -1677,12 +1679,12 @@
       height: inherit;
     }
 </style>
-<h1 id="design-principles">Design Principles</h1>
+<h1 id="design-principles">Design Principles<a class="headerlink" href="#design-principles" title="Permanent link"></a></h1>
 <p><code>GPJax</code> is designed to be a Gaussian process package that provides an accurate
 representation of the underlying maths. Variable names are chosen to closely
 match the notation in (Rasmussen and Williams, 2006)<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>. We here list the notation used
 in <code>GPJax</code> with its corresponding mathematical quantity.</p>
-<h2 id="gaussian-process-notation">Gaussian process notation</h2>
+<h2 id="gaussian-process-notation">Gaussian process notation<a class="headerlink" href="#gaussian-process-notation" title="Permanent link"></a></h2>
 <table>
 <thead>
 <tr>
@@ -1744,7 +1746,7 @@ in <code>GPJax</code> with its corresponding mathematical quantity.</p>
 </tr>
 </tbody>
 </table>
-<h2 id="sparse-gaussian-process-notation">Sparse Gaussian process notation</h2>
+<h2 id="sparse-gaussian-process-notation">Sparse Gaussian process notation<a class="headerlink" href="#sparse-gaussian-process-notation" title="Permanent link"></a></h2>
 <table>
 <thead>
 <tr>
@@ -1771,7 +1773,7 @@ in <code>GPJax</code> with its corresponding mathematical quantity.</p>
 </tr>
 </tbody>
 </table>
-<h2 id="package-style">Package style</h2>
+<h2 id="package-style">Package style<a class="headerlink" href="#package-style" title="Permanent link"></a></h2>
 <p>Prior to building GPJax, the developers of GPJax have benefited greatly from the
 <a href="https://github.com/GPflow/GPflow">GPFlow</a> and
 <a href="https://github.com/cornellius-gp/gpytorch">GPyTorch</a> packages. As such, many of

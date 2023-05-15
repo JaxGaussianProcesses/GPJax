@@ -47,6 +47,8 @@
     
       <link rel="stylesheet" href="../../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="../../stylesheets/permalinks.css">
+    
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
     
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
@@ -1636,7 +1638,7 @@
                   
 
 
-<h1 id="gps">GPs</h1>
+<h1 id="gps">GPs<a class="headerlink" href="#gps" title="Permanent link"></a></h1>
 
 
 <div class="doc doc-object doc-module">
@@ -1829,7 +1831,7 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.gps.AbstractPrior.__call__--returns">Returns</h6>
+      <h6 id="gpjax.gps.AbstractPrior.__call__--returns">Returns<a class="headerlink" href="#gpjax.gps.AbstractPrior.__call__--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
     of the Gaussian process.
 </code></pre></div>
@@ -1892,7 +1894,7 @@ this method must be implemented.</p>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.gps.AbstractPrior.predict--returns">Returns</h6>
+      <h6 id="gpjax.gps.AbstractPrior.predict--returns">Returns<a class="headerlink" href="#gpjax.gps.AbstractPrior.predict--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
     of the Gaussian process.
 </code></pre></div>
@@ -2047,7 +2049,7 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.gps.Prior.__mul__--returns">Returns</h6>
+      <h6 id="gpjax.gps.Prior.__mul__--returns">Returns<a class="headerlink" href="#gpjax.gps.Prior.__mul__--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Posterior: The relevant GP posterior for the given prior and
     likelihood. Special cases are accounted for where the model
     is conjugate.
@@ -2097,7 +2099,7 @@ dataset.</p></td>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.gps.Prior.__rmul__--returns">Returns</h6>
+      <h6 id="gpjax.gps.Prior.__rmul__--returns">Returns<a class="headerlink" href="#gpjax.gps.Prior.__rmul__--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Posterior: The relevant GP posterior for the given prior and
     likelihood. Special cases are accounted for where the model
     is conjugate.
@@ -2159,7 +2161,7 @@ prior distribution.</p></td>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.gps.Prior.predict--returns">Returns</h6>
+      <h6 id="gpjax.gps.Prior.predict--returns">Returns<a class="headerlink" href="#gpjax.gps.Prior.predict--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
     of the Gaussian process.
 </code></pre></div>
@@ -2271,7 +2273,7 @@ kernel.</p></td>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.gps.Prior.sample_approx--returns">Returns</h6>
+      <h6 id="gpjax.gps.Prior.sample_approx--returns">Returns<a class="headerlink" href="#gpjax.gps.Prior.sample_approx--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>FunctionalSample: A function representing an approximate sample from the
     Gaussian process prior.
 </code></pre></div>
@@ -2438,7 +2440,7 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.gps.AbstractPosterior.__call__--returns">Returns</h6>
+      <h6 id="gpjax.gps.AbstractPosterior.__call__--returns">Returns<a class="headerlink" href="#gpjax.gps.AbstractPosterior.__call__--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
     of the Gaussian process.
 </code></pre></div>
@@ -2500,7 +2502,7 @@ this method must be implemented.</p>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.gps.AbstractPosterior.predict--returns">Returns</h6>
+      <h6 id="gpjax.gps.AbstractPosterior.predict--returns">Returns<a class="headerlink" href="#gpjax.gps.AbstractPosterior.predict--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
     of the Gaussian process.
 </code></pre></div>
@@ -2686,7 +2688,7 @@ output data used for training dataset.</p></td>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.gps.ConjugatePosterior.predict--returns">Returns</h6>
+      <h6 id="gpjax.gps.ConjugatePosterior.predict--returns">Returns<a class="headerlink" href="#gpjax.gps.ConjugatePosterior.predict--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>GaussianDistribution: A
     function that accepts an input array and returns the predictive
         distribution as a `GaussianDistribution`.
@@ -2790,7 +2792,7 @@ kernel.</p></td>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.gps.ConjugatePosterior.sample_approx--returns">Returns</h6>
+      <h6 id="gpjax.gps.ConjugatePosterior.sample_approx--returns">Returns<a class="headerlink" href="#gpjax.gps.ConjugatePosterior.sample_approx--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>FunctionalSample: A function representing an approximate sample from the Gaussian
 process prior.
 </code></pre></div>
@@ -2951,7 +2953,7 @@ and output data used for training dataset.</p></td>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.gps.NonConjugatePosterior.predict--returns">Returns</h6>
+      <h6 id="gpjax.gps.NonConjugatePosterior.predict--returns">Returns<a class="headerlink" href="#gpjax.gps.NonConjugatePosterior.predict--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>GaussianDistribution: A function that accepts an
     input array and returns the predictive distribution as
     a `dx.Distribution`.
@@ -3020,7 +3022,7 @@ beliefs around the distribution of the data.</p></td>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.gps.construct_posterior--returns">Returns</h6>
+      <h6 id="gpjax.gps.construct_posterior--returns">Returns<a class="headerlink" href="#gpjax.gps.construct_posterior--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>AbstractPosterior: A posterior distribution. If the likelihood is
     Gaussian, then a `ConjugatePosterior` will be returned. Otherwise,
     a `NonConjugatePosterior` will be returned.

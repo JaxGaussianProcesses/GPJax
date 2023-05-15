@@ -47,6 +47,8 @@
     
       <link rel="stylesheet" href="../../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="../../stylesheets/permalinks.css">
+    
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
     
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
@@ -1603,7 +1605,7 @@
       height: inherit;
     }
 </style>
-<h1 id="gpjax-module">🌳 GPJax Module</h1>
+<h1 id="gpjax-module">🌳 GPJax Module<a class="headerlink" href="#gpjax-module" title="Permanent link"></a></h1>
 <p><code>GPJax</code> <strong>represents all objects as JAX
 <a href="https://jax.readthedocs.io/en/latest/pytrees.html"><em>PyTrees</em></a></strong>, giving</p>
 <ul>
@@ -1614,7 +1616,7 @@
 </ul>
 <p>We achieve this through providing a base <code>Module</code> abstraction to cleanly
 handles parameter trainability and optimising transformations for JAX models.</p>
-<h1 id="gaussian-process-objects-as-data">Gaussian process objects as data</h1>
+<h1 id="gaussian-process-objects-as-data">Gaussian process objects as data<a class="headerlink" href="#gaussian-process-objects-as-data" title="Permanent link"></a></h1>
 <p>Our abstraction is inspired by the <a href="https://github.com/patrick-kidger/equinox">Equinox</a> library and aims to offer a
 Bayesian/Gaussian process extension to their neural network abstractions. Our
 approach enables users to easily create Python classes and
@@ -1626,7 +1628,7 @@ structure, where every method is a function of the state (represented by the
 tree's leaves).</p>
 <p>To help you understand how to create custom objects in GPJax, we will look at
 a simple example in the following section.</p>
-<h2 id="the-rbf-kernel">The RBF kernel</h2>
+<h2 id="the-rbf-kernel">The RBF kernel<a class="headerlink" href="#the-rbf-kernel" title="Permanent link"></a></h2>
 <p>The kernel in a Gaussian process model is a mathematical function that
 defines the covariance structure between data points, allowing us to model
 complex relationships and make predictions based on the observed data. The
@@ -1683,7 +1685,7 @@ the kernel with respect to its parameters $<code>\nabla_{\ell, \sigma^2} k(1.0, 
 <p>This issues arises as the object we have defined is not yet
 compatible with JAX. To achieve this we must consider <a href="https://jax.readthedocs.io/en/latest/pytrees.html">JAX's <em>PyTree</em></a>
 abstraction.</p>
-<h2 id="pytrees">PyTree’s</h2>
+<h2 id="pytrees">PyTree’s<a class="headerlink" href="#pytrees" title="Permanent link"></a></h2>
 <p>JAX PyTrees are a powerful tool in the JAX library that enable users to work
 with complex data structures in a way that is efficient, flexible, and easy to
 use. A PyTree is a data structure that is composed of other data
@@ -1756,7 +1758,7 @@ values of such traversed recursively (i.e., as a tree!). This means we can
 define our own custom data structures and use them as PyTrees. This is the
 functionality that we exploit, whereby we construct all Gaussian process
 models via a tree-structure through our <code>Module</code> object.</p>
-<h1 id="module">Module</h1>
+<h1 id="module">Module<a class="headerlink" href="#module" title="Permanent link"></a></h1>
 <p>Our design, first and foremost, minimises additional abstractions on top of
 standard JAX: everything is just PyTrees and transformations on PyTrees, and
 secondly, provides full compatibility with the main JAX library itself,
@@ -1791,7 +1793,7 @@ following:</p>
 </code></pre></div>
 <p>By default unmarked leaf attributes default to an <code>Identity</code> bijector and
 trainablility set to <code>True</code>.</p>
-<h3 id="replacing-values">Replacing values</h3>
+<h3 id="replacing-values">Replacing values<a class="headerlink" href="#replacing-values" title="Permanent link"></a></h3>
 <p>For consistency with JAX’s functional programming principles, <code>Module</code>
 instances are immutable. PyTree nodes can be changed out-of-place via the
 <code>replace</code> method.</p>
@@ -1801,7 +1803,7 @@ instances are immutable. PyTree nodes can be changed out-of-place via the
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="go">RBF(lengthscale=3.14, variance=1.0)</span>
 </code></pre></div></p>
-<h2 id="transformations">Transformations 🤖</h2>
+<h2 id="transformations">Transformations 🤖<a class="headerlink" href="#transformations" title="Permanent link"></a></h2>
 <p>Use <code>constrain</code> / <code>unconstrain</code> to return a <code>Module</code> with each parameter's
 bijector <code>forward</code> / <code>inverse</code> operation applied!</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Transform kernel to unconstrained space</span>
@@ -1830,9 +1832,9 @@ bijector <code>forward</code> / <code>inverse</code> operation applied!</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="go">RBF(lengthscale=Array(3.14, dtype=float32), variance=Array(0.54132485, dtype=float32))</span>
 <a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="go">RBF(lengthscale=Array(3.14, dtype=float32), variance=Array(1., dtype=float32))</span>
 </code></pre></div></p>
-<h2 id="trainability">Trainability 🚂</h2>
+<h2 id="trainability">Trainability 🚂<a class="headerlink" href="#trainability" title="Permanent link"></a></h2>
 <p>Recall the example earlier, where we wanted to take the gradient of the kernel
-with repsect to its parameters $<code>\nabla_{\ell, \sigma^2} k(1.0, 2.0; \ell,
+with respect to its parameters $<code>\nabla_{\ell, \sigma^2} k(1.0, 2.0; \ell,
 \sigma^2)</code>$ at inputs <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">x=1.0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1.0</span></span></span></span> and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mn>2.0</mn></mrow><annotation encoding="application/x-tex">y=2.0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2.0</span></span></span></span>. We can now confirm we can do this
 with the new <code>Module</code>.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">kernel</span> <span class="o">=</span> <span class="n">RBF</span><span class="p">()</span>
@@ -1871,7 +1873,7 @@ flows on our <code>Module</code> class, via a <code>stop_gradient</code> method.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="go">RBF(lengthscale=Array(0., dtype=float32, weak_type=True), variance=Array(0.60653067, dtype=float32, weak_type=True))</span>
 </code></pre></div></p>
 <p>As expected, the gradient is zero for the lengthscale parameter.</p>
-<h2 id="static-fields">Static fields</h2>
+<h2 id="static-fields">Static fields<a class="headerlink" href="#static-fields" title="Permanent link"></a></h2>
 <p>In machine learning, initialising model parameters from random points is a
 common practice because it helps to break the symmetry in the model and allows
 the optimization algorithm to explore different regions of the parameter
@@ -1963,7 +1965,7 @@ both cases:</p>
 </code></pre></div></p>
 <p>We see that assigning <code>static_field</code> tells JAX not to regard the attribute as
 leaf of the PyTree.</p>
-<h2 id="metadata">Metadata</h2>
+<h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link"></a></h2>
 <p>To determine the parameter domain and trainable statuses of each parameter,
 the <code>Module</code> stores metadata for each leaf of the PyTree. This metadata is
 defined through a <code>dataclasses.field</code>. Thus, under the hood, we can define our
@@ -2025,7 +2027,7 @@ PyTree. However, instead of just the values, it returns a list of tuples that
 contain both the metadata and value of each PyTree leaf. This traced metadata
 can be utilised for applying maps (how <code>constrain</code>, <code>unconstrain</code>,
 <code>stop_gradient</code> work), as described in the next section.</p>
-<h2 id="metamap">Metamap</h2>
+<h2 id="metamap">Metamap<a class="headerlink" href="#metamap" title="Permanent link"></a></h2>
 <p>The <code>constrain</code>, <code>unconstrain</code>, and <code>stop_gradient</code> methods on the <code>Module</code>
 use a <code>meta_map</code> function under the hood. This function enables us to apply
 metadata functions to the PyTree leaves, making it a powerful tool.</p>
@@ -2033,7 +2035,7 @@ metadata functions to the PyTree leaves, making it a powerful tool.</p>
 create a flattened list of tuples consisting of (metadata, leaf value).
 However, it also allows us to apply a function to this list and return a new
 transformed PyTree, as demonstrated in the examples that follow.</p>
-<h3 id="filter-example">Filter example:</h3>
+<h3 id="filter-example">Filter example:<a class="headerlink" href="#filter-example" title="Permanent link"></a></h3>
 <p>A <code>meta_map</code> works similarly to <code>jax.tree_utils.tree_map</code>. However, it differs in that it allows us to define a function that operates on
 the tuple (metadata, leaf value). For example, we could use a function to
 filter based on a <code>name</code> attribute.</p>
@@ -2052,7 +2054,7 @@ filter based on a <code>name</code> attribute.</p>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="go">RBF(lengthscale=3.14, variance=1.0)</span>
 </code></pre></div></p>
-<h3 id="how-constrain-works">How <code>constrain</code> works:</h3>
+<h3 id="how-constrain-works">How <code>constrain</code> works:<a class="headerlink" href="#how-constrain-works" title="Permanent link"></a></h3>
 <p>To apply a constrain, we filter on the attribute "bijector", and apply a
 forward transformation to the PyTree leaf:</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="c1"># This is how constrain works! ⛏</span>

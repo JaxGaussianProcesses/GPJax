@@ -47,6 +47,8 @@
     
       <link rel="stylesheet" href="../../../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="../../../stylesheets/permalinks.css">
+    
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
     
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
@@ -1638,7 +1640,7 @@
                   
 
 
-<h1 id="linear-operator">Linear Operator</h1>
+<h1 id="linear-operator">Linear Operator<a class="headerlink" href="#linear-operator" title="Permanent link"></a></h1>
 
 
 <div class="doc doc-object doc-module">
@@ -2083,7 +2085,7 @@
   <div class="doc doc-contents ">
   
       <p>Diagonal of the linear operator.</p>
-<h6 id="gpjax.linops.linear_operator.LinearOperator.diagonal--returns">Returns</h6>
+<h6 id="gpjax.linops.linear_operator.LinearOperator.diagonal--returns">Returns<a class="headerlink" href="#gpjax.linops.linear_operator.LinearOperator.diagonal--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Float[Array, &quot; N&quot;]: Diagonal of the linear operator.
 </code></pre></div>
 
@@ -2104,7 +2106,7 @@
   <div class="doc doc-contents ">
   
       <p>Trace of the linear matrix.</p>
-<h6 id="gpjax.linops.linear_operator.LinearOperator.trace--returns">Returns</h6>
+<h6 id="gpjax.linops.linear_operator.LinearOperator.trace--returns">Returns<a class="headerlink" href="#gpjax.linops.linear_operator.LinearOperator.trace--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>ScalarFloat: Trace of the linear matrix.
 </code></pre></div>
 
@@ -2125,7 +2127,7 @@
   <div class="doc doc-contents ">
   
       <p>Log determinant of the linear matrix. Default implementation uses dense Cholesky decomposition.</p>
-<h6 id="gpjax.linops.linear_operator.LinearOperator.log_det--returns">Returns</h6>
+<h6 id="gpjax.linops.linear_operator.LinearOperator.log_det--returns">Returns<a class="headerlink" href="#gpjax.linops.linear_operator.LinearOperator.log_det--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>ScalarFloat: Log determinant of the linear matrix.
 </code></pre></div>
 
@@ -2146,7 +2148,7 @@
   <div class="doc doc-contents ">
   
       <p>Compute the root of the linear operator via the Cholesky decomposition.</p>
-<h6 id="gpjax.linops.linear_operator.LinearOperator.to_root--returns">Returns</h6>
+<h6 id="gpjax.linops.linear_operator.LinearOperator.to_root--returns">Returns<a class="headerlink" href="#gpjax.linops.linear_operator.LinearOperator.to_root--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Float[Array, &quot;N N&quot;]: Lower Cholesky decomposition of the linear operator.
 </code></pre></div>
 
@@ -2167,7 +2169,7 @@
   <div class="doc doc-contents ">
   
       <p>Inverse of the linear matrix. Default implementation uses dense Cholesky decomposition.</p>
-<h6 id="gpjax.linops.linear_operator.LinearOperator.inverse--returns">Returns</h6>
+<h6 id="gpjax.linops.linear_operator.LinearOperator.inverse--returns">Returns<a class="headerlink" href="#gpjax.linops.linear_operator.LinearOperator.inverse--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>LinearOperator: Inverse of the linear matrix.
 </code></pre></div>
 
@@ -2212,7 +2214,7 @@
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.linops.linear_operator.LinearOperator.solve--returns">Returns</h6>
+      <h6 id="gpjax.linops.linear_operator.LinearOperator.solve--returns">Returns<a class="headerlink" href="#gpjax.linops.linear_operator.LinearOperator.solve--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Float[Array, &quot;N M&quot;]: Solution of the linear system.
 </code></pre></div>
 
@@ -2237,7 +2239,7 @@
   <div class="doc doc-contents ">
   
       <p>Construct dense matrix from the linear operator.</p>
-<h6 id="gpjax.linops.linear_operator.LinearOperator.to_dense--returns">Returns</h6>
+<h6 id="gpjax.linops.linear_operator.LinearOperator.to_dense--returns">Returns<a class="headerlink" href="#gpjax.linops.linear_operator.LinearOperator.to_dense--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Float[Array, &quot;N N&quot;]: Dense linear matrix.
 </code></pre></div>
 
@@ -2286,7 +2288,7 @@
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.linops.linear_operator.LinearOperator.from_dense--returns">Returns</h6>
+      <h6 id="gpjax.linops.linear_operator.LinearOperator.from_dense--returns">Returns<a class="headerlink" href="#gpjax.linops.linear_operator.LinearOperator.from_dense--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>LinearOperator: Linear operator.
 </code></pre></div>
 
