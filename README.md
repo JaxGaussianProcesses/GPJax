@@ -167,14 +167,6 @@ pip install gpjax
 >
 > This version is possibly unstable and may contain bugs.
 
-Clone a copy of the repository to your local machine and run the setup
-configuration in development mode.
-```bash
-git clone https://github.com/JaxGaussianProcesses/GPJax.git
-cd GPJax
-poetry install
-```
-
 > **Note**
 >
 > We advise you create virtual environment before installing:
@@ -188,6 +180,14 @@ poetry install
 > ```python
 > poetry run pytest
 > ```
+
+Clone a copy of the repository to your local machine and run the setup
+configuration in development mode.
+```bash
+git clone https://github.com/JaxGaussianProcesses/GPJax.git
+cd GPJax
+poetry install
+```
 
 # Citing GPJax
 

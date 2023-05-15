@@ -16,8 +16,8 @@ pip install gpjax
 
 ## GPU/TPU support
 
-Fancy using GPJax on GPU/TPU? Then you'll need to install JAX with the relevant 
-hardware acceleration support as detailed in the 
+Fancy using GPJax on GPU/TPU? Then you'll need to install JAX with the relevant
+hardware acceleration support as detailed in the
 [JAX installation guide](https://github.com/google/jax#installation).
 
 

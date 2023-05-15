@@ -30,9 +30,7 @@ import jax
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import pytest
-from simple_pytree import (
-    Pytree,
-)
+from simple_pytree import Pytree
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base.module import (
