@@ -21,8 +21,8 @@ from dataclasses import (
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import pytest
-from gpjax.base import static_field
 
+from gpjax.base import static_field
 from gpjax.linops.linear_operator import LinearOperator
 
 

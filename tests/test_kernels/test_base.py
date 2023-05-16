@@ -13,7 +13,10 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass, field
+from dataclasses import (
+    dataclass,
+    field,
+)
 
 from jax.config import config
 import jax.numpy as jnp
@@ -55,7 +58,7 @@ def test_abstract_kernel():
     # Create a dummy kernel class with __call__ implemented:
     @dataclass
     class DummyKernel(AbstractKernel):
-        test_a: Float[Array, "1"] = field(default_factory = lambda: jnp.array([1.0]))
+        test_a: Float[Array, "1"] = field(default_factory=lambda: jnp.array([1.0]))
         test_b: Float[Array, "1"] = param_field(
             jnp.array([2.0]), bijector=tfb.Softplus()
         )

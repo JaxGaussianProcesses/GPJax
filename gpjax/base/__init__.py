@@ -20,8 +20,8 @@ from gpjax.base.module import (
     meta_flatten,
     meta_leaves,
     meta_map,
-    static_field,
     save_tree,
+    static_field,
 )
 from gpjax.base.param import param_field
 
