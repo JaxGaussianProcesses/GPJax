@@ -1,4 +1,6 @@
-# How can I contribute?
+# Contributing 
+
+## How can I contribute?
 
 GPJax welcomes contributions from interested individuals or groups. There are
 many ways to contribute, including:
@@ -15,13 +17,13 @@ many ways to contribute, including:
 - Extending or improving our [codebase](https://github.com/JaxGaussianProcesses/GPJax).
 
 
-# Code of conduct
+## Code of conduct
 
 As a contributor to GPJax, you can help us keep the community open and
 inclusive. Please read and follow our [Code of
 Conduct](https://github.com/JaxGaussianProcesses/GPJax/blob/master/.github/CODE_OF_CONDUCT.md).
 
-# Opening issues and getting support
+## Opening issues and getting support
 
 Please open issues on [Github Issue
 Tracker](https://github.com/JaxGaussianProcesses/GPJax/issues/new/choose). Here you can
@@ -30,7 +32,7 @@ mention
 You can ask a question or start a discussion in the [Discussion
 section](https://github.com/JaxGaussianProcesses/GPJax/discussions) on Github.
 
-# Contributing to the source code
+## Contributing to the source code
 
 Submitting code contributions to GPJax is done via a [GitHub pull
 request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests).
@@ -47,7 +49,7 @@ you through every detail!
     Before opening a pull request we recommend you check our [pull request checklist](#pull-request-checklist).
 
 
-## Step-by-step guide:
+### Step-by-step guide:
 
 1.  Click [here](https://github.com/JaxGaussianProcesses/GPJax/fork) to Fork GPJax's
   codebase (alternatively, click the 'Fork' button towards the top right of
@@ -114,7 +116,7 @@ you through every detail!
   request' button to send your changes to the project's maintainers for
   review.
 
-## Pull request checklist
+### Pull request checklist
 
 We welcome both complete or "work in progress" pull requests. Before opening
 one, we recommended you check the following guidelines to ensure a smooth review
