@@ -21,11 +21,6 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.jaxgaussianprocesses.com/give_me_the_code/</loc>
-         <lastmod>2023-05-16</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://docs.jaxgaussianprocesses.com/installation/</loc>
          <lastmod>2023-05-16</lastmod>
          <changefreq>daily</changefreq>
@@ -337,11 +332,6 @@
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/scripts/gen_pages/</loc>
-         <lastmod>2023-05-16</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://docs.jaxgaussianprocesses.com/scripts/notebook_converter/</loc>
          <lastmod>2023-05-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
