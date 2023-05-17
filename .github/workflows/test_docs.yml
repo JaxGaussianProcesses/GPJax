@@ -2,15 +2,15 @@ name: Test documentation
 
 on:
   pull_request:
-  push:
-    branches:
-      - main
 
 jobs:
   build:
     # Functionality for testing documentation builds on multiple OSes and Python versions
     name: Build docs (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    concurrency:
+      group: ${{ github.head_ref }}
+      cancel-in-progress: true
     defaults:
       run:
         shell: bash -l {0}

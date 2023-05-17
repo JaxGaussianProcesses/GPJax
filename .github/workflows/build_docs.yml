@@ -5,9 +5,12 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build:
-    # Functionality for testing documentation builds on multiple OSes and Python versions
+    concurrency: ci-${{ github.ref }}
     name: Build docs (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     defaults:
