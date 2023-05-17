@@ -98,18 +98,18 @@ $`\boldsymbol{x}`$. Here the marginal log-likelihood comprises the following for
 
     ```math
     \begin{align}
-        \log p(\boldsymbol{y}) = 0.5\left(-\boldsymbol{y}^{\top}\left(\bold{K}_{\boldsymbol{xx}} + \bold{\Sigma} \right)^{-1}\boldsymbol{y} -\log\lvert \bold{K}_{\boldsymbol{xx}} + \bold{\Sigma}\rvert \right) + \text{constant},
+        \log p(\boldsymbol{y}) = 0.5\left(-\boldsymbol{y}^{\top}\left(\mathbf{K}_{\boldsymbol{xx}} + \mathbf{\Sigma} \right)^{-1}\boldsymbol{y} -\log\lvert \mathbf{K}_{\boldsymbol{xx}} + \mathbf{\Sigma}\rvert \right) + \text{constant},
     \end{align}
     ```
 
 and the goal of inference is to maximise kernel hyperparameters (contained in the gram
-matrix $`\bold{K}_{\boldsymbol{xx}}`$) and likelihood hyperparameters (contained in the
-noise covariance $`\bold{\Sigma}`$). Computing the marginal log-likelihood (and its
+matrix $`\mathbf{K}_{\boldsymbol{xx}}`$) and likelihood hyperparameters (contained in the
+noise covariance $`\mathbf{\Sigma}`$). Computing the marginal log-likelihood (and its
 gradients), draws our attention to the term
 
     ```math
     \begin{align}
-        \underbrace{\left(\bold{K}_{\boldsymbol{xx}} - \sigma^2\boldsymbol{I} \right)^{-1}}_{\mathbf{A}}\boldsymbol{y},
+        \underbrace{\left(\mathbf{K}_{\boldsymbol{xx}} - \sigma^2\boldsymbol{I} \right)^{-1}}_{\mathbf{A}}\boldsymbol{y},
     \end{align}
     ```
 then we can see a solution can be obtained by solving the corresponding system of
