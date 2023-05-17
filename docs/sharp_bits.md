@@ -54,7 +54,7 @@ a constrained subset of the real-line. During gradient-based optimisation, as we
 approach the set's boundary, it becomes possible that we could step outside of the
 set's support and introduce a numerical and mathematical error into our model. For
 example, consider the variance parameter $`\sigma^2`$, which we know must be strictly
-positive. If at $t^{\\text{th}}$ iterate, our current estimate of $`\sigma^2`$ was
+positive. If at $`t^{\text{th}}`$ iterate, our current estimate of $`\sigma^2`$ was
 0.03 and our derivative informed us that $`\sigma^2`$ should decrease, then if our
 learning rate is greater is than 0.03, we would end up with a negative variance term.
 
@@ -82,9 +82,12 @@ have a range of tools at our disposal to make subsequent operations on the covar
 matrix faster. One of these tools is the Cholesky factorisation that uniquely decomposes
 any symmetric positive-definite matrix $`\mathbf{\Sigma}`$ by 
     
-    ```math 
+```math 
+\begin{align}
     \mathbf{\Sigma} = \mathbf{L}\mathbf{L}^{\top}
-    ```
+\end{align}
+```
+
 where $`\mathbf{L}`$ is a lower triangular matrix. 
 
 We make use of this result in GPJax when solving linear systems of equations of the
@@ -96,27 +99,28 @@ $`\boldsymbol{y} \sim \mathcal{N}(f(\boldsymbol{x}), \mathbf{\Sigma})`$ with $`f
 Gaussian process prior and gram matrix $`\mathbf{K}_{\boldsymbol{xx}}`$ at the inputs
 $`\boldsymbol{x}`$. Here the marginal log-likelihood comprises the following form
 
-    ```math
-    \begin{align}
-        \log p(\boldsymbol{y}) = 0.5\left(-\boldsymbol{y}^{\top}\left(\mathbf{K}_{\boldsymbol{xx}} + \mathbf{\Sigma} \right)^{-1}\boldsymbol{y} -\log\lvert \mathbf{K}_{\boldsymbol{xx}} + \mathbf{\Sigma}\rvert \right) + \text{constant},
-    \end{align}
-    ```
+```math
+\begin{align}
+    \log p(\boldsymbol{y}) = 0.5\left(-\boldsymbol{y}^{\top}\left(\mathbf{K}_{\boldsymbol{xx}} + \sigma^2\mathbf{I} \right)^{-1}\boldsymbol{y} -\log\lvert \mathbf{K}_{\boldsymbol{xx}} + \mathbf{\Sigma}\rvert -n\log(2\pi)\right) ,
+\end{align}
+```
 
 and the goal of inference is to maximise kernel hyperparameters (contained in the gram
 matrix $`\mathbf{K}_{\boldsymbol{xx}}`$) and likelihood hyperparameters (contained in the
 noise covariance $`\mathbf{\Sigma}`$). Computing the marginal log-likelihood (and its
 gradients), draws our attention to the term
 
-    ```math
-    \begin{align}
-        \underbrace{\left(\mathbf{K}_{\boldsymbol{xx}} - \sigma^2\boldsymbol{I} \right)^{-1}}_{\mathbf{A}}\boldsymbol{y},
-    \end{align}
-    ```
+```math
+\begin{align}
+    \underbrace{\left(\mathbf{K}_{\boldsymbol{xx}} + \sigma^2\mathbf{I} \right)^{-1}}_{\mathbf{A}}\boldsymbol{y},
+\end{align}
+```
+
 then we can see a solution can be obtained by solving the corresponding system of
 equations. By working with $`\mathbf{L} = \operatorname{chol}{\mathbf{A}}`$ instead of
 $`\mathbf{A}`$, we save a significant amount of floating-point operations (flops) by
 solving two triangular systems of equations (one for $`\mathbf{L}`$ and another for
-$`\mathbf{L}`$) instead of one dense system of equations. Solving two triangular systems
+$`\mathbf{L}^{\top}`$) instead of one dense system of equations. Solving two triangular systems
 of equations has complexity $`\mathcal{O}(n^3/6)`$; a vast improvement compared to
 regular solvers that have $`\mathcal{O}(n^3)`$ complexity in the number of datapoints
 $`n`$.
