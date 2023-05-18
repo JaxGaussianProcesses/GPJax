@@ -29,6 +29,7 @@ nav:
     - Kernels: examples/kernels.py
     - UCI regression: examples/yacht.py
     - Pathwise Sampling for Spatial Modelling: examples/spatial.py
+  - 💻 Raw tutorial code: give_me_the_code.md
   - 📕 Reference: api/
 
 theme:
@@ -77,6 +78,7 @@ plugins:
   - gen-files:
       scripts:
         - docs/scripts/gen_pages.py  # or any other name or path
+        - docs/scripts/notebook_converter.py  # or any other name or path
   - literate-nav:
       nav_file: SUMMARY.md
   - bibtex:
@@ -86,8 +88,8 @@ plugins:
   - mkdocs-jupyter:
       execute: false
       allow_errors: false
-#     binder: true
-#     binder_service_name: "gh"
+    # binder: true
+    # binder_service_name: "gh"
 #     binder_branch: "main"
   - mkdocstrings:
       watch:
