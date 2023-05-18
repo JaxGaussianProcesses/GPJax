@@ -13,13 +13,17 @@
         <link rel="canonical" href="https://docs.jaxgaussianprocesses.com/sharp_bits/">
       
       
+        <link rel="prev" href="../contributing/">
+      
+      
+        <link rel="next" href="../examples/pytrees/">
       
       <link rel="icon" href="../_static/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.11">
     
     
       
-        <title>🔪 The sharp bits - GPJax</title>
+        <title>🔪 Sharp bits - GPJax</title>
       
     
     
@@ -115,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              🔪 The sharp bits
+              🔪 Sharp bits
             
           </span>
         </div>
@@ -239,16 +243,18 @@
 
   
   
+    
+  
   
     
       
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
       
       
       
@@ -257,7 +263,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_2">
           <span class="md-nav__icon md-icon"></span>
           Getting started
@@ -301,6 +307,102 @@
       <a href="../contributing/" class="md-nav__link">
         🤝 Contributing
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          🔪 Sharp bits
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        🔪 Sharp bits
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pseudo-randomness" class="md-nav__link">
+    Pseudo-randomness
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bijectors" class="md-nav__link">
+    Bijectors
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#positive-definiteness" class="md-nav__link">
+    Positive-definiteness
+  </a>
+  
+    <nav class="md-nav" aria-label="Positive-definiteness">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-is-positive-definiteness-important" class="md-nav__link">
+    Why is positive-definiteness important?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-cholesky-drawback" class="md-nav__link">
+    The Cholesky drawback
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#slow-to-evaluate" class="md-nav__link">
+    Slow-to-evaluate
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1590,8 +1692,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#float64" class="md-nav__link">
-    Float64
+  <a href="#bijectors" class="md-nav__link">
+    Bijectors
   </a>
   
 </li>
@@ -1600,6 +1702,26 @@
   <a href="#positive-definiteness" class="md-nav__link">
     Positive-definiteness
   </a>
+  
+    <nav class="md-nav" aria-label="Positive-definiteness">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-is-positive-definiteness-important" class="md-nav__link">
+    Why is positive-definiteness important?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-cholesky-drawback" class="md-nav__link">
+    The Cholesky drawback
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1625,15 +1747,185 @@
                   
 
 
+<link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
 <h1 id="the-sharp-bits">🔪 The sharp bits<a class="headerlink" href="#the-sharp-bits" title="Permanent link"></a></h1>
 <h2 id="pseudo-randomness">Pseudo-randomness<a class="headerlink" href="#pseudo-randomness" title="Permanent link"></a></h2>
-<p>Can briefly acknowledge and then point to the Jax docs for more information.</p>
-<h2 id="float64">Float64<a class="headerlink" href="#float64" title="Permanent link"></a></h2>
-<p>The need for Float64 when inverting the Gram matrix</p>
+<p>Libraries like NumPy and Scipy use <em>stateful</em> pseudorandom number generators (PRNGs).
+However, the PRNG in JAX is stateless. This means that for a given function, the
+return always returns the same result unless the seed is changed. This is a good thing,
+but it means that we need to be careful when using JAX's PRNGs.</p>
+<p>To examine what it means for a PRNG to be stateful, consider the following example:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span> <span class="nn">jax.random</span> <span class="k">as</span> <span class="nn">jr</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># NumPy</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;NumPy:&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">())</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">())</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">JAX:&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">jr</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nb">print</span><span class="p">(</span><span class="n">jr</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Splitting key&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nb">print</span><span class="p">(</span><span class="n">jr</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">subkey</span><span class="p">))</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="go">NumPy:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="go">0.5194454541172852</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="go">0.9815886617924413</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="go">JAX:</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="go">0.95821166</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="go">0.95821166</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="go">Splitting key</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="go">0.23886406</span>
+</code></pre></div>
+We can see that, in libraries like NumPy, the PRNG key's state is incremented whenever
+a pseudorandom call is made. This can make debugging difficult to manage as it is not
+always clear when a PRNG is being used. In JAX, the PRNG key is not incremented,
+so the same key will always return the same result. This has further positive benefits
+for reproducibility.</p>
+<p>GPJax relies on JAX's PRNGs for all random number generation. Whilst we try wherever possible to handle the PRNG key's state for you, care must be taken when defining your own models and inference schemes to ensure that the PRNG key is handled correctly. The <a href="https://jax.readthedocs.io/en/latest/notebooks/Common_Gotchas_in_JAX.html#random-numbers">JAX documentation</a> has an excellent section on this.</p>
+<h2 id="bijectors">Bijectors<a class="headerlink" href="#bijectors" title="Permanent link"></a></h2>
+<p>Parameters such as the kernel's lengthscale or variance have their support defined on
+a constrained subset of the real-line. During gradient-based optimisation, as we
+approach the set's boundary, it becomes possible that we could step outside of the
+set's support and introduce a numerical and mathematical error into our model. For
+example, consider the lengthscale parameter <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">ℓ</mi></mrow><annotation encoding="application/x-tex">\ell</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">ℓ</span></span></span></span>, which we know must be strictly
+positive. If at <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>t</mi><mtext>th</mtext></msup></mrow><annotation encoding="application/x-tex">t^{\text{th}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8491em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">th</span></span></span></span></span></span></span></span></span></span></span></span></span> iterate, our current estimate of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">ℓ</mi></mrow><annotation encoding="application/x-tex">\ell</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">ℓ</span></span></span></span> was
+0.02 and our derivative informed us that <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">ℓ</mi></mrow><annotation encoding="application/x-tex">\ell</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">ℓ</span></span></span></span> should decrease, then if our
+learning rate is greater is than 0.03, we would end up with a negative variance term. 
+We visualise this issue below where the red cross denotes the invalid lengthscale value
+that would be obtained, were we to optimise in the unconstrained parameter space.</p>
+<p><img alt="" src="../_static/step_size_figure.svg" /></p>
+<p>A simple but impractical solution would be to use a tiny learning rate which would
+reduce the possibility of stepping outside of the parameter's support. However, this
+would be incredibly costly and does not eradicate the problem. An alternative solution
+is to apply a functional mapping to the parameter that projects it from a constrained
+subspace of the real-line onto the entire real-line. Here, gradient updates are
+applied in the unconstrained parameter space before transforming the value back to the
+original support of the parameters. Such a transformation is known as a bijection.</p>
+<p><img alt="" src="../_static/bijector_figure.svg" /></p>
+<p>To help understand this, we show the effect of using a log-exp bijector in the above
+figure. We have six points on the positive real line that range from 0.1 to 3 depicted
+by a blue cross. We then apply the bijector by log-transforming the constrained value.
+This gives us the points' unconstrained value which we depict by a red circle. It is
+this value that we apply gradient updates to. When we wish to recover the constrained
+value, we apply the inverse of the bijector, which is the exponential function in this
+case. This gives us back the blue cross.</p>
+<p>In GPJax, we supply bijective functions using <a href="https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/bijectors">Tensorflow Probability</a>.
+In our <a href="../examples/pytrees/">PyTrees doc</a> document, we detail how the user can define
+their own bijectors and attach them to the parameter(s) of their model.</p>
 <h2 id="positive-definiteness">Positive-definiteness<a class="headerlink" href="#positive-definiteness" title="Permanent link"></a></h2>
-<p>The need for jitter in the kernel Gram matrix</p>
+<blockquote>
+<p>"Symmetric positive definiteness is one of the highest accolades to which a matrix can aspire" - Nicholas Highman, Accuracy and stability of numerical algorithms (Higham, 2002)<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup></p>
+</blockquote>
+<h3 id="why-is-positive-definiteness-important">Why is positive-definiteness important?<a class="headerlink" href="#why-is-positive-definiteness-important" title="Permanent link"></a></h3>
+<p>The Gram matrix of a kernel, a concept that we explore more in our 
+<a href="../examples/kernels/">kernels notebook</a> and our <a href="../examples/pytrees/">PyTree notebook</a>, is a
+symmetric positive definite matrix. As such, we
+have a range of tools at our disposal to make subsequent operations on the covariance
+matrix faster. One of these tools is the Cholesky factorisation that uniquely decomposes
+any symmetric positive-definite matrix <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">Σ</mi></mrow><annotation encoding="application/x-tex">\mathbf{\Sigma}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">Σ</span></span></span></span> by </p>
+<p><p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right" columnspacing=""><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="bold">Σ</mi><mo>=</mo><mi mathvariant="bold">L</mi><msup><mi mathvariant="bold">L</mi><mi mathvariant="normal">⊤</mi></msup><mtext> </mtext><mo separator="true">,</mo></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr></mtable><annotation encoding="application/x-tex"> 
+\begin{align}
+    \mathbf{\Sigma} = \mathbf{L}\mathbf{L}^{\top}\,,
+\end{align}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.5591em;vertical-align:-0.5296em;"></span><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0296em;"><span style="top:-3.1304em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathbf">Σ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathbf">L</span><span class="mord"><span class="mord mathbf">L</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.5296em;"><span></span></span></span></span></span></span></span><span class="tag"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0296em;"><span style="top:-3.0296em;"><span class="pstrut" style="height:2.8991em;"></span><span class="eqn-num"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.5296em;"><span></span></span></span></span></span></span></span></span></p>
+where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">L</mi></mrow><annotation encoding="application/x-tex">\mathbf{L}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">L</span></span></span></span> is a lower triangular matrix. </p>
+<p>We make use of this result in GPJax when solving linear systems of equations of the
+form <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">A</mi><mi mathvariant="bold-italic">x</mi><mo>=</mo><mi mathvariant="bold-italic">b</mi></mrow><annotation encoding="application/x-tex">\mathbf{A}\boldsymbol{x} = \boldsymbol{b}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">A</span><span class="mord"><span class="mord"><span class="mord boldsymbol">x</span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol">b</span></span></span></span></span></span>. Whilst seemingly abstract at first,
+such problems are frequently encountered when constructing Gaussian process models. One
+such example is frequently encountered in the regression setting for learning Gaussian
+process kernel hyperparameters. Here we have labels 
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold-italic">y</mi><mo>∼</mo><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mi mathvariant="bold-italic">x</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="bold">I</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol{y} \sim \mathcal{N}(f(\boldsymbol{x}), \sigma^2\mathbf{I})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6389em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.03704em;">y</span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.14736em;">N</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord"><span class="mord"><span class="mord boldsymbol">x</span></span></span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathbf">I</span><span class="mclose">)</span></span></span></span> with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi mathvariant="bold-italic">x</mi><mo stretchy="false">)</mo><mo>∼</mo><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><mi mathvariant="bold">0</mi><mo separator="true">,</mo><msub><mi mathvariant="bold">K</mi><mi><mrow><mi mathvariant="bold-italic">x</mi><mi mathvariant="bold-italic">x</mi></mrow></mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">f(\boldsymbol{x}) \sim \mathcal{N}(\boldsymbol{0}, \mathbf{K}_{\boldsymbol{xx}})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord"><span class="mord"><span class="mord boldsymbol">x</span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.14736em;">N</span><span class="mopen">(</span><span class="mord"><span class="mord"><span class="mord mathbf">0</span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1611em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord boldsymbol mtight">xx</span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> arising from zero-mean
+Gaussian process prior and Gram matrix <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="bold">K</mi><mi><mrow><mi mathvariant="bold-italic">x</mi><mi mathvariant="bold-italic">x</mi></mrow></mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{K}_{\boldsymbol{xx}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8361em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1611em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord boldsymbol mtight">xx</span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> at the inputs
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold-italic">x</mi></mrow><annotation encoding="application/x-tex">\boldsymbol{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4444em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol">x</span></span></span></span></span></span>. Here the marginal log-likelihood comprises the following form</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right" columnspacing=""><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>log</mi><mo>⁡</mo><mi>p</mi><mo stretchy="false">(</mo><mi mathvariant="bold-italic">y</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.5</mn><mrow><mo fence="true">(</mo><mo>−</mo><msup><mi mathvariant="bold-italic">y</mi><mi mathvariant="normal">⊤</mi></msup><msup><mrow><mo fence="true">(</mo><msub><mi mathvariant="bold">K</mi><mi><mrow><mi mathvariant="bold-italic">x</mi><mi mathvariant="bold-italic">x</mi></mrow></mi></msub><mo>+</mo><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="bold">I</mi><mo fence="true">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi mathvariant="bold-italic">y</mi><mo>−</mo><mi>log</mi><mo>⁡</mo><mo stretchy="false">∣</mo><msub><mi mathvariant="bold">K</mi><mi><mrow><mi mathvariant="bold-italic">x</mi><mi mathvariant="bold-italic">x</mi></mrow></mi></msub><mo>+</mo><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="bold">I</mi><mo stretchy="false">∣</mo><mo>−</mo><mi>n</mi><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>2</mn><mi>π</mi><mo stretchy="false">)</mo><mo fence="true">)</mo></mrow><mo separator="true">,</mo></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{align}
+    \log p(\boldsymbol{y}) = 0.5\left(-\boldsymbol{y}^{\top}\left(\mathbf{K}_{\boldsymbol{xx}} + \sigma^2\mathbf{I} \right)^{-1}\boldsymbol{y} -\log\lvert \mathbf{K}_{\boldsymbol{xx}} + \sigma^2\mathbf{I}\rvert -n\log(2\pi)\right) ,
+\end{align}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.1em;vertical-align:-0.8em;"></span><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3em;"><span style="top:-3.3em;"><span class="pstrut" style="height:3.15em;"></span><span class="mord"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.03704em;">y</span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0.5</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size2">(</span></span><span class="mord">−</span><span class="mord"><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.03704em;">y</span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size1">(</span></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1611em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord boldsymbol mtight">xx</span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathbf">I</span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size1">)</span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.0681em;"><span style="top:-3.317em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.03704em;">y</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mopen">∣</span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1611em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord boldsymbol mtight">xx</span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathbf">I</span><span class="mclose">∣</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mopen">(</span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="mclose">)</span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size2">)</span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8em;"><span></span></span></span></span></span></span></span><span class="tag"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3em;"><span style="top:-3.3em;"><span class="pstrut" style="height:3.15em;"></span><span class="eqn-num"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8em;"><span></span></span></span></span></span></span></span></span></p>
+<p>and the goal of inference is to maximise kernel hyperparameters (contained in the Gram
+matrix <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="bold">K</mi><mi><mrow><mi mathvariant="bold-italic">x</mi><mi mathvariant="bold-italic">x</mi></mrow></mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{K}_{\boldsymbol{xx}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8361em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1611em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord boldsymbol mtight">xx</span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>) and likelihood hyperparameters (contained in the
+noise covariance <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="bold">I</mi></mrow><annotation encoding="application/x-tex">\sigma^2\mathbf{I}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathbf">I</span></span></span></span>). Computing the marginal log-likelihood (and its
+gradients), draws our attention to the term</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right" columnspacing=""><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><munder><munder><msup><mrow><mo fence="true">(</mo><msub><mi mathvariant="bold">K</mi><mi><mrow><mi mathvariant="bold-italic">x</mi><mi mathvariant="bold-italic">x</mi></mrow></mi></msub><mo>+</mo><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="bold">I</mi><mo fence="true">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="true">⏟</mo></munder><mi mathvariant="bold">A</mi></munder><mi mathvariant="bold-italic">y</mi><mo separator="true">,</mo></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{align}
+    \underbrace{\left(\mathbf{K}_{\boldsymbol{xx}} + \sigma^2\mathbf{I} \right)^{-1}}_{\mathbf{A}}\boldsymbol{y},
+\end{align}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:3.0464em;vertical-align:-1.2732em;"></span><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.7732em;"><span style="top:-3.7732em;"><span class="pstrut" style="height:3.0681em;"></span><span class="mord"><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0681em;"><span style="top:-1.3898em;"><span class="pstrut" style="height:3.0681em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathbf mtight">A</span></span></span></span><span style="top:-3.0681em;"><span class="pstrut" style="height:3.0681em;"></span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0681em;"><span class="svg-align" style="top:-2.0701em;"><span class="pstrut" style="height:3.0681em;"></span><span class="stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSc0MDBlbScgaGVpZ2h0PScwLjU0OGVtJyB2aWV3Qm94PScwIDAgNDAwMDAwIDU0OCcgcHJlc2VydmVBc3BlY3RSYXRpbz0neE1pbllNaW4gc2xpY2UnPjxwYXRoIGQ9J00wIDZsNi02aDE3YzEyLjY4OCAwIDE5LjMxMy4zIDIwIDEgNCA0IDcuMzEzIDguMyAxMCAxMwogMzUuMzEzIDUxLjMgODAuODEzIDkzLjggMTM2LjUgMTI3LjUgNTUuNjg4IDMzLjcgMTE3LjE4OCA1NS44IDE4NC41IDY2LjUuNjg4CiAwIDIgLjMgNCAxIDE4LjY4OCAyLjcgNzYgNC4zIDE3MiA1aDM5OTQ1MHYxMjBINDI5bC02LTFjLTEyNC42ODgtOC0yMzUtNjEuNwotMzMxLTE2MUM2MC42ODcgMTM4LjcgMzIuMzEyIDk5LjMgNyA1NEwwIDQxVjZ6Jy8+PC9zdmc+"/></span><span class="brace-center" style="height:0.548em;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSc0MDBlbScgaGVpZ2h0PScwLjU0OGVtJyB2aWV3Qm94PScwIDAgNDAwMDAwIDU0OCcgcHJlc2VydmVBc3BlY3RSYXRpbz0neE1pZFlNaW4gc2xpY2UnPjxwYXRoIGQ9J00xOTk1NzIgMjE0CmMxMDAuNyA4LjMgMTk1LjMgNDQgMjgwIDEwOCA1NS4zIDQyIDEwMS43IDkzIDEzOSAxNTNsOSAxNGMyLjctNCA1LjctOC43IDktMTQKIDUzLjMtODYuNyAxMjMuNy0xNTMgMjExLTE5OSA2Ni43LTM2IDEzNy4zLTU2LjMgMjEyLTYyaDE5OTU2OHYxMjBIMjAwNDMyYy0xNzguMwogMTEuNy0zMTEuNyA3OC4zLTQwMyAyMDEtNiA4LTkuNyAxMi0xMSAxMi0uNy43LTYuNyAxLTE4IDFzLTE3LjMtLjMtMTgtMWMtMS4zIDAKLTUtNC0xMS0xMi00NC43LTU5LjMtMTAxLjMtMTA2LjMtMTcwLTE0MXMtMTQ1LjMtNTQuMy0yMjktNjBIMFYyMTR6Jy8+PC9zdmc+"/></span><span class="brace-right" style="height:0.548em;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSc0MDBlbScgaGVpZ2h0PScwLjU0OGVtJyB2aWV3Qm94PScwIDAgNDAwMDAwIDU0OCcgcHJlc2VydmVBc3BlY3RSYXRpbz0neE1heFlNaW4gc2xpY2UnPjxwYXRoIGQ9J00zOTk5OTQgMGw2IDZ2MzVsLTYgMTFjLTU2IDEwNC0xMzUuMyAxODEuMy0yMzggMjMyLTU3LjMKIDI4LjctMTE3IDQ1LTE3OSA1MEgtMzAwVjIxNGgzOTk4OTdjNDMuMy03IDgxLTE1IDExMy0yNiAxMDAuNy0zMyAxNzkuNy05MSAyMzcKLTE3NCAyLjctNSA2LTkgMTAtMTMgLjctMSA3LjMtMSAyMC0xaDE3eicvPjwvc3ZnPg=="/></span></span></span><span style="top:-3.0681em;"><span class="pstrut" style="height:3.0681em;"></span><span class="mord"><span class="minner"><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size1">(</span></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1611em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord boldsymbol mtight">xx</span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathbf">I</span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size1">)</span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.0681em;"><span style="top:-3.317em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.998em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.6783em;"><span></span></span></span></span></span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.03704em;">y</span></span></span><span class="mpunct">,</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2732em;"><span></span></span></span></span></span></span></span><span class="tag"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.7732em;"><span style="top:-3.7732em;"><span class="pstrut" style="height:3.0681em;"></span><span class="eqn-num"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2732em;"><span></span></span></span></span></span></span></span></span></p>
+<p>then we can see a solution can be obtained by solving the corresponding system of
+equations. By working with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">L</mi><mo>=</mo><mi mathvariant="normal">chol</mi><mo>⁡</mo><mi mathvariant="bold">A</mi></mrow><annotation encoding="application/x-tex">\mathbf{L} = \operatorname{chol}{\mathbf{A}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mop"><span class="mord mathrm">chol</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">A</span></span></span></span></span> instead of
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">A</mi></mrow><annotation encoding="application/x-tex">\mathbf{A}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">A</span></span></span></span>, we save a significant amount of floating-point operations (flops) by
+solving two triangular systems of equations (one for <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">L</mi></mrow><annotation encoding="application/x-tex">\mathbf{L}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">L</span></span></span></span> and another for
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="bold">L</mi><mi mathvariant="normal">⊤</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf{L}^{\top}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8491em;"></span><span class="mord"><span class="mord mathbf">L</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span></span></span></span></span>) instead of one dense system of equations. Solving two triangular systems
+of equations has complexity <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>3</mn></msup><mi mathvariant="normal">/</mi><mn>6</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(n^3/6)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mord">/6</span><span class="mclose">)</span></span></span></span>; a vast improvement compared to
+regular solvers that have <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>3</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(n^3)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> complexity in the number of datapoints
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>.</p>
+<h3 id="the-cholesky-drawback">The Cholesky drawback<a class="headerlink" href="#the-cholesky-drawback" title="Permanent link"></a></h3>
+<p>While the computational acceleration provided by using Cholesky factors instead of dense
+matrices is hopefully now apparent, an awkward numerical instability <em>gotcha</em> can arise
+due to floating-point rounding errors. When we evaluate a covariance function on a set
+of points that are very <em>close</em> to one another, eigenvalues of the corresponding
+Gram matrix can get very small. So small that after numerical rounding, the
+smallest eigenvalues can become negative-valued. While not truly less than zero, our
+computer thinks they are, which becomes a problem when we want to compute a Cholesky
+factor since this requires that the input matrix is positive-definite. If there are
+negative eigenvalues, then this stipulation has been invalidated.</p>
+<p>To resolve this, we apply some numerical <em>jitter</em> to the diagonals of any Gram matrix.
+Typically this is incredibly small, with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><msup><mn>0</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup></mrow><annotation encoding="application/x-tex">10^{-6}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span></span> being the system default. However,
+for some problems, this amount may need to be increased. </p>
 <h2 id="slow-to-evaluate">Slow-to-evaluate<a class="headerlink" href="#slow-to-evaluate" title="Permanent link"></a></h2>
-<p>More than several thousand data points will require the use of inducing points - don't try and use the ConjugateMLL objective on a million data points.</p>
+<p>Famously, a regular Gaussian process model (as detailed in 
+<a href="../examples/regression/">our regression notebook</a>) will scale cubically in the number of data points.
+Consequently, if you try to fit your Gaussian process model to a data set containing more
+than several thousand data points, then you will likely incur a significant
+computational overhead. In such cases, we recommend using Sparse Gaussian processes to
+alleviate this issue.</p>
+<p>Approximately, when the data contains less than 50000 data points, we recommend using
+the uncollapsed evidence lower bound objective (Titsias, 2009)<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> to optimise the parameters
+of your sparse Gaussian process model. Such a model will scale linearly in the number of
+data points and quadratically in the number of inducing points. We demonstrate its use
+in <a href="../examples/collapsed_vi/">our sparse regression notebook</a>.</p>
+<p>For data sets exceeding 50000 data points, even the sparse Gaussian process outlined
+above will become computationally infeasible. In such cases, we recommend using the
+collapsed evidence lower bound objective (Hensman <em>et al.</em>, 2013)<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> that allows stochastic
+mini-batch optimisation of the parameters of your sparse Gaussian process model. Such a
+model will scale linearly in the batch size and quadratically in the number of inducing
+points. We demonstrate its use in 
+<a href="../examples/uncollapsed_vi/">our sparse stochastic variational inference notebook</a></p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Higham, N. J. (2002) <em>Accuracy and Stability of Numerical Algorithms</em>. Second. Society for Industrial and Applied Mathematics. DOI: <a href="https://doi.org/10.1137/1.9780898718027">10.1137/1.9780898718027</a>.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>Titsias, M. (2009) Variational learning of inducing variables in sparse Gaussian processes. In: <em>Proceedings of the twelth international conference on artificial intelligence and statistics</em>, 2009, pp. 567–574. Proceedings of machine learning research. PMLR.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>Hensman, J., Fusi, N. and Lawrence, N. D. (2013) Gaussian processes for big data. <em>arXiv preprint arXiv:1309.6835</em>.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 
 
   
