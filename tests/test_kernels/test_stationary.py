@@ -162,6 +162,13 @@ class BaseTestKernel:
             assert sdensity.loc == jnp.array(0.0)
             assert sdensity.scale == jnp.array(1.0)
 
+    @pytest.mark.parametrize("dim", [1, 3], ids=lambda x: f"dim={x}")
+    def test_isotropic(self, dim: int):
+        # Initialise kernel
+        kernel: AbstractKernel = self.kernel(active_dims=list(range(dim)))
+        if self.kernel not in [White]:
+            assert kernel.lengthscale.shape == ()
+
 
 def prod(inp):
     return [dict(zip(inp.keys(), values)) for values in product(*inp.values())]
