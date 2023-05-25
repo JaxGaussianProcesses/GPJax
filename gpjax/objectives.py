@@ -274,16 +274,14 @@ def variational_expectation(
     link_function = variational_family.posterior.likelihood.link_function
     log_prob = vmap(lambda f, y: link_function(f).log_prob(y))
 
-    # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
+    # Extract the likelihood's integration straegy
     integrator = variational_family.posterior.likelihood.integrator.integrate
+    # Register the likelihood's parameters with the integrator
     likelihood_dict = variational_family.posterior.likelihood.dict()
-    print(likelihood_dict)
     integration_fn = partial(integrator, **likelihood_dict)
+    # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
     expectation = integration_fn(fun=log_prob, mean=mean, sd=jnp.sqrt(variance), y=y)
     return expectation
-    # expectation = gauss_hermite_quadrature(log_prob, mean, jnp.sqrt(variance), y=y)
-
-    # return expectation
 
 
 class CollapsedELBO(AbstractObjective):
