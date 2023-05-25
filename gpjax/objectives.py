@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass
+from functools import partial
 
 from jax import vmap
 import jax.numpy as jnp
@@ -15,7 +16,6 @@ from gpjax.base import (
 from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.linops import identity
-from gpjax.quadrature import gauss_hermite_quadrature
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -275,9 +275,15 @@ def variational_expectation(
     log_prob = vmap(lambda f, y: link_function(f).log_prob(y))
 
     # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
-    expectation = gauss_hermite_quadrature(log_prob, mean, jnp.sqrt(variance), y=y)
-
+    integrator = variational_family.posterior.likelihood.integrator.integrate
+    likelihood_dict = variational_family.posterior.likelihood.dict()
+    print(likelihood_dict)
+    integration_fn = partial(integrator, **likelihood_dict)
+    expectation = integration_fn(fun=log_prob, mean=mean, sd=jnp.sqrt(variance), y=y)
     return expectation
+    # expectation = gauss_hermite_quadrature(log_prob, mean, jnp.sqrt(variance), y=y)
+
+    # return expectation
 
 
 class CollapsedELBO(AbstractObjective):

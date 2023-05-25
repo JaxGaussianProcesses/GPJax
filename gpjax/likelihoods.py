@@ -29,6 +29,11 @@ from gpjax.base import (
     static_field,
 )
 from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.integrators import (
+    AbstractIntegrator,
+    AnalyticalGaussianIntegrator,
+    GHQuadratureIntegrator,
+)
 from gpjax.linops.utils import to_dense
 from gpjax.typing import (
     Array,
@@ -44,6 +49,7 @@ class AbstractLikelihood(Module):
     r"""Abstract base class for likelihoods."""
 
     num_datapoints: int = static_field()
+    integrator: AbstractIntegrator = static_field(GHQuadratureIntegrator())
 
     def __call__(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
         r"""Evaluate the likelihood function at a given predictive distribution.
@@ -93,6 +99,7 @@ class Gaussian(AbstractLikelihood):
     obs_noise: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
     )
+    integrator: AbstractIntegrator = static_field(AnalyticalGaussianIntegrator())
 
     def link_function(self, f: Float[Array, "..."]) -> tfd.Normal:
         r"""The link function of the Gaussian likelihood.

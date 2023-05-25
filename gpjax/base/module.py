@@ -244,6 +244,9 @@ class Module(Pytree):
 
         return meta_map(_get_trainables, self)
 
+    def dict(self):
+        return {k: v for k, v in dataclasses.asdict(self).items()}
+
 
 def _toplevel_meta(pytree: Any) -> List[Optional[Dict[str, Any]]]:
     """Unpacks a list of meta corresponding to the top-level nodes of the pytree.

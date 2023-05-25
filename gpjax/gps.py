@@ -681,7 +681,7 @@ def construct_posterior(
 def _build_fourier_features_fn(
     prior: Prior, num_features: int, key: KeyArray
 ) -> Callable[[Float[Array, "N D"]], Float[Array, "N L"]]:
-    """Return a function that evaluates features sampled from the Fourier feature
+    r"""Return a function that evaluates features sampled from the Fourier feature
     decomposition of the prior's kernel.
 
     Args:
