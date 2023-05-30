@@ -89,7 +89,7 @@ plugins:
       execute: true
       allow_errors: false
       include: ["examples/*.py"]
-      ignore: ["examples/utils.py"]
+      ignore: ["examples/utils.py", "_statch/*.py", "scripts/*.py"]
     # binder: true
     # binder_service_name: "gh"
 #     binder_branch: "main"
