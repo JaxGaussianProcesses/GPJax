@@ -31,9 +31,11 @@ from gpjax.typing import (
 
 @dataclass
 class PoweredExponential(AbstractKernel):
-    r"""The powered exponential family of kernels.
+    r"""The powered exponential family of kernels. This also equivalent to the symmetric generalized normal distribution.
 
-    Key reference is Diggle and Ribeiro (2007) - "Model-based Geostatistics".
+    See Diggle and Ribeiro (2007) - "Model-based Geostatistics".
+    and
+    https://en.wikipedia.org/wiki/Generalized_normal_distribution#Symmetric_version
 
     """
 
@@ -41,7 +43,7 @@ class PoweredExponential(AbstractKernel):
         jnp.array(1.0), bijector=tfb.Softplus()
     )
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    power: ScalarFloat = param_field(jnp.array(1.0))
+    power: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Sigmoid())
     name: str = "Powered Exponential"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:

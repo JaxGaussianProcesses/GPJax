@@ -18,6 +18,7 @@ from beartype.typing import (
     Any,
     Union,
 )
+from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Float
@@ -90,6 +91,15 @@ class AbstractLikelihood(Module):
                 Gaussian process, f.
         """
         raise NotImplementedError
+
+    def expected_log_likelihood(
+        self,
+        y: Float[Array, "N D"],
+        mu: Float[Array, "N D"],
+        sigma2: Float[Array, "N D"],
+    ):
+        log_prob = vmap(lambda f, y: self.link_function(f).log_prob(y))
+        return self.integrator(fun=log_prob, y=y, mean=mu, sigma2=sigma2, **self.dict())
 
 
 @dataclass

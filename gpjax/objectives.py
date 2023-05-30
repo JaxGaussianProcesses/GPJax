@@ -1,6 +1,5 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from functools import partial
 
 from jax import vmap
 import jax.numpy as jnp
@@ -271,16 +270,8 @@ def variational_expectation(
 
     mean, variance = vmap(q_moments)(x[:, None])
 
-    link_function = variational_family.posterior.likelihood.link_function
-    log_prob = vmap(lambda f, y: link_function(f).log_prob(y))
-
-    # Extract the likelihood's integration straegy
-    integrator = variational_family.posterior.likelihood.integrator.integrate
-    # Register the likelihood's parameters with the integrator
-    likelihood_dict = variational_family.posterior.likelihood.dict()
-    integration_fn = partial(integrator, **likelihood_dict)
     # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
-    expectation = integration_fn(fun=log_prob, mean=mean, sd=jnp.sqrt(variance), y=y)
+    expectation = q.posterior.likelihood.expected_log_likelihood(y, mean, variance)
     return expectation
 
 

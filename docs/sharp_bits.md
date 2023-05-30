@@ -145,14 +145,14 @@ While the computational acceleration provided by using Cholesky factors instead 
 matrices is hopefully now apparent, an awkward numerical instability _gotcha_ can arise
 due to floating-point rounding errors. When we evaluate a covariance function on a set
 of points that are very _close_ to one another, eigenvalues of the corresponding
-Gram matrix can get very small. So small that after numerical rounding, the
-smallest eigenvalues can become negative-valued. While not truly less than zero, our
-computer thinks they are, which becomes a problem when we want to compute a Cholesky
-factor since this requires that the input matrix is positive-definite. If there are
-negative eigenvalues, then this stipulation has been invalidated.
+Gram matrix can get very small. While not _mathematically_ less than zero, the
+smallest eigenvalues can become negative-valued due to finite-precision numerical errors.
+This becomes a problem when we want to compute a Cholesky
+factor since this requires that the input matrix is _numerically_ positive-definite. If there are
+negative eigenvalues, this violates the requirements and results in a "Cholesky failure".
 
 To resolve this, we apply some numerical _jitter_ to the diagonals of any Gram matrix.
-Typically this is incredibly small, with $`10^{-6}`$ being the system default. However,
+Typically this is very small, with $`10^{-6}`$ being the system default. However,
 for some problems, this amount may need to be increased.
 
 ## Slow-to-evaluate
@@ -164,16 +164,16 @@ than several thousand data points, then you will likely incur a significant
 computational overhead. In such cases, we recommend using Sparse Gaussian processes to
 alleviate this issue.
 
-Approximately, when the data contains less than 50000 data points, we recommend using
-the uncollapsed evidence lower bound objective [@titsias2009] to optimise the parameters
+When the data contains less than around 50000 data points, we recommend using
+the collapsed evidence lower bound objective [@titsias2009] to optimise the parameters
 of your sparse Gaussian process model. Such a model will scale linearly in the number of
 data points and quadratically in the number of inducing points. We demonstrate its use
 in [our sparse regression notebook](examples/collapsed_vi.py).
 
 For data sets exceeding 50000 data points, even the sparse Gaussian process outlined
 above will become computationally infeasible. In such cases, we recommend using the
-collapsed evidence lower bound objective [@hensman2013gaussian] that allows stochastic
+uncollapsed evidence lower bound objective [@hensman2013gaussian] that allows stochastic
 mini-batch optimisation of the parameters of your sparse Gaussian process model. Such a
 model will scale linearly in the batch size and quadratically in the number of inducing
 points. We demonstrate its use in
-[our sparse stochastic variational inference notebook](examples/uncollapsed_vi.py)
+[our sparse stochastic variational inference notebook](examples/uncollapsed_vi.py).

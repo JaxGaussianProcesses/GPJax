@@ -26,14 +26,17 @@ config.update("jax_enable_x64", True)
 
 
 @pytest.mark.parametrize("jit", [True, False])
-def test_quadrature(jit):
+@pytest.mark.parametrize("num_points", [10, 20, 30])
+def test_quadrature(jit: bool, num_points: int):
     def test():
         def fun(x):
             return x**2
 
         mean = jnp.array([[2.0]])
         sd = jnp.array([[1.0]])
-        fn_val = GHQuadratureIntegrator().integrate(fun=fun, mean=mean, sd=sd)
+        fn_val = GHQuadratureIntegrator(num_points=num_points).integrate(
+            fun=fun, mean=mean, sd=sd
+        )
         return fn_val.squeeze().round(1)
 
     if jit:

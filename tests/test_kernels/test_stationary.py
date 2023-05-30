@@ -108,7 +108,7 @@ class BaseTestKernel:
             if field in ["variance", "lengthscale", "period", "alpha"]:
                 assert isinstance(meta[field]["bijector"], tfb.Softplus)
             if field in ["power"]:
-                assert isinstance(meta[field]["bijector"], tfb.Identity)
+                assert isinstance(meta[field]["bijector"], tfb.Sigmoid)
 
             # Trainability state
             assert meta[field]["trainable"] is True
@@ -225,7 +225,7 @@ class TestPeriodic(BaseTestKernel):
 class TestPoweredExponential(BaseTestKernel):
     kernel = PoweredExponential
     fields = prod(
-        {"lengthscale": [0.1, 1.0], "variance": [0.1, 1.0], "power": [0.1, 2.0]}
+        {"lengthscale": [0.1, 1.0], "variance": [0.1, 1.0], "power": [0.1, 0.9]}
     )
     params = {"test_initialization": fields}
     default_compute_engine = DenseKernelComputation
