@@ -1,9 +1,14 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from beartype.typing import Callable, Any
+
+from beartype.typing import (
+    Any,
+    Callable,
+)
 import jax.numpy as jnp
 from jaxtyping import Float
 import numpy as np
+
 from gpjax.typing import Array
 
 
@@ -20,6 +25,20 @@ class AbstractIntegrator:
         variance: Float[Array, "N D"],
         **likelihood_params: Any,
     ):
+        """Integrate a function with respect to a Gaussian distribution.
+
+        Typically, the function will be the likelihood function and the mean
+        and variance will be the parameters of the variational distribution.
+
+        Args:
+            fun (Callable): The function to be integrated.
+            y (Float[Array, 'N D']): _description_
+            mean (Float[Array, 'N D']): _description_
+            variance (Float[Array, 'N D']): _description_
+
+        Raises:
+            NotImplementedError: _description_
+        """
         raise NotImplementedError("self.integrate not implemented")
 
     def __call__(
