@@ -13,8 +13,10 @@
 # limitations under the License.
 # ==============================================================================
 
+# from __future__ import annotations
 from abc import abstractmethod
 from dataclasses import dataclass
+from typing import overload
 
 from beartype.typing import (
     Any,
@@ -43,6 +45,7 @@ from gpjax.kernels.base import AbstractKernel
 from gpjax.likelihoods import (
     AbstractLikelihood,
     Gaussian,
+    NonGaussianLikelihood,
 )
 from gpjax.linops import identity
 from gpjax.mean_functions import AbstractMeanFunction
@@ -134,7 +137,19 @@ class Prior(AbstractPrior):
     ```
     """
 
-    def __mul__(self, other: AbstractLikelihood):
+    @overload
+    def __mul__(self, other: Gaussian) -> "ConjugatePosterior":
+        ...
+
+    @overload
+    def __mul__(self, other: NonGaussianLikelihood) -> "NonConjugatePosterior":
+        ...
+
+    @overload
+    def __mul__(self, other: AbstractLikelihood) -> "AbstractPosterior":
+        ...
+
+    def __mul__(self, other):
         r"""Combine the prior with a likelihood to form a posterior distribution.
 
         The product of a prior and likelihood is proportional to the posterior
@@ -168,7 +183,19 @@ class Prior(AbstractPrior):
         """
         return construct_posterior(prior=self, likelihood=other)
 
-    def __rmul__(self, other: AbstractLikelihood):
+    @overload
+    def __rmul__(self, other: Gaussian) -> "ConjugatePosterior":
+        ...
+
+    @overload
+    def __rmul__(self, other: NonGaussianLikelihood) -> "NonConjugatePosterior":
+        ...
+
+    @overload
+    def __rmul__(self, other: AbstractLikelihood) -> "AbstractPosterior":
+        ...
+
+    def __rmul__(self, other):
         r"""Combine the prior with a likelihood to form a posterior distribution.
 
         Reimplement the multiplication operator to allow for order-invariant
@@ -654,9 +681,28 @@ class NonConjugatePosterior(AbstractPosterior):
 #######################
 # Utils
 #######################
+
+
+@overload
+def construct_posterior(prior: Prior, likelihood: Gaussian) -> ConjugatePosterior:
+    ...
+
+
+@overload
+def construct_posterior(
+    prior: Prior, likelihood: NonGaussianLikelihood
+) -> NonConjugatePosterior:
+    ...
+
+
+@overload
 def construct_posterior(
     prior: Prior, likelihood: AbstractLikelihood
 ) -> AbstractPosterior:
+    ...
+
+
+def construct_posterior(prior, likelihood):
     r"""Utility function for constructing a posterior object from a prior and
     likelihood. The function will automatically select the correct posterior
     object based on the likelihood.
