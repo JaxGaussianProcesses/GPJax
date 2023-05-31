@@ -38,7 +38,7 @@ def test_quadrature(jit: bool, num_points: int):
         fn_val = GHQuadratureIntegrator(num_points=num_points).integrate(
             fun=fun,
             mean=mean,
-            sigma2=variance,
+            variance=variance,
             y=jnp.ones_like(mean),
         )
         return fn_val.squeeze().round(1)
