@@ -15,7 +15,6 @@
 
 
 import jax
-import jax.random as jr
 from jax.config import config
 import jax.numpy as jnp
 import pytest
@@ -29,8 +28,6 @@ config.update("jax_enable_x64", True)
 @pytest.mark.parametrize("jit", [True, False])
 @pytest.mark.parametrize("num_points", [10, 20, 30])
 def test_quadrature(jit: bool, num_points: int):
-    key = jr.PRNGKey(123)
-
     def test():
         def fun(x, y):
             """In practice, the first argument will be the latent function values"""
