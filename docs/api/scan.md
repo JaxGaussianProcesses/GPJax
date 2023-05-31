@@ -1,3 +1,0 @@
-# Scan
-
-::: gpjax.scan

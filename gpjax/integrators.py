@@ -1,27 +1,23 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-
-from beartype.typing import (
-    Any,
-    Callable,
-)
+from beartype.typing import Callable, Any
 import jax.numpy as jnp
 from jaxtyping import Float
 import numpy as np
-from simple_pytree import Pytree
-
 from gpjax.typing import Array
 
 
 @dataclass
-class AbstractIntegrator(Pytree):
+class AbstractIntegrator:
+    """Base class for integrators."""
+
     @abstractmethod
     def integrate(
         self,
         fun: Callable,
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
-        sigma2: Float[Array, "N D"],
+        variance: Float[Array, "N D"],
         **likelihood_params: Any,
     ):
         raise NotImplementedError("self.integrate not implemented")
@@ -31,11 +27,10 @@ class AbstractIntegrator(Pytree):
         fun: Callable,
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
-        sigma2: Float[Array, "N D"],
-        *args: Any,
-        **kwargs: Any,
+        variance: Float[Array, "N D"],
+        **likelihood_params: Any,
     ):
-        return self.integrate(fun, y, mean, sigma2, *args, **kwargs)
+        return self.integrate(fun, y, mean, variance, **likelihood_params)
 
 
 @dataclass
@@ -47,11 +42,11 @@ class GHQuadratureIntegrator(AbstractIntegrator):
         fun: Callable,
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
-        sigma2: Float[Array, "N D"],
+        variance: Float[Array, "N D"],
         **likelihood_params: Any,
     ) -> Float[Array, " N"]:
         gh_points, gh_weights = np.polynomial.hermite.hermgauss(self.num_points)
-        sd = jnp.sqrt(sigma2)
+        sd = jnp.sqrt(variance)
         X = mean + jnp.sqrt(2.0) * sd * gh_points
         W = gh_weights / jnp.sqrt(jnp.pi)
         val = jnp.sum(fun(X, y) * W, axis=1)
@@ -65,14 +60,14 @@ class AnalyticalGaussianIntegrator(AbstractIntegrator):
         fun: Callable,
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
-        sigma2: Float[Array, "N D"],
+        variance: Float[Array, "N D"],
         **likelihood_params: Any,
     ) -> Float[Array, " N"]:
         obs_noise = likelihood_params["obs_noise"].squeeze()
         sq_error = jnp.square(y - mean)
         log2pi = jnp.log(2.0 * jnp.pi)
         val = jnp.sum(
-            log2pi + jnp.log(obs_noise) + (sq_error + sigma2) / obs_noise, axis=1
+            log2pi + jnp.log(obs_noise) + (sq_error + variance) / obs_noise, axis=1
         )
         return -0.5 * val
 

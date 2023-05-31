@@ -1,3 +1,0 @@
-# Likelihoods
-
-::: gpjax.likelihoods

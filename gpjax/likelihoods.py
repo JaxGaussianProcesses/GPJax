@@ -96,10 +96,12 @@ class AbstractLikelihood(Module):
         self,
         y: Float[Array, "N D"],
         mu: Float[Array, "N D"],
-        sigma2: Float[Array, "N D"],
+        variance: Float[Array, "N D"],
     ):
         log_prob = vmap(lambda f, y: self.link_function(f).log_prob(y))
-        return self.integrator(fun=log_prob, y=y, mean=mu, sigma2=sigma2, **self.dict())
+        return self.integrator(
+            fun=log_prob, y=y, mean=mu, variance=variance, **self.dict()
+        )
 
 
 @dataclass

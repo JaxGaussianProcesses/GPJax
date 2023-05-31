@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax_beartype
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # Sparse Stochastic Variational Inference
 #
@@ -58,7 +75,6 @@ x = jr.uniform(key=key, minval=-5.0, maxval=5.0, shape=(n,)).reshape(-1, 1)
 f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(subkey, shape=signal.shape) * noise
-
 D = gpx.Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
