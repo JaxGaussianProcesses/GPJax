@@ -23,7 +23,10 @@ import numpy as np
 import pytest
 
 from gpjax.integrators import GHQuadratureIntegrator
-from gpjax.likelihoods import Gaussian
+from gpjax.likelihoods import (
+    Bernoulli,
+    Gaussian,
+)
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -53,12 +56,29 @@ def test_quadrature(jit: bool, num_points: int):
 
 
 @pytest.mark.parametrize("jit", [True, False])
-@pytest.mark.parametrize("obs_noise", [(0.5, -2.57236494), (1.0, -1.91893853)])
-def test_analytical_gaussian(jit: bool, obs_noise: tp.Tuple[float, float]):
-    obs_noise, expected = obs_noise
+@pytest.mark.parametrize("params", [(0.5, -2.57236494), (1.0, -1.91893853)])
+def test_analytical_gaussian(jit: bool, params: tp.Tuple[float, float]):
+    obs_noise, expected = params
     likelihood = Gaussian(num_datapoints=1, obs_noise=jnp.array([obs_noise]))
     mu = jnp.array([[0.0]])
     variance = jnp.array([[1.0]])
+    y = jnp.array([[1.0]])
+
+    if jit:
+        ell_fn = jax.jit(likelihood.expected_log_likelihood)
+    else:
+        ell_fn = likelihood.expected_log_likelihood
+    ell = ell_fn(y=y, mean=mu, variance=variance)
+    np.testing.assert_almost_equal(ell, expected)
+
+
+@pytest.mark.parametrize("jit", [True, False])
+@pytest.mark.parametrize("params", [(0.25, 0.5, -0.65437282), (0.5, 1.0, -0.61716802)])
+def test_bernoulli_quadrature(jit: bool, params: tp.Tuple[float, float]):
+    mu, variance, expected = params
+    mu = jnp.atleast_2d(mu)
+    variance = jnp.atleast_2d(variance)
+    likelihood = Bernoulli(num_datapoints=1)
     y = jnp.array([[1.0]])
 
     if jit:
