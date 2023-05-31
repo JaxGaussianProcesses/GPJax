@@ -244,7 +244,13 @@ class Module(Pytree):
 
         return meta_map(_get_trainables, self)
 
-    def dict(self):
+    def dict(self) -> Dict[str, Any]:
+        """Return the module's fields as a dictionary.
+
+        Returns:
+            Dict[str, Any]: Dictionary of the module's fields. Keys are the field
+                names and values are the field values.
+        """
         return {k: v for k, v in dataclasses.asdict(self).items()}
 
 

@@ -223,6 +223,10 @@ def test_simple_linear_model(is_dataclass):
     assert meta(new).bias == {"amazing": True}
     assert meta(model).bias == {}
 
+    if is_dataclass:
+        params = model.dict()
+        assert params == {"weight": 1.0, "bias": 2.0}
+
 
 @pytest.mark.parametrize("is_dataclass", [True, False])
 def test_nested_Module_structure(is_dataclass):
