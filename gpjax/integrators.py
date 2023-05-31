@@ -24,7 +24,7 @@ class AbstractIntegrator:
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
         **likelihood_params: Any,
-    ):
+    ) -> Float[Array, " N"]:
         r"""Integrate a function with respect to a Gaussian distribution.
 
         Typically, the function will be the likelihood function and the mean
@@ -47,7 +47,7 @@ class AbstractIntegrator:
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
         **likelihood_params: Any,
-    ):
+    ) -> Float[Array, " N"]:
         r"""Integrate a function with respect to a Gaussian distribution.
 
         Typically, the function will be the likelihood function and the mean
