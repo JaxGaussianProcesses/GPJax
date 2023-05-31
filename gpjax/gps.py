@@ -55,7 +55,7 @@ from gpjax.typing import (
 
 @dataclass
 class AbstractPrior(Module):
-    """Abstract Gaussian process prior."""
+    r"""Abstract Gaussian process prior."""
 
     kernel: AbstractKernel
     mean_function: AbstractMeanFunction

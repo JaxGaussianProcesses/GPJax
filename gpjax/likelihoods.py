@@ -97,7 +97,23 @@ class AbstractLikelihood(Module):
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-    ):
+    ) -> Float[Array, " N"]:
+        r"""Compute the expected log likelihood.
+
+        For a variational distribution $`q(f)\sim\mathcal{N}(m, s)`$ and a likelihood
+        $`p(y|f)`$, compute the expected log likelihood:
+        ```math
+        \mathbb{E}_{q(f)}\left[\log p(y|f)\right]
+        ```
+
+        Args:
+            y (Float[Array, 'N D']): The observed response variable.
+            mean (Float[Array, 'N D']): The variational mean.
+            variance (Float[Array, 'N D']): The variational variance.
+
+        Returns:
+            ScalarFloat: The expected log likelihood.
+        """
         log_prob = vmap(lambda f, y: self.link_function(f).log_prob(y))
         return self.integrator(
             fun=log_prob, y=y, mean=mean, variance=variance, **self.dict()
