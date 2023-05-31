@@ -19,6 +19,7 @@ from beartype.typing import (
     Callable,
     Optional,
     Tuple,
+    TypeVar,
     Union,
 )
 import jax
@@ -36,11 +37,13 @@ from gpjax.typing import (
     ScalarFloat,
 )
 
+ModuleModel = TypeVar("ModuleModel", bound=Module)
+
 
 def fit(  # noqa: PLR0913
     *,
-    model: Module,
-    objective: Union[AbstractObjective, Callable[[Module, Dataset], ScalarFloat]],
+    model: ModuleModel,
+    objective: Union[AbstractObjective, Callable[[ModuleModel, Dataset], ScalarFloat]],
     train_data: Dataset,
     optim: ox.GradientTransformation,
     key: KeyArray,
@@ -50,7 +53,7 @@ def fit(  # noqa: PLR0913
     verbose: Optional[bool] = True,
     unroll: Optional[int] = 1,
     safe: Optional[bool] = True,
-) -> Tuple[Module, Array]:
+) -> Tuple[ModuleModel, Array]:
     r"""Train a Module model with respect to a supplied Objective function.
     Optimisers used here should originate from Optax.
 
