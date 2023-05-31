@@ -15,6 +15,7 @@
 
 
 import jax
+import jax.random as jr
 from jax.config import config
 import jax.numpy as jnp
 import pytest
@@ -28,17 +29,28 @@ config.update("jax_enable_x64", True)
 @pytest.mark.parametrize("jit", [True, False])
 @pytest.mark.parametrize("num_points", [10, 20, 30])
 def test_quadrature(jit: bool, num_points: int):
+    key = jr.PRNGKey(123)
+
     def test():
-        def fun(x):
-            return x**2
+        def fun(x, y):
+            """In practice, the first argument will be the latent function values"""
+            return x**2 + y
 
         mean = jnp.array([[2.0]])
-        sd = jnp.array([[1.0]])
+        variance = jnp.array([[1.0]])
         fn_val = GHQuadratureIntegrator(num_points=num_points).integrate(
-            fun=fun, mean=mean, sd=sd
+            fun=fun,
+            mean=mean,
+            sigma2=variance,
+            y=jnp.ones_like(mean),
         )
         return fn_val.squeeze().round(1)
 
     if jit:
         test = jax.jit(test)
-    assert test() == 5.0
+    assert test() == 6.0
+
+
+@pytest.mark.parametrize("jit", [True, False])
+def test_analytical_gaussian(jit: bool):
+    pass
