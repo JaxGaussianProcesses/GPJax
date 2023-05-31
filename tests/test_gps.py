@@ -21,7 +21,10 @@ except ImportError:
     ValidationErrors = ValueError
 
 from dataclasses import is_dataclass
-from typing import Callable
+from typing import (
+    Callable,
+    Type,
+)
 
 from jax.config import config
 import jax.numpy as jnp
@@ -214,7 +217,7 @@ def test_nonconjugate_posterior(
 @pytest.mark.parametrize("kernel", [RBF(), Matern52()])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
 def test_posterior_construct(
-    likelihood: AbstractLikelihood,
+    likelihood: Type[AbstractLikelihood],
     num_datapoints: int,
     mean_function: AbstractMeanFunction,
     kernel: AbstractKernel,
