@@ -1696,6 +1696,25 @@
 
 
 
+<h5 id="gpjax.fit.ModuleModel" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">ModuleModel</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;ModuleModel&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Module</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h5 id="gpjax.fit.__all__" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fit&#39;</span><span class="p">,</span> <span class="s1">&#39;get_batch&#39;</span><span class="p">]</span></code>
   
@@ -1718,7 +1737,7 @@
 
 
 <h5 id="gpjax.fit.fit" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">fit</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="n">objective</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractObjective</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Module</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">],</span> <span class="n">ScalarFloat</span><span class="p">]],</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">optim</span><span class="p">:</span> <span class="n">ox</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">,</span> <span class="n">num_iters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">log_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">unroll</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">safe</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Module</span><span class="p">,</span> <span class="n">Array</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">fit</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">ModuleModel</span><span class="p">,</span> <span class="n">objective</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractObjective</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ModuleModel</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">],</span> <span class="n">ScalarFloat</span><span class="p">]],</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">optim</span><span class="p">:</span> <span class="n">ox</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">,</span> <span class="n">num_iters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">log_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">unroll</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">safe</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ModuleModel</span><span class="p">,</span> <span class="n">Array</span><span class="p">]</span></code>
 
 </h5>
 
