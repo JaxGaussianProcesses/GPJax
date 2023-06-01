@@ -14,9 +14,11 @@
 # ==============================================================================
 
 from dataclasses import dataclass
+from typing import TypeVar, Union, Callable
 
 from beartype.typing import Optional
 import jax.numpy as jnp
+import jax
 from jaxtyping import Num
 from simple_pytree import Pytree
 
@@ -43,7 +45,7 @@ class Dataset(Pytree):
     def __repr__(self) -> str:
         r"""Returns a string representation of the dataset."""
         repr = (
-            f"- Number of observations: {self.n}\n- Input dimension:"
+            f"- Number of observations: {self.n}\n- Input dimension (sum over PyTree):"
             f" {self.in_dim}\n- Output dimension: {self.out_dim}"
         )
         return repr
@@ -72,12 +74,14 @@ class Dataset(Pytree):
     @property
     def n(self) -> int:
         r"""Number of observations."""
-        return self.X.shape[0]
+        return jax.tree_util.tree_leaves(self.X)[0].shape[0]
 
     @property
     def in_dim(self) -> int:
         r"""Dimension of the inputs, $`X`$."""
-        return self.X.shape[1]
+        return jax.tree_util.tree_reduce(
+            lambda a, b: a + b, jax.tree_map(lambda a: a.shape[1], self.X), 0
+        )
 
     @property
     def out_dim(self) -> int:
@@ -89,21 +93,41 @@ def _check_shape(
     X: Optional[Num[Array, "..."]], y: Optional[Num[Array, "..."]]
 ) -> None:
     r"""Checks that the shapes of $`X`$ and $`y`$ are compatible."""
-    if X is not None and y is not None and X.shape[0] != y.shape[0]:
+    len_ok, X_length = _check_all_leaves_const(lambda a: len(a), len(y), X)
+    if X is not None and y is not None and not len_ok:
         raise ValueError(
             "Inputs, X, and outputs, y, must have the same number of rows."
-            f" Got X.shape={X.shape} and y.shape={y.shape}."
+            f" Got len(y)={len(y)} and len(X)={X_length}."
         )
 
-    if X is not None and X.ndim != 2:
+    dim_ok, X_dim = _check_all_leaves_const(lambda a: a.ndim, 2, X)
+    if X is not None and not dim_ok:
         raise ValueError(
-            f"Inputs, X, must be a 2-dimensional array. Got X.ndim={X.ndim}."
+            f"Inputs, X, must be a 2-dimensional array. Got X.ndim={X_dim}."
         )
 
     if y is not None and y.ndim != 2:
         raise ValueError(
             f"Outputs, y, must be a 2-dimensional array. Got y.ndim={y.ndim}."
         )
+
+
+T = TypeVar("T")
+
+
+def _check_all_leaves_const(
+    extract_value: Callable[[any], T],
+    equal_to: T,
+    X: Optional[Union[Pytree, Num[Array, "..."]]],
+) -> bool:
+    values = jax.tree_map(extract_value, X)
+
+    return (
+        jax.tree_util.tree_reduce(
+            lambda a, b: a and b, jax.tree_map(lambda a: a == equal_to, values), True
+        ),
+        values,
+    )
 
 
 __all__ = [
