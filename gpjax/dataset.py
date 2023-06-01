@@ -14,11 +14,15 @@
 # ==============================================================================
 
 from dataclasses import dataclass
-from typing import TypeVar, Union, Callable
+from typing import (
+    Callable,
+    TypeVar,
+    Union,
+)
 
 from beartype.typing import Optional
-import jax.numpy as jnp
 import jax
+import jax.numpy as jnp
 from jaxtyping import Num
 from simple_pytree import Pytree
 

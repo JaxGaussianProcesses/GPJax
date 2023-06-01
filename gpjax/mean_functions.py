@@ -23,12 +23,12 @@ from beartype.typing import (
     List,
     Union,
 )
+import jax
 import jax.numpy as jnp
 from jaxtyping import (
     Float,
     Num,
 )
-import jax
 
 from gpjax.base import (
     Module,
