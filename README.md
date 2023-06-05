@@ -174,12 +174,7 @@ pip install gpjax
 > conda create -n gpjax_experimental python=3.10.0
 > conda activate gpjax_experimental
 >  ```
->
-> and recommend you check your installation passes the supplied unit tests:
->
-> ```python
-> poetry run pytest
-> ```
+
 
 Clone a copy of the repository to your local machine and run the setup
 configuration in development mode.
@@ -188,6 +183,12 @@ git clone https://github.com/JaxGaussianProcesses/GPJax.git
 cd GPJax
 poetry install
 ```
+
+> We recommend you check your installation passes the supplied unit tests:
+>
+> ```python
+> poetry run pytest
+> ```
 
 # Citing GPJax
 
