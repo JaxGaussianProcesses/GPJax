@@ -37,7 +37,7 @@ class AbstractIntegrator:
             mean (Float[Array, 'N D']): The mean of the variational distribution.
             variance (Float[Array, 'N D']): The variance of the variational
                 distribution.
-            **likelihood_params (AbstractLikelihood): The likelihood function.
+            likelihood (AbstractLikelihood): The likelihood function.
         """
         raise NotImplementedError("self.integrate not implemented")
 
@@ -60,7 +60,7 @@ class AbstractIntegrator:
             mean (Float[Array, 'N D']): The mean of the variational distribution.
             variance (Float[Array, 'N D']): The variance of the variational
                 distribution.
-            **likelihood_params (AbstractLikelihood): The likelihood function.
+            likelihood (AbstractLikelihood): The likelihood function.
         """
         return self.integrate(fun, y, mean, variance, likelihood)
 
@@ -96,7 +96,7 @@ class GHQuadratureIntegrator(AbstractIntegrator):
             mean (Float[Array, 'N D']): The mean of the variational distribution.
             variance (Float[Array, 'N D']): The variance of the variational
                 distribution.
-            **likelihood_params (AbstractLikelihood): The likelihood function.
+            likelihood (AbstractLikelihood): The likelihood function.
 
         Returns:
             Float[Array, 'N']: The expected log likelihood.
@@ -137,7 +137,7 @@ class AnalyticalGaussianIntegrator(AbstractIntegrator):
             mean (Float[Array, 'N D']): The mean of the variational distribution.
             variance (Float[Array, 'N D']): The variance of the variational
                 distribution.
-            **likelihood_params (Gaussian): The Gaussian likelihood function.
+            likelihood (Gaussian): The Gaussian likelihood function.
 
         Returns:
             Float[Array, 'N']: The expected log likelihood.
