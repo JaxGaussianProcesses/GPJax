@@ -1,15 +1,16 @@
 from abc import abstractmethod
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from beartype.typing import (
-    Any,
-    Callable,
-)
+from beartype.typing import Callable
 import jax.numpy as jnp
 from jaxtyping import Float
 import numpy as np
 
 from gpjax.typing import Array
+
+if TYPE_CHECKING:
+    import gpjax.likelihoods
 
 
 @dataclass
@@ -23,7 +24,7 @@ class AbstractIntegrator:
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        **likelihood_params: Any,
+        likelihood: "gpjax.likelihoods.AbstractLikelihood" = None,
     ) -> Float[Array, " N"]:
         r"""Integrate a function with respect to a Gaussian distribution.
 
@@ -36,7 +37,7 @@ class AbstractIntegrator:
             mean (Float[Array, 'N D']): The mean of the variational distribution.
             variance (Float[Array, 'N D']): The variance of the variational
                 distribution.
-            **likelihood_params (Any): The parameters of the likelihood function.
+            **likelihood_params (AbstractLikelihood): The likelihood function.
         """
         raise NotImplementedError("self.integrate not implemented")
 
@@ -46,7 +47,7 @@ class AbstractIntegrator:
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        **likelihood_params: Any,
+        likelihood: "gpjax.likelihoods.AbstractLikelihood" = None,
     ) -> Float[Array, " N"]:
         r"""Integrate a function with respect to a Gaussian distribution.
 
@@ -59,9 +60,9 @@ class AbstractIntegrator:
             mean (Float[Array, 'N D']): The mean of the variational distribution.
             variance (Float[Array, 'N D']): The variance of the variational
                 distribution.
-            **likelihood_params (Any): The parameters of the likelihood function.
+            **likelihood_params (AbstractLikelihood): The likelihood function.
         """
-        return self.integrate(fun, y, mean, variance, **likelihood_params)
+        return self.integrate(fun, y, mean, variance, likelihood)
 
 
 @dataclass
@@ -85,7 +86,7 @@ class GHQuadratureIntegrator(AbstractIntegrator):
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        **likelihood_params: Any,
+        likelihood: "gpjax.likelihoods.AbstractLikelihood" = None,
     ) -> Float[Array, " N"]:
         r"""Compute a quadrature integral.
 
@@ -95,7 +96,7 @@ class GHQuadratureIntegrator(AbstractIntegrator):
             mean (Float[Array, 'N D']): The mean of the variational distribution.
             variance (Float[Array, 'N D']): The variance of the variational
                 distribution.
-            **likelihood_params (Any): The parameters of the likelihood function.
+            **likelihood_params (AbstractLikelihood): The likelihood function.
 
         Returns:
             Float[Array, 'N']: The expected log likelihood.
@@ -126,7 +127,7 @@ class AnalyticalGaussianIntegrator(AbstractIntegrator):
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        **likelihood_params: Any,
+        likelihood: "gpjax.likelihoods.Gaussian" = None,
     ) -> Float[Array, " N"]:
         r"""Compute a Gaussian integral.
 
@@ -136,12 +137,12 @@ class AnalyticalGaussianIntegrator(AbstractIntegrator):
             mean (Float[Array, 'N D']): The mean of the variational distribution.
             variance (Float[Array, 'N D']): The variance of the variational
                 distribution.
-            **likelihood_params (Any): The parameters of the likelihood function.
+            **likelihood_params (Gaussian): The Gaussian likelihood function.
 
         Returns:
             Float[Array, 'N']: The expected log likelihood.
         """
-        obs_noise = likelihood_params["obs_noise"].squeeze()
+        obs_noise = likelihood.obs_noise.squeeze()
         sq_error = jnp.square(y - mean)
         log2pi = jnp.log(2.0 * jnp.pi)
         val = jnp.sum(

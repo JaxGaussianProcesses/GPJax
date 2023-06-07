@@ -244,15 +244,6 @@ class Module(Pytree):
 
         return meta_map(_get_trainables, self)
 
-    def dict(self) -> Dict[str, Any]:
-        """Return the module's fields as a dictionary.
-
-        Returns:
-            Dict[str, Any]: Dictionary of the module's fields. Keys are the field
-                names and values are the field values.
-        """
-        return {k: v for k, v in dataclasses.asdict(self).items()}
-
 
 def _toplevel_meta(pytree: Any) -> List[Optional[Dict[str, Any]]]:
     """Unpacks a list of meta corresponding to the top-level nodes of the pytree.

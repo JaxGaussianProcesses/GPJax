@@ -116,7 +116,7 @@ class AbstractLikelihood(Module):
         """
         log_prob = vmap(lambda f, y: self.link_function(f).log_prob(y))
         return self.integrator(
-            fun=log_prob, y=y, mean=mean, variance=variance, **self.dict()
+            fun=log_prob, y=y, mean=mean, variance=variance, likelihood=self
         )
 
 
