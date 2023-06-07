@@ -18,6 +18,7 @@ from beartype.typing import (
     Any,
     Union,
 )
+from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Float
@@ -29,6 +30,11 @@ from gpjax.base import (
     static_field,
 )
 from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.integrators import (
+    AbstractIntegrator,
+    AnalyticalGaussianIntegrator,
+    GHQuadratureIntegrator,
+)
 from gpjax.linops.utils import to_dense
 from gpjax.typing import (
     Array,
@@ -44,6 +50,7 @@ class AbstractLikelihood(Module):
     r"""Abstract base class for likelihoods."""
 
     num_datapoints: int = static_field()
+    integrator: AbstractIntegrator = static_field(GHQuadratureIntegrator())
 
     def __call__(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
         r"""Evaluate the likelihood function at a given predictive distribution.
@@ -85,6 +92,33 @@ class AbstractLikelihood(Module):
         """
         raise NotImplementedError
 
+    def expected_log_likelihood(
+        self,
+        y: Float[Array, "N D"],
+        mean: Float[Array, "N D"],
+        variance: Float[Array, "N D"],
+    ) -> Float[Array, " N"]:
+        r"""Compute the expected log likelihood.
+
+        For a variational distribution $`q(f)\sim\mathcal{N}(m, s)`$ and a likelihood
+        $`p(y|f)`$, compute the expected log likelihood:
+        ```math
+        \mathbb{E}_{q(f)}\left[\log p(y|f)\right]
+        ```
+
+        Args:
+            y (Float[Array, 'N D']): The observed response variable.
+            mean (Float[Array, 'N D']): The variational mean.
+            variance (Float[Array, 'N D']): The variational variance.
+
+        Returns:
+            ScalarFloat: The expected log likelihood.
+        """
+        log_prob = vmap(lambda f, y: self.link_function(f).log_prob(y))
+        return self.integrator(
+            fun=log_prob, y=y, mean=mean, variance=variance, likelihood=self
+        )
+
 
 @dataclass
 class Gaussian(AbstractLikelihood):
@@ -93,6 +127,7 @@ class Gaussian(AbstractLikelihood):
     obs_noise: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
     )
+    integrator: AbstractIntegrator = static_field(AnalyticalGaussianIntegrator())
 
     def link_function(self, f: Float[Array, "..."]) -> tfd.Normal:
         r"""The link function of the Gaussian likelihood.

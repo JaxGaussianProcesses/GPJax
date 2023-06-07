@@ -58,7 +58,7 @@ from gpjax.typing import (
 
 @dataclass
 class AbstractPrior(Module):
-    """Abstract Gaussian process prior."""
+    r"""Abstract Gaussian process prior."""
 
     kernel: AbstractKernel
     mean_function: AbstractMeanFunction
@@ -727,7 +727,7 @@ def construct_posterior(prior, likelihood):
 def _build_fourier_features_fn(
     prior: Prior, num_features: int, key: KeyArray
 ) -> Callable[[Float[Array, "N D"]], Float[Array, "N L"]]:
-    """Return a function that evaluates features sampled from the Fourier feature
+    r"""Return a function that evaluates features sampled from the Fourier feature
     decomposition of the prior's kernel.
 
     Args:

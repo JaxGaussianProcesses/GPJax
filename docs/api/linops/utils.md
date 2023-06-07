@@ -1,3 +1,0 @@
-# Utils
-
-::: gpjax.linops.utils

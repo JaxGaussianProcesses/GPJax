@@ -1,3 +1,0 @@
-# Param
-
-::: gpjax.base.param

@@ -1,3 +1,0 @@
-# Module
-
-::: gpjax.base.module
