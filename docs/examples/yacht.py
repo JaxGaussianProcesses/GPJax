@@ -1,3 +1,19 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax_beartype
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # UCI Data Benchmarking
 #
@@ -175,7 +191,7 @@ opt_posterior, history = gpx.fit(
     objective=negative_mll,
     train_data=training_data,
     optim=ox.adamw(learning_rate=0.05),
-    num_iters=500,
+    num_iters=5000,
     key=key,
 )
 
