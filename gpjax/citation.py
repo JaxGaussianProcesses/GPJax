@@ -2,13 +2,7 @@ from typing import Union
 
 from plum import dispatch
 
-from gpjax.kernels import (
-    ArcCosine,
-    GraphKernel,
-    Matern12,
-    Matern32,
-    Matern52,
-)
+from gpjax.kernels import ArcCosine, GraphKernel, Matern12, Matern32, Matern52, RFF
 from gpjax.objectives import (
     ELBO,
     CollapsedELBO,
@@ -19,6 +13,10 @@ from gpjax.objectives import (
 
 MaternKernels = Union[Matern12, Matern32, Matern52]
 MLLs = Union[ConjugateMLL, NonConjugateMLL, LogPosteriorDensity]
+
+
+def dict_to_string(d: dict) -> str:
+    return "\n".join([f"{k}: {v}" for k, v in d.items()])
 
 
 @dispatch
@@ -62,6 +60,18 @@ def cite(tree: GraphKernel) -> str:
     booktitle = {International Conference on Artificial Intelligence and Statistics},
     year      = {2021}
     }"""
+
+
+@dispatch
+def cite(tree: RFF) -> str:
+    return """@article{rahimi2007random,
+    title={Random features for large-scale kernel machines},
+    author={Rahimi, Ali and Recht, Benjamin},
+    journal={Advances in neural information processing systems},
+    volume={20},
+    year={2007}
+    }
+    """
 
 
 ####################
