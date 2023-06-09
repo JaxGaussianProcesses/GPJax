@@ -73,7 +73,7 @@ def test_graph_kernel():
     assert citation.citation_key == "borovitskiy2021matern"
     assert citation.title == "Matérn Gaussian Processes on Graphs"
     assert citation.year == "2021"
-    _check_no_fallback
+    _check_no_fallback(citation)
 
 
 @pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
