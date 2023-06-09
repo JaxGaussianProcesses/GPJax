@@ -1,5 +1,4 @@
-from typing import Union
-
+from beartype.typing import Union, Dict
 from plum import dispatch
 
 from gpjax.kernels import ArcCosine, GraphKernel, Matern12, Matern32, Matern52, RFF
@@ -13,10 +12,15 @@ from gpjax.objectives import (
 
 MaternKernels = Union[Matern12, Matern32, Matern52]
 MLLs = Union[ConjugateMLL, NonConjugateMLL, LogPosteriorDensity]
+CitationType = Union[str, Dict[str, str]]
 
 
-def dict_to_string(d: dict) -> str:
-    return "\n".join([f"{k}: {v}" for k, v in d.items()])
+def _citation_as_str(citation: Dict[str, str]) -> str:
+    citation_str = f"@{citation['citation_type']}{{{citation['citation_key']},"
+    for k, v in citation.items():
+        if k not in ["citation_type", "citation_key"]:
+            citation_str += f"\n{k} = {{{v}}},"
+    return citation_str + "\n}"
 
 
 @dispatch
@@ -30,15 +34,36 @@ def cite(tree) -> str:
 ####################
 # Kernel citations
 ####################
+# @dispatch
+# def cite(tree: MaternKernels) -> str:
+#     return """@phdthesis{matern1960SpatialV,
+#     author      = {Bertil {M}atérn},
+#     school      = {Stockholm University},
+#     institution = {Stockholm University},
+#     title       = {Spatial variation : Stochastic models and their application to some problems in forest surveys and other sampling investigations},
+#     year        = {1960}
+#     }"""
+
+
 @dispatch
-def cite(tree: MaternKernels) -> str:
-    return """@phdthesis{matern1960SpatialV,
-    author      = {Bertil {M}atérn},
-    school      = {Stockholm University},
-    institution = {Stockholm University},
-    title       = {Spatial variation : Stochastic models and their application to some problems in forest surveys and other sampling investigations},
-    year        = {1960}
-    }"""
+def cite(tree: MaternKernels, as_str: bool = False) -> CitationType:
+    citation = {
+        "author": "Bertil Matern",
+        "school": "Stockholm University",
+        "institution": "Stockholm University",
+        "title": (
+            "Spatial variation : Stochastic models and their application to some"
+            " problems in forest surveys and other sampling investigations"
+        ),
+        "year": "1960",
+        "citation_type": "phdthesis",
+        "citation_key": "matern1960SpatialV",
+        "notes": ""
+    }
+    if as_str:
+        return _citation_as_str(citation)
+    else:
+        return citation
 
 
 @dispatch
