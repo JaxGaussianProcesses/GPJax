@@ -105,7 +105,22 @@ q = gpx.CollapsedVariationalGaussian(posterior=posterior, inducing_inputs=z)
 # <strong data-cite="titsias2009">Titsias (2009)</strong>.
 
 # %%
-elbo = jit(gpx.CollapsedELBO(negative=True))
+elbo = gpx.CollapsedELBO(negative=True)
+
+# %% [markdown]
+# For researchers, GPJax has the capacity to print the bibtex citation for objects such
+# as the ELBO through the `cite()` function.
+
+# %%
+print(gpx.cite(elbo))
+
+# %% [markdown]
+# JIT-compiling expensive-to-compute functions such as the ELBO is
+# advisable. This can be achieved by wrapping the function in `jax.jit()`.
+
+# %%
+
+elbo = jit(elbo)
 
 # %% [markdown]
 # We now train our model akin to a Gaussian process regression model via the `fit`
