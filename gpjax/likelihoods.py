@@ -200,6 +200,42 @@ class Bernoulli(AbstractLikelihood):
 
 
 @dataclass
+class Beta(AbstractLikelihood):
+    def link_function(self, alpha: float, beta: float) -> tfd.Distribution:
+        r"""The probit link function of the Beta likelihood.
+
+        Args:
+            alpha : alpha parameter, indicating mean number of successes
+            beta  : beta parameter, indicating mean number of failures
+
+        Returns
+        -------
+            tfd.Distribution: The likelihood function.
+        """
+        return tfd.Beta(alpha, beta)
+
+    def predict(
+        self, dist: tfd.Distribution, alpha: float, beta: float
+    ) -> tfd.Distribution:
+        r"""Evaluate the pointwise predictive distribution.
+
+        Evaluate the pointwise predictive distribution, given a Gaussian
+        process posterior and likelihood parameters.
+
+        Args:
+            dist (tfd.Distribution): The Gaussian process posterior, evaluated
+                at a finite set of test points.
+            alpha (float) : alpha parameter, indicating mean number of successes
+            beta  (float) : beta parameter, indicating mean number of failures
+
+        Returns
+        -------
+            tfd.Distribution: The pointwise predictive distribution.
+        """
+        return self.link_function(alpha, beta)
+
+
+@dataclass
 class Poisson(AbstractLikelihood):
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         r"""The link function of the Poisson likelihood.
@@ -249,6 +285,7 @@ __all__ = [
     "NonGaussianLikelihood",
     "Gaussian",
     "Bernoulli",
+    "Beta",
     "Poisson",
     "inv_probit",
 ]
