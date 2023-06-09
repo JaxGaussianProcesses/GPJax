@@ -1,14 +1,21 @@
-from plum import dispatch
-from .kernels import Matern12, Matern32, Matern52, ArcCosine, GraphKernel
-from .objectives import (
-    ConjugateMLL,
-    NonConjugateMLL,
-    CollapsedELBO,
-    ELBO,
-    LogPosteriorDensity,
-)
 from typing import Union
 
+from plum import dispatch
+
+from gpjax.kernels import (
+    ArcCosine,
+    GraphKernel,
+    Matern12,
+    Matern32,
+    Matern52,
+)
+from gpjax.objectives import (
+    ELBO,
+    CollapsedELBO,
+    ConjugateMLL,
+    LogPosteriorDensity,
+    NonConjugateMLL,
+)
 
 MaternKernels = Union[Matern12, Matern32, Matern52]
 MLLs = Union[ConjugateMLL, NonConjugateMLL, LogPosteriorDensity]
@@ -50,7 +57,7 @@ def cite(tree: ArcCosine) -> str:
 @dispatch
 def cite(tree: GraphKernel) -> str:
     return """@inproceedings{borovitskiy2021matern,
-    title     = {Matérn {G}aussian processes on graphs},
+    title     = {Matérn Gaussian processes on graphs},
     author    = {Borovitskiy, Viacheslav and Azangulov, Iskander and Terenin, Alexander and Mostowsky, Peter and Deisenroth, Marc and Durrande, Nicolas},
     booktitle = {International Conference on Artificial Intelligence and Statistics},
     year      = {2021}
@@ -63,7 +70,7 @@ def cite(tree: GraphKernel) -> str:
 @dispatch
 def cite(tree: MLLs) -> str:
     return """@book{rasmussen2006gaussian,
-    title     = {{G}aussian processes for machine learning},
+    title     = {Gaussian processes for machine learning},
     author    = {Rasmussen, Carl Edward and Williams, Christopher K},
     volume    = {2},
     number    = {3},
@@ -75,7 +82,7 @@ def cite(tree: MLLs) -> str:
 @dispatch
 def cite(tree: CollapsedELBO) -> str:
     return """@inproceedings{titsias2009variational,
-    title        = {Variational learning of inducing variables in sparse {G}aussian processes},
+    title        = {Variational learning of inducing variables in sparse Gaussian processes},
     author       = {Titsias, Michalis},
     booktitle    = {International Conference on Artificial Intelligence and Statistics},
     pages        = {567--574},
@@ -87,7 +94,7 @@ def cite(tree: CollapsedELBO) -> str:
 @dispatch
 def cite(tree: ELBO) -> str:
     return """@article{hensman2013gaussian,
-    title   = {{G}aussian processes for big data},
+    title   = {Gaussian processes for big data},
     author  = {Hensman, James and Fusi, Nicolo and Lawrence, Neil D},
     journal = {International Conference on Artificial Intelligence and Statistics},
     year    = {2013}
