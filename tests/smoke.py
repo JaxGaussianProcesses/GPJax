@@ -1,6 +1,7 @@
-import jupytext
-import jax.numpy as jnp  # noqa: F401
 from dataclasses import dataclass
+
+import jax.numpy as jnp  # noqa: F401
+import jupytext
 import numpy as np
 
 
