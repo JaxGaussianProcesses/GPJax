@@ -201,22 +201,20 @@ class Bernoulli(AbstractLikelihood):
 
 @dataclass
 class Beta(AbstractLikelihood):
-    def link_function(self, alpha: float, beta: float) -> tfd.Distribution:
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         r"""The probit link function of the Beta likelihood.
 
         Args:
-            alpha : alpha parameter, indicating mean number of successes
-            beta  : beta parameter, indicating mean number of failures
+            f (Float[Array, "..."]): Function values.
 
         Returns
         -------
             tfd.Distribution: The likelihood function.
         """
-        return tfd.Beta(alpha, beta)
 
-    def predict(
-        self, dist: tfd.Distribution, alpha: float, beta: float
-    ) -> tfd.Distribution:
+        return tfd.Beta(f[0], f[1])
+
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
         r"""Evaluate the pointwise predictive distribution.
 
         Evaluate the pointwise predictive distribution, given a Gaussian
@@ -225,14 +223,18 @@ class Beta(AbstractLikelihood):
         Args:
             dist (tfd.Distribution): The Gaussian process posterior, evaluated
                 at a finite set of test points.
-            alpha (float) : alpha parameter, indicating mean number of successes
-            beta  (float) : beta parameter, indicating mean number of failures
 
         Returns
         -------
             tfd.Distribution: The pointwise predictive distribution.
         """
-        return self.link_function(alpha, beta)
+        mean = dist.mean().ravel()
+        stddev = dist.stddev().ravel()
+
+        alpha = mean / stddev
+        beta = (1.0 - mean) / stddev
+
+        return self.link_function([alpha, beta])
 
 
 @dataclass
