@@ -227,7 +227,22 @@ q = gpx.VariationalGaussian(posterior=p, inducing_inputs=z)
 # its negative.
 
 # %%
-negative_elbo = jit(gpx.ELBO(negative=True))
+negative_elbo = gpx.ELBO(negative=True)
+
+# %% [markdown]
+# For researchers, GPJax has the capacity to print the bibtex citation for objects such
+# as the ELBO through the `cite()` function.
+
+# %%
+print(gpx.cite(negative_elbo))
+
+# %% [markdown]
+# JIT-compiling expensive-to-compute functions such as the ELBO is
+# advisable. This can be achieved by wrapping the function in `jax.jit()`.
+
+# %%
+
+negative_elbo = jit(negative_elbo)
 
 # %% [markdown]
 # ### Mini-batching

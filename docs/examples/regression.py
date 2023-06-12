@@ -179,7 +179,7 @@ posterior = prior * likelihood
 # these parameters by optimising the marginal log-likelihood (MLL).
 
 # %%
-negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True))
+negative_mll = gpx.objectives.ConjugateMLL(negative=True)
 negative_mll(posterior, train_data=D)
 
 
@@ -188,6 +188,20 @@ negative_mll(posterior, train_data=D)
 #     ox.adam(learning_rate=0.01),
 #     ox.masked(ox.set_to_zero(), static_tree)
 #     )
+# %% [markdown]
+# For researchers, GPJax has the capacity to print the bibtex citation for objects such
+# as the marginal log-likelihood through the `cite()` function.
+
+# %%
+print(gpx.cite(negative_mll))
+
+# %% [markdown]
+# JIT-compiling expensive-to-compute functions such as the marginal log-likelihood is
+# advisable. This can be achieved by wrapping the function in `jax.jit()`.
+
+# %%
+negative_mll = jit(negative_mll)
+
 # %% [markdown]
 # Since most optimisers (including here) minimise a given function, we have realised
 # the negative marginal log-likelihood and just-in-time (JIT) compiled this to
