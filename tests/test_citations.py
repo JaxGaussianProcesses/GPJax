@@ -2,6 +2,7 @@ from jax.config import config
 
 config.update("jax_enable_x64", True)
 
+from jax import jit
 import jax.numpy as jnp
 import pytest
 
@@ -9,6 +10,7 @@ import gpjax as gpx
 from gpjax.citation import (
     AbstractCitation,
     BookCitation,
+    JittedFnCitation,
     NullCitation,
     PaperCitation,
     PhDThesisCitation,
@@ -138,3 +140,13 @@ def test_collapsed_elbo():
         == "International Conference on Artificial Intelligence and Statistics"
     )
     _check_no_fallback(citation)
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [gpx.ELBO(), gpx.CollapsedELBO(), gpx.LogPosteriorDensity(), gpx.ConjugateMLL()],
+)
+def test_jitted_fallback(objective):
+    citation = cite(jit(objective))
+    assert isinstance(citation, JittedFnCitation)
+    assert citation.__str__() == "Citation not available for jitted objects."

@@ -7,6 +7,7 @@ from beartype.typing import (
     Dict,
     Union,
 )
+from jaxlib.xla_extension import PjitFunction
 from plum import dispatch
 
 from gpjax.kernels import (
@@ -53,22 +54,16 @@ class AbstractCitation:
 
 
 class NullCitation(AbstractCitation):
-    citation_key: str = None
-    authors: str = None
-    title: str = None
-    year: str = None
-
-    def __repr__(self) -> str:
-        return repr(
-            "No citation available. If you think this is an error, please open a pull"
-            " request."
-        )
-
     def __str__(self) -> str:
         return (
             "No citation available. If you think this is an error, please open a pull"
             " request."
         )
+
+
+class JittedFnCitation(AbstractCitation):
+    def __str__(self) -> str:
+        return "Citation not available for jitted objects."
 
 
 @dataclass
@@ -97,6 +92,14 @@ class BookCitation(AbstractCitation):
 @dispatch
 def cite(tree) -> NullCitation:
     return NullCitation()
+
+
+####################
+# Default citation
+####################
+@dispatch
+def cite(tree: PjitFunction) -> JittedFnCitation:
+    return JittedFnCitation()
 
 
 ####################
