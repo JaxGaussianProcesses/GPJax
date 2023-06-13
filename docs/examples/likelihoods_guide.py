@@ -45,7 +45,7 @@
 # In GPJax, all likelihoods are a subclass of the `AbstractLikelihood` class. This base
 # abstract class contains the three core methods that all likelihoods must implement:
 # `predict`, `link_function`, and `expected_log_likelihood`. We will discuss each of
-# these methods in the forthcoming sections, but first we will show how to instantiate
+# these methods in the forthcoming sections, but first, we will show how to instantiate
 # a likelihood object. To do this, we'll need a dataset.
 
 # +
