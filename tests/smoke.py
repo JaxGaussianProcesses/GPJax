@@ -35,7 +35,7 @@ class Result:
             "plt.show()", ""
         )
         lines = contents.split("\n")
-        contents = "\n".join([l for l in lines if not l.startswith("%")])
+        contents = "\n".join([line for line in lines if not line.startswith("%")])
 
         loc = {}
         exec(contents, globals(), loc)
