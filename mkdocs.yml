@@ -26,9 +26,11 @@ nav:
     - Graph kernels: examples/graph_kernels.py
     - Sparse GPs: examples/uncollapsed_vi.py
     - Stochastic sparse GPs: examples/collapsed_vi.py
-    - Kernels: examples/kernels.py
-    - UCI regression: examples/yacht.py
     - Pathwise Sampling for Spatial Modelling: examples/spatial.py
+  - 📖 Guides for customisation:
+    - Kernels: examples/kernels.py
+    - Likelihoods: examples/likelihoods_guide.py
+    - UCI regression: examples/yacht.py
   - 💻 Raw tutorial code: give_me_the_code.md
   - 📕 Reference: api/
 

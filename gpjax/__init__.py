@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+from gpjax import integrators
 from gpjax.base import (
     Module,
     param_field,
@@ -83,6 +84,7 @@ __all__ = [
     "fit",
     "Prior",
     "construct_posterior",
+    "integrators",
     "RBF",
     "GraphKernel",
     "Matern12",
