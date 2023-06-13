@@ -194,7 +194,7 @@ for ax in axes.ravel():
 # distribution.
 #
 # A table of commonly used link functions and their corresponding likelihood can be
-# found [here](https://en.wikipedia.org/wiki/Generalized_linear_model#Link_function)
+# found [here](https://en.wikipedia.org/wiki/Generalized_linear_model#Link_function).
 #
 # ### Expected log likelihood
 #
