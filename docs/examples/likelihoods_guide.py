@@ -67,8 +67,8 @@ cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 key = jr.PRNGKey(123)
 
 
-N = 50
-x = jnp.sort(jr.uniform(key=key, shape=(N, 1), minval=-3.0, maxval=3.0), axis=0)
+n = 50
+x = jnp.sort(jr.uniform(key=key, shape=(n, 1), minval=-3.0, maxval=3.0), axis=0)
 xtest = jnp.linspace(-3, 3, 100)[:, None]
 f = lambda x: jnp.sin(x)
 y = f(x) + 0.1 * jr.normal(key, shape=x.shape)
