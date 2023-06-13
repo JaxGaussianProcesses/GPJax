@@ -44,7 +44,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
 import tensorflow_probability.substrates.jax as tfp
-from docs.examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -132,14 +131,18 @@ xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 z = jnp.linspace(-5.0, 5.0, 50).reshape(-1, 1)
 
 fig, ax = plt.subplots()
-[
-    ax.axvline(x=z_i, color=cols[2], alpha=0.3, linewidth=1, label="Inducing point")
-    for z_i in z
-]
+ax.vlines(
+    z,
+    ymin=y.min(),
+    ymax=y.max(),
+    alpha=0.3,
+    linewidth=1,
+    label="Inducing point",
+    color=cols[2],
+)
 ax.scatter(x, y, alpha=0.2, color=cols[0], label="Observations")
 ax.plot(xtest, f(xtest), color=cols[1], label="Latent function")
 ax.legend()
-ax = clean_legend(ax)
 ax.set(xlabel=r"$x$", ylabel=r"$f(x)$")
 
 # %% [markdown]
@@ -241,7 +244,6 @@ print(gpx.cite(negative_elbo))
 # advisable. This can be achieved by wrapping the function in `jax.jit()`.
 
 # %%
-
 negative_elbo = jit(negative_elbo)
 
 # %% [markdown]
@@ -296,12 +298,16 @@ ax.fill_between(
     color=cols[1],
     label="Two sigma",
 )
-[
-    ax.axvline(x=z_i, color=cols[2], alpha=0.3, linewidth=1, label="Inducing point")
-    for z_i in opt_posterior.inducing_inputs
-]
+ax.vlines(
+    opt_posterior.inducing_inputs,
+    ymin=y.min(),
+    ymax=y.max(),
+    alpha=0.3,
+    linewidth=1,
+    label="Inducing point",
+    color=cols[2],
+)
 ax.legend()
-ax = clean_legend(ax)
 
 # %% [markdown]
 # ## Custom transformations
@@ -349,12 +355,16 @@ ax.fill_between(
     color=cols[1],
     label="Two sigma",
 )
-[
-    ax.axvline(x=z_i, color=cols[2], alpha=0.3, linewidth=1, label="Inducing point")
-    for z_i in opt_posterior.inducing_inputs
-]
+ax.vlines(
+    opt_rep.inducing_inputs,
+    ymin=y.min(),
+    ymax=y.max(),
+    alpha=0.3,
+    linewidth=1,
+    label="Inducing point",
+    color=cols[2],
+)
 ax.legend()
-ax = clean_legend(ax)
 
 # %% [markdown]
 # We can see that `Square` transformation is able to get relatively better fit
