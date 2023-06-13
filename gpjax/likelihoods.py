@@ -212,7 +212,7 @@ class Beta(AbstractLikelihood):
             tfd.Distribution: The likelihood function.
         """
 
-        return tfd.Beta(f[0], f[1])
+        return tfd.Beta(inv_probit(f[0]), inv_probit(f[1]))
 
     def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
         r"""Evaluate the pointwise predictive distribution.
