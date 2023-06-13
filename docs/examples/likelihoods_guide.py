@@ -181,7 +181,7 @@ for ax in axes.ravel():
 
 # ### Link functions
 #
-# In the above figure we can see the latent samples being constrained to be either 0 or
+# In the above figure, we can see the latent samples being constrained to be either 0 or
 # 1 when a Bernoulli likelihood is specified. This is achieved by the
 # `inverse link_function` $\eta(\cdot)$ of the likelihood. The link function is a
 # deterministic function that maps the latent distribution of the Gaussian process to
