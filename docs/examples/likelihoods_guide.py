@@ -86,7 +86,7 @@ ax.legend()
 # likelihood is appropriate for this dataset as it allows for negative values.
 #
 # As we see in \eqref{eq:likelihood_fn}, the likelihood function factorises over the
-# $N$ observations. As such, we must provide this information to GPJax when
+# $n$ observations. As such, we must provide this information to GPJax when
 # instantiating a likelihood object. We do this by specifying the `num_datapoints`
 # argument.
 
