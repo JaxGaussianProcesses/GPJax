@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+from gpjax import integrators
 from gpjax.base import (
     Module,
     param_field,
 )
+from gpjax.citation import cite
 from gpjax.dataset import Dataset
 from gpjax.fit import fit
 from gpjax.gps import (
@@ -77,10 +79,12 @@ __contributors__ = "https://github.com/thomaspinder/GPJax/graphs/contributors"
 __all__ = [
     "Module",
     "param_field",
+    "cite",
     "kernels",
     "fit",
     "Prior",
     "construct_posterior",
+    "integrators",
     "RBF",
     "GraphKernel",
     "Matern12",
