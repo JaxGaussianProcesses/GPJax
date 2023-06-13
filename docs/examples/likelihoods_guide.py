@@ -1,6 +1,6 @@
 # # Likelihood guide
 #
-# In this notebook we will walk users through the process of creating a new likelihood
+# In this notebook, we will walk users through the process of creating a new likelihood
 # in GPJax.
 #
 # ## Background
