@@ -1,0 +1,41 @@
+{
+    "kernels.TimeSuite.time_covfunc_call": {
+        "code": "class TimeSuite:\n    def time_covfunc_call(self, kernel_func, n_datapoints, n_dims):\n        self.kernelfunc.gram(self.X)\n\n    def setup(self, kernel_func, n_datapoints, n_dims):\n        key = jr.PRNGKey(123)\n        self.X = jr.uniform(\n            key=key, minval=-3.0, maxval=3.0, shape=(n_datapoints, n_dims)\n        )\n        self.kernelfunc = get_kernel(kernel_name=kernel_func, n_dims=n_dims)",
+        "min_run_count": 2,
+        "name": "kernels.TimeSuite.time_covfunc_call",
+        "number": 0,
+        "param_names": [
+            "kernel",
+            "n_data",
+            "dimensionality"
+        ],
+        "params": [
+            [
+                "'RBF'",
+                "'MATERN12'",
+                "'MATERN32'",
+                "'MATERN52'",
+                "'POLYNOMIAL'"
+            ],
+            [
+                "10",
+                "100",
+                "1000"
+            ],
+            [
+                "1",
+                "2",
+                "5"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "timeout": 60.0,
+        "type": "time",
+        "unit": "seconds",
+        "version": "60eb88777e78bdde3c136a83470d1f641bb9a146a66f763f64fd0acb21788765",
+        "warmup_time": -1
+    },
+    "version": 2
+}
