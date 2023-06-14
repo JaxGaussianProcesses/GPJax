@@ -192,6 +192,10 @@ output = "reports/coverage.xml"
 
 [tool.poetry-dynamic-versioning]
 enable = true
+vcs = "git"
+
+[tool.poetry-dynamic-versioning.substitution]
+files = ["dowhy/__init__.py"]
 
 [tool.codespell]
 ignore-words-list = "fro" # Frobenius
