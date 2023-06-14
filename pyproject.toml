@@ -195,7 +195,7 @@ enable = true
 vcs = "git"
 
 [tool.poetry-dynamic-versioning.substitution]
-files = ["dowhy/__init__.py"]
+files = ["gpjax/__init__.py"]
 
 [tool.codespell]
 ignore-words-list = "fro" # Frobenius
