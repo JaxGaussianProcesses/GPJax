@@ -1,4 +1,4 @@
-name: Smoke Tests
+name: Integration Tests
 on:
   pull_request:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    name: Run Smoke Tests
+    name: Run Integration Tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -42,5 +42,5 @@ jobs:
           poetry install --all-extras --with docs
 
       # Run the unit tests and build the coverage report
-      - name: Run Smoke Tests
+      - name: Run Integration Tests
         run: poetry run python tests/smoke.py
