@@ -43,4 +43,4 @@ jobs:
 
       # Run the unit tests and build the coverage report
       - name: Run Integration Tests
-        run: poetry run python tests/smoke.py
+        run: poetry run python tests/integration_tests.py
