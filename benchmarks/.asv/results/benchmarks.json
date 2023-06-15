@@ -1,26 +1,30 @@
 {
-    "sparse.Sparse.time_eval": {
-        "code": "class Sparse:\n    def time_eval(self, n_datapoints, n_dims):\n        self.objective(self.q, self.data)\n\n    def setup(self, n_datapoints, n_inducing):\n        key = jr.PRNGKey(123)\n        self.X = jr.normal(key=key, shape=(n_datapoints, 1))\n        self.y = jnp.sin(self.X[:, :1])\n        self.data = gpx.Dataset(X=self.X, y=self.y)\n        kernel = gpx.kernels.RBF(active_dims=list(range(1)))\n        meanf = gpx.mean_functions.Constant()\n        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)\n        self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)\n        self.posterior = self.prior * self.likelihood\n    \n        Z = jnp.linspace(self.X.min(), self.X.max(), n_inducing).reshape(-1, 1)\n        self.q = gpx.CollapsedVariationalGaussian(\n            posterior=self.posterior, inducing_inputs=Z\n        )\n        self.objective = gpx.CollapsedELBO(negative=True)",
+    "objectives.Objectives.time_eval": {
+        "code": "class Objectives:\n    def time_eval(self, n_datapoints, n_dims, likelihood):\n        self.objective(self.posterior, train_data=self.data)\n\n    def setup(self, n_datapoints, n_dims, likelihood):\n        key = jr.PRNGKey(123)\n        self.X = jr.normal(key=key, shape=(n_datapoints, n_dims))\n        self.y = jnp.sin(self.X[:, :1])\n        if likelihood == \"Bernoulli\":\n            self.y = jnp.where(self.y > 0, 1, 0)\n        self.data = gpx.Dataset(X=self.X, y=self.y)\n        kernel = gpx.kernels.RBF(active_dims=list(range(n_dims)))\n        meanf = gpx.mean_functions.Constant()\n        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)\n        if likelihood == \"Bernoulli\":\n            self.likelihood = gpx.likelihoods.Bernoulli(num_datapoints=self.data.n)\n            self.objective = gpx.LogPosteriorDensity()\n        elif likelihood == \"Gaussian\":\n            self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)\n            self.objective = gpx.ConjugateMLL()\n        self.posterior = self.prior * self.likelihood",
         "min_run_count": 2,
-        "name": "sparse.Sparse.time_eval",
+        "name": "objectives.Objectives.time_eval",
         "number": 0,
         "param_names": [
             "n_data",
-            "n_inducing"
+            "n_dims",
+            "likelihood"
         ],
         "params": [
             [
-                "2000",
-                "5000",
-                "10000",
-                "20000"
+                "10",
+                "100",
+                "200",
+                "500",
+                "1000"
             ],
             [
-                "10",
-                "20",
-                "50",
-                "100",
-                "200"
+                "1",
+                "2",
+                "5"
+            ],
+            [
+                "'Gaussian'",
+                "'Bernoulli'"
             ]
         ],
         "repeat": 0,
@@ -29,31 +33,35 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "c42a0cef98e7ce98940fdd14075c567a03ab6e0217008f317c0b2ad4bc48bccb",
+        "version": "ba013def2ae4698fbe176bdeed5ed4e62f175feb5f89351a8e6223118526c63a",
         "warmup_time": -1
     },
-    "sparse.Sparse.time_grad": {
-        "code": "class Sparse:\n    def time_grad(self, n_datapoints, n_dims):\n        jax.grad(self.objective)(self.q, self.data)\n\n    def setup(self, n_datapoints, n_inducing):\n        key = jr.PRNGKey(123)\n        self.X = jr.normal(key=key, shape=(n_datapoints, 1))\n        self.y = jnp.sin(self.X[:, :1])\n        self.data = gpx.Dataset(X=self.X, y=self.y)\n        kernel = gpx.kernels.RBF(active_dims=list(range(1)))\n        meanf = gpx.mean_functions.Constant()\n        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)\n        self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)\n        self.posterior = self.prior * self.likelihood\n    \n        Z = jnp.linspace(self.X.min(), self.X.max(), n_inducing).reshape(-1, 1)\n        self.q = gpx.CollapsedVariationalGaussian(\n            posterior=self.posterior, inducing_inputs=Z\n        )\n        self.objective = gpx.CollapsedELBO(negative=True)",
+    "objectives.Objectives.time_grad": {
+        "code": "class Objectives:\n    def time_grad(self, n_datapoints, n_dims, likelihood):\n        jax.grad(self.objective)(self.posterior, train_data=self.data)\n\n    def setup(self, n_datapoints, n_dims, likelihood):\n        key = jr.PRNGKey(123)\n        self.X = jr.normal(key=key, shape=(n_datapoints, n_dims))\n        self.y = jnp.sin(self.X[:, :1])\n        if likelihood == \"Bernoulli\":\n            self.y = jnp.where(self.y > 0, 1, 0)\n        self.data = gpx.Dataset(X=self.X, y=self.y)\n        kernel = gpx.kernels.RBF(active_dims=list(range(n_dims)))\n        meanf = gpx.mean_functions.Constant()\n        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)\n        if likelihood == \"Bernoulli\":\n            self.likelihood = gpx.likelihoods.Bernoulli(num_datapoints=self.data.n)\n            self.objective = gpx.LogPosteriorDensity()\n        elif likelihood == \"Gaussian\":\n            self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)\n            self.objective = gpx.ConjugateMLL()\n        self.posterior = self.prior * self.likelihood",
         "min_run_count": 2,
-        "name": "sparse.Sparse.time_grad",
+        "name": "objectives.Objectives.time_grad",
         "number": 0,
         "param_names": [
             "n_data",
-            "n_inducing"
+            "n_dims",
+            "likelihood"
         ],
         "params": [
             [
-                "2000",
-                "5000",
-                "10000",
-                "20000"
+                "10",
+                "100",
+                "200",
+                "500",
+                "1000"
             ],
             [
-                "10",
-                "20",
-                "50",
-                "100",
-                "200"
+                "1",
+                "2",
+                "5"
+            ],
+            [
+                "'Gaussian'",
+                "'Bernoulli'"
             ]
         ],
         "repeat": 0,
@@ -62,7 +70,7 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "5aaf0153a37ed3daf24fa0e2a128884fc50602f21a8cc268d5ddb989aaabcd66",
+        "version": "19cae76dba5d83e53605707fcb7d0d9f8fee05aa83d2d744c1d6a52462576272",
         "warmup_time": -1
     },
     "version": 2

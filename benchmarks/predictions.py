@@ -2,26 +2,27 @@ from jax.config import config
 
 config.update("jax_enable_x64", True)
 import gpjax as gpx
+from gpjax.gps import ConjugatePosterior
 import jax.numpy as jnp
 import jax.random as jr
 import jax
 
-N_DATAPOINTS = [10, 100, 200, 500, 1000]
+N_TEST = [100, 200, 500, 1000, 2000, 3000]
 N_DIMS = [1, 2, 5]
 LIKELIHOOD = ["Gaussian", "Bernoulli"]
 
 
 class Objectives:
     param_names = [
-        "n_data",
+        "n_test",
         "n_dims",
         "likelihood",
     ]
-    params = [N_DATAPOINTS, N_DIMS, LIKELIHOOD]
+    params = [N_TEST, N_DIMS, LIKELIHOOD]
 
-    def setup(self, n_datapoints, n_dims, likelihood):
+    def setup(self, n_test, n_dims, likelihood):
         key = jr.PRNGKey(123)
-        self.X = jr.normal(key=key, shape=(n_datapoints, n_dims))
+        self.X = jr.normal(key=key, shape=(100, n_dims))
         self.y = jnp.sin(self.X[:, :1])
         if likelihood == "Bernoulli":
             self.y = jnp.where(self.y > 0, 1, 0)
@@ -31,14 +32,11 @@ class Objectives:
         self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)
         if likelihood == "Bernoulli":
             self.likelihood = gpx.likelihoods.Bernoulli(num_datapoints=self.data.n)
-            self.objective = gpx.LogPosteriorDensity()
         elif likelihood == "Gaussian":
             self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)
-            self.objective = gpx.ConjugateMLL()
-        self.posterior = self.prior * self.likelihood
+        self.posterior: ConjugatePosterior = self.prior * self.likelihood
+        key, subkey = jr.split(key)
+        self.xtest = jr.normal(key=subkey, shape=(n_test, n_dims))
 
-    def time_eval(self, n_datapoints, n_dims, likelihood):
-        self.objective(self.posterior, train_data=self.data)
-
-    def time_grad(self, n_datapoints, n_dims, likelihood):
-        jax.grad(self.objective)(self.posterior, train_data=self.data)
+    def time_predict(self, n_test, n_dims, likelihood):
+        self.posterior.predict(test_inputs=self.xtest, train_data=self.data)
