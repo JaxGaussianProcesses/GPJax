@@ -4,7 +4,7 @@ import jax.numpy as jnp
 from jaxtyping import Float
 
 from gpjax.kernels.computations.base import AbstractKernelComputation
-from gpjax.linops import DenseLinearOperator
+from gpjax.linops import Dense
 from gpjax.typing import Array
 
 
@@ -33,7 +33,7 @@ class BasisFunctionComputation(AbstractKernelComputation):
         z1 /= self.kernel.num_basis_fns
         return self.kernel.base_kernel.variance * jnp.matmul(z1, z2.T)
 
-    def gram(self, inputs: Float[Array, "N D"]) -> DenseLinearOperator:
+    def gram(self, inputs: Float[Array, "N D"]) -> Dense:
         r"""Compute an approximate Gram matrix.
 
         For the Gram matrix, we can save computations by computing only one matrix
@@ -43,13 +43,13 @@ class BasisFunctionComputation(AbstractKernelComputation):
             inputs (Float[Array, "N D"]): A $`N x D`$ array of inputs.
 
         Returns:
-            DenseLinearOperator: A dense linear operator representing the
+            Dense: A dense linear operator representing the
                 $`N \times N`$ Gram matrix.
         """
         z1 = self.compute_features(inputs)
         matrix = jnp.matmul(z1, z1.T)  # shape: (n_samples, n_samples)
         matrix /= self.kernel.num_basis_fns
-        return DenseLinearOperator(self.kernel.base_kernel.variance * matrix)
+        return Dense(self.kernel.base_kernel.variance * matrix)
 
     def compute_features(self, x: Float[Array, "N D"]) -> Float[Array, "N L"]:
         r"""Compute the features for the inputs.

@@ -31,7 +31,7 @@ from gpjax.kernels.nonstationary import (
     Linear,
     Polynomial,
 )
-from gpjax.linops import LinearOperator
+from gpjax.linops import AbstractLinearOperator
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -122,7 +122,7 @@ class BaseTestKernel:
 
         # Test gram matrix
         Kxx = kernel.gram(x)
-        assert isinstance(Kxx, LinearOperator)
+        assert isinstance(Kxx, AbstractLinearOperator)
         assert Kxx.shape == (n, n)
         assert jnp.all(jnp.linalg.eigvalsh(Kxx.to_dense() + jnp.eye(n) * 1e-6) > 0.0)
 

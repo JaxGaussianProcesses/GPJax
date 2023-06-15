@@ -1,4 +1,4 @@
-# Copyright 2022 The JaxLinOp Contributors. All Rights Reserved.
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,17 +23,17 @@ import jax.tree_util as jtu
 import pytest
 
 from gpjax.base import static_field
-from gpjax.linops.linear_operator import LinearOperator
+from gpjax.linops.base import AbstractLinearOperator
 
 
 def test_abstract_operator() -> None:
     # Test abstract linear operator raises an error.
     with pytest.raises(TypeError):
-        LinearOperator()
+        AbstractLinearOperator()
 
     # Test dataclass wrapped abstract linear operator raise an error.
     with pytest.raises(TypeError):
-        dataclass(LinearOperator)()
+        dataclass(AbstractLinearOperator)()
 
 
 @pytest.mark.parametrize("test_dataclass", [True, False])
@@ -41,7 +41,7 @@ def test_abstract_operator() -> None:
 @pytest.mark.parametrize("dtype", [jnp.float32, jnp.float64])
 def test_instantiate_no_attributes(test_dataclass, shape, dtype) -> None:
     # Test can instantiate a linear operator with the abstract methods defined.
-    class DummyLinearOperator(LinearOperator):
+    class DummyLinearOperator(AbstractLinearOperator):
         def diagonal(self, *args, **kwargs):
             pass
 
@@ -76,7 +76,7 @@ def test_instantiate_no_attributes(test_dataclass, shape, dtype) -> None:
 
     # Check types.
     assert isinstance(linop, DummyLinearOperator)
-    assert isinstance(linop, LinearOperator)
+    assert isinstance(linop, AbstractLinearOperator)
 
     if test_dataclass:
         assert is_dataclass(linop)
@@ -96,7 +96,7 @@ def test_instantiate_no_attributes(test_dataclass, shape, dtype) -> None:
 def test_instantiate_with_attributes(test_dataclass, shape, dtype) -> None:
     """Test if the covariance operator can be instantiated with attribute annotations."""
 
-    class DummyLinearOperator(LinearOperator):
+    class DummyLinearOperator(AbstractLinearOperator):
         a: int
         b: int = static_field()  # Lets have a static attribute here.
         c: int
@@ -108,9 +108,6 @@ def test_instantiate_with_attributes(test_dataclass, shape, dtype) -> None:
             self.shape = shape
             self.dtype = dtype
 
-        def diagonal(self, *args, **kwargs):
-            pass
-
         def shape(self, *args, **kwargs):
             pass
 
@@ -119,9 +116,6 @@ def test_instantiate_with_attributes(test_dataclass, shape, dtype) -> None:
 
         def __mul__(self, *args, **kwargs):
             """Multiply linear operator by scalar."""
-
-        def _add_diagonal(self, *args, **kwargs):
-            pass
 
         def __matmul__(self, *args, **kwargs):
             """Matrix multiplication."""
@@ -142,7 +136,7 @@ def test_instantiate_with_attributes(test_dataclass, shape, dtype) -> None:
 
     # Check types.
     assert isinstance(linop, DummyLinearOperator)
-    assert isinstance(linop, LinearOperator)
+    assert isinstance(linop, AbstractLinearOperator)
 
     if test_dataclass:
         assert is_dataclass(linop)

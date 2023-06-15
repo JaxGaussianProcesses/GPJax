@@ -17,6 +17,9 @@ from gpjax.base import (
     Module,
     param_field,
 )
+
+from gpjax.linops import *
+
 from gpjax.citation import cite
 from gpjax.dataset import Dataset
 from gpjax.fit import fit

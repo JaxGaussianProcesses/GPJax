@@ -1,4 +1,4 @@
-# Copyright 2022 The JaxLinOp Contributors. All Rights Reserved.
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,14 +16,19 @@
 
 from dataclasses import dataclass
 
-from beartype.typing import Any
+from beartype.typing import (
+    Any,
+    Union,
+)
 import jax.numpy as jnp
 from jaxtyping import Float
 
-from gpjax.linops.constant_diagonal_linear_operator import (
-    ConstantDiagonalLinearOperator,
+from gpjax.linops.base import AbstractLinearOperator
+from gpjax.linops.constant_diagonal import ConstantDiagonal
+from gpjax.linops.utils import (
+    _check_dtype_arg,
+    default_dtype,
 )
-from gpjax.linops.utils import default_dtype
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -37,7 +42,7 @@ def _check_size(size: Any) -> None:
 
 
 @dataclass
-class IdentityLinearOperator(ConstantDiagonalLinearOperator):
+class Identity(ConstantDiagonal):
     """Identity linear operator."""
 
     def __init__(self, size: int, dtype: jnp.dtype = None) -> None:
@@ -46,29 +51,27 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         Args:
             size (int): Size of the identity matrix.
         """
-        _check_size(size)
 
+        # Get dtype.
         if dtype is None:
             dtype = default_dtype()
 
+        # Check size.
+        _check_size(size)
+
+        # Check dtype.
+        _check_dtype_arg(dtype)
+
+        # Set attributes.
         self.value = jnp.array([1.0], dtype=dtype)
         self.size = size
         self.shape = (size, size)
         self.dtype = dtype
 
-    def __matmul__(self, other: Float[Array, "N M"]) -> Float[Array, "N M"]:
-        """Matrix multiplication.
-
-        Args:
-            other (Float[Array, "N M"]): Matrix to multiply with.
-
-        Returns
-        -------
-            Float[Array, "N M"]: Result of matrix multiplication.
-        """
+    def __matmul__(self, other: AbstractLinearOperator) -> AbstractLinearOperator:
         return other
 
-    def to_root(self) -> "IdentityLinearOperator":
+    def to_root(self) -> "Identity":
         """
         Lower triangular.
 
@@ -87,16 +90,18 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         """
         return jnp.array(0.0)
 
-    def inverse(self) -> "IdentityLinearOperator":
+    def inverse(self) -> "Identity":
         """Inverse of the covariance operator.
 
         Returns
         -------
-            DiagonalLinearOperator: Inverse of the covariance operator.
+            Diagonal: Inverse of the covariance operator.
         """
         return self
 
-    def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
+    def solve(
+        self, rhs: Union[AbstractLinearOperator, Float[Array, "... M"]]
+    ) -> AbstractLinearOperator:
         """Solve linear system.
 
         Args:
@@ -111,23 +116,23 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         return rhs
 
     @classmethod
-    def from_root(cls, root: "IdentityLinearOperator") -> "IdentityLinearOperator":
+    def from_root(cls, root: "Identity") -> "Identity":
         """Construct from root.
 
         Args:
-            root (IdentityLinearOperator): Root of the covariance operator.
+            root (Identity): Root of the covariance operator.
 
         Returns
         -------
-            IdentityLinearOperator: Covariance operator.
+            Identity: Covariance operator.
         """
         return root
 
     @classmethod
-    def from_dense(cls, dense: Float[Array, "N N"]) -> "IdentityLinearOperator":
-        return IdentityLinearOperator(dense.shape[0])
+    def from_dense(cls, dense: Float[Array, "N N"]) -> "Identity":
+        return Identity(dense.shape[0])
 
 
 __all__ = [
-    "IdentityLinearOperator",
+    "Identity",
 ]

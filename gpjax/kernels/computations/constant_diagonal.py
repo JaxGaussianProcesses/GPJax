@@ -19,14 +19,14 @@ from jaxtyping import Float
 
 from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.linops import (
-    ConstantDiagonalLinearOperator,
-    DiagonalLinearOperator,
+    ConstantDiagonal,
+    Diagonal,
 )
 from gpjax.typing import Array
 
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):
-    def gram(self, x: Float[Array, "N D"]) -> ConstantDiagonalLinearOperator:
+    def gram(self, x: Float[Array, "N D"]) -> ConstantDiagonal:
         r"""Compute the Gram matrix.
 
         Compute Gram covariance operator of the kernel function.
@@ -36,11 +36,9 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
         """
         value = self.kernel(x[0], x[0])
 
-        return ConstantDiagonalLinearOperator(
-            value=jnp.atleast_1d(value), size=x.shape[0]
-        )
+        return ConstantDiagonal(value=jnp.atleast_1d(value), size=x.shape[0])
 
-    def diagonal(self, inputs: Float[Array, "N D"]) -> DiagonalLinearOperator:
+    def diagonal(self, inputs: Float[Array, "N D"]) -> Diagonal:
         r"""Compute the diagonal Gram matrix's entries.
 
         For a given kernel, compute the elementwise diagonal of the
@@ -51,11 +49,11 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
 
         Returns
         -------
-            DiagonalLinearOperator: The computed diagonal variance entries.
+            Diagonal: The computed diagonal variance entries.
         """
         diag = vmap(lambda x: self.kernel(x, x))(inputs)
 
-        return DiagonalLinearOperator(diag=diag)
+        return Diagonal(diag=diag)
 
     def cross_covariance(
         self, x: Float[Array, "N D"], y: Float[Array, "M D"]

@@ -17,7 +17,7 @@ from jax import vmap
 from jaxtyping import Float
 
 from gpjax.kernels.computations.base import AbstractKernelComputation
-from gpjax.linops import DiagonalLinearOperator
+from gpjax.linops import Diagonal
 from gpjax.typing import Array
 
 
@@ -26,7 +26,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
     a diagonal Gram matrix.
     """
 
-    def gram(self, x: Float[Array, "N D"]) -> DiagonalLinearOperator:
+    def gram(self, x: Float[Array, "N D"]) -> Diagonal:
         r"""Compute the Gram matrix.
 
         For a kernel with diagonal structure, compute the $`N\times N`$ Gram matrix on
@@ -37,9 +37,9 @@ class DiagonalKernelComputation(AbstractKernelComputation):
 
         Returns
         -------
-            DiagonalLinearOperator: The computed square Gram matrix.
+            Diagonal: The computed square Gram matrix.
         """
-        return DiagonalLinearOperator(diag=vmap(lambda x: self.kernel(x, x))(x))
+        return Diagonal(diag=vmap(lambda x: self.kernel(x, x))(x))
 
     def cross_covariance(
         self, x: Float[Array, "N D"], y: Float[Array, "M D"]

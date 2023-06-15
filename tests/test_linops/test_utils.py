@@ -1,4 +1,4 @@
-# Copyright 2022 The JaxLinOp Contributors. All Rights Reserved.
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,36 +13,53 @@
 # limitations under the License.
 # ==============================================================================
 
+from numbers import Number
+from typing import Union
 
 from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
+from jaxtyping import (
+    Array,
+    Float,
+)
 import pytest
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 _PRNGKey = jr.PRNGKey(42)
 
-from gpjax.linops.dense_linear_operator import DenseLinearOperator
-from gpjax.linops.identity_linear_operator import IdentityLinearOperator
+from gpjax.linops.dense import Dense
 from gpjax.linops.utils import (
-    identity,
     to_dense,
+    to_linear_operator,
 )
 
 
-@pytest.mark.parametrize("n", [1, 2, 5])
-def test_identity(n: int) -> None:
-    id = identity(n)
-    assert isinstance(id, IdentityLinearOperator)
-    assert id.shape == (n, n)
-    assert id.size == n
-
-
-@pytest.mark.parametrize("n", [1, 2, 5])
-def test_to_dense(n: int) -> None:
-    mat = jr.uniform(_PRNGKey, (n, n))
-    lo = DenseLinearOperator(mat)
+@pytest.mark.parametrize("n", [1, 2])
+@pytest.mark.parametrize("m", [1, 2])
+def test_to_dense(n: int, m: int) -> None:
+    array = jr.uniform(_PRNGKey, (n, m))
+    lo = Dense(array)
 
     assert jnp.allclose(to_dense(lo), lo.to_dense())
-    assert jnp.allclose(to_dense(mat), mat)
+    assert jnp.allclose(to_dense(array), array)
+
+
+@pytest.mark.parametrize("n", [1, 2])
+@pytest.mark.parametrize("m", [1, 2])
+def test_array_to_linop(n: int, m: int) -> None:
+    array = jr.uniform(_PRNGKey, (n, m))
+    lo = to_linear_operator(array)
+
+    assert isinstance(lo, Dense)
+    assert jnp.allclose(lo.to_dense(), array)
+
+
+@pytest.mark.parametrize("number", [1.0, jnp.array(2.0), jnp.array(3.0)])
+def test_number_to_linop(
+    number: Union[Number, Float[Array, ""], Float[Array, "1"]]
+) -> None:
+    lo = to_linear_operator(number)
+    assert isinstance(lo, Dense)
+    assert jnp.allclose(lo.to_dense(), jnp.atleast_1d(number))

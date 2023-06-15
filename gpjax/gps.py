@@ -47,7 +47,7 @@ from gpjax.likelihoods import (
     Gaussian,
     NonGaussianLikelihood,
 )
-from gpjax.linops import identity
+from gpjax.linops import ConstantDiagonal
 from gpjax.mean_functions import AbstractMeanFunction
 from gpjax.typing import (
     Array,
@@ -245,7 +245,7 @@ class Prior(AbstractPrior):
         x = test_inputs
         mx = self.mean_function(x)
         Kxx = self.kernel.gram(x)
-        Kxx += identity(x.shape[0]) * self.jitter
+        Kxx += ConstantDiagonal(self.jitter, x.shape[0])
 
         return GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Kxx)
 
@@ -488,10 +488,10 @@ class ConjugatePosterior(AbstractPosterior):
         mx = self.prior.mean_function(x)
 
         # Precompute Gram matrix, Kxx, at training inputs, x
-        Kxx = self.prior.kernel.gram(x) + (identity(n) * self.prior.jitter)
+        Kxx = self.prior.kernel.gram(x) + ConstantDiagonal(self.prior.jitter, n)
 
         # Σ = Kxx + Io²
-        Sigma = Kxx + identity(n) * obs_noise
+        Sigma = Kxx + ConstantDiagonal(obs_noise, n)
 
         mean_t = self.prior.mean_function(t)
         Ktt = self.prior.kernel.gram(t)
@@ -505,7 +505,7 @@ class ConjugatePosterior(AbstractPosterior):
 
         # Ktt  -  Ktx (Kxx + Io²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
         covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
-        covariance += identity(n_test) * self.prior.jitter
+        covariance += ConstantDiagonal(self.prior.jitter, n_test)
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
@@ -557,6 +557,9 @@ class ConjugatePosterior(AbstractPosterior):
         if (not isinstance(num_samples, int)) or num_samples <= 0:
             raise ValueError("num_samples must be a positive integer")
 
+        # Unpack training data
+        x, y, n = train_data.X, train_data.y, train_data.n
+
         # sample fourier features
         fourier_feature_fn = _build_fourier_features_fn(self.prior, num_features, key)
 
@@ -565,17 +568,16 @@ class ConjugatePosterior(AbstractPosterior):
 
         # sample weights v for canonical features
         # v = Σ⁻¹ (y + ε - ɸ⍵) for  Σ = Kxx + Io² and ε ᯈ N(0, o²)
-        Kxx = self.prior.kernel.gram(train_data.X)  #  [N, N]
-        Sigma = Kxx + identity(train_data.n) * (
-            self.likelihood.obs_noise + self.jitter
-        )  #  [N, N]
+        Kxx = self.prior.kernel.gram(x)  #  [N, N]
+        Sigma = Kxx + ConstantDiagonal(self.likelihood.obs_noise, n)  #  [N, N]
+        Sigma += ConstantDiagonal(self.prior.jitter, n)  #  [N, N]
         eps = jnp.sqrt(self.likelihood.obs_noise) * normal(
-            key, [train_data.n, num_samples]
+            key, [n, num_samples]
         )  #  [N, B]
-        y = train_data.y - self.prior.mean_function(train_data.X)  # account for mean
-        Phi = fourier_feature_fn(train_data.X)
+        Phi = fourier_feature_fn(x)
+        mux = self.prior.mean_function(x)
         canonical_weights = Sigma.solve(
-            y + eps - jnp.inner(Phi, fourier_weights)
+            y - mux + eps - jnp.inner(Phi, fourier_weights)
         )  #  [N, B]
 
         def sample_fn(test_inputs: Float[Array, "n D"]) -> Float[Array, "n B"]:
@@ -584,7 +586,7 @@ class ConjugatePosterior(AbstractPosterior):
                 fourier_features, fourier_weights
             )  # [n, B]
             canonical_features = self.prior.kernel.cross_covariance(
-                test_inputs, train_data.X
+                test_inputs, x
             )  # [n, N]
             function_space_contribution = jnp.matmul(
                 canonical_features, canonical_weights
@@ -651,7 +653,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
         # Precompute lower triangular of Gram matrix, Lx, at training inputs, x
         Kxx = kernel.gram(x)
-        Kxx += identity(n) * self.prior.jitter
+        Kxx += ConstantDiagonal(self.prior.jitter, n)
         Lx = Kxx.to_root()
 
         # Unpack test inputs
@@ -659,7 +661,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
         # Compute terms of the posterior predictive distribution
         Ktx = kernel.cross_covariance(t, x)
-        Ktt = kernel.gram(t) + identity(n_test) * self.prior.jitter
+        Ktt = kernel.gram(t) + ConstantDiagonal(self.prior.jitter, n_test)
         mean_t = mean_function(t)
 
         # Lx⁻¹ Kxt
@@ -673,7 +675,7 @@ class NonConjugatePosterior(AbstractPosterior):
 
         # Ktt - Ktx Kxx⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
         covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
-        covariance += identity(n_test) * self.prior.jitter
+        covariance += ConstantDiagonal(self.prior.jitter, n_test)
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 

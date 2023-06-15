@@ -1,3 +1,18 @@
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 from abc import abstractmethod
 from dataclasses import dataclass
 
@@ -14,7 +29,7 @@ from gpjax.base import (
 )
 from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
-from gpjax.linops import identity
+from gpjax.linops import ConstantDiagonal
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -123,8 +138,8 @@ class ConjugateMLL(AbstractObjective):
 
         # Σ = (Kxx + Io²) = LLᵀ
         Kxx = posterior.prior.kernel.gram(x)
-        Kxx += identity(n) * posterior.prior.jitter
-        Sigma = Kxx + identity(n) * obs_noise
+        Kxx += ConstantDiagonal(posterior.prior.jitter, n)
+        Sigma = Kxx + ConstantDiagonal(obs_noise, n)
 
         # p(y | x, θ), where θ are the model hyperparameters:
         mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
@@ -169,7 +184,7 @@ class LogPosteriorDensity(AbstractObjective):
         # Unpack the training data
         x, y, n = data.X, data.y, data.n
         Kxx = posterior.prior.kernel.gram(x)
-        Kxx += identity(n) * posterior.prior.jitter
+        Kxx += ConstantDiagonal(posterior.prior.jitter, n)
         Lx = Kxx.to_root()
 
         # Compute the prior mean function
@@ -320,7 +335,7 @@ class CollapsedELBO(AbstractObjective):
         noise = variational_family.posterior.likelihood.obs_noise
         z = variational_family.inducing_inputs
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * variational_family.jitter
+        Kzz += ConstantDiagonal(variational_family.jitter, m)
         Kzx = kernel.cross_covariance(z, x)
         Kxx_diag = vmap(kernel, in_axes=(0, 0))(x, x)
         μx = mean_function(x)

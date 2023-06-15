@@ -1,4 +1,4 @@
-# Copyright 2022 The JaxLinOp Contributors. All Rights Reserved.
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,32 +13,33 @@
 # limitations under the License.
 # ==============================================================================
 
-from gpjax.linops.constant_diagonal_linear_operator import (
-    ConstantDiagonalLinearOperator,
-)
-from gpjax.linops.dense_linear_operator import DenseLinearOperator
-from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
-from gpjax.linops.identity_linear_operator import IdentityLinearOperator
-from gpjax.linops.linear_operator import LinearOperator
-from gpjax.linops.triangular_linear_operator import (
-    LowerTriangularLinearOperator,
-    UpperTriangularLinearOperator,
+# ⛏ Base and utils:
+from gpjax.linops.base import AbstractLinearOperator
+
+# 🪄 Linear operators:
+from gpjax.linops.constant_diagonal import ConstantDiagonal
+from gpjax.linops.dense import Dense
+from gpjax.linops.diagonal import Diagonal
+from gpjax.linops.identity import Identity
+from gpjax.linops.triangular import (
+    LowerTriangular,
+    UpperTriangular,
 )
 from gpjax.linops.utils import (
-    identity,
     to_dense,
+    to_linear_operator,
 )
-from gpjax.linops.zero_linear_operator import ZeroLinearOperator
+from gpjax.linops.zero import Zero
 
 __all__ = [
-    "LinearOperator",
-    "DenseLinearOperator",
-    "DiagonalLinearOperator",
-    "ConstantDiagonalLinearOperator",
-    "IdentityLinearOperator",
-    "ZeroLinearOperator",
-    "LowerTriangularLinearOperator",
-    "UpperTriangularLinearOperator",
-    "identity",
+    "AbstractLinearOperator",
     "to_dense",
+    "to_linear_operator",
+    "ConstantDiagonal",
+    "Dense",
+    "Diagonal",
+    "Identity",
+    "LowerTriangular",
+    "UpperTriangular",
+    "Zero",
 ]

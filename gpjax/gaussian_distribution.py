@@ -26,8 +26,9 @@ from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.linops import (
-    IdentityLinearOperator,
-    LinearOperator,
+    AbstractLinearOperator,
+    Identity,
+    to_linear_operator,
 )
 from gpjax.typing import (
     Array,
@@ -52,7 +53,7 @@ def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
             f"`scale.shape = {scale.shape}`."
         )
 
-    if scale is not None and not isinstance(scale, LinearOperator):
+    if scale is not None and not isinstance(scale, AbstractLinearOperator):
         raise ValueError(
             f"scale must be a LinearOperator or a JAX array, but got {type(scale)}"
         )
@@ -76,7 +77,7 @@ class GaussianDistribution(tfd.Distribution):
 
     Args:
         loc (Optional[Float[Array, " N"]]): The mean of the distribution. Defaults to None.
-        scale (Optional[LinearOperator]): The scale matrix of the distribution. Defaults to None.
+        scale (Optional[AbstractLinearOperator]): The scale matrix of the distribution. Defaults to None.
 
     Returns
     -------
@@ -91,10 +92,9 @@ class GaussianDistribution(tfd.Distribution):
     def __init__(
         self,
         loc: Optional[Float[Array, " N"]] = None,
-        scale: Optional[LinearOperator] = None,
+        scale: Optional[AbstractLinearOperator] = None,
     ) -> None:
         r"""Initialises the distribution."""
-        _check_loc_scale(loc, scale)
 
         # Find dimensionality of the distribution.
         if loc is not None:
@@ -109,7 +109,11 @@ class GaussianDistribution(tfd.Distribution):
 
         # If not specified, set the scale to the identity matrix.
         if scale is None:
-            scale = IdentityLinearOperator(num_dims)
+            scale = Identity(num_dims)
+        else:
+            scale = to_linear_operator(scale)
+
+        _check_loc_scale(loc, scale)
 
         self.loc = loc
         self.scale = scale

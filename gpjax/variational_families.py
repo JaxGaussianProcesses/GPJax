@@ -32,9 +32,9 @@ from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.gps import AbstractPosterior
 from gpjax.likelihoods import Gaussian
 from gpjax.linops import (
-    DenseLinearOperator,
-    LowerTriangularLinearOperator,
-    identity,
+    ConstantDiagonal,
+    Dense,
+    LowerTriangular,
 )
 from gpjax.typing import (
     Array,
@@ -109,6 +109,8 @@ class VariationalGaussian(AbstractVariationalGaussian):
     $`\mu`$ and $`sqrt`$ with $`S = sqrt sqrt^{\top}`$.
     """
 
+    # TODO: Replace variational_root_varaince from Float Array to LinOp.
+
     variational_mean: Float[Array, "N 1"] = param_field(None)
     variational_root_covariance: Float[Array, "N N"] = param_field(
         None, bijector=tfb.FillTriangular()
@@ -153,10 +155,10 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         muz = mean_function(z)
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += ConstantDiagonal(self.jitter, m)
 
-        sqrt = LowerTriangularLinearOperator.from_dense(sqrt)
-        S = DenseLinearOperator.from_root(sqrt)
+        sqrt = LowerTriangular.from_dense(sqrt)
+        S = Dense.from_root(sqrt)
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
         pu = GaussianDistribution(loc=jnp.atleast_1d(muz.squeeze()), scale=Kzz)
@@ -192,7 +194,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
         kernel = self.posterior.prior.kernel
 
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += ConstantDiagonal(self.jitter, m)
         Lz = Kzz.to_root()
         muz = mean_function(z)
 
@@ -221,7 +223,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
         )
-        covariance += identity(n_test) * self.jitter
+        covariance += ConstantDiagonal(self.jitter, n_test)
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -260,8 +262,8 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         mu = self.variational_mean
         sqrt = self.variational_root_covariance
 
-        sqrt = LowerTriangularLinearOperator.from_dense(sqrt)
-        S = DenseLinearOperator.from_root(sqrt)
+        sqrt = LowerTriangular.from_dense(sqrt)
+        S = Dense.from_root(sqrt)
 
         # Compute whitened KL divergence
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
@@ -297,7 +299,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         kernel = self.posterior.prior.kernel
 
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += ConstantDiagonal(self.jitter, m)
         Lz = Kzz.to_root()
 
         # Unpack test inputs
@@ -322,7 +324,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Lz_invT_sqrt, Ktz_Lz_invT_sqrt.T)
         )
-        covariance += identity(n_test) * self.jitter
+        covariance += ConstantDiagonal(self.jitter, n_test)
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -391,17 +393,17 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         # L = (L⁻¹)⁻¹I
         sqrt = jsp.linalg.solve_triangular(sqrt_inv, jnp.eye(m), lower=True)
-        sqrt = LowerTriangularLinearOperator.from_dense(sqrt)
+        sqrt = LowerTriangular.from_dense(sqrt)
 
         # S = LLᵀ:
-        S = DenseLinearOperator.from_root(sqrt)
+        S = Dense.from_root(sqrt)
 
         # μ = Sθ₁
         mu = S @ natural_vector
 
         muz = mean_function(z)
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += ConstantDiagonal(self.jitter, m)
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
         pu = GaussianDistribution(loc=jnp.atleast_1d(muz.squeeze()), scale=Kzz)
@@ -453,7 +455,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         mu = jnp.matmul(S, natural_vector)
 
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += ConstantDiagonal(self.jitter, m)
         Lz = Kzz.to_root()
         muz = mean_function(z)
 
@@ -482,7 +484,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Kzz_inv_L, Ktz_Kzz_inv_L.T)
         )
-        covariance += identity(n_test) * self.jitter
+        covariance += ConstantDiagonal(self.jitter, n_test)
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -549,12 +551,12 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         # S = η₂ - η₁ η₁ᵀ
         S = expectation_matrix - jnp.outer(mu, mu)
-        S = DenseLinearOperator(S)
-        S += identity(m) * self.jitter
+        S = Dense(S)
+        S += ConstantDiagonal(self.jitter, m)
 
         muz = mean_function(z)
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += ConstantDiagonal(self.jitter, m)
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
         pu = GaussianDistribution(loc=jnp.atleast_1d(muz.squeeze()), scale=Kzz)
@@ -595,14 +597,14 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         # S = η₂ - η₁ η₁ᵀ
         S = expectation_matrix - jnp.matmul(mu, mu.T)
-        S = DenseLinearOperator(S)
-        S += identity(m) * self.jitter
+        S = Dense(S)
+        S += ConstantDiagonal(self.jitter, m)
 
         # S = sqrt sqrtᵀ
         sqrt = S.to_root().to_dense()
 
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += ConstantDiagonal(self.jitter, m)
         Lz = Kzz.to_root()
         muz = mean_function(z)
 
@@ -631,7 +633,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
         )
-        covariance += identity(n_test) * self.jitter
+        covariance += ConstantDiagonal(self.jitter, n_test)
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -646,6 +648,8 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
     The key reference is Titsias, (2009) - Variational Learning of Inducing Variables
     in Sparse Gaussian Processes.
     """
+
+    # TODO: When it comes available, this class can be refactored to use Woobury linear operator computations
 
     def __post_init__(self):
         if not isinstance(self.posterior.likelihood, Gaussian):
@@ -683,7 +687,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
 
         Kzx = kernel.cross_covariance(z, x)
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * self.jitter
+        Kzz += ConstantDiagonal(self.jitter, m)
 
         # Lz Lzᵀ = Kzz
         Lz = Kzz.to_root()
@@ -728,7 +732,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(L_inv_Lz_inv_Kzt.T, L_inv_Lz_inv_Kzt)
         )
-        covariance += identity(n_test) * self.jitter
+        covariance += ConstantDiagonal(self.jitter, n_test)
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance

@@ -14,7 +14,7 @@
 # limitations under the License.
 # ==============================================================================
 
-
+import jax
 from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
@@ -24,8 +24,8 @@ import pytest
 config.update("jax_enable_x64", True)
 
 from gpjax.gaussian_distribution import GaussianDistribution
-from gpjax.linops.dense_linear_operator import DenseLinearOperator
-from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
+from gpjax.linops.dense import Dense
+from gpjax.linops.diagonal import Diagonal
 
 _key = jr.PRNGKey(seed=42)
 
@@ -35,7 +35,7 @@ from tensorflow_probability.substrates.jax.distributions import (
 )
 
 
-def approx_equal(res: jnp.ndarray, actual: jnp.ndarray) -> bool:
+def approx_equal(res: jax.Array, actual: jax.Array) -> bool:
     """Check if two arrays are approximately equal."""
     return jnp.linalg.norm(res - actual) < 1e-6
 
@@ -49,7 +49,7 @@ def test_array_arguments(n: int) -> None:
     # check that cholesky does not error
     _L = jnp.linalg.cholesky(covariance)  # noqa: F841
 
-    dist = GaussianDistribution(loc=mean, scale=DenseLinearOperator(covariance))
+    dist = GaussianDistribution(loc=mean, scale=Dense(covariance))
 
     assert approx_equal(dist.mean(), mean)
     assert approx_equal(dist.variance(), covariance.diagonal())
@@ -70,7 +70,7 @@ def test_diag_linear_operator(n: int) -> None:
     mean = jr.uniform(key_mean, shape=(n,))
     diag = jr.uniform(key_diag, shape=(n,))
 
-    dist_diag = GaussianDistribution(loc=mean, scale=DiagonalLinearOperator(diag**2))
+    dist_diag = GaussianDistribution(loc=mean, scale=Diagonal(diag**2))
     tfp_dist = MultivariateNormalDiag(loc=mean, scale_diag=diag)
 
     assert approx_equal(dist_diag.mean(), tfp_dist.mean())
@@ -101,7 +101,7 @@ def test_dense_linear_operator(n: int) -> None:
 
     sqrt = jnp.linalg.cholesky(covariance + jnp.eye(n) * 1e-10)
 
-    dist_dense = GaussianDistribution(loc=mean, scale=DenseLinearOperator(covariance))
+    dist_dense = GaussianDistribution(loc=mean, scale=Dense(covariance))
     tfp_dist = MultivariateNormalFullCovariance(loc=mean, covariance_matrix=covariance)
 
     assert approx_equal(dist_dense.mean(), tfp_dist.mean())
@@ -132,8 +132,8 @@ def test_kl_divergence(n: int) -> None:
     covariance_a = sqrt_a @ sqrt_a.T
     covariance_b = sqrt_b @ sqrt_b.T
 
-    dist_a = GaussianDistribution(loc=mean_a, scale=DenseLinearOperator(covariance_a))
-    dist_b = GaussianDistribution(loc=mean_b, scale=DenseLinearOperator(covariance_b))
+    dist_a = GaussianDistribution(loc=mean_a, scale=Dense(covariance_a))
+    dist_b = GaussianDistribution(loc=mean_b, scale=Dense(covariance_b))
 
     tfp_dist_a = MultivariateNormalFullCovariance(
         loc=mean_a, covariance_matrix=covariance_a
@@ -146,6 +146,7 @@ def test_kl_divergence(n: int) -> None:
         dist_a.kl_divergence(dist_b), tfp_dist_a.kl_divergence(tfp_dist_b)
     )
 
+    incompatible = GaussianDistribution(loc=jnp.ones((2 * n,)))
+
     with pytest.raises(ValueError):
-        incompatible = GaussianDistribution(loc=jnp.ones((2 * n,)))
         incompatible.kl_divergence(dist_a)

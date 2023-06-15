@@ -148,7 +148,8 @@ ignore = [
     "S101",
     "F722",
     'PLR2004',
-    "PLR0913"
+    "PLR0913",
+    "F811"
     ]
 unfixable = ["ERA001", "F401", "F841", "T201", "T203"]
 src = ["gpjax", "tests"]
