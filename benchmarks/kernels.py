@@ -1,3 +1,7 @@
+from jax.config import config
+
+config.update("jax_enable_x64", True)
+
 from gpjax import kernels
 import jax.random as jr
 
@@ -23,7 +27,7 @@ def get_kernel(kernel_name: str, n_dims: int):
         raise ValueError("Unknown covariance function name")
 
 
-class TimeSuite:
+class Kernels:
     param_names = ["kernel", "n_data", "dimensionality"]
     params = [KERNEL_NAMES, N_DATAPOINTS, N_DIMS]
 

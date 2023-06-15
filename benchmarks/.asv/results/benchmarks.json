@@ -1,31 +1,26 @@
 {
-    "kernels.TimeSuite.time_covfunc_call": {
-        "code": "class TimeSuite:\n    def time_covfunc_call(self, kernel_func, n_datapoints, n_dims):\n        self.kernelfunc.gram(self.X)\n\n    def setup(self, kernel_func, n_datapoints, n_dims):\n        key = jr.PRNGKey(123)\n        self.X = jr.uniform(\n            key=key, minval=-3.0, maxval=3.0, shape=(n_datapoints, n_dims)\n        )\n        self.kernelfunc = get_kernel(kernel_name=kernel_func, n_dims=n_dims)",
+    "sparse.Sparse.time_eval": {
+        "code": "class Sparse:\n    def time_eval(self, n_datapoints, n_dims):\n        self.objective(self.q, self.data)\n\n    def setup(self, n_datapoints, n_inducing):\n        key = jr.PRNGKey(123)\n        self.X = jr.normal(key=key, shape=(n_datapoints, 1))\n        self.y = jnp.sin(self.X[:, :1])\n        self.data = gpx.Dataset(X=self.X, y=self.y)\n        kernel = gpx.kernels.RBF(active_dims=list(range(1)))\n        meanf = gpx.mean_functions.Constant()\n        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)\n        self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)\n        self.posterior = self.prior * self.likelihood\n    \n        Z = jnp.linspace(self.X.min(), self.X.max(), n_inducing).reshape(-1, 1)\n        self.q = gpx.CollapsedVariationalGaussian(\n            posterior=self.posterior, inducing_inputs=Z\n        )\n        self.objective = gpx.CollapsedELBO(negative=True)",
         "min_run_count": 2,
-        "name": "kernels.TimeSuite.time_covfunc_call",
+        "name": "sparse.Sparse.time_eval",
         "number": 0,
         "param_names": [
-            "kernel",
             "n_data",
-            "dimensionality"
+            "n_inducing"
         ],
         "params": [
             [
-                "'RBF'",
-                "'MATERN12'",
-                "'MATERN32'",
-                "'MATERN52'",
-                "'POLYNOMIAL'"
+                "2000",
+                "5000",
+                "10000",
+                "20000"
             ],
             [
                 "10",
+                "20",
+                "50",
                 "100",
-                "1000"
-            ],
-            [
-                "1",
-                "2",
-                "5"
+                "200"
             ]
         ],
         "repeat": 0,
@@ -34,7 +29,40 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "60eb88777e78bdde3c136a83470d1f641bb9a146a66f763f64fd0acb21788765",
+        "version": "c42a0cef98e7ce98940fdd14075c567a03ab6e0217008f317c0b2ad4bc48bccb",
+        "warmup_time": -1
+    },
+    "sparse.Sparse.time_grad": {
+        "code": "class Sparse:\n    def time_grad(self, n_datapoints, n_dims):\n        jax.grad(self.objective)(self.q, self.data)\n\n    def setup(self, n_datapoints, n_inducing):\n        key = jr.PRNGKey(123)\n        self.X = jr.normal(key=key, shape=(n_datapoints, 1))\n        self.y = jnp.sin(self.X[:, :1])\n        self.data = gpx.Dataset(X=self.X, y=self.y)\n        kernel = gpx.kernels.RBF(active_dims=list(range(1)))\n        meanf = gpx.mean_functions.Constant()\n        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)\n        self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)\n        self.posterior = self.prior * self.likelihood\n    \n        Z = jnp.linspace(self.X.min(), self.X.max(), n_inducing).reshape(-1, 1)\n        self.q = gpx.CollapsedVariationalGaussian(\n            posterior=self.posterior, inducing_inputs=Z\n        )\n        self.objective = gpx.CollapsedELBO(negative=True)",
+        "min_run_count": 2,
+        "name": "sparse.Sparse.time_grad",
+        "number": 0,
+        "param_names": [
+            "n_data",
+            "n_inducing"
+        ],
+        "params": [
+            [
+                "2000",
+                "5000",
+                "10000",
+                "20000"
+            ],
+            [
+                "10",
+                "20",
+                "50",
+                "100",
+                "200"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "timeout": 60.0,
+        "type": "time",
+        "unit": "seconds",
+        "version": "5aaf0153a37ed3daf24fa0e2a128884fc50602f21a8cc268d5ddb989aaabcd66",
         "warmup_time": -1
     },
     "version": 2
