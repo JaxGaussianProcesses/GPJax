@@ -1,14 +1,15 @@
-from jax.config import config
+from dataclasses import (
+    dataclass,
+    field,
+)
 
-config.update("jax_enable_x64", True)
-
-from dataclasses import dataclass, field
-
+from beartype.typing import (
+    Any,
+    Callable,
+    Dict,
+)
 import jax.numpy as jnp  # noqa: F401
 import jupytext
-import numpy as np
-from beartype.typing import Callable, Any, Dict
-
 
 get_last = lambda x: x[-1]
 
