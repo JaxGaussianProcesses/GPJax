@@ -6,39 +6,81 @@ import jax.numpy as jnp
 import jax.random as jr
 import jax
 
-N_DATAPOINTS = [10, 100, 200, 500, 1000]
-N_DIMS = [1, 2, 5]
-LIKELIHOOD = ["Gaussian", "Bernoulli"]
 
-
-class Objectives:
+class Gaussian:
     param_names = [
         "n_data",
         "n_dims",
-        "likelihood",
     ]
-    params = [N_DATAPOINTS, N_DIMS, LIKELIHOOD]
+    params = [[10, 100, 200, 500, 1000], [1, 2, 5]]
 
-    def setup(self, n_datapoints, n_dims, likelihood):
+    def setup(self, n_datapoints, n_dims):
         key = jr.PRNGKey(123)
         self.X = jr.normal(key=key, shape=(n_datapoints, n_dims))
         self.y = jnp.sin(self.X[:, :1])
-        if likelihood == "Bernoulli":
-            self.y = jnp.where(self.y > 0, 1, 0)
         self.data = gpx.Dataset(X=self.X, y=self.y)
         kernel = gpx.kernels.RBF(active_dims=list(range(n_dims)))
         meanf = gpx.mean_functions.Constant()
         self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)
-        if likelihood == "Bernoulli":
-            self.likelihood = gpx.likelihoods.Bernoulli(num_datapoints=self.data.n)
-            self.objective = gpx.LogPosteriorDensity()
-        elif likelihood == "Gaussian":
-            self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)
-            self.objective = gpx.ConjugateMLL()
+        self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)
+        self.objective = gpx.ConjugateMLL()
         self.posterior = self.prior * self.likelihood
 
-    def time_eval(self, n_datapoints, n_dims, likelihood):
-        self.objective(self.posterior, train_data=self.data)
+    def time_eval(self, n_datapoints, n_dims):
+        self.objective.step(self.posterior, self.data).block_until_ready()
 
-    def time_grad(self, n_datapoints, n_dims, likelihood):
-        jax.grad(self.objective)(self.posterior, train_data=self.data)
+    def time_grad(self, n_datapoints, n_dims):
+        jax.block_until_ready(jax.grad(self.objective.step)(self.posterior, self.data))
+
+
+class Bernoulli:
+    param_names = [
+        "n_data",
+        "n_dims",
+    ]
+    params = [[10, 100, 200, 500, 1000], [1, 2, 5]]
+
+    def setup(self, n_datapoints, n_dims):
+        key = jr.PRNGKey(123)
+        self.X = jr.normal(key=key, shape=(n_datapoints, n_dims))
+        self.y = jnp.where(jnp.sin(self.X[:, :1]) > 0, 1, 0)
+        self.data = gpx.Dataset(X=self.X, y=self.y)
+        kernel = gpx.kernels.RBF(active_dims=list(range(n_dims)))
+        meanf = gpx.mean_functions.Constant()
+        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)
+        self.likelihood = gpx.likelihoods.Bernoulli(num_datapoints=self.data.n)
+        self.objective = gpx.LogPosteriorDensity()
+        self.posterior = self.prior * self.likelihood
+
+    def time_eval(self, n_datapoints, n_dims):
+        self.objective.step(self.posterior, self.data).block_until_ready()
+
+    def time_grad(self, n_datapoints, n_dims):
+        jax.block_until_ready(jax.grad(self.objective.step)(self.posterior, self.data))
+
+
+class Poisson:
+    param_names = [
+        "n_data",
+        "n_dims",
+    ]
+    params = [[10, 100, 200, 500, 1000], [1, 2, 5]]
+
+    def setup(self, n_datapoints, n_dims):
+        key = jr.PRNGKey(123)
+        self.X = jr.normal(key=key, shape=(n_datapoints, n_dims))
+        f = lambda x: 2.0 * jnp.sin(3 * x) + 0.5 * x  # latent function
+        self.y = jr.poisson(key, jnp.exp(f(self.X)))
+        self.data = gpx.Dataset(X=self.X, y=self.y)
+        kernel = gpx.kernels.RBF(active_dims=list(range(n_dims)))
+        meanf = gpx.mean_functions.Constant()
+        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)
+        self.likelihood = gpx.likelihoods.Poisson(num_datapoints=self.data.n)
+        self.objective = gpx.LogPosteriorDensity()
+        self.posterior = self.prior * self.likelihood
+
+    def time_eval(self, n_datapoints, n_dims):
+        self.objective.step(self.posterior, self.data).block_until_ready()
+
+    def time_grad(self, n_datapoints, n_dims):
+        jax.block_until_ready(jax.grad(self.objective.step)(self.posterior, self.data))

@@ -6,13 +6,10 @@ import jax.numpy as jnp
 import jax.random as jr
 import jax
 
-N_DATAPOINTS = [2000, 5000, 10000, 20000]
-N_INDUCING = [10, 20, 50, 100, 200]
-
 
 class Sparse:
     param_names = ["n_data", "n_inducing"]
-    params = [N_DATAPOINTS, N_INDUCING]
+    params = [[2000, 5000, 10000, 20000], [10, 20, 50, 100, 200]]
 
     def setup(self, n_datapoints, n_inducing):
         key = jr.PRNGKey(123)

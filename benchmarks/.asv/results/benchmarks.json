@@ -1,30 +1,23 @@
 {
-    "objectives.Objectives.time_eval": {
-        "code": "class Objectives:\n    def time_eval(self, n_datapoints, n_dims, likelihood):\n        self.objective(self.posterior, train_data=self.data)\n\n    def setup(self, n_datapoints, n_dims, likelihood):\n        key = jr.PRNGKey(123)\n        self.X = jr.normal(key=key, shape=(n_datapoints, n_dims))\n        self.y = jnp.sin(self.X[:, :1])\n        if likelihood == \"Bernoulli\":\n            self.y = jnp.where(self.y > 0, 1, 0)\n        self.data = gpx.Dataset(X=self.X, y=self.y)\n        kernel = gpx.kernels.RBF(active_dims=list(range(n_dims)))\n        meanf = gpx.mean_functions.Constant()\n        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)\n        if likelihood == \"Bernoulli\":\n            self.likelihood = gpx.likelihoods.Bernoulli(num_datapoints=self.data.n)\n            self.objective = gpx.LogPosteriorDensity()\n        elif likelihood == \"Gaussian\":\n            self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)\n            self.objective = gpx.ConjugateMLL()\n        self.posterior = self.prior * self.likelihood",
+    "kernels.ArcCosine.time_covfunc_call": {
+        "code": "class ArcCosine:\n    def time_covfunc_call(self, n_datapoints, n_dims):\n        self.kernel.gram(self.X)\n\n    def setup(self, n_datapoints, n_dims):\n        super().setup(n_datapoints, n_dims)\n        self.kernel = kernels.ArcCosine(active_dims=list(range(n_dims)))",
         "min_run_count": 2,
-        "name": "objectives.Objectives.time_eval",
+        "name": "kernels.ArcCosine.time_covfunc_call",
         "number": 0,
         "param_names": [
             "n_data",
-            "n_dims",
-            "likelihood"
+            "dimensionality"
         ],
         "params": [
             [
                 "10",
                 "100",
-                "200",
-                "500",
                 "1000"
             ],
             [
                 "1",
                 "2",
                 "5"
-            ],
-            [
-                "'Gaussian'",
-                "'Bernoulli'"
             ]
         ],
         "repeat": 0,
@@ -33,35 +26,28 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "ba013def2ae4698fbe176bdeed5ed4e62f175feb5f89351a8e6223118526c63a",
+        "version": "f923a5feb1913469c66f702d89993918b418cc376b993df1cb7b974c3af01dfe",
         "warmup_time": -1
     },
-    "objectives.Objectives.time_grad": {
-        "code": "class Objectives:\n    def time_grad(self, n_datapoints, n_dims, likelihood):\n        jax.grad(self.objective)(self.posterior, train_data=self.data)\n\n    def setup(self, n_datapoints, n_dims, likelihood):\n        key = jr.PRNGKey(123)\n        self.X = jr.normal(key=key, shape=(n_datapoints, n_dims))\n        self.y = jnp.sin(self.X[:, :1])\n        if likelihood == \"Bernoulli\":\n            self.y = jnp.where(self.y > 0, 1, 0)\n        self.data = gpx.Dataset(X=self.X, y=self.y)\n        kernel = gpx.kernels.RBF(active_dims=list(range(n_dims)))\n        meanf = gpx.mean_functions.Constant()\n        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)\n        if likelihood == \"Bernoulli\":\n            self.likelihood = gpx.likelihoods.Bernoulli(num_datapoints=self.data.n)\n            self.objective = gpx.LogPosteriorDensity()\n        elif likelihood == \"Gaussian\":\n            self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)\n            self.objective = gpx.ConjugateMLL()\n        self.posterior = self.prior * self.likelihood",
+    "kernels.Linear.time_covfunc_call": {
+        "code": "class Linear:\n    def time_covfunc_call(self, n_datapoints, n_dims):\n        self.kernel.gram(self.X)\n\n    def setup(self, n_datapoints, n_dims):\n        super().setup(n_datapoints, n_dims)\n        self.kernel = kernels.Linear(active_dims=list(range(n_dims)))",
         "min_run_count": 2,
-        "name": "objectives.Objectives.time_grad",
+        "name": "kernels.Linear.time_covfunc_call",
         "number": 0,
         "param_names": [
             "n_data",
-            "n_dims",
-            "likelihood"
+            "dimensionality"
         ],
         "params": [
             [
                 "10",
                 "100",
-                "200",
-                "500",
                 "1000"
             ],
             [
                 "1",
                 "2",
                 "5"
-            ],
-            [
-                "'Gaussian'",
-                "'Bernoulli'"
             ]
         ],
         "repeat": 0,
@@ -70,7 +56,217 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "19cae76dba5d83e53605707fcb7d0d9f8fee05aa83d2d744c1d6a52462576272",
+        "version": "937688fe2a0aa44886c8c5856202502b9c82d2043d1034bf1c5984d73999b6b3",
+        "warmup_time": -1
+    },
+    "kernels.Matern12.time_covfunc_call": {
+        "code": "class Matern12:\n    def time_covfunc_call(self, n_datapoints, n_dims):\n        self.kernel.gram(self.X)\n\n    def setup(self, n_datapoints, n_dims):\n        super().setup(n_datapoints, n_dims)\n        self.kernel = kernels.Matern12(active_dims=list(range(n_dims)))",
+        "min_run_count": 2,
+        "name": "kernels.Matern12.time_covfunc_call",
+        "number": 0,
+        "param_names": [
+            "n_data",
+            "dimensionality"
+        ],
+        "params": [
+            [
+                "10",
+                "100",
+                "1000"
+            ],
+            [
+                "1",
+                "2",
+                "5"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "timeout": 60.0,
+        "type": "time",
+        "unit": "seconds",
+        "version": "847a1c25403643211b2dbe93ac755ad2ddcd5da5e2b53136841d6ab99cc12699",
+        "warmup_time": -1
+    },
+    "kernels.Matern32.time_covfunc_call": {
+        "code": "class Matern32:\n    def time_covfunc_call(self, n_datapoints, n_dims):\n        self.kernel.gram(self.X)\n\n    def setup(self, n_datapoints, n_dims):\n        super().setup(n_datapoints, n_dims)\n        self.kernel = kernels.Matern32(active_dims=list(range(n_dims)))",
+        "min_run_count": 2,
+        "name": "kernels.Matern32.time_covfunc_call",
+        "number": 0,
+        "param_names": [
+            "n_data",
+            "dimensionality"
+        ],
+        "params": [
+            [
+                "10",
+                "100",
+                "1000"
+            ],
+            [
+                "1",
+                "2",
+                "5"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "timeout": 60.0,
+        "type": "time",
+        "unit": "seconds",
+        "version": "a520e46707f3b3181f63c1e1a372e9e6cea4d8bcfc1d24ab4b7f40ff1dadf171",
+        "warmup_time": -1
+    },
+    "kernels.Matern52.time_covfunc_call": {
+        "code": "class Matern52:\n    def time_covfunc_call(self, n_datapoints, n_dims):\n        self.kernel.gram(self.X)\n\n    def setup(self, n_datapoints, n_dims):\n        super().setup(n_datapoints, n_dims)\n        self.kernel = kernels.Matern52(active_dims=list(range(n_dims)))",
+        "min_run_count": 2,
+        "name": "kernels.Matern52.time_covfunc_call",
+        "number": 0,
+        "param_names": [
+            "n_data",
+            "dimensionality"
+        ],
+        "params": [
+            [
+                "10",
+                "100",
+                "1000"
+            ],
+            [
+                "1",
+                "2",
+                "5"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "timeout": 60.0,
+        "type": "time",
+        "unit": "seconds",
+        "version": "179838852e999abcac68e90c141724342d0b4a25656f5ea7be6409ac9205b91f",
+        "warmup_time": -1
+    },
+    "kernels.Polynomial.time_covfunc_call": {
+        "code": "class Polynomial:\n    def time_covfunc_call(self, n_datapoints, n_dims):\n        self.kernel.gram(self.X)\n\n    def setup(self, n_datapoints, n_dims):\n        super().setup(n_datapoints, n_dims)\n        self.kernel = kernels.Polynomial(active_dims=list(range(n_dims)))",
+        "min_run_count": 2,
+        "name": "kernels.Polynomial.time_covfunc_call",
+        "number": 0,
+        "param_names": [
+            "n_data",
+            "dimensionality"
+        ],
+        "params": [
+            [
+                "10",
+                "100",
+                "1000"
+            ],
+            [
+                "1",
+                "2",
+                "5"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "timeout": 60.0,
+        "type": "time",
+        "unit": "seconds",
+        "version": "67213fe983f9f09d6213609250aab0870f9b652c1fb08e07f68581af193365d5",
+        "warmup_time": -1
+    },
+    "kernels.PoweredExponential.time_covfunc_call": {
+        "code": "class PoweredExponential:\n    def time_covfunc_call(self, n_datapoints, n_dims):\n        self.kernel.gram(self.X)\n\n    def setup(self, n_datapoints, n_dims):\n        super().setup(n_datapoints, n_dims)\n        self.kernel = kernels.PoweredExponential(active_dims=list(range(n_dims)))",
+        "min_run_count": 2,
+        "name": "kernels.PoweredExponential.time_covfunc_call",
+        "number": 0,
+        "param_names": [
+            "n_data",
+            "dimensionality"
+        ],
+        "params": [
+            [
+                "10",
+                "100",
+                "1000"
+            ],
+            [
+                "1",
+                "2",
+                "5"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "timeout": 60.0,
+        "type": "time",
+        "unit": "seconds",
+        "version": "2da6e3291d5e431eed969aaba40c4b42f226ebad022e3ea56b257ab2e2e97bb4",
+        "warmup_time": -1
+    },
+    "kernels.RBF.time_covfunc_call": {
+        "code": "class RBF:\n    def time_covfunc_call(self, n_datapoints, n_dims):\n        self.kernel.gram(self.X)\n\n    def setup(self, n_datapoints, n_dims):\n        super().setup(n_datapoints, n_dims)\n        self.kernel = kernels.RBF(active_dims=list(range(n_dims)))",
+        "min_run_count": 2,
+        "name": "kernels.RBF.time_covfunc_call",
+        "number": 0,
+        "param_names": [
+            "n_data",
+            "dimensionality"
+        ],
+        "params": [
+            [
+                "10",
+                "100",
+                "1000"
+            ],
+            [
+                "1",
+                "2",
+                "5"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "timeout": 60.0,
+        "type": "time",
+        "unit": "seconds",
+        "version": "b52f5ad2fdad31ce7060e8eb015e77504de6b2566db3b05e702d48e17f7c3e7f",
+        "warmup_time": -1
+    },
+    "kernels.RationalQuadratic.time_covfunc_call": {
+        "code": "class RationalQuadratic:\n    def time_covfunc_call(self, n_datapoints, n_dims):\n        self.kernel.gram(self.X)\n\n    def setup(self, n_datapoints, n_dims):\n        super().setup(n_datapoints, n_dims)\n        self.kernel = kernels.RationalQuadratic(active_dims=list(range(n_dims)))",
+        "min_run_count": 2,
+        "name": "kernels.RationalQuadratic.time_covfunc_call",
+        "number": 0,
+        "param_names": [
+            "n_data",
+            "dimensionality"
+        ],
+        "params": [
+            [
+                "10",
+                "100",
+                "1000"
+            ],
+            [
+                "1",
+                "2",
+                "5"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "timeout": 60.0,
+        "type": "time",
+        "unit": "seconds",
+        "version": "4ff62cadc9b2f84aa5f6ea06736910da029bd98f3f7191de57356b43d6915b42",
         "warmup_time": -1
     },
     "version": 2

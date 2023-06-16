@@ -7,12 +7,10 @@ import jax.numpy as jnp
 from sklearn.datasets import make_spd_matrix
 import jax.random as jr
 
-N_DATAPOINTS = [10, 100, 200, 500, 1000]
-
 
 class LinOps:
     param_names = ["n_data"]
-    params = [N_DATAPOINTS]
+    params = [[10, 100, 200, 500, 1000]]
 
     def setup(self, n_datapoints):
         key = jr.PRNGKey(123)
