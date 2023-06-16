@@ -1,0 +1,46 @@
+name: Integration Tests
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Integration Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Select the Python versions to test against
+        os: ["ubuntu-latest", "macos-latest"]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+      fail-fast: true
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v3.5.2
+        with:
+          fetch-depth: 1
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Install Poetry
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.3.3
+        with:
+          version: 1.4.0
+
+      # Configure Poetry to use the virtual environment in the project
+      - name: Setup Poetry
+        run: |
+          poetry config virtualenvs.in-project true
+
+      # Install the dependencies
+      - name: Install Package
+        run: |
+          poetry install --all-extras --with docs
+
+      # Run the unit tests and build the coverage report
+      - name: Run Integration Tests
+        run: poetry run python tests/integration_tests.py
