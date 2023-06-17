@@ -1,3 +1,4 @@
+"""Identity linear operator Module."""
 # Copyright 2022 The JaxLinOp Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -125,6 +126,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
 
     @classmethod
     def from_dense(cls, dense: Float[Array, "N N"]) -> "IdentityLinearOperator":
+        r"""Construct the operator from a dense matrix."""
         return IdentityLinearOperator(dense.shape[0])
 
 

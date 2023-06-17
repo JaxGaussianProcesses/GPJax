@@ -1,5 +1,5 @@
 # Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
-#
+"""Polynomial kernel."""
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -40,6 +40,7 @@ class Polynomial(AbstractKernel):
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
 
     def __post_init__(self):
+        r"""Post initialization that concatenates the kernel's name with the degree."""
         self.name = f"Polynomial (degree {self.degree})"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:

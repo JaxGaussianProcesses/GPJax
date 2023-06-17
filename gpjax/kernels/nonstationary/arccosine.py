@@ -1,3 +1,4 @@
+"""ArcCosine kernel."""
 # Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,6 +51,7 @@ class ArcCosine(AbstractKernel):
     bias_variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
 
     def __post_init__(self):
+        r"""Post initialization that ensures a valid order is supplied."""
         if self.order not in [0, 1, 2]:
             raise ValueError("ArcCosine kernel only implemented for orders 0, 1 and 2.")
 

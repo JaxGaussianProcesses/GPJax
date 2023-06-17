@@ -1,3 +1,4 @@
+"""Kernel computation for constant diagonal kernels."""
 # Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +27,11 @@ from gpjax.typing import Array
 
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):
+    """Constant diagonal kernel computation class.
+
+    Operations with the kernel assume a constant diagonal Gram matrix.
+    """
+
     def gram(self, x: Float[Array, "N D"]) -> ConstantDiagonalLinearOperator:
         r"""Compute the Gram matrix.
 

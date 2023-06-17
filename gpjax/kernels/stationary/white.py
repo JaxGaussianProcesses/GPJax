@@ -1,3 +1,4 @@
+"""White noise kernel function."""
 # Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,6 +37,8 @@ from gpjax.typing import (
 
 @dataclass
 class White(AbstractKernel):
+    r"""White noise kernel."""
+
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     compute_engine: AbstractKernelComputation = static_field(
         ConstantDiagonalKernelComputation

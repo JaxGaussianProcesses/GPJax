@@ -1,3 +1,4 @@
+"""Constant diagonal linear operator module."""
 # Copyright 2022 The JaxLinOp Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +34,12 @@ from gpjax.typing import (
 
 
 def _check_args(value: Any, size: Any) -> None:
+    r"""Ensure that the supplied arguments are of valid type and shape.
+
+    Args:
+        value (Any): The value of the diagonal.
+        size (Any): The size of the diagonal entry. This must one-dimensional.
+    """
     if not isinstance(size, int):
         raise ValueError(f"`length` must be an integer, but `length = {size}`.")
 
@@ -45,6 +52,12 @@ def _check_args(value: Any, size: Any) -> None:
 
 @dataclass
 class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
+    """Constant diagonal linear operator.
+
+    This class represents a Linear operator whose diagonal entries are constant.
+    All off-diagonal entries are zero.
+    """
+
     value: Float[Array, "1"]
     size: int = static_field()
 
@@ -70,6 +83,15 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
     def __add__(
         self, other: Union[Float[Array, "N N"], LinearOperator]
     ) -> LinearOperator:
+        r"""Add the linear operator to another linear operator or JAX array.
+
+        Args:
+            other (Union[Float[Array, 'N N'], LinearOperator]): The right-hand side of
+                the addition.
+
+        Returns:
+            LinearOperator: The summed linear operator.
+        """
         if isinstance(other, ConstantDiagonalLinearOperator):
             if other.size == self.size:
                 return ConstantDiagonalLinearOperator(
@@ -85,7 +107,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
             return super().__add__(other)
 
     def __mul__(self, other: Union[ScalarFloat, Float[Array, "1"]]) -> LinearOperator:
-        """Multiply covariance operator by scalar.
+        r"""Multiply covariance operator by scalar.
 
         Args:
             other (LinearOperator): Scalar.
@@ -97,7 +119,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         return ConstantDiagonalLinearOperator(value=self.value * other, size=self.size)
 
     def _add_diagonal(self, other: DiagonalLinearOperator) -> LinearOperator:
-        """Add diagonal to the covariance operator,  useful for computing, Kxx + Io².
+        r"""Add diagonal to the covariance operator,  useful for computing, Kxx + Io².
 
         Args:
             other (DiagonalLinearOperator): Diagonal covariance operator to add to the covariance operator.
@@ -121,11 +143,11 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
             return super()._add_diagonal(other)
 
     def diagonal(self) -> Float[Array, " N"]:
-        """Diagonal of the covariance operator."""
+        r"""Diagonal of the covariance operator."""
         return self.value * jnp.ones(self.size)
 
     def to_root(self) -> "ConstantDiagonalLinearOperator":
-        """
+        r"""
         Lower triangular.
 
         Returns
@@ -137,7 +159,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         )
 
     def log_det(self) -> ScalarFloat:
-        """Log determinant.
+        r"""Log determinant.
 
         Returns
         -------
@@ -146,7 +168,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         return 2.0 * self.size * jnp.log(self.value.squeeze())
 
     def inverse(self) -> "ConstantDiagonalLinearOperator":
-        """Inverse of the covariance operator.
+        r"""Inverse of the covariance operator.
 
         Returns
         -------
@@ -155,7 +177,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         return ConstantDiagonalLinearOperator(value=1.0 / self.value, size=self.size)
 
     def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
-        """Solve linear system.
+        r"""Solve linear system.
 
         Args:
             rhs (Float[Array, "N M"]): Right hand side of the linear system.
@@ -168,7 +190,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
 
     @classmethod
     def from_dense(cls, dense: Float[Array, "N N"]) -> "ConstantDiagonalLinearOperator":
-        """Construct covariance operator from dense matrix.
+        r"""Construct covariance operator from dense matrix.
 
         Args:
             dense (Float[Array, "N N"]): Dense matrix.
@@ -185,7 +207,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
     def from_root(
         cls, root: "ConstantDiagonalLinearOperator"
     ) -> "ConstantDiagonalLinearOperator":
-        """Construct covariance operator from root.
+        r"""Construct covariance operator from root.
 
         Args:
             root (ConstantDiagonalLinearOperator): Root of the covariance operator.

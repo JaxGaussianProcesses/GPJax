@@ -1,3 +1,4 @@
+"""Zero linear operator."""
 # Copyright 2022 The JaxLinOp Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,6 +39,7 @@ from gpjax.typing import (
 
 
 def _check_size(shape: Any) -> None:
+    r"""Check that shape is a 2-tuple."""
     if not isinstance(shape, tuple):
         raise ValueError(
             f"`shape` must be a a tuple, but `type(shape) = {type(shape)}`."
@@ -50,7 +52,7 @@ def _check_size(shape: Any) -> None:
 # TODO: Generalise to non-square matrices.
 @dataclass
 class ZeroLinearOperator(LinearOperator):
-    """Zero linear operator."""
+    r"""Zero linear operator."""
 
     def __init__(self, shape: Tuple[int, ...], dtype: jnp.dtype = None) -> None:
         _check_size(shape)

@@ -1,3 +1,4 @@
+"""Rational quadratic kernel function."""
 # Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +32,7 @@ from gpjax.typing import (
 
 @dataclass
 class RationalQuadratic(AbstractKernel):
+    r"""Rational Quadratic kernel."""
     lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
     )

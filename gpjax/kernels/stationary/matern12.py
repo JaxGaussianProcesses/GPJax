@@ -1,3 +1,4 @@
+"""Matérn kernel with smoothness parameter fixed at 1/2."""
 # Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

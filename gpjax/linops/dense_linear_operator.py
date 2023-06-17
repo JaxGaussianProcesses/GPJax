@@ -1,3 +1,4 @@
+"""Dense linear operator Module."""
 # Copyright 2022 The JaxLinOp Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +31,12 @@ from gpjax.typing import (
 
 
 def _check_matrix(matrix: Array) -> None:
+    r"""Ensure that the supplied matrix is of valid shape.
+
+    Args:
+        matrix (Array): The matrix that is to be checked. The matrix must be
+            two-dimesnional and square.
+    """
     if matrix.ndim != 2:
         raise ValueError(
             "The `matrix` must have at two dimensions, but "
@@ -44,12 +51,12 @@ def _check_matrix(matrix: Array) -> None:
 
 @dataclass
 class DenseLinearOperator(LinearOperator):
-    """Dense covariance operator."""
+    r"""Dense covariance operator."""
 
     matrix: Float[Array, "N N"]
 
     def __init__(self, matrix: Float[Array, "N N"], dtype: jnp.dtype = None) -> None:
-        """Initialize the covariance operator.
+        r"""Initialize the covariance operator.
 
         Args:
             matrix (Float[Array, "N N"]): Dense matrix.
@@ -66,10 +73,12 @@ class DenseLinearOperator(LinearOperator):
     def __add__(
         self, other: Union[LinearOperator, Float[Array, "N N"]]
     ) -> LinearOperator:
-        """Add diagonal to another linear operator.
+        r"""Add diagonal to another linear operator.
 
         Args:
-            other (Union[LinearOperator, Float[Array, "N N"]]): Other linear operator. Dimension of both operators must match. If the other linear operator is not a DiagonalLinearOperator, dense matrix addition is used.
+            other (Union[LinearOperator, Float[Array, "N N"]]): Other linear operator.
+                Dimension of both operators must match. If the other linear operator
+                is not a DiagonalLinearOperator, dense matrix addition is used.
 
         Returns
         -------
@@ -93,7 +102,7 @@ class DenseLinearOperator(LinearOperator):
             raise NotImplementedError
 
     def __mul__(self, other: ScalarFloat) -> LinearOperator:
-        """Multiply covariance operator by scalar.
+        r"""Multiply covariance operator by scalar.
 
         Args:
             other (LinearOperator): Scalar.
@@ -108,10 +117,11 @@ class DenseLinearOperator(LinearOperator):
         self,
         other: "gpjax.linops.diagonal_linear_operator.DiagonalLinearOperator",  # noqa: F821
     ) -> LinearOperator:
-        """Add diagonal to the covariance operator,  useful for computing, Kxx + Io².
+        r"""Add diagonal to the covariance operator,  useful for computing, Kxx + Io².
 
         Args:
-            other (DiagonalLinearOperator): Diagonal covariance operator to add to the covariance operator.
+            other (DiagonalLinearOperator): Diagonal covariance operator to add to the
+                covariance operator.
 
         Returns
         -------
@@ -124,7 +134,7 @@ class DenseLinearOperator(LinearOperator):
         return DenseLinearOperator(matrix=new_matrix)
 
     def diagonal(self) -> Float[Array, " N"]:
-        """
+        r"""
         Diagonal of the covariance operator.
 
         Returns
@@ -134,7 +144,7 @@ class DenseLinearOperator(LinearOperator):
         return jnp.diag(self.matrix)
 
     def __matmul__(self, other: VecNOrMatNM) -> VecNOrMatNM:
-        """Matrix multiplication.
+        r"""Matrix multiplication.
 
         Args:
             other (Float[Array, "N M"]): Matrix to multiply with.
@@ -146,7 +156,7 @@ class DenseLinearOperator(LinearOperator):
         return jnp.matmul(self.matrix, other)
 
     def to_dense(self) -> Float[Array, "N N"]:
-        """Construct dense Covariance matrix from the covariance operator.
+        r"""Construct dense Covariance matrix from the covariance operator.
 
         Returns
         -------
@@ -156,7 +166,7 @@ class DenseLinearOperator(LinearOperator):
 
     @classmethod
     def from_dense(cls, matrix: Float[Array, "N N"]) -> "DenseLinearOperator":
-        """Construct covariance operator from dense covariance matrix.
+        r"""Construct covariance operator from dense covariance matrix.
 
         Args:
             matrix (Float[Array, "N N"]): Dense covariance matrix.
@@ -169,7 +179,7 @@ class DenseLinearOperator(LinearOperator):
 
     @classmethod
     def from_root(cls, root: LinearOperator) -> "DenseLinearOperator":
-        """Construct covariance operator from the root of the covariance matrix.
+        r"""Construct covariance operator from the root of the covariance matrix.
 
         Args:
             root (Float[Array, "N N"]): Root of the covariance matrix.
@@ -182,19 +192,24 @@ class DenseLinearOperator(LinearOperator):
 
 
 class DenseFromRootLinearOperator(DenseLinearOperator):
+    r"""Dense covariance operator computed from the root of the covariance matrix."""
     root: LinearOperator
 
     def __init__(self, root: LinearOperator):
-        """Initialize the covariance operator."""
+        r"""Initialize the covariance operator."""
         self.root = root
         self.shape = root.shape
         self.dtype = root.dtype
 
     def to_root(self) -> LinearOperator:
+        r"""Return the root of the covariance matrix."""
         return self.root
 
     @property
     def matrix(self) -> Float[Array, "N N"]:
+        r"""Compute the dense covariance matrix from the root of the covariance
+        matrix.
+        """
         dense_root = self.root.to_dense()
         return dense_root @ dense_root.T
 
