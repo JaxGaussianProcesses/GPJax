@@ -50,6 +50,8 @@ pre-commit = "^3.2.2"
 nbstripout = "^0.6.1"
 pydocstyle = "^6.3.0"
 codespell = "^2.2.4"
+interrogate = {extras = ["png"], version = "^1.5.0"}
+pycairo = "^1.23.0"
 
 
 [tool.poetry.group.docs.dependencies]
@@ -199,3 +201,12 @@ files = ["gpjax/__init__.py"]
 
 [tool.codespell]
 ignore-words-list = "fro" # Frobenius
+
+[tool.interrogate]
+ignore-init-method = true
+ignore-init-module = true
+fail-under = 80
+exclude = ["setup.py", "docs", "tests"]
+verbose = 2
+quiet = false
+color = true

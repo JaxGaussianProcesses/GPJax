@@ -1,3 +1,4 @@
+"""Compute Random Fourier Feature (RFF) kernel approximations.  """
 from dataclasses import dataclass
 
 from jax.random import PRNGKey
@@ -55,7 +56,7 @@ class RFF(AbstractKernel):
         self.name = f"{self.base_kernel.name} (RFF)"
 
     def __call__(self, x: Array, y: Array) -> Array:
-        pass
+        """Superfluous for RFFs."""
 
     def _check_valid_base_kernel(self, kernel: AbstractKernel):
         r"""Verify that the base kernel is valid for RFF approximation.
