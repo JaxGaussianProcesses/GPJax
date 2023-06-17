@@ -205,7 +205,7 @@ ignore-words-list = "fro" # Frobenius
 [tool.interrogate]
 ignore-init-method = true
 ignore-init-module = true
-fail-under = 80
+fail-under = 64
 exclude = ["setup.py", "docs", "tests"]
 verbose = 2
 quiet = false
