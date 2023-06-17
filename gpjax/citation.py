@@ -34,7 +34,7 @@ CitationType = Union[str, Dict[str, str]]
 
 @dataclass(repr=False)
 class AbstractCitation:
-    """Base class for citations."""
+    r"""Base class for citations."""
 
     citation_key: str = None
     authors: str = None
@@ -42,7 +42,7 @@ class AbstractCitation:
     year: str = None
 
     def as_str(self) -> str:
-        """Generate a bibtex citation string.
+        r""" "Generate a bibtex citation string.
 
         Citations are stored as dataclasses. This method generates a bibtex citation
         string from the relevant fields.
@@ -58,16 +58,16 @@ class AbstractCitation:
         return citation_str + "\n}"
 
     def __repr__(self) -> str:
-        """Return a bibtex citation string."""
+        r"""Return a bibtex citation string."""
         return repr(self.as_str())
 
     def __str__(self) -> str:
-        """Return a bibtex citation string."""
+        r"""Return a bibtex citation string."""
         return self.as_str()
 
 
 class NullCitation(AbstractCitation):
-    """Null citation for objects without citations.
+    r"""Null citation for objects without citations.
 
     This class is used as the fallback citation for objects without citations.
     """
@@ -81,7 +81,7 @@ class NullCitation(AbstractCitation):
 
 
 class JittedFnCitation(AbstractCitation):
-    """Jitted functions citation.
+    r"""Jitted functions citation.
 
     When a fucnction is jitted in JAX, it is not possible to recover the original
     function. This object makes it clear to users why generating a citation is not
@@ -95,7 +95,7 @@ class JittedFnCitation(AbstractCitation):
 
 @dataclass
 class PhDThesisCitation(AbstractCitation):
-    """Citation for a PhD thesis."""
+    r"""Citation for a PhD thesis."""
 
     school: str = None
     institution: str = None
@@ -104,7 +104,7 @@ class PhDThesisCitation(AbstractCitation):
 
 @dataclass
 class PaperCitation(AbstractCitation):
-    """Citation for conference papers and journal articles."""
+    r"""Citation for conference papers and journal articles."""
 
     booktitle: str = None
     citation_type: str = "inproceedings"
@@ -112,7 +112,7 @@ class PaperCitation(AbstractCitation):
 
 @dataclass
 class BookCitation(AbstractCitation):
-    """Citation for books."""
+    r"""Citation for books."""
 
     publisher: str = None
     volume: str = None
@@ -124,7 +124,7 @@ class BookCitation(AbstractCitation):
 ####################
 @dispatch
 def cite(tree) -> NullCitation:
-    """Fallback citation for objects without a reference."""
+    r"""Fallback citation for objects without a reference."""
     return NullCitation()
 
 
@@ -133,7 +133,7 @@ def cite(tree) -> NullCitation:
 ####################
 @dispatch
 def cite(tree: PjitFunction) -> JittedFnCitation:
-    """Fallback citation for jitted objects."""
+    r"""Fallback citation for jitted objects."""
     return JittedFnCitation()
 
 
@@ -142,7 +142,7 @@ def cite(tree: PjitFunction) -> JittedFnCitation:
 ####################
 @dispatch
 def cite(tree: MaternKernels) -> PhDThesisCitation:
-    """Citation for Matern kernels."""
+    r"""Citation for Matern kernels."""
     citation = PhDThesisCitation(
         citation_key="matern1960SpatialV",
         authors="Bertil Matérn",
@@ -159,7 +159,7 @@ def cite(tree: MaternKernels) -> PhDThesisCitation:
 
 @dispatch
 def cite(tree: ArcCosine) -> PaperCitation:
-    """Citation for ArcCosine kernels."""
+    r"""Citation for ArcCosine kernels."""
     return PaperCitation(
         citation_key="cho2009kernel",
         authors="Cho, Youngmin and Saul, Lawrence",
@@ -171,7 +171,7 @@ def cite(tree: ArcCosine) -> PaperCitation:
 
 @dispatch
 def cite(tree: GraphKernel) -> PaperCitation:
-    """Citation for Matérn graph kernels."""
+    r"""Citation for Matérn graph kernels."""
     return PaperCitation(
         citation_key="borovitskiy2021matern",
         title="Matérn Gaussian Processes on Graphs",
@@ -186,7 +186,7 @@ def cite(tree: GraphKernel) -> PaperCitation:
 
 @dispatch
 def cite(tree: RFF) -> PaperCitation:
-    """Citation for Random Fourier Features kernel approximations."""
+    r"""Citation for Random Fourier Features kernel approximations."""
     return PaperCitation(
         citation_key="rahimi2007random",
         authors="Rahimi, Ali and Recht, Benjamin",
@@ -202,7 +202,7 @@ def cite(tree: RFF) -> PaperCitation:
 ####################
 @dispatch
 def cite(tree: MLLs) -> BookCitation:
-    """Citation for the GP marginal log-likelihood."""
+    r"""Citation for the GP marginal log-likelihood."""
     return BookCitation(
         citation_key="rasmussen2006gaussian",
         title="Gaussian Processes for Machine Learning",
@@ -215,7 +215,7 @@ def cite(tree: MLLs) -> BookCitation:
 
 @dispatch
 def cite(tree: CollapsedELBO) -> PaperCitation:
-    """Citation for the collapsed evidence lower bound."""
+    r"""Citation for the collapsed evidence lower bound."""
     return PaperCitation(
         citation_key="titsias2009variational",
         title="Variational learning of inducing variables in sparse Gaussian processes",
@@ -227,7 +227,7 @@ def cite(tree: CollapsedELBO) -> PaperCitation:
 
 @dispatch
 def cite(tree: ELBO) -> PaperCitation:
-    """Citation for the uncollapsed evidence lower bound."""
+    r"""Citation for the uncollapsed evidence lower bound."""
     return PaperCitation(
         citation_key="hensman2013gaussian",
         title="Gaussian Processes for Big Data",

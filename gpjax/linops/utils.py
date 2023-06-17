@@ -31,7 +31,7 @@ from gpjax.typing import Array
 def identity(
     n: int,
 ) -> "gpjax.linops.identity_linear_operator.IdentityLinearOperator":  # noqa: F821
-    """Identity matrix.
+    r"""Identity matrix.
 
     Args:
         n (int): Size of the identity matrix.
@@ -46,7 +46,7 @@ def identity(
 
 
 def to_dense(obj: Union[Float[Array, "..."], LinearOperator]):
-    """
+    r"""
     Ensure an object is a dense matrix.
 
     Args:
@@ -69,7 +69,7 @@ def to_dense(obj: Union[Float[Array, "..."], LinearOperator]):
 
 
 def to_linear_operator(obj: Union[Float[Array, "..."], LinearOperator]):
-    """
+    r"""
     Ensure an object is a linear operator.
 
     Args:
@@ -95,7 +95,7 @@ def to_linear_operator(obj: Union[Float[Array, "..."], LinearOperator]):
 
 
 def check_shapes_match(shape1: Tuple[int, ...], shape2: Tuple[int, ...]) -> None:
-    """Check shapes of two objects.
+    r"""Check shapes of two objects.
 
     Args:
         shape1 (Tuple[int, "..."]): Shape of the first object.
@@ -112,7 +112,7 @@ def check_shapes_match(shape1: Tuple[int, ...], shape2: Tuple[int, ...]) -> None
 
 
 def default_dtype() -> Union[Type[jnp.float64], Type[jnp.float32]]:
-    """Get the default dtype for the linear operator.
+    r"""Get the default dtype for the linear operator.
 
     Returns
     -------

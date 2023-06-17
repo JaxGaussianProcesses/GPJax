@@ -32,17 +32,17 @@ from gpjax.typing import (
 
 
 def _check_size(size: Any) -> None:
-    """Check that size is an integer."""
+    r"""Check that size is an integer."""
     if not isinstance(size, int):
         raise ValueError(f"`size` must be an integer, but `size = {size}`.")
 
 
 @dataclass
 class IdentityLinearOperator(ConstantDiagonalLinearOperator):
-    """Identity linear operator."""
+    r"""Identity linear operator."""
 
     def __init__(self, size: int, dtype: jnp.dtype = None) -> None:
-        """Identity matrix.
+        r"""Identity matrix.
 
         Args:
             size (int): Size of the identity matrix.
@@ -58,7 +58,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         self.dtype = dtype
 
     def __matmul__(self, other: Float[Array, "N M"]) -> Float[Array, "N M"]:
-        """Matrix multiplication.
+        r"""Matrix multiplication.
 
         Args:
             other (Float[Array, "N M"]): Matrix to multiply with.
@@ -70,7 +70,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         return other
 
     def to_root(self) -> "IdentityLinearOperator":
-        """
+        r"""
         Lower triangular.
 
         Returns
@@ -80,7 +80,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         return self
 
     def log_det(self) -> ScalarFloat:
-        """Log determinant.
+        r"""Log determinant.
 
         Returns
         -------
@@ -89,7 +89,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         return jnp.array(0.0)
 
     def inverse(self) -> "IdentityLinearOperator":
-        """Inverse of the covariance operator.
+        r"""Inverse of the covariance operator.
 
         Returns
         -------
@@ -98,7 +98,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
         return self
 
     def solve(self, rhs: Float[Array, "... M"]) -> Float[Array, "... M"]:
-        """Solve linear system.
+        r"""Solve linear system.
 
         Args:
             rhs (Float[Array, "N M"]): Right hand side of the linear system.
@@ -113,7 +113,7 @@ class IdentityLinearOperator(ConstantDiagonalLinearOperator):
 
     @classmethod
     def from_root(cls, root: "IdentityLinearOperator") -> "IdentityLinearOperator":
-        """Construct from root.
+        r"""Construct from root.
 
         Args:
             root (IdentityLinearOperator): Root of the covariance operator.

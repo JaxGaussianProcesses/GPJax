@@ -52,7 +52,7 @@ def _check_args(value: Any, size: Any) -> None:
 
 @dataclass
 class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
-    """Constant diagonal linear operator.
+    r"""Constant diagonal linear operator.
 
     This class represents a Linear operator whose diagonal entries are constant.
     All off-diagonal entries are zero.
@@ -64,7 +64,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
     def __init__(
         self, value: Float[Array, "1"], size: int, dtype: jnp.dtype = None
     ) -> None:
-        """Initialize the constant diagonal linear operator.
+        r"""Initialize the constant diagonal linear operator.
 
         Args:
             value (Float[Array, "1"]): Constant value of the diagonal.
@@ -147,8 +147,7 @@ class ConstantDiagonalLinearOperator(DiagonalLinearOperator):
         return self.value * jnp.ones(self.size)
 
     def to_root(self) -> "ConstantDiagonalLinearOperator":
-        r"""
-        Lower triangular.
+        r"""Lower triangular.
 
         Returns
         -------

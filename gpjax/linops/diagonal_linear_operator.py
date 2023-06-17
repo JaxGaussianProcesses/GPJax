@@ -216,7 +216,7 @@ class DiagonalLinearOperator(LinearOperator):
 
 
 class DiagonalFromRootLinearOperator(DiagonalLinearOperator):
-    """Construct covariance operator from the lower triangular matrix."""
+    r"""Construct covariance operator from the lower triangular matrix."""
 
     root: DiagonalLinearOperator
 
