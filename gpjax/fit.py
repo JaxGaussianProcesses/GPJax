@@ -1,3 +1,4 @@
+"""Abstraction for training a Module model with respect to an Objective function."""
 # Copyright 2023 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -128,8 +129,10 @@ def fit(  # noqa: PLR0913
         _check_log_rate(log_rate)
         _check_verbose(verbose)
 
-    # Unconstrained space loss function with stop-gradient rule for non-trainable params.
     def loss(model: Module, batch: Dataset) -> ScalarFloat:
+        """Unconstrained space loss function with stop-gradient rule for non-trainable
+        params.
+        """
         model = model.stop_gradient()
         return objective(model.constrain(), batch)
 
@@ -144,6 +147,7 @@ def fit(  # noqa: PLR0913
 
     # Optimisation step.
     def step(carry, key):
+        """Define a single step of the optimisation loop."""
         model, opt_state = carry
 
         if batch_size != -1:

@@ -1,3 +1,4 @@
+"""Multivariate Gaussian distribution with a linear operator scale matrix."""
 # Copyright 2022 The GPJax Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -187,8 +188,8 @@ class GaussianDistribution(tfd.Distribution):
         # Gather n samples from standard normal distribution Z = [z₁, ..., zₙ]ᵀ.
         Z = jr.normal(key, shape=(n, *self.event_shape))
 
-        # xᵢ ~ N(loc, cov) <=> xᵢ = loc + sqrt zᵢ, where zᵢ ~ N(0, I).
         def affine_transformation(x):
+            """xᵢ ~ N(loc, cov) <=> xᵢ = loc + sqrt zᵢ, where zᵢ ~ N(0, I)."""
             return self.loc + sqrt @ x
 
         return vmap(affine_transformation)(Z)
@@ -202,6 +203,8 @@ class GaussianDistribution(tfd.Distribution):
         )  # TODO this looks weird, why ignore the second entry?
 
     def kl_divergence(self, other: "GaussianDistribution") -> ScalarFloat:
+        """Compute the KL divergence from self to another multivariate Gaussian
+        distribution."""
         return _kl_divergence(self, other)
 
 

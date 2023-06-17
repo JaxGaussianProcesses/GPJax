@@ -1,3 +1,4 @@
+"""Variational family parameterisations used in variational inference."""
 # Copyright 2022 The GPJax Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -115,6 +116,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
     )
 
     def __post_init__(self) -> None:
+        r"""Post-initialisation that ensures the variational parameters are set."""
         if self.variational_mean is None:
             self.variational_mean = jnp.zeros((self.num_inducing, 1))
 
@@ -346,6 +348,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
     natural_matrix: Float[Array, "M M"] = None
 
     def __post_init__(self):
+        r"""Post-initialisation that ensures the variational parameters are set."""
         if self.natural_vector is None:
             self.natural_vector = jnp.zeros((self.num_inducing, 1))
 
@@ -363,7 +366,8 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
             & = \operatorname{KL}[N(\mu, S)\mid\mid N(mz, \mathbf{K}_{zz})],
         \end{align}
         ```
-        with $\mu$ and $S$ computed from the natural parameterisation $\theta  = (S^{-1}\mu  , -S^{-1}/2)$.
+        with $\mu$ and $S$ computed from the natural parameterisation
+        $\theta  = (S^{-1}\mu  , -S^{-1}/2)$.
 
         Returns
         -------
@@ -384,7 +388,8 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         S_inv = -2 * natural_matrix
         S_inv += jnp.eye(m) * self.jitter
 
-        # Compute L⁻¹, where LLᵀ = S, via a trick found in the NumPyro source code and https://nbviewer.org/gist/fehiepsi/5ef8e09e61604f10607380467eb82006#Precision-to-scale_tril:
+        # Compute L⁻¹, where LLᵀ = S, via a trick found in the NumPyro source code
+        # and https://nbviewer.org/gist/fehiepsi/5ef8e09e61604f10607380467eb82006#Precision-to-scale_tril:
         sqrt_inv = jnp.swapaxes(
             jnp.linalg.cholesky(S_inv[..., ::-1, ::-1])[..., ::-1, ::-1], -2, -1
         )
@@ -507,6 +512,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
     expectation_matrix: Float[Array, "M M"] = None
 
     def __post_init__(self):
+        r"""Post-initialisation that ensures the variational parameters are set."""
         if self.expectation_vector is None:
             self.expectation_vector = jnp.zeros((self.num_inducing, 1))
         if self.expectation_matrix is None:
@@ -648,6 +654,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
     """
 
     def __post_init__(self):
+        r"""Post-initialisation that checks that a Gaussian likelihood is used."""
         if not isinstance(self.posterior.likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")
 

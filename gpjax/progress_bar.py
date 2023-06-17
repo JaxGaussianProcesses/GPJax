@@ -1,3 +1,4 @@
+"""Progress bar decorator for the body function of a `jax.lax.scan`."""
 # Copyright 2023 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,7 +54,7 @@ def progress_bar(num_iters: int, log_rate: int) -> Callable:
     tqdm_bars = {}
     remainder = num_iters % log_rate
 
-    """Define a tqdm progress bar."""
+    # Define a tqdm progress bar
     tqdm_bars[0] = tqdm(range(num_iters))
     tqdm_bars[0].set_description("Compiling...", refresh=True)
 
@@ -104,6 +105,7 @@ def progress_bar(num_iters: int, log_rate: int) -> Callable:
         r"""Decorator that adds a progress bar to `body_fun` used in `jax.lax.scan`."""
 
         def wrapper_progress_bar(carry: Any, x: Union[tuple, int]) -> Any:
+            """Wrapper function for `body_fun` that adds a progress bar."""
             # Get iteration number
             if type(x) is tuple:
                 iter_num, *_ = x

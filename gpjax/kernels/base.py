@@ -1,3 +1,4 @@
+"""Base kernel class and associated arithmetic operations between kernels."""
 # Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,12 +60,32 @@ class AbstractKernel(Module):
 
     @property
     def ndims(self):
+        r"""Number of dimensions on which the kernel operates."""
         return 1 if not self.active_dims else len(self.active_dims)
 
     def cross_covariance(self, x: Num[Array, "N D"], y: Num[Array, "M D"]):
+        r"""Compute the cross covariance between two inputs.
+
+        Args:
+            x (Num[Array, Num[Array, 'N D']]): Left hand input to the kernel function.
+                It's shape is $`N \times D`$.
+            y (Num[Array, Num[Array, 'N D']]): Right hand input to the kernel function.
+                It's shape is $`M \times D`$.
+        Returns:
+            _type_: The $`N \times M`$ cross covariance matrix between the two inputs.
+        """
         return self.compute_engine(self).cross_covariance(x, y)
 
     def gram(self, x: Num[Array, "N D"]):
+        r"""Compute the gram matrix of the kernel.
+
+        Args:
+            x (Num[Array, Num[Array, 'N D']]): The $`N \times D`$ input array to the
+                kernel function.
+
+        Returns:
+            Num[Array, 'N N']_: The $`N \times N`$ gram matrix of the kernel.
+        """
         return self.compute_engine(self).gram(x)
 
     def slice_input(self, x: Float[Array, "... D"]) -> Float[Array, "... Q"]:
@@ -142,6 +163,14 @@ class AbstractKernel(Module):
 
     @property
     def spectral_density(self) -> Optional[tfd.Distribution]:
+        r"""Return the spectral density of the kernel.
+
+        Returns:
+            Optional[tfd.Distribution]: The TensorFlow probability distribution
+                representing the spectral density of the kernel. By default, this
+                is None, but subclasses can override this property to return a
+                distribution.
+        """
         return None
 
 
@@ -176,7 +205,7 @@ class CombinationKernel(AbstractKernel):
     operator: Callable = static_field(None)
 
     def __post_init__(self):
-        # Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
+        r"""Add kernels to a list, flattening out instances of this class therein."""
         kernels_list: List[AbstractKernel] = []
 
         for kernel in self.kernels:

@@ -1,3 +1,4 @@
+"""Verbose scan (vscan) for JAX."""
 # Copyright 2023 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -134,6 +135,7 @@ def vscan(
         _progress_bar.close()
 
     def _body_fun(carry: Carry, iter_num_and_x: Tuple[ScalarInt, X]) -> Tuple[Carry, Y]:
+        r"""The body function for the scan."""
         # Unpack iter_num and x.
         iter_num, x = iter_num_and_x
 

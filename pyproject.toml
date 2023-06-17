@@ -200,13 +200,15 @@ vcs = "git"
 files = ["gpjax/__init__.py"]
 
 [tool.codespell]
-ignore-words-list = "fro" # Frobenius
+ignore-words-list = "fro"
 
 [tool.interrogate]
 ignore-init-method = true
 ignore-init-module = true
-fail-under = 64
+ignore-property-decorators=true
+fail-under = 84
 exclude = ["setup.py", "docs", "tests"]
 verbose = 2
 quiet = false
 color = true
+omit-covered-files = true

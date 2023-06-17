@@ -1,10 +1,25 @@
+"""Objective functions in GPJax that can be used for model optimisation."""
+# Copyright 2022 The GPJax Contributors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 from abc import abstractmethod
 from dataclasses import dataclass
 
 from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
-import jax.tree_util as jtu
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
 
@@ -31,20 +46,30 @@ class AbstractObjective(Module):
     constant: float = static_field(init=False, repr=False)
 
     def __post_init__(self) -> None:
+        r"""Post-initialisation method for the objective function. This method is
+        used to set the constant that is multiplied by the objective function.
+        """
         self.constant = jnp.array(-1.0) if self.negative else jnp.array(1.0)
 
-    def __hash__(self):
-        return hash(tuple(jtu.tree_leaves(self)))  # Probably put this on the Module!
-
     def __call__(self, *args, **kwargs) -> ScalarFloat:
+        r"""Evaluate a single step of the objective function. This method is used to
+        call the ``step`` method of the objective function."""
         return self.step(*args, **kwargs)
 
     @abstractmethod
     def step(self, *args, **kwargs) -> ScalarFloat:
+        r"""Evaluate a single step of the objective function. This method must be
+        implemented by any inheriting class."""
         raise NotImplementedError
 
 
 class ConjugateMLL(AbstractObjective):
+    r"""Marginal log-likelihood of a conjugate Gaussian process.
+
+    The marginal log-likelihood of a Gaussian process whose likelihood is a
+    Gaussian distribution. This leads to a closed form expression for the marginal
+    log-likelihood."""
+
     def step(
         self,
         posterior: "gpjax.gps.ConjugatePosterior",  # noqa: F821
@@ -196,6 +221,8 @@ NonConjugateMLL = LogPosteriorDensity
 
 
 class ELBO(AbstractObjective):
+    r"""The evidence lower bound of a variational approximation."""
+
     def step(
         self,
         variational_family: "gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
@@ -262,9 +289,10 @@ def variational_expectation(
     # Variational distribution q(f(·)) = N(f(·); μ(·), Σ(·, ·))
     q = variational_family
 
-    # Compute variational mean, μ(x), and variance, √diag(Σ(x, x)), at the training
-    # inputs, x
     def q_moments(x):
+        r"""Compute variational mean, μ(x), and variance, √diag(Σ(x, x)), at the
+        training inputs, x
+        """
         qx = q(x)
         return qx.mean(), qx.variance()
 

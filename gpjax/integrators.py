@@ -1,3 +1,4 @@
+"""Define integration strategies for computing expected log likelihoods."""
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import TYPE_CHECKING

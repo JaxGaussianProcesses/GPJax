@@ -1,3 +1,4 @@
+"""Likelihood functions to be used in conjunction with a Gaussian processes prior."""
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -168,6 +169,8 @@ class Gaussian(AbstractLikelihood):
 
 @dataclass
 class Bernoulli(AbstractLikelihood):
+    r"""Bernoulli likelihood object for binary data."""
+
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         r"""The probit link function of the Bernoulli likelihood.
 
@@ -201,6 +204,8 @@ class Bernoulli(AbstractLikelihood):
 
 @dataclass
 class Poisson(AbstractLikelihood):
+    r"""Poisson likelihood object for count data."""
+
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         r"""The link function of the Poisson likelihood.
 

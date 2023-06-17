@@ -1,3 +1,4 @@
+"""Define Gaussian process priors and posteriors."""
 # Copyright 2022 The GPJax Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -316,6 +317,8 @@ class Prior(AbstractPrior):
         feature_weights = normal(key, [num_samples, 2 * num_features])  # [B, L]
 
         def sample_fn(test_inputs: Float[Array, "N D"]) -> Float[Array, "N B"]:
+            """Sampling function that returns the evaluations of a sample across any
+            given inputs."""
             feature_evals = fourier_feature_fn(test_inputs)  # [N, L]
             evaluated_sample = jnp.inner(feature_evals, feature_weights)  # [N, B]
             return self.mean_function(test_inputs) + evaluated_sample
@@ -579,6 +582,8 @@ class ConjugatePosterior(AbstractPosterior):
         )  #  [N, B]
 
         def sample_fn(test_inputs: Float[Array, "n D"]) -> Float[Array, "n B"]:
+            """Sampling function that returns the evaluations of a sample across any
+            given inputs."""
             fourier_features = fourier_feature_fn(test_inputs)  # [n, L]
             weight_space_contribution = jnp.inner(
                 fourier_features, fourier_weights
@@ -617,6 +622,8 @@ class NonConjugatePosterior(AbstractPosterior):
     key: KeyArray = static_field(PRNGKey(42))
 
     def __post_init__(self):
+        """Post initialisation function that initialises the latent function's values
+        using information from the log-likelihood."""
         if self.latent is None:
             self.latent = normal(self.key, shape=(self.likelihood.num_datapoints, 1))
 
