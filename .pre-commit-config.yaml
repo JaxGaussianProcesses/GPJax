@@ -52,10 +52,8 @@ repos:
       - id: interrogate
         args:
           [
-            "gpjax",
+            "gpjax/",
             "--config",
             "pyproject.toml",
-            "--generate-badge",
-            ".github/assets/",
           ]
         pass_filenames: false
