@@ -755,6 +755,7 @@ def _build_fourier_features_fn(
     )
 
     def eval_fourier_features(test_inputs: Float[Array, "N D"]) -> Float[Array, "N L"]:
+        r"""Evaluate the sampled feature functions at the given inputs."""
         Phi = approximate_kernel.compute_features(x=test_inputs)
         Phi *= jnp.sqrt(prior.kernel.variance / num_features)
         return Phi
