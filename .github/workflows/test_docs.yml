@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  test-docs:
     # Functionality for testing documentation builds on multiple OSes and Python versions
     name: Build docs (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}

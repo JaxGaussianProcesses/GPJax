@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  test:
+  unit-tests:
     name: Run Tests
     runs-on: ubuntu-latest
     strategy:

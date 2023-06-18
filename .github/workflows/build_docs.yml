@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  build-docs:
     concurrency: ci-${{ github.ref }}
     name: Build docs (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}

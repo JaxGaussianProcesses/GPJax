@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  test:
+  integration-tests:
     name: Run Integration Tests
     runs-on: ubuntu-latest
     strategy:
