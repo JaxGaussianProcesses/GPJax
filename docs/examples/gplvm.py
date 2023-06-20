@@ -129,6 +129,7 @@ model = GPLVM(latent_process=latent_processes, latent_variables=initial_X)
 # kernel parameters, observation noise term, and the latent coordinate. We'll JIT
 # compile this function to accelerate optimisation.
 
+
 # %%
 @dataclass
 class GPLVM_MAP(gpx.objectives.AbstractObjective):
