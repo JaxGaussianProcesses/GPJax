@@ -78,7 +78,6 @@ features = world_data.drop(["Country", "Region", "GDP ($ per capita)"], axis="co
 # principal component analysis.
 
 # %%
-
 features = StandardScaler().fit_transform(features)
 latent_dim = 2
 principal_components = PCA(n_components=latent_dim).fit_transform(features)
@@ -122,6 +121,7 @@ class GPLVM(gpx.Module):
 
 model = GPLVM(latent_process=latent_processes, latent_variables=initial_X)
 
+
 # %% [markdown]
 # ## Optimisation
 #
@@ -130,8 +130,6 @@ model = GPLVM(latent_process=latent_processes, latent_variables=initial_X)
 # compile this function to accelerate optimisation.
 
 # %%
-
-
 @dataclass
 class GPLVM_MAP(gpx.objectives.AbstractObjective):
     def step(

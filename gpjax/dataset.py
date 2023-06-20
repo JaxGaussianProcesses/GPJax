@@ -1,3 +1,4 @@
+"""Dataset object that stores input and output data."""
 # Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,17 +30,12 @@ from jaxtyping import (
 from simple_pytree import Pytree
 from jaxtyping import Num
 from simple_pytree import Pytree, static_field
-from gpjax.base import Module
 
-from gpjax.base import (
-    Module,
-    static_field,
-)
 from gpjax.typing import Array
 
 
 @dataclass
-class Dataset(Module):
+class Dataset(Pytree):
     r"""Base class for datasets.
 
     Attributes
