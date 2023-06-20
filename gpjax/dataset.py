@@ -22,18 +22,19 @@ from beartype.typing import (
     Literal,
 )
 import jax.numpy as jnp
-<<<<<<< HEAD
 from jaxtyping import (
     Bool,
     Num,
 )
 from simple_pytree import Pytree
-=======
 from jaxtyping import Num
 from simple_pytree import Pytree, static_field
 from gpjax.base import Module
->>>>>>> 3216299 (GPLVM example)
 
+from gpjax.base import (
+    Module,
+    static_field,
+)
 from gpjax.typing import Array
 
 
@@ -66,8 +67,8 @@ class Dataset(Module):
         if isinstance(self.mask, str):
             if not self.mask == "infer automatically":
                 raise ValueError(
-                    f"mask must be either the string 'infer automatically', None, or a boolean array."
-                    f" Got mask={self.mask}."
+                    "mask must be either the string 'infer automatically', None, or a"
+                    f" boolean array. Got mask={self.mask}."
                 )
             elif self.y is not None:
                 mask = jnp.isnan(self.y)
@@ -158,15 +159,19 @@ def _check_precision(
     r"""Checks the precision of $`X`$ and $`y`."""
     if X is not None and X.dtype != jnp.float64:
         warnings.warn(
-            "X is not of type float64. "
-            f"Got X.dtype={X.dtype}. This may lead to numerical instability. ",
+            (
+                "X is not of type float64. "
+                f"Got X.dtype={X.dtype}. This may lead to numerical instability. "
+            ),
             stacklevel=2,
         )
 
     if y is not None and y.dtype != jnp.float64:
         warnings.warn(
-            "y is not of type float64."
-            f"Got y.dtype={y.dtype}. This may lead to numerical instability.",
+            (
+                "y is not of type float64."
+                f"Got y.dtype={y.dtype}. This may lead to numerical instability."
+            ),
             stacklevel=2,
         )
 
