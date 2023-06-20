@@ -152,4 +152,3 @@ package-lock.json
 node_modules/
 
 docs/api
-benchmarks/.asv/results
