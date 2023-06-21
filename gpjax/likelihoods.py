@@ -228,6 +228,42 @@ class Poisson(AbstractLikelihood):
         return self.link_function(dist.mean())
 
 
+@dataclass
+class Gamma(AbstractLikelihood):
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
+        r"""The link function of the Gamma likelihood.
+
+        Args:
+            f (Float[Array, "..."]): Function values.
+
+        Returns:
+            tfd.Distribution: The likelihood function.
+        """
+        return tfd.Gamma(inv_probit(f[0]), inv_probit(f[1]))
+
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        r"""Evaluate the pointwise predictive distribution.
+
+        Evaluate the pointwise predictive distribution, given a Gaussian
+        process posterior and likelihood parameters.
+
+        Args:
+            dist (tfd.Distribution): The Gaussian process posterior, evaluated
+                at a finite set of test points.
+
+        Returns:
+            tfd.Distribution: The pointwise predictive distribution.
+        """
+
+        mean = dist.mean().ravel()
+        stddev = dist.stddev().ravel()
+
+        alpha = (mean / stddev) ** 2
+        beta = mean / stddev**2
+
+        return self.link_function([alpha, beta])
+
+
 def inv_probit(x: Float[Array, " *N"]) -> Float[Array, " *N"]:
     r"""Compute the inverse probit function.
 
@@ -250,5 +286,6 @@ __all__ = [
     "Gaussian",
     "Bernoulli",
     "Poisson",
+    "Gamma",
     "inv_probit",
 ]
