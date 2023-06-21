@@ -152,7 +152,7 @@ for ax in axes.ravel():
     )
 # -
 
-# Similarily, for a Bernoulli likelihood function, the samples of $y$ would be binary.
+# Similarly, for a Bernoulli likelihood function, the samples of $y$ would be binary.
 
 # +
 likelihood = gpx.Bernoulli(num_datapoints=D.n)
