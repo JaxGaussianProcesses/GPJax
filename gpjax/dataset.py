@@ -14,13 +14,8 @@
 # ==============================================================================
 
 from dataclasses import dataclass
-from typing import (
-    Callable,
-    TypeVar,
-    Union,
-)
 
-from beartype.typing import Optional
+from beartype.typing import Optional, Callable, TypeVar, Union, Tuple
 import jax
 import jax.numpy as jnp
 from jaxtyping import Num
@@ -123,9 +118,8 @@ def _check_all_leaves_const(
     extract_value: Callable[[any], T],
     equal_to: T,
     X: Optional[Union[Pytree, Num[Array, "..."]]],
-) -> bool:
+) -> Tuple[bool, T]:
     values = jax.tree_map(extract_value, X)
-
     return (
         jax.tree_util.tree_reduce(
             lambda a, b: a and b, jax.tree_map(lambda a: a == equal_to, values), True
