@@ -256,7 +256,7 @@ negative_elbo = jit(negative_elbo)
 # %%
 schedule = ox.warmup_cosine_decay_schedule(
     init_value=0.0,
-    peak_value=0.1,
+    peak_value=0.01,
     warmup_steps=75,
     decay_steps=1500,
     end_value=0.001,
