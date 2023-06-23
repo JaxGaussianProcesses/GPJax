@@ -1,19 +1,25 @@
 """Compute Random Fourier Feature (RFF) kernel approximations.  """
 from dataclasses import dataclass
 
-from jax.random import PRNGKey
+import jax.numpy as jnp
+import jax.random as jr
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
+import beartype.typing as tp
 
 from gpjax.base import (
     param_field,
     static_field,
 )
 from gpjax.kernels.base import AbstractKernel
-from gpjax.kernels.computations import BasisFunctionComputation
+from gpjax.kernels.computations import (
+    BasisFunctionComputation,
+    NonStationaryBasisFunctionComputation,
+)
 from gpjax.typing import (
     Array,
     KeyArray,
+    ScalarFloat
 )
 
 
@@ -37,7 +43,7 @@ class RFF(AbstractKernel):
     base_kernel: AbstractKernel = None
     num_basis_fns: int = static_field(50)
     frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity())
-    key: KeyArray = static_field(PRNGKey(123))
+    key: KeyArray = static_field(jr.PRNGKey(123))
 
     def __post_init__(self) -> None:
         r"""Post-initialisation function.
@@ -47,7 +53,6 @@ class RFF(AbstractKernel):
         """
         self._check_valid_base_kernel(self.base_kernel)
         self.compute_engine = BasisFunctionComputation
-
         if self.frequencies is None:
             n_dims = self.base_kernel.ndims
             self.frequencies = self.base_kernel.spectral_density.sample(
@@ -83,4 +88,32 @@ class RFF(AbstractKernel):
         -------
             Float[Array, "N L"]: A $`N \times L`$ array of features where $`L = 2M`$.
         """
+        return self.compute_engine(self).compute_features(x)
+
+
+@dataclass
+class NonStationaryRFF(AbstractKernel):
+    """Kernel class for nonstationary Random Fourier Features."""
+
+    num_basis_fns: int = static_field(None)
+    n_dims: int = static_field(1)
+    variance: Float[Array, ""] = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    key: KeyArray = static_field(jr.PRNGKey(123), repr=0)
+    lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
+    )
+    frequencies: Float[Array, "2 M D"] = param_field(None, init=0, trainable=1)
+    dropout: ScalarFloat = static_field(0.0)
+    name: str = static_field("NonStationaryRFF", repr=False)
+    compute_engine: tp.Type[NonStationaryBasisFunctionComputation] = None
+
+
+    def __post_init__(self) -> None:
+        self.compute_engine = NonStationaryBasisFunctionComputation
+        self.frequencies = jr.normal(self.key, (2, self.num_basis_fns, self.n_dims))
+
+    def __call__(self, x, y):
+        return self.compute_engine(self).cross_covariance(x, y)
+
+    def compute_features(self, x):
         return self.compute_engine(self).compute_features(x)
