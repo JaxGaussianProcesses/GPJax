@@ -98,11 +98,11 @@ class NonStationaryRFF(AbstractKernel):
     num_basis_fns: int = static_field(None)
     n_dims: int = static_field(1)
     variance: Float[Array, ""] = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    key: KeyArray = static_field(jr.PRNGKey(123), repr=0)
+    key: KeyArray = static_field(jr.PRNGKey(123), repr=False)
     lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
     )
-    frequencies: Float[Array, "2 M D"] = param_field(None, init=0, trainable=1)
+    frequencies: Float[Array, "2 M D"] = param_field(None, init=False, trainable=True)
     dropout: ScalarFloat = static_field(0.0)
     name: str = static_field("NonStationaryRFF", repr=False)
     compute_engine: tp.Type[NonStationaryBasisFunctionComputation] = None
