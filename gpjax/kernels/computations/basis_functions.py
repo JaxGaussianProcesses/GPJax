@@ -111,13 +111,19 @@ class NonStationaryBasisFunctionComputation(AbstractKernelComputation):
             DenseLinearOperator: A dense linear operator representing the
                 $`N \times N`$ Gram matrix.
         """
+        Ω_1, Ω_2 = self.kernel.frequencies
+
         if d := self.kernel.dropout:
             Ω_1, Ω_2 = self._gaussian_dropout(Ω_1, Ω_2, d)
 
         Φ_x = self.compute_features(inputs, Ω_1, Ω_2)
-        return DenseLinearOperator(self.scaling * jnp.matmul(Φ_x, Φ_x.T), dtype=jnp.float64)
+        return DenseLinearOperator(
+            self.scaling * jnp.matmul(Φ_x, Φ_x.T), dtype=jnp.float64
+        )
 
-    def compute_features(self, x: Float[Array, "N D"], Ω_1, Ω_2) -> Float[Array, "N 2*M"]:
+    def compute_features(
+        self, x: Float[Array, "N D"], Ω_1, Ω_2
+    ) -> Float[Array, "N 2*M"]:
         r"""Compute the features for the inputs.
 
         Args:
@@ -138,10 +144,9 @@ class NonStationaryBasisFunctionComputation(AbstractKernelComputation):
     @property
     def scaling(self):
         return self.kernel.variance / (4 * self.kernel.num_basis_fns)
-    
 
     def _gaussian_dropout(self, Ω_1, Ω_2, d):
         self.key, subkey = jr.split(self.key)
-        Ω_1 += jr.normal(self.key, Ω_1.shape, dtype=Ω_1.dtype) * d 
-        Ω_2 += jr.normal(subkey, Ω_2.shape, dtype=Ω_2.dtype) * d 
+        Ω_1 += jr.normal(self.key, Ω_1.shape, dtype=Ω_1.dtype) * d
+        Ω_2 += jr.normal(subkey, Ω_2.shape, dtype=Ω_2.dtype) * d
         return Ω_1, Ω_2
