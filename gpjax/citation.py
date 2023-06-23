@@ -17,6 +17,7 @@ from gpjax.kernels import (
     Matern12,
     Matern32,
     Matern52,
+    NonStationaryRFF,
 )
 from gpjax.objectives import (
     ELBO,
@@ -154,6 +155,18 @@ def cite(tree: RFF) -> PaperCitation:
         title="Random features for large-scale kernel machines",
         year="2007",
         booktitle="Advances in neural information processing systems",
+        citation_type="article",
+    )
+
+
+@dispatch
+def cite(tree: NonStationaryRFF) -> PaperCitation:
+    return PaperCitation(
+        citation_key="ton_spatial_2018",
+        authors="Ton, Jean-Francois and Flaxman, Seth and Sejdinovic, Dino and Bhatt, Samir",
+        title="Spatial mapping with Gaussian Processes and nonstationary Fourier features",
+        year="2018",
+        booktitle="Spatial Statistics",
         citation_type="article",
     )
 

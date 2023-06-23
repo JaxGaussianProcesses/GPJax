@@ -1,3 +1,6 @@
-from gpjax.kernels.approximations.rff import RFF
+from gpjax.kernels.approximations.rff import (
+    RFF,
+    NonStationaryRFF,
+)
 
-__all__ = ["RFF"]
+__all__ = ["RFF", "NonStationaryRFF"]

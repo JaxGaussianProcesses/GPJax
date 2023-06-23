@@ -38,6 +38,7 @@ from gpjax.kernels import (
     Matern12,
     Matern32,
     Matern52,
+    NonStationaryRFF,
     Periodic,
     Polynomial,
     PoweredExponential,

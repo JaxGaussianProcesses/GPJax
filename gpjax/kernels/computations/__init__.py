@@ -14,7 +14,10 @@
 # ==============================================================================
 
 from gpjax.kernels.computations.base import AbstractKernelComputation
-from gpjax.kernels.computations.basis_functions import BasisFunctionComputation
+from gpjax.kernels.computations.basis_functions import (
+    BasisFunctionComputation,
+    NonStationaryBasisFunctionComputation,
+)
 from gpjax.kernels.computations.constant_diagonal import (
     ConstantDiagonalKernelComputation,
 )
@@ -25,6 +28,7 @@ from gpjax.kernels.computations.eigen import EigenKernelComputation
 __all__ = [
     "AbstractKernelComputation",
     "BasisFunctionComputation",
+    "NonStationaryBasisFunctionComputation",
     "ConstantDiagonalKernelComputation",
     "DenseKernelComputation",
     "DiagonalKernelComputation",
