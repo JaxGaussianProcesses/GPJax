@@ -16,7 +16,7 @@ packages = [{include = "gpjax"}]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.12"
-jax = ">=0.4.1"
+jax = ">=0.4.13"
 optax = "^0.1.4"
 jaxtyping = "^0.2.15"
 tqdm = "^4.65.0"
