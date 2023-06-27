@@ -25,6 +25,7 @@ class BasisFunctionComputation(AbstractKernelComputation):
         For a pair of inputs, compute the cross covariance matrix between the inputs.
 
         Args:
+            kernel (Kernel): the kernel function.
             x: (Float[Array, "N D"]): A $`N \times D`$ array of inputs.
             y: (Float[Array, "M D"]): A $`M \times D`$ array of inputs.
 
@@ -42,6 +43,7 @@ class BasisFunctionComputation(AbstractKernelComputation):
         multiplication between the inputs and the scaled frequencies.
 
         Args:
+            kernel (Kernel): the kernel function.
             inputs (Float[Array, "N D"]): A $`N x D`$ array of inputs.
 
         Returns:
@@ -57,6 +59,7 @@ class BasisFunctionComputation(AbstractKernelComputation):
         r"""Compute the features for the inputs.
 
         Args:
+            kernel (Kernel): the kernel function.
             x (Float[Array, "N D"]): A $`N \times D`$ array of inputs.
 
         Returns

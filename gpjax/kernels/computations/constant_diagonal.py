@@ -40,6 +40,7 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
         Compute Gram covariance operator of the kernel function.
 
         Args:
+            kernel (Kernel): the kernel function.
             x (Float[Array, "N N"]): The inputs to the kernel function.
         """
         value = kernel(x[0], x[0])
@@ -57,6 +58,7 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
         NxN gram matrix on an input matrix of shape $`N\times D`$.
 
         Args:
+            kernel (Kernel): the kernel function.
             inputs (Float[Array, "N D"]): The input matrix.
 
         Returns
@@ -76,6 +78,7 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
         matrices of shape NxD and MxD.
 
         Args:
+            kernel (Kernel): the kernel function.
             x (Float[Array,"N D"]): The input matrix.
             y (Float[Array,"M D"]): The input matrix.
 

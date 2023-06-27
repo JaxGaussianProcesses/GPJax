@@ -45,6 +45,7 @@ class AbstractKernelComputation:
         r"""Compute Gram covariance operator of the kernel function.
 
         Args:
+            kernel (AbstractKernel): the kernel function.
             x (Float[Array, "N N"]): The inputs to the kernel function.
 
         Returns
@@ -62,6 +63,7 @@ class AbstractKernelComputation:
         of input matrices with shape NxD and MxD.
 
         Args:
+            kernel (AbstractKernel): the kernel function.
             x (Float[Array,"N D"]): The first input matrix.
             y (Float[Array,"M D"]): The second input matrix.
 
@@ -78,6 +80,7 @@ class AbstractKernelComputation:
         NxN gram matrix on an input matrix of shape NxD.
 
         Args:
+            kernel (AbstractKernel): the kernel function.
             inputs (Float[Array, "N D"]): The input matrix.
 
         Returns

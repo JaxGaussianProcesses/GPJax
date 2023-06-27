@@ -44,6 +44,7 @@ class EigenKernelComputation(AbstractKernelComputation):
         cross-covariance matrix.
 
         Args:
+            kernel (Kernel): the kernel function.
             x (Float[Array,"N D"]): The input matrix.
             y (Float[Array,"M D"]): The input matrix.
 

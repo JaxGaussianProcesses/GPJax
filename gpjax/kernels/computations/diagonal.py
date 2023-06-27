@@ -36,6 +36,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
         an input matrix of shape $`N\times D`$.
 
         Args:
+            kernel (Kernel): the kernel function.
             x (Float[Array, "N D"]): The input matrix.
 
         Returns
@@ -53,6 +54,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
         input matrices of shape $`N\times D`$ and $`M\times D`$.
 
         Args:
+            kernel (Kernel): the kernel function.
             x (Float[Array,"N D"]): The input matrix.
             y (Float[Array,"M D"]): The input matrix.
 
