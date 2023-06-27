@@ -1761,6 +1761,25 @@
 
 
 
+<div class="doc doc-object doc-attribute">
+
+
+
+<h5 id="gpjax.kernels.computations.base.Kernel" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">Kernel</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Kernel&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s1">&#39;gpjax.kernels.base.AbstractKernel&#39;</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
 
 <div class="doc doc-object doc-class">
 
@@ -1794,25 +1813,6 @@
 
 
 
-<div class="doc doc-object doc-attribute">
-
-
-
-<h6 id="gpjax.kernels.computations.base.AbstractKernelComputation.kernel" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">kernel</span><span class="p">:</span> <span class="n">gpjax</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">AbstractKernel</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
 
 
 <div class="doc doc-object doc-function">
@@ -1820,7 +1820,7 @@
 
 
 <h6 id="gpjax.kernels.computations.base.AbstractKernelComputation.gram" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
+<code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
 
 </h6>
 
@@ -1840,6 +1840,16 @@
       </tr>
     </thead>
     <tbody>
+        <tr>
+          <td><code>kernel</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
+          </td>
+          <td><p>the kernel function.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
         <tr>
           <td><code>x</code></td>
           <td>
@@ -1865,7 +1875,7 @@
 
 
 <h6 id="gpjax.kernels.computations.base.AbstractKernelComputation.cross_covariance" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">M</span> <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">M</span> <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">M</span><span class="p">]</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -1890,6 +1900,16 @@ of input matrices with shape NxD and MxD.</p>
       </tr>
     </thead>
     <tbody>
+        <tr>
+          <td><code>kernel</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
+          </td>
+          <td><p>the kernel function.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
         <tr>
           <td><code>x</code></td>
           <td>
@@ -1925,7 +1945,7 @@ of input matrices with shape NxD and MxD.</p>
 
 
 <h6 id="gpjax.kernels.computations.base.AbstractKernelComputation.diagonal" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">diagonal</span><span class="p">(</span><span class="n">inputs</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DiagonalLinearOperator</span></code>
+<code class="highlight language-python"><span class="n">diagonal</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DiagonalLinearOperator</span></code>
 
 </h6>
 
@@ -1946,6 +1966,16 @@ NxN gram matrix on an input matrix of shape NxD.</p>
       </tr>
     </thead>
     <tbody>
+        <tr>
+          <td><code>kernel</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
+          </td>
+          <td><p>the kernel function.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
         <tr>
           <td><code>inputs</code></td>
           <td>
