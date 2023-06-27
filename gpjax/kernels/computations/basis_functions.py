@@ -70,5 +70,14 @@ class BasisFunctionComputation(AbstractKernelComputation):
         z = jnp.concatenate([jnp.cos(z), jnp.sin(z)], axis=-1)
         return z
 
-    def scaling(self, kernel):
+    def scaling(self, kernel: Kernel):
+        r"""Compute the scaling factor for the covariance matrix.
+
+        Args:
+            kernel (Kernel): the kernel function.
+
+        Returns
+        -------
+            Float[Array, ""]: A scalar array.
+        """
         return kernel.base_kernel.variance / kernel.num_basis_fns
