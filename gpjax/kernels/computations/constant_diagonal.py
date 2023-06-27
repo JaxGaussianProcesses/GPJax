@@ -17,16 +17,14 @@ import typing as tp
 
 from jax import vmap
 import jax.numpy as jnp
-from jaxtyping import (
-    Array,
-    Float,
-)
+from jaxtyping import Float
 
 from gpjax.kernels.computations import AbstractKernelComputation
 from gpjax.linops import (
     ConstantDiagonalLinearOperator,
     DiagonalLinearOperator,
 )
+from gpjax.typing import Array
 
 Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
 
