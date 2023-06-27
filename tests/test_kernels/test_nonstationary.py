@@ -25,7 +25,10 @@ import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.kernels.base import AbstractKernel
-from gpjax.kernels.computations import DenseKernelComputation
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
 from gpjax.kernels.nonstationary import (
     ArcCosine,
     Linear,
@@ -43,7 +46,7 @@ class BaseTestKernel:
     """A base class that contains all tests applied on non-stationary kernels."""
 
     kernel: AbstractKernel
-    default_compute_engine: type
+    default_compute_engine: AbstractKernelComputation
     static_fields: List[str]
 
     def pytest_generate_tests(self, metafunc):
@@ -152,7 +155,7 @@ class TestLinear(BaseTestKernel):
     fields = prod({"variance": [0.1, 1.0, 2.0]})
     params = {"test_initialization": fields}
     static_fields = []
-    default_compute_engine = DenseKernelComputation
+    default_compute_engine = DenseKernelComputation()
 
 
 class TestPolynomial(BaseTestKernel):
@@ -162,7 +165,7 @@ class TestPolynomial(BaseTestKernel):
     )
     static_fields = ["degree"]
     params = {"test_initialization": fields}
-    default_compute_engine = DenseKernelComputation
+    default_compute_engine = DenseKernelComputation()
 
 
 class TestArcCosine(BaseTestKernel):
@@ -177,7 +180,7 @@ class TestArcCosine(BaseTestKernel):
     )
     static_fields = ["order"]
     params = {"test_initialization": fields}
-    default_compute_engine = DenseKernelComputation
+    default_compute_engine = DenseKernelComputation()
 
     @pytest.mark.parametrize("order", [-1, 3], ids=lambda x: f"order={x}")
     def test_defaults(self, order: int) -> None:
