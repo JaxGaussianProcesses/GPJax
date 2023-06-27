@@ -18,7 +18,10 @@ from dataclasses import dataclass
 
 import beartype.typing as tp
 import jax.numpy as jnp
-from jaxtyping import Float
+from jaxtyping import (
+    Float,
+    Num,
+)
 
 from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.typing import Array
@@ -33,7 +36,7 @@ class EigenKernelComputation(AbstractKernelComputation):
     """
 
     def cross_covariance(
-        self, kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"]
+        self, kernel: Kernel, x: Num[Array, "N D"], y: Num[Array, "M D"]
     ) -> Float[Array, "N M"]:
         r"""Compute the cross-covariance matrix.
 

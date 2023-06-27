@@ -85,4 +85,4 @@ class RFF(AbstractKernel):
         -------
             Float[Array, "N L"]: A $`N \times L`$ array of features where $`L = 2M`$.
         """
-        return self.compute_engine.compute_features(x)
+        return self.compute_engine.compute_features(self, x)

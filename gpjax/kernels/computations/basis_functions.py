@@ -31,9 +31,9 @@ class BasisFunctionComputation(AbstractKernelComputation):
         Returns:
             Float[Array, "N M"]: A $N \times M$ array of cross-covariances.
         """
-        z1 = self.compute_features(x)
-        z2 = self.compute_features(y)
-        return self.scaling * jnp.matmul(z1, z2.T)
+        z1 = self.compute_features(kernel, x)
+        z2 = self.compute_features(kernel, y)
+        return self.scaling(kernel) * jnp.matmul(z1, z2.T)
 
     def gram(self, kernel: Kernel, inputs: Float[Array, "N D"]) -> DenseLinearOperator:
         r"""Compute an approximate Gram matrix.
@@ -48,8 +48,8 @@ class BasisFunctionComputation(AbstractKernelComputation):
             DenseLinearOperator: A dense linear operator representing the
                 $`N \times N`$ Gram matrix.
         """
-        z1 = self.compute_features(inputs)
-        return DenseLinearOperator(self.scaling * jnp.matmul(z1, z1.T))
+        z1 = self.compute_features(kernel, inputs)
+        return DenseLinearOperator(self.scaling(kernel) * jnp.matmul(z1, z1.T))
 
     def compute_features(
         self, kernel: Kernel, x: Float[Array, "N D"]
@@ -69,6 +69,5 @@ class BasisFunctionComputation(AbstractKernelComputation):
         z = jnp.concatenate([jnp.cos(z), jnp.sin(z)], axis=-1)
         return z
 
-    @property
-    def scaling(self):
-        return self.kernel.base_kernel.variance / self.kernel.num_basis_fns
+    def scaling(self, kernel):
+        return kernel.base_kernel.variance / kernel.num_basis_fns
