@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-
 import abc
 from dataclasses import dataclass
 from functools import partial
@@ -22,7 +21,6 @@ from beartype.typing import (
     Callable,
     List,
     Optional,
-    Type,
     Union,
 )
 import jax.numpy as jnp
@@ -51,9 +49,7 @@ from gpjax.typing import (
 class AbstractKernel(Module):
     r"""Base kernel class."""
 
-    compute_engine: Type[AbstractKernelComputation] = static_field(
-        DenseKernelComputation
-    )
+    compute_engine: AbstractKernelComputation = static_field(DenseKernelComputation())
     active_dims: Optional[List[int]] = static_field(None)
     name: str = static_field("AbstractKernel")
 
@@ -62,10 +58,10 @@ class AbstractKernel(Module):
         return 1 if not self.active_dims else len(self.active_dims)
 
     def cross_covariance(self, x: Num[Array, "N D"], y: Num[Array, "M D"]):
-        return self.compute_engine(self).cross_covariance(x, y)
+        return self.compute_engine.cross_covariance(self, x, y)
 
     def gram(self, x: Num[Array, "N D"]):
-        return self.compute_engine(self).gram(x)
+        return self.compute_engine.gram(self, x)
 
     def slice_input(self, x: Float[Array, "... D"]) -> Float[Array, "... Q"]:
         r"""Slice out the relevant columns of the input matrix.

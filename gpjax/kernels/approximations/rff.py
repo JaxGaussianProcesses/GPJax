@@ -37,6 +37,9 @@ class RFF(AbstractKernel):
     base_kernel: AbstractKernel = None
     num_basis_fns: int = static_field(50)
     frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity())
+    compute_engine: BasisFunctionComputation = static_field(
+        BasisFunctionComputation(), repr=False
+    )
     key: KeyArray = static_field(PRNGKey(123))
 
     def __post_init__(self) -> None:
@@ -46,7 +49,6 @@ class RFF(AbstractKernel):
         set the computation engine to be the basis function computation engine.
         """
         self._check_valid_base_kernel(self.base_kernel)
-        self.compute_engine = BasisFunctionComputation
 
         if self.frequencies is None:
             n_dims = self.base_kernel.ndims
@@ -83,4 +85,4 @@ class RFF(AbstractKernel):
         -------
             Float[Array, "N L"]: A $`N \times L`$ array of features where $`L = 2M`$.
         """
-        return self.compute_engine(self).compute_features(x)
+        return self.compute_engine.compute_features(x)
