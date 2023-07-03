@@ -308,7 +308,7 @@ with warnings.catch_warnings():
     )
 
 # %% [markdown]
-# Formmally, we can define this by letting $p(\mathbf{x}, \mathbf{y})$ be the
+# Formally, we can define this by letting $p(\mathbf{x}, \mathbf{y})$ be the
 # joint probability distribution defined over
 # $\mathbf{x}\sim\mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}}, \boldsymbol{\Sigma}_{\mathbf{xx}})$ and
 # $\mathbf{y}\sim\mathcal{N}(\boldsymbol{\mu}_{\mathbf{y}}, \boldsymbol{\Sigma}_{\mathbf{yy}})$.

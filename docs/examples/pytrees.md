@@ -9,7 +9,7 @@
   such as `grad`.
 
 We achieve this through providing a base `Module` abstraction to cleanly
-handles parameter trainability and optimising transformations for JAX models.
+handle parameter trainability and optimising transformations of JAX models.
 
 
 
@@ -106,7 +106,7 @@ compatible with JAX. To achieve this we must consider [JAX's _PyTree_](https://j
 abstraction.
 
 
-## PyTree’s
+## PyTrees
 
 JAX PyTrees are a powerful tool in the JAX library that enable users to work
 with complex data structures in a way that is efficient, flexible, and easy to
@@ -177,7 +177,7 @@ structure and handle each leaf individually. JAX PyTrees, therefore, are a
 powerful tool that can simplify many tasks in machine learning and scientific
 computing. As such, most JAX functions operate over _PyTrees of JAX arrays_.
 For instance, `jax.lax.scan`, accepts as input and produces as output a
-PyTrees of JAX arrays.
+PyTree of JAX arrays.
 
 Another key advantages of using JAX PyTrees is that they are designed to work
 efficiently with JAX's automatic differentiation and compilation features. For
@@ -231,7 +231,7 @@ For our RBF kernel we have two parameters; the lengthscale and the variance.
 Both of these have positive domains, and by default we want to train both of
 these parameters. To encode this we use a `param_field`, where we can define
 the domain of both parameters via a `Softplus` bijector (that restricts them
-to the positive domain), and define their trainble status to `True`.
+to the positive domain), and set their trainable status to `True`.
 
 ```python
 import tensorflow_probability.substrates.jax.bijectors as tfb
