@@ -73,7 +73,7 @@ you through every detail!
   work on the ``main`` branch of any repository.
 
 4.  We use [Poetry](https://python-poetry.org/) for packaging and dependency management, and project requirements are in       ``pyproject.toml``. We suggest using a [virtual environment](https://docs.python-guide.org/dev/virtualenvs/) for
-development. Once the virtual environment is activated, run:
+development. For those using Apple Silicon chips, we advise using [Conda miniforge](https://github.com/conda-forge/miniforge). Once the virtual environment is activated, run:
 
   ```bash
   $ poetry install
