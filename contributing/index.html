@@ -1876,35 +1876,41 @@ you through every detail!</p>
   Always use a <code>feature</code> branch. It's good practice to avoid
   work on the <code>main</code> branch of any repository.</p>
 <ol>
-<li>Project requirements are in <code>requirements.txt</code>. We suggest using a
-  <a href="https://docs.python-guide.org/dev/virtualenvs/">virtual environment</a> for
-  development. Once the virtual environment is activated, run:</li>
+<li>We use <a href="https://python-poetry.org/">Poetry</a> for packaging and dependency management, and project requirements are in       <code>pyproject.toml</code>. We suggest using a <a href="https://docs.python-guide.org/dev/virtualenvs/">virtual environment</a> for
+development. For those using Apple Silicon chips, we advise using <a href="https://github.com/conda-forge/miniforge">Conda miniforge</a>. Once the virtual environment is activated, run:</li>
 </ol>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-dev.txt
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>poetry<span class="w"> </span>install
+</code></pre></div>
+<p>At this point we recommend you check your installation passes the supplied unit tests:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>poetry<span class="w"> </span>run<span class="w"> </span>pytest
 </code></pre></div>
 <ol>
 <li>Install the pre-commit hooks.</li>
 </ol>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>pre-commit<span class="w"> </span>install
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>$<span class="w"> </span>pre-commit<span class="w"> </span>install
 </code></pre></div>
 <p>Please ensure you have done this before committing any files. If
   successful, this will print the following output <code>pre-commit installed at
   .git/hooks/pre-commit</code>.</p>
 <ol>
+<li>At this point you can manually run the pre-commit hooks with the following command:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+</code></pre></div>
+<ol>
 <li>Add changed files using <code>git add</code> and then <code>git commit</code> files to record your
   changes locally:</li>
 </ol>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>$<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>modified_files
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>$<span class="w"> </span>git<span class="w"> </span>commit
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>$<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>modified_files
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>$<span class="w"> </span>git<span class="w"> </span>commit
 </code></pre></div>
   After committing, it is a good idea to sync with the base repository in case
   there have been any changes:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>$<span class="w"> </span>git<span class="w"> </span>fetch<span class="w"> </span>upstream
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>$<span class="w"> </span>git<span class="w"> </span>rebase<span class="w"> </span>upstream/main
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>$<span class="w"> </span>git<span class="w"> </span>fetch<span class="w"> </span>upstream
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>$<span class="w"> </span>git<span class="w"> </span>rebase<span class="w"> </span>upstream/main
 </code></pre></div>
 <p>Then push the changes to your GitHub account with:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>$<span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>my-feature
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>$<span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>my-feature
 </code></pre></div>
 <ol>
 <li>Go to the GitHub web page of your fork of the GPJax repo. Click the 'Pull
@@ -1933,12 +1939,12 @@ request, we recommend you check the following:</p>
 <ul>
 <li>Do all public methods have informative docstrings that describe their
   function, input(s) and output(s)?</li>
+<li>Do the pre-commit hooks pass?</li>
 <li>Do the tests pass when everything is rebuilt from scratch?</li>
 <li>
 <p>Documentation and high-coverage tests are necessary for enhancements to be
   accepted. Test coverage can be checked with:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-dev.txt
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>$<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>--cov<span class="o">=</span>./<span class="w"> </span>--cov-report<span class="o">=</span>html
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>$<span class="w"> </span>poetry<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>--cov<span class="o">=</span>./<span class="w"> </span>--cov-report<span class="o">=</span>html
 </code></pre></div>
 </li>
 </ul>

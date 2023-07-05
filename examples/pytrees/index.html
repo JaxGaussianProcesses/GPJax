@@ -1709,7 +1709,7 @@
   such as <code>grad</code>.</li>
 </ul>
 <p>We achieve this through providing a base <code>Module</code> abstraction to cleanly
-handles parameter trainability and optimising transformations for JAX models.</p>
+handle parameter trainability and optimising transformations of JAX models.</p>
 <h1 id="gaussian-process-objects-as-data">Gaussian process objects as data<a class="headerlink" href="#gaussian-process-objects-as-data" title="Permanent link"></a></h1>
 <p>Our abstraction is inspired by the <a href="https://github.com/patrick-kidger/equinox">Equinox</a> library and aims to offer a
 Bayesian/Gaussian process extension to their neural network abstractions. Our
@@ -1779,7 +1779,7 @@ the kernel with respect to its parameters $<code>\nabla_{\ell, \sigma^2} k(1.0, 
 <p>This issues arises as the object we have defined is not yet
 compatible with JAX. To achieve this we must consider <a href="https://jax.readthedocs.io/en/latest/pytrees.html">JAX's <em>PyTree</em></a>
 abstraction.</p>
-<h2 id="pytrees">PyTree’s<a class="headerlink" href="#pytrees" title="Permanent link"></a></h2>
+<h2 id="pytrees">PyTrees<a class="headerlink" href="#pytrees" title="Permanent link"></a></h2>
 <p>JAX PyTrees are a powerful tool in the JAX library that enable users to work
 with complex data structures in a way that is efficient, flexible, and easy to
 use. A PyTree is a data structure that is composed of other data
@@ -1826,7 +1826,7 @@ structure and handle each leaf individually. JAX PyTrees, therefore, are a
 powerful tool that can simplify many tasks in machine learning and scientific
 computing. As such, most JAX functions operate over <em>PyTrees of JAX arrays</em>.
 For instance, <code>jax.lax.scan</code>, accepts as input and produces as output a
-PyTrees of JAX arrays.</p>
+PyTree of JAX arrays.</p>
 <p>Another key advantages of using JAX PyTrees is that they are designed to work
 efficiently with JAX's automatic differentiation and compilation features. For
 example, suppose you have a function that takes a PyTree as input and returns
@@ -1865,7 +1865,7 @@ that are to be trained, and we describe their domain and trainable status as
 Both of these have positive domains, and by default we want to train both of
 these parameters. To encode this we use a <code>param_field</code>, where we can define
 the domain of both parameters via a <code>Softplus</code> bijector (that restricts them
-to the positive domain), and define their trainble status to <code>True</code>.</p>
+to the positive domain), and set their trainable status to <code>True</code>.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">import</span> <span class="nn">tensorflow_probability.substrates.jax.bijectors</span> <span class="k">as</span> <span class="nn">tfb</span>
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kn">from</span> <span class="nn">gpjax.base</span> <span class="kn">import</span> <span class="n">Module</span><span class="p">,</span> <span class="n">param_field</span>
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
