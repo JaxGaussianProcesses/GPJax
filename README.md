@@ -32,7 +32,7 @@ Dodd](https://github.com/Daniel-Dodd).
 
 We would be delighted to receive contributions from interested individuals and
 groups. To learn how you can get involved, please read our [guide for
-contributing](https://github.com/JaxGaussianProcesses/GPJax/blob/master/CONTRIBUTING.md).
+contributing](https://github.com/JaxGaussianProcesses/GPJax/blob/main/docs/contributing.md).
 If you have any questions, we encourage you to [open an
 issue](https://github.com/JaxGaussianProcesses/GPJax/issues/new/choose). For
 broader conversations, such as best GP fitting practices or questions about the
@@ -67,7 +67,7 @@ process modelling.
 > - [**UCI regression**](https://docs.jaxgaussianprocesses.com/examples/yacht/)
 
 ## Conversion between `.ipynb` and `.py`
-Above examples are stored in [examples](examples) directory in the double
+Above examples are stored in [examples](docs/examples) directory in the double
 percent (`py:percent`) format. Checkout [jupytext
 using-cli](https://jupytext.readthedocs.io/en/latest/using-cli.html) for more
 info.
