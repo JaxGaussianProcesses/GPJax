@@ -109,7 +109,9 @@ import seaborn as sns
 import tensorflow_probability.substrates.jax as tfp
 from docs.examples.utils import confidence_ellipse
 
-plt.style.use("./gpjax.mplstyle")
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 tfd = tfp.distributions
 

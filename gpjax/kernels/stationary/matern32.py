@@ -51,10 +51,10 @@ class Matern32(AbstractKernel):
         r"""Compute the Matérn 3/2 kernel between a pair of arrays.
 
         Evaluate the kernel on a pair of inputs $`(x, y)`$ with
-        lengthscale parameter $\ell$ and variance $`\sigma^2`$.
+        lengthscale parameter $`\ell`$ and variance $`\sigma^2`$.
 
         ```math
-            k(x, y) = \\sigma^2 \\exp \\Bigg(1+ \\frac{\\sqrt{3}\\lvert x-y \\rvert}{\\ell^2}  \\Bigg)\\exp\\Bigg(-\\frac{\\sqrt{3}\\lvert x-y\\rvert}{\\ell^2} \\Bigg)
+            k(x, y) = \sigma^2 \exp \Bigg(1+ \frac{\sqrt{3}\lvert x-y \rvert}{\ell^2}  \Bigg)\exp\Bigg(-\frac{\sqrt{3}\lvert x-y\rvert}{\ell^2} \Bigg)
         ```
 
         Args:
