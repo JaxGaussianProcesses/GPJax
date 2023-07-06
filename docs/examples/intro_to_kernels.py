@@ -13,7 +13,7 @@ config.update("jax_enable_x64", True)
 from jax import jit
 import jax.numpy as jnp
 import jax.random as jr
-from jaxtyping import install_import_hook
+from jaxtyping import install_import_hook, Float
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
@@ -21,6 +21,7 @@ from docs.examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
+from gpjax.typing import Array
 
 key = jr.PRNGKey(42)
 plt.style.use(
@@ -39,17 +40,36 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 # ## Introducing a Common Family of Kernels - The Matérn Family
 
 # %% [markdown]
-# Intuitively, the kernel defines the notion of *similarity* between the value taken at two points, $\mathbf{x}$ and $\mathbf{x}'$, by a function $f$, and will be denoted as $k(\mathbf{x}, \mathbf{x}')$:
+# Intuitively, for a function $f$, the kernel defines the notion of *similarity* between
+# the value of the function at two points, $f(\mathbf{x})$ and $f(\mathbf{x}')$, and
+# will be denoted as $k(\mathbf{x}, \mathbf{x}')$:
 #
 # $$k(\mathbf{x}, \mathbf{x}') = \text{Cov}[f(\mathbf{x}), f(\mathbf{x}')]$$
 #
-#  One would expect that, given a previously unobserved test point $\mathbf{x}^*$, training points which are *closest* to this unobserved point will be most similar to it. As such, the kernel is used to define this notion of similarity within the GP framework. It tends to be up to the user to select a kernel which is appropriate for the function being modelled.
+#  One would expect that, given a previously unobserved test point $\mathbf{x}^*$, the
+#  training points which are *closest* to this unobserved point will be most similar to
+#  it. As such, the kernel is used to define this notion of similarity within the GP
+#  framework. It is up to the user to select a kernel which is appropriate for the
+#  function being modelled.
 #
 # One of the most widely used families of kernels is the Matérn family. These kernels take on the following form:
 #
 # $$k_{\nu}(\mathbf{x}, \mathbf{x'}) = \sigma^2 \frac{2^{1 - \nu}}{\Gamma(\nu)}\left(\sqrt{2\nu} \frac{|\mathbf{x} - \mathbf{x'}|}{\kappa}\right)^{\nu} K_{\nu} \left(\sqrt{2\nu} \frac{|\mathbf{x} - \mathbf{x'}|}{\kappa}\right)$$
 #
-# where $K_{\nu}$ is a modified Bessel function, $\nu$, $\kappa$ and $\sigma^2$ are hyperparameters specifying the mean-square differentiability, lengthscale and variability respectively, and $|\cdot|$ is used to denote the Euclidean norm.
+# where $K_{\nu}$ is a modified Bessel function, $\nu$, $\kappa$ and $\sigma^2$ are
+# hyperparameters specifying the mean-square differentiability, lengthscale and
+# variability respectively, and $|\cdot|$ is used to denote the Euclidean norm.
+#
+# Some commonly used Matérn kernels use half-integer values of $\nu$, such as $\nu = 1/2$
+# or $\nu = 3/2$. The fraction is sometimes omitted when naming the kernel, so that $\nu =
+# 1/2$ is referred to as the Matérn12 kernel, and $\nu = 3/2$ is referred to as the
+# Matérn32 kernel. When $\nu$ takes in a half-integer value, $\nu = k + 1/2$, the kernel
+# can be expressed as the product of a polynomial of order $k$ and an exponential:
+#
+# $$k_{k + 1/2}(\mathbf{x}, \mathbf{x'}) = \sigma^2
+# \exp\left(-\frac{\sqrt{2\nu}|\mathbf{x} - \mathbf{x'}|}{\kappa}\right)
+# \frac{\Gamma(k+1)}{\Gamma(2k+1)} \times \sum_{i= 0}^k \frac{(k+i)!}{i!(k-i)!}
+# \left(\frac{(\sqrt{8\nu}|\mathbf{x} - \mathbf{x'}|)}{\kappa}\right)^{k-i}$$
 #
 # In the limit of $\nu \to \infty$ this yields the *squared-exponential*, or *radial basis function (RBF)*, kernel, which is infinitely mean-square differentiable:
 #
@@ -79,8 +99,6 @@ for k, ax in zip(kernels, axes.ravel()):
 
 
 # %% [markdown]
-# It should be noted that commonly used Matérn kernels use half-integer values of $\nu$, such as $\nu = 1/2$ or $\nu = 5/2$. The fraction is sometimes omitted when naming the kernel, so that $\nu = 1/2$ is referred to as the Matérn12 kernel, and $\nu = 5/2$ is referred to as the Matérn52 kernel.
-#
 # The plots above clearly show that the choice of $\nu$ has a large impact on the *smoothness* of the functions being modelled by the GP, with functions drawn from GPs defined with the Matérn kernel becoming increasingly smooth as $\nu \to \infty$. More formally, this notion of smoothness is captured through the mean-square differentiability of the function being modelled. Functions sampled from GPs using a Matérn kernel are $k$-times mean-square differentiable, if and only if $\nu > k$. For instance, functions sampled from a GP using a Matérn12 kernel are zero times mean-square differentiable, and functions sampled from a GP using the RBF kernel are infinitely mean-square differentiable.
 #
 # As an important aside, a general property of the Matérn family of kernels is that they are examples of *stationary* kernels. This means that they only depend on the *displacement* of the two points being compared, $\mathbf{x} - \mathbf{x}'$, and not on their absolute values. This is a useful property to have, as it means that the kernel is invariant to translations in the input space. They also go beyond this, as they only depend on the Euclidean *distance* between the two points being compared, $|\mathbf{x} - \mathbf{x}'|$. Kernels which satisfy this property are known as *isotropic* kernels. This makes the function invariant to all rigid motions in the input space, such as rotations.
@@ -89,7 +107,7 @@ for k, ax in zip(kernels, axes.ravel()):
 # ## Inferring Kernel Hyperparameters
 
 # %% [markdown]
-# Most kernels have several *hyperparameters*, which we denote $\mathbf{\theta}$, which encode different assumptions about the underlying function being modelled. For the Matérn family descibred above, $\mathbf{\theta} = \{\nu, \kappa, \sigma\}$. A fully Bayesian approach to dealing with hyperparameters would be to place a prior over them, and marginalise over the posterior derived from the data in order to perform predictions. However, this is often computationally very expensive, and so a common approach is to instead *optimise* the hyperparameters by maximising the log marginal likelihood of the data. Given training data $\mathbf{D} = (\mathbf{X}, \mathbf{y})$, assumed to contain some additive Gaussian noise $\epsilon \sim \mathcal{N}(0, \sigma^2)$, the log marginal likelihood of the dataset is defined as:
+# Most kernels have several *hyperparameters*, which we denote $\mathbf{\theta}$, which encode different assumptions about the underlying function being modelled. For the Matérn family described above, $\mathbf{\theta} = \{\nu, \kappa, \sigma\}$. A fully Bayesian approach to dealing with hyperparameters would be to place a prior over them, and marginalise over the posterior derived from the data in order to perform predictions. However, this is often computationally very expensive, and so a common approach is to instead *optimise* the hyperparameters by maximising the log marginal likelihood of the data. Given training data $\mathbf{D} = (\mathbf{X}, \mathbf{y})$, assumed to contain some additive Gaussian noise $\epsilon \sim \mathcal{N}(0, \sigma^2)$, the log marginal likelihood of the dataset is defined as:
 #
 # $$ \begin{aligned}
 # \log(p(\mathbf{y} | \mathbf{X}, \boldsymbol{\theta})) &= \log\left(\int p(\mathbf{y} | \mathbf{f}, \mathbf{X}, \boldsymbol{\theta}) p(\mathbf{f} | \mathbf{X}, \boldsymbol{\theta}) d\mathbf{f}\right) \nonumber \\
@@ -97,6 +115,12 @@ for k, ax in zip(kernels, axes.ravel()):
 # \end{aligned}$$
 
 # %% [markdown]
+# This expression can then be maximised with respect to the hyperparameters using a
+# gradient-based approach such as Adam or L-BFGS. Note that we may choose to fix some
+# hyperparameters, and in GPJax the parameter $\nu$ is set by the user, and not
+# inferred though optimisation. For more details on using the log marginal likelihood to
+# optimise kernel hyperparameters, see our [GP introduction notebook](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/#gaussian-process-regression).
+#
 # We'll demonstrate the advantages of being able to infer kernel parameters from the training data by fitting a GP to the widely used [Forrester function](https://www.sfu.ca/~ssurjano/forretal08.html):
 #
 # $$f(x) = (6x - 2)^2 \sin(12x - 4)$$
@@ -104,7 +128,7 @@ for k, ax in zip(kernels, axes.ravel()):
 
 # %%
 # Forrester function
-def forrester(x):
+def forrester(x: Float[Array, "N"]) -> Float[Array, "N"]:
     return (6 * x - 2) ** 2 * jnp.sin(12 * x - 4)
 
 
@@ -136,7 +160,7 @@ likelihood = likelihood.replace_trainable(obs_noise=False)
 no_opt_posterior = prior * likelihood
 
 # %% [markdown]
-# We can then optimise the hyperparmeters by minimising the negative log marginal likelihood of the data:
+# We can then optimise the hyperparameters by minimising the negative log marginal likelihood of the data:
 
 # %%
 negative_mll = gpx.objectives.ConjugateMLL(negative=True)
@@ -153,6 +177,11 @@ opt_posterior, history = gpx.fit(
     key=key,
 )
 
+
+# %% [markdown]
+# Having optimised the hyperparameters, we can now make predictions using the posterior
+# with the optimised hyperparameters, and compare them to the predictions made using the
+# posterior with the default hyperparameters:
 
 # %%
 opt_latent_dist = opt_posterior.predict(test_x, train_data=D)
@@ -299,13 +328,25 @@ plt.show()
 # %% [markdown]
 # In this guide we have introduced several different kernel functions, $k$, which may make you wonder if any function of two input pairs you construct will make a valid kernel function? Alas, not any function can be used as a kernel function in a GP, and there is a necessary condition a function must satisfy in order to be a valid kernel function.
 #
-# In order to understand the necessary condition, it is useful to introduce the idea of a *Gram matrix*. As introduced in the [GP introduction notebook](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/), given $n$ input points, $\mathbf{X} = \{\mathbf{x}_1, \ldots, \mathbf{x}_n\}$, the *Gram matrix* is defined as:
+# In order to understand the necessary condition, it is useful to introduce the idea of a
+# *Gram matrix*. We'll use the same notation as the [GP introduction
+# notebook](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/), and denote
+# $n$ input points as $\mathbf{X} = \{\mathbf{x}_1, \ldots, \mathbf{x}_n\}$. Given these
+# input points and a kernel function $k$ the *Gram matrix* stores the pairwise kernel
+# evaluations between all input points. Mathematically, this leads to the Gram matrix being defined as:
 #
 # $$K(\mathbf{X}, \mathbf{X}) = \begin{bmatrix} k(\mathbf{x}_1, \mathbf{x}_1) & \cdots & k(\mathbf{x}_1, \mathbf{x}_n) \\ \vdots & \ddots & \vdots \\ k(\mathbf{x}_n, \mathbf{x}_1) & \cdots & k(\mathbf{x}_n, \mathbf{x}_n) \end{bmatrix}$$
 #
 # such that $K(\mathbf{X}, \mathbf{X})_{ij} = k(\mathbf{x}_i, \mathbf{x}_j)$.
 #
-# In order for $k$ to be a valid kernel/covariance function, the corresponding covariance martrix must be *positive semi-definite*. A real $n \times n$ matrix $K$ is positive semi-definite if and only if for all vectors $\mathbf{z} \in \mathbb{R}^n$, $\mathbf{z}^\top K \mathbf{z} \geq 0$. Alternatively, a real $n \times n$ matrix $K$ is positive semi-definite if and only if all of its eigenvalues are non-negative.
+# In order for $k$ to be a valid kernel/covariance function, the corresponding Gram matrix
+# must be *positive semi-definite*. In this case the Gram matrix is referred to as a
+# *covariance matrix*. A real $n \times n$ matrix $K$ is positive semi-definite if and
+# only if for all vectors $\mathbf{z} \in \mathbb{R}^n$:
+#
+# $$\mathbf{z}^\top K \mathbf{z} \geq 0$$
+#
+# Alternatively, a real $n \times n$ matrix $K$ is positive semi-definite if and only if all of its eigenvalues are non-negative.
 
 # %% [markdown]
 # ## Defining Kernels on Non-Euclidean Spaces

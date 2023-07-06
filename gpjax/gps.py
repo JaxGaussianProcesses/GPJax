@@ -123,9 +123,7 @@ class Prior(AbstractPrior):
     function $`k(\cdot, \cdot)`$ is given by
     $`p(f(\cdot)) = \mathcal{GP}(m(\cdot), k(\cdot, \cdot))`$.
 
-    To invoke a `Prior` distribution, only a kernel function is required. By
-    default, the mean function will be set to zero. In general, this assumption
-    will be reasonable assuming the data being modelled has been centred.
+    To invoke a `Prior` distribution, a kernel and mean function must be specified.
 
     Example:
     ```python
