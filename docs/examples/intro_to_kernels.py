@@ -52,7 +52,7 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 #  framework. It is up to the user to select a kernel which is appropriate for the
 #  function being modelled.
 #
-# One of the most widely used families of kernels is the Matérn family. These kernels take on the following form:
+# One of the most widely used families of kernels is the Matérn family ([Matérn, 1960](https://core.ac.uk/download/pdf/11698705.pdf)). These kernels take on the following form:
 #
 # $$k_{\nu}(\mathbf{x}, \mathbf{x'}) = \sigma^2 \frac{2^{1 - \nu}}{\Gamma(\nu)}\left(\sqrt{2\nu} \frac{|\mathbf{x} - \mathbf{x'}|}{\kappa}\right)^{\nu} K_{\nu} \left(\sqrt{2\nu} \frac{|\mathbf{x} - \mathbf{x'}|}{\kappa}\right)$$
 #
