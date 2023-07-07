@@ -17,11 +17,13 @@ from jaxtyping import install_import_hook, Float
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
+import pandas as pd
 from docs.examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 from gpjax.typing import Array
+from sklearn.preprocessing import StandardScaler
 
 key = jr.PRNGKey(42)
 plt.style.use(
@@ -37,28 +39,96 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 # In this notebook we'll develop some intuition for what kinds of priors are encoded through the use of different kernels, and how this can be useful when modelling different types of functions.
 
 # %% [markdown]
-# ## Introducing a Common Family of Kernels - The Matérn Family
-
-# %% [markdown]
+# ## What is a Kernel?
+#
 # Intuitively, for a function $f$, the kernel defines the notion of *similarity* between
 # the value of the function at two points, $f(\mathbf{x})$ and $f(\mathbf{x}')$, and
 # will be denoted as $k(\mathbf{x}, \mathbf{x}')$:
 #
-# $$k(\mathbf{x}, \mathbf{x}') = \text{Cov}[f(\mathbf{x}), f(\mathbf{x}')]$$
+# $$\begin{aligned} k(\mathbf{x}, \mathbf{x}') &= \text{Cov}[f(\mathbf{x}),
+# f(\mathbf{x}')] \\ &= \mathbb{E}[(f(\mathbf{x}) - \mathbb{E}[f(\mathbf{x})])(f(\mathbf{x}') - \mathbb{E}[f(\mathbf{x}')])] \end{aligned}$$
 #
 #  One would expect that, given a previously unobserved test point $\mathbf{x}^*$, the
 #  training points which are *closest* to this unobserved point will be most similar to
 #  it. As such, the kernel is used to define this notion of similarity within the GP
-#  framework. It is up to the user to select a kernel which is appropriate for the
-#  function being modelled.
+#  framework. It is up to the user to select a kernel function which is appropriate for
+#  the function being modelled. In this notebook we are going to give some examples of
+#  commonly used kernels, and try to develop an understanding of when one may wish to use
+#  one kernel over another. However, before we do this, it is worth discussing the
+#  necessary conditions for a function to be a valid kernel/covariance function. This
+#  requires a little bit of maths, so for those of you who just wish to obtain an
+#  intuitive understanding, feel free to skip to the section introducing the Matérn
+#  family of kernels.
 #
+# ### What are the necessary conditions for a function to be a valid kernel?
+#
+# Whilst intuitively the kernel function is used to define the notion of similarity within
+# the GP framework, it is important to note that there are two *necessary conditions*
+# that a kernel function must satisfy in order to be a valid covariance function. For
+# clarity, we will refer to *any* function mapping two inputs to a scalar output as a
+# *kernel function*, and we will refer to a *valid* kernel function satisfying the two
+# necessary conditions as a *covariance function*. However, it is worth noting that the
+# GP community often uses the terms *kernel function* and *covariance function*
+# interchangeably.
+#
+# The first necessary condition is that the covariance function must be *symmetric*, i.e.
+# $k(\mathbf{x}, \mathbf{x}') = k(\mathbf{x}', \mathbf{x})$. This is because the
+# covariance between two random variables $X$ and $X'$ is symmetric; if one looks at the
+# definition of covariance given above, it is clear that it is invariant to swapping the
+# order of the inputs $\mathbf{x}$ and $\mathbf{x}'$.
+#
+# The second necessary condition is that the covariance function must be *positive
+# semi-definite* (PSD). In order to understand this condition, it is useful to first
+# introduce the concept of a *Gram matrix*. We'll use the same notation as the [GP introduction
+# notebook](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/), and denote
+# $n$ input points as $\mathbf{X} = \{\mathbf{x}_1, \ldots, \mathbf{x}_n\}$. Given these
+# input points and a kernel function $k$ the *Gram matrix* stores the pairwise kernel
+# evaluations between all input points. Mathematically, this leads to the Gram matrix being defined as:
+#
+# $$K(\mathbf{X}, \mathbf{X}) = \begin{bmatrix} k(\mathbf{x}_1, \mathbf{x}_1) & \cdots & k(\mathbf{x}_1, \mathbf{x}_n) \\ \vdots & \ddots & \vdots \\ k(\mathbf{x}_n, \mathbf{x}_1) & \cdots & k(\mathbf{x}_n, \mathbf{x}_n) \end{bmatrix}$$
+#
+# such that $K(\mathbf{X}, \mathbf{X})_{ij} = k(\mathbf{x}_i, \mathbf{x}_j)$.
+#
+# In order for $k$ to be a valid covariance function, the corresponding Gram matrix
+# must be *positive semi-definite*. In this case the Gram matrix is referred to as a
+# *covariance matrix*. A real $n \times n$ matrix $K$ is positive semi-definite if and
+# only if for all vectors $\mathbf{z} \in \mathbb{R}^n$:
+#
+# $$\mathbf{z}^\top K \mathbf{z} \geq 0$$
+#
+# Alternatively, a real $n \times n$ matrix $K$ is positive semi-definite if and only if
+# all of its eigenvalues are non-negative.
+#
+# Therefore, the two necessary conditions for a function to be a valid covariance function
+# are that it must be *symmetric* and *positive semi-definite*. In this section we have
+# referred to *any* function from two inputs to a scalar output as a *kernel function*,
+# with its corresponding matrix of pairwise evaluations referred to as the *Gram matrix*,
+# and a function satisfying the two necessary conditions as a *covariance function*, with
+# its corresponding matrix of pairwise evaluations referred to as the *covariance matrix*.
+# This enabled us to easily define the necessary conditions for a function to be a valid
+# covariance function. However, as noted previously, the GP community often uses these
+# terms interchangeably, and so we will for the remainder of this notebook.
+#
+
+# %% [markdown]
+# ## Introducing a Common Family of Kernels - The Matérn Family
+
+# %% [markdown]
 # One of the most widely used families of kernels is the Matérn family ([Matérn, 1960](https://core.ac.uk/download/pdf/11698705.pdf)). These kernels take on the following form:
 #
 # $$k_{\nu}(\mathbf{x}, \mathbf{x'}) = \sigma^2 \frac{2^{1 - \nu}}{\Gamma(\nu)}\left(\sqrt{2\nu} \frac{|\mathbf{x} - \mathbf{x'}|}{\kappa}\right)^{\nu} K_{\nu} \left(\sqrt{2\nu} \frac{|\mathbf{x} - \mathbf{x'}|}{\kappa}\right)$$
 #
 # where $K_{\nu}$ is a modified Bessel function, $\nu$, $\kappa$ and $\sigma^2$ are
 # hyperparameters specifying the mean-square differentiability, lengthscale and
-# variability respectively, and $|\cdot|$ is used to denote the Euclidean norm.
+# variability respectively, and $|\cdot|$ is used to denote the Euclidean norm. Note that
+# for those of you less interested in the mathematical underpinnings of kernels, it isn't
+# necessary to understand the exact functional form of the Matérn kernels to
+# gain an understanding of how they behave. The key takeaway is that they are
+# parameterised by several hyperparameters, and that these hyperparameters dictate the
+# behaviour of functions sampled from the corresponding GP. The plots below will provide
+# some more intuition for how these hyperparameters affect the behaviour of functions
+# sampled from the corresponding GP.
+#
 #
 # Some commonly used Matérn kernels use half-integer values of $\nu$, such as $\nu = 1/2$
 # or $\nu = 3/2$. The fraction is sometimes omitted when naming the kernel, so that $\nu =
@@ -323,30 +393,272 @@ ax.set_title("Samples from the Linear Kernel")
 plt.show()
 
 # %% [markdown]
-# ## What are the Necessary Conditions for a Valid Kernel?
+# ## Composing Kernels
 
 # %% [markdown]
-# In this guide we have introduced several different kernel functions, $k$, which may make you wonder if any function of two input pairs you construct will make a valid kernel function? Alas, not any function can be used as a kernel function in a GP, and there is a necessary condition a function must satisfy in order to be a valid kernel function.
+# It is also mathematically valid to compose kernels through operations such as addition
+# and multiplication in order to produce more expressive kernels. For the mathematically
+# interested amongst you, this is valid as the resulting kernel functions still satisfy
+# the necessary conditions introduced at the [start of this
+# notebook](#what-are-the-necessary-conditions-for-a-function-to-be-a-valid-kernel).
+# Adding or multiplying kernel functions is equivalent to performing elementwise addition
+# or multiplication of the corresponding covariance matrices, and fortunately symmetric,
+# positive semi-definite kernels are closed under these operations. This means that
+# kernels produced by adding or multiplying other kernels will also be symmetric and
+# positive semi-definite, and so will also be valid kernels. GPJax provides the
+# functionality required to easily compose kernels via addition and multiplication, which
+# we'll demonstrate below.
 #
-# In order to understand the necessary condition, it is useful to introduce the idea of a
-# *Gram matrix*. We'll use the same notation as the [GP introduction
-# notebook](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/), and denote
-# $n$ input points as $\mathbf{X} = \{\mathbf{x}_1, \ldots, \mathbf{x}_n\}$. Given these
-# input points and a kernel function $k$ the *Gram matrix* stores the pairwise kernel
-# evaluations between all input points. Mathematically, this leads to the Gram matrix being defined as:
+# First, we'll take a look at some samples drawn from a GP prior using a kernel which is
+# composed of the sum of a linear kernel and a periodic kernel:
+
+# %%
+kernel_one = gpx.kernels.Linear()
+kernel_two = gpx.kernels.Periodic()
+sum_kernel = gpx.kernels.SumKernel(kernels=[kernel_one, kernel_two])
+mean = gpx.mean_functions.Zero()
+prior = gpx.Prior(mean_function=mean, kernel=sum_kernel)
+
+x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
+rv = prior(x)
+y = rv.sample(seed=key, sample_shape=(10,))
+fig, ax = plt.subplots()
+ax.plot(x, y.T, alpha=0.7)
+ax.set_title("Samples from a GP Prior with Kernel = Linear + Periodic")
+plt.show()
+
+
+# %% [markdown]
+# We can see that the samples drawn behave as one would naturally expect through adding
+# the two kernels together. In particular, the samples are still periodic, as with the
+# periodic kernel, but their mean also linearly increases/decreases as they move away from
+# the origin, as seen with the linear kernel.
 #
-# $$K(\mathbf{X}, \mathbf{X}) = \begin{bmatrix} k(\mathbf{x}_1, \mathbf{x}_1) & \cdots & k(\mathbf{x}_1, \mathbf{x}_n) \\ \vdots & \ddots & \vdots \\ k(\mathbf{x}_n, \mathbf{x}_1) & \cdots & k(\mathbf{x}_n, \mathbf{x}_n) \end{bmatrix}$$
+# Below we take a look at some samples drawn from a GP prior using a kernel which is
+# composed of the same two kernels, but this time multiplied together:
+
+# %%
+kernel_one = gpx.kernels.Linear()
+kernel_two = gpx.kernels.Periodic()
+sum_kernel = gpx.kernels.ProductKernel(kernels=[kernel_one, kernel_two])
+mean = gpx.mean_functions.Zero()
+prior = gpx.Prior(mean_function=mean, kernel=sum_kernel)
+
+x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
+rv = prior(x)
+y = rv.sample(seed=key, sample_shape=(10,))
+fig, ax = plt.subplots()
+ax.plot(x, y.T, alpha=0.7)
+ax.set_title("Samples from a GP with Kernel = Linear x Periodic")
+plt.show()
+
+
+# %% [markdown]
+# Once again, the samples drawn behave as one would naturally expect through multiplying
+# the two kernels together. In particular, the samples are still periodic but their mean
+# linearly increases/decreases as they move away from the origin, and the amplitude of
+# the oscillations also linearly increases with increasing distance from the origin.
+
+# %% [markdown]
+# ## Putting it All Together on a Real-World Dataset
+
+# %% [markdown]
+# ### Mauna Loa CO2 Dataset
+
+# %% [markdown]
+# We'll put together some of the ideas we've discussed in this notebook by fitting a GP
+# to the [Mauna Loa CO2 dataset](https://www.esrl.noaa.gov/gmd/ccgg/trends/data.html).
+# This dataset measures atmospheric CO2 concentration at the Mauna Loa Observatory in
+# Hawaii, and is widely used in the GP literature. It contains monthly CO2 readings
+# starting in March 1958. Interestingly, there was an eruption at the Mauna Loa volcano in
+# November 2022, so readings from December 2022 have changed to a site roughly 21 miles
+# North of the Mauna Loa Observatory. We'll use the data from March 1958 to November 2022,
+# and see how our GP extrapolates to 8 years before and after the data in the training
+# set.
 #
-# such that $K(\mathbf{X}, \mathbf{X})_{ij} = k(\mathbf{x}_i, \mathbf{x}_j)$.
+# First we'll load the data and plot it:
+
+# %%
+co2_data = pd.read_csv(
+    "https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_mlo.csv", comment="#"
+)
+co2_data = co2_data.loc[co2_data["decimal date"] < 2022 + 11 / 12]
+train_x = co2_data["decimal date"].values[:, None]
+train_y = co2_data["average"].values[:, None]
+
+fig, ax = plt.subplots()
+ax.plot(train_x, train_y)
+ax.set_title("CO2 Concentration in the Atmosphere")
+ax.set_xlabel("Year")
+ax.set_ylabel("CO2 Concentration (ppm)")
+plt.show()
+
+# %% [markdown]
+# Looking at the data, we can see that there is clearly a periodic trend, with a period of
+# roughly 1 year. We can also see that the data is increasing over time, which is
+# also expected. This looks roughly linear, although it may have a non-linear component.
+# This information will be useful when we come to choose our kernel.
 #
-# In order for $k$ to be a valid kernel/covariance function, the corresponding Gram matrix
-# must be *positive semi-definite*. In this case the Gram matrix is referred to as a
-# *covariance matrix*. A real $n \times n$ matrix $K$ is positive semi-definite if and
-# only if for all vectors $\mathbf{z} \in \mathbb{R}^n$:
+# First, we'll construct our GPJax dataset, and will standardise the outputs, to match our
+# assumption that the data has zero mean.
+
+# %%
+test_x = jnp.linspace(1950, 2030, 5000, dtype=jnp.float64).reshape(-1, 1)
+y_scaler = StandardScaler().fit(train_y)
+standardised_train_y = y_scaler.transform(train_y)
+
+D = gpx.Dataset(X=train_x, y=standardised_train_y)
+
+# %% [markdown]
+# Having constructed our dataset, we'll now define our kernel. We'll use a kernel which is
+# composed of the sum of a linear kernel and a periodic kernel, as we saw in the previous
+# section that this kernel is able to capture both the periodic and linear trends in the
+# data. We'll also add an RBF kernel to the sum, which will allow us to capture any
+# non-linear trends in the data:
 #
-# $$\mathbf{z}^\top K \mathbf{z} \geq 0$$
+# $$\text{Kernel = Linear + Periodic + RBF}$$
 #
-# Alternatively, a real $n \times n$ matrix $K$ is positive semi-definite if and only if all of its eigenvalues are non-negative.
+#
+
+# %%
+mean = gpx.mean_functions.Zero()
+rbf_kernel = gpx.kernels.RBF(lengthscale=100.0)
+periodic_kernel = gpx.kernels.Periodic()
+linear_kernel = gpx.kernels.Linear()
+sum_kernel = gpx.kernels.SumKernel(kernels=[linear_kernel, periodic_kernel])
+final_kernel = gpx.kernels.SumKernel(kernels=[rbf_kernel, sum_kernel])
+
+prior = gpx.Prior(mean_function=mean, kernel=final_kernel)
+likelihood = gpx.Gaussian(num_datapoints=D.n)
+
+posterior = prior * likelihood
+
+# %% [markdown]
+# With our model constructed, let's now fit it to the data, by minimising the negative log
+# marginal likelihood of the data:
+
+# %%
+negative_mll = gpx.objectives.ConjugateMLL(negative=True)
+negative_mll(posterior, train_data=D)
+negative_mll = jit(negative_mll)
+
+opt_posterior, history = gpx.fit(
+    model=posterior,
+    objective=negative_mll,
+    train_data=D,
+    optim=ox.adam(learning_rate=0.01),
+    num_iters=1000,
+    safe=True,
+    key=key,
+)
+
+# %% [markdown]
+# Now we can obtain the model's prediction over a period of time which includes the
+# training data, as well as 8 years before and after the training data:
+
+# %%
+latent_dist = opt_posterior.predict(test_x, train_data=D)
+predictive_dist = opt_posterior.likelihood(latent_dist)
+
+predictive_mean = predictive_dist.mean().reshape(-1, 1)
+predictive_std = predictive_dist.stddev().reshape(-1, 1)
+
+# %% [markdown]
+# Let's plot the model's predictions over this period of time:
+
+# %%
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(
+    train_x, standardised_train_y, "x", label="Observations", color=cols[0], alpha=0.5
+)
+ax.fill_between(
+    test_x.squeeze(),
+    predictive_mean.squeeze() - 2 * predictive_std.squeeze(),
+    predictive_mean.squeeze() + 2 * predictive_std.squeeze(),
+    alpha=0.2,
+    label="Two sigma",
+    color=cols[1],
+)
+ax.plot(
+    test_x,
+    predictive_mean - 2 * predictive_std,
+    linestyle="--",
+    linewidth=1,
+    color=cols[1],
+)
+ax.plot(
+    test_x,
+    predictive_mean + 2 * predictive_std,
+    linestyle="--",
+    linewidth=1,
+    color=cols[1],
+)
+ax.plot(test_x, predictive_mean, label="Predictive mean", color=cols[1])
+ax.set_xlabel("Year")
+ax.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))
+
+# %% [markdown]
+# We can see that the model seems to have captured the periodic trend in the data, as well
+# as the (roughly) linear trend. This enables our model to make reasonable seeming
+# predictions over the 8 years before and after the training data. Let's zoom in on the
+# period from 2010 onwards:
+#
+
+# %%
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(
+    train_x[train_x >= 2010],
+    standardised_train_y[train_x >= 2010],
+    "x",
+    label="Observations",
+    color=cols[0],
+    alpha=0.5,
+)
+ax.fill_between(
+    test_x[test_x >= 2010].squeeze(),
+    predictive_mean[test_x >= 2010] - 2 * predictive_std[test_x >= 2010],
+    predictive_mean[test_x >= 2010] + 2 * predictive_std[test_x >= 2010],
+    alpha=0.2,
+    label="Two sigma",
+    color=cols[1],
+)
+ax.plot(
+    test_x[test_x >= 2010],
+    predictive_mean[test_x >= 2010] - 2 * predictive_std[test_x >= 2010],
+    linestyle="--",
+    linewidth=1,
+    color=cols[1],
+)
+ax.plot(
+    test_x[test_x >= 2010],
+    predictive_mean[test_x >= 2010] + 2 * predictive_std[test_x >= 2010],
+    linestyle="--",
+    linewidth=1,
+    color=cols[1],
+)
+ax.plot(
+    test_x[test_x >= 2010],
+    predictive_mean[test_x >= 2010],
+    label="Predictive mean",
+    color=cols[1],
+)
+ax.set_xlabel("Year")
+ax.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))
+
+# %% [markdown]
+# This certainly looks like a reasonable fit to the data, with sensible extrapolation
+# beyond the training data, which finishes in November 2022. Moreover, the learned
+# parameters of the kernel are interpretable. Let's take a look at the learned period of the periodic kernel:
+
+# %%
+print(
+    f"Periodic Kernel Period: {[i for i in opt_posterior.prior.kernel.kernels if isinstance(i, gpx.kernels.Periodic)][0].period}"
+)
+
+# %% [markdown]
+# This tells us that the periodic trend learned has a period of $\approx 1$. This makes
+# intuitive sense, as the unit of the input data is years, and we can see that the
+# periodic trend tends to repeat itself roughly every year!
 
 # %% [markdown]
 # ## Defining Kernels on Non-Euclidean Spaces
