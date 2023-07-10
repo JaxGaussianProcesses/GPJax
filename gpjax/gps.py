@@ -320,6 +320,18 @@ class Prior(AbstractPrior):
 
         return sample_fn
 
+    def parameters_log_prior_density(self) -> Float:
+        r"""Compute the sum of the log prior density of the model's (trainable?) parameters.
+
+        Returns
+        -------
+            Float: The log prior density of the model's parameters.
+        """
+        # TODO: Loop over all trainable parameters in the kernel and sum their log prior
+        # densities.
+
+        raise NotImplementedError
+
 
 #######################
 # GP Posteriors

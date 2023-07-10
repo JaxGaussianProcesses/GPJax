@@ -47,6 +47,7 @@ from orbax.checkpoint import (
 )
 from simple_pytree import Pytree
 import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax.distributions as tfd
 
 Self = TypeVar("Self")
 
@@ -176,6 +177,10 @@ class Module(Pytree):
         """Replace the bijectors of local nodes of the Module."""
         return self.update_meta(**{k: {"bijector": v} for k, v in kwargs.items()})
 
+    def replace_prior(self: Self, **kwargs: Dict[str, tfd.Distribution]) -> Self:
+        """Replace the priors of local nodes of the Module."""
+        return self.update_meta(**{k: {"prior": v} for k, v in kwargs.items()})
+
     def constrain(self: Self) -> Self:
         """Transform model parameters to the constrained space according to their defined bijectors.
 
@@ -192,6 +197,7 @@ class Module(Pytree):
 
             return meta.get("bijector", tfb.Identity()).forward(leaf)
 
+        # TODO: Transform prior distributions to the constrained space?
         return meta_map(_apply_constrain, self)
 
     def unconstrain(self: Self) -> Self:
@@ -210,6 +216,7 @@ class Module(Pytree):
 
             return meta.get("bijector", tfb.Identity()).inverse(leaf)
 
+        # TODO: Transform prior distributions to the unconstrained space?
         return meta_map(_apply_unconstrain, self)
 
     def stop_gradient(self: Self) -> Self:

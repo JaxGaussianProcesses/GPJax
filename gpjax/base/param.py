@@ -24,6 +24,7 @@ from beartype.typing import (
     Optional,
 )
 import tensorflow_probability.substrates.jax.bijectors as tfb
+import tensorflow_probability.substrates.jax.distributions as tfd
 
 
 def param_field(  # noqa: PLR0913
@@ -37,6 +38,9 @@ def param_field(  # noqa: PLR0913
     hash: Optional[bool] = None,
     compare: bool = True,
     metadata: Optional[Mapping[str, Any]] = None,
+    prior: Optional[
+        tfd.Distribution
+    ] = None,  # set prior on *constraied* space of hyperparameters
 ):
     metadata = {} if metadata is None else dict(metadata)
 
@@ -48,11 +52,15 @@ def param_field(  # noqa: PLR0913
 
     if "pytree_node" in metadata:
         raise ValueError("Cannot use metadata with `pytree_node` already set.")
+
+    if "prior" in metadata:
+        raise ValueError("Cannot use metadata with `prior` already set.")
     if bijector is None:
         bijector = tfb.Identity()
     metadata["bijector"] = bijector
     metadata["trainable"] = trainable
     metadata["pytree_node"] = True
+    metadata["prior"] = prior
 
     if (
         default is not dataclasses.MISSING

@@ -129,6 +129,8 @@ class ConjugateMLL(AbstractObjective):
         # p(y | x, θ), where θ are the model hyperparameters:
         mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
 
+        # TODO: If using priors on hyperparameters, we need to add the log-prior
+        #  density here.
         return self.constant * (mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze())
 
 
@@ -187,6 +189,8 @@ class LogPosteriorDensity(AbstractObjective):
         # Whitened latent function values prior, p(wx | θ) = N(0, I)
         latent_prior = tfd.Normal(loc=0.0, scale=1.0)
 
+        # TODO: If using priors on hyperparameters, we need to add the log-prior
+        #  density here.
         return self.constant * (
             likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum()
         )
