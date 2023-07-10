@@ -49,7 +49,7 @@
     
       <link rel="stylesheet" href="../../stylesheets/permalinks.css">
     
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css">
     
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -403,6 +403,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/intro_to_kernels/" class="md-nav__link">
+        Introduction to Kernels
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -609,7 +623,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/kernels/" class="md-nav__link">
+      <a href="../../examples/constructing_new_kernels/" class="md-nav__link">
         Kernel Guide
       </a>
     </li>
@@ -1857,8 +1871,8 @@
 <code class="highlight language-python"><span class="n">jitter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">)</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -2048,9 +2062,7 @@ function.</p>
 <p>A Gaussian process prior parameterised by a mean function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">m(\cdot)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">m</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">)</span></span></span></span> and a kernel
 function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo separator="true">,</mo><mo>⋅</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">k(\cdot, \cdot)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">⋅</span><span class="mclose">)</span></span></span></span> is given by
 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><mrow><mi mathvariant="script">G</mi><mi mathvariant="script">P</mi></mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo separator="true">,</mo><mi>k</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo separator="true">,</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(f(\cdot)) = \mathcal{GP}(m(\cdot), k(\cdot, \cdot))</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">))</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathcal" style="margin-right:0.0593em;">G</span><span class="mord mathcal" style="margin-right:0.08222em;">P</span></span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">⋅</span><span class="mclose">))</span></span></span></span>.</p>
-<p>To invoke a <code>Prior</code> distribution, only a kernel function is required. By
-default, the mean function will be set to zero. In general, this assumption
-will be reasonable assuming the data being modelled has been centred.</p>
+<p>To invoke a <code>Prior</code> distribution, a kernel and mean function must be specified.</p>
 <p>Example:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -2466,8 +2478,8 @@ posterior objects should inherit from this class.</p>
 <code class="highlight language-python"><span class="n">jitter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">)</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -2953,8 +2965,8 @@ from, or optimise an approximation to, the posterior distribution.</p>
 <code class="highlight language-python"><span class="n">latent</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -2973,8 +2985,8 @@ from, or optimise an approximation to, the posterior distribution.</p>
 <code class="highlight language-python"><span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -3184,7 +3196,7 @@ beliefs around the distribution of the data.</p></td>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"></script>
       
         <script src="../../javascripts/katex.js"></script>
       

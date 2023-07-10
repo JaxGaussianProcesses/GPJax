@@ -2,337 +2,342 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/CODE_OF_CONDUCT/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/contributing/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/design/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/give_me_the_code/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/installation/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/sharp_bits/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/citation/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/dataset/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/fit/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/gaussian_distribution/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/gps/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/integrators/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/likelihoods/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/mean_functions/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/objectives/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/progress_bar/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/scan/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/typing/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/variational_families/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/base/module/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/base/param/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/base/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/approximations/rff/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/computations/base/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/computations/basis_functions/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/computations/constant_diagonal/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/computations/dense/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/computations/diagonal/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/computations/eigen/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/non_euclidean/graph/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/non_euclidean/utils/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/nonstationary/arccosine/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/nonstationary/linear/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/nonstationary/polynomial/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/stationary/matern12/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/stationary/matern32/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/stationary/matern52/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/stationary/periodic/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/stationary/powered_exponential/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/stationary/rational_quadratic/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/stationary/rbf/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/stationary/utils/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/stationary/white/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/linops/constant_diagonal_linear_operator/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/linops/dense_linear_operator/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/linops/diagonal_linear_operator/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/linops/identity_linear_operator/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/linops/linear_operator/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/linops/triangular_linear_operator/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/linops/utils/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/linops/zero_linear_operator/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/barycentres/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/classification/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/collapsed_vi/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/</loc>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/deep_kernels/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/graph_kernels/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.jaxgaussianprocesses.com/examples/kernels/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <loc>https://docs.jaxgaussianprocesses.com/examples/intro_to_kernels/</loc>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/likelihoods_guide/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/poisson/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/pytrees/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/regression/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/spatial/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/uncollapsed_vi/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.jaxgaussianprocesses.com/examples/yacht/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

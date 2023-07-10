@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://docs.jaxgaussianprocesses.com/examples/likelihoods_guide/">
       
       
-        <link rel="prev" href="../kernels/">
+        <link rel="prev" href="../constructing_new_kernels/">
       
       
         <link rel="next" href="../yacht/">
@@ -49,7 +49,7 @@
     
       <link rel="stylesheet" href="../../stylesheets/permalinks.css">
     
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css">
     
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -403,6 +403,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../intro_to_kernels/" class="md-nav__link">
+        Introduction to Kernels
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -611,7 +625,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/" class="md-nav__link">
+      <a href="../constructing_new_kernels/" class="md-nav__link">
         Kernel Guide
       </a>
     </li>
@@ -2897,7 +2911,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=4126910a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=ec5b0094" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2943,7 +2957,7 @@ a likelihood object. To do this, we'll need a dataset.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=3e19d31d" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=205b59bd" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2976,7 +2990,9 @@ a likelihood object. To do this, we'll need a dataset.</p>
 <span class="kn">import</span> <span class="nn">tensorflow_probability.substrates.jax</span> <span class="k">as</span> <span class="nn">tfp</span>
 
 <span class="n">tfd</span> <span class="o">=</span> <span class="n">tfp</span><span class="o">.</span><span class="n">distributions</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;./gpjax.mplstyle&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span>
+    <span class="s2">&quot;https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle&quot;</span>
+<span class="p">)</span>
 <span class="n">cols</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;axes.prop_cycle&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span>
 <span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
 
@@ -3006,7 +3022,9 @@ import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax as tfp
 
 tfd = tfp.distributions
-plt.style.use("./gpjax.mplstyle")
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 key = jr.PRNGKey(123)
 
@@ -3053,7 +3071,7 @@ ax.legend()</div>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.legend.Legend at 0x7fda1cb5dd90&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7fb467be8f40&gt;</pre>
 </div>
 
 </div>
@@ -3079,7 +3097,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=1fad2f4c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=09d7ee99" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3098,7 +3116,7 @@ argument.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=a7fe1841" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=111b5aae" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3153,7 +3171,7 @@ argument.</p>
 
 </div>
 </div>
-<div id="cell-id=e81be8da" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=dba134f9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3171,7 +3189,7 @@ initialise the likelihood with a value of $0.5$, then we would do this as follow
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=7d9b3c2e" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=9d2f9245" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3226,7 +3244,7 @@ initialise the likelihood with a value of $0.5$, then we would do this as follow
 
 </div>
 </div>
-<div id="cell-id=d9e497e6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=e5d7dcf7" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3248,7 +3266,7 @@ $\mathbf{y}^{\star}$.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=84b50d2b" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=aaa23315" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3362,7 +3380,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=62e781de" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=00b420ee" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3374,7 +3392,7 @@ class="
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=7200fdc6" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=ee3b8a76" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3474,7 +3492,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=1fb18fde" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=f4aa2e9a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3525,7 +3543,7 @@ approximation to the posterior.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=7b8006a3" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=3acf65fe" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3575,7 +3593,7 @@ mean, variance = jax.vmap(q_moments)(x[:, None])</div>
 
 </div>
 </div>
-<div id="cell-id=cb21d468" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=3e6d5add" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3589,7 +3607,7 @@ likelihood object.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=0b8aa5bb" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=015b56bb" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3644,7 +3662,7 @@ likelihood object.</p>
 
 </div>
 </div>
-<div id="cell-id=4619215e" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=42a57ac5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3657,7 +3675,7 @@ following:</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=cb2072c5" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=d64c0a97" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3697,7 +3715,7 @@ following:</p>
 
 </div>
 </div>
-<div id="cell-id=b7615db2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=299de978" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3710,7 +3728,7 @@ expectation can be computed analytically.</p>
 </div>
 </div>
 </div>
-<div id="cell-id=f4d0d574" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=59b3c8e9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3721,7 +3739,7 @@ expectation can be computed analytically.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=ec29c071" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=7d3d4558" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3767,16 +3785,16 @@ expectation can be computed analytically.</p>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>Author: Thomas Pinder
 
-Last updated: Wed Jul 05 2023
+Last updated: Mon Jul 10 2023
 
 Python implementation: CPython
-Python version       : 3.8.16
+Python version       : 3.8.17
 IPython version      : 8.12.2
 
-tensorflow_probability: 0.19.0
 jax                   : 0.4.9
-matplotlib            : 3.7.1
 gpjax                 : 0.0.0
+matplotlib            : 3.7.1
+tensorflow_probability: 0.19.0
 
 Watermark: 2.3.1
 
@@ -3844,7 +3862,7 @@ Watermark: 2.3.1
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"></script>
       
         <script src="../../javascripts/katex.js"></script>
       

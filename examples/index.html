@@ -45,7 +45,7 @@
     
       <link rel="stylesheet" href="../stylesheets/permalinks.css">
     
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css">
     
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -399,6 +399,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="intro_to_kernels/" class="md-nav__link">
+        Introduction to Kernels
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -605,7 +619,7 @@
   
   
     <li class="md-nav__item">
-      <a href="kernels/" class="md-nav__link">
+      <a href="constructing_new_kernels/" class="md-nav__link">
         Kernel Guide
       </a>
     </li>
@@ -1668,38 +1682,55 @@
                   
 
 
+<link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
 <h1 id="where-to-find-the-docs">Where to find the docs<a class="headerlink" href="#where-to-find-the-docs" title="Permanent link"></a></h1>
-<p>The GPJax documentation can be found here:
-https://docs.jaxgaussianprocesses.com/</p>
+<p>The GPJax documentation can be found here: https://docs.jaxgaussianprocesses.com/</p>
 <h1 id="how-to-build-the-docs">How to build the docs<a class="headerlink" href="#how-to-build-the-docs" title="Permanent link"></a></h1>
 <ol>
-<li>Install the requirements using <code>pip install -r docs/requirements.txt</code></li>
+<li>Ensure you have installed the requirements using <code>poetry install</code> in the root
+   directory.</li>
 <li>Make sure <code>pandoc</code> is installed</li>
-<li>Run the make script <code>make html</code></li>
+<li>Run the command <code>poetry run mkdocs serve</code> in the root directory.</li>
 </ol>
-<p>The corresponding HTML files can then be found in <code>docs/_build/html/</code>.</p>
+<p>The documentation will then be served at an IP address printed, which can then be opened
+in a browser of you choice e.g. <code>Serving on http://127.0.0.1:8000/</code>.</p>
 <h1 id="how-to-write-code-documentation">How to write code documentation<a class="headerlink" href="#how-to-write-code-documentation" title="Permanent link"></a></h1>
-<p>Our documentation it is written in ReStructuredText for Sphinx. This is a
-meta-language that is compiled into online documentation. For more details see
-<a href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html">Sphinx's documentation</a>.
-As a result, our docstrings adhere to a specific syntax that has to be kept in
-mind. Below we provide some guidelines.</p>
+<p>Our documentation is generated using <a href="https://www.mkdocs.org/">MkDocs</a>. This
+automatically creates online documentation from docstrings, with full support for
+Markdown. Longer tutorial-style notebooks are also converted to webpages by MkDocs, with
+these notebooks being stored in the <code>docs/examples</code> directory. If you write a new
+notebook and wish to add it to the documentation website, add it to the <code>nav</code> section of
+the <code>mkdocs.yml</code> file found in the root directory.</p>
+<p>Below we provide some guidelines for writing docstrings.</p>
 <h2 id="how-much-information-to-put-in-a-docstring">How much information to put in a docstring<a class="headerlink" href="#how-much-information-to-put-in-a-docstring" title="Permanent link"></a></h2>
-<p>A docstring should be informative. If in doubt, then it is best to add more
-information to a docstring than less. Many users will skim documentation, so
-please ensure the opening sentence or two of a docstring contains the core
-information. Adding examples and mathematical descriptions to documentation is
-highly desirable.</p>
-<p>We are making an active effort within GPJax to improve our documentation. If you
-spot any areas where there is missing information within the existing
-documentation, then please either raise an issue or
-<a href="https://docs.jaxgaussianprocesses.com/contributing/">create a pull request</a>.</p>
+<p>A docstring should be informative. If in doubt, then it is best to add more information
+to a docstring than less. Many users will skim documentation, so please ensure the
+opening sentence or two of a docstring contains the core information. Adding examples
+and mathematical descriptions to documentation is highly desirable.</p>
+<p>We are making an active effort within GPJax to improve our documentation. If you spot
+any areas where there is missing information within the existing documentation, then
+please either raise an issue or <a href="https://docs.jaxgaussianprocesses.com/contributing/">create a pull
+request</a>.</p>
 <h2 id="an-example-docstring">An example docstring<a class="headerlink" href="#an-example-docstring" title="Permanent link"></a></h2>
-<p>An example docstring that adheres the principles of GPJax is given below.
-The docstring contains a simple, snappy introduction with links to auxiliary
-components. More detail is then provided in the form of a mathematical
-description and a code example. The docstring is concluded with a description
-of the objects attributes with corresponding types.</p>
+<p>An example docstring that adheres the principles of GPJax is given below. The docstring
+contains a simple, snappy introduction with links to auxiliary components. More detail
+is then provided in the form of a mathematical description and a code example. The
+docstring is concluded with a description of the objects attributes with corresponding
+types.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">gpjax.gps</span> <span class="kn">import</span> <span class="n">AbstractPrior</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span> <span class="nn">gpjax.mean_functions</span> <span class="kn">import</span> <span class="n">AbstractMeanFunction</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span> <span class="nn">gpjax.kernels</span> <span class="kn">import</span> <span class="n">AbstractKernel</span>
@@ -1712,43 +1743,41 @@ of the objects attributes with corresponding types.</p>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="sd">    [mean](https://docs.jaxgaussianprocesses.com/api/mean_functions/)</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="sd">    and [kernel](https://docs.jaxgaussianprocesses.com/api/kernels/base/) function.</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="sd">    A Gaussian process prior parameterised by a mean function :math:`m(\\cdot)` and a kernel</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="sd">    function :math:`k(\\cdot, \\cdot)` is given by</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="sd">    .. math::</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="sd">        p(f(\\cdot)) = \mathcal{GP}(m(\\cdot), k(\\cdot, \\cdot)).</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="sd">    To invoke a ``Prior`` distribution, only a kernel function is required. By default,</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="sd">    the mean function will be set to zero. In general, this assumption will be reasonable</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="sd">    assuming the data being modelled has been centred.</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="sd">    Example:</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="sd">        &gt;&gt;&gt; import gpjax as gpx</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="sd">        &gt;&gt;&gt;</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="sd">        &gt;&gt;&gt; meanf = gpx.mean_functions.Zero()</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="sd">        &gt;&gt;&gt; kernel = gpx.kernels.RBF()</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="sd">        &gt;&gt;&gt; prior = gpx.Prior(mean_function=meanf, kernel = kernel)</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>
-<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="sd">        kernel (Kernel): The kernel function used to parameterise the prior.</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="sd">        mean_function (MeanFunction): The mean function used to parameterise the prior. Defaults to zero.</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="sd">        name (str): The name of the GP prior. Defaults to &quot;GP prior&quot;.</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>
-<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>    <span class="n">kernel</span><span class="p">:</span> <span class="n">AbstractKernel</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>    <span class="n">mean_function</span><span class="p">:</span> <span class="n">AbstractMeanFunction</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>    <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;GP prior&quot;</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="sd">    A Gaussian process prior parameterised by a mean function $`m(\cdot)`$ and a kernel</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="sd">    function $`k(\cdot, \cdot)`$ is given by</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="sd">    $`p(f(\cdot)) = \mathcal{GP}(m(\cdot), k(\cdot, \cdot))`$.</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="sd">    To invoke a `Prior` distribution, a kernel and mean function must be specified.</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="sd">    Example:</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="sd">        &gt;&gt;&gt; import gpjax as gpx</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="sd">        &gt;&gt;&gt;</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="sd">        &gt;&gt;&gt; meanf = gpx.mean_functions.Zero()</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="sd">        &gt;&gt;&gt; kernel = gpx.kernels.RBF()</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="sd">        &gt;&gt;&gt; prior = gpx.Prior(mean_function=meanf, kernel = kernel)</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="sd">        kernel (Kernel): The kernel function used to parameterise the prior.</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="sd">        mean_function (MeanFunction): The mean function used to parameterise the prior. Defaults to zero.</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="sd">        name (str): The name of the GP prior. Defaults to &quot;GP prior&quot;.</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>    <span class="n">kernel</span><span class="p">:</span> <span class="n">AbstractKernel</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>    <span class="n">mean_function</span><span class="p">:</span> <span class="n">AbstractMeanFunction</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>    <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;GP prior&quot;</span>
 </code></pre></div>
 <h3 id="documentation-syntax">Documentation syntax<a class="headerlink" href="#documentation-syntax" title="Permanent link"></a></h3>
-<p>A helpful cheatsheet for writing restructured text can be found
-<a href="https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst">here</a>. In addition to that, we adopt the following convention when documenting
-`` objects.</p>
+<p>We adopt the following convention when documenting objects:</p>
 <ul>
 <li>Class attributes should be specified using the <code>Attributes:</code> tag.</li>
 <li>Method argument should be specified using the <code>Args:</code> tags.</li>
-<li>All attributes and arguments should have types.</li>
+<li>Values returned by a method should be specified using the <code>Returns:</code> tag.</li>
+<li>All attributes, arguments and returned values should have types.</li>
 </ul>
+<div class="admonition attention">
+<p class="admonition-title">Note</p>
+<p>Inline math in docstrings needs to be rendered within both <code>$</code> and <code>symbols to be correctly rendered by MkDocs. For instance, where one would typically write `$k(x,y)$` in standard LaTeX, in docstrings you are required to write</code><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">k(x,y)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span></span>`` in order for the math to be correctly rendered by MkDocs.</p>
+</div>
 
 
   
@@ -1800,7 +1829,7 @@ of the objects attributes with corresponding types.</p>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"></script>
       
         <script src="../javascripts/katex.js"></script>
       

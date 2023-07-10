@@ -16,7 +16,7 @@
         <link rel="prev" href="../pytrees/">
       
       
-        <link rel="next" href="../regression/">
+        <link rel="next" href="../intro_to_kernels/">
       
       <link rel="icon" href="../../_static/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.11">
@@ -49,7 +49,7 @@
     
       <link rel="stylesheet" href="../../stylesheets/permalinks.css">
     
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css">
     
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -481,6 +481,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../intro_to_kernels/" class="md-nav__link">
+        Introduction to Kernels
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -687,7 +701,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/" class="md-nav__link">
+      <a href="../constructing_new_kernels/" class="md-nav__link">
         Kernel Guide
       </a>
     </li>
@@ -2831,7 +2845,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=eadba73d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=9f973da1" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2926,7 +2940,7 @@ We can plot three different parameterisations of this density.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=6e040f35" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=d53393a2" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2957,7 +2971,9 @@ We can plot three different parameterisations of this density.</p>
 <span class="kn">import</span> <span class="nn">tensorflow_probability.substrates.jax</span> <span class="k">as</span> <span class="nn">tfp</span>
 <span class="kn">from</span> <span class="nn">docs.examples.utils</span> <span class="kn">import</span> <span class="n">confidence_ellipse</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;./gpjax.mplstyle&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span>
+    <span class="s2">&quot;https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle&quot;</span>
+<span class="p">)</span>
 <span class="n">cols</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;axes.prop_cycle&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span>
 <span class="n">tfd</span> <span class="o">=</span> <span class="n">tfp</span><span class="o">.</span><span class="n">distributions</span>
 
@@ -2988,7 +3004,9 @@ import seaborn as sns
 import tensorflow_probability.substrates.jax as tfp
 from docs.examples.utils import confidence_ellipse
 
-plt.style.use("./gpjax.mplstyle")
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 tfd = tfp.distributions
 
@@ -3038,7 +3056,7 @@ ax.legend(loc="best")</div>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.legend.Legend at 0x7f1820f84880&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7f81e0e47f70&gt;</pre>
 </div>
 
 </div>
@@ -3064,7 +3082,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=8282eb8c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=5931941d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3098,7 +3116,7 @@ determines the correlation of the multivariate Gaussian.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=0cb3a977" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=cbb41937" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3244,7 +3262,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=9d80cdac" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=44ed24fe" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3287,7 +3305,7 @@ $p(\mathbf{y})$, occurring at the same time. We visualise this idea below.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=a66f08e6" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=2928f06c" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3488,7 +3506,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=ebd051d4" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=214b6ff5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3683,7 +3701,7 @@ GPs that served as the inspiration for this notebook.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=f4e252c7" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=1b10bed0" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3729,17 +3747,17 @@ GPs that served as the inspiration for this notebook.</p>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>Author: Thomas Pinder
 
-Last updated: Wed Jul 05 2023
+Last updated: Mon Jul 10 2023
 
 Python implementation: CPython
-Python version       : 3.8.16
+Python version       : 3.8.17
 IPython version      : 8.12.2
 
-pandas                : 1.5.3
-jax                   : 0.4.9
-matplotlib            : 3.7.1
 tensorflow_probability: 0.19.0
+matplotlib            : 3.7.1
 seaborn               : 0.12.2
+jax                   : 0.4.9
+pandas                : 1.5.3
 
 Watermark: 2.3.1
 
@@ -3807,7 +3825,7 @@ Watermark: 2.3.1
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"></script>
       
         <script src="../../javascripts/katex.js"></script>
       

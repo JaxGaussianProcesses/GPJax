@@ -49,7 +49,7 @@
     
       <link rel="stylesheet" href="../../../../stylesheets/permalinks.css">
     
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css">
     
     <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -403,6 +403,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../examples/intro_to_kernels/" class="md-nav__link">
+        Introduction to Kernels
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -609,7 +623,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../examples/kernels/" class="md-nav__link">
+      <a href="../../../../examples/constructing_new_kernels/" class="md-nav__link">
         Kernel Guide
       </a>
     </li>
@@ -1865,8 +1879,8 @@ of a graph.</p></td>
 <code class="highlight language-python"><span class="n">laplacian</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -1885,8 +1899,8 @@ of a graph.</p></td>
 <code class="highlight language-python"><span class="n">lengthscale</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -1905,8 +1919,8 @@ of a graph.</p></td>
 <code class="highlight language-python"><span class="n">variance</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -1925,8 +1939,8 @@ of a graph.</p></td>
 <code class="highlight language-python"><span class="n">smoothness</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -1945,8 +1959,8 @@ of a graph.</p></td>
 <code class="highlight language-python"><span class="n">eigenvalues</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -1965,8 +1979,8 @@ of a graph.</p></td>
 <code class="highlight language-python"><span class="n">eigenvectors</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -1985,8 +1999,8 @@ of a graph.</p></td>
 <code class="highlight language-python"><span class="n">num_vertex</span><span class="p">:</span> <span class="n">ScalarInt</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -2005,8 +2019,8 @@ of a graph.</p></td>
 <code class="highlight language-python"><span class="n">compute_engine</span><span class="p">:</span> <span class="n">AbstractKernelComputation</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">EigenKernelComputation</span><span class="p">(),</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -2025,8 +2039,8 @@ of a graph.</p></td>
 <code class="highlight language-python"><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Graph Matérn&#39;</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -2224,7 +2238,7 @@ evaluate the graph kernel on a pair of vertices <span class="katex"><span class=
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"></script>
       
         <script src="../../../../javascripts/katex.js"></script>
       
