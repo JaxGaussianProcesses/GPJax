@@ -52,7 +52,9 @@ with install_import_hook("gpjax", "beartype.beartype"):
 tfd = tfp.distributions
 identity_matrix = jnp.eye
 key = jr.PRNGKey(123)
-plt.style.use("./gpjax.mplstyle")
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
