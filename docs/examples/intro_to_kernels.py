@@ -212,11 +212,11 @@ test_x = jnp.linspace(0, 1, 100).reshape(-1, 1)
 test_y = forrester(test_x)
 
 # %% [markdown]
-# First we define our model, using the Matérn32 kernel, and construct our posterior *without* optimising the kernel hyperparameters:
+# First we define our model, using the Matérn52 kernel, and construct our posterior *without* optimising the kernel hyperparameters:
 
 # %%
 mean = gpx.mean_functions.Zero()
-kernel = gpx.kernels.Matern32(
+kernel = gpx.kernels.Matern52(
     lengthscale=jnp.array(2.0)
 )  # Initialise our kernel lengthscale to 2.0
 
@@ -672,7 +672,7 @@ print(
 #
 # - [Gaussian Processes for Machine Learning](http://www.gaussianprocess.org/gpml/chapters/RW.pdf) - Chapter 4 provides a comprehensive overview of kernels, diving deep into some of the technical details and also providing some kernels defined on non-Euclidean spaces such as strings.
 # - David Duvenaud's [Kernel Cookbook](https://www.cs.toronto.edu/~duvenaud/cookbook/) is a great resource for learning about kernels, and also provides some information about some of the pitfalls people commonly encounter when using the Matérn family of kernels. His PhD thesis, [Automatic Model Construction with Gaussian Processes](https://www.cs.toronto.edu/~duvenaud/thesis.pdf), also provides some in-depth recipes for how one may incorporate their prior knowledge when constructing kernels.
-# - Finally, please check out our [more advanced kernel guide](https://docs.jaxgaussianprocesses.com/examples/kernels/), which details some more kernels available in GPJax as well as how one may combine kernels together to form more complex kernels.
+# - Finally, please check out our [more advanced kernel guide](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/), which details some more kernels available in GPJax as well as how one may combine kernels together to form more complex kernels.
 #
 # ## System Configuration
 

@@ -447,8 +447,8 @@ with warnings.catch_warnings():
 # that are admissible under the GP prior. A kernel is a positive-definite
 # function with parameters $\boldsymbol{\theta}$ that maps pairs of inputs
 # $\mathbf{X}, \mathbf{X}' \in \mathcal{X}$ onto the real line. We dedicate the
-# entirety of the [Kernel Guide
-# notebook](https://docs.jaxgaussianprocesses.com/examples/kernels) to
+# entirety of the [Introduction to Kernels
+# notebook](https://docs.jaxgaussianprocesses.com/examples/intro_to_kernels) to
 # exploring the different GPs each kernel can yield.
 #
 # ## Gaussian process regression

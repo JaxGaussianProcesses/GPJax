@@ -124,7 +124,7 @@ plt.show()
 # optimised. For advice on achieving this, see the
 # [Regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/)
 # for advice on optimisation and the
-# [Kernels notebook](https://docs.jaxgaussianprocesses.com/examples/kernels/) for
+# [Kernels notebook](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/) for
 # advice on selecting an appropriate kernel.
 
 
