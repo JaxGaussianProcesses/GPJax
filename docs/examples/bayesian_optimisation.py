@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 import optax as ox
 import tensorflow_probability.substrates.jax as tfp
-from typing import List
+from typing import List, Tuple
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -596,7 +596,7 @@ for i in range(num_experiments):
 # %%
 def obtain_cumulative_minimum_statistics(
     experiment_results: List[gpx.Dataset],
-) -> tuple[Float[Array, "N 1"], Float[Array, "N 1"]]:
+) -> Tuple[Float[Array, "N 1"], Float[Array, "N 1"]]:
     cumulative_best_observation_results = []
     for exp_result in experiment_results:
         observations = exp_result.y
