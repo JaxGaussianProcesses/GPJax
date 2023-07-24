@@ -331,6 +331,7 @@ def plot_bayes_opt(
     predictive_std = predictive_dist.stddev()
 
     fig, ax = plt.subplots()
+    ax.plot(plt_x, predictive_mean, label="Predictive Mean", color=cols[1])
     ax.fill_between(
         plt_x.squeeze(),
         predictive_mean - 2 * predictive_std,
@@ -353,6 +354,7 @@ def plot_bayes_opt(
         linewidth=1,
         color=cols[1],
     )
+    ax.plot(plt_x, sample_y, label="Posterior Sample")
     ax.plot(
         plt_x,
         forrester_y,
@@ -361,8 +363,7 @@ def plot_bayes_opt(
         linestyle="--",
         linewidth=2,
     )
-    ax.plot(plt_x, predictive_mean, label="Predictive Mean", color=cols[1])
-    ax.plot(plt_x, sample_y, label="Posterior Sample")
+    ax.axvline(x=0.757, linestyle=":", color=cols[3], label="True Optimum")
     ax.scatter(dataset.X, dataset.y, label="Observations", color=cols[2], zorder=2)
     ax.scatter(
         queried_x,
