@@ -28,6 +28,7 @@ nav:
     - Sparse GPs: examples/uncollapsed_vi.py
     - Stochastic sparse GPs: examples/collapsed_vi.py
     - Pathwise Sampling for Spatial Modelling: examples/spatial.py
+    - Bayesian Optimisation: examples/bayesian_optimisation.py
   - 📖 Guides for customisation:
     - Kernels: examples/constructing_new_kernels.py
     - Likelihoods: examples/likelihoods_guide.py
