@@ -60,6 +60,7 @@ process modelling.
 > - [**Learning Gaussian Process Barycentres**](https://docs.jaxgaussianprocesses.com/examples/barycentres/)
 > - [**Deep Kernel Regression**](https://docs.jaxgaussianprocesses.com/examples/deep_kernels/)
 > - [**Poisson Regression**](https://docs.jaxgaussianprocesses.com/examples/poisson/)
+> - [**Bayesian Optimisation**](https://docs.jaxgaussianprocesses.com/examples/bayesian_optimisation/)
 
 ## Guides for customisation
 >

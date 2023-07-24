@@ -114,8 +114,7 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 # taking into consideration all the datapoints observed so far. Therefore, in order to
 # decide which point to query next we simply choose the point which maximises the
 # acquisition function, using an optimiser such as L-BFGS ([Liu and Nocedal,
-# 1989](https://link.springer.com/article/10.1007/BF01589116)) or Adam ([Kingma and Ba,
-# 2014](https://arxiv.org/abs/1412.6980)).
+# 1989](https://link.springer.com/article/10.1007/BF01589116)).
 #
 # The Bayesian optimisation loop can be summarised as follows, with $i$ denoting the
 # current iteration:
@@ -147,7 +146,7 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 # %% [markdown]
 # ## Thompson Sampling
 #
-# Thompson sampling ([Thompson, 1933](https://shorturl.at/ejmCM)) is a simple method which
+# Thompson sampling ([Thompson, 1933](https://www.dropbox.com/s/yhn9prnr5bz0156/1933-thompson.pdf)) is a simple method which
 # naturally balances exploration and exploitation. The core idea is to, at each iteration
 # of the BO loop, sample a function, $g$, from the posterior distribution of the surrogate
 # model $\mathcal{M}_i$, and then evaluate the black-box function at the point(s) which
@@ -201,7 +200,7 @@ D = gpx.Dataset(X=initial_x, y=initial_y)
 
 
 # %%
-def generate_optimised_posterior(
+def return_optimised_posterior(
     data: gpx.Dataset, prior: gpx.Module, key: Array
 ) -> gpx.Module:
     likelihood = gpx.Gaussian(
@@ -232,7 +231,7 @@ def generate_optimised_posterior(
 mean = gpx.mean_functions.Zero()
 kernel = gpx.kernels.Matern52()
 prior = gpx.Prior(mean_function=mean, kernel=kernel)
-opt_posterior = generate_optimised_posterior(D, prior, key)
+opt_posterior = return_optimised_posterior(D, prior, key)
 
 # %% [markdown]
 # We can then sample a function from the posterior distribution of the surrogate model. We
@@ -293,6 +292,7 @@ def optimise_sample(
     initial_sample_y = sample(initial_sample_points)
     best_x = jnp.array([initial_sample_points[jnp.argmin(initial_sample_y)]])
 
+    # We want to maximise the utility function, but the optimiser performs minimisation. Since we're minimising the sample drawn, the sample is actually the negative utility function.
     negative_utility_fn = lambda x: sample(x)[0][0]
     lbfgsb = ScipyBoundedMinimize(fun=negative_utility_fn, method="l-bfgs-b")
     bounds = (lower_bound, upper_bound)
@@ -385,7 +385,7 @@ plot_bayes_opt(opt_posterior, approx_sample, D, x_star)
 # each iteration.
 
 # %%
-bo_iters = 10
+bo_iters = 5
 
 # Set up initial dataset
 initial_x = tfp.mcmc.sample_halton_sequence(
@@ -401,7 +401,7 @@ for i in range(bo_iters):
     mean = gpx.mean_functions.Zero()
     kernel = gpx.kernels.Matern52()
     prior = gpx.Prior(mean_function=mean, kernel=kernel)
-    opt_posterior = generate_optimised_posterior(D, prior, subkey)
+    opt_posterior = return_optimised_posterior(D, prior, subkey)
 
     # Draw a sample from the posterior, and find the minimiser of it
     approx_sample = opt_posterior.sample_approx(
@@ -520,7 +520,7 @@ plt.show()
 lower_bound = jnp.array([-2.0, -1.0])
 upper_bound = jnp.array([2.0, 1.0])
 initial_sample_num = 5
-bo_iters = 15
+bo_iters = 11
 num_experiments = 5
 bo_experiment_results = []
 
@@ -543,7 +543,7 @@ for experiment in range(num_experiments):
             active_dims=[0, 1], lengthscale=jnp.array([1.0, 1.0]), variance=2.0
         )
         prior = gpx.Prior(mean_function=mean, kernel=kernel)
-        opt_posterior = generate_optimised_posterior(D, prior, subkey)
+        opt_posterior = return_optimised_posterior(D, prior, subkey)
 
         # Draw a sample from the posterior, and find the minimiser of it
         approx_sample = opt_posterior.sample_approx(
@@ -579,7 +579,11 @@ for i in range(num_experiments):
     initial_x = bo_experiment_results[i].X[:5]
     initial_y = bo_experiment_results[i].y[:5]
     final_x = jr.uniform(
-        key, shape=(15, 2), dtype=jnp.float64, minval=lower_bound, maxval=upper_bound
+        key,
+        shape=(bo_iters, 2),
+        dtype=jnp.float64,
+        minval=lower_bound,
+        maxval=upper_bound,
     )
     final_y = six_hump_camel(final_x)
     random_x = jnp.concatenate([initial_x, final_x], axis=0)
@@ -588,69 +592,71 @@ for i in range(num_experiments):
 
 
 # %% [markdown]
-# Finally, we'll process the experiment results to find the best observed value of the
-# black-box function at each iteration of the experiments. We'll then take the mean and
-# standard deviation of these values across the 5 experiments.
+# Finally, we'll process the experiment results to find the log regret at each iteration
+# of the experiments. The regret is defined as the difference between the minimum value of
+# the black-box function observed so far and the true global minimum of the black box
+# function. Mathematically, at time $t$, with observations $\mathcal{D}_t$, for function
+# $f$ with global minimum $f^*$, the regret is defined as:
+#
+# $$\text{regret}_t = \min_{\mathbf{x} \in \mathcal{D_t}}f(\mathbf{x}) - f^*$$
+#
+# We'll then take the mean and standard deviation of the log of the regret values across
+# the 5 experiments.
 
 
 # %%
-def obtain_cumulative_minimum_statistics(
+def obtain_log_regret_statistics(
     experiment_results: List[gpx.Dataset],
+    global_minimum: ScalarFloat,
 ) -> Tuple[Float[Array, "N 1"], Float[Array, "N 1"]]:
-    cumulative_best_observation_results = []
+    log_regret_results = []
     for exp_result in experiment_results:
         observations = exp_result.y
         cumulative_best_observations = jax.lax.associative_scan(
             jax.numpy.minimum, observations
         )
-        cumulative_best_observation_results.append(cumulative_best_observations)
+        regret = cumulative_best_observations - global_minimum
+        log_regret = jnp.log(regret)
+        log_regret_results.append(log_regret)
 
-    cumulative_best_observation_results = jnp.array(cumulative_best_observation_results)
-    cumulative_best_observation_mean = jnp.mean(
-        cumulative_best_observation_results, axis=0
-    )
-    cumulative_best_observation_std = jnp.std(
-        cumulative_best_observation_results, axis=0
-    )
-    return cumulative_best_observation_mean, cumulative_best_observation_std
+    log_regret_results = jnp.array(log_regret_results)
+    log_regret_mean = jnp.mean(log_regret_results, axis=0)
+    log_regret_std = jnp.std(log_regret_results, axis=0)
+    return log_regret_mean, log_regret_std
 
 
-bo_cumulative_min_mean, bo_cumulative_min_std = obtain_cumulative_minimum_statistics(
-    bo_experiment_results
+bo_log_regret_mean, bo_log_regret_std = obtain_log_regret_statistics(
+    bo_experiment_results, -1.031625
 )
 (
-    random_cumulative_min_mean,
-    random_cumulative_min_std,
-) = obtain_cumulative_minimum_statistics(random_experiment_results)
+    random_log_regret_mean,
+    random_log_regret_std,
+) = obtain_log_regret_statistics(random_experiment_results, -1.031625)
 
 # %% [markdown]
-# Now, when we plot the mean and standard deviation of the best observed value of the
-# black-box function at each iteration, we can see that BO outperforms random sampling,
-# consistently converging to the global minimum of the function.
+# Now, when we plot the mean and standard deviation of the log regret at each iteration,
+# we can see that BO outperforms random sampling!
 
 # %%
 fig, ax = plt.subplots()
 fn_evaluations = jnp.arange(1, bo_iters + initial_sample_num + 1)
-cumulative_best_y = jax.lax.associative_scan(jax.numpy.minimum, D.y)
-cumulative_random_y = jax.lax.associative_scan(jax.numpy.minimum, random_y)
-ax.plot(fn_evaluations, bo_cumulative_min_mean, label="Bayesian Optimisation")
+ax.plot(fn_evaluations, bo_log_regret_mean, label="Bayesian Optimisation")
 ax.fill_between(
     fn_evaluations,
-    bo_cumulative_min_mean[:, 0] - bo_cumulative_min_std[:, 0],
-    bo_cumulative_min_mean[:, 0] + bo_cumulative_min_std[:, 0],
+    bo_log_regret_mean[:, 0] - bo_log_regret_std[:, 0],
+    bo_log_regret_mean[:, 0] + bo_log_regret_std[:, 0],
     alpha=0.2,
 )
-ax.plot(fn_evaluations, random_cumulative_min_mean, label="Random Search")
+ax.plot(fn_evaluations, random_log_regret_mean, label="Random Search")
 ax.fill_between(
     fn_evaluations,
-    random_cumulative_min_mean[:, 0] - random_cumulative_min_std[:, 0],
-    random_cumulative_min_mean[:, 0] + random_cumulative_min_std[:, 0],
+    random_log_regret_mean[:, 0] - random_log_regret_std[:, 0],
+    random_log_regret_mean[:, 0] + random_log_regret_std[:, 0],
     alpha=0.2,
 )
 ax.axvline(x=initial_sample_num, linestyle=":")
-ax.axhline(y=-1.0316, linestyle="--", label="True Minimum")
 ax.set_xlabel("Number of Black-Box Function Evaluations")
-ax.set_ylabel("Best Observed Value")
+ax.set_ylabel("Log Regret")
 ax.legend()
 plt.show()
 
