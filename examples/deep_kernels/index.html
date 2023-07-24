@@ -691,6 +691,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bayesian_optimisation/" class="md-nav__link">
+        Introduction to Bayesian Optimisation
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -2938,7 +2952,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=89ce94a3" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=80e97c7f" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2955,7 +2969,7 @@ Gaussian process model's kernel through a neural network can offer a solution to
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=dfec525a" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=733a1ad7" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3086,7 +3100,7 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]</div>
 
 </div>
 </div>
-<div id="cell-id=086e0dd5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=2b700142" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3099,7 +3113,7 @@ discontinuities. To highlight this, we will use a sawtooth function as our data.
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=ea080c40" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=9b8f2815" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3177,7 +3191,7 @@ ax.legend(loc="best")</div>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.legend.Legend at 0x7faeac16a130&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7f6dec69afa0&gt;</pre>
 </div>
 
 </div>
@@ -3203,7 +3217,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=3ea0d12a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=1260e82d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3225,7 +3239,7 @@ are then computed using the regular <code>gram</code> and <code>cross_covariance
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=9bccdb81" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=b2f72be5" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3299,7 +3313,7 @@ class DeepKernelFunction(AbstractKernel):
 
 </div>
 </div>
-<div id="cell-id=bf4a5b7c" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=c790483e" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3310,7 +3324,7 @@ consider a small multi-layer perceptron with two linear hidden layers and ReLU
 activation functions between the layers. The first hidden layer contains 64 units,
 while the second layer contains 32 units. Finally, we'll make the output of our
 network a three units wide. The corresponding kernel that we define will then be of
-<a href="https://docs.jaxgaussianprocesses.com/examples/kernels/#active-dimensions">ARD form</a>
+<a href="https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#active-dimensions">ARD form</a>
 to allow for different lengthscales in each dimension of the feature space.
 Users may wish to design more intricate network structures for more complex tasks,
 which functionality is supported well in Haiku.</p>
@@ -3319,7 +3333,7 @@ which functionality is supported well in Haiku.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=408b0be2" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=e8a5fe37" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3383,7 +3397,7 @@ forward_linear = Network()</div>
 
 </div>
 </div>
-<div id="cell-id=47aa9dc9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=9d8f19a8" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3397,7 +3411,7 @@ kernel and assume a Gaussian likelihood.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div id="cell-id=5b649cf0" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div id="cell-id=dbd8058a" class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3443,7 +3457,7 @@ posterior = prior * likelihood</div>
 
 </div>
 </div>
-<div id="cell-id=2a67349b" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=d4eb84b0" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3466,7 +3480,7 @@ increased from 0 to 1 over 50 steps to get a reasonable initial learning rate va
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=ffa784e7" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=acae1a7f" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3561,7 +3575,7 @@ opt_posterior, history = gpx.fit(
 
 </div>
 </div>
-<div id="cell-id=305cc00a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=1d45d6b2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3574,7 +3588,7 @@ of the model. We can do this by simply applying the model to a test data set.</p
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=023e480b" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=c167a7ab" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3680,7 +3694,7 @@ ax.legend()</div>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.legend.Legend at 0x7faea459a7c0&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7f6de4cbcaf0&gt;</pre>
 </div>
 
 </div>
@@ -3706,7 +3720,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=abefc91a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=883c5af3" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3717,7 +3731,7 @@ class="
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=eb548c47" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=0c5085b3" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3763,17 +3777,17 @@ class="
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>Author: Thomas Pinder
 
-Last updated: Mon Jul 10 2023
+Last updated: Mon Jul 24 2023
 
 Python implementation: CPython
 Python version       : 3.8.17
 IPython version      : 8.12.2
 
-gpjax     : 0.0.0
-matplotlib: 3.7.1
 jax       : 0.4.9
 flax      : 0.6.10
 optax     : 0.1.5
+gpjax     : 0.0.0
+matplotlib: 3.7.1
 
 Watermark: 2.3.1
 

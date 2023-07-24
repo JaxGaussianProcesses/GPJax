@@ -658,6 +658,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bayesian_optimisation/" class="md-nav__link">
+        Introduction to Bayesian Optimisation
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -2845,7 +2859,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div id="cell-id=9f973da1" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=02f39b8d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2940,7 +2954,7 @@ We can plot three different parameterisations of this density.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=d53393a2" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=822bca1a" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3056,7 +3070,7 @@ ax.legend(loc="best")</div>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.legend.Legend at 0x7f81e0e47f70&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7fb9b4ae10d0&gt;</pre>
 </div>
 
 </div>
@@ -3082,7 +3096,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=5931941d" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=8835dce6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3116,7 +3130,7 @@ determines the correlation of the multivariate Gaussian.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=cbb41937" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=96d3349f" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3262,7 +3276,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=44ed24fe" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=427d8bee" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3305,7 +3319,7 @@ $p(\mathbf{y})$, occurring at the same time. We visualise this idea below.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=2928f06c" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=3927b945" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3506,7 +3520,7 @@ class="
 
 </div>
 </div>
-<div id="cell-id=214b6ff5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=025c08e5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3636,7 +3650,7 @@ as differentiability, variance and characteristic lengthscale of the functions
 that are admissible under the GP prior. A kernel is a positive-definite
 function with parameters $\boldsymbol{\theta}$ that maps pairs of inputs
 $\mathbf{X}, \mathbf{X}' \in \mathcal{X}$ onto the real line. We dedicate the
-entirety of the <a href="https://docs.jaxgaussianprocesses.com/examples/kernels">Kernel Guide
+entirety of the <a href="https://docs.jaxgaussianprocesses.com/examples/intro_to_kernels">Introduction to Kernels
 notebook</a> to
 exploring the different GPs each kernel can yield.</p>
 <h2 id="gaussian-process-regression">Gaussian process regression<a class="anchor-link" href="#gaussian-process-regression">&#182;</a></h2><p>When the likelihood function is a Gaussian distribution
@@ -3701,7 +3715,7 @@ GPs that served as the inspiration for this notebook.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=1b10bed0" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=83693426" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3747,17 +3761,17 @@ GPs that served as the inspiration for this notebook.</p>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>Author: Thomas Pinder
 
-Last updated: Mon Jul 10 2023
+Last updated: Mon Jul 24 2023
 
 Python implementation: CPython
 Python version       : 3.8.17
 IPython version      : 8.12.2
 
-tensorflow_probability: 0.19.0
-matplotlib            : 3.7.1
-seaborn               : 0.12.2
-jax                   : 0.4.9
 pandas                : 1.5.3
+jax                   : 0.4.9
+tensorflow_probability: 0.19.0
+seaborn               : 0.12.2
+matplotlib            : 3.7.1
 
 Watermark: 2.3.1
 
