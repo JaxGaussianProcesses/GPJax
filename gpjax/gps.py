@@ -217,7 +217,7 @@ class Prior(AbstractPrior):
         a TFP distribution for a given set of inputs.
 
         In the following example, we compute the predictive prior distribution
-        and then evaluate it on the interval :math:`[0, 1]`:
+        and then evaluate it on the interval $`[0, 1]`$:
 
         Example:
         ```python

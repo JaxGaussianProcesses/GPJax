@@ -381,7 +381,7 @@ plot_bayes_opt(opt_posterior, approx_sample, D, x_star)
 
 # %% [markdown]
 # At this point we can update our model with the newly augmented dataset, and repeat the
-# whole process until some stopping criterion is met. Below we repeat this process for 10
+# whole process until some stopping criterion is met. Below we repeat this process for 5
 # iterations, printing out the queried point and the value of the black-box function at
 # each iteration.
 
