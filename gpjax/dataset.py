@@ -35,10 +35,14 @@ class Dataset(Pytree):
 
     X: Optional[Num[Array, "N D"]] = None
     y: Optional[Num[Array, "N Q"]] = None
+    mask: Optional[Num[Array, "N Q"]] = None
 
     def __post_init__(self) -> None:
         r"""Checks that the shapes of $`X`$ and $`y`$ are compatible."""
         _check_shape(self.X, self.y)
+        if self.y is not None:
+            if jnp.any(mask := jnp.isnan(self.y)):
+                self.mask = ~mask
 
     def __repr__(self) -> str:
         r"""Returns a string representation of the dataset."""
@@ -60,6 +64,7 @@ class Dataset(Pytree):
         r"""Combine two datasets. Right hand dataset is stacked beneath the left."""
         X = None
         y = None
+        mask = None
 
         if self.X is not None and other.X is not None:
             X = jnp.concatenate((self.X, other.X))
@@ -67,7 +72,10 @@ class Dataset(Pytree):
         if self.y is not None and other.y is not None:
             y = jnp.concatenate((self.y, other.y))
 
-        return Dataset(X=X, y=y)
+        if self.mask is not None and other.mask is not None:
+            mask = jnp.concatenate((self.mask, other.mask))
+
+        return Dataset(X=X, y=y, mask=mask)
 
     @property
     def n(self) -> int:
