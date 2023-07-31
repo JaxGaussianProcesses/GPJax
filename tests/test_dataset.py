@@ -25,6 +25,7 @@ except ImportError:
 from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
+import jax.random as jr
 import jax.tree_util as jtu
 import pytest
 

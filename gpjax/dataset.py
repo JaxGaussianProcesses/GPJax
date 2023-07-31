@@ -26,6 +26,10 @@ from jaxtyping import (
     Bool,
     Num,
 )
+from jaxtyping import (
+    Bool,
+    Num,
+)
 from simple_pytree import Pytree
 
 from gpjax.typing import Array
