@@ -23,6 +23,7 @@ except ImportError:
     ValidationErrors = ValueError
 
 import jax.numpy as jnp
+import jax.random as jr
 import jax.tree_util as jtu
 import pytest
 
@@ -154,3 +155,42 @@ def test_y_none(n: int, in_dim: int) -> None:
 
     # Check tree flatten
     assert jtu.tree_leaves(D) == [x]
+
+
+@pytest.mark.parametrize("n", [1, 2, 10])
+@pytest.mark.parametrize("out_dim", [1, 2, 10])
+@pytest.mark.parametrize("in_dim", [1, 2, 10])
+def test_dataset_missing(n: int, in_dim: int, out_dim: int) -> None:
+    # Create dataset
+    x = jnp.ones((n, in_dim))
+    y = jr.normal(jr.PRNGKey(123), (n, out_dim))
+    y = y.at[y < 0].set(jnp.nan)
+    mask = ~jnp.isnan(y)
+    D = Dataset(X=x, y=y)
+
+    # Check mask
+    assert D.mask is not None
+    assert jnp.array_equal(D.mask, mask)
+
+    # Create second dataset
+    x2 = 2 * jnp.ones((n, in_dim))
+    y2 = 2 * jnp.ones((n, out_dim))
+    D2 = Dataset(X=x2, y=y2)
+
+    # Add datasets
+    D2 = D + D2
+
+    # Check mask
+    assert jnp.sum(~D2.mask) == jnp.sum(~D.mask)
+
+    # Test dataset shapes
+    assert D.n == n
+    assert D.in_dim == in_dim
+    assert D.out_dim == out_dim
+
+    # Check tree flatten
+    # lexicographic order: uppercase "X" comes before lowercase "m"
+    x_, mask_, y_ = jtu.tree_leaves(D)
+    assert jnp.allclose(x, x_)
+    assert jnp.array_equal(mask, mask_)
+    assert jnp.allclose(y, y_, equal_nan=True)
