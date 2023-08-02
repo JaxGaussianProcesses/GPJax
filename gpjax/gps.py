@@ -501,7 +501,13 @@ class ConjugatePosterior(AbstractPosterior):
             y = jnp.where(mask, 0.0, y)
             mx = jnp.where(mask, 0.0, mx)
             Sigma_masked = jnp.where(mask + mask.T, 0.0, Sigma.to_dense())
-            Sigma = cola.PSD(Dense(jnp.where(jnp.diag(jnp.squeeze(mask)), 1 / (2 * jnp.pi), Sigma_masked)))
+            Sigma = cola.PSD(
+                Dense(
+                    jnp.where(
+                        jnp.diag(jnp.squeeze(mask)), 1 / (2 * jnp.pi), Sigma_masked
+                    )
+                )
+            )
 
         mean_t = self.prior.mean_function(t)
         Ktt = self.prior.kernel.gram(t)
