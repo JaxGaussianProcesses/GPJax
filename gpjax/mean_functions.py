@@ -23,6 +23,7 @@ from beartype.typing import (
     List,
     Union,
 )
+import jax
 import jax.numpy as jnp
 from jaxtyping import (
     Float,
@@ -147,7 +148,7 @@ class Constant(AbstractMeanFunction):
         -------
             Float[Array, "1"]: The evaluated mean function.
         """
-        return jnp.ones((x.shape[0], 1)) * self.constant
+        return jnp.ones((jax.tree_util.tree_leaves(x)[0].shape[0], 1)) * self.constant
 
 
 @dataclasses.dataclass
