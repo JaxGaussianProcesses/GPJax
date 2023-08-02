@@ -182,12 +182,12 @@ def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
     -------
         Dataset: The batched dataset.
     """
-    x, y, n = train_data.X, train_data.y, train_data.n
+    x, y, n, mask = train_data.X, train_data.y, train_data.n, train_data.mask
 
     # Subsample mini-batch indices with replacement.
     indices = jr.choice(key, n, (batch_size,), replace=True)
 
-    return Dataset(X=x[indices], y=y[indices])
+    return Dataset(X=x[indices], y=y[indices], mask=mask[indices] if mask else False)
 
 
 def _check_model(model: Any) -> None:
