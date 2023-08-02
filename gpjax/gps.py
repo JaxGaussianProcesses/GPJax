@@ -476,7 +476,7 @@ class ConjugatePosterior(AbstractPosterior):
                     distribution as a `GaussianDistribution`.
         """
         # Unpack training data
-        x, y, n = train_data.X, train_data.y, train_data.n
+        x, y, n, mask = train_data.X, train_data.y, train_data.n, train_data.mask
 
         # Unpack test inputs
         t, n_test = test_inputs, test_inputs.shape[0]
@@ -491,11 +491,23 @@ class ConjugatePosterior(AbstractPosterior):
         # Σ = Kxx + Io²
         Sigma = Kxx + identity(n) * obs_noise
 
+        if mask is not None:
+            y = jnp.where(mask, 0.0, y)
+            mx = jnp.where(mask, 0.0, mx)
+            Sigma_masked = jnp.where(mask + mask.T, 0.0, Sigma.matrix)
+            Sigma = Sigma.replace(
+                matrix=jnp.where(
+                    jnp.diag(jnp.squeeze(mask)), 1 / (2 * jnp.pi), Sigma_masked
+                )
+            )
+
         mean_t = self.prior.mean_function(t)
         Ktt = self.prior.kernel.gram(t)
         Kxt = self.prior.kernel.cross_covariance(x, t)
 
         # Σ⁻¹ Kxt
+        if mask is not None:
+            Kxt = jnp.where(mask * jnp.ones((1, n_test), dtype=bool), 0.0, Kxt)
         Sigma_inv_Kxt = Sigma.solve(Kxt)
 
         # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
