@@ -15,7 +15,10 @@
 
 from dataclasses import dataclass
 
-from beartype.typing import Optional
+from beartype.typing import (
+    Optional,
+    Union,
+)
 import jax.numpy as jnp
 from jaxtyping import (
     Bool,
@@ -28,7 +31,6 @@ from gpjax.typing import Array
 
 class _Missing:
     """Sentinel class for not-yet-computed mask"""
-
 
 
 @dataclass
@@ -49,7 +51,7 @@ class Dataset(Pytree):
 
     X: Optional[Num[Array, "N D"]] = None
     y: Optional[Num[Array, "N Q"]] = None
-    mask: Bool[Array, "N Q"] | None = _Missing()
+    mask: Optional[Union[Bool[Array, "N Q"], None]] = _Missing()
 
     def __post_init__(self) -> None:
         r"""Checks that the shapes of $`X`$ and $`y`$ are compatible."""
