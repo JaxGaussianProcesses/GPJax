@@ -165,7 +165,7 @@ def test_dataset_missing(n: int, in_dim: int, out_dim: int) -> None:
     x = jnp.ones((n, in_dim))
     y = jr.normal(jr.PRNGKey(123), (n, out_dim))
     y = y.at[y < 0].set(jnp.nan)
-    mask = ~jnp.isnan(y)
+    mask = jnp.isnan(y)
     D = Dataset(X=x, y=y)
 
     # Check mask
@@ -181,7 +181,7 @@ def test_dataset_missing(n: int, in_dim: int, out_dim: int) -> None:
     D2 = D + D2
 
     # Check mask
-    assert jnp.sum(~D2.mask) == jnp.sum(~D.mask)
+    assert jnp.sum(D2.mask) == jnp.sum(D.mask)
 
     # Test dataset shapes
     assert D.n == n

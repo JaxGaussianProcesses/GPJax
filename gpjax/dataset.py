@@ -26,26 +26,42 @@ from simple_pytree import Pytree
 from gpjax.typing import Array
 
 
+class _Missing:
+    """Sentinel class for not-yet-computed mask"""
+
+
+
 @dataclass
 class Dataset(Pytree):
     r"""Base class for datasets.
 
     Attributes
     ----------
-        X (Optional[Num[Array, "N D"]]): Input data.
-        y (Optional[Num[Array, "N Q"]]): Output data.
+        X: Num[Array, "N D"], optional:
+            Input data.
+        y: Num[Array, "N Q"], optional:
+            Output data.
+        mask: Bool[Array, "N Q"] or None, optional
+            Mask for the output data. By default, a mask will be computed based on the output data.
+            User can optionally specify a pre-computed mask, or pass `None` which means no mask
+            will be computed.
     """
 
     X: Optional[Num[Array, "N D"]] = None
     y: Optional[Num[Array, "N Q"]] = None
-    mask: Optional[Bool[Array, "N Q"] | bool] = None
+    mask: Bool[Array, "N Q"] | None = _Missing()
 
     def __post_init__(self) -> None:
         r"""Checks that the shapes of $`X`$ and $`y`$ are compatible."""
         _check_shape(self.X, self.y)
-        if self.y is not None and self.mask is None:
-            if jnp.any(mask := jnp.isnan(self.y)):
-                self.mask = mask
+        if isinstance(self.mask, _Missing):
+            if self.y is not None:
+                if jnp.any(mask := jnp.isnan(self.y)):
+                    self.mask = mask
+                else:
+                    self.mask = None
+            else:
+                self.mask = None
 
     def __repr__(self) -> str:
         r"""Returns a string representation of the dataset."""
@@ -76,8 +92,8 @@ class Dataset(Pytree):
             y = jnp.concatenate((self.y, other.y))
 
         if (sm := self.mask is not None) | (om := other.mask is not None):
-            sm = self.mask if sm else jnp.ones(self.y.shape, dtype=bool)
-            om = other.mask if om else jnp.ones(other.y.shape, dtype=bool)
+            sm = self.mask if sm else jnp.zeros(self.y.shape, dtype=bool)
+            om = other.mask if om else jnp.zeros(other.y.shape, dtype=bool)
             mask = jnp.concatenate((sm, om))
 
         return Dataset(X=X, y=y, mask=mask)
