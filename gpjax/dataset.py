@@ -35,6 +35,10 @@ from simple_pytree import Pytree
 from gpjax.typing import Array
 
 
+class _Missing:
+    """Sentinel class for not-yet-computed mask"""
+
+
 @dataclass
 class Dataset(Pytree):
     r"""Base class for datasets.
@@ -42,8 +46,8 @@ class Dataset(Pytree):
     Attributes
     ----------
         X (Optional[Num[Array, "N D"]]): input data.
-        y: (Optional[Num[Array, "N Q"]]): output data.
-        mask: (Optional[Union[Bool[Array, "N Q"], Literal["infer automatically"]]]): mask for the output data.
+        y (Optional[Num[Array, "N Q"]]): output data.
+        mask (Optional[Union[Bool[Array, "N Q"], Literal["infer automatically"]]]): mask for the output data.
             Users can optionally specify a pre-computed mask, or explicitly pass `None` which
             means no mask will be used. Defaults to `"infer automatically"`, which means that
             the mask will be computed from the output data, or set to `None` if no output data is provided.
