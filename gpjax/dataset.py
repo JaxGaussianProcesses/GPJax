@@ -45,7 +45,7 @@ class Dataset(Pytree):
         _check_shape(self.X, self.y)
         if self.y is not None and self.mask is None:
             if jnp.any(mask := jnp.isnan(self.y)):
-                self.mask = ~mask
+                self.mask = mask
 
     def __repr__(self) -> str:
         r"""Returns a string representation of the dataset."""
