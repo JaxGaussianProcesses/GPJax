@@ -158,7 +158,8 @@ class GaussianDistribution(tfd.Distribution):
         r"""Calculates the log pdf of the multivariate Gaussian.
 
         Args:
-            y (Float[Array, " N"]): The value to calculate the log probability of.
+            y (Optional[Float[Array, " N"]]): the value of which to calculate the log probability.
+            mask: (Optional[Bool[Array, " N"]]): the mask for missing values in y.
 
         Returns
         -------
