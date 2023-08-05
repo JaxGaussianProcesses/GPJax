@@ -45,7 +45,9 @@ with install_import_hook("gpjax", "beartype.beartype"):
     from gpjax.kernels.computations import AbstractKernelComputation
 
 key = jr.PRNGKey(123)
-plt.style.use("./gpjax.mplstyle")
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
@@ -128,7 +130,7 @@ class DeepKernelFunction(AbstractKernel):
 # activation functions between the layers. The first hidden layer contains 64 units,
 # while the second layer contains 32 units. Finally, we'll make the output of our
 # network a three units wide. The corresponding kernel that we define will then be of
-# [ARD form](https://docs.jaxgaussianprocesses.com/examples/kernels/#active-dimensions)
+# [ARD form](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#active-dimensions)
 # to allow for different lengthscales in each dimension of the feature space.
 # Users may wish to design more intricate network structures for more complex tasks,
 # which functionality is supported well in Haiku.

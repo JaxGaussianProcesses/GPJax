@@ -59,7 +59,7 @@ from gpjax.typing import (
 
 @dataclass
 class AbstractPrior(Module):
-    """Abstract Gaussian process prior."""
+    r"""Abstract Gaussian process prior."""
 
     kernel: AbstractKernel
     mean_function: AbstractMeanFunction
@@ -124,9 +124,7 @@ class Prior(AbstractPrior):
     function $`k(\cdot, \cdot)`$ is given by
     $`p(f(\cdot)) = \mathcal{GP}(m(\cdot), k(\cdot, \cdot))`$.
 
-    To invoke a `Prior` distribution, only a kernel function is required. By
-    default, the mean function will be set to zero. In general, this assumption
-    will be reasonable assuming the data being modelled has been centred.
+    To invoke a `Prior` distribution, a kernel and mean function must be specified.
 
     Example:
     ```python
@@ -728,7 +726,7 @@ def construct_posterior(prior, likelihood):
 def _build_fourier_features_fn(
     prior: Prior, num_features: int, key: KeyArray
 ) -> Callable[[Float[Array, "N D"]], Float[Array, "N L"]]:
-    """Return a function that evaluates features sampled from the Fourier feature
+    r"""Return a function that evaluates features sampled from the Fourier feature
     decomposition of the prior's kernel.
 
     Args:

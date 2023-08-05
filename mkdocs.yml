@@ -17,6 +17,7 @@ nav:
     - 📎 JAX 101 [External]: https://jax.readthedocs.io/en/latest/jax-101/index.html
   - 💡 Background:
     - Intro to GPs: examples/intro_to_gps.py
+    - Intro to Kernels: examples/intro_to_kernels.py
   - 🎓 Tutorials:
     - Regression: examples/regression.py
     - Classification: examples/classification.py
@@ -26,9 +27,12 @@ nav:
     - Graph kernels: examples/graph_kernels.py
     - Sparse GPs: examples/uncollapsed_vi.py
     - Stochastic sparse GPs: examples/collapsed_vi.py
-    - Kernels: examples/kernels.py
-    - UCI regression: examples/yacht.py
     - Pathwise Sampling for Spatial Modelling: examples/spatial.py
+    - Bayesian Optimisation: examples/bayesian_optimisation.py
+  - 📖 Guides for customisation:
+    - Kernels: examples/constructing_new_kernels.py
+    - Likelihoods: examples/likelihoods_guide.py
+    - UCI regression: examples/yacht.py
   - 💻 Raw tutorial code: give_me_the_code.md
   - 📕 Reference: api/
 
@@ -128,11 +132,11 @@ extra:
 extra_css:
   - stylesheets/extra.css
   - stylesheets/permalinks.css
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css
 
 extra_javascript:
   # - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   # - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js
   - javascripts/katex.js

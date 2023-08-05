@@ -5,7 +5,7 @@
 # of a graph using a Gaussian process with a Matérn kernel presented in
 # <strong data-cite="borovitskiy2021matern"></strong>. For a general discussion of the
 # kernels supported within GPJax, see the
-# [kernels notebook](https://docs.jaxgaussianprocesses.com/examples/kernels).
+# [kernels notebook](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels).
 
 # %%
 # Enable Float64 for more stable matrix inversions.
@@ -28,7 +28,9 @@ with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
 key = jr.PRNGKey(123)
-plt.style.use("./gpjax.mplstyle")
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
@@ -134,9 +136,23 @@ cbar = plt.colorbar(sm)
 
 # %%
 likelihood = gpx.Gaussian(num_datapoints=D.n)
-prior = gpx.Prior(mean_function=gpx.Zero(), kernel=gpx.GraphKernel(laplacian=L))
+kernel = gpx.GraphKernel(laplacian=L)
+prior = gpx.Prior(mean_function=gpx.Zero(), kernel=kernel)
 posterior = prior * likelihood
 
+# %% [markdown]
+#
+# For researchers and the curious reader, GPJax provides the ability to print the
+# bibtex citation for objects such as the graph kernel through the `cite()` function.
+
+# %%
+print(gpx.cite(kernel))
+
+# %% [markdown]
+#
+# With a posterior defined, we can now optimise the model's hyperparameters.
+
+# %%
 opt_posterior, training_history = gpx.fit(
     model=posterior,
     objective=jit(gpx.ConjugateMLL(negative=True)),

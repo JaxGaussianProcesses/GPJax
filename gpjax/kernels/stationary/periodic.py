@@ -45,10 +45,10 @@ class Periodic(AbstractKernel):
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the Periodic kernel between a pair of arrays.
 
-        TODO: update docstring
-        Evaluate the kernel on a pair of inputs $`(x, y)`$ with length-scale parameter $\ell$ and variance $\sigma$.
+        Evaluate the kernel on a pair of inputs $`(x, y)`$ with length-scale parameter $`\ell`$, variance $`\sigma^2`$
+        and period $`p`$.
         ```math
-        k(x, y) = \sigma^2 \exp \Bigg( -0.5 \sum_{i=1}^{d} \Bigg)
+        k(x, y) = \sigma^2 \exp \left( -\frac{1}{2} \sum_{i=1}^{D} \left(\frac{\sin (\pi (x_i - y_i)/p)}{\ell}\right)^2 \right)
         ```
 
         Args:

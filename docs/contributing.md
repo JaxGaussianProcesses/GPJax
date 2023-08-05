@@ -1,4 +1,4 @@
-# Contributing 
+# Contributing
 
 ## How can I contribute?
 
@@ -72,13 +72,17 @@ you through every detail!
   Always use a `feature` branch. It's good practice to avoid
   work on the ``main`` branch of any repository.
 
-4.  Project requirements are in ``requirements.txt``. We suggest using a
-  [virtual environment](https://docs.python-guide.org/dev/virtualenvs/) for
-  development. Once the virtual environment is activated, run:
+4.  We use [Poetry](https://python-poetry.org/) for packaging and dependency management, and project requirements are in       ``pyproject.toml``. We suggest using a [virtual environment](https://docs.python-guide.org/dev/virtualenvs/) for
+development. For those using Apple Silicon chips, we advise using [Conda miniforge](https://github.com/conda-forge/miniforge). Once the virtual environment is activated, run:
 
   ```bash
-  $ pip install -e .
-  $ pip install -r requirements-dev.txt
+  $ poetry install
+  ```
+
+  At this point we recommend you check your installation passes the supplied unit tests:
+
+  ```bash
+  $ poetry run pytest
   ```
 
 5.  Install the pre-commit hooks.
@@ -91,7 +95,13 @@ you through every detail!
   successful, this will print the following output `pre-commit installed at
   .git/hooks/pre-commit`.
 
-1.  Add changed files using `git add` and then `git commit` files to record your
+6.  At this point you can manually run the pre-commit hooks with the following command:
+
+  ```bash
+  poetry run pre-commit run --all-files
+  ```
+
+7.  Add changed files using `git add` and then `git commit` files to record your
   changes locally:
 
   ```bash
@@ -112,7 +122,7 @@ you through every detail!
   $ git push -u origin my-feature
   ```
 
-7.  Go to the GitHub web page of your fork of the GPJax repo. Click the 'Pull
+8.  Go to the GitHub web page of your fork of the GPJax repo. Click the 'Pull
   request' button to send your changes to the project's maintainers for
   review.
 
@@ -143,13 +153,13 @@ request, we recommend you check the following:
 
   - Do all public methods have informative docstrings that describe their
   function, input(s) and output(s)?
+  - Do the pre-commit hooks pass?
   - Do the tests pass when everything is rebuilt from scratch?
   - Documentation and high-coverage tests are necessary for enhancements to be
   accepted. Test coverage can be checked with:
 
     ```bash
-    $ pip install -r requirements-dev.txt
-    $ pytest tests --cov=./ --cov-report=html
+    $ poetry run pytest tests --cov=./ --cov-report=html
     ```
 
   Navigate to the newly created folder `htmlcov` and open `index.html` to view

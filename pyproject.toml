@@ -25,6 +25,7 @@ tensorflow-probability = "^0.19.0"
 orbax-checkpoint = "^0.2.0"
 beartype = "^0.13.1"
 jaxlib = "0.4.7" # Temporary fix: https://github.com/google/jax/issues/15951
+plum-dispatch = "^2.1.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.2"
@@ -49,6 +50,7 @@ pre-commit = "^3.2.2"
 nbstripout = "^0.6.1"
 pydocstyle = "^6.3.0"
 codespell = "^2.2.4"
+interrogate = "^1.5.0"
 
 
 [tool.poetry.group.docs.dependencies]
@@ -146,7 +148,8 @@ ignore = [
     "RET504",
     "S101",
     "F722",
-    'PLR2004'
+    'PLR2004',
+    "PLR0913"
     ]
 unfixable = ["ERA001", "F401", "F841", "T201", "T203"]
 src = ["gpjax", "tests"]
@@ -159,10 +162,12 @@ convention = "numpy"
 "gpjax/__init__.py" = ['I', 'F401', 'E402', 'D104']
 "gpjax/progress_bar.py" = ["TCH004"]
 "gpjax/scan.py" = ["PLR0913"]
+"gpjax/citation.py" = ["F811"]
 "tests/test_base/test_module.py" = ["PLR0915"]
 "tests/test_linops/test_linear_operator.py" = ["PLR0913"]
 "tests/test_objectives.py" = ["PLR0913"]
 "docs/examples/barycentres.py" = ["PLR0913"]
+
 
 [tool.isort]
 profile = "black"
@@ -188,6 +193,19 @@ output = "reports/coverage.xml"
 
 [tool.poetry-dynamic-versioning]
 enable = true
+vcs = "git"
+
+[tool.poetry-dynamic-versioning.substitution]
+files = ["gpjax/__init__.py"]
 
 [tool.codespell]
 ignore-words-list = "fro" # Frobenius
+
+[tool.interrogate]
+ignore-init-method = true
+ignore-init-module = true
+fail-under = 64
+exclude = ["setup.py", "docs", "tests"]
+verbose = 2
+quiet = false
+color = true

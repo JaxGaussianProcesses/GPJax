@@ -109,7 +109,9 @@ import seaborn as sns
 import tensorflow_probability.substrates.jax as tfp
 from docs.examples.utils import confidence_ellipse
 
-plt.style.use("./gpjax.mplstyle")
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 tfd = tfp.distributions
 
@@ -308,7 +310,7 @@ with warnings.catch_warnings():
     )
 
 # %% [markdown]
-# Formmally, we can define this by letting $p(\mathbf{x}, \mathbf{y})$ be the
+# Formally, we can define this by letting $p(\mathbf{x}, \mathbf{y})$ be the
 # joint probability distribution defined over
 # $\mathbf{x}\sim\mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}}, \boldsymbol{\Sigma}_{\mathbf{xx}})$ and
 # $\mathbf{y}\sim\mathcal{N}(\boldsymbol{\mu}_{\mathbf{y}}, \boldsymbol{\Sigma}_{\mathbf{yy}})$.
@@ -445,8 +447,8 @@ with warnings.catch_warnings():
 # that are admissible under the GP prior. A kernel is a positive-definite
 # function with parameters $\boldsymbol{\theta}$ that maps pairs of inputs
 # $\mathbf{X}, \mathbf{X}' \in \mathcal{X}$ onto the real line. We dedicate the
-# entirety of the [Kernel Guide
-# notebook](https://docs.jaxgaussianprocesses.com/examples/kernels) to
+# entirety of the [Introduction to Kernels
+# notebook](https://docs.jaxgaussianprocesses.com/examples/intro_to_kernels) to
 # exploring the different GPs each kernel can yield.
 #
 # ## Gaussian process regression

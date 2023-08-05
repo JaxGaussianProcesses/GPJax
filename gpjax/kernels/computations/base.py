@@ -15,6 +15,7 @@
 
 import abc
 from dataclasses import dataclass
+import typing as tp
 
 from jax import vmap
 from jaxtyping import (
@@ -29,37 +30,40 @@ from gpjax.linops import (
 )
 from gpjax.typing import Array
 
+Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
+
 
 @dataclass
 class AbstractKernelComputation:
     r"""Abstract class for kernel computations."""
 
-    kernel: "gpjax.kernels.base.AbstractKernel"  # noqa: F821
-
     def gram(
         self,
+        kernel: Kernel,
         x: Num[Array, "N D"],
     ) -> LinearOperator:
         r"""Compute Gram covariance operator of the kernel function.
 
         Args:
+            kernel (AbstractKernel): the kernel function.
             x (Float[Array, "N N"]): The inputs to the kernel function.
 
         Returns
         -------
             LinearOperator: Gram covariance operator of the kernel function.
         """
-        Kxx = self.cross_covariance(x, x)
+        Kxx = self.cross_covariance(kernel, x, x)
         return DenseLinearOperator(Kxx)
 
     @abc.abstractmethod
     def cross_covariance(
-        self, x: Num[Array, "N D"], y: Num[Array, "M D"]
+        self, kernel: Kernel, x: Num[Array, "N D"], y: Num[Array, "M D"]
     ) -> Float[Array, "N M"]:
         r"""For a given kernel, compute the NxM gram matrix on an a pair
         of input matrices with shape NxD and MxD.
 
         Args:
+            kernel (AbstractKernel): the kernel function.
             x (Float[Array,"N D"]): The first input matrix.
             y (Float[Array,"M D"]): The second input matrix.
 
@@ -69,15 +73,18 @@ class AbstractKernelComputation:
         """
         raise NotImplementedError
 
-    def diagonal(self, inputs: Num[Array, "N D"]) -> DiagonalLinearOperator:
+    def diagonal(
+        self, kernel: Kernel, inputs: Num[Array, "N D"]
+    ) -> DiagonalLinearOperator:
         r"""For a given kernel, compute the elementwise diagonal of the
         NxN gram matrix on an input matrix of shape NxD.
 
         Args:
+            kernel (AbstractKernel): the kernel function.
             inputs (Float[Array, "N D"]): The input matrix.
 
         Returns
         -------
             DiagonalLinearOperator: The computed diagonal variance entries.
         """
-        return DiagonalLinearOperator(diag=vmap(lambda x: self.kernel(x, x))(inputs))
+        return DiagonalLinearOperator(diag=vmap(lambda x: kernel(x, x))(inputs))

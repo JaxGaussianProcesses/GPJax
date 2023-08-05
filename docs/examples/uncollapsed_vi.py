@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax_beartype
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # Sparse Stochastic Variational Inference
 #
@@ -27,7 +44,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
 import tensorflow_probability.substrates.jax as tfp
-from docs.examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -35,7 +51,9 @@ with install_import_hook("gpjax", "beartype.beartype"):
 
 key = jr.PRNGKey(123)
 tfb = tfp.bijectors
-plt.style.use("./gpjax.mplstyle")
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
@@ -58,7 +76,6 @@ x = jr.uniform(key=key, minval=-5.0, maxval=5.0, shape=(n,)).reshape(-1, 1)
 f = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
 signal = f(x)
 y = signal + jr.normal(subkey, shape=signal.shape) * noise
-
 D = gpx.Dataset(X=x, y=y)
 
 xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
@@ -116,14 +133,18 @@ xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 z = jnp.linspace(-5.0, 5.0, 50).reshape(-1, 1)
 
 fig, ax = plt.subplots()
-[
-    ax.axvline(x=z_i, color=cols[2], alpha=0.3, linewidth=1, label="Inducing point")
-    for z_i in z
-]
+ax.vlines(
+    z,
+    ymin=y.min(),
+    ymax=y.max(),
+    alpha=0.3,
+    linewidth=1,
+    label="Inducing point",
+    color=cols[2],
+)
 ax.scatter(x, y, alpha=0.2, color=cols[0], label="Observations")
 ax.plot(xtest, f(xtest), color=cols[1], label="Latent function")
 ax.legend()
-ax = clean_legend(ax)
 ax.set(xlabel=r"$x$", ylabel=r"$f(x)$")
 
 # %% [markdown]
@@ -211,7 +232,21 @@ q = gpx.VariationalGaussian(posterior=p, inducing_inputs=z)
 # its negative.
 
 # %%
-negative_elbo = jit(gpx.ELBO(negative=True))
+negative_elbo = gpx.ELBO(negative=True)
+
+# %% [markdown]
+# For researchers, GPJax has the capacity to print the bibtex citation for objects such
+# as the ELBO through the `cite()` function.
+
+# %%
+print(gpx.cite(negative_elbo))
+
+# %% [markdown]
+# JIT-compiling expensive-to-compute functions such as the ELBO is
+# advisable. This can be achieved by wrapping the function in `jax.jit()`.
+
+# %%
+negative_elbo = jit(negative_elbo)
 
 # %% [markdown]
 # ### Mini-batching
@@ -223,7 +258,7 @@ negative_elbo = jit(gpx.ELBO(negative=True))
 # %%
 schedule = ox.warmup_cosine_decay_schedule(
     init_value=0.0,
-    peak_value=0.1,
+    peak_value=0.01,
     warmup_steps=75,
     decay_steps=1500,
     end_value=0.001,
@@ -265,12 +300,16 @@ ax.fill_between(
     color=cols[1],
     label="Two sigma",
 )
-[
-    ax.axvline(x=z_i, color=cols[2], alpha=0.3, linewidth=1, label="Inducing point")
-    for z_i in opt_posterior.inducing_inputs
-]
+ax.vlines(
+    opt_posterior.inducing_inputs,
+    ymin=y.min(),
+    ymax=y.max(),
+    alpha=0.3,
+    linewidth=1,
+    label="Inducing point",
+    color=cols[2],
+)
 ax.legend()
-ax = clean_legend(ax)
 
 # %% [markdown]
 # ## Custom transformations
@@ -318,12 +357,16 @@ ax.fill_between(
     color=cols[1],
     label="Two sigma",
 )
-[
-    ax.axvline(x=z_i, color=cols[2], alpha=0.3, linewidth=1, label="Inducing point")
-    for z_i in opt_posterior.inducing_inputs
-]
+ax.vlines(
+    opt_rep.inducing_inputs,
+    ymin=y.min(),
+    ymax=y.max(),
+    alpha=0.3,
+    linewidth=1,
+    label="Inducing point",
+    color=cols[2],
+)
 ax.legend()
-ax = clean_legend(ax)
 
 # %% [markdown]
 # We can see that `Square` transformation is able to get relatively better fit

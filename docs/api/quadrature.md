@@ -1,3 +1,0 @@
-# Quadrature
-
-::: gpjax.quadrature

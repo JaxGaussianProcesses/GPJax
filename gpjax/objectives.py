@@ -15,7 +15,6 @@ from gpjax.base import (
 from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.linops import identity
-from gpjax.quadrature import gauss_hermite_quadrature
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -271,12 +270,8 @@ def variational_expectation(
 
     mean, variance = vmap(q_moments)(x[:, None])
 
-    link_function = variational_family.posterior.likelihood.link_function
-    log_prob = vmap(lambda f, y: link_function(f).log_prob(y))
-
     # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
-    expectation = gauss_hermite_quadrature(log_prob, mean, jnp.sqrt(variance), y=y)
-
+    expectation = q.posterior.likelihood.expected_log_likelihood(y, mean, variance)
     return expectation
 
 

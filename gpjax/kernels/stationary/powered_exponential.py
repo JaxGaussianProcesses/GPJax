@@ -34,7 +34,7 @@ class PoweredExponential(AbstractKernel):
     r"""The powered exponential family of kernels. This also equivalent to the symmetric generalized normal distribution.
 
     See Diggle and Ribeiro (2007) - "Model-based Geostatistics".
-    and   
+    and
     https://en.wikipedia.org/wiki/Generalized_normal_distribution#Symmetric_version
 
     """

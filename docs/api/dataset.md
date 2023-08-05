@@ -1,3 +1,0 @@
-# Dataset
-
-::: gpjax.dataset

@@ -150,3 +150,5 @@ scratch_nbs/
 package.json
 package-lock.json
 node_modules/
+
+docs/api

@@ -1,3 +1,0 @@
-# Fit
-
-::: gpjax.fit

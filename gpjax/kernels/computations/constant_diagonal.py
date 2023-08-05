@@ -13,52 +13,62 @@
 # limitations under the License.
 # ==============================================================================
 
+import typing as tp
+
 from jax import vmap
 import jax.numpy as jnp
 from jaxtyping import Float
 
-from gpjax.kernels.computations.base import AbstractKernelComputation
+from gpjax.kernels.computations import AbstractKernelComputation
 from gpjax.linops import (
     ConstantDiagonalLinearOperator,
     DiagonalLinearOperator,
 )
 from gpjax.typing import Array
 
+Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
+
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):
-    def gram(self, x: Float[Array, "N D"]) -> ConstantDiagonalLinearOperator:
+    def gram(
+        self, kernel: Kernel, x: Float[Array, "N D"]
+    ) -> ConstantDiagonalLinearOperator:
         r"""Compute the Gram matrix.
 
         Compute Gram covariance operator of the kernel function.
 
         Args:
+            kernel (Kernel): the kernel function.
             x (Float[Array, "N N"]): The inputs to the kernel function.
         """
-        value = self.kernel(x[0], x[0])
+        value = kernel(x[0], x[0])
 
         return ConstantDiagonalLinearOperator(
             value=jnp.atleast_1d(value), size=x.shape[0]
         )
 
-    def diagonal(self, inputs: Float[Array, "N D"]) -> DiagonalLinearOperator:
+    def diagonal(
+        self, kernel: Kernel, inputs: Float[Array, "N D"]
+    ) -> DiagonalLinearOperator:
         r"""Compute the diagonal Gram matrix's entries.
 
         For a given kernel, compute the elementwise diagonal of the
         NxN gram matrix on an input matrix of shape $`N\times D`$.
 
         Args:
+            kernel (Kernel): the kernel function.
             inputs (Float[Array, "N D"]): The input matrix.
 
         Returns
         -------
             DiagonalLinearOperator: The computed diagonal variance entries.
         """
-        diag = vmap(lambda x: self.kernel(x, x))(inputs)
+        diag = vmap(lambda x: kernel(x, x))(inputs)
 
         return DiagonalLinearOperator(diag=diag)
 
     def cross_covariance(
-        self, x: Float[Array, "N D"], y: Float[Array, "M D"]
+        self, kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
         r"""Compute the cross-covariance matrix.
 
@@ -66,6 +76,7 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
         matrices of shape NxD and MxD.
 
         Args:
+            kernel (Kernel): the kernel function.
             x (Float[Array,"N D"]): The input matrix.
             y (Float[Array,"M D"]): The input matrix.
 
@@ -75,5 +86,5 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
         """
         # TODO: This is currently a dense implementation. We should implement
         # a sparse LinearOperator for non-square cross-covariance matrices.
-        cross_cov = vmap(lambda x: vmap(lambda y: self.kernel(x, y))(y))(x)
+        cross_cov = vmap(lambda x: vmap(lambda y: kernel(x, y))(y))(x)
         return cross_cov
