@@ -17,11 +17,7 @@
 from dataclasses import dataclass
 from typing import NamedTuple
 import jax.numpy as jnp
-from jaxtyping import (
-    Float,
-    Int,
-    Num,
-)
+from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.base import (
@@ -29,14 +25,9 @@ from gpjax.base import (
     static_field,
 )
 from gpjax.kernels.base import AbstractKernel
-from gpjax.kernels.computations import (
-    AbstractKernelComputation,
-    EigenKernelComputation,
-)
-from gpjax.kernels.non_euclidean.utils import jax_gather_nd
+
 from gpjax.typing import (
     Array,
-    ScalarFloat,
     ScalarInt,
 )
 
@@ -44,7 +35,7 @@ tfb = tfp.bijectors
 
 CatKernelParams = NamedTuple(
     "DictKernelParams",
-    [("sdev", Float[Array, "N 1"]), ("cholesky_lower", Float[Array, "N*(N-1)//2"])],
+    [("sdev", Float[Array, "N 1"]), ("cholesky_lower", Float[Array, " N*(N-1)//2"])],
 )
 
 
@@ -64,7 +55,7 @@ class CatKernel(AbstractKernel):
         ValueError: If the number of diagonal variance parameters does not match the number of input space values.
     """
 
-    sdev: Float[Array, "N"] = param_field(jnp.ones((2,)), bijector=tfb.Softplus())
+    sdev: Float[Array, " N"] = param_field(jnp.ones((2,)), bijector=tfb.Softplus())
     cholesky_lower: Float[Array, "N N"] = param_field(
         jnp.eye(2), bijector=tfb.CorrelationCholesky()
     )
