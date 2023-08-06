@@ -22,11 +22,14 @@ try:
 except ImportError:
     ValidationErrors = ValueError
 
+from jax.config import config
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import pytest
 
 from gpjax.dataset import Dataset
+
+config.update("jax_enable_x64", True)
 
 
 @pytest.mark.parametrize("n", [1, 2, 10])
@@ -36,6 +39,7 @@ def test_dataset_init(n: int, in_dim: int, out_dim: int) -> None:
     # Create dataset
     x = jnp.ones((n, in_dim))
     y = jnp.ones((n, out_dim))
+
     D = Dataset(X=x, y=y)
 
     # Test dataset shapes
@@ -154,3 +158,36 @@ def test_y_none(n: int, in_dim: int) -> None:
 
     # Check tree flatten
     assert jtu.tree_leaves(D) == [x]
+
+
+@pytest.mark.parametrize(
+    ("prec_x", "prec_y"),
+    [
+        (jnp.float32, jnp.float64),
+        (jnp.float64, jnp.float32),
+        (jnp.float32, jnp.float32),
+    ],
+)
+@pytest.mark.parametrize("n", [1, 2, 10])
+@pytest.mark.parametrize("in_dim", [1, 2, 10])
+@pytest.mark.parametrize("out_dim", [1, 2, 10])
+def test_precision_warning(
+    n: int, in_dim: int, out_dim: int, prec_x: jnp.dtype, prec_y: jnp.dtype
+) -> None:
+    # Create dataset
+    x = jnp.ones((n, in_dim)).astype(prec_x)
+    y = jnp.ones((n, out_dim)).astype(prec_y)
+
+    # Check for warnings if dtypes are not float64
+    expected_warnings = 0
+    if prec_x != jnp.float64:
+        expected_warnings += 1
+    if prec_y != jnp.float64:
+        expected_warnings += 1
+
+    with pytest.warns(
+        UserWarning, match="Warning:.*is not of type float64.*"
+    ) as record:
+        Dataset(X=x, y=y)
+
+    assert len(record) == expected_warnings
