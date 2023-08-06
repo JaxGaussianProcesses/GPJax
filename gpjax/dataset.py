@@ -115,14 +115,14 @@ def _check_precision(
     r"""Checks the precision of $`X`$ and $`y`."""
     if X is not None and X.dtype != jnp.float64:
         warnings.warn(
-            "Warning: X is not of type float64. "
+            "X is not of type float64. "
             f"Got X.dtype={X.dtype}. This may lead to numerical instability. ",
             stacklevel=2,
         )
 
     if y is not None and y.dtype != jnp.float64:
         warnings.warn(
-            "Warning: y is not of type float64."
+            "y is not of type float64."
             f"Got y.dtype={y.dtype}. This may lead to numerical instability.",
             stacklevel=2,
         )

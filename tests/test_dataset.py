@@ -186,7 +186,7 @@ def test_precision_warning(
         expected_warnings += 1
 
     with pytest.warns(
-        UserWarning, match="Warning:.*is not of type float64.*"
+        UserWarning, match=".* is not of type float64.*"
     ) as record:
         Dataset(X=x, y=y)
 
