@@ -15,9 +15,9 @@
 
 
 from dataclasses import dataclass
-from typing import NamedTuple
+from typing import NamedTuple, Union
 import jax.numpy as jnp
-from jaxtyping import Float
+from jaxtyping import Float, Int
 import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.base import (
@@ -34,8 +34,8 @@ from gpjax.typing import (
 tfb = tfp.bijectors
 
 CatKernelParams = NamedTuple(
-    "DictKernelParams",
-    [("sdev", Float[Array, "N 1"]), ("cholesky_lower", Float[Array, " N*(N-1)//2"])],
+    "CatKernelParams",
+    [("stddev", Float[Array, "N 1"]), ("cholesky_lower", Float[Array, " N*(N-1)//2"])],
 )
 
 
@@ -47,43 +47,50 @@ class CatKernel(AbstractKernel):
     It returns the corresponding values from an the gram matrix when called.
 
     Args:
-        sdev (Float[Array, "N"]): The standard deviation parameters, one for each input space value.
+        stddev (Float[Array, "N"]): The standard deviation parameters, one for each input space value.
         cholesky_lower (Float[Array, "N*(N-1)//2 N"]): The parameters for the Cholesky factor of the gram matrix.
-        inspace_vals (list): The values in the input space this DictKernel works for. Stored for order reference, making clear the indices used for each input space value.
+        inspace_vals (list): The values in the input space this CatKernel works for. Stored for order reference, making clear the indices used for each input space value.
+        name (str): The name of the kernel.
+        input_1hot (bool): If True, the kernel expect to be called with a 1-hot encoding of the input space values. If False, it expects the indices of the input space values.
 
     Raises:
         ValueError: If the number of diagonal variance parameters does not match the number of input space values.
     """
 
-    sdev: Float[Array, " N"] = param_field(jnp.ones((2,)), bijector=tfb.Softplus())
+    stddev: Float[Array, " N"] = param_field(jnp.ones((2,)), bijector=tfb.Softplus())
     cholesky_lower: Float[Array, "N N"] = param_field(
         jnp.eye(2), bijector=tfb.CorrelationCholesky()
     )
     inspace_vals: list = static_field(None)
-    name: str = "Dictionary Kernel"
+    name: str = "Categorical Kernel"
     input_1hot: bool = static_field(False)
 
     def __post_init__(self):
-        if self.inspace_vals is not None and len(self.inspace_vals) != len(self.sdev):
+        if self.inspace_vals is not None and len(self.inspace_vals) != len(self.stddev):
             raise ValueError(
-                f"The number of sdev parameters ({len(self.sdev)}) has to match the number of input space values ({len(self.inspace_vals)}), unless inspace_vals is None."
+                f"The number of stddev parameters ({len(self.stddev)}) has to match the number of input space values ({len(self.inspace_vals)}), unless inspace_vals is None."
             )
 
     @property
-    def explicit_gram(self):
-        L = self.sdev.reshape(-1, 1) * self.cholesky_lower
+    def explicit_gram(self) -> Float[Array, "N N"]:
+        """Access the PSD gram matrix resulting from the parameters.
+
+        Returns:
+            Float[Array, "N N"]: The gram matrix.
+        """
+        L = self.stddev.reshape(-1, 1) * self.cholesky_lower
         return L @ L.T
 
     def __call__(  # TODO not consistent with general kernel interface
         self,
-        x: ScalarInt,
-        y: ScalarInt,
+        x: Union[ScalarInt, Int[Array, " N"]],
+        y: Union[ScalarInt, Int[Array, " N"]],
     ):
         r"""Compute the (co)variance between a pair of dictionary indices.
 
         Args:
-            x (ScalarInt): The index of the first dictionary entry.
-            y (ScalarInt): The index of the second dictionary entry.
+            x (Union[ScalarInt, Int[Array, "N"]]): The index of the first dictionary entry, or its one-hot encoding.
+            y (Union[ScalarInt, Int[Array, "N"]]): The index of the second dictionary entry, or its one-hot encoding.
 
         Returns
         -------
@@ -95,7 +102,7 @@ class CatKernel(AbstractKernel):
         except AttributeError:
             pass
         if self.input_1hot:
-            return self.explicit_gram[jnp.outer(x, y) == 1.0]
+            return self.explicit_gram[jnp.outer(x, y) == 1]
         else:
             return self.explicit_gram[x, y]
 
@@ -112,7 +119,9 @@ class CatKernel(AbstractKernel):
         return num_inspace_vals * (num_inspace_vals - 1) // 2
 
     @classmethod
-    def gram_to_sdev_cholesky_lower(cls, gram: Float[Array, "N N"]) -> CatKernelParams:
+    def gram_to_stddev_cholesky_lower(
+        cls, gram: Float[Array, "N N"]
+    ) -> CatKernelParams:
         """Compute the standard deviation and lower triangular Cholesky factor of the gram matrix.
 
         Args:
@@ -121,6 +130,6 @@ class CatKernel(AbstractKernel):
         Returns:
             tuple[Float[Array, "N"], Float[Array, "N N"]]: The standard deviation and lower triangular Cholesky factor of the gram matrix, where the latter is scaled to result in unit variances.
         """
-        sdev = jnp.sqrt(jnp.diag(gram))
-        L = jnp.linalg.cholesky(gram) / sdev.reshape(-1, 1)
-        return CatKernelParams(sdev, L)
+        stddev = jnp.sqrt(jnp.diag(gram))
+        L = jnp.linalg.cholesky(gram) / stddev.reshape(-1, 1)
+        return CatKernelParams(stddev, L)
