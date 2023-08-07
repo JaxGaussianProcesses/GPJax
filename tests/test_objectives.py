@@ -1,4 +1,5 @@
 import jax
+from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
@@ -18,6 +19,9 @@ from gpjax.objectives import (
     LogPosteriorDensity,
     NonConjugateMLL,
 )
+
+# Enable Float64 for more stable matrix inversions.
+config.update("jax_enable_x64", True)
 
 
 def test_abstract_objective():
