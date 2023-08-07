@@ -106,8 +106,8 @@ class CatKernel(AbstractKernel):
         else:
             return self.explicit_gram[x, y]
 
-    @classmethod
-    def num_cholesky_lower_params(cls, num_inspace_vals: ScalarInt) -> ScalarInt:
+    @staticmethod
+    def num_cholesky_lower_params(num_inspace_vals: ScalarInt) -> ScalarInt:
         """Compute the number of parameters required to store the lower triangular Cholesky factor of the gram matrix.
 
         Args:
@@ -118,10 +118,8 @@ class CatKernel(AbstractKernel):
         """
         return num_inspace_vals * (num_inspace_vals - 1) // 2
 
-    @classmethod
-    def gram_to_stddev_cholesky_lower(
-        cls, gram: Float[Array, "N N"]
-    ) -> CatKernelParams:
+    @staticmethod
+    def gram_to_stddev_cholesky_lower(gram: Float[Array, "N N"]) -> CatKernelParams:
         """Compute the standard deviation and lower triangular Cholesky factor of the gram matrix.
 
         Args:
