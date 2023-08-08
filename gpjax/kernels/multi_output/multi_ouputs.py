@@ -52,7 +52,10 @@ from jax import lax
 class AbstractMultiOutputKernel(AbstractKernel):
     r"""A base class for multi-output kernels."""
     
-    num_outputs: ScalarInt = static_field(1)
+    @abstractproperty
+    def num_outputs(self) -> ScalarInt:
+        raise NotImplementedError
+
 
     def get_output_idxs(self, x: Float[Array, "... D"]) -> Float[Array, "... 1"]:
         r"""Slice out the output indicies from the input matrix.
@@ -101,6 +104,9 @@ class IndependentMultiOutputKernel(AbstractMultiOutputKernel):
 
         self.kernels = kernels_list
 
+    def num_outputs(self) -> ScalarInt:
+        return len(self.kernels)
+
     def __call__(
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
@@ -121,6 +127,7 @@ class CoregionalisationKernel(AbstractMultiOutputKernel):
     we are only using a single latent function to model the correlation between outputs."""
 
     kernel: AbstractKernel = None
+    num_outputs: ScalarInt = static_field(1)
     rank: ScalarInt = static_field(1)
     compute_engine: AbstractKernelComputation = static_field(KroneckerProductKernelComputation()) # todo
 
