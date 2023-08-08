@@ -81,10 +81,10 @@ class CatKernel(AbstractKernel):
         L = self.stddev.reshape(-1, 1) * self.cholesky_lower
         return L @ L.T
 
-    def __call__(  # TODO not consistent with general kernel interface
+    def __call__(
         self,
-        x: Union[ScalarInt, Int[Array, " N"]],
-        y: Union[ScalarInt, Int[Array, " N"]],
+        x: Int[Array, " N"],
+        y: Int[Array, " N"],
     ):
         r"""Compute the (co)variance between a pair of dictionary indices.
 
