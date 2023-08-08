@@ -15,7 +15,7 @@
 
 
 from dataclasses import dataclass
-from typing import NamedTuple, Union
+from typing import NamedTuple
 import jax.numpy as jnp
 from jaxtyping import Float, Int
 import tensorflow_probability.substrates.jax as tfp
