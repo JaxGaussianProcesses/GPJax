@@ -39,14 +39,12 @@ class Dataset(Pytree):
 
     Attributes
     ----------
-        X: Num[Array, "N D"], optional:
-            Input data.
-        y: Num[Array, "N Q"], optional:
-            Output data.
-        mask: Bool[Array, "N Q"] or None, optional
-            Mask for the output data. By default, a mask will be computed based on the output data.
-            User can optionally specify a pre-computed mask, or pass `None` which means no mask
-            will be computed.
+        X (Optional[Num[Array, "N D"]]): input data.
+        y: (Optional[Num[Array, "N Q"]]): output data.
+        mask: (Optional[Bool[Array, "N Q"] or None]): mask for the output data.
+            By default, a mask will be computed based on the output data. User can
+            optionally specify a pre-computed mask, or explicitly pass `None` which
+            means no mask will be computed.
     """
 
     X: Optional[Num[Array, "N D"]] = None
@@ -58,7 +56,8 @@ class Dataset(Pytree):
         _check_shape(self.X, self.y)
         if isinstance(self.mask, _Missing):
             if self.y is not None:
-                if jnp.any(mask := jnp.isnan(self.y)):
+                mask = jnp.isnan(self.y)
+                if jnp.any(mask):
                     self.mask = mask
                 else:
                     self.mask = None
@@ -93,10 +92,12 @@ class Dataset(Pytree):
         if self.y is not None and other.y is not None:
             y = jnp.concatenate((self.y, other.y))
 
-        if (sm := self.mask is not None) | (om := other.mask is not None):
-            sm = self.mask if sm else jnp.zeros(self.y.shape, dtype=bool)
-            om = other.mask if om else jnp.zeros(other.y.shape, dtype=bool)
-            mask = jnp.concatenate((sm, om))
+        self_m_exists = self.mask is not None
+        other_m_exists = other.mask is not None
+        self_m = self.mask if self_m_exists else jnp.zeros(self.y.shape, dtype=bool)
+        other_m = other.mask if other_m_exists else jnp.zeros(other.y.shape, dtype=bool)
+        if self_m_exists or other_m_exists:
+            mask = jnp.concatenate((self_m, other_m))
 
         return Dataset(X=X, y=y, mask=mask)
 
