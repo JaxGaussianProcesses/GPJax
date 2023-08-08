@@ -14,8 +14,9 @@ from jax.config import config
 import jax.numpy as jnp
 import networkx as nx
 
-from gpjax.kernels.non_euclidean import GraphKernel
+from gpjax.kernels.non_euclidean import GraphKernel, CatKernel
 from gpjax.linops import identity
+import jax.random as jr
 
 # # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -46,3 +47,76 @@ def test_graph_kernel():
     Kxx += identity(n_verticies) * 1e-6
     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
     assert all(eigen_values > 0)
+
+
+def test_cat_kernel():
+    x = jr.normal(jr.PRNGKey(123), (5000, 3))
+    gram = jnp.cov(x.T)
+    params = CatKernel.gram_to_stddev_cholesky_lower(gram)
+    dk = CatKernel(
+        inspace_vals=list(range(len(gram))),
+        stddev=params.stddev,
+        cholesky_lower=params.cholesky_lower,
+    )
+    assert jnp.allclose(dk.explicit_gram, gram)
+
+    sdev = jnp.ones((2,))
+    cholesky_lower = jnp.eye(2)
+    inspace_vals = [0.0, 1.0]
+
+    # Initialize CatKernel object
+    dict_kernel = CatKernel(
+        stddev=sdev, cholesky_lower=cholesky_lower, inspace_vals=inspace_vals
+    )
+
+    assert dict_kernel.stddev.shape == sdev.shape
+    assert jnp.allclose(dict_kernel.stddev, sdev)
+    assert jnp.allclose(dict_kernel.cholesky_lower, cholesky_lower)
+    assert dict_kernel.inspace_vals == inspace_vals
+
+
+def test_cat_kernel_gram_to_stddev_cholesky_lower():
+    gram = jnp.array([[1.0, 0.5], [0.5, 1.0]])
+    sdev_expected = jnp.array([1.0, 1.0])
+    cholesky_lower_expected = jnp.array([[1.0, 0.0], [0.5, 0.8660254]])
+
+    # Compute sdev and cholesky_lower from gram
+    sdev, cholesky_lower = CatKernel.gram_to_stddev_cholesky_lower(gram)
+
+    assert jnp.allclose(sdev, sdev_expected)
+    assert jnp.allclose(cholesky_lower, cholesky_lower_expected)
+
+
+def test_cat_kernel_call():
+    sdev = jnp.ones((2,))
+    cholesky_lower = jnp.eye(2)
+    inspace_vals = [0.0, 1.0]
+
+    # Initialize CatKernel object
+    dict_kernel = CatKernel(
+        stddev=sdev, cholesky_lower=cholesky_lower, inspace_vals=inspace_vals
+    )
+
+    # Compute kernel value for pair of inputs
+    kernel_value = dict_kernel.__call__(0, 1)
+
+    assert jnp.allclose(kernel_value, 0.0)  # since cholesky_lower is identity matrix
+
+
+def test_cat_kernel_explicit_gram():
+    sdev = jnp.ones((2,))
+    cholesky_lower = jnp.eye(2)
+    inspace_vals = [0.0, 1.0]
+
+    # Initialize CatKernel object
+    dict_kernel = CatKernel(
+        stddev=sdev, cholesky_lower=cholesky_lower, inspace_vals=inspace_vals
+    )
+
+    # Compute explicit gram matrix
+    explicit_gram = dict_kernel.explicit_gram
+
+    assert explicit_gram.shape == (2, 2)
+    assert jnp.allclose(
+        explicit_gram, jnp.eye(2)
+    )  # since sdev are ones and cholesky_lower is identity matrix

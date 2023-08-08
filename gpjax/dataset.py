@@ -14,6 +14,7 @@
 # ==============================================================================
 
 from dataclasses import dataclass
+import warnings
 
 from beartype.typing import (
     Optional,
@@ -52,8 +53,11 @@ class Dataset(Pytree):
     mask: Optional[Union[Bool[Array, "N Q"], None]] = _Missing()
 
     def __post_init__(self) -> None:
-        r"""Checks that the shapes of $`X`$ and $`y`$ are compatible."""
+        r"""Checks that the shapes of $`X`$ and $`y`$ are compatible,
+        and provides warnings regarding the precision of $`X`$ and $`y`$."""
         _check_shape(self.X, self.y)
+        _check_precision(self.X, self.y)
+
         if isinstance(self.mask, _Missing):
             if self.y is not None:
                 mask = jnp.isnan(self.y)
@@ -135,6 +139,25 @@ def _check_shape(
     if y is not None and y.ndim != 2:
         raise ValueError(
             f"Outputs, y, must be a 2-dimensional array. Got y.ndim={y.ndim}."
+        )
+
+
+def _check_precision(
+    X: Optional[Num[Array, "..."]], y: Optional[Num[Array, "..."]]
+) -> None:
+    r"""Checks the precision of $`X`$ and $`y`."""
+    if X is not None and X.dtype != jnp.float64:
+        warnings.warn(
+            "X is not of type float64. "
+            f"Got X.dtype={X.dtype}. This may lead to numerical instability. ",
+            stacklevel=2,
+        )
+
+    if y is not None and y.dtype != jnp.float64:
+        warnings.warn(
+            "y is not of type float64."
+            f"Got y.dtype={y.dtype}. This may lead to numerical instability.",
+            stacklevel=2,
         )
 
 
