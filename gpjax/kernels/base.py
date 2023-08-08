@@ -81,8 +81,8 @@ class AbstractKernel(Module):
     @abc.abstractmethod
     def __call__(
         self,
-        x: Float[Array, " D"],
-        y: Float[Array, " D"],
+        x: Num[Array, " D"],
+        y: Num[Array, " D"],
     ) -> ScalarFloat:
         r"""Evaluate the kernel on a pair of inputs.
 
