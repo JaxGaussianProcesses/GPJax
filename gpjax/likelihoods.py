@@ -49,7 +49,6 @@ tfd = tfp.distributions
 class AbstractLikelihood(Module):
     r"""Abstract base class for likelihoods."""
 
-    num_datapoints: int = static_field()
     integrator: AbstractIntegrator = static_field(GHQuadratureIntegrator())
 
     def __call__(self, *args: Any, **kwargs: Any) -> tfd.Distribution:

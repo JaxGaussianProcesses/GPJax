@@ -611,12 +611,17 @@ class NonConjugatePosterior(AbstractPosterior):
     from, or optimise an approximation to, the posterior distribution.
     """
 
-    latent: Float[Array, "N 1"] = param_field(None)
+    _latent: Float[Array, "N 1"] = param_field(None)
     key: KeyArray = static_field(PRNGKey(42))
 
-    def __post_init__(self):
-        if self.latent is None:
-            self.latent = normal(self.key, shape=(self.likelihood.num_datapoints, 1))
+    def get_latent(self, num_datapoints: int) -> Float[Array, "N 1"]:
+        if self._latent is None:
+            self._latent = normal(self.key, shape=(num_datapoints, 1))
+        elif self._latent.shape[0] != num_datapoints:
+            raise ValueError(
+                "The number of datapoints supplied is not equal to the number of datapoints used in the existing latent function."
+            )
+        return self._latent
 
     def predict(
         self, test_inputs: Num[Array, "N D"], train_data: Dataset
@@ -664,7 +669,7 @@ class NonConjugatePosterior(AbstractPosterior):
         Lx_inv_Kxt = Lx.solve(Ktx.T)
 
         # Whitened function values, wx, corresponding to the inputs, x
-        wx = self.latent
+        wx = self.get_latent(num_datapoints=n)
 
         # μt + Ktx Lx⁻¹ wx
         mean = mean_t + jnp.matmul(Lx_inv_Kxt.T, wx)

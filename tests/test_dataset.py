@@ -185,9 +185,7 @@ def test_precision_warning(
     if prec_y != jnp.float64:
         expected_warnings += 1
 
-    with pytest.warns(
-        UserWarning, match=".* is not of type float64.*"
-    ) as record:
+    with pytest.warns(UserWarning, match=".* is not of type float64.*") as record:
         Dataset(X=x, y=y)
 
     assert len(record) == expected_warnings

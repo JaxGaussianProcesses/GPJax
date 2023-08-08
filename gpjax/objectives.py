@@ -176,7 +176,7 @@ class LogPosteriorDensity(AbstractObjective):
         mx = posterior.prior.mean_function(x)
 
         # Whitened function values, wx, corresponding to the inputs, x
-        wx = posterior.latent
+        wx = posterior.get_latent(num_datapoints=n)
 
         # f(x) = mx  +  Lx wx
         fx = mx + Lx @ wx
@@ -196,6 +196,8 @@ NonConjugateMLL = LogPosteriorDensity
 
 
 class ELBO(AbstractObjective):
+    full_dataset_size: int
+
     def step(
         self,
         variational_family: "gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
@@ -229,10 +231,7 @@ class ELBO(AbstractObjective):
 
         # For batch size b, we compute  n/b * Σᵢ[ ∫log(p(y|f(xᵢ))) q(f(xᵢ)) df(xᵢ)] - KL[q(f(·)) || p(f(·))]
         return self.constant * (
-            jnp.sum(var_exp)
-            * variational_family.posterior.likelihood.num_datapoints
-            / train_data.n
-            - kl
+            jnp.sum(var_exp) * self.full_dataset_size / train_data.n - kl
         )
 
 

@@ -15,9 +15,16 @@
 
 
 from dataclasses import dataclass
-from typing import NamedTuple, Union
+from typing import (
+    NamedTuple,
+    Union,
+)
+
 import jax.numpy as jnp
-from jaxtyping import Float, Int
+from jaxtyping import (
+    Float,
+    Int,
+)
 import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.base import (
@@ -25,7 +32,6 @@ from gpjax.base import (
     static_field,
 )
 from gpjax.kernels.base import AbstractKernel
-
 from gpjax.typing import (
     Array,
     ScalarInt,
