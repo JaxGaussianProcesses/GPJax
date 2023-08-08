@@ -151,6 +151,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://docs.jaxgaussianprocesses.com/api/kernels/non_euclidean/categorical/</loc>
+         <lastmod>2023-08-08</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://docs.jaxgaussianprocesses.com/api/kernels/non_euclidean/graph/</loc>
          <lastmod>2023-08-08</lastmod>
          <changefreq>daily</changefreq>
