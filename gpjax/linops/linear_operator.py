@@ -161,7 +161,7 @@ class LinearOperator(Pytree, Generic[ShapeT, DTypeT]):
         """
         root = self.to_root()
 
-        return 2.0 * jnp.sum(jnp.log(root.diagonal()))
+        return 2.0 * jnp.log(jnp.prod(root.diagonal()))
 
     def to_root(self) -> "LinearOperator":
         """Compute the root of the linear operator via the Cholesky decomposition.
