@@ -9,6 +9,10 @@
 #       format_name: percent
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax
+#     language: python
+#     name: python3
 # ---
 
 # %% [markdown]
@@ -104,7 +108,7 @@ for k, ax in zip(kernels, axes.ravel()):
 # like our RBF kernel to act on the first, second and fourth dimensions.
 
 # %%
-slice_kernel = gpx.kernels.RBF(active_dims=[0, 1, 3])
+slice_kernel = gpx.kernels.RBF(active_dims=[0, 1, 3], lengthscale = jnp.ones((3,)))
 
 # %% [markdown]
 #
