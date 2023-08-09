@@ -163,7 +163,10 @@ forward_linear = Network()
 # kernel and assume a Gaussian likelihood.
 
 # %%
-base_kernel = gpx.Matern52(active_dims=list(range(feature_space_dim)))
+base_kernel = gpx.Matern52(
+    active_dims=list(range(feature_space_dim)),
+    lengthscale=jnp.ones((feature_space_dim,)),
+)
 kernel = DeepKernelFunction(
     network=forward_linear, base_kernel=base_kernel, key=key, dummy_x=x
 )

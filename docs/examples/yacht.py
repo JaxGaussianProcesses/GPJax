@@ -1,3 +1,19 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # UCI Data Benchmarking
 #
@@ -152,7 +168,9 @@ scaled_Xte = x_scaler.transform(Xte)
 
 # %%
 n_train, n_covariates = scaled_Xtr.shape
-kernel = gpx.RBF(active_dims=list(range(n_covariates)))
+kernel = gpx.RBF(
+    active_dims=list(range(n_covariates)), lengthscale=np.ones((n_covariates,))
+)
 meanf = gpx.mean_functions.Zero()
 prior = gpx.Prior(mean_function=meanf, kernel=kernel)
 
