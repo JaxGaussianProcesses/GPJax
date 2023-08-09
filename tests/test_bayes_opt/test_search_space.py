@@ -43,6 +43,20 @@ def test_continuous_search_space_empty_bounds():
 @pytest.mark.parametrize(
     "lower_bounds, upper_bounds",
     [
+        (jnp.array([0.0], dtype=jnp.float64), jnp.array([1.0], jnp.float32)),
+        (jnp.array([0.0], dtype=jnp.float32), jnp.array([1.0], jnp.float64)),
+    ],
+)
+def test_continuous_search_space_dtype_consistency(
+    lower_bounds: Float[Array, " D"], upper_bounds: Float[Array, " D"]
+):
+    with pytest.raises(ValueError):
+        ContinuousSearchSpace(lower_bounds=lower_bounds, upper_bounds=upper_bounds)
+
+
+@pytest.mark.parametrize(
+    "lower_bounds, upper_bounds",
+    [
         (jnp.array([0.0]), jnp.array([1.0, 1.0])),
         (jnp.array([0.0, 0.0]), jnp.array([1.0])),
     ],

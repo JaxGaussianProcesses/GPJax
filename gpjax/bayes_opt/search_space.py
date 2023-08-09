@@ -30,7 +30,7 @@ from gpjax.typing import (
 @dataclass
 class AbstractSearchSpace(ABC):
     """The `AbstractSearchSpace` class is an abstract base class for
-    search spaces, which are used to bound the domain of functions being optimised.
+    search spaces, which are used to define domains for sampling and optimisation functionality in GPJax.
     """
 
     @abstractmethod
@@ -62,11 +62,13 @@ class ContinuousSearchSpace(AbstractSearchSpace):
     upper_bounds: Float[Array, " D"]
 
     def __post_init__(self):
+        if not self.lower_bounds.dtype == self.upper_bounds.dtype:
+            raise ValueError("Lower and upper bounds must have the same dtype.")
         if self.lower_bounds.shape != self.upper_bounds.shape:
             raise ValueError("Lower and upper bounds must have the same shape.")
         if self.lower_bounds.shape[0] == 0:
             raise ValueError("Lower and upper bounds cannot be empty")
-        if not (self.lower_bounds < self.upper_bounds).all():
+        if not (self.lower_bounds <= self.upper_bounds).all():
             raise ValueError("Lower bounds must be less than upper bounds.")
 
     @property
@@ -75,10 +77,6 @@ class ContinuousSearchSpace(AbstractSearchSpace):
 
     def sample(self, num_points: int, key: KeyArray) -> Float[Array, "N D"]:
         """Sample points from the search space using a Halton sequence.
-
-        Note that a single key generates a single sequence so, for instance, if one
-        generates a sequence of length 5 and a sequence of length 10 with the same key
-        then the former will be a prefix of the latter.
 
         Args:
             num_points (int): Number of points to be sampled from the search space.
