@@ -1,4 +1,4 @@
-# Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
+# Copyright 2023 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+from gpjax.bayes_opt import search_space
 
-from gpjax.kernels.non_euclidean.categorical import CatKernel
-from gpjax.kernels.non_euclidean.graph import GraphKernel
-
-__all__ = ["GraphKernel", "CatKernel"]
+__all__ = [
+    "search_space",
+]

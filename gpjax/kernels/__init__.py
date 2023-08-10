@@ -27,7 +27,10 @@ from gpjax.kernels.computations import (
     DiagonalKernelComputation,
     EigenKernelComputation,
 )
-from gpjax.kernels.non_euclidean import GraphKernel, CatKernel
+from gpjax.kernels.non_euclidean import (
+    CatKernel,
+    GraphKernel,
+)
 from gpjax.kernels.nonstationary import (
     ArcCosine,
     Linear,

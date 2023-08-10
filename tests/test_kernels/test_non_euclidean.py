@@ -12,11 +12,14 @@
 
 from jax.config import config
 import jax.numpy as jnp
+import jax.random as jr
 import networkx as nx
 
-from gpjax.kernels.non_euclidean import GraphKernel, CatKernel
+from gpjax.kernels.non_euclidean import (
+    CatKernel,
+    GraphKernel,
+)
 from gpjax.linops import identity
-import jax.random as jr
 
 # # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
