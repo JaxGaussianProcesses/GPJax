@@ -4,6 +4,7 @@ from jax.config import config
 config.update("jax_enable_x64", True)
 
 
+import jax
 from jax import jit
 import jax.numpy as jnp
 import jax.random as jr
@@ -85,3 +86,14 @@ def test_zero_mean_remains_zero() -> None:
     )
 
     assert opt_posterior.prior.mean_function.constant == 0.0
+
+
+def test_zero_mean_pytree_no_leaves():
+    zero_mean = Zero()
+    leaves = jax.tree_util.tree_leaves(zero_mean)
+    assert len(leaves) == 0
+
+
+def test_initialising_zero_mean_with_constant_raises_error():
+    with pytest.raises(TypeError):
+        Zero(constant=jnp.array([1.0]))
