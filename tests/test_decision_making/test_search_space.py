@@ -22,7 +22,7 @@ from jaxtyping import (
 )
 import pytest
 
-from gpjax.bayes_opt.search_space import (
+from gpjax.decision_making.search_space import (
     AbstractSearchSpace,
     ContinuousSearchSpace,
 )

@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-from gpjax.bayes_opt import search_space
+from beartype.typing import Final
 
-__all__ = [
-    "search_space",
-]
+OBJECTIVE: Final[str] = "OBJECTIVE"
