@@ -20,6 +20,7 @@ from gpjax.typing import (
     ScalarFloat,
 )
 
+
 tfd = tfp.distributions
 
 import cola
@@ -117,24 +118,30 @@ class ConjugateMLL(AbstractObjective):
             ScalarFloat: The marginal log-likelihood of the Gaussian process for the
                 current parameter set.
         """
-        x, y = train_data.X, train_data.y
+        x, y, n, mask = train_data.X, train_data.y, train_data.n, train_data.mask
+        m = y.shape[1]
+        if m > 1 and mask is not None:
+            mask = mask.flatten()
+        n_X_m = n * m
 
         # Observation noise o²
         obs_noise = posterior.likelihood.obs_noise
-        mx = posterior.prior.mean_function(x)
+
+        mx = jnp.repeat(posterior.prior.mean_function(x), m, axis=0)
 
         # Σ = (Kxx + Io²) = LLᵀ
         Kxx = posterior.prior.kernel.gram(x)
-        Kxx += cola.ops.I_like(Kxx) * posterior.prior.jitter
-        Sigma = Kxx + cola.ops.I_like(Kxx) * obs_noise
+        Kyy = posterior.prior.out_kernel.gram(jnp.arange(m))
+
+        Sigma = cola.ops.Kronecker(Kxx, Kyy)
+        Sigma = Sigma + cola.ops.I_like(Sigma) * (obs_noise + posterior.prior.jitter)
         Sigma = cola.PSD(Sigma)
 
         # p(y | x, θ), where θ are the model hyperparameters:
         mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
 
-        return self.constant * (
-            mll.log_prob(jnp.atleast_1d(y.squeeze()), mask=train_data.mask).squeeze()
-        )
+        rval = mll.log_prob(jnp.atleast_1d(y.flatten()), mask=mask).squeeze()
+        return self.constant * rval
 
 
 class LogPosteriorDensity(AbstractObjective):
