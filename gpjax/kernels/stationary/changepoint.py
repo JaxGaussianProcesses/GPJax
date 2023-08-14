@@ -37,8 +37,8 @@ from gpjax.typing import (
 
 
 @dataclass
-class SwitchKernel(AbstractKernel):
-    r"""A base class for products or sums of MeanFunctions.
+class ChangePoint(AbstractKernel):
+    r"""A change point kernel
     self.kernels: A list of exactly two kernels that will be switched.
     self.tswitch: The point at which to change to a different kernel.
         for example: if x and y are both less than tswitch, then you would use kernels[0]
