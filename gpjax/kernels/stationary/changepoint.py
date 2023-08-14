@@ -40,7 +40,13 @@ from gpjax.typing import (
 
 @dataclass
 class SwitchKernel(AbstractKernel):
-    r"""A base class for products or sums of MeanFunctions."""
+    r"""A base class for products or sums of MeanFunctions.
+    self.kernels: A list of exactly two kernels that will be switched.
+    self.tswitch: The point at which to change to a different kernel.
+        for example: if x and y are both less than tswitch, then you would use kernels[0]
+                     if x and y are both greater than or equal to tswitch, then you would use kernels[1]
+                     otherwise return cross-covariance of 0
+    """
 
     kernels: List[AbstractKernel] = None
     operator: Callable = static_field(None)
