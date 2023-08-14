@@ -91,7 +91,7 @@ class ChangePointRBF(gpx.kernels.AbstractKernel):
             out = jnp.float64(0)
             return out.squeeze()
 
-        def GetFunctionIndex(x, y, tswitch=1):
+        def get_function_index(x, y, tswitch=1):
             r"""
             Specify four possible indices given x, y, and tswitch.
 
@@ -110,7 +110,7 @@ class ChangePointRBF(gpx.kernels.AbstractKernel):
             indx = jnp.where(jnp.logical_and(cond1, jnp.invert(cond2)), 2, indx)
             return indx.squeeze().astype("uint8")
 
-        indx = GetFunctionIndex(x, y, tswitch=self.tswitch)
+        indx = get_function_index(x, y, tswitch=self.tswitch)
         flst = [k11, k21, k12, k22]
         K = jax.lax.switch(
             indx,
