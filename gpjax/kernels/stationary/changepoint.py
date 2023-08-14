@@ -32,8 +32,6 @@ from gpjax.base import (
     static_field,
 )
 from gpjax.kernels.base import AbstractKernel
-
-# from gpjax.base.param import param_field
 from gpjax.typing import (
     Array,
     ScalarFloat,
