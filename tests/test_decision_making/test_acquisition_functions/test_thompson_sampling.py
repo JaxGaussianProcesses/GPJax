@@ -12,19 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-from beartype.typing import Callable
 from jax.config import config
+
+config.update("jax_enable_x64", True)
+
+from beartype.typing import Callable
 import jax.numpy as jnp
 import jax.random as jr
-from jaxtyping import (
-    Array,
-    Float,
-)
 import pytest
 
 from gpjax.dataset import Dataset
 from gpjax.decision_making.acquisition_functions.thompson_sampling import (
     ThompsonSampling,
+)
+from gpjax.decision_making.test_functions.continuous_functions import (
+    AbstractContinuousTestFunction,
+    Forrester,
+    LogarithmicGoldsteinPrice,
 )
 from gpjax.decision_making.utils import OBJECTIVE
 from gpjax.gps import (
@@ -38,43 +42,7 @@ from gpjax.likelihoods import (
     Poisson,
 )
 from gpjax.mean_functions import Zero
-
-config.update("jax_enable_x64", True)
-
-
-def generate_dummy_1d_dataset() -> Dataset:
-    X = jr.uniform(key=jr.PRNGKey(42), minval=0.0, maxval=10.0, shape=(10, 1))
-    y = jnp.sin(X) + X + 1.0 + 10 * jr.normal(jr.PRNGKey(42), shape=X.shape)
-    D = Dataset(X, y)
-    return D
-
-
-def generate_dummy_2d_dataset() -> Dataset:
-    X = jr.uniform(key=jr.PRNGKey(42), minval=0.0, maxval=10.0, shape=(10, 2))
-    X0 = X[:, 0].reshape(-1, 1)
-    X1 = X[:, 1].reshape(-1, 1)
-    y = (
-        jnp.sin(X0)
-        + X1
-        + X0**2
-        + 1.0
-        + 10 * jr.normal(jr.PRNGKey(42), shape=X0.shape)
-    )
-    D = Dataset(X, y)
-    return D
-
-
-def generate_dummy_1d_test_X(num_test_points: int) -> Float[Array, "N 1"]:
-    test_X = jnp.linspace(0.0, 10.0, num_test_points).reshape(-1, 1)
-    return test_X
-
-
-def generate_dummy_2d_test_X(sqrt_num_test_points: int) -> Float[Array, "N 2"]:
-    test_X0 = jnp.linspace(0.0, 10.0, sqrt_num_test_points)
-    test_X1 = jnp.linspace(0.0, 10.0, sqrt_num_test_points)
-    test_X0, test_X1 = jnp.meshgrid(test_X0, test_X1)
-    test_X = jnp.column_stack((test_X0.ravel(), test_X1.ravel()))
-    return test_X
+from gpjax.typing import KeyArray
 
 
 def generate_dummy_conjugate_posterior(dataset: Dataset) -> ConjugatePosterior:
@@ -95,12 +63,16 @@ def generate_dummy_non_conjugate_posterior(dataset: Dataset) -> NonConjugatePost
     return posterior
 
 
+@pytest.mark.filterwarnings(
+    "ignore::UserWarning"
+)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_thompson_sampling_no_objective_posterior_raises_error():
-    dataset = generate_dummy_1d_dataset()
+    key = jr.PRNGKey(42)
+    forrester = Forrester()
+    dataset = forrester.generate_dataset(num_points=10, key=key)
     posterior = generate_dummy_conjugate_posterior(dataset)
     posteriors = {"CONSTRAINT": posterior}
     datasets = {OBJECTIVE: dataset}
-    key = jr.PRNGKey(42)
     with pytest.raises(ValueError):
         ts_acquisition_builder = ThompsonSampling(num_rff_features=500)
         ts_acquisition_builder.build_acquisition_function(
@@ -108,12 +80,16 @@ def test_thompson_sampling_no_objective_posterior_raises_error():
         )
 
 
+@pytest.mark.filterwarnings(
+    "ignore::UserWarning"
+)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_thompson_sampling_no_objective_dataset_raises_error():
-    dataset = generate_dummy_1d_dataset()
+    key = jr.PRNGKey(42)
+    forrester = Forrester()
+    dataset = forrester.generate_dataset(num_points=10, key=key)
     posterior = generate_dummy_conjugate_posterior(dataset)
     posteriors = {OBJECTIVE: posterior}
     datasets = {"CONSTRAINT": dataset}
-    key = jr.PRNGKey(42)
     with pytest.raises(ValueError):
         ts_acquisition_builder = ThompsonSampling(num_rff_features=500)
         ts_acquisition_builder.build_acquisition_function(
@@ -121,24 +97,16 @@ def test_thompson_sampling_no_objective_dataset_raises_error():
         )
 
 
-def test_thompson_sampling_none_key_raises_error():
-    dataset = generate_dummy_1d_dataset()
-    posterior = generate_dummy_conjugate_posterior(dataset)
-    posteriors = {OBJECTIVE: posterior}
-    datasets = {OBJECTIVE: dataset}
-    with pytest.raises(ValueError):
-        ts_acquisition_builder = ThompsonSampling(num_rff_features=500)
-        ts_acquisition_builder.build_acquisition_function(
-            posteriors=posteriors, datasets=datasets, key=None
-        )
-
-
+@pytest.mark.filterwarnings(
+    "ignore::UserWarning"
+)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_thompson_sampling_non_conjugate_posterior_raises_error():
-    dataset = generate_dummy_1d_dataset()
+    key = jr.PRNGKey(42)
+    forrester = Forrester()
+    dataset = forrester.generate_dataset(num_points=10, key=key)
     posterior = generate_dummy_non_conjugate_posterior(dataset)
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
-    key = jr.PRNGKey(42)
     with pytest.raises(ValueError):
         ts_acquisition_builder = ThompsonSampling(num_rff_features=500)
         ts_acquisition_builder.build_acquisition_function(
@@ -147,35 +115,51 @@ def test_thompson_sampling_non_conjugate_posterior_raises_error():
 
 
 @pytest.mark.parametrize(
-    "dataset, dimensionality",
-    [(generate_dummy_1d_dataset(), 1), (generate_dummy_2d_dataset(), 2)],
+    "test_target_function",
+    [(Forrester()), (LogarithmicGoldsteinPrice())],
 )
-@pytest.mark.parametrize("num_test_points", [49, 100])
+@pytest.mark.parametrize("num_test_points", [50, 100])
+@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.filterwarnings(
+    "ignore::UserWarning"
+)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_thompson_sampling_acquisition_function_correct_shapes(
-    dataset: Dataset, dimensionality: int, num_test_points: int
+    test_target_function: AbstractContinuousTestFunction,
+    num_test_points: int,
+    key: KeyArray,
 ):
+    dataset = test_target_function.generate_dataset(num_points=10, key=key)
     posterior = generate_dummy_conjugate_posterior(dataset)
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
-    key = jr.PRNGKey(42)
     ts_acquisition_builder = ThompsonSampling(num_rff_features=500)
     ts_acquisition_function = ts_acquisition_builder.build_acquisition_function(
         posteriors=posteriors, datasets=datasets, key=key
     )
-    if dimensionality == 1:
-        test_X = generate_dummy_1d_test_X(num_test_points)
-    elif dimensionality == 2:
-        test_X = generate_dummy_2d_test_X(int(jnp.sqrt(num_test_points)))
+    test_key, _ = jr.split(key)
+    test_X = test_target_function.generate_test_points(num_test_points, test_key)
     ts_acquisition_function_values = ts_acquisition_function(test_X)
     assert ts_acquisition_function_values.shape == (num_test_points, 1)
 
 
-def test_thompson_sampling_acquisition_function_same_key_same_function():
-    dataset = generate_dummy_1d_dataset()
+@pytest.mark.parametrize(
+    "test_target_function",
+    [(Forrester()), (LogarithmicGoldsteinPrice())],
+)
+@pytest.mark.parametrize("num_test_points", [50, 100])
+@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.filterwarnings(
+    "ignore::UserWarning"
+)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
+def test_thompson_sampling_acquisition_function_same_key_same_function(
+    test_target_function: AbstractContinuousTestFunction,
+    num_test_points: int,
+    key: KeyArray,
+):
+    dataset = test_target_function.generate_dataset(num_points=10, key=key)
     posterior = generate_dummy_conjugate_posterior(dataset)
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
-    key = jr.PRNGKey(42)
     ts_acquisition_builder_one = ThompsonSampling(num_rff_features=500)
     ts_acquisition_builder_two = ThompsonSampling(num_rff_features=500)
     ts_acquisition_function_one = ts_acquisition_builder_one.build_acquisition_function(
@@ -184,7 +168,8 @@ def test_thompson_sampling_acquisition_function_same_key_same_function():
     ts_acquisition_function_two = ts_acquisition_builder_two.build_acquisition_function(
         posteriors=posteriors, datasets=datasets, key=key
     )
-    test_X = jnp.linspace(0.0, 10.0, 100).reshape(-1, 1)
+    test_key, _ = jr.split(key)
+    test_X = test_target_function.generate_test_points(num_test_points, test_key)
     ts_acquisition_function_one_values = ts_acquisition_function_one(test_X)
     ts_acquisition_function_two_values = ts_acquisition_function_two(test_X)
     assert isinstance(ts_acquisition_function_one, Callable)
@@ -194,21 +179,35 @@ def test_thompson_sampling_acquisition_function_same_key_same_function():
     ).all()
 
 
-def test_thompson_sampling_acquisition_function_different_key_different_function():
-    dataset = generate_dummy_1d_dataset()
+@pytest.mark.parametrize(
+    "test_target_function",
+    [(Forrester()), (LogarithmicGoldsteinPrice())],
+)
+@pytest.mark.parametrize("num_test_points", [50, 100])
+@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.filterwarnings(
+    "ignore::UserWarning"
+)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
+def test_thompson_sampling_acquisition_function_different_key_different_function(
+    test_target_function: AbstractContinuousTestFunction,
+    num_test_points: int,
+    key: KeyArray,
+):
+    dataset = test_target_function.generate_dataset(num_points=10, key=key)
     posterior = generate_dummy_conjugate_posterior(dataset)
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
-    key_one = jr.PRNGKey(42)
-    key_two = jr.PRNGKey(43)
+    sample_one_key = key
+    sample_two_key, _ = jr.split(key)
     ts_acquisition_builder = ThompsonSampling(num_rff_features=500)
     ts_acquisition_function_one = ts_acquisition_builder.build_acquisition_function(
-        posteriors=posteriors, datasets=datasets, key=key_one
+        posteriors=posteriors, datasets=datasets, key=sample_one_key
     )
     ts_acquisition_function_two = ts_acquisition_builder.build_acquisition_function(
-        posteriors=posteriors, datasets=datasets, key=key_two
+        posteriors=posteriors, datasets=datasets, key=sample_two_key
     )
-    test_X = jnp.linspace(0.0, 10.0, 100).reshape(-1, 1)
+    test_key, _ = jr.split(sample_two_key)
+    test_X = test_target_function.generate_test_points(num_test_points, test_key)
     ts_acquisition_function_one_values = ts_acquisition_function_one(test_X)
     ts_acquisition_function_two_values = ts_acquisition_function_two(test_X)
     assert isinstance(ts_acquisition_function_one, Callable)

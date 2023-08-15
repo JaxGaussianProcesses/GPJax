@@ -13,7 +13,8 @@
 # limitations under the License.
 # ==============================================================================
 from dataclasses import dataclass
-from typing import Mapping
+
+from beartype.typing import Mapping
 
 from gpjax.dataset import Dataset
 from gpjax.decision_making.acquisition_functions.base import (
@@ -29,7 +30,9 @@ from gpjax.typing import KeyArray
 class ThompsonSampling(AbstractAcquisitionFunctionBuilder):
     """
     Form an acquisition function by drawing an approximate sample from the posterior,
-    using decoupled sampling as introduced in [Wilson et. al. (2020)](https://arxiv.org/abs/2002.09309).
+    using decoupled sampling as introduced in [Wilson et. al.
+    (2020)](https://arxiv.org/abs/2002.09309). Note that we return the *negative* of the
+    sample as the acquisition function, as acquisition functions are *maximised*.
     """
 
     num_rff_features: int = 500
@@ -40,14 +43,28 @@ class ThompsonSampling(AbstractAcquisitionFunctionBuilder):
         datasets: Mapping[str, Dataset],
         key: KeyArray,
     ) -> AcquisitionFunction:
-        if OBJECTIVE not in posteriors.keys():
-            raise ValueError("Objective posterior not found in posteriors")
-        if OBJECTIVE not in datasets.keys():
-            raise ValueError("Objective dataset not found in datasets")
-        if key is None:
-            raise ValueError(
-                "Key must be provided to draw an approximate sample from the posterior"
-            )
+        """
+        Draw an approximate sample from the posterior of the objective model and return
+        the *negative* of this sample as an acquisition function, as acquisition functions
+        are *maximised*.
+
+        Args:
+            posteriors (Mapping[str, AbstractPosterior]): Dictionary of posteriors to be
+            used to form the acquisition function. One of the posteriors must correspond
+            to the `OBJECTIVE` key, as we sample from the objective posterior to form
+            the acquisition function.
+            datasets (Mapping[str, Dataset]): Dictionary of datasets which may be used
+            to form the acquisition function. Keys in `datasets` should correspond to
+            keys in `posteriors`. One of the datasets must correspond
+            to the `OBJECTIVE` key.
+            key (KeyArray): JAX PRNG key used for random number generation.
+
+        Returns:
+            AcquisitionFunction: An appproximate sample from the objective model
+            posterior to to be *maximised* in order to decide which point to query
+            next.
+        """
+        self.check_objective_present(posteriors, datasets)
 
         objective_posterior = posteriors[OBJECTIVE]
         if not isinstance(objective_posterior, ConjugatePosterior):

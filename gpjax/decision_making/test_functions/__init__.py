@@ -1,4 +1,4 @@
-# Copyright 2023 The JaxGaussianProcesses Contributors. All Rights Reserved.
+# Copyright 2023 The GPJax Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,20 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-from gpjax.decision_making.acquisition_functions import (
-    AbstractAcquisitionFunctionBuilder,
-    AcquisitionFunction,
-    ThompsonSampling,
-)
-from gpjax.decision_making.acquisition_maximizer import (
-    AbstractAcquisitionMaximizer,
-    ContinuousAcquisitionMaximizer,
-)
-from gpjax.decision_making.search_space import (
-    AbstractSearchSpace,
-    ContinuousSearchSpace,
-)
-from gpjax.decision_making.test_functions import (
+
+from gpjax.decision_making.test_functions.continuous_functions import (
     AbstractContinuousTestFunction,
     Forrester,
     LogarithmicGoldsteinPrice,
@@ -33,15 +21,8 @@ from gpjax.decision_making.test_functions import (
 )
 
 __all__ = [
-    "AbstractAcquisitionFunctionBuilder",
-    "AbstractAcquisitionMaximizer",
-    "AbstractSearchSpace",
-    "AcquisitionFunction",
-    "ContinuousAcquisitionMaximizer",
-    "ContinuousSearchSpace",
     "AbstractContinuousTestFunction",
     "Forrester",
     "LogarithmicGoldsteinPrice",
     "Quadratic",
-    "ThompsonSampling",
 ]

@@ -17,13 +17,14 @@ from abc import (
     abstractmethod,
 )
 from dataclasses import dataclass
-from typing import (
+
+from beartype.typing import (
     Callable,
     Mapping,
-    Optional,
 )
 
 from gpjax.dataset import Dataset
+from gpjax.decision_making.utils import OBJECTIVE
 from gpjax.gps import AbstractPosterior
 from gpjax.typing import (
     Array,
@@ -44,14 +45,49 @@ class AbstractAcquisitionFunctionBuilder(ABC):
     Abstract class for building acquisition functions.
     """
 
+    def check_objective_present(
+        self,
+        posteriors: Mapping[str, AbstractPosterior],
+        datasets: Mapping[str, Dataset],
+    ) -> None:
+        """
+        Check that the objective posterior and dataset are present in the posteriors and
+        datasets.
+
+        Args:
+            posteriors (Mapping[str, AbstractPosterior]): Dictionary of posteriors to be
+            used to form the acquisition function.
+            datasets (Mapping[str, Dataset]): Dictionary of datasets which may be used
+            to form the acquisition function.
+
+        Raises:
+            ValueError: If the objective posterior or dataset are not present in the
+            posteriors or datasets.
+        """
+        if OBJECTIVE not in posteriors.keys():
+            raise ValueError("Objective posterior not found in posteriors")
+        elif OBJECTIVE not in datasets.keys():
+            raise ValueError("Objective dataset not found in datasets")
+
     @abstractmethod
     def build_acquisition_function(
         self,
         posteriors: Mapping[str, AbstractPosterior],
-        datasets: Optional[Mapping[str, Dataset]],
+        datasets: Mapping[str, Dataset],
         key: KeyArray,
     ) -> AcquisitionFunction:
         """
         Build an `AcquisitionFunction` from a set of posteriors and datasets.
+
+        Args:
+            posteriors (Mapping[str, AbstractPosterior]): Dictionary of posteriors to be
+            used to form the acquisition function.
+            datasets (Mapping[str, Dataset]): Dictionary of datasets which may be used
+            to form the acquisition function.
+            key (KeyArray): JAX PRNG key used for random number generation.
+
+        Returns:
+            AcquisitionFunction: Acquisition function to be *maximised* in order to
+            decide which point to query next.
         """
         raise NotImplementedError

@@ -19,6 +19,7 @@ from abc import (
 from dataclasses import dataclass
 
 import jax.numpy as jnp
+import jax.random as jr
 from jaxopt import ScipyBoundedMinimize
 
 from gpjax.decision_making.acquisition_functions import AcquisitionFunction
@@ -90,15 +91,22 @@ class ContinuousAcquisitionMaximizer(AbstractAcquisitionMaximizer):
     """The `ContinuousAcquisitionMaximizer` class is used to maximize acquisition
     functions over the continuous domain with L-BFGS-B. First we sample the acquisition
     function at `num_initial_samples` points from the search space, and then we run
-    L-BFGS-B from the best of these initial points.
+    L-BFGS-B from the best of these initial points. We run this process `num_restarts`
+    number of times, each time sampling a different random set of
+    `num_initial_samples`initial points.
     """
 
     num_initial_samples: int
+    num_restarts: int
 
     def __post_init__(self):
         if self.num_initial_samples < 1:
             raise ValueError(
                 f"num_initial_samples must be greater than 0, got {self.num_initial_samples}."
+            )
+        elif self.num_restarts < 1:
+            raise ValueError(
+                f"num_restarts must be greater than 0, got {self.num_restarts}."
             )
 
     def maximize(
@@ -107,21 +115,45 @@ class ContinuousAcquisitionMaximizer(AbstractAcquisitionMaximizer):
         search_space: ContinuousSearchSpace,
         key: KeyArray,
     ) -> Float[Array, "1 D"]:
-        initial_sample_points = search_space.sample(self.num_initial_samples, key=key)
-        best_initial_sample_point = _get_discrete_maximizer(
-            initial_sample_points, acquisition_function
-        )
+        max_observed_acquisition_function_value = None
+        maximizer = None
 
-        # Jaxopt minimizer requires a function which returns a scalar. It calls the
-        # acquisition function with one point at a time, so the acquisition function
-        # returns an array of shape [1, 1], so  we index to return a scalar. Note that
-        # we also return the negative of the acquisition function - this is because
-        # acquisition functions should be *maximimized* but the Jaxopt minimizer
-        # minimizes functions.
-        def scalar_acquisition_fn(x: Float[Array, "1 D"]) -> ScalarFloat:
-            return -acquisition_function(x)[0][0]
+        for _ in range(self.num_restarts):
+            key, _ = jr.split(key)
+            initial_sample_points = search_space.sample(
+                self.num_initial_samples, key=key
+            )
+            best_initial_sample_point = _get_discrete_maximizer(
+                initial_sample_points, acquisition_function
+            )
 
-        lbfgsb = ScipyBoundedMinimize(fun=scalar_acquisition_fn, method="l-bfgs-b")
-        bounds = (search_space.lower_bounds, search_space.upper_bounds)
-        optimised_point = lbfgsb.run(best_initial_sample_point, bounds=bounds).params
-        return optimised_point
+            def _scalar_acquisition_function(x: Float[Array, "1 D"]) -> ScalarFloat:
+                """
+                The Jaxopt minimizer requires a function which returns a scalar. It calls the
+                acquisition function with one point at a time, so the acquisition function
+                returns an array of shape [1, 1], so  we index to return a scalar. Note that
+                we also return the negative of the acquisition function - this is because
+                acquisition functions should be *maximimized* but the Jaxopt minimizer
+                minimizes functions.
+                """
+                return -acquisition_function(x)[0][0]
+
+            lbfgsb = ScipyBoundedMinimize(
+                fun=_scalar_acquisition_function, method="l-bfgs-b"
+            )
+            bounds = (search_space.lower_bounds, search_space.upper_bounds)
+            optimized_point = lbfgsb.run(
+                best_initial_sample_point, bounds=bounds
+            ).params
+            optimized_acquisition_function_value = _scalar_acquisition_function(
+                optimized_point
+            )
+            if (max_observed_acquisition_function_value is None) or (
+                optimized_acquisition_function_value
+                > max_observed_acquisition_function_value
+            ):
+                max_observed_acquisition_function_value = (
+                    optimized_acquisition_function_value
+                )
+                maximizer = optimized_point
+        return maximizer
