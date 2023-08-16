@@ -74,7 +74,7 @@ def test_thompson_sampling_no_objective_posterior_raises_error():
     posteriors = {"CONSTRAINT": posterior}
     datasets = {OBJECTIVE: dataset}
     with pytest.raises(ValueError):
-        ts_acquisition_builder = ThompsonSampling(num_rff_features=500)
+        ts_acquisition_builder = ThompsonSampling(num_features=100)
         ts_acquisition_builder.build_acquisition_function(
             posteriors=posteriors, datasets=datasets, key=key
         )
@@ -91,7 +91,7 @@ def test_thompson_sampling_no_objective_dataset_raises_error():
     posteriors = {OBJECTIVE: posterior}
     datasets = {"CONSTRAINT": dataset}
     with pytest.raises(ValueError):
-        ts_acquisition_builder = ThompsonSampling(num_rff_features=500)
+        ts_acquisition_builder = ThompsonSampling(num_features=100)
         ts_acquisition_builder.build_acquisition_function(
             posteriors=posteriors, datasets=datasets, key=key
         )
@@ -108,7 +108,25 @@ def test_thompson_sampling_non_conjugate_posterior_raises_error():
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
     with pytest.raises(ValueError):
-        ts_acquisition_builder = ThompsonSampling(num_rff_features=500)
+        ts_acquisition_builder = ThompsonSampling(num_features=100)
+        ts_acquisition_builder.build_acquisition_function(
+            posteriors=posteriors, datasets=datasets, key=key
+        )
+
+
+@pytest.mark.parametrize("num_rff_features", [0, -1, -10])
+@pytest.mark.filterwarnings(
+    "ignore::UserWarning"
+)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
+def test_thompson_sampling_invalid_rff_num_raises_error(num_rff_features: int):
+    key = jr.PRNGKey(42)
+    forrester = Forrester()
+    dataset = forrester.generate_dataset(num_points=10, key=key)
+    posterior = generate_dummy_conjugate_posterior(dataset)
+    posteriors = {OBJECTIVE: posterior}
+    datasets = {OBJECTIVE: dataset}
+    with pytest.raises(ValueError):
+        ts_acquisition_builder = ThompsonSampling(num_features=num_rff_features)
         ts_acquisition_builder.build_acquisition_function(
             posteriors=posteriors, datasets=datasets, key=key
         )
@@ -132,7 +150,7 @@ def test_thompson_sampling_acquisition_function_correct_shapes(
     posterior = generate_dummy_conjugate_posterior(dataset)
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
-    ts_acquisition_builder = ThompsonSampling(num_rff_features=500)
+    ts_acquisition_builder = ThompsonSampling(num_features=100)
     ts_acquisition_function = ts_acquisition_builder.build_acquisition_function(
         posteriors=posteriors, datasets=datasets, key=key
     )
@@ -160,8 +178,8 @@ def test_thompson_sampling_acquisition_function_same_key_same_function(
     posterior = generate_dummy_conjugate_posterior(dataset)
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
-    ts_acquisition_builder_one = ThompsonSampling(num_rff_features=500)
-    ts_acquisition_builder_two = ThompsonSampling(num_rff_features=500)
+    ts_acquisition_builder_one = ThompsonSampling(num_features=100)
+    ts_acquisition_builder_two = ThompsonSampling(num_features=100)
     ts_acquisition_function_one = ts_acquisition_builder_one.build_acquisition_function(
         posteriors=posteriors, datasets=datasets, key=key
     )
@@ -199,7 +217,7 @@ def test_thompson_sampling_acquisition_function_different_key_different_function
     datasets = {OBJECTIVE: dataset}
     sample_one_key = key
     sample_two_key, _ = jr.split(key)
-    ts_acquisition_builder = ThompsonSampling(num_rff_features=500)
+    ts_acquisition_builder = ThompsonSampling(num_features=100)
     ts_acquisition_function_one = ts_acquisition_builder.build_acquisition_function(
         posteriors=posteriors, datasets=datasets, key=sample_one_key
     )

@@ -13,6 +13,9 @@
 # limitations under the License.
 # ==============================================================================
 from jax.config import config
+
+config.update("jax_enable_x64", True)
+
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
@@ -25,8 +28,6 @@ from gpjax.decision_making.test_functions import (
 )
 from gpjax.typing import KeyArray
 
-config.update("jax_enable_x64", True)
-
 
 def test_abstract_continuous_test_function():
     with pytest.raises(TypeError):
@@ -37,8 +38,10 @@ def test_abstract_continuous_test_function():
     "test_function", [Quadratic(), Forrester(), LogarithmicGoldsteinPrice()]
 )
 def test_minimizer_evaluates_to_minimum(test_function: AbstractContinuousTestFunction):
+    evaluated_minimizer = test_function.evaluate(test_function.minimizer)
+    assert evaluated_minimizer.dtype == jnp.float64
     assert jnp.allclose(
-        test_function.evaluate(test_function.minimizer),
+        evaluated_minimizer,
         test_function.minimum,
         atol=1e-5,
     ).all()
@@ -55,6 +58,7 @@ def test_correct_minimum(test_function: AbstractContinuousTestFunction, key: Key
     test_x = test_function.generate_test_points(100000, key)
     function_vals = test_function.evaluate(test_x)
     vals_minus_minimum = function_vals - test_function.minimum
+    assert function_vals.dtype == jnp.float64
     assert jnp.all(vals_minus_minimum >= -1e-5)
 
 
@@ -64,15 +68,16 @@ def test_correct_minimum(test_function: AbstractContinuousTestFunction, key: Key
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
-def test_consistent_dtype(test_function: AbstractContinuousTestFunction):
+def test_correct_dtypes(test_function: AbstractContinuousTestFunction):
     minimizer = test_function.minimizer
     minimum = test_function.minimum
     dataset = test_function.generate_dataset(10, jr.PRNGKey(42))
     test_x = test_function.generate_test_points(10, jr.PRNGKey(42))
-    assert minimizer.dtype == minimum.dtype
-    assert minimizer.dtype == dataset.X.dtype
-    assert minimizer.dtype == dataset.y.dtype
-    assert minimizer.dtype == test_x.dtype
+    assert minimizer.dtype == jnp.float64
+    assert minimum.dtype == jnp.float64
+    assert dataset.X.dtype == jnp.float64
+    assert dataset.y.dtype == jnp.float64
+    assert test_x.dtype == jnp.float64
 
 
 @pytest.mark.parametrize(

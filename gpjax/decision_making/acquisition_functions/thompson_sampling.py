@@ -33,9 +33,19 @@ class ThompsonSampling(AbstractAcquisitionFunctionBuilder):
     using decoupled sampling as introduced in [Wilson et. al.
     (2020)](https://arxiv.org/abs/2002.09309). Note that we return the *negative* of the
     sample as the acquisition function, as acquisition functions are *maximised*.
+
+    Attributes:
+        num_features (int): The number of random Fourier features to use when drawing
+            the approximate sample from the posterior. Defaults to 100.
     """
 
-    num_rff_features: int = 500
+    num_features: int = 100
+
+    def __post_init__(self):
+        if self.num_features <= 0:
+            raise ValueError(
+                "The number of random Fourier features must be a positive integer."
+            )
 
     def build_acquisition_function(
         self,
@@ -77,7 +87,7 @@ class ThompsonSampling(AbstractAcquisitionFunctionBuilder):
             num_samples=1,
             train_data=objective_dataset,
             key=key,
-            num_features=self.num_rff_features,
+            num_features=self.num_features,
         )
 
         return lambda x: -1.0 * thompson_sample(

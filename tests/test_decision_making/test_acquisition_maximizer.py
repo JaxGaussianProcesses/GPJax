@@ -52,7 +52,7 @@ def test_discrete_maximizer_returns_correct_point(
     dimensionality: int,
     key: KeyArray,
 ):
-    query_points = test_function.search_space.sample(1000, key=key)
+    query_points = test_function.generate_test_points(1000, key=key)
     acquisition_function = lambda x: -1.0 * test_function.evaluate(x)
     acquisition_vals = acquisition_function(query_points)
     true_max_acquisition_val = jnp.max(acquisition_vals)
