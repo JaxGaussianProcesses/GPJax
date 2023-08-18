@@ -10,6 +10,11 @@ from beartype.typing import (
 from jaxlib.xla_extension import PjitFunction
 from plum import dispatch
 
+from gpjax.decision_making.acquisition_functions import ThompsonSampling
+from gpjax.decision_making.test_functions import (
+    Forrester,
+    LogarithmicGoldsteinPrice,
+)
 from gpjax.kernels import (
     RFF,
     ArcCosine,
@@ -192,5 +197,43 @@ def cite(tree: ELBO) -> PaperCitation:
         authors="Hensman, James and Fusi, Nicolo and Lawrence, Neil D",
         year="2013",
         booktitle="Uncertainty in Artificial Intelligence",
+        citation_type="article",
+    )
+
+
+####################
+# Decision making citations
+####################
+@dispatch
+def cite(tree: ThompsonSampling) -> PaperCitation:
+    return PaperCitation(
+        citation_key="wilson2020efficiently",
+        title="Efficiently sampling functions from Gaussian process posteriors",
+        authors="Wilson, James and Borovitskiy, Viacheslav and Terenin, Alexander and Mostowsky, Peter and Deisenroth, Marc",
+        year="2020",
+        booktitle="International Conference on Machine Learning",
+        citation_type="article",
+    )
+
+
+@dispatch
+def cite(tree: Forrester) -> BookCitation:
+    return BookCitation(
+        citation_key="forrester2008engineering",
+        authors="Forrester, Alexander and Sobester, Andras and Keane, Andy",
+        title="Engineering design via surrogate modelling: a practical guide",
+        year="2008",
+        publisher="John Wiley & Sons",
+    )
+
+
+@dispatch
+def cite(tree: LogarithmicGoldsteinPrice) -> PaperCitation:
+    return PaperCitation(
+        citation_key="picheny2013benchmark",
+        authors="Picheny, Victor and Wagner, Tobias and Ginsbourger, David",
+        title="A benchmark of kriging-based infill criteria for noisy optimization",
+        year="2013",
+        booktitle="Structural and multidisciplinary optimization",
         citation_type="article",
     )

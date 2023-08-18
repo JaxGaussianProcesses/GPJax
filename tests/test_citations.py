@@ -16,6 +16,11 @@ from gpjax.citation import (
     PhDThesisCitation,
     cite,
 )
+from gpjax.decision_making import (
+    Forrester,
+    LogarithmicGoldsteinPrice,
+    ThompsonSampling,
+)
 from gpjax.kernels import (
     RBF,
     RFF,
@@ -139,6 +144,63 @@ def test_collapsed_elbo():
         citation.booktitle
         == "International Conference on Artificial Intelligence and Statistics"
     )
+    _check_no_fallback(citation)
+
+
+def test_thompson_sampling():
+    thompson_sampling = ThompsonSampling()
+    citation = cite(thompson_sampling)
+
+    assert isinstance(citation, PaperCitation)
+    assert citation.citation_key == "wilson2020efficiently"
+    assert (
+        citation.title
+        == "Efficiently sampling functions from Gaussian process posteriors"
+    )
+    assert (
+        citation.authors
+        == "Wilson, James and Borovitskiy, Viacheslav and Terenin, Alexander and Mostowsky, Peter and Deisenroth, Marc"
+    )
+    assert citation.year == "2020"
+    assert citation.booktitle == "International Conference on Machine Learning"
+    assert citation.citation_type == "article"
+    _check_no_fallback(citation)
+
+
+def test_forrester():
+    forrester = Forrester()
+    citation = cite(forrester)
+
+    assert isinstance(citation, BookCitation)
+    assert citation.citation_key == "forrester2008engineering"
+    assert (
+        citation.title
+        == "Engineering design via surrogate modelling: a practical guide"
+    )
+    assert (
+        citation.authors == "Forrester, Alexander and Sobester, Andras and Keane, Andy"
+    )
+    assert citation.year == "2008"
+    assert citation.publisher == "John Wiley & Sons"
+    _check_no_fallback(citation)
+
+
+def test_logarithmic_goldstein_price():
+    logarithmic_goldstein_price = LogarithmicGoldsteinPrice()
+    citation = cite(logarithmic_goldstein_price)
+
+    assert isinstance(citation, PaperCitation)
+    assert citation.citation_key == "picheny2013benchmark"
+    assert (
+        citation.title
+        == "A benchmark of kriging-based infill criteria for noisy optimization"
+    )
+    assert (
+        citation.authors == "Picheny, Victor and Wagner, Tobias and Ginsbourger, David"
+    )
+    assert citation.year == "2013"
+    assert citation.booktitle == "Structural and multidisciplinary optimization"
+    assert citation.citation_type == "article"
     _check_no_fallback(citation)
 
 

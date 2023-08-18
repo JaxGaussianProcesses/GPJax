@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
+from beartype.roar import BeartypeCallHintParamViolation
 from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
@@ -22,7 +22,7 @@ from jaxtyping import (
 )
 import pytest
 
-from gpjax.bayes_opt.search_space import (
+from gpjax.decision_making.search_space import (
     AbstractSearchSpace,
     ContinuousSearchSpace,
 )
@@ -62,9 +62,9 @@ def test_continuous_search_space_dtype_consistency(
     ],
 )
 def test_continous_search_space_bounds_shape_consistency(
-    lower_bounds: Float[Array, " D"], upper_bounds: Float[Array, " D"]
+    lower_bounds: Float[Array, " D1"], upper_bounds: Float[Array, " D2"]
 ):
-    with pytest.raises(ValueError):
+    with pytest.raises((BeartypeCallHintParamViolation, ValueError)):
         ContinuousSearchSpace(lower_bounds=lower_bounds, upper_bounds=upper_bounds)
 
 
