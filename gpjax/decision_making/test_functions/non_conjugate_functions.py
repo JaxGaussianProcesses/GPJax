@@ -38,7 +38,7 @@ class PoissonTestFunction:
         search_space (ContinuousSearchSpace): Search space for the function.
     """
 
-    search_space: ContinuousSearchSpace = ContinuousSearchSpace(
+    search_space = ContinuousSearchSpace(
         lower_bounds=jnp.array([-2.0]),
         upper_bounds=jnp.array([2.0]),
     )
