@@ -12,17 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
 from gpjax.decision_making.test_functions.continuous_functions import (
     AbstractContinuousTestFunction,
     Forrester,
     LogarithmicGoldsteinPrice,
     Quadratic,
 )
+from gpjax.decision_making.test_functions.non_conjugate_functions import (
+    PoissonTestFunction,
+)
 
 __all__ = [
     "AbstractContinuousTestFunction",
     "Forrester",
     "LogarithmicGoldsteinPrice",
+    "PoissonTestFunction",
     "Quadratic",
 ]

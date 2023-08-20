@@ -21,6 +21,11 @@ from gpjax.decision_making.acquisition_maximizer import (
     AbstractAcquisitionMaximizer,
     ContinuousAcquisitionMaximizer,
 )
+from gpjax.decision_making.posterior_handler import PosteriorHandler
+from gpjax.decision_making.posterior_optimizer import (
+    AbstractPosteriorOptimizer,
+    AdamPosteriorOptimizer,
+)
 from gpjax.decision_making.search_space import (
     AbstractSearchSpace,
     ContinuousSearchSpace,
@@ -35,13 +40,16 @@ from gpjax.decision_making.test_functions import (
 __all__ = [
     "AbstractAcquisitionFunctionBuilder",
     "AbstractAcquisitionMaximizer",
+    "AbstractPosteriorOptimizer",
     "AbstractSearchSpace",
     "AcquisitionFunction",
+    "AdamPosteriorOptimizer",
     "ContinuousAcquisitionMaximizer",
     "ContinuousSearchSpace",
     "AbstractContinuousTestFunction",
     "Forrester",
     "LogarithmicGoldsteinPrice",
+    "PosteriorHandler",
     "Quadratic",
     "ThompsonSampling",
 ]
