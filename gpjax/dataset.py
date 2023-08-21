@@ -19,6 +19,7 @@ import warnings
 from beartype.typing import (
     Optional,
     Union,
+    Literal,
 )
 import jax.numpy as jnp
 from jaxtyping import (
@@ -30,10 +31,6 @@ from simple_pytree import Pytree
 from gpjax.typing import Array
 
 
-class _Missing:
-    """Sentinel class for not-yet-computed mask"""
-
-
 @dataclass
 class Dataset(Pytree):
     r"""Base class for datasets.
@@ -42,15 +39,17 @@ class Dataset(Pytree):
     ----------
         X (Optional[Num[Array, "N D"]]): input data.
         y: (Optional[Num[Array, "N Q"]]): output data.
-        mask: (Optional[Bool[Array, "N Q"] or None]): mask for the output data.
-            By default, a mask will be computed based on the output data. User can
-            optionally specify a pre-computed mask, or explicitly pass `None` which
-            means no mask will be computed.
+        mask: (Optional[Union[Bool[Array, "N Q"], Literal["infer automatically"]]]): mask for the output data.
+            Users can optionally specify a pre-computed mask, or explicitly pass `None` which
+            means no mask will be used. Defaults to `"infer automatically"` which means that
+            the mask will be computed from the output data, or set to `None` if no output data is provided.
     """
 
     X: Optional[Num[Array, "N D"]] = None
     y: Optional[Num[Array, "N Q"]] = None
-    mask: Optional[Union[Bool[Array, "N Q"], None]] = _Missing()
+    mask: Optional[
+        Union[Bool[Array, "N Q"], Literal["infer automatically"]]
+    ] = "infer automatically"
 
     def __post_init__(self) -> None:
         r"""Checks that the shapes of $`X`$ and $`y`$ are compatible,
@@ -58,15 +57,21 @@ class Dataset(Pytree):
         _check_shape(self.X, self.y)
         _check_precision(self.X, self.y)
 
-        if isinstance(self.mask, _Missing):
-            if self.y is not None:
-                mask = jnp.isnan(self.y)
-                if jnp.any(mask):
-                    self.mask = mask
+        if isinstance(self.mask, str):
+            if not self.mask == "infer automatically":
+                raise ValueError(
+                    f"mask must be either the string 'infer automatically', None, or a boolean array."
+                    f" Got mask={self.mask}."
+                )
+            else:
+                if self.y is not None:
+                    mask = jnp.isnan(self.y)
+                    if jnp.any(mask):
+                        self.mask = mask
+                    else:
+                        self.mask = None
                 else:
                     self.mask = None
-            else:
-                self.mask = None
 
     def __repr__(self) -> str:
         r"""Returns a string representation of the dataset."""
