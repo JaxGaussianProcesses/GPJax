@@ -20,6 +20,7 @@ from beartype.typing import (
     Optional,
     Union,
     Literal,
+    Literal,
 )
 import jax.numpy as jnp
 from jaxtyping import (
@@ -33,10 +34,6 @@ from jaxtyping import (
 from simple_pytree import Pytree
 
 from gpjax.typing import Array
-
-
-class _Missing:
-    """Sentinel class for not-yet-computed mask"""
 
 
 @dataclass
