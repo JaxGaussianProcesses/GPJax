@@ -63,15 +63,14 @@ class Dataset(Pytree):
                     f"mask must be either the string 'infer automatically', None, or a boolean array."
                     f" Got mask={self.mask}."
                 )
-            else:
-                if self.y is not None:
-                    mask = jnp.isnan(self.y)
-                    if jnp.any(mask):
-                        self.mask = mask
-                    else:
-                        self.mask = None
+            elif self.y is not None:
+                mask = jnp.isnan(self.y)
+                if jnp.any(mask):
+                    self.mask = mask
                 else:
                     self.mask = None
+            else:
+                self.mask = None
 
     def __repr__(self) -> str:
         r"""Returns a string representation of the dataset."""
