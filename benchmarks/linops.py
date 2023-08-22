@@ -2,10 +2,11 @@ from jax.config import config
 
 config.update("jax_enable_x64", True)
 
-from gpjax.linops import DenseLinearOperator
 import jax.numpy as jnp
-from sklearn.datasets import make_spd_matrix
 import jax.random as jr
+from sklearn.datasets import make_spd_matrix
+
+from gpjax.linops import DenseLinearOperator
 
 
 class LinOps:

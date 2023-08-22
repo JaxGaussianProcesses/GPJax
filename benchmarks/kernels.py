@@ -2,8 +2,9 @@ from jax.config import config
 
 config.update("jax_enable_x64", True)
 
-from gpjax import kernels
 import jax.random as jr
+
+from gpjax import kernels
 
 
 class Kernels:
