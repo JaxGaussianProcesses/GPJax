@@ -17,6 +17,7 @@ import abc
 from dataclasses import dataclass
 import typing as tp
 
+from cola import PSD
 from cola.ops import (
     Dense,
     Diagonal,
@@ -53,7 +54,7 @@ class AbstractKernelComputation:
             LinearOperator: Gram covariance operator of the kernel function.
         """
         Kxx = self.cross_covariance(kernel, x, x)
-        return Dense(Kxx)
+        return PSD(Dense(Kxx))
 
     @abc.abstractmethod
     def cross_covariance(

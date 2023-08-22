@@ -9,6 +9,7 @@ from gpjax.typing import Array
 
 Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
 
+from cola import PSD
 from cola.ops import Dense
 
 # TODO: Use low rank linear operator!
@@ -52,7 +53,7 @@ class BasisFunctionComputation(AbstractKernelComputation):
                 $`N \times N`$ Gram matrix.
         """
         z1 = self.compute_features(kernel, inputs)
-        return Dense(self.scaling(kernel) * jnp.matmul(z1, z1.T))
+        return PSD(Dense(self.scaling(kernel) * jnp.matmul(z1, z1.T)))
 
     def compute_features(
         self, kernel: Kernel, x: Float[Array, "N D"]

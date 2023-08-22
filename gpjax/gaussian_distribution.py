@@ -19,6 +19,8 @@ from beartype.typing import (
     Optional,
     Tuple,
 )
+import cola
+from cola.ops import Identity
 from jax import vmap
 import jax.numpy as jnp
 import jax.random as jr
@@ -28,10 +30,6 @@ from jaxtyping import (
 )
 import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.linops import (
-    IdentityLinearOperator,
-    LinearOperator,
-)
 from gpjax.typing import (
     Array,
     KeyArray,
@@ -49,13 +47,13 @@ def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
     if loc is not None and loc.ndim < 1:
         raise ValueError("The parameter `loc` must have at least one dimension.")
 
-    if scale is not None and scale.ndim < 2:
+    if scale is not None and len(scale.shape) < 2:  # scale.ndim < 2:
         raise ValueError(
             "The `scale` must have at least two dimensions, but "
             f"`scale.shape = {scale.shape}`."
         )
 
-    if scale is not None and not isinstance(scale, LinearOperator):
+    if scale is not None and not isinstance(scale, cola.LinearOperator):
         raise ValueError(
             f"scale must be a LinearOperator or a JAX array, but got {type(scale)}"
         )
@@ -79,7 +77,7 @@ class GaussianDistribution(tfd.Distribution):
 
     Args:
         loc (Optional[Float[Array, " N"]]): The mean of the distribution. Defaults to None.
-        scale (Optional[LinearOperator]): The scale matrix of the distribution. Defaults to None.
+        scale (Optional[cola.LinearOperator]): The scale matrix of the distribution. Defaults to None.
 
     Returns
     -------
@@ -94,7 +92,7 @@ class GaussianDistribution(tfd.Distribution):
     def __init__(
         self,
         loc: Optional[Float[Array, " N"]] = None,
-        scale: Optional[LinearOperator] = None,
+        scale: Optional[cola.LinearOperator] = None,
     ) -> None:
         r"""Initialises the distribution."""
         _check_loc_scale(loc, scale)
@@ -112,7 +110,7 @@ class GaussianDistribution(tfd.Distribution):
 
         # If not specified, set the scale to the identity matrix.
         if scale is None:
-            scale = IdentityLinearOperator(num_dims)
+            scale = Identity(shape=(num_dims, num_dims), dtype=loc.dtype)
 
         self.loc = loc
         self.scale = scale
@@ -135,11 +133,11 @@ class GaussianDistribution(tfd.Distribution):
 
     def variance(self) -> Float[Array, " N"]:
         r"""Calculates the variance."""
-        return self.scale.diagonal()
+        return cola.diag(self.scale)
 
     def stddev(self) -> Float[Array, " N"]:
         r"""Calculates the standard deviation."""
-        return jnp.sqrt(self.scale.diagonal())
+        return jnp.sqrt(cola.diag(self.scale))
 
     @property
     def event_shape(self) -> Tuple:
@@ -149,7 +147,8 @@ class GaussianDistribution(tfd.Distribution):
     def entropy(self) -> ScalarFloat:
         r"""Calculates the entropy of the distribution."""
         return 0.5 * (
-            self.event_shape[0] * (1.0 + jnp.log(2.0 * jnp.pi)) + self.scale.log_det()
+            self.event_shape[0] * (1.0 + jnp.log(2.0 * jnp.pi))
+            + cola.logdet(self.scale)
         )
 
     def log_prob(
@@ -181,7 +180,9 @@ class GaussianDistribution(tfd.Distribution):
 
         # compute the pdf, -1/2[ n log(2π) + log|Σ| + (y - µ)ᵀΣ⁻¹(y - µ) ]
         return -0.5 * (
-            n * jnp.log(2.0 * jnp.pi) + sigma.log_det() + diff.T @ sigma.solve(diff)
+            n * jnp.log(2.0 * jnp.pi)
+            + cola.logdet(sigma)
+            + diff.T @ cola.solve(sigma, diff)
         )
 
     def _sample_n(self, key: KeyArray, n: int) -> Float[Array, "n N"]:
@@ -195,7 +196,7 @@ class GaussianDistribution(tfd.Distribution):
             Float[Array, "n N"]: The samples.
         """
         # Obtain covariance root.
-        sqrt = self.scale.to_root()
+        sqrt = cola.sqrt(self.scale)
 
         # Gather n samples from standard normal distribution Z = [z₁, ..., zₙ]ᵀ.
         Z = jr.normal(key, shape=(n, *self.event_shape))
@@ -263,24 +264,26 @@ def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> ScalarFl
     sigma_p = p.scale
 
     # Find covariance roots.
-    sqrt_p = sigma_p.to_root()
-    sqrt_q = sigma_q.to_root()
+    sqrt_p = cola.sqrt(sigma_p)
+    sqrt_q = cola.sqrt(sigma_q)
 
     # diff, μp - μq
     diff = mu_p - mu_q
 
     # trace term, tr[Σp⁻¹ Σq] = tr[(LpLpᵀ)⁻¹(LqLqᵀ)] = tr[(Lp⁻¹Lq)(Lp⁻¹Lq)ᵀ] = (fr[LqLp⁻¹])²
     trace = _frobenius_norm_squared(
-        sqrt_p.solve(sqrt_q.to_dense())
+        cola.solve(sqrt_p, sqrt_q.to_dense())
     )  # TODO: Not most efficient, given the `to_dense()` call (e.g., consider diagonal p and q). Need to abstract solving linear operator against another linear operator.
 
     # Mahalanobis term, (μp - μq)ᵀ Σp⁻¹ (μp - μq) = tr [(μp - μq)ᵀ [LpLpᵀ]⁻¹ (μp - μq)] = (fr[Lp⁻¹(μp - μq)])²
     mahalanobis = jnp.sum(
-        jnp.square(sqrt_p.solve(diff))
+        jnp.square(cola.solve(sqrt_p, diff))
     )  # TODO: Need to improve this. Perhaps add a Mahalanobis method to ``LinearOperator``s.
 
     # KL[q(x)||p(x)] = [ [(μp - μq)ᵀ Σp⁻¹ (μp - μq)] - n - log|Σq| + log|Σp| + tr[Σp⁻¹ Σq] ] / 2
-    return (mahalanobis - n_dim - sigma_q.log_det() + sigma_p.log_det() + trace) / 2.0
+    return (
+        mahalanobis - n_dim - cola.logdet(sigma_q) + cola.logdet(sigma_p) + trace
+    ) / 2.0
 
 
 __all__ = [

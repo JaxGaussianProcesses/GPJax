@@ -23,6 +23,9 @@ from beartype.typing import (
     Callable,
     Optional,
 )
+import cola
+from cola.ops import Dense
+
 import jax.numpy as jnp
 from jax.random import (
     PRNGKey,
@@ -47,7 +50,6 @@ from gpjax.likelihoods import (
     Gaussian,
     NonGaussianLikelihood,
 )
-from gpjax.linops import identity
 from gpjax.mean_functions import AbstractMeanFunction
 from gpjax.typing import (
     Array,
@@ -243,7 +245,8 @@ class Prior(AbstractPrior):
         x = test_inputs
         mx = self.mean_function(x)
         Kxx = self.kernel.gram(x)
-        Kxx += identity(x.shape[0]) * self.jitter
+        Kxx += cola.ops.I_like(Kxx) * self.jitter
+        Kxx = cola.PSD(Kxx)
 
         return GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Kxx)
 
@@ -476,30 +479,28 @@ class ConjugatePosterior(AbstractPosterior):
                     distribution as a `GaussianDistribution`.
         """
         # Unpack training data
-        x, y, n, mask = train_data.X, train_data.y, train_data.n, train_data.mask
+        x, y, n_test, mask = train_data.X, train_data.y, train_data.n, train_data.mask
 
         # Unpack test inputs
-        t, n_test = test_inputs, test_inputs.shape[0]
+        t = test_inputs
 
         # Observation noise o²
         obs_noise = self.likelihood.obs_noise
         mx = self.prior.mean_function(x)
 
         # Precompute Gram matrix, Kxx, at training inputs, x
-        Kxx = self.prior.kernel.gram(x) + (identity(n) * self.prior.jitter)
+        Kxx = self.prior.kernel.gram(x)
+        Kxx += cola.ops.I_like(Kxx) * self.jitter
 
         # Σ = Kxx + Io²
-        Sigma = Kxx + identity(n) * obs_noise
+        Sigma = Kxx + cola.ops.I_like(Kxx) * obs_noise
+        Sigma = cola.PSD(Sigma)
 
         if mask is not None:
             y = jnp.where(mask, 0.0, y)
             mx = jnp.where(mask, 0.0, mx)
-            Sigma_masked = jnp.where(mask + mask.T, 0.0, Sigma.matrix)
-            Sigma = Sigma.replace(
-                matrix=jnp.where(
-                    jnp.diag(jnp.squeeze(mask)), 1 / (2 * jnp.pi), Sigma_masked
-                )
-            )
+            Sigma_masked = jnp.where(mask + mask.T, 0.0, Sigma.to_dense())
+            Sigma = cola.PSD(Dense(jnp.where(jnp.diag(jnp.squeeze(mask)), 1 / (2 * jnp.pi), Sigma_masked)))
 
         mean_t = self.prior.mean_function(t)
         Ktt = self.prior.kernel.gram(t)
@@ -508,14 +509,15 @@ class ConjugatePosterior(AbstractPosterior):
         # Σ⁻¹ Kxt
         if mask is not None:
             Kxt = jnp.where(mask * jnp.ones((1, n_test), dtype=bool), 0.0, Kxt)
-        Sigma_inv_Kxt = Sigma.solve(Kxt)
+        Sigma_inv_Kxt = cola.solve(Sigma, Kxt)
 
         # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
         mean = mean_t + jnp.matmul(Sigma_inv_Kxt.T, y - mx)
 
         # Ktt  -  Ktx (Kxx + Io²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
         covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
-        covariance += identity(n_test) * self.prior.jitter
+        covariance += cola.ops.I_like(covariance) * self.prior.jitter
+        covariance = cola.PSD(covariance)
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
@@ -576,7 +578,7 @@ class ConjugatePosterior(AbstractPosterior):
         # sample weights v for canonical features
         # v = Σ⁻¹ (y + ε - ɸ⍵) for  Σ = Kxx + Io² and ε ᯈ N(0, o²)
         Kxx = self.prior.kernel.gram(train_data.X)  #  [N, N]
-        Sigma = Kxx + identity(train_data.n) * (
+        Sigma = Kxx + cola.ops.I_like(Kxx) * (
             self.likelihood.obs_noise + self.jitter
         )  #  [N, N]
         eps = jnp.sqrt(self.likelihood.obs_noise) * normal(
@@ -584,8 +586,8 @@ class ConjugatePosterior(AbstractPosterior):
         )  #  [N, B]
         y = train_data.y - self.prior.mean_function(train_data.X)  # account for mean
         Phi = fourier_feature_fn(train_data.X)
-        canonical_weights = Sigma.solve(
-            y + eps - jnp.inner(Phi, fourier_weights)
+        canonical_weights = cola.solve(
+            Sigma, y + eps - jnp.inner(Phi, fourier_weights)
         )  #  [N, B]
 
         def sample_fn(test_inputs: Float[Array, "n D"]) -> Float[Array, "n B"]:
@@ -653,7 +655,7 @@ class NonConjugatePosterior(AbstractPosterior):
                 a `dx.Distribution`.
         """
         # Unpack training data
-        x, n = train_data.X, train_data.n
+        x = train_data.X
 
         # Unpack mean function and kernel
         mean_function = self.prior.mean_function
@@ -661,19 +663,20 @@ class NonConjugatePosterior(AbstractPosterior):
 
         # Precompute lower triangular of Gram matrix, Lx, at training inputs, x
         Kxx = kernel.gram(x)
-        Kxx += identity(n) * self.prior.jitter
-        Lx = Kxx.to_root()
+        Kxx += cola.ops.I_like(Kxx) * self.prior.jitter
+        Kxx = cola.PSD(Kxx)
+        Lx = cola.sqrt(Kxx)
 
         # Unpack test inputs
-        t, n_test = test_inputs, test_inputs.shape[0]
+        t = test_inputs
 
         # Compute terms of the posterior predictive distribution
         Ktx = kernel.cross_covariance(t, x)
-        Ktt = kernel.gram(t) + identity(n_test) * self.prior.jitter
+        Ktt = kernel.gram(t)
         mean_t = mean_function(t)
 
         # Lx⁻¹ Kxt
-        Lx_inv_Kxt = Lx.solve(Ktx.T)
+        Lx_inv_Kxt = cola.solve(Lx, Ktx.T)
 
         # Whitened function values, wx, corresponding to the inputs, x
         wx = self.latent
@@ -683,7 +686,8 @@ class NonConjugatePosterior(AbstractPosterior):
 
         # Ktt - Ktx Kxx⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
         covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
-        covariance += identity(n_test) * self.prior.jitter
+        covariance += cola.ops.I_like(covariance) * self.prior.jitter
+        covariance = cola.PSD(covariance)
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
