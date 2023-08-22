@@ -62,7 +62,9 @@ import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax as tfp
 
 tfd = tfp.distributions
-plt.style.use("./gpjax.mplstyle")
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 key = jr.PRNGKey(123)
 
@@ -152,7 +154,7 @@ for ax in axes.ravel():
     )
 # -
 
-# Similarily, for a Bernoulli likelihood function, the samples of $y$ would be binary.
+# Similarly, for a Bernoulli likelihood function, the samples of $y$ would be binary.
 
 # +
 likelihood = gpx.Bernoulli(num_datapoints=D.n)

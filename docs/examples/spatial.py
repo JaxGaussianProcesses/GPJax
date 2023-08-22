@@ -69,7 +69,9 @@ with install_import_hook("gpjax", "beartype.beartype"):
 
 
 key = jr.PRNGKey(123)
-plt.style.use("./gpjax.mplstyle")
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # Observed temperature data
@@ -131,7 +133,7 @@ D = Dataset(
 # alone isn't enough to to a decent job at interpolating this data. Therefore, we can also use elevation and optimize
 # the parameters of our kernel such that more relevance should be given to elevation. This is possible by using a
 # kernel that has one length-scale parameter per input dimension: an automatic relevance determination (ARD) kernel.
-# See our [kernel notebook](https://docs.jaxgaussianprocesses.com/examples/kernels/) for more an introduction to
+# See our [kernel notebook](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/) for more an introduction to
 # kernels in GPJax.
 
 # %%

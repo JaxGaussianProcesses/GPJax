@@ -14,5 +14,6 @@
 # ==============================================================================
 
 from gpjax.kernels.non_euclidean.graph import GraphKernel
+from gpjax.kernels.non_euclidean.categorical import CatKernel
 
-__all__ = ["GraphKernel"]
+__all__ = ["GraphKernel", "CatKernel"]

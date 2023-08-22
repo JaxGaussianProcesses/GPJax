@@ -34,7 +34,9 @@ with install_import_hook("gpjax", "beartype.beartype"):
 
 
 key = jr.PRNGKey(123)
-plt.style.use("./gpjax.mplstyle")
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
@@ -122,7 +124,7 @@ plt.show()
 # optimised. For advice on achieving this, see the
 # [Regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/)
 # for advice on optimisation and the
-# [Kernels notebook](https://docs.jaxgaussianprocesses.com/examples/kernels/) for
+# [Kernels notebook](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/) for
 # advice on selecting an appropriate kernel.
 
 
