@@ -50,6 +50,7 @@ pre-commit = "^3.2.2"
 nbstripout = "^0.6.1"
 pydocstyle = "^6.3.0"
 codespell = "^2.2.4"
+asv = "^0.6.0"
 
 
 [tool.poetry.group.docs.dependencies]

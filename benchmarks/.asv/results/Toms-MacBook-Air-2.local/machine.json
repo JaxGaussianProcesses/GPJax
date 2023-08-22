@@ -1,9 +1,0 @@
-{
-    "arch": "arm64",
-    "cpu": "Apple M1",
-    "machine": "Toms-MacBook-Air-2.local",
-    "num_cpu": "8",
-    "os": "Darwin 22.3.0",
-    "ram": "8589934592",
-    "version": 1
-}
