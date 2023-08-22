@@ -23,7 +23,9 @@ from beartype.typing import (
 )
 import jax
 from jax._src.random import _check_prng_key
+import jax.numpy as jnp
 import jax.random as jr
+import jaxopt
 from jaxopt.base import IterativeSolver
 
 from gpjax.base import Module
@@ -84,7 +86,6 @@ def fit(  # noqa: PLR0913
         >>> # (4) Train!
         >>> trained_model, history = gpx.fit(
                 model=model,
-                objective=loss,
                 train_data=D,
                 solver=jaxopt.LBFGS(loss_fn, max_stepsize=0.001, maxiter=4000),
             )
@@ -125,6 +126,11 @@ def fit(  # noqa: PLR0913
     # Initialise solver state.
     solver.fun = _wrap_objective(solver.fun)
     solver.__post_init__()  # needed to propagate changes to `fun` attribute
+
+    # needed for OptaxSolver to work
+    if isinstance(solver, jaxopt.OptaxSolver):
+        model = jax.tree_map(lambda x: x.astype(jnp.float64), model)
+
     solver_state = solver.init_state(
         model,
         get_batch(train_data, batch_size, key) if batch_size != -1 else train_data,
