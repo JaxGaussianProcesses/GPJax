@@ -18,14 +18,16 @@ from beartype.typing import (
     Callable,
     Optional,
 )
+import optax as ox
 
+import gpjax as gpx
 from gpjax.dataset import Dataset
-from gpjax.decision_making.posterior_optimizer import AbstractPosteriorOptimizer
 from gpjax.gps import (
     AbstractLikelihood,
     AbstractPosterior,
     AbstractPrior,
 )
+from gpjax.objectives import AbstractObjective
 from gpjax.typing import KeyArray
 
 LikelihoodBuilder = Callable[[int], AbstractLikelihood]
@@ -44,13 +46,23 @@ class PosteriorHandler:
         likelihood_builder (LikelihoodBuilder): Function which takes the number of
         datapoints as input and returns a likelihood object initialised with the given
         number of datapoints.
-        posterior_optimizer (AbstractPosteriorOptimizer): Optimizer to use for
-        optimizing the posterior hyperparameters.
+        optimization_objective (AbstractObjective): Objective to use for optimizing the
+        posterior hyperparameters.
+        optimizer (ox.GradientTransformation): Optax optimizer to use for optimizing the
+        posterior hyperparameters.
+        num_optimization_iterations (int): Number of iterations to optimize
+        the posterior hyperparameters for.
     """
 
     prior: AbstractPrior
     likelihood_builder: LikelihoodBuilder
-    posterior_optimizer: AbstractPosteriorOptimizer
+    optimization_objective: AbstractObjective
+    optimizer: ox.GradientTransformation
+    num_optimization_iters: int
+
+    def __post_init__(self):
+        if self.num_optimization_iters < 1:
+            raise ValueError("num_optimization_iters must be greater than 0.")
 
     def get_posterior(
         self, dataset: Dataset, optimize: bool, key: Optional[KeyArray] = None
@@ -67,15 +79,14 @@ class PosteriorHandler:
         Returns:
             Posterior for the given dataset.
         """
-        likelihood = self.likelihood_builder(dataset.n)
-        posterior = self.prior * likelihood
+        posterior = self.prior * self.likelihood_builder(dataset.n)
 
         if optimize:
             if key is None:
                 raise ValueError(
                     "A key must be provided in order to optimize the posterior."
                 )
-            posterior = self.posterior_optimizer.optimize(posterior, dataset, key)
+            posterior = self._optimize_posterior(posterior, dataset, key)
 
         return posterior
 
@@ -113,5 +124,32 @@ class PosteriorHandler:
                 raise ValueError(
                     "A key must be provided in order to optimize the posterior."
                 )
-            posterior = self.posterior_optimizer.optimize(posterior, dataset, key)
+            posterior = self._optimize_posterior(posterior, dataset, key)
         return posterior
+
+    def _optimize_posterior(
+        self, posterior: AbstractPosterior, dataset: Dataset, key: KeyArray
+    ) -> AbstractPosterior:
+        """
+        Takes a posterior and corresponding dataset and optimizes the posterior using the
+        GPJax `fit` method.
+
+        Args:
+            posterior: Posterior being optimized.
+            dataset: Dataset used for optimizing posterior.
+            key: A JAX PRNG key for generating random numbers.
+        Returns:
+            Optimized posterior.
+        """
+        opt_posterior, _ = gpx.fit(
+            model=posterior,
+            objective=self.optimization_objective,
+            train_data=dataset,
+            optim=self.optimizer,
+            num_iters=self.num_optimization_iters,
+            safe=True,
+            key=key,
+            verbose=False,
+        )
+
+        return opt_posterior
