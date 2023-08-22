@@ -19,12 +19,14 @@ from beartype.typing import (
     Callable,
     Optional,
     Tuple,
+    Type,
     TypeVar,
     Union,
 )
 import jax
 from jax._src.random import _check_prng_key
 import jax.random as jr
+from jaxopt.base import IterativeSolver
 import optax as ox
 
 from gpjax.base import Module
@@ -163,6 +165,143 @@ def fit(  # noqa: PLR0913
 
     # Optimisation loop.
     (model, _), history = scan(step, (model, state), (iter_keys), unroll=unroll)
+
+    # Constrained space.
+    model = model.constrain()
+
+    return model, history
+
+
+def fit_jaxopt(  # noqa: PLR0913
+    *,
+    model: ModuleModel,
+    objective: Union[AbstractObjective, Callable[[ModuleModel, Dataset], ScalarFloat]],
+    train_data: Dataset,
+    solver: Type[IterativeSolver],
+    solver_kwargs: dict[str, Any],
+    num_iters: int,
+    key: KeyArray,
+    batch_size: Optional[int] = -1,
+    log_rate: Optional[int] = 10,
+    verbose: Optional[bool] = True,
+    unroll: Optional[int] = 1,
+    safe: Optional[bool] = True,
+) -> Tuple[ModuleModel, Array]:
+    r"""Train a Module model with respect to a supplied Objective function.
+    `solver` must be a subclass of `jaxopt`'s `IterativeSolver`.
+
+    Example:
+    ```python
+        >>> import jax.numpy as jnp
+        >>> import jax.random as jr
+        >>> import jaxopt
+        >>> import gpjax as gpx
+        >>>
+        >>> # (1) Create a dataset:
+        >>> X = jnp.linspace(0.0, 10.0, 100)[:, None]
+        >>> y = 2.0 * X + 1.0 + 10 * jr.normal(jr.PRNGKey(0), X.shape)
+        >>> D = gpx.Dataset(X, y)
+        >>>
+        >>> # (2) Define your model:
+        >>> class LinearModel(gpx.Module):
+                weight: float = gpx.param_field()
+                bias: float = gpx.param_field()
+
+                def __call__(self, x):
+                    return self.weight * x + self.bias
+
+        >>> model = LinearModel(weight=1.0, bias=1.0)
+        >>>
+        >>> # (3) Define your loss function:
+        >>> class MeanSquareError(gpx.AbstractObjective):
+                def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
+                    return jnp.mean((train_data.y - model(train_data.X)) ** 2)
+        >>>
+        >>> loss = MeanSqaureError()
+        >>>
+        >>> # (4) Train!
+        >>> trained_model, history = gpx.fit(
+                model=model,
+                objective=loss,
+                train_data=D,
+                solver=jaxopt.LBFGS,
+                solver_kwargs={"max_stepsize": 0.001},
+                num_iters=1000,
+            )
+    ```
+
+    Args:
+        model (Module): The model Module to be optimised.
+        objective (Objective): The objective function that we are optimising with
+            respect to.
+        train_data (Dataset): The training data to be used for the optimisation.
+        solver (IterativeSolver): The `jaxopt` solver.
+        solver_kwargs (Dict[str, Any]): arguments for instantiating the solver.
+        num_iters (Optional[int]): The number of optimisation steps to run. Defaults
+            to 100.
+        batch_size (Optional[int]): The size of the mini-batch to use. Defaults to -1
+            (i.e. full batch).
+        key (Optional[KeyArray]): The random key to use for the optimisation batch
+            selection. Defaults to jr.PRNGKey(42).
+        log_rate (Optional[int]): How frequently the objective function's value should
+            be printed. Defaults to 10.
+        verbose (Optional[bool]): Whether to print the training loading bar. Defaults
+            to True.
+        unroll (int): The number of unrolled steps to use for the optimisation.
+            Defaults to 1.
+
+    Returns
+    -------
+        Tuple[Module, Array]: A Tuple comprising the optimised model and training
+            history respectively.
+    """
+    if safe:
+        # Check inputs.
+        _check_model(model)
+        _check_train_data(train_data)
+        _check_batch_size(batch_size)
+        _check_prng_key(key)
+        _check_log_rate(log_rate)
+        _check_verbose(verbose)
+
+    # Unconstrained space loss function with stop-gradient rule for non-trainable params.
+    def loss(model: Module, batch: Dataset) -> ScalarFloat:
+        model = model.stop_gradient()
+        return objective(model.constrain(), batch)
+
+    # Unconstrained space model.
+    model = model.unconstrain()
+
+    # Initialise optimiser state.
+    solver: IterativeSolver = solver(loss, **solver_kwargs)
+    solver_state = solver.init_state(
+        model,
+        get_batch(train_data, batch_size, key) if batch_size != -1 else train_data,
+    )
+    solver.maxiter = num_iters
+    jitted_update = jax.jit(solver.update)
+
+    # Mini-batch random keys to scan over.
+    iter_keys = jr.split(key, solver.maxiter)
+
+    # Optimisation step.
+    def step(carry, key):
+        model, state = carry
+
+        if batch_size != -1:
+            batch = get_batch(train_data, batch_size, key)
+        else:
+            batch = train_data
+
+        model, state = jitted_update(model, state, batch)
+        carry = model, state
+        return carry, state.value
+
+    # Optimisation scan.
+    scan = vscan if verbose else jax.lax.scan
+
+    # Optimisation loop.
+    (model, _), history = scan(step, (model, solver_state), (iter_keys), unroll=unroll)
 
     # Constrained space.
     model = model.constrain()
