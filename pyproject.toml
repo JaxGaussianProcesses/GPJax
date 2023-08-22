@@ -26,6 +26,7 @@ orbax-checkpoint = "^0.2.0"
 beartype = "^0.13.1"
 jaxlib = "0.4.7" # Temporary fix: https://github.com/google/jax/issues/15951
 plum-dispatch = "^2.1.0"
+jaxopt = "^0.8"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.2"
