@@ -46,7 +46,7 @@ class RBF(AbstractKernel):
         Evaluate the kernel on a pair of inputs $`(x, y)`$ with lengthscale parameter
         $`\ell`$ and variance $`\sigma^2`$:
         ```math
-        k(x,y)=\sigma^2\exp\Bigg(\frac{\lVert x - y \rVert^2_2}{2 \ell^2} \Bigg)
+        k(x,y)=\sigma^2\exp\Bigg(- \frac{\lVert x - y \rVert^2_2}{2 \ell^2} \Bigg)
         ```
 
         Args:

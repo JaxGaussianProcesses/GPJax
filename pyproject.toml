@@ -51,6 +51,7 @@ nbstripout = "^0.6.1"
 pydocstyle = "^6.3.0"
 codespell = "^2.2.4"
 asv = "^0.6.0"
+interrogate = "^1.5.0"
 
 
 [tool.poetry.group.docs.dependencies]
@@ -193,6 +194,19 @@ output = "reports/coverage.xml"
 
 [tool.poetry-dynamic-versioning]
 enable = true
+vcs = "git"
+
+[tool.poetry-dynamic-versioning.substitution]
+files = ["gpjax/__init__.py"]
 
 [tool.codespell]
 ignore-words-list = "fro" # Frobenius
+
+[tool.interrogate]
+ignore-init-method = true
+ignore-init-module = true
+fail-under = 64
+exclude = ["setup.py", "docs", "tests"]
+verbose = 2
+quiet = false
+color = true

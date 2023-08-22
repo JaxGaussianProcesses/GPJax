@@ -1,4 +1,4 @@
-name: Run Tests
+name: Integration Tests
 on:
   pull_request:
   push:
@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  unit-tests:
-    name: Run Tests
+  integration-tests:
+    name: Run Integration Tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -39,21 +39,8 @@ jobs:
       # Install the dependencies
       - name: Install Package
         run: |
-          poetry install --with tests
-
-      - name: Check docstrings
-        run: |
-          poetry run xdoctest ./gpjax
+          poetry install --all-extras --with docs
 
       # Run the unit tests and build the coverage report
-      - name: Run Tests
-        run: poetry run pytest -v --cov=./gpjax --cov-report=xml:./coverage.xml
-
-      - name: Upload code coverage
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
-          name: gpjax
-          flags: unittests
-          env_vars: OS,PYTHON
+      - name: Run Integration Tests
+        run: poetry run python tests/integration_tests.py

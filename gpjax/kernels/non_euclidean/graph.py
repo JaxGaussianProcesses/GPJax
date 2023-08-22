@@ -65,7 +65,9 @@ class GraphKernel(AbstractKernel):
     eigenvalues: Float[Array, " N"] = static_field(None)
     eigenvectors: Float[Array, "N N"] = static_field(None)
     num_vertex: ScalarInt = static_field(None)
-    compute_engine: AbstractKernelComputation = static_field(EigenKernelComputation)
+    compute_engine: AbstractKernelComputation = static_field(
+        EigenKernelComputation(), repr=False
+    )
     name: str = "Graph Matérn"
 
     def __post_init__(self):

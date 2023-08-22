@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  test-docs:
     # Functionality for testing documentation builds on multiple OSes and Python versions
     name: Build docs (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -43,7 +43,9 @@ jobs:
           npm install katex
 
       - name: Install LaTex
-        run: sudo apt-get install texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra dvipng cm-super
+        run: |
+          sudo apt-get update
+          sudo apt-get install texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra dvipng cm-super
 
       # Install Poetry and build the documentation
       - name: Install and configure Poetry

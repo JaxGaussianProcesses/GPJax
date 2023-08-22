@@ -32,7 +32,7 @@ Dodd](https://github.com/Daniel-Dodd).
 
 We would be delighted to receive contributions from interested individuals and
 groups. To learn how you can get involved, please read our [guide for
-contributing](https://github.com/JaxGaussianProcesses/GPJax/blob/master/CONTRIBUTING.md).
+contributing](https://github.com/JaxGaussianProcesses/GPJax/blob/main/docs/contributing.md).
 If you have any questions, we encourage you to [open an
 issue](https://github.com/JaxGaussianProcesses/GPJax/issues/new/choose). For
 broader conversations, such as best GP fitting practices or questions about the
@@ -54,20 +54,21 @@ process modelling.
 > - [**Stochastic Variational Inference**](https://docs.jaxgaussianprocesses.com/examples/uncollapsed_vi/)
 > - [**BlackJax Integration**](https://docs.jaxgaussianprocesses.com/examples/classification/#mcmc-inference)
 > - [**Laplace Approximation**](https://docs.jaxgaussianprocesses.com/examples/classification/#laplace-approximation)
-> - [**Inference on Non-Euclidean Spaces**](https://docs.jaxgaussianprocesses.com/examples/kernels/#custom-kernel)
+> - [**Inference on Non-Euclidean Spaces**](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#custom-kernel)
 > - [**Inference on Graphs**](https://docs.jaxgaussianprocesses.com/examples/graph_kernels/)
 > - [**Pathwise Sampling**](https://docs.jaxgaussianprocesses.com/examples/spatial/)
 > - [**Learning Gaussian Process Barycentres**](https://docs.jaxgaussianprocesses.com/examples/barycentres/)
 > - [**Deep Kernel Regression**](https://docs.jaxgaussianprocesses.com/examples/deep_kernels/)
 > - [**Poisson Regression**](https://docs.jaxgaussianprocesses.com/examples/poisson/)
+> - [**Bayesian Optimisation**](https://docs.jaxgaussianprocesses.com/examples/bayesian_optimisation/)
 
 ## Guides for customisation
 >
-> - [**Custom kernels**](https://docs.jaxgaussianprocesses.com/examples/kernels/#custom-kernel)
+> - [**Custom kernels**](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#custom-kernel)
 > - [**UCI regression**](https://docs.jaxgaussianprocesses.com/examples/yacht/)
 
 ## Conversion between `.ipynb` and `.py`
-Above examples are stored in [examples](examples) directory in the double
+Above examples are stored in [examples](docs/examples) directory in the double
 percent (`py:percent`) format. Checkout [jupytext
 using-cli](https://jupytext.readthedocs.io/en/latest/using-cli.html) for more
 info.

@@ -91,7 +91,7 @@ their own bijectors and attach them to the parameter(s) of their model.
 ### Why is positive-definiteness important?
 
 The Gram matrix of a kernel, a concept that we explore more in our
-[kernels notebook](examples/kernels.py) and our [PyTree notebook](examples/pytrees.md), is a
+[kernels notebook](examples/constructing_new_kernels.py) and our [PyTree notebook](examples/pytrees.md), is a
 symmetric positive definite matrix. As such, we
 have a range of tools at our disposal to make subsequent operations on the covariance
 matrix faster. One of these tools is the Cholesky factorisation that uniquely decomposes

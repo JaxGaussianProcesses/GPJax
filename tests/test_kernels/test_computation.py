@@ -42,7 +42,7 @@ def test_change_computation(kernel):
     dense_diagonals = jnp.diag(dense_matrix)
 
     # Let's now change the computation to DiagonalKernelComputation
-    kernel = kernel.replace(compute_engine=DiagonalKernelComputation)
+    kernel = kernel.replace(compute_engine=DiagonalKernelComputation())
     diagonal_matrix = kernel.gram(x).to_dense()
     diag_entries = jnp.diag(diagonal_matrix)
 
@@ -53,7 +53,7 @@ def test_change_computation(kernel):
     assert jnp.allclose(diagonal_matrix - jnp.diag(diag_entries), 0.0)
 
     # Let's now change the computation to ConstantDiagonalKernelComputation
-    kernel = kernel.replace(compute_engine=ConstantDiagonalKernelComputation)
+    kernel = kernel.replace(compute_engine=ConstantDiagonalKernelComputation())
     constant_diagonal_matrix = kernel.gram(x).to_dense()
     constant_entries = jnp.diag(constant_diagonal_matrix)
 

@@ -1,44 +1,47 @@
 # Where to find the docs
 
-The GPJax documentation can be found here:
-https://docs.jaxgaussianprocesses.com/
+The GPJax documentation can be found here: https://docs.jaxgaussianprocesses.com/
 
 # How to build the docs
 
-1. Install the requirements using `pip install -r docs/requirements.txt`
+1. Ensure you have installed the requirements using `poetry install` in the root
+   directory.
 2. Make sure `pandoc` is installed
-3. Run the make script `make html`
+3. Run the command `poetry run mkdocs serve` in the root directory.
 
-The corresponding HTML files can then be found in `docs/_build/html/`.
+The documentation will then be served at an IP address printed, which can then be opened
+in a browser of you choice e.g. `Serving on http://127.0.0.1:8000/`.
 
 # How to write code documentation
 
-Our documentation it is written in ReStructuredText for Sphinx. This is a
-meta-language that is compiled into online documentation. For more details see
-[Sphinx's documentation](https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html).
-As a result, our docstrings adhere to a specific syntax that has to be kept in
-mind. Below we provide some guidelines.
+Our documentation is generated using [MkDocs](https://www.mkdocs.org/). This
+automatically creates online documentation from docstrings, with full support for
+Markdown. Longer tutorial-style notebooks are also converted to webpages by MkDocs, with
+these notebooks being stored in the `docs/examples` directory. If you write a new
+notebook and wish to add it to the documentation website, add it to the `nav` section of
+the `mkdocs.yml` file found in the root directory.
+
+Below we provide some guidelines for writing docstrings.
 
 ## How much information to put in a docstring
 
-A docstring should be informative. If in doubt, then it is best to add more
-information to a docstring than less. Many users will skim documentation, so
-please ensure the opening sentence or two of a docstring contains the core
-information. Adding examples and mathematical descriptions to documentation is
-highly desirable.
+A docstring should be informative. If in doubt, then it is best to add more information
+to a docstring than less. Many users will skim documentation, so please ensure the
+opening sentence or two of a docstring contains the core information. Adding examples
+and mathematical descriptions to documentation is highly desirable.
 
-We are making an active effort within GPJax to improve our documentation. If you
-spot any areas where there is missing information within the existing
-documentation, then please either raise an issue or
-[create a pull request](https://docs.jaxgaussianprocesses.com/contributing/).
+We are making an active effort within GPJax to improve our documentation. If you spot
+any areas where there is missing information within the existing documentation, then
+please either raise an issue or [create a pull
+request](https://docs.jaxgaussianprocesses.com/contributing/).
 
 ## An example docstring
 
-An example docstring that adheres the principles of GPJax is given below.
-The docstring contains a simple, snappy introduction with links to auxiliary
-components. More detail is then provided in the form of a mathematical
-description and a code example. The docstring is concluded with a description
-of the objects attributes with corresponding types.
+An example docstring that adheres the principles of GPJax is given below. The docstring
+contains a simple, snappy introduction with links to auxiliary components. More detail
+is then provided in the form of a mathematical description and a code example. The
+docstring is concluded with a description of the objects attributes with corresponding
+types.
 
 ```python
 from gpjax.gps import AbstractPrior
@@ -53,16 +56,11 @@ class Prior(AbstractPrior):
     [mean](https://docs.jaxgaussianprocesses.com/api/mean_functions/)
     and [kernel](https://docs.jaxgaussianprocesses.com/api/kernels/base/) function.
 
-    A Gaussian process prior parameterised by a mean function :math:`m(\\cdot)` and a kernel
-    function :math:`k(\\cdot, \\cdot)` is given by
+    A Gaussian process prior parameterised by a mean function $`m(\cdot)`$ and a kernel
+    function $`k(\cdot, \cdot)`$ is given by
+    $`p(f(\cdot)) = \mathcal{GP}(m(\cdot), k(\cdot, \cdot))`$.
 
-    .. math::
-
-        p(f(\\cdot)) = \mathcal{GP}(m(\\cdot), k(\\cdot, \\cdot)).
-
-    To invoke a ``Prior`` distribution, only a kernel function is required. By default,
-    the mean function will be set to zero. In general, this assumption will be reasonable
-    assuming the data being modelled has been centred.
+    To invoke a `Prior` distribution, a kernel and mean function must be specified.
 
     Example:
         >>> import gpjax as gpx
@@ -84,10 +82,13 @@ class Prior(AbstractPrior):
 
 ### Documentation syntax
 
-A helpful cheatsheet for writing restructured text can be found
-[here](https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst). In addition to that, we adopt the following convention when documenting
-`` objects.
+We adopt the following convention when documenting objects:
 
 *  Class attributes should be specified using the `Attributes:` tag.
 *  Method argument should be specified using the `Args:` tags.
-*  All attributes and arguments should have types.
+*  Values returned by a method should be specified using the `Returns:` tag.
+*  All attributes, arguments and returned values should have types.
+
+!!! attention "Note"
+
+    Inline math in docstrings needs to be rendered within both `$` and `` symbols to be correctly rendered by MkDocs. For instance, where one would typically write `$k(x,y)$` in standard LaTeX, in docstrings you are required to write ``$`k(x,y)`$`` in order for the math to be correctly rendered by MkDocs.

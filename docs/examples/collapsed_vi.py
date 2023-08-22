@@ -1,3 +1,19 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax_beartype
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # Sparse Gaussian Process Regression
 #
@@ -28,7 +44,9 @@ with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
 key = jr.PRNGKey(123)
-plt.style.use("./gpjax.mplstyle")
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
@@ -71,12 +89,16 @@ z = jnp.linspace(-3.0, 3.0, n_inducing).reshape(-1, 1)
 fig, ax = plt.subplots()
 ax.scatter(x, y, alpha=0.25, label="Observations", color=cols[0])
 ax.plot(xtest, ytest, label="Latent function", linewidth=2, color=cols[1])
-[
-    ax.axvline(x=z_i, alpha=0.3, linewidth=0.5, label="Inducing point", color=cols[2])
-    for z_i in z
-]
+ax.vlines(
+    x=z,
+    ymin=y.min(),
+    ymax=y.max(),
+    alpha=0.3,
+    linewidth=0.5,
+    label="Inducing point",
+    color=cols[2],
+)
 ax.legend(loc="best")
-ax = clean_legend(ax)
 plt.show()
 
 # %% [markdown]
@@ -195,12 +217,17 @@ ax.plot(
     linewidth=0.5,
 )
 
-[
-    ax.axvline(x=z_i, alpha=0.3, linewidth=0.5, label="Inducing point", color=cols[2])
-    for z_i in inducing_points
-]
+
+ax.vlines(
+    x=inducing_points,
+    ymin=ytest.min(),
+    ymax=ytest.max(),
+    alpha=0.3,
+    linewidth=0.5,
+    label="Inducing point",
+    color=cols[2],
+)
 ax.legend()
-ax = clean_legend(ax)
 ax.set(xlabel=r"$x$", ylabel=r"$f(x)$")
 plt.show()
 
