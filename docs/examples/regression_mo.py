@@ -116,7 +116,9 @@ out_kernel = gpx.kernels.CatKernel(
     stddev=catkernel_params.stddev, cholesky_lower=catkernel_params.cholesky_lower
 )
 # out_kernel = gpx.kernels.White(variance=1.0)
-meanf = gpx.mean_functions.Zero()
+meanf = gpx.mean_functions.SumMeanFunction(
+    [gpx.mean_functions.Zero(2), gpx.mean_functions.Constant(jnp.array([0.0, 1.0]))]
+)
 prior = gpx.Prior(mean_function=meanf, kernel=kernel, out_kernel=out_kernel)
 
 # %% [markdown]
@@ -135,19 +137,20 @@ prior_std = prior_dist.variance()
 samples = prior_dist.sample(seed=key, sample_shape=(20,))
 
 
-fig, ax = plt.subplots()
-ax.plot(xtest, samples.T, alpha=0.5, color=cols[0], label="Prior samples")
-ax.plot(xtest, prior_mean, color=cols[1], label="Prior mean")
-ax.fill_between(
-    xtest.flatten(),
-    prior_mean - prior_std,
-    prior_mean + prior_std,
-    alpha=0.3,
-    color=cols[1],
-    label="Prior variance",
-)
-ax.legend(loc="best")
-ax = clean_legend(ax)
+fig, ax = plt.subplots(nrows=2, figsize=(7.5, 5))
+for i in range(2):
+    ax[i].plot(xtest, samples.T[i], alpha=0.5, color=cols[0], label="Prior samples")
+    ax[i].plot(xtest, prior_mean[:, i], color=cols[1], label="Prior mean")
+    ax[i].fill_between(
+        xtest.flatten(),
+        prior_mean[:, i] - prior_std[:, i],
+        prior_mean[:, i] + prior_std[:, i],
+        alpha=0.3,
+        color=cols[1],
+        label="Prior variance",
+    )
+    ax[i].legend(loc="best")
+    ax[i] = clean_legend(ax[i])
 
 # %% [markdown]
 # ## Constructing the posterior
@@ -265,10 +268,6 @@ predictive_std = predictive_dist.stddev()
 # latent function of interest.
 
 # %%
-import einops
-
-predictive_mean = einops.rearrange(predictive_mean, "(N D) -> N D", D=2)
-predictive_std = einops.rearrange(predictive_std, "(N D) -> N D", D=2)
 
 fig, ax = plt.subplots(nrows=2, figsize=(7.5, 5))
 for i in range(2):

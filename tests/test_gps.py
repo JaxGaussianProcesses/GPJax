@@ -35,7 +35,7 @@ import tensorflow_probability.substrates.jax.distributions as tfd
 
 # from gpjax.dataset import Dataset
 from gpjax.dataset import Dataset
-from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.distributions import GaussianDistribution
 from gpjax.gps import (
     AbstractPosterior,
     AbstractPrior,

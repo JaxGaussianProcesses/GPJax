@@ -34,7 +34,7 @@ from gpjax.base import (
     param_field,
     static_field,
 )
-from gpjax.typing import Array
+from gpjax.typing import Array, ScalarInt
 
 
 @dataclasses.dataclass
@@ -42,7 +42,7 @@ class AbstractMeanFunction(Module):
     r"""Mean function that is used to parameterise the Gaussian process."""
 
     @abc.abstractmethod
-    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
+    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N O"]:
         r"""Evaluate the mean function at the given points. This method is required for all subclasses.
 
         Args:
@@ -55,7 +55,7 @@ class AbstractMeanFunction(Module):
         raise NotImplementedError
 
     def __add__(
-        self, other: Union["AbstractMeanFunction", Float[Array, "1"]]
+        self, other: Union["AbstractMeanFunction", Float[Array, " O"]]
     ) -> "AbstractMeanFunction":
         r"""Add two mean functions.
 
@@ -74,7 +74,7 @@ class AbstractMeanFunction(Module):
     def __radd__(
         self,
         other: Union[
-            "AbstractMeanFunction", Float[Array, "1"]
+            "AbstractMeanFunction", Float[Array, " O"]
         ],  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
         r"""Add two mean functions.
@@ -91,7 +91,7 @@ class AbstractMeanFunction(Module):
     def __mul__(
         self,
         other: Union[
-            "AbstractMeanFunction", Float[Array, "1"]
+            "AbstractMeanFunction", Float[Array, " O"]
         ],  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
         r"""Multiply two mean functions.
@@ -111,7 +111,7 @@ class AbstractMeanFunction(Module):
     def __rmul__(
         self,
         other: Union[
-            "AbstractMeanFunction", Float[Array, "1"]
+            "AbstractMeanFunction", Float[Array, " O"]
         ],  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
         r"""Multiply two mean functions.
@@ -135,9 +135,9 @@ class Constant(AbstractMeanFunction):
     learned during training but defaults to 1.0.
     """
 
-    constant: Float[Array, "1"] = param_field(jnp.array([0.0]))
+    constant: Float[Array, " O"] = param_field(jnp.array([0.0]))
 
-    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
+    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N O"]:
         r"""Evaluate the mean function at the given points.
 
         Args:
@@ -193,7 +193,7 @@ class CombinationMeanFunction(AbstractMeanFunction):
         self.means = items_list
         self.operator = operator
 
-    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
+    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N O"]:
         r"""Evaluate combination kernel on a pair of inputs.
 
         Args:

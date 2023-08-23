@@ -13,7 +13,7 @@ from gpjax.base import (
     static_field,
 )
 from gpjax.dataset import Dataset
-from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.distributions import GaussianDistribution
 from gpjax.lower_cholesky import lower_cholesky
 from gpjax.typing import (
     Array,
@@ -127,7 +127,7 @@ class ConjugateMLL(AbstractObjective):
         # Observation noise o²
         obs_noise = posterior.likelihood.obs_noise
 
-        mx = jnp.repeat(posterior.prior.mean_function(x), m, axis=0)
+        mx = posterior.prior.mean_function(x)
 
         # Σ = (Kxx + Io²) = LLᵀ
         Kxx = posterior.prior.kernel.gram(x)
@@ -137,8 +137,9 @@ class ConjugateMLL(AbstractObjective):
         Sigma = Sigma + cola.ops.I_like(Sigma) * (obs_noise + posterior.prior.jitter)
         Sigma = cola.PSD(Sigma)
 
+        # flatten to handle multi-output case, then calculate
         # p(y | x, θ), where θ are the model hyperparameters:
-        mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
+        mll = GaussianDistribution(jnp.atleast_1d(mx.flatten()), Sigma)
 
         rval = mll.log_prob(jnp.atleast_1d(y.flatten()), mask=mask).squeeze()
         return self.constant * rval

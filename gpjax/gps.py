@@ -42,7 +42,7 @@ from gpjax.base import (
     static_field,
 )
 from gpjax.dataset import Dataset
-from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.distributions import GaussianDistribution, ReshapedDistribution
 from gpjax.kernels import RFF, White
 from gpjax.kernels.base import AbstractKernel
 from gpjax.likelihoods import (
@@ -249,12 +249,17 @@ class Prior(AbstractPrior):
                 of the Gaussian process.
         """
         x = test_inputs
-        mx = self.mean_function(x)
+        mx = jnp.atleast_1d(self.mean_function(x))
         Kxx = self.kernel.gram(x)
-        Kxx += cola.ops.I_like(Kxx) * self.jitter
-        Kxx = cola.PSD(Kxx)
+        Kyy = self.out_kernel.gram(jnp.arange(mx.shape[1]))
+        Sigma = cola.ops.Kronecker(Kxx, Kyy)
+        Sigma += cola.ops.I_like(Sigma) * self.jitter
 
-        return GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Kxx)
+        prior_distr = GaussianDistribution(mx.flatten(), Sigma)
+        if mx.shape[1] == 1:
+            return prior_distr
+        else:
+            return ReshapedDistribution(prior_distr, mx.shape)
 
     def sample_approx(
         self,
@@ -495,7 +500,7 @@ class ConjugatePosterior(AbstractPosterior):
 
         # Observation noise o²
         obs_noise = self.likelihood.obs_noise
-        mx = jnp.repeat(self.prior.mean_function(x), m, axis=0)
+        mx = self.prior.mean_function(x)
 
         # Precompute Gram matrix, Kxx, at training inputs, x
         Kxx = self.prior.kernel.gram(x)
@@ -519,7 +524,7 @@ class ConjugatePosterior(AbstractPosterior):
             )
 
         # FIXME: mean_function should probably be multidim
-        mean_t = jnp.repeat(self.prior.mean_function(t), m, axis=0)
+        mean_t = self.prior.mean_function(t)
         Ktt = jnp.kron(self.prior.kernel.gram(t).to_dense(), Kyy.to_dense())
         Kxt = jnp.kron(self.prior.kernel.cross_covariance(x, t), Kyy.to_dense())
 
@@ -529,14 +534,17 @@ class ConjugatePosterior(AbstractPosterior):
         Sigma_inv_Kxt = cola.solve(Sigma, Kxt)
 
         # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
-        mean = mean_t + jnp.matmul(Sigma_inv_Kxt.T, y.reshape((-1, 1)) - mx)
+        mean = mean_t.flatten() + jnp.matmul(Sigma_inv_Kxt.T, (y - mx).flatten())
 
         # Ktt  -  Ktx (Kxx + Io²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
         covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
         covariance += cola.ops.I_like(covariance) * self.prior.jitter
         covariance = cola.PSD(covariance)
-
-        return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
+        rval = GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
+        if m == 1:
+            return rval
+        else:
+            return ReshapedDistribution(rval, (n_test, m))
 
     def sample_approx(
         self,

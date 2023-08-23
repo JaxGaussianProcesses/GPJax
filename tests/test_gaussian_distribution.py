@@ -29,7 +29,9 @@ from cola.ops import (
     Diagonal,
 )
 
-from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.distributions import GaussianDistribution
+from gpjax.linops.dense_linear_operator import DenseLinearOperator
+from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 
 _key = jr.PRNGKey(seed=42)
 
