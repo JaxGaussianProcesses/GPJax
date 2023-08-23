@@ -17,6 +17,7 @@ from jaxtyping import install_import_hook, Float
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
+import jaxopt
 import pandas as pd
 from docs.examples.utils import clean_legend
 
@@ -233,16 +234,13 @@ no_opt_posterior = prior * likelihood
 # We can then optimise the hyperparameters by minimising the negative log marginal likelihood of the data:
 
 # %%
-negative_mll = gpx.objectives.ConjugateMLL(negative=True)
-negative_mll(no_opt_posterior, train_data=D)
-negative_mll = jit(negative_mll)
 
 opt_posterior, history = gpx.fit(
     model=no_opt_posterior,
-    objective=negative_mll,
     train_data=D,
-    optim=ox.adam(learning_rate=0.01),
-    num_iters=2000,
+    solver=jaxopt.OptaxSolver(
+        gpx.ConjugateMLL(negative=True), opt=ox.adamw(0.01), maxiter=2000
+    ),
     safe=True,
     key=key,
 )
@@ -538,16 +536,13 @@ posterior = prior * likelihood
 # marginal likelihood of the data:
 
 # %%
-negative_mll = gpx.objectives.ConjugateMLL(negative=True)
-negative_mll(posterior, train_data=D)
-negative_mll = jit(negative_mll)
 
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=negative_mll,
     train_data=D,
-    optim=ox.adam(learning_rate=0.01),
-    num_iters=1000,
+    solver=jaxopt.OptaxSolver(
+        gpx.ConjugateMLL(negative=True), opt=ox.adamw(0.01), maxiter=1000
+    ),
     safe=True,
     key=key,
 )

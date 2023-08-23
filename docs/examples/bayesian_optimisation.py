@@ -20,6 +20,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import optax as ox
+import jaxopt
 import tensorflow_probability.substrates.jax as tfp
 from typing import List, Tuple
 
@@ -216,10 +217,10 @@ def return_optimised_posterior(
 
     opt_posterior, history = gpx.fit(
         model=posterior,
-        objective=negative_mll,
-        train_data=data,
-        optim=ox.adam(learning_rate=0.01),
-        num_iters=1000,
+        train_data=D,
+        solver=jaxopt.OptaxSolver(
+            gpx.ConjugateMLL(negative=True), opt=ox.adam(0.01), maxiter=1000
+        ),
         safe=True,
         key=key,
         verbose=False,

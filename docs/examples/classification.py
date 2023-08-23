@@ -43,6 +43,7 @@ from jaxtyping import (
 )
 import matplotlib.pyplot as plt
 import optax as ox
+import jaxopt
 import tensorflow_probability.substrates.jax as tfp
 from tqdm import trange
 
@@ -118,14 +119,10 @@ print(type(posterior))
 # %%
 negative_lpd = jax.jit(gpx.LogPosteriorDensity(negative=True))
 
-optimiser = ox.adam(learning_rate=0.01)
-
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=negative_lpd,
     train_data=D,
-    optim=ox.adamw(learning_rate=0.01),
-    num_iters=1000,
+    solver=jaxopt.OptaxSolver(negative_lpd, opt=ox.adam(0.01), maxiter=1000),
     key=key,
 )
 

@@ -32,6 +32,7 @@ from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
+import jaxopt
 from docs.examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
@@ -216,10 +217,8 @@ negative_mll = jit(negative_mll)
 # %%
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=negative_mll,
     train_data=D,
-    optim=ox.adam(learning_rate=0.01),
-    num_iters=500,
+    solver=jaxopt.OptaxSolver(negative_mll, opt=ox.adamw(0.01), maxiter=500),
     safe=True,
     key=key,
 )

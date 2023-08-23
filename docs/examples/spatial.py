@@ -55,6 +55,7 @@ from jaxtyping import (
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
+import jaxopt
 import pandas as pd
 import planetary_computer
 import pystac_client
@@ -189,10 +190,8 @@ negative_mll(posterior, train_data=D)
 optim = ox.chain(ox.adam(learning_rate=0.1), ox.clip(1.0))
 posterior, history = gpx.fit(
     model=posterior,
-    objective=negative_mll,
     train_data=D,
-    optim=optim,
-    num_iters=3000,
+    solver=jaxopt.OptaxSolver(negative_mll, opt=optim, maxiter=3000),
     safe=True,
     key=key,
 )

@@ -41,6 +41,7 @@ from jaxtyping import (
 import matplotlib.pyplot as plt
 import numpy as np
 import optax as ox
+import jaxopt
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax as tfp
 
@@ -108,7 +109,7 @@ for k, ax in zip(kernels, axes.ravel()):
 # like our RBF kernel to act on the first, second and fourth dimensions.
 
 # %%
-slice_kernel = gpx.kernels.RBF(active_dims=[0, 1, 3], lengthscale = jnp.ones((3,)))
+slice_kernel = gpx.kernels.RBF(active_dims=[0, 1, 3], lengthscale=jnp.ones((3,)))
 
 # %% [markdown]
 #
@@ -270,10 +271,10 @@ circular_posterior = gpx.Prior(mean_function=meanf, kernel=PKern) * likelihood
 # Optimise GP's marginal log-likelihood using Adam
 opt_posterior, history = gpx.fit(
     model=circular_posterior,
-    objective=jit(gpx.ConjugateMLL(negative=True)),
     train_data=D,
-    optim=ox.adamw(learning_rate=0.05),
-    num_iters=500,
+    solver=jaxopt.OptaxSolver(
+        gpx.ConjugateMLL(negative=True), opt=ox.adamw(0.05), maxiter=500
+    ),
     key=key,
 )
 

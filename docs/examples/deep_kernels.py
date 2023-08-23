@@ -33,6 +33,7 @@ from jaxtyping import (
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
+import jaxopt
 from scipy.signal import sawtooth
 from gpjax.base import static_field
 
@@ -207,10 +208,10 @@ optimiser = ox.chain(
 
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=jax.jit(gpx.ConjugateMLL(negative=True)),
     train_data=D,
-    optim=optimiser,
-    num_iters=800,
+    solver=jaxopt.OptaxSolver(
+        gpx.ConjugateMLL(negative=True), opt=optimiser, maxiter=800
+    ),
     key=key,
 )
 

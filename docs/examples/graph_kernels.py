@@ -23,6 +23,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import networkx as nx
 import optax as ox
+import jaxopt
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -155,10 +156,10 @@ print(gpx.cite(kernel))
 # %%
 opt_posterior, training_history = gpx.fit(
     model=posterior,
-    objective=jit(gpx.ConjugateMLL(negative=True)),
     train_data=D,
-    optim=ox.adamw(learning_rate=0.01),
-    num_iters=1000,
+    solver=jaxopt.OptaxSolver(
+        gpx.ConjugateMLL(negative=True), opt=ox.adamw(0.01), maxiter=1000
+    ),
     key=key,
 )
 
