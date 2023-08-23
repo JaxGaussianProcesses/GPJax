@@ -81,7 +81,7 @@ def fit(  # noqa: PLR0913
                 def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
                     return jnp.mean((train_data.y - model(train_data.X)) ** 2)
         >>>
-        >>> loss = MeanSqaureError()
+        >>> loss = MeanSquaredError()
         >>>
         >>> # (4) Train!
         >>> trained_model, history = gpx.fit(
@@ -123,13 +123,13 @@ def fit(  # noqa: PLR0913
     # Unconstrained space model.
     model = model.unconstrain()
 
-    # Initialise solver state.
-    solver.fun = _wrap_objective(solver.fun)
-    solver.__post_init__()  # needed to propagate changes to `fun` attribute
-
     # needed for OptaxSolver to work
     if isinstance(solver, jaxopt.OptaxSolver):
         model = jax.tree_map(lambda x: x.astype(jnp.float64), model)
+
+    # Initialise solver state.
+    solver.fun = _wrap_objective(solver.fun)
+    solver.__post_init__()  # needed to propagate changes to `fun` attribute
 
     solver_state = solver.init_state(
         model,
