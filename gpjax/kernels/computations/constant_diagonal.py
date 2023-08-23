@@ -23,7 +23,7 @@ from cola.ops import (
 )
 from jax import vmap
 import jax.numpy as jnp
-from jaxtyping import Float
+from jaxtyping import Float, Num
 
 from gpjax.kernels.computations import AbstractKernelComputation
 from gpjax.typing import Array
@@ -32,14 +32,14 @@ Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa
 
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):
-    def gram(self, kernel: Kernel, x: Float[Array, "N D"]) -> LinearOperator:
+    def gram(self, kernel: Kernel, x: Num[Array, "N D"]) -> LinearOperator:
         r"""Compute the Gram matrix.
 
         Compute Gram covariance operator of the kernel function.
 
         Args:
             kernel (Kernel): the kernel function.
-            x (Float[Array, "N D"]): The inputs to the kernel function.
+            x (Num[Array, "N D"]): The inputs to the kernel function.
 
         Returns
         -------
@@ -51,7 +51,7 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
 
         return PSD(jnp.atleast_1d(value) * Identity(shape=shape, dtype=dtype))
 
-    def diagonal(self, kernel: Kernel, inputs: Float[Array, "N D"]) -> Diagonal:
+    def diagonal(self, kernel: Kernel, inputs: Num[Array, "N D"]) -> Diagonal:
         r"""Compute the diagonal Gram matrix's entries.
 
         For a given kernel, compute the elementwise diagonal of the
@@ -59,7 +59,7 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
 
         Args:
             kernel (Kernel): the kernel function.
-            inputs (Float[Array, "N D"]): The input matrix.
+            inputs (Num[Array, "N D"]): The input matrix.
 
         Returns
         -------
@@ -70,7 +70,7 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
         return PSD(Diagonal(diag=diag))
 
     def cross_covariance(
-        self, kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"]
+        self, kernel: Kernel, x: Num[Array, "N D"], y: Num[Array, "M D"]
     ) -> Float[Array, "N M"]:
         r"""Compute the cross-covariance matrix.
 
@@ -79,8 +79,8 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
 
         Args:
             kernel (Kernel): the kernel function.
-            x (Float[Array,"N D"]): The input matrix.
-            y (Float[Array,"M D"]): The input matrix.
+            x (Num[Array,"N D"]): The input matrix.
+            y (Num[Array,"M D"]): The input matrix.
 
         Returns
         -------

@@ -251,7 +251,7 @@ class Prior(AbstractPrior):
         x = test_inputs
         mx = jnp.atleast_1d(self.mean_function(x))
         Kxx = self.kernel.gram(x)
-        Kyy = self.out_kernel.gram(jnp.arange(mx.shape[1]))
+        Kyy = self.out_kernel.gram(jnp.arange(mx.shape[1])[:, jnp.newaxis])
         Sigma = cola.ops.Kronecker(Kxx, Kyy)
         Sigma += cola.ops.I_like(Sigma) * self.jitter
 
@@ -504,7 +504,7 @@ class ConjugatePosterior(AbstractPosterior):
 
         # Precompute Gram matrix, Kxx, at training inputs, x
         Kxx = self.prior.kernel.gram(x)
-        Kyy = self.prior.out_kernel.gram(jnp.arange(m))
+        Kyy = self.prior.out_kernel.gram(jnp.arange(m)[:, jnp.newaxis])
 
         # Σ = Kxx + Io²
         Sigma = cola.ops.Kronecker(Kxx, Kyy)

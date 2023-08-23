@@ -16,7 +16,7 @@
 from dataclasses import dataclass
 
 import jax.numpy as jnp
-from jaxtyping import Float
+from jaxtyping import Float, Num
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import (
@@ -42,7 +42,7 @@ class White(AbstractKernel):
     )
     name: str = "White"
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+    def __call__(self, x: Num[Array, " D"], y: Num[Array, " D"]) -> ScalarFloat:
         r"""Compute the White noise kernel between a pair of arrays.
 
         Evaluate the kernel on a pair of inputs $`(x, y)`$ with variance $`\sigma^2`$:
@@ -51,8 +51,8 @@ class White(AbstractKernel):
         ```
 
         Args:
-            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
+            x (Num[Array, " D"]): The left hand argument of the kernel function's call.
+            y (Num[Array, " D"]): The right hand argument of the kernel function's call.
 
         Returns
         -------

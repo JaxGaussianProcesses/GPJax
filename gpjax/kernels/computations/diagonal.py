@@ -20,7 +20,7 @@ from cola.ops import (
     LinearOperator,
 )
 from jax import vmap
-from jaxtyping import Float
+from jaxtyping import Float, Num
 
 from gpjax.kernels.computations import AbstractKernelComputation
 from gpjax.typing import Array
@@ -33,7 +33,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
     a diagonal Gram matrix.
     """
 
-    def gram(self, kernel: Kernel, x: Float[Array, "N D"]) -> LinearOperator:
+    def gram(self, kernel: Kernel, x: Num[Array, "N D"]) -> LinearOperator:
         r"""Compute the Gram matrix.
 
         For a kernel with diagonal structure, compute the $`N\times N`$ Gram matrix on
@@ -41,7 +41,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
 
         Args:
             kernel (Kernel): the kernel function.
-            x (Float[Array, "N D"]): The input matrix.
+            x (Num[Array, "N D"]): The input matrix.
 
         Returns
         -------
@@ -50,7 +50,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
         return PSD(Diagonal(diag=vmap(lambda x: kernel(x, x))(x)))
 
     def cross_covariance(
-        self, kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"]
+        self, kernel: Kernel, x: Num[Array, "N D"], y: Num[Array, "M D"]
     ) -> Float[Array, "N M"]:
         r"""Compute the cross-covariance matrix.
 
@@ -59,8 +59,8 @@ class DiagonalKernelComputation(AbstractKernelComputation):
 
         Args:
             kernel (Kernel): the kernel function.
-            x (Float[Array,"N D"]): The input matrix.
-            y (Float[Array,"M D"]): The input matrix.
+            x (Num[Array,"N D"]): The input matrix.
+            y (Num[Array,"M D"]): The input matrix.
 
         Returns
         -------

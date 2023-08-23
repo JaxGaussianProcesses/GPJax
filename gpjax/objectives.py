@@ -131,7 +131,7 @@ class ConjugateMLL(AbstractObjective):
 
         # Σ = (Kxx + Io²) = LLᵀ
         Kxx = posterior.prior.kernel.gram(x)
-        Kyy = posterior.prior.out_kernel.gram(jnp.arange(m))
+        Kyy = posterior.prior.out_kernel.gram(jnp.arange(m)[:, jnp.newaxis])
 
         Sigma = cola.ops.Kronecker(Kxx, Kyy)
         Sigma = Sigma + cola.ops.I_like(Sigma) * (obs_noise + posterior.prior.jitter)
