@@ -1,5 +1,3 @@
-from typing import TYPE_CHECKING
-
 from jax import config
 
 config.update("jax_enable_x64", True)
@@ -7,9 +5,6 @@ import jax.numpy as jnp
 import jax.random as jr
 
 import gpjax as gpx
-
-if TYPE_CHECKING:
-    from gpjax.gps import ConjugatePosterior
 
 
 class Gaussian:
