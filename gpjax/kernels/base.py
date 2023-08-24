@@ -24,10 +24,7 @@ from beartype.typing import (
     Union,
 )
 import jax.numpy as jnp
-from jaxtyping import (
-    Float,
-    Num,
-)
+from jaxtyping import Num
 import tensorflow_probability.substrates.jax.distributions as tfd
 
 from gpjax.base import (
