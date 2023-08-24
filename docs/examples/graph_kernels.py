@@ -133,7 +133,7 @@ cbar = plt.colorbar(sm)
 # For this reason, we simply perform gradient descent on the GP's marginal
 # log-likelihood term as in the
 # [regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/).
-# We do this using the Adam optimiser provided in `optax`.
+# We do this using the OptaxSolver provided by `jaxopt`, instantiated with the Adam optimiser.
 
 # %%
 likelihood = gpx.Gaussian(num_datapoints=D.n)

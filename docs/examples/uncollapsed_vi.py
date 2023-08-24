@@ -229,7 +229,7 @@ q = gpx.VariationalGaussian(posterior=p, inducing_inputs=z)
 # see Sections 3.1 and 4.1 of the excellent review paper
 # <strong data-cite="leibfried2020tutorial"></strong>.
 #
-# Since Optax's optimisers work to minimise functions, to maximise the ELBO we return
+# Since `jaxopt's solvers work to minimise functions, to maximise the ELBO we return
 # its negative.
 
 # %%

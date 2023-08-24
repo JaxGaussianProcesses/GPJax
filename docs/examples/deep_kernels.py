@@ -183,8 +183,8 @@ posterior = prior * likelihood
 # hyperparameter set.
 #
 # With the inclusion of a neural network, we take this opportunity to highlight the
-# additional benefits gleaned from using
-# [Optax](https://optax.readthedocs.io/en/latest/) for optimisation. In particular, we
+# additional benefits gleaned from using `jaxopt`'s
+# [Optax](https://optax.readthedocs.io/en/latest/) solver for optimisation. In particular, we
 # showcase the ability to use a learning rate scheduler that decays the optimiser's
 # learning rate throughout the inference. We decrease the learning rate according to a
 # half-cosine curve over 700 iterations, providing us with large step sizes early in

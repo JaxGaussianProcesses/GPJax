@@ -211,8 +211,8 @@ negative_mll = jit(negative_mll)
 # accelerate training.
 
 # %% [markdown]
-# We can now define an optimiser with `optax`. For this example we'll use the `adam`
-# optimiser.
+# We can now train our model using a `jaxopt` solver. In this case we opt for the `OptaxSolver`,
+# which wraps an `optax` optimizer.
 
 # %%
 opt_posterior, history = gpx.fit(

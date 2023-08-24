@@ -114,7 +114,7 @@ print(type(posterior))
 
 # %% [markdown]
 # We can obtain a MAP estimate by optimising the log-posterior density with
-# Optax's optimisers.
+# `jaxopt` solvers.
 
 # %%
 negative_lpd = jax.jit(gpx.LogPosteriorDensity(negative=True))

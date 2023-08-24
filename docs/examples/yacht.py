@@ -183,7 +183,8 @@ posterior = prior * likelihood
 # ### Model Optimisation
 #
 # With a model now defined, we can proceed to optimise the hyperparameters of our
-# model using Optax.
+# model using one of `jaxopt`'s solvers. In this case we use a solver that wraps an
+# `optax` optimizer.
 
 # %%
 training_data = gpx.Dataset(X=scaled_Xtr, y=scaled_ytr)
