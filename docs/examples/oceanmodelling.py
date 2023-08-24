@@ -391,8 +391,8 @@ plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shape)
 @dataclass
 class helmholtz_kernel(gpx.kernels.AbstractKernel):
     # initialise Phi and Psi kernels as any stationary kernel in gpJax
-    potential_kernel:gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0,1,2])
-    stream_kernel:gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0,1,2])
+    potential_kernel:gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0,1])
+    stream_kernel:gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0,1])
 
     def __call__(
         self, X: Float[Array, "1 D"], Xp: Float[Array, "1 D"]
