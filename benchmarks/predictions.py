@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from jax.config import config
+from jax import config
 
 config.update("jax_enable_x64", True)
 import jax.numpy as jnp
@@ -28,7 +28,7 @@ class Gaussian:
         meanf = gpx.mean_functions.Constant()
         self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)
         self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)
-        self.posterior: ConjugatePosterior = self.prior * self.likelihood
+        self.posterior = self.prior * self.likelihood
         key, subkey = jr.split(key)
         self.xtest = jr.normal(key=subkey, shape=(n_test, n_dims))
 
@@ -53,7 +53,7 @@ class Bernoulli:
         meanf = gpx.mean_functions.Constant()
         self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)
         self.likelihood = gpx.likelihoods.Bernoulli(num_datapoints=self.data.n)
-        self.posterior: ConjugatePosterior = self.prior * self.likelihood
+        self.posterior = self.prior * self.likelihood
         key, subkey = jr.split(key)
         self.xtest = jr.normal(key=subkey, shape=(n_test, n_dims))
 
@@ -78,7 +78,7 @@ class Poisson:
         meanf = gpx.mean_functions.Constant()
         self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)
         self.likelihood = gpx.likelihoods.Bernoulli(num_datapoints=self.data.n)
-        self.posterior: ConjugatePosterior = self.prior * self.likelihood
+        self.posterior = self.prior * self.likelihood
         key, subkey = jr.split(key)
         self.xtest = jr.normal(key=subkey, shape=(n_test, n_dims))
 
