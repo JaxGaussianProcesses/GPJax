@@ -159,7 +159,6 @@ class Gaussian(AbstractLikelihood):
             tfd.Distribution: The predictive distribution.
         """
         mean = dist.mean()
-        n_data = dist.event_shape[0]
         event_size = mean.size
 
         cov = dist.covariance()
