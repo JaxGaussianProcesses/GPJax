@@ -48,6 +48,7 @@ from gpjax.kernels import (
     RBF,
     AbstractKernel,
     Matern52,
+    White,
 )
 from gpjax.likelihoods import (
     AbstractLikelihood,
@@ -80,11 +81,15 @@ def test_abstract_posterior():
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 @pytest.mark.parametrize("kernel", [RBF(), Matern52()])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
+@pytest.mark.parametrize("out_kernel", [RBF(), White()])
 def test_prior(
-    num_datapoints: int, mean_function: AbstractMeanFunction, kernel: AbstractKernel
+    num_datapoints: int,
+    kernel: AbstractKernel,
+    mean_function: AbstractMeanFunction,
+    out_kernel: AbstractKernel,
 ) -> None:
     # Create prior.
-    prior = Prior(mean_function=mean_function, kernel=kernel)
+    prior = Prior(mean_function=mean_function, kernel=kernel, out_kernel=out_kernel)
 
     # Check types.
     assert isinstance(prior, Prior)
@@ -94,7 +99,7 @@ def test_prior(
     # Check pytree.
     assert jtu.tree_leaves(prior) == jtu.tree_leaves(kernel) + jtu.tree_leaves(
         mean_function
-    )
+    ) + jtu.tree_leaves(out_kernel)
 
     # Query a marginal distribution at some inputs.
     inputs = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
@@ -114,8 +119,12 @@ def test_prior(
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 @pytest.mark.parametrize("kernel", [RBF(), Matern52()])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
+@pytest.mark.parametrize("out_kernel", [RBF(), White()])
 def test_conjugate_posterior(
-    num_datapoints: int, mean_function: AbstractMeanFunction, kernel: AbstractKernel
+    num_datapoints: int,
+    mean_function: AbstractMeanFunction,
+    kernel: AbstractKernel,
+    out_kernel: AbstractKernel,
 ) -> None:
     # Create a dataset.
     key = jr.PRNGKey(123)
@@ -124,7 +133,7 @@ def test_conjugate_posterior(
     D = Dataset(X=x, y=y)
 
     # Define prior.
-    prior = Prior(mean_function=mean_function, kernel=kernel)
+    prior = Prior(mean_function=mean_function, kernel=kernel, out_kernel=out_kernel)
 
     # Define a likelihood.
     likelihood = Gaussian(num_datapoints=num_datapoints)
@@ -139,7 +148,7 @@ def test_conjugate_posterior(
     # Check tree flattening.
     assert jtu.tree_leaves(posterior) == jtu.tree_leaves(likelihood) + jtu.tree_leaves(
         kernel
-    ) + jtu.tree_leaves(mean_function)
+    ) + jtu.tree_leaves(mean_function) + jtu.tree_leaves(out_kernel)
 
     # Query a marginal distribution of the posterior at some inputs.
     inputs = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
@@ -159,8 +168,12 @@ def test_conjugate_posterior(
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 @pytest.mark.parametrize("kernel", [RBF(), Matern52()])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
+@pytest.mark.parametrize("out_kernel", [RBF(), White()])
 def test_nonconjugate_posterior(
-    num_datapoints: int, mean_function: AbstractMeanFunction, kernel: AbstractKernel
+    num_datapoints: int,
+    mean_function: AbstractMeanFunction,
+    kernel: AbstractKernel,
+    out_kernel: AbstractKernel,
 ) -> None:
     # Create a dataset.
     key = jr.PRNGKey(123)

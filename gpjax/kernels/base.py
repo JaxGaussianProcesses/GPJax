@@ -63,32 +63,32 @@ class AbstractKernel(Module):
     def gram(self, x: Num[Array, "N D"]):
         return self.compute_engine.gram(self, x)
 
-    def slice_input(self, x: Float[Array, "... D"]) -> Float[Array, "... Q"]:
+    def slice_input(self, x: Num[Array, "... D"]) -> Num[Array, "... Q"]:
         r"""Slice out the relevant columns of the input matrix.
 
         Select the relevant columns of the supplied matrix to be used within the
         kernel's evaluation.
 
         Args:
-            x (Float[Array, "... D"]): The matrix or vector that is to be sliced.
+            x (Num[Array, "... D"]): The matrix or vector that is to be sliced.
 
         Returns
         -------
-            Float[Array, "... Q"]: A sliced form of the input matrix.
+            Num[Array, "... Q"]: A sliced form of the input matrix.
         """
         return x[..., self.active_dims] if self.active_dims is not None else x
 
     @abc.abstractmethod
     def __call__(
         self,
-        x: Float[Array, " D"],
-        y: Float[Array, " D"],
+        x: Num[Array, " D"],
+        y: Num[Array, " D"],
     ) -> ScalarFloat:
         r"""Evaluate the kernel on a pair of inputs.
 
         Args:
-            x (Float[Array, " D"]): The left hand input of the kernel function.
-            y (Float[Array, " D"]): The right hand input of the kernel function.
+            x (Num[Array, " D"]): The left hand input of the kernel function.
+            y (Num[Array, " D"]): The right hand input of the kernel function.
 
         Returns
         -------
@@ -150,12 +150,12 @@ class Constant(AbstractKernel):
 
     constant: ScalarFloat = param_field(jnp.array(0.0))
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+    def __call__(self, x: Num[Array, " D"], y: Num[Array, " D"]) -> ScalarFloat:
         r"""Evaluate the kernel on a pair of inputs.
 
         Args:
-            x (Float[Array, " D"]): The left hand input of the kernel function.
-            y (Float[Array, " D"]): The right hand input of the kernel function.
+            x (Num[Array, " D"]): The left hand input of the kernel function.
+            y (Num[Array, " D"]): The right hand input of the kernel function.
 
         Returns
         -------
@@ -188,14 +188,14 @@ class CombinationKernel(AbstractKernel):
 
     def __call__(
         self,
-        x: Float[Array, " D"],
-        y: Float[Array, " D"],
+        x: Num[Array, " D"],
+        y: Num[Array, " D"],
     ) -> ScalarFloat:
         r"""Evaluate the kernel on a pair of inputs.
 
         Args:
-            x (Float[Array, " D"]): The left hand input of the kernel function.
-            y (Float[Array, " D"]): The right hand input of the kernel function.
+            x (Num[Array, " D"]): The left hand input of the kernel function.
+            y (Num[Array, " D"]): The right hand input of the kernel function.
 
         Returns
         -------
