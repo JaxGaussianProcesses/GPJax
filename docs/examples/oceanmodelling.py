@@ -55,17 +55,19 @@ from gpjax.base import static_field
 # We shall label the ground truth $D_0=\left\{ \left(\mathbf{x}_{0,i} , \mathbf{y}_{0,i} \right)\right\}_{i=1}^N$, where $\mathbf{y}_i$ is the 2 dimensional velocity vector at the $i$th location, $\mathbf{x}_i$. The training dataset contains simulated measurements from ocean drifters $D_T=\left\{\left(\mathbf{x}_{T,i}, \mathbf{y}_{T,i} \right)\right\}_{i=1}^{N_T}$, $N_T = 20$ in this case (the subscripts indicate the ground truth and the simulated measurements respectively).
 #
 
+
 # %%
-#function to place data from csv into correct array shape
+# function to place data from csv into correct array shape
 def prepare_data(df):
     pos = jnp.array([df["lon"], df["lat"]])
     vel = jnp.array([df["ubar"], df["vbar"]])
-    #extract shape stored as 'metadata' in the test data
+    # extract shape stored as 'metadata' in the test data
     try:
         shape = (int(df["shape"][1]), int(df["shape"][0]))  # shape = (34,16)
         return pos, vel, shape
     except KeyError:
         return pos, vel
+
 
 # loading in data
 try:
@@ -77,7 +79,7 @@ except FileNotFoundError:
 
 
 pos_test, vel_test, shape = prepare_data(gulf_data_test)
-pos_train, vel_train = prepare_data(gulf_data_train) 
+pos_train, vel_train = prepare_data(gulf_data_train)
 
 fig, ax = plt.subplots(1, 1)
 ax.quiver(
@@ -110,7 +112,7 @@ plt.show()
 # \end{array}\right)
 # $$
 #
-# where each $f^{(z)}\left(\mathbf{x}\right), z \in \{0,1\}$ is a scalar valued function. 
+# where each $f^{(z)}\left(\mathbf{x}\right), z \in \{0,1\}$ is a scalar valued function.
 #
 # Now consider the scalar-valued function $g: \mathbb{R}^2 \times\{0,1\} \rightarrow \mathbb{R}$, such that
 #
@@ -133,6 +135,7 @@ plt.show()
 #
 # where $z = 0$ if $i$ is odd and $z=1$ if $i$ is even.
 
+
 # %%
 # Change vectors x -> X = (x,z), and vectors y -> Y = (y,z) via the artificial z label
 def label_position(data):
@@ -141,9 +144,11 @@ def label_position(data):
     label = jnp.tile(jnp.array([0.0, 1.0]), n_points)
     return jnp.vstack((jnp.repeat(data, repeats=2, axis=1), label)).T
 
-#change vectors y -> Y by reshaping the velocity measurements
+
+# change vectors y -> Y by reshaping the velocity measurements
 def stack_velocity(data):
     return data.T.flatten().reshape(-1, 1)
+
 
 pos_train3d = label_position(pos_train)
 vel_train3d = stack_velocity(vel_train)
@@ -151,7 +156,7 @@ vel_train3d = stack_velocity(vel_train)
 # we also require the testing data to be relabelled for later use, such that we can query the 2Nx2N GP at the test points
 pos_test3d = label_position(pos_test)
 
-#place th etraining data into a Dataset object to be used by GPJax
+# place th etraining data into a Dataset object to be used by GPJax
 DT = gpx.Dataset(X=pos_train3d, y=vel_train3d)
 
 
@@ -168,6 +173,7 @@ DT = gpx.Dataset(X=pos_train3d, y=vel_train3d)
 # To implement this approach in GPJax, we define `velocity_kernel` in the following cell, following the steps outlined in the [custom kernels notebook](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#custom-kernel). This modular implementation takes the choice of user kernels as its class attributes: `kernel0` and `kernel1`. We must additionally pass the argument `active_dims = [0,1]`, which is an attribute of the base class `AbstractKernel`, into the chosen kernels. This is necessary such that the subsequent likelihood optimisation does not optimise over the artificial label dimension.
 #
 
+
 # %%
 @dataclass
 class velocity_kernel(gpx.kernels.AbstractKernel):
@@ -181,8 +187,8 @@ class velocity_kernel(gpx.kernels.AbstractKernel):
 
         z = jnp.array(X[2], dtype=int)
         zp = jnp.array(Xp[2], dtype=int)
-        
-        #acheive the correct value via 'switches' that are either 1 or 0
+
+        # achieve the correct value via 'switches' that are either 1 or 0
         k0_switch = ((z + 1) % 2) * ((zp + 1) % 2)
         k1_switch = z * zp
 
@@ -194,6 +200,7 @@ class velocity_kernel(gpx.kernels.AbstractKernel):
 # Next, we define the model in GPJax. The prior is defined using $k_{\text{vel}}\left(\mathbf{X}, \mathbf{X}^\prime \right)$ and 0 mean and 0 observation noise. We choose a Gaussian marginal log likelihood (MLL).
 #
 
+
 # %%
 def initialise_gp(kernel, mean, dataset):
     prior = gpx.Prior(mean_function=mean, kernel=kernel)
@@ -203,6 +210,7 @@ def initialise_gp(kernel, mean, dataset):
     posterior = prior * likelihood
     return posterior
 
+
 # Define the velocity GP
 mean = gpx.mean_functions.Zero()
 kernel = velocity_kernel()
@@ -211,6 +219,7 @@ velocity_posterior = initialise_gp(kernel, mean, DT)
 
 # %% [markdown]
 # With a model now defined, we can proceed to optimise the hyperparameters of our likelihood over $D_0$. This is done by minimising the marginal log likelihood using `optax`. We also plot its value at each step to visually confirm that we have found the minimum. See the  [introduction to Gaussian Processes](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/) notebook for more information on optimising the MLL.
+
 
 # %%
 def optimise_mll(posterior, dataset, NIters=1000, key=key, plot_history=True):
@@ -227,7 +236,7 @@ def optimise_mll(posterior, dataset, NIters=1000, key=key, plot_history=True):
         safe=True,
         key=key,
     )
-    #plot MLL value at each iteration
+    # plot MLL value at each iteration
     if plot_history:
         fig, ax = plt.subplots(1, 1)
         ax.plot(history, color=colors[1])
@@ -235,12 +244,14 @@ def optimise_mll(posterior, dataset, NIters=1000, key=key, plot_history=True):
 
     return opt_posterior
 
+
 opt_velocity_posterior = optimise_mll(velocity_posterior, DT)
 
 
 # %% [markdown]
 # ### Comparison
 # We next obtain the latent distribution of the GP of $g$ at $\mathbf{x}_{0,i}$, then extract its mean and standard at the test locations, $\mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i})$, as well as the standard deviation (we will use it at the very end).
+
 
 # %%
 def latent_distribution(opt_posterior, pos_3d):
@@ -260,6 +271,7 @@ pos_lat = pos_test
 # %% [markdown]
 # We now replot the ground truth (testing data) $D_0$, the predicted latent vector field $\mathbf{F}_{\text{latent}}(\mathbf{x_i})$, and a heatmap of the residuals at each location $\mathbf{R}(\mathbf{x}_i) = \mathbf{y}_{0,i} - \mathbf{F}_{\text{latent}}(\mathbf{x}_i) $, as well as $\left|\left|\mathbf{R}(\mathbf{x}_i)\right|\right|$.
 
+
 # %%
 # Residuals between ground truth and estimate
 def plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shape):
@@ -276,7 +288,7 @@ def plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shap
         vel_test[1],
         color=colors[0],
         label="Training data",
-        scale = 10
+        scale=10,
     )
     ax[0].quiver(
         pos_train[0],
@@ -285,7 +297,7 @@ def plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shap
         vel_train[1],
         color=colors[1],
         label="Test Data",
-        scale = 10
+        scale=10,
     )
     ax[0].set(
         xlim=[X.min() - 0.1, X.max() + 0.1],
@@ -302,11 +314,15 @@ def plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shap
         vel_lat[1],
         color=colors[3],
         label="Latent estimate of Ground Truth",
-        scale = 10
+        scale=10,
     )
     ax[1].quiver(
-        pos_train[0], pos_train[1], vel_train[0], vel_train[1], color=colors[1]
-        ,scale = 10
+        pos_train[0],
+        pos_train[1],
+        vel_train[0],
+        vel_train[1],
+        color=colors[1],
+        scale=10,
     )
     ax[1].set(
         xlim=[X.min() - 0.1, X.max() + 0.1],
@@ -314,19 +330,33 @@ def plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shap
         aspect="equal",
         title="GP Latent Estimate",
     )
-    
+
     # residuals
-    residuals_vel = jnp.flip(jnp.sqrt((vel_test[0] - vel_lat[0]) ** 2
-        + (vel_test[1] - vel_lat[1]) ** 2
-    ).reshape(shape), axis = [0])
+    residuals_vel = jnp.flip(
+        jnp.sqrt(
+            (vel_test[0] - vel_lat[0]) ** 2 + (vel_test[1] - vel_lat[1]) ** 2
+        ).reshape(shape),
+        axis=[0],
+    )
     im = ax[2].imshow(
-        residuals_vel, extent=[X.min(), X.max(), Y.min(), Y.max()], cmap="winter")
-    
-    
-    ax[2].quiver(pos_test[0], pos_test[1],vel_lat[0] - vel_test[0], vel_lat[1] - vel_test[1] ,color = 'white', scale = 10)
+        residuals_vel, extent=[X.min(), X.max(), Y.min(), Y.max()], cmap="winter"
+    )
+
     ax[2].quiver(
-    pos_train[0], pos_train[1], vel_train[0], vel_train[1], color=colors[1]
-        ,scale = 10
+        pos_test[0],
+        pos_test[1],
+        vel_lat[0] - vel_test[0],
+        vel_lat[1] - vel_test[1],
+        color="white",
+        scale=10,
+    )
+    ax[2].quiver(
+        pos_train[0],
+        pos_train[1],
+        vel_train[0],
+        vel_train[1],
+        color=colors[1],
+        scale=10,
     )
     ax[2].set(
         xlim=[X.min() - 0.1, X.max() + 0.1],
@@ -334,8 +364,13 @@ def plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shap
         aspect="equal",
         title="Residuals",
     )
-    
-    fig.colorbar(im, fraction=0.027, pad=0.04, orientation="vertical", )
+
+    fig.colorbar(
+        im,
+        fraction=0.027,
+        pad=0.04,
+        orientation="vertical",
+    )
     plt.show()
 
 
@@ -344,6 +379,7 @@ plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shape)
 
 # %% [markdown]
 # From the Latent Estimate we can see the velocity GP struggles to reconstruct features of the ground truth. This is because our construction of the kernel placed an independent prior on each physical dimension, which cannot be assumed. Therefore, we need a different approach that can implicitly incorporate this dependence at a fundamental level. To achieve this we will require a *Helmholtz Decomposition*.
+
 
 # %% [markdown]
 # ## Helmholtz Decomposition
@@ -391,25 +427,24 @@ plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shape)
 @dataclass
 class helmholtz_kernel(gpx.kernels.AbstractKernel):
     # initialise Phi and Psi kernels as any stationary kernel in gpJax
-    potential_kernel:gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0,1])
-    stream_kernel:gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0,1])
+    potential_kernel: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
+    stream_kernel: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
 
     def __call__(
         self, X: Float[Array, "1 D"], Xp: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
-        
-        # obtain indices for k_helm, implement in the correct sign between the derivatives 
+        # obtain indices for k_helm, implement in the correct sign between the derivatives
         z = jnp.array(X[2], dtype=int)
         zp = jnp.array(Xp[2], dtype=int)
         sign = (-1) ** (z + zp)
-        
+
         # convert to array to correctly index, -ve sign due to exchange symmetry (only true for stationary kernels)
         potential_dvtve = -jnp.array(
             hessian(self.potential_kernel)(X, Xp), dtype=jnp.float64
         )[z][zp]
         stream_dvtve = -jnp.array(
             hessian(self.stream_kernel)(X, Xp), dtype=jnp.float64
-        )[1-z][1-zp]
+        )[1 - z][1 - zp]
 
         return potential_dvtve + sign * stream_dvtve
 
@@ -452,6 +487,7 @@ plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shape)
 #
 # where each $p\left(\mathcal{Y}_i \mid \mathbf{X}_i \right)$ is the marginal Gaussian distribution at each test location, and $Y_{i,0}$ is the $i$th component of the (massaged) test data that we reserved at the beginning of the notebook in $D_0$. A smaller value is better, since the deviation of the ground truth and the model are small in this case.
 
+
 # %%
 # ensure testing data alternates between x0 and x1 components
 def nlpd(mean, std, vel_test):
@@ -459,7 +495,8 @@ def nlpd(mean, std, vel_test):
     normal = tfp.substrates.jax.distributions.Normal(loc=mean, scale=std)
     return -jnp.sum(normal.log_prob(vel_query))
 
-#compute nlpd for velocity and helmholtz
+
+# compute nlpd for velocity and helmholtz
 nlpd_vel = nlpd(velocity_mean, velocity_std, vel_test)
 nlpd_helm = nlpd(helmholtz_mean, helmholtz_std, vel_test)
 
