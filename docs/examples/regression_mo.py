@@ -50,7 +50,7 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 # $\mathcal{D} = (\boldsymbol{x}, \boldsymbol{y}) = \{(x_i, y_i)\}_{i=1}^{100}$ with inputs $\boldsymbol{x}$
 # sampled uniformly on $(-3., 3)$ and corresponding independent noisy outputs
 #
-# $$\boldsymbol{y} \sim \mathcal{N} \left(\sin(4\boldsymbol{x}) + \cos(2 \boldsymbol{x}), \textbf{I} * 0.3^2 \right).$$
+# $$\boldsymbol{y} \sim \mathcal{N} \left(\left[\sin(4\boldsymbol{x}) + \cos(2 \boldsymbol{x}), \sin(4\boldsymbol{x}) + \cos(3 \boldsymbol{x})\right], \textbf{I} * 0.3^2 \right).$$
 #
 # We store our data $\mathcal{D}$ as a GPJax `Dataset` and create test inputs and labels
 # for later.
@@ -61,10 +61,7 @@ noise = 0.3
 
 key, subkey = jr.split(key)
 x = jr.uniform(key=key, minval=-3.0, maxval=3.0, shape=(n,)).reshape(-1, 1)
-g = lambda x: jnp.sin(4 * x) + jnp.cos(2 * x)
-f = lambda x: jnp.array(
-    [jnp.sin(4 * x) + jnp.cos(2 * x), jnp.cos(4 * x) + jnp.sin(2 * x)]
-).T.squeeze()
+f = lambda x: jnp.sin(4 * x) + jnp.array([jnp.cos(2 * x), jnp.cos(3 * x)]).T.squeeze()
 signal = f(x)
 y = signal + jr.normal(subkey, shape=signal.shape) * noise
 
