@@ -239,33 +239,33 @@ class ReshapedDistribution(tfd.Distribution):
         self._output_shape = output_shape
 
     def mean(self) -> Float[Array, " N ..."]:
-        r"""Calculates the mean."""
+        r"""Mean of the base distribution, reshaped to the output shape."""
         return jnp.reshape(self._distribution.mean(), self._output_shape)
 
     def median(self) -> Float[Array, " N ..."]:
-        r"""Calculates the median."""
+        r"""Median of the base distribution, reshaped to the output shape"""
         return jnp.reshape(self._distribution.median(), self._output_shape)
 
     def mode(self) -> Float[Array, " N ..."]:
-        r"""Calculates the mode."""
+        r"""Mode of the base distribution, reshaped to the output shape"""
         return jnp.reshape(self._distribution.mode(), self._output_shape)
 
     def covariance(self) -> Float[Array, " N ..."]:
-        r"""Calculates the covariance matrix."""
+        r"""Covariance of the base distribution, reshaped to the squared output shape"""
         return jnp.reshape(
             self._distribution.covariance(), self._output_shape + self._output_shape
         )
 
     def variance(self) -> Float[Array, " N ..."]:
-        r"""Calculates the variance."""
+        r"""Variances of the base distribution, reshaped to the output shape"""
         return jnp.reshape(self._distribution.variance(), self._output_shape)
 
     def stddev(self) -> Float[Array, " N ..."]:
-        r"""Calculates the standard deviation."""
+        r"""Standard deviations of the base distribution, reshaped to the output shape"""
         return jnp.reshape(self._distribution.stddev(), self._output_shape)
 
     def entropy(self) -> ScalarFloat:
-        r"""Calculates the entropy."""
+        r"""Entropy of the base distribution."""
         return self._distribution.entropy()
 
     def log_prob(
@@ -279,7 +279,7 @@ class ReshapedDistribution(tfd.Distribution):
     def sample(
         self, seed: Any, sample_shape: Tuple[int, ...] = ()
     ) -> Float[Array, " n N ..."]:
-        r"""Draws samples from the distribution."""
+        r"""Draws samples from the distribution and reshapes them to the output shape."""
         sample = self._distribution.sample(seed, sample_shape)
         return jnp.reshape(sample, sample_shape + self._output_shape)
 
