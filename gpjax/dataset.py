@@ -41,7 +41,7 @@ class Dataset(Pytree):
         y: (Optional[Num[Array, "N Q"]]): output data.
         mask: (Optional[Union[Bool[Array, "N Q"], Literal["infer automatically"]]]): mask for the output data.
             Users can optionally specify a pre-computed mask, or explicitly pass `None` which
-            means no mask will be used. Defaults to `"infer automatically"` which means that
+            means no mask will be used. Defaults to `"infer automatically"`, which means that
             the mask will be computed from the output data, or set to `None` if no output data is provided.
     """
 
