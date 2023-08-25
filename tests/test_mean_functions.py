@@ -1,11 +1,10 @@
 # Enable Float64 for more stable matrix inversions.
-from jax.config import config
+from jax import config
 
 config.update("jax_enable_x64", True)
 
 
 import jax
-from jax import jit
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (
@@ -72,10 +71,7 @@ def test_zero_mean_remains_zero() -> None:
     posterior = prior * likelihood
 
     negative_mll = gpx.objectives.ConjugateMLL(negative=True)
-    negative_mll(posterior, train_data=D)
-    negative_mll = jit(negative_mll)
-
-    opt_posterior, history = gpx.fit(
+    opt_posterior, _ = gpx.fit(
         model=posterior,
         objective=negative_mll,
         train_data=D,
