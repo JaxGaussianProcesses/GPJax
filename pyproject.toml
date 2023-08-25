@@ -16,16 +16,16 @@ packages = [{include = "gpjax"}]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.12"
-jax = ">=0.4.1"
 optax = "^0.1.4"
 jaxtyping = "^0.2.15"
 tqdm = "^4.65.0"
 simple-pytree = "^0.1.7"
 tensorflow-probability = "^0.19.0"
-orbax-checkpoint = "^0.2.0"
 beartype = "^0.13.1"
-jaxlib = "0.4.7" # Temporary fix: https://github.com/google/jax/issues/15951
 plum-dispatch = "^2.1.0"
+jax = ">=0.4.10"
+jaxlib = ">=0.4.10"
+orbax-checkpoint = ">=0.2.3"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.2"
