@@ -2983,13 +2983,13 @@ numpy = ">=1.18.0"
 
 [[package]]
 name = "orbax-checkpoint"
-version = "0.2.2"
+version = "0.2.3"
 description = "Orbax Checkpoint"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "orbax-checkpoint-0.2.2.tar.gz", hash = "sha256:9f6a260e3e2efe85c1e975599cfc8da0c691161f43fb67c54557d36265c95127"},
-    {file = "orbax_checkpoint-0.2.2-py3-none-any.whl", hash = "sha256:8e1a385e28d2817a477dcdab601081bebb127b2c0fa3747a5e1a53f29f103bfa"},
+    {file = "orbax-checkpoint-0.2.3.tar.gz", hash = "sha256:155e0a2dceef2901122e66585171e1dff4f4a4d9d2abe43a2b514279b9a3dabd"},
+    {file = "orbax_checkpoint-0.2.3-py3-none-any.whl", hash = "sha256:a001bf48f1cebc635b07263fa546473ea48be3e278c50d5ade880b9aafb96f8a"},
 ]
 
 [package.dependencies]
@@ -2997,7 +2997,7 @@ absl-py = "*"
 cached_property = "*"
 etils = "*"
 importlib_resources = "*"
-jax = ">=0.4.8"
+jax = ">=0.4.9"
 jaxlib = "*"
 msgpack = "*"
 nest_asyncio = "*"
@@ -5140,4 +5140,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "c28ee41885457e83a3c641dfcd3e61704c8940df23c7c7eeef8f82406cdf8d00"
+content-hash = "6e8522a727760f42f1c044d42954a92abff6188cee00ae5d3066d766a127fb06"
