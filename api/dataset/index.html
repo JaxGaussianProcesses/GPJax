@@ -1841,8 +1841,12 @@
   
       <p>Base class for datasets.</p>
 <h6 id="gpjax.dataset.Dataset--attributes">Attributes<a class="headerlink" href="#gpjax.dataset.Dataset--attributes" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>X (Optional[Num[Array, &quot;N D&quot;]]): Input data.
-y (Optional[Num[Array, &quot;N Q&quot;]]): Output data.
+<div class="highlight"><pre><span></span><code>X (Optional[Num[Array, &quot;N D&quot;]]): input data.
+y: (Optional[Num[Array, &quot;N Q&quot;]]): output data.
+mask: (Optional[Union[Bool[Array, &quot;N Q&quot;], Literal[&quot;infer automatically&quot;]]]): mask for the output data.
+    Users can optionally specify a pre-computed mask, or explicitly pass `None` which
+    means no mask will be used. Defaults to `&quot;infer automatically&quot;`, which means that
+    the mask will be computed from the output data, or set to `None` if no output data is provided.
 </code></pre></div>
 
 
@@ -1865,8 +1869,8 @@ y (Optional[Num[Array, &quot;N Q&quot;]]): Output data.
 <code class="highlight language-python"><span class="n">X</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">D</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
 </h6>
@@ -1885,8 +1889,28 @@ y (Optional[Num[Array, &quot;N Q&quot;]]): Output data.
 <code class="highlight language-python"><span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">Q</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h6 id="gpjax.dataset.Dataset.mask" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Bool</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">N</span> <span class="n">Q</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="n">infer</span> <span class="n">automatically</span><span class="p">]]]</span> <span class="o">=</span> <span class="s1">&#39;infer automatically&#39;</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
 </h6>

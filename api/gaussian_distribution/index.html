@@ -2115,7 +2115,7 @@
 
 
 <h6 id="gpjax.gaussian_distribution.GaussianDistribution.log_prob" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">N</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
+<code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">N</span><span class="p">],</span> <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Bool</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span>  <span class="n">N</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -2138,11 +2138,21 @@
         <tr>
           <td><code>y</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>,  N]</code>
+                <code><span title="beartype.typing.Optional">Optional</span>[<span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>,  N]]</code>
           </td>
-          <td><p>The value to calculate the log probability of.</p></td>
+          <td><p>the value of which to calculate the log probability.</p></td>
           <td>
               <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>mask</code></td>
+          <td>
+                <code><span title="beartype.typing.Optional">Optional</span>[<span title="jaxtyping.Bool">Bool</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>,  N]]</code>
+          </td>
+          <td><p>(Optional[Bool[Array, " N"]]): the mask for missing values in y.</p></td>
+          <td>
+                <code>None</code>
           </td>
         </tr>
     </tbody>
