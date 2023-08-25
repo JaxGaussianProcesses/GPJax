@@ -1837,25 +1837,6 @@
 
 </div>
 
-<div class="doc doc-object doc-attribute">
-
-
-
-<h5 id="gpjax.mean_functions.Zero" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">Zero</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">Constant</span><span class="p">,</span> <span class="n">constant</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]))</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h5>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
 
 <div class="doc doc-object doc-class">
 
@@ -2175,8 +2156,8 @@ learned during training but defaults to 1.0.</p>
 <code class="highlight language-python"><span class="n">constant</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]))</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
@@ -2233,6 +2214,73 @@ learned during training but defaults to 1.0.</p>
   </div>
 
 </div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h5 id="gpjax.mean_functions.Zero" class="doc doc-heading">
+        <code>Zero</code>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.Constant" href="#gpjax.mean_functions.Constant">Constant</a></code></p>
+
+  
+      <p>Zero mean function.</p>
+<p>The zero mean function. This function returns a zero scalar value for all
+inputs. Unlike the Constant mean function, the constant scalar zero is fixed, and
+cannot be treated as a model hyperparameter and learned during training.</p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h6 id="gpjax.mean_functions.Zero.constant" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">constant</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
 
 
 
@@ -2303,8 +2351,8 @@ learned during training but defaults to 1.0.</p>
 <code class="highlight language-python"><span class="n">operator</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">operator</span></code>
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 </h6>
