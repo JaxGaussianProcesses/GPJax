@@ -48,7 +48,9 @@ class DenseLinearOperator(LinearOperator):
 
     matrix: Float[Array, "N N"]
 
-    def __init__(self, matrix: Float[Array, "N N"], dtype: jnp.dtype = None) -> None:
+    def __init__(
+        self, matrix: Float[Array, "N N"], dtype: jnp.dtype = None, shape: tuple = None
+    ) -> None:
         """Initialize the covariance operator.
 
         Args:
