@@ -219,9 +219,8 @@ scatter = ax.scatter(
     cmap="viridis",
     norm=mpl.colors.LogNorm(),
 )
-
-legend1 = ax.legend(*scatter.legend_elements(num=6), loc="best", title="Log GDP")
-ax.add_artist(legend1)
+cbar = fig.colorbar(scatter, ax=ax)
+cbar.set_label('log-GDP')
 ax.set(
     xlabel="Latent dimension 1",
     ylabel="Latent dimension 2",
