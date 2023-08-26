@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from gpjax.kernels.non_euclidean.graph import GraphKernel
 from gpjax.kernels.non_euclidean.categorical import CatKernel
+from gpjax.kernels.non_euclidean.graph import GraphKernel
 
 __all__ = ["GraphKernel", "CatKernel"]

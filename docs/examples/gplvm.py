@@ -119,6 +119,7 @@ latent_processes = prior * likelihood
 # %% [markdown]
 # We'll now define the GPLVM using the `gpx.Module` provided in GPJax. Unlike in [GP regression](./regression.py), we have to augment the model to contain not only the posterior distribution, but also the latent variables. Fortunately, this is easily achieved by adding an additional line to the model's field list and specifying it as a `param_field`. This will ensure that the latent variables are optimised alongside the GP's hyperparameters.
 
+
 # %%
 @dataclass
 class GPLVM(gpx.Module):
@@ -133,6 +134,7 @@ model = GPLVM(latent_process=latent_processes, latent_variables=initial_X)
 # ## Optimisation
 #
 # We can now optimise the parameters of our model. We achieve this by optimising the marginal log-likelihood as used in [regression notebook](./regression.py) where we now compute its value for each of $D$ observed dimensions and sum them together. We'll also use the `jax.jit` decorator to JIT compile the function to accelerate optimisation.
+
 
 # %%
 @dataclass
@@ -220,7 +222,7 @@ scatter = ax.scatter(
     norm=mpl.colors.LogNorm(),
 )
 cbar = fig.colorbar(scatter, ax=ax)
-cbar.set_label('log-GDP')
+cbar.set_label("log-GDP")
 ax.set(
     xlabel="Latent dimension 1",
     ylabel="Latent dimension 2",

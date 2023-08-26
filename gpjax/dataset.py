@@ -18,18 +18,19 @@ from dataclasses import dataclass
 import warnings
 
 from beartype.typing import (
+    Literal,
     Optional,
     Union,
-    Literal,
 )
 import jax.numpy as jnp
 from jaxtyping import (
     Bool,
     Num,
 )
-from simple_pytree import Pytree
-from jaxtyping import Num
-from simple_pytree import Pytree, static_field
+from simple_pytree import (
+    Pytree,
+    static_field,
+)
 
 from gpjax.typing import Array
 
