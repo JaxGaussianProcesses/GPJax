@@ -14,7 +14,7 @@ class Gaussian:
     ]
     params = [[100, 200, 500, 1000, 2000, 3000], [1, 2, 5]]
 
-    def setup(self, n_test, n_dims):
+    def setup(self, n_test: int, n_dims: int):
         key = jr.PRNGKey(123)
         self.X = jr.normal(key=key, shape=(100, n_dims))
         self.y = jnp.sin(self.X[:, :1])
@@ -27,7 +27,7 @@ class Gaussian:
         key, subkey = jr.split(key)
         self.xtest = jr.normal(key=subkey, shape=(n_test, n_dims))
 
-    def time_predict(self, n_test, n_dims):
+    def time_predict(self, n_test: int, n_dims: int):
         self.posterior.predict(test_inputs=self.xtest, train_data=self.data)
 
 
@@ -38,7 +38,7 @@ class Bernoulli:
     ]
     params = [[100, 200, 500, 1000, 2000, 3000], [1, 2, 5]]
 
-    def setup(self, n_test, n_dims):
+    def setup(self, n_test: int, n_dims: int):
         key = jr.PRNGKey(123)
         self.X = jr.normal(key=key, shape=(100, n_dims))
         self.y = jnp.sin(self.X[:, :1])
@@ -52,7 +52,7 @@ class Bernoulli:
         key, subkey = jr.split(key)
         self.xtest = jr.normal(key=subkey, shape=(n_test, n_dims))
 
-    def time_predict(self, n_test, n_dims):
+    def time_predict(self, n_test: int, n_dims: int):
         self.posterior.predict(test_inputs=self.xtest, train_data=self.data)
 
 
@@ -63,7 +63,7 @@ class Poisson:
     ]
     params = [[100, 200, 500, 1000, 2000, 3000], [1, 2, 5]]
 
-    def setup(self, n_test, n_dims):
+    def setup(self, n_test: int, n_dims: int):
         key = jr.PRNGKey(123)
         self.X = jr.normal(key=key, shape=(100, n_dims))
         f = lambda x: 2.0 * jnp.sin(3 * x) + 0.5 * x  # latent function
@@ -77,5 +77,5 @@ class Poisson:
         key, subkey = jr.split(key)
         self.xtest = jr.normal(key=subkey, shape=(n_test, n_dims))
 
-    def time_predict(self, n_test, n_dims):
+    def time_predict(self, n_test: int, n_dims: int):
         self.posterior.predict(test_inputs=self.xtest, train_data=self.data)

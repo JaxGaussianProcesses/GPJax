@@ -12,7 +12,7 @@ class Sparse:
     param_names = ["n_data", "n_inducing"]
     params = [[2000, 5000, 10000, 20000], [10, 20, 50, 100, 200]]
 
-    def setup(self, n_datapoints, n_inducing):
+    def setup(self, n_datapoints: int, n_inducing: int):
         key = jr.PRNGKey(123)
         self.X = jr.normal(key=key, shape=(n_datapoints, 1))
         self.y = jnp.sin(self.X[:, :1])
@@ -29,8 +29,8 @@ class Sparse:
         )
         self.objective = gpx.CollapsedELBO(negative=True)
 
-    def time_eval(self, n_datapoints, n_dims):
+    def time_eval(self, n_datapoints: int, n_dims: int):
         self.objective(self.q, self.data)
 
-    def time_grad(self, n_datapoints, n_dims):
+    def time_grad(self, n_datapoints: int, n_dims: int):
         jax.grad(self.objective)(self.q, self.data)
