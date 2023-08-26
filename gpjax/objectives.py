@@ -129,7 +129,9 @@ class ConjugateMLL(AbstractObjective):
         # p(y | x, θ), where θ are the model hyperparameters:
         mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
 
-        return self.constant * (mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze())
+        return self.constant * (
+            mll.log_prob(jnp.atleast_1d(y.squeeze()), mask=train_data.mask).squeeze()
+        )
 
 
 class LogPosteriorDensity(AbstractObjective):

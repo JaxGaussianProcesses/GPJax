@@ -17,6 +17,7 @@
 from gpjax.kernels.approximations import RFF
 from gpjax.kernels.base import (
     AbstractKernel,
+    Constant,
     ProductKernel,
     SumKernel,
 )
@@ -27,7 +28,10 @@ from gpjax.kernels.computations import (
     DiagonalKernelComputation,
     EigenKernelComputation,
 )
-from gpjax.kernels.non_euclidean import GraphKernel, CatKernel
+from gpjax.kernels.non_euclidean import (
+    CatKernel,
+    GraphKernel,
+)
 from gpjax.kernels.nonstationary import (
     ArcCosine,
     Linear,
@@ -47,6 +51,7 @@ from gpjax.kernels.stationary import (
 __all__ = [
     "AbstractKernel",
     "ArcCosine",
+    "Constant",
     "RBF",
     "GraphKernel",
     "CatKernel",

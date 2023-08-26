@@ -22,7 +22,10 @@ from beartype.typing import (
 from jax import vmap
 import jax.numpy as jnp
 import jax.random as jr
-from jaxtyping import Float
+from jaxtyping import (
+    Bool,
+    Float,
+)
 import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.linops import (
@@ -149,11 +152,14 @@ class GaussianDistribution(tfd.Distribution):
             self.event_shape[0] * (1.0 + jnp.log(2.0 * jnp.pi)) + self.scale.log_det()
         )
 
-    def log_prob(self, y: Float[Array, " N"]) -> ScalarFloat:
+    def log_prob(
+        self, y: Float[Array, " N"], mask: Optional[Bool[Array, " N"]] = None
+    ) -> ScalarFloat:
         r"""Calculates the log pdf of the multivariate Gaussian.
 
         Args:
-            y (Float[Array, " N"]): The value to calculate the log probability of.
+            y (Optional[Float[Array, " N"]]): the value of which to calculate the log probability.
+            mask: (Optional[Bool[Array, " N"]]): the mask for missing values in y.
 
         Returns
         -------
@@ -162,6 +168,13 @@ class GaussianDistribution(tfd.Distribution):
         mu = self.loc
         sigma = self.scale
         n = mu.shape[-1]
+        if mask is not None:
+            y = jnp.where(mask, 0.0, y)
+            mu = jnp.where(mask, 0.0, mu)
+            sigma_masked = jnp.where(mask[None] + mask[:, None], 0.0, sigma.matrix)
+            sigma = sigma.replace(
+                matrix=jnp.where(jnp.diag(mask), 1 / (2 * jnp.pi), sigma_masked)
+            )
 
         # diff, y - µ
         diff = y - mu
