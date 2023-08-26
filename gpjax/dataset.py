@@ -22,17 +22,23 @@ from beartype.typing import (
     Literal,
 )
 import jax.numpy as jnp
+<<<<<<< HEAD
 from jaxtyping import (
     Bool,
     Num,
 )
 from simple_pytree import Pytree
+=======
+from jaxtyping import Num
+from simple_pytree import Pytree, static_field
+from gpjax.base import Module
+>>>>>>> 3216299 (GPLVM example)
 
 from gpjax.typing import Array
 
 
 @dataclass
-class Dataset(Pytree):
+class Dataset(Module):
     r"""Base class for datasets.
 
     Attributes
@@ -45,8 +51,8 @@ class Dataset(Pytree):
             the mask will be computed from the output data, or set to `None` if no output data is provided.
     """
 
-    X: Optional[Num[Array, "N D"]] = None
-    y: Optional[Num[Array, "N Q"]] = None
+    X: Optional[Num[Array, "N D"]] = static_field(None)
+    y: Optional[Num[Array, "N Q"]] = static_field(None)
     mask: Optional[
         Union[Bool[Array, "N Q"], Literal["infer automatically"]]
     ] = "infer automatically"
