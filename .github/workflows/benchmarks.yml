@@ -34,12 +34,15 @@ jobs:
         run: |
           poetry install --all-extras --with dev
           pip install virtualenv
+          pip install asv
 
       - name: Set asv machine
-        run: asv machine --yes
+        run: |
+          cd benchmarks
+          asv machine --yes
 
       - name: Run benchmarks
-        uses: |
+        run: |
           cd benchmarks
           asv run --python PYTHON
           asv publish
