@@ -33,6 +33,7 @@ jobs:
       - name: Install dependencies
         run: |
           poetry install --all-extras --with dev
+          pip install asv
           pip install virtualenv
 
       - name: Set asv machine
