@@ -39,7 +39,7 @@ jobs:
         run: asv machine --yes
 
       - name: Run benchmarks
-        uses: |
+        run: |
           cd benchmarks
           asv run --python PYTHON
           asv publish
