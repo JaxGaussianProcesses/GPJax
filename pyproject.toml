@@ -1,18 +1,19 @@
 [tool.poetry]
 name = "gpjax"
-version = "0.0.0" # Merely a placeholder, will be replaced by the dynamic versioning plugin
+version = "0.6.8"
 description = "Gaussian processes in JAX."
-authors = ["Thomas Pinder <tompinder@live.co.uk>", "Daniel Dodd <daniel_dodd@icloud.com>"]
+authors = [
+  "Thomas Pinder <tompinder@live.co.uk>",
+  "Daniel Dodd <daniel_dodd@icloud.com>",
+]
 license = "Apache-2.0"
 readme = "README.md"
 homepage = "https://github.com/JaxGaussianProcesses/GPJax"
 repository = "https://github.com/JaxGaussianProcesses/GPJax"
-include = [
-    "LICENSE",
-]
+include = ["LICENSE"]
 documentation = "https://docs.jaxgaussianprocesses.com/"
 keywords = ["gaussian-processes jax machine-learning bayesian"]
-packages = [{include = "gpjax"}]
+packages = [{ include = "gpjax" }]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.12"
@@ -50,6 +51,7 @@ pre-commit = "^3.2.2"
 nbstripout = "^0.6.1"
 pydocstyle = "^6.3.0"
 codespell = "^2.2.4"
+asv = "^0.6.0"
 interrogate = "^1.5.0"
 
 
@@ -87,24 +89,24 @@ pytkdocs = "^0.16.1"
 mkdocs-gen-files = "^0.5.0"
 mkdocs-literate-nav = "^0.6.0"
 mkdocs-git-authors-plugin = "^0.7.0"
-mkdocstrings = {version = "^0.21.2", extras = ["python"]}
+mkdocstrings = { version = "^0.21.2", extras = ["python"] }
 markdown-katex = "^202112.1034"
 
 [build-system]
-requires = ["poetry-core", "poetry-dynamic-versioning"]
-build-backend = "poetry_dynamic_versioning.backend"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
-[tool.black]  # https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-via-a-file
+[tool.black] # https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-via-a-file
 line-length = 88
 target-version = ["py38"]
 
-[tool.pytest.ini_options]  # https://docs.pytest.org/en/latest/reference/reference.html#ini-options-ref
+[tool.pytest.ini_options] # https://docs.pytest.org/en/latest/reference/reference.html#ini-options-ref
 # addopts = "--color=yes --doctest-modules --exitfirst --failed-first --strict-config --strict-markers --typeguard-packages=my_package --verbosity=2 --junitxml=reports/pytest.xml"
 filterwarnings = ["error", "ignore::DeprecationWarning"]
 testpaths = ["gpjax", "tests"]
 xfail_strict = true
 
-[tool.ruff]  # https://github.com/charliermarsh/ruff
+[tool.ruff] # https://github.com/charliermarsh/ruff
 fix = true
 cache-dir = "~/.cache/ruff"
 dummy-variable-rgx = "^_$"
@@ -124,7 +126,9 @@ select = [
   # flake8-quotes
   "Q",
   # pylint
-  "PLE", "PLR", "PLW",
+  "PLE",
+  "PLR",
+  "PLW",
   # misc lints
   "PIE",
   # flake8-pyi
@@ -137,20 +141,20 @@ select = [
   "TCH",
 ]
 ignore = [
-    # space before : (needed for how black formats slicing)
-    # "E203",  # not yet implemented
-    # module level import not at top of file
-    "E402",
-    # do not assign a lambda expression, use a def
-    "E731",
-    "E501",
-    "PGH001",
-    "RET504",
-    "S101",
-    "F722",
-    'PLR2004',
-    "PLR0913"
-    ]
+  # space before : (needed for how black formats slicing)
+  # "E203",  # not yet implemented
+  # module level import not at top of file
+  "E402",
+  # do not assign a lambda expression, use a def
+  "E731",
+  "E501",
+  "PGH001",
+  "RET504",
+  "S101",
+  "F722",
+  'PLR2004',
+  "PLR0913",
+]
 unfixable = ["ERA001", "F401", "F841", "T201", "T203"]
 src = ["gpjax", "tests"]
 target-version = "py38"
@@ -176,19 +180,19 @@ force_sort_within_sections = true
 force_grid_wrap = 2
 skip = 'docs'
 
-[tool.coverage.report]  # https://coverage.readthedocs.io/en/latest/config.html#report
+[tool.coverage.report] # https://coverage.readthedocs.io/en/latest/config.html#report
 fail_under = 50
 precision = 1
 show_missing = true
 skip_covered = true
 
-[tool.coverage.run]  # https://coverage.readthedocs.io/en/latest/config.html#run
+[tool.coverage.run] # https://coverage.readthedocs.io/en/latest/config.html#run
 branch = true
 command_line = "--module pytest"
 data_file = "reports/.coverage"
 source = ["src"]
 
-[tool.coverage.xml]  # https://coverage.readthedocs.io/en/latest/config.html#xml
+[tool.coverage.xml] # https://coverage.readthedocs.io/en/latest/config.html#xml
 output = "reports/coverage.xml"
 
 [tool.poetry-dynamic-versioning]
