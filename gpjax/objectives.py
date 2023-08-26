@@ -267,16 +267,20 @@ def variational_expectation(
     # Variational distribution q(f(·)) = N(f(·); μ(·), Σ(·, ·))
     q = variational_family
 
-    # Compute variational mean, μ(x), and variance, √diag(Σ(x, x)), at the training
+    # TODO: This needs cleaning up! We are squeezing then broadcasting `mean` and `variance`, which is not ideal.
+
+    # Compute variational mean, μ(x), and variance, diag(Σ(x, x)), at the training
     # inputs, x
     def q_moments(x):
         qx = q(x)
-        return qx.mean(), qx.variance()
+        return qx.mean().squeeze(), qx.covariance().squeeze()
 
     mean, variance = vmap(q_moments)(x[:, None])
 
     # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
-    expectation = q.posterior.likelihood.expected_log_likelihood(y, mean, variance)
+    expectation = q.posterior.likelihood.expected_log_likelihood(
+        y, mean[:, None], variance[:, None]
+    )
     return expectation
 
 

@@ -15,9 +15,11 @@
 
 import typing as tp
 
+from cola import PSD
 from cola.ops import (
     Diagonal,
     Identity,
+    LinearOperator,
 )
 from jax import vmap
 import jax.numpy as jnp
@@ -30,20 +32,24 @@ Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa
 
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):
-    def gram(self, kernel: Kernel, x: Float[Array, "N D"]) -> Diagonal:
+    def gram(self, kernel: Kernel, x: Float[Array, "N D"]) -> LinearOperator:
         r"""Compute the Gram matrix.
 
         Compute Gram covariance operator of the kernel function.
 
         Args:
             kernel (Kernel): the kernel function.
-            x (Float[Array, "N N"]): The inputs to the kernel function.
+            x (Float[Array, "N D"]): The inputs to the kernel function.
+
+        Returns
+        -------
+            LinearOperator: Gram covariance operator of the kernel function.
         """
         value = kernel(x[0], x[0])
         dtype = value.dtype
         shape = (x.shape[0], x.shape[0])
 
-        return jnp.atleast_1d(value) * Identity(shape=shape, dtype=dtype)
+        return PSD(jnp.atleast_1d(value) * Identity(shape=shape, dtype=dtype))
 
     def diagonal(self, kernel: Kernel, inputs: Float[Array, "N D"]) -> Diagonal:
         r"""Compute the diagonal Gram matrix's entries.
@@ -61,7 +67,7 @@ class ConstantDiagonalKernelComputation(AbstractKernelComputation):
         """
         diag = vmap(lambda x: kernel(x, x))(inputs)
 
-        return Diagonal(diag=diag)
+        return PSD(Diagonal(diag=diag))
 
     def cross_covariance(
         self, kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"]

@@ -50,6 +50,7 @@ from gpjax.likelihoods import (
     Gaussian,
     NonGaussianLikelihood,
 )
+from gpjax.lower_cholesky import lower_cholesky
 from gpjax.mean_functions import AbstractMeanFunction
 from gpjax.typing import (
     Array,
@@ -665,7 +666,7 @@ class NonConjugatePosterior(AbstractPosterior):
         Kxx = kernel.gram(x)
         Kxx += cola.ops.I_like(Kxx) * self.prior.jitter
         Kxx = cola.PSD(Kxx)
-        Lx = cola.sqrt(Kxx)
+        Lx = lower_cholesky(Kxx)
 
         # Unpack test inputs
         t = test_inputs

@@ -86,4 +86,4 @@ class AbstractKernelComputation:
         -------
             Diagonal: The computed diagonal variance entries.
         """
-        return Diagonal(diag=vmap(lambda x: kernel(x, x))(inputs))
+        return PSD(Diagonal(diag=vmap(lambda x: kernel(x, x))(inputs)))

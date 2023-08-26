@@ -30,6 +30,7 @@ from jaxtyping import (
 )
 import tensorflow_probability.substrates.jax as tfp
 
+from gpjax.lower_cholesky import lower_cholesky
 from gpjax.typing import (
     Array,
     KeyArray,
@@ -55,7 +56,7 @@ def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
 
     if scale is not None and not isinstance(scale, cola.LinearOperator):
         raise ValueError(
-            f"scale must be a LinearOperator or a JAX array, but got {type(scale)}"
+            f"The `scale` must be a cola.LinearOperator but got {type(scale)}"
         )
 
     if scale is not None and (scale.shape[-1] != scale.shape[-2]):
@@ -113,7 +114,7 @@ class GaussianDistribution(tfd.Distribution):
             scale = Identity(shape=(num_dims, num_dims), dtype=loc.dtype)
 
         self.loc = loc
-        self.scale = scale
+        self.scale = cola.PSD(scale)
 
     def mean(self) -> Float[Array, " N"]:
         r"""Calculates the mean."""
@@ -196,7 +197,7 @@ class GaussianDistribution(tfd.Distribution):
             Float[Array, "n N"]: The samples.
         """
         # Obtain covariance root.
-        sqrt = cola.sqrt(self.scale)
+        sqrt = lower_cholesky(self.scale)
 
         # Gather n samples from standard normal distribution Z = [z₁, ..., zₙ]ᵀ.
         Z = jr.normal(key, shape=(n, *self.event_shape))
@@ -264,8 +265,8 @@ def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> ScalarFl
     sigma_p = p.scale
 
     # Find covariance roots.
-    sqrt_p = cola.sqrt(sigma_p)
-    sqrt_q = cola.sqrt(sigma_q)
+    sqrt_p = lower_cholesky(sigma_p)
+    sqrt_q = lower_cholesky(sigma_q)
 
     # diff, μp - μq
     diff = mu_p - mu_q

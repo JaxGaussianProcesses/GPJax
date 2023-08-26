@@ -32,6 +32,7 @@ from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
 from gpjax.gps import AbstractPosterior
 from gpjax.likelihoods import Gaussian
+from gpjax.lower_cholesky import lower_cholesky
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -187,7 +188,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         Kzz = kernel.gram(z)
         Kzz += cola.ops.I_like(Kzz) * self.jitter
-        Lz = cola.sqrt(Kzz)
+        Lz = lower_cholesky(Kzz)
         muz = mean_function(z)
 
         # Unpack test inputs
@@ -291,7 +292,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
 
         Kzz = kernel.gram(z)
         Kzz += cola.ops.I_like(Kzz) * self.jitter
-        Lz = cola.sqrt(Kzz)
+        Lz = lower_cholesky(Kzz)
 
         # Unpack test inputs
         t = test_inputs
@@ -447,7 +448,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
 
         Kzz = kernel.gram(z)
         Kzz += cola.ops.I_like(Kzz) * self.jitter
-        Lz = cola.sqrt(Kzz)
+        Lz = lower_cholesky(Kzz)
         muz = mean_function(z)
 
         Ktt = kernel.gram(test_inputs)
@@ -589,11 +590,11 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         S = cola.PSD(S)
 
         # S = sqrt sqrtᵀ
-        sqrt = cola.sqrt(S).to_dense()
+        sqrt = lower_cholesky(S)
 
         Kzz = kernel.gram(z)
         Kzz += cola.ops.I_like(Kzz) * self.jitter
-        Lz = cola.sqrt(Kzz)
+        Lz = lower_cholesky(Kzz)
         muz = mean_function(z)
 
         # Unpack test inputs
@@ -610,7 +611,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         Kzz_inv_Kzt = cola.solve(Lz.T, Lz_inv_Kzt)
 
         # Ktz Kzz⁻¹ sqrt
-        Ktz_Kzz_inv_sqrt = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
+        Ktz_Kzz_inv_sqrt = Kzz_inv_Kzt.T @ sqrt
 
         # μt  +  Ktz Kzz⁻¹ (μ  -  μz)
         mean = mut + jnp.matmul(Kzz_inv_Kzt.T, mu - muz)
@@ -676,7 +677,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         Kzz += cola.ops.I_like(Kzz) * self.jitter
 
         # Lz Lzᵀ = Kzz
-        Lz = cola.sqrt(Kzz)
+        Lz = lower_cholesky(Kzz)
 
         # Lz⁻¹ Kzx
         Lz_inv_Kzx = cola.solve(Lz, Kzx)
