@@ -169,7 +169,7 @@ def test_masked_log_prob(n):
     _L = jnp.linalg.cholesky(covariance)  # noqa: F841
 
     # check that masked log_prob is equal to tfp log_prob with missing values removed
-    dist = GaussianDistribution(loc=mean, scale=DenseLinearOperator(covariance))
+    dist = GaussianDistribution(loc=mean, scale=Dense(covariance))
     tfp_dist = MultivariateNormalFullCovariance(
         loc=mean[~mask], covariance_matrix=covariance[~mask][:, ~mask]
     )
