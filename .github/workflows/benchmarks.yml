@@ -52,7 +52,7 @@ jobs:
         run: |
           source .venv/bin/activate
           cd benchmarks
-          poetry run asv run --python PYTHON
+          poetry run asv run --show-stderr
           poetry run asv publish
 
       - name: Deploy to benchmarks branch
