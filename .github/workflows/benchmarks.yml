@@ -30,24 +30,26 @@ jobs:
         uses: snok/install-poetry@v1
         with:
           version: 1.2.2
-          virtualenvs-create: false
+          virtualenvs-create: true
           virtualenvs-in-project: false
           installer-parallel: true
 
       - name: Install dependencies
         run: |
-          poetry install --all-extras --with dev
+          poetry install --no-interaction --all-extras --with dev
           pip install packaging
           pip install virtualenv
           pip install asv
 
       - name: Set asv machine
         run: |
+          source .venv/bin/activate
           cd benchmarks
           asv machine --yes
 
       - name: Run benchmarks
         run: |
+          source .venv/bin/activate
           cd benchmarks
           asv run
           asv publish
