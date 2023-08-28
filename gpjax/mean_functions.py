@@ -34,7 +34,7 @@ from gpjax.base import (
     param_field,
     static_field,
 )
-from gpjax.typing import Array, ScalarInt
+from gpjax.typing import Array
 
 
 @dataclasses.dataclass
@@ -159,7 +159,6 @@ class Zero(Constant):
     cannot be treated as a model hyperparameter and learned during training.
     """
     constant: Float[Array, "1"] = static_field(jnp.array([0.0]), init=False)
-
 
 @dataclasses.dataclass
 class CombinationMeanFunction(AbstractMeanFunction):
