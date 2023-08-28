@@ -26,9 +26,17 @@ jobs:
         with:
           python-version: "3.8"
 
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.2.2
+          virtualenvs-create: false
+          virtualenvs-in-project: false
+          installer-parallel: true
+
       - name: Install dependencies
         run: |
-          pip install gpjax
+          poetry install --all-extras --with dev
           pip install packaging
           pip install virtualenv
           pip install asv
