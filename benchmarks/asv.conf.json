@@ -8,6 +8,7 @@
         "PIP_NO_BUILD_ISOLATION=false python -m pip wheel --no-deps --no-index -w {build_cache_dir} {build_dir}"
     ],
     "branches": ["main"],
+
     "dvcs": "git",
     "environment_type": "virtualenv",
     "show_commit_url": "https://github.com/jaxgaussianprocesses/gpjax/commit/main",

@@ -36,6 +36,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          pip install poetry
           poetry install --no-interaction --all-extras --with dev
           pip install packaging
           pip install virtualenv
@@ -45,14 +46,14 @@ jobs:
         run: |
           source .venv/bin/activate
           cd benchmarks
-          asv machine --yes
+          poetry run asv machine --yes
 
       - name: Run benchmarks
         run: |
           source .venv/bin/activate
           cd benchmarks
-          asv run
-          asv publish
+          poetry run asv run --python PYTHON
+          poetry run asv publish
 
       - name: Deploy to benchmarks branch
         uses: peaceiris/actions-gh-pages@v3
