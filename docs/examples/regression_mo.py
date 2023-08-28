@@ -38,9 +38,9 @@ from docs.examples.utils import clean_legend
 import gpjax as gpx
 
 key = jr.PRNGKey(123)
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
+# plt.style.use(
+#    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+# )
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
@@ -113,9 +113,7 @@ out_kernel = gpx.kernels.CatKernel(
     stddev=catkernel_params.stddev, cholesky_lower=catkernel_params.cholesky_lower
 )
 # out_kernel = gpx.kernels.White(variance=1.0)
-meanf = gpx.mean_functions.SumMeanFunction(
-    [gpx.mean_functions.Zero(2), gpx.mean_functions.Constant(jnp.array([0.0, 1.0]))]
-)
+meanf = gpx.mean_functions.Constant(jnp.array([0.0, 1.0]))
 prior = gpx.Prior(mean_function=meanf, kernel=kernel, out_kernel=out_kernel)
 
 # %% [markdown]
