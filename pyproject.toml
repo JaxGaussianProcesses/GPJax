@@ -27,7 +27,6 @@ jax = ">=0.4.10"
 jaxlib = ">=0.4.10"
 orbax-checkpoint = ">=0.2.3"
 cola-ml = "^0.0.1"
-cola-plum-dispatch = "^0.1.1"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.2"
