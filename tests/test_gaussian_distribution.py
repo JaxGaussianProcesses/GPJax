@@ -60,6 +60,9 @@ def test_array_arguments(n: int) -> None:
     assert approx_equal(dist.stddev(), jnp.sqrt(covariance.diagonal()))
     assert approx_equal(dist.covariance(), covariance)
 
+    assert isinstance(dist.scale, Dense)
+    assert cola.PSD in dist.scale.annotations
+
     y = jr.uniform(_key, shape=(n,))
 
     tfp_dist = MultivariateNormalFullCovariance(loc=mean, covariance_matrix=covariance)
@@ -74,8 +77,13 @@ def test_diag_linear_operator(n: int) -> None:
     mean = jr.uniform(key_mean, shape=(n,))
     diag = jr.uniform(key_diag, shape=(n,))
 
+    # We purosely forget to add a PSD annotation to the diagonal matrix.
     dist_diag = GaussianDistribution(loc=mean, scale=Diagonal(diag**2))
     tfp_dist = MultivariateNormalDiag(loc=mean, scale_diag=diag)
+
+    # We check that the PSD annotation is added automatically.
+    assert isinstance(dist_diag.scale, Diagonal)
+    assert cola.PSD in dist_diag.scale.annotations
 
     assert approx_equal(dist_diag.mean(), tfp_dist.mean())
     assert approx_equal(dist_diag.mode(), tfp_dist.mode())

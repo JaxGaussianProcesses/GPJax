@@ -16,7 +16,7 @@
 import cola
 import jax.numpy as jnp
 
-# TODO: Add lower_cholesky for other linear operators.
+# TODO: Once this functionality is supported in CoLA, remove this.
 
 
 @cola.dispatch
