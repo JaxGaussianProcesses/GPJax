@@ -30,6 +30,11 @@ def lower_cholesky(A: cola.ops.LinearOperator):  # noqa: F811
         cola.ops.LinearOperator: The lower Cholesky factor of A.
     """
 
+    if cola.PSD not in A.annotations:
+        raise ValueError(
+            "Expected LinearOperator to be PSD, did you forget to use cola.PSD?"
+        )
+
     return cola.ops.Triangular(jnp.linalg.cholesky(A.to_dense()), lower=True)
 
 
@@ -41,3 +46,15 @@ def _(A: cola.ops.Diagonal):  # noqa: F811
 @lower_cholesky.dispatch
 def _(A: cola.ops.Identity):  # noqa: F811
     return A
+
+
+@lower_cholesky.dispatch
+def _(A: cola.ops.Kronecker):  # noqa: F811
+    return cola.ops.Kronecker(*[lower_cholesky(Ai) for Ai in A.Ms])
+
+
+@lower_cholesky.dispatch
+def _(A: cola.ops.BlockDiag):  # noqa: F811
+    return cola.ops.BlockDiag(
+        *[lower_cholesky(Ai) for Ai in A.Ms], multiplicities=A.multiplicities
+    )
