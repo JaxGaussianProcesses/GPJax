@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-from jax.config import config
+from jax import config
 
 config.update("jax_enable_x64", True)
 
@@ -22,14 +22,12 @@ import jax.random as jr
 import pytest
 
 from gpjax.dataset import Dataset
-from gpjax.decision_making.acquisition_functions.thompson_sampling import (
-    ThompsonSampling,
-)
 from gpjax.decision_making.test_functions.continuous_functions import (
     AbstractContinuousTestFunction,
     Forrester,
     LogarithmicGoldsteinPrice,
 )
+from gpjax.decision_making.utility_functions.thompson_sampling import ThompsonSampling
 from gpjax.decision_making.utils import OBJECTIVE
 from gpjax.gps import (
     ConjugatePosterior,
@@ -74,8 +72,8 @@ def test_thompson_sampling_no_objective_posterior_raises_error():
     posteriors = {"CONSTRAINT": posterior}
     datasets = {OBJECTIVE: dataset}
     with pytest.raises(ValueError):
-        ts_acquisition_builder = ThompsonSampling(num_features=100)
-        ts_acquisition_builder.build_acquisition_function(
+        ts_utility_builder = ThompsonSampling(num_features=100)
+        ts_utility_builder.build_utility_function(
             posteriors=posteriors, datasets=datasets, key=key
         )
 
@@ -91,8 +89,8 @@ def test_thompson_sampling_no_objective_dataset_raises_error():
     posteriors = {OBJECTIVE: posterior}
     datasets = {"CONSTRAINT": dataset}
     with pytest.raises(ValueError):
-        ts_acquisition_builder = ThompsonSampling(num_features=100)
-        ts_acquisition_builder.build_acquisition_function(
+        ts_utility_builder = ThompsonSampling(num_features=100)
+        ts_utility_builder.build_utility_function(
             posteriors=posteriors, datasets=datasets, key=key
         )
 
@@ -108,8 +106,8 @@ def test_thompson_sampling_non_conjugate_posterior_raises_error():
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
     with pytest.raises(ValueError):
-        ts_acquisition_builder = ThompsonSampling(num_features=100)
-        ts_acquisition_builder.build_acquisition_function(
+        ts_utility_builder = ThompsonSampling(num_features=100)
+        ts_utility_builder.build_utility_function(
             posteriors=posteriors, datasets=datasets, key=key
         )
 
@@ -126,8 +124,8 @@ def test_thompson_sampling_invalid_rff_num_raises_error(num_rff_features: int):
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
     with pytest.raises(ValueError):
-        ts_acquisition_builder = ThompsonSampling(num_features=num_rff_features)
-        ts_acquisition_builder.build_acquisition_function(
+        ts_utility_builder = ThompsonSampling(num_features=num_rff_features)
+        ts_utility_builder.build_utility_function(
             posteriors=posteriors, datasets=datasets, key=key
         )
 
@@ -141,7 +139,7 @@ def test_thompson_sampling_invalid_rff_num_raises_error(num_rff_features: int):
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
-def test_thompson_sampling_acquisition_function_correct_shapes(
+def test_thompson_sampling_utility_function_correct_shapes(
     test_target_function: AbstractContinuousTestFunction,
     num_test_points: int,
     key: KeyArray,
@@ -150,14 +148,14 @@ def test_thompson_sampling_acquisition_function_correct_shapes(
     posterior = generate_dummy_conjugate_posterior(dataset)
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
-    ts_acquisition_builder = ThompsonSampling(num_features=100)
-    ts_acquisition_function = ts_acquisition_builder.build_acquisition_function(
+    ts_utility_builder = ThompsonSampling(num_features=100)
+    ts_utility_function = ts_utility_builder.build_utility_function(
         posteriors=posteriors, datasets=datasets, key=key
     )
     test_key, _ = jr.split(key)
     test_X = test_target_function.generate_test_points(num_test_points, test_key)
-    ts_acquisition_function_values = ts_acquisition_function(test_X)
-    assert ts_acquisition_function_values.shape == (num_test_points, 1)
+    ts_utility_function_values = ts_utility_function(test_X)
+    assert ts_utility_function_values.shape == (num_test_points, 1)
 
 
 @pytest.mark.parametrize(
@@ -169,7 +167,7 @@ def test_thompson_sampling_acquisition_function_correct_shapes(
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
-def test_thompson_sampling_acquisition_function_same_key_same_function(
+def test_thompson_sampling_utility_function_same_key_same_function(
     test_target_function: AbstractContinuousTestFunction,
     num_test_points: int,
     key: KeyArray,
@@ -178,23 +176,21 @@ def test_thompson_sampling_acquisition_function_same_key_same_function(
     posterior = generate_dummy_conjugate_posterior(dataset)
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
-    ts_acquisition_builder_one = ThompsonSampling(num_features=100)
-    ts_acquisition_builder_two = ThompsonSampling(num_features=100)
-    ts_acquisition_function_one = ts_acquisition_builder_one.build_acquisition_function(
+    ts_utility_builder_one = ThompsonSampling(num_features=100)
+    ts_utility_builder_two = ThompsonSampling(num_features=100)
+    ts_utility_function_one = ts_utility_builder_one.build_utility_function(
         posteriors=posteriors, datasets=datasets, key=key
     )
-    ts_acquisition_function_two = ts_acquisition_builder_two.build_acquisition_function(
+    ts_utility_function_two = ts_utility_builder_two.build_utility_function(
         posteriors=posteriors, datasets=datasets, key=key
     )
     test_key, _ = jr.split(key)
     test_X = test_target_function.generate_test_points(num_test_points, test_key)
-    ts_acquisition_function_one_values = ts_acquisition_function_one(test_X)
-    ts_acquisition_function_two_values = ts_acquisition_function_two(test_X)
-    assert isinstance(ts_acquisition_function_one, Callable)
-    assert isinstance(ts_acquisition_function_two, Callable)
-    assert (
-        ts_acquisition_function_one_values == ts_acquisition_function_two_values
-    ).all()
+    ts_utility_function_one_values = ts_utility_function_one(test_X)
+    ts_utility_function_two_values = ts_utility_function_two(test_X)
+    assert isinstance(ts_utility_function_one, Callable)
+    assert isinstance(ts_utility_function_two, Callable)
+    assert (ts_utility_function_one_values == ts_utility_function_two_values).all()
 
 
 @pytest.mark.parametrize(
@@ -206,7 +202,7 @@ def test_thompson_sampling_acquisition_function_same_key_same_function(
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
-def test_thompson_sampling_acquisition_function_different_key_different_function(
+def test_thompson_sampling_utility_function_different_key_different_function(
     test_target_function: AbstractContinuousTestFunction,
     num_test_points: int,
     key: KeyArray,
@@ -217,19 +213,17 @@ def test_thompson_sampling_acquisition_function_different_key_different_function
     datasets = {OBJECTIVE: dataset}
     sample_one_key = key
     sample_two_key, _ = jr.split(key)
-    ts_acquisition_builder = ThompsonSampling(num_features=100)
-    ts_acquisition_function_one = ts_acquisition_builder.build_acquisition_function(
+    ts_utility_builder = ThompsonSampling(num_features=100)
+    ts_utility_function_one = ts_utility_builder.build_utility_function(
         posteriors=posteriors, datasets=datasets, key=sample_one_key
     )
-    ts_acquisition_function_two = ts_acquisition_builder.build_acquisition_function(
+    ts_utility_function_two = ts_utility_builder.build_utility_function(
         posteriors=posteriors, datasets=datasets, key=sample_two_key
     )
     test_key, _ = jr.split(sample_two_key)
     test_X = test_target_function.generate_test_points(num_test_points, test_key)
-    ts_acquisition_function_one_values = ts_acquisition_function_one(test_X)
-    ts_acquisition_function_two_values = ts_acquisition_function_two(test_X)
-    assert isinstance(ts_acquisition_function_one, Callable)
-    assert isinstance(ts_acquisition_function_two, Callable)
-    assert not (
-        ts_acquisition_function_one_values == ts_acquisition_function_two_values
-    ).all()
+    ts_utility_function_one_values = ts_utility_function_one(test_X)
+    ts_utility_function_two_values = ts_utility_function_two(test_X)
+    assert isinstance(ts_utility_function_one, Callable)
+    assert isinstance(ts_utility_function_two, Callable)
+    assert not (ts_utility_function_one_values == ts_utility_function_two_values).all()

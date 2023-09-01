@@ -16,30 +16,30 @@
 from beartype.typing import Mapping
 
 from gpjax.dataset import Dataset
-from gpjax.decision_making.acquisition_functions import (
-    AbstractAcquisitionFunctionBuilder,
-    AcquisitionFunction,
-)
 from gpjax.decision_making.test_functions import Quadratic
+from gpjax.decision_making.utility_functions import (
+    AbstractUtilityFunctionBuilder,
+    UtilityFunction,
+)
 from gpjax.gps import ConjugatePosterior
 from gpjax.typing import KeyArray
 
 
-class QuadraticAcquisitionFunctionBuilder(AbstractAcquisitionFunctionBuilder):
+class QuadraticUtilityFunctionBuilder(AbstractUtilityFunctionBuilder):
     """
-    Dummy acquisition function builder for testing purposes, which returns the negative
+    Dummy utility function builder for testing purposes, which returns the negative
     of the value of a quadratic test function at the input points. This is because
-    acquisition functions are *maximised*, and we wish to *minimise* the quadratic test
+    utility functions are *maximised*, and we wish to *minimise* the quadratic test
     function.
     """
 
-    def build_acquisition_function(
+    def build_utility_function(
         self,
         posteriors: Mapping[str, ConjugatePosterior],
         datasets: Mapping[str, Dataset],
         key: KeyArray,
-    ) -> AcquisitionFunction:
+    ) -> UtilityFunction:
         test_function = Quadratic()
         return lambda x: -1.0 * test_function.evaluate(
             x
-        )  # Acquisition functions are *maximised*
+        )  # Utility functions are *maximised*

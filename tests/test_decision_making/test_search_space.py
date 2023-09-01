@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 from beartype.roar import BeartypeCallHintParamViolation
-from jax.config import config
+from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (

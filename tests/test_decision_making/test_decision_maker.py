@@ -23,16 +23,9 @@ import pytest
 
 import gpjax as gpx
 from gpjax.dataset import Dataset
-from gpjax.decision_making.acquisition_functions import (
-    AbstractAcquisitionFunctionBuilder,
-)
-from gpjax.decision_making.acquisition_maximizer import (
-    AbstractAcquisitionMaximizer,
-    ContinuousAcquisitionMaximizer,
-)
 from gpjax.decision_making.decision_maker import (
     AbstractDecisionMaker,
-    DecisionMaker,
+    UtilityDrivenDecisionMaker,
 )
 from gpjax.decision_making.posterior_handler import PosteriorHandler
 from gpjax.decision_making.search_space import (
@@ -40,12 +33,17 @@ from gpjax.decision_making.search_space import (
     ContinuousSearchSpace,
 )
 from gpjax.decision_making.test_functions import Quadratic
+from gpjax.decision_making.utility_functions import AbstractUtilityFunctionBuilder
+from gpjax.decision_making.utility_maximizer import (
+    AbstractUtilityMaximizer,
+    ContinuousUtilityMaximizer,
+)
 from gpjax.decision_making.utils import (
     OBJECTIVE,
     build_function_evaluator,
 )
 from gpjax.typing import KeyArray
-from tests.test_decision_making.utils import QuadraticAcquisitionFunctionBuilder
+from tests.test_decision_making.utils import QuadraticUtilityFunctionBuilder
 
 CONSTRAINT = "CONSTRAINT"
 
@@ -77,13 +75,13 @@ def posterior_handler() -> PosteriorHandler:
 
 
 @pytest.fixture
-def acquisition_function_builder() -> AbstractAcquisitionFunctionBuilder:
-    return QuadraticAcquisitionFunctionBuilder()
+def utility_function_builder() -> AbstractUtilityFunctionBuilder:
+    return QuadraticUtilityFunctionBuilder()
 
 
 @pytest.fixture
-def acquisition_maximizer() -> AbstractAcquisitionMaximizer:
-    return ContinuousAcquisitionMaximizer(num_initial_samples=1000, num_restarts=1)
+def utility_maximizer() -> AbstractUtilityMaximizer:
+    return ContinuousUtilityMaximizer(num_initial_samples=1000, num_restarts=1)
 
 
 def get_dataset(num_points: int, key: KeyArray) -> Dataset:
@@ -103,21 +101,23 @@ def test_abstract_decision_maker_raises_error():
 def test_invalid_tags_raises_error(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
-    acquisition_function_builder: AbstractAcquisitionFunctionBuilder,
-    acquisition_maximizer: AbstractAcquisitionMaximizer,
+    utility_function_builder: AbstractUtilityFunctionBuilder,
+    utility_maximizer: AbstractUtilityMaximizer,
 ):
     key = jr.PRNGKey(42)
     posterior_handlers = {OBJECTIVE: posterior_handler}
     dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
     datasets = {"CONSTRAINT": dataset}  # Dataset tag doesn't match posterior tag
     with pytest.raises(ValueError):
-        DecisionMaker(
+        UtilityDrivenDecisionMaker(
             search_space=search_space,
             posterior_handlers=posterior_handlers,
             datasets=datasets,
-            acquisition_function_builder=acquisition_function_builder,
-            acquisition_maximizer=acquisition_maximizer,
+            utility_function_builder=utility_function_builder,
+            utility_maximizer=utility_maximizer,
             key=key,
+            post_ask=[],
+            post_tell=[],
         )
 
 
@@ -127,21 +127,23 @@ def test_invalid_tags_raises_error(
 def test_initialisation_optimizes_posterior_hyperparameters(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
-    acquisition_function_builder: AbstractAcquisitionFunctionBuilder,
-    acquisition_maximizer: AbstractAcquisitionMaximizer,
+    utility_function_builder: AbstractUtilityFunctionBuilder,
+    utility_maximizer: AbstractUtilityMaximizer,
 ):
     key = jr.PRNGKey(42)
     posterior_handlers = {OBJECTIVE: posterior_handler, CONSTRAINT: posterior_handler}
     objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
     constraint_dataset = get_dataset(num_points=5, key=jr.PRNGKey(10))
     datasets = {"OBJECTIVE": objective_dataset, CONSTRAINT: constraint_dataset}
-    decision_maker = DecisionMaker(
+    decision_maker = UtilityDrivenDecisionMaker(
         search_space=search_space,
         posterior_handlers=posterior_handlers,
         datasets=datasets,
-        acquisition_function_builder=acquisition_function_builder,
-        acquisition_maximizer=acquisition_maximizer,
+        utility_function_builder=utility_function_builder,
+        utility_maximizer=utility_maximizer,
         key=key,
+        post_ask=[],
+        post_tell=[],
     )
     # Assert kernel hyperparameters get changed from their initial values
     assert decision_maker.posteriors[OBJECTIVE].prior.kernel.lengthscale != jnp.array(
@@ -168,26 +170,28 @@ def test_initialisation_optimizes_posterior_hyperparameters(
 def test_decision_maker_ask(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
-    acquisition_function_builder: AbstractAcquisitionFunctionBuilder,
-    acquisition_maximizer: AbstractAcquisitionMaximizer,
+    utility_function_builder: AbstractUtilityFunctionBuilder,
+    utility_maximizer: AbstractUtilityMaximizer,
 ):
     key = jr.PRNGKey(42)
     posterior_handlers = {OBJECTIVE: posterior_handler}
     objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
     datasets = {"OBJECTIVE": objective_dataset}
-    decision_maker = DecisionMaker(
+    decision_maker = UtilityDrivenDecisionMaker(
         search_space=search_space,
         posterior_handlers=posterior_handlers,
         datasets=datasets,
-        acquisition_function_builder=acquisition_function_builder,
-        acquisition_maximizer=acquisition_maximizer,
+        utility_function_builder=utility_function_builder,
+        utility_maximizer=utility_maximizer,
         key=key,
+        post_ask=[],
+        post_tell=[],
     )
     initial_decision_maker_key = decision_maker.key
     query_point = decision_maker.ask(key=key)
     assert query_point.shape == (1, 1)
     assert jnp.allclose(query_point, jnp.array([[0.5]]), atol=1e-5)
-    assert decision_maker.current_acquisition_function is not None
+    assert decision_maker.current_utility_function is not None
     assert (
         decision_maker.key == initial_decision_maker_key
     ).all()  # Ensure decision maker key is unchanged
@@ -199,8 +203,8 @@ def test_decision_maker_ask(
 def test_decision_maker_tell_with_inconsistent_observations_raises_error(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
-    acquisition_function_builder: AbstractAcquisitionFunctionBuilder,
-    acquisition_maximizer: AbstractAcquisitionMaximizer,
+    utility_function_builder: AbstractUtilityFunctionBuilder,
+    utility_maximizer: AbstractUtilityMaximizer,
 ):
     key = jr.PRNGKey(42)
     posterior_handlers = {OBJECTIVE: posterior_handler, CONSTRAINT: posterior_handler}
@@ -210,13 +214,15 @@ def test_decision_maker_tell_with_inconsistent_observations_raises_error(
         "OBJECTIVE": initial_objective_dataset,
         CONSTRAINT: initial_constraint_dataset,
     }
-    decision_maker = DecisionMaker(
+    decision_maker = UtilityDrivenDecisionMaker(
         search_space=search_space,
         posterior_handlers=posterior_handlers,
         datasets=datasets,
-        acquisition_function_builder=acquisition_function_builder,
-        acquisition_maximizer=acquisition_maximizer,
+        utility_function_builder=utility_function_builder,
+        utility_maximizer=utility_maximizer,
         key=key,
+        post_ask=[],
+        post_tell=[],
     )
     mock_objective_observation = get_dataset(num_points=1, key=jr.PRNGKey(1))
     mock_constraint_observation = get_dataset(num_points=1, key=jr.PRNGKey(2))
@@ -234,8 +240,8 @@ def test_decision_maker_tell_with_inconsistent_observations_raises_error(
 def test_decision_maker_tell_updates_datasets_and_models(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
-    acquisition_function_builder: AbstractAcquisitionFunctionBuilder,
-    acquisition_maximizer: AbstractAcquisitionMaximizer,
+    utility_function_builder: AbstractUtilityFunctionBuilder,
+    utility_maximizer: AbstractUtilityMaximizer,
 ):
     key = jr.PRNGKey(42)
     posterior_handlers = {OBJECTIVE: posterior_handler, CONSTRAINT: posterior_handler}
@@ -245,13 +251,15 @@ def test_decision_maker_tell_updates_datasets_and_models(
         "OBJECTIVE": initial_objective_dataset,
         CONSTRAINT: initial_constraint_dataset,
     }
-    decision_maker = DecisionMaker(
+    decision_maker = UtilityDrivenDecisionMaker(
         search_space=search_space,
         posterior_handlers=posterior_handlers,
         datasets=datasets,
-        acquisition_function_builder=acquisition_function_builder,
-        acquisition_maximizer=acquisition_maximizer,
+        utility_function_builder=utility_function_builder,
+        utility_maximizer=utility_maximizer,
         key=key,
+        post_ask=[],
+        post_tell=[],
     )
     initial_decision_maker_key = decision_maker.key
     initial_objective_posterior = decision_maker.posteriors[OBJECTIVE]
@@ -295,8 +303,8 @@ def test_decision_maker_tell_updates_datasets_and_models(
 def test_decision_maker_run(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
-    acquisition_function_builder: AbstractAcquisitionFunctionBuilder,
-    acquisition_maximizer: AbstractAcquisitionMaximizer,
+    utility_function_builder: AbstractUtilityFunctionBuilder,
+    utility_maximizer: AbstractUtilityMaximizer,
     n_steps: int,
 ):
     key = jr.PRNGKey(42)
@@ -305,13 +313,15 @@ def test_decision_maker_run(
     datasets = {
         "OBJECTIVE": initial_objective_dataset,
     }
-    decision_maker = DecisionMaker(
+    decision_maker = UtilityDrivenDecisionMaker(
         search_space=search_space,
         posterior_handlers=posterior_handlers,
         datasets=datasets,
-        acquisition_function_builder=acquisition_function_builder,
-        acquisition_maximizer=acquisition_maximizer,
+        utility_function_builder=utility_function_builder,
+        utility_maximizer=utility_maximizer,
         key=key,
+        post_ask=[],
+        post_tell=[],
     )
     initial_decision_maker_key = decision_maker.key
     black_box_fn = Quadratic()
@@ -324,7 +334,7 @@ def test_decision_maker_run(
     assert query_datasets[OBJECTIVE].n == 5 + n_steps
     assert (
         jnp.abs(query_datasets[OBJECTIVE].X[-n_steps:] - jnp.array([[0.5]])) < 1e-5
-    ).all()  # Ensure we're querying the correct point in our dummy acquisition function at each step
+    ).all()  # Ensure we're querying the correct point in our dummy utility function at each step
     assert (
         decision_maker.key != initial_decision_maker_key
     ).all()  # Ensure decision maker key gets updated

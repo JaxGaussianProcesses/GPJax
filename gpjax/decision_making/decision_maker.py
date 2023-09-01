@@ -16,10 +16,7 @@ from abc import (
     ABC,
     abstractmethod,
 )
-from dataclasses import (
-    dataclass,
-    field,
-)
+from dataclasses import dataclass
 
 from beartype.typing import (
     Callable,
@@ -30,12 +27,10 @@ from beartype.typing import (
 import jax.random as jr
 
 from gpjax.dataset import Dataset
-from gpjax.decision_making.acquisition_functions import (
-    AbstractAcquisitionFunctionBuilder,
-)
-from gpjax.decision_making.acquisition_maximizer import AbstractAcquisitionMaximizer
 from gpjax.decision_making.posterior_handler import PosteriorHandler
 from gpjax.decision_making.search_space import AbstractSearchSpace
+from gpjax.decision_making.utility_functions import AbstractUtilityFunctionBuilder
+from gpjax.decision_making.utility_maximizer import AbstractUtilityMaximizer
 from gpjax.decision_making.utils import FunctionEvaluator
 from gpjax.gps import AbstractPosterior
 from gpjax.typing import (
@@ -48,28 +43,29 @@ from gpjax.typing import (
 @dataclass
 class AbstractDecisionMaker(ABC):
     """
-    AbstractDecisionMaker abstract base class which handles the core decision loop. The
-    decision making loop is split into two key steps, `ask` and `tell`. The `ask`
+    AbstractDecisionMaker abstract base class which handles the core decision making
+    loop, where we sequentially decide on points to query our function of interest at.
+    The decision making loop is split into two key steps, `ask` and `tell`. The `ask`
     step is typically used to decide which point to query next. The `tell` step is
-    typically used to update models and datasets with newly queried points.
+    typically used to update models and datasets with newly queried points. These steps
+    can be combined in a 'run' loop which alternates between asking which point to query
+    next and telling the decision maker about the newly queried point having evaluated
+    the black-box function of interest at this point.
 
     Attributes:
-        search_space (AbstractSearchSpace): Search space which is being queried
+        search_space (AbstractSearchSpace): Search space over which we can evaluate the
+        function(s) of interest.
         posterior_handlers (Dict[str, PosteriorHandler]): Dictionary of posterior
             handlers, which are used to update posteriors throughout the decision making
-            loop. Tags are used to distinguish between posteriors. In a typical Bayesian
-            optimisation setup one of the tags will be `OBJECTIVE`, defined in
+            loop. Note that the word `posteriors` is used for consistency with GPJax, but these
+            objects are typically referred to as `models` in the model-based decision
+            making literature. Tags are used to distinguish between posteriors. In a typical
+            Bayesian optimisation setup one of the tags will be `OBJECTIVE`, defined in
             decision_making.utils.
         datasets (Dict[str, Dataset]): Dictionary of datasets, which are augmented with
             observations throughout the decision making loop. In a typical setup they are
-            also used to fit the posteriors, using the `posterior_handlers`. Tags are used
+            also used to update the posteriors, using the `posterior_handlers`. Tags are used
             to distinguish datasets, and correspond to tags in `posterior_handlers`.
-        acquisition_function_builder (AbstractAcquisitionFunctionBuilder): Object which
-            builds acquisition functions from posteriors and datasets, to decide where
-            to query next. In a typical Bayesian optimisation setup the point chosen to
-            be queried next is the point which maximizes the acquisition function.
-        acquisition_maximizer (AbstractAcquisitionMaximizer): Object which maximizes
-            acquisition functions over the search space.
         key (KeyArray): JAX random key, used to generate random numbers.
         post_ask (List[Callable]): List of functions to be executed after each ask step.
         post_tell (List[Callable]): List of functions to be executed after each tell
@@ -79,64 +75,13 @@ class AbstractDecisionMaker(ABC):
     search_space: AbstractSearchSpace
     posterior_handlers: Dict[str, PosteriorHandler]
     datasets: Dict[str, Dataset]
-    acquisition_function_builder: AbstractAcquisitionFunctionBuilder
-    acquisition_maximizer: AbstractAcquisitionMaximizer
     key: KeyArray
-    post_ask: List[Callable] = field(
-        default_factory=list
-    )  # Specific type is List[Callable[[DecisionMaker, Float[Array, ["1 D"]]], None]] but causes Beartype issues
-    post_tell: List[Callable] = field(
-        default_factory=list
-    )  # Specific type is List[Callable[[DecisionMaker], None]] but causes Beartype issues
-
-    @abstractmethod
-    def ask(self, key: KeyArray) -> Float[Array, "1 D"]:
-        """
-        In a typical decision making setup this will use the
-        `acquisition_function_builder` to form an acquisition function and then return
-        the point which maximizes the acquisition function using the
-        `acquisition_maximizer` as the point to be queried next.
-
-        Args:
-            key (KeyArray): JAX PRNG key for controlling random state.
-
-        Returns:
-            Float[Array, "1 D"]: Point to be queried next
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def tell(self, observation_datasets: Mapping[str, Dataset], key: KeyArray):
-        """
-        Tell decision maker about new observations. In a typical decision making setup
-        we will update the datasets and posteriors with the new observations.
-
-        Args:
-            observation_datasets (Mapping[str, Dataset]): Dictionary of datasets
-                containing new observations. Tags are used to distinguish datasets, and
-                correspond to tags in `posterior_handlers` in a typical setup.
-            key (KeyArray): JAX PRNG key for controlling random state.
-        """
-        raise NotImplementedError
-
-
-@dataclass
-class DecisionMaker(AbstractDecisionMaker):
-    """
-    DecisionMaker class which handles the core decision making loop in a typical setup. The
-    decision making loop is split into two key steps, `ask` and `tell`. The `ask`
-    step forms an `AcquisitionFunction` from the current `posteriors` and `datasets` and
-    returns the point which maximises it. It also stores the formed acquisition function
-    under the attribute `self.current_acquisition_function` so that it can be called,
-    for instance for plotting, after the `ask` function has been called. The `tell` step
-    adds a newly queried point to the `datasets` and updates the `posteriors`.
-
-    This can be run as a typical ask-tell loop, or the `run` method can be used to run
-    the decision making loop for a fixed number of steps. Moreover, the `run` method executes
-    the functions in `post_ask` and `post_tell` after each ask and tell step
-    respectively. This enables the user to add custom functionality, such as the ability
-    to plot values of interest during the optimization process.
-    """
+    post_ask: List[
+        Callable
+    ]  # Specific type is List[Callable[[AbstractDecisionMaker, Float[Array, ["1 D"]]], None]] but causes Beartype issues
+    post_tell: List[
+        Callable
+    ]  # Specific type is List[Callable[[AbstractDecisionMaker], None]] but causes Beartype issues
 
     def __post_init__(self):
         """
@@ -159,31 +104,18 @@ class DecisionMaker(AbstractDecisionMaker):
                 self.datasets[tag], optimize=True, key=self.key
             )
 
+    @abstractmethod
     def ask(self, key: KeyArray) -> Float[Array, "1 D"]:
         """
-        Get updated acquisition function and return the point which maximises it. This
-        method also stores the acquisition function in
-        `self.current_acquisition_function` so that it can be accessed after the ask
-        function has been called. This is useful for non-deterministic acquisition
-        functions, which will differ between calls to `ask` due to the splitting of
-        `self.key`.
+        Get the point to be queried next.
 
         Args:
             key (KeyArray): JAX PRNG key for controlling random state.
 
         Returns:
-            Float[Array, "1 D"]: Point to be queried next.
+            Float[Array, "1 D"]: Point to be queried next
         """
-        self.current_acquisition_function = (
-            self.acquisition_function_builder.build_acquisition_function(
-                self.posteriors, self.datasets, key
-            )
-        )
-
-        key, _ = jr.split(key)
-        return self.acquisition_maximizer.maximize(
-            self.current_acquisition_function, self.search_space, key
-        )
+        raise NotImplementedError
 
     def tell(self, observation_datasets: Mapping[str, Dataset], key: KeyArray):
         """
@@ -252,3 +184,66 @@ class DecisionMaker(AbstractDecisionMaker):
                 post_tell_method(self)
 
         return self.datasets
+
+
+@dataclass
+class UtilityDrivenDecisionMaker(AbstractDecisionMaker):
+    """
+    UtilityDrivenDecisionMaker class which handles the core decision making loop in a
+    typical model-based decision making setup. In this setup we use surrogate model(s)
+    for the function(s) of interest, and define a utility function (often called the
+    'acquisition function' in the context of Bayesian optimisation) which characterises
+    how useful it would be to query a given point within the search space given the data
+    we have observed so far. This can then be used to decide which point(s) to query
+    next.
+
+    The decision making loop is split into two key steps, `ask` and `tell`. The `ask`
+    step forms a `UtilityFunction` from the current `posteriors` and `datasets` and
+    returns the point which maximises it. It also stores the formed utility function
+    under the attribute `self.current_utility_function` so that it can be called,
+    for instance for plotting, after the `ask` function has been called. The `tell` step
+    adds a newly queried point to the `datasets` and updates the `posteriors`.
+
+    This can be run as a typical ask-tell loop, or the `run` method can be used to run
+    the decision making loop for a fixed number of steps. Moreover, the `run` method executes
+    the functions in `post_ask` and `post_tell` after each ask and tell step
+    respectively. This enables the user to add custom functionality, such as the ability
+    to plot values of interest during the optimization process.
+
+    Attributes:
+        utility_function_builder (AbstractUtilityFunctionBuilder): Object which
+                builds utility functions from posteriors and datasets, to decide where
+                to query next. In a typical Bayesian optimisation setup the point chosen to
+                be queried next is the point which maximizes the utility function.
+        utility_maximizer (AbstractUtilityMaximizer): Object which maximizes
+            utility functions over the search space.
+    """
+
+    utility_function_builder: AbstractUtilityFunctionBuilder
+    utility_maximizer: AbstractUtilityMaximizer
+
+    def ask(self, key: KeyArray) -> Float[Array, "1 D"]:
+        """
+        Get updated utility function and return the point which maximises it. This
+        method also stores the utility function in
+        `self.current_utility_function` so that it can be accessed after the ask
+        function has been called. This is useful for non-deterministic utility
+        functions, which will differ between calls to `ask` due to the splitting of
+        `self.key`.
+
+        Args:
+            key (KeyArray): JAX PRNG key for controlling random state.
+
+        Returns:
+            Float[Array, "1 D"]: Point to be queried next.
+        """
+        self.current_utility_function = (
+            self.utility_function_builder.build_utility_function(
+                self.posteriors, self.datasets, key
+            )
+        )
+
+        key, _ = jr.split(key)
+        return self.utility_maximizer.maximize(
+            self.current_utility_function, self.search_space, key
+        )

@@ -12,18 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-from gpjax.decision_making.acquisition_functions import (
-    AbstractAcquisitionFunctionBuilder,
-    AcquisitionFunction,
-    ThompsonSampling,
-)
-from gpjax.decision_making.acquisition_maximizer import (
-    AbstractAcquisitionMaximizer,
-    ContinuousAcquisitionMaximizer,
-)
 from gpjax.decision_making.decision_maker import (
     AbstractDecisionMaker,
-    DecisionMaker,
+    UtilityDrivenDecisionMaker,
 )
 from gpjax.decision_making.posterior_handler import PosteriorHandler
 from gpjax.decision_making.search_space import (
@@ -36,18 +27,27 @@ from gpjax.decision_making.test_functions import (
     LogarithmicGoldsteinPrice,
     Quadratic,
 )
+from gpjax.decision_making.utility_functions import (
+    AbstractUtilityFunctionBuilder,
+    ThompsonSampling,
+    UtilityFunction,
+)
+from gpjax.decision_making.utility_maximizer import (
+    AbstractUtilityMaximizer,
+    ContinuousUtilityMaximizer,
+)
 from gpjax.decision_making.utils import build_function_evaluator
 
 __all__ = [
-    "AbstractAcquisitionFunctionBuilder",
-    "AbstractAcquisitionMaximizer",
+    "AbstractUtilityFunctionBuilder",
+    "AbstractUtilityMaximizer",
     "AbstractDecisionMaker",
     "AbstractSearchSpace",
-    "AcquisitionFunction",
+    "UtilityFunction",
     "build_function_evaluator",
-    "ContinuousAcquisitionMaximizer",
+    "ContinuousUtilityMaximizer",
     "ContinuousSearchSpace",
-    "DecisionMaker",
+    "UtilityDrivenDecisionMaker",
     "AbstractContinuousTestFunction",
     "Forrester",
     "LogarithmicGoldsteinPrice",

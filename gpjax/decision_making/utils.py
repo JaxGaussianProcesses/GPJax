@@ -26,7 +26,7 @@ from gpjax.typing import (
 
 OBJECTIVE: Final[str] = "OBJECTIVE"
 """
-Tag for the objective dataset/function in standard acquisition functions.
+Tag for the objective dataset/function in standard utility functions.
 """
 
 

@@ -22,11 +22,11 @@ import jax.numpy as jnp
 import jax.random as jr
 from jaxopt import ScipyBoundedMinimize
 
-from gpjax.decision_making.acquisition_functions import AcquisitionFunction
 from gpjax.decision_making.search_space import (
     AbstractSearchSpace,
     ContinuousSearchSpace,
 )
+from gpjax.decision_making.utility_functions import UtilityFunction
 from gpjax.typing import (
     Array,
     Float,
@@ -36,60 +36,58 @@ from gpjax.typing import (
 
 
 def _get_discrete_maximizer(
-    query_points: Float[Array, "N D"], acquisition_function: AcquisitionFunction
+    query_points: Float[Array, "N D"], utility_function: UtilityFunction
 ) -> Float[Array, "1 D"]:
-    """Get the point which maximises the acquisition function evaluated at a given set of points.
+    """Get the point which maximises the utility function evaluated at a given set of points.
 
     Args:
         query_points (Float[Array, "N D"]): Set of points at which to evaluate the
-        acquisition function.
-        acquisition_function (AcquisitionFunction): Acquisition function
-        to evaluate at `query_points`.
+        utility function.
+        utility_function (UtilityFunction): Utility function to evaluate at `query_points`.
 
     Returns:
-        Float[Array, "1 D"]: Point in `query_points` which maximises the acquisition
-        function.
+        Float[Array, "1 D"]: Point in `query_points` which maximises the utility function.
     """
-    acquisition_function_values = acquisition_function(query_points)
-    max_acquisition_function_value_idx = jnp.argmax(
-        acquisition_function_values, axis=0, keepdims=True
+    utility_function_values = utility_function(query_points)
+    max_utility_function_value_idx = jnp.argmax(
+        utility_function_values, axis=0, keepdims=True
     )
     best_sample_point = jnp.take_along_axis(
-        query_points, max_acquisition_function_value_idx, axis=0
+        query_points, max_utility_function_value_idx, axis=0
     )
     return best_sample_point
 
 
 @dataclass
-class AbstractAcquisitionMaximizer(ABC):
-    """Abstract base class for acquisition function maximizers."""
+class AbstractUtilityMaximizer(ABC):
+    """Abstract base class for utility function maximizers."""
 
     @abstractmethod
     def maximize(
         self,
-        acquisition_function: AcquisitionFunction,
+        utility_function: UtilityFunction,
         search_space: AbstractSearchSpace,
         key: KeyArray,
     ) -> Float[Array, "1 D"]:
-        """Maximize the given acquisition function over the search space provided.
+        """Maximize the given utility function over the search space provided.
 
         Args:
-            acquisition_function (AcquisitionFunction): Acquisition function to be
+            utility_function (UtilityFunction): Utility function to be
             maximized.
             search_space (AbstractSearchSpace): Search space over which to maximize
-            the acquisition function.
+            the utility function.
             key (KeyArray): JAX PRNG key.
 
         Returns:
-            Float[Array, "1 D"]: Point at which the acquisition function is maximized.
+            Float[Array, "1 D"]: Point at which the utility function is maximized.
         """
         raise NotImplementedError
 
 
 @dataclass
-class ContinuousAcquisitionMaximizer(AbstractAcquisitionMaximizer):
-    """The `ContinuousAcquisitionMaximizer` class is used to maximize acquisition
-    functions over the continuous domain with L-BFGS-B. First we sample the acquisition
+class ContinuousUtilityMaximizer(AbstractUtilityMaximizer):
+    """The `ContinuousUtilityMaximizer` class is used to maximize utility
+    functions over the continuous domain with L-BFGS-B. First we sample the utility
     function at `num_initial_samples` points from the search space, and then we run
     L-BFGS-B from the best of these initial points. We run this process `num_restarts`
     number of times, each time sampling a different random set of
@@ -111,11 +109,11 @@ class ContinuousAcquisitionMaximizer(AbstractAcquisitionMaximizer):
 
     def maximize(
         self,
-        acquisition_function: AcquisitionFunction,
+        utility_function: UtilityFunction,
         search_space: ContinuousSearchSpace,
         key: KeyArray,
     ) -> Float[Array, "1 D"]:
-        max_observed_acquisition_function_value = None
+        max_observed_utility_function_value = None
         maximizer = None
 
         for _ in range(self.num_restarts):
@@ -124,36 +122,31 @@ class ContinuousAcquisitionMaximizer(AbstractAcquisitionMaximizer):
                 self.num_initial_samples, key=key
             )
             best_initial_sample_point = _get_discrete_maximizer(
-                initial_sample_points, acquisition_function
+                initial_sample_points, utility_function
             )
 
-            def _scalar_acquisition_function(x: Float[Array, "1 D"]) -> ScalarFloat:
+            def _scalar_utility_function(x: Float[Array, "1 D"]) -> ScalarFloat:
                 """
                 The Jaxopt minimizer requires a function which returns a scalar. It calls the
-                acquisition function with one point at a time, so the acquisition function
+                utility function with one point at a time, so the utility function
                 returns an array of shape [1, 1], so  we index to return a scalar. Note that
-                we also return the negative of the acquisition function - this is because
-                acquisition functions should be *maximimized* but the Jaxopt minimizer
+                we also return the negative of the utility function - this is because
+                utility functions should be *maximimized* but the Jaxopt minimizer
                 minimizes functions.
                 """
-                return -acquisition_function(x)[0][0]
+                return -utility_function(x)[0][0]
 
             lbfgsb = ScipyBoundedMinimize(
-                fun=_scalar_acquisition_function, method="l-bfgs-b"
+                fun=_scalar_utility_function, method="l-bfgs-b"
             )
             bounds = (search_space.lower_bounds, search_space.upper_bounds)
             optimized_point = lbfgsb.run(
                 best_initial_sample_point, bounds=bounds
             ).params
-            optimized_acquisition_function_value = _scalar_acquisition_function(
-                optimized_point
-            )
-            if (max_observed_acquisition_function_value is None) or (
-                optimized_acquisition_function_value
-                > max_observed_acquisition_function_value
+            optimized_utility_function_value = _scalar_utility_function(optimized_point)
+            if (max_observed_utility_function_value is None) or (
+                optimized_utility_function_value > max_observed_utility_function_value
             ):
-                max_observed_acquisition_function_value = (
-                    optimized_acquisition_function_value
-                )
+                max_observed_utility_function_value = optimized_utility_function_value
                 maximizer = optimized_point
         return maximizer
