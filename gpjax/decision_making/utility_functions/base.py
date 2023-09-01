@@ -32,17 +32,17 @@ from gpjax.typing import (
     KeyArray,
 )
 
-AcquisitionFunction = Callable[[Float[Array, "N D"]], Float[Array, "N 1"]]
+UtilityFunction = Callable[[Float[Array, "N D"]], Float[Array, "N 1"]]
 """
-Type alias for acquisition functions, which take an array of points of shape $`[N, D]`$
-and return the value of the acquisition function at each point in an array of shape $`[N, 1]`$.
+Type alias for utility functions, which take an array of points of shape $`[N, D]`$
+and return the value of the utility function at each point in an array of shape $`[N, 1]`$.
 """
 
 
 @dataclass
-class AbstractAcquisitionFunctionBuilder(ABC):
+class AbstractUtilityFunctionBuilder(ABC):
     """
-    Abstract class for building acquisition functions.
+    Abstract class for building utility functions.
     """
 
     def check_objective_present(
@@ -56,9 +56,9 @@ class AbstractAcquisitionFunctionBuilder(ABC):
 
         Args:
             posteriors (Mapping[str, AbstractPosterior]): Dictionary of posteriors to be
-            used to form the acquisition function.
+            used to form the utility function.
             datasets (Mapping[str, Dataset]): Dictionary of datasets which may be used
-            to form the acquisition function.
+            to form the utility function.
 
         Raises:
             ValueError: If the objective posterior or dataset are not present in the
@@ -70,24 +70,24 @@ class AbstractAcquisitionFunctionBuilder(ABC):
             raise ValueError("Objective dataset not found in datasets")
 
     @abstractmethod
-    def build_acquisition_function(
+    def build_utility_function(
         self,
         posteriors: Mapping[str, AbstractPosterior],
         datasets: Mapping[str, Dataset],
         key: KeyArray,
-    ) -> AcquisitionFunction:
+    ) -> UtilityFunction:
         """
-        Build an `AcquisitionFunction` from a set of posteriors and datasets.
+        Build a `UtilityFunction` from a set of posteriors and datasets.
 
         Args:
             posteriors (Mapping[str, AbstractPosterior]): Dictionary of posteriors to be
-            used to form the acquisition function.
+            used to form the utility function.
             datasets (Mapping[str, Dataset]): Dictionary of datasets which may be used
-            to form the acquisition function.
+            to form the utility function.
             key (KeyArray): JAX PRNG key used for random number generation.
 
         Returns:
-            AcquisitionFunction: Acquisition function to be *maximised* in order to
+            UtilityFunction: Utility function to be *maximised* in order to
             decide which point to query next.
         """
         raise NotImplementedError

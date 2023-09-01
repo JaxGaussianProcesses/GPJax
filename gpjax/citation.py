@@ -10,11 +10,11 @@ from beartype.typing import (
 from jaxlib.xla_extension import PjitFunction
 from plum import dispatch
 
-from gpjax.decision_making.acquisition_functions import ThompsonSampling
 from gpjax.decision_making.test_functions import (
     Forrester,
     LogarithmicGoldsteinPrice,
 )
+from gpjax.decision_making.utility_functions import ThompsonSampling
 from gpjax.kernels import (
     RFF,
     ArcCosine,

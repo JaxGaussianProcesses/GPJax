@@ -1,4 +1,4 @@
-# Copyright 2023 The GPJax Contributors. All Rights Reserved.
+# Copyright 2023 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
-from jax.config import config
-import pytest
-
-from gpjax.decision_making.acquisition_functions.base import (
-    AbstractAcquisitionFunctionBuilder,
+from gpjax.decision_making.utility_functions.base import (
+    AbstractUtilityFunctionBuilder,
+    UtilityFunction,
 )
+from gpjax.decision_making.utility_functions.thompson_sampling import ThompsonSampling
 
-config.update("jax_enable_x64", True)
-
-
-def test_abstract_acquisition_function_builder():
-    with pytest.raises(TypeError):
-        AbstractAcquisitionFunctionBuilder()
+__all__ = [
+    "UtilityFunction",
+    "AbstractUtilityFunctionBuilder",
+    "ThompsonSampling",
+]

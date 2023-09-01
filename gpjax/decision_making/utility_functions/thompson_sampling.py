@@ -17,9 +17,9 @@ from dataclasses import dataclass
 from beartype.typing import Mapping
 
 from gpjax.dataset import Dataset
-from gpjax.decision_making.acquisition_functions.base import (
-    AbstractAcquisitionFunctionBuilder,
-    AcquisitionFunction,
+from gpjax.decision_making.utility_functions.base import (
+    AbstractUtilityFunctionBuilder,
+    UtilityFunction,
 )
 from gpjax.decision_making.utils import OBJECTIVE
 from gpjax.gps import ConjugatePosterior
@@ -27,12 +27,12 @@ from gpjax.typing import KeyArray
 
 
 @dataclass
-class ThompsonSampling(AbstractAcquisitionFunctionBuilder):
+class ThompsonSampling(AbstractUtilityFunctionBuilder):
     """
-    Form an acquisition function by drawing an approximate sample from the posterior,
+    Form a utility function by drawing an approximate sample from the posterior,
     using decoupled sampling as introduced in [Wilson et. al.
     (2020)](https://arxiv.org/abs/2002.09309). Note that we return the *negative* of the
-    sample as the acquisition function, as acquisition functions are *maximised*.
+    sample as the utility function, as utility functions are *maximised*.
 
     Attributes:
         num_features (int): The number of random Fourier features to use when drawing
@@ -47,30 +47,30 @@ class ThompsonSampling(AbstractAcquisitionFunctionBuilder):
                 "The number of random Fourier features must be a positive integer."
             )
 
-    def build_acquisition_function(
+    def build_utility_function(
         self,
         posteriors: Mapping[str, ConjugatePosterior],
         datasets: Mapping[str, Dataset],
         key: KeyArray,
-    ) -> AcquisitionFunction:
+    ) -> UtilityFunction:
         """
         Draw an approximate sample from the posterior of the objective model and return
-        the *negative* of this sample as an acquisition function, as acquisition functions
+        the *negative* of this sample as a utility function, as utility functions
         are *maximised*.
 
         Args:
             posteriors (Mapping[str, AbstractPosterior]): Dictionary of posteriors to be
-            used to form the acquisition function. One of the posteriors must correspond
+            used to form the utility function. One of the posteriors must correspond
             to the `OBJECTIVE` key, as we sample from the objective posterior to form
-            the acquisition function.
+            the utility function.
             datasets (Mapping[str, Dataset]): Dictionary of datasets which may be used
-            to form the acquisition function. Keys in `datasets` should correspond to
+            to form the utility function. Keys in `datasets` should correspond to
             keys in `posteriors`. One of the datasets must correspond
             to the `OBJECTIVE` key.
             key (KeyArray): JAX PRNG key used for random number generation.
 
         Returns:
-            AcquisitionFunction: An appproximate sample from the objective model
+            UtilityFunction: An appproximate sample from the objective model
             posterior to to be *maximised* in order to decide which point to query
             next.
         """
@@ -90,6 +90,4 @@ class ThompsonSampling(AbstractAcquisitionFunctionBuilder):
             num_features=self.num_features,
         )
 
-        return lambda x: -1.0 * thompson_sample(
-            x
-        )  # Acquisition functions are *maximised*
+        return lambda x: -1.0 * thompson_sample(x)  # Utility functions are *maximised*

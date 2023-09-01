@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-from jax.config import config
+from jax import config
 
 config.update("jax_enable_x64", True)
 
