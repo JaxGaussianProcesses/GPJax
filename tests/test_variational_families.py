@@ -267,3 +267,25 @@ def test_collapsed_variational_gaussian(
     for l1, l2 in zip(jtu.tree_leaves(variational_family), true_leaves):
         assert l1.shape == l2.shape
         assert (l1 == l2).all()
+
+
+@pytest.mark.parametrize("n_inducing", [1, 10, 20])
+def test_natural_expectation_switching(n_inducing: int) -> None:
+    prior = gpx.Prior(kernel=gpx.RBF(), mean_function=gpx.Constant())
+    likelihood = gpx.Gaussian(123)
+    inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
+    posterior = prior * likelihood
+
+    nat = NaturalVariationalGaussian(
+        posterior=posterior, inducing_inputs=inducing_inputs
+    )
+    exp = nat.to_expectation()
+
+    assert isinstance(exp, ExpectationVariationalGaussian)
+    assert isinstance(nat, NaturalVariationalGaussian)
+
+    nat2 = exp.to_natural()
+    assert isinstance(nat2, NaturalVariationalGaussian)
+
+    assert jnp.allclose(nat2.natural_vector, nat.natural_vector)
+    assert jnp.allclose(nat2.natural_matrix.to_dense(), nat.natural_matrix.to_dense())

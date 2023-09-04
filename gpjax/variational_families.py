@@ -16,8 +16,15 @@
 import abc
 from dataclasses import dataclass
 
-from beartype.typing import Any
+from beartype.typing import (
+    Any,
+    Tuple,
+)
 import cola
+from jax import (
+    value_and_grad,
+    vmap,
+)
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Float
@@ -336,8 +343,8 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
     where $`T(u) = [u, uu^{\top}]`$ are the sufficient statistics.
     """
 
-    natural_vector: Float[Array, "M 1"] = None
-    natural_matrix: Float[Array, "M M"] = None
+    natural_vector: Float[Array, "M 1"] = param_field(None, trainable=False)
+    natural_matrix: Float[Array, "M M"] = param_field(None, trainable=False)
 
     def __post_init__(self):
         if self.natural_vector is None:
@@ -479,6 +486,32 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
         )
 
+    def to_expectation(self) -> "ExpectationVariationalGaussian":
+        natural_matrix = self.natural_matrix
+        natural_vector = self.natural_vector
+
+        # S = (-2θ₂)⁻¹
+        S_inv = -2.0 * natural_matrix
+        S_inv += cola.ops.I_like(S_inv) * self.jitter
+        S_inv = cola.PSD(S_inv)
+        S = cola.inverse(S_inv)
+
+        # μ = Sθ₁
+        mu = S @ natural_vector
+
+        # η₁ = μ
+        expectation_vector = mu
+
+        # η₂ = S + μ μᵀ
+        expectation_matrix = S.to_dense() + jnp.matmul(mu, mu.T)
+
+        return ExpectationVariationalGaussian(
+            posterior=self.posterior,
+            inducing_inputs=self.inducing_inputs,
+            expectation_vector=expectation_vector,
+            expectation_matrix=expectation_matrix,
+        )
+
 
 @dataclass
 class ExpectationVariationalGaussian(AbstractVariationalGaussian):
@@ -540,8 +573,8 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         # S = η₂ - η₁ η₁ᵀ
         S = expectation_matrix - jnp.outer(mu, mu)
         S = cola.ops.Dense(S)
-        S = cola.PSD(S)
         S += cola.ops.I_like(S) * self.jitter
+        S = cola.PSD(S)
 
         muz = mean_function(z)
         Kzz = kernel.gram(z)
@@ -626,6 +659,288 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
+        )
+
+    def to_natural(self) -> "NaturalVariationalGaussian":
+        expectation_matrix = self.expectation_matrix
+        expectation_vector = self.expectation_vector
+
+        # S = η₂ - η₁ η₁ᵀ
+        S = cola.PSD(
+            cola.ops.Dense(expectation_matrix)
+            - jnp.matmul(expectation_vector, expectation_vector.T)
+        )
+
+        # θ₂ = -S⁻¹/2
+        S += cola.ops.I_like(S) * self.jitter
+        S_inv = cola.inverse(S)
+        natural_matrix = -0.5 * S_inv.to_dense()
+
+        # θ₁ = S⁻¹μ = S⁻¹η₁
+        natural_vector = S_inv @ expectation_vector
+
+        return NaturalVariationalGaussian(
+            posterior=self.posterior,
+            inducing_inputs=self.inducing_inputs,
+            natural_vector=natural_vector,
+            natural_matrix=natural_matrix,
+        )
+
+
+@dataclass
+class DualVariationalGaussian(VariationalGaussian):
+    """The Dual variational parameterisation. The Dual vector and matrix correspond to the learnt sufficient statistics of the learnt psuedo likelihood."""
+
+    dual_vector: Float[Array, "M 1"] = param_field(None, trainable=False)
+    dual_matrix: Float[Array, "M M"] = param_field(None, trainable=False)
+
+    def __post_init__(self):
+        if self.dual_vector is None:
+            self.dual_vector = jnp.zeros((self.num_inducing, 1))
+
+        if self.dual_matrix is None:
+            self.dual_matrix = jnp.eye(self.num_inducing) * 1e-10
+
+    def psuedo_data(self) -> Tuple[Float[Array, "M 1"], Float[Array, "M M"]]:
+        """Returns the psuedo Gaussian observations, $\tilde{y}$, and corresponding covariance, $\tilde{\\Sigma}$, i.e., $\tilde{y} \\sim \\mathcal{N}((f(z), \tilde{\\Sigma})$.
+
+        Returns
+        -------
+            Tuple[Float[Array, "M 1"], Float[Array, "M M"]]: The psuedo data y and psuedo covariance.
+        """
+        # Unpack variational parameters
+        dual_vector, dual_matrix = self.dual_vector, self.dual_matrix
+
+        # cov = (-2λ₂)⁻¹
+        inv_peusdo_cov = -2.0 * cola.ops.Dense(dual_matrix)
+        inv_peusdo_cov += cola.ops.I_like(inv_peusdo_cov) * self.posterior.prior.jitter
+        inv_peusdo_cov = cola.PSD(inv_peusdo_cov)
+        peusdo_cov = cola.inverse(inv_peusdo_cov)
+
+        # y = (-2λ₂)⁻¹λ₁
+        peusdo_y = peusdo_cov @ dual_vector
+
+        return peusdo_y, peusdo_cov
+
+    # This is the ConjugateLikelihood at the inducing inputs z, but with multivariate likelihood cov.
+    # TODO: Create this as an objective like conjugate MLL + add Multivate noise cov Gaussian likelihood.
+    def psuedo_log_likelihood(self) -> ScalarFloat:
+        """Returns the log likelihood of the psuedo data, $\tilde{y}$, under the psuedo likelihood.
+
+            $$ \\int p(f(z))\\mathcal{N}(\tilde{y}; f(z),  \tilde{\\Sigma}) $$
+
+            This is the same as marginal likelihood for conjugate observations $\tilde{y} \\sim \\mathcal{N}(f(z), \tilde{\\Sigma})$.
+
+        Returns
+        -------
+            ScalarFloat: The log likelihood of the psuedo data under the psuedo likelihood.
+        """
+        posterior = self.posterior
+        z = self.inducing_inputs
+
+        # Compute the psuedo data from the dual parameters.
+        y, cov = self.psuedo_data()
+
+        # Compute the marginal likelihood of the psuedo data under the prior.
+        mz = posterior.prior.mean_function(z)
+        Kzz = posterior.prior.kernel.gram(z)
+        Kzz += cola.ops.I_like(Kzz) * posterior.prior.jitter
+        mll = GaussianDistribution(jnp.atleast_1d(mz.squeeze()), Kzz + cov)
+
+        return mll.log_prob(jnp.atleast_1d(y.squeeze())).sum()
+
+    # This is the AnalyticalGaussianIntegrator at the inducing inputs z, but with multivariate likelihood S.
+    # TODO: extend Gaussian and AnalyticalGaussianIntegrator to multivariate likelihoods.
+    def peusdo_expected_density(self) -> ScalarFloat:
+        """Returns the expected density of the psuedo data. This is the same as the AnalyticalGaussianIntegrator at the inducing inputs z for the pseudo data.
+
+            $$ \\int q(f(z))\\log(\\mathcal{N}(\tilde{y}; f(z),  \tilde{\\Sigma})) $$
+
+        Returns
+        -------
+            ScalarFloat: The expected density of the psuedo data.
+        """
+        z = self.inducing_inputs
+        qz = self.predict(z)
+        mu, S = qz.loc, qz.scale
+
+        # Compute the psuedo data from the dual parameters.
+        psuedo_y, psuedo_cov = self.psuedo_data()
+
+        # Compute the marginal likelihood of the psuedo data under the prior.
+        ml = (
+            GaussianDistribution(
+                jnp.atleast_1d(mu.squeeze()),
+                psuedo_cov + cola.ops.I_like(psuedo_cov) * self.posterior.prior.jitter,
+            )
+            .log_prob(jnp.atleast_1d(psuedo_y.squeeze()))
+            .sum()
+        )
+        trace = -0.5 * jnp.trace(
+            (
+                cola.inverse(
+                    cola.PSD(
+                        psuedo_cov
+                        + cola.ops.I_like(psuedo_cov) * self.posterior.prior.jitter
+                    )
+                )
+                @ S
+            ).to_dense()
+        )
+        return ml + trace
+
+    def prior_kl(self) -> ScalarFloat:
+        r"""Evaluate the prior KL-divergence.
+
+        Compute the KL-divergence between our current variational approximation and the Gaussian process prior.
+
+        For this variational family, we have
+
+        ```math
+        \begin{align}
+        \operatorname{KL}(q(f(\cdot))\mid\mid p(\cdot)) & = \int q(f(z))\log(\mathcal{N}(\tilde{y}; f(z),  \tilde{\Sigma})) - \int p(f(z))\mathcal{N}(\tilde{y}; f(z),  \tilde{\Sigma})
+        \end{align}
+        ```
+        where $\mu$ and $S$ are the expectation parameters of the variational distribution and $m_z$ and $K_{zz}$ are the mean and covariance of the prior distribution.
+
+        Returns
+        -------
+            ScalarFloat: The KL-divergence between our variational approximation and the GP prior.
+        """
+        return self.peusdo_expected_density() - self.psuedo_log_likelihood()
+
+    def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
+        r"""Compute the predictive distribution of the GP at the test inputs t.
+
+        This is the integral $`q(f(t)) = \int p(f(t)\mid u) q(u) \mathrm{d}u`$, which
+        can be computed in closed form as:
+        ```math
+            \mathcal{N}\left(f(t); \mu(t) + \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} (\tilde{y} - \mu(z)),  \mathbf{K}_{tt} - \mathbf{K}_{tz} (\mathbf{K}_{zz} + \tilde{\Sigma})^{-1} \mathbf{K}_{zt} \right).
+        ```
+
+        Where $\tilde{y}$ and $\tilde{\Sigma}$ are computed from the dual parameterisation $(\lambda_1, \lambda_2) = (\tilde{\Sigma}^{-1}\tilde{y}, -\tilde{\Sigma}^{-1}/2 = (-2 )^{-1})$.
+
+        Observe this is the same as conditioning a the Gaussian process prior on the psuedo Gaussian obvserions, $\tilde{y} \sim \mathcal{N}((f(z), \tilde{\Sigma})$.
+
+        Args:
+            test_inputs (Float[Array, "N D"]): The test inputs at which we wish to
+                make a prediction.
+
+        Returns
+        -------
+            GaussianDistribution: The predictive distribution of the low-rank GP at
+                the test inputs.
+        """
+
+        # These are same as conjugate Gaussian process prior - where we subsitite in the psuedo data.
+        # The issue with just using our current one in GPJax - is that we don't support multivariate noise likelihoods.
+
+        # Alternatively could add the natural parmeters of the psuedo likelihood that correspond to the dual parameters, to the natural parameters of the prior
+        # And use NaturalVariationalGaussian's predict.
+
+        # Regardless, here is some code that works for now.
+
+        # Unpack variational parameters
+        psuedo_y, psuedo_cov = self.psuedo_data()
+        z = self.inducing_inputs
+
+        # Unpack mean function and kernel
+        mean_function = self.posterior.prior.mean_function
+        kernel = self.posterior.prior.kernel
+
+        Kzz = kernel.gram(z)
+        Kzz += cola.ops.I_like(Kzz) * self.jitter
+        mz = mean_function(z)
+
+        # Unpack test inputs
+        t = test_inputs
+
+        Ktt = kernel.gram(t)
+        Kzt = kernel.cross_covariance(z, t)
+        mt = mean_function(t)
+
+        # (Kzz + psuedo_cov)
+        Sigma = cola.PSD(Kzz + psuedo_cov)
+
+        # (Kzz + psuedo_cov)⁻¹ Kzt
+        Sigma_inv_Kzt = cola.solve(Sigma, Kzt)
+
+        # mt + Ktz (Kzz + psuedo_cov)⁻¹ (psuedo_y - mz)
+        mean = mt + Sigma_inv_Kzt.T @ (psuedo_y - mz)
+
+        # Ktt +  Ktz (Kzz + psuedo_cov)⁻¹ Kzt
+        covariance = Ktt + Sigma_inv_Kzt.T @ Kzt
+        covariance += cola.ops.I_like(covariance) * self.jitter
+
+        return GaussianDistribution(
+            loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
+        )
+
+    # TODO: This just gives you an idea of how to compute the natural gradient.
+    # We need to work out some API
+    # It would be nice not to reuse all the variational expectation code.
+    # (This was done so due to squeezing a vmap, to facilitate grad on (1, ) array).
+    def natural_gradient(self, train_data: Dataset) -> "DualVariationalGaussian":
+        r"""Compute the natural_gradient.
+
+        Returns
+        -------
+            DualVariationalGaussian: The natural gradient of the variational parameters.
+        """
+
+        ## --- REUSING CODE FROM EXPECTATION VARIATIONAL GAUSSIAN ---
+
+        # Unpack training batch
+        x, y = train_data.X, train_data.y
+
+        # Variational distribution q(f(·)) = N(f(·); μ(·), Σ(·, ·))
+        q = self
+
+        # TODO: This needs cleaning up! We are squeezing then broadcasting `mean` and `variance`, which is not ideal.
+
+        # Compute variational mean, μ(x), and variance, diag(Σ(x, x)), at the training
+        # inputs, x
+        def q_moments(x):
+            qx = q(x)
+            return qx.mean().squeeze(), qx.covariance().squeeze()
+
+        mean, variance = vmap(q_moments)(x[:, None])
+
+        # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
+        exp_ll = lambda y, m, v: q.posterior.likelihood.expected_log_likelihood(
+            y, m, v
+        ).squeeze()  # <---- CHANGED THIS
+
+        _, (dL_mi, dL_vi) = vmap(
+            value_and_grad(exp_ll, argnums=(1, 2)), in_axes=(0, 0, 0)
+        )(
+            y[:, None], mean[:, None], variance[:, None]
+        )  # <---- CHANGED THIS
+
+        ## --- REUSING CODE FROM EXPECTATION VARIATIONAL GAUSSIAN ---
+
+        # These are natural gradients at each dual site q(f(xi)):
+        dL_mu_1i = dL_mi - 2.0 * dL_vi * mean[:, None]
+        dL_mu_2i = dL_vi
+
+        # Now we compute the project these down to compute natural gradients of the low-rank dual variational parameters
+        z = self.inducing_inputs
+        Kzz = self.posterior.prior.kernel.gram(z)
+        Kzx = self.posterior.prior.kernel.cross_covariance(z, x)
+        Kzz_inv_Kzx = (
+            cola.inverse(
+                cola.PSD(Kzz + cola.ops.I_like(Kzz) * self.posterior.prior.jitter)
+            )
+            @ Kzx
+        )
+
+        natgrad_dual_vector = Kzz_inv_Kzx @ dL_mu_1i
+        natgrad_dual_matrix = (
+            Kzz_inv_Kzx @ cola.ops.Diagonal(dL_mu_2i.squeeze()) @ Kzz_inv_Kzx.T
+        )
+
+        return self.replace(
+            dual_vector=natgrad_dual_vector, dual_matrix=natgrad_dual_matrix
         )
 
 
@@ -733,5 +1048,6 @@ __all__ = [
     "WhitenedVariationalGaussian",
     "NaturalVariationalGaussian",
     "ExpectationVariationalGaussian",
+    "DualVariationalGaussian",
     "CollapsedVariationalGaussian",
 ]
