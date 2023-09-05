@@ -25,7 +25,6 @@ from matplotlib import rcParams
 import matplotlib.pyplot as plt
 import optax as ox
 import pandas as pd
-from sklearn.model_selection import train_test_split
 import tensorflow_probability as tfp
 
 with install_import_hook("gpjax", "beartype.beartype"):
@@ -38,9 +37,6 @@ plt.style.use(
 )
 colors = rcParams["axes.prop_cycle"].by_key()["color"]
 
-import dataclasses
-from gpjax import Constant
-from gpjax.base import static_field
 
 # %% [markdown]
 # ## Data Loading and problem setting
@@ -70,12 +66,13 @@ def prepare_data(df):
 
 
 # loading in data
-try:
-    gulf_data_train = pd.read_csv("data/gulfdata_train.csv")
-    gulf_data_test = pd.read_csv("data/gulfdata_test.csv")
-except FileNotFoundError:
-    gulf_data_train = pd.read_csv("docs/examples/data/gulfdata_train.csv")
-    gulf_data_test = pd.read_csv("docs/examples/data/gulfdata_test.csv")
+
+gulf_data_train = pd.read_csv(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/gpjaxstatic/main/data/gulfdata_train.csv"
+)
+gulf_data_test = pd.read_csv(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/gpjaxstatic/main/data/gulfdata_test.csv"
+)
 
 
 pos_test, vel_test, shape = prepare_data(gulf_data_test)
@@ -83,7 +80,14 @@ pos_train, vel_train = prepare_data(gulf_data_train)
 
 fig, ax = plt.subplots(1, 1)
 ax.quiver(
-    pos_test[0], pos_test[1], vel_test[0], vel_test[1], color=colors[0], label="$D_0$"
+    pos_test[0],
+    pos_test[1],
+    vel_test[0],
+    vel_test[1],
+    color=colors[0],
+    label="$D_0$",
+    angles="xy",
+    scale=10,
 )
 ax.quiver(
     pos_train[0],
@@ -93,6 +97,8 @@ ax.quiver(
     color=colors[1],
     alpha=0.7,
     label="$D_T$",
+    angles="xy",
+    scale=10,
 )
 ax.legend()
 plt.show()
@@ -150,14 +156,15 @@ def stack_velocity(data):
     return data.T.flatten().reshape(-1, 1)
 
 
-pos_train3d = label_position(pos_train)
-vel_train3d = stack_velocity(vel_train)
+def dataset_3d(pos, vel):
+    return gpx.Dataset(label_position(pos), stack_velocity(vel))
+
+
+# label and place the training data into a Dataset object to be used by GPJax
+dataset_train = dataset_3d(pos_train, vel_train)
 
 # we also require the testing data to be relabelled for later use, such that we can query the 2Nx2N GP at the test points
-pos_test3d = label_position(pos_test)
-
-# place th etraining data into a Dataset object to be used by GPJax
-DT = gpx.Dataset(X=pos_train3d, y=vel_train3d)
+dataset_ground_truth = dataset_3d(pos_test, vel_test)
 
 
 # %% [markdown]
@@ -170,13 +177,13 @@ DT = gpx.Dataset(X=pos_train3d, y=vel_train3d)
 #
 # where $k^{(z)}\left(\mathbf{x}, \mathbf{x}^{\prime}\right)$ are the user chosen kernels for each dimension. What this means is that there are no correlations between the $x^{(0)}$ and $x^{(1)}$ dimensions for all choices $\mathbf{X}$ and $\mathbf{X}^{\prime}$, since there are no off-diagonal elements in the Gram matrix populated by this choice.
 #
-# To implement this approach in GPJax, we define `velocity_kernel` in the following cell, following the steps outlined in the [custom kernels notebook](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#custom-kernel). This modular implementation takes the choice of user kernels as its class attributes: `kernel0` and `kernel1`. We must additionally pass the argument `active_dims = [0,1]`, which is an attribute of the base class `AbstractKernel`, into the chosen kernels. This is necessary such that the subsequent likelihood optimisation does not optimise over the artificial label dimension.
+# To implement this approach in GPJax, we define `VelocityKernel` in the following cell, following the steps outlined in the [custom kernels notebook](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#custom-kernel). This modular implementation takes the choice of user kernels as its class attributes: `kernel0` and `kernel1`. We must additionally pass the argument `active_dims = [0,1]`, which is an attribute of the base class `AbstractKernel`, into the chosen kernels. This is necessary such that the subsequent likelihood optimisation does not optimise over the artificial label dimension.
 #
 
 
 # %%
 @dataclass
-class velocity_kernel(gpx.kernels.AbstractKernel):
+class VelocityKernel(gpx.kernels.AbstractKernel):
     kernel0: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
     kernel1: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
 
@@ -213,8 +220,8 @@ def initialise_gp(kernel, mean, dataset):
 
 # Define the velocity GP
 mean = gpx.mean_functions.Zero()
-kernel = velocity_kernel()
-velocity_posterior = initialise_gp(kernel, mean, DT)
+kernel = VelocityKernel()
+velocity_posterior = initialise_gp(kernel, mean, dataset_train)
 
 
 # %% [markdown]
@@ -223,7 +230,7 @@ velocity_posterior = initialise_gp(kernel, mean, DT)
 
 # %%
 def optimise_mll(posterior, dataset, NIters=1000, key=key, plot_history=True):
-    # define the Marginal Log likelihood using DT
+    # define the Marginal Log likelihood using dataset_train
     objective = gpx.objectives.ConjugateMLL(negative=True)
     # Optimise to minimise the MLL
     optimiser = ox.adam(learning_rate=0.1)
@@ -245,7 +252,7 @@ def optimise_mll(posterior, dataset, NIters=1000, key=key, plot_history=True):
     return opt_posterior
 
 
-opt_velocity_posterior = optimise_mll(velocity_posterior, DT)
+opt_velocity_posterior = optimise_mll(velocity_posterior, dataset_train)
 
 
 # %% [markdown]
@@ -254,18 +261,19 @@ opt_velocity_posterior = optimise_mll(velocity_posterior, DT)
 
 
 # %%
-def latent_distribution(opt_posterior, pos_3d):
-    latent = opt_posterior.predict(pos_3d, train_data=DT)
+def latent_distribution(opt_posterior, pos_3d, dataset_train):
+    latent = opt_posterior.predict(pos_3d, train_data=dataset_train)
     latent_mean = latent.mean()
     latent_std = latent.stddev()
     return latent_mean, latent_std
 
 
 # extract latent mean and std of g, redistribute into vectors to model F
-velocity_mean, velocity_std = latent_distribution(opt_velocity_posterior, pos_test3d)
+velocity_mean, velocity_std = latent_distribution(
+    opt_velocity_posterior, dataset_ground_truth.X, dataset_train
+)
 
-vel_lat = [velocity_mean[::2], velocity_mean[1::2]]
-pos_lat = pos_test
+dataset_latent_velocity = dataset_3d(pos_test, velocity_mean)
 
 
 # %% [markdown]
@@ -274,107 +282,93 @@ pos_lat = pos_test
 
 # %%
 # Residuals between ground truth and estimate
-def plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shape):
-    Y = pos_test[1]
-    X = pos_test[0]
-    # make figure
-    fig, ax = plt.subplots(1, 3, figsize=(12, 3))
-    fig.tight_layout()
-    # ground truth
-    ax[0].quiver(
-        pos_test[0],
-        pos_test[1],
-        vel_test[0],
-        vel_test[1],
-        color=colors[0],
-        label="Training data",
-        scale=10,
-    )
-    ax[0].quiver(
-        pos_train[0],
-        pos_train[1],
-        vel_train[0],
-        vel_train[1],
-        color=colors[1],
-        label="Test Data",
-        scale=10,
-    )
-    ax[0].set(
-        xlim=[X.min() - 0.1, X.max() + 0.1],
-        ylim=[Y.min() + 0.1, Y.max() + 0.1],
-        aspect="equal",
-        title="Ground Truth",
+
+
+def plot_vector_field(ax, dataset, **kwargs):
+    ax.quiver(
+        dataset.X[::2][:, 0],
+        dataset.X[::2][:, 1],
+        dataset.y[::2],
+        dataset.y[1::2],
+        **kwargs,
     )
 
-    # Latent estimate of vector field F
-    ax[1].quiver(
-        pos_lat[0],
-        pos_lat[1],
-        vel_lat[0],
-        vel_lat[1],
-        color=colors[3],
-        label="Latent estimate of Ground Truth",
-        scale=10,
-    )
-    ax[1].quiver(
-        pos_train[0],
-        pos_train[1],
-        vel_train[0],
-        vel_train[1],
-        color=colors[1],
-        scale=10,
-    )
-    ax[1].set(
+
+def prepare_ax(ax, X, Y, title, **kwargs):
+    ax.set(
         xlim=[X.min() - 0.1, X.max() + 0.1],
         ylim=[Y.min() + 0.1, Y.max() + 0.1],
         aspect="equal",
-        title="GP Latent Estimate",
+        title=title,
+        ylabel="latitude",
+        **kwargs,
     )
+
+
+def residuals(dataset_latent, dataset_ground_truth):
+    return jnp.sqrt(
+        (dataset_latent.y[::2] - dataset_ground_truth.y[::2]) ** 2
+        + (dataset_latent.y[1::2] - dataset_ground_truth.y[1::2]) ** 2
+    )
+
+
+def plot_fields(
+    dataset_ground_truth, dataset_trajectory, dataset_latent, shape=shape, scale=10
+):
+    X = dataset_ground_truth.X[:, 0][::2]
+    Y = dataset_ground_truth.X[:, 1][::2]
+    # make figure
+    fig, ax = plt.subplots(1, 3, figsize=(12.0, 2.7), sharey=True)
+
+    # ground truth
+    plot_vector_field(
+        ax[0],
+        dataset_ground_truth,
+        color=colors[0],
+        label="Ocean Current",
+        angles="xy",
+        scale=scale,
+    )
+    plot_vector_field(
+        ax[0],
+        dataset_trajectory,
+        color=colors[1],
+        label="Drifter",
+        angles="xy",
+        scale=scale,
+    )
+    prepare_ax(ax[0], X, Y, "Ground Truth")
+
+    # Latent estimate of vector field F
+    plot_vector_field(ax[1], dataset_latent, color=colors[0], angles="xy", scale=scale)
+    plot_vector_field(
+        ax[1], dataset_trajectory, color=colors[1], angles="xy", scale=scale
+    )
+    prepare_ax(ax[1], X, Y, "GP Estimate", xlabel="Longitude")
 
     # residuals
     residuals_vel = jnp.flip(
-        jnp.sqrt(
-            (vel_test[0] - vel_lat[0]) ** 2 + (vel_test[1] - vel_lat[1]) ** 2
-        ).reshape(shape),
-        axis=[0],
+        residuals(dataset_latent, dataset_ground_truth).reshape(shape), axis=0
     )
     im = ax[2].imshow(
-        residuals_vel, extent=[X.min(), X.max(), Y.min(), Y.max()], cmap="winter"
+        residuals_vel,
+        extent=[X.min(), X.max(), Y.min(), Y.max()],
+        cmap="jet",
+        vmin=0,
+        vmax=1.0,
+        interpolation="spline36",
     )
+    plot_vector_field(
+        ax[2], dataset_trajectory, color=colors[1], angles="xy", scale=scale
+    )
+    prepare_ax(ax[2], X, Y, "Residuals", xlabel="Longitude")
+    fig.colorbar(im, fraction=0.027, pad=0.04, orientation="vertical")
 
-    ax[2].quiver(
-        pos_test[0],
-        pos_test[1],
-        vel_lat[0] - vel_test[0],
-        vel_lat[1] - vel_test[1],
-        color="white",
-        scale=10,
-    )
-    ax[2].quiver(
-        pos_train[0],
-        pos_train[1],
-        vel_train[0],
-        vel_train[1],
-        color=colors[1],
-        scale=10,
-    )
-    ax[2].set(
-        xlim=[X.min() - 0.1, X.max() + 0.1],
-        ylim=[Y.min() + 0.1, Y.max() + 0.1],
-        aspect="equal",
-        title="Residuals",
-    )
-
-    fig.colorbar(
-        im,
-        fraction=0.027,
-        pad=0.04,
-        orientation="vertical",
-    )
+    fig.legend(loc="lower center", framealpha=0.0, ncols=3, fontsize="medium")
     plt.show()
 
 
-plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shape)
+plot_fields(dataset_ground_truth, dataset_train, dataset_latent_velocity)
 
 
 # %% [markdown]
@@ -425,7 +419,7 @@ plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shape)
 # for either $z$.
 # %%
 @dataclass
-class helmholtz_kernel(gpx.kernels.AbstractKernel):
+class HelmholtzKernel(gpx.kernels.AbstractKernel):
     # initialise Phi and Psi kernels as any stationary kernel in gpJax
     potential_kernel: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
     stream_kernel: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
@@ -451,14 +445,14 @@ class helmholtz_kernel(gpx.kernels.AbstractKernel):
 
 # %% [markdown]
 # ### GPJax Implementation
-# We repeat the exact same steps as with the velocity GP model, but replacing `velocity_kernel` with `helmholtz_kernel`.
+# We repeat the exact same steps as with the velocity GP model, but replacing `VelocityKernel` with `HelmholtzKernel`.
 
 # %%
 # Redefine Gaussian process with Helmholtz kernel
-kernel = helmholtz_kernel()
-helmholtz_posterior = initialise_gp(kernel, mean, DT)
+kernel = HelmholtzKernel()
+helmholtz_posterior = initialise_gp(kernel, mean, dataset_train)
 # Optimise hyperparameters using optax
-opt_helmholtz_posterior = optimise_mll(helmholtz_posterior, DT)
+opt_helmholtz_posterior = optimise_mll(helmholtz_posterior, dataset_train)
 
 
 # %% [markdown]
@@ -467,11 +461,12 @@ opt_helmholtz_posterior = optimise_mll(helmholtz_posterior, DT)
 
 # %%
 # obtain latent distribution, extract x and y values over g
-helmholtz_mean, helmholtz_std = latent_distribution(opt_helmholtz_posterior, pos_test3d)
-vel_lat = [helmholtz_mean[::2], helmholtz_mean[1::2]]
-pos_lat = pos_test
+helmholtz_mean, helmholtz_std = latent_distribution(
+    opt_helmholtz_posterior, dataset_ground_truth.X, dataset_train
+)
+dataset_latent_helmholtz = dataset_3d(pos_test, helmholtz_mean)
 
-plot_fields(pos_train, pos_test, vel_train, vel_test, pos_lat, vel_lat, shape)
+plot_fields(dataset_ground_truth, dataset_train, dataset_latent_helmholtz)
 
 # %% [markdown]
 # Visually, the Helmholtz model performs better than the velocity model, preserving the local structure of the $\mathbf{F}$. Since we placed priors on $\Phi$ and $\Psi$, the construction of $\mathbf{F}$ allows for correlations between the dimensions (non-zero off diagonal elements in the Gram matrix populated by $k_\text{Helm}\left(\mathbf{X},\mathbf{X}^{\prime}\right)$ ).
