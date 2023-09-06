@@ -32,17 +32,27 @@ from gpjax.typing import (
     KeyArray,
 )
 
-UtilityFunction = Callable[[Float[Array, "N D"]], Float[Array, "N 1"]]
+SinglePointUtilityFunction = Callable[[Float[Array, "N D"]], Float[Array, "N 1"]]
 """
-Type alias for utility functions, which take an array of points of shape $`[N, D]`$
+Type alias for utility functions which don't support batching, and instead characterise
+the utility of querying a single point, rather than a batch of points. They take an array of points of shape $`[N, D]`$
 and return the value of the utility function at each point in an array of shape $`[N, 1]`$.
 """
 
 
+UtilityFunction = SinglePointUtilityFunction
+"""
+Type alias for all utility functions. Currently we only support
+`SinglePointUtilityFunction`s, but in future may support batched utility functions too.
+Note that `UtilityFunction`s are *maximised* in order to decide which point, or batch of points, to query next.
+"""
+
+
 @dataclass
-class AbstractUtilityFunctionBuilder(ABC):
+class AbstractSinglePointUtilityFunctionBuilder(ABC):
     """
-    Abstract class for building utility functions.
+    Abstract class for building utility functions which don't support batches. As such,
+    they characterise the utility of querying a single point next.
     """
 
     def check_objective_present(
@@ -75,7 +85,7 @@ class AbstractUtilityFunctionBuilder(ABC):
         posteriors: Mapping[str, AbstractPosterior],
         datasets: Mapping[str, Dataset],
         key: KeyArray,
-    ) -> UtilityFunction:
+    ) -> SinglePointUtilityFunction:
         """
         Build a `UtilityFunction` from a set of posteriors and datasets.
 
@@ -87,7 +97,14 @@ class AbstractUtilityFunctionBuilder(ABC):
             key (KeyArray): JAX PRNG key used for random number generation.
 
         Returns:
-            UtilityFunction: Utility function to be *maximised* in order to
+            SinglePointUtilityFunction: Utility function to be *maximised* in order to
             decide which point to query next.
         """
         raise NotImplementedError
+
+
+AbstractUtilityFunctionBuilder = AbstractSinglePointUtilityFunctionBuilder
+"""
+Type alias for utility function builders. For now this only include single point utility
+function builders, but in the future we may support batched utility function builders.
+"""

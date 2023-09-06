@@ -28,13 +28,16 @@ from gpjax.decision_making.test_functions import (
     Quadratic,
 )
 from gpjax.decision_making.utility_functions import (
+    AbstractSinglePointUtilityFunctionBuilder,
     AbstractUtilityFunctionBuilder,
+    SinglePointUtilityFunction,
     ThompsonSampling,
     UtilityFunction,
 )
 from gpjax.decision_making.utility_maximizer import (
+    AbstractSinglePointUtilityMaximizer,
     AbstractUtilityMaximizer,
-    ContinuousUtilityMaximizer,
+    ContinuousSinglePointUtilityMaximizer,
 )
 from gpjax.decision_making.utils import build_function_evaluator
 
@@ -43,9 +46,11 @@ __all__ = [
     "AbstractUtilityMaximizer",
     "AbstractDecisionMaker",
     "AbstractSearchSpace",
+    "AbstractSinglePointUtilityFunctionBuilder",
+    "AbstractSinglePointUtilityMaximizer",
     "UtilityFunction",
     "build_function_evaluator",
-    "ContinuousUtilityMaximizer",
+    "ContinuousSinglePointUtilityMaximizer",
     "ContinuousSearchSpace",
     "UtilityDrivenDecisionMaker",
     "AbstractContinuousTestFunction",
@@ -53,5 +58,6 @@ __all__ = [
     "LogarithmicGoldsteinPrice",
     "PosteriorHandler",
     "Quadratic",
+    "SinglePointUtilityFunction",
     "ThompsonSampling",
 ]

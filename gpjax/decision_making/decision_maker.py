@@ -16,6 +16,7 @@ from abc import (
     ABC,
     abstractmethod,
 )
+import copy
 from dataclasses import dataclass
 
 from beartype.typing import (
@@ -24,12 +25,16 @@ from beartype.typing import (
     List,
     Mapping,
 )
+import jax.numpy as jnp
 import jax.random as jr
 
 from gpjax.dataset import Dataset
 from gpjax.decision_making.posterior_handler import PosteriorHandler
 from gpjax.decision_making.search_space import AbstractSearchSpace
-from gpjax.decision_making.utility_functions import AbstractUtilityFunctionBuilder
+from gpjax.decision_making.utility_functions import (
+    AbstractUtilityFunctionBuilder,
+    ThompsonSampling,
+)
 from gpjax.decision_making.utility_maximizer import AbstractUtilityMaximizer
 from gpjax.decision_making.utils import FunctionEvaluator
 from gpjax.gps import AbstractPosterior
@@ -67,6 +72,9 @@ class AbstractDecisionMaker(ABC):
             also used to update the posteriors, using the `posterior_handlers`. Tags are used
             to distinguish datasets, and correspond to tags in `posterior_handlers`.
         key (KeyArray): JAX random key, used to generate random numbers.
+        batch_size (int): Number of points to query at each step of the decision making
+            loop. Note that `SinglePointUtilityFunction`s are only capable of generating
+            one point to be queried at each iteration of the decision making loop.
         post_ask (List[Callable]): List of functions to be executed after each ask step.
         post_tell (List[Callable]): List of functions to be executed after each tell
             step.
@@ -76,9 +84,10 @@ class AbstractDecisionMaker(ABC):
     posterior_handlers: Dict[str, PosteriorHandler]
     datasets: Dict[str, Dataset]
     key: KeyArray
+    batch_size: int
     post_ask: List[
         Callable
-    ]  # Specific type is List[Callable[[AbstractDecisionMaker, Float[Array, ["1 D"]]], None]] but causes Beartype issues
+    ]  # Specific type is List[Callable[[AbstractDecisionMaker, Float[Array, ["B D"]]], None]] but causes Beartype issues
     post_tell: List[
         Callable
     ]  # Specific type is List[Callable[[AbstractDecisionMaker], None]] but causes Beartype issues
@@ -89,6 +98,15 @@ class AbstractDecisionMaker(ABC):
         consistent (i.e. have the same tags), and then initialise the posteriors, optimizing them using the
         corresponding datasets.
         """
+        self.datasets = copy.copy(
+            self.datasets
+        )  # Ensure initial datasets passed in to DecisionMaker are not mutated from within
+
+        if self.batch_size < 1:
+            raise ValueError(
+                f"Batch size must be greater than 0, got {self.batch_size}."
+            )
+
         # Check that posterior handlers and datasets are consistent
         if self.posterior_handlers.keys() != self.datasets.keys():
             raise ValueError(
@@ -105,9 +123,9 @@ class AbstractDecisionMaker(ABC):
             )
 
     @abstractmethod
-    def ask(self, key: KeyArray) -> Float[Array, "1 D"]:
+    def ask(self, key: KeyArray) -> Float[Array, "B D"]:
         """
-        Get the point to be queried next.
+        Get the point(s) to be queried next.
 
         Args:
             key (KeyArray): JAX PRNG key for controlling random state.
@@ -222,28 +240,64 @@ class UtilityDrivenDecisionMaker(AbstractDecisionMaker):
     utility_function_builder: AbstractUtilityFunctionBuilder
     utility_maximizer: AbstractUtilityMaximizer
 
-    def ask(self, key: KeyArray) -> Float[Array, "1 D"]:
+    def __post_init__(self):
+        super().__post_init__()
+        if self.batch_size > 1 and not isinstance(
+            self.utility_function_builder, ThompsonSampling
+        ):
+            raise NotImplementedError(
+                "Batch size > 1 currently only supported for Thompson sampling."
+            )
+
+    def ask(self, key: KeyArray) -> Float[Array, "B D"]:
         """
-        Get updated utility function and return the point which maximises it. This
-        method also stores the utility function in
-        `self.current_utility_function` so that it can be accessed after the ask
+        Get updated utility function(s) and return the point(s) which maximises it/them. This
+        method also stores the utility function(s) in
+        `self.current_utility_functions` so that they can be accessed after the ask
         function has been called. This is useful for non-deterministic utility
-        functions, which will differ between calls to `ask` due to the splitting of
+        functions, which may differ between calls to `ask` due to the splitting of
         `self.key`.
+
+        Note that in general `SinglePointUtilityFunction`s are only capable of
+        generating one point to be queried at each iteration of the decision making loop
+        (i.e. `self.batch_size` must be 1). However, Thompson sampling can be used in a
+        batched setting by drawing a batch of different samples from the GP posterior.
+        This is done by calling `build_utility_function` with different keys
+        sequentilly, and optimising each of these individual samples in sequence in
+        order to obtain `self.batch_size` points to query next.
 
         Args:
             key (KeyArray): JAX PRNG key for controlling random state.
 
         Returns:
-            Float[Array, "1 D"]: Point to be queried next.
+            Float[Array, "B D"]: Point(s) to be queried next.
         """
-        self.current_utility_function = (
-            self.utility_function_builder.build_utility_function(
-                self.posteriors, self.datasets, key
-            )
-        )
+        self.current_utility_functions = []
+        maximizers = []
+        if isinstance(self.utility_function_builder, ThompsonSampling) or (
+            (not isinstance(self.utility_function_builder, ThompsonSampling))
+            and (self.batch_size == 1)
+        ):
+            # Draw 'self.batch_size' Thompson samples and optimize each of them in order to
+            # obtain 'self.batch_size' points to query next.
+            for _ in range(self.batch_size):
+                decision_function = (
+                    self.utility_function_builder.build_utility_function(
+                        self.posteriors, self.datasets, key
+                    )
+                )
+                self.current_utility_functions.append(decision_function)
 
-        key, _ = jr.split(key)
-        return self.utility_maximizer.maximize(
-            self.current_utility_function, self.search_space, key
-        )
+                _, key = jr.split(key)
+                maximizer = self.utility_maximizer.maximize(
+                    decision_function, self.search_space, key
+                )
+                maximizers.append(maximizer)
+                _, key = jr.split(key)
+
+            maximizers = jnp.concatenate(maximizers)
+            return maximizers
+        else:
+            raise NotImplementedError(
+                "Only Thompson sampling currently supports batch size > 1."
+            )
