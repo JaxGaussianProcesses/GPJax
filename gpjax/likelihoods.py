@@ -35,7 +35,6 @@ from gpjax.integrators import (
     AnalyticalGaussianIntegrator,
     GHQuadratureIntegrator,
 )
-from gpjax.linops.utils import to_dense
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -160,7 +159,7 @@ class Gaussian(AbstractLikelihood):
             tfd.Distribution: The predictive distribution.
         """
         n_data = dist.event_shape[0]
-        cov = to_dense(dist.covariance())
+        cov = dist.covariance()
         noisy_cov = cov.at[jnp.diag_indices(n_data)].add(self.obs_noise)
 
         return tfd.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)

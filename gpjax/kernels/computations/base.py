@@ -17,17 +17,18 @@ import abc
 from dataclasses import dataclass
 import typing as tp
 
+from cola import PSD
+from cola.ops import (
+    Dense,
+    Diagonal,
+    LinearOperator,
+)
 from jax import vmap
 from jaxtyping import (
     Float,
     Num,
 )
 
-from gpjax.linops import (
-    DenseLinearOperator,
-    DiagonalLinearOperator,
-    LinearOperator,
-)
 from gpjax.typing import Array
 
 Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
@@ -53,7 +54,7 @@ class AbstractKernelComputation:
             LinearOperator: Gram covariance operator of the kernel function.
         """
         Kxx = self.cross_covariance(kernel, x, x)
-        return DenseLinearOperator(Kxx)
+        return PSD(Dense(Kxx))
 
     @abc.abstractmethod
     def cross_covariance(
@@ -73,9 +74,7 @@ class AbstractKernelComputation:
         """
         raise NotImplementedError
 
-    def diagonal(
-        self, kernel: Kernel, inputs: Num[Array, "N D"]
-    ) -> DiagonalLinearOperator:
+    def diagonal(self, kernel: Kernel, inputs: Num[Array, "N D"]) -> Diagonal:
         r"""For a given kernel, compute the elementwise diagonal of the
         NxN gram matrix on an input matrix of shape NxD.
 
@@ -85,6 +84,6 @@ class AbstractKernelComputation:
 
         Returns
         -------
-            DiagonalLinearOperator: The computed diagonal variance entries.
+            Diagonal: The computed diagonal variance entries.
         """
-        return DiagonalLinearOperator(diag=vmap(lambda x: kernel(x, x))(inputs))
+        return PSD(Diagonal(diag=vmap(lambda x: kernel(x, x))(inputs)))

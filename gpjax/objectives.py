@@ -14,13 +14,15 @@ from gpjax.base import (
 )
 from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
-from gpjax.linops import identity
+from gpjax.lower_cholesky import lower_cholesky
 from gpjax.typing import (
     Array,
     ScalarFloat,
 )
 
 tfd = tfp.distributions
+
+import cola
 
 
 @dataclass
@@ -115,7 +117,7 @@ class ConjugateMLL(AbstractObjective):
             ScalarFloat: The marginal log-likelihood of the Gaussian process for the
                 current parameter set.
         """
-        x, y, n = train_data.X, train_data.y, train_data.n
+        x, y = train_data.X, train_data.y
 
         # Observation noise o²
         obs_noise = posterior.likelihood.obs_noise
@@ -123,8 +125,9 @@ class ConjugateMLL(AbstractObjective):
 
         # Σ = (Kxx + Io²) = LLᵀ
         Kxx = posterior.prior.kernel.gram(x)
-        Kxx += identity(n) * posterior.prior.jitter
-        Sigma = Kxx + identity(n) * obs_noise
+        Kxx += cola.ops.I_like(Kxx) * posterior.prior.jitter
+        Sigma = Kxx + cola.ops.I_like(Kxx) * obs_noise
+        Sigma = cola.PSD(Sigma)
 
         # p(y | x, θ), where θ are the model hyperparameters:
         mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
@@ -169,10 +172,11 @@ class LogPosteriorDensity(AbstractObjective):
                 current parameter set.
         """
         # Unpack the training data
-        x, y, n = data.X, data.y, data.n
+        x, y = data.X, data.y
         Kxx = posterior.prior.kernel.gram(x)
-        Kxx += identity(n) * posterior.prior.jitter
-        Lx = Kxx.to_root()
+        Kxx += cola.ops.I_like(Kxx) * posterior.prior.jitter
+        Kxx = cola.PSD(Kxx)
+        Lx = lower_cholesky(Kxx)
 
         # Compute the prior mean function
         mx = posterior.prior.mean_function(x)
@@ -264,17 +268,24 @@ def variational_expectation(
     # Variational distribution q(f(·)) = N(f(·); μ(·), Σ(·, ·))
     q = variational_family
 
-    # Compute variational mean, μ(x), and variance, √diag(Σ(x, x)), at the training
+    # TODO: This needs cleaning up! We are squeezing then broadcasting `mean` and `variance`, which is not ideal.
+
+    # Compute variational mean, μ(x), and variance, diag(Σ(x, x)), at the training
     # inputs, x
     def q_moments(x):
         qx = q(x)
-        return qx.mean(), qx.variance()
+        return qx.mean().squeeze(), qx.covariance().squeeze()
 
     mean, variance = vmap(q_moments)(x[:, None])
 
     # ≈ ∫[log(p(y|f(x))) q(f(x))] df(x)
-    expectation = q.posterior.likelihood.expected_log_likelihood(y, mean, variance)
+    expectation = q.posterior.likelihood.expected_log_likelihood(
+        y, mean[:, None], variance[:, None]
+    )
     return expectation
+
+
+# TODO: Replace code within CollapsedELBO to using (low rank structure of) LinOps and the GaussianDistribution object to be as succinct as e.g., the `ConjugateMLL`.
 
 
 class CollapsedELBO(AbstractObjective):
@@ -322,12 +333,13 @@ class CollapsedELBO(AbstractObjective):
         noise = variational_family.posterior.likelihood.obs_noise
         z = variational_family.inducing_inputs
         Kzz = kernel.gram(z)
-        Kzz += identity(m) * variational_family.jitter
+        Kzz += cola.ops.I_like(Kzz) * variational_family.jitter
+        Kzz = cola.PSD(Kzz)
         Kzx = kernel.cross_covariance(z, x)
         Kxx_diag = vmap(kernel, in_axes=(0, 0))(x, x)
         μx = mean_function(x)
 
-        Lz = Kzz.to_root()
+        Lz = lower_cholesky(Kzz)
 
         # Notation and derivation:
         #
@@ -355,7 +367,7 @@ class CollapsedELBO(AbstractObjective):
         #
         #   with A and B defined as above.
 
-        A = Lz.solve(Kzx) / jnp.sqrt(noise)
+        A = cola.solve(Lz, Kzx) / jnp.sqrt(noise)
 
         # AAᵀ
         AAT = jnp.matmul(A, A.T)
