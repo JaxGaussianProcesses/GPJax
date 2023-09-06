@@ -14,6 +14,7 @@ from gpjax.base import (
 )
 from gpjax.dataset import Dataset
 from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.lower_cholesky import lower_cholesky
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -175,7 +176,7 @@ class LogPosteriorDensity(AbstractObjective):
         Kxx = posterior.prior.kernel.gram(x)
         Kxx += cola.ops.I_like(Kxx) * posterior.prior.jitter
         Kxx = cola.PSD(Kxx)
-        Lx = cola.sqrt(Kxx)
+        Lx = lower_cholesky(Kxx)
 
         # Compute the prior mean function
         mx = posterior.prior.mean_function(x)
@@ -338,7 +339,7 @@ class CollapsedELBO(AbstractObjective):
         Kxx_diag = vmap(kernel, in_axes=(0, 0))(x, x)
         μx = mean_function(x)
 
-        Lz = cola.sqrt(Kzz)
+        Lz = lower_cholesky(Kzz)
 
         # Notation and derivation:
         #

@@ -255,16 +255,12 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> tfd.MultivariateNorma
     Kxx = opt_posterior.prior.kernel.gram(x)
     Kxx += identity_matrix(D.n) * jitter
     Kxx = cola.PSD(Kxx)
-    Lx = lower_cholesky(Kxx)
-
-    # Lx⁻¹ Kxt
-    Lx_inv_Ktx = Lx.solve(Kxt)
 
     # Kxx⁻¹ Kxt
-    Kxx_inv_Ktx = Lx.T.solve(Lx_inv_Ktx)
+    Kxx_inv_Kxt = cola.solve(Kxx, Kxt)
 
     # Ktx Kxx⁻¹[ H⁻¹ ] Kxx⁻¹ Kxt
-    laplace_cov_term = jnp.matmul(jnp.matmul(Kxx_inv_Ktx.T, H_inv), Kxx_inv_Ktx)
+    laplace_cov_term = jnp.matmul(jnp.matmul(Kxx_inv_Kxt.T, H_inv), Kxx_inv_Kxt)
 
     mean = map_latent_dist.mean()
     covariance = map_latent_dist.covariance() + laplace_cov_term
