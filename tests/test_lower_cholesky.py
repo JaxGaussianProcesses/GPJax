@@ -9,7 +9,6 @@ from cola.ops import (
     Triangular,
 )
 import jax.numpy as jnp
-import jax.scipy as jsp
 import pytest
 
 from gpjax.lower_cholesky import lower_cholesky

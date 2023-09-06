@@ -9,7 +9,6 @@ import pytest
 from gpjax.kernels.computations import (
     ConstantDiagonalKernelComputation,
     DiagonalKernelComputation,
-    BasisFunctionComputation,
 )
 from gpjax.kernels.nonstationary import (
     Linear,
