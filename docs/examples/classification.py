@@ -207,13 +207,15 @@ ax.legend()
 # datapoints below.
 
 # %%
+from gpjax.lower_cholesky import lower_cholesky
+
 gram, cross_covariance = (kernel.gram, kernel.cross_covariance)
 jitter = 1e-6
 
 # Compute (latent) function value map estimates at training points:
 Kxx = opt_posterior.prior.kernel.gram(x)
 Kxx += identity_matrix(D.n) * jitter
-Lx = Kxx.to_root()
+Lx = lower_cholesky(Kxx)
 f_hat = Lx @ opt_posterior.latent
 
 # Negative Hessian,  H = -∇²p_tilde(y|f):
@@ -250,7 +252,7 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> tfd.MultivariateNorma
     Kxt = opt_posterior.prior.kernel.cross_covariance(x, test_inputs)
     Kxx = opt_posterior.prior.kernel.gram(x)
     Kxx += identity_matrix(D.n) * jitter
-    Lx = Kxx.to_root()
+    Lx = lower_cholesky(Kxx)
 
     # Lx⁻¹ Kxt
     Lx_inv_Ktx = Lx.solve(Kxt)
