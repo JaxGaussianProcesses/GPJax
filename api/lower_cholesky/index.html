@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://docs.jaxgaussianprocesses.com/api/progress_bar/">
+        <link rel="canonical" href="https://docs.jaxgaussianprocesses.com/api/lower_cholesky/">
       
       
-        <link rel="prev" href="../objectives/">
+        <link rel="prev" href="../likelihoods/">
       
       
-        <link rel="next" href="../scan/">
+        <link rel="next" href="../mean_functions/">
       
       
       <link rel="icon" href="../../_static/favicon.ico">
@@ -24,7 +24,7 @@
     
     
       
-        <title>Progress Bar - GPJax</title>
+        <title>Lower Cholesky - GPJax</title>
       
     
     
@@ -87,7 +87,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#progress-bar" class="md-skip">
+        <a href="#lower-cholesky" class="md-skip">
           Skip to content
         </a>
       
@@ -122,7 +122,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Progress Bar
+              Lower Cholesky
             
           </span>
         </div>
@@ -1872,9 +1872,29 @@
                 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../lower_cholesky/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Lower Cholesky
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -1883,6 +1903,33 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.lower_cholesky" class="md-nav__link">
+    lower_cholesky
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1932,29 +1979,9 @@
                 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Progress Bar
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../progress_bar/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1963,33 +1990,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#gpjax.progress_bar" class="md-nav__link">
-    progress_bar
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2097,8 +2097,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gpjax.progress_bar" class="md-nav__link">
-    progress_bar
+  <a href="#gpjax.lower_cholesky" class="md-nav__link">
+    lower_cholesky
   </a>
   
 </li>
@@ -2118,7 +2118,7 @@
                   
 
 
-<h1 id="progress-bar">Progress Bar<a class="headerlink" href="#progress-bar" title="Permanent link"></a></h1>
+<h1 id="lower-cholesky">Lower Cholesky<a class="headerlink" href="#lower-cholesky" title="Permanent link"></a></h1>
 
 
 <div class="doc doc-object doc-module">
@@ -2126,8 +2126,8 @@
 
 
 
-<h4 id="gpjax.progress_bar" class="doc doc-heading">
-          <code>gpjax.progress_bar</code>
+<h4 id="gpjax.lower_cholesky" class="doc doc-heading">
+          <code>gpjax.lower_cholesky</code>
 
 
 </h4>
@@ -2144,26 +2144,6 @@
 
 
 
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h5 id="gpjax.progress_bar.__all__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;progress_bar&#39;</span><span class="p">]</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h5>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
 
 
 
@@ -2172,32 +2152,86 @@
 
 
 
-<h5 id="gpjax.progress_bar.progress_bar" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">progress_bar</span><span class="p">(</span><span class="n">num_iters</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">log_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span></code>
+<h5 id="gpjax.lower_cholesky.lower_cholesky" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">lower_cholesky</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">cola</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">LinearOperator</span><span class="p">)</span></code>
 
 </h5>
 
 
   <div class="doc doc-contents ">
   
-      <p>Progress bar decorator for the body function of a <code>jax.lax.scan</code>.</p>
-<p>Example:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">jax</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">&gt;&gt;&gt;</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">carry</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">iteration_numbers</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="nd">@progress_bar</span><span class="p">(</span><span class="n">num_iters</span><span class="o">=</span><span class="n">iteration_numbers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">log_rate</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">body_func</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="o">...</span>    <span class="k">return</span> <span class="n">carry</span><span class="p">,</span> <span class="n">x</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="o">&gt;&gt;&gt;</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">carry</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">body_func</span><span class="p">,</span> <span class="n">carry</span><span class="p">,</span> <span class="n">iteration_numbers</span><span class="p">)</span>
-</code></pre></div></p>
-<p>Adapted from this <a href="https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/">excellent blog post</a>.</p>
-<p>Might be nice in future to directly create a general purpose <code>verbose scan</code>
-inplace of a for a jax.lax.scan, that takes the same arguments as a jax.lax.scan,
-but prints a progress bar.</p>
+      <p>Returns the lower Cholesky factor of a linear operator.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>A</code></td>
+          <td>
+                <code><span title="cola.ops.LinearOperator">LinearOperator</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A linear operator.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>cola.ops.LinearOperator: The lower Cholesky factor of A.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h5 id="gpjax.lower_cholesky._" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">_</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">cola</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">BlockDiag</span><span class="p">)</span></code>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
 
   </div>
 
