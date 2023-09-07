@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/">
       
       
-        <link rel="prev" href="../bayesian_optimisation/">
+        <link rel="prev" href="../oceanmodelling/">
       
       
         <link rel="next" href="../likelihoods_guide/">
@@ -722,6 +722,26 @@
   
   <span class="md-ellipsis">
     Introduction to Bayesian Optimisation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oceanmodelling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Gaussian Processes for Vector Fields and Ocean Current Modelling
   </span>
   
 
@@ -3286,7 +3306,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
 <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3f156b2e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=178350b6">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3298,7 +3318,7 @@ create custom kernels.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b7f4afdb">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3eb1fcbf">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3400,7 +3420,7 @@ cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c13956fa">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=82f320e2">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3425,7 +3445,7 @@ function draws per kernel.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=096318a0">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=27db5539">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3502,7 +3522,7 @@ for k, ax in zip(kernels, axes.ravel()):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=92cec67f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e561f94a">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3518,7 +3538,7 @@ like our RBF kernel to act on the first, second and fourth dimensions.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9fe53590">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=66c07aac">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3545,7 +3565,7 @@ like our RBF kernel to act on the first, second and fourth dimensions.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a1d9491f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3942751f">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3556,7 +3576,7 @@ like our RBF kernel to act on the first, second and fourth dimensions.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7d959e27">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=09893f94">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3596,7 +3616,7 @@ like our RBF kernel to act on the first, second and fourth dimensions.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c4aadf04">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=83854ff4">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3608,7 +3628,7 @@ input dimensions.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=bb35af45">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1107b209">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3658,7 +3678,7 @@ print(K.shape)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f67e19e7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f7c04490">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3672,7 +3692,7 @@ a sum kernel is provided by the <code>SumKernel</code> class.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ac21e706">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8983cb33">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3726,7 +3746,7 @@ fig.colorbar(im2, ax=ax[2], fraction=0.05)</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.colorbar.Colorbar at 0x7fc31deb5b10&gt;</pre>
+<pre>&lt;matplotlib.colorbar.Colorbar at 0x7f562788dc90&gt;</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -3739,7 +3759,7 @@ fig.colorbar(im2, ax=ax[2], fraction=0.05)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2b3c1ef8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f93a4bbd">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3750,7 +3770,7 @@ fig.colorbar(im2, ax=ax[2], fraction=0.05)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=50b2fb7d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d264f365">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3808,7 +3828,7 @@ fig.colorbar(im3, ax=ax[3], fraction=0.05)</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[7]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.colorbar.Colorbar at 0x7fc3186f2bc0&gt;</pre>
+<pre>&lt;matplotlib.colorbar.Colorbar at 0x7f562732ecb0&gt;</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -3821,7 +3841,7 @@ fig.colorbar(im3, ax=ax[3], fraction=0.05)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b264f47d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2a6606ee">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3859,7 +3879,7 @@ While $d$ is an angular distance metric</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2462148a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=82d3d6da">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3922,7 +3942,7 @@ class Polar(gpx.kernels.AbstractKernel):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=13611f7d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a2c4a75a">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3940,7 +3960,7 @@ when we define the parameter field.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f584e76c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e9c5e2ba">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3954,7 +3974,7 @@ for further details on this process).</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c4a28db3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=acde4427">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4041,7 +4061,7 @@ opt_posterior, history = gpx.fit(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=18113a57">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ee56630c">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4053,7 +4073,7 @@ and illustrate the results.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0b50f527">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5ce41e19">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4084,7 +4104,7 @@ one_sigma = posterior_rv.stddev()</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d71e5ba6">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a26e2178">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4164,7 +4184,7 @@ ax.legend()</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[11]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.legend.Legend at 0x7fc316f89cf0&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7f56247a4d60&gt;</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -4177,7 +4197,7 @@ ax.legend()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e1f500be">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0cd5fe02">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4188,7 +4208,7 @@ ax.legend()</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d35f4dcd">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=18d66d7c">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4224,18 +4244,18 @@ ax.legend()</div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>Author: Thomas Pinder
 
-Last updated: Wed Sep 06 2023
+Last updated: Thu Sep 07 2023
 
 Python implementation: CPython
 Python version       : 3.10.12
 IPython version      : 8.14.0
 
-gpjax                 : 0.6.8
-jax                   : 0.4.14
-tensorflow_probability: 0.19.0
-numpy                 : 1.25.2
 optax                 : 0.1.7
+numpy                 : 1.25.2
+jax                   : 0.4.14
+gpjax                 : 0.6.8
 matplotlib            : 3.7.2
+tensorflow_probability: 0.19.0
 
 Watermark: 2.4.3
 
