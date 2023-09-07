@@ -1,7 +1,7 @@
 # %% [markdown]
 # # Gaussian Processes for Vector Fields and Ocean Current Modelling
 #
-# In this notebook, we use Gaussian processes to learn vector valued functions. We will be
+# In this notebook, we use Gaussian processes to learn vector-valued functions. We will be
 # recreating the results by [Berlinghieri et al. (2023)](https://arxiv.org/pdf/2302.10364.pdf) by an
 # application to real-world ocean surface velocity data, collected via surface drifters.
 #
