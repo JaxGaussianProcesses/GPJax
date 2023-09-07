@@ -2,10 +2,10 @@
 # # Gaussian Processes for Vector Fields and Ocean Current Modelling
 #
 # In this notebook, we use Gaussian processes to learn vector valued functions. We will be
-# recreating the results by [Berlinghieri et. al, (2023)](https://arxiv.org/pdf/2302.10364.pdf) by an
-# application to real world ocean surface velocity data, collected via surface drifters.
+# recreating the results by [Berlinghieri et al. (2023)](https://arxiv.org/pdf/2302.10364.pdf) by an
+# application to real-world ocean surface velocity data, collected via surface drifters.
 #
-# Surface drifters are measurement devices that measure the dynamics and circulation patterns of the world's oceans. Studying and predicting ocean currents are important to climate research, for example forecasting and predicting oil spills, oceanographic surveying of eddies and upwelling, or providing information on the distribution of biomass in ecosystems. We will be using the [Gulf Drifters Open dataset](https://zenodo.org/record/4421585), which contains all publicly available surface drifter trajectories from the Gulf of Mexico spanning 28 years.
+# Surface drifters are measurement devices that measure the dynamics and circulation patterns of the world's oceans. Studying and predicting ocean currents are important to climate research, for example, forecasting and predicting oil spills, oceanographic surveying of eddies and upwelling, or providing information on the distribution of biomass in ecosystems. We will be using the [Gulf Drifters Open dataset](https://zenodo.org/record/4421585), which contains all publicly available surface drifter trajectories from the Gulf of Mexico spanning 28 years.
 # %%
 from jax.config import config
 
@@ -39,7 +39,7 @@ colors = rcParams["axes.prop_cycle"].by_key()["color"]
 
 
 # %% [markdown]
-# ## Data Loading and problem setting
+# ## Data loading and preprocessing
 # The real dataset has been binned into an $N=34\times16$ grid, equally spaced over the longitude-latitude interval $[-90.8,-83.8] \times [24.0,27.5]$. Each bin has a size $\approx 0.21\times0.21$, and contains the average velocity across all measurements that fall inside it.
 #
 # We will call this binned ocean data the ground truth, and label it with the vector field
@@ -48,7 +48,7 @@ colors = rcParams["axes.prop_cycle"].by_key()["color"]
 # $$
 # where $\mathbf{x} = (x^{(0)}$,$x^{(1)})^\text{T}$, with a vector basis in the standard Cartesian directions (dimensions will be indicated by superscripts).
 #
-# We shall label the ground truth $D_0=\left\{ \left(\mathbf{x}_{0,i} , \mathbf{y}_{0,i} \right)\right\}_{i=1}^N$, where $\mathbf{y}_i$ is the 2 dimensional velocity vector at the $i$th location, $\mathbf{x}_i$. The training dataset contains simulated measurements from ocean drifters $D_T=\left\{\left(\mathbf{x}_{T,i}, \mathbf{y}_{T,i} \right)\right\}_{i=1}^{N_T}$, $N_T = 20$ in this case (the subscripts indicate the ground truth and the simulated measurements respectively).
+# We shall label the ground truth $D_0=\left\{ \left(\mathbf{x}_{0,i} , \mathbf{y}_{0,i} \right)\right\}_{i=1}^N$, where $\mathbf{y}_{,i$ is the 2-dimensional velocity vector at the $i$-th location, $\mathbf{x}_{0,i}$. The training dataset contains simulated measurements from ocean drifters $D_T=\left\{\left(\mathbf{x}_{T,i}, \mathbf{y}_{T,i} \right)\right\}_{i=1}^{N_T}$, $N_T = 20$ in this case (the subscripts indicate the ground truth and the simulated measurements respectively).
 #
 
 
@@ -68,24 +68,24 @@ def prepare_data(df):
 # loading in data
 
 gulf_data_train = pd.read_csv(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/gpjaxstatic/main/data/gulfdata_train.csv"
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/static/main/data/gulfdata_train.csv"
 )
 gulf_data_test = pd.read_csv(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/gpjaxstatic/main/data/gulfdata_test.csv"
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/static/main/data/gulfdata_test.csv"
 )
 
 
 pos_test, vel_test, shape = prepare_data(gulf_data_test)
 pos_train, vel_train = prepare_data(gulf_data_train)
 
-fig, ax = plt.subplots(1, 1)
+fig, ax = plt.subplots(1, 1, figsize=(6, 3))
 ax.quiver(
     pos_test[0],
     pos_test[1],
     vel_test[0],
     vel_test[1],
     color=colors[0],
-    label="$D_0$",
+    label="Ocean Current",
     angles="xy",
     scale=10,
 )
@@ -96,16 +96,27 @@ ax.quiver(
     vel_train[1],
     color=colors[1],
     alpha=0.7,
-    label="$D_T$",
+    label="Drifter",
     angles="xy",
     scale=10,
 )
-ax.legend()
+
+ax.set(
+    xlabel="Longitude",
+    ylabel="Latitude",
+)
+ax.legend(
+    framealpha=0.0,
+    ncols=2,
+    fontsize="medium",
+    bbox_to_anchor=(0.5, -0.3),
+    loc="lower center",
+)
 plt.show()
 
 # %% [markdown]
 # ## Problem Setting
-# Our aim is to obtain estimates for $\mathbf{F}$ at the set of points $\left\{ \mathbf{x}_{0,i} \right\}_{i=1}^N$ using Gaussian processes, followed by a comparison of the latent model to the ground truth $D_0$. Note that $D_0$ is not passed into any functions used  by GPJax, and is only used to compare against the two GP models at the end of the notebook.
+# We aim to obtain estimates for $\mathbf{F}$ at the set of points $\left\{ \mathbf{x}_{0,i} \right\}_{i=1}^N$ using Gaussian processes, followed by a comparison of the latent model to the ground truth $D_0$. Note that $D_0$ is not passed into any functions used  by GPJax, and is only used to compare against the two GP models at the end of the notebook.
 #
 # Since $\mathbf{F}$ is a vector-valued function, we require GPs that can directly learn vector-valued functions[<sup>1</sup>](#fn1). To implement this in GPJax, the problem can be changed to learn a scalar-valued function by 'massaging' the data into a  $2N\times2N$ problem, such that each dimension of our GP is associated with a *component* of $\mathbf{y}_{T,i}$.
 #
@@ -115,7 +126,7 @@ plt.show()
 # \mathbf{y} = \mathbf{F}(\mathbf{x}) = \left(\begin{array}{l}
 # f^{(0)}\left(\mathbf{x}\right) \\
 # f^{(1)}\left(\mathbf{x}\right)
-# \end{array}\right)
+# \end{array}\right),
 # $$
 #
 # where each $f^{(z)}\left(\mathbf{x}\right), z \in \{0,1\}$ is a scalar valued function.
@@ -128,7 +139,8 @@ plt.show()
 #
 # We have increased the input dimension by 1, from the 2D $\mathbf{x}$ to the 3D $\mathbf{X} = \left(\mathbf{x}, 0\right)$ or $\mathbf{X} = \left(\mathbf{x}, 1\right)$.
 #
-# By choosing the value of the third dimension, 0 or 1, we may now incorporate this information into computation of the kernel.
+# By choosing the value of the third dimension, 0 or 1, we may now incorporate this
+# information into the computation of the kernel.
 # We therefore make new 3D datasets $D_{T,3D} = \left\{\left( \mathbf{X}_{T,i},\mathbf{Y}_{T,i} \right) \right\} _{i=0}^{2N_T}$ and $D_{0,3D} = \left\{\left( \mathbf{X}_{0,i},\mathbf{Y}_{0,i} \right) \right\} _{i=0}^{2N}$ that incorporates this new labelling, such that for each dataset (indicated by the subscript $D = 0$ or $D=T$),
 #
 # $$
@@ -168,11 +180,13 @@ dataset_ground_truth = dataset_3d(pos_test, vel_test)
 
 
 # %% [markdown]
-# ## Velocity (Dimension) Decomposition
-# Having labelled the data, we are now in a position to use GPJax to learn the function $g$, and hence $\mathbf{F}$. A naive approach to the problem is to apply a GP prior directly onto the velocities of each dimension independently, which is called the *velocity* GP. For our prior, we choose an isotropic mean 0 over all dimensions of the GP, and a piecewise kernel that depends on the $z$ labels of the inputs, such that for two inputs $\mathbf{X} = \left( \mathbf{x}, z \right )$ and $\mathbf{X}^\prime = \left( \mathbf{x}^\prime, z^\prime \right )$,
+# ## Velocity (dimension) decomposition
+# Having labelled the data, we are now in a position to use GPJax to learn the function $g$, and hence $\mathbf{F}$. A naive approach to the problem is to apply a GP prior directly to the velocities of each dimension independently, which is called the *velocity* GP. For our prior, we choose an isotropic mean 0 over all dimensions of the GP, and a piecewise kernel that depends on the $z$ labels of the inputs, such that for two inputs $\mathbf{X} = \left( \mathbf{x}, z \right )$ and $\mathbf{X}^\prime = \left( \mathbf{x}^\prime, z^\prime \right )$,
 #
 # $$
-# k_{\text{vel}} \left(\mathbf{X}, \mathbf{X}^{\prime}\right)= \begin{cases}k^{(z)}\left(\mathbf{x}, \mathbf{x}^{\prime}\right) & \text { if } z=z^{\prime} \\ 0 & \text { if } z \neq z^{\prime}\end{cases}
+# k_{\text{vel}} \left(\mathbf{X}, \mathbf{X}^{\prime}\right)=
+# \begin{cases}k^{(z)}\left(\mathbf{x}, \mathbf{x}^{\prime}\right) & \text { if }
+# z=z^{\prime} \\ 0 & \text { if } z \neq z^{\prime}, \end{cases}
 # $$
 #
 # where $k^{(z)}\left(\mathbf{x}, \mathbf{x}^{\prime}\right)$ are the user chosen kernels for each dimension. What this means is that there are no correlations between the $x^{(0)}$ and $x^{(1)}$ dimensions for all choices $\mathbf{X}$ and $\mathbf{X}^{\prime}$, since there are no off-diagonal elements in the Gram matrix populated by this choice.
@@ -203,8 +217,8 @@ class VelocityKernel(gpx.kernels.AbstractKernel):
 
 
 # %% [markdown]
-# ### GPJax Implementation
-# Next, we define the model in GPJax. The prior is defined using $k_{\text{vel}}\left(\mathbf{X}, \mathbf{X}^\prime \right)$ and 0 mean and 0 observation noise. We choose a Gaussian marginal log likelihood (MLL).
+# ### GPJax implementation
+# Next, we define the model in GPJax. The prior is defined using $k_{\text{vel}}\left(\mathbf{X}, \mathbf{X}^\prime \right)$ and 0 mean and 0 observation noise. We choose a Gaussian marginal log-likelihood (MLL).
 #
 
 
@@ -225,12 +239,12 @@ velocity_posterior = initialise_gp(kernel, mean, dataset_train)
 
 
 # %% [markdown]
-# With a model now defined, we can proceed to optimise the hyperparameters of our likelihood over $D_0$. This is done by minimising the marginal log likelihood using `optax`. We also plot its value at each step to visually confirm that we have found the minimum. See the  [introduction to Gaussian Processes](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/) notebook for more information on optimising the MLL.
+# With a model now defined, we can proceed to optimise the hyperparameters of our likelihood over $D_0$. This is done by minimising the MLL using `optax`. We also plot its value at each step to visually confirm that we have found the minimum. See the  [introduction to Gaussian Processes](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/) notebook for more information on optimising the MLL.
 
 
 # %%
 def optimise_mll(posterior, dataset, NIters=1000, key=key, plot_history=True):
-    # define the Marginal Log likelihood using dataset_train
+    # define the MLL using dataset_train
     objective = gpx.objectives.ConjugateMLL(negative=True)
     # Optimise to minimise the MLL
     optimiser = ox.adam(learning_rate=0.1)
@@ -247,7 +261,7 @@ def optimise_mll(posterior, dataset, NIters=1000, key=key, plot_history=True):
     if plot_history:
         fig, ax = plt.subplots(1, 1)
         ax.plot(history, color=colors[1])
-        ax.set(xlabel="Training iteration", ylabel="Negative marginal log likelihood")
+        ax.set(xlabel="Training iteration", ylabel="Negative MLL")
 
     return opt_posterior
 
@@ -277,7 +291,7 @@ dataset_latent_velocity = dataset_3d(pos_test, velocity_mean)
 
 
 # %% [markdown]
-# We now replot the ground truth (testing data) $D_0$, the predicted latent vector field $\mathbf{F}_{\text{latent}}(\mathbf{x_i})$, and a heatmap of the residuals at each location $\mathbf{R}(\mathbf{x}_i) = \mathbf{y}_{0,i} - \mathbf{F}_{\text{latent}}(\mathbf{x}_i) $, as well as $\left|\left|\mathbf{R}(\mathbf{x}_i)\right|\right|$.
+# We now replot the ground truth (testing data) $D_0$, the predicted latent vector field $\mathbf{F}_{\text{latent}}(\mathbf{x_i})$, and a heatmap of the residuals at each location $\mathbf{R}(\mathbf{x}_{0,i}) = \mathbf{y}_{0,i} - \mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i}) $, as well as $\left|\left|\mathbf{R}(\mathbf{x}_{0,i})\right|\right|$.
 
 
 # %%
@@ -318,7 +332,7 @@ def plot_fields(
     X = dataset_ground_truth.X[:, 0][::2]
     Y = dataset_ground_truth.X[:, 1][::2]
     # make figure
-    fig, ax = plt.subplots(1, 3, figsize=(12.0, 2.7), sharey=True)
+    fig, ax = plt.subplots(1, 3, figsize=(12.0, 3.0), sharey=True)
 
     # ground truth
     plot_vector_field(
@@ -337,7 +351,7 @@ def plot_fields(
         angles="xy",
         scale=scale,
     )
-    prepare_ax(ax[0], X, Y, "Ground Truth")
+    prepare_ax(ax[0], X, Y, "Ground Truth", xlabel="Longitude")
 
     # Latent estimate of vector field F
     plot_vector_field(ax[1], dataset_latent, color=colors[0], angles="xy", scale=scale)
@@ -364,7 +378,13 @@ def plot_fields(
     prepare_ax(ax[2], X, Y, "Residuals", xlabel="Longitude")
     fig.colorbar(im, fraction=0.027, pad=0.04, orientation="vertical")
 
-    fig.legend(loc="lower center", framealpha=0.0, ncols=3, fontsize="medium")
+    fig.legend(
+        framealpha=0.0,
+        ncols=2,
+        fontsize="medium",
+        bbox_to_anchor=(0.5, -0.03),
+        loc="lower center",
+    )
     plt.show()
 
 
@@ -372,11 +392,11 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_velocity)
 
 
 # %% [markdown]
-# From the Latent Estimate we can see the velocity GP struggles to reconstruct features of the ground truth. This is because our construction of the kernel placed an independent prior on each physical dimension, which cannot be assumed. Therefore, we need a different approach that can implicitly incorporate this dependence at a fundamental level. To achieve this we will require a *Helmholtz Decomposition*.
+# From the latent estimate we can see the velocity GP struggles to reconstruct features of the ground truth. This is because our construction of the kernel placed an independent prior on each physical dimension, which cannot be assumed. Therefore, we need a different approach that can implicitly incorporate this dependence at a fundamental level. To achieve this we will require a *Helmholtz Decomposition*.
 
 
 # %% [markdown]
-# ## Helmholtz Decomposition
+# ## Helmholtz decomposition
 # In 2 dimensions, a twice continuously differentiable and compactly supported vector field $\mathbf{F}: \mathbb{R}^2 \rightarrow \mathbb{R}^2$ can be expressed as the sum of the gradient of a scalar potential $\Phi: \mathbb{R}^2 \rightarrow \mathbb{R}$, called the potential function, and the vorticity operator of another scalar potential $\Psi: \mathbb{R}^2 \rightarrow \mathbb{R}$, called the stream function ([Berlinghieri et. al, (2023)](https://arxiv.org/pdf/2302.10364.pdf)) such that
 # $$
 # \mathbf{F}=\operatorname{grad} \Phi+\operatorname{rot} \Psi,
@@ -413,7 +433,7 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_velocity)
 # Note that we have operated $\dfrac{\partial}{\partial x^{(z)}}$, *not* $\dfrac{\partial}{\partial \left(x^\prime \right)^{(z)}}$, as the boxed equation suggests. This is not an issue if we choose stationary kernels $k(\mathbf{x}, \mathbf{x}^{\prime}) = k(\mathbf{x} - \mathbf{x}^{\prime})$ , as the partial derivatives with respect to the components have the following exchange symmetry:
 #
 # $$
-# \frac{\partial}{\partial x^{(z)}} = - \frac{\partial}{\partial \left( x^\prime \right)^{(z)}}
+# \frac{\partial}{\partial x^{(z)}} = - \frac{\partial}{\partial \left( x^\prime \right)^{(z)}},
 # $$
 #
 # for either $z$.
@@ -444,8 +464,8 @@ class HelmholtzKernel(gpx.kernels.AbstractKernel):
 
 
 # %% [markdown]
-# ### GPJax Implementation
-# We repeat the exact same steps as with the velocity GP model, but replacing `VelocityKernel` with `HelmholtzKernel`.
+# ### GPJax iImplementation
+# We repeat the same steps as with the velocity GP model, replacing `VelocityKernel` with `HelmholtzKernel`.
 
 # %%
 # Redefine Gaussian process with Helmholtz kernel
@@ -457,7 +477,7 @@ opt_helmholtz_posterior = optimise_mll(helmholtz_posterior, dataset_train)
 
 # %% [markdown]
 # ### Comparison
-# We again plot the ground truth (testing data) $D_0$, the predicted latent vector field $\mathbf{F}_{\text{latent}}(\mathbf{x_i})$, and a heatmap of the residuals at each location $R(\mathbf{x}_i) = \mathbf{y}_{0,i} - \mathbf{F}_{\text{latent}}(\mathbf{x}_i)$ and $\left|\left|R(\mathbf{x}_i)  \right|\right|$.
+# We again plot the ground truth (testing data) $D_0$, the predicted latent vector field $\mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i})$, and a heatmap of the residuals at each location $R(\mathbf{x}_{0,i}) = \mathbf{y}_{0,i} - \mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i})$ and $\left|\left|R(\mathbf{x}_{0,i})  \right|\right|$.
 
 # %%
 # obtain latent distribution, extract x and y values over g
@@ -469,12 +489,12 @@ dataset_latent_helmholtz = dataset_3d(pos_test, helmholtz_mean)
 plot_fields(dataset_ground_truth, dataset_train, dataset_latent_helmholtz)
 
 # %% [markdown]
-# Visually, the Helmholtz model performs better than the velocity model, preserving the local structure of the $\mathbf{F}$. Since we placed priors on $\Phi$ and $\Psi$, the construction of $\mathbf{F}$ allows for correlations between the dimensions (non-zero off diagonal elements in the Gram matrix populated by $k_\text{Helm}\left(\mathbf{X},\mathbf{X}^{\prime}\right)$ ).
+# Visually, the Helmholtz model performs better than the velocity model, preserving the local structure of the $\mathbf{F}$. Since we placed priors on $\Phi$ and $\Psi$, the construction of $\mathbf{F}$ allows for correlations between the dimensions (non-zero off-diagonal elements in the Gram matrix populated by $k_\text{Helm}\left(\mathbf{X},\mathbf{X}^{\prime}\right)$ ).
 
 
 # %% [markdown]
-# ## Negative Log Predictive Densities
-# Lastly, we directly compare the velocity and Hemlholtz models by computing the [negative log predictive densities](https://en.wikipedia.org/wiki/Negative_log_predictive_density) for each model. This is a quantitative metric that measures the probability of the ground truth given the data.
+# ## Negative log predictive densities
+# Lastly, we directly compare the velocity and Helmholtz models by computing the [negative log predictive densities](https://en.wikipedia.org/wiki/Negative_log_predictive_density) for each model. This is a quantitative metric that measures the probability of the ground truth given the data.
 #
 # $$
 # \mathrm{NLPD}=-\sum_{i=1}^{2N} \log \left(  p\left(\mathcal{Y}_i = Y_{0,i} \mid \mathbf{X}_{i}\right) \right),
@@ -502,8 +522,8 @@ print("NLPD for Velocity: %.2f \nNLPD for Helmholtz: %.2f" % (nlpd_vel, nlpd_hel
 # %% [markdown]
 # <span id="fn1"></span>
 # ## Footnote
-# Kernels for vector valued functions have been studied in the literature, see [Alvarez et. al, (2012)](https://doi.org/10.48550/arXiv.1106.6251)
-# ## System Configuration
+# Kernels for vector-valued functions have been studied in the literature, see [Alvarez et al. (2012)](https://doi.org/10.48550/arXiv.1106.6251)
+# ## System configuration
 # %%
 # %reload_ext watermark
 # %watermark -n -u -v -iv -w -a 'Ivan Shalashilin'
