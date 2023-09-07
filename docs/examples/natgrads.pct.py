@@ -58,7 +58,7 @@ D = gpx.Dataset(X=x, y=y)
 xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 
 # %% [markdown]
-# Intialise inducing points:
+# Initialise inducing points:
 
 # %%
 z = jnp.linspace(-5.0, 5.0, 20).reshape(-1, 1)
@@ -113,9 +113,9 @@ from gpjax.fit import get_batch
 
 likelihood = gpx.Gaussian(num_datapoints=n)
 kernel = gpx.RBF()
-prior = gpx.Prior(kernel=kernel, mean_function=gpx.Constant(), jitter=1e-6)
+prior = gpx.Prior(kernel=kernel, mean_function=gpx.Constant())
 p = prior * likelihood
-q = gpx.NaturalVariationalGaussian(posterior=p, inducing_inputs=z, jitter=1e-6)
+q = gpx.NaturalVariationalGaussian(posterior=p, inducing_inputs=z)
 
 # Define the optimiser:
 opt = ox.adam(1e-2)
@@ -162,10 +162,10 @@ def step(carry, key):
 
     q, state = mstep(q, state, batch)
     q, state = estep(q, state, batch)
-    return (q, state), None
+    return (q, state), elbo(q, D)
 
 
-(q, _), _ = lax.scan(step, (q, state), jr.split(jr.PRNGKey(42), 100))
+(q, _), natural_hist = lax.scan(step, (q, state), jr.split(jr.PRNGKey(42), 100))
 
 q.posterior.likelihood
 
@@ -259,7 +259,7 @@ key = jr.PRNGKey(123)
 q = DualVariationalGaussian(posterior=p, inducing_inputs=z)
 
 # Define the optimiser:
-opt = ox.adam(0.1)
+opt = ox.adam(1e-2)
 state = opt.init(q)
 
 # Define the hyperparameter objective:
@@ -304,10 +304,10 @@ def step(carry, key):
     q, state = mstep(q, state, batch)
     q, state = estep(q, state, batch)
 
-    return (q, state), None
+    return (q, state), elbo(q, D)
 
 
-(q, _), _ = lax.scan(step, (q, state), jr.split(jr.PRNGKey(42), 1000))
+(q, _), dual_hist = lax.scan(step, (q, state), jr.split(jr.PRNGKey(42), 100))
 
 q.posterior.likelihood
 
@@ -324,6 +324,11 @@ ax.plot(xtest, meanf, label="Posterior mean", color="tab:blue")
 ax.fill_between(xtest.flatten(), meanf - sigma, meanf + sigma, alpha=0.3)
 [ax.axvline(x=z_i, color="black", alpha=0.3, linewidth=1) for z_i in q.inducing_inputs]
 plt.show()
+
+# %%
+plt.plot(natural_hist, label="Natural")
+plt.plot(dual_hist, label="Dual")
+plt.legend()
 
 # %% [markdown]
 # ## System configuration
