@@ -29,6 +29,7 @@ nav:
     - Stochastic sparse GPs: examples/collapsed_vi.py
     - Pathwise Sampling for Spatial Modelling: examples/spatial.py
     - Bayesian Optimisation: examples/bayesian_optimisation.py
+    - Decision Making: examples/decision_making.py
     - Multi-output GPs for Ocean Modelling: examples/oceanmodelling.py
   - 📖 Guides for customisation:
     - Kernels: examples/constructing_new_kernels.py

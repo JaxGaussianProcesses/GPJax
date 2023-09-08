@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-from gpjax import integrators
+from gpjax import (
+    decision_making,
+    integrators,
+)
 from gpjax.base import (
     Module,
     param_field,
@@ -81,6 +84,7 @@ __all__ = [
     "Module",
     "param_field",
     "cite",
+    "decision_making",
     "kernels",
     "fit",
     "Prior",

@@ -137,8 +137,6 @@ select = [
   "TID",
   # implicit string concatenation
   "ISC",
-  # type-checking imports
-  "TCH",
 ]
 ignore = [
   # space before : (needed for how black formats slicing)
