@@ -48,7 +48,7 @@ colors = rcParams["axes.prop_cycle"].by_key()["color"]
 # $$
 # where $\mathbf{x} = (x^{(0)}$,$x^{(1)})^\text{T}$, with a vector basis in the standard Cartesian directions (dimensions will be indicated by superscripts).
 #
-# We shall label the ground truth $D_0=\left\{ \left(\mathbf{x}_{0,i} , \mathbf{y}_{0,i} \right)\right\}_{i=1}^N$, where $\mathbf{y}_{,i$ is the 2-dimensional velocity vector at the $i$-th location, $\mathbf{x}_{0,i}$. The training dataset contains simulated measurements from ocean drifters $D_T=\left\{\left(\mathbf{x}_{T,i}, \mathbf{y}_{T,i} \right)\right\}_{i=1}^{N_T}$, $N_T = 20$ in this case (the subscripts indicate the ground truth and the simulated measurements respectively).
+# We shall label the ground truth $D_0=\left\{ \left(\mathbf{x}_{0,i} , \mathbf{y}_{0,i} \right)\right\}_{i=1}^N$, where $\mathbf{y}_{0,i}$ is the 2-dimensional velocity vector at the $i$-th location, $\mathbf{x}_{0,i}$. The training dataset contains simulated measurements from ocean drifters $D_T=\left\{\left(\mathbf{x}_{T,i}, \mathbf{y}_{T,i} \right)\right\}_{i=1}^{N_T}$, $N_T = 20$ in this case (the subscripts indicate the ground truth and the simulated measurements respectively).
 #
 
 
@@ -129,7 +129,7 @@ plt.show()
 # \end{array}\right),
 # $$
 #
-# where each $f^{(z)}\left(\mathbf{x}\right), z \in \{0,1\}$ is a scalar valued function.
+# where each $f^{(z)}\left(\mathbf{x}\right), z \in \{0,1\}$ is a scalar-valued function.
 #
 # Now consider the scalar-valued function $g: \mathbb{R}^2 \times\{0,1\} \rightarrow \mathbb{R}$, such that
 #
@@ -397,7 +397,7 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_velocity)
 
 # %% [markdown]
 # ## Helmholtz decomposition
-# In 2 dimensions, a twice continuously differentiable and compactly supported vector field $\mathbf{F}: \mathbb{R}^2 \rightarrow \mathbb{R}^2$ can be expressed as the sum of the gradient of a scalar potential $\Phi: \mathbb{R}^2 \rightarrow \mathbb{R}$, called the potential function, and the vorticity operator of another scalar potential $\Psi: \mathbb{R}^2 \rightarrow \mathbb{R}$, called the stream function ([Berlinghieri et. al, (2023)](https://arxiv.org/pdf/2302.10364.pdf)) such that
+# In 2 dimensions, a twice continuously differentiable and compactly supported vector field $\mathbf{F}: \mathbb{R}^2 \rightarrow \mathbb{R}^2$ can be expressed as the sum of the gradient of a scalar potential $\Phi: \mathbb{R}^2 \rightarrow \mathbb{R}$, called the potential function, and the vorticity operator of another scalar potential $\Psi: \mathbb{R}^2 \rightarrow \mathbb{R}$, called the stream function ([Berlinghieri et al. (2023)](https://arxiv.org/pdf/2302.10364.pdf)) such that
 # $$
 # \mathbf{F}=\operatorname{grad} \Phi+\operatorname{rot} \Psi,
 # $$
@@ -464,7 +464,7 @@ class HelmholtzKernel(gpx.kernels.AbstractKernel):
 
 
 # %% [markdown]
-# ### GPJax iImplementation
+# ### GPJax implementation
 # We repeat the same steps as with the velocity GP model, replacing `VelocityKernel` with `HelmholtzKernel`.
 
 # %%
@@ -500,7 +500,7 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_helmholtz)
 # \mathrm{NLPD}=-\sum_{i=1}^{2N} \log \left(  p\left(\mathcal{Y}_i = Y_{0,i} \mid \mathbf{X}_{i}\right) \right),
 # $$
 #
-# where each $p\left(\mathcal{Y}_i \mid \mathbf{X}_i \right)$ is the marginal Gaussian distribution at each test location, and $Y_{i,0}$ is the $i$th component of the (massaged) test data that we reserved at the beginning of the notebook in $D_0$. A smaller value is better, since the deviation of the ground truth and the model are small in this case.
+# where each $p\left(\mathcal{Y}_i \mid \mathbf{X}_i \right)$ is the marginal Gaussian distribution over $\mathcal{Y}_i$ at each test location, and $Y_{i,0}$ is the $i$-th component of the (massaged) test data that we reserved at the beginning of the notebook in $D_0$. A smaller value is better, since the deviation of the ground truth and the model are small in this case.
 
 
 # %%
