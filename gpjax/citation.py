@@ -206,8 +206,8 @@ def _(tree) -> PaperCitation:
 ####################
 # Decision making citations
 ####################
-@dispatch
-def cite(tree: ThompsonSampling) -> PaperCitation:
+@cite.register(ThompsonSampling)
+def _(tree) -> PaperCitation:
     return PaperCitation(
         citation_key="wilson2020efficiently",
         title="Efficiently sampling functions from Gaussian process posteriors",
@@ -218,8 +218,8 @@ def cite(tree: ThompsonSampling) -> PaperCitation:
     )
 
 
-@dispatch
-def cite(tree: Forrester) -> BookCitation:
+@cite.register(Forrester)
+def _(tree) -> BookCitation:
     return BookCitation(
         citation_key="forrester2008engineering",
         authors="Forrester, Alexander and Sobester, Andras and Keane, Andy",
@@ -229,8 +229,8 @@ def cite(tree: Forrester) -> BookCitation:
     )
 
 
-@dispatch
-def cite(tree: LogarithmicGoldsteinPrice) -> PaperCitation:
+@cite.register(LogarithmicGoldsteinPrice)
+def _(tree) -> PaperCitation:
     return PaperCitation(
         citation_key="picheny2013benchmark",
         authors="Picheny, Victor and Wagner, Tobias and Ginsbourger, David",
