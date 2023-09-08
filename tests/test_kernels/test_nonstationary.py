@@ -16,6 +16,7 @@ from dataclasses import is_dataclass
 from itertools import product
 from typing import List
 
+from cola.ops import LinearOperator
 import jax
 from jax.config import config
 import jax.numpy as jnp
@@ -34,7 +35,6 @@ from gpjax.kernels.nonstationary import (
     Linear,
     Polynomial,
 )
-from gpjax.linops import LinearOperator
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

@@ -2,13 +2,13 @@ from dataclasses import (
     dataclass,
     fields,
 )
+from functools import singledispatch
 
 from beartype.typing import (
     Dict,
     Union,
 )
 from jaxlib.xla_extension import PjitFunction
-from plum import dispatch
 
 from gpjax.decision_making.test_functions import (
     Forrester,
@@ -31,8 +31,6 @@ from gpjax.objectives import (
     NonConjugateMLL,
 )
 
-MaternKernels = Union[Matern12, Matern32, Matern52]
-MLLs = Union[ConjugateMLL, NonConjugateMLL, LogPosteriorDensity]
 CitationType = Union[str, Dict[str, str]]
 
 
@@ -94,24 +92,26 @@ class BookCitation(AbstractCitation):
 ####################
 # Default citation
 ####################
-@dispatch
-def cite(tree) -> NullCitation:
+@singledispatch
+def cite(tree) -> AbstractCitation:
     return NullCitation()
 
 
 ####################
 # Default citation
 ####################
-@dispatch
-def cite(tree: PjitFunction) -> JittedFnCitation:
+@cite.register(PjitFunction)
+def _(tree):
     return JittedFnCitation()
 
 
 ####################
 # Kernel citations
 ####################
-@dispatch
-def cite(tree: MaternKernels) -> PhDThesisCitation:
+@cite.register(Matern12)
+@cite.register(Matern32)
+@cite.register(Matern52)
+def _(tree) -> PhDThesisCitation:
     citation = PhDThesisCitation(
         citation_key="matern1960SpatialV",
         authors="Bertil Matérn",
@@ -126,8 +126,8 @@ def cite(tree: MaternKernels) -> PhDThesisCitation:
     return citation
 
 
-@dispatch
-def cite(tree: ArcCosine) -> PaperCitation:
+@cite.register(ArcCosine)
+def _(_) -> PaperCitation:
     return PaperCitation(
         citation_key="cho2009kernel",
         authors="Cho, Youngmin and Saul, Lawrence",
@@ -137,8 +137,8 @@ def cite(tree: ArcCosine) -> PaperCitation:
     )
 
 
-@dispatch
-def cite(tree: GraphKernel) -> PaperCitation:
+@cite.register(GraphKernel)
+def _(tree) -> PaperCitation:
     return PaperCitation(
         citation_key="borovitskiy2021matern",
         title="Matérn Gaussian Processes on Graphs",
@@ -151,8 +151,8 @@ def cite(tree: GraphKernel) -> PaperCitation:
     )
 
 
-@dispatch
-def cite(tree: RFF) -> PaperCitation:
+@cite.register(RFF)
+def _(tree) -> PaperCitation:
     return PaperCitation(
         citation_key="rahimi2007random",
         authors="Rahimi, Ali and Recht, Benjamin",
@@ -166,8 +166,10 @@ def cite(tree: RFF) -> PaperCitation:
 ####################
 # Objective citations
 ####################
-@dispatch
-def cite(tree: MLLs) -> BookCitation:
+@cite.register(ConjugateMLL)
+@cite.register(NonConjugateMLL)
+@cite.register(LogPosteriorDensity)
+def _(tree) -> BookCitation:
     return BookCitation(
         citation_key="rasmussen2006gaussian",
         title="Gaussian Processes for Machine Learning",
@@ -178,8 +180,8 @@ def cite(tree: MLLs) -> BookCitation:
     )
 
 
-@dispatch
-def cite(tree: CollapsedELBO) -> PaperCitation:
+@cite.register(CollapsedELBO)
+def _(tree) -> PaperCitation:
     return PaperCitation(
         citation_key="titsias2009variational",
         title="Variational learning of inducing variables in sparse Gaussian processes",
@@ -189,8 +191,8 @@ def cite(tree: CollapsedELBO) -> PaperCitation:
     )
 
 
-@dispatch
-def cite(tree: ELBO) -> PaperCitation:
+@cite.register(ELBO)
+def _(tree) -> PaperCitation:
     return PaperCitation(
         citation_key="hensman2013gaussian",
         title="Gaussian Processes for Big Data",

@@ -17,6 +17,7 @@
 from gpjax.kernels.approximations import RFF
 from gpjax.kernels.base import (
     AbstractKernel,
+    Constant,
     ProductKernel,
     SumKernel,
 )
@@ -50,6 +51,7 @@ from gpjax.kernels.stationary import (
 __all__ = [
     "AbstractKernel",
     "ArcCosine",
+    "Constant",
     "RBF",
     "GraphKernel",
     "CatKernel",
