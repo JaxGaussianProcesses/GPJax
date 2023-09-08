@@ -854,8 +854,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#gpjax-iimplementation" class="md-nav__link">
-    GPJax iImplementation
+  <a href="#gpjax-implementation_1" class="md-nav__link">
+    GPJax implementation
   </a>
   
 </li>
@@ -2572,8 +2572,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#gpjax-iimplementation" class="md-nav__link">
-    GPJax iImplementation
+  <a href="#gpjax-implementation_1" class="md-nav__link">
+    GPJax implementation
   </a>
   
 </li>
@@ -3674,7 +3674,7 @@ Licensed under the Apache License, Version 2.0.
     init_mathjax();
     </script>
 <!-- End of mathjax configuration --><div class="jupyter-wrapper">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ed71471b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=36f3a8ad">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3688,7 +3688,7 @@ application to real-world ocean surface velocity data, collected via surface dri
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=58154cf8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b2761866">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3784,7 +3784,7 @@ colors = rcParams["axes.prop_cycle"].by_key()["color"]</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8a1879d9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8a611574">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3796,12 +3796,12 @@ $$
 \mathbf{F} \equiv \mathbf{F}(\mathbf{x}),
 $$
 where $\mathbf{x} = (x^{(0)}$,$x^{(1)})^\text{T}$, with a vector basis in the standard Cartesian directions (dimensions will be indicated by superscripts).</p>
-<p>We shall label the ground truth $D_0=\left\{ \left(\mathbf{x}_{0,i} , \mathbf{y}_{0,i} \right)\right\}_{i=1}^N$, where $\mathbf{y}_{,i$ is the 2-dimensional velocity vector at the $i$-th location, $\mathbf{x}_{0,i}$. The training dataset contains simulated measurements from ocean drifters $D_T=\left\{\left(\mathbf{x}_{T,i}, \mathbf{y}_{T,i} \right)\right\}_{i=1}^{N_T}$, $N_T = 20$ in this case (the subscripts indicate the ground truth and the simulated measurements respectively).</p>
+<p>We shall label the ground truth $D_0=\left\{ \left(\mathbf{x}_{0,i} , \mathbf{y}_{0,i} \right)\right\}_{i=1}^N$, where $\mathbf{y}_{0,i}$ is the 2-dimensional velocity vector at the $i$-th location, $\mathbf{x}_{0,i}$. The training dataset contains simulated measurements from ocean drifters $D_T=\left\{\left(\mathbf{x}_{T,i}, \mathbf{y}_{T,i} \right)\right\}_{i=1}^{N_T}$, $N_T = 20$ in this case (the subscripts indicate the ground truth and the simulated measurements respectively).</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=67461335">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=88457375">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3958,7 +3958,7 @@ plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9493ece5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a5005ebb">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3973,7 +3973,7 @@ f^{(0)}\left(\mathbf{x}\right) \\
 f^{(1)}\left(\mathbf{x}\right)
 \end{array}\right),
 $$</p>
-<p>where each $f^{(z)}\left(\mathbf{x}\right), z \in \{0,1\}$ is a scalar valued function.</p>
+<p>where each $f^{(z)}\left(\mathbf{x}\right), z \in \{0,1\}$ is a scalar-valued function.</p>
 <p>Now consider the scalar-valued function $g: \mathbb{R}^2 \times\{0,1\} \rightarrow \mathbb{R}$, such that</p>
 <p>$$
 g \left(\mathbf{x} , 0 \right) = f^{(0)} ( \mathbf{x} ), \text{and } g \left( \mathbf{x}, 1 \right)=f^{(1)}\left(\mathbf{x}\right).
@@ -3994,7 +3994,7 @@ $$</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e1beb68d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7bdf4478">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4063,7 +4063,7 @@ dataset_ground_truth = dataset_3d(pos_test, vel_test)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=114dcb0d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=599176b5">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4081,7 +4081,7 @@ $$</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a8bc6aa5">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9015d887">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4142,7 +4142,7 @@ class VelocityKernel(gpx.kernels.AbstractKernel):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5feaa983">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e087df5b">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4153,7 +4153,7 @@ class VelocityKernel(gpx.kernels.AbstractKernel):
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4cad2e9f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bbc5825f">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4204,7 +4204,7 @@ velocity_posterior = initialise_gp(kernel, mean, dataset_train)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=73b22fbc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=79f08b4e">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4215,7 +4215,7 @@ velocity_posterior = initialise_gp(kernel, mean, dataset_train)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3fcf82ea">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=86d5bc23">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4306,7 +4306,7 @@ opt_velocity_posterior = optimise_mll(velocity_posterior, dataset_train)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3bf0337f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e42a093c">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4317,7 +4317,7 @@ opt_velocity_posterior = optimise_mll(velocity_posterior, dataset_train)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0c1278e7">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f4ffc588">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4368,7 +4368,7 @@ dataset_latent_velocity = dataset_3d(pos_test, velocity_mean)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=23dc2251">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9ac22c50">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4379,7 +4379,7 @@ dataset_latent_velocity = dataset_3d(pos_test, velocity_mean)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9511693a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d5e123df">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4604,7 +4604,7 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_velocity)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a875c0c7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4a2b9f6a">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4615,13 +4615,13 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_velocity)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=267e0fb7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8c9be52f">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="helmholtz-decomposition">Helmholtz decomposition<a class="anchor-link" href="#helmholtz-decomposition">¶</a></h2><p>In 2 dimensions, a twice continuously differentiable and compactly supported vector field $\mathbf{F}: \mathbb{R}^2 \rightarrow \mathbb{R}^2$ can be expressed as the sum of the gradient of a scalar potential $\Phi: \mathbb{R}^2 \rightarrow \mathbb{R}$, called the potential function, and the vorticity operator of another scalar potential $\Psi: \mathbb{R}^2 \rightarrow \mathbb{R}$, called the stream function (<a href="https://arxiv.org/pdf/2302.10364.pdf">Berlinghieri et. al, (2023)</a>) such that
+<h2 id="helmholtz-decomposition">Helmholtz decomposition<a class="anchor-link" href="#helmholtz-decomposition">¶</a></h2><p>In 2 dimensions, a twice continuously differentiable and compactly supported vector field $\mathbf{F}: \mathbb{R}^2 \rightarrow \mathbb{R}^2$ can be expressed as the sum of the gradient of a scalar potential $\Phi: \mathbb{R}^2 \rightarrow \mathbb{R}$, called the potential function, and the vorticity operator of another scalar potential $\Psi: \mathbb{R}^2 \rightarrow \mathbb{R}$, called the stream function (<a href="https://arxiv.org/pdf/2302.10364.pdf">Berlinghieri et al. (2023)</a>) such that
 $$
 \mathbf{F}=\operatorname{grad} \Phi+\operatorname{rot} \Psi,
 $$
@@ -4655,7 +4655,7 @@ $$</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=86ec30b5">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7c33f5d8">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4726,18 +4726,18 @@ class HelmholtzKernel(gpx.kernels.AbstractKernel):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=db5b0aa0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9736a98a">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="gpjax-iimplementation">GPJax iImplementation<a class="anchor-link" href="#gpjax-iimplementation">¶</a></h3><p>We repeat the same steps as with the velocity GP model, replacing <code>VelocityKernel</code> with <code>HelmholtzKernel</code>.</p>
+<h3 id="gpjax-implementation">GPJax implementation<a class="anchor-link" href="#gpjax-implementation">¶</a></h3><p>We repeat the same steps as with the velocity GP model, replacing <code>VelocityKernel</code> with <code>HelmholtzKernel</code>.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b9981172">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4f6ddc13">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4790,7 +4790,7 @@ opt_helmholtz_posterior = optimise_mll(helmholtz_posterior, dataset_train)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=325ecad4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=af9807e7">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4801,7 +4801,7 @@ opt_helmholtz_posterior = optimise_mll(helmholtz_posterior, dataset_train)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=504322b1">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b767a42c">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4852,7 +4852,7 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_helmholtz)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bbb5f50d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8d7df696">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4863,7 +4863,7 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_helmholtz)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2f1e70b5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=79f8a732">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4873,12 +4873,12 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_helmholtz)</div>
 <p>$$
 \mathrm{NLPD}=-\sum_{i=1}^{2N} \log \left(  p\left(\mathcal{Y}_i = Y_{0,i} \mid \mathbf{X}_{i}\right) \right),
 $$</p>
-<p>where each $p\left(\mathcal{Y}_i \mid \mathbf{X}_i \right)$ is the marginal Gaussian distribution at each test location, and $Y_{i,0}$ is the $i$th component of the (massaged) test data that we reserved at the beginning of the notebook in $D_0$. A smaller value is better, since the deviation of the ground truth and the model are small in this case.</p>
+<p>where each $p\left(\mathcal{Y}_i \mid \mathbf{X}_i \right)$ is the marginal Gaussian distribution over $\mathcal{Y}_i$ at each test location, and $Y_{i,0}$ is the $i$-th component of the (massaged) test data that we reserved at the beginning of the notebook in $D_0$. A smaller value is better, since the deviation of the ground truth and the model are small in this case.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=64ee2835">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b28bef43">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4941,7 +4941,7 @@ NLPD for Helmholtz: -284.54
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e2b05d4a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=351ed2df">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4952,7 +4952,7 @@ NLPD for Helmholtz: -284.54
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ecc43895">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=33944125">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4965,7 +4965,7 @@ NLPD for Helmholtz: -284.54
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=faf23363">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=37413ff5">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -5007,12 +5007,12 @@ Python implementation: CPython
 Python version       : 3.10.12
 IPython version      : 8.14.0
 
-tensorflow_probability: 0.19.0
-pandas                : 1.5.3
 gpjax                 : 0.6.8
-optax                 : 0.1.7
 matplotlib            : 3.7.2
 jax                   : 0.4.14
+pandas                : 1.5.3
+tensorflow_probability: 0.19.0
+optax                 : 0.1.7
 
 Watermark: 2.4.3
 
