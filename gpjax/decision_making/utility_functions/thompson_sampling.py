@@ -18,8 +18,8 @@ from beartype.typing import Mapping
 
 from gpjax.dataset import Dataset
 from gpjax.decision_making.utility_functions.base import (
-    AbstractUtilityFunctionBuilder,
-    UtilityFunction,
+    AbstractSinglePointUtilityFunctionBuilder,
+    SinglePointUtilityFunction,
 )
 from gpjax.decision_making.utils import OBJECTIVE
 from gpjax.gps import ConjugatePosterior
@@ -27,12 +27,19 @@ from gpjax.typing import KeyArray
 
 
 @dataclass
-class ThompsonSampling(AbstractUtilityFunctionBuilder):
+class ThompsonSampling(AbstractSinglePointUtilityFunctionBuilder):
     """
     Form a utility function by drawing an approximate sample from the posterior,
     using decoupled sampling as introduced in [Wilson et. al.
     (2020)](https://arxiv.org/abs/2002.09309). Note that we return the *negative* of the
     sample as the utility function, as utility functions are *maximised*.
+
+    Note that this is a single batch utility function, as it doesn't support classical
+    batching. However, Thompson sampling can be used in a batched setting by drawing a
+    batch of different samples from the GP posterior. This can be done by calling
+    `build_utility_function` with different keys, an example of which can be seen in the
+    `ask` method of the `UtilityDrivenDecisionMaker` class. The samples can then be
+    optimised sequentially.
 
     Attributes:
         num_features (int): The number of random Fourier features to use when drawing
@@ -52,7 +59,7 @@ class ThompsonSampling(AbstractUtilityFunctionBuilder):
         posteriors: Mapping[str, ConjugatePosterior],
         datasets: Mapping[str, Dataset],
         key: KeyArray,
-    ) -> UtilityFunction:
+    ) -> SinglePointUtilityFunction:
         """
         Draw an approximate sample from the posterior of the objective model and return
         the *negative* of this sample as a utility function, as utility functions
@@ -67,10 +74,11 @@ class ThompsonSampling(AbstractUtilityFunctionBuilder):
             to form the utility function. Keys in `datasets` should correspond to
             keys in `posteriors`. One of the datasets must correspond
             to the `OBJECTIVE` key.
-            key (KeyArray): JAX PRNG key used for random number generation.
+            key (KeyArray): JAX PRNG key used for random number generation. This can be
+            changed to draw different samples.
 
         Returns:
-            UtilityFunction: An appproximate sample from the objective model
+            SinglePointUtilityFunction: An appproximate sample from the objective model
             posterior to to be *maximised* in order to decide which point to query
             next.
         """

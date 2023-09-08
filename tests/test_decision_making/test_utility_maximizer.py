@@ -27,16 +27,16 @@ from gpjax.decision_making.test_functions.continuous_functions import (
     Quadratic,
 )
 from gpjax.decision_making.utility_maximizer import (
-    AbstractUtilityMaximizer,
-    ContinuousUtilityMaximizer,
+    AbstractSinglePointUtilityMaximizer,
+    ContinuousSinglePointUtilityMaximizer,
     _get_discrete_maximizer,
 )
 from gpjax.typing import KeyArray
 
 
-def test_abstract_utility_maximizer():
+def test_abstract_single_batch_utility_maximizer():
     with pytest.raises(TypeError):
-        AbstractUtilityMaximizer()
+        AbstractSinglePointUtilityMaximizer()
 
 
 @pytest.mark.parametrize(
@@ -67,7 +67,7 @@ def test_continuous_maximizer_raises_error_with_erroneous_num_initial_samples(
     num_initial_samples: int,
 ):
     with pytest.raises(ValueError):
-        ContinuousUtilityMaximizer(
+        ContinuousSinglePointUtilityMaximizer(
             num_initial_samples=num_initial_samples, num_restarts=1
         )
 
@@ -77,7 +77,9 @@ def test_continuous_maximizer_raises_error_with_erroneous_num_restarts(
     num_restarts: int,
 ):
     with pytest.raises(ValueError):
-        ContinuousUtilityMaximizer(num_initial_samples=1, num_restarts=num_restarts)
+        ContinuousSinglePointUtilityMaximizer(
+            num_initial_samples=1, num_restarts=num_restarts
+        )
 
 
 @pytest.mark.parametrize(
@@ -95,10 +97,10 @@ def test_continous_maximizer_returns_same_point_with_same_key(
     key: KeyArray,
     num_restarts: int,
 ):
-    continuous_maximizer_one = ContinuousUtilityMaximizer(
+    continuous_maximizer_one = ContinuousSinglePointUtilityMaximizer(
         num_initial_samples=1000, num_restarts=num_restarts
     )
-    continuous_maximizer_two = ContinuousUtilityMaximizer(
+    continuous_maximizer_two = ContinuousSinglePointUtilityMaximizer(
         num_initial_samples=1000, num_restarts=num_restarts
     )
     utility_function = lambda x: -1.0 * test_function.evaluate(x)
@@ -137,7 +139,7 @@ def test_continuous_maximizer_finds_correct_point(
     key: KeyArray,
     num_restarts: int,
 ):
-    continuous_utility_maximizer = ContinuousUtilityMaximizer(
+    continuous_utility_maximizer = ContinuousSinglePointUtilityMaximizer(
         num_initial_samples=1000, num_restarts=num_restarts
     )
     utility_function = lambda x: -1.0 * test_function.evaluate(x)
@@ -159,7 +161,7 @@ def test_continuous_maximizer_finds_correct_point(
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_continuous_maximizer_jaxopt_component(key: KeyArray, num_restarts: int):
     quadratic = Quadratic()
-    continuous_utility_maximizer = ContinuousUtilityMaximizer(
+    continuous_utility_maximizer = ContinuousSinglePointUtilityMaximizer(
         num_initial_samples=1,  # Force JaxOpt L-GFBS-B to do the heavy lifting
         num_restarts=num_restarts,
     )

@@ -33,17 +33,20 @@ from gpjax.decision_making.search_space import (
     ContinuousSearchSpace,
 )
 from gpjax.decision_making.test_functions import Quadratic
-from gpjax.decision_making.utility_functions import AbstractUtilityFunctionBuilder
+from gpjax.decision_making.utility_functions import (
+    AbstractSinglePointUtilityFunctionBuilder,
+    ThompsonSampling,
+)
 from gpjax.decision_making.utility_maximizer import (
-    AbstractUtilityMaximizer,
-    ContinuousUtilityMaximizer,
+    AbstractSinglePointUtilityMaximizer,
+    ContinuousSinglePointUtilityMaximizer,
 )
 from gpjax.decision_making.utils import (
     OBJECTIVE,
     build_function_evaluator,
 )
 from gpjax.typing import KeyArray
-from tests.test_decision_making.utils import QuadraticUtilityFunctionBuilder
+from tests.test_decision_making.utils import QuadraticSinglePointUtilityFunctionBuilder
 
 CONSTRAINT = "CONSTRAINT"
 
@@ -75,13 +78,20 @@ def posterior_handler() -> PosteriorHandler:
 
 
 @pytest.fixture
-def utility_function_builder() -> AbstractUtilityFunctionBuilder:
-    return QuadraticUtilityFunctionBuilder()
+def utility_function_builder() -> AbstractSinglePointUtilityFunctionBuilder:
+    return QuadraticSinglePointUtilityFunctionBuilder()
 
 
 @pytest.fixture
-def utility_maximizer() -> AbstractUtilityMaximizer:
-    return ContinuousUtilityMaximizer(num_initial_samples=1000, num_restarts=1)
+def thompson_sampling_utility_function_builder() -> ThompsonSampling:
+    return ThompsonSampling(num_features=100)
+
+
+@pytest.fixture
+def utility_maximizer() -> AbstractSinglePointUtilityMaximizer:
+    return ContinuousSinglePointUtilityMaximizer(
+        num_initial_samples=1000, num_restarts=1
+    )
 
 
 def get_dataset(num_points: int, key: KeyArray) -> Dataset:
@@ -95,14 +105,70 @@ def test_abstract_decision_maker_raises_error():
         AbstractDecisionMaker()
 
 
+@pytest.mark.parametrize("batch_size", [0, -1, -10])
+@pytest.mark.filterwarnings(
+    "ignore::UserWarning"
+)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
+def test_invalid_batch_size_raises_error(
+    search_space: AbstractSearchSpace,
+    posterior_handler: PosteriorHandler,
+    utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
+    utility_maximizer: AbstractSinglePointUtilityMaximizer,
+    batch_size: int,
+):
+    key = jr.PRNGKey(42)
+    posterior_handlers = {OBJECTIVE: posterior_handler}
+    objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
+    datasets = {"OBJECTIVE": objective_dataset}
+    with pytest.raises(ValueError):
+        UtilityDrivenDecisionMaker(
+            search_space=search_space,
+            posterior_handlers=posterior_handlers,
+            datasets=datasets,
+            utility_function_builder=utility_function_builder,
+            utility_maximizer=utility_maximizer,
+            key=key,
+            post_ask=[],
+            post_tell=[],
+            batch_size=batch_size,
+        )
+
+
+@pytest.mark.filterwarnings(
+    "ignore::UserWarning"
+)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
+def test_non_thompson_sampling_non_one_batch_size_raises_error(
+    search_space: AbstractSearchSpace,
+    posterior_handler: PosteriorHandler,
+    utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
+    utility_maximizer: AbstractSinglePointUtilityMaximizer,
+):
+    key = jr.PRNGKey(42)
+    posterior_handlers = {OBJECTIVE: posterior_handler}
+    objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
+    datasets = {"OBJECTIVE": objective_dataset}
+    with pytest.raises(NotImplementedError):
+        UtilityDrivenDecisionMaker(
+            search_space=search_space,
+            posterior_handlers=posterior_handlers,
+            datasets=datasets,
+            utility_function_builder=utility_function_builder,
+            utility_maximizer=utility_maximizer,
+            key=key,
+            post_ask=[],
+            post_tell=[],
+            batch_size=2,
+        )
+
+
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_invalid_tags_raises_error(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
-    utility_function_builder: AbstractUtilityFunctionBuilder,
-    utility_maximizer: AbstractUtilityMaximizer,
+    utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
+    utility_maximizer: AbstractSinglePointUtilityMaximizer,
 ):
     key = jr.PRNGKey(42)
     posterior_handlers = {OBJECTIVE: posterior_handler}
@@ -118,6 +184,7 @@ def test_invalid_tags_raises_error(
             key=key,
             post_ask=[],
             post_tell=[],
+            batch_size=1,
         )
 
 
@@ -127,8 +194,8 @@ def test_invalid_tags_raises_error(
 def test_initialisation_optimizes_posterior_hyperparameters(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
-    utility_function_builder: AbstractUtilityFunctionBuilder,
-    utility_maximizer: AbstractUtilityMaximizer,
+    utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
+    utility_maximizer: AbstractSinglePointUtilityMaximizer,
 ):
     key = jr.PRNGKey(42)
     posterior_handlers = {OBJECTIVE: posterior_handler, CONSTRAINT: posterior_handler}
@@ -144,6 +211,7 @@ def test_initialisation_optimizes_posterior_hyperparameters(
         key=key,
         post_ask=[],
         post_tell=[],
+        batch_size=1,
     )
     # Assert kernel hyperparameters get changed from their initial values
     assert decision_maker.posteriors[OBJECTIVE].prior.kernel.lengthscale != jnp.array(
@@ -170,8 +238,8 @@ def test_initialisation_optimizes_posterior_hyperparameters(
 def test_decision_maker_ask(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
-    utility_function_builder: AbstractUtilityFunctionBuilder,
-    utility_maximizer: AbstractUtilityMaximizer,
+    utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
+    utility_maximizer: AbstractSinglePointUtilityMaximizer,
 ):
     key = jr.PRNGKey(42)
     posterior_handlers = {OBJECTIVE: posterior_handler}
@@ -186,12 +254,51 @@ def test_decision_maker_ask(
         key=key,
         post_ask=[],
         post_tell=[],
+        batch_size=1,
     )
     initial_decision_maker_key = decision_maker.key
     query_point = decision_maker.ask(key=key)
     assert query_point.shape == (1, 1)
     assert jnp.allclose(query_point, jnp.array([[0.5]]), atol=1e-5)
-    assert decision_maker.current_utility_function is not None
+    assert len(decision_maker.current_utility_functions) == 1
+    assert (
+        decision_maker.key == initial_decision_maker_key
+    ).all()  # Ensure decision maker key is unchanged
+
+
+@pytest.mark.parametrize("batch_size", [1, 2, 5])
+@pytest.mark.filterwarnings(
+    "ignore::UserWarning"
+)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
+def test_decision_maker_ask_multi_batch_ts(
+    search_space: AbstractSearchSpace,
+    posterior_handler: PosteriorHandler,
+    thompson_sampling_utility_function_builder: ThompsonSampling,
+    utility_maximizer: AbstractSinglePointUtilityMaximizer,
+    batch_size: int,
+):
+    key = jr.PRNGKey(42)
+    posterior_handlers = {OBJECTIVE: posterior_handler}
+    objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
+    datasets = {"OBJECTIVE": objective_dataset}
+    decision_maker = UtilityDrivenDecisionMaker(
+        search_space=search_space,
+        posterior_handlers=posterior_handlers,
+        datasets=datasets,
+        utility_function_builder=thompson_sampling_utility_function_builder,
+        utility_maximizer=utility_maximizer,
+        key=key,
+        post_ask=[],
+        post_tell=[],
+        batch_size=batch_size,
+    )
+    initial_decision_maker_key = decision_maker.key
+    query_points = decision_maker.ask(key=key)
+    assert query_points.shape == (batch_size, 1)
+    assert (
+        len(jnp.unique(query_points)) == batch_size
+    )  # Ensure we aren't drawing the same Thompson sample each time
+    assert len(decision_maker.current_utility_functions) == batch_size
     assert (
         decision_maker.key == initial_decision_maker_key
     ).all()  # Ensure decision maker key is unchanged
@@ -203,15 +310,15 @@ def test_decision_maker_ask(
 def test_decision_maker_tell_with_inconsistent_observations_raises_error(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
-    utility_function_builder: AbstractUtilityFunctionBuilder,
-    utility_maximizer: AbstractUtilityMaximizer,
+    utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
+    utility_maximizer: AbstractSinglePointUtilityMaximizer,
 ):
     key = jr.PRNGKey(42)
     posterior_handlers = {OBJECTIVE: posterior_handler, CONSTRAINT: posterior_handler}
     initial_objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
     initial_constraint_dataset = get_dataset(num_points=5, key=jr.PRNGKey(10))
     datasets = {
-        "OBJECTIVE": initial_objective_dataset,
+        OBJECTIVE: initial_objective_dataset,
         CONSTRAINT: initial_constraint_dataset,
     }
     decision_maker = UtilityDrivenDecisionMaker(
@@ -223,6 +330,7 @@ def test_decision_maker_tell_with_inconsistent_observations_raises_error(
         key=key,
         post_ask=[],
         post_tell=[],
+        batch_size=1,
     )
     mock_objective_observation = get_dataset(num_points=1, key=jr.PRNGKey(1))
     mock_constraint_observation = get_dataset(num_points=1, key=jr.PRNGKey(2))
@@ -240,8 +348,8 @@ def test_decision_maker_tell_with_inconsistent_observations_raises_error(
 def test_decision_maker_tell_updates_datasets_and_models(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
-    utility_function_builder: AbstractUtilityFunctionBuilder,
-    utility_maximizer: AbstractUtilityMaximizer,
+    utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
+    utility_maximizer: AbstractSinglePointUtilityMaximizer,
 ):
     key = jr.PRNGKey(42)
     posterior_handlers = {OBJECTIVE: posterior_handler, CONSTRAINT: posterior_handler}
@@ -260,6 +368,7 @@ def test_decision_maker_tell_updates_datasets_and_models(
         key=key,
         post_ask=[],
         post_tell=[],
+        batch_size=1,
     )
     initial_decision_maker_key = decision_maker.key
     initial_objective_posterior = decision_maker.posteriors[OBJECTIVE]
@@ -303,25 +412,26 @@ def test_decision_maker_tell_updates_datasets_and_models(
 def test_decision_maker_run(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
-    utility_function_builder: AbstractUtilityFunctionBuilder,
-    utility_maximizer: AbstractUtilityMaximizer,
+    utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
+    utility_maximizer: AbstractSinglePointUtilityMaximizer,
     n_steps: int,
 ):
     key = jr.PRNGKey(42)
     posterior_handlers = {OBJECTIVE: posterior_handler}
     initial_objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
-    datasets = {
+    initial_datasets = {
         "OBJECTIVE": initial_objective_dataset,
     }
     decision_maker = UtilityDrivenDecisionMaker(
         search_space=search_space,
         posterior_handlers=posterior_handlers,
-        datasets=datasets,
+        datasets=initial_datasets,
         utility_function_builder=utility_function_builder,
         utility_maximizer=utility_maximizer,
         key=key,
         post_ask=[],
         post_tell=[],
+        batch_size=1,
     )
     initial_decision_maker_key = decision_maker.key
     black_box_fn = Quadratic()
@@ -331,10 +441,58 @@ def test_decision_maker_run(
     query_datasets = decision_maker.run(
         n_steps=n_steps, black_box_function_evaluator=black_box_function_evaluator
     )
+    assert initial_datasets[OBJECTIVE].n == 5
     assert query_datasets[OBJECTIVE].n == 5 + n_steps
     assert (
         jnp.abs(query_datasets[OBJECTIVE].X[-n_steps:] - jnp.array([[0.5]])) < 1e-5
     ).all()  # Ensure we're querying the correct point in our dummy utility function at each step
+    assert (
+        decision_maker.key != initial_decision_maker_key
+    ).all()  # Ensure decision maker key gets updated
+
+
+@pytest.mark.parametrize("n_steps", [1, 3])
+@pytest.mark.parametrize("batch_size", [1, 3])
+@pytest.mark.filterwarnings(
+    "ignore::UserWarning"
+)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
+def test_decision_maker_run_ts(
+    search_space: AbstractSearchSpace,
+    posterior_handler: PosteriorHandler,
+    thompson_sampling_utility_function_builder: ThompsonSampling,
+    utility_maximizer: AbstractSinglePointUtilityMaximizer,
+    n_steps: int,
+    batch_size: int,
+):
+    key = jr.PRNGKey(42)
+    posterior_handlers = {OBJECTIVE: posterior_handler}
+    initial_objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
+    initial_datasets = {
+        "OBJECTIVE": initial_objective_dataset,
+    }
+    decision_maker = UtilityDrivenDecisionMaker(
+        search_space=search_space,
+        posterior_handlers=posterior_handlers,
+        datasets=initial_datasets,
+        utility_function_builder=thompson_sampling_utility_function_builder,
+        utility_maximizer=utility_maximizer,
+        key=key,
+        post_ask=[],
+        post_tell=[],
+        batch_size=batch_size,
+    )
+    initial_decision_maker_key = decision_maker.key
+    black_box_fn = Quadratic()
+    black_box_function_evaluator = build_function_evaluator(
+        {OBJECTIVE: black_box_fn.evaluate}
+    )
+    query_datasets = decision_maker.run(
+        n_steps=n_steps, black_box_function_evaluator=black_box_function_evaluator
+    )
+    assert initial_datasets[OBJECTIVE].n == 5
+    assert (
+        query_datasets[OBJECTIVE].n == 5 + n_steps * batch_size
+    )  # Ensure we're getting the correct number of points
     assert (
         decision_maker.key != initial_decision_maker_key
     ).all()  # Ensure decision maker key gets updated

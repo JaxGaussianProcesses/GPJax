@@ -26,7 +26,7 @@ from gpjax.decision_making.search_space import (
     AbstractSearchSpace,
     ContinuousSearchSpace,
 )
-from gpjax.decision_making.utility_functions import UtilityFunction
+from gpjax.decision_making.utility_functions import SinglePointUtilityFunction
 from gpjax.typing import (
     Array,
     Float,
@@ -36,14 +36,15 @@ from gpjax.typing import (
 
 
 def _get_discrete_maximizer(
-    query_points: Float[Array, "N D"], utility_function: UtilityFunction
+    query_points: Float[Array, "N D"], utility_function: SinglePointUtilityFunction
 ) -> Float[Array, "1 D"]:
     """Get the point which maximises the utility function evaluated at a given set of points.
 
     Args:
         query_points (Float[Array, "N D"]): Set of points at which to evaluate the
         utility function.
-        utility_function (UtilityFunction): Utility function to evaluate at `query_points`.
+        utility_function (SinglePointUtilityFunction): Single point utility function to
+        be evaluated at "query_points".
 
     Returns:
         Float[Array, "1 D"]: Point in `query_points` which maximises the utility function.
@@ -59,13 +60,13 @@ def _get_discrete_maximizer(
 
 
 @dataclass
-class AbstractUtilityMaximizer(ABC):
-    """Abstract base class for utility function maximizers."""
+class AbstractSinglePointUtilityMaximizer(ABC):
+    """Abstract base class for single point utility function maximizers."""
 
     @abstractmethod
     def maximize(
         self,
-        utility_function: UtilityFunction,
+        utility_function: SinglePointUtilityFunction,
         search_space: AbstractSearchSpace,
         key: KeyArray,
     ) -> Float[Array, "1 D"]:
@@ -85,7 +86,7 @@ class AbstractUtilityMaximizer(ABC):
 
 
 @dataclass
-class ContinuousUtilityMaximizer(AbstractUtilityMaximizer):
+class ContinuousSinglePointUtilityMaximizer(AbstractSinglePointUtilityMaximizer):
     """The `ContinuousUtilityMaximizer` class is used to maximize utility
     functions over the continuous domain with L-BFGS-B. First we sample the utility
     function at `num_initial_samples` points from the search space, and then we run
@@ -109,7 +110,7 @@ class ContinuousUtilityMaximizer(AbstractUtilityMaximizer):
 
     def maximize(
         self,
-        utility_function: UtilityFunction,
+        utility_function: SinglePointUtilityFunction,
         search_space: ContinuousSearchSpace,
         key: KeyArray,
     ) -> Float[Array, "1 D"]:
@@ -150,3 +151,10 @@ class ContinuousUtilityMaximizer(AbstractUtilityMaximizer):
                 max_observed_utility_function_value = optimized_utility_function_value
                 maximizer = optimized_point
         return maximizer
+
+
+AbstractUtilityMaximizer = AbstractSinglePointUtilityMaximizer
+"""
+Type alias for a utility maximizer. Currently we only support single point utility
+functions, but in future may support batched utility functions.
+"""

@@ -13,7 +13,9 @@
 # limitations under the License.
 # ==============================================================================
 from gpjax.decision_making.utility_functions.base import (
+    AbstractSinglePointUtilityFunctionBuilder,
     AbstractUtilityFunctionBuilder,
+    SinglePointUtilityFunction,
     UtilityFunction,
 )
 from gpjax.decision_making.utility_functions.thompson_sampling import ThompsonSampling
@@ -21,5 +23,7 @@ from gpjax.decision_making.utility_functions.thompson_sampling import ThompsonSa
 __all__ = [
     "UtilityFunction",
     "AbstractUtilityFunctionBuilder",
+    "AbstractSinglePointUtilityFunctionBuilder",
+    "SinglePointUtilityFunction",
     "ThompsonSampling",
 ]
