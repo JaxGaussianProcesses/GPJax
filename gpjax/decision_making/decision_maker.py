@@ -274,6 +274,8 @@ class UtilityDrivenDecisionMaker(AbstractDecisionMaker):
         """
         self.current_utility_functions = []
         maximizers = []
+        # We currently only allow Thompson sampling to be run with batch size > 1. More
+        # batched utility functions may be added in the future.
         if isinstance(self.utility_function_builder, ThompsonSampling) or (
             (not isinstance(self.utility_function_builder, ThompsonSampling))
             and (self.batch_size == 1)
