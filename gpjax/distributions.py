@@ -173,13 +173,6 @@ class GaussianDistribution(tfd.Distribution):
         mu = self.loc
         sigma = self.scale
         n = mu.shape[-1]
-        if mask is not None:
-            y = jnp.where(mask, 0.0, y)
-            mu = jnp.where(mask, 0.0, mu)
-            sigma_masked = jnp.where(mask[None] + mask[:, None], 0.0, sigma.matrix)
-            sigma = sigma.replace(
-                matrix=jnp.where(jnp.diag(mask), 1 / (2 * jnp.pi), sigma_masked)
-            )
 
         if mask is not None:
             y = jnp.where(mask, 0.0, y)

@@ -494,7 +494,6 @@ class ConjugatePosterior(AbstractPosterior):
         m = y.shape[1]
         if m > 1 and mask is not None:
             mask = mask.flatten()
-        n_X_m = n * m
         # Unpack test inputs
         t = test_inputs
 
@@ -524,8 +523,9 @@ class ConjugatePosterior(AbstractPosterior):
             )
 
         mean_t = self.prior.mean_function(t)
-        Ktt = jnp.kron(self.prior.kernel.gram(t).to_dense(), Kyy.to_dense())
-        Kxt = jnp.kron(self.prior.kernel.cross_covariance(x, t), Kyy.to_dense())
+        Ktt = cola.ops.Kronecker(self.prior.kernel.gram(t), Kyy)
+        Ktt = cola.PSD(Ktt)
+        Kxt = cola.ops.Kronecker(self.prior.kernel.cross_covariance(x, t), Kyy)
 
         # Σ⁻¹ Kxt
         if mask is not None:

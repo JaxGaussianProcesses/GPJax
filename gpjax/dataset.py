@@ -20,7 +20,6 @@ from beartype.typing import (
     Optional,
     Union,
     Literal,
-    Literal,
 )
 import jax.numpy as jnp
 from jaxtyping import (

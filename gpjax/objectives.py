@@ -122,7 +122,6 @@ class ConjugateMLL(AbstractObjective):
         m = y.shape[1]
         if m > 1 and mask is not None:
             mask = mask.flatten()
-        n_X_m = n * m
 
         # Observation noise o²
         obs_noise = posterior.likelihood.obs_noise

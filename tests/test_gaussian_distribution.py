@@ -30,8 +30,6 @@ from cola.ops import (
 )
 
 from gpjax.distributions import GaussianDistribution
-from gpjax.linops.dense_linear_operator import DenseLinearOperator
-from gpjax.linops.diagonal_linear_operator import DiagonalLinearOperator
 
 _key = jr.PRNGKey(seed=42)
 
