@@ -523,7 +523,6 @@ class ConjugatePosterior(AbstractPosterior):
                 )
             )
 
-        # FIXME: mean_function should probably be multidim
         mean_t = self.prior.mean_function(t)
         Ktt = jnp.kron(self.prior.kernel.gram(t).to_dense(), Kyy.to_dense())
         Kxt = jnp.kron(self.prior.kernel.cross_covariance(x, t), Kyy.to_dense())
