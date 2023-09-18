@@ -251,7 +251,7 @@ def optimise_mll(posterior, dataset, NIters=1000, key=key, plot_history=True):
     opt_posterior, history = gpx.fit(
         model=posterior,
         train_data=dataset,
-        solver = jaxopt.OptaxSolver(objective, opt=ox.adam(0.1), maxiter=NIters),
+        solver=jaxopt.OptaxSolver(objective, opt=ox.adam(0.1), maxiter=NIters),
         safe=True,
         key=key,
     )

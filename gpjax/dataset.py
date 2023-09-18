@@ -17,9 +17,9 @@ from dataclasses import dataclass
 import warnings
 
 from beartype.typing import (
+    Literal,
     Optional,
     Union,
-    Literal,
 )
 import jax.numpy as jnp
 from jaxtyping import (
