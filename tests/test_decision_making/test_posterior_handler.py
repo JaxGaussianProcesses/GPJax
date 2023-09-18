@@ -22,6 +22,7 @@ from beartype.typing import (
 )
 import jax.numpy as jnp
 import jax.random as jr
+import jaxopt
 import optax as ox
 import pytest
 
@@ -62,13 +63,12 @@ def test_posterior_handler_erroneous_num_optimization_iterations_raises_error(
     prior = Prior(mean_function=mean_function, kernel=kernel)
     likelihood_builder = gaussian_likelihood_builder
     training_objective = ConjugateMLL(negative=True)
+    solver = jaxopt.LBFGS(training_objective, maxiter=num_optimization_iters)
     with pytest.raises(ValueError):
         PosteriorHandler(
             prior=prior,
             likelihood_builder=likelihood_builder,
-            optimization_objective=training_objective,
-            optimizer=ox.adam(learning_rate=0.01),
-            num_optimization_iters=num_optimization_iters,
+            solver=solver,
         )
 
 
@@ -81,12 +81,11 @@ def test_get_optimized_posterior_with_no_key_raises_error():
     prior = Prior(mean_function=mean_function, kernel=kernel)
     likelihood_builder = gaussian_likelihood_builder
     training_objective = ConjugateMLL(negative=True)
+    solver = jaxopt.OptaxSolver(training_objective, opt=ox.adam(1e-3), maxiter=10)
     posterior_handler = PosteriorHandler(
         prior=prior,
         likelihood_builder=likelihood_builder,
-        optimization_objective=training_objective,
-        optimizer=ox.adam(learning_rate=0.01),
-        num_optimization_iters=10,
+        solver=solver,
     )
     toy_function = Forrester()
     dataset = toy_function.generate_dataset(num_points=5, key=jr.PRNGKey(42))
@@ -103,12 +102,11 @@ def test_update_and_optimize_posterior_with_no_key_raises_error():
     prior = Prior(mean_function=mean_function, kernel=kernel)
     likelihood_builder = gaussian_likelihood_builder
     training_objective = ConjugateMLL(negative=True)
+    solver = jaxopt.OptaxSolver(training_objective, opt=ox.adam(1e-3), maxiter=10)
     posterior_handler = PosteriorHandler(
         prior=prior,
         likelihood_builder=likelihood_builder,
-        optimization_objective=training_objective,
-        optimizer=ox.adam(learning_rate=0.01),
-        num_optimization_iters=10,
+        solver=solver,
     )
     toy_function = Forrester()
     dataset = toy_function.generate_dataset(num_points=5, key=jr.PRNGKey(42))
@@ -143,12 +141,11 @@ def test_get_posterior_no_optimization_correct_num_datapoints_and_not_optimized(
     mean_function = Constant(constant=jnp.array([1.0]))
     kernel = Matern52(lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
     prior = Prior(mean_function=mean_function, kernel=kernel)
+    solver = jaxopt.OptaxSolver(training_objective, opt=ox.adam(1e-3), maxiter=10)
     posterior_handler = PosteriorHandler(
         prior=prior,
         likelihood_builder=likelihood_builder,
-        optimization_objective=training_objective,
-        optimizer=ox.adam(learning_rate=0.01),
-        num_optimization_iters=10,
+        solver=solver,
     )
     dataset = test_function.generate_dataset(
         num_points=num_datapoints, key=jr.PRNGKey(42)
@@ -185,12 +182,11 @@ def test_get_posterior_with_optimization_correct_num_datapoints_and_optimized(
     kernel = Matern52(lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
     prior = Prior(mean_function=mean_function, kernel=kernel)
     non_optimized_posterior = prior * likelihood_builder(num_datapoints)
+    solver = jaxopt.OptaxSolver(training_objective, opt=ox.adam(1e-3), maxiter=10)
     posterior_handler = PosteriorHandler(
         prior=prior,
         likelihood_builder=likelihood_builder,
-        optimization_objective=training_objective,
-        optimizer=ox.adam(learning_rate=0.01),
-        num_optimization_iters=10,
+        solver=solver,
     )
     dataset = test_function.generate_dataset(
         num_points=num_datapoints, key=jr.PRNGKey(42)
@@ -231,12 +227,11 @@ def test_update_posterior_no_optimize_same_prior_parameters_and_different_num_da
     mean_function = Constant(constant=jnp.array([1.0]))
     kernel = Matern52(lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
     prior = Prior(mean_function=mean_function, kernel=kernel)
+    solver = jaxopt.OptaxSolver(training_objective, opt=ox.adam(1e-3), maxiter=10)
     posterior_handler = PosteriorHandler(
         prior=prior,
         likelihood_builder=likelihood_builder,
-        optimization_objective=training_objective,
-        optimizer=ox.adam(learning_rate=0.01),
-        num_optimization_iters=10,
+        solver=solver,
     )
     initial_dataset = test_function.generate_dataset(
         num_points=initial_num_datapoints, key=jr.PRNGKey(42)
@@ -290,12 +285,11 @@ def test_update_posterior_with_optimization_updated_prior_parameters_and_differe
     mean_function = Constant(constant=jnp.array([1.0]))
     kernel = Matern52(lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
     prior = Prior(mean_function=mean_function, kernel=kernel)
+    solver = jaxopt.OptaxSolver(training_objective, opt=ox.adam(1e-3), maxiter=10)
     posterior_handler = PosteriorHandler(
         prior=prior,
         likelihood_builder=likelihood_builder,
-        optimization_objective=training_objective,
-        optimizer=ox.adam(learning_rate=0.01),
-        num_optimization_iters=10,
+        solver=solver,
     )
     initial_dataset = test_function.generate_dataset(
         num_points=initial_num_datapoints, key=jr.PRNGKey(42)

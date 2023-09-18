@@ -18,7 +18,7 @@ from beartype.typing import (
     Callable,
     Optional,
 )
-import optax as ox
+from jaxopt.base import IterativeSolver
 
 import gpjax as gpx
 from gpjax.dataset import Dataset
@@ -27,7 +27,6 @@ from gpjax.gps import (
     AbstractPosterior,
     AbstractPrior,
 )
-from gpjax.objectives import AbstractObjective
 from gpjax.typing import KeyArray
 
 LikelihoodBuilder = Callable[[int], AbstractLikelihood]
@@ -46,23 +45,17 @@ class PosteriorHandler:
         likelihood_builder (LikelihoodBuilder): Function which takes the number of
         datapoints as input and returns a likelihood object initialised with the given
         number of datapoints.
-        optimization_objective (AbstractObjective): Objective to use for optimizing the
+        solver (IterativeSolver): The `jaxopt` solver used to optimize the
         posterior hyperparameters.
-        optimizer (ox.GradientTransformation): Optax optimizer to use for optimizing the
-        posterior hyperparameters.
-        num_optimization_iterations (int): Number of iterations to optimize
-        the posterior hyperparameters for.
     """
 
     prior: AbstractPrior
     likelihood_builder: LikelihoodBuilder
-    optimization_objective: AbstractObjective
-    optimizer: ox.GradientTransformation
-    num_optimization_iters: int
+    solver: IterativeSolver
 
     def __post_init__(self):
-        if self.num_optimization_iters < 1:
-            raise ValueError("num_optimization_iters must be greater than 0.")
+        if self.solver.maxiter < 1:
+            raise ValueError("solver must run for more that 0 steps.")
 
     def get_posterior(
         self, dataset: Dataset, optimize: bool, key: Optional[KeyArray] = None
@@ -143,10 +136,8 @@ class PosteriorHandler:
         """
         opt_posterior, _ = gpx.fit(
             model=posterior,
-            objective=self.optimization_objective,
             train_data=dataset,
-            optim=self.optimizer,
-            num_iters=self.num_optimization_iters,
+            solver=self.solver,
             safe=True,
             key=key,
             verbose=False,
