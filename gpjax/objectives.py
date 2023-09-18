@@ -118,7 +118,7 @@ class ConjugateMLL(AbstractObjective):
             ScalarFloat: The marginal log-likelihood of the Gaussian process for the
                 current parameter set.
         """
-        x, y, n, mask = train_data.X, train_data.y, train_data.n, train_data.mask
+        x, y, mask = train_data.X, train_data.y, train_data.mask
         m = y.shape[1]
         if m > 1 and mask is not None:
             mask = mask.flatten()
