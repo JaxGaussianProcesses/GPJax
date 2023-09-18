@@ -14,11 +14,15 @@
 # ==============================================================================
 
 import beartype.typing as tp
+from cola import PSD
+from cola.ops import (
+    Diagonal,
+    LinearOperator,
+)
 from jax import vmap
 from jaxtyping import Float
 
 from gpjax.kernels.computations import AbstractKernelComputation
-from gpjax.linops import DiagonalLinearOperator
 from gpjax.typing import Array
 
 Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
@@ -29,7 +33,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
     a diagonal Gram matrix.
     """
 
-    def gram(self, kernel: Kernel, x: Float[Array, "N D"]) -> DiagonalLinearOperator:
+    def gram(self, kernel: Kernel, x: Float[Array, "N D"]) -> LinearOperator:
         r"""Compute the Gram matrix.
 
         For a kernel with diagonal structure, compute the $`N\times N`$ Gram matrix on
@@ -41,9 +45,9 @@ class DiagonalKernelComputation(AbstractKernelComputation):
 
         Returns
         -------
-            DiagonalLinearOperator: The computed square Gram matrix.
+            LinearOperator: The computed square Gram matrix.
         """
-        return DiagonalLinearOperator(diag=vmap(lambda x: kernel(x, x))(x))
+        return PSD(Diagonal(diag=vmap(lambda x: kernel(x, x))(x)))
 
     def cross_covariance(
         self, kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"]

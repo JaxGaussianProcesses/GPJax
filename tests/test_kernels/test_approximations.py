@@ -1,5 +1,6 @@
 from typing import Tuple
 
+from cola.ops import Dense
 import jax
 from jax.config import config
 import jax.numpy as jnp
@@ -21,7 +22,6 @@ from gpjax.kernels.stationary import (
     PoweredExponential,
     RationalQuadratic,
 )
-from gpjax.linops import DenseLinearOperator
 
 config.update("jax_enable_x64", True)
 _jitter = 1e-6
@@ -51,7 +51,7 @@ def test_gram(kernel: AbstractKernel, num_basis_fns: int, n_dims: int, n_data: i
     linop = approximate.gram(x)
 
     # Check the return type
-    assert isinstance(linop, DenseLinearOperator)
+    assert isinstance(linop, Dense)
 
     Kxx = linop.to_dense() + jnp.eye(n_data) * _jitter
 

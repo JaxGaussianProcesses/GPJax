@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-from gpjax import integrators
+from gpjax import (
+    decision_making,
+    integrators,
+)
 from gpjax.base import (
     Module,
     param_field,
@@ -29,8 +32,8 @@ from gpjax.kernels import (
     RFF,
     AbstractKernel,
     BasisFunctionComputation,
-    ConstantDiagonalKernelComputation,
     CatKernel,
+    ConstantDiagonalKernelComputation,
     DenseKernelComputation,
     DiagonalKernelComputation,
     EigenKernelComputation,
@@ -75,12 +78,13 @@ __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
 __url__ = "https://github.com/JaxGaussianProcesses/GPJax"
 __contributors__ = "https://github.com/JaxGaussianProcesses/GPJax/graphs/contributors"
-__version__ = "0.0.0"
+__version__ = "0.6.8"
 
 __all__ = [
     "Module",
     "param_field",
     "cite",
+    "decision_making",
     "kernels",
     "fit",
     "Prior",

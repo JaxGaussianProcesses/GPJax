@@ -151,6 +151,17 @@ class Constant(AbstractMeanFunction):
 
 
 @dataclasses.dataclass
+class Zero(Constant):
+    r"""Zero mean function.
+
+    The zero mean function. This function returns a zero scalar value for all
+    inputs. Unlike the Constant mean function, the constant scalar zero is fixed, and
+    cannot be treated as a model hyperparameter and learned during training.
+    """
+    constant: Float[Array, "1"] = static_field(jnp.array([0.0]), init=False)
+
+
+@dataclasses.dataclass
 class CombinationMeanFunction(AbstractMeanFunction):
     r"""A base class for products or sums of AbstractMeanFunctions."""
 
@@ -199,4 +210,3 @@ SumMeanFunction = partial(CombinationMeanFunction, operator=partial(jnp.sum, axi
 ProductMeanFunction = partial(
     CombinationMeanFunction, operator=partial(jnp.sum, axis=0)
 )
-Zero = partial(Constant, constant=jnp.array([0.0]))

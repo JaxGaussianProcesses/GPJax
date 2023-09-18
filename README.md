@@ -90,6 +90,10 @@ jupytext --to py:percent example.ipynb
 Let us import some dependencies and simulate a toy dataset $\mathcal{D}$.
 
 ```python
+from jax import config
+
+config.update("jax_enable_x64", True)
+
 import gpjax as gpx
 import jax
 from jax import grad, jit
