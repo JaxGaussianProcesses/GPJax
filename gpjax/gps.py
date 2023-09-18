@@ -490,12 +490,13 @@ class ConjugatePosterior(AbstractPosterior):
                     distribution as a `GaussianDistribution`.
         """
         # Unpack training data
-        x, y, n_test, mask = train_data.X, train_data.y, train_data.n, train_data.mask
+        x, y, n_train, mask = train_data.X, train_data.y, train_data.n, train_data.mask
         m = y.shape[1]
         if m > 1 and mask is not None:
             mask = mask.flatten()
         # Unpack test inputs
         t = test_inputs
+        n_test = len(test_inputs)
 
         # Observation noise o²
         obs_noise = self.likelihood.obs_noise
@@ -529,14 +530,14 @@ class ConjugatePosterior(AbstractPosterior):
 
         # Σ⁻¹ Kxt
         if mask is not None:
-            Kxt = jnp.where(mask * jnp.ones((1, n_test), dtype=bool), 0.0, Kxt)
+            Kxt = jnp.where(mask * jnp.ones((1, n_train), dtype=bool), 0.0, Kxt)
         Sigma_inv_Kxt = cola.solve(Sigma, Kxt)
 
         # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
-        mean = mean_t.flatten() + jnp.matmul(Sigma_inv_Kxt.T, (y - mx).flatten())
+        mean = mean_t.flatten() + Sigma_inv_Kxt.T @ (y - mx).flatten()
 
         # Ktt  -  Ktx (Kxx + Io²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
-        covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
+        covariance = Ktt - Kxt.T @ Sigma_inv_Kxt
         covariance += cola.ops.I_like(covariance) * self.prior.jitter
         covariance = cola.PSD(covariance)
         rval = GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
