@@ -508,7 +508,7 @@ class ConjugatePosterior(AbstractPosterior):
 
         # Σ = Kxx + Io²
         Sigma = cola.ops.Kronecker(Kxx, Kyy)
-        Sigma = cola.ops.I_like(Sigma) * (obs_noise + self.jitter)
+        Sigma += cola.ops.I_like(Sigma) * (obs_noise + self.jitter)
         Sigma = cola.PSD(Sigma)
 
         if mask is not None:
