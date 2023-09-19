@@ -135,7 +135,6 @@ def fit(  # noqa: PLR0913
         model,
         get_batch(train_data, batch_size, key) if batch_size != -1 else train_data,
     )
-    jitted_update = jax.jit(solver.update)
 
     # Mini-batch random keys to scan over.
     iter_keys = jr.split(key, solver.maxiter)
@@ -149,7 +148,7 @@ def fit(  # noqa: PLR0913
         else:
             batch = train_data
 
-        model, state = jitted_update(model, state, batch)
+        model, state = solver.update(model, state, batch)
         carry = model, state
         return carry, state.value
 
