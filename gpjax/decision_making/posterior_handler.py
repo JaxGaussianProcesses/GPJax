@@ -18,6 +18,7 @@ from beartype.typing import (
     Callable,
     Optional,
 )
+import jaxopt
 from jaxopt.base import IterativeSolver
 
 import gpjax as gpx
@@ -134,10 +135,16 @@ class PosteriorHandler:
         Returns:
             Optimized posterior.
         """
+
+        # TODO: Clean this one up!
+        # We create a new solver state -> since the dataset (and therefore loss function) has changed!
+        old = self.solver
+        solver = jaxopt.OptaxSolver(fun=old.fun, opt=old.opt, maxiter=old.maxiter)
+
         opt_posterior, _ = gpx.fit(
             model=posterior,
             train_data=dataset,
-            solver=self.solver,
+            solver=solver,
             safe=True,
             key=key,
             verbose=False,

@@ -23,7 +23,7 @@ from jax import config
 
 config.update("jax_enable_x64", True)
 
-
+import jaxopt
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib as mpl
@@ -169,13 +169,16 @@ likelihood_builder = lambda n: gpx.Gaussian(num_datapoints=n, obs_noise=jnp.arra
 # `PosteriorHandler` as demonstrated below:
 
 # %%
-posterior_handler = PosteriorHandler(
-    prior,
-    likelihood_builder=likelihood_builder,
-    optimization_objective=gpx.ConjugateMLL(negative=True),
-    optimizer=ox.adam(learning_rate=0.01),
-    num_optimization_iters=1000,
+
+solver = jaxopt.OptaxSolver(
+    gpx.ConjugateMLL(negative=True), opt=ox.adam(learning_rate=0.01), maxiter=5000
 )
+posterior_handler = PosteriorHandler(
+    prior=prior,
+    likelihood_builder=likelihood_builder,
+    solver=solver,
+)
+
 posterior_handlers = {OBJECTIVE: posterior_handler}
 
 # %% [markdown]
@@ -274,6 +277,7 @@ def plot_bo_iteration(
 ):
     posterior = dm.posteriors[OBJECTIVE]
     dataset = dm.datasets[OBJECTIVE]
+
     plt_x = jnp.linspace(0, 1, 1000).reshape(-1, 1)
     forrester_y = forrester(plt_x.squeeze(axis=-1))
     utility_fn = dm.current_utility_functions[0]
