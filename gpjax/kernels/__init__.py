@@ -39,6 +39,7 @@ from gpjax.kernels.nonstationary import (
 )
 from gpjax.kernels.stationary import (
     RBF,
+    Matern,
     Matern12,
     Matern32,
     Matern52,
@@ -55,6 +56,7 @@ __all__ = [
     "RBF",
     "GraphKernel",
     "CatKernel",
+    "Matern",
     "Matern12",
     "Matern32",
     "Matern52",

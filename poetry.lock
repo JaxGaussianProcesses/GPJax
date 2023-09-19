@@ -2265,6 +2265,18 @@ doc = ["myst-parser", "sphinx", "sphinx-book-theme"]
 test = ["coverage", "pytest", "pytest-cov"]
 
 [[package]]
+name = "logbesselk"
+version = "3.2.0"
+description = "Provide function to calculate the modified Bessel function of the second kind"
+category = "main"
+optional = false
+python-versions = ">=3.8,<3.12"
+files = [
+    {file = "logbesselk-3.2.0-py3-none-any.whl", hash = "sha256:ffb58a6d8c738722666fa0522ad4583ec9f5862a7e0882df6fecc6df988468bc"},
+    {file = "logbesselk-3.2.0.tar.gz", hash = "sha256:886b7eeb04dd906a5872400a1b0ab18cefb416a3b082f167e0d4033c8feb4313"},
+]
+
+[[package]]
 name = "lxml"
 version = "4.9.3"
 description = "Powerful and Pythonic XML processing library combining libxml2/libxslt with the ElementTree API."
@@ -5830,4 +5842,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "5579512ea30793a8d3ea7fe9e486e2635226caa0bf5415b173f650751c8b3016"
+content-hash = "6d1b63822ef4793b66c49caaf979816d3513ffc82a245fe680d74922edf04f01"

@@ -16,6 +16,7 @@
 from gpjax.kernels.stationary.matern12 import Matern12
 from gpjax.kernels.stationary.matern32 import Matern32
 from gpjax.kernels.stationary.matern52 import Matern52
+from gpjax.kernels.stationary.matern import Matern
 from gpjax.kernels.stationary.periodic import Periodic
 from gpjax.kernels.stationary.powered_exponential import PoweredExponential
 from gpjax.kernels.stationary.rational_quadratic import RationalQuadratic
@@ -26,6 +27,7 @@ __all__ = [
     "Matern12",
     "Matern32",
     "Matern52",
+    "Matern",
     "Periodic",
     "PoweredExponential",
     "RationalQuadratic",
