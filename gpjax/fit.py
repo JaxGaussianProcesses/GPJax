@@ -20,13 +20,16 @@ from beartype.typing import (
     Optional,
     Tuple,
     TypeVar,
+    Union,
 )
 import jax
 from jax._src.random import _check_prng_key
 import jax.numpy as jnp
 import jax.random as jr
-import jaxopt
-from jaxopt.base import IterativeSolver
+from jaxopt import (
+    OptaxSolver,
+    ScipyMinimize,
+)
 
 from gpjax.base import Module
 from gpjax.dataset import Dataset
@@ -43,7 +46,7 @@ def fit(  # noqa: PLR0913
     *,
     model: ModuleModel,
     train_data: Dataset,
-    solver: IterativeSolver,
+    solver: Union[ScipyMinimize, OptaxSolver],
     key: KeyArray,
     batch_size: Optional[int] = -1,
     log_rate: Optional[int] = 10,
@@ -52,7 +55,7 @@ def fit(  # noqa: PLR0913
     safe: Optional[bool] = True,
 ) -> Tuple[ModuleModel, Array]:
     r"""Train a Module model with respect to a supplied Objective function.
-    `solver` must be an instance of `jaxopt`'s `IterativeSolver`.
+    `solver` must be an instance of `jaxopt`'s `OptaxSolver` or `ScipyMinimze`.
 
     Example:
     ```python
@@ -87,14 +90,14 @@ def fit(  # noqa: PLR0913
         >>> trained_model, history = gpx.fit(
                 model=model,
                 train_data=D,
-                solver=jaxopt.LBFGS(loss_fn, max_stepsize=0.001, maxiter=4000),
+                solver=jaxopt.ScipyMinimize(fun=loss),
             )
     ```
 
     Args:
         model (Module): The model Module to be optimised.
         train_data (Dataset): The training data to be used for the optimisation.
-        solver (IterativeSolver): The `jaxopt` solver.
+        solver (Union[SCipyMinimize, OptaxSolver])): The `jaxopt` solver.
         batch_size (Optional[int]): The size of the mini-batch to use. Defaults to -1
             (i.e. full batch).
         key (Optional[KeyArray]): The random key to use for the optimisation batch
@@ -120,43 +123,56 @@ def fit(  # noqa: PLR0913
         _check_log_rate(log_rate)
         _check_verbose(verbose)
 
+    if isinstance(solver, ScipyMinimize) and batch_size != -1:
+        raise ValueError("ScipyMinimze optimizers do not support batching")
+
     # Unconstrained space model.
     model = model.unconstrain()
 
-    # needed for OptaxSolver to work
-    if isinstance(solver, jaxopt.OptaxSolver):
-        model = jax.tree_map(lambda x: x.astype(jnp.float64), model)
-
     # Initialise solver state.
     solver.fun = _wrap_objective(solver.fun)
+    solver.options.pop("maxiter", None)  # allow __post_init__ without jaxopt error
     solver.__post_init__()  # needed to propagate changes to `fun` attribute
 
-    solver_state = solver.init_state(
-        model,
-        get_batch(train_data, batch_size, key) if batch_size != -1 else train_data,
-    )
+    if isinstance(solver, OptaxSolver):  # hack for Optax compatibility
+        model = jax.tree_map(lambda x: x.astype(jnp.float64), model)
 
-    # Mini-batch random keys to scan over.
-    iter_keys = jr.split(key, solver.maxiter)
+    if isinstance(solver, OptaxSolver):  # For optax, run optimization by step
+        solver_state = solver.init_state(
+            model,
+            get_batch(train_data, batch_size, key) if batch_size != -1 else train_data,
+        )
 
-    # Optimisation step.
-    def step(carry, key):
-        model, state = carry
+        # Mini-batch random keys to scan over.
+        iter_keys = jr.split(key, solver.maxiter)
 
-        if batch_size != -1:
-            batch = get_batch(train_data, batch_size, key)
-        else:
-            batch = train_data
+        # Optimisation step.
+        def step(carry, key):
+            model, state = carry
 
-        model, state = solver.update(model, state, batch)
-        carry = model, state
-        return carry, state.value
+            if batch_size != -1:
+                batch = get_batch(train_data, batch_size, key)
+            else:
+                batch = train_data
 
-    # Optimisation scan.
-    scan = vscan if verbose else jax.lax.scan
+            model, state = solver.update(model, state, batch)
+            carry = model, state
+            return carry, state.value
 
-    # Optimisation loop.
-    (model, _), history = scan(step, (model, solver_state), (iter_keys), unroll=unroll)
+        # Optimisation scan.
+        scan = vscan if verbose else jax.lax.scan
+
+        # Optimisation loop.
+        (model, _), history = scan(
+            step, (model, solver_state), (iter_keys), unroll=unroll
+        )
+
+    elif isinstance(solver, ScipyMinimize):  # Scipy runs whole optimization loop
+        initial_loss = solver.fun(model, train_data)
+        model, result = solver.run(model, train_data)
+        history = jnp.array([initial_loss, result.fun_val])
+        if verbose:
+            print(f" Found model with loss {result.fun_val}")
 
     # Constrained space.
     model = model.constrain()

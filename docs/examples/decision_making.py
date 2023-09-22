@@ -28,7 +28,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import optax as ox
+
 
 import gpjax as gpx
 from gpjax.decision_making.utility_functions import (
@@ -170,9 +170,7 @@ likelihood_builder = lambda n: gpx.Gaussian(num_datapoints=n, obs_noise=jnp.arra
 
 # %%
 
-solver = jaxopt.OptaxSolver(
-    gpx.ConjugateMLL(negative=True), opt=ox.adam(learning_rate=0.01), maxiter=5000
-)
+solver = jaxopt.ScipyMinimize(fun=gpx.ConjugateMLL(negative=True))
 posterior_handler = PosteriorHandler(
     prior=prior,
     likelihood_builder=likelihood_builder,

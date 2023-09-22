@@ -80,12 +80,12 @@ def test_simple_linear_model() -> None:
     trained_model, hist = fit(
         model=model,
         train_data=D,
-        solver=jaxopt.LBFGS(loss, max_stepsize=1e-3, maxiter=100),
+        solver=jaxopt.ScipyMinimize(fun=loss),
         key=jr.PRNGKey(123),
     )
 
     # Ensure we return a history of the correct length
-    assert len(hist) == 100
+    assert len(hist) == 2
 
     # Ensure we return a model of the same class
     assert isinstance(trained_model, LinearModel)
@@ -123,7 +123,7 @@ def test_gaussian_process_regression(
     trained_model, history = fit(
         model=posterior,
         train_data=D,
-        solver=jaxopt.LBFGS(mll, maxiter=num_iters, max_stepsize=1e-3),
+        solver=jaxopt.ScipyMinimize(fun=mll),
         verbose=verbose,
         key=jr.PRNGKey(123),
     )
@@ -132,7 +132,7 @@ def test_gaussian_process_regression(
     assert isinstance(trained_model, ConjugatePosterior)
 
     # Ensure we return a history of the correct length
-    assert len(history) == num_iters
+    assert len(history) == 2
 
     # Ensure we reduce the loss
     assert mll(trained_model, D) < mll(posterior, D)

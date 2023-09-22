@@ -12,14 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-from dataclasses import dataclass
+from dataclasses import (
+    asdict,
+    dataclass,
+)
 
 from beartype.typing import (
     Callable,
     Optional,
+    Union,
 )
-import jaxopt
-from jaxopt.base import IterativeSolver
+from jaxopt import (
+    OptaxSolver,
+    ScipyMinimize,
+)
 
 import gpjax as gpx
 from gpjax.dataset import Dataset
@@ -46,13 +52,13 @@ class PosteriorHandler:
         likelihood_builder (LikelihoodBuilder): Function which takes the number of
         datapoints as input and returns a likelihood object initialised with the given
         number of datapoints.
-        solver (IterativeSolver): The `jaxopt` solver used to optimize the
+        solver (Union[ScipyMinimize, OptaxSolver]): The `jaxopt` solver used to optimize the
         posterior hyperparameters.
     """
 
     prior: AbstractPrior
     likelihood_builder: LikelihoodBuilder
-    solver: IterativeSolver
+    solver: Union[ScipyMinimize, OptaxSolver]
 
     def __post_init__(self):
         if self.solver.maxiter < 1:
@@ -136,15 +142,16 @@ class PosteriorHandler:
             Optimized posterior.
         """
 
-        # TODO: Clean this one up!
-        # We create a new solver state -> since the dataset (and therefore loss function) has changed!
-        old = self.solver
-        solver = jaxopt.OptaxSolver(fun=old.fun, opt=old.opt, maxiter=old.maxiter)
+        # # We create a new solver state -> since the dataset (and therefore loss function) has changed!
+        attributes = asdict(self.solver)
+        attributes["options"].pop("maxiter", None)  # allow reinit without jaxopt error
+        attributes.pop("fun", None)  # pass in fun as callable rather than dict
+        new_solver = self.solver.__class__(fun=self.solver.fun, **attributes)
 
         opt_posterior, _ = gpx.fit(
             model=posterior,
             train_data=dataset,
-            solver=solver,
+            solver=new_solver,
             safe=True,
             key=key,
             verbose=False,

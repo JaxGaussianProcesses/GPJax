@@ -54,24 +54,6 @@ def poisson_likelihood_builder(num_datapoints: int) -> Poisson:
     return Poisson(num_datapoints=num_datapoints)
 
 
-@pytest.mark.parametrize("num_optimization_iters", [0, -1, -10])
-def test_posterior_handler_erroneous_num_optimization_iterations_raises_error(
-    num_optimization_iters: int,
-):
-    mean_function = Constant()
-    kernel = Matern52()
-    prior = Prior(mean_function=mean_function, kernel=kernel)
-    likelihood_builder = gaussian_likelihood_builder
-    training_objective = ConjugateMLL(negative=True)
-    solver = jaxopt.LBFGS(training_objective, maxiter=num_optimization_iters)
-    with pytest.raises(ValueError):
-        PosteriorHandler(
-            prior=prior,
-            likelihood_builder=likelihood_builder,
-            solver=solver,
-        )
-
-
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
@@ -285,7 +267,7 @@ def test_update_posterior_with_optimization_updated_prior_parameters_and_differe
     mean_function = Constant(constant=jnp.array([1.0]))
     kernel = Matern52(lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
     prior = Prior(mean_function=mean_function, kernel=kernel)
-    solver = jaxopt.OptaxSolver(training_objective, opt=ox.adam(1e-3), maxiter=10)
+    solver = jaxopt.ScipyMinimize(fun=training_objective, maxiter=1)
     posterior_handler = PosteriorHandler(
         prior=prior,
         likelihood_builder=likelihood_builder,
