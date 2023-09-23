@@ -15,9 +15,10 @@
 # ---
 
 # %% [markdown]
-# # Regression
+# # Regression with multiple outputs (EXPERIMENTAL)
 #
-# In this notebook we demonstate how to fit a Gaussian process regression model.
+# In this notebook we demonstate how to fit a Gaussian process regression model with multiple correlated outputs.
+# This feature is still experimental.
 
 # %%
 # Enable Float64 for more stable matrix inversions.
@@ -99,8 +100,17 @@ for i in range(2):
 # The choice of kernel function is critical as, among other things, it governs the
 # smoothness of the outputs that our GP can generate.
 #
-# For simplicity, we consider a radial basis function (RBF) kernel:
-# $$k(x, x') = \sigma^2 \exp\left(-\frac{\lVert x - x' \rVert_2^2}{2 \ell^2}\right).$$
+# For simplicity, we consider a radial basis function (RBF) kernel to model similarity of inputs:
+# $$k_\mathrm{inp}(x_\mathrm{inp}, x_\mathrm{inp}') = \sigma^2 \exp\left(-\frac{\lVert x - x' \rVert_2^2}{2 \ell^2}\right),$$
+# and a categorical kernel to model similarity of outputs:
+# $$k_\mathrm{idx}(x_\mathrm{idx}, x_\mathrm{idx}') = G_{x_\mathrm{idx}, x_\mathrm{idx}'}.$$
+# Here, $G$ is an explicit gram matrix and $x_\mathrm{idx}, x_\mathrm{idx}'$ are indices to the output dimension and to $G$.
+# For example $G_{1,2}$ contains the covariance between output dimensions $1$ and $2$, as does $G_{2,1} = G_{1,2}$.
+#
+# The overall kernel then is defined as
+# $$k([x_\mathrm{inp}, x_\mathrm{idx}], [x_\mathrm{inp}', x_\mathrm{idx}']) = k_\mathrm{inp}(x_\mathrm{inp}, x_\mathrm{inp}') k_\mathrm{idx}(x_\mathrm{idx}, x_\mathrm{idx}').$$
+# In the standard GPJax implementation, we never explicitly handle output dimension indices such as $x_\mathrm{idx}$.
+# Rather, we simply define a dataset with multiple output columns.
 #
 # On paper a GP is written as $f(\cdot) \sim \mathcal{GP}(\textbf{0}, k(\cdot, \cdot'))$,
 # we can reciprocate this process in GPJax via defining a `Prior` with our chosen `RBF`
@@ -213,7 +223,8 @@ negative_mll = jit(negative_mll)
 
 # %% [markdown]
 # Since most optimisers (including here) minimise a given function, we have realised
-# the negative marginal log-likelihood and just-in-time (JIT) compiled this to
+# the negative
+# marginal log-likelihood and just-in-time (JIT) compiled this to
 # accelerate training.
 
 # %% [markdown]
@@ -247,7 +258,7 @@ ax.set(xlabel="Training iteration", ylabel="Negative marginal log likelihood")
 # Equipped with the posterior and a set of optimised hyperparameter values, we are now
 # in a position to query our GP's predictive distribution at novel test inputs. To do
 # this, we use our defined `posterior` and `likelihood` at our test inputs to obtain
-# the predictive distribution as a `Distrax` multivariate Gaussian upon which `mean`
+# the predictive distribution as a multivariate Gaussian upon which `mean`
 # and `stddev` can be used to extract the predictive mean and standard deviatation.
 
 # %%
@@ -307,3 +318,5 @@ for i in range(2):
 # %%
 # %reload_ext watermark
 # %watermark -n -u -v -iv -w -a 'Thomas Pinder & Daniel Dodd'
+
+# %%
