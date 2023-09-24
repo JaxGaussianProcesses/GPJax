@@ -18,6 +18,9 @@ from beartype.typing import (
     Any,
     Optional,
     Tuple,
+    Generic,
+    TypeVar,
+    Union,
 )
 import cola
 from cola.ops import (
@@ -226,7 +229,10 @@ class GaussianDistribution(tfd.Distribution):
         return _kl_divergence(self, other)
 
 
-class ReshapedDistribution(tfd.Distribution):
+DistrT = TypeVar("DistrT", bound=tfd.Distribution)
+
+
+class ReshapedDistribution(tfd.Distribution, Generic[DistrT]):
     def __init__(self, distribution: tfd.Distribution, output_shape: Tuple[int, ...]):
         self._distribution = distribution
         self._output_shape = output_shape
@@ -355,4 +361,11 @@ def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> ScalarFl
     ) / 2.0
 
 
-__all__ = ["GaussianDistribution", "ReshapedDistribution"]
+ReshapedGaussianDistribution = Union[
+    GaussianDistribution, ReshapedDistribution[GaussianDistribution]
+]
+__all__ = [
+    "GaussianDistribution",
+    "ReshapedDistribution",
+    "ReshapedGaussianDistribution",
+]

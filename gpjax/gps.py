@@ -42,7 +42,11 @@ from gpjax.base import (
     static_field,
 )
 from gpjax.dataset import Dataset
-from gpjax.distributions import GaussianDistribution, ReshapedDistribution
+from gpjax.distributions import (
+    GaussianDistribution,
+    ReshapedDistribution,
+    ReshapedGaussianDistribution,
+)
 from gpjax.kernels import RFF, White
 from gpjax.kernels.base import AbstractKernel
 from gpjax.likelihoods import (
@@ -72,7 +76,7 @@ class AbstractPrior(Module):
     # just not sure how to ensure Kronecker structure then
     out_kernel: AbstractKernel = field(default_factory=White)
 
-    def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
+    def __call__(self, *args: Any, **kwargs: Any) -> ReshapedGaussianDistribution:
         r"""Evaluate the Gaussian process at the given points.
 
         The output of this function is a
@@ -90,13 +94,13 @@ class AbstractPrior(Module):
 
         Returns
         -------
-            GaussianDistribution: A multivariate normal random variable representation
-                of the Gaussian process.
+            ReshapedGaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process, possibly with reshaped events.
         """
         return self.predict(*args, **kwargs)
 
     @abstractmethod
-    def predict(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
+    def predict(self, *args: Any, **kwargs: Any) -> ReshapedGaussianDistribution:
         r"""Evaluate the predictive distribution.
 
         Compute the latent function's multivariate normal distribution for a
@@ -109,8 +113,8 @@ class AbstractPrior(Module):
 
         Returns
         -------
-            GaussianDistribution: A multivariate normal random variable representation
-                of the Gaussian process.
+            ReshapedGaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process, possibly with reshaped events.
         """
         raise NotImplementedError
 
@@ -219,7 +223,7 @@ class Prior(AbstractPrior):
         """
         return self.__mul__(other)
 
-    def predict(self, test_inputs: Num[Array, "N D"]) -> GaussianDistribution:
+    def predict(self, test_inputs: Num[Array, "N D"]) -> ReshapedGaussianDistribution:
         r"""Compute the predictive prior distribution for a given set of
         parameters. The output of this function is a function that computes
         a TFP distribution for a given set of inputs.
@@ -245,8 +249,8 @@ class Prior(AbstractPrior):
 
         Returns
         -------
-            GaussianDistribution: A multivariate normal random variable representation
-                of the Gaussian process.
+            ReshapedGaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process, possibly with reshaped events.
         """
         x = test_inputs
         mx = jnp.atleast_1d(self.mean_function(x))
@@ -350,7 +354,7 @@ class AbstractPosterior(Module):
     likelihood: AbstractLikelihood
     jitter: float = static_field(1e-6)
 
-    def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
+    def __call__(self, *args: Any, **kwargs: Any) -> ReshapedGaussianDistribution:
         r"""Evaluate the Gaussian process posterior at the given points.
 
         The output of this function is a
@@ -368,13 +372,13 @@ class AbstractPosterior(Module):
 
         Returns
         -------
-            GaussianDistribution: A multivariate normal random variable representation
-                of the Gaussian process.
+            ReshapedGaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process, possibly with reshaped events.
         """
         return self.predict(*args, **kwargs)
 
     @abstractmethod
-    def predict(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
+    def predict(self, *args: Any, **kwargs: Any) -> ReshapedGaussianDistribution:
         r"""Compute the latent function's multivariate normal distribution for a
         given set of parameters. For any class inheriting the `AbstractPrior` class,
         this method must be implemented.
@@ -385,8 +389,8 @@ class AbstractPosterior(Module):
 
         Returns
         -------
-            GaussianDistribution: A multivariate normal random variable representation
-                of the Gaussian process.
+            ReshapedGaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process, possibly with reshaped events.
         """
         raise NotImplementedError
 
@@ -438,7 +442,7 @@ class ConjugatePosterior(AbstractPosterior):
         self,
         test_inputs: Num[Array, "N D"],
         train_data: Dataset,
-    ) -> GaussianDistribution:
+    ) -> ReshapedGaussianDistribution:
         r"""Query the predictive posterior distribution.
 
         Conditional on a training data set, compute the GP's posterior
@@ -485,9 +489,9 @@ class ConjugatePosterior(AbstractPosterior):
 
         Returns
         -------
-            GaussianDistribution: A
+            ReshapedGaussianDistribution: A
                 function that accepts an input array and returns the predictive
-                    distribution as a `GaussianDistribution`.
+                    distribution as a `GaussianDistribution` or a `ReshapedDistribution[GaussianDistribution]`.
         """
         # Unpack training data
         x, y, n_train, mask = train_data.X, train_data.y, train_data.n, train_data.mask
