@@ -29,7 +29,7 @@ from gpjax.base import (
     static_field,
 )
 from gpjax.dataset import Dataset
-from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.distributions import GaussianDistribution
 from gpjax.gps import AbstractPosterior
 from gpjax.likelihoods import Gaussian
 from gpjax.lower_cholesky import lower_cholesky

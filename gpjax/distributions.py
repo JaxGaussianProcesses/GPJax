@@ -18,6 +18,9 @@ from beartype.typing import (
     Any,
     Optional,
     Tuple,
+    Generic,
+    TypeVar,
+    Union,
 )
 import cola
 from cola.ops import (
@@ -226,6 +229,71 @@ class GaussianDistribution(tfd.Distribution):
         return _kl_divergence(self, other)
 
 
+DistrT = TypeVar("DistrT", bound=tfd.Distribution)
+
+
+class ReshapedDistribution(tfd.Distribution, Generic[DistrT]):
+    def __init__(self, distribution: tfd.Distribution, output_shape: Tuple[int, ...]):
+        self._distribution = distribution
+        self._output_shape = output_shape
+
+    def mean(self) -> Float[Array, " N ..."]:
+        r"""Mean of the base distribution, reshaped to the output shape."""
+        return jnp.reshape(self._distribution.mean(), self._output_shape)
+
+    def median(self) -> Float[Array, " N ..."]:
+        r"""Median of the base distribution, reshaped to the output shape"""
+        return jnp.reshape(self._distribution.median(), self._output_shape)
+
+    def mode(self) -> Float[Array, " N ..."]:
+        r"""Mode of the base distribution, reshaped to the output shape"""
+        return jnp.reshape(self._distribution.mode(), self._output_shape)
+
+    def covariance(self) -> Float[Array, " N ..."]:
+        r"""Covariance of the base distribution, reshaped to the squared output shape"""
+        return jnp.reshape(
+            self._distribution.covariance(), self._output_shape + self._output_shape
+        )
+
+    def variance(self) -> Float[Array, " N ..."]:
+        r"""Variances of the base distribution, reshaped to the output shape"""
+        return jnp.reshape(self._distribution.variance(), self._output_shape)
+
+    def stddev(self) -> Float[Array, " N ..."]:
+        r"""Standard deviations of the base distribution, reshaped to the output shape"""
+        return jnp.reshape(self._distribution.stddev(), self._output_shape)
+
+    def entropy(self) -> ScalarFloat:
+        r"""Entropy of the base distribution."""
+        return self._distribution.entropy()
+
+    def log_prob(
+        self, y: Float[Array, " N ..."], mask: Optional[Bool[Array, " N ..."]]
+    ) -> ScalarFloat:
+        r"""Calculates the log probability."""
+        return self._distribution.log_prob(
+            y.reshape(-1), mask if mask is None else mask.reshape(-1)
+        )
+
+    def sample(
+        self, seed: Any, sample_shape: Tuple[int, ...] = ()
+    ) -> Float[Array, " n N ..."]:
+        r"""Draws samples from the distribution and reshapes them to the output shape."""
+        sample = self._distribution.sample(seed, sample_shape)
+        return jnp.reshape(sample, sample_shape + self._output_shape)
+
+    def kl_divergence(self, other: "ReshapedDistribution") -> ScalarFloat:
+        r"""Calculates the Kullback-Leibler divergence."""
+        other_flat = tfd.Distribution(
+            loc=other._distribution.loc, scale=other._distribution.scale
+        )
+        return tfd.kl_divergence(self._distribution, other_flat)
+
+    @property
+    def event_shape(self) -> Tuple:
+        return self._output_shape
+
+
 def _check_and_return_dimension(
     q: GaussianDistribution, p: GaussianDistribution
 ) -> int:
@@ -293,6 +361,11 @@ def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> ScalarFl
     ) / 2.0
 
 
+ReshapedGaussianDistribution = Union[
+    GaussianDistribution, ReshapedDistribution[GaussianDistribution]
+]
 __all__ = [
     "GaussianDistribution",
+    "ReshapedDistribution",
+    "ReshapedGaussianDistribution",
 ]

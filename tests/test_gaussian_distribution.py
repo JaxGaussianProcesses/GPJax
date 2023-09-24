@@ -29,7 +29,7 @@ from cola.ops import (
     Diagonal,
 )
 
-from gpjax.gaussian_distribution import GaussianDistribution
+from gpjax.distributions import GaussianDistribution
 
 _key = jr.PRNGKey(seed=42)
 

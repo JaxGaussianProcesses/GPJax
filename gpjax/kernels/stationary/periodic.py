@@ -17,7 +17,7 @@ from dataclasses import dataclass
 
 from beartype.typing import Union
 import jax.numpy as jnp
-from jaxtyping import Float
+from jaxtyping import Float, Num
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import param_field
@@ -42,7 +42,7 @@ class Periodic(AbstractKernel):
     period: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Periodic"
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+    def __call__(self, x: Num[Array, " D"], y: Num[Array, " D"]) -> ScalarFloat:
         r"""Compute the Periodic kernel between a pair of arrays.
 
         Evaluate the kernel on a pair of inputs $`(x, y)`$ with length-scale parameter $`\ell`$, variance $`\sigma^2`$
@@ -52,8 +52,8 @@ class Periodic(AbstractKernel):
         ```
 
         Args:
-            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's call
+            x (Num[Array, " D"]): The left hand argument of the kernel function's call.
+            y (Num[Array, " D"]): The right hand argument of the kernel function's call
         Returns:
             ScalarFloat: The value of $`k(x, y)`$.
         """
