@@ -1408,11 +1408,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../fit/" class="md-nav__link">
+      <a href="../../../distributions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Fit
+    Distributions
   </span>
   
 
@@ -1428,11 +1428,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gaussian_distribution/" class="md-nav__link">
+      <a href="../../../fit/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Gaussian Distribution
+    Fit
   </span>
   
 
@@ -2555,7 +2555,7 @@ a diagonal Gram matrix.</p>
 
 
 <h6 id="gpjax.kernels.computations.diagonal.DiagonalKernelComputation.gram" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
+          <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
 
 </h6>
 
@@ -2611,7 +2611,7 @@ an input matrix of shape <span class="katex"><span class="katex-mathml"><math xm
         <tr>
           <td><code>x</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2639,7 +2639,7 @@ an input matrix of shape <span class="katex"><span class="katex-mathml"><math xm
 
 
 <h6 id="gpjax.kernels.computations.diagonal.DiagonalKernelComputation.cross_covariance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N M&#39;</span><span class="p">]</span></code>
+          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N M&#39;</span><span class="p">]</span></code>
 
 </h6>
 
@@ -2695,7 +2695,7 @@ input matrices of shape <span class="katex"><span class="katex-mathml"><math xml
         <tr>
           <td><code>x</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2709,7 +2709,7 @@ input matrices of shape <span class="katex"><span class="katex-mathml"><math xml
         <tr>
           <td><code>y</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;M D&#39;]</code>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;M D&#39;]</code>
           </td>
           <td>
             <div class="doc-md-description">

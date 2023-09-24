@@ -1408,11 +1408,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../fit/" class="md-nav__link">
+      <a href="../../../distributions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Fit
+    Distributions
   </span>
   
 
@@ -1428,11 +1428,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gaussian_distribution/" class="md-nav__link">
+      <a href="../../../fit/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Gaussian Distribution
+    Fit
   </span>
   
 
@@ -2601,27 +2601,6 @@ additional details.</p>
 
 
 
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.bias_variance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">bias_variance</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
 <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.compute_engine" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">compute_engine</span><span class="p">:</span> <span class="n">AbstractKernelComputation</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">DenseKernelComputation</span><span class="p">())</span></code>
   
@@ -2645,6 +2624,27 @@ additional details.</p>
 
 <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.active_dims" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">active_dims</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.bias_variance" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">bias_variance</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -2730,6 +2730,24 @@ additional details.</p>
 
 <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__post_init__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.cross_covariance" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span></code>
 
 </h6>
 
@@ -2845,24 +2863,6 @@ call</p>
 
 
 
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.cross_covariance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.gram" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span></code>
 
@@ -2882,7 +2882,7 @@ call</p>
 
 
 <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.slice_input" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
+          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
 
 </h6>
 
@@ -2909,7 +2909,7 @@ kernel's evaluation.</p>
         <tr>
           <td><code>x</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2923,7 +2923,7 @@ kernel's evaluation.</p>
     </tbody>
   </table>
       <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.slice_input--returns">Returns<a class="headerlink" href="#gpjax.kernels.nonstationary.arccosine.ArcCosine.slice_input--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
+<div class="highlight"><pre><span></span><code>Num[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
 </code></pre></div>
 
   </div>

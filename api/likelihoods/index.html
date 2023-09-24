@@ -1408,11 +1408,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../fit/" class="md-nav__link">
+      <a href="../distributions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Fit
+    Distributions
   </span>
   
 
@@ -1428,11 +1428,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../gaussian_distribution/" class="md-nav__link">
+      <a href="../fit/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Gaussian Distribution
+    Fit
   </span>
   
 
@@ -4412,59 +4412,6 @@ evaluated at a finite set of test points.</p>
 
 
 
-<h6 id="gpjax.likelihoods.Bernoulli.link_function" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>The probit link function of the Bernoulli likelihood.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>f</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, ...]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Function values.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.likelihoods.Bernoulli.link_function--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Bernoulli.link_function--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>tfd.Distribution: The likelihood function.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.likelihoods.Bernoulli.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4516,6 +4463,59 @@ evaluated at a finite set of test points.</p>
       <p>Transform model parameters to the constrained space according to their defined bijectors.</p>
 <h6 id="gpjax.likelihoods.Bernoulli.constrain--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Bernoulli.constrain--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: transformed to the constrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.likelihoods.Bernoulli.link_function" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The probit link function of the Bernoulli likelihood.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>f</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, ...]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Function values.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.likelihoods.Bernoulli.link_function--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Bernoulli.link_function--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>tfd.Distribution: The likelihood function.
 </code></pre></div>
 
   </div>
@@ -5259,6 +5259,29 @@ at a finite set of test points.</p>
 
 
 
+<h6 id="gpjax.likelihoods.Poisson.stop_gradient" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">stop_gradient</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Stop gradients flowing through the Module.</p>
+<h6 id="gpjax.likelihoods.Poisson.stop_gradient--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Poisson.stop_gradient--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with gradients stopped.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
 <h6 id="gpjax.likelihoods.Poisson.predict" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">dist</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
 
@@ -5325,29 +5348,6 @@ at a finite set of test points.</p>
         </tr>
     </tbody>
   </table>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.likelihoods.Poisson.stop_gradient" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">stop_gradient</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Stop gradients flowing through the Module.</p>
-<h6 id="gpjax.likelihoods.Poisson.stop_gradient--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Poisson.stop_gradient--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Module: with gradients stopped.
-</code></pre></div>
 
   </div>
 

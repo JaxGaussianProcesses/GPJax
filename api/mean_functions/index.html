@@ -1408,11 +1408,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../fit/" class="md-nav__link">
+      <a href="../distributions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Fit
+    Distributions
   </span>
   
 
@@ -1428,11 +1428,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../gaussian_distribution/" class="md-nav__link">
+      <a href="../fit/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Gaussian Distribution
+    Fit
   </span>
   
 
@@ -2574,7 +2574,7 @@
 
 
 <h6 id="gpjax.mean_functions.AbstractMeanFunction.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">]</span></code>
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N O&#39;</span><span class="p">]</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -2631,7 +2631,7 @@
 
 
 <h6 id="gpjax.mean_functions.AbstractMeanFunction.__add__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -2684,7 +2684,7 @@
 
 
 <h6 id="gpjax.mean_functions.AbstractMeanFunction.__radd__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -2737,7 +2737,7 @@
 
 
 <h6 id="gpjax.mean_functions.AbstractMeanFunction.__mul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -2861,7 +2861,7 @@
 
 
 <h6 id="gpjax.mean_functions.AbstractMeanFunction.__rmul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -3191,7 +3191,7 @@ learned during training but defaults to 1.0.</p>
 
 
 <h6 id="gpjax.mean_functions.Constant.constant" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">constant</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]))</span></code>
+          <code class="highlight language-python"><span class="n">constant</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]))</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3215,7 +3215,7 @@ learned during training but defaults to 1.0.</p>
 
 
 <h6 id="gpjax.mean_functions.Constant.__add__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -3268,7 +3268,7 @@ learned during training but defaults to 1.0.</p>
 
 
 <h6 id="gpjax.mean_functions.Constant.__radd__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -3321,7 +3321,7 @@ learned during training but defaults to 1.0.</p>
 
 
 <h6 id="gpjax.mean_functions.Constant.__mul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -3445,7 +3445,7 @@ learned during training but defaults to 1.0.</p>
 
 
 <h6 id="gpjax.mean_functions.Constant.__rmul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -3551,7 +3551,7 @@ learned during training but defaults to 1.0.</p>
 
 
 <h6 id="gpjax.mean_functions.Constant.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">]</span></code>
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N O&#39;</span><span class="p">]</span></code>
 
 </h6>
 
@@ -3828,7 +3828,7 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 <h6 id="gpjax.mean_functions.Zero.constant" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">constant</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">constant</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3852,7 +3852,7 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 <h6 id="gpjax.mean_functions.Zero.__add__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -3905,7 +3905,7 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 <h6 id="gpjax.mean_functions.Zero.__radd__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -3958,7 +3958,7 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 <h6 id="gpjax.mean_functions.Zero.__mul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -4082,7 +4082,7 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 <h6 id="gpjax.mean_functions.Zero.__rmul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -4188,7 +4188,7 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 <h6 id="gpjax.mean_functions.Zero.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">]</span></code>
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N O&#39;</span><span class="p">]</span></code>
 
 </h6>
 
@@ -4506,7 +4506,7 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 <h6 id="gpjax.mean_functions.CombinationMeanFunction.__add__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -4559,7 +4559,7 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 <h6 id="gpjax.mean_functions.CombinationMeanFunction.__radd__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -4612,7 +4612,7 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 <h6 id="gpjax.mean_functions.CombinationMeanFunction.__mul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -4736,7 +4736,7 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 <h6 id="gpjax.mean_functions.CombinationMeanFunction.__rmul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
 </h6>
 
@@ -4976,7 +4976,7 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 <h6 id="gpjax.mean_functions.CombinationMeanFunction.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">]</span></code>
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N O&#39;</span><span class="p">]</span></code>
 
 </h6>
 

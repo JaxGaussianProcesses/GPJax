@@ -1455,11 +1455,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../fit/" class="md-nav__link">
+      <a href="../distributions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Fit
+    Distributions
   </span>
   
 
@@ -1475,11 +1475,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../gaussian_distribution/" class="md-nav__link">
+      <a href="../fit/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Gaussian Distribution
+    Fit
   </span>
   
 
@@ -2535,8 +2535,8 @@
       <p>Base class for datasets.</p>
 <h6 id="gpjax.dataset.Dataset--attributes">Attributes<a class="headerlink" href="#gpjax.dataset.Dataset--attributes" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>X (Optional[Num[Array, &quot;N D&quot;]]): input data.
-y: (Optional[Num[Array, &quot;N Q&quot;]]): output data.
-mask: (Optional[Union[Bool[Array, &quot;N Q&quot;], Literal[&quot;infer automatically&quot;]]]): mask for the output data.
+y (Optional[Num[Array, &quot;N Q&quot;]]): output data.
+mask (Optional[Union[Bool[Array, &quot;N Q&quot;], Literal[&quot;infer automatically&quot;]]]): mask for the output data.
     Users can optionally specify a pre-computed mask, or explicitly pass `None` which
     means no mask will be used. Defaults to `&quot;infer automatically&quot;`, which means that
     the mask will be computed from the output data, or set to `None` if no output data is provided.
