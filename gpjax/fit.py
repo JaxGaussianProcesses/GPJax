@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
+from dataclasses import (
+    asdict,
+    dataclass,
+)
 
 from beartype.typing import (
     Any,
@@ -131,12 +134,13 @@ def fit(  # noqa: PLR0913
 
     # Initialise solver state.
     solver.fun = _wrap_objective(solver.fun)
-    if hasattr(solver, "options"):  # allow __post_init__ without weird jaxopt error
-        solver.options.pop("maxiter", None)
-    solver.__post_init__()  # needed to propagate changes to `fun` attribute
 
     if isinstance(solver, OptaxSolver):  # hack for Optax compatibility
         model = jax.tree_map(lambda x: x.astype(jnp.float64), model)
+    # # elif isinstance(solver, ScipyMinimize): # hack for jaxopt compatibility
+    # del solver.options["maxiter"]
+
+    solver.__post_init__()  # needed to propagate changes to `fun` attribute
 
     if isinstance(solver, OptaxSolver):  # For optax, run optimization by step
         solver_state = solver.init_state(
