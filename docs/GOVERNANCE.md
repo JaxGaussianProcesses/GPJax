@@ -30,7 +30,7 @@ document outlines the governance structure for the current status.
   administrative tasks such as website maintenance.
    * Currently [daniel-dodd@](https://github.com/daniel-dodd),
      [henrymoss@](https://github.com/henrymoss), [st--@](https://github.com/st--), and
-     [thomaspinder@](https://github.com/thomaspinder are the gardeners of GPJax.
+     [thomaspinder@](https://github.com/thomaspinder) are the gardeners of GPJax.
 
 ## Responsibility
 We cannot hold anyone responsible really since we are all doing free work here, but some

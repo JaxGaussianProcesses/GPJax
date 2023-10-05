@@ -25,10 +25,13 @@ with GP models.
 
 # Package support
 
-GPJax was founded by [Thomas Pinder](https://github.com/thomaspinder). Today,
-the maintenance of GPJax is undertaken by [Thomas
-Pinder](https://github.com/thomaspinder) and [Daniel
-Dodd](https://github.com/Daniel-Dodd).
+GPJax was founded by [Thomas Pinder](https://github.com/thomaspinder). Today, the
+project's gardeners are [daniel-dodd@](https://github.com/daniel-dodd),
+[henrymoss@](https://github.com/henrymoss), [st--@](https://github.com/st--), and
+[thomaspinder@](https://github.com/thomaspinder), listed in alphabetical order. The full governance structure of GPJax is detailed [here](docs/GOVERNANCE.md).We
+appreciate all [the contributors to
+GPJax](https://github.com/JaxGaussianProcesses/GPJax/graphs/contributors) who have
+helped to shape GPJax into the package it is today.
 
 We would be delighted to receive contributions from interested individuals and
 groups. To learn how you can get involved, please read our [guide for
