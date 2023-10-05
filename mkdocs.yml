@@ -38,7 +38,7 @@ nav:
   - 💻 Raw tutorial code: give_me_the_code.md
   - Community:
     - 👥 Code of conduct: CODE_OF_CONDUCT.md
-    - 📜 Governance: GOVERNANCE.MD
+    - 📜 Governance: GOVERNANCE.md
     - 📨 Contact: https://jaxgaussianprocesses.com/contact/
   - 📕 Reference: api/
 
@@ -49,6 +49,7 @@ theme:
     - navigation.instant
     - navigation.tracking
     - navigation.sections
+    - navigation.expand
     - navigation.top # Show a back to top button
     - content.code.copy
     - search.suggest # Show search suggestions
