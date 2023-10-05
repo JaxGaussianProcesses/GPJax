@@ -36,7 +36,12 @@ nav:
     - Likelihoods: examples/likelihoods_guide.py
     - UCI regression: examples/yacht.py
   - 💻 Raw tutorial code: give_me_the_code.md
+  - Community:
+    - 👥 Code of conduct: CODE_OF_CONDUCT.md
+    - 📜 Governance: GOVERNANCE.MD
+    - 📨 Contact: https://jaxgaussianprocesses.com/contact/
   - 📕 Reference: api/
+
 
 theme:
   name: material
