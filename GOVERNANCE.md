@@ -28,8 +28,9 @@ document outlines the governance structure for the current status.
   the project and making decisions about its future direction. GPJax gardeners have the
   ability to merge pull requests into the GPJax repository. GPJax gardeners also take on
   administrative tasks such as website maintenance.
-   * Currently [thomaspinder@](https://github.com/thomaspinder) and ... are the
-     gardeners of GPJax.
+   * Currently [daniel-dodd@](https://github.com/daniel-dodd),
+     [henrymoss@](https://github.com/henrymoss), [st--@](https://github.com/st--), and
+     [thomaspinder@](https://github.com/thomaspinder are the gardeners of GPJax.
 
 ## Responsibility
 We cannot hold anyone responsible really since we are all doing free work here, but some
