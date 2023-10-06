@@ -31,7 +31,7 @@ import jax.random as jr
 from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import optax as ox
+import jaxopt
 from docs.examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
@@ -185,11 +185,6 @@ negative_mll = gpx.objectives.ConjugateMLL(negative=True)
 negative_mll(posterior, train_data=D)
 
 
-# static_tree = jax.tree_map(lambda x: not(x), posterior.trainables)
-# optim = ox.chain(
-#     ox.adam(learning_rate=0.01),
-#     ox.masked(ox.set_to_zero(), static_tree)
-#     )
 # %% [markdown]
 # For researchers, GPJax has the capacity to print the bibtex citation for objects such
 # as the marginal log-likelihood through the `cite()` function.
@@ -210,29 +205,17 @@ negative_mll = jit(negative_mll)
 # accelerate training.
 
 # %% [markdown]
-# We can now define an optimiser with `optax`. For this example we'll use the `adam`
-# optimiser.
+# We can now train our model using a `jaxopt` solver. In this case we opt for the `OptaxSolver`,
+# which wraps an `optax` optimizer.
 
 # %%
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=negative_mll,
     train_data=D,
-    optim=ox.adam(learning_rate=0.01),
-    num_iters=500,
+    solver=jaxopt.ScipyMinimize(fun=negative_mll),
     safe=True,
     key=key,
 )
-
-# %% [markdown]
-# The calling of `fit` returns two objects: the optimised posterior and a history of
-# training losses. We can plot the training loss to see how the optimisation has
-# progressed.
-
-# %%
-fig, ax = plt.subplots()
-ax.plot(history, color=cols[1])
-ax.set(xlabel="Training iteration", ylabel="Negative marginal log likelihood")
 
 # %% [markdown]
 # ## Prediction

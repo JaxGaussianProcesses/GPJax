@@ -43,6 +43,7 @@ from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
+import jaxopt
 import tensorflow_probability.substrates.jax as tfp
 
 with install_import_hook("gpjax", "beartype.beartype"):
@@ -228,7 +229,7 @@ q = gpx.VariationalGaussian(posterior=p, inducing_inputs=z)
 # see Sections 3.1 and 4.1 of the excellent review paper
 # <strong data-cite="leibfried2020tutorial"></strong>.
 #
-# Since Optax's optimisers work to minimise functions, to maximise the ELBO we return
+# Since `jaxopt's solvers work to minimise functions, to maximise the ELBO we return
 # its negative.
 
 # %%
@@ -266,10 +267,8 @@ schedule = ox.warmup_cosine_decay_schedule(
 
 opt_posterior, history = gpx.fit(
     model=q,
-    objective=negative_elbo,
     train_data=D,
-    optim=ox.adam(learning_rate=schedule),
-    num_iters=3000,
+    solver=jaxopt.OptaxSolver(negative_elbo, opt=ox.adam(schedule), maxiter=3000),
     key=jr.PRNGKey(42),
     batch_size=128,
 )
@@ -330,10 +329,8 @@ reparameterised_q = q.replace_bijector(variational_root_covariance=triangular_tr
 # %%
 opt_rep, history = gpx.fit(
     model=reparameterised_q,
-    objective=negative_elbo,
     train_data=D,
-    optim=ox.adam(learning_rate=0.01),
-    num_iters=3000,
+    solver=jaxopt.OptaxSolver(negative_elbo, opt=ox.adam(0.01), maxiter=3000),
     key=jr.PRNGKey(42),
     batch_size=128,
 )

@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
+import jaxopt
 import optax as ox
 import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
@@ -78,15 +79,13 @@ def test_simple_linear_model() -> None:
     # Train!
     trained_model, hist = fit(
         model=model,
-        objective=loss,
         train_data=D,
-        optim=ox.sgd(0.001),
-        num_iters=100,
+        solver=jaxopt.ScipyMinimize(fun=loss),
         key=jr.PRNGKey(123),
     )
 
     # Ensure we return a history of the correct length
-    assert len(hist) == 100
+    assert len(hist) == 2
 
     # Ensure we return a model of the same class
     assert isinstance(trained_model, LinearModel)
@@ -98,10 +97,38 @@ def test_simple_linear_model() -> None:
     assert trained_model.bias == 1.0
 
 
+@pytest.mark.parametrize("batch_size", [10, 100])
+def test_raises_if_try_to_batch_scipy_optim(batch_size: int) -> None:
+    # Create dataset:
+    key = jr.PRNGKey(123)
+    x = jnp.sort(jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(10, 1)), axis=0)
+    y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
+    D = Dataset(X=x, y=y)
+
+    # Define GP model:
+    prior = Prior(kernel=RBF(), mean_function=Constant())
+    likelihood = Gaussian(num_datapoints=10)
+    posterior = prior * likelihood
+
+    # Define loss function:
+    mll = ConjugateMLL(negative=True)
+
+    with pytest.raises(ValueError):
+        fit(
+            model=posterior,
+            train_data=D,
+            solver=jaxopt.ScipyMinimize(fun=mll),
+            batch_size=batch_size,
+            key=jr.PRNGKey(123),
+        )
+
+
 @pytest.mark.parametrize("num_iters", [1, 5])
 @pytest.mark.parametrize("n_data", [1, 20])
 @pytest.mark.parametrize("verbose", [True, False])
-def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> None:
+def test_gaussian_process_regression(
+    num_iters: int, n_data: int, verbose: bool
+) -> None:
     # Create dataset:
     key = jr.PRNGKey(123)
     x = jnp.sort(
@@ -121,10 +148,8 @@ def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> N
     # Train!
     trained_model, history = fit(
         model=posterior,
-        objective=mll,
         train_data=D,
-        optim=ox.adam(0.1),
-        num_iters=num_iters,
+        solver=jaxopt.ScipyMinimize(fun=mll),
         verbose=verbose,
         key=jr.PRNGKey(123),
     )
@@ -133,7 +158,7 @@ def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> N
     assert isinstance(trained_model, ConjugatePosterior)
 
     # Ensure we return a history of the correct length
-    assert len(history) == num_iters
+    assert len(history) == 2
 
     # Ensure we reduce the loss
     assert mll(trained_model, D) < mll(posterior, D)
@@ -169,10 +194,8 @@ def test_batch_fitting(
     # Train!
     trained_model, history = fit(
         model=q,
-        objective=elbo,
         train_data=D,
-        optim=ox.adam(0.1),
-        num_iters=num_iters,
+        solver=jaxopt.OptaxSolver(elbo, opt=ox.adam(1e-3), maxiter=num_iters),
         batch_size=batch_size,
         verbose=verbose,
         key=jr.PRNGKey(123),

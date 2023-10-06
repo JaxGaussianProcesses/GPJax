@@ -35,7 +35,7 @@ from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-import optax as ox
+import jaxopt
 import pandas as pd
 from sklearn.metrics import (
     mean_squared_error,
@@ -182,20 +182,17 @@ posterior = prior * likelihood
 # ### Model Optimisation
 #
 # With a model now defined, we can proceed to optimise the hyperparameters of our
-# model using Optax.
+# model using one of `jaxopt`'s solvers.
 
 # %%
 training_data = gpx.Dataset(X=scaled_Xtr, y=scaled_ytr)
 
 negative_mll = jit(gpx.ConjugateMLL(negative=True))
-optimiser = ox.adamw(0.05)
 
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=negative_mll,
     train_data=training_data,
-    optim=ox.adamw(learning_rate=0.05),
-    num_iters=500,
+    solver=jaxopt.ScipyMinimize(fun=negative_mll),
     key=key,
 )
 

@@ -15,7 +15,10 @@
 
 import beartype.typing as tp
 from jax import vmap
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 
 from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.typing import Array

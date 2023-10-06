@@ -29,7 +29,10 @@ from gpjax.base import (
     param_field,
     static_field,
 )
-from gpjax.distributions import GaussianDistribution, ReshapedDistribution
+from gpjax.distributions import (
+    GaussianDistribution,
+    ReshapedDistribution,
+)
 from gpjax.integrators import (
     AbstractIntegrator,
     AnalyticalGaussianIntegrator,

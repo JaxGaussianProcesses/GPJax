@@ -15,7 +15,10 @@
 
 # from __future__ import annotations
 from abc import abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import (
+    dataclass,
+    field,
+)
 from typing import overload
 
 from beartype.typing import (
@@ -25,7 +28,6 @@ from beartype.typing import (
 )
 import cola
 from cola.ops import Dense
-
 import jax.numpy as jnp
 from jax.random import (
     PRNGKey,
@@ -47,7 +49,10 @@ from gpjax.distributions import (
     ReshapedDistribution,
     ReshapedGaussianDistribution,
 )
-from gpjax.kernels import RFF, White
+from gpjax.kernels import (
+    RFF,
+    White,
+)
 from gpjax.kernels.base import AbstractKernel
 from gpjax.likelihoods import (
     AbstractLikelihood,
@@ -503,7 +508,7 @@ class ConjugatePosterior(AbstractPosterior):
         n_test = len(test_inputs)
 
         # Observation noise o²
-        obs_noise = self.likelihood.obs_noise
+        obs_noise = self.likelihood.obs_noise**2
         mx = self.prior.mean_function(x)
 
         # Precompute Gram matrix, Kxx, at training inputs, x
@@ -608,9 +613,9 @@ class ConjugatePosterior(AbstractPosterior):
         # v = Σ⁻¹ (y + ε - ɸ⍵) for  Σ = Kxx + Io² and ε ᯈ N(0, o²)
         Kxx = self.prior.kernel.gram(train_data.X)  #  [N, N]
         Sigma = Kxx + cola.ops.I_like(Kxx) * (
-            self.likelihood.obs_noise + self.jitter
+            self.likelihood.obs_noise**2 + self.jitter
         )  #  [N, N]
-        eps = jnp.sqrt(self.likelihood.obs_noise) * normal(
+        eps = self.likelihood.obs_noise * normal(
             key, [train_data.n, num_samples]
         )  #  [N, B]
         y = train_data.y - self.prior.mean_function(train_data.X)  # account for mean

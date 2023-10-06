@@ -40,7 +40,7 @@ from jaxtyping import (
 )
 import matplotlib.pyplot as plt
 import numpy as np
-import optax as ox
+import jaxopt
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax as tfp
 
@@ -270,10 +270,8 @@ circular_posterior = gpx.Prior(mean_function=meanf, kernel=PKern) * likelihood
 # Optimise GP's marginal log-likelihood using Adam
 opt_posterior, history = gpx.fit(
     model=circular_posterior,
-    objective=jit(gpx.ConjugateMLL(negative=True)),
     train_data=D,
-    optim=ox.adamw(learning_rate=0.05),
-    num_iters=500,
+    solver=jaxopt.ScipyMinimize(fun=gpx.ConjugateMLL(negative=True)),
     key=key,
 )
 

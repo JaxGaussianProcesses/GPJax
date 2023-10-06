@@ -38,6 +38,7 @@ from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
+import jaxopt
 from docs.examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
@@ -155,10 +156,8 @@ elbo = jit(elbo)
 # %%
 opt_posterior, history = gpx.fit(
     model=q,
-    objective=elbo,
     train_data=D,
-    optim=ox.adamw(learning_rate=1e-2),
-    num_iters=500,
+    solver=jaxopt.OptaxSolver(elbo, opt=ox.adamw(1e-2), maxiter=500),
     key=key,
 )
 

@@ -33,6 +33,7 @@ from jaxtyping import (
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
+import jaxopt
 from scipy.signal import sawtooth
 from gpjax.base import static_field
 
@@ -182,8 +183,8 @@ posterior = prior * likelihood
 # hyperparameter set.
 #
 # With the inclusion of a neural network, we take this opportunity to highlight the
-# additional benefits gleaned from using
-# [Optax](https://optax.readthedocs.io/en/latest/) for optimisation. In particular, we
+# additional benefits gleaned from using `jaxopt`'s
+# [Optax](https://optax.readthedocs.io/en/latest/) solver for optimisation. In particular, we
 # showcase the ability to use a learning rate scheduler that decays the optimiser's
 # learning rate throughout the inference. We decrease the learning rate according to a
 # half-cosine curve over 700 iterations, providing us with large step sizes early in
@@ -207,10 +208,10 @@ optimiser = ox.chain(
 
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=jax.jit(gpx.ConjugateMLL(negative=True)),
     train_data=D,
-    optim=optimiser,
-    num_iters=800,
+    solver=jaxopt.OptaxSolver(
+        gpx.ConjugateMLL(negative=True), opt=optimiser, maxiter=800
+    ),
     key=key,
 )
 

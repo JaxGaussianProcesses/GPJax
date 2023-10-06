@@ -7,6 +7,7 @@ config.update("jax_enable_x64", True)
 import jax
 import jax.numpy as jnp
 import jax.random as jr
+import jaxopt
 from jaxtyping import (
     Array,
     Float,
@@ -73,10 +74,8 @@ def test_zero_mean_remains_zero() -> None:
     negative_mll = gpx.objectives.ConjugateMLL(negative=True)
     opt_posterior, _ = gpx.fit(
         model=posterior,
-        objective=negative_mll,
         train_data=D,
-        optim=ox.adam(learning_rate=0.5),
-        num_iters=1000,
+        solver=jaxopt.OptaxSolver(negative_mll, opt=ox.adam(0.5), maxiter=1_000),
         safe=True,
         key=key,
     )

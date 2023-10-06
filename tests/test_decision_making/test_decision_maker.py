@@ -18,6 +18,7 @@ config.update("jax_enable_x64", True)
 
 import jax.numpy as jnp
 import jax.random as jr
+import jaxopt
 import optax as ox
 import pytest
 
@@ -67,12 +68,13 @@ def posterior_handler() -> PosteriorHandler:
     likelihood_builder = lambda x: gpx.Gaussian(
         num_datapoints=x, obs_noise=jnp.array(1e-6)
     )
+    solver = jaxopt.OptaxSolver(
+        gpx.ConjugateMLL(negative=True), opt=ox.adamw(0.01), maxiter=10
+    )
     posterior_handler = PosteriorHandler(
         prior=prior,
         likelihood_builder=likelihood_builder,
-        optimization_objective=gpx.ConjugateMLL(negative=True),
-        optimizer=ox.adam(learning_rate=0.01),
-        num_optimization_iters=100,
+        solver=solver,
     )
     return posterior_handler
 

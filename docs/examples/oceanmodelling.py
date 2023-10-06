@@ -23,7 +23,7 @@ from jaxtyping import (
 )
 from matplotlib import rcParams
 import matplotlib.pyplot as plt
-import optax as ox
+import jaxopt
 import pandas as pd
 import tensorflow_probability as tfp
 
@@ -239,30 +239,21 @@ velocity_posterior = initialise_gp(kernel, mean, dataset_train)
 
 
 # %% [markdown]
-# With a model now defined, we can proceed to optimise the hyperparameters of our likelihood over $D_0$. This is done by minimising the MLL using `optax`. We also plot its value at each step to visually confirm that we have found the minimum. See the  [introduction to Gaussian Processes](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/) notebook for more information on optimising the MLL.
+# With a model now defined, we can proceed to optimise the hyperparameters of our likelihood over $D_0$. This is done by minimising the MLL using `jaxopt`. See the  [introduction to Gaussian Processes](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/) notebook for more information on optimising the MLL.
 
 
 # %%
-def optimise_mll(posterior, dataset, NIters=1000, key=key, plot_history=True):
+def optimise_mll(posterior, dataset, key=key):
     # define the MLL using dataset_train
     objective = gpx.objectives.ConjugateMLL(negative=True)
     # Optimise to minimise the MLL
-    optimiser = ox.adam(learning_rate=0.1)
     opt_posterior, history = gpx.fit(
         model=posterior,
-        objective=objective,
         train_data=dataset,
-        optim=optimiser,
-        num_iters=NIters,
+        solver=jaxopt.ScipyMinimize(fun=objective),
         safe=True,
         key=key,
     )
-    # plot MLL value at each iteration
-    if plot_history:
-        fig, ax = plt.subplots(1, 1)
-        ax.plot(history, color=colors[1])
-        ax.set(xlabel="Training iteration", ylabel="Negative MLL")
-
     return opt_posterior
 
 
@@ -471,7 +462,7 @@ class HelmholtzKernel(gpx.kernels.AbstractKernel):
 # Redefine Gaussian process with Helmholtz kernel
 kernel = HelmholtzKernel()
 helmholtz_posterior = initialise_gp(kernel, mean, dataset_train)
-# Optimise hyperparameters using optax
+# Optimise hyperparameters using jaxopt
 opt_helmholtz_posterior = optimise_mll(helmholtz_posterior, dataset_train)
 
 

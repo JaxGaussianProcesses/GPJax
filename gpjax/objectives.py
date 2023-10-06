@@ -20,7 +20,6 @@ from gpjax.typing import (
     ScalarFloat,
 )
 
-
 tfd = tfp.distributions
 
 import cola

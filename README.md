@@ -95,10 +95,14 @@ from jax import config
 config.update("jax_enable_x64", True)
 
 import gpjax as gpx
+import jax
 from jax import grad, jit
 import jax.numpy as jnp
 import jax.random as jr
 import optax as ox
+import jaxopt
+
+jax.config.update("jax_enable_x64", True)
 
 key = jr.PRNGKey(123)
 
@@ -120,19 +124,17 @@ likelihood = gpx.Gaussian(num_datapoints = n)
 # Construct the posterior
 posterior = prior * likelihood
 
-# Define an optimiser
-optimiser = ox.adam(learning_rate=1e-2)
-
 # Define the marginal log-likelihood
 negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True))
+
+# Define a solver
+solver = jaxopt.OptaxSolver(negative_mll, ox.adam(learning_rate=1e-2), maxiter=500)
 
 # Obtain Type 2 MLEs of the hyperparameters
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=negative_mll,
     train_data=D,
-    optim=optimiser,
-    num_iters=500,
+    solver=solver,
     safe=True,
     key=key,
 )

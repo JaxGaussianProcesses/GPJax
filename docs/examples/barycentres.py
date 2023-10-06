@@ -26,7 +26,7 @@ import jax.random as jr
 import jax.scipy.linalg as jsl
 from jaxtyping import install_import_hook
 import matplotlib.pyplot as plt
-import optax as ox
+import jaxopt
 import tensorflow_probability.substrates.jax.distributions as tfd
 
 with install_import_hook("gpjax", "beartype.beartype"):
@@ -139,10 +139,8 @@ def fit_gp(x: jax.Array, y: jax.Array) -> tfd.MultivariateNormalFullCovariance:
 
     opt_posterior, _ = gpx.fit(
         model=posterior,
-        objective=jax.jit(gpx.ConjugateMLL(negative=True)),
         train_data=D,
-        optim=ox.adamw(learning_rate=0.01),
-        num_iters=500,
+        solver=jaxopt.ScipyMinimize(fun=gpx.ConjugateMLL(negative=True)),
         key=key,
     )
     latent_dist = opt_posterior.predict(xtest, train_data=D)

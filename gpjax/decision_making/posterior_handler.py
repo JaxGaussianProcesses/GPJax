@@ -12,13 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-from dataclasses import dataclass
+from dataclasses import (
+    asdict,
+    dataclass,
+)
 
 from beartype.typing import (
     Callable,
     Optional,
+    Union,
 )
-import optax as ox
+from jaxopt import (
+    OptaxSolver,
+    ScipyMinimize,
+)
 
 import gpjax as gpx
 from gpjax.dataset import Dataset
@@ -27,7 +34,6 @@ from gpjax.gps import (
     AbstractPosterior,
     AbstractPrior,
 )
-from gpjax.objectives import AbstractObjective
 from gpjax.typing import KeyArray
 
 LikelihoodBuilder = Callable[[int], AbstractLikelihood]
@@ -46,23 +52,17 @@ class PosteriorHandler:
         likelihood_builder (LikelihoodBuilder): Function which takes the number of
         datapoints as input and returns a likelihood object initialised with the given
         number of datapoints.
-        optimization_objective (AbstractObjective): Objective to use for optimizing the
+        solver (Union[ScipyMinimize, OptaxSolver]): The `jaxopt` solver used to optimize the
         posterior hyperparameters.
-        optimizer (ox.GradientTransformation): Optax optimizer to use for optimizing the
-        posterior hyperparameters.
-        num_optimization_iterations (int): Number of iterations to optimize
-        the posterior hyperparameters for.
     """
 
     prior: AbstractPrior
     likelihood_builder: LikelihoodBuilder
-    optimization_objective: AbstractObjective
-    optimizer: ox.GradientTransformation
-    num_optimization_iters: int
+    solver: Union[ScipyMinimize, OptaxSolver]
 
     def __post_init__(self):
-        if self.num_optimization_iters < 1:
-            raise ValueError("num_optimization_iters must be greater than 0.")
+        if self.solver.maxiter < 1:
+            raise ValueError("solver must run for more that 0 steps.")
 
     def get_posterior(
         self, dataset: Dataset, optimize: bool, key: Optional[KeyArray] = None
@@ -141,12 +141,17 @@ class PosteriorHandler:
         Returns:
             Optimized posterior.
         """
+
+        # # We create a new solver state -> since the dataset (and therefore loss function) has changed!
+        attributes = asdict(self.solver)
+        attributes["options"].pop("maxiter", None)  # allow reinit without jaxopt error
+        attributes.pop("fun", None)  # pass in fun as callable rather than dict
+        new_solver = self.solver.__class__(fun=self.solver.fun, **attributes)
+
         opt_posterior, _ = gpx.fit(
             model=posterior,
-            objective=self.optimization_objective,
             train_data=dataset,
-            optim=self.optimizer,
-            num_iters=self.num_optimization_iters,
+            solver=new_solver,
             safe=True,
             key=key,
             verbose=False,
