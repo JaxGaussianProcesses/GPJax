@@ -15,7 +15,10 @@
 
 # from __future__ import annotations
 from abc import abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import (
+    dataclass,
+    field,
+)
 from typing import overload
 
 from beartype.typing import (
@@ -25,7 +28,6 @@ from beartype.typing import (
 )
 import cola
 from cola.ops import Dense
-
 import jax.numpy as jnp
 from jax.random import (
     PRNGKey,
@@ -47,7 +49,10 @@ from gpjax.distributions import (
     ReshapedDistribution,
     ReshapedGaussianDistribution,
 )
-from gpjax.kernels import RFF, White
+from gpjax.kernels import (
+    RFF,
+    White,
+)
 from gpjax.kernels.base import AbstractKernel
 from gpjax.likelihoods import (
     AbstractLikelihood,
@@ -503,7 +508,7 @@ class ConjugatePosterior(AbstractPosterior):
         n_test = len(test_inputs)
 
         # Observation noise o²
-        obs_noise = self.likelihood.obs_noise
+        obs_var = self.likelihood.obs_stddev**2
         mx = self.prior.mean_function(x)
 
         # Precompute Gram matrix, Kxx, at training inputs, x
@@ -512,7 +517,7 @@ class ConjugatePosterior(AbstractPosterior):
 
         # Σ = Kxx + Io²
         Sigma = cola.ops.Kronecker(Kxx, Kyy)
-        Sigma += cola.ops.I_like(Sigma) * (obs_noise + self.jitter)
+        Sigma += cola.ops.I_like(Sigma) * (obs_var + self.jitter)
         Sigma = cola.PSD(Sigma)
 
         if mask is not None:
@@ -606,13 +611,10 @@ class ConjugatePosterior(AbstractPosterior):
 
         # sample weights v for canonical features
         # v = Σ⁻¹ (y + ε - ɸ⍵) for  Σ = Kxx + Io² and ε ᯈ N(0, o²)
+        obs_var = self.likelihood.obs_stddev**2
         Kxx = self.prior.kernel.gram(train_data.X)  #  [N, N]
-        Sigma = Kxx + cola.ops.I_like(Kxx) * (
-            self.likelihood.obs_noise + self.jitter
-        )  #  [N, N]
-        eps = jnp.sqrt(self.likelihood.obs_noise) * normal(
-            key, [train_data.n, num_samples]
-        )  #  [N, B]
+        Sigma = Kxx + cola.ops.I_like(Kxx) * (obs_var + self.jitter)  #  [N, N]
+        eps = jnp.sqrt(obs_var) * normal(key, [train_data.n, num_samples])  #  [N, B]
         y = train_data.y - self.prior.mean_function(train_data.X)  # account for mean
         Phi = fourier_feature_fn(train_data.X)
         canonical_weights = cola.solve(

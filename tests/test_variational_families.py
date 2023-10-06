@@ -247,7 +247,7 @@ def test_collapsed_variational_gaussian(
     # Test init
     assert variational_family.num_inducing == n_inducing
     assert (variational_family.inducing_inputs == inducing_inputs).all()
-    assert variational_family.posterior.likelihood.obs_noise == 1.0
+    assert variational_family.posterior.likelihood.obs_stddev == 1.0
 
     # Test predictions
     predictive_dist = variational_family(test_inputs, D)

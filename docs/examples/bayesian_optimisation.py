@@ -204,9 +204,9 @@ def return_optimised_posterior(
     data: gpx.Dataset, prior: gpx.Module, key: Array
 ) -> gpx.Module:
     likelihood = gpx.Gaussian(
-        num_datapoints=data.n, obs_noise=jnp.array(1e-6)
-    )  # Our function is noise-free, so we set the observation noise to a very small value
-    likelihood = likelihood.replace_trainable(obs_noise=False)
+        num_datapoints=data.n, obs_stddev=jnp.array(1e-3)
+    )  # Our function is noise-free, so we set the observation noise's standard deviation to a very small value
+    likelihood = likelihood.replace_trainable(obs_stddev=False)
 
     posterior = prior * likelihood
 

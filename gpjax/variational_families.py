@@ -664,7 +664,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         x, y = train_data.X, train_data.y
 
         # Unpack variational parameters
-        noise = self.posterior.likelihood.obs_noise
+        noise_var = self.posterior.likelihood.obs_stddev**2
         z = self.inducing_inputs
         m = self.num_inducing
 
@@ -683,7 +683,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         Lz_inv_Kzx = cola.solve(Lz, Kzx)
 
         # A = Lz⁻¹ Kzt / o
-        A = Lz_inv_Kzx / jnp.sqrt(noise)
+        A = Lz_inv_Kzx / jnp.sqrt(noise_var)
 
         # AAᵀ
         AAT = jnp.matmul(A, A.T)
@@ -711,7 +711,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         L_inv_Lz_inv_Kzt = jsp.linalg.solve_triangular(L, Lz_inv_Kzt, lower=True)
 
         # μt + 1/o² Ktz Kzz⁻¹ Kzx (y - μx)
-        mean = mut + jnp.matmul(Kzt.T / noise, Kzz_inv_Kzx_diff)
+        mean = mut + jnp.matmul(Kzt.T / noise_var, Kzz_inv_Kzx_diff)
 
         # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻¹ (I + AAᵀ)⁻¹ Lz⁻¹ Kzt
         covariance = (

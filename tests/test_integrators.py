@@ -58,8 +58,8 @@ def test_quadrature(jit: bool, num_points: int):
 @pytest.mark.parametrize("jit", [True, False])
 @pytest.mark.parametrize("params", [(0.5, -2.57236494), (1.0, -1.91893853)])
 def test_analytical_gaussian(jit: bool, params: tp.Tuple[float, float]):
-    obs_noise, expected = params
-    likelihood = Gaussian(num_datapoints=1, obs_noise=jnp.array([obs_noise]))
+    obs_stddev, expected = params
+    likelihood = Gaussian(num_datapoints=1, obs_stddev=jnp.array([obs_stddev]))
     mu = jnp.array([[0.0]])
     variance = jnp.array([[1.0]])
     y = jnp.array([[1.0]])

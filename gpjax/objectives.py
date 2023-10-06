@@ -20,7 +20,6 @@ from gpjax.typing import (
     ScalarFloat,
 )
 
-
 tfd = tfp.distributions
 
 import cola
@@ -124,7 +123,7 @@ class ConjugateMLL(AbstractObjective):
             mask = mask.flatten()
 
         # Observation noise o²
-        obs_noise = posterior.likelihood.obs_noise
+        obs_stddev = posterior.likelihood.obs_stddev
 
         mx = posterior.prior.mean_function(x)
 
@@ -133,7 +132,7 @@ class ConjugateMLL(AbstractObjective):
         Kyy = posterior.prior.out_kernel.gram(jnp.arange(m)[:, jnp.newaxis])
 
         Sigma = cola.ops.Kronecker(Kxx, Kyy)
-        Sigma = Sigma + cola.ops.I_like(Sigma) * (obs_noise + posterior.prior.jitter)
+        Sigma = Sigma + cola.ops.I_like(Sigma) * (obs_stddev + posterior.prior.jitter)
         Sigma = cola.PSD(Sigma)
 
         # flatten to handle multi-output case, then calculate
@@ -337,7 +336,7 @@ class CollapsedELBO(AbstractObjective):
 
         m = variational_family.num_inducing
 
-        noise = variational_family.posterior.likelihood.obs_noise
+        noise = variational_family.posterior.likelihood.obs_stddev
         z = variational_family.inducing_inputs
         Kzz = kernel.gram(z)
         Kzz += cola.ops.I_like(Kzz) * variational_family.jitter
