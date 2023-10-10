@@ -48,8 +48,8 @@ class ChangePoint(AbstractKernel):
 
     kernels: List[AbstractKernel] = None
     operator: Callable = static_field(None)
-    tswitch: float = param_field(
-        jnp.float64(1.0), bijector=tfb.Identity(), trainable=False
+    tswitch: ScalarFloat = param_field(
+        jnp.array(1.0), bijector=tfb.Identity(), trainable=False
     )
 
     def __post_init__(self):

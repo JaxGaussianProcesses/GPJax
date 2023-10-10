@@ -34,6 +34,7 @@ from gpjax.kernels.computations import (
 )
 from gpjax.kernels.stationary import (
     RBF,
+    ChangePoint,
     Matern12,
     Matern32,
     Matern52,
@@ -239,6 +240,44 @@ class TestRationalQuadratic(BaseTestKernel):
     )
     params = {"test_initialization": fields}
     default_compute_engine = DenseKernelComputation()
+
+
+@pytest.mark.parametrize(
+    "kernel",
+    [RBF, RationalQuadratic, Matern12, Matern32, Matern52],
+)
+@pytest.mark.parametrize("tswitch_param", [0.1, 0.25, 0.5, 0.75, 0.9])
+def test_changepoint_kernel(kernel: AbstractKernel, tswitch_param: float) -> None:
+    n_kerns = 2
+    # Create inputs
+    n = 20
+    x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
+
+    # Create list of kernels
+    kernels = [kernel() for _ in range(n_kerns)]
+
+    # Create combination kernel
+    combination_kernel = ChangePoint(kernels=kernels, tswitch=tswitch_param)
+
+    # Check params are a list of dictionaries
+    assert combination_kernel.kernels == kernels
+
+    # Check combination kernel set
+    assert len(combination_kernel.kernels) == n_kerns
+    assert isinstance(combination_kernel.kernels, list)
+    assert isinstance(combination_kernel.kernels[0], AbstractKernel)
+
+    # Compute gram matrix
+    Kxx = combination_kernel.gram(x)
+
+    # Check shapes
+    assert Kxx.shape[0] == Kxx.shape[1]
+    assert Kxx.shape[1] == n
+
+    # Check positive definiteness
+    jitter = 1e-6
+    eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense() + jnp.eye(n) * jitter)
+    assert (eigen_values > 0).all()
 
 
 @pytest.mark.parametrize("smoothness", [1, 2, 3])

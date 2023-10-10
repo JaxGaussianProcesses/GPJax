@@ -13,6 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
+from gpjax.kernels.stationary.changepoint import ChangePoint
 from gpjax.kernels.stationary.matern12 import Matern12
 from gpjax.kernels.stationary.matern32 import Matern32
 from gpjax.kernels.stationary.matern52 import Matern52
@@ -23,6 +24,7 @@ from gpjax.kernels.stationary.rbf import RBF
 from gpjax.kernels.stationary.white import White
 
 __all__ = [
+    "ChangePoint",
     "Matern12",
     "Matern32",
     "Matern52",
