@@ -122,7 +122,12 @@ class ChangePoint(AbstractKernel):
 
         indx = get_function_index(x, y, tswitch=self.tswitch)
 
-        flst = [self.kernels[0].__call__, k_zero, k_zero, self.kernels[1].__call__]
-        K = jax.lax.switch(indx, flst, x, y)
+        kernel_options = [
+            self.kernels[0].__call__,
+            k_zero,
+            k_zero,
+            self.kernels[1].__call__,
+        ]
+        K = jax.lax.switch(indx, kernel_options, x, y)
 
         return K.squeeze()
