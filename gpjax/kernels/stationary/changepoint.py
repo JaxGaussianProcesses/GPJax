@@ -39,11 +39,15 @@ from gpjax.typing import (
 @dataclass
 class ChangePoint(AbstractKernel):
     r"""A change point kernel
+
+    See Saatci, Turner, Rasmussen 2010 ICML paper for details.
+
     self.kernels: A list of exactly two kernels that will be switched.
     self.tswitch: The point at which to change to a different kernel.
         for example: if x and y are both less than tswitch, then you would use kernels[0]
                      if x and y are both greater than or equal to tswitch, then you would use kernels[1]
                      otherwise return cross-covariance of 0
+
     """
 
     kernels: List[AbstractKernel] = None

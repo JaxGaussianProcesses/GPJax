@@ -18,6 +18,7 @@ from gpjax.decision_making.utility_functions import ThompsonSampling
 from gpjax.kernels import (
     RFF,
     ArcCosine,
+    ChangePoint,
     GraphKernel,
     Matern12,
     Matern32,
@@ -134,6 +135,17 @@ def _(_) -> PaperCitation:
         title="Kernel Methods for Deep Learning",
         year="2009",
         booktitle="Advances in Neural Information Processing Systems",
+    )
+
+
+@cite.register(ChangePoint)
+def _(_) -> PaperCitation:
+    return PaperCitation(
+        citation_key="saatcci2010gaussian",
+        authors="Saatci, Yunus and Turner, Ryan D and Rasmussen, Carl E",
+        title="Gaussian process change point models",
+        year="2010",
+        booktitle="Proceedings of the 27th International Conference on Machine Learning (ICML-10)",
     )
 
 
