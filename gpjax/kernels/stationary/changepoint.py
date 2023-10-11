@@ -87,7 +87,7 @@ class ChangePoint(AbstractKernel):
             ScalarFloat: The evaluated kernel function at the supplied inputs.
         """
 
-        def get_function_index(x, y, tswitch=1):
+        def get_function_index(x, y, tswitch):
             r"""
             Specify four possible indices given x, y, and tswitch.
 
