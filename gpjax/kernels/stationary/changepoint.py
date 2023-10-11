@@ -60,6 +60,9 @@ class ChangePoint(AbstractKernel):
         # Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
         kernels_list: List[AbstractKernel] = []
 
+        if len(kernels_list) != 2:
+            raise TypeError("Current implementation only accepts 2 kernels")
+
         for kernel in self.kernels:
             if not isinstance(kernel, AbstractKernel):
                 raise TypeError("can only combine Kernel instances")  # pragma: no cover
