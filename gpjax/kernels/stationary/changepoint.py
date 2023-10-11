@@ -73,14 +73,14 @@ class ChangePoint(AbstractKernel):
 
     def __call__(
         self,
-        x: Float[Array, " D"],
-        y: Float[Array, " D"],
+        x: Float[Array, " 1"],
+        y: Float[Array, " 1"],
     ) -> ScalarFloat:
         r"""Evaluate the kernel on a pair of inputs.
 
         Args:
-            x (Float[Array, " D"]): The left hand input of the kernel function.
-            y (Float[Array, " D"]): The right hand input of the kernel function.
+            x (Float[Array, " 1"]): The left hand input of the kernel function.
+            y (Float[Array, " 1"]): The right hand input of the kernel function.
 
         Returns
         -------
