@@ -89,7 +89,16 @@ class ChangePoint(AbstractKernel):
 
         def get_function_index(x, y, tswitch):
             r"""
-            Specify four possible indices given x, y, and tswitch.
+            Specify which kernel function to compute given x, y, and tswitch.
+
+            There are four indices that correspond to different functions used to calculate the
+            kernel distance between two points.
+
+            First scenario: cond1 and cond2 less than tswitch (left of tswitch) would calculating
+            distance by evaluating first kernel.
+            Second and third scenario: the two points are left and right of tswitch,
+            so evaluating the covariance as 0.
+            Fourth scenario: both points are right of tswitch, calculate distance using second kernel.
 
             Args:
                     x: Left hand argument of kernel function's call
