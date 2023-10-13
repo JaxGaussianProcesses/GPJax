@@ -65,7 +65,7 @@ def posterior_handler() -> PosteriorHandler:
     kernel = gpx.Matern52(lengthscale=jnp.array(1.0), variance=jnp.array(1.0))
     prior = gpx.Prior(mean_function=mean, kernel=kernel)
     likelihood_builder = lambda x: gpx.Gaussian(
-        num_datapoints=x, obs_noise=jnp.array(1e-6)
+        num_datapoints=x, obs_stddev=jnp.array(1e-3)
     )
     posterior_handler = PosteriorHandler(
         prior=prior,

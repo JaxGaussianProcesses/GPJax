@@ -23,7 +23,10 @@ from cola.ops import (
 )
 from jax import vmap
 import jax.numpy as jnp
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 
 from gpjax.kernels.computations import AbstractKernelComputation
 from gpjax.typing import Array

@@ -29,7 +29,10 @@ from gpjax.base import (
     param_field,
     static_field,
 )
-from gpjax.distributions import GaussianDistribution, ReshapedDistribution
+from gpjax.distributions import (
+    GaussianDistribution,
+    ReshapedDistribution,
+)
 from gpjax.integrators import (
     AbstractIntegrator,
     AnalyticalGaussianIntegrator,
@@ -121,9 +124,15 @@ class AbstractLikelihood(Module):
 
 @dataclass
 class Gaussian(AbstractLikelihood):
-    r"""Gaussian likelihood object."""
+    r"""Gaussian likelihood object.
 
-    obs_noise: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
+    Args:
+        obs_stddev (Union[ScalarFloat, Float[Array, "#N"]]): the standard deviation
+            of the Gaussian observation noise.
+
+    """
+
+    obs_stddev: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
     )
     integrator: AbstractIntegrator = static_field(AnalyticalGaussianIntegrator())
@@ -138,7 +147,7 @@ class Gaussian(AbstractLikelihood):
         -------
             tfd.Normal: The likelihood function.
         """
-        return tfd.Normal(loc=f, scale=self.obs_noise.astype(f.dtype))
+        return tfd.Normal(loc=f, scale=self.obs_stddev.astype(f.dtype))
 
     def predict(
         self, dist: Union[tfd.MultivariateNormalTriL, GaussianDistribution]
@@ -167,7 +176,7 @@ class Gaussian(AbstractLikelihood):
         mean = mean.flatten()
         cov = cov.reshape([mean.size] * 2)
 
-        noisy_cov = cov.at[jnp.diag_indices(event_size)].add(self.obs_noise)
+        noisy_cov = cov.at[jnp.diag_indices(event_size)].add(self.obs_stddev**2)
 
         likelihood_distr = tfd.MultivariateNormalFullCovariance(mean, noisy_cov)
         if len(dist.event_shape) == 1:

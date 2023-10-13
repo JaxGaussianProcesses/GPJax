@@ -17,7 +17,10 @@ from dataclasses import dataclass
 
 from beartype.typing import Union
 import jax.numpy as jnp
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 

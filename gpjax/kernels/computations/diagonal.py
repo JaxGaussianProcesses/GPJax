@@ -20,7 +20,10 @@ from cola.ops import (
     LinearOperator,
 )
 from jax import vmap
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 
 from gpjax.kernels.computations import AbstractKernelComputation
 from gpjax.typing import Array

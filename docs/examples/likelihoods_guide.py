@@ -99,12 +99,13 @@ gpx.likelihoods.Gaussian(num_datapoints=D.n)
 # Some likelihoods, such as the Gaussian likelihood, contain parameters that we seek
 # to infer. In the case of the Gaussian likelihood, we have a single parameter
 # $\sigma^2$ that determines the observation noise. In GPJax, we can specify the value
-# of this parameter when instantiating the likelihood object. If we do not specify a
+# of $\sigma$ when instantiating the likelihood object. If we do not specify a
 # value, then the likelihood will be initialised with a default value. In the case of
 # the Gaussian likelihood, the default value is $1.0$. If we instead wanted to
-# initialise the likelihood with a value of $0.5$, then we would do this as follows:
+# initialise the likelihood standard deviation with a value of $0.5$, then we would do
+# this as follows:
 
-gpx.likelihoods.Gaussian(num_datapoints=D.n, obs_noise=0.5)
+gpx.likelihoods.Gaussian(num_datapoints=D.n, obs_stddev=0.5)
 
 # To control other properties of the observation noise such as trainability and value
 # constraints, see our [PyTree guide](pytrees.md).
@@ -127,7 +128,7 @@ kernel = gpx.Matern32()
 meanf = gpx.Zero()
 prior = gpx.Prior(kernel=kernel, mean_function=meanf)
 
-likelihood = gpx.Gaussian(num_datapoints=D.n, obs_noise=0.1)
+likelihood = gpx.Gaussian(num_datapoints=D.n, obs_stddev=0.1)
 
 posterior = prior * likelihood
 
@@ -252,7 +253,7 @@ jnp.sum(likelihood.expected_log_likelihood(y=y, mean=mean, variance=variance))
 
 lquad = gpx.Gaussian(
     num_datapoints=D.n,
-    obs_noise=jnp.array([0.1]),
+    obs_stddev=jnp.array([0.1]),
     integrator=gpx.integrators.GHQuadratureIntegrator(num_points=20),
 )
 

@@ -16,9 +16,9 @@
 
 from beartype.typing import (
     Any,
+    Generic,
     Optional,
     Tuple,
-    Generic,
     TypeVar,
     Union,
 )

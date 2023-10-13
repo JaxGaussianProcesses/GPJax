@@ -66,8 +66,8 @@ def test_zero_mean_remains_zero() -> None:
     )  # Prevent kernel from modelling non-zero mean
     meanf = Zero()
     prior = gpx.Prior(mean_function=meanf, kernel=kernel)
-    likelihood = gpx.Gaussian(num_datapoints=D.n, obs_noise=jnp.array(1e-6))
-    likelihood = likelihood.replace_trainable(obs_noise=False)
+    likelihood = gpx.Gaussian(num_datapoints=D.n, obs_stddev=jnp.array(1e-3))
+    likelihood = likelihood.replace_trainable(obs_stddev=False)
     posterior = prior * likelihood
 
     negative_mll = gpx.objectives.ConjugateMLL(negative=True)
