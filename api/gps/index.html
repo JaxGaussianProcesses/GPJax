@@ -2861,6 +2861,59 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
 
 
 
+<h6 id="gpjax.gps.AbstractPrior.replace" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the values of the fields of the object.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.gps.AbstractPrior.replace--returns">Returns<a class="headerlink" href="#gpjax.gps.AbstractPrior.replace--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
 <h6 id="gpjax.gps.AbstractPrior.predict" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReshapedGaussianDistribution</span></code>
   
@@ -2924,59 +2977,6 @@ this method must be implemented.</p>
       <h6 id="gpjax.gps.AbstractPrior.predict--returns">Returns<a class="headerlink" href="#gpjax.gps.AbstractPrior.predict--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>ReshapedGaussianDistribution: A multivariate normal random variable representation
     of the Gaussian process, possibly with reshaped events.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.gps.AbstractPrior.replace" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">replace</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Replace the values of the fields of the object.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>**kwargs</code></td>
-          <td>
-                <code><span title="beartype.typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>keyword arguments to replace the fields of the object.</p>
-            </div>
-          </td>
-          <td>
-                <code>{}</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.gps.AbstractPrior.replace--returns">Returns<a class="headerlink" href="#gpjax.gps.AbstractPrior.replace--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
 </code></pre></div>
 
   </div>

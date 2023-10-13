@@ -3408,6 +3408,37 @@
       <p>Gaussian likelihood object.</p>
 
 
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>obs_stddev</code></td>
+          <td>
+                <code><span title="beartype.typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.ScalarFloat" href="../typing/#gpjax.typing.ScalarFloat">ScalarFloat</a>, <span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39;#N&#39;]]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the standard deviation
+of the Gaussian observation noise.</p>
+            </div>
+          </td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.base.param_field" href="../base/param/#gpjax.base.param.param_field">param_field</a>(jax.<span title="jax.array">array</span>(1.0), bijector=<a class="autorefs autorefs-internal" title="gpjax.likelihoods.tfb" href="#gpjax.likelihoods.tfb">tfb</a>.<span title="gpjax.likelihoods.tfb.Softplus">Softplus</span>())</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
   
 
   <div class="doc doc-children">
@@ -3444,8 +3475,8 @@
 
 
 
-<h6 id="gpjax.likelihoods.Gaussian.obs_noise" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">obs_noise</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ScalarFloat</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;#N&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
+<h6 id="gpjax.likelihoods.Gaussian.obs_stddev" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">obs_stddev</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ScalarFloat</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;#N&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3856,6 +3887,59 @@
 
 
 
+<h6 id="gpjax.likelihoods.Gaussian.update_meta" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">update_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Update the metadata of the fields. The metadata must already exist.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.likelihoods.Gaussian.update_meta--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Gaussian.update_meta--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
 <h6 id="gpjax.likelihoods.Gaussian.predict" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">dist</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalTriL</span><span class="p">,</span> <span class="n">GaussianDistribution</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalFullCovariance</span></code>
 
@@ -3902,59 +3986,6 @@ evaluated at a finite set of test points.</p>
   </table>
       <h6 id="gpjax.likelihoods.Gaussian.predict--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Gaussian.predict--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>tfd.Distribution: The predictive distribution.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.likelihoods.Gaussian.update_meta" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">update_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Update the metadata of the fields. The metadata must already exist.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>**kwargs</code></td>
-          <td>
-                <code><span title="beartype.typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>keyword arguments to replace the fields of the object.</p>
-            </div>
-          </td>
-          <td>
-                <code>{}</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.likelihoods.Gaussian.update_meta--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Gaussian.update_meta--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
 </code></pre></div>
 
   </div>
@@ -4661,6 +4692,29 @@ evaluated at a finite set of test points.</p>
 
 
 
+<h6 id="gpjax.likelihoods.Bernoulli.unconstrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the unconstrained space according to their defined bijectors.</p>
+<h6 id="gpjax.likelihoods.Bernoulli.unconstrain--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Bernoulli.unconstrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the unconstrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
 <h6 id="gpjax.likelihoods.Bernoulli.predict" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">dist</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
 
@@ -4705,29 +4759,6 @@ at a finite set of test points.</p>
   </table>
       <h6 id="gpjax.likelihoods.Bernoulli.predict--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Bernoulli.predict--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>tfd.Distribution: The pointwise predictive distribution.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.likelihoods.Bernoulli.unconstrain" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Transform model parameters to the unconstrained space according to their defined bijectors.</p>
-<h6 id="gpjax.likelihoods.Bernoulli.unconstrain--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Bernoulli.unconstrain--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Module: transformed to the unconstrained space.
 </code></pre></div>
 
   </div>
@@ -5318,6 +5349,29 @@ at a finite set of test points.</p>
 
 
 
+<h6 id="gpjax.likelihoods.Poisson.stop_gradient" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">stop_gradient</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Stop gradients flowing through the Module.</p>
+<h6 id="gpjax.likelihoods.Poisson.stop_gradient--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Poisson.stop_gradient--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with gradients stopped.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
 <h6 id="gpjax.likelihoods.Poisson.link_function" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
 
@@ -5381,29 +5435,6 @@ at a finite set of test points.</p>
         </tr>
     </tbody>
   </table>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.likelihoods.Poisson.stop_gradient" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">stop_gradient</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Stop gradients flowing through the Module.</p>
-<h6 id="gpjax.likelihoods.Poisson.stop_gradient--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Poisson.stop_gradient--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Module: with gradients stopped.
-</code></pre></div>
 
   </div>
 
