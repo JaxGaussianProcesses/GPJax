@@ -123,7 +123,7 @@ class ConjugateMLL(AbstractObjective):
             mask = mask.flatten()
 
         # Observation noise o²
-        obs_stddev = posterior.likelihood.obs_stddev
+        obs_var = posterior.likelihood.obs_stddev**2
 
         mx = posterior.prior.mean_function(x)
 
@@ -132,7 +132,7 @@ class ConjugateMLL(AbstractObjective):
         Kyy = posterior.prior.out_kernel.gram(jnp.arange(m)[:, jnp.newaxis])
 
         Sigma = cola.ops.Kronecker(Kxx, Kyy)
-        Sigma = Sigma + cola.ops.I_like(Sigma) * (obs_stddev + posterior.prior.jitter)
+        Sigma = Sigma + cola.ops.I_like(Sigma) * (obs_var + posterior.prior.jitter)
         Sigma = cola.PSD(Sigma)
 
         # flatten to handle multi-output case, then calculate

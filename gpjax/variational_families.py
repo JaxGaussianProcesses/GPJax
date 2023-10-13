@@ -683,7 +683,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         Lz_inv_Kzx = cola.solve(Lz, Kzx)
 
         # A = Lz⁻¹ Kzt / o
-        A = Lz_inv_Kzx / jnp.sqrt(noise_var)
+        A = Lz_inv_Kzx / self.posterior.likelihood.obs_stddev
 
         # AAᵀ
         AAT = jnp.matmul(A, A.T)
