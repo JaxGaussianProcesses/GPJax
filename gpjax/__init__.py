@@ -74,6 +74,8 @@ from gpjax.variational_families import (
     WhitenedVariationalGaussian,
 )
 
+from gpjax import sklearn
+
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
 __url__ = "https://github.com/JaxGaussianProcesses/GPJax"
@@ -81,6 +83,7 @@ __contributors__ = "https://github.com/JaxGaussianProcesses/GPJax/graphs/contrib
 __version__ = "0.7.1"
 
 __all__ = [
+    "sklearn",
     "Module",
     "param_field",
     "cite",

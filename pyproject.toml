@@ -92,6 +92,10 @@ mkdocs-git-authors-plugin = "^0.7.0"
 mkdocstrings = { version = "^0.21.2", extras = ["python"] }
 markdown-katex = "^202112.1034"
 
+
+[tool.poetry.group.sklearn.dependencies]
+loguru = "^0.7.2"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
