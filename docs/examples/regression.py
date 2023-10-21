@@ -214,7 +214,7 @@ negative_mll = jit(negative_mll)
 # optimiser.
 
 # %%
-opt_posterior, history = gpx.fit_bfgs(
+opt_posterior, history = gpx.fit_scipy(
     model=posterior,
     objective=negative_mll,
     train_data=D,

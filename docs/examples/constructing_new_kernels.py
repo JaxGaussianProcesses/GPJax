@@ -268,7 +268,7 @@ likelihood = gpx.Gaussian(num_datapoints=n)
 circular_posterior = gpx.Prior(mean_function=meanf, kernel=PKern) * likelihood
 
 # Optimise GP's marginal log-likelihood using BFGS
-opt_posterior, history = gpx.fit_bfgs(
+opt_posterior, history = gpx.fit_scipy(
     model=circular_posterior,
     objective=jit(gpx.ConjugateMLL(negative=True)),
     train_data=D,

@@ -237,14 +237,10 @@ negative_mll = gpx.objectives.ConjugateMLL(negative=True)
 negative_mll(no_opt_posterior, train_data=D)
 negative_mll = jit(negative_mll)
 
-opt_posterior, history = gpx.fit(
+opt_posterior, history = gpx.fit_scipy(
     model=no_opt_posterior,
     objective=negative_mll,
     train_data=D,
-    optim=ox.adam(learning_rate=0.01),
-    num_iters=2000,
-    safe=True,
-    key=key,
 )
 
 
@@ -542,14 +538,10 @@ negative_mll = gpx.objectives.ConjugateMLL(negative=True)
 negative_mll(posterior, train_data=D)
 negative_mll = jit(negative_mll)
 
-opt_posterior, history = gpx.fit(
+opt_posterior, history = gpx.fit_scipy(
     model=posterior,
     objective=negative_mll,
     train_data=D,
-    optim=ox.adam(learning_rate=0.01),
-    num_iters=1000,
-    safe=True,
-    key=key,
 )
 
 # %% [markdown]

@@ -232,14 +232,10 @@ negative_mll = jit(negative_mll)
 # optimiser.
 
 # %%
-opt_posterior, history = gpx.fit(
+opt_posterior, history = gpx.fit_scipy(
     model=posterior,
     objective=negative_mll,
     train_data=D,
-    optim=ox.adam(learning_rate=0.01),
-    num_iters=500,
-    safe=True,
-    key=key,
 )
 
 # %% [markdown]

@@ -175,13 +175,12 @@ def fit(  # noqa: PLR0913
 
 
 
-def fit_bfgs(  # noqa: PLR0913
+def fit_scipy(  # noqa: PLR0913
     *,
     model: ModuleModel,
     objective: Union[AbstractObjective, Callable[[ModuleModel, Dataset], ScalarFloat]],
     train_data: Dataset,
     max_iters: Optional[int] = 500,
-    tol: float = 0.01,
     verbose: Optional[bool] = True,
     safe: Optional[bool] = True,
 ) -> Tuple[ModuleModel, Array]:
@@ -195,7 +194,6 @@ def fit_bfgs(  # noqa: PLR0913
         train_data (Dataset): The training data to be used for the optimisation.
         max_iters (Optional[int]): The maximum number of optimisation steps to run. Defaults
             to 500.
-        tol (Optional[float]): The tolerance for termination. Defaults to scipy default.
         verbose (Optional[bool]): Whether to print the information about the optimisation. Defaults
             to True.
 
@@ -210,7 +208,6 @@ def fit_bfgs(  # noqa: PLR0913
         _check_train_data(train_data)
         _check_num_iters(max_iters)
         _check_verbose(verbose)
-        _check_tol(tol)
 
 
     # Unconstrained space model.
@@ -221,25 +218,22 @@ def fit_bfgs(  # noqa: PLR0913
         model = model.stop_gradient()
         return objective(model.constrain(), data)
 
-    solver = jaxopt.BFGS(
+    solver = jaxopt.ScipyMinimize(
         fun=loss, 
         maxiter=max_iters, 
-        tol=tol, 
-        # method="L-BFGS-B",
-        #implicit_diff=False,
         )
 
     initial_loss = solver.fun(model, train_data)
     model, result = solver.run(model, data = train_data)
-    history = jnp.array([initial_loss, result.value])
+    history = jnp.array([initial_loss, result.fun_val])
     
     if verbose:
-        print(f"Initial loss: {initial_loss}")
-        # if result.success:
-        #     print(f"Optimization was successful")
-        # else:
-        #     print(f"Optimization was not successful")
-        print(f"Final loss {result.value} after {result.num_fun_eval} iterations")
+        print(f"Initial loss is {initial_loss}")
+        if result.success:
+            print(f"Optimization was successful")
+        else:
+            print(f"Optimization was not successful")
+        print(f"Final loss is {result.fun_val} after {result.num_fun_eval} iterations")
         
     # Constrained space.
     model = model.constrain()
@@ -320,14 +314,6 @@ def _check_log_rate(log_rate: Any) -> None:
 
     if not log_rate > 0:
         raise ValueError("log_rate must be positive")
-
-def _check_tol(tol: Any) -> None:
-    """Check that the tolerance is of type float and positive."""
-    if not isinstance(tol, float):
-        raise TypeError("tol must be of type float or None")
-    
-    if not tol > 0:
-        raise ValueError("tol must be positive")
 
 
 def _check_verbose(verbose: Any) -> None:
