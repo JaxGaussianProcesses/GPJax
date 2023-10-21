@@ -248,10 +248,14 @@ def optimise_mll(posterior, dataset, NIters=1000, key=key, plot_history=True):
     objective = gpx.objectives.ConjugateMLL(negative=True)
     # Optimise to minimise the MLL
     optimiser = ox.adam(learning_rate=0.1)
-    opt_posterior, history = gpx.fit_bfgs(
+    opt_posterior, history = gpx.fit(
         model=posterior,
         objective=objective,
         train_data=dataset,
+        optim=optimiser,
+        num_iters=NIters,
+        safe=True,
+        key=key,
     )
     # plot MLL value at each iteration
     if plot_history:

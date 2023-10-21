@@ -30,7 +30,6 @@ from gpjax.base import (
 from gpjax.dataset import Dataset
 from gpjax.fit import (
     fit,
-    fit_bfgs,
     get_batch,
 )
 from gpjax.gps import (
@@ -98,28 +97,6 @@ def test_simple_linear_model() -> None:
     # Test stop_gradient on bias:
     assert trained_model.bias == 1.0
 
-    # Train with bfgs!
-    trained_model, hist = fit_bfgs(
-        model=model,
-        objective=loss,
-        train_data=D,
-        max_iters=10,
-    )
-
-    # Ensure we return a history of the correct length
-    assert len(hist) == 2
-
-    # Ensure we return a model of the same class
-    assert isinstance(trained_model, LinearModel)
-
-    # Test reduction in loss:
-    assert loss(trained_model, D) < loss(model, D)
-
-    # Test stop_gradient on bias:
-    assert trained_model.bias == 1.0
-
-
-
 
 @pytest.mark.parametrize("num_iters", [1, 5])
 @pytest.mark.parametrize("n_data", [1, 20])
@@ -141,7 +118,7 @@ def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> N
     # Define loss function:
     mll = ConjugateMLL(negative=True)
 
-    # Train with optax!
+    # Train!
     trained_model, history = fit(
         model=posterior,
         objective=mll,
@@ -160,28 +137,6 @@ def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> N
 
     # Ensure we reduce the loss
     assert mll(trained_model, D) < mll(posterior, D)
-
-    # Train with BFGS!
-    trained_model_bfgs, history_bfgs = fit_bfgs(
-        model=posterior,
-        objective=mll,
-        train_data=D,
-        max_iters=num_iters,
-        verbose=verbose,
-    )
-
-    # Ensure the trained model is a Gaussian process posterior
-    assert isinstance(trained_model_bfgs, ConjugatePosterior)
-
-    # Ensure we return a history_bfgs of the correct length
-    assert len(history_bfgs) == 2
-
-    # Ensure we reduce the loss
-    assert mll(trained_model_bfgs, D) < mll(posterior, D)
-
-
-
-
 
 
 @pytest.mark.parametrize("num_iters", [1, 5])

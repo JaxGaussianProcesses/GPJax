@@ -23,11 +23,9 @@ from beartype.typing import (
     Union,
 )
 import jax
-import jax.numpy as jnp
 from jax._src.random import _check_prng_key
 import jax.random as jr
 import optax as ox
-import jaxopt
 
 from gpjax.base import Module
 from gpjax.dataset import Dataset
@@ -172,100 +170,6 @@ def fit(  # noqa: PLR0913
     return model, history
 
 
-
-
-
-def fit_bfgs(  # noqa: PLR0913
-    *,
-    model: ModuleModel,
-    objective: Union[AbstractObjective, Callable[[ModuleModel, Dataset], ScalarFloat]],
-    train_data: Dataset,
-    max_iters: Optional[int] = 500,
-    tol: float = 0.01,
-    verbose: Optional[bool] = True,
-    safe: Optional[bool] = True,
-) -> Tuple[ModuleModel, Array]:
-    r"""Train a Module model with respect to a supplied Objective function.
-    Optimisers used here should originate from Optax. todo
-
-    Args:
-        model (Module): The model Module to be optimised.
-        objective (Objective): The objective function that we are optimising with
-            respect to.
-        train_data (Dataset): The training data to be used for the optimisation.
-        max_iters (Optional[int]): The maximum number of optimisation steps to run. Defaults
-            to 500.
-        tol (Optional[float]): The tolerance for termination. Defaults to scipy default.
-        verbose (Optional[bool]): Whether to print the information about the optimisation. Defaults
-            to True.
-
-    Returns
-    -------
-        Tuple[Module, Array]: A Tuple comprising the optimised model and training
-            history respectively.
-    """
-    if safe:
-        # Check inputs.
-        _check_model(model)
-        _check_train_data(train_data)
-        _check_num_iters(max_iters)
-        _check_verbose(verbose)
-        _check_tol(tol)
-
-
-    # Unconstrained space model.
-    model = model.unconstrain()
-
-    # Unconstrained space loss function with stop-gradient rule for non-trainable params.
-    def loss(model: Module, data: Dataset) -> ScalarFloat:
-        model = model.stop_gradient()
-        return objective(model.constrain(), data)
-
-    solver = jaxopt.BFGS(
-        fun=loss, 
-        maxiter=max_iters, 
-        tol=tol, 
-        # method="L-BFGS-B",
-        #implicit_diff=False,
-        )
-
-    initial_loss = solver.fun(model, train_data)
-    model, result = solver.run(model, data = train_data)
-    history = jnp.array([initial_loss, result.value])
-    
-    if verbose:
-        print(f"Initial loss: {initial_loss}")
-        # if result.success:
-        #     print(f"Optimization was successful")
-        # else:
-        #     print(f"Optimization was not successful")
-        print(f"Final loss {result.value} after {result.num_fun_eval} iterations")
-        
-    # Constrained space.
-    model = model.constrain()
-    return model, history
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
     """Batch the data into mini-batches. Sampling is done with replacement.
 
@@ -320,14 +224,6 @@ def _check_log_rate(log_rate: Any) -> None:
 
     if not log_rate > 0:
         raise ValueError("log_rate must be positive")
-
-def _check_tol(tol: Any) -> None:
-    """Check that the tolerance is of type float and positive."""
-    if not isinstance(tol, float):
-        raise TypeError("tol must be of type float or None")
-    
-    if not tol > 0:
-        raise ValueError("tol must be positive")
 
 
 def _check_verbose(verbose: Any) -> None:

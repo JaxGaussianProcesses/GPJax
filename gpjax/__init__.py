@@ -22,7 +22,7 @@ from gpjax.base import (
 )
 from gpjax.citation import cite
 from gpjax.dataset import Dataset
-from gpjax.fit import fit, fit_bfgs
+from gpjax.fit import fit
 from gpjax.gps import (
     Prior,
     construct_posterior,
@@ -87,7 +87,6 @@ __all__ = [
     "decision_making",
     "kernels",
     "fit",
-    "fit_bfgs",
     "Prior",
     "construct_posterior",
     "integrators",
