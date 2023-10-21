@@ -153,7 +153,9 @@ prior = gpx.Prior(mean_function=mean, kernel=kernel)
 # with the correct number of datapoints:
 
 # %%
-likelihood_builder = lambda n: gpx.Gaussian(num_datapoints=n, obs_noise=jnp.array(1e-6))
+likelihood_builder = lambda n: gpx.Gaussian(
+    num_datapoints=n, obs_stddev=jnp.array(1e-3)
+)
 
 # %% [markdown]
 # Now we have all the components required for constructing our GP posterior. Since we'll

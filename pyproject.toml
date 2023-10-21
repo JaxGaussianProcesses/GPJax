@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gpjax"
-version = "0.6.8"
+version = "0.7.1"
 description = "Gaussian processes in JAX."
 authors = [
   "Thomas Pinder <tompinder@live.co.uk>",
@@ -207,7 +207,13 @@ ignore-words-list = "fro" # Frobenius
 ignore-init-method = true
 ignore-init-module = true
 fail-under = 64
-exclude = ["setup.py", "docs", "tests", "gpjax/__init__.py", "gpjax/citation.py"]
+exclude = [
+  "setup.py",
+  "docs",
+  "tests",
+  "gpjax/__init__.py",
+  "gpjax/citation.py",
+]
 verbose = 2
 quiet = false
 color = true

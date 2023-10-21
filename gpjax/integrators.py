@@ -142,11 +142,11 @@ class AnalyticalGaussianIntegrator(AbstractIntegrator):
         Returns:
             Float[Array, 'N']: The expected log likelihood.
         """
-        obs_noise = likelihood.obs_noise.squeeze()
+        obs_stddev = likelihood.obs_stddev.squeeze()
         sq_error = jnp.square(y - mean)
         log2pi = jnp.log(2.0 * jnp.pi)
         val = jnp.sum(
-            log2pi + jnp.log(obs_noise) + (sq_error + variance) / obs_noise, axis=1
+            log2pi + jnp.log(obs_stddev) + (sq_error + variance) / obs_stddev, axis=1
         )
         return -0.5 * val
 

@@ -23,12 +23,9 @@ flexibility in extending the code to suit their own needs. The idea is that the
 code should be as close as possible to the maths we write on paper when working
 with GP models.
 
-# Package support
+# Package organisation
 
-GPJax was founded by [Thomas Pinder](https://github.com/thomaspinder). Today,
-the maintenance of GPJax is undertaken by [Thomas
-Pinder](https://github.com/thomaspinder) and [Daniel
-Dodd](https://github.com/Daniel-Dodd).
+## Contributions
 
 We would be delighted to receive contributions from interested individuals and
 groups. To learn how you can get involved, please read our [guide for
@@ -39,10 +36,36 @@ broader conversations, such as best GP fitting practices or questions about the
 mathematics of GPs, we invite you to [open a
 discussion](https://github.com/JaxGaussianProcesses/GPJax/discussions).
 
+Another way you can contribute to GPJax is through [issue
+triaging](https://www.codetriage.com/what).  This can include reproducing bug reports,
+asking for vital information such as version numbers and reproduction instructions, or
+identifying stale issues. If you would like to begin triaging issues, an easy way to get
+started is to 
+[subscribe to GPJax on CodeTriage](https://www.codetriage.com/jaxgaussianprocesses/gpjax).
+
+As a contributor to GPJax, you are expected to abide by our [code of
+conduct](docs/CODE_OF_CONDUCT.md). If you are feel that you have either experienced or
+witnessed behaviour that violates this standard, then we ask that you report any such
+behaviours though [this form](https://jaxgaussianprocesses.com/contact/) or reach out to 
+one of the project's [_gardeners_](https://docs.jaxgaussianprocesses.com/GOVERNANCE/#roles).
+
 Feel free to join our [Slack
 Channel](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw),
 where we can discuss the development of GPJax and broader support for Gaussian
 process modelling.
+
+
+## Governance
+
+GPJax was founded by [Thomas Pinder](https://github.com/thomaspinder). Today, the
+project's gardeners are [daniel-dodd@](https://github.com/daniel-dodd),
+[henrymoss@](https://github.com/henrymoss), [st--@](https://github.com/st--), and
+[thomaspinder@](https://github.com/thomaspinder), listed in alphabetical order. The full
+governance structure of GPJax is detailed [here](docs/GOVERNANCE.md).We appreciate all
+[the contributors to
+GPJax](https://github.com/JaxGaussianProcesses/GPJax/graphs/contributors) who have
+helped to shape GPJax into the package it is today.
+
 
 # Supported methods and interfaces
 

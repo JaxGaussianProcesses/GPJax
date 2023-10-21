@@ -98,7 +98,7 @@ class BaseTestLikelihood:
 
         for field in meta:
             # Bijectors
-            if field in ["obs_noise"]:
+            if field in ["obs_stddev"]:
                 assert isinstance(meta[field]["bijector"], tfb.Softplus)
 
             # Trainability state
@@ -146,7 +146,7 @@ def prod(inp):
 
 class TestGaussian(BaseTestLikelihood):
     likelihood = Gaussian
-    fields = prod({"obs_noise": [0.1, 0.5, 1.0]})
+    fields = prod({"obs_stddev": [0.1, 0.5, 1.0]})
     params = {"test_initialisation": fields, "test_call": fields}
     static_fields = ["num_datapoints"]
 
@@ -160,7 +160,7 @@ class TestGaussian(BaseTestLikelihood):
 
         # Check predictive mean and variance.
         assert (pred_dist.mean() == latent_mean).all()
-        noise_matrix = jnp.eye(likelihood.num_datapoints) * likelihood.obs_noise
+        noise_matrix = jnp.eye(likelihood.num_datapoints) * likelihood.obs_stddev**2
         assert np.allclose(
             pred_dist.scale_tril, jnp.linalg.cholesky(latent_cov + noise_matrix)
         )

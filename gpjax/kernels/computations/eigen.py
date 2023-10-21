@@ -45,8 +45,8 @@ class EigenKernelComputation(AbstractKernelComputation):
 
         Args:
             kernel (Kernel): the kernel function.
-            x (Float[Array,"N D"]): The input matrix.
-            y (Float[Array,"M D"]): The input matrix.
+            x (Num[Array,"N D"]): The input matrix.
+            y (Num[Array,"M D"]): The input matrix.
 
         Returns:
             _type_: _description_
