@@ -210,18 +210,14 @@ negative_mll = jit(negative_mll)
 # accelerate training.
 
 # %% [markdown]
-# We can now define an optimiser with `optax`. For this example we'll use the `adam`
+# We can now define an optimiser with `jaxopt`. For this example we'll use the `bfgs`
 # optimiser.
 
 # %%
-opt_posterior, history = gpx.fit(
+opt_posterior, history = gpx.fit_bfgs(
     model=posterior,
     objective=negative_mll,
     train_data=D,
-    optim=ox.adam(learning_rate=0.01),
-    num_iters=500,
-    safe=True,
-    key=key,
 )
 
 # %% [markdown]

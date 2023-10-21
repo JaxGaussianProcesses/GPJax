@@ -153,13 +153,10 @@ print(gpx.cite(kernel))
 # With a posterior defined, we can now optimise the model's hyperparameters.
 
 # %%
-opt_posterior, training_history = gpx.fit(
+opt_posterior, training_history = gpx.fit_bfgs(
     model=posterior,
     objective=jit(gpx.ConjugateMLL(negative=True)),
     train_data=D,
-    optim=ox.adamw(learning_rate=0.01),
-    num_iters=1000,
-    key=key,
 )
 
 # %% [markdown]

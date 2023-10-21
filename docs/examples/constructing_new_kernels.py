@@ -267,14 +267,11 @@ meanf = gpx.mean_functions.Zero()
 likelihood = gpx.Gaussian(num_datapoints=n)
 circular_posterior = gpx.Prior(mean_function=meanf, kernel=PKern) * likelihood
 
-# Optimise GP's marginal log-likelihood using Adam
-opt_posterior, history = gpx.fit(
+# Optimise GP's marginal log-likelihood using BFGS
+opt_posterior, history = gpx.fit_bfgs(
     model=circular_posterior,
     objective=jit(gpx.ConjugateMLL(negative=True)),
     train_data=D,
-    optim=ox.adamw(learning_rate=0.05),
-    num_iters=500,
-    key=key,
 )
 
 # %% [markdown]

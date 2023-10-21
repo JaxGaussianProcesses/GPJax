@@ -137,13 +137,11 @@ def fit_gp(x: jax.Array, y: jax.Array) -> tfd.MultivariateNormalFullCovariance:
     likelihood = gpx.Gaussian(num_datapoints=n)
     posterior = gpx.Prior(mean_function=gpx.Constant(), kernel=gpx.RBF()) * likelihood
 
-    opt_posterior, _ = gpx.fit(
+    opt_posterior, _ = gpx.fit_bfgs(
         model=posterior,
         objective=jax.jit(gpx.ConjugateMLL(negative=True)),
         train_data=D,
-        optim=ox.adamw(learning_rate=0.01),
-        num_iters=500,
-        key=key,
+        max_iters=500,
     )
     latent_dist = opt_posterior.predict(xtest, train_data=D)
     return opt_posterior.likelihood(latent_dist)
