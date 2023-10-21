@@ -46,8 +46,7 @@ started is to
 As a contributor to GPJax, you are expected to abide by our [code of
 conduct](docs/CODE_OF_CONDUCT.md). If you are feel that you have either experienced or
 witnessed behaviour that violates this standard, then we ask that you report any such
-behaviours though [this form](https://jaxgaussianprocesses.com/contact/) or reach out to 
-one of the project's [_gardeners_](https://docs.jaxgaussianprocesses.com/GOVERNANCE/#roles).
+behaviours though [this form](https://jaxgaussianprocesses.com/contact/).
 
 Feel free to join our [Slack
 Channel](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw),
