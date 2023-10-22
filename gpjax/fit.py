@@ -209,7 +209,6 @@ def fit_scipy(  # noqa: PLR0913
         _check_num_iters(max_iters)
         _check_verbose(verbose)
 
-
     # Unconstrained space model.
     model = model.unconstrain()
 

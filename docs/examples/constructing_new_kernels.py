@@ -40,7 +40,6 @@ from jaxtyping import (
 )
 import matplotlib.pyplot as plt
 import numpy as np
-import optax as ox
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax as tfp
 
@@ -214,13 +213,12 @@ def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
 
 
-bij = tfb.Chain([tfb.Softplus(), tfb.Shift(np.array(4.0).astype(np.float64))])
-
+bij = tfb.SoftClip(low=jnp.array(4.0, dtype=jnp.float64))
 
 @dataclass
 class Polar(gpx.kernels.AbstractKernel):
     period: float = static_field(2 * jnp.pi)
-    tau: float = param_field(jnp.array([4.0]), bijector=bij)
+    tau: float = param_field(jnp.array([5.0]), bijector=bij)
 
     def __call__(
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
@@ -285,6 +283,7 @@ posterior_rv = opt_posterior.likelihood(opt_posterior.predict(angles, train_data
 mu = posterior_rv.mean()
 one_sigma = posterior_rv.stddev()
 
+
 # %%
 fig = plt.figure(figsize=(7, 3.5))
 gridspec = fig.add_gridspec(1, 1)
@@ -311,7 +310,7 @@ ax.fill_between(
 ax.plot(angles, mu, label="Posterior mean")
 ax.scatter(D.X, D.y, alpha=1, label="Observations")
 ax.legend()
-
+plt.show()
 # %% [markdown]
 # ## System configuration
 

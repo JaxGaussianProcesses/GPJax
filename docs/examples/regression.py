@@ -210,7 +210,7 @@ negative_mll = jit(negative_mll)
 # accelerate training.
 
 # %% [markdown]
-# We can now define an optimiser with `jaxopt`. For this example we'll use the `bfgs`
+# We can now define an optimiser. For this example we'll use the `bfgs`
 # optimiser.
 
 # %%

@@ -217,8 +217,8 @@ test_y = forrester(test_x)
 # %%
 mean = gpx.mean_functions.Zero()
 kernel = gpx.kernels.Matern52(
-    lengthscale=jnp.array(2.0)
-)  # Initialise our kernel lengthscale to 2.0
+    lengthscale=jnp.array(0.1)
+)  # Initialise our kernel lengthscale to 0.1
 
 prior = gpx.Prior(mean_function=mean, kernel=kernel)
 

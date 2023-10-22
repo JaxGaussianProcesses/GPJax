@@ -228,7 +228,7 @@ negative_mll = jit(negative_mll)
 # accelerate training.
 
 # %% [markdown]
-# We can now define an optimiser with `optax`. For this example we'll use the `adam`
+# We can now define an optimiser with `scipy`. For this example we'll use the `BFGS`
 # optimiser.
 
 # %%

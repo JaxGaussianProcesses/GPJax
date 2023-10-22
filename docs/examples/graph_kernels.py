@@ -22,7 +22,6 @@ from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import networkx as nx
-import optax as ox
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -132,7 +131,7 @@ cbar = plt.colorbar(sm)
 # For this reason, we simply perform gradient descent on the GP's marginal
 # log-likelihood term as in the
 # [regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/).
-# We do this using the Adam optimiser provided in `optax`.
+# We do this using the BFGS optimiser provided in `scipy` via 'jaxopt'.
 
 # %%
 likelihood = gpx.Gaussian(num_datapoints=D.n)
@@ -200,7 +199,6 @@ sm = plt.cm.ScalarMappable(
 )
 sm.set_array([])
 cbar = plt.colorbar(sm)
-
 # %% [markdown]
 #
 # Reassuringly, our model seems to provide equally good predictions in each cluster.
