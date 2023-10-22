@@ -22,10 +22,14 @@ from gpjax.base import (
 )
 from gpjax.citation import cite
 from gpjax.dataset import Dataset
+<<<<<<< HEAD
 from gpjax.fit import (
     fit,
     fit_scipy,
 )
+=======
+from gpjax.fit import fit
+>>>>>>> main
 from gpjax.gps import (
     Prior,
     construct_posterior,
@@ -90,7 +94,10 @@ __all__ = [
     "decision_making",
     "kernels",
     "fit",
+<<<<<<< HEAD
     "fit_scipy",
+=======
+>>>>>>> main
     "Prior",
     "construct_posterior",
     "integrators",
