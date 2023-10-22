@@ -215,6 +215,7 @@ def angular_distance(x, y, c):
 
 bij = tfb.SoftClip(low=jnp.array(4.0, dtype=jnp.float64))
 
+
 @dataclass
 class Polar(gpx.kernels.AbstractKernel):
     period: float = static_field(2 * jnp.pi)
@@ -283,7 +284,6 @@ posterior_rv = opt_posterior.likelihood(opt_posterior.predict(angles, train_data
 mu = posterior_rv.mean()
 one_sigma = posterior_rv.stddev()
 
-
 # %%
 fig = plt.figure(figsize=(7, 3.5))
 gridspec = fig.add_gridspec(1, 1)
@@ -310,7 +310,6 @@ ax.fill_between(
 ax.plot(angles, mu, label="Posterior mean")
 ax.scatter(D.X, D.y, alpha=1, label="Observations")
 ax.legend()
-plt.show()
 # %% [markdown]
 # ## System configuration
 

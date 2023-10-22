@@ -23,11 +23,11 @@ from beartype.typing import (
     Union,
 )
 import jax
-import jax.numpy as jnp
 from jax._src.random import _check_prng_key
+import jax.numpy as jnp
 import jax.random as jr
-import optax as ox
 import jaxopt
+import optax as ox
 
 from gpjax.base import Module
 from gpjax.dataset import Dataset
@@ -172,9 +172,6 @@ def fit(  # noqa: PLR0913
     return model, history
 
 
-
-
-
 def fit_scipy(  # noqa: PLR0913
     *,
     model: ModuleModel,
@@ -218,45 +215,25 @@ def fit_scipy(  # noqa: PLR0913
         return objective(model.constrain(), data)
 
     solver = jaxopt.ScipyMinimize(
-        fun=loss, 
-        maxiter=max_iters, 
-        )
+        fun=loss,
+        maxiter=max_iters,
+    )
 
     initial_loss = solver.fun(model, train_data)
-    model, result = solver.run(model, data = train_data)
+    model, result = solver.run(model, data=train_data)
     history = jnp.array([initial_loss, result.fun_val])
-    
+
     if verbose:
         print(f"Initial loss is {initial_loss}")
         if result.success:
-            print(f"Optimization was successful")
+            print("Optimization was successful")
         else:
-            print(f"Optimization was not successful")
+            print("Optimization was not successful")
         print(f"Final loss is {result.fun_val} after {result.num_fun_eval} iterations")
-        
+
     # Constrained space.
     model = model.constrain()
     return model, history
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:

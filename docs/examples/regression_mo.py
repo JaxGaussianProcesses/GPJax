@@ -239,16 +239,6 @@ opt_posterior, history = gpx.fit_scipy(
 )
 
 # %% [markdown]
-# The calling of `fit` returns two objects: the optimised posterior and a history of
-# training losses. We can plot the training loss to see how the optimisation has
-# progressed.
-
-# %%
-fig, ax = plt.subplots()
-ax.plot(history, color=cols[1])
-ax.set(xlabel="Training iteration", ylabel="Negative marginal log likelihood")
-
-# %% [markdown]
 # ## Prediction
 #
 # Equipped with the posterior and a set of optimised hyperparameter values, we are now

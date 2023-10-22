@@ -119,8 +119,6 @@ def test_simple_linear_model() -> None:
     assert trained_model.bias == 1.0
 
 
-
-
 @pytest.mark.parametrize("num_iters", [1, 5])
 @pytest.mark.parametrize("n_data", [1, 20])
 @pytest.mark.parametrize("verbose", [True, False])
@@ -178,10 +176,6 @@ def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> N
 
     # Ensure we reduce the loss
     assert mll(trained_model_bfgs, D) < mll(posterior, D)
-
-
-
-
 
 
 @pytest.mark.parametrize("num_iters", [1, 5])

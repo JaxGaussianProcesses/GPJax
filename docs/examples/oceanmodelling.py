@@ -242,7 +242,7 @@ velocity_posterior = initialise_gp(kernel, mean, dataset_train)
 
 
 # %%
-def optimise_mll(posterior, dataset, NIters=1000, key=key, plot_history=True):
+def optimise_mll(posterior, dataset, NIters=1000, key=key):
     # define the MLL using dataset_train
     objective = gpx.objectives.ConjugateMLL(negative=True)
     # Optimise to minimise the MLL
@@ -251,12 +251,6 @@ def optimise_mll(posterior, dataset, NIters=1000, key=key, plot_history=True):
         objective=objective,
         train_data=dataset,
     )
-    # plot MLL value at each iteration
-    if plot_history:
-        fig, ax = plt.subplots(1, 1)
-        ax.plot(history, color=colors[1])
-        ax.set(xlabel="Training iteration", ylabel="Negative MLL")
-
     return opt_posterior
 
 

@@ -22,7 +22,10 @@ from gpjax.base import (
 )
 from gpjax.citation import cite
 from gpjax.dataset import Dataset
-from gpjax.fit import fit, fit_scipy
+from gpjax.fit import (
+    fit,
+    fit_scipy,
+)
 from gpjax.gps import (
     Prior,
     construct_posterior,

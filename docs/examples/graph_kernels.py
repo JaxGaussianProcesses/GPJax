@@ -199,6 +199,7 @@ sm = plt.cm.ScalarMappable(
 )
 sm.set_array([])
 cbar = plt.colorbar(sm)
+
 # %% [markdown]
 #
 # Reassuringly, our model seems to provide equally good predictions in each cluster.
