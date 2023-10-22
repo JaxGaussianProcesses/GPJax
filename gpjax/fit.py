@@ -26,10 +26,7 @@ import jax
 from jax._src.random import _check_prng_key
 import jax.numpy as jnp
 import jax.random as jr
-<<<<<<< HEAD
 import jaxopt
-=======
->>>>>>> main
 import optax as ox
 
 from gpjax.base import Module

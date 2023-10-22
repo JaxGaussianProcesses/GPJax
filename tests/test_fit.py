@@ -30,6 +30,7 @@ from gpjax.base import (
 from gpjax.dataset import Dataset
 from gpjax.fit import (
     fit,
+    fit_scipy,
     get_batch,
 )
 from gpjax.gps import (
@@ -97,9 +98,8 @@ def test_simple_linear_model() -> None:
     # Test stop_gradient on bias:
     assert trained_model.bias == 1.0
 
-<<<<<<< HEAD
     # Train with bfgs!
-    trained_model, hist = fit_bfgs(
+    trained_model, hist = fit_scipy(
         model=model,
         objective=loss,
         train_data=D,
@@ -118,8 +118,6 @@ def test_simple_linear_model() -> None:
     # Test stop_gradient on bias:
     assert trained_model.bias == 1.0
 
-=======
->>>>>>> main
 
 @pytest.mark.parametrize("num_iters", [1, 5])
 @pytest.mark.parametrize("n_data", [1, 20])
@@ -161,9 +159,8 @@ def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> N
     # Ensure we reduce the loss
     assert mll(trained_model, D) < mll(posterior, D)
 
-<<<<<<< HEAD
     # Train with BFGS!
-    trained_model_bfgs, history_bfgs = fit_bfgs(
+    trained_model_bfgs, history_bfgs = fit_scipy(
         model=posterior,
         objective=mll,
         train_data=D,
@@ -180,8 +177,6 @@ def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> N
     # Ensure we reduce the loss
     assert mll(trained_model_bfgs, D) < mll(posterior, D)
 
-=======
->>>>>>> main
 
 @pytest.mark.parametrize("num_iters", [1, 5])
 @pytest.mark.parametrize("batch_size", [1, 20, 50])
