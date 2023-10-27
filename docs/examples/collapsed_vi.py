@@ -244,11 +244,11 @@ plt.show()
 full_rank_model = gpx.Prior(mean_function=gpx.Zero(), kernel=gpx.RBF()) * gpx.Gaussian(
     num_datapoints=D.n
 )
-negative_mll = jit(gpx.ConjugateMLL(negative=True))
+negative_mll = jit(gpx.ConjugateMLL(negative=True).step)
 # %timeit negative_mll(full_rank_model, D).block_until_ready()
 
 # %%
-negative_elbo = jit(gpx.CollapsedELBO(negative=True))
+negative_elbo = jit(gpx.CollapsedELBO(negative=True).step)
 # %timeit negative_elbo(q, D).block_until_ready()
 
 # %% [markdown]
