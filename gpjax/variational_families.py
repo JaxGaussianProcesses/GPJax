@@ -16,7 +16,10 @@
 import abc
 from dataclasses import dataclass
 
-from beartype.typing import Any
+from beartype.typing import (
+    Any,
+    Union,
+)
 import cola
 import jax.numpy as jnp
 import jax.scipy as jsp
@@ -106,7 +109,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
     $`\mu`$ and $`sqrt`$ with $`S = sqrt sqrt^{\top}`$.
     """
 
-    variational_mean: Float[Array, "N 1"] = param_field(None)
+    variational_mean: Union[Float[Array, "N 1"], None] = param_field(None)
     variational_root_covariance: Float[Array, "N N"] = param_field(
         None, bijector=tfb.FillTriangular()
     )

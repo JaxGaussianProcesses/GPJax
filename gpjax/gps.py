@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-# from __future__ import annotations
 from abc import abstractmethod
 from dataclasses import (
     dataclass,
@@ -25,6 +24,7 @@ from beartype.typing import (
     Any,
     Callable,
     Optional,
+    Union,
 )
 import cola
 from cola.ops import Dense
@@ -152,17 +152,17 @@ class Prior(AbstractPrior):
     ```
     """
 
-    @overload
-    def __mul__(self, other: Gaussian) -> "ConjugatePosterior":
-        ...
+    # @overload
+    # def __mul__(self, other: Gaussian) -> "ConjugatePosterior":
+    #     ...
 
-    @overload
-    def __mul__(self, other: NonGaussianLikelihood) -> "NonConjugatePosterior":
-        ...
+    # @overload
+    # def __mul__(self, other: NonGaussianLikelihood) -> "NonConjugatePosterior":
+    #     ...
 
-    @overload
-    def __mul__(self, other: AbstractLikelihood) -> "AbstractPosterior":
-        ...
+    # @overload
+    # def __mul__(self, other: AbstractLikelihood) -> "AbstractPosterior":
+    #     ...
 
     def __mul__(self, other):
         r"""Combine the prior with a likelihood to form a posterior distribution.
@@ -198,17 +198,17 @@ class Prior(AbstractPrior):
         """
         return construct_posterior(prior=self, likelihood=other)
 
-    @overload
-    def __rmul__(self, other: Gaussian) -> "ConjugatePosterior":
-        ...
+    # @overload
+    # def __rmul__(self, other: Gaussian) -> "ConjugatePosterior":
+    #     ...
 
-    @overload
-    def __rmul__(self, other: NonGaussianLikelihood) -> "NonConjugatePosterior":
-        ...
+    # @overload
+    # def __rmul__(self, other: NonGaussianLikelihood) -> "NonConjugatePosterior":
+    #     ...
 
-    @overload
-    def __rmul__(self, other: AbstractLikelihood) -> "AbstractPosterior":
-        ...
+    # @overload
+    # def __rmul__(self, other: AbstractLikelihood) -> "AbstractPosterior":
+    #     ...
 
     def __rmul__(self, other):
         r"""Combine the prior with a likelihood to form a posterior distribution.
@@ -656,7 +656,7 @@ class NonConjugatePosterior(AbstractPosterior):
     from, or optimise an approximation to, the posterior distribution.
     """
 
-    latent: Float[Array, "N 1"] = param_field(None)
+    latent: Union[Float[Array, "N 1"], None] = param_field(None)
     key: KeyArray = static_field(PRNGKey(42))
 
     def __post_init__(self):

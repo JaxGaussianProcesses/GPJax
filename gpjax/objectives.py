@@ -22,7 +22,20 @@ from gpjax.typing import (
 
 tfd = tfp.distributions
 
+from typing import TypeVar
+
 import cola
+
+ConjugatePosterior = TypeVar(
+    "ConjugatePosterior", bound="gpjax.gps.ConjugatePosterior"  # noqa: F821
+)
+NonConjugatePosterior = TypeVar(
+    "NonConjugatePosterior", bound="gpjax.gps.NonConjugatePosterior"  # noqa: F821
+)
+VariationalFamily = TypeVar(
+    "VariationalFamily",
+    bound="gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
+)
 
 
 @dataclass
@@ -30,7 +43,7 @@ class AbstractObjective(Module):
     r"""Abstract base class for objectives."""
 
     negative: bool = static_field(False)
-    constant: float = static_field(init=False, repr=False)
+    constant: ScalarFloat = static_field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         self.constant = jnp.array(-1.0) if self.negative else jnp.array(1.0)
@@ -49,8 +62,8 @@ class AbstractObjective(Module):
 class ConjugateMLL(AbstractObjective):
     def step(
         self,
-        posterior: "gpjax.gps.ConjugatePosterior",  # noqa: F821
-        train_data: Dataset,  # noqa: F821
+        posterior: ConjugatePosterior,
+        train_data: Dataset,
     ) -> ScalarFloat:
         r"""Evaluate the marginal log-likelihood of the Gaussian process.
 
@@ -148,9 +161,7 @@ class LogPosteriorDensity(AbstractObjective):
     sometimes referred to as the marginal log-likelihood.
     """
 
-    def step(
-        self, posterior: "gpjax.gps.NonConjugatePosterior", data: Dataset  # noqa: F821
-    ) -> ScalarFloat:
+    def step(self, posterior: NonConjugatePosterior, data: Dataset) -> ScalarFloat:
         r"""Evaluate the log-posterior density of a Gaussian process.
 
         Compute the marginal log-likelihood, or log-posterior density of the Gaussian
@@ -210,7 +221,7 @@ NonConjugateMLL = LogPosteriorDensity
 class ELBO(AbstractObjective):
     def step(
         self,
-        variational_family: "gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
+        variational_family: VariationalFamily,
         train_data: Dataset,
     ) -> ScalarFloat:
         r"""Compute the evidence lower bound of a variational approximation.
@@ -249,7 +260,7 @@ class ELBO(AbstractObjective):
 
 
 def variational_expectation(
-    variational_family: "gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
+    variational_family: VariationalFamily,
     train_data: Dataset,
 ) -> Float[Array, " N"]:
     r"""Compute the variational expectation.
@@ -304,7 +315,7 @@ class CollapsedELBO(AbstractObjective):
 
     def step(
         self,
-        variational_family: "gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
+        variational_family: VariationalFamily,
         train_data: Dataset,
     ) -> ScalarFloat:
         r"""Compute a single step of the collapsed evidence lower bound.

@@ -16,6 +16,7 @@
 
 from dataclasses import dataclass
 
+from beartype.typing import Union
 import jax.numpy as jnp
 from jaxtyping import (
     Float,
@@ -58,13 +59,13 @@ class GraphKernel(AbstractKernel):
             of a graph.
     """
 
-    laplacian: Num[Array, "N N"] = static_field(None)
+    laplacian: Union[Num[Array, "N N"], None] = static_field(None)
     lengthscale: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     smoothness: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    eigenvalues: Float[Array, " N"] = static_field(None)
-    eigenvectors: Float[Array, "N N"] = static_field(None)
-    num_vertex: ScalarInt = static_field(None)
+    eigenvalues: Union[Float[Array, "N 1"], None] = static_field(None)
+    eigenvectors: Union[Float[Array, "N N"], None] = static_field(None)
+    num_vertex: Union[ScalarInt, None] = static_field(None)
     compute_engine: AbstractKernelComputation = static_field(
         EigenKernelComputation(), repr=False
     )

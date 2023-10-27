@@ -67,7 +67,7 @@ class CatKernel(AbstractKernel):
     cholesky_lower: Float[Array, "N N"] = param_field(
         jnp.eye(2), bijector=tfb.CorrelationCholesky()
     )
-    inspace_vals: list = static_field(None)
+    inspace_vals: Union[list, None] = static_field(None)
     name: str = "Categorical Kernel"
     input_1hot: bool = static_field(False)
 
