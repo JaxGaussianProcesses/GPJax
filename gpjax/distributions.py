@@ -26,6 +26,7 @@ import cola
 from cola.ops import (
     Dense,
     Identity,
+    LinearOperator,
 )
 from jax import vmap
 import jax.numpy as jnp
@@ -60,9 +61,9 @@ def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
             f"`scale.shape = {scale.shape}`."
         )
 
-    if scale is not None and not isinstance(scale, cola.LinearOperator):
+    if scale is not None and not isinstance(scale, LinearOperator):
         raise ValueError(
-            f"The `scale` must be a cola.LinearOperator but got {type(scale)}"
+            f"The `scale` must be a CoLA LinearOperator but got {type(scale)}"
         )
 
     if scale is not None and (scale.shape[-1] != scale.shape[-2]):
@@ -84,7 +85,7 @@ class GaussianDistribution(tfd.Distribution):
 
     Args:
         loc (Optional[Float[Array, " N"]]): The mean of the distribution. Defaults to None.
-        scale (Optional[cola.LinearOperator]): The scale matrix of the distribution. Defaults to None.
+        scale (Optional[LinearOperator]): The scale matrix of the distribution. Defaults to None.
 
     Returns
     -------
@@ -99,7 +100,7 @@ class GaussianDistribution(tfd.Distribution):
     def __init__(
         self,
         loc: Optional[Float[Array, " N"]] = None,
-        scale: Optional[cola.LinearOperator] = None,
+        scale: Optional[LinearOperator] = None,
     ) -> None:
         r"""Initialises the distribution."""
         _check_loc_scale(loc, scale)
@@ -155,9 +156,7 @@ class GaussianDistribution(tfd.Distribution):
         r"""Calculates the entropy of the distribution."""
         return 0.5 * (
             self.event_shape[0] * (1.0 + jnp.log(2.0 * jnp.pi))
-            + cola.logdet(
-                self.scale, method="dense"
-            )  # <--- Seems to be an issue with CoLA!
+            + cola.logdet(self.scale)
         )
 
     def log_prob(
@@ -191,7 +190,7 @@ class GaussianDistribution(tfd.Distribution):
         # compute the pdf, -1/2[ n log(2π) + log|Σ| + (y - µ)ᵀΣ⁻¹(y - µ) ]
         return -0.5 * (
             n * jnp.log(2.0 * jnp.pi)
-            + cola.logdet(sigma, method="dense")  # <--- Seems to be an issue with CoLA!
+            + cola.logdet(sigma)
             + diff.T @ cola.solve(sigma, diff)
         )
 
@@ -351,9 +350,7 @@ def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> ScalarFl
     )  # TODO: Not most efficient, given the `to_dense()` call (e.g., consider diagonal p and q). Need to abstract solving linear operator against another linear operator.
 
     # Mahalanobis term, (μp - μq)ᵀ Σp⁻¹ (μp - μq) = tr [(μp - μq)ᵀ [LpLpᵀ]⁻¹ (μp - μq)] = (fr[Lp⁻¹(μp - μq)])²
-    mahalanobis = jnp.sum(
-        jnp.square(cola.solve(sqrt_p, diff))
-    )  # TODO: Need to improve this. Perhaps add a Mahalanobis method to ``LinearOperator``s.
+    mahalanobis = jnp.sum(jnp.square(cola.solve(sqrt_p, diff)))
 
     # KL[q(x)||p(x)] = [ [(μp - μq)ᵀ Σp⁻¹ (μp - μq)] - n - log|Σq| + log|Σp| + tr[Σp⁻¹ Σq] ] / 2
     return (
