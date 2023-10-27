@@ -46,6 +46,8 @@ from gpjax.typing import (
 
 tfd = tfp.distributions
 
+from cola.linalg.decompositions.decompositions import Cholesky
+
 
 def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
     r"""Checks that the inputs are correct."""
@@ -156,7 +158,7 @@ class GaussianDistribution(tfd.Distribution):
         r"""Calculates the entropy of the distribution."""
         return 0.5 * (
             self.event_shape[0] * (1.0 + jnp.log(2.0 * jnp.pi))
-            + cola.logdet(self.scale)
+            + cola.logdet(self.scale, Cholesky(), Cholesky())
         )
 
     def log_prob(
@@ -190,8 +192,8 @@ class GaussianDistribution(tfd.Distribution):
         # compute the pdf, -1/2[ n log(2π) + log|Σ| + (y - µ)ᵀΣ⁻¹(y - µ) ]
         return -0.5 * (
             n * jnp.log(2.0 * jnp.pi)
-            + cola.logdet(sigma)
-            + diff.T @ cola.solve(sigma, diff)
+            + cola.logdet(sigma, Cholesky(), Cholesky())
+            + diff.T @ cola.solve(sigma, diff, Cholesky())
         )
 
     def _sample_n(self, key: KeyArray, n: int) -> Float[Array, "n N"]:
@@ -346,15 +348,19 @@ def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> ScalarFl
 
     # trace term, tr[Σp⁻¹ Σq] = tr[(LpLpᵀ)⁻¹(LqLqᵀ)] = tr[(Lp⁻¹Lq)(Lp⁻¹Lq)ᵀ] = (fr[LqLp⁻¹])²
     trace = _frobenius_norm_squared(
-        cola.solve(sqrt_p, sqrt_q.to_dense())
+        cola.solve(sqrt_p, sqrt_q.to_dense(), Cholesky())
     )  # TODO: Not most efficient, given the `to_dense()` call (e.g., consider diagonal p and q). Need to abstract solving linear operator against another linear operator.
 
     # Mahalanobis term, (μp - μq)ᵀ Σp⁻¹ (μp - μq) = tr [(μp - μq)ᵀ [LpLpᵀ]⁻¹ (μp - μq)] = (fr[Lp⁻¹(μp - μq)])²
-    mahalanobis = jnp.sum(jnp.square(cola.solve(sqrt_p, diff)))
+    mahalanobis = jnp.sum(jnp.square(cola.solve(sqrt_p, diff, Cholesky())))
 
     # KL[q(x)||p(x)] = [ [(μp - μq)ᵀ Σp⁻¹ (μp - μq)] - n - log|Σq| + log|Σp| + tr[Σp⁻¹ Σq] ] / 2
     return (
-        mahalanobis - n_dim - cola.logdet(sigma_q) + cola.logdet(sigma_p) + trace
+        mahalanobis
+        - n_dim
+        - cola.logdet(sigma_q, Cholesky(), Cholesky())
+        + cola.logdet(sigma_p, Cholesky(), Cholesky())
+        + trace
     ) / 2.0
 
 

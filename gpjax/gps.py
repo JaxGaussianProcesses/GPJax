@@ -27,6 +27,7 @@ from beartype.typing import (
     Union,
 )
 import cola
+from cola.linalg.decompositions.decompositions import Cholesky
 from cola.ops import Dense
 import jax.numpy as jnp
 from jax.random import (
@@ -540,7 +541,7 @@ class ConjugatePosterior(AbstractPosterior):
         # Σ⁻¹ Kxt
         if mask is not None:
             Kxt = jnp.where(mask * jnp.ones((1, n_train), dtype=bool), 0.0, Kxt)
-        Sigma_inv_Kxt = cola.solve(Sigma, Kxt)
+        Sigma_inv_Kxt = cola.solve(Sigma, Kxt, Cholesky())
 
         # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
         mean = mean_t.flatten() + Sigma_inv_Kxt.T @ (y - mx).flatten()
@@ -618,7 +619,9 @@ class ConjugatePosterior(AbstractPosterior):
         y = train_data.y - self.prior.mean_function(train_data.X)  # account for mean
         Phi = fourier_feature_fn(train_data.X)
         canonical_weights = cola.solve(
-            Sigma, y + eps - jnp.inner(Phi, fourier_weights)
+            Sigma,
+            y + eps - jnp.inner(Phi, fourier_weights),
+            Cholesky(),
         )  #  [N, B]
 
         def sample_fn(test_inputs: Float[Array, "n D"]) -> Float[Array, "n B"]:
@@ -707,7 +710,7 @@ class NonConjugatePosterior(AbstractPosterior):
         mean_t = mean_function(t)
 
         # Lx⁻¹ Kxt
-        Lx_inv_Kxt = cola.solve(Lx, Ktx.T)
+        Lx_inv_Kxt = cola.solve(Lx, Ktx.T, Cholesky())
 
         # Whitened function values, wx, corresponding to the inputs, x
         wx = self.latent

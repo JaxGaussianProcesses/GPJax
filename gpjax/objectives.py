@@ -37,6 +37,8 @@ VariationalFamily = TypeVar(
     bound="gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
 )
 
+from cola.linalg.decompositions.decompositions import Cholesky
+
 
 @dataclass
 class AbstractObjective(Module):
@@ -384,7 +386,7 @@ class CollapsedELBO(AbstractObjective):
         #
         #   with A and B defined as above.
 
-        A = cola.solve(Lz, Kzx) / jnp.sqrt(noise)
+        A = cola.solve(Lz, Kzx, Cholesky()) / jnp.sqrt(noise)
 
         # AAᵀ
         AAT = jnp.matmul(A, A.T)
