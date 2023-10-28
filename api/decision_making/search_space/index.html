@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.6">
     
     
       
@@ -2677,31 +2677,9 @@ search spaces, which are used to define domains for sampling and optimisation fu
 
   <div class="doc doc-contents ">
   
-      <p>Dimensionality of the search space.</p>
-
-
-
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-<td><code>int</code></td>          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Dimensionality of the search space.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      <p>Dimensionality of the search space.
+Returns:
+    int: Dimensionality of the search space.</p>
   </div>
 
 </div>
@@ -2726,75 +2704,12 @@ search spaces, which are used to define domains for sampling and optimisation fu
 
   <div class="doc doc-contents ">
   
-      <p>Sample points from the search space.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>num_points</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Number of points to be sampled from the search space.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>key</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.typing.KeyArray" href="../../typing/#gpjax.typing.KeyArray">KeyArray</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>JAX PRNG key.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Float[Array, "N D"]: <code>num_points</code> points sampled from the search space.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      <p>Sample points from the search space.
+Args:
+    num_points (int): Number of points to be sampled from the search space.
+    key (KeyArray): JAX PRNG key.
+Returns:
+    Float[Array, "N D"]: <code>num_points</code> points sampled from the search space.</p>
 
   </div>
 
@@ -2996,40 +2911,9 @@ search spaces, which are used to define domains for sampling and optimisation fu
         </tr>
     </tbody>
   </table>
-
-
-
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Float[Array, "N D"]: <code>num_points</code> points sampled using the Halton sequence</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>from the search space.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      <p>Returns:
+    Float[Array, "N D"]: <code>num_points</code> points sampled using the Halton sequence
+    from the search space.</p>
 
   </div>
 

@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.6">
     
     
       
@@ -2809,168 +2809,6 @@
 
 
 
-<h6 id="gpjax.kernels.base.AbstractKernel.cross_covariance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.AbstractKernel.gram" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.AbstractKernel.slice_input" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Slice out the relevant columns of the input matrix.</p>
-<p>Select the relevant columns of the supplied matrix to be used within the
-kernel's evaluation.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The matrix or vector that is to be sliced.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.AbstractKernel.slice_input--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.AbstractKernel.slice_input--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Num[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.AbstractKernel.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Evaluate the kernel on a pair of inputs.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The left hand input of the kernel function.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>y</code></td>
-          <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The right hand input of the kernel function.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.AbstractKernel.__call__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.AbstractKernel.__call__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>ScalarFloat: The evaluated kernel function at the supplied inputs.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.kernels.base.AbstractKernel.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -2978,59 +2816,6 @@ kernel's evaluation.</p>
 
 
   <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.AbstractKernel.__add__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be added to the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.AbstractKernel.__add__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.AbstractKernel.__add__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
-</code></pre></div>
 
   </div>
 
@@ -3083,112 +2868,6 @@ kernel's evaluation.</p>
   </table>
       <h6 id="gpjax.kernels.base.AbstractKernel.replace--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.AbstractKernel.replace--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: with the fields replaced.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.AbstractKernel.__radd__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be added to the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.AbstractKernel.__radd__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.AbstractKernel.__radd__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.AbstractKernel.__mul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Multiply two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be multiplied with the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.AbstractKernel.__mul__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.AbstractKernel.__mul__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the product of the two kernels.
 </code></pre></div>
 
   </div>
@@ -3429,6 +3108,271 @@ kernel's evaluation.</p>
 </div>
 
 
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.AbstractKernel.cross_covariance" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.AbstractKernel.gram" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.AbstractKernel.slice_input" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Slice out the relevant columns of the input matrix.</p>
+<p>Select the relevant columns of the supplied matrix to be used within the
+kernel's evaluation.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The matrix or vector that is to be sliced.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.base.AbstractKernel.slice_input--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.AbstractKernel.slice_input--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Num[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.AbstractKernel.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Evaluate the kernel on a pair of inputs.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The left hand input of the kernel function.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>y</code></td>
+          <td>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The right hand input of the kernel function.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.base.AbstractKernel.__call__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.AbstractKernel.__call__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>ScalarFloat: The evaluated kernel function at the supplied inputs.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.AbstractKernel.__add__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two kernels together.
+Args:
+    other (AbstractKernel): The kernel to be added to the current kernel.</p>
+<h6 id="gpjax.kernels.base.AbstractKernel.__add__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.AbstractKernel.__add__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.AbstractKernel.__radd__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two kernels together.
+Args:
+    other (AbstractKernel): The kernel to be added to the current kernel.</p>
+<h6 id="gpjax.kernels.base.AbstractKernel.__radd__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.AbstractKernel.__radd__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.AbstractKernel.__mul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two kernels together.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The kernel to be multiplied with the current kernel.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.base.AbstractKernel.__mul__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.AbstractKernel.__mul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the product of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
 
   </div>
 
@@ -3603,97 +3547,6 @@ The scalar value itself can be treated as a model hyperparameter and learned dur
 
 
 
-<h6 id="gpjax.kernels.base.Constant.cross_covariance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.Constant.gram" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.Constant.slice_input" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Slice out the relevant columns of the input matrix.</p>
-<p>Select the relevant columns of the supplied matrix to be used within the
-kernel's evaluation.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The matrix or vector that is to be sliced.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.Constant.slice_input--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.Constant.slice_input--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Num[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.kernels.base.Constant.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -3701,59 +3554,6 @@ kernel's evaluation.</p>
 
 
   <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.Constant.__add__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be added to the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.Constant.__add__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.Constant.__add__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
-</code></pre></div>
 
   </div>
 
@@ -3806,112 +3606,6 @@ kernel's evaluation.</p>
   </table>
       <h6 id="gpjax.kernels.base.Constant.replace--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.Constant.replace--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: with the fields replaced.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.Constant.__radd__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be added to the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.Constant.__radd__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.Constant.__radd__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.Constant.__mul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Multiply two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be multiplied with the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.Constant.__mul__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.Constant.__mul__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the product of the two kernels.
 </code></pre></div>
 
   </div>
@@ -4018,73 +3712,6 @@ kernel's evaluation.</p>
   </table>
       <h6 id="gpjax.kernels.base.Constant.update_meta--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.Constant.update_meta--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: with the fields replaced.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.Constant.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Evaluate the kernel on a pair of inputs.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The left hand input of the kernel function.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>y</code></td>
-          <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The right hand input of the kernel function.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.Constant.__call__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.Constant.__call__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>ScalarFloat: The evaluated kernel function at the supplied inputs.
 </code></pre></div>
 
   </div>
@@ -4213,6 +3840,267 @@ kernel's evaluation.</p>
 
 
   <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.Constant.cross_covariance" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.Constant.gram" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.Constant.slice_input" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Slice out the relevant columns of the input matrix.</p>
+<p>Select the relevant columns of the supplied matrix to be used within the
+kernel's evaluation.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The matrix or vector that is to be sliced.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.base.Constant.slice_input--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.Constant.slice_input--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Num[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.Constant.__add__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two kernels together.
+Args:
+    other (AbstractKernel): The kernel to be added to the current kernel.</p>
+<h6 id="gpjax.kernels.base.Constant.__add__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.Constant.__add__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.Constant.__radd__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two kernels together.
+Args:
+    other (AbstractKernel): The kernel to be added to the current kernel.</p>
+<h6 id="gpjax.kernels.base.Constant.__radd__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.Constant.__radd__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.Constant.__mul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two kernels together.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The kernel to be multiplied with the current kernel.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.base.Constant.__mul__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.Constant.__mul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the product of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.Constant.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Evaluate the kernel on a pair of inputs.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The left hand input of the kernel function.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>y</code></td>
+          <td>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The right hand input of the kernel function.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.base.Constant.__call__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.Constant.__call__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>ScalarFloat: The evaluated kernel function at the supplied inputs.
+</code></pre></div>
 
   </div>
 
@@ -4413,97 +4301,6 @@ kernel's evaluation.</p>
 
 
 
-<h6 id="gpjax.kernels.base.CombinationKernel.cross_covariance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.CombinationKernel.gram" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.CombinationKernel.slice_input" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Slice out the relevant columns of the input matrix.</p>
-<p>Select the relevant columns of the supplied matrix to be used within the
-kernel's evaluation.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The matrix or vector that is to be sliced.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.CombinationKernel.slice_input--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.slice_input--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Num[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.kernels.base.CombinationKernel.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -4511,59 +4308,6 @@ kernel's evaluation.</p>
 
 
   <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.CombinationKernel.__add__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be added to the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.CombinationKernel.__add__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.__add__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
-</code></pre></div>
 
   </div>
 
@@ -4616,112 +4360,6 @@ kernel's evaluation.</p>
   </table>
       <h6 id="gpjax.kernels.base.CombinationKernel.replace--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.replace--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: with the fields replaced.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.CombinationKernel.__radd__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be added to the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.CombinationKernel.__radd__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.__radd__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.CombinationKernel.__mul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Multiply two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be multiplied with the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.base.CombinationKernel.__mul__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.__mul__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the product of the two kernels.
 </code></pre></div>
 
   </div>
@@ -4860,24 +4498,6 @@ kernel's evaluation.</p>
 
 
 
-<h6 id="gpjax.kernels.base.CombinationKernel.__post_init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.kernels.base.CombinationKernel.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4910,6 +4530,282 @@ kernel's evaluation.</p>
 <h6 id="gpjax.kernels.base.CombinationKernel.constrain--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.constrain--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: transformed to the constrained space.
 </code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.CombinationKernel.unconstrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the unconstrained space according to their defined bijectors.</p>
+<h6 id="gpjax.kernels.base.CombinationKernel.unconstrain--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.unconstrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the unconstrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.CombinationKernel.stop_gradient" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">stop_gradient</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Stop gradients flowing through the Module.</p>
+<h6 id="gpjax.kernels.base.CombinationKernel.stop_gradient--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.stop_gradient--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with gradients stopped.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.CombinationKernel.trainables" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.CombinationKernel.cross_covariance" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.CombinationKernel.gram" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.CombinationKernel.slice_input" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Slice out the relevant columns of the input matrix.</p>
+<p>Select the relevant columns of the supplied matrix to be used within the
+kernel's evaluation.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The matrix or vector that is to be sliced.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.base.CombinationKernel.slice_input--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.slice_input--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Num[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.CombinationKernel.__add__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two kernels together.
+Args:
+    other (AbstractKernel): The kernel to be added to the current kernel.</p>
+<h6 id="gpjax.kernels.base.CombinationKernel.__add__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.__add__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.CombinationKernel.__radd__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two kernels together.
+Args:
+    other (AbstractKernel): The kernel to be added to the current kernel.</p>
+<h6 id="gpjax.kernels.base.CombinationKernel.__radd__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.__radd__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.CombinationKernel.__mul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two kernels together.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The kernel to be multiplied with the current kernel.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.base.CombinationKernel.__mul__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.__mul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the product of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.base.CombinationKernel.__post_init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
 
   </div>
 
@@ -4977,70 +4873,6 @@ kernel's evaluation.</p>
       <h6 id="gpjax.kernels.base.CombinationKernel.__call__--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.__call__--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>ScalarFloat: The evaluated kernel function at the supplied inputs.
 </code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.CombinationKernel.unconstrain" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Transform model parameters to the unconstrained space according to their defined bijectors.</p>
-<h6 id="gpjax.kernels.base.CombinationKernel.unconstrain--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.unconstrain--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Module: transformed to the unconstrained space.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.CombinationKernel.stop_gradient" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">stop_gradient</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Stop gradients flowing through the Module.</p>
-<h6 id="gpjax.kernels.base.CombinationKernel.stop_gradient--returns">Returns<a class="headerlink" href="#gpjax.kernels.base.CombinationKernel.stop_gradient--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Module: with gradients stopped.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.base.CombinationKernel.trainables" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
 
   </div>
 

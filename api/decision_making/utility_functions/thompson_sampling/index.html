@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.6">
     
     
       
@@ -2723,6 +2723,95 @@ the approximate sample from the posterior. Defaults to 100.</p>
 
 
 
+<h6 id="gpjax.decision_making.utility_functions.thompson_sampling.ThompsonSampling.check_objective_present" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">check_objective_present</span><span class="p">(</span><span class="n">posteriors</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">AbstractPosterior</span><span class="p">],</span> <span class="n">datasets</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Check that the objective posterior and dataset are present in the posteriors and
+datasets.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>posteriors</code></td>
+          <td>
+                <code><span title="beartype.typing.Mapping">Mapping</span>[str, <a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPosterior" href="../../../gps/#gpjax.gps.AbstractPosterior">AbstractPosterior</a>]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Dictionary of posteriors to be</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>datasets</code></td>
+          <td>
+                <code><span title="beartype.typing.Mapping">Mapping</span>[str, <a class="autorefs autorefs-internal" title="gpjax.dataset.Dataset" href="../../../dataset/#gpjax.dataset.Dataset">Dataset</a>]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Dictionary of datasets which may be used</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>ValueError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If the objective posterior or dataset are not present in the</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
 <h6 id="gpjax.decision_making.utility_functions.thompson_sampling.ThompsonSampling.__post_init__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
 
@@ -2849,95 +2938,6 @@ are <em>maximised</em>.</p>
           <td>
             <div class="doc-md-description">
               <p>next.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.decision_making.utility_functions.thompson_sampling.ThompsonSampling.check_objective_present" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">check_objective_present</span><span class="p">(</span><span class="n">posteriors</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">AbstractPosterior</span><span class="p">],</span> <span class="n">datasets</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Check that the objective posterior and dataset are present in the posteriors and
-datasets.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>posteriors</code></td>
-          <td>
-                <code><span title="beartype.typing.Mapping">Mapping</span>[str, <a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPosterior" href="../../../gps/#gpjax.gps.AbstractPosterior">AbstractPosterior</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Dictionary of posteriors to be</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>datasets</code></td>
-          <td>
-                <code><span title="beartype.typing.Mapping">Mapping</span>[str, <a class="autorefs autorefs-internal" title="gpjax.dataset.Dataset" href="../../../dataset/#gpjax.dataset.Dataset">Dataset</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Dictionary of datasets which may be used</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-
-  <p><strong>Raises:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td>
-                <code>ValueError</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>If the objective posterior or dataset are not present in the</p>
             </div>
           </td>
         </tr>

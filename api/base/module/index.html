@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.6">
     
     
       
@@ -3173,80 +3173,13 @@
 
   <div class="doc doc-contents ">
   
-      <p>Apply a function to a Module where the first argument are the pytree leaves, and the second argument are the Module metadata leaves.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>f</code></td>
-          <td>
-                <code><span title="beartype.typing.Callable">Callable</span>[[<span title="beartype.typing.Any">Any</span>, <span title="beartype.typing.Dict">Dict</span>[str, <span title="beartype.typing.Any">Any</span>]], <span title="beartype.typing.Any">Any</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The function to apply to the pytree.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>pytree</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.base.module.Module" href="#gpjax.base.module.Module">Module</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The pytree to apply the function to.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>rest</code></td>
-          <td>
-                <code><span title="beartype.typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Additional pytrees to apply the function to. Defaults to None.</p>
-            </div>
-          </td>
-          <td>
-                <code>()</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>is_leaf</code></td>
-          <td>
-                <code><span title="beartype.typing.Callable">Callable</span>[[<span title="beartype.typing.Any">Any</span>], bool]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>predicate to determine if a node is a leaf. Defaults to None.</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.base.module.meta_map--returns">Returns<a class="headerlink" href="#gpjax.base.module.meta_map--returns" title="Permanent link"></a></h6>
+      <p>Apply a function to a Module where the first argument are the pytree leaves, and the second argument are the Module metadata leaves.
+Args:
+    f (Callable[[Any, Dict[str, Any]], Any]): The function to apply to the pytree.
+    pytree (Module): The pytree to apply the function to.
+    rest (Any, optional): Additional pytrees to apply the function to. Defaults to None.
+    is_leaf (Callable[[Any], bool], optional): predicate to determine if a node is a leaf. Defaults to None.</p>
+<h6 id="gpjax.base.module.meta_map--returns">Returns<a class="headerlink" href="#gpjax.base.module.meta_map--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: The transformed pytree.
 </code></pre></div>
 

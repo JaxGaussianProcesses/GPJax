@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.6">
     
     
       
@@ -2683,104 +2683,6 @@ a dense gram matrix structure.</p>
 
 
 
-<h6 id="gpjax.kernels.computations.dense.DenseKernelComputation.cross_covariance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N M&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <link rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
-  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
-  crossorigin="anonymous" />
-
-<style type="text/css">
-    .katex img {
-      object-fit: fill;
-      padding: unset;
-      display: block;
-      position: absolute;
-      width: 100%;
-      height: inherit;
-    }
-</style>
-<p>Compute the cross-covariance matrix.</p>
-<p>For a given kernel, compute the NxM covariance matrix on a pair of input
-matrices of shape <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>x</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">NxD</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mord mathnormal">x</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span> and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mi>x</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">MxD</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mord mathnormal">x</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span>.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>kernel</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.computations.dense.Kernel" href="#gpjax.kernels.computations.dense.Kernel">Kernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the kernel function.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The input matrix.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>y</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;M D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The input matrix.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.computations.dense.DenseKernelComputation.cross_covariance--returns">Returns<a class="headerlink" href="#gpjax.kernels.computations.dense.DenseKernelComputation.cross_covariance--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;N M&quot;]: The computed cross-covariance.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.kernels.computations.dense.DenseKernelComputation.gram" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
 
@@ -2904,6 +2806,104 @@ NxN gram matrix on an input matrix of shape NxD.</p>
   </table>
       <h6 id="gpjax.kernels.computations.dense.DenseKernelComputation.diagonal--returns">Returns<a class="headerlink" href="#gpjax.kernels.computations.dense.DenseKernelComputation.diagonal--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Diagonal: The computed diagonal variance entries.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.computations.dense.DenseKernelComputation.cross_covariance" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N M&#39;</span><span class="p">]</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>Compute the cross-covariance matrix.</p>
+<p>For a given kernel, compute the NxM covariance matrix on a pair of input
+matrices of shape <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>x</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">NxD</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mord mathnormal">x</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span> and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mi>x</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">MxD</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mord mathnormal">x</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span>.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>kernel</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.computations.dense.Kernel" href="#gpjax.kernels.computations.dense.Kernel">Kernel</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the kernel function.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The input matrix.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>y</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;M D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The input matrix.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.computations.dense.DenseKernelComputation.cross_covariance--returns">Returns<a class="headerlink" href="#gpjax.kernels.computations.dense.DenseKernelComputation.cross_covariance--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Float[Array, &quot;N M&quot;]: The computed cross-covariance.
 </code></pre></div>
 
   </div>

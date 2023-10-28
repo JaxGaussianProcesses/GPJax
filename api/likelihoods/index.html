@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.6">
     
     
       
@@ -2788,174 +2788,6 @@
 
 
 
-<h6 id="gpjax.likelihoods.AbstractLikelihood.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Evaluate the likelihood function at a given predictive distribution.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>*args</code></td>
-          <td>
-                <code><span title="beartype.typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Arguments to be passed to the likelihood's <code>predict</code> method.</p>
-            </div>
-          </td>
-          <td>
-                <code>()</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>**kwargs</code></td>
-          <td>
-                <code><span title="beartype.typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Keyword arguments to be passed to the likelihood's
-<code>predict</code> method.</p>
-            </div>
-          </td>
-          <td>
-                <code>{}</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.likelihoods.AbstractLikelihood.__call__--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.AbstractLikelihood.__call__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>tfd.Distribution: The predictive distribution.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.likelihoods.AbstractLikelihood.predict" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Evaluate the likelihood function at a given predictive distribution.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>*args</code></td>
-          <td>
-                <code><span title="beartype.typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Arguments to be passed to the likelihood's <code>predict</code> method.</p>
-            </div>
-          </td>
-          <td>
-                <code>()</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>**kwargs</code></td>
-          <td>
-                <code><span title="beartype.typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Keyword arguments to be passed to the likelihood's
-<code>predict</code> method.</p>
-            </div>
-          </td>
-          <td>
-                <code>{}</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.likelihoods.AbstractLikelihood.predict--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.AbstractLikelihood.predict--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>tfd.Distribution: The predictive distribution.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.likelihoods.AbstractLikelihood.link_function" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Return the link function of the likelihood function.</p>
-<h6 id="gpjax.likelihoods.AbstractLikelihood.link_function--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.AbstractLikelihood.link_function--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>tfd.Distribution: The distribution of observations, y, given values of the
-    Gaussian process, f.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.likelihoods.AbstractLikelihood.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -2963,128 +2795,6 @@
 
 
   <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.likelihoods.AbstractLikelihood.expected_log_likelihood" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">expected_log_likelihood</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">mean</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">variance</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <link rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
-  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
-  crossorigin="anonymous" />
-
-<style type="text/css">
-    .katex img {
-      object-fit: fill;
-      padding: unset;
-      display: block;
-      position: absolute;
-      width: 100%;
-      height: inherit;
-    }
-</style>
-<p>Compute the expected log likelihood.</p>
-<p>For a variational distribution <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo><mo>∼</mo><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><mi>m</mi><mo separator="true">,</mo><mi>s</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">q(f)\sim\mathcal{N}(m, s)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.14736em;">N</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">s</span><span class="mclose">)</span></span></span></span> and a likelihood
-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>y</mi><mi mathvariant="normal">∣</mi><mi>f</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(y|f)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span></span></span></span>, compute the expected log likelihood:
-<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="double-struck">E</mi><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></msub><mrow><mo fence="true">[</mo><mi>log</mi><mo>⁡</mo><mi>p</mi><mo stretchy="false">(</mo><mi>y</mi><mi mathvariant="normal">∣</mi><mi>f</mi><mo stretchy="false">)</mo><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">
-\mathbb{E}_{q(f)}\left[\log p(y|f)\right]
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1052em;vertical-align:-0.3552em;"></span><span class="mord"><span class="mord mathbb">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.5198em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3552em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">[</span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span><span class="mclose delimcenter" style="top:0em;">]</span></span></span></span></span></span></p></p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>y</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The observed response variable.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>mean</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The variational mean.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>variance</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The variational variance.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-<td><code>ScalarFloat</code></td>          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39; N&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The expected log likelihood.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
 
   </div>
 
@@ -3377,150 +3087,12 @@
 </div>
 
 
-
-  </div>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-
-<h5 id="gpjax.likelihoods.Gaussian" class="doc doc-heading">
-          <code>Gaussian</code>
-
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
-
-</h5>
-
-
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.likelihoods.AbstractLikelihood" href="#gpjax.likelihoods.AbstractLikelihood">AbstractLikelihood</a></code></p>
-
-  
-      <p>Gaussian likelihood object.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>obs_stddev</code></td>
-          <td>
-                <code><span title="beartype.typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.ScalarFloat" href="../typing/#gpjax.typing.ScalarFloat">ScalarFloat</a>, <span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39;#N&#39;]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the standard deviation
-of the Gaussian observation noise.</p>
-            </div>
-          </td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.base.param_field" href="../base/param/#gpjax.base.param.param_field">param_field</a>(jax.<span title="jax.array">array</span>(1.0), bijector=<a class="autorefs autorefs-internal" title="gpjax.likelihoods.tfb" href="#gpjax.likelihoods.tfb">tfb</a>.<span title="gpjax.likelihoods.tfb.Softplus">Softplus</span>())</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.likelihoods.Gaussian.num_datapoints" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">num_datapoints</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">()</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.likelihoods.Gaussian.obs_stddev" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">obs_stddev</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ScalarFloat</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;#N&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.likelihoods.Gaussian.integrator" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">integrator</span><span class="p">:</span> <span class="n">AbstractIntegrator</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">AnalyticalGaussianIntegrator</span><span class="p">())</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-
-
-
 <div class="doc doc-object doc-function">
 
 
 
 
-<h6 id="gpjax.likelihoods.Gaussian.__call__" class="doc doc-heading">
+<h6 id="gpjax.likelihoods.AbstractLikelihood.__call__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
 
 </h6>
@@ -3574,7 +3146,7 @@ of the Gaussian observation noise.</p>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.likelihoods.Gaussian.__call__--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Gaussian.__call__--returns" title="Permanent link"></a></h6>
+      <h6 id="gpjax.likelihoods.AbstractLikelihood.__call__--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.AbstractLikelihood.__call__--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>tfd.Distribution: The predictive distribution.
 </code></pre></div>
 
@@ -3588,13 +3160,67 @@ of the Gaussian observation noise.</p>
 
 
 
-<h6 id="gpjax.likelihoods.Gaussian.__init_subclass__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
+<h6 id="gpjax.likelihoods.AbstractLikelihood.predict" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
 
 </h6>
 
 
   <div class="doc doc-contents ">
+  
+      <p>Evaluate the likelihood function at a given predictive distribution.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>*args</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Arguments to be passed to the likelihood's <code>predict</code> method.</p>
+            </div>
+          </td>
+          <td>
+                <code>()</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Keyword arguments to be passed to the likelihood's
+<code>predict</code> method.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.likelihoods.AbstractLikelihood.predict--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.AbstractLikelihood.predict--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>tfd.Distribution: The predictive distribution.
+</code></pre></div>
 
   </div>
 
@@ -3606,7 +3232,35 @@ of the Gaussian observation noise.</p>
 
 
 
-<h6 id="gpjax.likelihoods.Gaussian.expected_log_likelihood" class="doc doc-heading">
+<h6 id="gpjax.likelihoods.AbstractLikelihood.link_function" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Return the link function of the likelihood function.</p>
+<h6 id="gpjax.likelihoods.AbstractLikelihood.link_function--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.AbstractLikelihood.link_function--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>tfd.Distribution: The distribution of observations, y, given values of the
+    Gaussian process, f.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.likelihoods.AbstractLikelihood.expected_log_likelihood" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">expected_log_likelihood</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">mean</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">variance</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">]</span></code>
 
 </h6>
@@ -3717,6 +3371,162 @@ of the Gaussian observation noise.</p>
         </tr>
     </tbody>
   </table>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h5 id="gpjax.likelihoods.Gaussian" class="doc doc-heading">
+          <code>Gaussian</code>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.likelihoods.AbstractLikelihood" href="#gpjax.likelihoods.AbstractLikelihood">AbstractLikelihood</a></code></p>
+
+  
+      <p>Gaussian likelihood object.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>obs_stddev</code></td>
+          <td>
+                <code><span title="beartype.typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.ScalarFloat" href="../typing/#gpjax.typing.ScalarFloat">ScalarFloat</a>, <span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39;#N&#39;]]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the standard deviation
+of the Gaussian observation noise.</p>
+            </div>
+          </td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.base.param_field" href="../base/param/#gpjax.base.param.param_field">param_field</a>(<span title="jax.array">array</span>(1.0), bijector=<span title="gpjax.likelihoods.tfb.Softplus">Softplus</span>())</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h6 id="gpjax.likelihoods.Gaussian.num_datapoints" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">num_datapoints</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h6 id="gpjax.likelihoods.Gaussian.obs_stddev" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">obs_stddev</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ScalarFloat</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;#N&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h6 id="gpjax.likelihoods.Gaussian.integrator" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">integrator</span><span class="p">:</span> <span class="n">AbstractIntegrator</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">AnalyticalGaussianIntegrator</span><span class="p">())</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.likelihoods.Gaussian.__init_subclass__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
 
   </div>
 
@@ -3834,59 +3644,6 @@ of the Gaussian observation noise.</p>
 
 
 
-<h6 id="gpjax.likelihoods.Gaussian.link_function" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>The link function of the Gaussian likelihood.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>f</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, ...]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Function values.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.likelihoods.Gaussian.link_function--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Gaussian.link_function--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>tfd.Normal: The likelihood function.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.likelihoods.Gaussian.update_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">update_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3928,64 +3685,6 @@ of the Gaussian observation noise.</p>
   </table>
       <h6 id="gpjax.likelihoods.Gaussian.update_meta--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Gaussian.update_meta--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: with the fields replaced.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.likelihoods.Gaussian.predict" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">dist</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalTriL</span><span class="p">,</span> <span class="n">GaussianDistribution</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalFullCovariance</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Evaluate the Gaussian likelihood.</p>
-<p>Evaluate the Gaussian likelihood function at a given predictive
-distribution. Computationally, this is equivalent to summing the
-observation noise term to the diagonal elements of the predictive
-distribution's covariance matrix.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>dist</code></td>
-          <td>
-                <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The Gaussian process posterior,
-evaluated at a finite set of test points.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.likelihoods.Gaussian.predict--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Gaussian.predict--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>tfd.Distribution: The predictive distribution.
 </code></pre></div>
 
   </div>
@@ -4120,96 +3819,12 @@ evaluated at a finite set of test points.</p>
 </div>
 
 
-
-  </div>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-
-<h5 id="gpjax.likelihoods.Bernoulli" class="doc doc-heading">
-          <code>Bernoulli</code>
-
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
-
-</h5>
-
-
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.likelihoods.AbstractLikelihood" href="#gpjax.likelihoods.AbstractLikelihood">AbstractLikelihood</a></code></p>
-
-
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.likelihoods.Bernoulli.num_datapoints" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">num_datapoints</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">()</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.likelihoods.Bernoulli.integrator" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">integrator</span><span class="p">:</span> <span class="n">AbstractIntegrator</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">GHQuadratureIntegrator</span><span class="p">())</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-
-
-
 <div class="doc doc-object doc-function">
 
 
 
 
-<h6 id="gpjax.likelihoods.Bernoulli.__call__" class="doc doc-heading">
+<h6 id="gpjax.likelihoods.Gaussian.__call__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
 
 </h6>
@@ -4263,7 +3878,7 @@ evaluated at a finite set of test points.</p>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.likelihoods.Bernoulli.__call__--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Bernoulli.__call__--returns" title="Permanent link"></a></h6>
+      <h6 id="gpjax.likelihoods.Gaussian.__call__--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Gaussian.__call__--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>tfd.Distribution: The predictive distribution.
 </code></pre></div>
 
@@ -4277,25 +3892,7 @@ evaluated at a finite set of test points.</p>
 
 
 
-<h6 id="gpjax.likelihoods.Bernoulli.__init_subclass__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.likelihoods.Bernoulli.expected_log_likelihood" class="doc doc-heading">
+<h6 id="gpjax.likelihoods.Gaussian.expected_log_likelihood" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">expected_log_likelihood</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">mean</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">variance</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">]</span></code>
 
 </h6>
@@ -4406,6 +4003,219 @@ evaluated at a finite set of test points.</p>
         </tr>
     </tbody>
   </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.likelihoods.Gaussian.link_function" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The link function of the Gaussian likelihood.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>f</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, ...]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Function values.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.likelihoods.Gaussian.link_function--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Gaussian.link_function--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>tfd.Normal: The likelihood function.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.likelihoods.Gaussian.predict" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">dist</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalTriL</span><span class="p">,</span> <span class="n">GaussianDistribution</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalFullCovariance</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Evaluate the Gaussian likelihood.</p>
+<p>Evaluate the Gaussian likelihood function at a given predictive
+distribution. Computationally, this is equivalent to summing the
+observation noise term to the diagonal elements of the predictive
+distribution's covariance matrix.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>dist</code></td>
+          <td>
+                <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The Gaussian process posterior,
+evaluated at a finite set of test points.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.likelihoods.Gaussian.predict--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Gaussian.predict--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>tfd.Distribution: The predictive distribution.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h5 id="gpjax.likelihoods.Bernoulli" class="doc doc-heading">
+          <code>Bernoulli</code>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.likelihoods.AbstractLikelihood" href="#gpjax.likelihoods.AbstractLikelihood">AbstractLikelihood</a></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h6 id="gpjax.likelihoods.Bernoulli.num_datapoints" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">num_datapoints</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h6 id="gpjax.likelihoods.Bernoulli.integrator" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">integrator</span><span class="p">:</span> <span class="n">AbstractIntegrator</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">GHQuadratureIntegrator</span><span class="p">())</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.likelihoods.Bernoulli.__init_subclass__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
 
   </div>
 
@@ -4639,59 +4449,6 @@ evaluated at a finite set of test points.</p>
 
 
 
-<h6 id="gpjax.likelihoods.Bernoulli.link_function" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>The probit link function of the Bernoulli likelihood.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>f</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, ...]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Function values.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.likelihoods.Bernoulli.link_function--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Bernoulli.link_function--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>tfd.Distribution: The likelihood function.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.likelihoods.Bernoulli.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4703,62 +4460,6 @@ evaluated at a finite set of test points.</p>
       <p>Transform model parameters to the unconstrained space according to their defined bijectors.</p>
 <h6 id="gpjax.likelihoods.Bernoulli.unconstrain--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Bernoulli.unconstrain--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: transformed to the unconstrained space.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.likelihoods.Bernoulli.predict" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">dist</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Evaluate the pointwise predictive distribution.</p>
-<p>Evaluate the pointwise predictive distribution, given a Gaussian
-process posterior and likelihood parameters.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>dist</code></td>
-          <td>
-                <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The Gaussian process posterior, evaluated
-at a finite set of test points.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.likelihoods.Bernoulli.predict--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Bernoulli.predict--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>tfd.Distribution: The pointwise predictive distribution.
 </code></pre></div>
 
   </div>
@@ -4807,96 +4508,12 @@ at a finite set of test points.</p>
 </div>
 
 
-
-  </div>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-
-<h5 id="gpjax.likelihoods.Poisson" class="doc doc-heading">
-          <code>Poisson</code>
-
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
-
-</h5>
-
-
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.likelihoods.AbstractLikelihood" href="#gpjax.likelihoods.AbstractLikelihood">AbstractLikelihood</a></code></p>
-
-
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.likelihoods.Poisson.num_datapoints" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">num_datapoints</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">()</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.likelihoods.Poisson.integrator" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">integrator</span><span class="p">:</span> <span class="n">AbstractIntegrator</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">GHQuadratureIntegrator</span><span class="p">())</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-
-
-
 <div class="doc doc-object doc-function">
 
 
 
 
-<h6 id="gpjax.likelihoods.Poisson.__call__" class="doc doc-heading">
+<h6 id="gpjax.likelihoods.Bernoulli.__call__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
 
 </h6>
@@ -4950,7 +4567,7 @@ at a finite set of test points.</p>
         </tr>
     </tbody>
   </table>
-      <h6 id="gpjax.likelihoods.Poisson.__call__--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Poisson.__call__--returns" title="Permanent link"></a></h6>
+      <h6 id="gpjax.likelihoods.Bernoulli.__call__--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Bernoulli.__call__--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>tfd.Distribution: The predictive distribution.
 </code></pre></div>
 
@@ -4964,25 +4581,7 @@ at a finite set of test points.</p>
 
 
 
-<h6 id="gpjax.likelihoods.Poisson.__init_subclass__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.likelihoods.Poisson.expected_log_likelihood" class="doc doc-heading">
+<h6 id="gpjax.likelihoods.Bernoulli.expected_log_likelihood" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">expected_log_likelihood</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">mean</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">variance</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">]</span></code>
 
 </h6>
@@ -5093,6 +4692,217 @@ at a finite set of test points.</p>
         </tr>
     </tbody>
   </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.likelihoods.Bernoulli.link_function" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The probit link function of the Bernoulli likelihood.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>f</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, ...]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Function values.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.likelihoods.Bernoulli.link_function--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Bernoulli.link_function--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>tfd.Distribution: The likelihood function.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.likelihoods.Bernoulli.predict" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">dist</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Evaluate the pointwise predictive distribution.</p>
+<p>Evaluate the pointwise predictive distribution, given a Gaussian
+process posterior and likelihood parameters.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>dist</code></td>
+          <td>
+                <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The Gaussian process posterior, evaluated
+at a finite set of test points.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.likelihoods.Bernoulli.predict--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Bernoulli.predict--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>tfd.Distribution: The pointwise predictive distribution.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h5 id="gpjax.likelihoods.Poisson" class="doc doc-heading">
+          <code>Poisson</code>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.likelihoods.AbstractLikelihood" href="#gpjax.likelihoods.AbstractLikelihood">AbstractLikelihood</a></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h6 id="gpjax.likelihoods.Poisson.num_datapoints" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">num_datapoints</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h6 id="gpjax.likelihoods.Poisson.integrator" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">integrator</span><span class="p">:</span> <span class="n">AbstractIntegrator</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">GHQuadratureIntegrator</span><span class="p">())</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.likelihoods.Poisson.__init_subclass__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
 
   </div>
 
@@ -5372,6 +5182,214 @@ at a finite set of test points.</p>
 
 
 
+<h6 id="gpjax.likelihoods.Poisson.trainables" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.likelihoods.Poisson.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Evaluate the likelihood function at a given predictive distribution.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>*args</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Arguments to be passed to the likelihood's <code>predict</code> method.</p>
+            </div>
+          </td>
+          <td>
+                <code>()</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Keyword arguments to be passed to the likelihood's
+<code>predict</code> method.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.likelihoods.Poisson.__call__--returns">Returns<a class="headerlink" href="#gpjax.likelihoods.Poisson.__call__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>tfd.Distribution: The predictive distribution.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.likelihoods.Poisson.expected_log_likelihood" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">expected_log_likelihood</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">mean</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">variance</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">]</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>Compute the expected log likelihood.</p>
+<p>For a variational distribution <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo><mo>∼</mo><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><mi>m</mi><mo separator="true">,</mo><mi>s</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">q(f)\sim\mathcal{N}(m, s)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.14736em;">N</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">s</span><span class="mclose">)</span></span></span></span> and a likelihood
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>y</mi><mi mathvariant="normal">∣</mi><mi>f</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(y|f)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span></span></span></span>, compute the expected log likelihood:
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="double-struck">E</mi><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></msub><mrow><mo fence="true">[</mo><mi>log</mi><mo>⁡</mo><mi>p</mi><mo stretchy="false">(</mo><mi>y</mi><mi mathvariant="normal">∣</mi><mi>f</mi><mo stretchy="false">)</mo><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">
+\mathbb{E}_{q(f)}\left[\log p(y|f)\right]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1052em;vertical-align:-0.3552em;"></span><span class="mord"><span class="mord mathbb">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.5198em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3552em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">[</span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span><span class="mclose delimcenter" style="top:0em;">]</span></span></span></span></span></span></p></p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>y</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The observed response variable.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>mean</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The variational mean.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>variance</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The variational variance.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>ScalarFloat</code></td>          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39; N&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The expected log likelihood.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
 <h6 id="gpjax.likelihoods.Poisson.link_function" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">link_function</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span></code>
 
@@ -5512,24 +5530,6 @@ at a finite set of test points.</p>
         </tr>
     </tbody>
   </table>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.likelihoods.Poisson.trainables" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
 
   </div>
 

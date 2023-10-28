@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.6">
     
     
       
@@ -2713,7 +2713,7 @@ It returns the corresponding values from an the gram matrix when called.</p>
             </div>
           </td>
           <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.base.param_field" href="../../../base/param/#gpjax.base.param.param_field">param_field</a>(jax.<span title="jax.ones">ones</span>((2)), bijector=<a class="autorefs autorefs-internal" title="gpjax.kernels.non_euclidean.categorical.tfb" href="#gpjax.kernels.non_euclidean.categorical.tfb">tfb</a>.<span title="gpjax.kernels.non_euclidean.categorical.tfb.Softplus">Softplus</span>())</code>
+                <code><a class="autorefs autorefs-internal" title="gpjax.base.param_field" href="../../../base/param/#gpjax.base.param.param_field">param_field</a>(<span title="jax.ones">ones</span>((2)), bijector=<span title="gpjax.kernels.non_euclidean.categorical.tfb.Softplus">Softplus</span>())</code>
           </td>
         </tr>
         <tr>
@@ -2727,7 +2727,7 @@ It returns the corresponding values from an the gram matrix when called.</p>
             </div>
           </td>
           <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.base.param_field" href="../../../base/param/#gpjax.base.param.param_field">param_field</a>(jax.<span title="jax.eye">eye</span>(2), bijector=<a class="autorefs autorefs-internal" title="gpjax.kernels.non_euclidean.categorical.tfb" href="#gpjax.kernels.non_euclidean.categorical.tfb">tfb</a>.<span title="gpjax.kernels.non_euclidean.categorical.tfb.CorrelationCholesky">CorrelationCholesky</span>())</code>
+                <code><a class="autorefs autorefs-internal" title="gpjax.base.param_field" href="../../../base/param/#gpjax.base.param.param_field">param_field</a>(<span title="jax.eye">eye</span>(2), bijector=<span title="gpjax.kernels.non_euclidean.categorical.tfb.CorrelationCholesky">CorrelationCholesky</span>())</code>
           </td>
         </tr>
         <tr>
@@ -2877,6 +2877,26 @@ It returns the corresponding values from an the gram matrix when called.</p>
 
 
 
+<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.spectral_density" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">spectral_density</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span><span class="p">]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
 <h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.stddev" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">stddev</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">)),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
   
@@ -2920,7 +2940,7 @@ It returns the corresponding values from an the gram matrix when called.</p>
 
 
 <h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.inspace_vals" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">inspace_vals</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">inspace_vals</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3023,203 +3043,7 @@ It returns the corresponding values from an the gram matrix when called.</p>
 
 </div>
 
-<div class="doc doc-object doc-attribute">
 
-
-
-
-<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.spectral_density" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">spectral_density</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span><span class="p">]</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.cross_covariance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.gram" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.slice_input" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Slice out the relevant columns of the input matrix.</p>
-<p>Select the relevant columns of the supplied matrix to be used within the
-kernel's evaluation.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The matrix or vector that is to be sliced.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.slice_input--returns">Returns<a class="headerlink" href="#gpjax.kernels.non_euclidean.categorical.CatKernel.slice_input--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Num[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__post_init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ScalarInt</span><span class="p">,</span> <span class="n">Int</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">]],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ScalarInt</span><span class="p">,</span> <span class="n">Int</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">]])</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Compute the (co)variance between a pair of dictionary indices.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.ScalarInt" href="../../../typing/#gpjax.typing.ScalarInt">ScalarInt</a>, <span title="jaxtyping.Int">Int</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, N]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The index of the first dictionary entry, or its one-hot encoding.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>y</code></td>
-          <td>
-                <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.ScalarInt" href="../../../typing/#gpjax.typing.ScalarInt">ScalarInt</a>, <span title="jaxtyping.Int">Int</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, N]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The index of the second dictionary entry, or its one-hot encoding.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__call__--returns">Returns<a class="headerlink" href="#gpjax.kernels.non_euclidean.categorical.CatKernel.__call__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>ScalarFloat: The value of $k(v_i, v_j)$.
-</code></pre></div>
-
-  </div>
-
-</div>
 
 
 <div class="doc doc-object doc-function">
@@ -3234,59 +3058,6 @@ kernel's evaluation.</p>
 
 
   <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__add__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be added to the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__add__--returns">Returns<a class="headerlink" href="#gpjax.kernels.non_euclidean.categorical.CatKernel.__add__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
-</code></pre></div>
 
   </div>
 
@@ -3351,190 +3122,6 @@ kernel's evaluation.</p>
 
 
 
-<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__radd__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be added to the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__radd__--returns">Returns<a class="headerlink" href="#gpjax.kernels.non_euclidean.categorical.CatKernel.__radd__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.num_cholesky_lower_params" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">num_cholesky_lower_params</span><span class="p">(</span><span class="n">num_inspace_vals</span><span class="p">:</span> <span class="n">ScalarInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarInt</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Compute the number of parameters required to store the lower triangular Cholesky factor of the gram matrix.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>num_inspace_vals</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.typing.ScalarInt" href="../../../typing/#gpjax.typing.ScalarInt">ScalarInt</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The number of values in the input space.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-<td><code>ScalarInt</code></td>          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.typing.ScalarInt" href="../../../typing/#gpjax.typing.ScalarInt">ScalarInt</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The number of parameters required to store the lower triangle of the Cholesky factor of the gram matrix.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__mul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Multiply two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be multiplied with the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__mul__--returns">Returns<a class="headerlink" href="#gpjax.kernels.non_euclidean.categorical.CatKernel.__mul__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the product of the two kernels.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3577,84 +3164,6 @@ kernel's evaluation.</p>
       <h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.replace_meta--returns">Returns<a class="headerlink" href="#gpjax.kernels.non_euclidean.categorical.CatKernel.replace_meta--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: with the metadata of the fields replaced.
 </code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.gram_to_stddev_cholesky_lower" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">gram_to_stddev_cholesky_lower</span><span class="p">(</span><span class="n">gram</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N N&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">CatKernelParams</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Compute the standard deviation and lower triangular Cholesky factor of the gram matrix.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>gram</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;N N&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The gram matrix.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.non_euclidean.categorical.CatKernelParams" href="#gpjax.kernels.non_euclidean.categorical.CatKernelParams">CatKernelParams</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>tuple[Float[Array, "N"], Float[Array, "N N"]]: The standard deviation and lower triangular Cholesky factor of the gram matrix, where the latter is scaled to result in unit variances.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
 
   </div>
 
@@ -3835,6 +3344,441 @@ kernel's evaluation.</p>
 
 
   <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.cross_covariance" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.gram" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.slice_input" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Slice out the relevant columns of the input matrix.</p>
+<p>Select the relevant columns of the supplied matrix to be used within the
+kernel's evaluation.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The matrix or vector that is to be sliced.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.slice_input--returns">Returns<a class="headerlink" href="#gpjax.kernels.non_euclidean.categorical.CatKernel.slice_input--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Num[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__add__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two kernels together.
+Args:
+    other (AbstractKernel): The kernel to be added to the current kernel.</p>
+<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__add__--returns">Returns<a class="headerlink" href="#gpjax.kernels.non_euclidean.categorical.CatKernel.__add__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__radd__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two kernels together.
+Args:
+    other (AbstractKernel): The kernel to be added to the current kernel.</p>
+<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__radd__--returns">Returns<a class="headerlink" href="#gpjax.kernels.non_euclidean.categorical.CatKernel.__radd__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__mul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two kernels together.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The kernel to be multiplied with the current kernel.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__mul__--returns">Returns<a class="headerlink" href="#gpjax.kernels.non_euclidean.categorical.CatKernel.__mul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the product of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__post_init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ScalarInt</span><span class="p">,</span> <span class="n">Int</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">]],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ScalarInt</span><span class="p">,</span> <span class="n">Int</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">]])</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Compute the (co)variance between a pair of dictionary indices.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.ScalarInt" href="../../../typing/#gpjax.typing.ScalarInt">ScalarInt</a>, <span title="jaxtyping.Int">Int</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, N]]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The index of the first dictionary entry, or its one-hot encoding.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>y</code></td>
+          <td>
+                <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.ScalarInt" href="../../../typing/#gpjax.typing.ScalarInt">ScalarInt</a>, <span title="jaxtyping.Int">Int</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, N]]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The index of the second dictionary entry, or its one-hot encoding.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.__call__--returns">Returns<a class="headerlink" href="#gpjax.kernels.non_euclidean.categorical.CatKernel.__call__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>ScalarFloat: The value of $k(v_i, v_j)$.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.num_cholesky_lower_params" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">num_cholesky_lower_params</span><span class="p">(</span><span class="n">num_inspace_vals</span><span class="p">:</span> <span class="n">ScalarInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarInt</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Compute the number of parameters required to store the lower triangular Cholesky factor of the gram matrix.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>num_inspace_vals</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.typing.ScalarInt" href="../../../typing/#gpjax.typing.ScalarInt">ScalarInt</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The number of values in the input space.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>ScalarInt</code></td>          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.typing.ScalarInt" href="../../../typing/#gpjax.typing.ScalarInt">ScalarInt</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The number of parameters required to store the lower triangle of the Cholesky factor of the gram matrix.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.non_euclidean.categorical.CatKernel.gram_to_stddev_cholesky_lower" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">gram_to_stddev_cholesky_lower</span><span class="p">(</span><span class="n">gram</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N N&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">CatKernelParams</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Compute the standard deviation and lower triangular Cholesky factor of the gram matrix.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>gram</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;N N&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The gram matrix.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.non_euclidean.categorical.CatKernelParams" href="#gpjax.kernels.non_euclidean.categorical.CatKernelParams">CatKernelParams</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>tuple[Float[Array, "N"], Float[Array, "N N"]]: The standard deviation and lower triangular Cholesky factor of the gram matrix, where the latter is scaled to result in unit variances.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
 
   </div>
 

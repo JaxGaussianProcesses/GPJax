@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.6">
     
     
       
@@ -2629,7 +2629,7 @@
 
 
 <h5 id="gpjax.citation.CitationType" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">CitationType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span></code>
+          <code class="highlight language-python"><span class="n">CitationType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
@@ -2680,7 +2680,7 @@
 
 
 <h6 id="gpjax.citation.AbstractCitation.citation_key" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">citation_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">citation_key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -2701,7 +2701,7 @@
 
 
 <h6 id="gpjax.citation.AbstractCitation.authors" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">authors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">authors</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -2722,7 +2722,7 @@
 
 
 <h6 id="gpjax.citation.AbstractCitation.title" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">title</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -2743,7 +2743,7 @@
 
 
 <h6 id="gpjax.citation.AbstractCitation.year" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">year</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">year</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -2856,7 +2856,7 @@
 
 
 <h6 id="gpjax.citation.NullCitation.citation_key" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">citation_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">citation_key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -2877,7 +2877,7 @@
 
 
 <h6 id="gpjax.citation.NullCitation.authors" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">authors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">authors</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -2898,7 +2898,7 @@
 
 
 <h6 id="gpjax.citation.NullCitation.title" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">title</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -2919,7 +2919,7 @@
 
 
 <h6 id="gpjax.citation.NullCitation.year" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">year</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">year</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3003,182 +3003,6 @@
 
 
 
-<h5 id="gpjax.citation.JittedFnCitation" class="doc doc-heading">
-          <code>JittedFnCitation</code>
-
-
-</h5>
-
-
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.citation.AbstractCitation" href="#gpjax.citation.AbstractCitation">AbstractCitation</a></code></p>
-
-
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.citation.JittedFnCitation.citation_key" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">citation_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.citation.JittedFnCitation.authors" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">authors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.citation.JittedFnCitation.title" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.citation.JittedFnCitation.year" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">year</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.citation.JittedFnCitation.as_str" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">as_str</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.citation.JittedFnCitation.__repr__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__repr__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.citation.JittedFnCitation.__str__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__str__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-
-  </div>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-
 <h5 id="gpjax.citation.PhDThesisCitation" class="doc doc-heading">
           <code>PhDThesisCitation</code>
 
@@ -3212,7 +3036,7 @@
 
 
 <h6 id="gpjax.citation.PhDThesisCitation.citation_key" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">citation_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">citation_key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3233,7 +3057,7 @@
 
 
 <h6 id="gpjax.citation.PhDThesisCitation.authors" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">authors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">authors</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3254,7 +3078,7 @@
 
 
 <h6 id="gpjax.citation.PhDThesisCitation.title" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">title</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3275,7 +3099,7 @@
 
 
 <h6 id="gpjax.citation.PhDThesisCitation.year" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">year</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">year</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3296,7 +3120,7 @@
 
 
 <h6 id="gpjax.citation.PhDThesisCitation.school" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">school</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">school</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3317,7 +3141,7 @@
 
 
 <h6 id="gpjax.citation.PhDThesisCitation.institution" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">institution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">institution</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3338,7 +3162,7 @@
 
 
 <h6 id="gpjax.citation.PhDThesisCitation.citation_type" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">citation_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;phdthesis&#39;</span></code>
+          <code class="highlight language-python"><span class="n">citation_type</span><span class="p">:</span> <span class="n">CitationType</span> <span class="o">=</span> <span class="s1">&#39;phdthesis&#39;</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3455,7 +3279,7 @@
 
 
 <h6 id="gpjax.citation.PaperCitation.citation_key" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">citation_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">citation_key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3476,7 +3300,7 @@
 
 
 <h6 id="gpjax.citation.PaperCitation.authors" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">authors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">authors</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3497,7 +3321,7 @@
 
 
 <h6 id="gpjax.citation.PaperCitation.title" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">title</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3518,7 +3342,7 @@
 
 
 <h6 id="gpjax.citation.PaperCitation.year" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">year</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">year</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3539,7 +3363,7 @@
 
 
 <h6 id="gpjax.citation.PaperCitation.booktitle" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">booktitle</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">booktitle</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3560,7 +3384,7 @@
 
 
 <h6 id="gpjax.citation.PaperCitation.citation_type" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">citation_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;inproceedings&#39;</span></code>
+          <code class="highlight language-python"><span class="n">citation_type</span><span class="p">:</span> <span class="n">CitationType</span> <span class="o">=</span> <span class="s1">&#39;inproceedings&#39;</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3677,7 +3501,7 @@
 
 
 <h6 id="gpjax.citation.BookCitation.citation_key" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">citation_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">citation_key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3698,7 +3522,7 @@
 
 
 <h6 id="gpjax.citation.BookCitation.authors" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">authors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">authors</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3719,7 +3543,7 @@
 
 
 <h6 id="gpjax.citation.BookCitation.title" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">title</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3740,7 +3564,7 @@
 
 
 <h6 id="gpjax.citation.BookCitation.year" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">year</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">year</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3761,7 +3585,7 @@
 
 
 <h6 id="gpjax.citation.BookCitation.publisher" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">publisher</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">publisher</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3782,7 +3606,7 @@
 
 
 <h6 id="gpjax.citation.BookCitation.volume" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">volume</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="n">volume</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3803,7 +3627,7 @@
 
 
 <h6 id="gpjax.citation.BookCitation.citation_type" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">citation_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;book&#39;</span></code>
+          <code class="highlight language-python"><span class="n">citation_type</span><span class="p">:</span> <span class="n">CitationType</span> <span class="o">=</span> <span class="s1">&#39;book&#39;</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>

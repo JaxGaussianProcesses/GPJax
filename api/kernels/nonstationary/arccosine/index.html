@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.6">
     
     
       
@@ -2667,69 +2667,6 @@ additional details.</p>
 
 
 
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.order" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">order</span><span class="p">:</span> <span class="n">ScalarInt</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.variance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">variance</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.weight_variance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">weight_variance</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ScalarFloat</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
 <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.compute_engine" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">compute_engine</span><span class="p">:</span> <span class="n">AbstractKernelComputation</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">DenseKernelComputation</span><span class="p">())</span></code>
   
@@ -2753,27 +2690,6 @@ additional details.</p>
 
 <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.active_dims" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">active_dims</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.bias_variance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">bias_variance</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -2849,215 +2765,91 @@ additional details.</p>
 
 </div>
 
-
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__post_init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
+<div class="doc doc-object doc-attribute">
 
 
 
 
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.cross_covariance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.order" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">order</span><span class="p">:</span> <span class="n">ScalarInt</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></code>
   
-      <link rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
-  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
-  crossorigin="anonymous" />
-
-<style type="text/css">
-    .katex img {
-      object-fit: fill;
-      padding: unset;
-      display: block;
-      position: absolute;
-      width: 100%;
-      height: inherit;
-    }
-</style>
-<p>Evaluate the kernel on a pair of inputs <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(x, y)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span></span></p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, D]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The left hand argument of the kernel function's
-call.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>y</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, D]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The right hand argument of the kernel function's
-call</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <link rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
-  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
-  crossorigin="anonymous" />
-
-<style type="text/css">
-    .katex img {
-      object-fit: fill;
-      padding: unset;
-      display: block;
-      position: absolute;
-      width: 100%;
-      height: inherit;
-    }
-</style>
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__call__--returns">Returns<a class="headerlink" href="#gpjax.kernels.nonstationary.arccosine.ArcCosine.__call__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>ScalarFloat: The value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">k(x, y)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span></span>.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.gram" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span></code>
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
 
 </h6>
 
 
   <div class="doc doc-contents ">
-
   </div>
 
 </div>
 
-
-<div class="doc doc-object doc-function">
-
+<div class="doc doc-object doc-attribute">
 
 
 
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.slice_input" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
 
-</h6>
-
-
-  <div class="doc doc-contents ">
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.variance" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">variance</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
   
-      <p>Slice out the relevant columns of the input matrix.</p>
-<p>Select the relevant columns of the supplied matrix to be used within the
-kernel's evaluation.</p>
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
 
 
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The matrix or vector that is to be sliced.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.slice_input--returns">Returns<a class="headerlink" href="#gpjax.kernels.nonstationary.arccosine.ArcCosine.slice_input--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Num[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
-</code></pre></div>
-
+  <div class="doc doc-contents ">
   </div>
 
 </div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.weight_variance" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">weight_variance</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ScalarFloat</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.bias_variance" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">bias_variance</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
 
 
 <div class="doc doc-object doc-function">
@@ -3072,59 +2864,6 @@ kernel's evaluation.</p>
 
 
   <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__add__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be added to the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__add__--returns">Returns<a class="headerlink" href="#gpjax.kernels.nonstationary.arccosine.ArcCosine.__add__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
-</code></pre></div>
 
   </div>
 
@@ -3177,112 +2916,6 @@ kernel's evaluation.</p>
   </table>
       <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.replace--returns">Returns<a class="headerlink" href="#gpjax.kernels.nonstationary.arccosine.ArcCosine.replace--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: with the fields replaced.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__radd__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be added to the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__radd__--returns">Returns<a class="headerlink" href="#gpjax.kernels.nonstationary.arccosine.ArcCosine.__radd__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__mul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Multiply two kernels together.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The kernel to be multiplied with the current kernel.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__mul__--returns">Returns<a class="headerlink" href="#gpjax.kernels.nonstationary.arccosine.ArcCosine.__mul__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the product of the two kernels.
 </code></pre></div>
 
   </div>
@@ -3517,6 +3150,317 @@ kernel's evaluation.</p>
 
 
   <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.cross_covariance" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M D&#39;</span><span class="p">])</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.gram" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.slice_input" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Slice out the relevant columns of the input matrix.</p>
+<p>Select the relevant columns of the supplied matrix to be used within the
+kernel's evaluation.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The matrix or vector that is to be sliced.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.slice_input--returns">Returns<a class="headerlink" href="#gpjax.kernels.nonstationary.arccosine.ArcCosine.slice_input--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Num[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__add__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two kernels together.
+Args:
+    other (AbstractKernel): The kernel to be added to the current kernel.</p>
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__add__--returns">Returns<a class="headerlink" href="#gpjax.kernels.nonstationary.arccosine.ArcCosine.__add__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__radd__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two kernels together.
+Args:
+    other (AbstractKernel): The kernel to be added to the current kernel.</p>
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__radd__--returns">Returns<a class="headerlink" href="#gpjax.kernels.nonstationary.arccosine.ArcCosine.__radd__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the sum of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__mul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractKernel</span><span class="p">,</span> <span class="n">ScalarFloat</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AbstractKernel</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two kernels together.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The kernel to be multiplied with the current kernel.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__mul__--returns">Returns<a class="headerlink" href="#gpjax.kernels.nonstationary.arccosine.ArcCosine.__mul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractKernel: A new kernel that is the product of the two kernels.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__post_init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>Evaluate the kernel on a pair of inputs <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(x, y)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span></span></p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, D]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The left hand argument of the kernel function's
+call.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>y</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, D]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The right hand argument of the kernel function's
+call</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<h6 id="gpjax.kernels.nonstationary.arccosine.ArcCosine.__call__--returns">Returns<a class="headerlink" href="#gpjax.kernels.nonstationary.arccosine.ArcCosine.__call__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>ScalarFloat: The value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">k(x, y)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mclose">)</span></span></span></span>.
+</code></pre></div>
 
   </div>
 

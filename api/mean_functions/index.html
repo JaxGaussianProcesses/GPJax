@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.6">
     
     
       
@@ -2706,222 +2706,6 @@
 
 
 
-<h6 id="gpjax.mean_functions.AbstractMeanFunction.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N O&#39;</span><span class="p">]</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Evaluate the mean function at the given points. This method is required for all subclasses.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The point at which to evaluate the mean function.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.AbstractMeanFunction.__call__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.AbstractMeanFunction.__call__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;1]: The evaluated mean function.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.AbstractMeanFunction.__add__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two mean functions.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The other mean function to add.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.AbstractMeanFunction.__add__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.AbstractMeanFunction.__add__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.AbstractMeanFunction.__radd__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two mean functions.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The other mean function to add.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.AbstractMeanFunction.__radd__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.AbstractMeanFunction.__radd__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.AbstractMeanFunction.__mul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Multiply two mean functions.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The other mean function to multiply.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.AbstractMeanFunction.__mul__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.AbstractMeanFunction.__mul__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.mean_functions.AbstractMeanFunction.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -2981,59 +2765,6 @@
   </table>
       <h6 id="gpjax.mean_functions.AbstractMeanFunction.replace--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.AbstractMeanFunction.replace--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: with the fields replaced.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.AbstractMeanFunction.__rmul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Multiply two mean functions.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The other mean function to multiply.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.AbstractMeanFunction.__rmul__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.AbstractMeanFunction.__rmul__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
 </code></pre></div>
 
   </div>
@@ -3274,6 +3005,275 @@
 </div>
 
 
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.AbstractMeanFunction.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N O&#39;</span><span class="p">]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Evaluate the mean function at the given points. This method is required for all subclasses.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The point at which to evaluate the mean function.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.AbstractMeanFunction.__call__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.AbstractMeanFunction.__call__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Float[Array, &quot;1]: The evaluated mean function.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.AbstractMeanFunction.__add__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.AbstractMeanFunction.__add__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.AbstractMeanFunction.__add__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.AbstractMeanFunction.__radd__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.AbstractMeanFunction.__radd__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.AbstractMeanFunction.__radd__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.AbstractMeanFunction.__mul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.AbstractMeanFunction.__mul__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.AbstractMeanFunction.__mul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.AbstractMeanFunction.__rmul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.AbstractMeanFunction.__rmul__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.AbstractMeanFunction.__rmul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
 
   </div>
 
@@ -3340,165 +3340,6 @@ learned during training but defaults to 1.0.</p>
 </div>
 
 
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.Constant.__add__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two mean functions.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The other mean function to add.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.Constant.__add__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Constant.__add__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.Constant.__radd__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two mean functions.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The other mean function to add.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.Constant.__radd__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Constant.__radd__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.Constant.__mul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Multiply two mean functions.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The other mean function to multiply.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.Constant.__mul__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Constant.__mul__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
-</code></pre></div>
-
-  </div>
-
-</div>
 
 
 <div class="doc doc-object doc-function">
@@ -3577,59 +3418,6 @@ learned during training but defaults to 1.0.</p>
 
 
 
-<h6 id="gpjax.mean_functions.Constant.__rmul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Multiply two mean functions.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The other mean function to multiply.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.Constant.__rmul__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Constant.__rmul__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.mean_functions.Constant.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3671,59 +3459,6 @@ learned during training but defaults to 1.0.</p>
   </table>
       <h6 id="gpjax.mean_functions.Constant.replace_meta--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Constant.replace_meta--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: with the metadata of the fields replaced.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.Constant.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N O&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Evaluate the mean function at the given points.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The point at which to evaluate the mean function.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.Constant.__call__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Constant.__call__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: The evaluated mean function.
 </code></pre></div>
 
   </div>
@@ -3911,6 +3646,271 @@ learned during training but defaults to 1.0.</p>
 </div>
 
 
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.Constant.__add__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.Constant.__add__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Constant.__add__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.Constant.__radd__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.Constant.__radd__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Constant.__radd__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.Constant.__mul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.Constant.__mul__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Constant.__mul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.Constant.__rmul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.Constant.__rmul__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Constant.__rmul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.Constant.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N O&#39;</span><span class="p">]</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Evaluate the mean function at the given points.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The point at which to evaluate the mean function.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.Constant.__call__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Constant.__call__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: The evaluated mean function.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
 
   </div>
 
@@ -3977,165 +3977,6 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 </div>
 
 
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.Zero.__add__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two mean functions.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The other mean function to add.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.Zero.__add__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Zero.__add__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.Zero.__radd__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Add two mean functions.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The other mean function to add.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.Zero.__radd__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Zero.__radd__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.Zero.__mul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Multiply two mean functions.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The other mean function to multiply.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.Zero.__mul__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Zero.__mul__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
-</code></pre></div>
-
-  </div>
-
-</div>
 
 
 <div class="doc doc-object doc-function">
@@ -4214,59 +4055,6 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 
-<h6 id="gpjax.mean_functions.Zero.__rmul__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Multiply two mean functions.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>other</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The other mean function to multiply.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.Zero.__rmul__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Zero.__rmul__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.mean_functions.Zero.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4308,59 +4096,6 @@ cannot be treated as a model hyperparameter and learned during training.</p>
   </table>
       <h6 id="gpjax.mean_functions.Zero.replace_meta--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Zero.replace_meta--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Module: with the metadata of the fields replaced.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.Zero.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N O&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Evaluate the mean function at the given points.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The point at which to evaluate the mean function.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.Zero.__call__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Zero.__call__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: The evaluated mean function.
 </code></pre></div>
 
   </div>
@@ -4548,6 +4283,271 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 </div>
 
 
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.Zero.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N O&#39;</span><span class="p">]</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Evaluate the mean function at the given points.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The point at which to evaluate the mean function.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.Zero.__call__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Zero.__call__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Float[Array, &quot;1&quot;]: The evaluated mean function.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.Zero.__add__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.Zero.__add__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Zero.__add__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.Zero.__radd__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.Zero.__radd__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Zero.__radd__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.Zero.__mul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.Zero.__mul__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Zero.__mul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.Zero.__rmul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.Zero.__rmul__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.Zero.__rmul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
 
   </div>
 
@@ -4631,6 +4631,310 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 </div>
 
 
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.CombinationMeanFunction.__init_subclass__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.CombinationMeanFunction.replace" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the values of the fields of the object.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.CombinationMeanFunction.replace--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.CombinationMeanFunction.replace--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.CombinationMeanFunction.replace_meta" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the metadata of the fields.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the metadata of the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.CombinationMeanFunction.replace_meta--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.CombinationMeanFunction.replace_meta--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the metadata of the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.CombinationMeanFunction.update_meta" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">update_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Update the metadata of the fields. The metadata must already exist.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.mean_functions.CombinationMeanFunction.update_meta--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.CombinationMeanFunction.update_meta--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.CombinationMeanFunction.replace_trainable" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the trainability status of local nodes of the Module.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.CombinationMeanFunction.replace_bijector" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the bijectors of local nodes of the Module.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.CombinationMeanFunction.constrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">constrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the constrained space according to their defined bijectors.</p>
+<h6 id="gpjax.mean_functions.CombinationMeanFunction.constrain--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.CombinationMeanFunction.constrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the constrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.CombinationMeanFunction.unconstrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the unconstrained space according to their defined bijectors.</p>
+<h6 id="gpjax.mean_functions.CombinationMeanFunction.unconstrain--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.CombinationMeanFunction.unconstrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the unconstrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.CombinationMeanFunction.stop_gradient" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">stop_gradient</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Stop gradients flowing through the Module.</p>
+<h6 id="gpjax.mean_functions.CombinationMeanFunction.stop_gradient--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.CombinationMeanFunction.stop_gradient--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with gradients stopped.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.mean_functions.CombinationMeanFunction.trainables" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
 
 
 <div class="doc doc-object doc-function">
@@ -4797,77 +5101,6 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 
-<h6 id="gpjax.mean_functions.CombinationMeanFunction.__init_subclass__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.CombinationMeanFunction.replace" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">replace</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Replace the values of the fields of the object.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>**kwargs</code></td>
-          <td>
-                <code><span title="beartype.typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>keyword arguments to replace the fields of the object.</p>
-            </div>
-          </td>
-          <td>
-                <code>{}</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.CombinationMeanFunction.replace--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.CombinationMeanFunction.replace--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.mean_functions.CombinationMeanFunction.__rmul__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
 
@@ -4921,182 +5154,13 @@ cannot be treated as a model hyperparameter and learned during training.</p>
 
 
 
-<h6 id="gpjax.mean_functions.CombinationMeanFunction.replace_meta" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Replace the metadata of the fields.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>**kwargs</code></td>
-          <td>
-                <code><span title="beartype.typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>keyword arguments to replace the metadata of the fields of the object.</p>
-            </div>
-          </td>
-          <td>
-                <code>{}</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.CombinationMeanFunction.replace_meta--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.CombinationMeanFunction.replace_meta--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Module: with the metadata of the fields replaced.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.CombinationMeanFunction.update_meta" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">update_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Update the metadata of the fields. The metadata must already exist.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>**kwargs</code></td>
-          <td>
-                <code><span title="beartype.typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>keyword arguments to replace the fields of the object.</p>
-            </div>
-          </td>
-          <td>
-                <code>{}</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.mean_functions.CombinationMeanFunction.update_meta--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.CombinationMeanFunction.update_meta--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.CombinationMeanFunction.replace_trainable" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Replace the trainability status of local nodes of the Module.</p>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
 <h6 id="gpjax.mean_functions.CombinationMeanFunction.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">means</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">],</span> <span class="n">operator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">means</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">],</span> <span class="n">operator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
 
 </h6>
 
 
   <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.CombinationMeanFunction.replace_bijector" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Replace the bijectors of local nodes of the Module.</p>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.CombinationMeanFunction.constrain" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">constrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Transform model parameters to the constrained space according to their defined bijectors.</p>
-<h6 id="gpjax.mean_functions.CombinationMeanFunction.constrain--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.CombinationMeanFunction.constrain--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Module: transformed to the constrained space.
-</code></pre></div>
 
   </div>
 
@@ -5150,70 +5214,6 @@ cannot be treated as a model hyperparameter and learned during training.</p>
       <h6 id="gpjax.mean_functions.CombinationMeanFunction.__call__--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.CombinationMeanFunction.__call__--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Float[Array, &quot; Q&quot;]: The evaluated mean function.
 </code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.CombinationMeanFunction.unconstrain" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Transform model parameters to the unconstrained space according to their defined bijectors.</p>
-<h6 id="gpjax.mean_functions.CombinationMeanFunction.unconstrain--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.CombinationMeanFunction.unconstrain--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Module: transformed to the unconstrained space.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.CombinationMeanFunction.stop_gradient" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">stop_gradient</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Stop gradients flowing through the Module.</p>
-<h6 id="gpjax.mean_functions.CombinationMeanFunction.stop_gradient--returns">Returns<a class="headerlink" href="#gpjax.mean_functions.CombinationMeanFunction.stop_gradient--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Module: with gradients stopped.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.mean_functions.CombinationMeanFunction.trainables" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
 
   </div>
 

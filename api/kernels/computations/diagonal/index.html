@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.6">
     
     
       
@@ -2683,6 +2683,74 @@ a diagonal Gram matrix.</p>
 
 
 
+<h6 id="gpjax.kernels.computations.diagonal.DiagonalKernelComputation.diagonal" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">diagonal</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Diagonal</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>For a given kernel, compute the elementwise diagonal of the
+NxN gram matrix on an input matrix of shape NxD.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>kernel</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the kernel function.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>inputs</code></td>
+          <td>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The input matrix.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.kernels.computations.diagonal.DiagonalKernelComputation.diagonal--returns">Returns<a class="headerlink" href="#gpjax.kernels.computations.diagonal.DiagonalKernelComputation.diagonal--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Diagonal: The computed diagonal variance entries.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
 <h6 id="gpjax.kernels.computations.diagonal.DiagonalKernelComputation.gram" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">gram</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">LinearOperator</span></code>
 
@@ -2853,74 +2921,6 @@ input matrices of shape <span class="katex"><span class="katex-mathml"><math xml
   </table>
       <h6 id="gpjax.kernels.computations.diagonal.DiagonalKernelComputation.cross_covariance--returns">Returns<a class="headerlink" href="#gpjax.kernels.computations.diagonal.DiagonalKernelComputation.cross_covariance--returns" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>Float[Array, &quot;N M&quot;]: The computed cross-covariance.
-</code></pre></div>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.kernels.computations.diagonal.DiagonalKernelComputation.diagonal" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">diagonal</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Diagonal</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>For a given kernel, compute the elementwise diagonal of the
-NxN gram matrix on an input matrix of shape NxD.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>kernel</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the kernel function.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>inputs</code></td>
-          <td>
-                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The input matrix.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <h6 id="gpjax.kernels.computations.diagonal.DiagonalKernelComputation.diagonal--returns">Returns<a class="headerlink" href="#gpjax.kernels.computations.diagonal.DiagonalKernelComputation.diagonal--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Diagonal: The computed diagonal variance entries.
 </code></pre></div>
 
   </div>
