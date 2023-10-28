@@ -39,9 +39,9 @@ from docs.examples.utils import clean_legend
 import gpjax as gpx
 
 key = jr.PRNGKey(123)
-# plt.style.use(
-#    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-# )
+plt.style.use(
+   "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
@@ -317,6 +317,4 @@ for i in range(2):
 
 # %%
 # %reload_ext watermark
-# %watermark -n -u -v -iv -w -a 'Thomas Pinder & Daniel Dodd'
-
-# %%
+# %watermark -n -u -v -iv -w -a 'Ingmar Schuster'
