@@ -75,6 +75,7 @@ from gpjax.variational_families import (
 )
 
 from gpjax import sklearn
+from gpjax import kernels
 
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
@@ -84,6 +85,7 @@ __version__ = "0.7.1"
 
 __all__ = [
     "sklearn",
+    "kernels",
     "Module",
     "param_field",
     "cite",

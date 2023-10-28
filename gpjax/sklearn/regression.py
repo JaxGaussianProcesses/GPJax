@@ -1,25 +1,25 @@
 from dataclasses import dataclass
 
 import jax
-import jax.random as jr
+from jaxtyping import Num
 from loguru import logger
 import optax as ox
 
 from gpjax.dataset import Dataset
 from gpjax.fit import fit
-from gpjax.gps import (
-    ConjugatePosterior,
-)
+from gpjax.gps import ConjugatePosterior
 from gpjax.kernels import AbstractKernel
-from gpjax.likelihoods import (
-    Gaussian,
-)
-from gpjax.mean_functions import (
-    AbstractMeanFunction,
-)
+from gpjax.likelihoods import Gaussian
+from gpjax.mean_functions import AbstractMeanFunction
 from gpjax.sklearn.base import BaseEstimator
+from gpjax.typing import (
+    Array,
+    KeyArray,
+)
 from gpjax.variational_families import CollapsedVariationalGaussian
-from gpjax.typing import KeyArray
+import tensorflow_probability.substrates.jax as tfp
+
+tfd = tfp.distributions
 
 
 @dataclass
@@ -30,8 +30,8 @@ class GPJaxRegressor(BaseEstimator):
 
     def fit(
         self,
-        X: jax.Array,
-        y: jax.Array,
+        X: Num[Array, "N D"],
+        y: Num[Array, "N 1"],
         key: KeyArray,
         compile=True,
         **optim_kwargs,
@@ -63,7 +63,7 @@ class GPJaxRegressor(BaseEstimator):
         logger.info(f"Final loss: {history[-1]: .3f}")
         self.optim_posterior = optim_posterior
 
-    def predict(self, X):
+    def predict(self, X: Num[Array, "N D"]) -> tfd.MultivariateNormalFullCovariance:
         logger.info(f"Predicting {X.shape[0]} test data points")
         if isinstance(self.optim_posterior, ConjugatePosterior):
             latent_dist = self.optim_posterior.predict(X, train_data=self.training_data)

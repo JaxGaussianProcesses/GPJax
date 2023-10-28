@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Any
-from beartype.typing import Protocol, Callable
-from gpjax.typing import Array
+
+from beartype.typing import Callable
 from jaxtyping import Num
+
+from gpjax.typing import Array
 
 
 @dataclass
@@ -11,16 +12,16 @@ class AbstractScore:
     name: str
 
     @abstractmethod
-    def __call__(self, predictive_dist, y: Num[Array, "N Q"]) -> float:
+    def __call__(self, predictive_dist, y: Num[Array, "N 1"]) -> float:
         raise NotImplementedError("Please implement `__call__` in your subclass")
 
 
 @dataclass
 class SKLearnScore:
     name: str
-    fn: Callable[[Num[Array, "N Q"], Num[Array, "N Q"]], float]
+    fn: Callable[[Num[Array, "N 1"], Num[Array, "N 1"]], float]
 
-    def __call__(self, predictive_dist, y: Num[Array, "N Q"]) -> float:
+    def __call__(self, predictive_dist, y: Num[Array, "N 1"]) -> float:
         mu = predictive_dist.mean()
         return self.fn(y, mu)
 
@@ -29,5 +30,5 @@ class SKLearnScore:
 class LogPredictiveDensity(AbstractScore):
     name: str = "Log-posterior density"
 
-    def __call__(self, predictive_dist, y: Num[Array, "N Q"]) -> float:
-        return predictive_dist.log_prob(y).sum()
+    def __call__(self, predictive_dist, y: Num[Array, "N 1"]) -> float:
+        return predictive_dist.log_prob(y).mean()
