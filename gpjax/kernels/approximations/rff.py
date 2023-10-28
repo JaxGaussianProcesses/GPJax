@@ -1,6 +1,7 @@
 """Compute Random Fourier Feature (RFF) kernel approximations.  """
 from dataclasses import dataclass
 
+from beartype.typing import Union
 from jax.random import PRNGKey
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
@@ -34,9 +35,11 @@ class RFF(AbstractKernel):
     - 'On the Error of Random Fourier Features' by Sutherland and Schneider (2015).
     """
 
-    base_kernel: AbstractKernel = None
+    base_kernel: Union[AbstractKernel, None] = None
     num_basis_fns: int = static_field(50)
-    frequencies: Float[Array, "M 1"] = param_field(None, bijector=tfb.Identity())
+    frequencies: Union[Float[Array, "M D"], None] = param_field(
+        None, bijector=tfb.Identity()
+    )
     compute_engine: BasisFunctionComputation = static_field(
         BasisFunctionComputation(), repr=False
     )
@@ -57,8 +60,9 @@ class RFF(AbstractKernel):
             )
         self.name = f"{self.base_kernel.name} (RFF)"
 
-    def __call__(self, x: Array, y: Array) -> Array:
+    def __call__(self, x: Float[Array, "D 1"], y: Float[Array, "D 1"]) -> None:
         """Superfluous for RFFs."""
+        raise RuntimeError("RFFs do not have a kernel function.")
 
     def _check_valid_base_kernel(self, kernel: AbstractKernel):
         r"""Verify that the base kernel is valid for RFF approximation.

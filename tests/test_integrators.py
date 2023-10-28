@@ -47,6 +47,7 @@ def test_quadrature(jit: bool, num_points: int):
             mean=mean,
             variance=variance,
             y=jnp.ones_like(mean),
+            likelihood=None,
         )
         return fn_val.squeeze().round(1)
 

@@ -16,8 +16,12 @@
 import abc
 from dataclasses import dataclass
 
-from beartype.typing import Any
+from beartype.typing import (
+    Any,
+    Union,
+)
 import cola
+from cola.linalg.decompositions.decompositions import Cholesky
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Float
@@ -106,7 +110,7 @@ class VariationalGaussian(AbstractVariationalGaussian):
     $`\mu`$ and $`sqrt`$ with $`S = sqrt sqrt^{\top}`$.
     """
 
-    variational_mean: Float[Array, "N 1"] = param_field(None)
+    variational_mean: Union[Float[Array, "N 1"], None] = param_field(None)
     variational_root_covariance: Float[Array, "N N"] = param_field(
         None, bijector=tfb.FillTriangular()
     )
@@ -199,10 +203,10 @@ class VariationalGaussian(AbstractVariationalGaussian):
         mut = mean_function(t)
 
         # Lz⁻¹ Kzt
-        Lz_inv_Kzt = cola.solve(Lz, Kzt)
+        Lz_inv_Kzt = cola.solve(Lz, Kzt, Cholesky())
 
         # Kzz⁻¹ Kzt
-        Kzz_inv_Kzt = cola.solve(Lz.T, Lz_inv_Kzt)
+        Kzz_inv_Kzt = cola.solve(Lz.T, Lz_inv_Kzt, Cholesky())
 
         # Ktz Kzz⁻¹ sqrt
         Ktz_Kzz_inv_sqrt = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
@@ -302,7 +306,7 @@ class WhitenedVariationalGaussian(VariationalGaussian):
         mut = mean_function(t)
 
         # Lz⁻¹ Kzt
-        Lz_inv_Kzt = cola.solve(Lz, Kzt)
+        Lz_inv_Kzt = cola.solve(Lz, Kzt, Cholesky())
 
         # Ktz Lz⁻ᵀ sqrt
         Ktz_Lz_invT_sqrt = jnp.matmul(Lz_inv_Kzt.T, sqrt)
@@ -456,10 +460,10 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian):
         mut = mean_function(test_inputs)
 
         # Lz⁻¹ Kzt
-        Lz_inv_Kzt = cola.solve(Lz, Kzt)
+        Lz_inv_Kzt = cola.solve(Lz, Kzt, Cholesky())
 
         # Kzz⁻¹ Kzt
-        Kzz_inv_Kzt = cola.solve(Lz.T, Lz_inv_Kzt)
+        Kzz_inv_Kzt = cola.solve(Lz.T, Lz_inv_Kzt, Cholesky())
 
         # Ktz Kzz⁻¹ L
         Ktz_Kzz_inv_L = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
@@ -605,10 +609,10 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian):
         mut = mean_function(t)
 
         # Lz⁻¹ Kzt
-        Lz_inv_Kzt = cola.solve(Lz, Kzt)
+        Lz_inv_Kzt = cola.solve(Lz, Kzt, Cholesky())
 
         # Kzz⁻¹ Kzt
-        Kzz_inv_Kzt = cola.solve(Lz.T, Lz_inv_Kzt)
+        Kzz_inv_Kzt = cola.solve(Lz.T, Lz_inv_Kzt, Cholesky())
 
         # Ktz Kzz⁻¹ sqrt
         Ktz_Kzz_inv_sqrt = Kzz_inv_Kzt.T @ sqrt
@@ -680,7 +684,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         Lz = lower_cholesky(Kzz)
 
         # Lz⁻¹ Kzx
-        Lz_inv_Kzx = cola.solve(Lz, Kzx)
+        Lz_inv_Kzx = cola.solve(Lz, Kzx, Cholesky())
 
         # A = Lz⁻¹ Kzt / o
         A = Lz_inv_Kzx / self.posterior.likelihood.obs_stddev
@@ -698,14 +702,14 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian):
         Lz_inv_Kzx_diff = jsp.linalg.cho_solve((L, True), jnp.matmul(Lz_inv_Kzx, diff))
 
         # Kzz⁻¹ Kzx (y - μx)
-        Kzz_inv_Kzx_diff = cola.solve(Lz.T, Lz_inv_Kzx_diff)
+        Kzz_inv_Kzx_diff = cola.solve(Lz.T, Lz_inv_Kzx_diff, Cholesky())
 
         Ktt = kernel.gram(t)
         Kzt = kernel.cross_covariance(z, t)
         mut = mean_function(t)
 
         # Lz⁻¹ Kzt
-        Lz_inv_Kzt = cola.solve(Lz, Kzt)
+        Lz_inv_Kzt = cola.solve(Lz, Kzt, Cholesky())
 
         # L⁻¹ Lz⁻¹ Kzt
         L_inv_Lz_inv_Kzt = jsp.linalg.solve_triangular(L, Lz_inv_Kzt, lower=True)

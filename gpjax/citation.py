@@ -31,15 +31,15 @@ from gpjax.objectives import (
     NonConjugateMLL,
 )
 
-CitationType = Union[str, Dict[str, str]]
+CitationType = Union[None, str, Dict[str, str]]
 
 
 @dataclass(repr=False)
 class AbstractCitation:
-    citation_key: str = None
-    authors: str = None
-    title: str = None
-    year: str = None
+    citation_key: Union[str, None] = None
+    authors: Union[str, None] = None
+    title: Union[str, None] = None
+    year: Union[str, None] = None
 
     def as_str(self) -> str:
         citation_str = f"@{self.citation_type}{{{self.citation_key},"
@@ -64,29 +64,24 @@ class NullCitation(AbstractCitation):
         )
 
 
-class JittedFnCitation(AbstractCitation):
-    def __str__(self) -> str:
-        return "Citation not available for jitted objects."
-
-
 @dataclass
 class PhDThesisCitation(AbstractCitation):
-    school: str = None
-    institution: str = None
-    citation_type: str = "phdthesis"
+    school: Union[str, None] = None
+    institution: Union[str, None] = None
+    citation_type: CitationType = "phdthesis"
 
 
 @dataclass
 class PaperCitation(AbstractCitation):
-    booktitle: str = None
-    citation_type: str = "inproceedings"
+    booktitle: Union[str, None] = None
+    citation_type: CitationType = "inproceedings"
 
 
 @dataclass
 class BookCitation(AbstractCitation):
-    publisher: str = None
-    volume: str = None
-    citation_type: str = "book"
+    publisher: Union[str, None] = None
+    volume: Union[str, None] = None
+    citation_type: CitationType = "book"
 
 
 ####################
@@ -101,8 +96,8 @@ def cite(tree) -> AbstractCitation:
 # Default citation
 ####################
 @cite.register(PjitFunction)
-def _(tree):
-    return JittedFnCitation()
+def _(tree) -> None:
+    raise RuntimeError("Citation not available for jitted objects.")
 
 
 ####################

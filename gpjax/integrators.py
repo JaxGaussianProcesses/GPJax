@@ -1,16 +1,23 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import (
+    TypeVar,
+    Union,
+)
 
 from beartype.typing import Callable
 import jax.numpy as jnp
 from jaxtyping import Float
 import numpy as np
 
+import gpjax
 from gpjax.typing import Array
 
-if TYPE_CHECKING:
-    import gpjax.likelihoods
+Likelihood = TypeVar(
+    "Likelihood",
+    bound=Union["gpjax.likelihoods.AbstractLikelihood", None],  # noqa: F821
+)
+Gaussian = TypeVar("Gaussian", bound="gpjax.likelihoods.Gaussian")  # noqa: F821
 
 
 @dataclass
@@ -24,7 +31,7 @@ class AbstractIntegrator:
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: "gpjax.likelihoods.AbstractLikelihood" = None,
+        likelihood: Likelihood,
     ) -> Float[Array, " N"]:
         r"""Integrate a function with respect to a Gaussian distribution.
 
@@ -47,7 +54,7 @@ class AbstractIntegrator:
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: "gpjax.likelihoods.AbstractLikelihood" = None,
+        likelihood: Likelihood,
     ) -> Float[Array, " N"]:
         r"""Integrate a function with respect to a Gaussian distribution.
 
@@ -86,7 +93,7 @@ class GHQuadratureIntegrator(AbstractIntegrator):
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: "gpjax.likelihoods.AbstractLikelihood" = None,
+        likelihood: Likelihood,
     ) -> Float[Array, " N"]:
         r"""Compute a quadrature integral.
 
@@ -127,7 +134,7 @@ class AnalyticalGaussianIntegrator(AbstractIntegrator):
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: "gpjax.likelihoods.Gaussian" = None,
+        likelihood: Gaussian,
     ) -> Float[Array, " N"]:
         r"""Compute a Gaussian integral.
 
