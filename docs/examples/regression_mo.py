@@ -40,7 +40,7 @@ import gpjax as gpx
 
 key = jr.PRNGKey(123)
 plt.style.use(
-   "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
 )
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 

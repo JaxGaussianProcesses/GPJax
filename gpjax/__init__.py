@@ -15,6 +15,8 @@
 from gpjax import (
     decision_making,
     integrators,
+    kernels,
+    sklearn,
 )
 from gpjax.base import (
     Module,
@@ -73,9 +75,6 @@ from gpjax.variational_families import (
     VariationalGaussian,
     WhitenedVariationalGaussian,
 )
-
-from gpjax import sklearn
-from gpjax import kernels
 
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
