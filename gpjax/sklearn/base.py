@@ -26,7 +26,11 @@ from gpjax.objectives import (
 )
 from gpjax.sklearn import DefaultConfig
 from gpjax.sklearn.scores import AbstractScore
-from gpjax.typing import Array, KeyArray, ScalarFloat
+from gpjax.typing import (
+    Array,
+    KeyArray,
+    ScalarFloat,
+)
 from gpjax.variational_families import (
     AbstractVariationalFamily,
     CollapsedVariationalGaussian,
@@ -67,17 +71,17 @@ class BaseEstimator:
     def predict(self, X: Num[Array, "N D"]) -> tfd.Distribution:
         raise NotImplementedError("Please implement `predict` in your subclass")
 
-    def predict_mean(self, X: Num[Array, "N D"]) -> Num[Array, "N"]:
+    def predict_mean(self, X: Num[Array, "N D"]) -> Num[Array, " N"]:
         predictive_dist = self.predict(X)
         return predictive_dist.mean()
 
-    def predict_stddev(self, X: Num[Array, "N D"]) -> Num[Array, "N"]:
+    def predict_stddev(self, X: Num[Array, "N D"]) -> Num[Array, " N"]:
         predictive_dist = self.predict(X)
         return predictive_dist.stddev()
 
     def predict_mean_and_stddev(
         self, X: Num[Array, "N D"]
-    ) -> Tuple[Num[Array, "N"], Num[Array, "N"]]:
+    ) -> Tuple[Num[Array, " N"], Num[Array, " N"]]:
         predictive_dist = self.predict(X)
         return predictive_dist.mean(), predictive_dist.stddev()
 

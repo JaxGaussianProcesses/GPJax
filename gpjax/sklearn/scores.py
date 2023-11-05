@@ -1,10 +1,14 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-import jax.numpy as jnp
-from beartype.typing import Callable
-from jaxtyping import Num, Float
 
-from gpjax.typing import Array, ScalarFloat
+from beartype.typing import Callable
+import jax.numpy as jnp
+from jaxtyping import Num
+
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 @dataclass

@@ -86,7 +86,7 @@ model.fit(x, y, key=key)
 # %%
 from sklearn.metrics import mean_squared_error
 
-model.score(xtest, ytest, gpx.sklearn.SKLearnScore('mse', mean_squared_error))
+model.score(xtest, ytest, gpx.sklearn.SKLearnScore("mse", mean_squared_error))
 model.score(x, y, gpx.sklearn.LogPredictiveDensity())
 
 # %% [markdown]
@@ -136,10 +136,8 @@ ax.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))
 # ## System configuration
 
 # %%
-%reload_ext watermark
-%watermark -n -u -v -iv -w -a 'Thomas Pinder'
+# %reload_ext watermark
+# %watermark -n -u -v -iv -w -a 'Thomas Pinder & Daniel Dodd'
 
 # %% [markdown]
 #
-
-

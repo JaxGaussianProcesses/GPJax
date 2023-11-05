@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
+import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.kernels import AbstractKernel
 from gpjax.mean_functions import AbstractMeanFunction
 from gpjax.sklearn.base import BaseEstimator
-import tensorflow_probability.substrates.jax as tfp
 
 tfd = tfp.distributions
 

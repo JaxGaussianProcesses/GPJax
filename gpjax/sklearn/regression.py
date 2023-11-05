@@ -4,6 +4,7 @@ import jax
 from jaxtyping import Num
 from loguru import logger
 import optax as ox
+import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.dataset import Dataset
 from gpjax.fit import fit
@@ -17,7 +18,6 @@ from gpjax.typing import (
     KeyArray,
 )
 from gpjax.variational_families import CollapsedVariationalGaussian
-import tensorflow_probability.substrates.jax as tfp
 
 tfd = tfp.distributions
 

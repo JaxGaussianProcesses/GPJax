@@ -1,11 +1,14 @@
 # from .classification import GPJaxClassifier
-from .config import DefaultConfig
-from .regression import GPJaxRegressor
-from .scores import (
+from gpjax.sklearn.config import DefaultConfig
+from gpjax.sklearn.optim import (
+    GPJaxOptimiser,
+    GPJaxOptimizer,
+)
+from gpjax.sklearn.regression import GPJaxRegressor
+from gpjax.sklearn.scores import (
     LogPredictiveDensity,
     SKLearnScore,
 )
-from .optim import GPJaxOptimizer, GPJaxOptimiser
 
 __all__ = [
     "GPJaxRegressor",
