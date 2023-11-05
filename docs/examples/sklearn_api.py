@@ -1,20 +1,3 @@
-# -*- coding: utf-8 -*-
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     custom_cell_magics: kql
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.11.2
-#   kernelspec:
-#     display_name: gpjax
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # SKLearn-API
 #
@@ -80,17 +63,83 @@ ax.legend(loc="best")
 
 # %%
 model = gpx.sklearn.GPJaxRegressor(kernel=gpx.kernels.RBF())
-model
+
+# %% [markdown]
+# Let's now fit the model. Using the abstraction provided by `GPJaxRegressor`, this can be achieved by simply invoking the `fit` method.
 
 # %%
 model.fit(x, y, key=key)
 
+# %% [markdown]
+# In the above cell, the Adam optimiser was used as the the default optimiser. However, should you wish to use another optimiser from [Optax](https://github.com/google-deepmind/optax), then you can simply supply it to fit as follows
+# ```
+# import optax as ox
+#
+# model.fit(x, y, key=key, optim = ox.sgd(learning_rate=0.01))
+# ```
+
+# %% [markdown]
+# ## Model evaluation
+#
+# With a model now fit, we wish to evaluate the model's quality. To do this, we can _score_ the model using either a GPJax scoring function, or a [metric from sklearn](https://scikit-learn.org/stable/modules/model_evaluation.html). We demonstrate how this can be achieved using GPJax's log-posterior density, and the mean-squared error function from sklearn. Scoring functions can be evaluation on either the training or test set, as we show below.
+
 # %%
 from sklearn.metrics import mean_squared_error
+
+model.score(xtest, ytest, gpx.sklearn.SKLearnScore('mse', mean_squared_error))
+model.score(x, y, gpx.sklearn.LogPredictiveDensity())
+
+# %% [markdown]
+# ## Model prediction
+#
+# Once we're happy with the model's performance, we can make predictions using the `predict` method. Here we are presented with four options:
+# 1. `predict` returns the predictive posterior distribution
+# 2. `predict_mean` returns the expected value of the predictive posterior distribution
+# 3. `predict_stddev` returns the standard-deviation of the predictive posterior distribution
+# 4. `predict_mean_and_stddev` returns 2. and 3.
+
+# %%
+mu, sigma = model.predict_mean_and_stddev(xtest)
+
+fig, ax = plt.subplots(figsize=(7.5, 2.5))
+ax.plot(x, y, "x", label="Observations", color=cols[0], alpha=0.5)
+ax.fill_between(
+    xtest.squeeze(),
+    mu - 2 * sigma,
+    mu + 2 * sigma,
+    alpha=0.2,
+    label="Two sigma",
+    color=cols[1],
+)
+ax.plot(
+    xtest,
+    mu - 2 * sigma,
+    linestyle="--",
+    linewidth=1,
+    color=cols[1],
+)
+ax.plot(
+    xtest,
+    mu + 2 * sigma,
+    linestyle="--",
+    linewidth=1,
+    color=cols[1],
+)
+ax.plot(
+    xtest, ytest, label="Latent function", color=cols[0], linestyle="--", linewidth=2
+)
+ax.plot(xtest, mu, label="Predictive mean", color=cols[1])
+ax.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))
+
 
 # %% [markdown]
 # ## System configuration
 
 # %%
-# %reload_ext watermark
-# %watermark -n -u -v -iv -w -a 'Thomas Pinder & Daniel Dodd'
+%reload_ext watermark
+%watermark -n -u -v -iv -w -a 'Thomas Pinder'
+
+# %% [markdown]
+#
+
+

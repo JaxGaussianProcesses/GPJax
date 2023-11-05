@@ -26,10 +26,7 @@ from gpjax.objectives import (
 )
 from gpjax.sklearn import DefaultConfig
 from gpjax.sklearn.scores import AbstractScore
-from gpjax.typing import (
-    Array,
-    KeyArray,
-)
+from gpjax.typing import Array, KeyArray, ScalarFloat
 from gpjax.variational_families import (
     AbstractVariationalFamily,
     CollapsedVariationalGaussian,
@@ -70,23 +67,23 @@ class BaseEstimator:
     def predict(self, X: Num[Array, "N D"]) -> tfd.Distribution:
         raise NotImplementedError("Please implement `predict` in your subclass")
 
-    def predict_mean(self, X: Num[Array, "N D"]) -> Num[Array, "N 1"]:
+    def predict_mean(self, X: Num[Array, "N D"]) -> Num[Array, "N"]:
         predictive_dist = self.predict(X)
         return predictive_dist.mean()
 
-    def predict_stddev(self, X: Num[Array, "N D"]) -> Num[Array, "N 1"]:
+    def predict_stddev(self, X: Num[Array, "N D"]) -> Num[Array, "N"]:
         predictive_dist = self.predict(X)
         return predictive_dist.stddev()
 
     def predict_mean_and_stddev(
         self, X: Num[Array, "N D"]
-    ) -> Tuple[Num[Array, "N 1"], Num[Array, "N 1"]]:
+    ) -> Tuple[Num[Array, "N"], Num[Array, "N"]]:
         predictive_dist = self.predict(X)
         return predictive_dist.mean(), predictive_dist.stddev()
 
     def score(
         self, X: Num[Array, "N D"], y: Num[Array, "N D"], scoring_fn: AbstractScore
-    ) -> float:
+    ) -> ScalarFloat:
         predictive_dist = self.predict(X)
         score = scoring_fn(predictive_dist, y)
         logger.info(f"{scoring_fn.name}: {score: .3f}")
@@ -153,6 +150,3 @@ class BaseEstimator:
             objective = ELBO(negative=True)
             logger.info("Using uncollapsed ELBO")
         return objective, model
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.kernel.name})"
