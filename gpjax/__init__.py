@@ -43,7 +43,6 @@ __all__ = [
     "likelihoods",
     "mean_functions",
     "objectives",
-    "sklearn",
     "variational_families",
     "Dataset",
     "cite",
