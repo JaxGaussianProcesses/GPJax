@@ -36,8 +36,8 @@ def kmeans_inducing_point_selector(
 
 @dataclass
 class DefaultConfig:
-    sparse_threshold: Optional[int] = 2000
-    stochastic_threshold: Optional[int] = 20000
+    sparse_threshold: Optional[int] = 5000
+    stochastic_threshold: Optional[int] = 50000
     min_num_inducing: Optional[int] = 100
     n_inducing_heuristic: Optional[NumInducingHeuristic] = None
     inducing_point_selector: Optional[InducingPointSelector] = None
