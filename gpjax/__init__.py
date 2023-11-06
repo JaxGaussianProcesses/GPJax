@@ -24,10 +24,9 @@ from gpjax import (
     sklearn,
     variational_families,
 )
-from gpjax.dataset import Dataset
 from gpjax.citation import cite
+from gpjax.dataset import Dataset
 from gpjax.fit import fit
-
 
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"

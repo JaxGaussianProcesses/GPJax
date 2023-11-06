@@ -40,13 +40,13 @@ Another way you can contribute to GPJax is through [issue
 triaging](https://www.codetriage.com/what).  This can include reproducing bug reports,
 asking for vital information such as version numbers and reproduction instructions, or
 identifying stale issues. If you would like to begin triaging issues, an easy way to get
-started is to 
+started is to
 [subscribe to GPJax on CodeTriage](https://www.codetriage.com/jaxgaussianprocesses/gpjax).
 
 As a contributor to GPJax, you are expected to abide by our [code of
 conduct](docs/CODE_OF_CONDUCT.md). If you are feel that you have either experienced or
 witnessed behaviour that violates this standard, then we ask that you report any such
-behaviours though [this form](https://jaxgaussianprocesses.com/contact/) or reach out to 
+behaviours though [this form](https://jaxgaussianprocesses.com/contact/) or reach out to
 one of the project's [_gardeners_](https://docs.jaxgaussianprocesses.com/GOVERNANCE/#roles).
 
 Feel free to join our [Slack
