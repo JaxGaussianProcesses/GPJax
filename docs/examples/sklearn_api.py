@@ -137,7 +137,7 @@ ax.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))
 
 # %%
 # %reload_ext watermark
-# %watermark -n -u -v -iv -w -a 'Thomas Pinder & Daniel Dodd'
+# %watermark -n -u -v -iv -w -a 'Thomas Pinder'
 
 # %% [markdown]
 #
