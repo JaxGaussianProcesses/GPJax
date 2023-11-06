@@ -21,7 +21,6 @@ from gpjax import (
     likelihoods,
     mean_functions,
     objectives,
-    sklearn,
     variational_families,
 )
 from gpjax.citation import cite
