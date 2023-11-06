@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # %% [markdown]
 # # Graph Kernels
 #
@@ -118,7 +119,8 @@ sm = plt.cm.ScalarMappable(
     cmap=plt.cm.inferno, norm=plt.Normalize(vmin=vmin, vmax=vmax)
 )
 sm.set_array([])
-cbar = plt.colorbar(sm)
+ax = plt.gca()
+cbar = plt.colorbar(sm, ax=ax)
 
 # %% [markdown]
 #
@@ -197,8 +199,8 @@ vmin, vmax = error.min(), error.max()
 sm = plt.cm.ScalarMappable(
     cmap=plt.cm.inferno, norm=plt.Normalize(vmin=vmin, vmax=vmax)
 )
-sm.set_array([])
-cbar = plt.colorbar(sm)
+ax = plt.gca()
+cbar = plt.colorbar(sm, ax=ax)
 
 # %% [markdown]
 #

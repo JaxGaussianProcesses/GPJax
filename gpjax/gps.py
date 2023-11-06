@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-# from __future__ import annotations
 from abc import abstractmethod
 from dataclasses import (
     dataclass,
@@ -25,8 +24,10 @@ from beartype.typing import (
     Any,
     Callable,
     Optional,
+    Union,
 )
 import cola
+from cola.linalg.decompositions.decompositions import Cholesky
 from cola.ops import Dense
 import jax.numpy as jnp
 from jax.random import (
@@ -152,17 +153,17 @@ class Prior(AbstractPrior):
     ```
     """
 
-    @overload
-    def __mul__(self, other: Gaussian) -> "ConjugatePosterior":
-        ...
+    # @overload
+    # def __mul__(self, other: Gaussian) -> "ConjugatePosterior":
+    #     ...
 
-    @overload
-    def __mul__(self, other: NonGaussianLikelihood) -> "NonConjugatePosterior":
-        ...
+    # @overload
+    # def __mul__(self, other: NonGaussianLikelihood) -> "NonConjugatePosterior":
+    #     ...
 
-    @overload
-    def __mul__(self, other: AbstractLikelihood) -> "AbstractPosterior":
-        ...
+    # @overload
+    # def __mul__(self, other: AbstractLikelihood) -> "AbstractPosterior":
+    #     ...
 
     def __mul__(self, other):
         r"""Combine the prior with a likelihood to form a posterior distribution.
@@ -198,17 +199,17 @@ class Prior(AbstractPrior):
         """
         return construct_posterior(prior=self, likelihood=other)
 
-    @overload
-    def __rmul__(self, other: Gaussian) -> "ConjugatePosterior":
-        ...
+    # @overload
+    # def __rmul__(self, other: Gaussian) -> "ConjugatePosterior":
+    #     ...
 
-    @overload
-    def __rmul__(self, other: NonGaussianLikelihood) -> "NonConjugatePosterior":
-        ...
+    # @overload
+    # def __rmul__(self, other: NonGaussianLikelihood) -> "NonConjugatePosterior":
+    #     ...
 
-    @overload
-    def __rmul__(self, other: AbstractLikelihood) -> "AbstractPosterior":
-        ...
+    # @overload
+    # def __rmul__(self, other: AbstractLikelihood) -> "AbstractPosterior":
+    #     ...
 
     def __rmul__(self, other):
         r"""Combine the prior with a likelihood to form a posterior distribution.
@@ -540,7 +541,7 @@ class ConjugatePosterior(AbstractPosterior):
         # Σ⁻¹ Kxt
         if mask is not None:
             Kxt = jnp.where(mask * jnp.ones((1, n_train), dtype=bool), 0.0, Kxt)
-        Sigma_inv_Kxt = cola.solve(Sigma, Kxt)
+        Sigma_inv_Kxt = cola.solve(Sigma, Kxt, Cholesky())
 
         # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
         mean = mean_t.flatten() + Sigma_inv_Kxt.T @ (y - mx).flatten()
@@ -618,7 +619,9 @@ class ConjugatePosterior(AbstractPosterior):
         y = train_data.y - self.prior.mean_function(train_data.X)  # account for mean
         Phi = fourier_feature_fn(train_data.X)
         canonical_weights = cola.solve(
-            Sigma, y + eps - jnp.inner(Phi, fourier_weights)
+            Sigma,
+            y + eps - jnp.inner(Phi, fourier_weights),
+            Cholesky(),
         )  #  [N, B]
 
         def sample_fn(test_inputs: Float[Array, "n D"]) -> Float[Array, "n B"]:
@@ -656,7 +659,7 @@ class NonConjugatePosterior(AbstractPosterior):
     from, or optimise an approximation to, the posterior distribution.
     """
 
-    latent: Float[Array, "N 1"] = param_field(None)
+    latent: Union[Float[Array, "N 1"], None] = param_field(None)
     key: KeyArray = static_field(PRNGKey(42))
 
     def __post_init__(self):
@@ -707,7 +710,7 @@ class NonConjugatePosterior(AbstractPosterior):
         mean_t = mean_function(t)
 
         # Lx⁻¹ Kxt
-        Lx_inv_Kxt = cola.solve(Lx, Ktx.T)
+        Lx_inv_Kxt = cola.solve(Lx, Ktx.T, Cholesky())
 
         # Whitened function values, wx, corresponding to the inputs, x
         wx = self.latent

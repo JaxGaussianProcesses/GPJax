@@ -10,7 +10,6 @@ import gpjax as gpx
 from gpjax.citation import (
     AbstractCitation,
     BookCitation,
-    JittedFnCitation,
     NullCitation,
     PaperCitation,
     PhDThesisCitation,
@@ -209,6 +208,5 @@ def test_logarithmic_goldstein_price():
     [gpx.ELBO(), gpx.CollapsedELBO(), gpx.LogPosteriorDensity(), gpx.ConjugateMLL()],
 )
 def test_jitted_fallback(objective):
-    citation = cite(jit(objective))
-    assert isinstance(citation, JittedFnCitation)
-    assert citation.__str__() == "Citation not available for jitted objects."
+    with pytest.raises(RuntimeError):
+        _ = cite(jit(objective))
