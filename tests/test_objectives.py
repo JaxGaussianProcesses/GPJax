@@ -64,7 +64,8 @@ def test_conjugate_mll(
 
     # Build model
     p = Prior(
-        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+        kernel=gpx.kernels.RBF(active_dims=list(range(num_dims))),
+        mean_function=gpx.mean_functions.Constant(),
     )
     likelihood = Gaussian(num_datapoints=num_datapoints)
     post = p * likelihood
@@ -93,7 +94,8 @@ def test_non_conjugate_mll(
 
     # Build model
     p = Prior(
-        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+        kernel=gpx.kernels.RBF(active_dims=list(range(num_dims))),
+        mean_function=gpx.mean_functions.Constant(),
     )
     likelihood = Bernoulli(num_datapoints=num_datapoints)
     post = p * likelihood
@@ -129,7 +131,8 @@ def test_collapsed_elbo(
     )
 
     p = Prior(
-        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+        kernel=gpx.kernels.RBF(active_dims=list(range(num_dims))),
+        mean_function=gpx.mean_functions.Constant(),
     )
     likelihood = Gaussian(num_datapoints=num_datapoints)
     q = gpx.CollapsedVariationalGaussian(posterior=p * likelihood, inducing_inputs=z)
@@ -169,7 +172,8 @@ def test_elbo(
     )
 
     p = Prior(
-        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+        kernel=gpx.kernels.RBF(active_dims=list(range(num_dims))),
+        mean_function=gpx.mean_functions.Constant(),
     )
     if binary:
         likelihood = Bernoulli(num_datapoints=num_datapoints)
