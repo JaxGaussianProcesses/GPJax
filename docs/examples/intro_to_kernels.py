@@ -520,7 +520,7 @@ D = gpx.Dataset(X=train_x, y=standardised_train_y)
 mean = gpx.mean_functions.Zero()
 rbf_kernel = gpx.kernels.RBF(lengthscale=100.0)
 periodic_kernel = gpx.kernels.Periodic()
-linear_kernel = gpx.kernels.Linear()
+linear_kernel = gpx.kernels.Linear(variance=0.001)
 sum_kernel = gpx.kernels.SumKernel(kernels=[linear_kernel, periodic_kernel])
 final_kernel = gpx.kernels.SumKernel(kernels=[rbf_kernel, sum_kernel])
 
@@ -538,11 +538,15 @@ negative_mll = gpx.objectives.ConjugateMLL(negative=True)
 negative_mll(posterior, train_data=D)
 negative_mll = jit(negative_mll)
 
-opt_posterior, history = gpx.fit_scipy(
+opt_posterior, history = gpx.fit(
     model=posterior,
     objective=negative_mll,
     train_data=D,
+    optim=ox.adamw(learning_rate=1e-2),
+    num_iters=500,
+    key=key,
 )
+
 
 # %% [markdown]
 # Now we can obtain the model's prediction over a period of time which includes the

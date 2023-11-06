@@ -232,7 +232,7 @@ def fit_scipy(  # noqa: PLR0913
         if result.success:
             print("Optimization was successful")
         else:
-            raise FailedScipyFitError("Optimization failed")
+            raise FailedScipyFitError("Optimization failed, try increasing max_iters or using a different optimiser.")
         print(f"Final loss is {result.fun_val} after {result.num_fun_eval} iterations")
 
     # Constrained space.
