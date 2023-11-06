@@ -124,7 +124,7 @@ out_kernel = gpx.kernels.CatKernel(
 )
 # out_kernel = gpx.kernels.White(variance=1.0)
 meanf = gpx.mean_functions.Constant(jnp.array([0.0, 1.0]))
-prior = gpx.Prior(mean_function=meanf, kernel=kernel, out_kernel=out_kernel)
+prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel, out_kernel=out_kernel)
 
 # %% [markdown]
 #
@@ -169,7 +169,7 @@ for i in range(2):
 # This is defined in GPJax through calling a `Gaussian` instance.
 
 # %%
-likelihood = gpx.Gaussian(num_datapoints=D.n)
+likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
 
 # %% [markdown]
 # The posterior is proportional to the prior multiplied by the likelihood, written as

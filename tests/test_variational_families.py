@@ -114,8 +114,10 @@ def test_variational_gaussians(
     variational_family: AbstractVariationalFamily,
 ) -> None:
     # Initialise variational family:
-    prior = gpx.Prior(kernel=gpx.RBF(), mean_function=gpx.Constant())
-    likelihood = gpx.Gaussian(123)
+    prior = gpx.gps.Prior(
+        kernel=gpx.kernels.RBF(), mean_function=gpx.mean_functions.Constant()
+    )
+    likelihood = gpx.likelihoods.Gaussian(123)
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
     test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
 
@@ -223,14 +225,16 @@ def test_collapsed_variational_gaussian(
     x = jnp.hstack([x] * point_dim)
     D = gpx.Dataset(X=x, y=y)
 
-    prior = gpx.Prior(kernel=gpx.RBF(), mean_function=gpx.Constant())
+    prior = gpx.gps.Prior(
+        kernel=gpx.kernels.RBF(), mean_function=gpx.mean_functions.Constant()
+    )
 
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
     inducing_inputs = jnp.hstack([inducing_inputs] * point_dim)
     test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
     test_inputs = jnp.hstack([test_inputs] * point_dim)
 
-    posterior = prior * gpx.Gaussian(num_datapoints=D.n)
+    posterior = prior * gpx.likelihoods.Gaussian(num_datapoints=D.n)
 
     variational_family = CollapsedVariationalGaussian(
         posterior=posterior,
@@ -240,7 +244,7 @@ def test_collapsed_variational_gaussian(
     # We should raise an error for non-Gaussian likelihoods:
     with pytest.raises(TypeError):
         CollapsedVariationalGaussian(
-            posterior=prior * gpx.Bernoulli(num_datapoints=D.n),
+            posterior=prior * gpx.likelihoods.Bernoulli(num_datapoints=D.n),
             inducing_inputs=inducing_inputs,
         )
 

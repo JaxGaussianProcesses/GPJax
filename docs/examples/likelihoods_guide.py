@@ -124,11 +124,11 @@ gpx.likelihoods.Gaussian(num_datapoints=D.n, obs_stddev=0.5)
 # $\mathbf{y}^{\star}$.
 
 # +
-kernel = gpx.Matern32()
-meanf = gpx.Zero()
-prior = gpx.Prior(kernel=kernel, mean_function=meanf)
+kernel = gpx.kernels.Matern32()
+meanf = gpx.mean_functions.Zero()
+prior = gpx.gps.Prior(kernel=kernel, mean_function=meanf)
 
-likelihood = gpx.Gaussian(num_datapoints=D.n, obs_stddev=0.1)
+likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n, obs_stddev=0.1)
 
 posterior = prior * likelihood
 
@@ -158,7 +158,7 @@ for ax in axes.ravel():
 # Similarly, for a Bernoulli likelihood function, the samples of $y$ would be binary.
 
 # +
-likelihood = gpx.Bernoulli(num_datapoints=D.n)
+likelihood = gpx.likelihoods.Bernoulli(num_datapoints=D.n)
 
 
 fig, axes = plt.subplots(ncols=3, nrows=1, figsize=(9, 2))
@@ -231,7 +231,7 @@ for ax in axes.ravel():
 
 # +
 z = jnp.linspace(-3.0, 3.0, 10).reshape(-1, 1)
-q = gpx.VariationalGaussian(posterior=posterior, inducing_inputs=z)
+q = gpx.variational_families.VariationalGaussian(posterior=posterior, inducing_inputs=z)
 
 
 def q_moments(x):
@@ -251,7 +251,7 @@ jnp.sum(likelihood.expected_log_likelihood(y=y, mean=mean, variance=variance))
 # However, had we wanted to do this using quadrature, then we would have done the
 # following:
 
-lquad = gpx.Gaussian(
+lquad = gpx.likelihoods.Gaussian(
     num_datapoints=D.n,
     obs_stddev=jnp.array([0.1]),
     integrator=gpx.integrators.GHQuadratureIntegrator(num_points=20),

@@ -67,7 +67,7 @@ class Prior(AbstractPrior):
         >>>
         >>> meanf = gpx.mean_functions.Zero()
         >>> kernel = gpx.kernels.RBF()
-        >>> prior = gpx.Prior(mean_function=meanf, kernel = kernel)
+        >>> prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
 
     Attributes:
         kernel (Kernel): The kernel function used to parameterise the prior.

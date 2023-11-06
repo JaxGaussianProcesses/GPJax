@@ -108,7 +108,7 @@ ax.legend(loc="best")
 # %%
 kernel = gpx.kernels.RBF()
 meanf = gpx.mean_functions.Zero()
-prior = gpx.Prior(mean_function=meanf, kernel=kernel)
+prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 
 # %% [markdown]
 #
@@ -152,7 +152,7 @@ ax = clean_legend(ax)
 # This is defined in GPJax through calling a `Gaussian` instance.
 
 # %%
-likelihood = gpx.Gaussian(num_datapoints=D.n)
+likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
 
 # %% [markdown]
 # The posterior is proportional to the prior multiplied by the likelihood, written as

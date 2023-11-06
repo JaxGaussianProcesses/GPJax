@@ -151,7 +151,7 @@ kernel = gpx.kernels.RBF(
 
 # %%
 @dataclass
-class MeanFunction(gpx.gps.AbstractMeanFunction):
+class MeanFunction(gpx.mean_functions.AbstractMeanFunction):
     w: Float[Array, "1"] = param_field(jnp.array([0.0]))
     b: Float[Array, "1"] = param_field(jnp.array([0.0]))
 
@@ -166,8 +166,8 @@ class MeanFunction(gpx.gps.AbstractMeanFunction):
 
 # %%
 mean_function = MeanFunction()
-prior = gpx.Prior(kernel=kernel, mean_function=mean_function)
-likelihood = gpx.Gaussian(D.n)
+prior = gpx.gps.Prior(kernel=kernel, mean_function=mean_function)
+likelihood = gpx.likelihoods.Gaussian(D.n)
 
 # %% [markdown]
 # Finally, we construct the posterior.

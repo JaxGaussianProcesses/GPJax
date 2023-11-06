@@ -95,13 +95,13 @@ L = nx.laplacian_matrix(G).toarray()
 # %%
 x = jnp.arange(G.number_of_nodes()).reshape(-1, 1)
 
-true_kernel = gpx.GraphKernel(
+true_kernel = gpx.kernels.GraphKernel(
     laplacian=L,
     lengthscale=2.3,
     variance=3.2,
     smoothness=6.1,
 )
-prior = gpx.Prior(mean_function=gpx.Zero(), kernel=true_kernel)
+prior = gpx.gps.Prior(mean_function=gpx.mean_functions.Zero(), kernel=true_kernel)
 
 fx = prior(x)
 y = fx.sample(seed=key, sample_shape=(1,)).reshape(-1, 1)
@@ -137,9 +137,9 @@ cbar = plt.colorbar(sm, ax=ax)
 # We do this using the Adam optimiser provided in `optax`.
 
 # %%
-likelihood = gpx.Gaussian(num_datapoints=D.n)
-kernel = gpx.GraphKernel(laplacian=L)
-prior = gpx.Prior(mean_function=gpx.Zero(), kernel=kernel)
+likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
+kernel = gpx.kernels.GraphKernel(laplacian=L)
+prior = gpx.gps.Prior(mean_function=gpx.mean_functions.Zero(), kernel=kernel)
 posterior = prior * likelihood
 
 # %% [markdown]
@@ -157,7 +157,7 @@ print(gpx.cite(kernel))
 # %%
 opt_posterior, training_history = gpx.fit(
     model=posterior,
-    objective=jit(gpx.ConjugateMLL(negative=True)),
+    objective=jit(gpx.objectives.ConjugateMLL(negative=True)),
     train_data=D,
     optim=ox.adamw(learning_rate=0.01),
     num_iters=1000,

@@ -168,13 +168,13 @@ scaled_Xte = x_scaler.transform(Xte)
 
 # %%
 n_train, n_covariates = scaled_Xtr.shape
-kernel = gpx.RBF(
+kernel = gpx.kernels.RBF(
     active_dims=list(range(n_covariates)), lengthscale=np.ones((n_covariates,))
 )
 meanf = gpx.mean_functions.Zero()
-prior = gpx.Prior(mean_function=meanf, kernel=kernel)
+prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 
-likelihood = gpx.Gaussian(num_datapoints=n_train)
+likelihood = gpx.likelihoods.Gaussian(num_datapoints=n_train)
 
 posterior = prior * likelihood
 
@@ -187,7 +187,7 @@ posterior = prior * likelihood
 # %%
 training_data = gpx.Dataset(X=scaled_Xtr, y=scaled_ytr)
 
-negative_mll = jit(gpx.ConjugateMLL(negative=True))
+negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True))
 optimiser = ox.adamw(0.05)
 
 opt_posterior, history = gpx.fit(

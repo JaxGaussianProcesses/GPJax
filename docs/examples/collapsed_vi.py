@@ -106,10 +106,10 @@ plt.show()
 # this, it is intractable to evaluate.
 
 # %%
-meanf = gpx.Constant()
-kernel = gpx.RBF()
-likelihood = gpx.Gaussian(num_datapoints=D.n)
-prior = gpx.Prior(mean_function=meanf, kernel=kernel)
+meanf = gpx.mean_functions.Constant()
+kernel = gpx.kernels.RBF()
+likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
+prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 posterior = prior * likelihood
 
 # %% [markdown]
@@ -119,7 +119,9 @@ posterior = prior * likelihood
 # inducing points into the constructor as arguments.
 
 # %%
-q = gpx.CollapsedVariationalGaussian(posterior=posterior, inducing_inputs=z)
+q = gpx.variational_families.CollapsedVariationalGaussian(
+    posterior=posterior, inducing_inputs=z
+)
 
 # %% [markdown]
 # We define our variational inference algorithm through `CollapsedVI`. This defines
@@ -127,7 +129,7 @@ q = gpx.CollapsedVariationalGaussian(posterior=posterior, inducing_inputs=z)
 # <strong data-cite="titsias2009">Titsias (2009)</strong>.
 
 # %%
-elbo = gpx.CollapsedELBO(negative=True)
+elbo = gpx.objectives.CollapsedELBO(negative=True)
 
 # %% [markdown]
 # For researchers, GPJax has the capacity to print the bibtex citation for objects such
@@ -241,14 +243,14 @@ plt.show()
 # full model.
 
 # %%
-full_rank_model = gpx.Prior(mean_function=gpx.Zero(), kernel=gpx.RBF()) * gpx.Gaussian(
-    num_datapoints=D.n
-)
-negative_mll = jit(gpx.ConjugateMLL(negative=True).step)
+full_rank_model = gpx.gps.Prior(
+    mean_function=gpx.mean_functions.Zero(), kernel=gpx.kernels.RBF()
+) * gpx.likelihoods.Gaussian(num_datapoints=D.n)
+negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True).step)
 # %timeit negative_mll(full_rank_model, D).block_until_ready()
 
 # %%
-negative_elbo = jit(gpx.CollapsedELBO(negative=True).step)
+negative_elbo = jit(gpx.objectives.CollapsedELBO(negative=True).step)
 # %timeit negative_elbo(q, D).block_until_ready()
 
 # %% [markdown]

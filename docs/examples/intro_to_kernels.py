@@ -161,7 +161,7 @@ x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 meanf = gpx.mean_functions.Zero()
 
 for k, ax in zip(kernels, axes.ravel()):
-    prior = gpx.Prior(mean_function=meanf, kernel=k)
+    prior = gpx.gps.Prior(mean_function=meanf, kernel=k)
     rv = prior(x)
     y = rv.sample(seed=key, sample_shape=(10,))
     ax.plot(x, y.T, alpha=0.7)
@@ -220,9 +220,9 @@ kernel = gpx.kernels.Matern52(
     lengthscale=jnp.array(2.0)
 )  # Initialise our kernel lengthscale to 2.0
 
-prior = gpx.Prior(mean_function=mean, kernel=kernel)
+prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 
-likelihood = gpx.Gaussian(
+likelihood = gpx.likelihoods.Gaussian(
     num_datapoints=D.n, obs_stddev=jnp.array(1e-3)
 )  # Our function is noise-free, so we set the observation noise's standard deviation to a very small value
 likelihood = likelihood.replace_trainable(obs_stddev=False)
@@ -358,7 +358,7 @@ print(
 # %%
 mean = gpx.mean_functions.Zero()
 kernel = gpx.kernels.Periodic()
-prior = gpx.Prior(mean_function=mean, kernel=kernel)
+prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 
 x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 rv = prior(x)
@@ -381,7 +381,7 @@ plt.show()
 # %%
 mean = gpx.mean_functions.Zero()
 kernel = gpx.kernels.Linear()
-prior = gpx.Prior(mean_function=mean, kernel=kernel)
+prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 
 x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 rv = prior(x)
@@ -417,7 +417,7 @@ kernel_one = gpx.kernels.Linear()
 kernel_two = gpx.kernels.Periodic()
 sum_kernel = gpx.kernels.SumKernel(kernels=[kernel_one, kernel_two])
 mean = gpx.mean_functions.Zero()
-prior = gpx.Prior(mean_function=mean, kernel=sum_kernel)
+prior = gpx.gps.Prior(mean_function=mean, kernel=sum_kernel)
 
 x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 rv = prior(x)
@@ -442,7 +442,7 @@ kernel_one = gpx.kernels.Linear()
 kernel_two = gpx.kernels.Periodic()
 sum_kernel = gpx.kernels.ProductKernel(kernels=[kernel_one, kernel_two])
 mean = gpx.mean_functions.Zero()
-prior = gpx.Prior(mean_function=mean, kernel=sum_kernel)
+prior = gpx.gps.Prior(mean_function=mean, kernel=sum_kernel)
 
 x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 rv = prior(x)
@@ -528,8 +528,8 @@ linear_kernel = gpx.kernels.Linear()
 sum_kernel = gpx.kernels.SumKernel(kernels=[linear_kernel, periodic_kernel])
 final_kernel = gpx.kernels.SumKernel(kernels=[rbf_kernel, sum_kernel])
 
-prior = gpx.Prior(mean_function=mean, kernel=final_kernel)
-likelihood = gpx.Gaussian(num_datapoints=D.n)
+prior = gpx.gps.Prior(mean_function=mean, kernel=final_kernel)
+likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
 
 posterior = prior * likelihood
 
@@ -652,7 +652,8 @@ ax.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))
 
 # %%
 print(
-    f"Periodic Kernel Period: {[i for i in opt_posterior.prior.kernel.kernels if isinstance(i, gpx.kernels.Periodic)][0].period}"
+    "Periodic Kernel Period:"
+    f" {[i for i in opt_posterior.prior.kernel.kernels if isinstance(i, gpx.kernels.Periodic)][0].period}"
 )
 
 # %% [markdown]

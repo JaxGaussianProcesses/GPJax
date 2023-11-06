@@ -201,9 +201,9 @@ D = gpx.Dataset(X=initial_x, y=initial_y)
 
 # %%
 def return_optimised_posterior(
-    data: gpx.Dataset, prior: gpx.Module, key: Array
-) -> gpx.Module:
-    likelihood = gpx.Gaussian(
+    data: gpx.Dataset, prior: gpx.base.Module, key: Array
+) -> gpx.base.Module:
+    likelihood = gpx.likelihoods.Gaussian(
         num_datapoints=data.n, obs_stddev=jnp.array(1e-3)
     )  # Our function is noise-free, so we set the observation noise's standard deviation to a very small value
     likelihood = likelihood.replace_trainable(obs_stddev=False)
@@ -230,7 +230,7 @@ def return_optimised_posterior(
 
 mean = gpx.mean_functions.Zero()
 kernel = gpx.kernels.Matern52()
-prior = gpx.Prior(mean_function=mean, kernel=kernel)
+prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 opt_posterior = return_optimised_posterior(D, prior, key)
 
 # %% [markdown]
@@ -315,7 +315,7 @@ y_star = forrester(x_star)
 
 # %%
 def plot_bayes_opt(
-    posterior: gpx.Module,
+    posterior: gpx.base.Module,
     sample: FunctionalSample,
     dataset: gpx.Dataset,
     queried_x: ScalarFloat,
@@ -401,7 +401,7 @@ for i in range(bo_iters):
     # Generate optimised posterior using previously observed data
     mean = gpx.mean_functions.Zero()
     kernel = gpx.kernels.Matern52()
-    prior = gpx.Prior(mean_function=mean, kernel=kernel)
+    prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
     opt_posterior = return_optimised_posterior(D, prior, subkey)
 
     # Draw a sample from the posterior, and find the minimiser of it
@@ -543,7 +543,7 @@ for experiment in range(num_experiments):
         kernel = gpx.kernels.Matern52(
             active_dims=[0, 1], lengthscale=jnp.array([1.0, 1.0]), variance=2.0
         )
-        prior = gpx.Prior(mean_function=mean, kernel=kernel)
+        prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
         opt_posterior = return_optimised_posterior(D, prior, subkey)
 
         # Draw a sample from the posterior, and find the minimiser of it
@@ -561,7 +561,8 @@ for experiment in range(num_experiments):
         # Evaluate the black-box function at the best point observed so far, and add it to the dataset
         y_star = six_hump_camel(x_star)
         print(
-            f"BO Iteration: {i + 1}, Queried Point: {x_star}, Black-Box Function Value: {y_star}"
+            f"BO Iteration: {i + 1}, Queried Point: {x_star}, Black-Box Function Value:"
+            f" {y_star}"
         )
         D = D + gpx.Dataset(X=x_star, y=y_star)
     bo_experiment_results.append(D)

@@ -89,10 +89,10 @@ ax.scatter(x, y)
 # choose a Bernoulli likelihood with a probit link function.
 
 # %%
-kernel = gpx.RBF()
-meanf = gpx.Constant()
-prior = gpx.Prior(mean_function=meanf, kernel=kernel)
-likelihood = gpx.Bernoulli(num_datapoints=D.n)
+kernel = gpx.kernels.RBF()
+meanf = gpx.mean_functions.Constant()
+prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
+likelihood = gpx.likelihoods.Bernoulli(num_datapoints=D.n)
 
 # %% [markdown]
 # We construct the posterior through the product of our prior and likelihood.
@@ -116,7 +116,7 @@ print(type(posterior))
 # Optax's optimisers.
 
 # %%
-negative_lpd = jax.jit(gpx.LogPosteriorDensity(negative=True))
+negative_lpd = jax.jit(gpx.objectives.LogPosteriorDensity(negative=True))
 
 optimiser = ox.adam(learning_rate=0.01)
 
@@ -345,7 +345,7 @@ ax.legend()
 num_adapt = 500
 num_samples = 500
 
-lpd = jax.jit(gpx.LogPosteriorDensity(negative=False))
+lpd = jax.jit(gpx.objectives.LogPosteriorDensity(negative=False))
 unconstrained_lpd = jax.jit(lambda tree: lpd(tree.constrain(), D))
 
 adapt = blackjax.window_adaptation(
