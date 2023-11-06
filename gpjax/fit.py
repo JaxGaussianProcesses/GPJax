@@ -42,6 +42,10 @@ from gpjax.typing import (
 ModuleModel = TypeVar("ModuleModel", bound=Module)
 
 
+class FailedScipyFitError(Exception):
+    """Raised a model fit using Scipy fails"""
+
+
 def fit(  # noqa: PLR0913
     *,
     model: ModuleModel,
@@ -228,7 +232,7 @@ def fit_scipy(  # noqa: PLR0913
         if result.success:
             print("Optimization was successful")
         else:
-            print("Optimization was not successful")
+            raise FailedScipyFitError("Optimization failed")
         print(f"Final loss is {result.fun_val} after {result.num_fun_eval} iterations")
 
     # Constrained space.

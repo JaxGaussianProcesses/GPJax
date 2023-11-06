@@ -19,6 +19,10 @@ from dataclasses import dataclass
 from jax.config import config
 import jax.numpy as jnp
 import jax.random as jr
+from jaxtyping import (
+    Float,
+    Num,
+)
 import optax as ox
 import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
@@ -29,6 +33,7 @@ from gpjax.base import (
 )
 from gpjax.dataset import Dataset
 from gpjax.fit import (
+    FailedScipyFitError,
     fit,
     fit_scipy,
     get_batch,
@@ -39,12 +44,16 @@ from gpjax.gps import (
 )
 from gpjax.kernels import RBF
 from gpjax.likelihoods import Gaussian
-from gpjax.mean_functions import Constant
+from gpjax.mean_functions import (
+    AbstractMeanFunction,
+    Constant,
+)
 from gpjax.objectives import (
     ELBO,
     AbstractObjective,
     ConjugateMLL,
 )
+from gpjax.typing import Array
 from gpjax.variational_families import VariationalGaussian
 
 # Enable Float64 for more stable matrix inversions.
@@ -119,10 +128,9 @@ def test_simple_linear_model() -> None:
     assert trained_model.bias == 1.0
 
 
-@pytest.mark.parametrize("num_iters", [1, 5])
-@pytest.mark.parametrize("n_data", [1, 20])
+@pytest.mark.parametrize("n_data", [20])
 @pytest.mark.parametrize("verbose", [True, False])
-def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> None:
+def test_gaussian_process_regression(n_data: int, verbose: bool) -> None:
     # Create dataset:
     key = jr.PRNGKey(123)
     x = jnp.sort(
@@ -145,7 +153,7 @@ def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> N
         objective=mll,
         train_data=D,
         optim=ox.adam(0.1),
-        num_iters=num_iters,
+        num_iters=15,
         verbose=verbose,
         key=jr.PRNGKey(123),
     )
@@ -154,7 +162,7 @@ def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> N
     assert isinstance(trained_model, ConjugatePosterior)
 
     # Ensure we return a history of the correct length
-    assert len(history) == num_iters
+    assert len(history) == 15
 
     # Ensure we reduce the loss
     assert mll(trained_model, D) < mll(posterior, D)
@@ -164,7 +172,7 @@ def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> N
         model=posterior,
         objective=mll,
         train_data=D,
-        max_iters=num_iters,
+        max_iters=15,
         verbose=verbose,
     )
 
@@ -176,6 +184,49 @@ def test_gaussian_process_regression(num_iters, n_data: int, verbose: bool) -> N
 
     # Ensure we reduce the loss
     assert mll(trained_model_bfgs, D) < mll(posterior, D)
+
+
+def test_scipy_fit_error_raises() -> None:
+    # Create dataset:
+    D = Dataset(
+        X=jnp.array([[0.0]], dtype=jnp.float64), y=jnp.array([[0.0]], dtype=jnp.float64)
+    )
+
+    # build crazy mean function so that opt fails
+    @dataclass
+    class CrazyMean(AbstractMeanFunction):
+        def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N O"]:
+            return jnp.heaviside(x, 100.0)
+
+    # Define GP model with crazy mean function:
+    prior = Prior(kernel=RBF(), mean_function=CrazyMean())
+    likelihood = Gaussian(num_datapoints=2)
+    posterior = prior * likelihood
+
+    # Define loss function:
+    mll = ConjugateMLL(negative=True)
+
+    with pytest.raises(FailedScipyFitError):
+        fit_scipy(
+            model=posterior,
+            objective=mll,
+            train_data=D,
+            max_iters=10,
+        )
+
+    # also check fails if no given enough steps
+    prior = Prior(kernel=RBF(), mean_function=Constant())
+    likelihood = Gaussian(num_datapoints=2)
+    posterior = prior * likelihood
+    mll = ConjugateMLL(negative=True)
+
+    with pytest.raises(FailedScipyFitError):
+        fit_scipy(
+            model=posterior,
+            objective=mll,
+            train_data=D,
+            max_iters=1,
+        )
 
 
 @pytest.mark.parametrize("num_iters", [1, 5])
