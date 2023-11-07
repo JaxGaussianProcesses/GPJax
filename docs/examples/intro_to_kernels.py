@@ -10,7 +10,6 @@ from jax.config import config
 
 config.update("jax_enable_x64", True)
 
-from jax import jit
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import install_import_hook, Float
@@ -235,7 +234,6 @@ no_opt_posterior = prior * likelihood
 # %%
 negative_mll = gpx.objectives.ConjugateMLL(negative=True)
 negative_mll(no_opt_posterior, train_data=D)
-negative_mll = jit(negative_mll)
 
 opt_posterior, history = gpx.fit_scipy(
     model=no_opt_posterior,
@@ -536,7 +534,6 @@ posterior = prior * likelihood
 # %%
 negative_mll = gpx.objectives.ConjugateMLL(negative=True)
 negative_mll(posterior, train_data=D)
-negative_mll = jit(negative_mll)
 
 opt_posterior, history = gpx.fit(
     model=posterior,
