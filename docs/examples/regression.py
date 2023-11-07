@@ -210,29 +210,15 @@ negative_mll = jit(negative_mll)
 # accelerate training.
 
 # %% [markdown]
-# We can now define an optimiser with `optax`. For this example we'll use the `adam`
+# We can now define an optimiser. For this example we'll use the `bfgs`
 # optimiser.
 
 # %%
-opt_posterior, history = gpx.fit(
+opt_posterior, history = gpx.fit_scipy(
     model=posterior,
     objective=negative_mll,
     train_data=D,
-    optim=ox.adam(learning_rate=0.01),
-    num_iters=500,
-    safe=True,
-    key=key,
 )
-
-# %% [markdown]
-# The calling of `fit` returns two objects: the optimised posterior and a history of
-# training losses. We can plot the training loss to see how the optimisation has
-# progressed.
-
-# %%
-fig, ax = plt.subplots()
-ax.plot(history, color=cols[1])
-ax.set(xlabel="Training iteration", ylabel="Negative marginal log likelihood")
 
 # %% [markdown]
 # ## Prediction

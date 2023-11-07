@@ -23,7 +23,6 @@ from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import networkx as nx
-import optax as ox
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -134,7 +133,7 @@ cbar = plt.colorbar(sm, ax=ax)
 # For this reason, we simply perform gradient descent on the GP's marginal
 # log-likelihood term as in the
 # [regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/).
-# We do this using the Adam optimiser provided in `optax`.
+# We do this using the BFGS optimiser provided in `scipy` via 'jaxopt'.
 
 # %%
 likelihood = gpx.Gaussian(num_datapoints=D.n)
@@ -155,13 +154,10 @@ print(gpx.cite(kernel))
 # With a posterior defined, we can now optimise the model's hyperparameters.
 
 # %%
-opt_posterior, training_history = gpx.fit(
+opt_posterior, training_history = gpx.fit_scipy(
     model=posterior,
     objective=jit(gpx.ConjugateMLL(negative=True)),
     train_data=D,
-    optim=ox.adamw(learning_rate=0.01),
-    num_iters=1000,
-    key=key,
 )
 
 # %% [markdown]

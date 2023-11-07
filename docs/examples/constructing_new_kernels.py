@@ -40,7 +40,6 @@ from jaxtyping import (
 )
 import matplotlib.pyplot as plt
 import numpy as np
-import optax as ox
 from simple_pytree import static_field
 import tensorflow_probability.substrates.jax as tfp
 
@@ -214,13 +213,13 @@ def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
 
 
-bij = tfb.Chain([tfb.Softplus(), tfb.Shift(np.array(4.0).astype(np.float64))])
+bij = tfb.SoftClip(low=jnp.array(4.0, dtype=jnp.float64))
 
 
 @dataclass
 class Polar(gpx.kernels.AbstractKernel):
     period: float = static_field(2 * jnp.pi)
-    tau: float = param_field(jnp.array([4.0]), bijector=bij)
+    tau: float = param_field(jnp.array([5.0]), bijector=bij)
 
     def __call__(
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
@@ -267,14 +266,11 @@ meanf = gpx.mean_functions.Zero()
 likelihood = gpx.Gaussian(num_datapoints=n)
 circular_posterior = gpx.Prior(mean_function=meanf, kernel=PKern) * likelihood
 
-# Optimise GP's marginal log-likelihood using Adam
-opt_posterior, history = gpx.fit(
+# Optimise GP's marginal log-likelihood using BFGS
+opt_posterior, history = gpx.fit_scipy(
     model=circular_posterior,
     objective=jit(gpx.ConjugateMLL(negative=True)),
     train_data=D,
-    optim=ox.adamw(learning_rate=0.05),
-    num_iters=500,
-    key=key,
 )
 
 # %% [markdown]
@@ -314,7 +310,6 @@ ax.fill_between(
 ax.plot(angles, mu, label="Posterior mean")
 ax.scatter(D.X, D.y, alpha=1, label="Observations")
 ax.legend()
-
 # %% [markdown]
 # ## System configuration
 
