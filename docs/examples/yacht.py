@@ -168,9 +168,9 @@ scaled_Xte = x_scaler.transform(Xte)
 # %%
 n_train, n_covariates = scaled_Xtr.shape
 kernel = gpx.RBF(
-    active_dims=list(range(n_covariates)), 
-    variance = np.var(scaled_ytr),
-    lengthscale=0.1*np.ones((n_covariates,)),
+    active_dims=list(range(n_covariates)),
+    variance=np.var(scaled_ytr),
+    lengthscale=0.1 * np.ones((n_covariates,)),
 )
 meanf = gpx.mean_functions.Zero()
 prior = gpx.Prior(mean_function=meanf, kernel=kernel)
