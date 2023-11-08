@@ -19,7 +19,7 @@ from itertools import product
 
 from cola.ops import LinearOperator
 import jax
-from jax.config import config
+from jax import config
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import pytest

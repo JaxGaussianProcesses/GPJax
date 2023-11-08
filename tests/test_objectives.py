@@ -1,5 +1,5 @@
 import jax
-from jax.config import config
+from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 import pytest

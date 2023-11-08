@@ -31,7 +31,7 @@ import jax.tree_util as jtu
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax as tfp
-from jax.config import config
+from jax import config
 from jaxtyping import install_import_hook
 
 with install_import_hook("gpjax", "beartype.beartype"):

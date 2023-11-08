@@ -50,7 +50,7 @@
 
 # +
 # Enable Float64 for more stable matrix inversions.
-from jax.config import config
+from jax import config
 
 config.update("jax_enable_x64", True)
 

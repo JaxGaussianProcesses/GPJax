@@ -7,13 +7,13 @@
 #
 # Surface drifters are measurement devices that measure the dynamics and circulation patterns of the world's oceans. Studying and predicting ocean currents are important to climate research, for example, forecasting and predicting oil spills, oceanographic surveying of eddies and upwelling, or providing information on the distribution of biomass in ecosystems. We will be using the [Gulf Drifters Open dataset](https://zenodo.org/record/4421585), which contains all publicly available surface drifter trajectories from the Gulf of Mexico spanning 28 years.
 # %%
-from jax.config import config
+from jax import config
 
 config.update("jax_enable_x64", True)
 from dataclasses import dataclass
 
 from jax import hessian
-from jax.config import config
+from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (
