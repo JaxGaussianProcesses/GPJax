@@ -17,7 +17,7 @@
 import typing as tp
 
 import jax
-from jax.config import config
+from jax import config
 import jax.numpy as jnp
 import numpy as np
 import pytest

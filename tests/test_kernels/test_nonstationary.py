@@ -18,7 +18,7 @@ from typing import List
 
 from cola.ops import LinearOperator
 import jax
-from jax.config import config
+from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
