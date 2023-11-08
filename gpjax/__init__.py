@@ -81,7 +81,7 @@ __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
 __url__ = "https://github.com/JaxGaussianProcesses/GPJax"
 __contributors__ = "https://github.com/JaxGaussianProcesses/GPJax/graphs/contributors"
-__version__ = "0.7.1"
+__version__ = "0.7.3"
 
 __all__ = [
     "Module",
