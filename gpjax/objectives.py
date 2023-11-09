@@ -206,7 +206,7 @@ class ConjugateLOOCV(AbstractObjective):
         For optimal performance, the objective should be ``jax.jit``
         compiled.
         ```python
-            mll = jit(gpx.ConjugateMLL(negative=True))
+            mll = jit(gpx.ConjugateLOOCV(negative=True))
         ```
 
         Args:
