@@ -93,7 +93,7 @@ class ConjugateMLL(AbstractObjective):
         ```python
             >>> import gpjax as gpx
             >>>
-            >>> xtrain = jnp.linspect is an unphysical plasma that has somehow converged. Removing the outliers makes the dataset look a lot nicer (removing the points I suspect are unphysical/junk). space(0, 1).reshape(-1, 1)
+            >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
             >>> ytrain = jnp.sin(xtrain)
             >>> D = gpx.Dataset(X=xtrain, y=ytrain)
             >>>
