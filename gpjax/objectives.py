@@ -93,7 +93,7 @@ class ConjugateMLL(AbstractObjective):
         ```python
             >>> import gpjax as gpx
             >>>
-            >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
+            >>> xtrain = jnp.linspect is an unphysical plasma that has somehow converged. Removing the outliers makes the dataset look a lot nicer (removing the points I suspect are unphysical/junk). space(0, 1).reshape(-1, 1)
             >>> ytrain = jnp.sin(xtrain)
             >>> D = gpx.Dataset(X=xtrain, y=ytrain)
             >>>
@@ -243,12 +243,10 @@ class ConjugateLOOCV(AbstractObjective):
         Sigma = cola.PSD(Sigma)  # [N, N]
 
         Sigma_inv_y = cola.solve(Sigma, y - mx, Cholesky())  # [N, 1]
-        Sigma_inv = cola.inv(Sigma, Cholesky())  # [N, N]
+        Sigma_inv_diag = cola.linalg.diag(cola.inv(Sigma, Cholesky()))[:, None]  # [N, 1]
 
-        denom = cola.linalg.diag(Sigma_inv)[:, None]  # [N, 1]
-
-        loocv_means = mx + (y - mx) - Sigma_inv_y / denom
-        loocv_stds = jnp.sqrt(1.0 / denom)
+        loocv_means = mx + (y - mx) - Sigma_inv_y / Sigma_inv_diag
+        loocv_stds = jnp.sqrt(1.0 / Sigma_inv_diag)
 
         loocv_posterior = tfd.Normal(loc=loocv_means, scale=loocv_stds)
         loocv = jnp.sum(loocv_posterior.log_prob(y))

@@ -68,6 +68,7 @@ from gpjax.objectives import (
     ConjugateMLL,
     LogPosteriorDensity,
     NonConjugateMLL,
+    ConjugateLOOCV,
 )
 from gpjax.variational_families import (
     CollapsedVariationalGaussian,
@@ -116,6 +117,7 @@ __all__ = [
     "CollapsedVI",
     "StochasticVI",
     "ConjugateMLL",
+    "ConjugateLOOCV",
     "NonConjugateMLL",
     "LogPosteriorDensity",
     "CollapsedELBO",
