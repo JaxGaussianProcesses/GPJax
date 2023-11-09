@@ -243,7 +243,9 @@ class ConjugateLOOCV(AbstractObjective):
         Sigma = cola.PSD(Sigma)  # [N, N]
 
         Sigma_inv_y = cola.solve(Sigma, y - mx, Cholesky())  # [N, 1]
-        Sigma_inv_diag = cola.linalg.diag(cola.inv(Sigma, Cholesky()))[:, None]  # [N, 1]
+        Sigma_inv_diag = cola.linalg.diag(cola.inv(Sigma, Cholesky()))[
+            :, None
+        ]  # [N, 1]
 
         loocv_means = mx + (y - mx) - Sigma_inv_y / Sigma_inv_diag
         loocv_stds = jnp.sqrt(1.0 / Sigma_inv_diag)

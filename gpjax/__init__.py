@@ -65,10 +65,10 @@ from gpjax.mean_functions import (
 from gpjax.objectives import (
     ELBO,
     CollapsedELBO,
+    ConjugateLOOCV,
     ConjugateMLL,
     LogPosteriorDensity,
     NonConjugateMLL,
-    ConjugateLOOCV,
 )
 from gpjax.variational_families import (
     CollapsedVariationalGaussian,
