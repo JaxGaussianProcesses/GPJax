@@ -158,8 +158,6 @@ class ConjugateMLL(AbstractObjective):
         return self.constant * rval
 
 
-
-
 class ConjugateLOOCV(AbstractObjective):
     def step(
         self,
@@ -167,8 +165,8 @@ class ConjugateLOOCV(AbstractObjective):
         train_data: Dataset,
     ) -> ScalarFloat:
         r"""Evaluate the leave-one-out log predictive probability of the Gaussian process following
-        section 5.4.2 of Rasmussen et al. 2006 - Gaussian Processes for Machine Learning. This metric 
-        calculates the average performace of all models that can be obtained by training on all but one
+        section 5.4.2 of Rasmussen et al. 2006 - Gaussian Processes for Machine Learning. This metric
+        calculates the average performance of all models that can be obtained by training on all but one
         data point, and then predicting the left out data point.
 
         The returned metric can then be used for gradient based optimisation
@@ -227,25 +225,27 @@ class ConjugateLOOCV(AbstractObjective):
 
         if mask is not None:
             raise NotImplementedError("ConjugateLOOCV does not yet support masking")
-        if m>1:
-            raise NotImplementedError("ConjugateLOOCV does not yet support multi-output")
+        if m > 1:
+            raise NotImplementedError(
+                "ConjugateLOOCV does not yet support multi-output"
+            )
 
         # Observation noise o²
         obs_var = posterior.likelihood.obs_stddev**2
 
-        mx = posterior.prior.mean_function(x) # [N, M]
+        mx = posterior.prior.mean_function(x)  # [N, M]
 
         # Σ = (Kxx + Io²)
         Kxx = posterior.prior.kernel.gram(x)
         Kyy = posterior.prior.out_kernel.gram(jnp.arange(m)[:, jnp.newaxis])
         Sigma = cola.ops.Kronecker(Kxx, Kyy)
         Sigma = Kxx + cola.ops.I_like(Kxx) * (obs_var + posterior.prior.jitter)
-        Sigma = cola.PSD(Sigma) # [N, N]
+        Sigma = cola.PSD(Sigma)  # [N, N]
 
-        Sigma_inv_y = cola.solve(Sigma, y - mx, Cholesky()) # [N, 1]
-        Sigma_inv = cola.inv(Sigma, Cholesky()) # [N, N]
+        Sigma_inv_y = cola.solve(Sigma, y - mx, Cholesky())  # [N, 1]
+        Sigma_inv = cola.inv(Sigma, Cholesky())  # [N, N]
 
-        denom = cola.linalg.diag(Sigma_inv)[:, None] # [N, 1]
+        denom = cola.linalg.diag(Sigma_inv)[:, None]  # [N, 1]
 
         loocv_means = mx + (y - mx) - Sigma_inv_y / denom
         loocv_stds = jnp.sqrt(1.0 / denom)
@@ -253,9 +253,6 @@ class ConjugateLOOCV(AbstractObjective):
         loocv_posterior = tfd.Normal(loc=loocv_means, scale=loocv_stds)
         loocv = jnp.sum(loocv_posterior.log_prob(y))
         return self.constant * loocv
-
-
-
 
 
 class LogPosteriorDensity(AbstractObjective):

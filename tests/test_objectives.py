@@ -15,8 +15,8 @@ from gpjax.objectives import (
     ELBO,
     AbstractObjective,
     CollapsedELBO,
-    ConjugateMLL,
     ConjugateLOOCV,
+    ConjugateMLL,
     LogPosteriorDensity,
     NonConjugateMLL,
 )
@@ -81,9 +81,6 @@ def test_conjugate_mll(
     assert evaluation.shape == ()
 
 
-
-
-
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])
 @pytest.mark.parametrize("num_dims", [1, 2, 3])
 @pytest.mark.parametrize("negative", [False, True])
@@ -111,16 +108,6 @@ def test_conjugate_loocv(
     evaluation = loocv(post, D)
     assert isinstance(evaluation, jax.Array)
     assert evaluation.shape == ()
-
-
-
-
-
-
-
-
-
-
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])
