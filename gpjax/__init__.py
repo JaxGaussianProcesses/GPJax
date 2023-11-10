@@ -65,6 +65,7 @@ from gpjax.mean_functions import (
 from gpjax.objectives import (
     ELBO,
     CollapsedELBO,
+    ConjugateLOOCV,
     ConjugateMLL,
     LogPosteriorDensity,
     NonConjugateMLL,
@@ -116,6 +117,7 @@ __all__ = [
     "CollapsedVI",
     "StochasticVI",
     "ConjugateMLL",
+    "ConjugateLOOCV",
     "NonConjugateMLL",
     "LogPosteriorDensity",
     "CollapsedELBO",

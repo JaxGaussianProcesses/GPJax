@@ -158,6 +158,103 @@ class ConjugateMLL(AbstractObjective):
         return self.constant * rval
 
 
+class ConjugateLOOCV(AbstractObjective):
+    def step(
+        self,
+        posterior: ConjugatePosterior,
+        train_data: Dataset,
+    ) -> ScalarFloat:
+        r"""Evaluate the leave-one-out log predictive probability of the Gaussian process following
+        section 5.4.2 of Rasmussen et al. 2006 - Gaussian Processes for Machine Learning. This metric
+        calculates the average performance of all models that can be obtained by training on all but one
+        data point, and then predicting the left out data point.
+
+        The returned metric can then be used for gradient based optimisation
+        of the model's parameters or for model comparison. The implementation
+        given here enables exact estimation of the Gaussian process' latent
+        function values.
+
+        For a given ``ConjugatePosterior`` object, the following code snippet shows
+        how the leave-one-out log predicitive probability can be evaluated.
+
+        Example:
+        ```python
+            >>> import gpjax as gpx
+            >>>
+            >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
+            >>> ytrain = jnp.sin(xtrain)
+            >>> D = gpx.Dataset(X=xtrain, y=ytrain)
+            >>>
+            >>> meanf = gpx.mean_functions.Constant()
+            >>> kernel = gpx.kernels.RBF()
+            >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
+            >>> prior = gpx.Prior(mean_function = meanf, kernel=kernel)
+            >>> posterior = prior * likelihood
+            >>>
+            >>> loocv = gpx.ConjugateLOOCV(negative=True)
+            >>> loocv(posterior, train_data = D)
+        ```
+
+        Our goal is to maximise the leave-one-out log predictive probability. Therefore, when
+        optimising the model's parameters with respect to the parameters, we use the negative
+        leave-one-out log predictive probability. This can be realised through
+
+        ```python
+            mll = gpx.ConjugateLOOCV(negative=True)
+        ```
+
+        For optimal performance, the objective should be ``jax.jit``
+        compiled.
+        ```python
+            mll = jit(gpx.ConjugateLOOCV(negative=True))
+        ```
+
+        Args:
+            posterior (ConjugatePosterior): The posterior distribution for which
+                we want to compute the leave-one-out log predictive probability.
+            train_data (Dataset): The training dataset used to compute the
+                leave-one-out log predictive probability..
+
+        Returns
+        -------
+            ScalarFloat: The leave-one-out log predictive probability of the Gaussian
+                process for the current parameter set.
+        """
+        x, y, mask = train_data.X, train_data.y, train_data.mask
+        m = y.shape[1]
+
+        if mask is not None:
+            raise NotImplementedError("ConjugateLOOCV does not yet support masking")
+        if m > 1:
+            raise NotImplementedError(
+                "ConjugateLOOCV does not yet support multi-output"
+            )
+
+        # Observation noise o²
+        obs_var = posterior.likelihood.obs_stddev**2
+
+        mx = posterior.prior.mean_function(x)  # [N, M]
+
+        # Σ = (Kxx + Io²)
+        Kxx = posterior.prior.kernel.gram(x)
+        Kyy = posterior.prior.out_kernel.gram(jnp.arange(m)[:, jnp.newaxis])
+        Sigma = cola.ops.Kronecker(Kxx, Kyy)
+        Sigma = Kxx + cola.ops.I_like(Kxx) * (obs_var + posterior.prior.jitter)
+        Sigma = cola.PSD(Sigma)  # [N, N]
+
+        Sigma_inv_y = cola.solve(Sigma, y - mx, Cholesky())  # [N, 1]
+        Sigma_inv_diag = cola.linalg.diag(cola.inv(Sigma, Cholesky()))[
+            :, None
+        ]  # [N, 1]
+
+        loocv_means = mx + (y - mx) - Sigma_inv_y / Sigma_inv_diag
+        loocv_stds = jnp.sqrt(1.0 / Sigma_inv_diag)
+
+        loocv_posterior = tfd.Normal(loc=loocv_means, scale=loocv_stds)
+        loocv = jnp.sum(loocv_posterior.log_prob(y))
+        return self.constant * loocv
+
+
 class LogPosteriorDensity(AbstractObjective):
     r"""The log-posterior density of a non-conjugate Gaussian process. This is
     sometimes referred to as the marginal log-likelihood.
