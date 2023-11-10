@@ -3760,6 +3760,548 @@ marginal log-likelihood.</p>
 
 
 
+<h5 id="gpjax.objectives.ConjugateLOOCV" class="doc doc-heading">
+          <code>ConjugateLOOCV</code>
+
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.objectives.AbstractObjective" href="#gpjax.objectives.AbstractObjective">AbstractObjective</a></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.negative" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.constant" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">constant</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.__init_subclass__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.replace" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the values of the fields of the object.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.objectives.ConjugateLOOCV.replace--returns">Returns<a class="headerlink" href="#gpjax.objectives.ConjugateLOOCV.replace--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.replace_meta" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the metadata of the fields.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the metadata of the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.objectives.ConjugateLOOCV.replace_meta--returns">Returns<a class="headerlink" href="#gpjax.objectives.ConjugateLOOCV.replace_meta--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the metadata of the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.update_meta" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">update_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Update the metadata of the fields. The metadata must already exist.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.objectives.ConjugateLOOCV.update_meta--returns">Returns<a class="headerlink" href="#gpjax.objectives.ConjugateLOOCV.update_meta--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.replace_trainable" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the trainability status of local nodes of the Module.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.replace_bijector" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the bijectors of local nodes of the Module.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.constrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">constrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the constrained space according to their defined bijectors.</p>
+<h6 id="gpjax.objectives.ConjugateLOOCV.constrain--returns">Returns<a class="headerlink" href="#gpjax.objectives.ConjugateLOOCV.constrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the constrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.unconstrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the unconstrained space according to their defined bijectors.</p>
+<h6 id="gpjax.objectives.ConjugateLOOCV.unconstrain--returns">Returns<a class="headerlink" href="#gpjax.objectives.ConjugateLOOCV.unconstrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the unconstrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.stop_gradient" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">stop_gradient</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Stop gradients flowing through the Module.</p>
+<h6 id="gpjax.objectives.ConjugateLOOCV.stop_gradient--returns">Returns<a class="headerlink" href="#gpjax.objectives.ConjugateLOOCV.stop_gradient--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with gradients stopped.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.trainables" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.__post_init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.__hash__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__hash__</span><span class="p">()</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.step" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">step</span><span class="p">(</span><span class="n">posterior</span><span class="p">:</span> <span class="n">ConjugatePosterior</span><span class="p">,</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Evaluate the leave-one-out log predictive probability of the Gaussian process following
+section 5.4.2 of Rasmussen et al. 2006 - Gaussian Processes for Machine Learning. This metric
+calculates the average performance of all models that can be obtained by training on all but one
+data point, and then predicting the left out data point.</p>
+<p>The returned metric can then be used for gradient based optimisation
+of the model's parameters or for model comparison. The implementation
+given here enables exact estimation of the Gaussian process' latent
+function values.</p>
+<p>For a given <code>ConjugatePosterior</code> object, the following code snippet shows
+how the leave-one-out log predicitive probability can be evaluated.</p>
+<p>Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">xtrain</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">ytrain</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">xtrain</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">D</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">xtrain</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">ytrain</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">meanf</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">mean_functions</span><span class="o">.</span><span class="n">Constant</span><span class="p">()</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">kernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">()</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">likelihood</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">likelihoods</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">num_datapoints</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">mean_function</span> <span class="o">=</span> <span class="n">meanf</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">)</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">posterior</span> <span class="o">=</span> <span class="n">prior</span> <span class="o">*</span> <span class="n">likelihood</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="o">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">loocv</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">ConjugateLOOCV</span><span class="p">(</span><span class="n">negative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">loocv</span><span class="p">(</span><span class="n">posterior</span><span class="p">,</span> <span class="n">train_data</span> <span class="o">=</span> <span class="n">D</span><span class="p">)</span>
+</code></pre></div></p>
+<p>Our goal is to maximise the leave-one-out log predictive probability. Therefore, when
+optimising the model's parameters with respect to the parameters, we use the negative
+leave-one-out log predictive probability. This can be realised through</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>    <span class="n">mll</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">ConjugateLOOCV</span><span class="p">(</span><span class="n">negative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p>For optimal performance, the objective should be <code>jax.jit</code>
+compiled.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>    <span class="n">mll</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="n">gpx</span><span class="o">.</span><span class="n">ConjugateLOOCV</span><span class="p">(</span><span class="n">negative</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</code></pre></div></p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>posterior</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.objectives.ConjugatePosterior" href="#gpjax.objectives.ConjugatePosterior">ConjugatePosterior</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The posterior distribution for which
+we want to compute the leave-one-out log predictive probability.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>train_data</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.dataset.Dataset" href="../dataset/#gpjax.dataset.Dataset">Dataset</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The training dataset used to compute the
+leave-one-out log predictive probability..</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.objectives.ConjugateLOOCV.step--returns">Returns<a class="headerlink" href="#gpjax.objectives.ConjugateLOOCV.step--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>ScalarFloat: The leave-one-out log predictive probability of the Gaussian
+    process for the current parameter set.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
 <h5 id="gpjax.objectives.LogPosteriorDensity" class="doc doc-heading">
           <code>LogPosteriorDensity</code>
 
