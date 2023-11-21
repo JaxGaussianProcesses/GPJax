@@ -1,3 +1,4 @@
+"""Dataset object that stores input and output data."""
 # Copyright 2022 The JaxGaussianProcesses Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +27,10 @@ from jaxtyping import (
     Bool,
     Num,
 )
-from simple_pytree import Pytree
+from simple_pytree import (
+    Pytree,
+    static_field,
+)
 
 from gpjax.typing import Array
 
@@ -45,8 +49,8 @@ class Dataset(Pytree):
             the mask will be computed from the output data, or set to `None` if no output data is provided.
     """
 
-    X: Optional[Num[Array, "N D"]] = None
-    y: Optional[Num[Array, "N Q"]] = None
+    X: Optional[Num[Array, "N D"]] = static_field(None)
+    y: Optional[Num[Array, "N Q"]] = static_field(None)
     mask: Optional[
         Union[Bool[Array, "N Q"], Literal["infer automatically"]]
     ] = "infer automatically"
@@ -60,8 +64,8 @@ class Dataset(Pytree):
         if isinstance(self.mask, str):
             if not self.mask == "infer automatically":
                 raise ValueError(
-                    f"mask must be either the string 'infer automatically', None, or a boolean array."
-                    f" Got mask={self.mask}."
+                    "mask must be either the string 'infer automatically', None, or a"
+                    f" boolean array. Got mask={self.mask}."
                 )
             elif self.y is not None:
                 mask = jnp.isnan(self.y)
@@ -152,15 +156,19 @@ def _check_precision(
     r"""Checks the precision of $`X`$ and $`y`."""
     if X is not None and X.dtype != jnp.float64:
         warnings.warn(
-            "X is not of type float64. "
-            f"Got X.dtype={X.dtype}. This may lead to numerical instability. ",
+            (
+                "X is not of type float64. "
+                f"Got X.dtype={X.dtype}. This may lead to numerical instability. "
+            ),
             stacklevel=2,
         )
 
     if y is not None and y.dtype != jnp.float64:
         warnings.warn(
-            "y is not of type float64."
-            f"Got y.dtype={y.dtype}. This may lead to numerical instability.",
+            (
+                "y is not of type float64."
+                f"Got y.dtype={y.dtype}. This may lead to numerical instability."
+            ),
             stacklevel=2,
         )
 
