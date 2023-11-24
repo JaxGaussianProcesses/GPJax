@@ -126,6 +126,7 @@ class AnalyticalGaussianIntegrator(AbstractIntegrator):
     log-likelihood is given by
     ```math
     \mathbb{E}_{q(f)}[\log p(y|f)] = -\frac{1}{2}\left(\log(2\pi\sigma^2) + \frac{1}{\sigma^2}((y-m)^2 + s)\right)
+    ```
     """
 
     def integrate(
@@ -153,7 +154,8 @@ class AnalyticalGaussianIntegrator(AbstractIntegrator):
         sq_error = jnp.square(y - mean)
         log2pi = jnp.log(2.0 * jnp.pi)
         val = jnp.sum(
-            log2pi + jnp.log(obs_stddev**2) + (sq_error + variance) / obs_stddev**2, axis=1
+            log2pi + jnp.log(obs_stddev**2) + (sq_error + variance) / obs_stddev**2,
+            axis=1
         )
         return -0.5 * val
 
