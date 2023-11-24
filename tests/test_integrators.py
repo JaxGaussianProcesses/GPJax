@@ -57,7 +57,9 @@ def test_quadrature(jit: bool, num_points: int):
 
 
 @pytest.mark.parametrize("jit", [True, False])
-@pytest.mark.parametrize("params", [(0.5, -2.57236494), (1.0, -1.91893853)])
+@pytest.mark.parametrize(
+    "params", [(0.5, -4.22579135), (1.0, -1.91893853), (0.01, -9996.31376835)]
+)
 def test_analytical_gaussian(jit: bool, params: tp.Tuple[float, float]):
     obs_stddev, expected = params
     likelihood = Gaussian(num_datapoints=1, obs_stddev=jnp.array([obs_stddev]))
