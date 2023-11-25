@@ -87,12 +87,21 @@ def static_field(  # noqa: PLR0913
     )
 
 
+def _inherited_metadata(cls: type) -> Dict[str]:
+    meta_data = dict()
+    for parent_class in cls.mro():
+        if parent_class is not cls and parent_class is not Module:
+            if issubclass(parent_class, Module):
+                meta_data.update(parent_class._pytree__meta)
+    return meta_data
+
+
 class Module(Pytree):
     _pytree__meta: Dict[str, Any] = static_field()
 
     def __init_subclass__(cls, mutable: bool = False):
-        cls._pytree__meta = {}
         super().__init_subclass__(mutable=mutable)
+        cls._pytree__meta = _inherited_metadata(cls)
         class_vars = vars(cls)
         for field, value in class_vars.items():
             if (

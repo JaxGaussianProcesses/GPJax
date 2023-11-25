@@ -876,3 +876,66 @@ class TestMutablePytree:
         # test mutation
         pytree.x = 4
         assert pytree.x == 4
+
+
+@pytest.mark.parametrize("is_dataclass", [True, False])
+@pytest.mark.parametrize("iterable", [list, tuple])
+def test_inheritance_different_meta(is_dataclass, iterable):
+    class Tree(Module):
+        a: int = param_field(bijector=tfb.Identity(), default=1)
+        b: int = param_field(bijector=tfb.Softplus(), default=2)
+        c: int = param_field(bijector=tfb.Tanh(), default=0, trainable=False)
+
+        def __init__(self, a=1.0, b=2.0, c=0.0):
+            self.a = a
+            self.b = b
+            self.c = c
+
+    if is_dataclass:
+        Tree = dataclass(Tree)
+
+    class SubTree(Tree):
+        pass
+
+    tree = SubTree()
+
+    assert isinstance(tree, Module)
+    assert isinstance(tree, Pytree)
+
+    assert tree.a == 1.0
+    assert tree.b == 2.0
+    assert tree.c == 0.0
+
+    meta_tree = meta(tree)
+
+    assert isinstance(meta_tree, Module)
+    assert isinstance(meta_tree, Pytree)
+
+    assert isinstance(meta_tree.a["bijector"], tfb.Identity)
+    assert meta_tree.a["trainable"] is True
+    assert isinstance(meta_tree.b["bijector"], tfb.Softplus)
+    assert meta_tree.b["trainable"] is True
+    assert isinstance(meta_tree.c["bijector"], tfb.Tanh)
+    assert meta_tree.c["trainable"] is False
+
+    # Test constrain and unconstrain
+
+    constrained_tree = tree.constrain()
+    unconstrained_tree = tree.unconstrain()
+
+    assert jtu.tree_structure(unconstrained_tree) == jtu.tree_structure(tree)
+    assert jtu.tree_structure(constrained_tree) == jtu.tree_structure(tree)
+
+    assert isinstance(constrained_tree, Module)
+    assert isinstance(constrained_tree, Pytree)
+
+    assert isinstance(unconstrained_tree, Module)
+    assert isinstance(unconstrained_tree, Pytree)
+
+    assert constrained_tree.a == tfb.Identity().forward(1.0)
+    assert constrained_tree.b == tfb.Softplus().forward(2.0)
+    assert constrained_tree.c == tfb.Tanh().forward(0.0)
+
+    assert unconstrained_tree.a == tfb.Identity().inverse(1.0)
+    assert unconstrained_tree.b == tfb.Softplus().inverse(2.0)
+    assert unconstrained_tree.c == tfb.Tanh().inverse(0.0)
