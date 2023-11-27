@@ -446,7 +446,7 @@ class CollapsedELBO(AbstractObjective):
 
         m = variational_family.num_inducing
 
-        noise = variational_family.posterior.likelihood.obs_stddev
+        noise = variational_family.posterior.likelihood.obs_stddev**2
         z = variational_family.inducing_inputs
         Kzz = kernel.gram(z)
         Kzz += cola.ops.I_like(Kzz) * variational_family.jitter
