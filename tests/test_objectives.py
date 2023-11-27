@@ -175,7 +175,12 @@ def test_collapsed_elbo(
     assert isinstance(evaluation, jax.Array)
     assert evaluation.shape == ()
 
-    # with pytest.raises(TypeError):
+    # Data on the full dataset should be the same as the marginal likelihood
+    q = gpx.CollapsedVariationalGaussian(posterior=p * likelihood, inducing_inputs=D.X)
+    mll = ConjugateMLL(negative=negative)
+    expected_value = mll(p * likelihood, D)
+    actual_value = negative_elbo(q, D)
+    assert jnp.abs(actual_value - expected_value) / expected_value < 1e-6
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])
