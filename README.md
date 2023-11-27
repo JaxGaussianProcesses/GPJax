@@ -44,9 +44,9 @@ started is to
 [subscribe to GPJax on CodeTriage](https://www.codetriage.com/jaxgaussianprocesses/gpjax).
 
 As a contributor to GPJax, you are expected to abide by our [code of
-conduct](docs/CODE_OF_CONDUCT.md). If you are feel that you have either experienced or
+conduct](docs/CODE_OF_CONDUCT.md). If you feel that you have either experienced or
 witnessed behaviour that violates this standard, then we ask that you report any such
-behaviours though [this form](https://jaxgaussianprocesses.com/contact/) or reach out to
+behaviours through [this form](https://jaxgaussianprocesses.com/contact/) or reach out to
 one of the project's [_gardeners_](https://docs.jaxgaussianprocesses.com/GOVERNANCE/#roles).
 
 Feel free to join our [Slack
@@ -61,7 +61,7 @@ GPJax was founded by [Thomas Pinder](https://github.com/thomaspinder). Today, th
 project's gardeners are [daniel-dodd@](https://github.com/daniel-dodd),
 [henrymoss@](https://github.com/henrymoss), [st--@](https://github.com/st--), and
 [thomaspinder@](https://github.com/thomaspinder), listed in alphabetical order. The full
-governance structure of GPJax is detailed [here](docs/GOVERNANCE.md).We appreciate all
+governance structure of GPJax is detailed [here](docs/GOVERNANCE.md). We appreciate all
 [the contributors to
 GPJax](https://github.com/JaxGaussianProcesses/GPJax/graphs/contributors) who have
 helped to shape GPJax into the package it is today.
@@ -135,10 +135,10 @@ D = gpx.Dataset(X=x, y=y)
 # Construct the prior
 meanf = gpx.mean_functions.Zero()
 kernel = gpx.kernels.RBF()
-prior = gpx.Prior(mean_function=meanf, kernel = kernel)
+prior = gpx.Prior(mean_function=meanf, kernel=kernel)
 
 # Define a likelihood
-likelihood = gpx.Gaussian(num_datapoints = n)
+likelihood = gpx.Gaussian(num_datapoints=n)
 
 # Construct the posterior
 posterior = prior * likelihood
