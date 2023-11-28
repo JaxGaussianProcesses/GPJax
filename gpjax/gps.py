@@ -16,7 +16,6 @@
 from abc import abstractmethod
 from dataclasses import (
     dataclass,
-    field,
 )
 from typing import overload
 
@@ -28,7 +27,6 @@ from beartype.typing import (
 )
 import cola
 from cola.linalg.decompositions.decompositions import Cholesky
-from cola.ops import Dense
 import jax.numpy as jnp
 from jax.random import (
     PRNGKey,
@@ -45,12 +43,9 @@ from gpjax.base import (
     static_field,
 )
 from gpjax.dataset import Dataset
-from gpjax.distributions import (
-    GaussianDistribution,
-)
+from gpjax.distributions import GaussianDistribution
 from gpjax.kernels import (
     RFF,
-    White,
 )
 from gpjax.kernels.base import AbstractKernel
 from gpjax.likelihoods import (
@@ -487,7 +482,7 @@ class ConjugatePosterior(AbstractPosterior):
                 returns the predictive distribution as a `GaussianDistribution`.
         """
         # Unpack training data
-        x, y, n_test = train_data.X, train_data.y, train_data.n
+        x, y = train_data.X, train_data.y
 
         # Unpack test inputs
         t = test_inputs
@@ -504,7 +499,6 @@ class ConjugatePosterior(AbstractPosterior):
         Sigma = Kxx + cola.ops.I_like(Kxx) * obs_noise
         Sigma = cola.PSD(Sigma)
 
-
         mean_t = self.prior.mean_function(t)
         Ktt = self.prior.kernel.gram(t)
         Kxt = self.prior.kernel.cross_covariance(x, t)
@@ -519,7 +513,6 @@ class ConjugatePosterior(AbstractPosterior):
         covariance = cola.PSD(covariance)
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
-
 
     def sample_approx(
         self,

@@ -16,15 +16,12 @@
 
 from beartype.typing import (
     Any,
-    Generic,
     Optional,
     Tuple,
     TypeVar,
-    Union,
 )
 import cola
 from cola.ops import (
-    Dense,
     Identity,
     LinearOperator,
 )
@@ -32,7 +29,6 @@ from jax import vmap
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (
-    Bool,
     Float,
 )
 import tensorflow_probability.substrates.jax as tfp
@@ -161,9 +157,7 @@ class GaussianDistribution(tfd.Distribution):
             + cola.logdet(self.scale, Cholesky(), Cholesky())
         )
 
-    def log_prob(
-        self, y: Float[Array, " N"]
-    ) -> ScalarFloat:
+    def log_prob(self, y: Float[Array, " N"]) -> ScalarFloat:
         r"""Calculates the log pdf of the multivariate Gaussian.
 
         Args:

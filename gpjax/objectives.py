@@ -135,7 +135,7 @@ class ConjugateMLL(AbstractObjective):
         x, y = train_data.X, train_data.y
 
         # Observation noise o²
-        obs_noise = posterior.likelihood.obs_stddev ** 2
+        obs_noise = posterior.likelihood.obs_stddev**2
         mx = posterior.prior.mean_function(x)
 
         # Σ = (Kxx + Io²) = LLᵀ
@@ -147,9 +147,7 @@ class ConjugateMLL(AbstractObjective):
         # p(y | x, θ), where θ are the model hyperparameters:
         mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
 
-        return self.constant * (
-            mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
-        )
+        return self.constant * (mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze())
 
 
 class ConjugateLOOCV(AbstractObjective):
@@ -215,7 +213,7 @@ class ConjugateLOOCV(AbstractObjective):
                 process for the current parameter set.
         """
         x, y = train_data.X, train_data.y
-        m = y.shape[1]
+        y.shape[1]
 
         # Observation noise o²
         obs_var = posterior.likelihood.obs_stddev**2
