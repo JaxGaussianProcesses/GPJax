@@ -28,10 +28,7 @@ from gpjax.kernels.computations import (
     DiagonalKernelComputation,
     EigenKernelComputation,
 )
-from gpjax.kernels.non_euclidean import (
-    CatKernel,
-    GraphKernel,
-)
+from gpjax.kernels.non_euclidean import GraphKernel
 from gpjax.kernels.nonstationary import (
     ArcCosine,
     Linear,
@@ -54,7 +51,6 @@ __all__ = [
     "Constant",
     "RBF",
     "GraphKernel",
-    "CatKernel",
     "Matern12",
     "Matern32",
     "Matern52",

@@ -14,9 +14,7 @@
 # ==============================================================================
 
 from abc import abstractmethod
-from dataclasses import (
-    dataclass,
-)
+from dataclasses import dataclass
 from typing import overload
 
 from beartype.typing import (
@@ -44,9 +42,7 @@ from gpjax.base import (
 )
 from gpjax.dataset import Dataset
 from gpjax.distributions import GaussianDistribution
-from gpjax.kernels import (
-    RFF,
-)
+from gpjax.kernels import RFF
 from gpjax.kernels.base import AbstractKernel
 from gpjax.likelihoods import (
     AbstractLikelihood,

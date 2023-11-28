@@ -252,7 +252,9 @@ def test_posterior_construct(
     leaves_rmul = jtu.tree_leaves(posterior_rmul)
     leaves_manual = jtu.tree_leaves(posterior_manual)
 
-    for leaf_mul, leaf_rmul, leaf_man in zip(leaves_mul, leaves_rmul, leaves_manual, strict=True):
+    for leaf_mul, leaf_rmul, leaf_man in zip(
+        leaves_mul, leaves_rmul, leaves_manual, strict=True
+    ):
         assert (leaf_mul == leaf_rmul).all()
         assert (leaf_rmul == leaf_man).all()
 

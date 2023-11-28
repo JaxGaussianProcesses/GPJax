@@ -28,9 +28,7 @@ from cola.ops import (
 from jax import vmap
 import jax.numpy as jnp
 import jax.random as jr
-from jaxtyping import (
-    Float,
-)
+from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.lower_cholesky import lower_cholesky
