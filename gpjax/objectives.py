@@ -132,30 +132,24 @@ class ConjugateMLL(AbstractObjective):
             ScalarFloat: The marginal log-likelihood of the Gaussian process for the
                 current parameter set.
         """
-        x, y, mask = train_data.X, train_data.y, train_data.mask
-        m = y.shape[1]
-        if m > 1 and mask is not None:
-            mask = mask.flatten()
+        x, y = train_data.X, train_data.y
 
         # Observation noise o²
-        obs_var = posterior.likelihood.obs_stddev**2
-
+        obs_noise = posterior.likelihood.obs_stddev ** 2
         mx = posterior.prior.mean_function(x)
 
         # Σ = (Kxx + Io²) = LLᵀ
         Kxx = posterior.prior.kernel.gram(x)
-        Kyy = posterior.prior.out_kernel.gram(jnp.arange(m)[:, jnp.newaxis])
-
-        Sigma = cola.ops.Kronecker(Kxx, Kyy)
-        Sigma = Sigma + cola.ops.I_like(Sigma) * (obs_var + posterior.prior.jitter)
+        Kxx += cola.ops.I_like(Kxx) * posterior.prior.jitter
+        Sigma = Kxx + cola.ops.I_like(Kxx) * obs_noise
         Sigma = cola.PSD(Sigma)
 
-        # flatten to handle multi-output case, then calculate
         # p(y | x, θ), where θ are the model hyperparameters:
-        mll = GaussianDistribution(jnp.atleast_1d(mx.flatten()), Sigma)
+        mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
 
-        rval = mll.log_prob(jnp.atleast_1d(y.flatten()), mask=mask).squeeze()
-        return self.constant * rval
+        return self.constant * (
+            mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
+        )
 
 
 class ConjugateLOOCV(AbstractObjective):
@@ -220,15 +214,8 @@ class ConjugateLOOCV(AbstractObjective):
             ScalarFloat: The leave-one-out log predictive probability of the Gaussian
                 process for the current parameter set.
         """
-        x, y, mask = train_data.X, train_data.y, train_data.mask
+        x, y = train_data.X, train_data.y
         m = y.shape[1]
-
-        if mask is not None:
-            raise NotImplementedError("ConjugateLOOCV does not yet support masking")
-        if m > 1:
-            raise NotImplementedError(
-                "ConjugateLOOCV does not yet support multi-output"
-            )
 
         # Observation noise o²
         obs_var = posterior.likelihood.obs_stddev**2
@@ -237,8 +224,6 @@ class ConjugateLOOCV(AbstractObjective):
 
         # Σ = (Kxx + Io²)
         Kxx = posterior.prior.kernel.gram(x)
-        Kyy = posterior.prior.out_kernel.gram(jnp.arange(m)[:, jnp.newaxis])
-        Sigma = cola.ops.Kronecker(Kxx, Kyy)
         Sigma = Kxx + cola.ops.I_like(Kxx) * (obs_var + posterior.prior.jitter)
         Sigma = cola.PSD(Sigma)  # [N, N]
 

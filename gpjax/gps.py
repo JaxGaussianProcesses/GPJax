@@ -47,8 +47,6 @@ from gpjax.base import (
 from gpjax.dataset import Dataset
 from gpjax.distributions import (
     GaussianDistribution,
-    ReshapedDistribution,
-    ReshapedGaussianDistribution,
 )
 from gpjax.kernels import (
     RFF,
@@ -77,12 +75,7 @@ class AbstractPrior(Module):
     mean_function: AbstractMeanFunction
     jitter: float = static_field(1e-6)
 
-    # TODO: when letting kernels be responsible for certain features, like
-    # RBF(features=["outp_idx"]), this can be folded into the kernel,
-    # just not sure how to ensure Kronecker structure then
-    out_kernel: AbstractKernel = field(default_factory=White)
-
-    def __call__(self, *args: Any, **kwargs: Any) -> ReshapedGaussianDistribution:
+    def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
         r"""Evaluate the Gaussian process at the given points.
 
         The output of this function is a
@@ -100,13 +93,13 @@ class AbstractPrior(Module):
 
         Returns
         -------
-            ReshapedGaussianDistribution: A multivariate normal random variable representation
-                of the Gaussian process, possibly with reshaped events.
+            GaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process.
         """
         return self.predict(*args, **kwargs)
 
     @abstractmethod
-    def predict(self, *args: Any, **kwargs: Any) -> ReshapedGaussianDistribution:
+    def predict(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
         r"""Evaluate the predictive distribution.
 
         Compute the latent function's multivariate normal distribution for a
@@ -119,8 +112,8 @@ class AbstractPrior(Module):
 
         Returns
         -------
-            ReshapedGaussianDistribution: A multivariate normal random variable representation
-                of the Gaussian process, possibly with reshaped events.
+            GaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process.
         """
         raise NotImplementedError
 
@@ -229,7 +222,7 @@ class Prior(AbstractPrior):
         """
         return self.__mul__(other)
 
-    def predict(self, test_inputs: Num[Array, "N D"]) -> ReshapedGaussianDistribution:
+    def predict(self, test_inputs: Num[Array, "N D"]) -> GaussianDistribution:
         r"""Compute the predictive prior distribution for a given set of
         parameters. The output of this function is a function that computes
         a TFP distribution for a given set of inputs.
@@ -255,21 +248,16 @@ class Prior(AbstractPrior):
 
         Returns
         -------
-            ReshapedGaussianDistribution: A multivariate normal random variable representation
-                of the Gaussian process, possibly with reshaped events.
+            GaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process.
         """
         x = test_inputs
-        mx = jnp.atleast_1d(self.mean_function(x))
+        mx = self.mean_function(x)
         Kxx = self.kernel.gram(x)
-        Kyy = self.out_kernel.gram(jnp.arange(mx.shape[1])[:, jnp.newaxis])
-        Sigma = cola.ops.Kronecker(Kxx, Kyy)
-        Sigma += cola.ops.I_like(Sigma) * self.jitter
+        Kxx += cola.ops.I_like(Kxx) * self.jitter
+        Kxx = cola.PSD(Kxx)
 
-        prior_distr = GaussianDistribution(mx.flatten(), Sigma)
-        if mx.shape[1] == 1:
-            return prior_distr
-        else:
-            return ReshapedDistribution(prior_distr, mx.shape)
+        return GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Kxx)
 
     def sample_approx(
         self,
@@ -360,7 +348,7 @@ class AbstractPosterior(Module):
     likelihood: AbstractLikelihood
     jitter: float = static_field(1e-6)
 
-    def __call__(self, *args: Any, **kwargs: Any) -> ReshapedGaussianDistribution:
+    def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
         r"""Evaluate the Gaussian process posterior at the given points.
 
         The output of this function is a
@@ -378,13 +366,13 @@ class AbstractPosterior(Module):
 
         Returns
         -------
-            ReshapedGaussianDistribution: A multivariate normal random variable representation
-                of the Gaussian process, possibly with reshaped events.
+            GaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process.
         """
         return self.predict(*args, **kwargs)
 
     @abstractmethod
-    def predict(self, *args: Any, **kwargs: Any) -> ReshapedGaussianDistribution:
+    def predict(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
         r"""Compute the latent function's multivariate normal distribution for a
         given set of parameters. For any class inheriting the `AbstractPrior` class,
         this method must be implemented.
@@ -395,8 +383,8 @@ class AbstractPosterior(Module):
 
         Returns
         -------
-            ReshapedGaussianDistribution: A multivariate normal random variable representation
-                of the Gaussian process, possibly with reshaped events.
+            GaussianDistribution: A multivariate normal random variable representation
+                of the Gaussian process.
         """
         raise NotImplementedError
 
@@ -448,7 +436,7 @@ class ConjugatePosterior(AbstractPosterior):
         self,
         test_inputs: Num[Array, "N D"],
         train_data: Dataset,
-    ) -> ReshapedGaussianDistribution:
+    ) -> GaussianDistribution:
         r"""Query the predictive posterior distribution.
 
         Conditional on a training data set, compute the GP's posterior
@@ -495,66 +483,43 @@ class ConjugatePosterior(AbstractPosterior):
 
         Returns
         -------
-            ReshapedGaussianDistribution: A
-                function that accepts an input array and returns the predictive
-                    distribution as a `GaussianDistribution` or a `ReshapedDistribution[GaussianDistribution]`.
+            GaussianDistribution: A function that accepts an input array and
+                returns the predictive distribution as a `GaussianDistribution`.
         """
         # Unpack training data
-        x, y, n_train, mask = train_data.X, train_data.y, train_data.n, train_data.mask
-        m = y.shape[1]
-        if m > 1 and mask is not None:
-            mask = mask.flatten()
+        x, y, n_test = train_data.X, train_data.y, train_data.n
+
         # Unpack test inputs
         t = test_inputs
-        n_test = len(test_inputs)
 
         # Observation noise o²
-        obs_var = self.likelihood.obs_stddev**2
+        obs_noise = self.likelihood.obs_stddev**2
         mx = self.prior.mean_function(x)
 
         # Precompute Gram matrix, Kxx, at training inputs, x
         Kxx = self.prior.kernel.gram(x)
-        Kyy = self.prior.out_kernel.gram(jnp.arange(m)[:, jnp.newaxis])
+        Kxx += cola.ops.I_like(Kxx) * self.jitter
 
         # Σ = Kxx + Io²
-        Sigma = cola.ops.Kronecker(Kxx, Kyy)
-        Sigma += cola.ops.I_like(Sigma) * (obs_var + self.jitter)
+        Sigma = Kxx + cola.ops.I_like(Kxx) * obs_noise
         Sigma = cola.PSD(Sigma)
 
-        if mask is not None:
-            y = jnp.where(mask, 0.0, y)
-            mx = jnp.where(mask, 0.0, mx)
-            Sigma_masked = jnp.where(mask + mask.T, 0.0, Sigma.to_dense())
-            Sigma = cola.PSD(
-                Dense(
-                    jnp.where(
-                        jnp.diag(jnp.squeeze(mask)), 1 / (2 * jnp.pi), Sigma_masked
-                    )
-                )
-            )
 
         mean_t = self.prior.mean_function(t)
-        Ktt = cola.ops.Kronecker(self.prior.kernel.gram(t), Kyy)
-        Ktt = cola.PSD(Ktt)
-        Kxt = cola.ops.Kronecker(self.prior.kernel.cross_covariance(x, t), Kyy)
-
-        # Σ⁻¹ Kxt
-        if mask is not None:
-            Kxt = jnp.where(mask * jnp.ones((1, n_train), dtype=bool), 0.0, Kxt)
-        Sigma_inv_Kxt = cola.solve(Sigma, Kxt, Cholesky())
+        Ktt = self.prior.kernel.gram(t)
+        Kxt = self.prior.kernel.cross_covariance(x, t)
+        Sigma_inv_Kxt = cola.solve(Sigma, Kxt)
 
         # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
-        mean = mean_t.flatten() + Sigma_inv_Kxt.T @ (y - mx).flatten()
+        mean = mean_t + jnp.matmul(Sigma_inv_Kxt.T, y - mx)
 
         # Ktt  -  Ktx (Kxx + Io²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
-        covariance = Ktt - Kxt.T @ Sigma_inv_Kxt
+        covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
         covariance += cola.ops.I_like(covariance) * self.prior.jitter
         covariance = cola.PSD(covariance)
-        rval = GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
-        if m == 1:
-            return rval
-        else:
-            return ReshapedDistribution(rval, (n_test, m))
+
+        return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
+
 
     def sample_approx(
         self,

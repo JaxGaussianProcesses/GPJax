@@ -81,15 +81,13 @@ def test_abstract_posterior():
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 @pytest.mark.parametrize("kernel", [RBF(), Matern52()])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
-@pytest.mark.parametrize("out_kernel", [RBF(), White()])
 def test_prior(
     num_datapoints: int,
     kernel: AbstractKernel,
     mean_function: AbstractMeanFunction,
-    out_kernel: AbstractKernel,
 ) -> None:
     # Create prior.
-    prior = Prior(mean_function=mean_function, kernel=kernel, out_kernel=out_kernel)
+    prior = Prior(mean_function=mean_function, kernel=kernel)
 
     # Check types.
     assert isinstance(prior, Prior)
@@ -99,7 +97,7 @@ def test_prior(
     # Check pytree.
     assert jtu.tree_leaves(prior) == jtu.tree_leaves(kernel) + jtu.tree_leaves(
         mean_function
-    ) + jtu.tree_leaves(out_kernel)
+    )
 
     # Query a marginal distribution at some inputs.
     inputs = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
@@ -119,12 +117,10 @@ def test_prior(
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 @pytest.mark.parametrize("kernel", [RBF(), Matern52()])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
-@pytest.mark.parametrize("out_kernel", [RBF(), White()])
 def test_conjugate_posterior(
     num_datapoints: int,
     mean_function: AbstractMeanFunction,
     kernel: AbstractKernel,
-    out_kernel: AbstractKernel,
 ) -> None:
     # Create a dataset.
     key = jr.PRNGKey(123)
@@ -133,7 +129,7 @@ def test_conjugate_posterior(
     D = Dataset(X=x, y=y)
 
     # Define prior.
-    prior = Prior(mean_function=mean_function, kernel=kernel, out_kernel=out_kernel)
+    prior = Prior(mean_function=mean_function, kernel=kernel)
 
     # Define a likelihood.
     likelihood = Gaussian(num_datapoints=num_datapoints)
@@ -148,7 +144,7 @@ def test_conjugate_posterior(
     # Check tree flattening.
     assert jtu.tree_leaves(posterior) == jtu.tree_leaves(likelihood) + jtu.tree_leaves(
         kernel
-    ) + jtu.tree_leaves(mean_function) + jtu.tree_leaves(out_kernel)
+    ) + jtu.tree_leaves(mean_function)
 
     # Query a marginal distribution of the posterior at some inputs.
     inputs = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
@@ -167,64 +163,11 @@ def test_conjugate_posterior(
 
 @pytest.mark.parametrize("num_datapoints", [1, 10])
 @pytest.mark.parametrize("kernel", [RBF(), Matern52()])
-@pytest.mark.parametrize(
-    "mean_function",
-    [Constant(constant=jnp.zeros((2,))), Constant(constant=jnp.ones((2,)))],
-)
-@pytest.mark.parametrize("out_kernel", [RBF(), Matern52()])
-def test_conjugate_posterior_mo(
-    num_datapoints: int,
-    mean_function: AbstractMeanFunction,
-    kernel: AbstractKernel,
-    out_kernel: AbstractKernel,
-) -> None:
-    # Create a dataset.
-    key = jr.PRNGKey(123)
-    x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1))
-    y = (
-        jnp.hstack([jnp.sin(x), jnp.cos(x)])
-        + jr.normal(key=key, shape=(num_datapoints, 2)) * 0.1
-    )
-    D = Dataset(X=x, y=y)
-
-    # Define prior.
-    prior = Prior(mean_function=mean_function, kernel=kernel, out_kernel=out_kernel)
-
-    # Define a likelihood.
-    likelihood = Gaussian(num_datapoints=num_datapoints)
-
-    # Construct the posterior via the class.
-    posterior = ConjugatePosterior(prior=prior, likelihood=likelihood)
-
-    # Check types.
-    assert isinstance(posterior, ConjugatePosterior)
-    assert is_dataclass(posterior)
-
-    # Check tree flattening.
-    assert jtu.tree_leaves(posterior) == jtu.tree_leaves(likelihood) + jtu.tree_leaves(
-        kernel
-    ) + jtu.tree_leaves(mean_function) + jtu.tree_leaves(out_kernel)
-
-    # Query a marginal distribution of the posterior at some inputs.
-    inputs = jnp.linspace(-3.0, 3.0, num_datapoints).reshape(-1, 1)
-    marginal_distribution = posterior(inputs, D)
-
-    # Ensure that the marginal distribution has the correct shape.
-    mu = marginal_distribution.mean()
-    sigma = marginal_distribution.covariance()
-    assert mu.shape == (num_datapoints, 2)
-    assert sigma.shape == (num_datapoints, 2, num_datapoints, 2)
-
-
-@pytest.mark.parametrize("num_datapoints", [1, 10])
-@pytest.mark.parametrize("kernel", [RBF(), Matern52()])
 @pytest.mark.parametrize("mean_function", [Zero(), Constant()])
-@pytest.mark.parametrize("out_kernel", [RBF(), White()])
 def test_nonconjugate_posterior(
     num_datapoints: int,
     mean_function: AbstractMeanFunction,
     kernel: AbstractKernel,
-    out_kernel: AbstractKernel,
 ) -> None:
     # Create a dataset.
     key = jr.PRNGKey(123)
