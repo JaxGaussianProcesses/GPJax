@@ -172,9 +172,9 @@ print(gpx.cite(kernel))
 # %%
 opt_posterior, training_history = gpx.fit_scipy(
     model=posterior,
-    objective=jit(gpx.ConjugateMLL(negative=True)),
+    objective=gpx.ConjugateMLL(negative=True),
     train_data=D,
-    max_iters=1000
+    max_iters=1000,
 )
 
 # %% [markdown]
