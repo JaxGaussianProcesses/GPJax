@@ -161,5 +161,3 @@ def test_kl_divergence(n: int) -> None:
     with pytest.raises(ValueError):
         incompatible = GaussianDistribution(loc=jnp.ones((2 * n,)))
         incompatible.kl_divergence(dist_a)
-
-

@@ -1,4 +1,20 @@
 # -*- coding: utf-8 -*-
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # Graph Kernels
 #
@@ -158,6 +174,7 @@ opt_posterior, training_history = gpx.fit_scipy(
     model=posterior,
     objective=jit(gpx.ConjugateMLL(negative=True)),
     train_data=D,
+    max_iters=1000
 )
 
 # %% [markdown]

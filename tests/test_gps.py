@@ -48,7 +48,6 @@ from gpjax.kernels import (
     RBF,
     AbstractKernel,
     Matern52,
-    White,
 )
 from gpjax.likelihoods import (
     AbstractLikelihood,
@@ -201,7 +200,7 @@ def test_nonconjugate_posterior(
     ]
     leaves = jtu.tree_leaves(posterior)
 
-    for l1, l2 in zip(leaves, true_leaves):
+    for l1, l2 in zip(leaves, true_leaves, strict=True):
         assert (l1 == l2).all()
 
     # Query a marginal distribution of the posterior at some inputs.
@@ -253,7 +252,7 @@ def test_posterior_construct(
     leaves_rmul = jtu.tree_leaves(posterior_rmul)
     leaves_manual = jtu.tree_leaves(posterior_manual)
 
-    for leaf_mul, leaf_rmul, leaf_man in zip(leaves_mul, leaves_rmul, leaves_manual):
+    for leaf_mul, leaf_rmul, leaf_man in zip(leaves_mul, leaves_rmul, leaves_manual, strict=True):
         assert (leaf_mul == leaf_rmul).all()
         assert (leaf_rmul == leaf_man).all()
 

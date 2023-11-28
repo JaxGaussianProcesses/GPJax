@@ -24,7 +24,6 @@ except ImportError:
 
 from jax import config
 import jax.numpy as jnp
-import jax.random as jr
 import jax.tree_util as jtu
 import pytest
 
@@ -47,10 +46,7 @@ def test_dataset_init(n: int, in_dim: int) -> None:
     assert D.in_dim == in_dim
 
     # Test representation
-    assert (
-        D.__repr__()
-        == f"- Number of observations: {n}\n- Input dimension: {in_dim}"
-    )
+    assert D.__repr__() == f"- Number of observations: {n}\n- Input dimension: {in_dim}"
 
     # Ensure dataclass
     assert is_dataclass(D)
@@ -151,7 +147,6 @@ def test_y_none(n: int, in_dim: int) -> None:
 
     # Check tree flatten
     assert jtu.tree_leaves(D) == [x]
-
 
 
 @pytest.mark.parametrize(

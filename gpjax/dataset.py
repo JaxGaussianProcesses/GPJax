@@ -17,13 +17,10 @@ from dataclasses import dataclass
 import warnings
 
 from beartype.typing import (
-    Literal,
     Optional,
-    Union,
 )
 import jax.numpy as jnp
 from jaxtyping import (
-    Bool,
     Num,
 )
 from simple_pytree import Pytree
@@ -53,8 +50,7 @@ class Dataset(Pytree):
     def __repr__(self) -> str:
         r"""Returns a string representation of the dataset."""
         repr = (
-            f"- Number of observations: {self.n}\n- Input dimension:"
-            f" {self.in_dim}"
+            f"- Number of observations: {self.n}\n- Input dimension: {self.in_dim}"
         )
         return repr
 
