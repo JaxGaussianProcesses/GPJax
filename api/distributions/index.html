@@ -703,26 +703,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/spatial/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Pathwise Sampling for Spatial Modelling
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../examples/bayesian_optimisation/" class="md-nav__link">
         
   
@@ -1976,26 +1956,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/non_euclidean/categorical/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Categorical
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../kernels/non_euclidean/graph/" class="md-nav__link">
         
   
@@ -2668,28 +2628,8 @@
 
 
 
-<h5 id="gpjax.distributions.ReshapedGaussianDistribution" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">ReshapedGaussianDistribution</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">GaussianDistribution</span><span class="p">,</span> <span class="n">ReshapedDistribution</span><span class="p">[</span><span class="n">GaussianDistribution</span><span class="p">]]</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h5>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
 <h5 id="gpjax.distributions.__all__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GaussianDistribution&#39;</span><span class="p">,</span> <span class="s1">&#39;ReshapedDistribution&#39;</span><span class="p">,</span> <span class="s1">&#39;ReshapedGaussianDistribution&#39;</span><span class="p">]</span></code>
+          <code class="highlight language-python"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GaussianDistribution&#39;</span><span class="p">]</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
@@ -3012,7 +2952,7 @@
 
 
 <h6 id="gpjax.distributions.GaussianDistribution.log_prob" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">],</span> <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Bool</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
+          <code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -3046,20 +2986,6 @@
           </td>
           <td>
               <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>mask</code></td>
-          <td>
-                <code><span title="beartype.typing.Optional">Optional</span>[<span title="jaxtyping.Bool">Bool</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../typing/#gpjax.typing.Array">Array</a>, &#39; N&#39;]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>(Optional[Bool[Array, " N"]]): the mask for missing values in y.</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
           </td>
         </tr>
     </tbody>
@@ -3105,282 +3031,6 @@
 
 
   <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-
-  </div>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-
-<h5 id="gpjax.distributions.ReshapedDistribution" class="doc doc-heading">
-          <code>ReshapedDistribution</code>
-
-
-</h5>
-
-
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="gpjax.distributions.tfd.Distribution">Distribution</span></code>, <code><span title="beartype.typing.Generic">Generic</span>[<a class="autorefs autorefs-internal" title="gpjax.distributions.DistrT" href="#gpjax.distributions.DistrT">DistrT</a>]</code></p>
-
-
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.distributions.ReshapedDistribution.event_shape" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">event_shape</span><span class="p">:</span> <span class="n">Tuple</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.distributions.ReshapedDistribution.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">distribution</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Distribution</span><span class="p">,</span> <span class="n">output_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.distributions.ReshapedDistribution.mean" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">mean</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N ...&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Mean of the base distribution, reshaped to the output shape.</p>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.distributions.ReshapedDistribution.median" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">median</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N ...&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Median of the base distribution, reshaped to the output shape</p>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.distributions.ReshapedDistribution.mode" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">mode</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N ...&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Mode of the base distribution, reshaped to the output shape</p>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.distributions.ReshapedDistribution.covariance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">covariance</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N ...&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Covariance of the base distribution, reshaped to the squared output shape</p>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.distributions.ReshapedDistribution.variance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">variance</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N ...&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Variances of the base distribution, reshaped to the output shape</p>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.distributions.ReshapedDistribution.stddev" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">stddev</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N ...&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Standard deviations of the base distribution, reshaped to the output shape</p>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.distributions.ReshapedDistribution.entropy" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">entropy</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Entropy of the base distribution.</p>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.distributions.ReshapedDistribution.log_prob" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N ...&#39;</span><span class="p">],</span> <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Bool</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N ...&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Calculates the log probability.</p>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.distributions.ReshapedDistribution.sample" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">sample_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">())</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; n N ...&#39;</span><span class="p">]</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Draws samples from the distribution and reshapes them to the output shape.</p>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h6 id="gpjax.distributions.ReshapedDistribution.kl_divergence" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">kl_divergence</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">ReshapedDistribution</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Calculates the Kullback-Leibler divergence.</p>
 
   </div>
 

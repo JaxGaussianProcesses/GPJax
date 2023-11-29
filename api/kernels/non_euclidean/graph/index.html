@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://docs.jaxgaussianprocesses.com/api/kernels/non_euclidean/graph/">
       
       
-        <link rel="prev" href="../categorical/">
+        <link rel="prev" href="../../computations/eigen/">
       
       
         <link rel="next" href="../utils/">
@@ -688,26 +688,6 @@
   
   <span class="md-ellipsis">
     Sparse Gaussian Process Regression
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../examples/spatial/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Pathwise Sampling for Spatial Modelling
   </span>
   
 
@@ -1922,26 +1902,6 @@
             Non Euclidean
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../categorical/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Categorical
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
             
               
                 
@@ -3325,7 +3285,7 @@ of a graph.</p>
 
 
 <h6 id="gpjax.kernels.non_euclidean.graph.GraphKernel.slice_input" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
+          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
 
 </h6>
 
@@ -3352,7 +3312,7 @@ kernel's evaluation.</p>
         <tr>
           <td><code>x</code></td>
           <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -3366,7 +3326,7 @@ kernel's evaluation.</p>
     </tbody>
   </table>
       <h6 id="gpjax.kernels.non_euclidean.graph.GraphKernel.slice_input--returns">Returns<a class="headerlink" href="#gpjax.kernels.non_euclidean.graph.GraphKernel.slice_input--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Num[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
+<div class="highlight"><pre><span></span><code>Float[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
 </code></pre></div>
 
   </div>

@@ -703,26 +703,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../examples/spatial/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Pathwise Sampling for Spatial Modelling
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../../examples/bayesian_optimisation/" class="md-nav__link">
         
   
@@ -1929,26 +1909,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../non_euclidean/categorical/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Categorical
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../non_euclidean/graph/" class="md-nav__link">
         
   
@@ -3129,7 +3089,7 @@
 
 
 <h6 id="gpjax.kernels.stationary.white.White.slice_input" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
+          <code class="highlight language-python"><span class="n">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;... Q&#39;</span><span class="p">]</span></code>
 
 </h6>
 
@@ -3156,7 +3116,7 @@ kernel's evaluation.</p>
         <tr>
           <td><code>x</code></td>
           <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;... D&#39;]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -3170,7 +3130,7 @@ kernel's evaluation.</p>
     </tbody>
   </table>
       <h6 id="gpjax.kernels.stationary.white.White.slice_input--returns">Returns<a class="headerlink" href="#gpjax.kernels.stationary.white.White.slice_input--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Num[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
+<div class="highlight"><pre><span></span><code>Float[Array, &quot;... Q&quot;]: A sliced form of the input matrix.
 </code></pre></div>
 
   </div>
@@ -3287,7 +3247,7 @@ Args:
 
 
 <h6 id="gpjax.kernels.stationary.white.White.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
 </h6>
 
@@ -3331,7 +3291,7 @@ k(x, y) = \sigma^2 \delta(x-y)
         <tr>
           <td><code>x</code></td>
           <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -3345,7 +3305,7 @@ k(x, y) = \sigma^2 \delta(x-y)
         <tr>
           <td><code>y</code></td>
           <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39; D&#39;]</code>
           </td>
           <td>
             <div class="doc-md-description">

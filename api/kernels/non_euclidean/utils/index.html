@@ -703,26 +703,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../examples/spatial/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Pathwise Sampling for Spatial Modelling
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../../examples/bayesian_optimisation/" class="md-nav__link">
         
   
@@ -1929,26 +1909,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../categorical/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Categorical
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../graph/" class="md-nav__link">
         
   
@@ -2632,7 +2592,7 @@
 
 
 <h5 id="gpjax.kernels.non_euclidean.utils.jax_gather_nd" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">jax_gather_nd</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N *rest&#39;</span><span class="p">],</span> <span class="n">indices</span><span class="p">:</span> <span class="n">Int</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; M 1&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; M *rest&#39;</span><span class="p">]</span></code>
+          <code class="highlight language-python"><span class="n">jax_gather_nd</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N *rest&#39;</span><span class="p">],</span> <span class="n">indices</span><span class="p">:</span> <span class="n">Int</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; M 1&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; M *rest&#39;</span><span class="p">]</span></code>
 
 </h5>
 
@@ -2659,7 +2619,7 @@
         <tr>
           <td><code>params</code></td>
           <td>
-                <code><span title="jaxtyping.Num">Num</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2674,7 +2634,7 @@ which we shall slice.</p>
         <tr>
           <td><code>indices</code></td>
           <td>
-                <code>Float[<span title="jaxtyping.Int">Int</span>]</code>
+                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Int">Int</span>]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2690,7 +2650,7 @@ index $i$.</p>
     </tbody>
   </table>
       <h6 id="gpjax.kernels.non_euclidean.utils.jax_gather_nd--returns">Returns<a class="headerlink" href="#gpjax.kernels.non_euclidean.utils.jax_gather_nd--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>Num[Array: An arbitrary array with leading axes of length $M$.
+<div class="highlight"><pre><span></span><code>Float[Array: An arbitrary array with leading axes of length $M$.
 </code></pre></div>
 
   </div>

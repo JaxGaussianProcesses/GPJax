@@ -703,26 +703,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/spatial/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Pathwise Sampling for Spatial Modelling
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../examples/bayesian_optimisation/" class="md-nav__link">
         
   
@@ -1976,26 +1956,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/non_euclidean/categorical/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Categorical
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../kernels/non_euclidean/graph/" class="md-nav__link">
         
   
@@ -2739,27 +2699,6 @@
 
 </div>
 
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.gps.AbstractPrior.out_kernel" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">out_kernel</span><span class="p">:</span> <span class="n">AbstractKernel</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">White</span><span class="p">)</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
 
 
 
@@ -3073,7 +3012,7 @@
 
 
 <h6 id="gpjax.gps.AbstractPrior.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReshapedGaussianDistribution</span></code>
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
 
 </h6>
 
@@ -3133,8 +3072,8 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
     </tbody>
   </table>
       <h6 id="gpjax.gps.AbstractPrior.__call__--returns">Returns<a class="headerlink" href="#gpjax.gps.AbstractPrior.__call__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>ReshapedGaussianDistribution: A multivariate normal random variable representation
-    of the Gaussian process, possibly with reshaped events.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
+    of the Gaussian process.
 </code></pre></div>
 
   </div>
@@ -3148,7 +3087,7 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
 
 
 <h6 id="gpjax.gps.AbstractPrior.predict" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReshapedGaussianDistribution</span></code>
+          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -3208,8 +3147,8 @@ this method must be implemented.</p>
     </tbody>
   </table>
       <h6 id="gpjax.gps.AbstractPrior.predict--returns">Returns<a class="headerlink" href="#gpjax.gps.AbstractPrior.predict--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>ReshapedGaussianDistribution: A multivariate normal random variable representation
-    of the Gaussian process, possibly with reshaped events.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
+    of the Gaussian process.
 </code></pre></div>
 
   </div>
@@ -3335,27 +3274,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 <h6 id="gpjax.gps.Prior.jitter" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">jitter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">)</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.gps.Prior.out_kernel" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">out_kernel</span><span class="p">:</span> <span class="n">AbstractKernel</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">White</span><span class="p">)</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -3683,7 +3601,7 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 <h6 id="gpjax.gps.Prior.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReshapedGaussianDistribution</span></code>
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
 
 </h6>
 
@@ -3743,8 +3661,8 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
     </tbody>
   </table>
       <h6 id="gpjax.gps.Prior.__call__--returns">Returns<a class="headerlink" href="#gpjax.gps.Prior.__call__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>ReshapedGaussianDistribution: A multivariate normal random variable representation
-    of the Gaussian process, possibly with reshaped events.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
+    of the Gaussian process.
 </code></pre></div>
 
   </div>
@@ -3876,7 +3794,7 @@ dataset.</p>
 
 
 <h6 id="gpjax.gps.Prior.predict" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ReshapedGaussianDistribution</span></code>
+          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
 
 </h6>
 
@@ -3930,8 +3848,8 @@ prior distribution.</p>
     </tbody>
   </table>
       <h6 id="gpjax.gps.Prior.predict--returns">Returns<a class="headerlink" href="#gpjax.gps.Prior.predict--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>ReshapedGaussianDistribution: A multivariate normal random variable representation
-    of the Gaussian process, possibly with reshaped events.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
+    of the Gaussian process.
 </code></pre></div>
 
   </div>
@@ -4484,7 +4402,7 @@ posterior objects should inherit from this class.</p>
 
 
 <h6 id="gpjax.gps.AbstractPosterior.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReshapedGaussianDistribution</span></code>
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
 
 </h6>
 
@@ -4544,8 +4462,8 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
     </tbody>
   </table>
       <h6 id="gpjax.gps.AbstractPosterior.__call__--returns">Returns<a class="headerlink" href="#gpjax.gps.AbstractPosterior.__call__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>ReshapedGaussianDistribution: A multivariate normal random variable representation
-    of the Gaussian process, possibly with reshaped events.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
+    of the Gaussian process.
 </code></pre></div>
 
   </div>
@@ -4559,7 +4477,7 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
 
 
 <h6 id="gpjax.gps.AbstractPosterior.predict" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReshapedGaussianDistribution</span></code>
+          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -4618,8 +4536,8 @@ this method must be implemented.</p>
     </tbody>
   </table>
       <h6 id="gpjax.gps.AbstractPosterior.predict--returns">Returns<a class="headerlink" href="#gpjax.gps.AbstractPosterior.predict--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>ReshapedGaussianDistribution: A multivariate normal random variable representation
-    of the Gaussian process, possibly with reshaped events.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
+    of the Gaussian process.
 </code></pre></div>
 
   </div>
@@ -5093,7 +5011,7 @@ where
 
 
 <h6 id="gpjax.gps.ConjugatePosterior.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReshapedGaussianDistribution</span></code>
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
 
 </h6>
 
@@ -5153,8 +5071,8 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
     </tbody>
   </table>
       <h6 id="gpjax.gps.ConjugatePosterior.__call__--returns">Returns<a class="headerlink" href="#gpjax.gps.ConjugatePosterior.__call__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>ReshapedGaussianDistribution: A multivariate normal random variable representation
-    of the Gaussian process, possibly with reshaped events.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
+    of the Gaussian process.
 </code></pre></div>
 
   </div>
@@ -5168,7 +5086,7 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
 
 
 <h6 id="gpjax.gps.ConjugatePosterior.predict" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReshapedGaussianDistribution</span></code>
+          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
 
 </h6>
 
@@ -5256,9 +5174,8 @@ output data used for training dataset.</p>
     </tbody>
   </table>
       <h6 id="gpjax.gps.ConjugatePosterior.predict--returns">Returns<a class="headerlink" href="#gpjax.gps.ConjugatePosterior.predict--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>ReshapedGaussianDistribution: A
-    function that accepts an input array and returns the predictive
-        distribution as a `GaussianDistribution` or a `ReshapedDistribution[GaussianDistribution]`.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A function that accepts an input array and
+    returns the predictive distribution as a `GaussianDistribution`.
 </code></pre></div>
 
   </div>
@@ -5850,7 +5767,7 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 <h6 id="gpjax.gps.NonConjugatePosterior.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReshapedGaussianDistribution</span></code>
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
 
 </h6>
 
@@ -5910,8 +5827,8 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
     </tbody>
   </table>
       <h6 id="gpjax.gps.NonConjugatePosterior.__call__--returns">Returns<a class="headerlink" href="#gpjax.gps.NonConjugatePosterior.__call__--returns" title="Permanent link"></a></h6>
-<div class="highlight"><pre><span></span><code>ReshapedGaussianDistribution: A multivariate normal random variable representation
-    of the Gaussian process, possibly with reshaped events.
+<div class="highlight"><pre><span></span><code>GaussianDistribution: A multivariate normal random variable representation
+    of the Gaussian process.
 </code></pre></div>
 
   </div>

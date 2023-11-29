@@ -703,26 +703,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/spatial/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Pathwise Sampling for Spatial Modelling
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../examples/bayesian_optimisation/" class="md-nav__link">
         
   
@@ -1976,26 +1956,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/non_euclidean/categorical/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Categorical
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../kernels/non_euclidean/graph/" class="md-nav__link">
         
   
@@ -2669,10 +2629,6 @@
 <h6 id="gpjax.dataset.Dataset--attributes">Attributes<a class="headerlink" href="#gpjax.dataset.Dataset--attributes" title="Permanent link"></a></h6>
 <div class="highlight"><pre><span></span><code>X (Optional[Num[Array, &quot;N D&quot;]]): input data.
 y (Optional[Num[Array, &quot;N Q&quot;]]): output data.
-mask (Optional[Union[Bool[Array, &quot;N Q&quot;], Literal[&quot;infer automatically&quot;]]]): mask for the output data.
-    Users can optionally specify a pre-computed mask, or explicitly pass `None` which
-    means no mask will be used. Defaults to `&quot;infer automatically&quot;`, which means that
-    the mask will be computed from the output data, or set to `None` if no output data is provided.
 </code></pre></div>
 
 
@@ -2714,27 +2670,6 @@ mask (Optional[Union[Bool[Array, &quot;N Q&quot;], Literal[&quot;infer automatic
 
 <h6 id="gpjax.dataset.Dataset.y" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N Q&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.dataset.Dataset.mask" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Bool</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N Q&#39;</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;infer automatically&#39;</span><span class="p">]]]</span> <span class="o">=</span> <span class="s1">&#39;infer automatically&#39;</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
@@ -2804,43 +2739,6 @@ mask (Optional[Union[Bool[Array, &quot;N Q&quot;], Literal[&quot;infer automatic
     }
 </style>
 <p>Dimension of the inputs, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi></mrow><annotation encoding="application/x-tex">X</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07847em;">X</span></span></span></span>.</p>
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h6 id="gpjax.dataset.Dataset.out_dim" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">out_dim</span><span class="p">:</span> <span class="nb">int</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h6>
-
-
-  <div class="doc doc-contents ">
-  
-      <link rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
-  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
-  crossorigin="anonymous" />
-
-<style type="text/css">
-    .katex img {
-      object-fit: fill;
-      padding: unset;
-      display: block;
-      position: absolute;
-      width: 100%;
-      height: inherit;
-    }
-</style>
-<p>Dimension of the outputs, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span>.</p>
   </div>
 
 </div>
