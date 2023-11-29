@@ -24,7 +24,10 @@ from beartype.typing import (
     Union,
 )
 import jax.numpy as jnp
-from jaxtyping import Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 import tensorflow_probability.substrates.jax.distributions as tfd
 
 from gpjax.base import (
@@ -60,18 +63,18 @@ class AbstractKernel(Module):
     def gram(self, x: Num[Array, "N D"]):
         return self.compute_engine.gram(self, x)
 
-    def slice_input(self, x: Num[Array, "... D"]) -> Num[Array, "... Q"]:
+    def slice_input(self, x: Float[Array, "... D"]) -> Float[Array, "... Q"]:
         r"""Slice out the relevant columns of the input matrix.
 
         Select the relevant columns of the supplied matrix to be used within the
         kernel's evaluation.
 
         Args:
-            x (Num[Array, "... D"]): The matrix or vector that is to be sliced.
+            x (Float[Array, "... D"]): The matrix or vector that is to be sliced.
 
         Returns
         -------
-            Num[Array, "... Q"]: A sliced form of the input matrix.
+            Float[Array, "... Q"]: A sliced form of the input matrix.
         """
         return x[..., self.active_dims] if self.active_dims is not None else x
 
@@ -147,12 +150,12 @@ class Constant(AbstractKernel):
 
     constant: ScalarFloat = param_field(jnp.array(0.0))
 
-    def __call__(self, x: Num[Array, " D"], y: Num[Array, " D"]) -> ScalarFloat:
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Evaluate the kernel on a pair of inputs.
 
         Args:
-            x (Num[Array, " D"]): The left hand input of the kernel function.
-            y (Num[Array, " D"]): The right hand input of the kernel function.
+            x (Float[Array, " D"]): The left hand input of the kernel function.
+            y (Float[Array, " D"]): The right hand input of the kernel function.
 
         Returns
         -------
@@ -185,14 +188,14 @@ class CombinationKernel(AbstractKernel):
 
     def __call__(
         self,
-        x: Num[Array, " D"],
-        y: Num[Array, " D"],
+        x: Float[Array, " D"],
+        y: Float[Array, " D"],
     ) -> ScalarFloat:
         r"""Evaluate the kernel on a pair of inputs.
 
         Args:
-            x (Num[Array, " D"]): The left hand input of the kernel function.
-            y (Num[Array, " D"]): The right hand input of the kernel function.
+            x (Float[Array, " D"]): The left hand input of the kernel function.
+            y (Float[Array, " D"]): The right hand input of the kernel function.
 
         Returns
         -------

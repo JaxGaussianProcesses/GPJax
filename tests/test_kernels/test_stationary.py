@@ -172,7 +172,9 @@ class BaseTestKernel:
 
 
 def prod(inp):
-    return [dict(zip(inp.keys(), values)) for values in product(*inp.values())]
+    return [
+        dict(zip(inp.keys(), values, strict=True)) for values in product(*inp.values())
+    ]
 
 
 class TestRBF(BaseTestKernel):

@@ -308,7 +308,7 @@ def meta_leaves(
             yield meta_leaf
             return
 
-        for metadata, leaf in zip(leaves_meta, leaves_values):
+        for metadata, leaf in zip(leaves_meta, leaves_values, strict=True):
             yield from _unpack_metadata((metadata, leaf), leaf, is_leaf)
 
     return list(_unpack_metadata(pytree, pytree, is_leaf))
@@ -352,7 +352,7 @@ def meta_map(
     """
     leaves, treedef = meta_flatten(pytree, is_leaf=is_leaf)
     all_leaves = [leaves] + [treedef.treedef.flatten_up_to(r) for r in rest]
-    return treedef.unflatten(f(*xs) for xs in zip(*all_leaves))
+    return treedef.unflatten(f(*xs) for xs in zip(*all_leaves, strict=True))
 
 
 def meta(pytree: Module, *, is_leaf: Optional[Callable[[Any], bool]] = None) -> Module:

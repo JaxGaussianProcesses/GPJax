@@ -24,7 +24,6 @@ except ImportError:
 
 from jax import config
 import jax.numpy as jnp
-import jax.random as jr
 import jax.tree_util as jtu
 import pytest
 
@@ -34,26 +33,20 @@ config.update("jax_enable_x64", True)
 
 
 @pytest.mark.parametrize("n", [1, 2, 10])
-@pytest.mark.parametrize("out_dim", [1, 2, 10])
 @pytest.mark.parametrize("in_dim", [1, 2, 10])
-def test_dataset_init(n: int, in_dim: int, out_dim: int) -> None:
+def test_dataset_init(n: int, in_dim: int) -> None:
     # Create dataset
     x = jnp.ones((n, in_dim))
-    y = jnp.ones((n, out_dim))
+    y = jnp.ones((n, 1))
 
     D = Dataset(X=x, y=y)
 
     # Test dataset shapes
     assert D.n == n
     assert D.in_dim == in_dim
-    assert D.out_dim == out_dim
 
     # Test representation
-    assert (
-        D.__repr__()
-        == f"- Number of observations: {n}\n- Input dimension: {in_dim}\n- Output"
-        f" dimension: {out_dim}"
-    )
+    assert D.__repr__() == f"- Number of observations: {n}\n- Input dimension: {in_dim}"
 
     # Ensure dataclass
     assert is_dataclass(D)
@@ -68,17 +61,16 @@ def test_dataset_init(n: int, in_dim: int, out_dim: int) -> None:
 
 @pytest.mark.parametrize("n1", [1, 2, 10])
 @pytest.mark.parametrize("n2", [1, 2, 10])
-@pytest.mark.parametrize("out_dim", [1, 2, 10])
 @pytest.mark.parametrize("in_dim", [1, 2, 10])
-def test_dataset_add(n1: int, n2: int, in_dim: int, out_dim: int) -> None:
+def test_dataset_add(n1: int, n2: int, in_dim: int) -> None:
     # Create first dataset
     x1 = jnp.ones((n1, in_dim))
-    y1 = jnp.ones((n1, out_dim))
+    y1 = jnp.ones((n1, 1))
     D1 = Dataset(X=x1, y=y1)
 
     # Create second dataset
     x2 = 2 * jnp.ones((n2, in_dim))
-    y2 = 2 * jnp.ones((n2, out_dim))
+    y2 = 2 * jnp.ones((n2, 1))
     D2 = Dataset(X=x2, y=y2)
 
     # Add datasets
@@ -87,13 +79,11 @@ def test_dataset_add(n1: int, n2: int, in_dim: int, out_dim: int) -> None:
     # Test shapes
     assert D.n == n1 + n2
     assert D.in_dim == in_dim
-    assert D.out_dim == out_dim
 
     # Test representation
     assert (
         D.__repr__()
-        == f"- Number of observations: {n1 + n2}\n- Input dimension: {in_dim}\n- Output"
-        f" dimension: {out_dim}"
+        == f"- Number of observations: {n1 + n2}\n- Input dimension: {in_dim}"
     )
 
     # Ensure dataclass
@@ -111,12 +101,11 @@ def test_dataset_add(n1: int, n2: int, in_dim: int, out_dim: int) -> None:
 
 
 @pytest.mark.parametrize(("nx", "ny"), [(1, 2), (2, 1), (10, 5), (5, 10)])
-@pytest.mark.parametrize("out_dim", [1, 2, 10])
 @pytest.mark.parametrize("in_dim", [1, 2, 10])
-def test_dataset_incorrect_lengths(nx: int, ny: int, out_dim: int, in_dim: int) -> None:
+def test_dataset_incorrect_lengths(nx: int, ny: int, in_dim: int) -> None:
     # Create input and output pairs of different lengths
     x = jnp.ones((nx, in_dim))
-    y = jnp.ones((ny, out_dim))
+    y = jnp.ones((ny, 1))
 
     # Ensure error is raised upon dataset creation
     with pytest.raises(ValidationErrors):
@@ -124,9 +113,8 @@ def test_dataset_incorrect_lengths(nx: int, ny: int, out_dim: int, in_dim: int) 
 
 
 @pytest.mark.parametrize("n", [1, 2, 10])
-@pytest.mark.parametrize("out_dim", [1, 2, 10])
 @pytest.mark.parametrize("in_dim", [1, 2, 10])
-def test_2d_inputs(n: int, out_dim: int, in_dim: int) -> None:
+def test_2d_inputs(n: int, in_dim: int) -> None:
     # Create dataset where output dimension is incorrectly not 2D
     x = jnp.ones((n, in_dim))
     y = jnp.ones((n,))
@@ -137,7 +125,7 @@ def test_2d_inputs(n: int, out_dim: int, in_dim: int) -> None:
 
     # Create dataset where input dimension is incorrectly not 2D
     x = jnp.ones((n,))
-    y = jnp.ones((n, out_dim))
+    y = jnp.ones((n, 1))
 
     # Ensure error is raised upon dataset creation
     with pytest.raises(ValidationErrors):
@@ -161,45 +149,6 @@ def test_y_none(n: int, in_dim: int) -> None:
     assert jtu.tree_leaves(D) == [x]
 
 
-@pytest.mark.parametrize("n", [1, 2, 10])
-@pytest.mark.parametrize("out_dim", [1, 2, 10])
-@pytest.mark.parametrize("in_dim", [1, 2, 10])
-def test_dataset_missing(n: int, in_dim: int, out_dim: int) -> None:
-    # Create dataset
-    x = jnp.ones((n, in_dim))
-    y = jr.normal(jr.PRNGKey(123), (n, out_dim))
-    y = y.at[y < 0].set(jnp.nan)
-    mask = jnp.isnan(y)
-    D = Dataset(X=x, y=y)
-
-    # Check mask
-    assert D.mask is not None
-    assert jnp.array_equal(D.mask, mask)
-
-    # Create second dataset
-    x2 = 2 * jnp.ones((n, in_dim))
-    y2 = 2 * jnp.ones((n, out_dim))
-    D2 = Dataset(X=x2, y=y2)
-
-    # Add datasets
-    D2 = D + D2
-
-    # Check mask
-    assert jnp.sum(D2.mask) == jnp.sum(D.mask)
-
-    # Test dataset shapes
-    assert D.n == n
-    assert D.in_dim == in_dim
-    assert D.out_dim == out_dim
-
-    # Check tree flatten
-    # lexicographic order: uppercase "X" comes before lowercase "m"
-    x_, mask_, y_ = jtu.tree_leaves(D)
-    assert jnp.allclose(x, x_)
-    assert jnp.array_equal(mask, mask_)
-    assert jnp.allclose(y, y_, equal_nan=True)
-
-
 @pytest.mark.parametrize(
     ("prec_x", "prec_y"),
     [
@@ -210,13 +159,12 @@ def test_dataset_missing(n: int, in_dim: int, out_dim: int) -> None:
 )
 @pytest.mark.parametrize("n", [1, 2, 10])
 @pytest.mark.parametrize("in_dim", [1, 2, 10])
-@pytest.mark.parametrize("out_dim", [1, 2, 10])
 def test_precision_warning(
-    n: int, in_dim: int, out_dim: int, prec_x: jnp.dtype, prec_y: jnp.dtype
+    n: int, in_dim: int, prec_x: jnp.dtype, prec_y: jnp.dtype
 ) -> None:
     # Create dataset
     x = jnp.ones((n, in_dim)).astype(prec_x)
-    y = jnp.ones((n, out_dim)).astype(prec_y)
+    y = jnp.ones((n, 1)).astype(prec_y)
 
     # Check for warnings if dtypes are not float64
     expected_warnings = 0

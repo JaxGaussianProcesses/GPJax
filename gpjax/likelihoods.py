@@ -29,10 +29,7 @@ from gpjax.base import (
     param_field,
     static_field,
 )
-from gpjax.distributions import (
-    GaussianDistribution,
-    ReshapedDistribution,
-)
+from gpjax.distributions import GaussianDistribution
 from gpjax.integrators import (
     AbstractIntegrator,
     AnalyticalGaussianIntegrator,
@@ -167,22 +164,11 @@ class Gaussian(AbstractLikelihood):
         -------
             tfd.Distribution: The predictive distribution.
         """
-        mean = dist.mean()
-        event_size = mean.size
-
+        n_data = dist.event_shape[0]
         cov = dist.covariance()
+        noisy_cov = cov.at[jnp.diag_indices(n_data)].add(self.obs_stddev**2)
 
-        # reshape for handling multi-output case
-        mean = mean.flatten()
-        cov = cov.reshape([mean.size] * 2)
-
-        noisy_cov = cov.at[jnp.diag_indices(event_size)].add(self.obs_stddev**2)
-
-        likelihood_distr = tfd.MultivariateNormalFullCovariance(mean, noisy_cov)
-        if len(dist.event_shape) == 1:
-            return likelihood_distr
-        else:
-            return ReshapedDistribution(likelihood_distr, dist.event_shape)
+        return tfd.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
 
 
 @dataclass
