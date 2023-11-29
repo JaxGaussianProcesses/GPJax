@@ -22,6 +22,7 @@ from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import networkx as nx
+import optax as ox
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -153,12 +154,14 @@ print(gpx.cite(kernel))
 # With a posterior defined, we can now optimise the model's hyperparameters.
 
 # %%
-opt_posterior, training_history = gpx.fit_scipy(
+opt_posterior, training_history = gpx.fit(
     model=posterior,
     objective=gpx.ConjugateMLL(negative=True),
     train_data=D,
-    max_iters=1000,
-)
+    optim=ox.adam(learning_rate=0.01),
+    num_iters=1000,
+    key=key
+    )
 
 # %% [markdown]
 #
