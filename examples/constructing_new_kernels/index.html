@@ -3080,7 +3080,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0484e5ea">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2e7d2fab">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3092,7 +3092,7 @@ create custom kernels.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9202d1e5">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f74edec3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3179,7 +3179,7 @@ cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fda97fe0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=df10c875">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3204,7 +3204,7 @@ function draws per kernel.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b8902c13">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8764be41">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3237,7 +3237,7 @@ function draws per kernel.</p>
 <span class="n">meanf</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">mean_functions</span><span class="o">.</span><span class="n">Zero</span><span class="p">()</span>
 
 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">kernels</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">ravel</span><span class="p">()):</span>
-    <span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">mean_function</span><span class="o">=</span><span class="n">meanf</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">gps</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">mean_function</span><span class="o">=</span><span class="n">meanf</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
     <span class="n">rv</span> <span class="o">=</span> <span class="n">prior</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">rv</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,))</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
@@ -3258,7 +3258,7 @@ x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 meanf = gpx.mean_functions.Zero()
 
 for k, ax in zip(kernels, axes.ravel()):
-    prior = gpx.Prior(mean_function=meanf, kernel=k)
+    prior = gpx.gps.Prior(mean_function=meanf, kernel=k)
     rv = prior(x)
     y = rv.sample(seed=key, sample_shape=(10,))
     ax.plot(x, y.T, alpha=0.7)
@@ -3281,7 +3281,7 @@ for k, ax in zip(kernels, axes.ravel()):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=791c9475">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=26754b9c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3297,7 +3297,7 @@ like our RBF kernel to act on the first, second and fourth dimensions.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=777a8de5">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7fa29ddb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3324,7 +3324,7 @@ like our RBF kernel to act on the first, second and fourth dimensions.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0a61de16">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e4a7b7fc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3335,7 +3335,7 @@ like our RBF kernel to act on the first, second and fourth dimensions.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8ede4cc3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a6d949a2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3375,7 +3375,7 @@ like our RBF kernel to act on the first, second and fourth dimensions.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a0530aef">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ea0b1280">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3387,7 +3387,7 @@ input dimensions.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b8cb769b">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cd6401ae">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3437,7 +3437,7 @@ print(K.shape)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=58d40700">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8e00427b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3451,7 +3451,7 @@ a sum kernel is provided by the <code>SumKernel</code> class.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=dc4358aa">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=66bc9d47">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3505,7 +3505,7 @@ fig.colorbar(im2, ax=ax[2], fraction=0.05)</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;matplotlib.colorbar.Colorbar at 0x7fbbe8b366e0&gt;</pre>
+<pre>&lt;matplotlib.colorbar.Colorbar at 0x7fef25bed270&gt;</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -3518,7 +3518,7 @@ fig.colorbar(im2, ax=ax[2], fraction=0.05)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5a11e985">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fc194411">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3529,7 +3529,7 @@ fig.colorbar(im2, ax=ax[2], fraction=0.05)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c7bff75e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8c69a524">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3587,7 +3587,7 @@ fig.colorbar(im3, ax=ax[3], fraction=0.05)</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[7]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;matplotlib.colorbar.Colorbar at 0x7fbbe8659fc0&gt;</pre>
+<pre>&lt;matplotlib.colorbar.Colorbar at 0x7fef255aa6e0&gt;</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -3600,7 +3600,7 @@ fig.colorbar(im3, ax=ax[3], fraction=0.05)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bef93fee">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a9fbd9c5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3638,7 +3638,7 @@ While $d$ is an angular distance metric</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f84bc1b3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1edecb71">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3701,7 +3701,7 @@ class Polar(gpx.kernels.AbstractKernel):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3c8035e7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e33c2a73">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3719,7 +3719,7 @@ when we define the parameter field.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=983cf123">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fb9f9c1b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3733,7 +3733,7 @@ for further details on this process).</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1b08adc2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=db8d88d1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3764,13 +3764,13 @@ for further details on this process).</p>
 <span class="c1"># Define polar Gaussian process</span>
 <span class="n">PKern</span> <span class="o">=</span> <span class="n">Polar</span><span class="p">()</span>
 <span class="n">meanf</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">mean_functions</span><span class="o">.</span><span class="n">Zero</span><span class="p">()</span>
-<span class="n">likelihood</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">num_datapoints</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
-<span class="n">circular_posterior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">mean_function</span><span class="o">=</span><span class="n">meanf</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">PKern</span><span class="p">)</span> <span class="o">*</span> <span class="n">likelihood</span>
+<span class="n">likelihood</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">likelihoods</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">num_datapoints</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+<span class="n">circular_posterior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">gps</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">mean_function</span><span class="o">=</span><span class="n">meanf</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">PKern</span><span class="p">)</span> <span class="o">*</span> <span class="n">likelihood</span>
 
 <span class="c1"># Optimise GP's marginal log-likelihood using BFGS</span>
 <span class="n">opt_posterior</span><span class="p">,</span> <span class="n">history</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">fit_scipy</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="n">circular_posterior</span><span class="p">,</span>
-    <span class="n">objective</span><span class="o">=</span><span class="n">jit</span><span class="p">(</span><span class="n">gpx</span><span class="o">.</span><span class="n">ConjugateMLL</span><span class="p">(</span><span class="n">negative</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
+    <span class="n">objective</span><span class="o">=</span><span class="n">jit</span><span class="p">(</span><span class="n">gpx</span><span class="o">.</span><span class="n">objectives</span><span class="o">.</span><span class="n">ConjugateMLL</span><span class="p">(</span><span class="n">negative</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
     <span class="n">train_data</span><span class="o">=</span><span class="n">D</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
@@ -3787,13 +3787,13 @@ D = gpx.Dataset(X=X, y=y)
 # Define polar Gaussian process
 PKern = Polar()
 meanf = gpx.mean_functions.Zero()
-likelihood = gpx.Gaussian(num_datapoints=n)
-circular_posterior = gpx.Prior(mean_function=meanf, kernel=PKern) * likelihood
+likelihood = gpx.likelihoods.Gaussian(num_datapoints=n)
+circular_posterior = gpx.gps.Prior(mean_function=meanf, kernel=PKern) * likelihood
 
 # Optimise GP's marginal log-likelihood using BFGS
 opt_posterior, history = gpx.fit_scipy(
     model=circular_posterior,
-    objective=jit(gpx.ConjugateMLL(negative=True)),
+    objective=jit(gpx.objectives.ConjugateMLL(negative=True)),
     train_data=D,
 )</div>
 </div>
@@ -3817,7 +3817,7 @@ Final loss is 29.785122724775505 after 24 iterations
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=eeefd7be">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7dfa97eb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3829,7 +3829,7 @@ and illustrate the results.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b64e90e0">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=703f0c43">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3860,7 +3860,7 @@ one_sigma = posterior_rv.stddev()</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9efc1533">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f3979edc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3940,7 +3940,7 @@ ax.legend()</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[11]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;matplotlib.legend.Legend at 0x7fbbbdc292a0&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7fef24ea6dd0&gt;</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -3953,7 +3953,7 @@ ax.legend()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d9d18b6d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b274d5fc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3964,7 +3964,7 @@ ax.legend()</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=59a29e73">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4ebb0974">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4000,16 +4000,16 @@ ax.legend()</div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>Author: Thomas Pinder
 
-Last updated: Wed Nov 29 2023
+Last updated: Thu Nov 30 2023
 
 Python implementation: CPython
 Python version       : 3.10.13
 IPython version      : 8.17.2
 
+matplotlib            : 3.8.1
 tensorflow_probability: 0.19.0
 jax                   : 0.4.20
-matplotlib            : 3.8.1
-gpjax                 : 0.7.3
+gpjax                 : 0.8.0
 numpy                 : 1.26.1
 
 Watermark: 2.4.3

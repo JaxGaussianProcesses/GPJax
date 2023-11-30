@@ -3094,7 +3094,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1f92ea08">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3ff7ea25">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3139,7 +3139,7 @@ a likelihood object. To do this, we'll need a dataset.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ffef06cf">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8b4026d1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3231,7 +3231,7 @@ ax.legend()</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[1]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;matplotlib.legend.Legend at 0x7fe930393df0&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7f9f8588b6a0&gt;</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -3244,7 +3244,7 @@ ax.legend()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4712fc24">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4089e095">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3262,7 +3262,7 @@ argument.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=fc33b432">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ccfa8146">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3301,7 +3301,7 @@ argument.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5967a886">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8318fe96">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3319,7 +3319,7 @@ this as follows:</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8d675230">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a5b23ef2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3358,7 +3358,7 @@ this as follows:</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c8a1168f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4138f9b7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3379,7 +3379,7 @@ $\mathbf{y}^{\star}$.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ddab56ea">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=51e26a1f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3397,11 +3397,11 @@ $\mathbf{y}^{\star}$.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">kernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Matern32</span><span class="p">()</span>
-<span class="n">meanf</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Zero</span><span class="p">()</span>
-<span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span> <span class="n">mean_function</span><span class="o">=</span><span class="n">meanf</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">kernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">Matern32</span><span class="p">()</span>
+<span class="n">meanf</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">mean_functions</span><span class="o">.</span><span class="n">Zero</span><span class="p">()</span>
+<span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">gps</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span> <span class="n">mean_function</span><span class="o">=</span><span class="n">meanf</span><span class="p">)</span>
 
-<span class="n">likelihood</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">num_datapoints</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">obs_stddev</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">likelihood</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">likelihoods</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">num_datapoints</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">obs_stddev</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 
 <span class="n">posterior</span> <span class="o">=</span> <span class="n">prior</span> <span class="o">*</span> <span class="n">likelihood</span>
 
@@ -3427,11 +3427,11 @@ $\mathbf{y}^{\star}$.</p>
         <span class="n">label</span><span class="o">=</span><span class="s2">"Predictive samples"</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">kernel = gpx.Matern32()
-meanf = gpx.Zero()
-prior = gpx.Prior(kernel=kernel, mean_function=meanf)
+<div class="clipboard-copy-txt" id="cell-4">kernel = gpx.kernels.Matern32()
+meanf = gpx.mean_functions.Zero()
+prior = gpx.gps.Prior(kernel=kernel, mean_function=meanf)
 
-likelihood = gpx.Gaussian(num_datapoints=D.n, obs_stddev=0.1)
+likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n, obs_stddev=0.1)
 
 posterior = prior * likelihood
 
@@ -3474,7 +3474,7 @@ for ax in axes.ravel():
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3753b384">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4c604e57">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3485,7 +3485,7 @@ for ax in axes.ravel():
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3fb0c08f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=33008663">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3503,7 +3503,7 @@ for ax in axes.ravel():
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">likelihood</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="n">num_datapoints</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">likelihood</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">likelihoods</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="n">num_datapoints</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
 
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
@@ -3526,7 +3526,7 @@ for ax in axes.ravel():
         <span class="n">label</span><span class="o">=</span><span class="s2">"Predictive samples"</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">likelihood = gpx.Bernoulli(num_datapoints=D.n)
+<div class="clipboard-copy-txt" id="cell-5">likelihood = gpx.likelihoods.Bernoulli(num_datapoints=D.n)
 
 
 fig, axes = plt.subplots(ncols=3, nrows=1, figsize=(9, 2))
@@ -3566,7 +3566,7 @@ for ax in axes.ravel():
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7749e278">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cf848add">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3616,7 +3616,7 @@ approximation to the posterior.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ee9360ea">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9d31e985">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3635,7 +3635,7 @@ approximation to the posterior.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">z</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">q</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">VariationalGaussian</span><span class="p">(</span><span class="n">posterior</span><span class="o">=</span><span class="n">posterior</span><span class="p">,</span> <span class="n">inducing_inputs</span><span class="o">=</span><span class="n">z</span><span class="p">)</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">variational_families</span><span class="o">.</span><span class="n">VariationalGaussian</span><span class="p">(</span><span class="n">posterior</span><span class="o">=</span><span class="n">posterior</span><span class="p">,</span> <span class="n">inducing_inputs</span><span class="o">=</span><span class="n">z</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">q_moments</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -3646,7 +3646,7 @@ approximation to the posterior.</p>
 <span class="n">mean</span><span class="p">,</span> <span class="n">variance</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">q_moments</span><span class="p">)(</span><span class="n">x</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">z = jnp.linspace(-3.0, 3.0, 10).reshape(-1, 1)
-q = gpx.VariationalGaussian(posterior=posterior, inducing_inputs=z)
+q = gpx.variational_families.VariationalGaussian(posterior=posterior, inducing_inputs=z)
 
 
 def q_moments(x):
@@ -3661,7 +3661,7 @@ mean, variance = jax.vmap(q_moments)(x[:, None])</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c1da2c59">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2c3c1249">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3674,7 +3674,7 @@ likelihood object.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9fb36e01">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e27342da">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3713,7 +3713,7 @@ likelihood object.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a04024a9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ebad9ece">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3725,7 +3725,7 @@ following:</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2f209663">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=60e14ffe">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3743,13 +3743,13 @@ following:</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">lquad</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">lquad</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">likelihoods</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span>
     <span class="n">num_datapoints</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">,</span>
     <span class="n">obs_stddev</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">]),</span>
     <span class="n">integrator</span><span class="o">=</span><span class="n">gpx</span><span class="o">.</span><span class="n">integrators</span><span class="o">.</span><span class="n">GHQuadratureIntegrator</span><span class="p">(</span><span class="n">num_points</span><span class="o">=</span><span class="mi">20</span><span class="p">),</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">lquad = gpx.Gaussian(
+<div class="clipboard-copy-txt" id="cell-8">lquad = gpx.likelihoods.Gaussian(
     num_datapoints=D.n,
     obs_stddev=jnp.array([0.1]),
     integrator=gpx.integrators.GHQuadratureIntegrator(num_points=20),
@@ -3760,7 +3760,7 @@ following:</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=755c14c4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f1fbbcfa">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3772,7 +3772,7 @@ expectation can be computed analytically.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7a764026">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=934eeb53">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3783,7 +3783,7 @@ expectation can be computed analytically.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1bc45a94">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2e64b85d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3819,16 +3819,16 @@ expectation can be computed analytically.</p>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>Author: Thomas Pinder
 
-Last updated: Wed Nov 29 2023
+Last updated: Thu Nov 30 2023
 
 Python implementation: CPython
 Python version       : 3.10.13
 IPython version      : 8.17.2
 
+gpjax                 : 0.8.0
 matplotlib            : 3.8.1
-tensorflow_probability: 0.19.0
 jax                   : 0.4.20
-gpjax                 : 0.7.3
+tensorflow_probability: 0.19.0
 
 Watermark: 2.4.3
 
