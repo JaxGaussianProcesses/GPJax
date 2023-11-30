@@ -29,7 +29,10 @@ from gpjax.base import (
 )
 from gpjax.citation import cite
 from gpjax.dataset import Dataset
-from gpjax.fit import fit
+from gpjax.fit import (
+    fit,
+    fit_scipy,
+)
 
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
@@ -52,4 +55,5 @@ __all__ = [
     "fit",
     "Module",
     "param_field",
+    "fit_scipy",
 ]
