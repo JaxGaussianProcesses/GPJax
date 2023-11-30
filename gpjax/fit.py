@@ -24,7 +24,9 @@ from beartype.typing import (
 )
 import jax
 from jax._src.random import _check_prng_key
+import jax.numpy as jnp
 import jax.random as jr
+import jaxopt
 import optax as ox
 
 from gpjax.base import Module
@@ -38,6 +40,10 @@ from gpjax.typing import (
 )
 
 ModuleModel = TypeVar("ModuleModel", bound=Module)
+
+
+class FailedScipyFitError(Exception):
+    """Raised a model fit using Scipy fails"""
 
 
 def fit(  # noqa: PLR0913
@@ -170,6 +176,72 @@ def fit(  # noqa: PLR0913
     return model, history
 
 
+def fit_scipy(  # noqa: PLR0913
+    *,
+    model: ModuleModel,
+    objective: Union[AbstractObjective, Callable[[ModuleModel, Dataset], ScalarFloat]],
+    train_data: Dataset,
+    max_iters: Optional[int] = 500,
+    verbose: Optional[bool] = True,
+    safe: Optional[bool] = True,
+) -> Tuple[ModuleModel, Array]:
+    r"""Train a Module model with respect to a supplied Objective function.
+    Optimisers used here should originate from Optax. todo
+
+    Args:
+        model (Module): The model Module to be optimised.
+        objective (Objective): The objective function that we are optimising with
+            respect to.
+        train_data (Dataset): The training data to be used for the optimisation.
+        max_iters (Optional[int]): The maximum number of optimisation steps to run. Defaults
+            to 500.
+        verbose (Optional[bool]): Whether to print the information about the optimisation. Defaults
+            to True.
+
+    Returns
+    -------
+        Tuple[Module, Array]: A Tuple comprising the optimised model and training
+            history respectively.
+    """
+    if safe:
+        # Check inputs.
+        _check_model(model)
+        _check_train_data(train_data)
+        _check_num_iters(max_iters)
+        _check_verbose(verbose)
+
+    # Unconstrained space model.
+    model = model.unconstrain()
+
+    # Unconstrained space loss function with stop-gradient rule for non-trainable params.
+    def loss(model: Module, data: Dataset) -> ScalarFloat:
+        model = model.stop_gradient()
+        return objective(model.constrain(), data)
+
+    solver = jaxopt.ScipyMinimize(
+        fun=loss,
+        maxiter=max_iters,
+    )
+
+    initial_loss = solver.fun(model, train_data)
+    model, result = solver.run(model, data=train_data)
+    history = jnp.array([initial_loss, result.fun_val])
+
+    if verbose:
+        print(f"Initial loss is {initial_loss}")
+        if result.success:
+            print("Optimization was successful")
+        else:
+            raise FailedScipyFitError(
+                "Optimization failed, try increasing max_iters or using a different optimiser."
+            )
+        print(f"Final loss is {result.fun_val} after {result.num_fun_eval} iterations")
+
+    # Constrained space.
+    model = model.constrain()
+    return model, history
+
+
 def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
     """Batch the data into mini-batches. Sampling is done with replacement.
 
@@ -182,12 +254,12 @@ def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
     -------
         Dataset: The batched dataset.
     """
-    x, y, n, mask = train_data.X, train_data.y, train_data.n, train_data.mask
+    x, y, n = train_data.X, train_data.y, train_data.n
 
     # Subsample mini-batch indices with replacement.
     indices = jr.choice(key, n, (batch_size,), replace=True)
 
-    return Dataset(X=x[indices], y=y[indices], mask=mask[indices] if mask else None)
+    return Dataset(X=x[indices], y=y[indices])
 
 
 def _check_model(model: Any) -> None:

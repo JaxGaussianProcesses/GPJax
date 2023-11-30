@@ -17,10 +17,7 @@ from dataclasses import dataclass
 
 from beartype.typing import Union
 import jax.numpy as jnp
-from jaxtyping import (
-    Float,
-    Num,
-)
+from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 
@@ -48,8 +45,8 @@ class Matern32(AbstractKernel):
 
     def __call__(
         self,
-        x: Num[Array, " D"],
-        y: Num[Array, " D"],
+        x: Float[Array, " D"],
+        y: Float[Array, " D"],
     ) -> ScalarFloat:
         r"""Compute the Matérn 3/2 kernel between a pair of arrays.
 
@@ -61,8 +58,8 @@ class Matern32(AbstractKernel):
         ```
 
         Args:
-            x (Num[Array, " D"]): The left hand argument of the kernel function's call.
-            y (Num[Array, " D"]): The right hand argument of the kernel function's call.
+            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
+            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
 
         Returns
         -------

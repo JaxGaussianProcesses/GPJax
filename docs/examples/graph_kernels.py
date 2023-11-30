@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # %% [markdown]
 # # Graph Kernels
 #
@@ -10,7 +9,7 @@
 
 # %%
 # Enable Float64 for more stable matrix inversions.
-from jax.config import config
+from jax import config
 
 config.update("jax_enable_x64", True)
 
@@ -134,7 +133,7 @@ cbar = plt.colorbar(sm, ax=ax)
 # For this reason, we simply perform gradient descent on the GP's marginal
 # log-likelihood term as in the
 # [regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/).
-# We do this using the Adam optimiser provided in `optax`.
+# We do this using the BFGS optimiser provided in `scipy` via 'jaxopt'.
 
 # %%
 likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
@@ -157,12 +156,12 @@ print(gpx.cite(kernel))
 # %%
 opt_posterior, training_history = gpx.fit(
     model=posterior,
-    objective=jit(gpx.objectives.ConjugateMLL(negative=True)),
+    objective=gpx.ConjugateMLL(negative=True),
     train_data=D,
-    optim=ox.adamw(learning_rate=0.01),
+    optim=ox.adam(learning_rate=0.01),
     num_iters=1000,
-    key=key,
-)
+    key=key
+    )
 
 # %% [markdown]
 #

@@ -1,5 +1,5 @@
 import jax
-from jax.config import config
+from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
@@ -10,6 +10,7 @@ from gpjax.objectives import (
     ELBO,
     AbstractObjective,
     CollapsedELBO,
+    ConjugateLOOCV,
     ConjugateMLL,
     LogPosteriorDensity,
     NonConjugateMLL,
@@ -72,6 +73,35 @@ def test_conjugate_mll(
         mll = jax.jit(mll)
 
     evaluation = mll(post, D)
+    assert isinstance(evaluation, jax.Array)
+    assert evaluation.shape == ()
+
+
+@pytest.mark.parametrize("num_datapoints", [1, 2, 10])
+@pytest.mark.parametrize("num_dims", [1, 2, 3])
+@pytest.mark.parametrize("negative", [False, True])
+@pytest.mark.parametrize("jit_compile", [False, True])
+@pytest.mark.parametrize("key_val", [123, 42])
+def test_conjugate_loocv(
+    num_datapoints: int, num_dims: int, negative: bool, jit_compile: bool, key_val: int
+):
+    key = jr.PRNGKey(key_val)
+    D = build_data(num_datapoints, num_dims, key, binary=False)
+
+    # Build model
+    p = Prior(
+        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+    )
+    likelihood = Gaussian(num_datapoints=num_datapoints)
+    post = p * likelihood
+
+    loocv = ConjugateLOOCV(negative=negative)
+    assert isinstance(loocv, AbstractObjective)
+
+    if jit_compile:
+        loocv = jax.jit(loocv)
+
+    evaluation = loocv(post, D)
     assert isinstance(evaluation, jax.Array)
     assert evaluation.shape == ()
 
@@ -145,7 +175,12 @@ def test_collapsed_elbo(
     assert isinstance(evaluation, jax.Array)
     assert evaluation.shape == ()
 
-    # with pytest.raises(TypeError):
+    # Data on the full dataset should be the same as the marginal likelihood
+    q = gpx.CollapsedVariationalGaussian(posterior=p * likelihood, inducing_inputs=D.X)
+    mll = ConjugateMLL(negative=negative)
+    expected_value = mll(p * likelihood, D)
+    actual_value = negative_elbo(q, D)
+    assert jnp.abs(actual_value - expected_value) / expected_value < 1e-6
 
 
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])

@@ -7,13 +7,13 @@
 #
 # Surface drifters are measurement devices that measure the dynamics and circulation patterns of the world's oceans. Studying and predicting ocean currents are important to climate research, for example, forecasting and predicting oil spills, oceanographic surveying of eddies and upwelling, or providing information on the distribution of biomass in ecosystems. We will be using the [Gulf Drifters Open dataset](https://zenodo.org/record/4421585), which contains all publicly available surface drifter trajectories from the Gulf of Mexico spanning 28 years.
 # %%
-from jax.config import config
+from jax import config
 
 config.update("jax_enable_x64", True)
 from dataclasses import dataclass
 
 from jax import hessian
-from jax.config import config
+from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (
@@ -23,7 +23,6 @@ from jaxtyping import (
 )
 from matplotlib import rcParams
 import matplotlib.pyplot as plt
-import optax as ox
 import pandas as pd
 import tensorflow_probability as tfp
 
@@ -239,30 +238,19 @@ velocity_posterior = initialise_gp(kernel, mean, dataset_train)
 
 
 # %% [markdown]
-# With a model now defined, we can proceed to optimise the hyperparameters of our likelihood over $D_0$. This is done by minimising the MLL using `optax`. We also plot its value at each step to visually confirm that we have found the minimum. See the  [introduction to Gaussian Processes](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/) notebook for more information on optimising the MLL.
+# With a model now defined, we can proceed to optimise the hyperparameters of our likelihood over $D_0$. This is done by minimising the MLL using `BFGS`. We also plot its value at each step to visually confirm that we have found the minimum. See the  [introduction to Gaussian Processes](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/) notebook for more information on optimising the MLL.
 
 
 # %%
-def optimise_mll(posterior, dataset, NIters=1000, key=key, plot_history=True):
+def optimise_mll(posterior, dataset, NIters=1000, key=key):
     # define the MLL using dataset_train
     objective = gpx.objectives.ConjugateMLL(negative=True)
     # Optimise to minimise the MLL
-    optimiser = ox.adam(learning_rate=0.1)
-    opt_posterior, history = gpx.fit(
+    opt_posterior, history = gpx.fit_scipy(
         model=posterior,
         objective=objective,
         train_data=dataset,
-        optim=optimiser,
-        num_iters=NIters,
-        safe=True,
-        key=key,
     )
-    # plot MLL value at each iteration
-    if plot_history:
-        fig, ax = plt.subplots(1, 1)
-        ax.plot(history, color=colors[1])
-        ax.set(xlabel="Training iteration", ylabel="Negative MLL")
-
     return opt_posterior
 
 
@@ -471,7 +459,7 @@ class HelmholtzKernel(gpx.kernels.AbstractKernel):
 # Redefine Gaussian process with Helmholtz kernel
 kernel = HelmholtzKernel()
 helmholtz_posterior = initialise_gp(kernel, mean, dataset_train)
-# Optimise hyperparameters using optax
+# Optimise hyperparameters using BFGS
 opt_helmholtz_posterior = optimise_mll(helmholtz_posterior, dataset_train)
 
 

@@ -18,7 +18,7 @@ from typing import (
     Tuple,
 )
 
-from jax.config import config
+from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
@@ -141,7 +141,7 @@ def test_variational_gaussians(
             + [diag_matrix_val(1.0)(n_inducing)]
         )
 
-        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves):
+        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves, strict=True):
             assert (l1 == l2).all()
 
     elif isinstance(q, WhitenedVariationalGaussian):
@@ -157,7 +157,7 @@ def test_variational_gaussians(
             + [diag_matrix_val(1.0)(n_inducing)]
         )
 
-        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves):
+        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves, strict=True):
             assert (l1 == l2).all()
 
     elif isinstance(q, NaturalVariationalGaussian):
@@ -174,7 +174,7 @@ def test_variational_gaussians(
             + jtu.tree_leaves(posterior)
         )
 
-        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves):
+        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves, strict=True):
             assert (l1 == l2).all()
 
     elif isinstance(q, ExpectationVariationalGaussian):
@@ -191,7 +191,7 @@ def test_variational_gaussians(
             + jtu.tree_leaves(posterior)
         )
 
-        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves):
+        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves, strict=True):
             assert (l1 == l2).all()
 
     # Test KL
@@ -268,6 +268,6 @@ def test_collapsed_variational_gaussian(
     # Test pytree structure (nodes are alphabetically flattened, hence the ordering)
     true_leaves = [inducing_inputs, *jtu.tree_leaves(posterior)]
 
-    for l1, l2 in zip(jtu.tree_leaves(variational_family), true_leaves):
+    for l1, l2 in zip(jtu.tree_leaves(variational_family), true_leaves, strict=True):
         assert l1.shape == l2.shape
         assert (l1 == l2).all()

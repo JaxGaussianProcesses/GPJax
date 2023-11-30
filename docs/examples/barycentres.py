@@ -14,7 +14,7 @@
 
 # %%
 # Enable Float64 for more stable matrix inversions.
-from jax.config import config
+from jax import config
 
 config.update("jax_enable_x64", True)
 
@@ -142,13 +142,10 @@ def fit_gp(x: jax.Array, y: jax.Array) -> tfd.MultivariateNormalFullCovariance:
         * likelihood
     )
 
-    opt_posterior, _ = gpx.fit(
+    opt_posterior, _ = gpx.fit_scipy(
         model=posterior,
-        objective=jax.jit(gpx.objectives.ConjugateMLL(negative=True)),
+        objective=gpx.ConjugateMLL(negative=True),
         train_data=D,
-        optim=ox.adamw(learning_rate=0.01),
-        num_iters=500,
-        key=key,
     )
     latent_dist = opt_posterior.predict(xtest, train_data=D)
     return opt_posterior.likelihood(latent_dist)

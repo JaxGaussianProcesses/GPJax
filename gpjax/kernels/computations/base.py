@@ -47,7 +47,7 @@ class AbstractKernelComputation:
 
         Args:
             kernel (AbstractKernel): the kernel function.
-            x (Float[Array, "N N"]): The inputs to the kernel function.
+            x (Num[Array, "N N"]): The inputs to the kernel function.
 
         Returns
         -------
@@ -65,8 +65,8 @@ class AbstractKernelComputation:
 
         Args:
             kernel (AbstractKernel): the kernel function.
-            x (Float[Array,"N D"]): The first input matrix.
-            y (Float[Array,"M D"]): The second input matrix.
+            x (Num[Array,"N D"]): The first input matrix.
+            y (Num[Array,"M D"]): The second input matrix.
 
         Returns
         -------

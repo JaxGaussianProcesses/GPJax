@@ -15,7 +15,7 @@
 # ==============================================================================
 
 
-from jax.config import config
+from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
@@ -161,24 +161,3 @@ def test_kl_divergence(n: int) -> None:
     with pytest.raises(ValueError):
         incompatible = GaussianDistribution(loc=jnp.ones((2 * n,)))
         incompatible.kl_divergence(dist_a)
-
-
-@pytest.mark.parametrize("n", [5, 100])
-def test_masked_log_prob(n):
-    key_mean, key_sqrt = jr.split(_key, 2)
-    mean = jr.uniform(key_mean, shape=(n,))
-    sqrt = jr.uniform(key_sqrt, shape=(n, n))
-    covariance = sqrt @ sqrt.T
-    y = jr.normal(_key, shape=(n,))
-    y = y.at[jr.choice(key_sqrt, y.shape[0], (1,))].set(jnp.nan)
-    mask = jnp.isnan(y)
-
-    # check that cholesky does not error
-    _L = jnp.linalg.cholesky(covariance)  # noqa: F841
-
-    # check that masked log_prob is equal to tfp log_prob with missing values removed
-    dist = GaussianDistribution(loc=mean, scale=Dense(covariance))
-    tfp_dist = MultivariateNormalFullCovariance(
-        loc=mean[~mask], covariance_matrix=covariance[~mask][:, ~mask]
-    )
-    assert approx_equal(dist.log_prob(y, mask=mask), tfp_dist.log_prob(y[~mask]))

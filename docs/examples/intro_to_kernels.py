@@ -6,11 +6,10 @@
 
 # %%
 # Enable Float64 for more stable matrix inversions.
-from jax.config import config
+from jax import config
 
 config.update("jax_enable_x64", True)
 
-from jax import jit
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import install_import_hook, Float
@@ -217,8 +216,8 @@ test_y = forrester(test_x)
 # %%
 mean = gpx.mean_functions.Zero()
 kernel = gpx.kernels.Matern52(
-    lengthscale=jnp.array(2.0)
-)  # Initialise our kernel lengthscale to 2.0
+    lengthscale=jnp.array(0.1)
+)  # Initialise our kernel lengthscale to 0.1
 
 prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 
@@ -235,16 +234,11 @@ no_opt_posterior = prior * likelihood
 # %%
 negative_mll = gpx.objectives.ConjugateMLL(negative=True)
 negative_mll(no_opt_posterior, train_data=D)
-negative_mll = jit(negative_mll)
 
-opt_posterior, history = gpx.fit(
+opt_posterior, history = gpx.fit_scipy(
     model=no_opt_posterior,
     objective=negative_mll,
     train_data=D,
-    optim=ox.adam(learning_rate=0.01),
-    num_iters=2000,
-    safe=True,
-    key=key,
 )
 
 
@@ -524,7 +518,7 @@ D = gpx.Dataset(X=train_x, y=standardised_train_y)
 mean = gpx.mean_functions.Zero()
 rbf_kernel = gpx.kernels.RBF(lengthscale=100.0)
 periodic_kernel = gpx.kernels.Periodic()
-linear_kernel = gpx.kernels.Linear()
+linear_kernel = gpx.kernels.Linear(variance=0.001)
 sum_kernel = gpx.kernels.SumKernel(kernels=[linear_kernel, periodic_kernel])
 final_kernel = gpx.kernels.SumKernel(kernels=[rbf_kernel, sum_kernel])
 
@@ -540,17 +534,16 @@ posterior = prior * likelihood
 # %%
 negative_mll = gpx.objectives.ConjugateMLL(negative=True)
 negative_mll(posterior, train_data=D)
-negative_mll = jit(negative_mll)
 
 opt_posterior, history = gpx.fit(
     model=posterior,
     objective=negative_mll,
     train_data=D,
-    optim=ox.adam(learning_rate=0.01),
-    num_iters=1000,
-    safe=True,
+    optim=ox.adamw(learning_rate=1e-2),
+    num_iters=500,
     key=key,
 )
+
 
 # %% [markdown]
 # Now we can obtain the model's prediction over a period of time which includes the

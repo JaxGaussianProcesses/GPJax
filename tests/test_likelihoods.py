@@ -20,7 +20,7 @@ from typing import (
     List,
 )
 
-from jax.config import config
+from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
@@ -141,7 +141,9 @@ class BaseTestLikelihood:
 
 
 def prod(inp):
-    return [dict(zip(inp.keys(), values)) for values in product(*inp.values())]
+    return [
+        dict(zip(inp.keys(), values, strict=True)) for values in product(*inp.values())
+    ]
 
 
 class TestGaussian(BaseTestLikelihood):

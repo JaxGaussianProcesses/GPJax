@@ -26,12 +26,13 @@ from gpjax import (
 from gpjax.citation import cite
 from gpjax.dataset import Dataset
 from gpjax.fit import fit
+from gpjax.base import Module, param_field
 
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
 __url__ = "https://github.com/JaxGaussianProcesses/GPJax"
 __contributors__ = "https://github.com/JaxGaussianProcesses/GPJax/graphs/contributors"
-__version__ = "0.7.2"
+__version__ = "0.8.0"
 
 __all__ = [
     "base",
@@ -46,4 +47,6 @@ __all__ = [
     "Dataset",
     "cite",
     "fit",
+    "Module",
+    "param_field"
 ]

@@ -87,12 +87,21 @@ def static_field(  # noqa: PLR0913
     )
 
 
+def _inherited_metadata(cls: type) -> Dict[str]:
+    meta_data = dict()
+    for parent_class in cls.mro():
+        if parent_class is not cls and parent_class is not Module:
+            if issubclass(parent_class, Module):
+                meta_data.update(parent_class._pytree__meta)
+    return meta_data
+
+
 class Module(Pytree):
     _pytree__meta: Dict[str, Any] = static_field()
 
     def __init_subclass__(cls, mutable: bool = False):
-        cls._pytree__meta = {}
         super().__init_subclass__(mutable=mutable)
+        cls._pytree__meta = _inherited_metadata(cls)
         class_vars = vars(cls)
         for field, value in class_vars.items():
             if (
@@ -299,7 +308,7 @@ def meta_leaves(
             yield meta_leaf
             return
 
-        for metadata, leaf in zip(leaves_meta, leaves_values):
+        for metadata, leaf in zip(leaves_meta, leaves_values, strict=True):
             yield from _unpack_metadata((metadata, leaf), leaf, is_leaf)
 
     return list(_unpack_metadata(pytree, pytree, is_leaf))
@@ -343,7 +352,7 @@ def meta_map(
     """
     leaves, treedef = meta_flatten(pytree, is_leaf=is_leaf)
     all_leaves = [leaves] + [treedef.treedef.flatten_up_to(r) for r in rest]
-    return treedef.unflatten(f(*xs) for xs in zip(*all_leaves))
+    return treedef.unflatten(f(*xs) for xs in zip(*all_leaves, strict=True))
 
 
 def meta(pytree: Module, *, is_leaf: Optional[Callable[[Any], bool]] = None) -> Module:

@@ -18,7 +18,7 @@ from dataclasses import (
     field,
 )
 
-from jax.config import config
+from jax import config
 import jax.numpy as jnp
 from jaxtyping import (
     Array,
