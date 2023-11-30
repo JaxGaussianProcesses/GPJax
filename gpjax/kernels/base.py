@@ -29,7 +29,6 @@ from jaxtyping import (
     Num,
 )
 import tensorflow_probability.substrates.jax.distributions as tfd
-from cola.ops.operators import LinearOperator
 
 from gpjax.base import (
     Module,
@@ -61,7 +60,7 @@ class AbstractKernel(Module):
     def cross_covariance(self, x: Num[Array, "N D"], y: Num[Array, "M D"]):
         return self.compute_engine.cross_covariance(self, x, y)
 
-    def gram(self, x: Num[Array, "N D"]) -> LinearOperator:
+    def gram(self, x: Num[Array, "N D"]):
         return self.compute_engine.gram(self, x)
 
     def slice_input(self, x: Float[Array, "... D"]) -> Float[Array, "... Q"]:

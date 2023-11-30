@@ -17,8 +17,8 @@ import abc
 from dataclasses import dataclass
 import typing as tp
 
-from cola.annotations import PSD
-from cola.ops.operators import (
+from cola import PSD
+from cola.ops import (
     Dense,
     Diagonal,
     LinearOperator,
