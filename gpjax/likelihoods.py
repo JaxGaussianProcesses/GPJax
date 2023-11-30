@@ -247,11 +247,11 @@ def inv_probit(x: Float[Array, " *N"]) -> Float[Array, " *N"]:
     return 0.5 * (1.0 + jsp.special.erf(x / jnp.sqrt(2.0))) * (1 - 2 * jitter) + jitter
 
 
-NonGaussianLikelihood = Union[Poisson, Bernoulli]
+NonGaussian = Union[Poisson, Bernoulli]
 
 __all__ = [
     "AbstractLikelihood",
-    "NonGaussianLikelihood",
+    "NonGaussian",
     "Gaussian",
     "Bernoulli",
     "Poisson",
