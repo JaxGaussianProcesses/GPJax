@@ -46,11 +46,7 @@ started is to
 As a contributor to GPJax, you are expected to abide by our [code of
 conduct](docs/CODE_OF_CONDUCT.md). If you feel that you have either experienced or
 witnessed behaviour that violates this standard, then we ask that you report any such
-<<<<<<< HEAD
-behaviours though [this form](https://jaxgaussianprocesses.com/contact/) or reach out to
-=======
 behaviours through [this form](https://jaxgaussianprocesses.com/contact/) or reach out to
->>>>>>> ac475762faa0cb9c64a773d5d9d3506d1a3ebdf2
 one of the project's [_gardeners_](https://docs.jaxgaussianprocesses.com/GOVERNANCE/#roles).
 
 Feel free to join our [Slack
@@ -139,17 +135,10 @@ D = gpx.Dataset(X=x, y=y)
 # Construct the prior
 meanf = gpx.mean_functions.Zero()
 kernel = gpx.kernels.RBF()
-<<<<<<< HEAD
 prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
 
 # Define a likelihood
 likelihood = gpx.likelihoods.Gaussian(num_datapoints = n)
-=======
-prior = gpx.Prior(mean_function=meanf, kernel=kernel)
-
-# Define a likelihood
-likelihood = gpx.Gaussian(num_datapoints=n)
->>>>>>> ac475762faa0cb9c64a773d5d9d3506d1a3ebdf2
 
 # Construct the posterior
 posterior = prior * likelihood
