@@ -23,10 +23,13 @@ from gpjax import (
     objectives,
     variational_families,
 )
+from gpjax.base import (
+    Module,
+    param_field,
+)
 from gpjax.citation import cite
 from gpjax.dataset import Dataset
 from gpjax.fit import fit
-from gpjax.base import Module, param_field
 
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
@@ -48,5 +51,5 @@ __all__ = [
     "cite",
     "fit",
     "Module",
-    "param_field"
+    "param_field",
 ]
