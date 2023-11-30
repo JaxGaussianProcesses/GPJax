@@ -144,7 +144,7 @@ def fit_gp(x: jax.Array, y: jax.Array) -> tfd.MultivariateNormalFullCovariance:
 
     opt_posterior, _ = gpx.fit_scipy(
         model=posterior,
-        objective=gpx.ConjugateMLL(negative=True),
+        objective=gpx.objectives.ConjugateMLL(negative=True),
         train_data=D,
     )
     latent_dist = opt_posterior.predict(xtest, train_data=D)

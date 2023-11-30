@@ -167,7 +167,7 @@ scaled_Xte = x_scaler.transform(Xte)
 
 # %%
 n_train, n_covariates = scaled_Xtr.shape
-kernel = gpx.RBF(
+kernel = gpx.kernels.RBF(
     active_dims=list(range(n_covariates)),
     variance=np.var(scaled_ytr),
     lengthscale=0.1 * np.ones((n_covariates,)),
@@ -188,7 +188,7 @@ posterior = prior * likelihood
 # %%
 training_data = gpx.Dataset(X=scaled_Xtr, y=scaled_ytr)
 
-negative_mll = jit(gpx.ConjugateMLL(negative=True))
+negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True))
 
 opt_posterior, history = gpx.fit_scipy(
     model=posterior,
