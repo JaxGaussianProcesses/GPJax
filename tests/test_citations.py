@@ -6,7 +6,6 @@ from jax import jit
 import jax.numpy as jnp
 import pytest
 
-import gpjax as gpx
 from gpjax.citation import (
     AbstractCitation,
     BookCitation,
@@ -29,6 +28,13 @@ from gpjax.kernels import (
     Matern12,
     Matern32,
     Matern52,
+)
+from gpjax.objectives import (
+    ELBO,
+    CollapsedELBO,
+    ConjugateMLL,
+    LogPosteriorDensity,
+    NonConjugateMLL,
 )
 
 
@@ -103,7 +109,7 @@ def test_missing_citation(kernel):
 
 
 @pytest.mark.parametrize(
-    "mll", [gpx.ConjugateMLL(), gpx.NonConjugateMLL(), gpx.LogPosteriorDensity()]
+    "mll", [ConjugateMLL(), NonConjugateMLL(), LogPosteriorDensity()]
 )
 def test_mlls(mll):
     citation = cite(mll)
@@ -115,7 +121,7 @@ def test_mlls(mll):
 
 
 def test_uncollapsed_elbo():
-    elbo = gpx.ELBO()
+    elbo = ELBO()
     citation = cite(elbo)
 
     assert isinstance(citation, PaperCitation)
@@ -128,7 +134,7 @@ def test_uncollapsed_elbo():
 
 
 def test_collapsed_elbo():
-    elbo = gpx.CollapsedELBO()
+    elbo = CollapsedELBO()
     citation = cite(elbo)
 
     assert isinstance(citation, PaperCitation)
@@ -158,7 +164,8 @@ def test_thompson_sampling():
     )
     assert (
         citation.authors
-        == "Wilson, James and Borovitskiy, Viacheslav and Terenin, Alexander and Mostowsky, Peter and Deisenroth, Marc"
+        == "Wilson, James and Borovitskiy, Viacheslav and Terenin, Alexander and"
+        " Mostowsky, Peter and Deisenroth, Marc"
     )
     assert citation.year == "2020"
     assert citation.booktitle == "International Conference on Machine Learning"
@@ -205,7 +212,7 @@ def test_logarithmic_goldstein_price():
 
 @pytest.mark.parametrize(
     "objective",
-    [gpx.ELBO(), gpx.CollapsedELBO(), gpx.LogPosteriorDensity(), gpx.ConjugateMLL()],
+    [ELBO(), CollapsedELBO(), LogPosteriorDensity(), ConjugateMLL()],
 )
 def test_jitted_fallback(objective):
     with pytest.raises(RuntimeError):

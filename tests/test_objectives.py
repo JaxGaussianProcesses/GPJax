@@ -5,12 +5,9 @@ import jax.random as jr
 import pytest
 
 import gpjax as gpx
-from gpjax import (
-    Bernoulli,
-    Gaussian,
-    Prior,
-)
 from gpjax.dataset import Dataset
+from gpjax.gps import Prior
+from gpjax.likelihoods import Gaussian
 from gpjax.objectives import (
     ELBO,
     AbstractObjective,
@@ -64,10 +61,11 @@ def test_conjugate_mll(
     D = build_data(num_datapoints, num_dims, key, binary=False)
 
     # Build model
-    p = Prior(
-        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+    p = gpx.gps.Prior(
+        kernel=gpx.kernels.RBF(active_dims=list(range(num_dims))),
+        mean_function=gpx.mean_functions.Constant(),
     )
-    likelihood = Gaussian(num_datapoints=num_datapoints)
+    likelihood = gpx.likelihoods.Gaussian(num_datapoints=num_datapoints)
     post = p * likelihood
 
     mll = ConjugateMLL(negative=negative)
@@ -94,7 +92,8 @@ def test_conjugate_loocv(
 
     # Build model
     p = Prior(
-        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+        kernel=gpx.kernels.RBF(active_dims=list(range(num_dims))),
+        mean_function=gpx.mean_functions.Constant(),
     )
     likelihood = Gaussian(num_datapoints=num_datapoints)
     post = p * likelihood
@@ -122,10 +121,11 @@ def test_non_conjugate_mll(
     D = build_data(num_datapoints, num_dims, key, binary=True)
 
     # Build model
-    p = Prior(
-        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+    p = gpx.gps.Prior(
+        kernel=gpx.kernels.RBF(active_dims=list(range(num_dims))),
+        mean_function=gpx.mean_functions.Constant(),
     )
-    likelihood = Bernoulli(num_datapoints=num_datapoints)
+    likelihood = gpx.likelihoods.Bernoulli(num_datapoints=num_datapoints)
     post = p * likelihood
 
     mll = NonConjugateMLL(negative=negative)
@@ -158,11 +158,14 @@ def test_collapsed_elbo(
         key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints // 2, num_dims)
     )
 
-    p = Prior(
-        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+    p = gpx.gps.Prior(
+        kernel=gpx.kernels.RBF(active_dims=list(range(num_dims))),
+        mean_function=gpx.mean_functions.Constant(),
     )
-    likelihood = Gaussian(num_datapoints=num_datapoints)
-    q = gpx.CollapsedVariationalGaussian(posterior=p * likelihood, inducing_inputs=z)
+    likelihood = gpx.likelihoods.Gaussian(num_datapoints=num_datapoints)
+    q = gpx.variational_families.CollapsedVariationalGaussian(
+        posterior=p * likelihood, inducing_inputs=z
+    )
 
     negative_elbo = CollapsedELBO(negative=negative)
 
@@ -176,7 +179,9 @@ def test_collapsed_elbo(
     assert evaluation.shape == ()
 
     # Data on the full dataset should be the same as the marginal likelihood
-    q = gpx.CollapsedVariationalGaussian(posterior=p * likelihood, inducing_inputs=D.X)
+    q = gpx.variational_families.CollapsedVariationalGaussian(
+        posterior=p * likelihood, inducing_inputs=D.X
+    )
     mll = ConjugateMLL(negative=negative)
     expected_value = mll(p * likelihood, D)
     actual_value = negative_elbo(q, D)
@@ -203,16 +208,17 @@ def test_elbo(
         key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints // 2, num_dims)
     )
 
-    p = Prior(
-        kernel=gpx.RBF(active_dims=list(range(num_dims))), mean_function=gpx.Constant()
+    p = gpx.gps.Prior(
+        kernel=gpx.kernels.RBF(active_dims=list(range(num_dims))),
+        mean_function=gpx.mean_functions.Constant(),
     )
     if binary:
-        likelihood = Bernoulli(num_datapoints=num_datapoints)
+        likelihood = gpx.likelihoods.Bernoulli(num_datapoints=num_datapoints)
     else:
-        likelihood = Gaussian(num_datapoints=num_datapoints)
+        likelihood = gpx.likelihoods.Gaussian(num_datapoints=num_datapoints)
     post = p * likelihood
 
-    q = gpx.VariationalGaussian(posterior=post, inducing_inputs=z)
+    q = gpx.variational_families.VariationalGaussian(posterior=post, inducing_inputs=z)
 
     negative_elbo = ELBO(
         negative=negative,

@@ -136,9 +136,9 @@ initial_datasets = function_evaluator(initial_x)
 # mean function and kernel for the job at hand:
 
 # %%
-mean = gpx.Zero()
-kernel = gpx.Matern52()
-prior = gpx.Prior(mean_function=mean, kernel=kernel)
+mean = gpx.mean_functions.Zero()
+kernel = gpx.kernels.Matern52()
+prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 
 # %% [markdown]
 # One difference from GPJax is the way in which we define our likelihood. In GPJax, we
@@ -153,7 +153,7 @@ prior = gpx.Prior(mean_function=mean, kernel=kernel)
 # with the correct number of datapoints:
 
 # %%
-likelihood_builder = lambda n: gpx.Gaussian(
+likelihood_builder = lambda n: gpx.likelihoods.Gaussian(
     num_datapoints=n, obs_stddev=jnp.array(1e-3)
 )
 
@@ -174,7 +174,7 @@ likelihood_builder = lambda n: gpx.Gaussian(
 posterior_handler = PosteriorHandler(
     prior,
     likelihood_builder=likelihood_builder,
-    optimization_objective=gpx.ConjugateMLL(negative=True),
+    optimization_objective=gpx.objectives.ConjugateMLL(negative=True),
     optimizer=ox.adam(learning_rate=0.01),
     num_optimization_iters=1000,
 )

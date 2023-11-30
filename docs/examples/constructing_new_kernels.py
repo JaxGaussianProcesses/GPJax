@@ -89,7 +89,7 @@ x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 meanf = gpx.mean_functions.Zero()
 
 for k, ax in zip(kernels, axes.ravel()):
-    prior = gpx.Prior(mean_function=meanf, kernel=k)
+    prior = gpx.gps.Prior(mean_function=meanf, kernel=k)
     rv = prior(x)
     y = rv.sample(seed=key, sample_shape=(10,))
     ax.plot(x, y.T, alpha=0.7)
@@ -263,13 +263,13 @@ D = gpx.Dataset(X=X, y=y)
 # Define polar Gaussian process
 PKern = Polar()
 meanf = gpx.mean_functions.Zero()
-likelihood = gpx.Gaussian(num_datapoints=n)
-circular_posterior = gpx.Prior(mean_function=meanf, kernel=PKern) * likelihood
+likelihood = gpx.likelihoods.Gaussian(num_datapoints=n)
+circular_posterior = gpx.gps.Prior(mean_function=meanf, kernel=PKern) * likelihood
 
 # Optimise GP's marginal log-likelihood using BFGS
 opt_posterior, history = gpx.fit_scipy(
     model=circular_posterior,
-    objective=jit(gpx.ConjugateMLL(negative=True)),
+    objective=jit(gpx.objectives.ConjugateMLL(negative=True)),
     train_data=D,
 )
 

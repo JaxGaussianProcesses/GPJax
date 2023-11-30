@@ -13,8 +13,15 @@
 # limitations under the License.
 # ==============================================================================
 from gpjax import (
+    base,
     decision_making,
+    gps,
     integrators,
+    kernels,
+    likelihoods,
+    mean_functions,
+    objectives,
+    variational_families,
 )
 from gpjax.base import (
     Module,
@@ -26,111 +33,27 @@ from gpjax.fit import (
     fit,
     fit_scipy,
 )
-from gpjax.gps import (
-    Prior,
-    construct_posterior,
-)
-from gpjax.kernels import (
-    RBF,
-    RFF,
-    AbstractKernel,
-    BasisFunctionComputation,
-    ConstantDiagonalKernelComputation,
-    DenseKernelComputation,
-    DiagonalKernelComputation,
-    EigenKernelComputation,
-    GraphKernel,
-    Linear,
-    Matern12,
-    Matern32,
-    Matern52,
-    Periodic,
-    Polynomial,
-    PoweredExponential,
-    ProductKernel,
-    RationalQuadratic,
-    SumKernel,
-    White,
-)
-from gpjax.likelihoods import (
-    Bernoulli,
-    Gaussian,
-    Poisson,
-)
-from gpjax.mean_functions import (
-    Constant,
-    Zero,
-)
-from gpjax.objectives import (
-    ELBO,
-    CollapsedELBO,
-    ConjugateLOOCV,
-    ConjugateMLL,
-    LogPosteriorDensity,
-    NonConjugateMLL,
-)
-from gpjax.variational_families import (
-    CollapsedVariationalGaussian,
-    ExpectationVariationalGaussian,
-    NaturalVariationalGaussian,
-    VariationalGaussian,
-    WhitenedVariationalGaussian,
-)
 
 __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
 __url__ = "https://github.com/JaxGaussianProcesses/GPJax"
 __contributors__ = "https://github.com/JaxGaussianProcesses/GPJax/graphs/contributors"
-__version__ = "0.7.3"
+__version__ = "0.8.0"
 
 __all__ = [
+    "base",
+    "decision_making",
+    "gps",
+    "integrators",
+    "kernels",
+    "likelihoods",
+    "mean_functions",
+    "objectives",
+    "variational_families",
+    "Dataset",
+    "cite",
+    "fit",
     "Module",
     "param_field",
-    "cite",
-    "decision_making",
-    "kernels",
-    "fit",
     "fit_scipy",
-    "Prior",
-    "construct_posterior",
-    "integrators",
-    "RBF",
-    "GraphKernel",
-    "Matern12",
-    "Matern32",
-    "Matern52",
-    "Polynomial",
-    "ProductKernel",
-    "SumKernel",
-    "Bernoulli",
-    "Gaussian",
-    "Poisson",
-    "Constant",
-    "Zero",
-    "Dataset",
-    "CollapsedVariationalGaussian",
-    "ExpectationVariationalGaussian",
-    "NaturalVariationalGaussian",
-    "VariationalGaussian",
-    "WhitenedVariationalGaussian",
-    "CollapsedVI",
-    "StochasticVI",
-    "ConjugateMLL",
-    "ConjugateLOOCV",
-    "NonConjugateMLL",
-    "LogPosteriorDensity",
-    "CollapsedELBO",
-    "ELBO",
-    "AbstractKernel",
-    "Linear",
-    "DenseKernelComputation",
-    "DiagonalKernelComputation",
-    "ConstantDiagonalKernelComputation",
-    "EigenKernelComputation",
-    "PoweredExponential",
-    "Periodic",
-    "RationalQuadratic",
-    "White",
-    "BasisFunctionComputation",
-    "RFF",
 ]

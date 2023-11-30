@@ -76,9 +76,9 @@ def fit(  # noqa: PLR0913
         >>> D = gpx.Dataset(X, y)
         >>>
         >>> # (2) Define your model:
-        >>> class LinearModel(gpx.Module):
-                weight: float = gpx.param_field()
-                bias: float = gpx.param_field()
+        >>> class LinearModel(gpx.base.Module):
+                weight: float = gpx.base.param_field()
+                bias: float = gpx.base.param_field()
 
                 def __call__(self, x):
                     return self.weight * x + self.bias
@@ -86,7 +86,7 @@ def fit(  # noqa: PLR0913
         >>> model = LinearModel(weight=1.0, bias=1.0)
         >>>
         >>> # (3) Define your loss function:
-        >>> class MeanSquareError(gpx.AbstractObjective):
+        >>> class MeanSquareError(gpx.objectives.AbstractObjective):
                 def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
                     return jnp.mean((train_data.y - model(train_data.X)) ** 2)
         >>>

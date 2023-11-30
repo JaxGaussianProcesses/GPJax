@@ -21,7 +21,7 @@ class Gaussian:
         self.data = gpx.Dataset(X=self.X, y=self.y)
         kernel = gpx.kernels.RBF(active_dims=list(range(n_dims)))
         meanf = gpx.mean_functions.Constant()
-        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)
+        self.prior = gpx.gps.Prior(kernel=kernel, mean_function=meanf)
         self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)
         self.posterior = self.prior * self.likelihood
         key, subkey = jr.split(key)
@@ -46,7 +46,7 @@ class Bernoulli:
         self.data = gpx.Dataset(X=self.X, y=self.y)
         kernel = gpx.kernels.RBF(active_dims=list(range(n_dims)))
         meanf = gpx.mean_functions.Constant()
-        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)
+        self.prior = gpx.gps.Prior(kernel=kernel, mean_function=meanf)
         self.likelihood = gpx.likelihoods.Bernoulli(num_datapoints=self.data.n)
         self.posterior = self.prior * self.likelihood
         key, subkey = jr.split(key)
@@ -71,7 +71,7 @@ class Poisson:
         self.data = gpx.Dataset(X=self.X, y=self.y)
         kernel = gpx.kernels.RBF(active_dims=list(range(n_dims)))
         meanf = gpx.mean_functions.Constant()
-        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)
+        self.prior = gpx.gps.Prior(kernel=kernel, mean_function=meanf)
         self.likelihood = gpx.likelihoods.Bernoulli(num_datapoints=self.data.n)
         self.posterior = self.prior * self.likelihood
         key, subkey = jr.split(key)

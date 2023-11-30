@@ -133,7 +133,7 @@ class Prior(AbstractPrior):
 
         >>> kernel = gpx.kernels.RBF()
         >>> meanf = gpx.mean_functions.Zero()
-        >>> prior = gpx.Prior(mean_function=meanf, kernel = kernel)
+        >>> prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
     ```
     """
 
@@ -167,7 +167,7 @@ class Prior(AbstractPrior):
             >>>
             >>> meanf = gpx.mean_functions.Zero()
             >>> kernel = gpx.kernels.RBF()
-            >>> prior = gpx.Prior(mean_function=meanf, kernel = kernel)
+            >>> prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
             >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=100)
             >>>
             >>> prior * likelihood
@@ -228,7 +228,7 @@ class Prior(AbstractPrior):
             >>>
             >>> kernel = gpx.kernels.RBF()
             >>> meanf = gpx.mean_functions.Zero()
-            >>> prior = gpx.Prior(mean_function=meanf, kernel = kernel)
+            >>> prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
             >>>
             >>> prior.predict(jnp.linspace(0, 1, 100))
         ```
@@ -289,7 +289,7 @@ class Prior(AbstractPrior):
             >>>
             >>> meanf = gpx.mean_functions.Zero()
             >>> kernel = gpx.kernels.RBF()
-            >>> prior = gpx.Prior(mean_function=meanf, kernel = kernel)
+            >>> prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
             >>>
             >>> sample_fn = prior.sample_approx(10, key)
             >>> sample_fn(jnp.linspace(0, 1, 100).reshape(-1, 1))
@@ -413,7 +413,7 @@ class ConjugatePosterior(AbstractPosterior):
             >>> import gpjax as gpx
             >>> import jax.numpy as jnp
 
-            >>> prior = gpx.Prior(
+            >>> prior = gpx.gps.Prior(
                     mean_function = gpx.mean_functions.Zero(),
                     kernel = gpx.kernels.RBF()
                 )
@@ -461,8 +461,8 @@ class ConjugatePosterior(AbstractPosterior):
                 >>> D = gpx.Dataset(X=xtrain, y=ytrain)
                 >>> xtest = jnp.linspace(0, 1).reshape(-1, 1)
                 >>>
-                >>> prior = gpx.Prior(mean_function = gpx.Zero(), kernel = gpx.RBF())
-                >>> posterior = prior * gpx.Gaussian(num_datapoints = D.n)
+                >>> prior = gpx.gps.Prior(mean_function = gpx.mean_functions.Zero(), kernel = gpx.kernels.RBF())
+                >>> posterior = prior * gpx.likelihoods.Gaussian(num_datapoints = D.n)
                 >>> predictive_dist = posterior(xtest, D)
             ```
 

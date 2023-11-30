@@ -173,9 +173,9 @@ kernel = gpx.RBF(
     lengthscale=0.1 * np.ones((n_covariates,)),
 )
 meanf = gpx.mean_functions.Zero()
-prior = gpx.Prior(mean_function=meanf, kernel=kernel)
+prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 
-likelihood = gpx.Gaussian(num_datapoints=n_train)
+likelihood = gpx.likelihoods.Gaussian(num_datapoints=n_train)
 
 posterior = prior * likelihood
 

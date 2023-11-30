@@ -100,10 +100,10 @@ class ConjugateMLL(AbstractObjective):
             >>> meanf = gpx.mean_functions.Constant()
             >>> kernel = gpx.kernels.RBF()
             >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
-            >>> prior = gpx.Prior(mean_function = meanf, kernel=kernel)
+            >>> prior = gpx.gps.Prior(mean_function = meanf, kernel=kernel)
             >>> posterior = prior * likelihood
             >>>
-            >>> mll = gpx.ConjugateMLL(negative=True)
+            >>> mll = gpx.objectives.ConjugateMLL(negative=True)
             >>> mll(posterior, train_data = D)
         ```
 
@@ -112,13 +112,13 @@ class ConjugateMLL(AbstractObjective):
         marginal log-likelihood. This can be realised through
 
         ```python
-            mll = gpx.ConjugateMLL(negative=True)
+            mll = gpx.objectives.ConjugateMLL(negative=True)
         ```
 
         For optimal performance, the marginal log-likelihood should be ``jax.jit``
         compiled.
         ```python
-            mll = jit(gpx.ConjugateMLL(negative=True))
+            mll = jit(gpx.objectives.ConjugateMLL(negative=True))
         ```
 
         Args:
@@ -180,10 +180,10 @@ class ConjugateLOOCV(AbstractObjective):
             >>> meanf = gpx.mean_functions.Constant()
             >>> kernel = gpx.kernels.RBF()
             >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
-            >>> prior = gpx.Prior(mean_function = meanf, kernel=kernel)
+            >>> prior = gpx.gps.Prior(mean_function = meanf, kernel=kernel)
             >>> posterior = prior * likelihood
             >>>
-            >>> loocv = gpx.ConjugateLOOCV(negative=True)
+            >>> loocv = gpx.objectives.ConjugateLOOCV(negative=True)
             >>> loocv(posterior, train_data = D)
         ```
 
@@ -192,13 +192,13 @@ class ConjugateLOOCV(AbstractObjective):
         leave-one-out log predictive probability. This can be realised through
 
         ```python
-            mll = gpx.ConjugateLOOCV(negative=True)
+            mll = gpx.objectives.ConjugateLOOCV(negative=True)
         ```
 
         For optimal performance, the objective should be ``jax.jit``
         compiled.
         ```python
-            mll = jit(gpx.ConjugateLOOCV(negative=True))
+            mll = jit(gpx.objectives.ConjugateLOOCV(negative=True))
         ```
 
         Args:
