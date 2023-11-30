@@ -156,7 +156,7 @@ print(gpx.cite(kernel))
 # %%
 opt_posterior, training_history = gpx.fit(
     model=posterior,
-    objective=gpx.ConjugateMLL(negative=True),
+    objective=gpx.objectives.ConjugateMLL(negative=True),
     train_data=D,
     optim=ox.adam(learning_rate=0.01),
     num_iters=1000,

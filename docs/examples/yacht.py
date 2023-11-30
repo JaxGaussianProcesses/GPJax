@@ -188,7 +188,7 @@ posterior = prior * likelihood
 # %%
 training_data = gpx.Dataset(X=scaled_Xtr, y=scaled_ytr)
 
-negative_mll = jit(gpx.ConjugateMLL(negative=True))
+negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True))
 
 opt_posterior, history = gpx.fit_scipy(
     model=posterior,
