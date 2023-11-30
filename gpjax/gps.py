@@ -28,7 +28,9 @@ from beartype.typing import (
     Optional,
     Union,
 )
-import cola
+from cola.linalg.inverse.inv import solve
+from cola.annotations import PSD
+from cola.ops.operators import I_like
 from cola.linalg.decompositions.decompositions import Cholesky
 import jax.numpy as jnp
 from jax.random import (
@@ -275,8 +277,8 @@ class Prior(AbstractPrior[MeanFunction, Kernel]):
         x = test_inputs
         mx = self.mean_function(x)
         Kxx = self.kernel.gram(x)
-        Kxx += cola.ops.I_like(Kxx) * self.jitter
-        Kxx = cola.PSD(Kxx)
+        Kxx += I_like(Kxx) * self.jitter
+        Kxx = PSD(Kxx)
 
         return GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Kxx)
 
@@ -522,24 +524,24 @@ class ConjugatePosterior(AbstractPosterior[PriorType, GaussianLikelihood]):
 
         # Precompute Gram matrix, Kxx, at training inputs, x
         Kxx = self.prior.kernel.gram(x)
-        Kxx += cola.ops.I_like(Kxx) * self.jitter
+        Kxx += I_like(Kxx) * self.jitter
 
         # Σ = Kxx + Io²
-        Sigma = Kxx + cola.ops.I_like(Kxx) * obs_noise
-        Sigma = cola.PSD(Sigma)
+        Sigma = Kxx + I_like(Kxx) * obs_noise
+        Sigma = PSD(Sigma)
 
         mean_t = self.prior.mean_function(t)
         Ktt = self.prior.kernel.gram(t)
         Kxt = self.prior.kernel.cross_covariance(x, t)
-        Sigma_inv_Kxt = cola.solve(Sigma, Kxt)
+        Sigma_inv_Kxt = solve(Sigma, Kxt)
 
         # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
         mean = mean_t + jnp.matmul(Sigma_inv_Kxt.T, y - mx)
 
         # Ktt  -  Ktx (Kxx + Io²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
         covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
-        covariance += cola.ops.I_like(covariance) * self.prior.jitter
-        covariance = cola.PSD(covariance)
+        covariance += I_like(covariance) * self.prior.jitter
+        covariance = PSD(covariance)
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
@@ -601,11 +603,11 @@ class ConjugatePosterior(AbstractPosterior[PriorType, GaussianLikelihood]):
         # v = Σ⁻¹ (y + ε - ɸ⍵) for  Σ = Kxx + Io² and ε ᯈ N(0, o²)
         obs_var = self.likelihood.obs_stddev**2
         Kxx = self.prior.kernel.gram(train_data.X)  #  [N, N]
-        Sigma = Kxx + cola.ops.I_like(Kxx) * (obs_var + self.jitter)  #  [N, N]
+        Sigma = Kxx + I_like(Kxx) * (obs_var + self.jitter)  #  [N, N]
         eps = jnp.sqrt(obs_var) * normal(key, [train_data.n, num_samples])  #  [N, B]
         y = train_data.y - self.prior.mean_function(train_data.X)  # account for mean
         Phi = fourier_feature_fn(train_data.X)
-        canonical_weights = cola.solve(
+        canonical_weights = solve(
             Sigma,
             y + eps - jnp.inner(Phi, fourier_weights),
             Cholesky(),
@@ -684,8 +686,8 @@ class NonConjugatePosterior(AbstractPosterior[PriorType, NonGaussianLikelihood])
 
         # Precompute lower triangular of Gram matrix, Lx, at training inputs, x
         Kxx = kernel.gram(x)
-        Kxx += cola.ops.I_like(Kxx) * self.prior.jitter
-        Kxx = cola.PSD(Kxx)
+        Kxx += I_like(Kxx) * self.prior.jitter
+        Kxx = PSD(Kxx)
         Lx = lower_cholesky(Kxx)
 
         # Unpack test inputs
@@ -697,7 +699,7 @@ class NonConjugatePosterior(AbstractPosterior[PriorType, NonGaussianLikelihood])
         mean_t = mean_function(t)
 
         # Lx⁻¹ Kxt
-        Lx_inv_Kxt = cola.solve(Lx, Ktx.T, Cholesky())
+        Lx_inv_Kxt = solve(Lx, Ktx.T, Cholesky())
 
         # Whitened function values, wx, corresponding to the inputs, x
         wx = self.latent
@@ -707,8 +709,8 @@ class NonConjugatePosterior(AbstractPosterior[PriorType, NonGaussianLikelihood])
 
         # Ktt - Ktx Kxx⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
         covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
-        covariance += cola.ops.I_like(covariance) * self.prior.jitter
-        covariance = cola.PSD(covariance)
+        covariance += I_like(covariance) * self.prior.jitter
+        covariance = PSD(covariance)
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
