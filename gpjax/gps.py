@@ -12,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
+# from __future__ import annotations
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import overload
+from typing import (
+    TYPE_CHECKING,
+    Generic,
+    TypeVar,
+    overload,
+)
 
 from beartype.typing import (
     Any,
@@ -47,7 +52,7 @@ from gpjax.kernels.base import AbstractKernel
 from gpjax.likelihoods import (
     AbstractLikelihood,
     Gaussian,
-    NonGaussianLikelihood,
+    NonGaussian,
 )
 from gpjax.lower_cholesky import lower_cholesky
 from gpjax.mean_functions import AbstractMeanFunction
@@ -57,13 +62,19 @@ from gpjax.typing import (
     KeyArray,
 )
 
+Kernel = TypeVar("Kernel", bound=AbstractKernel)
+MeanFunction = TypeVar("MeanFunction", bound=AbstractMeanFunction)
+Likelihood = TypeVar("Likelihood", bound=AbstractLikelihood)
+NonGaussianLikelihood = TypeVar("NonGaussianLikelihood", bound=NonGaussian)
+GaussianLikelihood = TypeVar("GaussianLikelihood", bound=Gaussian)
+
 
 @dataclass
-class AbstractPrior(Module):
+class AbstractPrior(Module, Generic[MeanFunction, Kernel]):
     r"""Abstract Gaussian process prior."""
 
-    kernel: AbstractKernel
-    mean_function: AbstractMeanFunction
+    kernel: Kernel
+    mean_function: MeanFunction
     jitter: float = static_field(1e-6)
 
     def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
@@ -113,7 +124,7 @@ class AbstractPrior(Module):
 # GP Priors
 #######################
 @dataclass
-class Prior(AbstractPrior):
+class Prior(AbstractPrior[MeanFunction, Kernel]):
     r"""A Gaussian process prior object.
 
     The GP is parameterised by a
@@ -136,18 +147,27 @@ class Prior(AbstractPrior):
         >>> prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
     ```
     """
+    if TYPE_CHECKING:
 
-    # @overload
-    # def __mul__(self, other: Gaussian) -> "ConjugatePosterior":
-    #     ...
+        @overload
+        def __mul__(
+            self, other: GaussianLikelihood
+        ) -> "ConjugatePosterior[Prior[MeanFunction, Kernel], GaussianLikelihood]":
+            ...
 
-    # @overload
-    # def __mul__(self, other: NonGaussianLikelihood) -> "NonConjugatePosterior":
-    #     ...
+        @overload
+        def __mul__(
+            self, other: NonGaussianLikelihood
+        ) -> (
+            "NonConjugatePosterior[Prior[MeanFunction, Kernel], NonGaussianLikelihood]"
+        ):
+            ...
 
-    # @overload
-    # def __mul__(self, other: AbstractLikelihood) -> "AbstractPosterior":
-    #     ...
+        @overload
+        def __mul__(
+            self, other: Likelihood
+        ) -> "AbstractPosterior[Prior[MeanFunction, Kernel], Likelihood]":
+            ...
 
     def __mul__(self, other):
         r"""Combine the prior with a likelihood to form a posterior distribution.
@@ -183,17 +203,27 @@ class Prior(AbstractPrior):
         """
         return construct_posterior(prior=self, likelihood=other)
 
-    # @overload
-    # def __rmul__(self, other: Gaussian) -> "ConjugatePosterior":
-    #     ...
+    if TYPE_CHECKING:
 
-    # @overload
-    # def __rmul__(self, other: NonGaussianLikelihood) -> "NonConjugatePosterior":
-    #     ...
+        @overload
+        def __rmul__(
+            self, other: GaussianLikelihood
+        ) -> "ConjugatePosterior[Prior[MeanFunction, Kernel], GaussianLikelihood]":
+            ...
 
-    # @overload
-    # def __rmul__(self, other: AbstractLikelihood) -> "AbstractPosterior":
-    #     ...
+        @overload
+        def __rmul__(
+            self, other: NonGaussianLikelihood
+        ) -> (
+            "NonConjugatePosterior[Prior[MeanFunction, Kernel], NonGaussianLikelihood]"
+        ):
+            ...
+
+        @overload
+        def __rmul__(
+            self, other: Likelihood
+        ) -> "AbstractPosterior[Prior[MeanFunction, Kernel], Likelihood]":
+            ...
 
     def __rmul__(self, other):
         r"""Combine the prior with a likelihood to form a posterior distribution.
@@ -324,19 +354,22 @@ class Prior(AbstractPrior):
         return sample_fn
 
 
+PriorType = TypeVar("PriorType", bound=AbstractPrior)
+
+
 #######################
 # GP Posteriors
 #######################
 @dataclass
-class AbstractPosterior(Module):
+class AbstractPosterior(Module, Generic[PriorType, Likelihood]):
     r"""Abstract Gaussian process posterior.
 
     The base GP posterior object conditioned on an observed dataset. All
     posterior objects should inherit from this class.
     """
 
-    prior: AbstractPrior
-    likelihood: AbstractLikelihood
+    prior: AbstractPrior[MeanFunction, Kernel]
+    likelihood: Likelihood
     jitter: float = static_field(1e-6)
 
     def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
@@ -381,7 +414,7 @@ class AbstractPosterior(Module):
 
 
 @dataclass
-class ConjugatePosterior(AbstractPosterior):
+class ConjugatePosterior(AbstractPosterior[PriorType, GaussianLikelihood]):
     r"""A Conjuate Gaussian process posterior object.
 
     A Gaussian process posterior distribution when the constituent likelihood
@@ -600,7 +633,7 @@ class ConjugatePosterior(AbstractPosterior):
 
 
 @dataclass
-class NonConjugatePosterior(AbstractPosterior):
+class NonConjugatePosterior(AbstractPosterior[PriorType, NonGaussianLikelihood]):
     r"""A non-conjugate Gaussian process posterior object.
 
     A Gaussian process posterior object for models where the likelihood is
@@ -686,21 +719,16 @@ class NonConjugatePosterior(AbstractPosterior):
 
 
 @overload
-def construct_posterior(prior: Prior, likelihood: Gaussian) -> ConjugatePosterior:
+def construct_posterior(
+    prior: PriorType, likelihood: GaussianLikelihood
+) -> ConjugatePosterior[PriorType, GaussianLikelihood]:
     ...
 
 
 @overload
 def construct_posterior(
-    prior: Prior, likelihood: NonGaussianLikelihood
-) -> NonConjugatePosterior:
-    ...
-
-
-@overload
-def construct_posterior(
-    prior: Prior, likelihood: AbstractLikelihood
-) -> AbstractPosterior:
+    prior: PriorType, likelihood: NonGaussianLikelihood
+) -> NonConjugatePosterior[PriorType, NonGaussianLikelihood]:
     ...
 
 
