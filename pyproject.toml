@@ -183,6 +183,7 @@ fail_under = 50
 precision = 1
 show_missing = true
 skip_covered = true
+exclude_lines = ["if TYPE_CHECKING:"]
 
 [tool.coverage.run] # https://coverage.readthedocs.io/en/latest/config.html#run
 branch = true
