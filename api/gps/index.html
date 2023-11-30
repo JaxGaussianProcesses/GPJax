@@ -2588,6 +2588,126 @@
 
 
 
+<h5 id="gpjax.gps.Kernel" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">Kernel</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Kernel&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">AbstractKernel</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h5 id="gpjax.gps.MeanFunction" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">MeanFunction</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;MeanFunction&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">AbstractMeanFunction</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h5 id="gpjax.gps.Likelihood" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">Likelihood</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Likelihood&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">AbstractLikelihood</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h5 id="gpjax.gps.NonGaussianLikelihood" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">NonGaussianLikelihood</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;NonGaussianLikelihood&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">NonGaussian</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h5 id="gpjax.gps.GaussianLikelihood" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">GaussianLikelihood</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;GaussianLikelihood&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Gaussian</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h5 id="gpjax.gps.PriorType" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">PriorType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;PriorType&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">AbstractPrior</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
 <h5 id="gpjax.gps.__all__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AbstractPrior&#39;</span><span class="p">,</span> <span class="s1">&#39;Prior&#39;</span><span class="p">,</span> <span class="s1">&#39;AbstractPosterior&#39;</span><span class="p">,</span> <span class="s1">&#39;ConjugatePosterior&#39;</span><span class="p">,</span> <span class="s1">&#39;NonConjugatePosterior&#39;</span><span class="p">,</span> <span class="s1">&#39;construct_posterior&#39;</span><span class="p">]</span></code>
   
@@ -2622,7 +2742,7 @@
 
   <div class="doc doc-contents ">
           <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.base.Module" href="../base/module/#gpjax.base.module.Module">Module</a></code></p>
+            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.base.Module" href="../base/module/#gpjax.base.module.Module">Module</a></code>, <code><span title="typing.Generic">Generic</span>[<a class="autorefs autorefs-internal" title="gpjax.gps.MeanFunction" href="#gpjax.gps.MeanFunction">MeanFunction</a>, <a class="autorefs autorefs-internal" title="gpjax.gps.Kernel" href="#gpjax.gps.Kernel">Kernel</a>]</code></p>
 
   
       <p>Abstract Gaussian process prior.</p>
@@ -2644,7 +2764,7 @@
 
 
 <h6 id="gpjax.gps.AbstractPrior.kernel" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">kernel</span><span class="p">:</span> <span class="n">AbstractKernel</span></code>
+          <code class="highlight language-python"><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -2664,7 +2784,7 @@
 
 
 <h6 id="gpjax.gps.AbstractPrior.mean_function" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">mean_function</span><span class="p">:</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="n">mean_function</span><span class="p">:</span> <span class="n">MeanFunction</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -3181,7 +3301,7 @@ this method must be implemented.</p>
 
   <div class="doc doc-contents ">
           <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPrior" href="#gpjax.gps.AbstractPrior">AbstractPrior</a></code></p>
+            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPrior" href="#gpjax.gps.AbstractPrior">AbstractPrior</a>[<a class="autorefs autorefs-internal" title="gpjax.gps.MeanFunction" href="#gpjax.gps.MeanFunction">MeanFunction</a>, <a class="autorefs autorefs-internal" title="gpjax.gps.Kernel" href="#gpjax.gps.Kernel">Kernel</a>]</code></p>
 
   
       <link rel="stylesheet"
@@ -3233,7 +3353,7 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 <h6 id="gpjax.gps.Prior.kernel" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">kernel</span><span class="p">:</span> <span class="n">AbstractKernel</span></code>
+          <code class="highlight language-python"><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -3253,7 +3373,7 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 <h6 id="gpjax.gps.Prior.mean_function" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">mean_function</span><span class="p">:</span> <span class="n">AbstractMeanFunction</span></code>
+          <code class="highlight language-python"><span class="n">mean_function</span><span class="p">:</span> <span class="n">MeanFunction</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -3763,7 +3883,7 @@ product of a likelihood and a prior i.e., likelihood * prior.</p>
         <tr>
           <td><code>other</code></td>
           <td>
-                <code>Likelihood</code>
+                <code><a class="autorefs autorefs-internal" title="gpjax.gps.Likelihood" href="#gpjax.gps.Likelihood">Likelihood</a></code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -4010,7 +4130,7 @@ kernel.</p>
 
   <div class="doc doc-contents ">
           <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.base.Module" href="../base/module/#gpjax.base.module.Module">Module</a></code></p>
+            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.base.Module" href="../base/module/#gpjax.base.module.Module">Module</a></code>, <code><span title="typing.Generic">Generic</span>[<a class="autorefs autorefs-internal" title="gpjax.gps.PriorType" href="#gpjax.gps.PriorType">PriorType</a>, <a class="autorefs autorefs-internal" title="gpjax.gps.Likelihood" href="#gpjax.gps.Likelihood">Likelihood</a>]</code></p>
 
   
       <p>Abstract Gaussian process posterior.</p>
@@ -4034,7 +4154,7 @@ posterior objects should inherit from this class.</p>
 
 
 <h6 id="gpjax.gps.AbstractPosterior.prior" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span></code>
+          <code class="highlight language-python"><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span><span class="p">[</span><span class="n">MeanFunction</span><span class="p">,</span> <span class="n">Kernel</span><span class="p">]</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -4054,7 +4174,7 @@ posterior objects should inherit from this class.</p>
 
 
 <h6 id="gpjax.gps.AbstractPosterior.likelihood" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">likelihood</span><span class="p">:</span> <span class="n">AbstractLikelihood</span></code>
+          <code class="highlight language-python"><span class="n">likelihood</span><span class="p">:</span> <span class="n">Likelihood</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -4570,7 +4690,7 @@ this method must be implemented.</p>
 
   <div class="doc doc-contents ">
           <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPosterior" href="#gpjax.gps.AbstractPosterior">AbstractPosterior</a></code></p>
+            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPosterior" href="#gpjax.gps.AbstractPosterior">AbstractPosterior</a>[<a class="autorefs autorefs-internal" title="gpjax.gps.PriorType" href="#gpjax.gps.PriorType">PriorType</a>, <a class="autorefs autorefs-internal" title="gpjax.gps.GaussianLikelihood" href="#gpjax.gps.GaussianLikelihood">GaussianLikelihood</a>]</code></p>
 
   
       <link rel="stylesheet"
@@ -4643,7 +4763,7 @@ where
 
 
 <h6 id="gpjax.gps.ConjugatePosterior.prior" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span></code>
+          <code class="highlight language-python"><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span><span class="p">[</span><span class="n">MeanFunction</span><span class="p">,</span> <span class="n">Kernel</span><span class="p">]</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -4663,7 +4783,7 @@ where
 
 
 <h6 id="gpjax.gps.ConjugatePosterior.likelihood" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">likelihood</span><span class="p">:</span> <span class="n">AbstractLikelihood</span></code>
+          <code class="highlight language-python"><span class="n">likelihood</span><span class="p">:</span> <span class="n">Likelihood</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -5327,7 +5447,7 @@ process prior.
 
   <div class="doc doc-contents ">
           <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPosterior" href="#gpjax.gps.AbstractPosterior">AbstractPosterior</a></code></p>
+            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPosterior" href="#gpjax.gps.AbstractPosterior">AbstractPosterior</a>[<a class="autorefs autorefs-internal" title="gpjax.gps.PriorType" href="#gpjax.gps.PriorType">PriorType</a>, <a class="autorefs autorefs-internal" title="gpjax.gps.NonGaussianLikelihood" href="#gpjax.gps.NonGaussianLikelihood">NonGaussianLikelihood</a>]</code></p>
 
   
       <p>A non-conjugate Gaussian process posterior object.</p>
@@ -5357,7 +5477,7 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 <h6 id="gpjax.gps.NonConjugatePosterior.prior" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span></code>
+          <code class="highlight language-python"><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span><span class="p">[</span><span class="n">MeanFunction</span><span class="p">,</span> <span class="n">Kernel</span><span class="p">]</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -5377,7 +5497,7 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 <h6 id="gpjax.gps.NonConjugatePosterior.likelihood" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">likelihood</span><span class="p">:</span> <span class="n">AbstractLikelihood</span></code>
+          <code class="highlight language-python"><span class="n">likelihood</span><span class="p">:</span> <span class="n">Likelihood</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
