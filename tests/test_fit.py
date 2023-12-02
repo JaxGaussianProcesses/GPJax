@@ -25,6 +25,7 @@ from jaxtyping import (
 )
 import optax as ox
 import pytest
+import scipy
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import (
@@ -33,7 +34,6 @@ from gpjax.base import (
 )
 from gpjax.dataset import Dataset
 from gpjax.fit import (
-    FailedScipyFitError,
     fit,
     fit_scipy,
     get_batch,
@@ -116,7 +116,7 @@ def test_simple_linear_model() -> None:
     )
 
     # Ensure we return a history of the correct length
-    assert len(hist) == 2
+    assert len(hist) > 2
 
     # Ensure we return a model of the same class
     assert isinstance(trained_model, LinearModel)
@@ -180,7 +180,7 @@ def test_gaussian_process_regression(n_data: int, verbose: bool) -> None:
     assert isinstance(trained_model_bfgs, ConjugatePosterior)
 
     # Ensure we return a history_bfgs of the correct length
-    assert len(history_bfgs) == 2
+    assert len(history_bfgs) > 2
 
     # Ensure we reduce the loss
     assert mll(trained_model_bfgs, D) < mll(posterior, D)
@@ -206,7 +206,7 @@ def test_scipy_fit_error_raises() -> None:
     # Define loss function:
     mll = ConjugateMLL(negative=True)
 
-    with pytest.raises(FailedScipyFitError):
+    with pytest.raises(scipy.optimize.OptimizeWarning):
         fit_scipy(
             model=posterior,
             objective=mll,
@@ -220,7 +220,7 @@ def test_scipy_fit_error_raises() -> None:
     posterior = prior * likelihood
     mll = ConjugateMLL(negative=True)
 
-    with pytest.raises(FailedScipyFitError):
+    with pytest.raises(scipy.optimize.OptimizeWarning):
         fit_scipy(
             model=posterior,
             objective=mll,
