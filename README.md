@@ -135,10 +135,10 @@ D = gpx.Dataset(X=x, y=y)
 # Construct the prior
 meanf = gpx.mean_functions.Zero()
 kernel = gpx.kernels.RBF()
-prior = gpx.Prior(mean_function=meanf, kernel=kernel)
+prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
 
 # Define a likelihood
-likelihood = gpx.Gaussian(num_datapoints=n)
+likelihood = gpx.likelihoods.Gaussian(num_datapoints = n)
 
 # Construct the posterior
 posterior = prior * likelihood

@@ -19,7 +19,7 @@ class Sparse:
         self.data = gpx.Dataset(X=self.X, y=self.y)
         kernel = gpx.kernels.RBF(active_dims=list(range(1)))
         meanf = gpx.mean_functions.Constant()
-        self.prior = gpx.Prior(kernel=kernel, mean_function=meanf)
+        self.prior = gpx.gps.Prior(kernel=kernel, mean_function=meanf)
         self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)
         self.posterior = self.prior * self.likelihood
 

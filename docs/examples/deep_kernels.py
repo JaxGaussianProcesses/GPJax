@@ -163,16 +163,16 @@ forward_linear = Network()
 # kernel and assume a Gaussian likelihood.
 
 # %%
-base_kernel = gpx.Matern52(
+base_kernel = gpx.kernels.Matern52(
     active_dims=list(range(feature_space_dim)),
     lengthscale=jnp.ones((feature_space_dim,)),
 )
 kernel = DeepKernelFunction(
     network=forward_linear, base_kernel=base_kernel, key=key, dummy_x=x
 )
-meanf = gpx.Zero()
-prior = gpx.Prior(mean_function=meanf, kernel=kernel)
-likelihood = gpx.Gaussian(num_datapoints=D.n)
+meanf = gpx.mean_functions.Zero()
+prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
+likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
 posterior = prior * likelihood
 # %% [markdown]
 # ### Optimisation
@@ -207,7 +207,7 @@ optimiser = ox.chain(
 
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=jax.jit(gpx.ConjugateMLL(negative=True)),
+    objective=jax.jit(gpx.objectives.ConjugateMLL(negative=True)),
     train_data=D,
     optim=optimiser,
     num_iters=800,

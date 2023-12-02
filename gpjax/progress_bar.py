@@ -36,10 +36,10 @@ def progress_bar(num_iters: int, log_rate: int) -> Callable:
         >>>
         >>> carry = jnp.array(0.0)
         >>> iteration_numbers = jnp.arange(100)
-
+        >>>
         >>> @progress_bar(num_iters=iteration_numbers.shape[0], log_rate=10)
         >>> def body_func(carry, x):
-        ...    return carry, x
+        >>>    return carry, x
         >>>
         >>> carry, _ = jax.lax.scan(body_func, carry, iteration_numbers)
     ```

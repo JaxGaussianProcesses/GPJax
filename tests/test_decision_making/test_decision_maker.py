@@ -61,16 +61,16 @@ def search_space() -> ContinuousSearchSpace:
 
 @pytest.fixture
 def posterior_handler() -> PosteriorHandler:
-    mean = gpx.Zero()
-    kernel = gpx.Matern52(lengthscale=jnp.array(1.0), variance=jnp.array(1.0))
-    prior = gpx.Prior(mean_function=mean, kernel=kernel)
-    likelihood_builder = lambda x: gpx.Gaussian(
+    mean = gpx.mean_functions.Zero()
+    kernel = gpx.kernels.Matern52(lengthscale=jnp.array(1.0), variance=jnp.array(1.0))
+    prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
+    likelihood_builder = lambda x: gpx.likelihoods.Gaussian(
         num_datapoints=x, obs_stddev=jnp.array(1e-3)
     )
     posterior_handler = PosteriorHandler(
         prior=prior,
         likelihood_builder=likelihood_builder,
-        optimization_objective=gpx.ConjugateMLL(negative=True),
+        optimization_objective=gpx.objectives.ConjugateMLL(negative=True),
         optimizer=ox.adam(learning_rate=0.01),
         num_optimization_iters=100,
     )

@@ -83,10 +83,10 @@ ax.legend()
 # kernel, chosen for the purpose of exposition. We adopt the Poisson likelihood available in GPJax.
 
 # %%
-kernel = gpx.RBF()
-meanf = gpx.Constant()
-prior = gpx.Prior(mean_function=meanf, kernel=kernel)
-likelihood = gpx.Poisson(num_datapoints=D.n)
+kernel = gpx.kernels.RBF()
+meanf = gpx.mean_functions.Constant()
+prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
+likelihood = gpx.likelihoods.Poisson(num_datapoints=D.n)
 
 # %% [markdown]
 # We construct the posterior through the product of our prior and likelihood.
@@ -135,7 +135,7 @@ print(type(posterior))
 num_adapt = 100
 num_samples = 200
 
-lpd = jax.jit(gpx.LogPosteriorDensity(negative=False))
+lpd = jax.jit(gpx.objectives.LogPosteriorDensity(negative=False))
 unconstrained_lpd = jax.jit(lambda tree: lpd(tree.constrain(), D))
 
 adapt = blackjax.window_adaptation(

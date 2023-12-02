@@ -203,10 +203,10 @@ ax.set(xlabel=r"$x$", ylabel=r"$f(x)$")
 
 # %%
 meanf = gpx.mean_functions.Zero()
-likelihood = gpx.Gaussian(num_datapoints=n)
-prior = gpx.Prior(mean_function=meanf, kernel=jk.RBF())
+likelihood = gpx.likelihoods.Gaussian(num_datapoints=n)
+prior = gpx.gps.Prior(mean_function=meanf, kernel=jk.RBF())
 p = prior * likelihood
-q = gpx.VariationalGaussian(posterior=p, inducing_inputs=z)
+q = gpx.variational_families.VariationalGaussian(posterior=p, inducing_inputs=z)
 
 # %% [markdown]
 # Here, the variational process $q(\cdot)$ depends on the prior through
@@ -232,7 +232,7 @@ q = gpx.VariationalGaussian(posterior=p, inducing_inputs=z)
 # its negative.
 
 # %%
-negative_elbo = gpx.ELBO(negative=True)
+negative_elbo = gpx.objectives.ELBO(negative=True)
 
 # %% [markdown]
 # For researchers, GPJax has the capacity to print the bibtex citation for objects such

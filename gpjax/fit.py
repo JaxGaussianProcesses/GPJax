@@ -23,11 +23,16 @@ from beartype.typing import (
     Union,
 )
 import jax
+from jax import (
+    jit,
+    value_and_grad,
+)
 from jax._src.random import _check_prng_key
+from jax.flatten_util import ravel_pytree
 import jax.numpy as jnp
 import jax.random as jr
-import jaxopt
 import optax as ox
+import scipy
 
 from gpjax.base import Module
 from gpjax.dataset import Dataset
@@ -40,10 +45,6 @@ from gpjax.typing import (
 )
 
 ModuleModel = TypeVar("ModuleModel", bound=Module)
-
-
-class FailedScipyFitError(Exception):
-    """Raised a model fit using Scipy fails"""
 
 
 def fit(  # noqa: PLR0913
@@ -76,9 +77,9 @@ def fit(  # noqa: PLR0913
         >>> D = gpx.Dataset(X, y)
         >>>
         >>> # (2) Define your model:
-        >>> class LinearModel(gpx.Module):
-                weight: float = gpx.param_field()
-                bias: float = gpx.param_field()
+        >>> class LinearModel(gpx.base.Module):
+                weight: float = gpx.base.param_field()
+                bias: float = gpx.base.param_field()
 
                 def __call__(self, x):
                     return self.weight * x + self.bias
@@ -86,7 +87,7 @@ def fit(  # noqa: PLR0913
         >>> model = LinearModel(weight=1.0, bias=1.0)
         >>>
         >>> # (3) Define your loss function:
-        >>> class MeanSquareError(gpx.AbstractObjective):
+        >>> class MeanSquareError(gpx.objectives.AbstractObjective):
                 def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
                     return jnp.mean((train_data.y - model(train_data.X)) ** 2)
         >>>
@@ -214,30 +215,31 @@ def fit_scipy(  # noqa: PLR0913
     model = model.unconstrain()
 
     # Unconstrained space loss function with stop-gradient rule for non-trainable params.
-    def loss(model: Module, data: Dataset) -> ScalarFloat:
+    def loss(model: Module) -> ScalarFloat:
         model = model.stop_gradient()
-        return objective(model.constrain(), data)
+        return objective(model.constrain(), train_data)
 
-    solver = jaxopt.ScipyMinimize(
-        fun=loss,
-        maxiter=max_iters,
+    # convert to numpy for interface with scipy
+    x0, scipy_to_jnp = ravel_pytree(model)
+
+    @jit
+    def scipy_wrapper(x0):
+        value, grads = value_and_grad(loss)(scipy_to_jnp(jnp.array(x0)))
+        scipy_grads = ravel_pytree(grads)[0]
+        return value, scipy_grads
+
+    history = [scipy_wrapper(x0)[0]]
+    result = scipy.optimize.minimize(
+        fun=scipy_wrapper,
+        x0=x0,
+        jac=True,
+        callback=lambda X: history.append(scipy_wrapper(X)[0]),
+        options={"maxiter": max_iters, "disp": verbose},
     )
+    history = jnp.array(history)
 
-    initial_loss = solver.fun(model, train_data)
-    model, result = solver.run(model, data=train_data)
-    history = jnp.array([initial_loss, result.fun_val])
-
-    if verbose:
-        print(f"Initial loss is {initial_loss}")
-        if result.success:
-            print("Optimization was successful")
-        else:
-            raise FailedScipyFitError(
-                "Optimization failed, try increasing max_iters or using a different optimiser."
-            )
-        print(f"Final loss is {result.fun_val} after {result.num_fun_eval} iterations")
-
-    # Constrained space.
+    # convert back to pytree and reconstrain
+    model = scipy_to_jnp(result.x)
     model = model.constrain()
     return model, history
 
