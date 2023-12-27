@@ -185,6 +185,7 @@ def fit_scipy(  # noqa: PLR0913
     max_iters: Optional[int] = 500,
     verbose: Optional[bool] = True,
     safe: Optional[bool] = True,
+    bounds: Optional[scipy.optimize.Bounds] = None,
 ) -> Tuple[ModuleModel, Array]:
     r"""Train a Module model with respect to a supplied Objective function.
     Optimisers used here should originate from Optax. todo
@@ -225,6 +226,7 @@ def fit_scipy(  # noqa: PLR0913
     @jit
     def scipy_wrapper(x0):
         value, grads = value_and_grad(loss)(scipy_to_jnp(jnp.array(x0)))
+        
         scipy_grads = ravel_pytree(grads)[0]
         return value, scipy_grads
 
@@ -235,6 +237,7 @@ def fit_scipy(  # noqa: PLR0913
         jac=True,
         callback=lambda X: history.append(scipy_wrapper(X)[0]),
         options={"maxiter": max_iters, "disp": verbose},
+        bounds=bounds,
     )
     history = jnp.array(history)
 
