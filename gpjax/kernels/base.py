@@ -38,7 +38,9 @@ class AbstractKernel(nnx.Module):
 
     n_dims: int = nnx.field(init=True)
     active_dims: tp.Union[list[int], int, slice] = 1
-    compute_engine: AbstractKernelComputation = DenseKernelComputation()
+    compute_engine: AbstractKernelComputation = nnx.field(
+        default=DenseKernelComputation(), repr=False
+    )
     name: str = "AbstractKernel"
 
     def __post_init__(self):
@@ -83,7 +85,9 @@ class AbstractKernel(nnx.Module):
         """
         raise NotImplementedError
 
-    def __add__(self, other: tp.Union["AbstractKernel", ScalarFloat]) -> "AbstractKernel":
+    def __add__(
+        self, other: tp.Union["AbstractKernel", ScalarFloat]
+    ) -> "AbstractKernel":
         r"""Add two kernels together.
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
@@ -97,7 +101,9 @@ class AbstractKernel(nnx.Module):
         else:
             return SumKernel(kernels=[self, Constant(other)])
 
-    def __radd__(self, other: tp.Union["AbstractKernel", ScalarFloat]) -> "AbstractKernel":
+    def __radd__(
+        self, other: tp.Union["AbstractKernel", ScalarFloat]
+    ) -> "AbstractKernel":
         r"""Add two kernels together.
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
@@ -108,7 +114,9 @@ class AbstractKernel(nnx.Module):
         """
         return self.__add__(other)
 
-    def __mul__(self, other: tp.Union["AbstractKernel", ScalarFloat]) -> "AbstractKernel":
+    def __mul__(
+        self, other: tp.Union["AbstractKernel", ScalarFloat]
+    ) -> "AbstractKernel":
         r"""Multiply two kernels together.
 
         Args:
@@ -155,8 +163,8 @@ class Constant(AbstractKernel):
 class CombinationKernel(AbstractKernel):
     r"""A base class for products or sums of MeanFunctions."""
 
-    kernels: list[AbstractKernel]
-    operator: tp.Callable
+    kernels: list[AbstractKernel] = None
+    operator: tp.Callable = None
 
     def __post_init__(self):
         # Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.

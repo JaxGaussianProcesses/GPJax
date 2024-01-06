@@ -13,19 +13,12 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import (
-    param_field,
-    static_field,
-)
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
-    AbstractKernelComputation,
     ConstantDiagonalKernelComputation,
 )
 from gpjax.typing import (
@@ -34,12 +27,10 @@ from gpjax.typing import (
 )
 
 
-@dataclass
+@nnx.dataclass
 class White(AbstractKernel):
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    compute_engine: AbstractKernelComputation = static_field(
-        ConstantDiagonalKernelComputation(), repr=False
-    )
+    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=jnp.array(1.0))
+    compute_engine = ConstantDiagonalKernelComputation()
     name: str = "White"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
