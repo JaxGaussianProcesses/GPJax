@@ -13,26 +13,20 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
+import beartype.typing as tp
 
-from beartype.typing import Union
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import (
-    param_field,
-    static_field,
-)
 from gpjax.kernels.base import AbstractKernel
 from gpjax.typing import (
     Array,
     ScalarFloat,
-    ScalarInt,
 )
 
 
-@dataclass
+@nnx.dataclass
 class ArcCosine(AbstractKernel):
     r"""The ArCosine kernel.
 
@@ -42,12 +36,12 @@ class ArcCosine(AbstractKernel):
     additional details.
     """
 
-    order: ScalarInt = static_field(0)
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    weight_variance: Union[ScalarFloat, Float[Array, " D"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
+    order: tp.Literal[0, 1, 2] = 0
+    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
+    weight_variance: tp.Union[ScalarFloat, Float[Array, " D"]] = nnx.variable_field(
+        nnx.Param, default=1.0
     )
-    bias_variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    bias_variance: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
 
     def __post_init__(self):
         if self.order not in [0, 1, 2]:
