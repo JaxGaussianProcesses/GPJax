@@ -15,30 +15,18 @@
 
 
 import abc
-import dataclasses
-from functools import partial
+import functools as ft
+import beartype.typing as tp
 
-from beartype.typing import (
-    Callable,
-    List,
-    Union,
-)
+from flax.experimental import nnx
 import jax.numpy as jnp
-from jaxtyping import (
-    Float,
-    Num,
-)
+from jaxtyping import Float, Num
 
-from gpjax.base import (
-    Module,
-    param_field,
-    static_field,
-)
 from gpjax.typing import Array
 
 
-@dataclasses.dataclass
-class AbstractMeanFunction(Module):
+@nnx.dataclass
+class AbstractMeanFunction(nnx.Module):
     r"""Mean function that is used to parameterise the Gaussian process."""
 
     @abc.abstractmethod
@@ -55,7 +43,7 @@ class AbstractMeanFunction(Module):
         raise NotImplementedError
 
     def __add__(
-        self, other: Union["AbstractMeanFunction", Float[Array, " O"]]
+        self, other: tp.Union["AbstractMeanFunction", Float[Array, " O"]]
     ) -> "AbstractMeanFunction":
         r"""Add two mean functions.
 
@@ -73,7 +61,7 @@ class AbstractMeanFunction(Module):
 
     def __radd__(
         self,
-        other: Union[
+        other: tp.Union[
             "AbstractMeanFunction", Float[Array, " O"]
         ],  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
@@ -90,7 +78,7 @@ class AbstractMeanFunction(Module):
 
     def __mul__(
         self,
-        other: Union[
+        other: tp.Union[
             "AbstractMeanFunction", Float[Array, " O"]
         ],  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
@@ -110,7 +98,7 @@ class AbstractMeanFunction(Module):
 
     def __rmul__(
         self,
-        other: Union[
+        other: tp.Union[
             "AbstractMeanFunction", Float[Array, " O"]
         ],  # TODO should this be ScalarFloat? or Num?
     ) -> "AbstractMeanFunction":
@@ -126,7 +114,7 @@ class AbstractMeanFunction(Module):
         return self.__mul__(other)
 
 
-@dataclasses.dataclass
+@nnx.dataclass
 class Constant(AbstractMeanFunction):
     r"""Constant mean function.
 
@@ -135,7 +123,7 @@ class Constant(AbstractMeanFunction):
     learned during training but defaults to 1.0.
     """
 
-    constant: Float[Array, " O"] = param_field(jnp.array([0.0]))
+    constant: Float[Array, " O"] = nnx.variable_field(nnx.Param, default=jnp.array([0.0]))
 
     def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N O"]:
         r"""Evaluate the mean function at the given points.
@@ -150,7 +138,7 @@ class Constant(AbstractMeanFunction):
         return jnp.ones((x.shape[0], 1)) * self.constant
 
 
-@dataclasses.dataclass
+@nnx.dataclass
 class Zero(Constant):
     r"""Zero mean function.
 
@@ -158,26 +146,26 @@ class Zero(Constant):
     inputs. Unlike the Constant mean function, the constant scalar zero is fixed, and
     cannot be treated as a model hyperparameter and learned during training.
     """
-    constant: Float[Array, " O"] = static_field(jnp.array([0.0]), init=False)
+    constant: Float[Array, " O"] = nnx.variable_field(nnx.Param, jnp.array([0.0]), init=False)
 
 
-@dataclasses.dataclass
+@nnx.dataclass
 class CombinationMeanFunction(AbstractMeanFunction):
     r"""A base class for products or sums of AbstractMeanFunctions."""
 
-    means: List[AbstractMeanFunction]
-    operator: Callable = static_field()
+    means: list[AbstractMeanFunction]
+    operator: tp.Callable
 
     def __init__(
         self,
-        means: List[AbstractMeanFunction],
-        operator: Callable,
+        means: list[AbstractMeanFunction],
+        operator: tp.Callable,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
 
         # Add means to a list, flattening out instances of this class therein, as in GPFlow kernels.
-        items_list: List[AbstractMeanFunction] = []
+        items_list: list[AbstractMeanFunction] = []
 
         for item in means:
             if not isinstance(item, AbstractMeanFunction):
@@ -206,7 +194,7 @@ class CombinationMeanFunction(AbstractMeanFunction):
         return self.operator(jnp.stack([m(x) for m in self.means]))
 
 
-SumMeanFunction = partial(CombinationMeanFunction, operator=partial(jnp.sum, axis=0))
-ProductMeanFunction = partial(
-    CombinationMeanFunction, operator=partial(jnp.sum, axis=0)
+SumMeanFunction = ft.partial(CombinationMeanFunction, operator=ft.partial(jnp.sum, axis=0))
+ProductMeanFunction = ft.partial(
+    CombinationMeanFunction, operator=ft.partial(jnp.sum, axis=0)
 )
