@@ -13,15 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
+import beartype.typing as tp
 
-from beartype.typing import Union
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
-import tensorflow_probability.substrates.jax.distributions as tfd
+import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.stationary.utils import squared_distance
 from gpjax.typing import (
@@ -29,15 +27,14 @@ from gpjax.typing import (
     ScalarFloat,
 )
 
-
-@dataclass
+@nnx.dataclass
 class RBF(AbstractKernel):
     r"""The Radial Basis Function (RBF) kernel."""
 
-    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
+    lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = nnx.variable_field(
+        nnx.Param, default=jnp.array(1.0)
     )
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=jnp.array(1.0))
     name: str = "RBF"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
@@ -62,5 +59,5 @@ class RBF(AbstractKernel):
         return K.squeeze()
 
     @property
-    def spectral_density(self) -> tfd.Normal:
-        return tfd.Normal(loc=0.0, scale=1.0)
+    def spectral_density(self) -> tfp.distributions.Normal:
+        return tfp.distributions.Normal(0.0, 1.0)

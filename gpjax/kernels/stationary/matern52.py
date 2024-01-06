@@ -13,15 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
+import beartype.typing as tp
 
-from beartype.typing import Union
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.stationary.utils import (
     build_student_t_distribution,
@@ -33,14 +32,14 @@ from gpjax.typing import (
 )
 
 
-@dataclass
+@nnx.dataclass
 class Matern52(AbstractKernel):
     r"""The Matérn kernel with smoothness parameter fixed at 2.5."""
 
-    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
+    lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = nnx.variable_field(
+        nnx.Param, default=1.0
     )
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=jnp.array(1.0))
     name: str = "Matérn52"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:

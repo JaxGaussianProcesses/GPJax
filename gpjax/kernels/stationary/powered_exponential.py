@@ -13,14 +13,12 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
+import beartype.typing as tp
 
-from beartype.typing import Union
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.stationary.utils import euclidean_distance
 from gpjax.typing import (
@@ -29,7 +27,7 @@ from gpjax.typing import (
 )
 
 
-@dataclass
+@nnx.dataclass
 class PoweredExponential(AbstractKernel):
     r"""The powered exponential family of kernels. This also equivalent to the symmetric generalized normal distribution.
 
@@ -39,11 +37,11 @@ class PoweredExponential(AbstractKernel):
 
     """
 
-    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
+    lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = nnx.variable_field(
+        nnx.Param, default=jnp.array(1.0)
     )
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    power: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Sigmoid())
+    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=jnp.array(1.0))
+    power: ScalarFloat = nnx.variable_field(nnx.Param, default=jnp.array(1.0))
     name: str = "Powered Exponential"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
