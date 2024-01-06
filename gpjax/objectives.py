@@ -1,6 +1,6 @@
-from abc import abstractmethod
-from dataclasses import dataclass
+import abc 
 
+from flax.experimental import nnx
 from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
@@ -8,10 +8,7 @@ import jax.tree_util as jtu
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.base import (
-    Module,
-    static_field,
-)
+import gpjax
 from gpjax.dataset import Dataset
 from gpjax.distributions import GaussianDistribution
 from gpjax.lower_cholesky import lower_cholesky
@@ -24,7 +21,12 @@ tfd = tfp.distributions
 
 from typing import TypeVar
 
-import cola
+
+from cola.annotations import PSD
+from cola.linalg.decompositions.decompositions import Cholesky
+from cola.linalg.inverse.inv import inv, solve
+from cola.linalg.trace.diag_trace import diag
+from cola.ops.operators import I_like
 
 ConjugatePosterior = TypeVar(
     "ConjugatePosterior", bound="gpjax.gps.ConjugatePosterior"  # noqa: F821
@@ -37,15 +39,14 @@ VariationalFamily = TypeVar(
     bound="gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
 )
 
-from cola.linalg.decompositions.decompositions import Cholesky
 
 
-@dataclass
-class AbstractObjective(Module):
+@nnx.dataclass
+class AbstractObjective(nnx.Module):
     r"""Abstract base class for objectives."""
 
-    negative: bool = static_field(False)
-    constant: ScalarFloat = static_field(init=False, repr=False)
+    negative: bool = False
+    constant: ScalarFloat = nnx.variable_field(nnx.Intermediate, init=False, repr=False)
 
     def __post_init__(self) -> None:
         self.constant = jnp.array(-1.0) if self.negative else jnp.array(1.0)
@@ -56,9 +57,9 @@ class AbstractObjective(Module):
     def __call__(self, *args, **kwargs) -> ScalarFloat:
         return self.step(*args, **kwargs)
 
-    @abstractmethod
+    @abc.abstractmethod
     def step(self, *args, **kwargs) -> ScalarFloat:
-        raise NotImplementedError
+        ...
 
 
 class ConjugateMLL(AbstractObjective):
@@ -140,9 +141,9 @@ class ConjugateMLL(AbstractObjective):
 
         # Σ = (Kxx + Io²) = LLᵀ
         Kxx = posterior.prior.kernel.gram(x)
-        Kxx += cola.ops.I_like(Kxx) * posterior.prior.jitter
-        Sigma = Kxx + cola.ops.I_like(Kxx) * obs_noise
-        Sigma = cola.PSD(Sigma)
+        Kxx += I_like(Kxx) * posterior.prior.jitter
+        Sigma = Kxx + I_like(Kxx) * obs_noise
+        Sigma = PSD(Sigma)
 
         # p(y | x, θ), where θ are the model hyperparameters:
         mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
@@ -222,11 +223,11 @@ class ConjugateLOOCV(AbstractObjective):
 
         # Σ = (Kxx + Io²)
         Kxx = posterior.prior.kernel.gram(x)
-        Sigma = Kxx + cola.ops.I_like(Kxx) * (obs_var + posterior.prior.jitter)
-        Sigma = cola.PSD(Sigma)  # [N, N]
+        Sigma = Kxx + I_like(Kxx) * (obs_var + posterior.prior.jitter)
+        Sigma = PSD(Sigma)  # [N, N]
 
-        Sigma_inv_y = cola.solve(Sigma, y - mx, Cholesky())  # [N, 1]
-        Sigma_inv_diag = cola.linalg.diag(cola.inv(Sigma, Cholesky()))[
+        Sigma_inv_y = solve(Sigma, y - mx, Cholesky())  # [N, 1]
+        Sigma_inv_diag = diag(inv(Sigma, Cholesky()))[
             :, None
         ]  # [N, 1]
 
@@ -273,8 +274,8 @@ class LogPosteriorDensity(AbstractObjective):
         # Unpack the training data
         x, y = data.X, data.y
         Kxx = posterior.prior.kernel.gram(x)
-        Kxx += cola.ops.I_like(Kxx) * posterior.prior.jitter
-        Kxx = cola.PSD(Kxx)
+        Kxx += I_like(Kxx) * posterior.prior.jitter
+        Kxx = PSD(Kxx)
         Lx = lower_cholesky(Kxx)
 
         # Compute the prior mean function
@@ -432,8 +433,8 @@ class CollapsedELBO(AbstractObjective):
         noise = variational_family.posterior.likelihood.obs_stddev**2
         z = variational_family.inducing_inputs
         Kzz = kernel.gram(z)
-        Kzz += cola.ops.I_like(Kzz) * variational_family.jitter
-        Kzz = cola.PSD(Kzz)
+        Kzz += I_like(Kzz) * variational_family.jitter
+        Kzz = PSD(Kzz)
         Kzx = kernel.cross_covariance(z, x)
         Kxx_diag = vmap(kernel, in_axes=(0, 0))(x, x)
         μx = mean_function(x)
@@ -466,7 +467,7 @@ class CollapsedELBO(AbstractObjective):
         #
         #   with A and B defined as above.
 
-        A = cola.solve(Lz, Kzx, Cholesky()) / jnp.sqrt(noise)
+        A = solve(Lz, Kzx, Cholesky()) / jnp.sqrt(noise)
 
         # AAᵀ
         AAT = jnp.matmul(A, A.T)
