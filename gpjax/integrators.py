@@ -1,11 +1,7 @@
-from abc import abstractmethod
-from dataclasses import dataclass
-from typing import (
-    TypeVar,
-    Union,
-)
+import abc
+import beartype.typing as tp
 
-from beartype.typing import Callable
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
 import numpy as np
@@ -13,25 +9,25 @@ import numpy as np
 import gpjax
 from gpjax.typing import Array
 
-Likelihood = TypeVar(
-    "Likelihood",
-    bound=Union["gpjax.likelihoods.AbstractLikelihood", None],  # noqa: F821
+L = tp.TypeVar(
+    "L",
+    bound="gpjax.likelihoods.AbstractLikelihood",  # noqa: F821
 )
-Gaussian = TypeVar("Gaussian", bound="gpjax.likelihoods.Gaussian")  # noqa: F821
+GL = tp.TypeVar("GL", bound="gpjax.likelihoods.Gaussian")  # noqa: F821
 
 
-@dataclass
+@nnx.dataclass
 class AbstractIntegrator:
     r"""Base class for integrators."""
 
-    @abstractmethod
+    @abc.abstractmethod
     def integrate(
         self,
-        fun: Callable,
+        fun: tp.Callable,
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: Likelihood,
+        likelihood: L,
     ) -> Float[Array, " N"]:
         r"""Integrate a function with respect to a Gaussian distribution.
 
@@ -50,11 +46,11 @@ class AbstractIntegrator:
 
     def __call__(
         self,
-        fun: Callable,
+        fun: tp.Callable,
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: Likelihood,
+        likelihood: L,
     ) -> Float[Array, " N"]:
         r"""Integrate a function with respect to a Gaussian distribution.
 
@@ -72,7 +68,7 @@ class AbstractIntegrator:
         return self.integrate(fun, y, mean, variance, likelihood)
 
 
-@dataclass
+@nnx.dataclass
 class GHQuadratureIntegrator(AbstractIntegrator):
     r"""Compute an integral using Gauss-Hermite quadrature.
 
@@ -89,11 +85,11 @@ class GHQuadratureIntegrator(AbstractIntegrator):
 
     def integrate(
         self,
-        fun: Callable,
+        fun: tp.Callable,
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: Likelihood,
+        likelihood: L,
     ) -> Float[Array, " N"]:
         r"""Compute a quadrature integral.
 
@@ -116,7 +112,7 @@ class GHQuadratureIntegrator(AbstractIntegrator):
         return val
 
 
-@dataclass
+@nnx.dataclass
 class AnalyticalGaussianIntegrator(AbstractIntegrator):
     r"""Compute the analytical integral of a Gaussian likelihood.
 
@@ -131,11 +127,11 @@ class AnalyticalGaussianIntegrator(AbstractIntegrator):
 
     def integrate(
         self,
-        fun: Callable,
+        fun: tp.Callable,
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: Gaussian,
+        likelihood: GL,
     ) -> Float[Array, " N"]:
         r"""Compute a Gaussian integral.
 
