@@ -14,27 +14,14 @@
 # ==============================================================================
 
 import abc
-from dataclasses import dataclass
-from functools import partial
+import functools as ft
+import beartype.typing as tp
 
-from beartype.typing import (
-    Callable,
-    List,
-    Optional,
-    Union,
-)
+from flax.experimental import nnx
 import jax.numpy as jnp
-from jaxtyping import (
-    Float,
-    Num,
-)
+from jaxtyping import Float, Num
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.base import (
-    Module,
-    param_field,
-    static_field,
-)
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
     DenseKernelComputation,
@@ -45,17 +32,17 @@ from gpjax.typing import (
 )
 
 
-@dataclass
-class AbstractKernel(Module):
+@nnx.dataclass
+class AbstractKernel(nnx.Module):
     r"""Base kernel class."""
 
-    compute_engine: AbstractKernelComputation = static_field(DenseKernelComputation())
-    active_dims: Optional[List[int]] = static_field(None)
-    name: str = static_field("AbstractKernel")
+    n_dims: int = nnx.field(init=True)
+    active_dims: tp.Union[list[int], int, slice] = 1
+    compute_engine: AbstractKernelComputation = DenseKernelComputation()
+    name: str = "AbstractKernel"
 
-    @property
-    def ndims(self):
-        return 1 if not self.active_dims else len(self.active_dims)
+    def __post_init__(self):
+        self.n_dims, self.active_dims = _check_active_dims(self.active_dims)
 
     def cross_covariance(self, x: Num[Array, "N D"], y: Num[Array, "M D"]):
         return self.compute_engine.cross_covariance(self, x, y)
@@ -96,7 +83,7 @@ class AbstractKernel(Module):
         """
         raise NotImplementedError
 
-    def __add__(self, other: Union["AbstractKernel", ScalarFloat]) -> "AbstractKernel":
+    def __add__(self, other: tp.Union["AbstractKernel", ScalarFloat]) -> "AbstractKernel":
         r"""Add two kernels together.
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
@@ -110,7 +97,7 @@ class AbstractKernel(Module):
         else:
             return SumKernel(kernels=[self, Constant(other)])
 
-    def __radd__(self, other: Union["AbstractKernel", ScalarFloat]) -> "AbstractKernel":
+    def __radd__(self, other: tp.Union["AbstractKernel", ScalarFloat]) -> "AbstractKernel":
         r"""Add two kernels together.
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
@@ -121,7 +108,7 @@ class AbstractKernel(Module):
         """
         return self.__add__(other)
 
-    def __mul__(self, other: Union["AbstractKernel", ScalarFloat]) -> "AbstractKernel":
+    def __mul__(self, other: tp.Union["AbstractKernel", ScalarFloat]) -> "AbstractKernel":
         r"""Multiply two kernels together.
 
         Args:
@@ -137,18 +124,18 @@ class AbstractKernel(Module):
             return ProductKernel(kernels=[self, Constant(other)])
 
     @property
-    def spectral_density(self) -> Optional[tfd.Distribution]:
+    def spectral_density(self) -> tp.Union[tfd.Distribution, None]:
         return None
 
 
-@dataclass
+@nnx.dataclass
 class Constant(AbstractKernel):
     r"""
     A constant kernel. This kernel evaluates to a constant for all inputs.
     The scalar value itself can be treated as a model hyperparameter and learned during training.
     """
 
-    constant: ScalarFloat = param_field(jnp.array(0.0))
+    constant: ScalarFloat = nnx.variable_field(nnx.Param, default=jnp.array(0.0))
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Evaluate the kernel on a pair of inputs.
@@ -164,16 +151,16 @@ class Constant(AbstractKernel):
         return self.constant.squeeze()
 
 
-@dataclass
+@nnx.dataclass
 class CombinationKernel(AbstractKernel):
     r"""A base class for products or sums of MeanFunctions."""
 
-    kernels: List[AbstractKernel] = None
-    operator: Callable = static_field(None)
+    kernels: list[AbstractKernel]
+    operator: tp.Callable
 
     def __post_init__(self):
         # Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
-        kernels_list: List[AbstractKernel] = []
+        kernels_list: list[AbstractKernel] = []
 
         for kernel in self.kernels:
             if not isinstance(kernel, AbstractKernel):
@@ -204,5 +191,27 @@ class CombinationKernel(AbstractKernel):
         return self.operator(jnp.stack([k(x, y) for k in self.kernels]))
 
 
-SumKernel = partial(CombinationKernel, operator=jnp.sum)
-ProductKernel = partial(CombinationKernel, operator=jnp.prod)
+@tp.overload
+def _check_active_dims(active_dims: list[int]) -> list[int]:
+    ...
+
+
+@tp.overload
+def _check_active_dims(active_dims: int) -> slice:
+    ...
+
+
+def _check_active_dims(active_dims: list[int] | int | slice):
+    if isinstance(a := active_dims, list):
+        return len(a), active_dims
+    elif isinstance(a, int):
+        return a, slice(None)
+    elif isinstance(a, slice):
+        step = a.step if a.step is not None else 1
+        return (a.stop - a.start) // step, a
+    else:
+        raise ValueError("active_dims must be a list, int or slice.")
+
+
+SumKernel = ft.partial(CombinationKernel, operator=jnp.sum)
+ProductKernel = ft.partial(CombinationKernel, operator=jnp.prod)
