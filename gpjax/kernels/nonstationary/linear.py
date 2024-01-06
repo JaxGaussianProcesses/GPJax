@@ -13,13 +13,12 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
+import beartype.typing as tp
 
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
 from gpjax.typing import (
     Array,
@@ -27,11 +26,11 @@ from gpjax.typing import (
 )
 
 
-@dataclass
+@nnx.dataclass
 class Linear(AbstractKernel):
     r"""The linear kernel."""
 
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
     name: str = "Linear"
 
     def __call__(
