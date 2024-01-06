@@ -12,23 +12,15 @@
 # ==============================================================================
 
 import abc
-from dataclasses import dataclass
+import beartype.typing as tp
 
-from beartype.typing import (
-    Any,
-    Union,
-)
+from flax.experimental import nnx
 from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.base import (
-    Module,
-    param_field,
-    static_field,
-)
 from gpjax.distributions import GaussianDistribution
 from gpjax.integrators import (
     AbstractIntegrator,
@@ -44,14 +36,14 @@ tfb = tfp.bijectors
 tfd = tfp.distributions
 
 
-@dataclass
-class AbstractLikelihood(Module):
+@nnx.dataclass
+class AbstractLikelihood(nnx.Module):
     r"""Abstract base class for likelihoods."""
 
-    num_datapoints: int = static_field()
-    integrator: AbstractIntegrator = static_field(GHQuadratureIntegrator())
+    num_datapoints: int
+    integrator: AbstractIntegrator = GHQuadratureIntegrator()
 
-    def __call__(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
+    def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> tfd.Distribution:
         r"""Evaluate the likelihood function at a given predictive distribution.
 
         Args:
@@ -66,7 +58,7 @@ class AbstractLikelihood(Module):
         return self.predict(*args, **kwargs)
 
     @abc.abstractmethod
-    def predict(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
+    def predict(self, *args: tp.Any, **kwargs: tp.Any) -> tfd.Distribution:
         r"""Evaluate the likelihood function at a given predictive distribution.
 
         Args:
@@ -119,7 +111,7 @@ class AbstractLikelihood(Module):
         )
 
 
-@dataclass
+@nnx.dataclass
 class Gaussian(AbstractLikelihood):
     r"""Gaussian likelihood object.
 
@@ -129,10 +121,10 @@ class Gaussian(AbstractLikelihood):
 
     """
 
-    obs_stddev: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
+    obs_stddev: tp.Union[ScalarFloat, Float[Array, "#N"]] = nnx.variable_field(
+        nnx.Param, default=jnp.array(1.0)
     )
-    integrator: AbstractIntegrator = static_field(AnalyticalGaussianIntegrator())
+    integrator: AbstractIntegrator = AnalyticalGaussianIntegrator()
 
     def link_function(self, f: Float[Array, "..."]) -> tfd.Normal:
         r"""The link function of the Gaussian likelihood.
@@ -147,7 +139,7 @@ class Gaussian(AbstractLikelihood):
         return tfd.Normal(loc=f, scale=self.obs_stddev.astype(f.dtype))
 
     def predict(
-        self, dist: Union[tfd.MultivariateNormalTriL, GaussianDistribution]
+        self, dist: tp.Union[tfd.MultivariateNormalTriL, GaussianDistribution]
     ) -> tfd.MultivariateNormalFullCovariance:
         r"""Evaluate the Gaussian likelihood.
 
@@ -171,7 +163,7 @@ class Gaussian(AbstractLikelihood):
         return tfd.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
 
 
-@dataclass
+@nnx.dataclass
 class Bernoulli(AbstractLikelihood):
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         r"""The probit link function of the Bernoulli likelihood.
@@ -204,7 +196,7 @@ class Bernoulli(AbstractLikelihood):
         return self.link_function(mean / jnp.sqrt(1.0 + variance))
 
 
-@dataclass
+@nnx.dataclass
 class Poisson(AbstractLikelihood):
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         r"""The link function of the Poisson likelihood.
@@ -247,7 +239,7 @@ def inv_probit(x: Float[Array, " *N"]) -> Float[Array, " *N"]:
     return 0.5 * (1.0 + jsp.special.erf(x / jnp.sqrt(2.0))) * (1 - 2 * jitter) + jitter
 
 
-NonGaussian = Union[Poisson, Bernoulli]
+NonGaussian = tp.Union[Poisson, Bernoulli]
 
 __all__ = [
     "AbstractLikelihood",
