@@ -123,7 +123,9 @@ class Constant(AbstractMeanFunction):
     learned during training but defaults to 1.0.
     """
 
-    constant: Float[Array, " O"] = nnx.variable_field(nnx.Param, default=jnp.array([0.0]))
+    constant: Float[Array, " O"] = nnx.variable_field(
+        nnx.Param, default=jnp.array([0.0])
+    )
 
     def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N O"]:
         r"""Evaluate the mean function at the given points.
@@ -146,7 +148,9 @@ class Zero(Constant):
     inputs. Unlike the Constant mean function, the constant scalar zero is fixed, and
     cannot be treated as a model hyperparameter and learned during training.
     """
-    constant: Float[Array, " O"] = nnx.variable_field(nnx.Param, jnp.array([0.0]), init=False)
+    constant: Float[Array, " O"] = nnx.variable_field(
+        nnx.Param, default=jnp.array([0.0]), init=False
+    )
 
 
 @nnx.dataclass
@@ -194,7 +198,9 @@ class CombinationMeanFunction(AbstractMeanFunction):
         return self.operator(jnp.stack([m(x) for m in self.means]))
 
 
-SumMeanFunction = ft.partial(CombinationMeanFunction, operator=ft.partial(jnp.sum, axis=0))
+SumMeanFunction = ft.partial(
+    CombinationMeanFunction, operator=ft.partial(jnp.sum, axis=0)
+)
 ProductMeanFunction = ft.partial(
     CombinationMeanFunction, operator=ft.partial(jnp.sum, axis=0)
 )

@@ -628,8 +628,8 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
     from, or optimise an approximation to, the posterior distribution.
     """
 
-    latent: Float[Array, "N 1"] = nnx.variable_field(nnx.Intermediate)
     key: KeyArray = nnx.Intermediate(jr.PRNGKey(42))
+    latent: Float[Array, "N 1"] = nnx.variable_field(nnx.Intermediate, default=None)
 
     def __post_init__(self):
         if self.latent is None:
