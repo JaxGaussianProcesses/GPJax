@@ -13,22 +13,17 @@
 # limitations under the License.
 # ==============================================================================
 
+from dataclasses import field
 
-from dataclasses import dataclass
-
-from beartype.typing import Union
+from flax.experimental import nnx
+import beartype.typing as tp
 import jax.numpy as jnp
 from jaxtyping import (
     Float,
     Int,
     Num,
 )
-import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.base import (
-    param_field,
-    static_field,
-)
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
@@ -41,13 +36,12 @@ from gpjax.typing import (
     ScalarInt,
 )
 
-tfb = tfp.bijectors
 
 
 ##########################################
 # Graph kernels
 ##########################################
-@dataclass
+@nnx.dataclass
 class GraphKernel(AbstractKernel):
     r"""The Matérn graph kernel defined on the vertex set of a graph.
 
@@ -59,16 +53,16 @@ class GraphKernel(AbstractKernel):
             of a graph.
     """
 
-    laplacian: Union[Num[Array, "N N"], None] = static_field(None)
-    lengthscale: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    smoothness: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    eigenvalues: Union[Float[Array, "N 1"], None] = static_field(None)
-    eigenvectors: Union[Float[Array, "N N"], None] = static_field(None)
-    num_vertex: Union[ScalarInt, None] = static_field(None)
-    compute_engine: AbstractKernelComputation = static_field(
-        EigenKernelComputation(), repr=False
+    compute_engine: AbstractKernelComputation = nnx.field(
+        default=EigenKernelComputation(), repr=False
     )
+    lengthscale: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
+    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
+    laplacian: tp.Union[Num[Array, "N N"], None] = field(kw_only=True)
+    smoothness: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
+    eigenvalues: Float[Array, "N 1"] = nnx.field(init=False)
+    eigenvectors: Float[Array, "N N"] = nnx.field(init=False)
+    num_vertex: ScalarInt = nnx.field(init=False)
     name: str = "Graph Matérn"
 
     def __post_init__(self):
