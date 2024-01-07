@@ -1,15 +1,11 @@
 """Compute Random Fourier Feature (RFF) kernel approximations.  """
-from dataclasses import dataclass
+import beartype.typing as tp
 
-from beartype.typing import Union
-from jax.random import PRNGKey
+from flax.experimental import nnx
+import jax.random as jr
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import (
-    param_field,
-    static_field,
-)
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import BasisFunctionComputation
 from gpjax.typing import (
@@ -18,7 +14,7 @@ from gpjax.typing import (
 )
 
 
-@dataclass
+@nnx.dataclass
 class RFF(AbstractKernel):
     r"""Computes an approximation of the kernel using Random Fourier Features.
 
@@ -35,15 +31,15 @@ class RFF(AbstractKernel):
     - 'On the Error of Random Fourier Features' by Sutherland and Schneider (2015).
     """
 
-    base_kernel: Union[AbstractKernel, None] = None
-    num_basis_fns: int = static_field(50)
-    frequencies: Union[Float[Array, "M D"], None] = param_field(
-        None, bijector=tfb.Identity()
+    base_kernel: tp.Union[AbstractKernel, None] = None
+    num_basis_fns: int = 50
+    frequencies: tp.Union[Float[Array, "M D"], None] = nnx.variable_field(
+        nnx.Param, default=None,
     )
-    compute_engine: BasisFunctionComputation = static_field(
-        BasisFunctionComputation(), repr=False
+    compute_engine: BasisFunctionComputation = nnx.field(
+        default = BasisFunctionComputation(), repr=False
     )
-    key: KeyArray = static_field(PRNGKey(123))
+    key: KeyArray = jr.PRNGKey(123)
 
     def __post_init__(self) -> None:
         r"""Post-initialisation function.
