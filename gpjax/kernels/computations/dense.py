@@ -14,13 +14,15 @@
 # ==============================================================================
 
 import beartype.typing as tp
+
 from jax import vmap
 from jaxtyping import Float
 
+import gpjax
 from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.typing import Array
 
-Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
+K = tp.TypeVar("K", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
 
 
 class DenseKernelComputation(AbstractKernelComputation):
@@ -29,7 +31,7 @@ class DenseKernelComputation(AbstractKernelComputation):
     """
 
     def cross_covariance(
-        self, kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"]
+        self, kernel: K, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
         r"""Compute the cross-covariance matrix.
 

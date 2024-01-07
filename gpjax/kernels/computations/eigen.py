@@ -14,8 +14,6 @@
 # ==============================================================================
 
 
-from dataclasses import dataclass
-
 import beartype.typing as tp
 import jax.numpy as jnp
 from jaxtyping import (
@@ -23,13 +21,13 @@ from jaxtyping import (
     Num,
 )
 
+import gpjax
 from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.typing import Array
 
 Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
 
 
-@dataclass
 class EigenKernelComputation(AbstractKernelComputation):
     r"""Eigen kernel computation class. Kernels who operate on an
     eigen-decomposed structure should use this computation object.
