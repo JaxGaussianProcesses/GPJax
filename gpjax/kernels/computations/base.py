@@ -14,33 +14,34 @@
 # ==============================================================================
 
 import abc
-from dataclasses import dataclass
 import typing as tp
 
-from cola import PSD
-from cola.ops import (
+from cola.annotations import PSD
+from cola.ops.operators import (
     Dense,
     Diagonal,
     LinearOperator,
 )
+from flax.experimental import nnx
 from jax import vmap
 from jaxtyping import (
     Float,
     Num,
 )
 
+import gpjax
 from gpjax.typing import Array
 
-Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
+K = tp.TypeVar("K", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
 
 
-@dataclass
+@nnx.dataclass
 class AbstractKernelComputation:
     r"""Abstract class for kernel computations."""
 
     def gram(
         self,
-        kernel: Kernel,
+        kernel: K,
         x: Num[Array, "N D"],
     ) -> LinearOperator:
         r"""Compute Gram covariance operator of the kernel function.
@@ -58,7 +59,7 @@ class AbstractKernelComputation:
 
     @abc.abstractmethod
     def cross_covariance(
-        self, kernel: Kernel, x: Num[Array, "N D"], y: Num[Array, "M D"]
+        self, kernel: K, x: Num[Array, "N D"], y: Num[Array, "M D"]
     ) -> Float[Array, "N M"]:
         r"""For a given kernel, compute the NxM gram matrix on an a pair
         of input matrices with shape NxD and MxD.
@@ -74,7 +75,7 @@ class AbstractKernelComputation:
         """
         raise NotImplementedError
 
-    def diagonal(self, kernel: Kernel, inputs: Num[Array, "N D"]) -> Diagonal:
+    def diagonal(self, kernel: K, inputs: Num[Array, "N D"]) -> Diagonal:
         r"""For a given kernel, compute the elementwise diagonal of the
         NxN gram matrix on an input matrix of shape NxD.
 
