@@ -36,7 +36,7 @@ from gpjax.typing import (
 class AbstractKernel(nnx.Module):
     r"""Base kernel class."""
 
-    n_dims: int = nnx.field(init=True)
+    n_dims: int = nnx.field(init=False)
     active_dims: tp.Union[list[int], int, slice] = 1
     compute_engine: AbstractKernelComputation = nnx.field(
         default=DenseKernelComputation(), repr=False
