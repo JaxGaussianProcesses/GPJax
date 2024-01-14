@@ -17,7 +17,7 @@ from dataclasses import (
     dataclass,
     field,
 )
-
+from beartype.typing import List
 from jax import config
 import jax.numpy as jnp
 from jaxtyping import (
@@ -30,6 +30,8 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 from gpjax.base import param_field
 from gpjax.kernels.base import (
     AbstractKernel,
+    AdditiveKernel,
+    Constant,
     CombinationKernel,
     ProductKernel,
     SumKernel,
@@ -77,6 +79,10 @@ def test_abstract_kernel():
     assert dummy_kernel.test_b == jnp.array([2.0])
     assert dummy_kernel(jnp.array([1.0]), jnp.array([2.0])) == 4.0
 
+@pytest.mark.parametrize("constant", [0.1,10.0])
+def test_constant_kernel(constant: Float) -> None:
+    k = Constant(constant=jnp.array(constant))
+    assert k(jnp.array([1.0]), jnp.array([2.0])) == constant
 
 @pytest.mark.parametrize("combination_type", [SumKernel, ProductKernel])
 @pytest.mark.parametrize(
@@ -186,3 +192,59 @@ def test_prod_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
 
     # Check manual and automatic gram matrices are equal
     assert jnp.all(Kxx.to_dense() == Kxx_k1.to_dense() * Kxx_k2.to_dense())
+
+def test_additive_kernel() -> None:
+
+    # test raises if given wrong init
+    with pytest.raises(ValueError):
+        AdditiveKernel(
+            kernels=[RBF()], 
+            max_interaction_depth = 2,
+            interaction_variances = jnp.array([1.0,1.0])
+        )
+
+    base_kernels = [
+        RBF(lengthscale=0.1, active_dims=[0]), 
+        RBF(lengthscale=1.0, active_dims=[1]), 
+        RBF(lengthscale=10.0, active_dims=[2])
+        ]
+    vars= jnp.array([1.0, 2.0, 3.0, 4.0])
+    additive_kernel = AdditiveKernel(
+        kernels=base_kernels, 
+        max_interaction_depth = 3,
+        interaction_variances = vars,
+    ) 
+    x= jnp.array([1.0,2.0,3.0], dtype=jnp.float64)
+    y = jnp.array([3.0,2.0,1.0], dtype=jnp.float64)
+    ks = jnp.stack([k(x, y) for k in base_kernels])
+    
+    # test that the internal Newton Girad identity is correct
+    ng_identity = additive_kernel._compute_additive_terms_girad_newton(ks)
+    assert ng_identity[0] == 1.0
+    all_first = ks[0] + ks[1] + ks[2]
+    assert ng_identity[1] == all_first
+    all_2nd = ks[0]*ks[1] + ks[0]*ks[2] + ks[1]*ks[2]
+    assert (ng_identity[2] - all_2nd)**2 < 1e-10
+    all_3rd = ks[0]*ks[1]*ks[2]
+    assert (ng_identity[3] - all_3rd)**2 < 1e-10
+
+    # check that the kernel eval is correct
+    k_eval = additive_kernel(x, y)
+    k_exact = vars[0] + vars[1]*all_first + vars[2]*all_2nd + vars[3]*all_3rd
+    assert (k_exact - k_eval)**2 < 1e-10
+
+    # check that get_specific_kernel works
+    k0 = additive_kernel.get_specific_kernel([])
+    assert isinstance(k0, Constant)
+    assert k0(x,y) == vars[0]
+    k1 = additive_kernel.get_specific_kernel([0])
+    assert isinstance(k1, CombinationKernel)
+    assert k1(x,y) == vars[1]* base_kernels[0](x,y)
+    k2 = additive_kernel.get_specific_kernel([0,1])
+    assert isinstance(k2, CombinationKernel)
+    assert k2(x,y) == vars[2]* base_kernels[0](x,y)*base_kernels[1](x,y)
+
+
+
+
+

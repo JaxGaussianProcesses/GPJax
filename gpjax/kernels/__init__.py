@@ -20,6 +20,7 @@ from gpjax.kernels.base import (
     Constant,
     ProductKernel,
     SumKernel,
+    AdditiveKernel,
 )
 from gpjax.kernels.computations import (
     BasisFunctionComputation,
@@ -47,6 +48,7 @@ from gpjax.kernels.stationary import (
 
 __all__ = [
     "AbstractKernel",
+    "AdditiveKernel"
     "ArcCosine",
     "Constant",
     "RBF",

@@ -24,11 +24,13 @@ from beartype.typing import (
     Union,
 )
 import jax.numpy as jnp
+import jax
 from jaxtyping import (
     Float,
     Num,
 )
 import tensorflow_probability.substrates.jax.distributions as tfd
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import (
     Module,
@@ -42,6 +44,7 @@ from gpjax.kernels.computations import (
 from gpjax.typing import (
     Array,
     ScalarFloat,
+    ScalarInt,
 )
 
 
@@ -206,3 +209,74 @@ class CombinationKernel(AbstractKernel):
 
 SumKernel = partial(CombinationKernel, operator=jnp.sum)
 ProductKernel = partial(CombinationKernel, operator=jnp.prod)
+
+
+@dataclass()
+class AdditiveKernel(AbstractKernel):
+    r"""Build an additive kernel from a list of individual base kernels for a specific maximum interaction depth."""
+
+    kernels: list[AbstractKernel] = None
+    max_interaction_depth: ScalarInt = static_field(1)
+    interaction_variances: Float[Array, " p"] = param_field(jnp.array([1.0, 1.0]), bijector=tfb.Softplus())
+    name: str = "AdditiveKernel"
+
+    def __post_init__(self): # jax/jit requires specifying max_interaction depth even though this could be inferred from length of interaction_variances
+        if not self.max_interaction_depth == len(self.interaction_variances) - 1:
+            raise ValueError("Number of interaction variances must be equal to max_interaction_depth + 1")
+
+    def __call__(self, x: Num[Array, " D"], y: Num[Array, " D"]) -> ScalarFloat:
+        r"""Compute the additive kernel between a pair of inputs.
+
+        Args:
+            x (Float[Array, " D"]): The left hand input of the kernel function.
+            y (Float[Array, " D"]): The right hand input of the kernel function.
+
+        Returns
+        -------
+            ScalarFloat: The evaluated kernel function at the supplied inputs.
+        """
+        x_sliced, y_sliced = self.slice_input(x), self.slice_input(y)
+        ks = jnp.stack([k(x_sliced, y_sliced) for k in self.kernels]) # individual kernel evals
+        return jnp.dot(self._compute_additive_terms_girad_newton(ks), self.interaction_variances) # combined kernel
+            
+    @jax.jit   
+    def _compute_additive_terms_girad_newton(self, ks: Num[Array, " D"]) -> Num[Array, " p"]:
+        r"""Given a list of inputs, compute a new list containing all products up to order
+        `max_interaction_depth`. For efficiency, we us the Girad Newton identity 
+        (i.e. O(d^2) instead of exponential).
+
+        Args:
+            ks (Num[Array, " D"]): The evaluations of the individual kernels.
+
+        Returns
+        -------
+            ScalarFloat: The sum of products of individual kernels for each required order.
+        """
+        powers = jnp.arange(self.max_interaction_depth + 1)[:, None] # [p + 1, 1]
+        s = jnp.power(ks[None, :],powers) # [p + 1, d]
+        e = jnp.ones(shape=(self.max_interaction_depth+1), dtype=jnp.float64) # lazy init then populate
+        for n in range(1, self.max_interaction_depth + 1): # has to be for loop because iterative
+            thing = jax.vmap(lambda k: ((-1.0)**(k-1))*e[n-k]*s[k, :])(jnp.arange(1, n+1))
+            e = e.at[n].set((1.0/n) *jnp.sum(thing))
+        return jnp.array(e) # [p + 1]
+    
+    def get_specific_kernel(self, component_list: List[int] = []) -> AbstractKernel:
+        r""" Get a specific kernel from the additive kernel corresponding to component_list.
+
+        For example, requesting component_list = [0, 1] will return the kernel corresponding to the
+        product of the first two kernels considered in additive kernel.
+
+        Args:
+            component_list (List[int]): The list representing the desired sub-kernel combination.
+
+        Returns
+        -------
+            AbstractKernel: The individual kernel corresponding to the desired sub-kernel combination.
+        
+        
+        """
+        var = self.interaction_variances[len(component_list)]
+        kernel = Constant(constant = var)
+        for i in component_list:
+            kernel = kernel * self.kernels[i]
+        return kernel
