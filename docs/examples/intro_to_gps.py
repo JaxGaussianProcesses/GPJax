@@ -403,7 +403,7 @@ with warnings.catch_warnings():
 # $\mathbf{K}_{ff}$ such that the $(i, j)^{\text{th}}$ entry of the matrix is
 # given by $[\mathbf{K}_{ff}]_{i, j} = k(\mathbf{x}_i, \mathbf{x}_j)$. As is
 # conventional within the literature, we centre our training data and assume
-# $\mu(\mathbf{X}):= 0$ for all $\mathbf{X}\in\mathbf{X}$. We further drop
+# $\mu(\mathbf{X}):= 0$ for all $\mathbf{X}\in\mathcal{X}$. We further drop
 # dependency on $\boldsymbol{\theta}$ and $\mathbf{X}$ for notational
 # convenience in the remainder of this article.
 #
