@@ -268,10 +268,10 @@ opt_predictive_mean = opt_predictive_dist.mean()
 opt_predictive_std = opt_predictive_dist.stddev()
 
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(5, 6))
-ax1.plot(training_x, training_y, "x", label="Observations", color=cols[0], alpha=0.5)
 ax1.plot(
     test_x, test_y, label="Latent function", color=cols[0], linestyle="--", linewidth=2
 )
+ax1.plot(training_x, training_y, "x", label="Observations", color="k", zorder=5)
 plot_ribbon(ax1, test_x, opt_predictive_dist, color=cols[1])
 ax1.set_title("Posterior with Hyperparameter Optimisation")
 ax1.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))
@@ -279,10 +279,10 @@ ax1.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))
 no_opt_latent_dist = no_opt_posterior.predict(test_x, train_data=D)
 no_opt_predictive_dist = no_opt_posterior.likelihood(no_opt_latent_dist)
 
-ax2.plot(training_x, training_y, "x", label="Observations", color=cols[0], alpha=0.5)
 ax2.plot(
     test_x, test_y, label="Latent function", color=cols[0], linestyle="--", linewidth=2
 )
+ax2.plot(training_x, training_y, "x", label="Observations", color="k", zorder=5)
 plot_ribbon(ax2, test_x, no_opt_predictive_dist, color=cols[1])
 ax2.set_title("Posterior without Hyperparameter Optimisation")
 ax2.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))
