@@ -201,7 +201,7 @@ def forrester(x: Float[Array, "N"]) -> Float[Array, "N"]:
     return (6 * x - 2) ** 2 * jnp.sin(12 * x - 4)
 
 
-n = 5
+n = 13
 
 training_x = jr.uniform(key=key, minval=0, maxval=1, shape=(n,)).reshape(-1, 1)
 training_y = forrester(training_x)
