@@ -322,7 +322,8 @@ with warnings.catch_warnings():
 #     \end{bmatrix}\right) = \mathcal{N}\left(\begin{bmatrix}
 #         \boldsymbol{\mu}_{\mathbf{x}} \\ \boldsymbol{\mu}_{\mathbf{y}}
 #     \end{bmatrix}, \begin{bmatrix}
-#         \boldsymbol{\Sigma}_{\mathbf{yx}}, \boldsymbol{\Sigma}_{\mathbf{yy}}
+#         \boldsymbol{\Sigma}_{\mathbf{xx}} & \boldsymbol{\Sigma}_{\mathbf{xy}}\\
+#         \boldsymbol{\Sigma}_{\mathbf{yx}} & \boldsymbol{\Sigma}_{\mathbf{yy}}
 #     \end{bmatrix} \right)\,,
 # \end{align}
 # $$
