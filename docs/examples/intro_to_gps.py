@@ -344,7 +344,7 @@ with warnings.catch_warnings():
 # $$
 # \begin{alignat}{3}
 #     & \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{y} && = p(\mathbf{x})
-#     && = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}},
+#     && = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}},\boldsymbol{\Sigma}_{\mathbf{xx}})\\
 #     & \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{x} && = p(\mathbf{y})
 #     && = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{y}},
 #     \boldsymbol{\Sigma}_{\mathbf{yy}})\,.
