@@ -3028,7 +3028,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=38f77af5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=025f0992">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3122,7 +3122,7 @@ We can plot three different parameterisations of this density.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=88b51648">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e05f7185">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3216,7 +3216,7 @@ ax.legend(loc="best")</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[1]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;matplotlib.legend.Legend at 0x7f2361f49c90&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7fd9cdf598a0&gt;</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -3229,7 +3229,7 @@ ax.legend(loc="best")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9eccfa4a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=73219012">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3262,7 +3262,7 @@ determines the correlation of the multivariate Gaussian.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=97d520bf">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9f680fc8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3382,7 +3382,7 @@ for a, t, d in zip([ax0, ax1, ax2], titles, dists):
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>/tmp/ipykernel_11416/962842387.py:32: MatplotlibDeprecationWarning: The collections attribute was deprecated in Matplotlib 3.8 and will be removed two minor releases later.
+<pre>/tmp/ipykernel_11361/962842387.py:32: MatplotlibDeprecationWarning: The collections attribute was deprecated in Matplotlib 3.8 and will be removed two minor releases later.
   for c in cntf.collections:
 </pre>
 </div>
@@ -3397,7 +3397,7 @@ for a, t, d in zip([ax0, ax1, ax2], titles, dists):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bdcd8c19">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=46ee21d7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3439,7 +3439,7 @@ $p(\mathbf{y})$, occurring at the same time. We visualise this idea below.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3d75cde8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=fa0aaafa">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3608,7 +3608,7 @@ with warnings.catch_warnings():
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a0125ccc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9e0926f4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3626,7 +3626,8 @@ $$
     \end{bmatrix}\right) = \mathcal{N}\left(\begin{bmatrix}
         \boldsymbol{\mu}_{\mathbf{x}} \\ \boldsymbol{\mu}_{\mathbf{y}}
     \end{bmatrix}, \begin{bmatrix}
-        \boldsymbol{\Sigma}_{\mathbf{yx}}, \boldsymbol{\Sigma}_{\mathbf{yy}}
+        \boldsymbol{\Sigma}_{\mathbf{xx}} &amp; \boldsymbol{\Sigma}_{\mathbf{xy}}\\
+        \boldsymbol{\Sigma}_{\mathbf{yx}} &amp; \boldsymbol{\Sigma}_{\mathbf{yy}}
     \end{bmatrix} \right)\,,
 \end{align}
 $$
@@ -3646,7 +3647,7 @@ $\mathbf{y}$ is given by
 $$
 \begin{alignat}{3}
     &amp; \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{y} &amp;&amp; = p(\mathbf{x})
-    &amp;&amp; = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}},
+    &amp;&amp; = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}},\boldsymbol{\Sigma}_{\mathbf{xx}})\\
     &amp; \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{x} &amp;&amp; = p(\mathbf{y})
     &amp;&amp; = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{y}},
     \boldsymbol{\Sigma}_{\mathbf{yy}})\,.
@@ -3803,7 +3804,7 @@ GPs that served as the inspiration for this notebook.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5ebe2ac1">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ca968cd1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3839,17 +3840,17 @@ GPs that served as the inspiration for this notebook.</p>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>Author: Thomas Pinder
 
-Last updated: Fri Jan 26 2024
+Last updated: Mon Jan 29 2024
 
 Python implementation: CPython
 Python version       : 3.10.13
 IPython version      : 8.17.2
 
-tensorflow_probability: 0.19.0
-matplotlib            : 3.8.1
 pandas                : 1.5.3
-seaborn               : 0.12.2
 jax                   : 0.4.20
+matplotlib            : 3.8.1
+seaborn               : 0.12.2
+tensorflow_probability: 0.19.0
 
 Watermark: 2.4.3
 
