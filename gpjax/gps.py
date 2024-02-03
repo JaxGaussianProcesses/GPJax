@@ -460,6 +460,8 @@ class ConjugatePosterior(AbstractPosterior[PriorType, GaussianLikelihood]):
         self,
         test_inputs: Num[Array, "N D"],
         train_data: Dataset,
+        kernel_between_train: Optional[AbstractKernel] = None,
+        kernel_with_test: Optional[AbstractKernel] = None,
     ) -> GaussianDistribution:
         r"""Query the predictive posterior distribution.
 
@@ -504,6 +506,8 @@ class ConjugatePosterior(AbstractPosterior[PriorType, GaussianLikelihood]):
                 predictive distribution is evaluated.
             train_data (Dataset): A `gpx.Dataset` object that contains the input and
                 output data used for training dataset.
+            kernel_between_train (Optional[AbstractKernel): todo
+            kernel_with_test (Optional[AbstractKernel): todo
 
         Returns
         -------
@@ -520,8 +524,12 @@ class ConjugatePosterior(AbstractPosterior[PriorType, GaussianLikelihood]):
         obs_noise = self.likelihood.obs_stddev**2
         mx = self.prior.mean_function(x)
 
+        # If provided, use the extra kernels, otherwise use the prior's kernel (standard behaviour)
+        kernel_between_x = self.prior.kernel if kernel_between_train is None else kernel_between_train
+        kernel_with_t = self.prior.kernel if kernel_with_test is None else kernel_with_test
+
         # Precompute Gram matrix, Kxx, at training inputs, x
-        Kxx = self.prior.kernel.gram(x)
+        Kxx = kernel_between_x.gram(x)
         Kxx += cola.ops.I_like(Kxx) * self.jitter
 
         # Σ = Kxx + Io²
@@ -529,8 +537,8 @@ class ConjugatePosterior(AbstractPosterior[PriorType, GaussianLikelihood]):
         Sigma = cola.PSD(Sigma)
 
         mean_t = self.prior.mean_function(t)
-        Ktt = self.prior.kernel.gram(t)
-        Kxt = self.prior.kernel.cross_covariance(x, t)
+        Ktt = kernel_with_t.gram(t)
+        Kxt = kernel_with_t.cross_covariance(x, t)
         Sigma_inv_Kxt = cola.solve(Sigma, Kxt)
 
         # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
@@ -542,6 +550,8 @@ class ConjugatePosterior(AbstractPosterior[PriorType, GaussianLikelihood]):
         covariance = cola.PSD(covariance)
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
+
+
 
     def sample_approx(
         self,
