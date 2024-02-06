@@ -12,9 +12,10 @@ from gpjax.base import (
     Module,
     static_field,
 )
-from gpjax.dataset import Dataset
+from gpjax.dataset import Dataset, VerticalDataset
 from gpjax.distributions import GaussianDistribution
 from gpjax.lower_cholesky import lower_cholesky
+from gpjax.gps import CustomConjugatePosterior, CustomAdditiveConjugatePosterior
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -496,3 +497,49 @@ class CollapsedELBO(AbstractObjective):
 
         # log N(y; μx, Io² + KxzKzz⁻¹Kzx) - 1/2o² tr(Kxx - KxzKzz⁻¹Kzx)
         return self.constant * (two_log_prob - two_trace).squeeze() / 2.0
+
+
+
+class CustomConjugateMLL(ConjugateMLL):
+    def step(
+        self,
+        posterior: CustomConjugatePosterior,
+        train_data: VerticalDataset,
+    ) -> ScalarFloat:
+        x,y = posterior.smoother.smooth_data(train_data)
+        return super().step(posterior, Dataset(x, y))
+
+
+class CustomELBO(AbstractObjective):
+    def step(
+        self,
+        variational_family: VariationalFamily,
+        train_data: VerticalDataset,
+    ) -> ScalarFloat:
+        return self.constant * (
+            jnp.sum(custom_variational_expectation(variational_family, train_data))
+            * variational_family.posterior.likelihood.num_datapoints
+            / train_data.n
+            - variational_family.prior_kl()
+        )
+
+
+def custom_variational_expectation(
+    variational_family: VariationalFamily,
+    train_data: VerticalDataset,
+) -> Float[Array, " N"]:
+    # Unpack training batch
+    x,y = variational_family.posterior.smoother.smooth_data(train_data)
+
+    q = variational_family
+
+    def q_moments(x):
+        qx = q(x)
+        return qx.mean().squeeze(), qx.covariance().squeeze()
+
+    mean, variance = vmap(q_moments)(x[:, None])
+
+    expectation = q.posterior.likelihood.expected_log_likelihood(
+        y, mean[:, None], variance[:, None]
+    )
+    return expectation

@@ -20,7 +20,9 @@ from typing import (
     Generic,
     TypeVar,
     overload,
+    List,
 )
+import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from beartype.typing import (
     Any,
@@ -35,6 +37,7 @@ from jax.random import (
     PRNGKey,
     normal,
 )
+from jax import vmap
 from jaxtyping import (
     Float,
     Num,
@@ -45,7 +48,7 @@ from gpjax.base import (
     param_field,
     static_field,
 )
-from gpjax.dataset import Dataset
+from gpjax.dataset import Dataset, VerticalDataset
 from gpjax.distributions import GaussianDistribution
 from gpjax.kernels import RFF
 from gpjax.kernels.base import AbstractKernel
@@ -60,6 +63,7 @@ from gpjax.typing import (
     Array,
     FunctionalSample,
     KeyArray,
+    ScalarFloat,
 )
 
 Kernel = TypeVar("Kernel", bound=AbstractKernel)
@@ -493,7 +497,7 @@ class ConjugatePosterior(AbstractPosterior[PriorType, GaussianLikelihood]):
                 >>>
                 >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
                 >>> ytrain = jnp.sin(xtrain)
-                >>> D = gpx.Dataset(X=xtrain, y=ytrain)
+                >>> D = VerticalDataset(X=xtrain, y=ytrain)
                 >>> xtest = jnp.linspace(0, 1).reshape(-1, 1)
                 >>>
                 >>> prior = gpx.gps.Prior(mean_function = gpx.mean_functions.Zero(), kernel = gpx.kernels.RBF())
@@ -504,7 +508,7 @@ class ConjugatePosterior(AbstractPosterior[PriorType, GaussianLikelihood]):
         Args:
             test_inputs (Num[Array, "N D"]): A Jax array of test inputs at which the
                 predictive distribution is evaluated.
-            train_data (Dataset): A `gpx.Dataset` object that contains the input and
+            train_data (Dataset): A `VerticalDataset` object that contains the input and
                 output data used for training dataset.
             kernel_between_train (Optional[AbstractKernel): todo
             kernel_with_test (Optional[AbstractKernel): todo
@@ -676,7 +680,7 @@ class NonConjugatePosterior(AbstractPosterior[PriorType, NonGaussianLikelihood])
         transformed through the likelihood function's inverse link function.
 
         Args:
-            train_data (Dataset): A `gpx.Dataset` object that contains the input
+            train_data (Dataset): A `VerticalDataset` object that contains the input
                 and output data used for training dataset.
 
         Returns
@@ -803,3 +807,97 @@ __all__ = [
     "NonConjugatePosterior",
     "construct_posterior",
 ]
+
+
+
+
+
+
+@dataclass
+class VerticalSmoother(Module):
+    smoother_mean: Float[Array, "1 D"]  = param_field(None)
+    smoother_input_scale: Float[Array, "1 D"] = param_field(None)
+    Z_levels: Float[Array, "1 L"] = static_field(jnp.array([[1.0]]))
+
+    def __post_init__(self):
+        self.Z_mean = jnp.mean(self.Z_levels)
+        self.Z_std = jnp.std(self.Z_levels)
+        self.Z_levels = (self.Z_levels - self.Z_mean) / self.Z_std
+
+    def smooth(self) -> Num[Array, "D L"]:
+        smoothing_weights = jnp.exp(-0.5*((self.Z_levels-self.smoother_mean.T)/(self.smoother_input_scale.T))**2) # [D, L]
+        return  (smoothing_weights/ jnp.sum(smoothing_weights, axis=-1, keepdims=True)) # [D, L]
+    
+    def smooth_data(self, dataset: VerticalDataset) -> Num[Array, "N D"]:
+        x3d, x2d, xstatic, y = dataset.X3d, dataset.X2d, dataset.Xstatic, dataset.y
+        x3d_smooth = jnp.sum(jnp.multiply(self.smooth() , x3d), axis=-1) # [N, D_3d]
+        x = jnp.hstack([x3d_smooth, x2d, xstatic]) # [N, D_3d + D_2d +D_static]
+        return x, y
+
+
+
+@dataclass
+class CustomConjugatePosterior(ConjugatePosterior):
+    smoother: VerticalSmoother = VerticalSmoother()
+    
+    def predict(
+        self,
+        test_inputs: Num[Array, "N D"],
+        train_data: VerticalDataset,
+        kernel_between_train: Optional[AbstractKernel] = None,
+        kernel_with_test: Optional[AbstractKernel] = None,
+    ) -> GaussianDistribution:
+
+        # smooth data to get in form for preds
+        x,y = self.smoother.smooth_data(train_data)
+        smoothed_train_data = Dataset(x, y)
+        return super().predict(test_inputs, smoothed_train_data, kernel_between_train, kernel_with_test)
+
+
+class CustomAdditiveConjugatePosterior(CustomConjugatePosterior):
+    def __post__init__(self):
+        assert isinstance(self.prior.kernel, AdditiveKernel), "AdditiveConjugatePosterior requires an AdditiveKernel"
+
+    def predict_additive_component(
+        self,
+        test_inputs: Num[Array, "N D"],
+        train_data: VerticalDataset,
+        component_list: List[List[int]]
+    ) -> GaussianDistribution:
+        r"""Get the posterior predictive distribution for a specific additive component."""
+        specific_kernel = self.prior.kernel.get_specific_kernel(component_list)
+        return self.predict(test_inputs, train_data, kernel_with_test = specific_kernel)
+
+    def get_sobol_index(self, train_data: VerticalDataset, component_list: List[int]) -> ScalarFloat:
+        """ Return the sobol index for the additive component corresponding to component_list. """
+        if isinstance(component_list[0], List):
+            raise ValueError("Use get_sobol_indicies if you want to calc for multiple components")
+        x,y = self.smoother.smooth_data(train_data)
+        component_posterior = self.predict_additive_component(x, train_data, component_list)
+        full_posterior= self.predict(x, train_data) # wasteful as only need means
+        return jnp.var(component_posterior.mean()) / jnp.var(full_posterior.mean())
+    
+    def get_sobol_indicies(self, train_data: VerticalDataset, component_list: List[List[int]]) -> Num[Array, "c"]:
+        if not isinstance(component_list, List):
+            raise ValueError("Use get_sobol_index if you want to calc for single components")
+        x,y = self.smoother.smooth_data(train_data)
+        m_x = self.prior.mean_function(x).T
+
+        base_kernels = self.prior.kernel.kernels
+        Kxx_indiv = jnp.stack([k.gram(x).to_dense() for k in base_kernels], axis=0) # [d, N, N]
+        interaction_variances = self.prior.kernel.interaction_variances
+        Kxx_components = [interaction_variances[len(c)]*jnp.prod(Kxx_indiv[c, :, :], axis=0) for c in component_list] 
+        Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, N]
+        assert Kxx_components.shape[0] == len(component_list)
+
+        Kxx = self.prior.kernel.gram(x).to_dense() # [N, N]
+        Sigma = cola.PSD(Kxx + cola.ops.I_like(Kxx) * self.likelihood.obs_stddev**2)
+
+        def get_mean_from_covar(K): # [N,N] -> [N, 1]
+            Sigma_inv_Kxx = cola.solve(Sigma, K)
+            return m_x.T + jnp.matmul(Sigma_inv_Kxx.T, y - m_x) # [N, 1] 
+
+        mean_overall =  get_mean_from_covar(Kxx) # [N, 1]
+        mean_components = vmap(get_mean_from_covar)(Kxx_components) # [c, N, 1]
+
+        return jnp.var(mean_components[:,:,0], axis=-1) / jnp.var(mean_overall) # [c]

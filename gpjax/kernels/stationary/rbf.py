@@ -17,6 +17,7 @@ from dataclasses import dataclass
 
 from beartype.typing import Union
 import jax.numpy as jnp
+import warnings
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
@@ -64,3 +65,34 @@ class RBF(AbstractKernel):
     @property
     def spectral_density(self) -> tfd.Normal:
         return tfd.Normal(loc=0.0, scale=1.0)
+
+
+@dataclass()
+class OrthogonalRBF(AbstractKernel):
+    r"""todo only for unit gaussian input measure and zero mean."""
+    name: str = "OrthogonalRBF"
+    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
+    )
+
+    def __post_init__(self):
+        warnings.warn("This kernel is only valid for unit gaussian input measures and zero mean functions.")
+
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+        r"""Compute an orthogonal RBF kernel between a pair of arrays."""
+        x = self.slice_input(x) # [d]
+        y = self.slice_input(y) # [d]
+        ks = jnp.exp(-0.5 * ((x - y) / self.lengthscale) ** 2) # [d]
+        ks -=  self._cov_x_s(x) * self._cov_x_s(y) / self._var_s() # [d]
+        return jnp.prod(ks)
+    
+    def _cov_x_s(self,x):
+        l2 = self.lengthscale ** 2
+        return jnp.sqrt(l2 / (l2 + 1.0)) * jnp.exp(-0.5 * (x ** 2) / (l2 + 1.0)) # [d]
+        
+    def _var_s(self):
+        return  jnp.sqrt(self.lengthscale ** 2 / (self.lengthscale ** 2 + 2.0)) # [d]
+
+    @property
+    def spectral_density(self) -> tfd.Normal:
+        raise NotImplementedError

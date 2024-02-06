@@ -35,7 +35,7 @@ import optax as ox
 import scipy
 
 from gpjax.base import Module
-from gpjax.dataset import Dataset
+from gpjax.dataset import Dataset, VerticalDataset
 from gpjax.objectives import AbstractObjective
 from gpjax.scan import vscan
 from gpjax.typing import (
@@ -247,7 +247,7 @@ def fit_scipy(  # noqa: PLR0913
     return model, history
 
 
-def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
+def get_batch(train_data: Union[Dataset, VerticalDataset], batch_size: int, key: KeyArray) -> Dataset:
     """Batch the data into mini-batches. Sampling is done with replacement.
 
     Args:
@@ -259,12 +259,23 @@ def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
     -------
         Dataset: The batched dataset.
     """
-    x, y, n = train_data.X, train_data.y, train_data.n
 
-    # Subsample mini-batch indices with replacement.
-    indices = jr.choice(key, n, (batch_size,), replace=True)
-
-    return Dataset(X=x[indices], y=y[indices])
+    if isinstance(train_data, VerticalDataset):
+        x3d, x2d, xstatic, y, n = train_data.X3d, train_data.X2d,train_data.Xstatic, train_data.y, train_data.n
+        # Subsample mini-batch indices with replacement.
+        indices = jr.choice(key, n, (batch_size,), replace=True)
+        return VerticalDataset(
+            X3d=x3d[indices], 
+            X2d = x2d[indices],
+            Xstatic = xstatic[indices],
+            y=y[indices]
+            )   
+        
+    else:
+        x, y, n = train_data.X, train_data.y, train_data.n
+        # Subsample mini-batch indices with replacement.
+        indices = jr.choice(key, n, (batch_size,), replace=True)
+        return Dataset(X=x[indices], y=y[indices])
 
 
 def _check_model(model: Any) -> None:

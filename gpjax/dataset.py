@@ -120,6 +120,32 @@ def _check_precision(
         )
 
 
+
+
+@dataclass
+class VerticalDataset(Pytree):
+    X2d: Num[Array, "N D"] = None
+    X3d: Num[Array, "N D L"] = None
+    Xstatic: Num[Array, "N D"] = None
+    y: Num[Array, "N 1"] = None
+
+    def __post_init__(self) -> None:
+        _check_precision(self.X2d, self.y)
+        _check_precision(self.Xstatic, self.y)
+        _check_precision(self.X3d, self.y)
+
+    @property
+    def X(self):
+        return NotImplementedError("Use X2d, X3d or Xstatic instead")
+
+    @property
+    def n(self):
+        return self.X2d.shape[0]
+
+
+
 __all__ = [
     "Dataset",
 ]
+
+
