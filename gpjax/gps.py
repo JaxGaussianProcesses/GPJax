@@ -38,6 +38,7 @@ from jax.random import (
     normal,
 )
 from jax import vmap
+import jax
 from jaxtyping import (
     Float,
     Num,
@@ -818,6 +819,7 @@ class VerticalSmoother(Module):
     smoother_mean: Float[Array, "1 D"]  = param_field(None)
     smoother_input_scale: Float[Array, "1 D"] = param_field(None)
     Z_levels: Float[Array, "1 L"] = static_field(jnp.array([[1.0]]))
+    
 
     def __post_init__(self):
         self.Z_mean = jnp.mean(self.Z_levels)
@@ -825,7 +827,8 @@ class VerticalSmoother(Module):
         self.Z_levels = (self.Z_levels - self.Z_mean) / self.Z_std
 
     def smooth(self) -> Num[Array, "D L"]:
-        smoothing_weights = jnp.exp(-0.5*((self.Z_levels-self.smoother_mean.T)/(self.smoother_input_scale.T))**2) # [D, L]
+        smoothing_weights = jax.scipy.stats.norm.pdf(self.Z_levels, self.smoother_mean.T, self.smoother_input_scale.T)
+        #smoothing_weights = jnp.exp(-0.5*((self.Z_levels-self.smoother_mean.T)/(self.smoother_input_scale.T))**2) # [D, L]
         return  (smoothing_weights/ jnp.sum(smoothing_weights, axis=-1, keepdims=True)) # [D, L]
     
     def smooth_data(self, dataset: VerticalDataset) -> Num[Array, "N D"]:
