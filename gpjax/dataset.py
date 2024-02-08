@@ -142,7 +142,9 @@ class VerticalDataset(Pytree):
     def n(self):
         return self.X2d.shape[0]
 
-
+    @property
+    def dim(self):
+        return self.X2d.shape[1] + self.X3d.shape[1] + self.Xstatic.shape[1]
 
 __all__ = [
     "Dataset",

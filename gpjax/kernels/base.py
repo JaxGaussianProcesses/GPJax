@@ -224,6 +224,7 @@ class AdditiveKernel(AbstractKernel):
         if not self.max_interaction_depth == len(self.interaction_variances) - 1:
             raise ValueError("Number of interaction variances must be equal to max_interaction_depth + 1")
 
+
     def __call__(self, x: Num[Array, " D"], y: Num[Array, " D"]) -> ScalarFloat:
         r"""Compute the additive kernel between a pair of inputs.
 
@@ -237,8 +238,21 @@ class AdditiveKernel(AbstractKernel):
         """
         x_sliced, y_sliced = self.slice_input(x), self.slice_input(y)
         ks = jnp.stack([k(x_sliced, y_sliced) for k in self.kernels]) # individual kernel evals
-        return jnp.dot(self._compute_additive_terms_girad_newton(ks), self.interaction_variances) # combined kernel
+
+
+        assert self.interaction_variances.shape[0] == 3
+        ks = jnp.stack([k(x_sliced/jnp.sqrt(2.0), y_sliced/jnp.sqrt(2.0)) for k in self.kernels]) # individual kernel evals
+        add_2 =  self._compute_additive_terms_girad_newton(ks)
+        e = jnp.ones(shape=(self.max_interaction_depth+1), dtype=jnp.float64) # lazy init then populate
+        e = e.at[1].set(jnp.sum(ks))
+        e = e.at[2].set(add_2[2])
+        return jnp.dot(e, self.interaction_variances) # combined kernel
+        # return jnp.dot(self._compute_additive_terms_girad_newton(ks), self.interaction_variances) # combined kernel
             
+
+
+
+
     @jax.jit   
     def _compute_additive_terms_girad_newton(self, ks: Num[Array, " D"]) -> Num[Array, " p"]:
         r"""Given a list of inputs, compute a new list containing all products up to order
@@ -252,6 +266,8 @@ class AdditiveKernel(AbstractKernel):
         -------
             ScalarFloat: The sum of products of individual kernels for each required order.
         """
+        
+
         powers = jnp.arange(self.max_interaction_depth + 1)[:, None] # [p + 1, 1]
         s = jnp.power(ks[None, :],powers) # [p + 1, d]
         e = jnp.ones(shape=(self.max_interaction_depth+1), dtype=jnp.float64) # lazy init then populate
@@ -260,6 +276,9 @@ class AdditiveKernel(AbstractKernel):
             e = e.at[n].set((1.0/n) *jnp.sum(thing))
         return jnp.array(e) # [p + 1]
     
+
+
+
     def get_specific_kernel(self, component_list: List[int] = []) -> AbstractKernel:
         r""" Get a specific kernel from the additive kernel corresponding to component_list.
 

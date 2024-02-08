@@ -507,7 +507,12 @@ class CustomConjugateMLL(ConjugateMLL):
         train_data: VerticalDataset,
     ) -> ScalarFloat:
         x,y = posterior.smoother.smooth_data(train_data)
-        return super().step(posterior, Dataset(x, y))
+        # log_prob = jnp.sum(tfd.Gamma(1.0,0.2).log_prob(posterior.prior.kernel.interaction_variances))
+        # lengthscales = jnp.array([posterior.prior.kernel.kernels[k].lengthscale[0] for k in range(train_data.dim)])
+        # mu_0 = -1.5
+        # simga_0 = jnp.sqrt(3.0)
+        # log_prob += jnp.sum(tfd.LogNormal(mu_0 + jnp.log(train_data.dim)/2.0, simga_0).log_prob(lengthscales))
+        return super().step(posterior, Dataset(x, y)) #+ log_prob
 
 
 class CustomELBO(AbstractObjective):
@@ -543,3 +548,4 @@ def custom_variational_expectation(
         y, mean[:, None], variance[:, None]
     )
     return expectation
+

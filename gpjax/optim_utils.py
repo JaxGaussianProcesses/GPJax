@@ -1,6 +1,7 @@
 import jax.numpy as jnp
 from optax import GradientTransformation
 import jax.tree_util as jtu
+import jax
 
 
 
@@ -40,4 +41,12 @@ def optim_builder(optim_pytree):
 
         return updates, state
 
+    return GradientTransformation(init_fn, update_fn)
+
+
+def zero_grads():
+    def init_fn(_): 
+        return ()
+    def update_fn(updates, state, params=None):
+        return jax.tree_map(jnp.zeros_like, updates), ()
     return GradientTransformation(init_fn, update_fn)
