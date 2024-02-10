@@ -829,7 +829,9 @@ class VerticalSmoother(Module):
     def smooth(self) -> Num[Array, "D L"]:
         smoothing_weights = jax.scipy.stats.norm.pdf(self.Z_levels, self.smoother_mean.T, self.smoother_input_scale.T)
         #smoothing_weights = jnp.exp(-0.5*((self.Z_levels-self.smoother_mean.T)/(self.smoother_input_scale.T))**2) # [D, L]
-        return  smoothing_weights # (smoothing_weights/ jnp.sum(smoothing_weights, axis=-1, keepdims=True)) # [D, L]
+        #return   (smoothing_weights/ jnp.sum(smoothing_weights, axis=-1, keepdims=True)) # [D, L]
+        return  (smoothing_weights/ jnp.sqrt(jnp.sum(smoothing_weights**2, axis=-1, keepdims=True))) # [D, L]
+    
     
     def smooth_data(self, dataset: VerticalDataset) -> Num[Array, "N D"]:
         x3d, x2d, xstatic, y = dataset.X3d, dataset.X2d, dataset.Xstatic, dataset.y
