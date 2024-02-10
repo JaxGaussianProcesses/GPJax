@@ -24,6 +24,7 @@ from beartype.typing import (
     Union,
 )
 import jax.numpy as jnp
+import numpy as np
 import jax
 from jaxtyping import (
     Float,
@@ -240,21 +241,23 @@ class AdditiveKernel(AbstractKernel):
         ks = jnp.stack([k(x_sliced, y_sliced) for k in self.kernels]) # individual kernel evals
 
 
-        assert self.interaction_variances.shape[0] == 3
-        ks = jnp.stack([k(x_sliced/jnp.sqrt(2.0), y_sliced/jnp.sqrt(2.0)) for k in self.kernels]) # individual kernel evals
-        add_2 =  self._compute_additive_terms_girad_newton(ks)
-        e = jnp.ones(shape=(self.max_interaction_depth+1), dtype=jnp.float64) # lazy init then populate
-        e = e.at[1].set(jnp.sum(ks))
-        e = e.at[2].set(add_2[2])
-        return jnp.dot(e, self.interaction_variances) # combined kernel
-        # return jnp.dot(self._compute_additive_terms_girad_newton(ks), self.interaction_variances) # combined kernel
+        # assert self.interaction_variances.shape[0] == 3
+        # ks = jnp.stack([k(x_sliced/jnp.sqrt(2.0), y_sliced/jnp.sqrt(2.0)) for k in self.kernels]) # individual kernel evals
+        # add_2 =  self._compute_additive_terms_girad_newton(ks)
+        # e = jnp.ones(shape=(self.max_interaction_depth+1), dtype=jnp.float64) # lazy init then populate
+        # e = e.at[1].set(jnp.sum(ks))
+        # e = e.at[2].set(add_2[2])
+        # return jnp.dot(e, self.interaction_variances) # combined kernel
+        return self._compute_additive_terms_girad_newton(ks) # combined kernel
             
 
 
 
-
-    @jax.jit   
-    def _compute_additive_terms_girad_newton(self, ks: Num[Array, " D"]) -> Num[Array, " p"]:
+    from jax import custom_jvp
+    
+    
+    @jax.jit
+    def _compute_additive_terms_girad_newton(self, ks: Num[Array, " D"]) -> Num[Array, " 1"]:
         r"""Given a list of inputs, compute a new list containing all products up to order
         `max_interaction_depth`. For efficiency, we us the Girad Newton identity 
         (i.e. O(d^2) instead of exponential).
@@ -264,19 +267,35 @@ class AdditiveKernel(AbstractKernel):
 
         Returns
         -------
-            ScalarFloat: The sum of products of individual kernels for each required order.
+            ScalarFloat: The sum of products of individual kernels for each required order. todo
         """
-        
-
-        powers = jnp.arange(self.max_interaction_depth + 1)[:, None] # [p + 1, 1]
-        s = jnp.power(ks[None, :],powers) # [p + 1, d]
-        e = jnp.ones(shape=(self.max_interaction_depth+1), dtype=jnp.float64) # lazy init then populate
-        for n in range(1, self.max_interaction_depth + 1): # has to be for loop because iterative
-            thing = jax.vmap(lambda k: ((-1.0)**(k-1))*e[n-k]*s[k, :])(jnp.arange(1, n+1))
-            e = e.at[n].set((1.0/n) *jnp.sum(thing))
-        return jnp.array(e) # [p + 1]
+    
+        def do_recursion(ks_vec: Num[Array, "M D"]) -> Num[Array, "p M"]:
+            powers = jnp.arange(self.max_interaction_depth+1)[:, None, None] # [p+1 , 1, 1]
+            s = jnp.power(ks_vec,powers) # [p+1, M, d]
+            e = jnp.ones(shape=(self.max_interaction_depth+1, jnp.shape(ks_vec)[0]), dtype=jnp.float64) # lazy init then populate [p+1, M]
+            for n in range(1, self.max_interaction_depth+1 ): # has to be for loop because iterative (could unroll to speed up for worse mem)
+                thing = jax.vmap(lambda k: ((-1.0)**(k-1))*e[n-k,:]*jnp.sum(s[k, :, :], -1))(jnp.arange(1, n+1)) # [n, M, d]
+                e = e.at[n].set((1.0/n) *jnp.sum(thing, (0)))
+            return e
     
 
+        from jax import custom_jvp
+        @custom_jvp 
+        def calc(ks: Num[Array, " D"], interaction_variances: Float[Array, " p"] ) -> Num[Array, " 1"]:
+            return jnp.sum(do_recursion(ks[None,:][:,0]) * interaction_variances) # [p + 1]
+            
+        
+        @calc.defjvp
+        def calc_jvp(primals, tangents):
+            ks , iv = primals
+            ks_dot, iv_dot = tangents
+        
+            ks_vec = jnp.repeat(ks[None,:],jnp.shape(ks)[0], 0) - jnp.diag(ks) # [d+1, d]
+            e = do_recursion(jnp.vstack([ks_vec, ks[None,:]])) # [p+1, d+1]
+            return jnp.sum(e[:,-1] * iv),  jnp.sum(jnp.sum(e[:-1,:-1] * iv[:, None][1:],0) * ks_dot) + jnp.sum(e[:,-1] * iv_dot)
+
+        return calc(ks, self.interaction_variances)
 
 
     def get_specific_kernel(self, component_list: List[int] = []) -> AbstractKernel:
@@ -299,3 +318,4 @@ class AdditiveKernel(AbstractKernel):
         for i in component_list:
             kernel = kernel * self.kernels[i]
         return kernel
+    
