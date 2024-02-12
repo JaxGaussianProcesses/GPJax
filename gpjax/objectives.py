@@ -498,7 +498,9 @@ class CollapsedELBO(AbstractObjective):
         # log N(y; μx, Io² + KxzKzz⁻¹Kzx) - 1/2o² tr(Kxx - KxzKzz⁻¹Kzx)
         return self.constant * (two_log_prob - two_trace).squeeze() / 2.0
 
-
+##############################################################################################################################
+##############################################################################################################################
+##############################################################################################################################
 
 class CustomConjugateMLL(ConjugateMLL):
     def step(
@@ -507,12 +509,29 @@ class CustomConjugateMLL(ConjugateMLL):
         train_data: VerticalDataset,
     ) -> ScalarFloat:
         x,y = posterior.smoother.smooth_data(train_data)
+        d = jnp.shape(x)[1]
+        log_prob =0.0
         # log_prob = jnp.sum(tfd.Gamma(1.0,0.2).log_prob(posterior.prior.kernel.interaction_variances))
         # lengthscales = jnp.array([posterior.prior.kernel.kernels[k].lengthscale[0] for k in range(train_data.dim)])
-        # mu_0 = -1.5
-        # simga_0 = jnp.sqrt(3.0)
-        # log_prob += jnp.sum(tfd.LogNormal(mu_0 + jnp.log(train_data.dim)/2.0, simga_0).log_prob(lengthscales))
-        return super().step(posterior, Dataset(x, y)) #+ log_prob
+        # log_prob += jnp.sum(tfd.Gamma(1.0, 1.0).log_prob(1.0/lengthscales))
+        return super().step(posterior, Dataset(x, y)) + log_prob
+
+
+class CustomConjugateLOOCV(ConjugateLOOCV):
+    def step(
+        self,
+        posterior: CustomConjugatePosterior,
+        train_data: VerticalDataset,
+    ) -> ScalarFloat:
+        x,y = posterior.smoother.smooth_data(train_data)
+        d = jnp.shape(x)[1]
+        log_prob =0.0
+        # log_prob = jnp.sum(tfd.Gamma(1.0,0.2).log_prob(posterior.prior.kernel.interaction_variances))
+        # lengthscales = jnp.array([posterior.prior.kernel.kernels[k].lengthscale[0] for k in range(train_data.dim)])
+        # log_prob += jnp.sum(tfd.Gamma(1.0, 1.0).log_prob(1.0/lengthscales))
+        return super().step(posterior, Dataset(x, y)) + log_prob
+
+
 
 
 class CustomELBO(AbstractObjective):
