@@ -47,6 +47,7 @@ class AbstractObjective(Module):
 
     negative: bool = static_field(False)
     constant: ScalarFloat = static_field(init=False, repr=False)
+    tau: ScalarFloat = static_field(1.0)
 
     def __post_init__(self) -> None:
         self.constant = jnp.array(-1.0) if self.negative else jnp.array(1.0)
@@ -504,7 +505,6 @@ class CollapsedELBO(AbstractObjective):
 
 
 class CustomConjugateMLL(ConjugateMLL):
-    
     def step(
         self,
         posterior: CustomConjugatePosterior,
@@ -515,10 +515,10 @@ class CustomConjugateMLL(ConjugateMLL):
         d = jnp.shape(x)[1]
         log_prob =0.0
         #log_prob += jnp.sum(tfd.Gamma(1.0,0.2).log_prob(posterior.prior.kernel.interaction_variances))
-        log_prob += tfd.HalfCauchy(0.0,0.1).log_prob((1.0 / posterior.prior.kernel.kernels[0].lengthscale**2))
-        #log_prob += jnp.sum(jnp.vstack([tfd.HalfCauchy(0.0,0.1).log_prob((1.0 / posterior.prior.kernel.kernels[k].lengthscale**2)) for k in range(d)]))
+        
+        #log_prob += jnp.sum(jnp.vstack([tfd.HalfCauchy(0.0,self.tau).log_prob((1.0 / posterior.prior.kernel.kernels[k].lengthscale**2)) for k in range(d)])).squeeze()
 
-        return super().step(posterior, Dataset(x, y)) + log_prob.squeeze()
+        return super().step(posterior, Dataset(x, y)) + self.constant*log_prob
 
 
 class CustomConjugateLOOCV(ConjugateLOOCV):
