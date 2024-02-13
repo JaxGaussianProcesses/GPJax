@@ -502,19 +502,23 @@ class CollapsedELBO(AbstractObjective):
 ##############################################################################################################################
 ##############################################################################################################################
 
+
 class CustomConjugateMLL(ConjugateMLL):
+    
     def step(
         self,
         posterior: CustomConjugatePosterior,
         train_data: VerticalDataset,
     ) -> ScalarFloat:
         x,y = posterior.smoother.smooth_data(train_data)
+        
         d = jnp.shape(x)[1]
         log_prob =0.0
-        # log_prob = jnp.sum(tfd.Gamma(1.0,0.2).log_prob(posterior.prior.kernel.interaction_variances))
-        # lengthscales = jnp.array([posterior.prior.kernel.kernels[k].lengthscale[0] for k in range(train_data.dim)])
-        # log_prob += jnp.sum(tfd.Gamma(1.0, 1.0).log_prob(1.0/lengthscales))
-        return super().step(posterior, Dataset(x, y)) + log_prob
+        #log_prob += jnp.sum(tfd.Gamma(1.0,0.2).log_prob(posterior.prior.kernel.interaction_variances))
+        log_prob += tfd.HalfCauchy(0.0,0.1).log_prob((1.0 / posterior.prior.kernel.kernels[0].lengthscale**2))
+        #log_prob += jnp.sum(jnp.vstack([tfd.HalfCauchy(0.0,0.1).log_prob((1.0 / posterior.prior.kernel.kernels[k].lengthscale**2)) for k in range(d)]))
+
+        return super().step(posterior, Dataset(x, y)) + log_prob.squeeze()
 
 
 class CustomConjugateLOOCV(ConjugateLOOCV):
@@ -526,9 +530,7 @@ class CustomConjugateLOOCV(ConjugateLOOCV):
         x,y = posterior.smoother.smooth_data(train_data)
         d = jnp.shape(x)[1]
         log_prob =0.0
-        # log_prob = jnp.sum(tfd.Gamma(1.0,0.2).log_prob(posterior.prior.kernel.interaction_variances))
-        # lengthscales = jnp.array([posterior.prior.kernel.kernels[k].lengthscale[0] for k in range(train_data.dim)])
-        # log_prob += jnp.sum(tfd.Gamma(1.0, 1.0).log_prob(1.0/lengthscales))
+
         return super().step(posterior, Dataset(x, y)) + log_prob
 
 

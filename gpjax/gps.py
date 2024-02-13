@@ -831,14 +831,17 @@ class VerticalSmoother(Module):
 
     def smooth(self) -> Num[Array, "D L"]:
         smoothing_weights = jax.scipy.stats.norm.pdf(self.Z_levels, self.smoother_mean.T, self.smoother_input_scale.T)
+        return smoothing_weights
+        
         #smoothing_weights = jnp.exp(-0.5*((self.Z_levels-self.smoother_mean.T)/(self.smoother_input_scale.T))**2) # [D, L]
-        return   (smoothing_weights/ jnp.sum(smoothing_weights, axis=-1, keepdims=True)) # [D, L]
+        #return   (smoothing_weights/ jnp.sum(smoothing_weights, axis=-1, keepdims=True)) # [D, L]
         #return  (smoothing_weights/ jnp.sqrt(jnp.sum(smoothing_weights**2, axis=-1, keepdims=True))) # [D, L]
     
     
     def smooth_data(self, dataset: VerticalDataset) -> Num[Array, "N D"]:
         x3d, x2d, xstatic, y = dataset.X3d, dataset.X2d, dataset.Xstatic, dataset.y
-        x3d_smooth = jnp.sum(jnp.multiply(self.smooth() , x3d), axis=-1) # [N, D_3d]
+        delta = self.Z_levels[:,1:] - self.Z_levels[:,:-1]
+        x3d_smooth = jnp.sum(jnp.multiply(self.smooth()[:,:-1]*delta , x3d[:,:,:-1]), axis=-1) # [N, D_3d]
         x = jnp.hstack([x3d_smooth, x2d, xstatic]) # [N, D_3d + D_2d +D_static]
         x = (x - jnp.mean(x, axis=0)) / jnp.std(x, axis=0)
         return x, y
