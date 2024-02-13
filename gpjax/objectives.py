@@ -516,7 +516,7 @@ class CustomConjugateMLL(ConjugateMLL):
         log_prob =0.0
         #log_prob += jnp.sum(tfd.Gamma(1.0,0.2).log_prob(posterior.prior.kernel.interaction_variances))
         
-        #log_prob += jnp.sum(jnp.vstack([tfd.HalfCauchy(0.0,self.tau).log_prob((1.0 / posterior.prior.kernel.kernels[k].lengthscale**2)) for k in range(d)])).squeeze()
+        log_prob += jnp.sum(jnp.vstack([tfd.HalfCauchy(0.0,self.tau).log_prob((1.0 / posterior.prior.kernel.kernels[k].lengthscale**2)) for k in range(d)])).squeeze()
 
         return super().step(posterior, Dataset(x, y)) + self.constant*log_prob
 
