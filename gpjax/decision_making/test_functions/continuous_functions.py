@@ -12,24 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-from abc import (
-    ABC,
-    abstractmethod,
-)
+from abc import abstractmethod
 from dataclasses import dataclass
 
 import jax.numpy as jnp
 from jaxtyping import (
     Array,
     Float,
+    Num,
 )
+import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.dataset import Dataset
 from gpjax.decision_making.search_space import ContinuousSearchSpace
+from gpjax.gps import AbstractMeanFunction
 from gpjax.typing import KeyArray
 
 
-class AbstractContinuousTestFunction(ABC):
+class AbstractContinuousTestFunction(AbstractMeanFunction):
     """
     Abstract base class for continuous test functions.
 
@@ -43,19 +43,28 @@ class AbstractContinuousTestFunction(ABC):
     minimizer: Float[Array, "1 D"]
     minimum: Float[Array, "1 1"]
 
-    def generate_dataset(self, num_points: int, key: KeyArray) -> Dataset:
+    def generate_dataset(
+        self, num_points: int, key: KeyArray, obs_stddev: float = 0.0
+    ) -> Dataset:
         """
         Generate a toy dataset from the test function.
 
         Args:
             num_points (int): Number of points to sample.
             key (KeyArray): JAX PRNG key.
+            obs_stddev (float): (Optional) standard deviation of Gaussian distributed
+            noise added to observations.
 
         Returns:
             Dataset: Dataset of points sampled from the test function.
         """
         X = self.search_space.sample(num_points=num_points, key=key)
-        y = self.evaluate(X)
+        gaussian_noise = tfp.distributions.Normal(
+            jnp.zeros(num_points), obs_stddev * jnp.ones(num_points)
+        )
+        y = self.evaluate(X) + jnp.transpose(
+            gaussian_noise.sample(sample_shape=[1], seed=key)
+        )
         return Dataset(X=X, y=y)
 
     def generate_test_points(
@@ -72,6 +81,9 @@ class AbstractContinuousTestFunction(ABC):
             Float[Array, 'N D']: Test points sampled from the search space.
         """
         return self.search_space.sample(num_points=num_points, key=key)
+
+    def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N 1"]:
+        return self.evaluate(x)
 
     @abstractmethod
     def evaluate(self, x: Float[Array, "N D"]) -> Float[Array, "N 1"]:

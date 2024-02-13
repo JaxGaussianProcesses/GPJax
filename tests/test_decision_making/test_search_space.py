@@ -132,9 +132,6 @@ def test_continous_search_space_invalid_sample_num_points(
     ],
 )
 @pytest.mark.parametrize("num_points", [1, 5, 50])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_continuous_search_space_sample_shape(
     continuous_search_space: ContinuousSearchSpace, dimensionality: int, num_points: int
 ):
@@ -152,9 +149,6 @@ def test_continuous_search_space_sample_shape(
     ],
 )
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(5)])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_continous_search_space_sample_same_key_same_samples(
     continuous_search_space: ContinuousSearchSpace, key: jr.key
 ):
@@ -175,9 +169,6 @@ def test_continous_search_space_sample_same_key_same_samples(
     "key_one, key_two",
     [(jr.key(42), jr.key(5)), (jr.key(1), jr.key(2))],
 )
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_continuous_search_space_different_keys_different_samples(
     continuous_search_space: ContinuousSearchSpace,
     key_one: jr.key,
@@ -206,9 +197,6 @@ def test_continuous_search_space_different_keys_different_samples(
         ),
     ],
 )
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_continuous_search_space_valid_sample_ranges(
     continuous_search_space: ContinuousSearchSpace,
 ):

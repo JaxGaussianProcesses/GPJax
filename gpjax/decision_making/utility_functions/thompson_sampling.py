@@ -22,10 +22,7 @@ from gpjax.decision_making.utility_functions.base import (
     SinglePointUtilityFunction,
 )
 from gpjax.decision_making.utils import OBJECTIVE
-from gpjax.gps import (
-    ConjugatePosterior,
-    NonConjugatePosterior,
-)
+from gpjax.gps import ConjugatePosterior
 from gpjax.typing import KeyArray
 
 
@@ -59,7 +56,7 @@ class ThompsonSampling(AbstractSinglePointUtilityFunctionBuilder):
 
     def build_utility_function(
         self,
-        posteriors: Mapping[str, ConjugatePosterior | NonConjugatePosterior],
+        posteriors: Mapping[str, ConjugatePosterior],
         datasets: Mapping[str, Dataset],
         key: KeyArray,
     ) -> SinglePointUtilityFunction:
@@ -69,8 +66,8 @@ class ThompsonSampling(AbstractSinglePointUtilityFunctionBuilder):
         are *maximised*.
 
         Args:
-            posteriors (Mapping[str, AbstractPosterior]): Dictionary of posteriors to be
-            used to form the utility function. One of the posteriors must correspond
+            posteriors (Mapping[str, ConjugatePosterior]): Dictionary of posteriors to
+            be used to form the utility function. One of the posteriors must correspond
             to the `OBJECTIVE` key, as we sample from the objective posterior to form
             the utility function.
             datasets (Mapping[str, Dataset]): Dictionary of datasets which may be used
