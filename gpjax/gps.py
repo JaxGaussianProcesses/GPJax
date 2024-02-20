@@ -829,9 +829,12 @@ class VerticalSmoother(Module):
         self.Z_std = jnp.std(self.Z_levels)
         self.Z_levels = (self.Z_levels - self.Z_mean) / self.Z_std
 
+
+    def smooth_fn(self, x):
+        return jax.scipy.stats.norm.pdf(x, self.smoother_mean.T, self.smoother_input_scale.T)
+
     def smooth(self) -> Num[Array, "D L"]:
-        smoothing_weights = jax.scipy.stats.norm.pdf(self.Z_levels, self.smoother_mean.T, self.smoother_input_scale.T)
-        return smoothing_weights
+        return self.smooth_fn(self.Z_levels)
         
         #smoothing_weights = jnp.exp(-0.5*((self.Z_levels-self.smoother_mean.T)/(self.smoother_input_scale.T))**2) # [D, L]
         #return   (smoothing_weights/ jnp.sum(smoothing_weights, axis=-1, keepdims=True)) # [D, L]
