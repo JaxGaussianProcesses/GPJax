@@ -845,8 +845,9 @@ class VerticalSmoother(Module):
         x3d, x2d, xstatic, y = dataset.X3d, dataset.X2d, dataset.Xstatic, dataset.y
         delta = self.Z_levels[:,1:] - self.Z_levels[:,:-1]
         x3d_smooth = jnp.sum(jnp.multiply(self.smooth()[:,:-1]*delta , x3d[:,:,:-1]), axis=-1) # [N, D_3d]
+        x3d_smooth = x3d_smooth / (jnp.max(self.Z_levels) - jnp.min(self.Z_levels))
+        #x3d_smooth = (x3d_smooth - jnp.mean(x3d_smooth, axis=0)) / jnp.std(x3d_smooth, axis=0)
         x = jnp.hstack([x3d_smooth, x2d, xstatic]) # [N, D_3d + D_2d +D_static]
-        x = (x - jnp.mean(x, axis=0)) / jnp.std(x, axis=0)
         return x, y
 
 
@@ -917,7 +918,30 @@ class CustomAdditiveConjugatePosterior(CustomConjugatePosterior):
         mean_overall =  get_mean_from_covar(Kxx) # [N, 1]
         mean_components = vmap(get_mean_from_covar)(Kxx_components) # [c, N, 1]
 
-        return jnp.var(mean_components[:,:,0], axis=-1) / jnp.var(mean_overall) # [c]
+        sobols = jnp.var(mean_components[:,:,0], axis=-1) / jnp.var(mean_overall) # [c]
+
+        k=5
+        top_idx = jax.lax.top_k(sobols, k)[1]
+        zeroth = self.predict_additive_component(x, train_data, []).mean()[0]
+
+        from matplotlib import pyplot as plt
+        plt.figure()
+        plt.hist(train_data.y.T)
+        plt.title("true")
+        plt.figure()
+        plt.title("all iteractions")
+        plt.hist(jnp.sum(mean_components[:,:,0],0).T+ zeroth)
+        plt.figure()
+        plt.title(f"best {k} iteractions")
+        plt.hist(jnp.sum(mean_components[:,:,0][top_idx],0).T + zeroth)
+        plt.figure()
+
+
+        #return jnp.max(mean_components[:,:,0], axis=-1) - jnp.min(mean_components[:,:,0], axis=-1)
+        return sobols
+    
+    
+    
 
 
 

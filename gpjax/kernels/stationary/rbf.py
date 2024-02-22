@@ -96,3 +96,38 @@ class OrthogonalRBF(AbstractKernel):
     @property
     def spectral_density(self) -> tfd.Normal:
         raise NotImplementedError
+    
+import jax
+@dataclass()
+class OrthogonalRBFUnif(OrthogonalRBF):
+    r"""todo only for unit gaussian input measure and zero mean."""
+    name: str = "OrthogonalRBFUnif"
+    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
+    )
+
+    def __post_init__(self):
+        warnings.warn("This kernel is only valid for U input measureds and zero mean functions.")
+        self.lower = -1.0
+        self.upper = 1.0
+
+    def _cov_x_s(self,x):
+        l2 = self.lengthscale ** 2
+        
+        
+        cov = jnp.sqrt(l2) * jnp.sqrt(jnp.pi / 2.0) / (self.upper - self.lower)
+        cov *= jax.scipy.special.erf((self.upper-x) / (jnp.sqrt(2.0 * l2))) - jax.scipy.special.erf((self.lower-x) / (jnp.sqrt(2.0 * l2)))
+        
+        return cov # [d]
+        
+    def _var_s(self):
+        l2 = self.lengthscale**2
+        y = (self.upper - self.lower) / (jnp.sqrt(2.0 * l2))
+        
+        var = 2.0 * l2 / ((self.upper-self.lower)**2)
+        var *= jnp.sqrt(jnp.pi)*y*jax.scipy.special.erf(y) + jnp.exp(-jnp.square(y))-1.0
+        return  var
+
+
+
+
