@@ -15,8 +15,13 @@
 
 try:
     import beartype
+    import jaxtyping
 
-    ValidationErrors = (ValueError, beartype.roar.BeartypeCallHintParamViolation)
+    ValidationErrors = (
+        ValueError,
+        beartype.roar.BeartypeCallHintParamViolation,
+        jaxtyping.TypeCheckError,
+    )
 except ImportError:
     ValidationErrors = ValueError
 
