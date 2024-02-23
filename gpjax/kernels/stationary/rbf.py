@@ -15,7 +15,7 @@
 
 from dataclasses import dataclass
 
-from beartype.typing import Union
+from beartype.typing import Union, Optional
 import jax.numpy as jnp
 import warnings
 from jaxtyping import Float
@@ -100,7 +100,6 @@ class OrthogonalRBF(AbstractKernel):
 import jax
 @dataclass()
 class OrthogonalRBFUnif(OrthogonalRBF):
-    r"""todo only for unit gaussian input measure and zero mean."""
     name: str = "OrthogonalRBFUnif"
     lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
@@ -127,7 +126,5 @@ class OrthogonalRBFUnif(OrthogonalRBF):
         var = 2.0 * l2 / ((self.upper-self.lower)**2)
         var *= jnp.sqrt(jnp.pi)*y*jax.scipy.special.erf(y) + jnp.exp(-jnp.square(y))-1.0
         return  var
-
-
 
 

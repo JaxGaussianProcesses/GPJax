@@ -19,12 +19,16 @@ from dataclasses import dataclass
 from beartype.typing import (
     Any,
     Union,
+    Optional,
 )
+
+from jax import vmap
+from typing import List
 import cola
 from cola.linalg.decompositions.decompositions import Cholesky
 import jax.numpy as jnp
 import jax.scipy as jsp
-from jaxtyping import Float
+from jaxtyping import Float, Num
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.base import (
@@ -33,6 +37,7 @@ from gpjax.base import (
     static_field,
 )
 from gpjax.dataset import Dataset
+from gpjax.kernels import AbstractKernel
 from gpjax.distributions import GaussianDistribution
 from gpjax.gps import AbstractPosterior
 from gpjax.likelihoods import Gaussian
@@ -163,7 +168,13 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         return qu.kl_divergence(pu)
 
-    def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
+    def predict(
+            self, 
+            test_inputs: Float[Array, "N D"],
+            kernel_between_train: Optional[AbstractKernel] = None,
+            kernel_with_test: Optional[AbstractKernel] = None,
+            ) -> GaussianDistribution:
+        
         r"""Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral $`q(f(t)) = \int p(f(t)\mid u) q(u) \mathrm{d}u`$, which
@@ -181,6 +192,11 @@ class VariationalGaussian(AbstractVariationalGaussian):
             GaussianDistribution: The predictive distribution of the low-rank GP at
                 the test inputs.
         """
+
+        # If provided, use the extra kernels, otherwise use the prior's kernel (standard behaviour)
+        kernel_between_x = self.posterior.prior.kernel if kernel_between_train is None else kernel_between_train
+        kernel_with_t = self.posterior.prior.kernel if kernel_with_test is None else kernel_with_test
+
         # Unpack variational parameters
         mu = self.variational_mean
         sqrt = self.variational_root_covariance
@@ -188,9 +204,8 @@ class VariationalGaussian(AbstractVariationalGaussian):
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
-        kernel = self.posterior.prior.kernel
 
-        Kzz = kernel.gram(z)
+        Kzz = kernel_between_x.gram(z)
         Kzz += cola.ops.I_like(Kzz) * self.jitter
         Lz = lower_cholesky(Kzz)
         muz = mean_function(z)
@@ -198,8 +213,8 @@ class VariationalGaussian(AbstractVariationalGaussian):
         # Unpack test inputs
         t = test_inputs
 
-        Ktt = kernel.gram(t)
-        Kzt = kernel.cross_covariance(z, t)
+        Ktt = kernel_with_t.gram(t)
+        Kzt = kernel_with_t.cross_covariance(z, t)
         mut = mean_function(t)
 
         # Lz⁻¹ Kzt
@@ -739,3 +754,54 @@ __all__ = [
     "ExpectationVariationalGaussian",
     "CollapsedVariationalGaussian",
 ]
+
+
+
+
+
+
+class CustomVariationalGaussian(VariationalGaussian):
+   
+
+    def get_sobol_indicies(self, component_list: List[List[int]]) -> Num[Array, "c"]:
+        
+        # Unpack variational parameters
+        mu = self.variational_mean
+        sqrt = self.variational_root_covariance
+        z = self.inducing_inputs
+
+        # Unpack mean function and kernel
+        mean_function = self.posterior.prior.mean_function
+
+        base_kernels = self.posterior.prior.kernel.kernels
+        Kzz_indiv = jnp.stack([k.gram(z).to_dense() for k in base_kernels], axis=0) # [d, N, N]
+        interaction_variances = self.posterior.prior.kernel.interaction_variances
+        Kzz_components = [interaction_variances[len(c)]*jnp.prod(Kzz_indiv[c, :, :], axis=0) for c in component_list] 
+        Kzz_components = jnp.stack(Kzz_components, axis=0) # [c, N, N]
+        assert Kzz_components.shape[0] == len(component_list)
+
+        Kzz =  self.posterior.prior.kernel.gram(z).to_dense() # [N, N]
+        Kzz = cola.PSD(Kzz + cola.ops.I_like(Kzz) * self.jitter)
+        Lz = lower_cholesky(Kzz)
+
+        def get_mean_from_covar(K):
+            Lz_inv_Kzt = cola.solve(Lz, K, Cholesky())
+            Kzz_inv_Kzt = cola.solve(Lz.T, Lz_inv_Kzt, Cholesky())
+            return Kzz_inv_Kzt.T @ mu
+
+
+        mean_overall =  get_mean_from_covar(Kzz) # [N, 1]
+        mean_components = vmap(get_mean_from_covar)(Kzz_components) # [c, N, 1]
+
+        return jnp.var(mean_components[:,:,0], axis=-1) / jnp.var(mean_overall) # [c]
+
+
+
+    def predict_additive_component(
+        self,
+        test_inputs: Num[Array, "N D"],
+        component_list: List[List[int]]
+    ) -> GaussianDistribution:
+        r"""Get the posterior predictive distribution for a specific additive component."""
+        specific_kernel = self.posterior.prior.kernel.get_specific_kernel(component_list)
+        return self.predict(test_inputs, kernel_with_test = specific_kernel)

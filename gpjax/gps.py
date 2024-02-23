@@ -820,7 +820,7 @@ __all__ = [
 @dataclass
 class VerticalSmoother(Module):
     smoother_mean: Float[Array, "1 D"]  = param_field(None)
-    smoother_input_scale: Float[Array, "1 D"] = param_field(None)
+    smoother_input_scale: Float[Array, "1 D"] = param_field(None, bijector=tfb.Softplus())
     Z_levels: Float[Array, "1 L"] = static_field(jnp.array([[1.0]]))
     
 
@@ -831,7 +831,7 @@ class VerticalSmoother(Module):
 
 
     def smooth_fn(self, x):
-        return jax.scipy.stats.norm.pdf(x, self.smoother_mean.T, self.smoother_input_scale.T)
+        return  jax.scipy.stats.norm.pdf(x, self.smoother_mean.T, self.smoother_input_scale.T)
 
     def smooth(self) -> Num[Array, "D L"]:
         return self.smooth_fn(self.Z_levels)
@@ -845,6 +845,8 @@ class VerticalSmoother(Module):
         x3d, x2d, xstatic, y = dataset.X3d, dataset.X2d, dataset.Xstatic, dataset.y
         delta = self.Z_levels[:,1:] - self.Z_levels[:,:-1]
         x3d_smooth = jnp.sum(jnp.multiply(self.smooth()[:,:-1]*delta , x3d[:,:,:-1]), axis=-1) # [N, D_3d]
+        #standard = jnp.sum(jnp.multiply(delta , x3d[:,:,:-1]), axis=-1) # [N, D_3d]
+        #x3d_smooth = x3d_smooth / standard
         x3d_smooth = x3d_smooth / (jnp.max(self.Z_levels) - jnp.min(self.Z_levels))
         #x3d_smooth = (x3d_smooth - jnp.mean(x3d_smooth, axis=0)) / jnp.std(x3d_smooth, axis=0)
         x = jnp.hstack([x3d_smooth, x2d, xstatic]) # [N, D_3d + D_2d +D_static]
