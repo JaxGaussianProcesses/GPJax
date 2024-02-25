@@ -18,6 +18,7 @@ import beartype.typing as tp
 import jax.numpy as jnp
 from jaxtyping import Float
 
+from gpjax.parameters import Parameter, PositiveReal
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 from gpjax.typing import (
@@ -37,12 +38,16 @@ class Periodic(StationaryKernel):
     def __init__(
         self,
         active_dims: tp.Union[list[int], int, slice],
-        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = 1.0,
-        variance: ScalarFloat = 1.0,
-        period: ScalarFloat = 1.0,
+        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
+        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
+        period: tp.Union[ScalarFloat, Parameter] = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        self.period = period
+        
+        if isinstance(period, Parameter):
+            self.period = period
+        else:
+            self.period = PositiveReal(period)
 
         super().__init__(active_dims, lengthscale, variance, compute_engine)
 

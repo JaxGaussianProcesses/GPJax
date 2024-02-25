@@ -18,6 +18,7 @@ import beartype.typing as tp
 import jax.numpy as jnp
 from jaxtyping import Float
 
+from gpjax.parameters import Parameter, SigmoidBounded
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 from gpjax.kernels.stationary.utils import euclidean_distance
@@ -40,12 +41,15 @@ class PoweredExponential(StationaryKernel):
     def __init__(
         self,
         active_dims: tp.Union[list[int], int, slice],
-        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = 1.0,
-        variance: ScalarFloat = 1.0,
-        power: ScalarFloat = 1.0,
+        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
+        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
+        power: tp.Union[ScalarFloat, Parameter] = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        self.power = power
+        if isinstance(power, Parameter):
+            self.power = power
+        else:
+            self.power = SigmoidBounded(power)
 
         super().__init__(active_dims, lengthscale, variance, compute_engine)
 

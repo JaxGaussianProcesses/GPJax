@@ -36,7 +36,6 @@ K = tp.TypeVar("K", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
 
 
 class AbstractKernelComputation(nnx.Module):
-    
     r"""Abstract class for kernel computations."""
 
     def gram(
