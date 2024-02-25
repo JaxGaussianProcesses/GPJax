@@ -20,13 +20,13 @@ import jax.numpy as jnp
 from jaxtyping import Float
 
 from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 from gpjax.typing import (
     Array,
     ScalarFloat,
 )
 
 
-@nnx.dataclass
 class ArcCosine(AbstractKernel):
     r"""The ArCosine kernel.
 
@@ -36,20 +36,27 @@ class ArcCosine(AbstractKernel):
     additional details.
     """
 
-    order: tp.Literal[0, 1, 2] = 0
-    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
-    weight_variance: tp.Union[ScalarFloat, Float[Array, " D"]] = nnx.variable_field(
-        nnx.Param, default=1.0
-    )
-    bias_variance: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
-
-    def __post_init__(self):
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], int, slice],
+        order: tp.Literal[0, 1, 2] = 0,
+        variance: ScalarFloat = 1.0,
+        weight_variance: tp.Union[ScalarFloat, Float[Array, " D"]] = 1.0,
+        bias_variance: ScalarFloat = 1.0,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
         if self.order not in [0, 1, 2]:
             raise ValueError("ArcCosine kernel only implemented for orders 0, 1 and 2.")
+        
+        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
+        self.order = order
+        self.variance = variance
+        self.weight_variance = weight_variance
+        self.bias_variance = bias_variance
         self.name = f"ArcCosine (order {self.order})"
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> Float[Array, "D"]:
         r"""Evaluate the kernel on a pair of inputs $`(x, y)`$
 
         Args:

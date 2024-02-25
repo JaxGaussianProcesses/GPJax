@@ -20,18 +20,27 @@ import jax.numpy as jnp
 from jaxtyping import Float
 
 from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 from gpjax.typing import (
     Array,
     ScalarFloat,
 )
 
 
-@nnx.dataclass
 class Linear(AbstractKernel):
     r"""The linear kernel."""
 
-    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
     name: str = "Linear"
+
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], int, slice],
+        variance: ScalarFloat = 1.0,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
+
+        self.variance = variance
 
     def __call__(
         self,

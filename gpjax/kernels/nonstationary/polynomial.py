@@ -20,21 +20,29 @@ import jax.numpy as jnp
 from jaxtyping import Float
 
 from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 from gpjax.typing import (
     Array,
     ScalarFloat,
 )
 
 
-@nnx.dataclass
 class Polynomial(AbstractKernel):
     """The Polynomial kernel with variable degree."""
 
-    degree: int = 2
-    shift: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
-    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], int, slice],
+        degree: int = 2,
+        shift: ScalarFloat = 1.0,
+        variance: ScalarFloat = 1.0,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
-    def __post_init__(self):
+        self.degree = degree
+        self.shift = shift
+        self.variance = variance
         self.name = f"Polynomial (degree {self.degree})"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
