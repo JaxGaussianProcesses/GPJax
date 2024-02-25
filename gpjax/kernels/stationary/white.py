@@ -17,7 +17,7 @@ import typing as tp
 import jax.numpy as jnp
 from jaxtyping import Float
 
-from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
     ConstantDiagonalKernelComputation,
@@ -28,8 +28,7 @@ from gpjax.typing import (
 )
 
 
-class White(AbstractKernel):
-    
+class White(StationaryKernel):
     name: str = "White"
 
     def __init__(
@@ -38,9 +37,7 @@ class White(AbstractKernel):
         variance: ScalarFloat = 1.0,
         compute_engine: AbstractKernelComputation = ConstantDiagonalKernelComputation(),
     ):
-        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
-
-        self.variance = variance
+        super().__init__(active_dims, 1.0, variance, compute_engine)
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the White noise kernel between a pair of arrays.

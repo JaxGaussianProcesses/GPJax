@@ -15,22 +15,18 @@
 
 import beartype.typing as tp
 
-from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
 
-from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
-from gpjax.kernels.stationary.utils import (
-    _check_lengthscale_dims_compat
-)
 from gpjax.typing import (
     Array,
     ScalarFloat,
 )
 
 
-class Periodic(AbstractKernel):
+class Periodic(StationaryKernel):
     r"""The periodic kernel.
 
     Key reference is MacKay 1998 - "Introduction to Gaussian processes".
@@ -46,15 +42,13 @@ class Periodic(AbstractKernel):
         period: ScalarFloat = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
-        
-        _check_lengthscale_dims_compat(lengthscale, self.n_dims)
-        
-        self.lengthscale = lengthscale
-        self.variance = variance
         self.period = period
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> Float[Array, ""]:
+        super().__init__(active_dims, lengthscale, variance, compute_engine)
+
+    def __call__(
+        self, x: Float[Array, " D"], y: Float[Array, " D"]
+    ) -> Float[Array, ""]:
         r"""Compute the Periodic kernel between a pair of arrays.
 
         Evaluate the kernel on a pair of inputs $`(x, y)`$ with length-scale parameter $`\ell`$, variance $`\sigma^2`$

@@ -21,12 +21,11 @@ from jaxtyping import Float
 import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import (
     build_student_t_distribution,
     euclidean_distance,
-    _check_lengthscale_dims_compat
 )
 from gpjax.typing import (
     Array,
@@ -35,7 +34,7 @@ from gpjax.typing import (
 
 
 @nnx.dataclass
-class Matern32(AbstractKernel):
+class Matern32(StationaryKernel):
     r"""The Matérn kernel with smoothness parameter fixed at 1.5."""
 
     name: str = "Matérn32"
@@ -47,12 +46,7 @@ class Matern32(AbstractKernel):
         variance: ScalarFloat = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
-        
-        _check_lengthscale_dims_compat(lengthscale, self.n_dims)
-        
-        self.lengthscale = lengthscale
-        self.variance = variance
+        super().__init__(active_dims, lengthscale, variance, compute_engine)
 
     def __call__(
         self,

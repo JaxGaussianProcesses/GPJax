@@ -1,12 +1,11 @@
 """Compute Random Fourier Feature (RFF) kernel approximations.  """
 import beartype.typing as tp
 
-from flax.experimental import nnx
 import jax.random as jr
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.computations import BasisFunctionComputation
 from gpjax.typing import (
     Array,
@@ -14,7 +13,6 @@ from gpjax.typing import (
 )
 
 
-@nnx.dataclass
 class RFF(AbstractKernel):
     r"""Computes an approximation of the kernel using Random Fourier Features.
 
@@ -31,26 +29,35 @@ class RFF(AbstractKernel):
     - 'On the Error of Random Fourier Features' by Sutherland and Schneider (2015).
     """
 
-    base_kernel: tp.Union[AbstractKernel, None] = None
-    num_basis_fns: int = 50
-    frequencies: tp.Union[Float[Array, "M D"], None] = nnx.variable_field(
-        nnx.Param, default=None,
-    )
-    compute_engine: BasisFunctionComputation = nnx.field(
-        default = BasisFunctionComputation(), repr=False
-    )
-    key: KeyArray = jr.PRNGKey(123)
+    def __init__(
+        self,
+        base_kernel: StationaryKernel,
+        num_basis_fns: int = 50,
+        frequencies: tp.Union[Float[Array, "M D"], None] = None,
+        compute_engine: BasisFunctionComputation = BasisFunctionComputation(),
+        key: KeyArray = jr.PRNGKey(0),
+    ):
+        r"""Initialise the RFF kernel.
 
-    def __post_init__(self) -> None:
-        r"""Post-initialisation function.
-
-        This function is called after the initialisation of the kernel. It is used to
-        set the computation engine to be the basis function computation engine.
+        Args:
+            base_kernel (StationaryKernel): The base kernel to be approximated.
+            num_basis_fns (int): The number of basis functions to use in the approximation.
+            frequencies (Float[Array, "M D"] | None): The frequencies to use in the approximation.
+                If None, the frequencies are sampled from the spectral density of the base
+                kernel.
+            compute_engine (BasisFunctionComputation): The computation engine to use for
+                the basis function computation.
+            key (KeyArray): The random key to use for sampling the frequencies.
         """
         self._check_valid_base_kernel(self.base_kernel)
+        self.base_kernel = base_kernel
+        self.num_basis_fns = num_basis_fns
+        self.frequencies = frequencies
+        self.compute_engine = compute_engine
+        self.key = key
 
         if self.frequencies is None:
-            n_dims = self.base_kernel.ndims
+            n_dims = self.base_kernel.n_dims
             self.frequencies = self.base_kernel.spectral_density.sample(
                 seed=self.key, sample_shape=(self.num_basis_fns, n_dims)
             )

@@ -18,15 +18,13 @@ import beartype.typing as tp
 from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 from gpjax.kernels.stationary.utils import (
     build_student_t_distribution,
     euclidean_distance,
-    _check_lengthscale_dims_compat
 )
 from gpjax.typing import (
     Array,
@@ -34,7 +32,7 @@ from gpjax.typing import (
 )
 
 
-class Matern52(AbstractKernel):
+class Matern52(StationaryKernel):
     r"""The Matérn kernel with smoothness parameter fixed at 2.5."""
 
     name: str = "Matérn52"
@@ -46,15 +44,11 @@ class Matern52(AbstractKernel):
         variance: ScalarFloat = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
-        
-        _check_lengthscale_dims_compat(lengthscale, self.n_dims)
-        
-        self.lengthscale = lengthscale
-        self.variance = variance
+        super().__init__(active_dims, lengthscale, variance, compute_engine)
 
-
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> Float[Array, ""]:
+    def __call__(
+        self, x: Float[Array, " D"], y: Float[Array, " D"]
+    ) -> Float[Array, ""]:
         r"""Compute the Matérn 5/2 kernel between a pair of arrays.
 
         Evaluate the kernel on a pair of inputs $`(x, y)`$ with
