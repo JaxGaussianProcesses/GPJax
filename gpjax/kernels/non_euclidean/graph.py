@@ -37,11 +37,6 @@ from gpjax.typing import (
 )
 
 
-
-##########################################
-# Graph kernels
-##########################################
-@nnx.dataclass
 class GraphKernel(AbstractKernel):
     r"""The Matérn graph kernel defined on the vertex set of a graph.
 
@@ -53,26 +48,30 @@ class GraphKernel(AbstractKernel):
             of a graph.
     """
 
-    compute_engine: AbstractKernelComputation = nnx.field(
-        default=EigenKernelComputation(), repr=False
-    )
-    lengthscale: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
-    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
-    laplacian: tp.Union[Num[Array, "N N"], None] = field(kw_only=True)
-    smoothness: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
-    eigenvalues: Float[Array, "N 1"] = nnx.field(init=False)
-    eigenvectors: Float[Array, "N N"] = nnx.field(init=False)
-    num_vertex: ScalarInt = nnx.field(init=False)
+    num_vertex: tp.Union[ScalarInt, None]
+    eigenvalues: Float[Array, "N 1"]
+    eigenvectors: Float[Array, "N N"]
     name: str = "Graph Matérn"
 
-    def __post_init__(self):
-        if self.laplacian is None:
-            raise ValueError("Graph laplacian must be specified")
+    def __init__(
+        self,
+        laplacian: Num[Array, "N N"],
+        active_dims: tp.Union[list[int], int, slice],
+        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = 1.0,
+        variance: ScalarFloat = 1.0,
+        smoothness: ScalarFloat = 1.0,
+        compute_engine: AbstractKernelComputation = EigenKernelComputation(),
+    ):
+        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
+
+        self.laplacian = laplacian
+        self.lengthscale = lengthscale
+        self.variance = variance
+        self.smoothness = smoothness
 
         evals, self.eigenvectors = jnp.linalg.eigh(self.laplacian)
         self.eigenvalues = evals.reshape(-1, 1)
-        if self.num_vertex is None:
-            self.num_vertex = self.eigenvalues.shape[0]
+        self.num_vertex = self.eigenvalues.shape[0]
 
     def __call__(  # TODO not consistent with general kernel interface
         self,
