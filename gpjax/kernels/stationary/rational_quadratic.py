@@ -20,21 +20,33 @@ import jax.numpy as jnp
 from jaxtyping import Float
 
 from gpjax.kernels.base import AbstractKernel
-from gpjax.kernels.stationary.utils import squared_distance
+from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
+from gpjax.kernels.stationary.utils import squared_distance, _check_lengthscale_dims_compat
 from gpjax.typing import (
     Array,
     ScalarFloat,
 )
 
 
-@nnx.dataclass
 class RationalQuadratic(AbstractKernel):
-    lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = nnx.variable_field(
-        nnx.Param, default=jnp.array(1.0)
-    )
-    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=jnp.array(1.0))
-    alpha: ScalarFloat = nnx.variable_field(nnx.Param, default=jnp.array(1.0))
+    
     name: str = "Rational Quadratic"
+
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], int, slice],
+        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = 1.0,
+        variance: ScalarFloat = 1.0,
+        alpha: ScalarFloat = 1.0,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
+
+        _check_lengthscale_dims_compat(lengthscale, self.n_dims)
+
+        self.lengthscale = lengthscale
+        self.variance = variance
+        self.alpha = alpha
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the Powered Exponential kernel between a pair of arrays.

@@ -32,19 +32,21 @@ from gpjax.typing import (
 )
 
 
-@nnx.dataclass
 class AbstractKernel(nnx.Module):
     r"""Base kernel class."""
 
-    n_dims: int = nnx.field(init=False)
-    active_dims: tp.Union[list[int], int, slice] = 1
-    compute_engine: AbstractKernelComputation = nnx.field(
-        default=DenseKernelComputation(), repr=False
-    )
+    n_dims: int
+    active_dims: tp.Union[list[int], int, slice]
+    compute_engine: AbstractKernelComputation
     name: str = "AbstractKernel"
 
-    def __post_init__(self):
-        self.n_dims, self.active_dims = _check_active_dims(self.active_dims)
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], int, slice],
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        self.n_dims, self.active_dims = _check_active_dims(active_dims)
+        self.compute_engine = compute_engine
 
     def cross_covariance(self, x: Num[Array, "N D"], y: Num[Array, "M D"]):
         return self.compute_engine.cross_covariance(self, x, y)
@@ -136,14 +138,20 @@ class AbstractKernel(nnx.Module):
         return None
 
 
-@nnx.dataclass
 class Constant(AbstractKernel):
     r"""
     A constant kernel. This kernel evaluates to a constant for all inputs.
     The scalar value itself can be treated as a model hyperparameter and learned during training.
     """
 
-    constant: ScalarFloat = nnx.variable_field(nnx.Param, default=jnp.array(0.0))
+    def __init__(
+        self,
+        constant: ScalarFloat = jnp.array(0.0),
+        active_dims: tp.Union[list[int], int, slice] = slice(None),
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        self.constant = constant
+        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Evaluate the kernel on a pair of inputs.
@@ -163,14 +171,17 @@ class Constant(AbstractKernel):
 class CombinationKernel(AbstractKernel):
     r"""A base class for products or sums of MeanFunctions."""
 
-    kernels: list[AbstractKernel] = None
-    operator: tp.Callable = None
 
-    def __post_init__(self):
+    def __init__(
+        self,
+        kernels: list[AbstractKernel],
+        operator: tp.Callable,
+        active_dims: tp.Union[list[int], int, slice] = slice(None),
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
         # Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
         kernels_list: list[AbstractKernel] = []
-
-        for kernel in self.kernels:
+        for kernel in kernels:
             if not isinstance(kernel, AbstractKernel):
                 raise TypeError("can only combine Kernel instances")  # pragma: no cover
 
@@ -180,6 +191,9 @@ class CombinationKernel(AbstractKernel):
                 kernels_list.append(kernel)
 
         self.kernels = kernels_list
+        self.operator = operator
+
+        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
     def __call__(
         self,
@@ -215,8 +229,14 @@ def _check_active_dims(active_dims: list[int] | int | slice):
     elif isinstance(a, int):
         return a, slice(None)
     elif isinstance(a, slice):
+        if a.stop is None:
+            raise ValueError("active_dims slice must have a stop value.")
+        if a.stop < 0:
+            raise ValueError("active_dims slice stop value must be positive.")
+            
+        start = a.start if a.start is not None else 0
         step = a.step if a.step is not None else 1
-        return (a.stop - a.start) // step, a
+        return (a.stop - start) // step, a
     else:
         raise ValueError("active_dims must be a list, int or slice.")
 
