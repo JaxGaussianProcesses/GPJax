@@ -10,7 +10,7 @@
 from jax import config
 
 config.update("jax_enable_x64", True)
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from jax import hessian
 from jax import config
@@ -195,10 +195,16 @@ dataset_ground_truth = dataset_3d(pos_test, vel_test)
 
 
 # %%
+
+
 @dataclass
 class VelocityKernel(gpx.kernels.AbstractKernel):
-    kernel0: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
-    kernel1: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
+    kernel0: gpx.kernels.AbstractKernel = field(
+        default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
+    )
+    kernel1: gpx.kernels.AbstractKernel = field(
+        default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
+    )
 
     def __call__(
         self, X: Float[Array, "1 D"], Xp: Float[Array, "1 D"]
@@ -429,8 +435,12 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_velocity)
 @dataclass
 class HelmholtzKernel(gpx.kernels.AbstractKernel):
     # initialise Phi and Psi kernels as any stationary kernel in gpJax
-    potential_kernel: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
-    stream_kernel: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
+    potential_kernel: gpx.kernels.AbstractKernel = field(
+        default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
+    )
+    stream_kernel: gpx.kernels.AbstractKernel = field(
+        default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
+    )
 
     def __call__(
         self, X: Float[Array, "1 D"], Xp: Float[Array, "1 D"]

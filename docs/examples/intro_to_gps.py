@@ -322,7 +322,8 @@ with warnings.catch_warnings():
 #     \end{bmatrix}\right) = \mathcal{N}\left(\begin{bmatrix}
 #         \boldsymbol{\mu}_{\mathbf{x}} \\ \boldsymbol{\mu}_{\mathbf{y}}
 #     \end{bmatrix}, \begin{bmatrix}
-#         \boldsymbol{\Sigma}_{\mathbf{yx}}, \boldsymbol{\Sigma}_{\mathbf{yy}}
+#         \boldsymbol{\Sigma}_{\mathbf{xx}} & \boldsymbol{\Sigma}_{\mathbf{xy}}\\
+#         \boldsymbol{\Sigma}_{\mathbf{yx}} & \boldsymbol{\Sigma}_{\mathbf{yy}}
 #     \end{bmatrix} \right)\,,
 # \end{align}
 # $$
@@ -344,7 +345,7 @@ with warnings.catch_warnings():
 # $$
 # \begin{alignat}{3}
 #     & \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{y} && = p(\mathbf{x})
-#     && = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}},
+#     && = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}},\boldsymbol{\Sigma}_{\mathbf{xx}})\\
 #     & \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{x} && = p(\mathbf{y})
 #     && = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{y}},
 #     \boldsymbol{\Sigma}_{\mathbf{yy}})\,.
@@ -403,7 +404,7 @@ with warnings.catch_warnings():
 # $\mathbf{K}_{ff}$ such that the $(i, j)^{\text{th}}$ entry of the matrix is
 # given by $[\mathbf{K}_{ff}]_{i, j} = k(\mathbf{x}_i, \mathbf{x}_j)$. As is
 # conventional within the literature, we centre our training data and assume
-# $\mu(\mathbf{X}):= 0$ for all $\mathbf{X}\in\mathbf{X}$. We further drop
+# $\mu(\mathbf{X}):= 0$ for all $\mathbf{X}\in\mathcal{X}$. We further drop
 # dependency on $\boldsymbol{\theta}$ and $\mathbf{X}$ for notational
 # convenience in the remainder of this article.
 #
@@ -473,7 +474,7 @@ with warnings.catch_warnings():
 # be analytically expressed as
 # $$
 # \begin{align}
-#         & = 0.5\left(-\underbrace{\mathbf{y}^{\top}\left(\mathbf{K}_{ff} - \sigma_n^2\mathbf{I}_n \right)^{-1}\mathbf{y}}_{\text{Data fit}} -\underbrace{\log\lvert \mathbf{K}_{ff} + \sigma^2_n\rvert}_{\text{Complexity}} -\underbrace{n\log 2\pi}_{\text{Constant}} \right)\,.
+#         & = 0.5\left(-\underbrace{\mathbf{y}^{\top}\left(\mathbf{K}_{ff} + \sigma_n^2\mathbf{I}_n \right)^{-1}\mathbf{y}}_{\text{Data fit}} -\underbrace{\log\lvert \mathbf{K}_{ff} + \sigma^2_n\rvert}_{\text{Complexity}} -\underbrace{n\log 2\pi}_{\text{Constant}} \right)\,.
 # \end{align}
 # $$
 #
