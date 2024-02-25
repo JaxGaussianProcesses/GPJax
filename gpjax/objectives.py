@@ -1,4 +1,4 @@
-import abc 
+import abc
 
 from flax.experimental import nnx
 from jax import vmap
@@ -40,16 +40,13 @@ VariationalFamily = TypeVar(
 )
 
 
-
 @nnx.dataclass
 class AbstractObjective(nnx.Module):
     r"""Abstract base class for objectives."""
 
-    negative: bool = False
-    constant: ScalarFloat = nnx.variable_field(nnx.Intermediate, init=False, repr=False)
-
-    def __post_init__(self) -> None:
-        self.constant = jnp.array(-1.0) if self.negative else jnp.array(1.0)
+    def __init__(self, negative: bool = False):
+        self.negative = negative
+        self._constant = -1.0 if negative else 1.0
 
     def __hash__(self):
         return hash(tuple(jtu.tree_leaves(self)))  # Probably put this on the Module!
@@ -148,7 +145,7 @@ class ConjugateMLL(AbstractObjective):
         # p(y | x, θ), where θ are the model hyperparameters:
         mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
 
-        return self.constant * (mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze())
+        return self._constant * (mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze())
 
 
 class ConjugateLOOCV(AbstractObjective):
@@ -227,16 +224,14 @@ class ConjugateLOOCV(AbstractObjective):
         Sigma = PSD(Sigma)  # [N, N]
 
         Sigma_inv_y = solve(Sigma, y - mx, Cholesky())  # [N, 1]
-        Sigma_inv_diag = diag(inv(Sigma, Cholesky()))[
-            :, None
-        ]  # [N, 1]
+        Sigma_inv_diag = diag(inv(Sigma, Cholesky()))[:, None]  # [N, 1]
 
         loocv_means = mx + (y - mx) - Sigma_inv_y / Sigma_inv_diag
         loocv_stds = jnp.sqrt(1.0 / Sigma_inv_diag)
 
         loocv_posterior = tfd.Normal(loc=loocv_means, scale=loocv_stds)
         loocv = jnp.sum(loocv_posterior.log_prob(y))
-        return self.constant * loocv
+        return self._constant * loocv
 
 
 class LogPosteriorDensity(AbstractObjective):
@@ -293,7 +288,7 @@ class LogPosteriorDensity(AbstractObjective):
         # Whitened latent function values prior, p(wx | θ) = N(0, I)
         latent_prior = tfd.Normal(loc=0.0, scale=1.0)
 
-        return self.constant * (
+        return self._constant * (
             likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum()
         )
 
@@ -334,7 +329,7 @@ class ELBO(AbstractObjective):
         var_exp = variational_expectation(variational_family, train_data)
 
         # For batch size b, we compute  n/b * Σᵢ[ ∫log(p(y|f(xᵢ))) q(f(xᵢ)) df(xᵢ)] - KL[q(f(·)) || p(f(·))]
-        return self.constant * (
+        return self._constant * (
             jnp.sum(var_exp)
             * variational_family.posterior.likelihood.num_datapoints
             / train_data.n
@@ -496,4 +491,4 @@ class CollapsedELBO(AbstractObjective):
         two_trace = jnp.sum(Kxx_diag) / noise - jnp.trace(AAT)
 
         # log N(y; μx, Io² + KxzKzz⁻¹Kzx) - 1/2o² tr(Kxx - KxzKzz⁻¹Kzx)
-        return self.constant * (two_log_prob - two_trace).squeeze() / 2.0
+        return self._constant * (two_log_prob - two_trace).squeeze() / 2.0
