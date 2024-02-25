@@ -10,7 +10,7 @@
 from jax import config
 
 config.update("jax_enable_x64", True)
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from jax import hessian
 from jax import config
@@ -195,7 +195,6 @@ dataset_ground_truth = dataset_3d(pos_test, vel_test)
 
 
 # %%
-from dataclasses import field
 
 
 @dataclass
