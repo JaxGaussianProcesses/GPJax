@@ -36,12 +36,16 @@ tfb = tfp.bijectors
 tfd = tfp.distributions
 
 
-@nnx.dataclass
 class AbstractLikelihood(nnx.Module):
     r"""Abstract base class for likelihoods."""
 
-    num_datapoints: int
-    integrator: AbstractIntegrator = GHQuadratureIntegrator()
+    def __init__(
+        self,
+        num_datapoints: int,
+        integrator: AbstractIntegrator = GHQuadratureIntegrator(),
+    ):
+        self.num_datapoints = num_datapoints
+        self.integrator = integrator
 
     def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> tfd.Distribution:
         r"""Evaluate the likelihood function at a given predictive distribution.
@@ -111,7 +115,6 @@ class AbstractLikelihood(nnx.Module):
         )
 
 
-@nnx.dataclass
 class Gaussian(AbstractLikelihood):
     r"""Gaussian likelihood object.
 
@@ -121,10 +124,14 @@ class Gaussian(AbstractLikelihood):
 
     """
 
-    obs_stddev: tp.Union[ScalarFloat, Float[Array, "#N"]] = nnx.variable_field(
-        nnx.Param, default=jnp.array(1.0)
-    )
-    integrator: AbstractIntegrator = AnalyticalGaussianIntegrator()
+    def __init__(
+        self,
+        num_datapoints: int,
+        obs_stddev: tp.Union[ScalarFloat, Float[Array, "#N"]] = jnp.array(1.0),
+    ):
+        self.obs_stddev = obs_stddev
+
+        super().__init__(num_datapoints, AnalyticalGaussianIntegrator())
 
     def link_function(self, f: Float[Array, "..."]) -> tfd.Normal:
         r"""The link function of the Gaussian likelihood.
@@ -163,7 +170,6 @@ class Gaussian(AbstractLikelihood):
         return tfd.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
 
 
-@nnx.dataclass
 class Bernoulli(AbstractLikelihood):
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         r"""The probit link function of the Bernoulli likelihood.
@@ -196,7 +202,6 @@ class Bernoulli(AbstractLikelihood):
         return self.link_function(mean / jnp.sqrt(1.0 + variance))
 
 
-@nnx.dataclass
 class Poisson(AbstractLikelihood):
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         r"""The link function of the Poisson likelihood.

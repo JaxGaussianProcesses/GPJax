@@ -22,12 +22,15 @@ from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float, Num
 
-from gpjax.typing import Array
+from gpjax.typing import Array, ScalarFloat
 
 
-@nnx.dataclass
 class AbstractMeanFunction(nnx.Module):
     r"""Mean function that is used to parameterise the Gaussian process."""
+
+    @abc.abstractmethod
+    def __init__(self) -> None:
+        super().__init__()
 
     @abc.abstractmethod
     def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N O"]:
@@ -114,7 +117,6 @@ class AbstractMeanFunction(nnx.Module):
         return self.__mul__(other)
 
 
-@nnx.dataclass
 class Constant(AbstractMeanFunction):
     r"""Constant mean function.
 
@@ -123,9 +125,8 @@ class Constant(AbstractMeanFunction):
     learned during training but defaults to 1.0.
     """
 
-    constant: Float[Array, " O"] = nnx.variable_field(
-        nnx.Param, default=jnp.array([0.0])
-    )
+    def __init__(self, constant: tp.Union[ScalarFloat, Float[Array, " O"]] = 0.0):
+        self.constant = constant
 
     def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N O"]:
         r"""Evaluate the mean function at the given points.
@@ -140,7 +141,6 @@ class Constant(AbstractMeanFunction):
         return jnp.ones((x.shape[0], 1)) * self.constant
 
 
-@nnx.dataclass
 class Zero(Constant):
     r"""Zero mean function.
 
@@ -148,17 +148,11 @@ class Zero(Constant):
     inputs. Unlike the Constant mean function, the constant scalar zero is fixed, and
     cannot be treated as a model hyperparameter and learned during training.
     """
-    constant: Float[Array, " O"] = nnx.variable_field(
-        nnx.Param, default=jnp.array([0.0]), init=False
-    )
+    constant = jnp.array(0.0)
 
 
-@nnx.dataclass
 class CombinationMeanFunction(AbstractMeanFunction):
     r"""A base class for products or sums of AbstractMeanFunctions."""
-
-    means: list[AbstractMeanFunction]
-    operator: tp.Callable
 
     def __init__(
         self,
