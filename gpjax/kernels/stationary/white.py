@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+import typing as tp
 
-from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
 
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
+    AbstractKernelComputation,
     ConstantDiagonalKernelComputation,
 )
 from gpjax.typing import (
@@ -27,11 +28,19 @@ from gpjax.typing import (
 )
 
 
-@nnx.dataclass
 class White(AbstractKernel):
-    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=jnp.array(1.0))
-    compute_engine = ConstantDiagonalKernelComputation()
+    
     name: str = "White"
+
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], int, slice],
+        variance: ScalarFloat = 1.0,
+        compute_engine: AbstractKernelComputation = ConstantDiagonalKernelComputation(),
+    ):
+        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
+
+        self.variance = variance
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the White noise kernel between a pair of arrays.

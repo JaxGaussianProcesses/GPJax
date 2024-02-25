@@ -20,27 +20,41 @@ import jax.numpy as jnp
 from jaxtyping import Float
 
 from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
+from gpjax.kernels.stationary.utils import (
+    _check_lengthscale_dims_compat
+)
 from gpjax.typing import (
     Array,
     ScalarFloat,
 )
 
 
-@nnx.dataclass
 class Periodic(AbstractKernel):
     r"""The periodic kernel.
 
     Key reference is MacKay 1998 - "Introduction to Gaussian processes".
     """
 
-    lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = nnx.variable_field(
-        nnx.Param, default=1.0
-    )
-    variance: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
-    period: ScalarFloat = nnx.variable_field(nnx.Param, default=1.0)
     name: str = "Periodic"
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], int, slice],
+        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = 1.0,
+        variance: ScalarFloat = 1.0,
+        period: ScalarFloat = 1.0,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
+        
+        _check_lengthscale_dims_compat(lengthscale, self.n_dims)
+        
+        self.lengthscale = lengthscale
+        self.variance = variance
+        self.period = period
+
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> Float[Array, ""]:
         r"""Compute the Periodic kernel between a pair of arrays.
 
         Evaluate the kernel on a pair of inputs $`(x, y)`$ with length-scale parameter $`\ell`$, variance $`\sigma^2`$

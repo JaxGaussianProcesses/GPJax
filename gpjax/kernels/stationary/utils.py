@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+import typing as tp
 
 import jax.numpy as jnp
 from jaxtyping import Float
@@ -68,3 +69,20 @@ def euclidean_distance(x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFl
         ScalarFloat: The euclidean distance between the inputs.
     """
     return jnp.sqrt(jnp.maximum(squared_distance(x, y), 1e-36))
+
+
+def _check_lengthscale_dims_compat(lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]], n_dims: int) -> None:
+    r"""Check that the lengthscale parameter is compatible with the number of input dimensions.
+
+    Args:
+        lengthscale (Float[Array, " D"]): The lengthscale parameter.
+        n_dims (int): The number of input dimensions.
+    """
+    if isinstance(lengthscale, [float, int]):
+        return
+    
+    if not (lengthscale.shape == (1,) or lengthscale.shape == (n_dims,)):
+        raise ValueError(
+            "Expected `lengthscale` parameter to be compatible with the number of input dimensions. "
+            f"Got `lengthscale` with shape: {lengthscale.shape} and `n_dims` = {n_dims}. "
+        )
