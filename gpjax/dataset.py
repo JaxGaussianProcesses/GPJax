@@ -13,19 +13,15 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
 import warnings
 
 from beartype.typing import Optional
 import jax.numpy as jnp
 from jaxtyping import Num
-from simple_pytree import Pytree
-
 from gpjax.typing import Array
 
 
-@dataclass
-class Dataset(Pytree):
+class Dataset:
     r"""Base class for datasets.
 
     Attributes
