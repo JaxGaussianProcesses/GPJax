@@ -17,6 +17,7 @@ import typing as tp
 import jax.numpy as jnp
 from jaxtyping import Float
 
+from gpjax.parameters import Parameter
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
@@ -29,14 +30,15 @@ from gpjax.typing import (
 
 
 class White(StationaryKernel):
+    
     name: str = "White"
 
     def __init__(
         self,
         active_dims: tp.Union[list[int], int, slice],
-        variance: ScalarFloat = 1.0,
+        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
         compute_engine: AbstractKernelComputation = ConstantDiagonalKernelComputation(),
-    ):
+    ): 
         super().__init__(active_dims, 1.0, variance, compute_engine)
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:

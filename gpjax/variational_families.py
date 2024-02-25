@@ -47,6 +47,7 @@ GL = tp.TypeVar("GL", bound=Gaussian)
 P = tp.TypeVar("P", bound=AbstractPrior)
 PP = tp.TypeVar("PP", bound=AbstractPosterior)
 
+
 @nnx.dataclass
 class AbstractVariationalFamily(nnx.Module, tp.Generic[L]):
     r"""
@@ -645,7 +646,6 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian[GL]):
     The key reference is Titsias, (2009) - Variational Learning of Inducing Variables
     in Sparse Gaussian Processes.
     """
-
 
     def __post_init__(self):
         if not isinstance(self.posterior.likelihood, Gaussian):

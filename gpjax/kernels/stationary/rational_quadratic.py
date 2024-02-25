@@ -15,10 +15,9 @@
 
 import beartype.typing as tp
 
-from flax.experimental import nnx
-import jax.numpy as jnp
 from jaxtyping import Float
 
+from gpjax.parameters import Parameter, PositiveReal
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 from gpjax.kernels.stationary.utils import squared_distance
@@ -34,12 +33,16 @@ class RationalQuadratic(StationaryKernel):
     def __init__(
         self,
         active_dims: tp.Union[list[int], int, slice],
-        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = 1.0,
-        variance: ScalarFloat = 1.0,
-        alpha: ScalarFloat = 1.0,
+        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
+        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
+        alpha: tp.Union[ScalarFloat, Parameter] = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        self.alpha = alpha
+        
+        if isinstance(alpha, Parameter):
+            self.alpha = alpha
+        else:
+            self.alpha = PositiveReal(alpha)
 
         super().__init__(active_dims, lengthscale, variance, compute_engine)
 

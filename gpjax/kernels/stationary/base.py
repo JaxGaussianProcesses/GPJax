@@ -13,17 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
+
 import beartype.typing as tp
-
-from flax.experimental import nnx
-import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax as tfp
 
+from gpjax.parameters import Parameter, PositiveReal
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 from gpjax.kernels.stationary.utils import (
-    squared_distance,
     _check_lengthscale_dims_compat,
 )
 from gpjax.typing import (
@@ -38,13 +35,20 @@ class StationaryKernel(AbstractKernel):
     def __init__(
         self,
         active_dims: tp.Union[list[int], int, slice],
-        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = 1.0,
-        variance: ScalarFloat = 1.0,
+        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
+        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
         _check_lengthscale_dims_compat(lengthscale, self.n_dims)
 
-        self.lengthscale = lengthscale
-        self.variance = variance
+        if isinstance(lengthscale, Parameter):
+            self.lengthscale = lengthscale
+        else:
+            self.lengthscale = PositiveReal(lengthscale)
+
+        if isinstance(variance, Parameter):
+            self.variance = variance
+        else:
+            self.variance = PositiveReal(variance)
