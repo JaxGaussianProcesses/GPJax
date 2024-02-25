@@ -3122,7 +3122,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=864d1064">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bd452d9a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3136,7 +3136,7 @@ application to real-world ocean surface velocity data, collected via surface dri
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6e466420">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6e66cd73">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3157,7 +3157,7 @@ application to real-world ocean surface velocity data, collected via surface dri
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">config</span>
 
 <span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">"jax_enable_x64"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 
 <span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">hessian</span>
 <span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">config</span>
@@ -3186,7 +3186,7 @@ application to real-world ocean surface velocity data, collected via surface dri
 <div class="clipboard-copy-txt" id="cell-1">from jax import config
 
 config.update("jax_enable_x64", True)
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from jax import hessian
 from jax import config
@@ -3217,7 +3217,7 @@ colors = rcParams["axes.prop_cycle"].by_key()["color"]</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=281d5f72">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f13e31c1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3234,7 +3234,7 @@ where $\mathbf{x} = (x^{(0)}$,$x^{(1)})^\text{T}$, with a vector basis in the st
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ee6a8650">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=82e3b3e5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3391,7 +3391,7 @@ plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=eb64d3d2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0b814ce6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3427,7 +3427,7 @@ $$</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=56c09901">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5b7b8542">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3496,7 +3496,7 @@ dataset_ground_truth = dataset_3d(pos_test, vel_test)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3f3417a8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=49b24e2c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3514,7 +3514,7 @@ $$</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b54b39d0">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=19ec8afc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3534,8 +3534,12 @@ $$</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">VelocityKernel</span><span class="p">(</span><span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">AbstractKernel</span><span class="p">):</span>
-    <span class="n">kernel0</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">AbstractKernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">(</span><span class="n">active_dims</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-    <span class="n">kernel1</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">AbstractKernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">(</span><span class="n">active_dims</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">kernel0</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">AbstractKernel</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">(</span><span class="n">active_dims</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">kernel1</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">AbstractKernel</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">(</span><span class="n">active_dims</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">"1 D"</span><span class="p">],</span> <span class="n">Xp</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">"1 D"</span><span class="p">]</span>
@@ -3551,10 +3555,16 @@ $$</p>
 
         <span class="k">return</span> <span class="n">k0_switch</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel0</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Xp</span><span class="p">)</span> <span class="o">+</span> <span class="n">k1_switch</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel1</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Xp</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">@dataclass
+<div class="clipboard-copy-txt" id="cell-4">
+
+@dataclass
 class VelocityKernel(gpx.kernels.AbstractKernel):
-    kernel0: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
-    kernel1: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
+    kernel0: gpx.kernels.AbstractKernel = field(
+        default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
+    )
+    kernel1: gpx.kernels.AbstractKernel = field(
+        default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
+    )
 
     def __call__(
         self, X: Float[Array, "1 D"], Xp: Float[Array, "1 D"]
@@ -3575,7 +3585,7 @@ class VelocityKernel(gpx.kernels.AbstractKernel):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b0a08eb0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f2e04320">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3586,7 +3596,7 @@ class VelocityKernel(gpx.kernels.AbstractKernel):
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9185a7e3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=697a643f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3637,7 +3647,7 @@ velocity_posterior = initialise_gp(kernel, mean, dataset_train)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e53debce">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9edac020">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3648,7 +3658,7 @@ velocity_posterior = initialise_gp(kernel, mean, dataset_train)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=597411cb">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e2eaf541">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3716,7 +3726,7 @@ opt_velocity_posterior = optimise_mll(velocity_posterior, dataset_train)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f3756ba6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b3c16000">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3727,7 +3737,7 @@ opt_velocity_posterior = optimise_mll(velocity_posterior, dataset_train)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2982a51c">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cac57adb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3778,7 +3788,7 @@ dataset_latent_velocity = dataset_3d(pos_test, velocity_mean)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bca4ebe6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ffc8f3d8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3789,7 +3799,7 @@ dataset_latent_velocity = dataset_3d(pos_test, velocity_mean)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5f4c5376">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ba2ce653">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4014,7 +4024,7 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_velocity)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=65239989">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=589a7a9a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4025,7 +4035,7 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_velocity)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1550e530">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7776b345">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4065,7 +4075,7 @@ $$</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4cd36b0d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d38df496">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4086,8 +4096,12 @@ $$</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">HelmholtzKernel</span><span class="p">(</span><span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">AbstractKernel</span><span class="p">):</span>
     <span class="c1"># initialise Phi and Psi kernels as any stationary kernel in gpJax</span>
-    <span class="n">potential_kernel</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">AbstractKernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">(</span><span class="n">active_dims</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-    <span class="n">stream_kernel</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">AbstractKernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">(</span><span class="n">active_dims</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">potential_kernel</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">AbstractKernel</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">(</span><span class="n">active_dims</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">stream_kernel</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">AbstractKernel</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">(</span><span class="n">active_dims</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">"1 D"</span><span class="p">],</span> <span class="n">Xp</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">"1 D"</span><span class="p">]</span>
@@ -4110,8 +4124,12 @@ $$</p>
 <div class="clipboard-copy-txt" id="cell-9">@dataclass
 class HelmholtzKernel(gpx.kernels.AbstractKernel):
     # initialise Phi and Psi kernels as any stationary kernel in gpJax
-    potential_kernel: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
-    stream_kernel: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1])
+    potential_kernel: gpx.kernels.AbstractKernel = field(
+        default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
+    )
+    stream_kernel: gpx.kernels.AbstractKernel = field(
+        default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
+    )
 
     def __call__(
         self, X: Float[Array, "1 D"], Xp: Float[Array, "1 D"]
@@ -4136,7 +4154,7 @@ class HelmholtzKernel(gpx.kernels.AbstractKernel):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=15d15e21">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ced2928d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4147,7 +4165,7 @@ class HelmholtzKernel(gpx.kernels.AbstractKernel):
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9f973722">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=382929ba">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4199,7 +4217,7 @@ opt_helmholtz_posterior = optimise_mll(helmholtz_posterior, dataset_train)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e8124930">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a89c526c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4210,7 +4228,7 @@ opt_helmholtz_posterior = optimise_mll(helmholtz_posterior, dataset_train)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=df373001">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d7672f1d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4261,7 +4279,7 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_helmholtz)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=289855da">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=63c8af06">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4272,7 +4290,7 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_helmholtz)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1477a503">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8be5feb8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4287,7 +4305,7 @@ $$</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0b9c59cc">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c2332e1d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4350,7 +4368,7 @@ NLPD for Helmholtz: -280.59
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8fe12c93">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c9a0cf37">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4361,7 +4379,7 @@ NLPD for Helmholtz: -280.59
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cb773720">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5c0b5334">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4374,7 +4392,7 @@ NLPD for Helmholtz: -280.59
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d671779c">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a9e4f1cc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4416,11 +4434,11 @@ Python implementation: CPython
 Python version       : 3.10.13
 IPython version      : 8.17.2
 
-tensorflow_probability: 0.19.0
-jax                   : 0.4.20
-pandas                : 1.5.3
-gpjax                 : 0.8.0
 matplotlib            : 3.8.1
+tensorflow_probability: 0.19.0
+gpjax                 : 0.8.0
+pandas                : 1.5.3
+jax                   : 0.4.20
 
 Watermark: 2.4.3
 
