@@ -16,7 +16,6 @@ L = tp.TypeVar(
 GL = tp.TypeVar("GL", bound="gpjax.likelihoods.Gaussian")  # noqa: F821
 
 
-@nnx.dataclass
 class AbstractIntegrator:
     r"""Base class for integrators."""
 
@@ -68,7 +67,6 @@ class AbstractIntegrator:
         return self.integrate(fun, y, mean, variance, likelihood)
 
 
-@nnx.dataclass
 class GHQuadratureIntegrator(AbstractIntegrator):
     r"""Compute an integral using Gauss-Hermite quadrature.
 
@@ -112,7 +110,6 @@ class GHQuadratureIntegrator(AbstractIntegrator):
         return val
 
 
-@nnx.dataclass
 class AnalyticalGaussianIntegrator(AbstractIntegrator):
     r"""Compute the analytical integral of a Gaussian likelihood.
 
