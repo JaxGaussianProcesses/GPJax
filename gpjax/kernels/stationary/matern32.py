@@ -39,15 +39,6 @@ class Matern32(StationaryKernel):
 
     name: str = "Matérn32"
 
-    def __init__(
-        self,
-        active_dims: tp.Union[list[int], int, slice],
-        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = 1.0,
-        variance: ScalarFloat = 1.0,
-        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
-    ):
-        super().__init__(active_dims, lengthscale, variance, compute_engine)
-
     def __call__(
         self,
         x: Float[Array, " D"],
