@@ -47,7 +47,7 @@ class ArcCosine(AbstractKernel):
     ):
         if self.order not in [0, 1, 2]:
             raise ValueError("ArcCosine kernel only implemented for orders 0, 1 and 2.")
-        
+
         super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
         self.order = order
@@ -56,7 +56,9 @@ class ArcCosine(AbstractKernel):
         self.bias_variance = bias_variance
         self.name = f"ArcCosine (order {self.order})"
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> Float[Array, "D"]:
+    def __call__(
+        self, x: Float[Array, " D"], y: Float[Array, " D"]
+    ) -> Float[Array, "D"]:
         r"""Evaluate the kernel on a pair of inputs $`(x, y)`$
 
         Args:

@@ -171,7 +171,6 @@ class Constant(AbstractKernel):
 class CombinationKernel(AbstractKernel):
     r"""A base class for products or sums of MeanFunctions."""
 
-
     def __init__(
         self,
         kernels: list[AbstractKernel],
@@ -233,7 +232,7 @@ def _check_active_dims(active_dims: list[int] | int | slice):
             raise ValueError("active_dims slice must have a stop value.")
         if a.stop < 0:
             raise ValueError("active_dims slice stop value must be positive.")
-            
+
         start = a.start if a.start is not None else 0
         step = a.step if a.step is not None else 1
         return (a.stop - start) // step, a

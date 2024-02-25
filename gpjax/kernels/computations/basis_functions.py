@@ -14,13 +14,12 @@ import gpjax
 from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.typing import Array
 
-K = tp.TypeVar("K", bound="gpjax.kernels.approximations.AbstractKernel")  # noqa: F821
+K = tp.TypeVar("K", bound="gpjax.kernels.approximations.RFF")  # noqa: F821
 
 
 # TODO: Use low rank linear operator!
 
 
-@nnx.dataclass
 class BasisFunctionComputation(AbstractKernelComputation):
     r"""Compute engine class for finite basis function approximations to a kernel."""
 
