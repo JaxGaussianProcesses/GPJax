@@ -51,13 +51,24 @@ NGL = tp.TypeVar("NGL", bound=NonGaussian)
 GL = tp.TypeVar("GL", bound=Gaussian)
 
 
-@nnx.dataclass
 class AbstractPrior(nnx.Module, tp.Generic[M, K]):
     r"""Abstract Gaussian process prior."""
 
-    kernel: K
-    mean_function: M
-    jitter: float = 1e-6
+    def __init__(
+        self,
+        kernel: K,
+        mean_function: M,
+        jitter: float = 1e-6,
+    ):
+        r"""Construct a Gaussian process prior.
+
+        Args:
+            kernel (AbstractKernel): The kernel function.
+            mean_function (AbstractMeanFunction): The mean function.
+        """
+        self.kernel = kernel
+        self.mean_function = mean_function
+        self.jitter = jitter
 
     def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> GaussianDistribution:
         r"""Evaluate the Gaussian process at the given points.
@@ -105,7 +116,6 @@ class AbstractPrior(nnx.Module, tp.Generic[M, K]):
 #######################
 # GP Priors
 #######################
-@nnx.dataclass
 class Prior(AbstractPrior[M, K]):
     r"""A Gaussian process prior object.
 
@@ -133,6 +143,7 @@ class Prior(AbstractPrior[M, K]):
     if tp.TYPE_CHECKING:
 
         @tp.overload
+<<<<<<< HEAD
         def __mul__(self, other: GL) -> "ConjugatePosterior[Prior[M, K], GL]": ...
 
         @tp.overload
@@ -140,6 +151,18 @@ class Prior(AbstractPrior[M, K]):
 
         @tp.overload
         def __mul__(self, other: L) -> "AbstractPosterior[Prior[M, K], L]": ...
+=======
+        def __mul__(self, other: GL) -> "ConjugatePosterior[Prior[M, K], GL]":
+            ...
+
+        @tp.overload
+        def __mul__(self, other: NGL) -> "NonConjugatePosterior[Prior[M, K], NGL]":
+            ...
+
+        @tp.overload
+        def __mul__(self, other: L) -> "AbstractPosterior[Prior[M, K], L]":
+            ...
+>>>>>>> c536b1ad (gps as normal classes)
 
     def __mul__(self, other):
         r"""Combine the prior with a likelihood to form a posterior distribution.
@@ -178,6 +201,7 @@ class Prior(AbstractPrior[M, K]):
     if tp.TYPE_CHECKING:
 
         @tp.overload
+<<<<<<< HEAD
         def __rmul__(self, other: GL) -> "ConjugatePosterior[Prior[M, K], GL]": ...
 
         @tp.overload
@@ -185,6 +209,18 @@ class Prior(AbstractPrior[M, K]):
 
         @tp.overload
         def __rmul__(self, other: L) -> "AbstractPosterior[Prior[M, K], L]": ...
+=======
+        def __rmul__(self, other: GL) -> "ConjugatePosterior[Prior[M, K], GL]":
+            ...
+
+        @tp.overload
+        def __rmul__(self, other: NGL) -> "NonConjugatePosterior[Prior[M, K], NGL]":
+            ...
+
+        @tp.overload
+        def __rmul__(self, other: L) -> "AbstractPosterior[Prior[M, K], L]":
+            ...
+>>>>>>> c536b1ad (gps as normal classes)
 
     def __rmul__(self, other):
         r"""Combine the prior with a likelihood to form a posterior distribution.
@@ -321,7 +357,6 @@ P = tp.TypeVar("P", bound=AbstractPrior)
 #######################
 # GP Posteriors
 #######################
-@nnx.dataclass
 class AbstractPosterior(nnx.Module, tp.Generic[P, L]):
     r"""Abstract Gaussian process posterior.
 
@@ -329,9 +364,23 @@ class AbstractPosterior(nnx.Module, tp.Generic[P, L]):
     posterior objects should inherit from this class.
     """
 
-    prior: AbstractPrior[M, K]
-    likelihood: L
-    jitter: float = 1e-6
+    def __init__(
+        self,
+        prior: AbstractPrior[M, K],
+        likelihood: L,
+        jitter: float = 1e-6,
+    ):
+        r"""Construct a Gaussian process posterior.
+
+        Args:
+            prior (AbstractPrior): The prior distribution.
+            likelihood (AbstractLikelihood): The likelihood distribution.
+            jitter (float): A small constant added to the diagonal of the
+                covariance matrix to ensure numerical stability.
+        """
+        self.prior = prior
+        self.likelihood = likelihood
+        self.jitter = jitter
 
     def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> GaussianDistribution:
         r"""Evaluate the Gaussian process posterior at the given points.
@@ -374,7 +423,6 @@ class AbstractPosterior(nnx.Module, tp.Generic[P, L]):
         raise NotImplementedError
 
 
-@nnx.dataclass
 class ConjugatePosterior(AbstractPosterior[P, GL]):
     r"""A Conjuate Gaussian process posterior object.
 
@@ -593,7 +641,6 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
         return sample_fn
 
 
-@nnx.dataclass
 class NonConjugatePosterior(AbstractPosterior[P, NGL]):
     r"""A non-conjugate Gaussian process posterior object.
 
@@ -607,12 +654,27 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
     from, or optimise an approximation to, the posterior distribution.
     """
 
-    key: KeyArray = nnx.Intermediate(jr.PRNGKey(42))
-    latent: Float[Array, "N 1"] = nnx.variable_field(nnx.Intermediate, default=None)
+    latent: Float[Array, "N 1"]
 
-    def __post_init__(self):
-        if self.latent is None:
-            self.latent = jr.normal(self.key, shape=(self.likelihood.num_datapoints, 1))
+    def __init__(
+        self,
+        prior: P,
+        likelihood: NGL,
+        jitter: float = 1e-6,
+        key: KeyArray = jr.PRNGKey(42),
+    ):
+        r"""Construct a non-conjugate Gaussian process posterior.
+
+        Args:
+            prior (AbstractPrior): The prior distribution.
+            likelihood (AbstractLikelihood): The likelihood distribution.
+            jitter (float): A small constant added to the diagonal of the
+                covariance matrix to ensure numerical stability.
+        """
+        super().__init__(prior=prior, likelihood=likelihood, jitter=jitter)
+
+        self.latent = jr.normal(self.key, shape=(self.likelihood.num_datapoints, 1))
+        self.key = key
 
     def predict(
         self, test_inputs: Num[Array, "N D"], train_data: Dataset
@@ -680,11 +742,13 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
 
 
 @tp.overload
-def construct_posterior(prior: P, likelihood: GL) -> ConjugatePosterior[P, GL]: ...
+def construct_posterior(prior: P, likelihood: GL) -> ConjugatePosterior[P, GL]:
+    ...
 
 
 @tp.overload
-def construct_posterior(prior: P, likelihood: NGL) -> NonConjugatePosterior[P, NGL]: ...
+def construct_posterior(prior: P, likelihood: NGL) -> NonConjugatePosterior[P, NGL]:
+    ...
 
 
 def construct_posterior(prior, likelihood):
