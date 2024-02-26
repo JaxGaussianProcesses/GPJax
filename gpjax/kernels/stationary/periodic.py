@@ -37,7 +37,7 @@ class Periodic(StationaryKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], int, slice] = 1,
         lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
         variance: tp.Union[ScalarFloat, Parameter] = 1.0,
         period: tp.Union[ScalarFloat, Parameter] = 1.0,

@@ -32,13 +32,12 @@ class RationalQuadratic(StationaryKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], int, slice] = 1,
         lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
         variance: tp.Union[ScalarFloat, Parameter] = 1.0,
         alpha: tp.Union[ScalarFloat, Parameter] = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        
         if isinstance(alpha, Parameter):
             self.alpha = alpha
         else:
