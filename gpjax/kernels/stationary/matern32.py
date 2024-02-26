@@ -33,7 +33,6 @@ from gpjax.typing import (
 )
 
 
-@nnx.dataclass
 class Matern32(StationaryKernel):
     r"""The Matérn kernel with smoothness parameter fixed at 1.5."""
 

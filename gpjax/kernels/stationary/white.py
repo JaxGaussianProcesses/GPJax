@@ -30,15 +30,14 @@ from gpjax.typing import (
 
 
 class White(StationaryKernel):
-    
     name: str = "White"
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], int, slice] = 1,
         variance: tp.Union[ScalarFloat, Parameter] = 1.0,
         compute_engine: AbstractKernelComputation = ConstantDiagonalKernelComputation(),
-    ): 
+    ):
         super().__init__(active_dims, 1.0, variance, compute_engine)
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
