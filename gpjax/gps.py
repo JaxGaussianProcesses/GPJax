@@ -27,6 +27,7 @@ import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import Float, Num
 
+from gpjax.parameters import Parameter, Static
 from gpjax.dataset import Dataset
 from gpjax.distributions import GaussianDistribution
 from gpjax.kernels import RFF
@@ -660,6 +661,7 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
         self,
         prior: P,
         likelihood: NGL,
+        latent: tp.Union[Float[Array, "N 1"], Parameter, None] = None,
         jitter: float = 1e-6,
         key: KeyArray = jr.PRNGKey(42),
     ):
@@ -673,8 +675,10 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
         """
         super().__init__(prior=prior, likelihood=likelihood, jitter=jitter)
 
-        self.latent = jr.normal(self.key, shape=(self.likelihood.num_datapoints, 1))
-        self.key = key
+        latent = latent or jr.normal(key, shape=(self.likelihood.num_datapoints, 1))
+        
+        # TODO: static or intermediate?
+        self.latent = latent if isinstance(latent, Parameter) else Static(latent)
 
     def predict(
         self, test_inputs: Num[Array, "N D"], train_data: Dataset
