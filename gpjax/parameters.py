@@ -9,13 +9,14 @@ T = tp.TypeVar("T")
 
 class Parameter(nnx.Variable[T]):
     """Parameter base class."""
-    
+
     def __init__(self, value: T, **kwargs):
         if not isinstance(value, (int, float, Array)):
             raise ValueError(
                 f"Expected parameter value to be a scalar or array. Got {value}."
             )
         super().__init__(value=value, **kwargs)
+
 
 class PositiveReal(Parameter):
     """Parameter that is strictly positive."""
@@ -37,7 +38,7 @@ class SigmoidBounded(Parameter):
     """Parameter that is bounded between 0 and 1."""
 
 
-class Static(Parameter):
+class Static(nnx.Variable[T]):
     """Parameter that does not change during training."""
 
 

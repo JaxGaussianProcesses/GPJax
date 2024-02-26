@@ -13,9 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import field
-
-from flax.experimental import nnx
 import beartype.typing as tp
 import jax.numpy as jnp
 from jaxtyping import (
@@ -24,7 +21,8 @@ from jaxtyping import (
     Num,
 )
 
-from gpjax.kernels.base import AbstractKernel
+from gpjax.parameters import Parameter, Real, PositiveReal, Static
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
     EigenKernelComputation,
@@ -37,7 +35,7 @@ from gpjax.typing import (
 )
 
 
-class GraphKernel(AbstractKernel):
+class GraphKernel(StationaryKernel):
     r"""The Matérn graph kernel defined on the vertex set of a graph.
 
     A Matérn graph kernel defined on the vertices of a graph. The key reference
@@ -56,22 +54,24 @@ class GraphKernel(AbstractKernel):
     def __init__(
         self,
         laplacian: Num[Array, "N N"],
-        active_dims: tp.Union[list[int], int, slice],
-        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]] = 1.0,
-        variance: ScalarFloat = 1.0,
+        active_dims: tp.Union[list[int], int, slice] = 1,
+        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
+        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
         smoothness: ScalarFloat = 1.0,
         compute_engine: AbstractKernelComputation = EigenKernelComputation(),
     ):
-        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
+        if isinstance(smoothness, Parameter):
+            self.smoothness = smoothness
+        else:
+            self.smoothness = PositiveReal(smoothness)
 
-        self.laplacian = laplacian
-        self.lengthscale = lengthscale
-        self.variance = variance
-        self.smoothness = smoothness
-
-        evals, self.eigenvectors = jnp.linalg.eigh(self.laplacian)
-        self.eigenvalues = evals.reshape(-1, 1)
+        self.laplacian = Static(laplacian)
+        evals, eigenvectors = jnp.linalg.eigh(self.laplacian)
+        eigenvectors = Static(eigenvectors)
+        self.eigenvalues = Static(evals.reshape(-1, 1))
         self.num_vertex = self.eigenvalues.shape[0]
+
+        super().__init__(active_dims, lengthscale, variance, compute_engine)
 
     def __call__(  # TODO not consistent with general kernel interface
         self,

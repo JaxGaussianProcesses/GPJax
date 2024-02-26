@@ -21,6 +21,7 @@ import jax.scipy as jsp
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
 
+from gpjax.parameters import Parameter, PositiveReal
 from gpjax.distributions import GaussianDistribution
 from gpjax.integrators import (
     AbstractIntegrator,
@@ -127,9 +128,12 @@ class Gaussian(AbstractLikelihood):
     def __init__(
         self,
         num_datapoints: int,
-        obs_stddev: tp.Union[ScalarFloat, Float[Array, "#N"]] = jnp.array(1.0),
+        obs_stddev: tp.Union[ScalarFloat, Float[Array, "#N"], PositiveReal] = 1.0,
     ):
-        self.obs_stddev = obs_stddev
+        if isinstance(obs_stddev, Parameter):
+            self.obs_stddev = obs_stddev
+        else:
+            self.obs_stddev = PositiveReal(jnp.asarray(obs_stddev))
 
         super().__init__(num_datapoints, AnalyticalGaussianIntegrator())
 

@@ -4,6 +4,7 @@ import beartype.typing as tp
 import jax.random as jr
 from jaxtyping import Float
 
+
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.computations import BasisFunctionComputation
@@ -49,17 +50,16 @@ class RFF(AbstractKernel):
                 the basis function computation.
             key (KeyArray): The random key to use for sampling the frequencies.
         """
-        self._check_valid_base_kernel(self.base_kernel)
+        self._check_valid_base_kernel(base_kernel)
         self.base_kernel = base_kernel
         self.num_basis_fns = num_basis_fns
         self.frequencies = frequencies
         self.compute_engine = compute_engine
-        self.key = key
 
         if self.frequencies is None:
             n_dims = self.base_kernel.n_dims
             self.frequencies = self.base_kernel.spectral_density.sample(
-                seed=self.key, sample_shape=(self.num_basis_fns, n_dims)
+                seed=key, sample_shape=(self.num_basis_fns, n_dims)
             )
         self.name = f"{self.base_kernel.name} (RFF)"
 
@@ -67,7 +67,8 @@ class RFF(AbstractKernel):
         """Superfluous for RFFs."""
         raise RuntimeError("RFFs do not have a kernel function.")
 
-    def _check_valid_base_kernel(self, kernel: AbstractKernel):
+    @staticmethod
+    def _check_valid_base_kernel(kernel: AbstractKernel):
         r"""Verify that the base kernel is valid for RFF approximation.
 
         Args:
