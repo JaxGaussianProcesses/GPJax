@@ -37,25 +37,27 @@ class ArcCosine(AbstractKernel):
     additional details.
     """
 
+    name = "ArcCosine"
+
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], int, slice] = 1,
         order: tp.Literal[0, 1, 2] = 0,
         variance: ScalarFloat = 1.0,
         weight_variance: tp.Union[ScalarFloat, Float[Array, " D"]] = 1.0,
         bias_variance: ScalarFloat = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        if self.order not in [0, 1, 2]:
+        if order not in [0, 1, 2]:
             raise ValueError("ArcCosine kernel only implemented for orders 0, 1 and 2.")
-
-        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
         self.order = order
         self.variance = variance
         self.weight_variance = weight_variance
         self.bias_variance = bias_variance
         self.name = f"ArcCosine (order {self.order})"
+
+        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
     def __call__(
         self, x: Float[Array, " D"], y: Float[Array, " D"]

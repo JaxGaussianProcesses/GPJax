@@ -25,8 +25,8 @@ from flax.experimental import nnx
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
+from gpjax.parameters import Parameter, Static
 from gpjax.dataset import Dataset
 from gpjax.distributions import GaussianDistribution
 from gpjax.gps import AbstractPosterior, AbstractPrior
@@ -48,14 +48,14 @@ P = tp.TypeVar("P", bound=AbstractPrior)
 PP = tp.TypeVar("PP", bound=AbstractPosterior)
 
 
-@nnx.dataclass
 class AbstractVariationalFamily(nnx.Module, tp.Generic[L]):
     r"""
     Abstract base class used to represent families of distributions that can be
     used within variational inference.
     """
 
-    posterior: AbstractPosterior[P, L]
+    def __init__(self, posterior: AbstractPosterior[P, L]):
+        self.posterior = posterior
 
     def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> GaussianDistribution:
         r"""Evaluate the variational family's density.
@@ -91,12 +91,19 @@ class AbstractVariationalFamily(nnx.Module, tp.Generic[L]):
         raise NotImplementedError
 
 
-@nnx.dataclass
 class AbstractVariationalGaussian(AbstractVariationalFamily[L]):
     r"""The variational Gaussian family of probability distributions."""
 
-    inducing_inputs: Float[Array, "N D"]
-    jitter: ScalarFloat = 1e-6
+    def __init__(
+        self,
+        posterior: AbstractPosterior[P, L],
+        inducing_inputs: Float[Array, "N D"],
+        jitter: ScalarFloat = 1e-6,
+    ):
+        self.inducing_inputs = Static(inducing_inputs)
+        self.jitter = jitter
+
+        super().__init__(posterior)
 
     @property
     def num_inducing(self) -> int:
@@ -104,7 +111,6 @@ class AbstractVariationalGaussian(AbstractVariationalFamily[L]):
         return self.inducing_inputs.shape[0]
 
 
-@nnx.dataclass
 class VariationalGaussian(AbstractVariationalGaussian[L]):
     r"""The variational Gaussian family of probability distributions.
 
@@ -115,19 +121,25 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
     $`\mu`$ and $`sqrt`$ with $`S = sqrt sqrt^{\top}`$.
     """
 
-    variational_mean: tp.Union[Float[Array, "N 1"], None] = nnx.variable_field(
-        nnx.Param, default=None
-    )
-    variational_root_covariance: tp.Union[
-        Float[Array, "N N"], None
-    ] = nnx.variable_field(nnx.Param, default=None)
+    def __init__(
+        self,
+        posterior: AbstractPosterior[P, L],
+        inducing_inputs: Float[Array, "N D"],
+        variational_mean: tp.Union[Float[Array, "N 1"], None] = None,
+        variational_root_covariance: tp.Union[Float[Array, "N N"], None] = None,
+        jitter: ScalarFloat = 1e-6,
+    ):
+        
+        super().__init__(posterior, inducing_inputs, jitter)
+        
+        # TODO: when is a parameter "Static" and when is it "Intermediate?"
+        self.variational_mean = Static(
+            variational_mean or jnp.zeros((self.num_inducing, 1))
+        )
+        self.variational_root_covariance = Static(
+            variational_root_covariance or jnp.eye(self.num_inducing)
+        )
 
-    def __post_init__(self) -> None:
-        if self.variational_mean is None:
-            self.variational_mean = jnp.zeros((self.num_inducing, 1))
-
-        if self.variational_root_covariance is None:
-            self.variational_root_covariance = jnp.eye(self.num_inducing)
 
     def prior_kl(self) -> ScalarFloat:
         r"""Compute the prior KL divergence.
@@ -234,7 +246,6 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         )
 
 
-@nnx.dataclass
 class WhitenedVariationalGaussian(VariationalGaussian[L]):
     r"""The whitened variational Gaussian family of probability distributions.
 
@@ -334,7 +345,6 @@ class WhitenedVariationalGaussian(VariationalGaussian[L]):
         )
 
 
-@nnx.dataclass
 class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
     r"""The natural variational Gaussian family of probability distributions.
 
@@ -347,15 +357,21 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
     where $`T(u) = [u, uu^{\top}]`$ are the sufficient statistics.
     """
 
-    natural_vector: Float[Array, "M 1"] = None
-    natural_matrix: Float[Array, "M M"] = None
 
-    def __post_init__(self):
-        if self.natural_vector is None:
-            self.natural_vector = jnp.zeros((self.num_inducing, 1))
+    def __init__(
+        self,
+        posterior: AbstractPosterior[P, L],
+        inducing_inputs: Float[Array, "N D"],
+        natural_vector: tp.Union[Float[Array, "M 1"], None] = None,
+        natural_matrix: tp.Union[Float[Array, "M M"], None] = None,
+        jitter: ScalarFloat = 1e-6,
+    ):
+        
+        super().__init__(posterior, inducing_inputs, jitter)
+        
+        self.natural_vector = Static(natural_vector or jnp.zeros((self.num_inducing, 1)))
+        self.natural_matrix = Static(natural_matrix or -0.5 * jnp.eye(self.num_inducing))
 
-        if self.natural_matrix is None:
-            self.natural_matrix = -0.5 * jnp.eye(self.num_inducing)
 
     def prior_kl(self) -> ScalarFloat:
         r"""Compute the KL-divergence between our current variational approximation
@@ -491,7 +507,6 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
         )
 
 
-@nnx.dataclass
 class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
     r"""The natural variational Gaussian family of probability distributions.
 
@@ -505,14 +520,20 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
     inference over.
     """
 
-    expectation_vector: Float[Array, "M 1"] = None
-    expectation_matrix: Float[Array, "M M"] = None
+    def __init__(
+        self,
+        posterior: AbstractPosterior[P, L],
+        inducing_inputs: Float[Array, "N D"],
+        expectation_vector: tp.Union[Float[Array, "M 1"], None] = None,
+        expectation_matrix: tp.Union[Float[Array, "M M"], None] = None,
+        jitter: ScalarFloat = 1e-6,
+    ):
+        
+        super().__init__(posterior, inducing_inputs, jitter)
 
-    def __post_init__(self):
-        if self.expectation_vector is None:
-            self.expectation_vector = jnp.zeros((self.num_inducing, 1))
-        if self.expectation_matrix is None:
-            self.expectation_matrix = jnp.eye(self.num_inducing)
+        # must come after super().__init__
+        self.expectation_vector = Static(expectation_vector or jnp.zeros((self.num_inducing, 1)))
+        self.expectation_matrix = Static(expectation_matrix or jnp.eye(self.num_inducing))
 
     def prior_kl(self) -> ScalarFloat:
         r"""Evaluate the prior KL-divergence.
@@ -638,7 +659,6 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
         )
 
 
-@nnx.dataclass
 class CollapsedVariationalGaussian(AbstractVariationalGaussian[GL]):
     r"""Collapsed variational Gaussian.
 
