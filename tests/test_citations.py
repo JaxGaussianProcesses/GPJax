@@ -51,7 +51,7 @@ def _check_no_fallback(citation: AbstractCitation):
     )
 
 
-@pytest.mark.parametrize("kernel", [Matern12(), Matern32(), Matern52()])
+@pytest.mark.parametrize("kernel", [Matern12(1), Matern32(1), Matern52(1)])
 def test_matern_kernels(kernel):
     citation = cite(kernel)
     # Check type
@@ -65,7 +65,7 @@ def test_matern_kernels(kernel):
 
 
 def test_arc_cosine():
-    kernel = ArcCosine()
+    kernel = ArcCosine(1)
     citation = cite(kernel)
 
     assert isinstance(citation, PaperCitation)
@@ -88,7 +88,7 @@ def test_graph_kernel():
     _check_no_fallback(citation)
 
 
-@pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
+@pytest.mark.parametrize("kernel", [RBF(1), Matern12(1), Matern32(1), Matern52(1)])
 def test_rff(kernel):
     base_kernel = kernel
     rff = RFF(base_kernel=base_kernel)
@@ -102,7 +102,7 @@ def test_rff(kernel):
     _check_no_fallback(citation)
 
 
-@pytest.mark.parametrize("kernel", [RBF(), Linear()])
+@pytest.mark.parametrize("kernel", [RBF(1), Linear(1)])
 def test_missing_citation(kernel):
     citation = cite(kernel)
     assert isinstance(citation, NullCitation)

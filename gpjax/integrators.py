@@ -26,7 +26,7 @@ class AbstractIntegrator:
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: L,
+        likelihood: L | None,
     ) -> Float[Array, " N"]:
         r"""Integrate a function with respect to a Gaussian distribution.
 
@@ -49,7 +49,7 @@ class AbstractIntegrator:
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: L,
+        likelihood: L | None,
     ) -> Float[Array, " N"]:
         r"""Integrate a function with respect to a Gaussian distribution.
 
@@ -79,7 +79,15 @@ class GHQuadratureIntegrator(AbstractIntegrator):
     polynomial $`H_J(t)`$ that we can look up in table
     [link](https://keisan.casio.com/exec/system/1281195844).
     """
-    num_points: int = 20
+
+    def __init__(self, num_points: int = 20):
+        r"""Initialize the integrator.
+
+        Args:
+            num_points (int, optional): The number of points to use in the
+                quadrature. Defaults to 20.
+        """
+        self.num_points = num_points
 
     def integrate(
         self,
@@ -87,7 +95,7 @@ class GHQuadratureIntegrator(AbstractIntegrator):
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: L,
+        likelihood: L | None,
     ) -> Float[Array, " N"]:
         r"""Compute a quadrature integral.
 
