@@ -50,6 +50,7 @@ CallableLoss = tpe.Callable[
     [nnx.State, tpe.Unpack[tuple[nnx.State, ...]], nnx.GraphDef, Dataset], ScalarFloat
 ]
 
+
 def conjugate_mll(negative: bool = False) -> CallableLoss:
     r"""Evaluate the marginal log-likelihood of the Gaussian process.
 
@@ -401,6 +402,7 @@ def collapsed_elbo(negative: bool = False) -> CallableLoss:
     The key reference is Titsias, (2009) - Variational Learning of Inducing Variables
     in Sparse Gaussian Processes.
     """
+
     def evaluate(
         params: nnx.State,
         extra_states: tuple[nnx.State, ...],  # beartype: ignore
@@ -506,5 +508,5 @@ def collapsed_elbo(negative: bool = False) -> CallableLoss:
         # log N(y; μx, Io² + KxzKzz⁻¹Kzx) - 1/2o² tr(Kxx - KxzKzz⁻¹Kzx)
         res = (two_log_prob - two_trace).squeeze() / 2.0
         return -res if negative else res
-    
+
     return evaluate

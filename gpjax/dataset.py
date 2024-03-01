@@ -19,6 +19,7 @@ from beartype.typing import Optional
 import jax
 import jax.numpy as jnp
 from jaxtyping import Num
+
 from gpjax.typing import Array
 
 
@@ -77,10 +78,10 @@ class Dataset:
     def in_dim(self) -> int:
         r"""Dimension of the inputs, $`X`$."""
         return self.X.shape[1]
-    
+
     def tree_flatten(self):
         return (self.X, self.y), None
-    
+
     @classmethod
     def tree_unflatten(cls, aux_data, children):
         return cls(*children)

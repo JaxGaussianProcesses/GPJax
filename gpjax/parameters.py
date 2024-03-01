@@ -1,7 +1,9 @@
 import typing as tp
 
 from flax.experimental import nnx
+import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
+
 from gpjax.typing import Array
 
 T = tp.TypeVar("T")

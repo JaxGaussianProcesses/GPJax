@@ -17,12 +17,12 @@ import typing as tp
 import jax.numpy as jnp
 from jaxtyping import Float
 
-from gpjax.parameters import Parameter
-from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
     ConstantDiagonalKernelComputation,
 )
+from gpjax.kernels.stationary.base import StationaryKernel
+from gpjax.parameters import Parameter
 from gpjax.typing import (
     Array,
     ScalarFloat,

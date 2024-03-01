@@ -14,14 +14,16 @@
 # ==============================================================================
 
 import beartype.typing as tp
-
 from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax.distributions as tfd
 
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
 from gpjax.kernels.stationary.base import StationaryKernel
-from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 from gpjax.kernels.stationary.utils import (
     build_student_t_distribution,
     euclidean_distance,

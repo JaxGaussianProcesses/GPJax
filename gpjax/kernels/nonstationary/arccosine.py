@@ -14,14 +14,16 @@
 # ==============================================================================
 
 import beartype.typing as tp
-
 from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
 
-from gpjax.parameters import Parameter
 from gpjax.kernels.base import AbstractKernel
-from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
+from gpjax.parameters import Parameter
 from gpjax.typing import (
     Array,
     ScalarFloat,

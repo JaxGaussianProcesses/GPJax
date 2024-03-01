@@ -17,11 +17,15 @@
 import beartype.typing as tp
 from jaxtyping import Float
 
-from gpjax.parameters import Parameter, PositiveReal
 from gpjax.kernels.base import AbstractKernel
-from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
-from gpjax.kernels.stationary.utils import (
-    _check_lengthscale_dims_compat,
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
+from gpjax.kernels.stationary.utils import _check_lengthscale_dims_compat
+from gpjax.parameters import (
+    Parameter,
+    PositiveReal,
 )
 from gpjax.typing import (
     Array,
@@ -29,6 +33,7 @@ from gpjax.typing import (
 )
 
 Lengthscale = tp.Union[tp.Union[ScalarFloat, Float[Array, " D"]]]
+
 
 class StationaryKernel(AbstractKernel):
     """Base class for stationary kernels."""

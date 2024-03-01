@@ -15,17 +15,23 @@
 
 import abc
 import functools as ft
-import beartype.typing as tp
 
+import beartype.typing as tp
 from flax.experimental import nnx
 import jax.numpy as jnp
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.parameters import Parameter, Real
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
     DenseKernelComputation,
+)
+from gpjax.parameters import (
+    Parameter,
+    Real,
 )
 from gpjax.typing import (
     Array,
@@ -150,8 +156,7 @@ class Constant(AbstractKernel):
         active_dims: tp.Union[list[int], int, slice] = 1,
         constant: tp.Union[ScalarFloat, Parameter[ScalarFloat]] = jnp.array(0.0),
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
-    ):  
-        
+    ):
         if isinstance(constant, Parameter):
             self.constant = constant
         else:

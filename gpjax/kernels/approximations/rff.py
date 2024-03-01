@@ -1,13 +1,11 @@
 """Compute Random Fourier Feature (RFF) kernel approximations.  """
 import beartype.typing as tp
-
 import jax.random as jr
 from jaxtyping import Float
 
-
 from gpjax.kernels.base import AbstractKernel
-from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.computations import BasisFunctionComputation
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.typing import (
     Array,
     KeyArray,
