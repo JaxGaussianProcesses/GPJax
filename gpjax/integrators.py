@@ -1,7 +1,6 @@
 import abc
-import beartype.typing as tp
 
-from flax.experimental import nnx
+import beartype.typing as tp
 import jax.numpy as jnp
 from jaxtyping import Float
 import numpy as np

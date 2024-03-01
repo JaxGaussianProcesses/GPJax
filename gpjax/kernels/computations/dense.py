@@ -14,7 +14,6 @@
 # ==============================================================================
 
 import beartype.typing as tp
-
 from jax import vmap
 from jaxtyping import Float
 

@@ -14,13 +14,15 @@
 # ==============================================================================
 
 import beartype.typing as tp
-
 import jax.numpy as jnp
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
 
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
 from gpjax.kernels.stationary.base import StationaryKernel
-from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 from gpjax.kernels.stationary.utils import squared_distance
 from gpjax.typing import (
     Array,

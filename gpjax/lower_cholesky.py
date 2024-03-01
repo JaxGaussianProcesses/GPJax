@@ -13,10 +13,16 @@
 # limitations under the License.
 # ==============================================================================
 
+from cola.annotations import PSD
 from cola.fns import dispatch
 from cola.ops.operator_base import LinearOperator
-from cola.ops.operators import Triangular, Diagonal, Identity, Kronecker, BlockDiag
-from cola.annotations import PSD
+from cola.ops.operators import (
+    BlockDiag,
+    Diagonal,
+    Identity,
+    Kronecker,
+    Triangular,
+)
 import jax.numpy as jnp
 
 # TODO: Once this functionality is supported in CoLA, remove this.

@@ -14,14 +14,19 @@
 # ==============================================================================
 
 import beartype.typing as tp
-
 import jax.numpy as jnp
 from jaxtyping import Float
 
-from gpjax.parameters import Parameter, SigmoidBounded
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
 from gpjax.kernels.stationary.base import StationaryKernel
-from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 from gpjax.kernels.stationary.utils import euclidean_distance
+from gpjax.parameters import (
+    Parameter,
+    SigmoidBounded,
+)
 from gpjax.typing import (
     Array,
     ScalarFloat,

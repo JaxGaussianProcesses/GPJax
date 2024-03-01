@@ -14,20 +14,20 @@
 # ==============================================================================
 # from __future__ import annotations
 from abc import abstractmethod
+
 import beartype.typing as tp
-
 from cola.annotations import PSD
-from cola.ops.operators import I_like
-from cola.linalg.inverse.inv import solve
 from cola.linalg.decompositions.decompositions import Cholesky
-
+from cola.linalg.inverse.inv import solve
+from cola.ops.operators import I_like
 from flax.experimental import nnx
-
 import jax.numpy as jnp
 import jax.random as jr
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 
-from gpjax.parameters import Parameter, Static
 from gpjax.dataset import Dataset
 from gpjax.distributions import GaussianDistribution
 from gpjax.kernels import RFF
@@ -39,6 +39,10 @@ from gpjax.likelihoods import (
 )
 from gpjax.lower_cholesky import lower_cholesky
 from gpjax.mean_functions import AbstractMeanFunction
+from gpjax.parameters import (
+    Parameter,
+    Static,
+)
 from gpjax.typing import (
     Array,
     FunctionalSample,
@@ -676,7 +680,7 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
         super().__init__(prior=prior, likelihood=likelihood, jitter=jitter)
 
         latent = latent or jr.normal(key, shape=(self.likelihood.num_datapoints, 1))
-        
+
         # TODO: static or intermediate?
         self.latent = latent if isinstance(latent, Parameter) else Static(latent)
 

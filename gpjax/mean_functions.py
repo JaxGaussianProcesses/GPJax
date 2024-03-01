@@ -16,13 +16,23 @@
 
 import abc
 import functools as ft
-import beartype.typing as tp
 
+import beartype.typing as tp
 from flax.experimental import nnx
 import jax.numpy as jnp
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Num,
+)
 
-from gpjax.typing import Array, ScalarFloat
+from gpjax.parameters import (
+    Parameter,
+    Real,
+)
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
 
 
 class AbstractMeanFunction(nnx.Module):

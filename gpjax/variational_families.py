@@ -14,26 +14,39 @@
 # ==============================================================================
 
 import abc
-import beartype.typing as tp
 
+import beartype.typing as tp
 from cola.annotations import PSD
 from cola.linalg.decompositions.decompositions import Cholesky
 from cola.linalg.inverse.inv import solve
-from cola.ops.operators import I_like, Triangular, Dense
-
+from cola.ops.operators import (
+    Dense,
+    I_like,
+    Triangular,
+)
 from flax.experimental import nnx
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Float
 
-from gpjax.parameters import Parameter, Static
 from gpjax.dataset import Dataset
 from gpjax.distributions import GaussianDistribution
-from gpjax.gps import AbstractPosterior, AbstractPrior
+from gpjax.gps import (
+    AbstractPosterior,
+    AbstractPrior,
+)
 from gpjax.kernels.base import AbstractKernel
-from gpjax.mean_functions import AbstractMeanFunction
-from gpjax.likelihoods import AbstractLikelihood, Gaussian, NonGaussian
+from gpjax.likelihoods import (
+    AbstractLikelihood,
+    Gaussian,
+    NonGaussian,
+)
 from gpjax.lower_cholesky import lower_cholesky
+from gpjax.mean_functions import AbstractMeanFunction
+from gpjax.parameters import (
+    Parameter,
+    Static,
+)
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -129,9 +142,8 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         variational_root_covariance: tp.Union[Float[Array, "N N"], None] = None,
         jitter: ScalarFloat = 1e-6,
     ):
-        
         super().__init__(posterior, inducing_inputs, jitter)
-        
+
         # TODO: when is a parameter "Static" and when is it "Intermediate?"
         self.variational_mean = Static(
             variational_mean or jnp.zeros((self.num_inducing, 1))
@@ -139,7 +151,6 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         self.variational_root_covariance = Static(
             variational_root_covariance or jnp.eye(self.num_inducing)
         )
-
 
     def prior_kl(self) -> ScalarFloat:
         r"""Compute the prior KL divergence.
@@ -357,7 +368,6 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
     where $`T(u) = [u, uu^{\top}]`$ are the sufficient statistics.
     """
 
-
     def __init__(
         self,
         posterior: AbstractPosterior[P, L],
@@ -366,12 +376,14 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
         natural_matrix: tp.Union[Float[Array, "M M"], None] = None,
         jitter: ScalarFloat = 1e-6,
     ):
-        
         super().__init__(posterior, inducing_inputs, jitter)
-        
-        self.natural_vector = Static(natural_vector or jnp.zeros((self.num_inducing, 1)))
-        self.natural_matrix = Static(natural_matrix or -0.5 * jnp.eye(self.num_inducing))
 
+        self.natural_vector = Static(
+            natural_vector or jnp.zeros((self.num_inducing, 1))
+        )
+        self.natural_matrix = Static(
+            natural_matrix or -0.5 * jnp.eye(self.num_inducing)
+        )
 
     def prior_kl(self) -> ScalarFloat:
         r"""Compute the KL-divergence between our current variational approximation
@@ -528,12 +540,15 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
         expectation_matrix: tp.Union[Float[Array, "M M"], None] = None,
         jitter: ScalarFloat = 1e-6,
     ):
-        
         super().__init__(posterior, inducing_inputs, jitter)
 
         # must come after super().__init__
-        self.expectation_vector = Static(expectation_vector or jnp.zeros((self.num_inducing, 1)))
-        self.expectation_matrix = Static(expectation_matrix or jnp.eye(self.num_inducing))
+        self.expectation_vector = Static(
+            expectation_vector or jnp.zeros((self.num_inducing, 1))
+        )
+        self.expectation_matrix = Static(
+            expectation_matrix or jnp.eye(self.num_inducing)
+        )
 
     def prior_kl(self) -> ScalarFloat:
         r"""Evaluate the prior KL-divergence.

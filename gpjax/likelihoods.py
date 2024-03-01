@@ -12,8 +12,8 @@
 # ==============================================================================
 
 import abc
-import beartype.typing as tp
 
+import beartype.typing as tp
 from flax.experimental import nnx
 from jax import vmap
 import jax.numpy as jnp
@@ -21,12 +21,15 @@ import jax.scipy as jsp
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.parameters import Parameter, PositiveReal
 from gpjax.distributions import GaussianDistribution
 from gpjax.integrators import (
     AbstractIntegrator,
     AnalyticalGaussianIntegrator,
     GHQuadratureIntegrator,
+)
+from gpjax.parameters import (
+    Parameter,
+    PositiveReal,
 )
 from gpjax.typing import (
     Array,

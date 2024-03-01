@@ -21,13 +21,18 @@ from jaxtyping import (
     Num,
 )
 
-from gpjax.parameters import Parameter, Real, PositiveReal, Static
-from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
     EigenKernelComputation,
 )
 from gpjax.kernels.non_euclidean.utils import jax_gather_nd
+from gpjax.kernels.stationary.base import StationaryKernel
+from gpjax.parameters import (
+    Parameter,
+    PositiveReal,
+    Real,
+    Static,
+)
 from gpjax.typing import (
     Array,
     ScalarFloat,

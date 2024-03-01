@@ -14,13 +14,18 @@
 # ==============================================================================
 
 import beartype.typing as tp
-
 from jaxtyping import Float
 
-from gpjax.parameters import Parameter, PositiveReal
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
 from gpjax.kernels.stationary.base import StationaryKernel
-from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
 from gpjax.kernels.stationary.utils import squared_distance
+from gpjax.parameters import (
+    Parameter,
+    PositiveReal,
+)
 from gpjax.typing import (
     Array,
     ScalarFloat,
