@@ -6,7 +6,6 @@ from cola.ops.operators import (
     Dense,
     LinearOperator,
 )
-from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
 
