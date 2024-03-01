@@ -1,12 +1,26 @@
 import abc
+from functools import partial
+from typing import TypeVar
 
+from cola.annotations import PSD
+from cola.linalg.decompositions.decompositions import Cholesky
+from cola.linalg.inverse.inv import (
+    inv,
+    solve,
+)
+from cola.linalg.trace.diag_trace import diag
+from cola.ops.operators import I_like
 from flax.experimental import nnx
-from jax import vmap
+from jax import (
+    jit,
+    vmap,
+)
 import jax.numpy as jnp
 import jax.scipy as jsp
 import jax.tree_util as jtu
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
+import typing_extensions as tpe
 
 import gpjax
 from gpjax.dataset import Dataset
@@ -19,14 +33,6 @@ from gpjax.typing import (
 
 tfd = tfp.distributions
 
-from typing import TypeVar
-
-
-from cola.annotations import PSD
-from cola.linalg.decompositions.decompositions import Cholesky
-from cola.linalg.inverse.inv import inv, solve
-from cola.linalg.trace.diag_trace import diag
-from cola.ops.operators import I_like
 
 ConjugatePosterior = TypeVar(
     "ConjugatePosterior", bound="gpjax.gps.ConjugatePosterior"  # noqa: F821
@@ -40,96 +46,80 @@ VariationalFamily = TypeVar(
 )
 
 
-@nnx.dataclass
-class AbstractObjective(nnx.Module):
-    r"""Abstract base class for objectives."""
+CallableLoss = tpe.Callable[
+    [nnx.State, tpe.Unpack[tuple[nnx.State, ...]], nnx.GraphDef, Dataset], ScalarFloat
+]
 
-    def __init__(self, negative: bool = False):
-        self.negative = negative
-        self._constant = -1.0 if negative else 1.0
+def conjugate_mll(negative: bool = False) -> CallableLoss:
+    r"""Evaluate the marginal log-likelihood of the Gaussian process.
 
-    def __hash__(self):
-        return hash(tuple(jtu.tree_leaves(self)))  # Probably put this on the Module!
+    Compute the marginal log-likelihood function of the Gaussian process.
+    The returned function can then be used for gradient based optimisation
+    of the model's parameters or for model comparison. The implementation
+    given here enables exact estimation of the Gaussian process' latent
+    function values.
 
-    def __call__(self, *args, **kwargs) -> ScalarFloat:
-        return self.step(*args, **kwargs)
+    For a training dataset $`\{x_n, y_n\}_{n=1}^N`$, set of test inputs
+    $`\mathbf{x}^{\star}`$ the corresponding latent function evaluations are given
+    by $`\mathbf{f}=f(\mathbf{x})`$ and $`\mathbf{f}^{\star}f(\mathbf{x}^{\star})`$,
+    the marginal log-likelihood is given by:
+    ```math
+    \begin{align}
+        \log p(\mathbf{y}) & = \int p(\mathbf{y}\mid\mathbf{f})p(\mathbf{f}, \mathbf{f}^{\star}\mathrm{d}\mathbf{f}^{\star}\\
+        &=0.5\left(-\mathbf{y}^{\top}\left(k(\mathbf{x}, \mathbf{x}') +\sigma^2\mathbf{I}_N  \right)^{-1}\mathbf{y}-\log\lvert k(\mathbf{x}, \mathbf{x}') + \sigma^2\mathbf{I}_N\rvert - n\log 2\pi \right).
+    \end{align}
+    ```
 
-    @abc.abstractmethod
-    def step(self, *args, **kwargs) -> ScalarFloat:
-        ...
+    For a given ``ConjugatePosterior`` object, the following code snippet shows
+    how the marginal log-likelihood can be evaluated.
 
+    Example:
+    ```python
+        >>> import gpjax as gpx
+        >>>
+        >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
+        >>> ytrain = jnp.sin(xtrain)
+        >>> D = gpx.Dataset(X=xtrain, y=ytrain)
+        >>>
+        >>> meanf = gpx.mean_functions.Constant()
+        >>> kernel = gpx.kernels.RBF()
+        >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
+        >>> prior = gpx.gps.Prior(mean_function = meanf, kernel=kernel)
+        >>> posterior = prior * likelihood
+        >>>
+        >>> mll = gpx.objectives.ConjugateMLL(negative=True)
+        >>> mll(posterior, train_data = D)
+    ```
 
-class ConjugateMLL(AbstractObjective):
-    def step(
-        self,
-        posterior: ConjugatePosterior,
+    Our goal is to maximise the marginal log-likelihood. Therefore, when optimising
+    the model's parameters with respect to the parameters, we use the negative
+    marginal log-likelihood. This can be realised through
+
+    ```python
+        mll = gpx.objectives.ConjugateMLL(negative=True)
+    ```
+
+    For optimal performance, the marginal log-likelihood should be ``jax.jit``
+    compiled.
+    ```python
+        mll = jit(gpx.objectives.ConjugateMLL(negative=True))
+    ```
+
+    Args:
+        negative (bool, optional): If True, the negative marginal log-likelihood.
+
+    Returns
+    -------
+        CallableLoss : The marginal log-likelihood of a conjugate Gaussian process.
+    """
+
+    def evaluate(
+        params: nnx.State,
+        extra_states: tuple[nnx.State, ...],  # beartype: ignore
+        moduledef: nnx.GraphDef,
         train_data: Dataset,
     ) -> ScalarFloat:
-        r"""Evaluate the marginal log-likelihood of the Gaussian process.
-
-        Compute the marginal log-likelihood function of the Gaussian process.
-        The returned function can then be used for gradient based optimisation
-        of the model's parameters or for model comparison. The implementation
-        given here enables exact estimation of the Gaussian process' latent
-        function values.
-
-        For a training dataset $`\{x_n, y_n\}_{n=1}^N`$, set of test inputs
-        $`\mathbf{x}^{\star}`$ the corresponding latent function evaluations are given
-        by $`\mathbf{f}=f(\mathbf{x})`$ and $`\mathbf{f}^{\star}f(\mathbf{x}^{\star})`$,
-        the marginal log-likelihood is given by:
-        ```math
-        \begin{align}
-            \log p(\mathbf{y}) & = \int p(\mathbf{y}\mid\mathbf{f})p(\mathbf{f}, \mathbf{f}^{\star}\mathrm{d}\mathbf{f}^{\star}\\
-            &=0.5\left(-\mathbf{y}^{\top}\left(k(\mathbf{x}, \mathbf{x}') +\sigma^2\mathbf{I}_N  \right)^{-1}\mathbf{y}-\log\lvert k(\mathbf{x}, \mathbf{x}') + \sigma^2\mathbf{I}_N\rvert - n\log 2\pi \right).
-        \end{align}
-        ```
-
-        For a given ``ConjugatePosterior`` object, the following code snippet shows
-        how the marginal log-likelihood can be evaluated.
-
-        Example:
-        ```python
-            >>> import gpjax as gpx
-            >>>
-            >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
-            >>> ytrain = jnp.sin(xtrain)
-            >>> D = gpx.Dataset(X=xtrain, y=ytrain)
-            >>>
-            >>> meanf = gpx.mean_functions.Constant()
-            >>> kernel = gpx.kernels.RBF()
-            >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
-            >>> prior = gpx.gps.Prior(mean_function = meanf, kernel=kernel)
-            >>> posterior = prior * likelihood
-            >>>
-            >>> mll = gpx.objectives.ConjugateMLL(negative=True)
-            >>> mll(posterior, train_data = D)
-        ```
-
-        Our goal is to maximise the marginal log-likelihood. Therefore, when optimising
-        the model's parameters with respect to the parameters, we use the negative
-        marginal log-likelihood. This can be realised through
-
-        ```python
-            mll = gpx.objectives.ConjugateMLL(negative=True)
-        ```
-
-        For optimal performance, the marginal log-likelihood should be ``jax.jit``
-        compiled.
-        ```python
-            mll = jit(gpx.objectives.ConjugateMLL(negative=True))
-        ```
-
-        Args:
-            posterior (ConjugatePosterior): The posterior distribution for which
-                we want to compute the marginal log-likelihood.
-            train_data (Dataset): The training dataset used to compute the
-                marginal log-likelihood.
-
-        Returns
-        -------
-            ScalarFloat: The marginal log-likelihood of the Gaussian process for the
-                current parameter set.
-        """
+        posterior = moduledef.merge(params, *extra_states)
         x, y = train_data.X, train_data.y
 
         # Observation noise o²
@@ -144,74 +134,78 @@ class ConjugateMLL(AbstractObjective):
 
         # p(y | x, θ), where θ are the model hyperparameters:
         mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
+        res = mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
+        return -res if negative else res
 
-        return self._constant * (mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze())
+    return evaluate
 
 
-class ConjugateLOOCV(AbstractObjective):
-    def step(
-        self,
-        posterior: ConjugatePosterior,
+def conjugate_loocv(negative: bool = False) -> CallableLoss:
+    r"""Evaluate the leave-one-out log predictive probability of the Gaussian process following
+    section 5.4.2 of Rasmussen et al. 2006 - Gaussian Processes for Machine Learning. This metric
+    calculates the average performance of all models that can be obtained by training on all but one
+    data point, and then predicting the left out data point.
+
+    The returned metric can then be used for gradient based optimisation
+    of the model's parameters or for model comparison. The implementation
+    given here enables exact estimation of the Gaussian process' latent
+    function values.
+
+    For a given ``ConjugatePosterior`` object, the following code snippet shows
+    how the leave-one-out log predicitive probability can be evaluated.
+
+    Example:
+    ```python
+        >>> import gpjax as gpx
+        >>>
+        >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
+        >>> ytrain = jnp.sin(xtrain)
+        >>> D = gpx.Dataset(X=xtrain, y=ytrain)
+        >>>
+        >>> meanf = gpx.mean_functions.Constant()
+        >>> kernel = gpx.kernels.RBF()
+        >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
+        >>> prior = gpx.gps.Prior(mean_function = meanf, kernel=kernel)
+        >>> posterior = prior * likelihood
+        >>>
+        >>> loocv = gpx.objectives.ConjugateLOOCV(negative=True)
+        >>> loocv(posterior, train_data = D)
+    ```
+
+    Our goal is to maximise the leave-one-out log predictive probability. Therefore, when
+    optimising the model's parameters with respect to the parameters, we use the negative
+    leave-one-out log predictive probability. This can be realised through
+
+    ```python
+        mll = gpx.objectives.ConjugateLOOCV(negative=True)
+    ```
+
+    For optimal performance, the objective should be ``jax.jit``
+    compiled.
+    ```python
+        mll = jit(gpx.objectives.ConjugateLOOCV(negative=True))
+    ```
+
+    Args:
+        posterior (ConjugatePosterior): The posterior distribution for which
+            we want to compute the leave-one-out log predictive probability.
+        train_data (Dataset): The training dataset used to compute the
+            leave-one-out log predictive probability..
+
+    Returns
+    -------
+        ScalarFloat: The leave-one-out log predictive probability of the Gaussian
+            process for the current parameter set.
+    """
+
+    def evaluate(
+        params: nnx.State,
+        extra_states: tuple[nnx.State, ...],  # beartype: ignore
+        moduledef: nnx.GraphDef,
         train_data: Dataset,
     ) -> ScalarFloat:
-        r"""Evaluate the leave-one-out log predictive probability of the Gaussian process following
-        section 5.4.2 of Rasmussen et al. 2006 - Gaussian Processes for Machine Learning. This metric
-        calculates the average performance of all models that can be obtained by training on all but one
-        data point, and then predicting the left out data point.
-
-        The returned metric can then be used for gradient based optimisation
-        of the model's parameters or for model comparison. The implementation
-        given here enables exact estimation of the Gaussian process' latent
-        function values.
-
-        For a given ``ConjugatePosterior`` object, the following code snippet shows
-        how the leave-one-out log predicitive probability can be evaluated.
-
-        Example:
-        ```python
-            >>> import gpjax as gpx
-            >>>
-            >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
-            >>> ytrain = jnp.sin(xtrain)
-            >>> D = gpx.Dataset(X=xtrain, y=ytrain)
-            >>>
-            >>> meanf = gpx.mean_functions.Constant()
-            >>> kernel = gpx.kernels.RBF()
-            >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
-            >>> prior = gpx.gps.Prior(mean_function = meanf, kernel=kernel)
-            >>> posterior = prior * likelihood
-            >>>
-            >>> loocv = gpx.objectives.ConjugateLOOCV(negative=True)
-            >>> loocv(posterior, train_data = D)
-        ```
-
-        Our goal is to maximise the leave-one-out log predictive probability. Therefore, when
-        optimising the model's parameters with respect to the parameters, we use the negative
-        leave-one-out log predictive probability. This can be realised through
-
-        ```python
-            mll = gpx.objectives.ConjugateLOOCV(negative=True)
-        ```
-
-        For optimal performance, the objective should be ``jax.jit``
-        compiled.
-        ```python
-            mll = jit(gpx.objectives.ConjugateLOOCV(negative=True))
-        ```
-
-        Args:
-            posterior (ConjugatePosterior): The posterior distribution for which
-                we want to compute the leave-one-out log predictive probability.
-            train_data (Dataset): The training dataset used to compute the
-                leave-one-out log predictive probability..
-
-        Returns
-        -------
-            ScalarFloat: The leave-one-out log predictive probability of the Gaussian
-                process for the current parameter set.
-        """
+        posterior = moduledef.merge(params, *extra_states)
         x, y = train_data.X, train_data.y
-        y.shape[1]
 
         # Observation noise o²
         obs_var = posterior.likelihood.obs_stddev**2
@@ -230,16 +224,24 @@ class ConjugateLOOCV(AbstractObjective):
         loocv_stds = jnp.sqrt(1.0 / Sigma_inv_diag)
 
         loocv_posterior = tfd.Normal(loc=loocv_means, scale=loocv_stds)
-        loocv = jnp.sum(loocv_posterior.log_prob(y))
-        return self._constant * loocv
+        res = jnp.sum(loocv_posterior.log_prob(y))
+
+        return -res if negative else res
+
+    return evaluate
 
 
-class LogPosteriorDensity(AbstractObjective):
+def log_posterior_density(negative: bool = False) -> CallableLoss:
     r"""The log-posterior density of a non-conjugate Gaussian process. This is
     sometimes referred to as the marginal log-likelihood.
     """
 
-    def step(self, posterior: NonConjugatePosterior, data: Dataset) -> ScalarFloat:
+    def evaluate(
+        params: nnx.State,
+        extra_states: tuple[nnx.State, ...],  # beartype: ignore
+        moduledef: nnx.GraphDef,
+        train_data: Dataset,
+    ) -> ScalarFloat:
         r"""Evaluate the log-posterior density of a Gaussian process.
 
         Compute the marginal log-likelihood, or log-posterior density of the Gaussian
@@ -266,8 +268,10 @@ class LogPosteriorDensity(AbstractObjective):
             ScalarFloat: The log-posterior density of the Gaussian process for the
                 current parameter set.
         """
+        posterior = moduledef.merge(params, *extra_states)
+
         # Unpack the training data
-        x, y = data.X, data.y
+        x, y = train_data.X, train_data.y
         Kxx = posterior.prior.kernel.gram(x)
         Kxx += I_like(Kxx) * posterior.prior.jitter
         Kxx = PSD(Kxx)
@@ -287,19 +291,21 @@ class LogPosteriorDensity(AbstractObjective):
 
         # Whitened latent function values prior, p(wx | θ) = N(0, I)
         latent_prior = tfd.Normal(loc=0.0, scale=1.0)
+        res = likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum()
 
-        return self._constant * (
-            likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum()
-        )
+        return -res if negative else res
 
-
-NonConjugateMLL = LogPosteriorDensity
+    return evaluate
 
 
-class ELBO(AbstractObjective):
-    def step(
-        self,
-        variational_family: VariationalFamily,
+non_conjugate_mll = log_posterior_density
+
+
+def elbo(negative: bool = False) -> CallableLoss:
+    def evaluate(
+        params: nnx.State,
+        extra_states: tuple[nnx.State, ...],  # beartype: ignore
+        moduledef: nnx.GraphDef,
         train_data: Dataset,
     ) -> ScalarFloat:
         r"""Compute the evidence lower bound of a variational approximation.
@@ -322,6 +328,8 @@ class ELBO(AbstractObjective):
             ScalarFloat: The evidence lower bound of the variational approximation for
                 the current model parameter set.
         """
+        variational_family = moduledef.merge(params, *extra_states)
+
         # KL[q(f(·)) || p(f(·))]
         kl = variational_family.prior_kl()
 
@@ -329,12 +337,15 @@ class ELBO(AbstractObjective):
         var_exp = variational_expectation(variational_family, train_data)
 
         # For batch size b, we compute  n/b * Σᵢ[ ∫log(p(y|f(xᵢ))) q(f(xᵢ)) df(xᵢ)] - KL[q(f(·)) || p(f(·))]
-        return self._constant * (
+        res = (
             jnp.sum(var_exp)
             * variational_family.posterior.likelihood.num_datapoints
             / train_data.n
             - kl
         )
+        return -res if negative else res
+
+    return evaluate
 
 
 def variational_expectation(
@@ -383,17 +394,17 @@ def variational_expectation(
 # TODO: Replace code within CollapsedELBO to using (low rank structure of) LinOps and the GaussianDistribution object to be as succinct as e.g., the `ConjugateMLL`.
 
 
-class CollapsedELBO(AbstractObjective):
+def collapsed_elbo(negative: bool = False) -> CallableLoss:
     r"""The collapsed evidence lower bound.
 
     Collapsed variational inference for a sparse Gaussian process regression model.
     The key reference is Titsias, (2009) - Variational Learning of Inducing Variables
     in Sparse Gaussian Processes.
     """
-
-    def step(
-        self,
-        variational_family: VariationalFamily,
+    def evaluate(
+        params: nnx.State,
+        extra_states: tuple[nnx.State, ...],  # beartype: ignore
+        moduledef: nnx.GraphDef,
         train_data: Dataset,
     ) -> ScalarFloat:
         r"""Compute a single step of the collapsed evidence lower bound.
@@ -416,6 +427,8 @@ class CollapsedELBO(AbstractObjective):
             ScalarFloat: The evidence lower bound of the variational approximation for
                 the current model parameter set.
         """
+        variational_family = moduledef.merge(params, *extra_states)
+
         # Unpack training data
         x, y, n = train_data.X, train_data.y, train_data.n
 
@@ -491,4 +504,7 @@ class CollapsedELBO(AbstractObjective):
         two_trace = jnp.sum(Kxx_diag) / noise - jnp.trace(AAT)
 
         # log N(y; μx, Io² + KxzKzz⁻¹Kzx) - 1/2o² tr(Kxx - KxzKzz⁻¹Kzx)
-        return self._constant * (two_log_prob - two_trace).squeeze() / 2.0
+        res = (two_log_prob - two_trace).squeeze() / 2.0
+        return -res if negative else res
+    
+    return evaluate
