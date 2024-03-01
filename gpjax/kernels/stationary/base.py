@@ -28,15 +28,16 @@ from gpjax.typing import (
     ScalarFloat,
 )
 
+Lengthscale = tp.Union[tp.Union[ScalarFloat, Float[Array, " D"]]]
 
 class StationaryKernel(AbstractKernel):
     """Base class for stationary kernels."""
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice] = 1,
-        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
-        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
+        active_dims: tp.Union[list[int], int, slice] = None,
+        lengthscale: tp.Union[Lengthscale, Parameter[Lengthscale]] = 1.0,
+        variance: tp.Union[ScalarFloat, Parameter[ScalarFloat]] = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         super().__init__(active_dims=active_dims, compute_engine=compute_engine)

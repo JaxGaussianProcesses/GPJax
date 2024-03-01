@@ -35,7 +35,7 @@ from gpjax.typing import Array
 K = tp.TypeVar("K", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
 
 
-class AbstractKernelComputation(nnx.Module):
+class AbstractKernelComputation:
     r"""Abstract class for kernel computations."""
 
     def gram(

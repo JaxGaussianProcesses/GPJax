@@ -54,7 +54,7 @@ class GraphKernel(StationaryKernel):
     def __init__(
         self,
         laplacian: Num[Array, "N N"],
-        active_dims: tp.Union[list[int], int, slice] = 1,
+        active_dims: tp.Union[list[int], int, slice] = None,
         lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
         variance: tp.Union[ScalarFloat, Parameter] = 1.0,
         smoothness: ScalarFloat = 1.0,

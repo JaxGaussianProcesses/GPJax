@@ -32,7 +32,7 @@ class Polynomial(AbstractKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice] = 1,
+        active_dims: tp.Union[list[int], int, slice] = None,
         degree: int = 2,
         shift: ScalarFloat = 1.0,
         variance: ScalarFloat = 1.0,

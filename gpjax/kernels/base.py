@@ -22,6 +22,7 @@ import jax.numpy as jnp
 from jaxtyping import Float, Num
 import tensorflow_probability.substrates.jax.distributions as tfd
 
+from gpjax.parameters import Parameter, Real
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
     DenseKernelComputation,
@@ -42,7 +43,7 @@ class AbstractKernel(nnx.Module):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], int, slice, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         self.n_dims, self.active_dims = _check_active_dims(active_dims)
@@ -146,11 +147,16 @@ class Constant(AbstractKernel):
 
     def __init__(
         self,
-        constant: ScalarFloat = jnp.array(0.0),
-        active_dims: tp.Union[list[int], int, slice] = slice(None),
+        active_dims: tp.Union[list[int], int, slice] = 1,
+        constant: tp.Union[ScalarFloat, Parameter[ScalarFloat]] = jnp.array(0.0),
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
-    ):
-        self.constant = constant
+    ):  
+        
+        if isinstance(constant, Parameter):
+            self.constant = constant
+        else:
+            self.constant = Real(jnp.array(constant))
+
         super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
@@ -175,7 +181,7 @@ class CombinationKernel(AbstractKernel):
         self,
         kernels: list[AbstractKernel],
         operator: tp.Callable,
-        active_dims: tp.Union[list[int], int, slice] = slice(None),
+        active_dims: tp.Union[list[int], int, slice] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         # Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
