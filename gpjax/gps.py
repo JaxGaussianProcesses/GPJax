@@ -823,15 +823,9 @@ class VerticalSmoother(Module):
     smoother_input_scale: Float[Array, "1 D"] = param_field(None, bijector=tfb.Softplus())
     Z_levels: Float[Array, "1 L"] = static_field(jnp.array([[1.0]]))
     
-
-    def __post_init__(self):
-        self.Z_mean = jnp.mean(self.Z_levels)
-        self.Z_std = jnp.std(self.Z_levels)
-        self.Z_levels = (self.Z_levels - self.Z_mean) / self.Z_std
-
-
     def smooth_fn(self, x):
-        return  jax.scipy.stats.norm.pdf(x, self.smoother_mean.T, self.smoother_input_scale.T)
+        return jnp.exp(-0.5 * ((x - self.smoother_mean.T) / self.smoother_input_scale.T) ** 2)
+        #return  jax.scipy.stats.norm.pdf(x, self.smoother_mean.T, self.smoother_input_scale.T)
 
     def smooth(self) -> Num[Array, "D L"]:
         return self.smooth_fn(self.Z_levels)

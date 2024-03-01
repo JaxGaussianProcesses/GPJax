@@ -75,8 +75,8 @@ class OrthogonalRBF(AbstractKernel):
         jnp.array(1.0), bijector=tfb.Softplus()
     )
 
-    def __post_init__(self):
-        warnings.warn("This kernel is only valid for unit gaussian input measures and zero mean functions.")
+    #def __post_init__(self):
+        #warnings.warn("This kernel is only valid for unit gaussian input measures and zero mean functions.")
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute an orthogonal RBF kernel between a pair of arrays."""
@@ -106,7 +106,7 @@ class OrthogonalRBFUnif(OrthogonalRBF):
     )
 
     def __post_init__(self):
-        warnings.warn("This kernel is only valid for U input measureds and zero mean functions.")
+        #warnings.warn("This kernel is only valid for U input measureds and zero mean functions.")
         self.lower = -1.0
         self.upper = 1.0
 
