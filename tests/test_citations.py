@@ -29,13 +29,6 @@ from gpjax.kernels import (
     Matern32,
     Matern52,
 )
-from gpjax.objectives import (
-    ELBO,
-    CollapsedELBO,
-    ConjugateMLL,
-    LogPosteriorDensity,
-    NonConjugateMLL,
-)
 
 
 def _check_no_fallback(citation: AbstractCitation):
@@ -108,49 +101,6 @@ def test_missing_citation(kernel):
     assert isinstance(citation, NullCitation)
 
 
-@pytest.mark.parametrize(
-    "mll", [ConjugateMLL(), NonConjugateMLL(), LogPosteriorDensity()]
-)
-def test_mlls(mll):
-    citation = cite(mll)
-    assert isinstance(citation, BookCitation)
-    assert citation.citation_key == "rasmussen2006gaussian"
-    assert citation.title == "Gaussian Processes for Machine Learning"
-    assert citation.publisher == "MIT press Cambridge, MA"
-    _check_no_fallback(citation)
-
-
-def test_uncollapsed_elbo():
-    elbo = ELBO()
-    citation = cite(elbo)
-
-    assert isinstance(citation, PaperCitation)
-    assert citation.citation_key == "hensman2013gaussian"
-    assert citation.title == "Gaussian Processes for Big Data"
-    assert citation.authors == "Hensman, James and Fusi, Nicolo and Lawrence, Neil D"
-    assert citation.year == "2013"
-    assert citation.booktitle == "Uncertainty in Artificial Intelligence"
-    _check_no_fallback(citation)
-
-
-def test_collapsed_elbo():
-    elbo = CollapsedELBO()
-    citation = cite(elbo)
-
-    assert isinstance(citation, PaperCitation)
-    assert citation.citation_key == "titsias2009variational"
-    assert (
-        citation.title
-        == "Variational learning of inducing variables in sparse Gaussian processes"
-    )
-    assert citation.authors == "Titsias, Michalis"
-    assert citation.year == "2009"
-    assert (
-        citation.booktitle
-        == "International Conference on Artificial Intelligence and Statistics"
-    )
-    _check_no_fallback(citation)
-
 
 def test_thompson_sampling():
     thompson_sampling = ThompsonSampling()
@@ -209,11 +159,3 @@ def test_logarithmic_goldstein_price():
     assert citation.citation_type == "article"
     _check_no_fallback(citation)
 
-
-@pytest.mark.parametrize(
-    "objective",
-    [ELBO(), CollapsedELBO(), LogPosteriorDensity(), ConjugateMLL()],
-)
-def test_jitted_fallback(objective):
-    with pytest.raises(RuntimeError):
-        _ = cite(jit(objective))

@@ -36,7 +36,7 @@ import scipy
 
 from gpjax.base import Module
 from gpjax.dataset import Dataset
-from gpjax.objectives import AbstractObjective
+from gpjax.objectives import Objective
 from gpjax.scan import vscan
 from gpjax.typing import (
     Array,
@@ -50,7 +50,7 @@ ModuleModel = TypeVar("ModuleModel", bound=Module)
 def fit(  # noqa: PLR0913
     *,
     model: ModuleModel,
-    objective: Union[AbstractObjective, Callable[[ModuleModel, Dataset], ScalarFloat]],
+    objective: Union[Objective, Callable[[ModuleModel, Dataset], ScalarFloat]],
     train_data: Dataset,
     optim: ox.GradientTransformation,
     key: KeyArray,
@@ -87,7 +87,7 @@ def fit(  # noqa: PLR0913
         >>> model = LinearModel(weight=1.0, bias=1.0)
         >>>
         >>> # (3) Define your loss function:
-        >>> class MeanSquareError(gpx.objectives.AbstractObjective):
+        >>> class MeanSquareError(gpx.objectives.Objective):
                 def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
                     return jnp.mean((train_data.y - model(train_data.X)) ** 2)
         >>>
@@ -180,7 +180,7 @@ def fit(  # noqa: PLR0913
 def fit_scipy(  # noqa: PLR0913
     *,
     model: ModuleModel,
-    objective: Union[AbstractObjective, Callable[[ModuleModel, Dataset], ScalarFloat]],
+    objective: Union[Objective, Callable[[ModuleModel, Dataset], ScalarFloat]],
     train_data: Dataset,
     max_iters: Optional[int] = 500,
     verbose: Optional[bool] = True,
