@@ -27,7 +27,7 @@ from gpjax.gps import (
     AbstractPosterior,
     AbstractPrior,
 )
-from gpjax.objectives import AbstractObjective
+from gpjax.objectives import Objective
 from gpjax.typing import KeyArray
 
 LikelihoodBuilder = Callable[[int], AbstractLikelihood]
@@ -46,7 +46,7 @@ class PosteriorHandler:
         likelihood_builder (LikelihoodBuilder): Function which takes the number of
         datapoints as input and returns a likelihood object initialised with the given
         number of datapoints.
-        optimization_objective (AbstractObjective): Objective to use for optimizing the
+        optimization_objective (Objective): Objective to use for optimizing the
         posterior hyperparameters.
         optimizer (ox.GradientTransformation): Optax optimizer to use for optimizing the
         posterior hyperparameters.
@@ -56,7 +56,7 @@ class PosteriorHandler:
 
     prior: AbstractPrior
     likelihood_builder: LikelihoodBuilder
-    optimization_objective: AbstractObjective
+    optimization_objective: Objective
     optimizer: ox.GradientTransformation
     num_optimization_iters: int
 

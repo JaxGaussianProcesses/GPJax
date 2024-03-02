@@ -46,12 +46,12 @@ VariationalFamily = TypeVar(
 )
 
 
-CallableLoss = tpe.Callable[
+Objective = tpe.Callable[
     [nnx.State, tpe.Unpack[tuple[nnx.State, ...]], nnx.GraphDef, Dataset], ScalarFloat
 ]
 
 
-def conjugate_mll(negative: bool = False) -> CallableLoss:
+def conjugate_mll(negative: bool = False) -> Objective:
     r"""Evaluate the marginal log-likelihood of the Gaussian process.
 
     Compute the marginal log-likelihood function of the Gaussian process.
@@ -111,7 +111,7 @@ def conjugate_mll(negative: bool = False) -> CallableLoss:
 
     Returns
     -------
-        CallableLoss : The marginal log-likelihood of a conjugate Gaussian process.
+        Objective : The marginal log-likelihood of a conjugate Gaussian process.
     """
 
     def evaluate(
@@ -141,7 +141,7 @@ def conjugate_mll(negative: bool = False) -> CallableLoss:
     return evaluate
 
 
-def conjugate_loocv(negative: bool = False) -> CallableLoss:
+def conjugate_loocv(negative: bool = False) -> Objective:
     r"""Evaluate the leave-one-out log predictive probability of the Gaussian process following
     section 5.4.2 of Rasmussen et al. 2006 - Gaussian Processes for Machine Learning. This metric
     calculates the average performance of all models that can be obtained by training on all but one
@@ -232,7 +232,7 @@ def conjugate_loocv(negative: bool = False) -> CallableLoss:
     return evaluate
 
 
-def log_posterior_density(negative: bool = False) -> CallableLoss:
+def log_posterior_density(negative: bool = False) -> Objective:
     r"""The log-posterior density of a non-conjugate Gaussian process. This is
     sometimes referred to as the marginal log-likelihood.
     """
@@ -302,7 +302,7 @@ def log_posterior_density(negative: bool = False) -> CallableLoss:
 non_conjugate_mll = log_posterior_density
 
 
-def elbo(negative: bool = False) -> CallableLoss:
+def elbo(negative: bool = False) -> Objective:
     def evaluate(
         params: nnx.State,
         extra_states: tuple[nnx.State, ...],  # beartype: ignore
@@ -395,7 +395,7 @@ def variational_expectation(
 # TODO: Replace code within CollapsedELBO to using (low rank structure of) LinOps and the GaussianDistribution object to be as succinct as e.g., the `ConjugateMLL`.
 
 
-def collapsed_elbo(negative: bool = False) -> CallableLoss:
+def collapsed_elbo(negative: bool = False) -> Objective:
     r"""The collapsed evidence lower bound.
 
     Collapsed variational inference for a sparse Gaussian process regression model.
