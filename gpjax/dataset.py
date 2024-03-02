@@ -45,7 +45,7 @@ class Dataset:
 
     def __repr__(self) -> str:
         r"""Returns a string representation of the dataset."""
-        repr = f"Dataset(Number of observations: {self.n:=} - Input dimensions: {self.in_dim})"
+        repr = f"Dataset(Number of observations: {self.n:=} - Input dimension: {self.in_dim})"
         return repr
 
     def is_supervised(self) -> bool:
