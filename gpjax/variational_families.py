@@ -43,10 +43,7 @@ from gpjax.likelihoods import (
 )
 from gpjax.lower_cholesky import lower_cholesky
 from gpjax.mean_functions import AbstractMeanFunction
-from gpjax.parameters import (
-    Parameter,
-    Static,
-)
+from gpjax.parameters import Static
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -682,8 +679,15 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian[GL]):
     in Sparse Gaussian Processes.
     """
 
-    def __post_init__(self):
-        if not isinstance(self.posterior.likelihood, Gaussian):
+    def __init__(
+        self,
+        posterior: AbstractPosterior[P, GL],
+        inducing_inputs: Float[Array, "N D"],
+        jitter: ScalarFloat = 1e-6,
+    ):
+        super().__init__(posterior, inducing_inputs, jitter)
+
+        if not isinstance(posterior.likelihood, Gaussian):
             raise TypeError("Likelihood must be Gaussian.")
 
     def predict(
