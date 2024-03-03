@@ -219,11 +219,16 @@ class AdditiveKernel(AbstractKernel):
     kernels: list[AbstractKernel] = None
     max_interaction_depth: ScalarInt = static_field(1)
     interaction_variances: Float[Array, " p"] = param_field(jnp.array([1.0, 1.0]), bijector=tfb.Softplus())
+    zeroth_order: bool = static_field(True)
     name: str = "AdditiveKernel"
 
     def __post_init__(self): # jax/jit requires specifying max_interaction depth even though this could be inferred from length of interaction_variances
-        if not self.max_interaction_depth == len(self.interaction_variances) - 1:
-            raise ValueError("Number of interaction variances must be equal to max_interaction_depth + 1")
+        if self.zeroth_order:
+            if not self.max_interaction_depth == len(self.interaction_variances) - 1:
+                raise ValueError("Number of interaction variances must be equal to max_interaction_depth + 1")
+        else:
+            if not self.max_interaction_depth == len(self.interaction_variances):
+                raise ValueError("Number of interaction variances must be equal to max_interaction_depth")
 
 
     def __call__(self, x: Num[Array, " D"], y: Num[Array, " D"]) -> ScalarFloat:
@@ -246,10 +251,10 @@ class AdditiveKernel(AbstractKernel):
         # ks_05 = jnp.stack([k(x_sliced / jnp.sqrt(2.0), y_sliced / jnp.sqrt(2.0)) for k in self.kernels]) # individual kernel evals
         # e_05 = self._compute_additive_terms_girad_newton(ks_05)
         # return self.interaction_variances[0] * e_1[0] + self.interaction_variances[1] *e_1[1] + self.interaction_variances[2] *e_05[2]
-        
-        
-        
-        return jnp.sum(self._compute_additive_terms_girad_newton(ks) * self.interaction_variances)
+        if self.zeroth_order:
+            return jnp.sum(self._compute_additive_terms_girad_newton(ks) * self.interaction_variances)
+        else:
+            return jnp.sum(self._compute_additive_terms_girad_newton(ks)[1:] * self.interaction_variances)
         #return self._compute_additive_terms_girad_newton(ks) # combined kernel
             
 
