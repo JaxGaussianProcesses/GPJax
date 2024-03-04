@@ -27,7 +27,6 @@ from jaxtyping import (
 import pytest
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import param_field
 from gpjax.kernels.base import (
     AbstractKernel,
     CombinationKernel,
@@ -45,6 +44,11 @@ from gpjax.kernels.stationary import (
     Matern52,
     RationalQuadratic,
 )
+from gpjax.parameters import (
+    Parameter,
+    PositiveReal,
+    Real,
+)
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -56,12 +60,14 @@ def test_abstract_kernel():
         AbstractKernel()
 
     # Create a dummy kernel class with __call__ implemented:
-    @dataclass
     class DummyKernel(AbstractKernel):
-        test_a: Float[Array, "1"] = field(default_factory=lambda: jnp.array([1.0]))
-        test_b: Float[Array, "1"] = param_field(
-            jnp.array([2.0]), bijector=tfb.Softplus()
-        )
+        def __init__(
+            self,
+            test_a: Float[Array, "1"] = jnp.array([1.0]),
+            test_b: Float[Array, "1"] = jnp.array([2.0]),
+        ):
+            self.test_a = Real(test_a)
+            self.test_b = PositiveReal(test_b)
 
         def __call__(
             self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
@@ -71,9 +77,6 @@ def test_abstract_kernel():
     # Initialise dummy kernel class and test __call__ method:
     dummy_kernel = DummyKernel()
     assert dummy_kernel.test_a == jnp.array([1.0])
-    assert isinstance(
-        dummy_kernel._pytree__meta["test_b"].get("bijector"), tfb.Softplus
-    )
     assert dummy_kernel.test_b == jnp.array([2.0])
     assert dummy_kernel(jnp.array([1.0]), jnp.array([2.0])) == 4.0
 

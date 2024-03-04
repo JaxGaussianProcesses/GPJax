@@ -14,7 +14,6 @@
 # ==============================================================================
 
 
-from dataclasses import is_dataclass
 from itertools import product
 
 from cola.ops import LinearOperator
@@ -72,50 +71,26 @@ class BaseTestKernel:
 
     @pytest.mark.parametrize("dim", [None, 1, 3], ids=lambda x: f"dim={x}")
     def test_initialization(self, fields: dict, dim: int) -> None:
-        # Check that kernel is a dataclass
-        assert is_dataclass(self.kernel)
-
         # Input fields as JAX arrays
-        fields = {k: jnp.array(v) for k, v in fields.items()}
+        # fields = {k: jnp.array(v) for k, v in fields.items()}
 
         # Test number of dimensions
         if dim is None:
             kernel: AbstractKernel = self.kernel(**fields)
-            assert kernel.ndims == 1
+            assert kernel.n_dims == 1
         else:
             kernel: AbstractKernel = self.kernel(active_dims=list(range(dim)), **fields)
-            assert kernel.ndims == dim
+            assert kernel.n_dims == dim
 
         # Check default compute engine
-        assert kernel.compute_engine == self.default_compute_engine
+        assert isinstance(kernel.compute_engine, type(self.default_compute_engine))
 
         # Check properties
         for field, value in fields.items():
             assert getattr(kernel, field) == value
 
-        # Check pytree structure
-        leaves = jtu.tree_leaves(kernel)
-        assert len(leaves) == len(fields)
-
-        # Test dtype of params
-        for v in leaves:
-            assert v.dtype == jnp.float64
-
-        # meta
-        meta = kernel._pytree__meta
-        assert meta.keys() == fields.keys()
-        for field in fields:
-            # Bijectors
-            if field in ["variance", "lengthscale", "period", "alpha"]:
-                assert isinstance(meta[field]["bijector"], tfb.Softplus)
-            if field in ["power"]:
-                assert isinstance(meta[field]["bijector"], tfb.Sigmoid)
-
-            # Trainability state
-            assert meta[field]["trainable"] is True
-
         # Test kernel call
-        x = jnp.linspace(0.0, 1.0, 10 * kernel.ndims).reshape(10, kernel.ndims)
+        x = jnp.linspace(0.0, 1.0, 10 * kernel.n_dims).reshape(10, kernel.n_dims)
         jax.vmap(kernel)(x, x)
 
     @pytest.mark.parametrize("n", [1, 2, 5], ids=lambda x: f"n={x}")
