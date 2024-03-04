@@ -843,7 +843,7 @@ class VerticalSmoother(Module):
         #x3d_smooth = x3d_smooth / standard
         #x3d_smooth = x3d_smooth / (jnp.max(self.Z_levels) - jnp.min(self.Z_levels))
         #x3d_smooth = (x3d_smooth - jnp.mean(x3d_smooth, axis=0)) / jnp.std(x3d_smooth, axis=0)
-        x3d_smooth = (x3d_smooth - jnp.min(x3d_smooth, 0)) / (jnp.max(x3d_smooth,0)-jnp.min(x3d_smooth, 0))
+        #x3d_smooth = (x3d_smooth - jnp.min(x3d_smooth, 0)) / (jnp.max(x3d_smooth,0)-jnp.min(x3d_smooth, 0))
         x = jnp.hstack([x3d_smooth, x2d, xstatic]) # [N, D_3d + D_2d +D_static]
         return x, y
 

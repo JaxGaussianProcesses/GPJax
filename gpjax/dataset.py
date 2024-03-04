@@ -21,8 +21,6 @@ from typing import List
 import jax.numpy as jnp
 from jaxtyping import Num
 from simple_pytree import Pytree
-import matplotlib.pyplot as plt
-
 from gpjax.typing import Array
 
 
@@ -130,9 +128,6 @@ class VerticalDataset(Pytree):
     X2d_raw: Num[Array, "N D"] = None
     Xstatic_raw: Num[Array, "N D"] = None
     y_raw: Num[Array, "N 1"] = None
-    names_2d: List[str] = None
-    names_3d:  List[str] = None
-    names_static:  List[str] = None
     mean_standardization: bool = False
     
 
@@ -173,43 +168,10 @@ class VerticalDataset(Pytree):
         self.Y_mean = jnp.mean(self.y_raw)
         self.Y_std = jnp.std(self.y_raw)
         Y = (self.y_raw - self.Y_mean) / self.Y_std
-        plt.hist(Y.T)
-        plt.title("Y")
-
-        for data in [self.X3d_raw, X3d]:
-            fig, ax = plt.subplots(nrows=3, ncols=4)
-            i,j=0,0
-            for row in ax:
-                for col in row:
-                    col.boxplot(data[:,i,:].T, showfliers=False);
-                    col.set_title(self.names_3d[i])
-                    i+=1
-                    if i==data.shape[1]:
-                        break
-                if i==data.shape[1]:
-                    break
-
-        fig, ax = plt.subplots(nrows=1, ncols=X2d.shape[1])
-        i=0
-        for col in ax:
-            col.hist(X2d[:100000,i].T);
-            col.set_title(self.names_2d[i])
-            i+=1
-        fig, ax = plt.subplots(nrows=1, ncols=Xstatic.shape[1])
-        i=0
-        for col in ax:
-            col.hist(Xstatic[:100000,i].T);
-            col.set_title(self.names_static[i])
-            i+=1
-
         self.X3d = X3d
         self.X2d = X2d
         self.Xstatic = Xstatic
         self.y = Y
-        
-        
-        
-
 
     @property
     def X(self):
