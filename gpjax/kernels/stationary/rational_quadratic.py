@@ -37,7 +37,7 @@ class RationalQuadratic(StationaryKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice] = None,
+        active_dims: tp.Union[list[int], int, slice, None] = None,
         lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
         variance: tp.Union[ScalarFloat, Parameter] = 1.0,
         alpha: tp.Union[ScalarFloat, Parameter] = 1.0,

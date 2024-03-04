@@ -17,6 +17,9 @@ class Parameter(nnx.Variable[T]):
             raise ValueError(
                 f"Expected parameter value to be a scalar or array. Got {value}."
             )
+        if isinstance(value, (int, float)):
+            value = jnp.array(value)
+
         super().__init__(value=value, **kwargs)
 
 

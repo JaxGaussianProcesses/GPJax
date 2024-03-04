@@ -38,7 +38,6 @@ from gpjax.typing import (
 class AbstractMeanFunction(nnx.Module):
     r"""Mean function that is used to parameterise the Gaussian process."""
 
-    @abc.abstractmethod
     def __init__(self) -> None:
         super().__init__()
 
@@ -135,8 +134,13 @@ class Constant(AbstractMeanFunction):
     learned during training but defaults to 1.0.
     """
 
-    def __init__(self, constant: tp.Union[ScalarFloat, Float[Array, " O"]] = 0.0):
-        self.constant = constant
+    def __init__(
+        self, constant: tp.Union[ScalarFloat, Float[Array, " O"], Parameter] = 0.0
+    ):
+        if isinstance(constant, Parameter):
+            self.constant = constant
+        else:
+            self.constant = Real(jnp.array(constant))
 
     def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N O"]:
         r"""Evaluate the mean function at the given points.
@@ -158,7 +162,9 @@ class Zero(Constant):
     inputs. Unlike the Constant mean function, the constant scalar zero is fixed, and
     cannot be treated as a model hyperparameter and learned during training.
     """
-    constant = jnp.array(0.0)
+
+    def __init__(self):
+        super().__init__(constant=jnp.array(0.0))
 
 
 class CombinationMeanFunction(AbstractMeanFunction):

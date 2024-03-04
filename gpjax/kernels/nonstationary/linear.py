@@ -36,7 +36,7 @@ class Linear(AbstractKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice] = None,
+        active_dims: tp.Union[list[int], int, slice, None] = None,
         variance: ScalarFloat = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):

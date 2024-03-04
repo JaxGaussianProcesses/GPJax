@@ -40,14 +40,14 @@ class StationaryKernel(AbstractKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice] = None,
+        active_dims: tp.Union[list[int], int, slice, None] = None,
         lengthscale: tp.Union[Lengthscale, Parameter[Lengthscale]] = 1.0,
         variance: tp.Union[ScalarFloat, Parameter[ScalarFloat]] = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
-        _check_lengthscale_dims_compat(lengthscale, self.n_dims)
+        self.n_dims = _check_lengthscale_dims_compat(lengthscale, self.n_dims)
 
         if isinstance(lengthscale, Parameter):
             self.lengthscale = lengthscale

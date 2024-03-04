@@ -71,20 +71,27 @@ def euclidean_distance(x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFl
     return jnp.sqrt(jnp.maximum(squared_distance(x, y), 1e-36))
 
 
+# TODO: maybe improve the control flow here
 def _check_lengthscale_dims_compat(
-    lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]], n_dims: int
-) -> None:
+    lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]], n_dims: tp.Union[int, None] 
+) -> tp.Union[int, None]:
     r"""Check that the lengthscale parameter is compatible with the number of input dimensions.
 
     Args:
         lengthscale (Float[Array, " D"]): The lengthscale parameter.
         n_dims (int): The number of input dimensions.
     """
-    if isinstance(lengthscale, (float, int)):
-        return
+    ls_shape = jnp.shape(lengthscale)
 
-    if not (lengthscale.shape == (1,) or lengthscale.shape == (n_dims,)):
-        raise ValueError(
-            "Expected `lengthscale` parameter to be compatible with the number of input dimensions. "
-            f"Got `lengthscale` with shape: {lengthscale.shape} and `n_dims` = {n_dims}. "
-        )
+    if ls_shape == ():
+        return n_dims 
+    else:
+        if n_dims is None:
+            return ls_shape[0]
+        else:
+            if ls_shape != (n_dims,):
+                raise ValueError(
+                    "Expected `lengthscale` to be compatible with the number " 
+                    f"of input dimensions. Got `lengthscale` with shape {ls_shape}, "
+                    f"but the number of input dimensions is {n_dims}."
+                )
