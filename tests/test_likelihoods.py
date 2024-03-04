@@ -81,7 +81,6 @@ class BaseTestLikelihood:
         for field, value in fields.items():
             assert getattr(likelihood, field) == value
 
-
     @pytest.mark.parametrize("n", [1, 2, 10], ids=lambda x: f"n={x}")
     def test_link_functions(self, n: int):
         # Initialize likelihood with defaults
