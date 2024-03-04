@@ -50,7 +50,7 @@ from gpjax.mean_functions import (
 )
 from gpjax.objectives import (
     ELBO,
-    AbstractObjective,
+    Objective,
     ConjugateMLL,
 )
 from gpjax.typing import Array
@@ -79,7 +79,7 @@ def test_simple_linear_model() -> None:
 
     # Define loss function:
     @dataclass
-    class MeanSqaureError(AbstractObjective):
+    class MeanSqaureError(Objective):
         def step(self, model: LinearModel, train_data: Dataset) -> float:
             return jnp.mean((train_data.y - model(train_data.X)) ** 2)
 
