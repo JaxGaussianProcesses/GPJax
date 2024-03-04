@@ -39,7 +39,7 @@ from gpjax.likelihoods import (
 )
 from gpjax.mean_functions import Constant
 from gpjax.objectives import (
-    AbstractObjective,
+    Objective,
     ConjugateMLL,
     NonConjugateMLL,
 )
@@ -137,7 +137,7 @@ def test_update_and_optimize_posterior_with_no_key_raises_error():
 def test_get_posterior_no_optimization_correct_num_datapoints_and_not_optimized(
     num_datapoints: int,
     likelihood_builder: Callable[[int], AbstractLikelihood],
-    training_objective: AbstractObjective,
+    training_objective: Objective,
     test_function: Union[Forrester, PoissonTestFunction],
 ):
     mean_function = Constant(constant=jnp.array([1.0]))
@@ -176,7 +176,7 @@ def test_get_posterior_no_optimization_correct_num_datapoints_and_not_optimized(
 def test_get_posterior_with_optimization_correct_num_datapoints_and_optimized(
     num_datapoints: int,
     likelihood_builder: Callable[[int], AbstractLikelihood],
-    training_objective: AbstractObjective,
+    training_objective: Objective,
     test_function: Union[Forrester, PoissonTestFunction],
 ):
     mean_function = Constant(constant=jnp.array([1.0]))
@@ -221,7 +221,7 @@ def test_get_posterior_with_optimization_correct_num_datapoints_and_optimized(
 def test_update_posterior_no_optimize_same_prior_parameters_and_different_num_datapoints(
     initial_num_datapoints: int,
     likelihood_builder: Callable[[int], AbstractLikelihood],
-    training_objective: AbstractObjective,
+    training_objective: Objective,
     test_function: Union[Forrester, PoissonTestFunction],
 ):
     mean_function = Constant(constant=jnp.array([1.0]))
@@ -280,7 +280,7 @@ def test_update_posterior_no_optimize_same_prior_parameters_and_different_num_da
 def test_update_posterior_with_optimization_updated_prior_parameters_and_different_num_datapoints(
     initial_num_datapoints: int,
     likelihood_builder: Callable[[int], AbstractLikelihood],
-    training_objective: AbstractObjective,
+    training_objective: Objective,
     test_function: Union[Forrester, PoissonTestFunction],
 ):
     mean_function = Constant(constant=jnp.array([1.0]))
