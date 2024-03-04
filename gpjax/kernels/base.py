@@ -43,7 +43,7 @@ class AbstractKernel(nnx.Module):
     r"""Base kernel class."""
 
     n_dims: int
-    active_dims: tp.Union[list[int], int, slice]
+    active_dims: tp.Union[list[int], int, slice, None]
     compute_engine: AbstractKernelComputation
     name: str = "AbstractKernel"
 
@@ -153,7 +153,7 @@ class Constant(AbstractKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice] = 1,
+        active_dims: tp.Union[list[int], int, slice, None] = 1,
         constant: tp.Union[ScalarFloat, Parameter[ScalarFloat]] = jnp.array(0.0),
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
@@ -178,7 +178,6 @@ class Constant(AbstractKernel):
         return self.constant.squeeze()
 
 
-@nnx.dataclass
 class CombinationKernel(AbstractKernel):
     r"""A base class for products or sums of MeanFunctions."""
 
@@ -186,7 +185,7 @@ class CombinationKernel(AbstractKernel):
         self,
         kernels: list[AbstractKernel],
         operator: tp.Callable,
-        active_dims: tp.Union[list[int], int, slice] = None,
+        active_dims: tp.Union[list[int], int, slice, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         # Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
@@ -224,16 +223,20 @@ class CombinationKernel(AbstractKernel):
 
 
 @tp.overload
-def _check_active_dims(active_dims: list[int]) -> list[int]:
+def _check_active_dims(active_dims: list[int]) -> tuple[int, list[int]]:
     ...
 
 
 @tp.overload
-def _check_active_dims(active_dims: int) -> slice:
+def _check_active_dims(active_dims: int) -> tuple[tp.Union[int, None], slice]:
     ...
 
 
-def _check_active_dims(active_dims: list[int] | int | slice):
+@tp.overload
+def _check_active_dims(active_dims: None) -> tuple[None, slice]:
+    ...
+
+def _check_active_dims(active_dims: tp.Union[list[int], int, slice, None]):
     if isinstance(a := active_dims, list):
         return len(a), active_dims
     elif isinstance(a, int):
@@ -247,6 +250,8 @@ def _check_active_dims(active_dims: list[int] | int | slice):
         start = a.start if a.start is not None else 0
         step = a.step if a.step is not None else 1
         return (a.stop - start) // step, a
+    elif a is None:
+        return None, slice(None)
     else:
         raise ValueError("active_dims must be a list, int or slice.")
 

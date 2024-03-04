@@ -34,7 +34,7 @@ class White(StationaryKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice] = 1,
+        active_dims: tp.Union[list[int], int, slice, None] = None,
         variance: tp.Union[ScalarFloat, Parameter] = 1.0,
         compute_engine: AbstractKernelComputation = ConstantDiagonalKernelComputation(),
     ):

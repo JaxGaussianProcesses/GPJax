@@ -43,7 +43,7 @@ class ArcCosine(AbstractKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice] = None,
+        active_dims: tp.Union[list[int], int, slice, None] = None,
         order: tp.Literal[0, 1, 2] = 0,
         variance: ScalarFloat = 1.0,
         weight_variance: tp.Union[ScalarFloat, Float[Array, " D"]] = 1.0,
