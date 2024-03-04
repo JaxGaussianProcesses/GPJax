@@ -17,9 +17,11 @@ from dataclasses import dataclass
 import warnings
 
 from beartype.typing import Optional
+from typing import List 
 import jax.numpy as jnp
 from jaxtyping import Num
 from simple_pytree import Pytree
+import matplotlib.pyplot as plt
 
 from gpjax.typing import Array
 
@@ -124,15 +126,90 @@ def _check_precision(
 
 @dataclass
 class VerticalDataset(Pytree):
-    X2d: Num[Array, "N D"] = None
-    X3d: Num[Array, "N D L"] = None
-    Xstatic: Num[Array, "N D"] = None
-    y: Num[Array, "N 1"] = None
+    X3d_raw: Num[Array, "N D L"] = None
+    X2d_raw: Num[Array, "N D"] = None
+    Xstatic_raw: Num[Array, "N D"] = None
+    y_raw: Num[Array, "N 1"] = None
+    names_2d: List[str] = None
+    names_3d:  List[str] = None
+    names_static:  List[str] = None
+    mean_standardization: bool = False
+    
 
     def __post_init__(self) -> None:
-        _check_precision(self.X2d, self.y)
-        _check_precision(self.Xstatic, self.y)
-        _check_precision(self.X3d, self.y)
+        _check_precision(self.X2d_raw, self.y_raw)
+        _check_precision(self.Xstatic_raw, self.y_raw)
+        _check_precision(self.X3d_raw, self.y_raw)
+        
+        
+        if not self.mean_standardization:
+            print("standardized inputs with max and min")
+            X3d_min = jnp.min(self.X3d_raw, axis=(0))
+            X3d_max = jnp.max(self.X3d_raw,axis=(0))
+            X3d = (self.X3d_raw-X3d_min[None,:,:]) / (X3d_max[None,:,:] - X3d_min[None,:,:])
+            #X3d = X3d - jnp.mean(X3d, 0)
+            X2d_min = jnp.min(self.X2d_raw, axis=0)
+            X2d_max = jnp.max(self.X2d_raw,axis=0)
+            X2d = (self.X2d_raw - X2d_min) / (X2d_max - X2d_min)
+            Xstatic_min = jnp.min(self.Xstatic_raw, axis=0)
+            Xstatic_max = jnp.max(self.Xstatic_raw,axis=0)
+            Xstatic = (Xstatic_max - self.Xstatic_raw) / (Xstatic_max - Xstatic_min)
+        else:
+            print("standardized inputs to be Gaussian")
+            X3d_mean = jnp.means(self.X3d_raw,axis=(0))
+            # X3d_std = jnp.std(X3d, axis=(0,2))
+            # X3d = (X3d - X3d_mean[None,:,:]) / X3d_std[None,:,None]
+            X3d_std = jnp.std(self.X3d_raw, axis=(0))
+            X3d = (self.X3d_raw - X3d_mean[None,:,:]) / X3d_std[None,:,:]
+            X2d_std = jnp.std(self.X2d_raw, axis=0)
+            X2d_mean = jnp.mean(self.X2d_raw,axis=0)
+            X2d = (self.X2d_raw - X2d_mean) / X2d_std
+            Xstatic_std = jnp.std(self.Xstatic_raw, axis=0)
+            Xstatic_mean = jnp.mean(self.Xstatic_raw,axis=0)
+            Xstatic = (self.Xstatic_raw - Xstatic_mean) / Xstatic_std
+
+
+        print(f"then standardized Y as Gaussian")
+        self.Y_mean = jnp.mean(self.y_raw)
+        self.Y_std = jnp.std(self.y_raw)
+        Y = (self.y_raw - self.Y_mean) / self.Y_std
+        plt.hist(Y.T)
+        plt.title("Y")
+
+        for data in [self.X3d_raw, X3d]:
+            fig, ax = plt.subplots(nrows=3, ncols=4)
+            i,j=0,0
+            for row in ax:
+                for col in row:
+                    col.boxplot(data[:,i,:].T, showfliers=False);
+                    col.set_title(self.names_3d[i])
+                    i+=1
+                    if i==data.shape[1]:
+                        break
+                if i==data.shape[1]:
+                    break
+
+        fig, ax = plt.subplots(nrows=1, ncols=X2d.shape[1])
+        i=0
+        for col in ax:
+            col.hist(X2d[:100000,i].T);
+            col.set_title(self.names_2d[i])
+            i+=1
+        fig, ax = plt.subplots(nrows=1, ncols=Xstatic.shape[1])
+        i=0
+        for col in ax:
+            col.hist(Xstatic[:100000,i].T);
+            col.set_title(self.names_static[i])
+            i+=1
+
+        self.X3d = X3d
+        self.X2d = X2d
+        self.Xstatic = Xstatic
+        self.y = Y
+        
+        
+        
+
 
     @property
     def X(self):
