@@ -151,7 +151,6 @@ def _(tree) -> PaperCitation:
     )
 
 
-
 ####################
 # Decision making citations
 ####################

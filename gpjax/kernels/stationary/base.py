@@ -38,6 +38,9 @@ LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 class StationaryKernel(AbstractKernel):
     """Base class for stationary kernels."""
 
+    lengthscale: nnx.Variable[Lengthscale]
+    variance: nnx.Variable[ScalarArray]
+
     def __init__(
         self,
         active_dims: tp.Union[list[int], int, slice],

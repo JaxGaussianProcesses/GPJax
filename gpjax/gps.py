@@ -144,6 +144,7 @@ class Prior(AbstractPrior[M, K]):
         >>> prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
     ```
     """
+
     if tp.TYPE_CHECKING:
 
         @tp.overload
@@ -151,14 +152,18 @@ class Prior(AbstractPrior[M, K]):
             ...
 
         @tp.overload
-        def __mul__(self, other: NGL) -> "NonConjugatePosterior[Prior[M, K], NGL]":
+        def __mul__(  # noqa: F811
+            self, other: NGL
+        ) -> "NonConjugatePosterior[Prior[M, K], NGL]":
             ...
 
         @tp.overload
-        def __mul__(self, other: L) -> "AbstractPosterior[Prior[M, K], L]":
+        def __mul__(  # noqa: F811
+            self, other: L
+        ) -> "AbstractPosterior[Prior[M, K], L]":
             ...
 
-    def __mul__(self, other):
+    def __mul__(self, other):  # noqa: F811
         r"""Combine the prior with a likelihood to form a posterior distribution.
 
         The product of a prior and likelihood is proportional to the posterior
@@ -199,14 +204,18 @@ class Prior(AbstractPrior[M, K]):
             ...
 
         @tp.overload
-        def __rmul__(self, other: NGL) -> "NonConjugatePosterior[Prior[M, K], NGL]":
+        def __rmul__(  # noqa: F811
+            self, other: NGL
+        ) -> "NonConjugatePosterior[Prior[M, K], NGL]":
             ...
 
         @tp.overload
-        def __rmul__(self, other: L) -> "AbstractPosterior[Prior[M, K], L]":
+        def __rmul__(  # noqa: F811
+            self, other: L
+        ) -> "AbstractPosterior[Prior[M, K], L]":
             ...
 
-    def __rmul__(self, other):
+    def __rmul__(self, other):  # noqa: F811
         r"""Combine the prior with a likelihood to form a posterior distribution.
 
         Reimplement the multiplication operator to allow for order-invariant
@@ -734,11 +743,13 @@ def construct_posterior(prior: P, likelihood: GL) -> ConjugatePosterior[P, GL]:
 
 
 @tp.overload
-def construct_posterior(prior: P, likelihood: NGL) -> NonConjugatePosterior[P, NGL]:
+def construct_posterior(  # noqa: F811
+    prior: P, likelihood: NGL
+) -> NonConjugatePosterior[P, NGL]:
     ...
 
 
-def construct_posterior(prior, likelihood):
+def construct_posterior(prior, likelihood):  # noqa: F811
     r"""Utility function for constructing a posterior object from a prior and
     likelihood. The function will automatically select the correct posterior
     object based on the likelihood.

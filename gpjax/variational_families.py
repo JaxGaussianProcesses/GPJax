@@ -118,7 +118,7 @@ class AbstractVariationalGaussian(AbstractVariationalFamily[L]):
     @property
     def num_inducing(self) -> int:
         """The number of inducing inputs."""
-        return self.inducing_inputs.shape[0]
+        return self.inducing_inputs.value.shape[0]
 
 
 class VariationalGaussian(AbstractVariationalGaussian[L]):
@@ -170,9 +170,9 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
                 approximation and the GP prior.
         """
         # Unpack variational parameters
-        mu = self.variational_mean
-        sqrt = self.variational_root_covariance
-        z = self.inducing_inputs
+        mu = self.variational_mean.value
+        sqrt = self.variational_root_covariance.value
+        z = self.inducing_inputs.value
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
@@ -209,9 +209,9 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
                 the test inputs.
         """
         # Unpack variational parameters
-        mu = self.variational_mean
-        sqrt = self.variational_root_covariance
-        z = self.inducing_inputs
+        mu = self.variational_mean.value
+        sqrt = self.variational_root_covariance.value
+        z = self.inducing_inputs.value
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
@@ -282,8 +282,8 @@ class WhitenedVariationalGaussian(VariationalGaussian[L]):
                 approximation and the GP prior.
         """
         # Unpack variational parameters
-        mu = self.variational_mean
-        sqrt = Triangular(self.variational_root_covariance)
+        mu = self.variational_mean.value
+        sqrt = Triangular(self.variational_root_covariance.value)
 
         # S = LLᵀ
         S = sqrt @ sqrt.T
@@ -312,9 +312,9 @@ class WhitenedVariationalGaussian(VariationalGaussian[L]):
                 the test inputs.
         """
         # Unpack variational parameters
-        mu = self.variational_mean
-        sqrt = self.variational_root_covariance
-        z = self.inducing_inputs
+        mu = self.variational_mean.value
+        sqrt = self.variational_root_covariance.value
+        z = self.inducing_inputs.value
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
@@ -401,9 +401,9 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
                 the GP prior.
         """
         # Unpack variational parameters
-        natural_vector = self.natural_vector
-        natural_matrix = self.natural_matrix
-        z = self.inducing_inputs
+        natural_vector = self.natural_vector.value
+        natural_matrix = self.natural_matrix.value
+        z = self.inducing_inputs.value
         m = self.num_inducing
 
         # Unpack mean function and kernel
@@ -455,9 +455,9 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
                 return the predictive distribution at those points.
         """
         # Unpack variational parameters
-        natural_vector = self.natural_vector
-        natural_matrix = self.natural_matrix
-        z = self.inducing_inputs
+        natural_vector = self.natural_vector.value
+        natural_matrix = self.natural_matrix.value
+        z = self.inducing_inputs.value
         m = self.num_inducing
 
         # Unpack mean function and kernel
@@ -570,9 +570,9 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
                 the GP prior.
         """
         # Unpack variational parameters
-        expectation_vector = self.expectation_vector
-        expectation_matrix = self.expectation_matrix
-        z = self.inducing_inputs
+        expectation_vector = self.expectation_vector.value
+        expectation_matrix = self.expectation_matrix.value
+        z = self.inducing_inputs.value
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
@@ -615,9 +615,9 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
                 test inputs $t$.
         """
         # Unpack variational parameters
-        expectation_vector = self.expectation_vector
-        expectation_matrix = self.expectation_matrix
-        z = self.inducing_inputs
+        expectation_vector = self.expectation_vector.value
+        expectation_matrix = self.expectation_matrix.value
+        z = self.inducing_inputs.value
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
@@ -712,8 +712,8 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian[GL]):
         x, y = train_data.X, train_data.y
 
         # Unpack variational parameters
-        noise_var = self.posterior.likelihood.obs_stddev**2
-        z = self.inducing_inputs
+        noise_var = self.posterior.likelihood.obs_stddev.value**2
+        z = self.inducing_inputs.value
         m = self.num_inducing
 
         # Unpack mean function and kernel
@@ -731,7 +731,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian[GL]):
         Lz_inv_Kzx = solve(Lz, Kzx, Cholesky())
 
         # A = Lz⁻¹ Kzt / o
-        A = Lz_inv_Kzx / self.posterior.likelihood.obs_stddev
+        A = Lz_inv_Kzx / self.posterior.likelihood.obs_stddev.value
 
         # AAᵀ
         AAT = jnp.matmul(A, A.T)
