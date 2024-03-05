@@ -23,8 +23,10 @@ from gpjax.kernels.computations import (
     AbstractKernelComputation,
     DenseKernelComputation,
 )
+from gpjax.parameters import PositiveReal
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
 )
 
@@ -36,13 +38,18 @@ class Linear(AbstractKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice, None] = None,
-        variance: ScalarFloat = 1.0,
+        active_dims: tp.Union[list[int], int, slice],
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
-        self.variance = variance
+        if isinstance(variance, nnx.Variable):
+            self.variance = variance
+        else:
+            self.variance = PositiveReal(variance)
+            if tp.TYPE_CHECKING:
+                self.variance = tp.cast(PositiveReal[ScalarArray], self.variance)
 
     def __call__(
         self,
@@ -65,5 +72,5 @@ class Linear(AbstractKernel):
         """
         x = self.slice_input(x)
         y = self.slice_input(y)
-        K = self.variance * jnp.matmul(x.T, y)
+        K = self.variance.value * jnp.matmul(x.T, y)
         return K.squeeze()

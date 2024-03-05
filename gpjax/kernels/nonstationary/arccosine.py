@@ -23,11 +23,15 @@ from gpjax.kernels.computations import (
     AbstractKernelComputation,
     DenseKernelComputation,
 )
-from gpjax.parameters import Parameter
+from gpjax.parameters import PositiveReal
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
 )
+
+WeightVariance = tp.Union[Float[Array, "D"], ScalarArray]
+WeightVarianceCompatible = tp.Union[ScalarFloat, list[float], WeightVariance]
 
 
 class ArcCosine(AbstractKernel):
@@ -39,31 +43,57 @@ class ArcCosine(AbstractKernel):
     additional details.
     """
 
+    variance: nnx.Variable[ScalarArray]
+    weight_variance: nnx.Variable[WeightVariance]
+    bias_variance: nnx.Variable[ScalarArray]
     name = "ArcCosine"
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice, None] = None,
+        active_dims: tp.Union[list[int], int, slice],
         order: tp.Literal[0, 1, 2] = 0,
-        variance: ScalarFloat = 1.0,
-        weight_variance: tp.Union[ScalarFloat, Float[Array, " D"]] = 1.0,
-        bias_variance: ScalarFloat = 1.0,
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        weight_variance: tp.Union[
+            WeightVarianceCompatible, nnx.Variable[WeightVariance]
+        ] = 1.0,
+        bias_variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         if order not in [0, 1, 2]:
             raise ValueError("ArcCosine kernel only implemented for orders 0, 1 and 2.")
 
         self.order = order
-        self.variance = variance
-        self.weight_variance = weight_variance
-        self.bias_variance = bias_variance
+
+        if isinstance(weight_variance, nnx.Variable):
+            self.weight_variance = weight_variance
+        else:
+            self.weight_variance = PositiveReal(weight_variance)
+            if tp.TYPE_CHECKING:
+                self.weight_variance = tp.cast(
+                    PositiveReal[WeightVariance], self.weight_variance
+                )
+
+        if isinstance(variance, nnx.Variable):
+            self.variance = variance
+        else:
+            self.variance = PositiveReal(variance)
+            if tp.TYPE_CHECKING:
+                self.variance = tp.cast(PositiveReal[ScalarArray], self.variance)
+
+        if isinstance(bias_variance, nnx.Variable):
+            self.bias_variance = bias_variance
+        else:
+            self.bias_variance = PositiveReal(bias_variance)
+            if tp.TYPE_CHECKING:
+                self.bias_variance = tp.cast(
+                    PositiveReal[ScalarArray], self.bias_variance
+                )
+
         self.name = f"ArcCosine (order {self.order})"
 
         super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
-    def __call__(
-        self, x: Float[Array, " D"], y: Float[Array, " D"]
-    ) -> Float[Array, "D"]:
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarArray:
         r"""Evaluate the kernel on a pair of inputs $`(x, y)`$
 
         Args:
@@ -74,7 +104,7 @@ class ArcCosine(AbstractKernel):
 
         Returns
         -------
-            ScalarFloat: The value of $`k(x, y)`$.
+            ScalarArray: The value of $`k(x, y)`$.
         """
 
         x = self.slice_input(x)
@@ -91,7 +121,7 @@ class ArcCosine(AbstractKernel):
         K = self._J(theta)
         K *= jnp.sqrt(x_x) ** self.order
         K *= jnp.sqrt(y_y) ** self.order
-        K *= self.variance / jnp.pi
+        K *= self.variance.value / jnp.pi
 
         return K.squeeze()
 
@@ -107,7 +137,7 @@ class ArcCosine(AbstractKernel):
         -------
             ScalarFloat: The value of the weighted product between the two arguments``.
         """
-        return jnp.inner(self.weight_variance * x, y) + self.bias_variance
+        return jnp.inner(self.weight_variance.value * x, y) + self.bias_variance.value
 
     def _J(self, theta: ScalarFloat) -> ScalarFloat:
         r"""Evaluate the angular dependency function corresponding to the desired order.
