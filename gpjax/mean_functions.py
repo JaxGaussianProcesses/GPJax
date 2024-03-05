@@ -152,7 +152,7 @@ class Constant(AbstractMeanFunction):
         -------
             Float[Array, "1"]: The evaluated mean function.
         """
-        return jnp.ones((x.shape[0], 1)) * self.constant
+        return jnp.ones((x.shape[0], 1)) * self.constant.value
 
 
 class Zero(Constant):
