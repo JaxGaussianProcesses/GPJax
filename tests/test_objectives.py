@@ -52,13 +52,9 @@ def build_data(num_datapoints: int, num_dims: int, key, binary: bool):
 
 @pytest.mark.parametrize("num_datapoints", [1, 2, 10])
 @pytest.mark.parametrize("num_dims", [1, 2, 3])
-@pytest.mark.parametrize("negative", [False, True])
-@pytest.mark.parametrize("jit_compile", [False, True])
 @pytest.mark.parametrize("key_val", [123, 42])
-def test_conjugate_mll(
-    num_datapoints: int, num_dims: int, negative: bool, jit_compile: bool, key_val: int
-):
-    key = jr.key(key_val)
+def test_conjugate_mll(num_datapoints: int, num_dims: int, key_val: int):
+    key = jr.PRNGKey(key_val)
     D = build_data(num_datapoints, num_dims, key, binary=False)
 
     # Build model
@@ -69,19 +65,29 @@ def test_conjugate_mll(
     likelihood = gpx.likelihoods.Gaussian(num_datapoints=num_datapoints)
     post = p * likelihood
 
-    mll = conjugate_mll(negative=negative)
-    assert isinstance(mll, Objective)
+    # test simple call
+    res_simple = conjugate_mll(post, D)
+    assert isinstance(res_simple, jax.Array)
 
-    # test call
-    state, states, graphdef = post.split(Parameter, ...)
-    res = mll(post, D)
+    # test call wrapped in loss function
+    state, *states, graphdef = post.split(Parameter, ...)
 
-    # if jit_compile:
-    # mll = jax.jit(mll)
+    def loss(params):
+        posterior = graphdef.merge(params, *states)
+        return -conjugate_mll(posterior, D)
 
-    evaluation = mll(post, D)
-    assert isinstance(evaluation, jax.Array)
-    assert evaluation.shape == ()
+    res_wrapped = loss(state)
+    assert res_simple == res_wrapped
+
+    # test loss with jit
+    loss = jax.jit(loss)
+    res_jit = loss(state)
+    assert res_simple == res_jit
+
+    # test loss with grad
+    grad = jax.grad(loss)
+    grad_res = grad(state)
+    assert isinstance(grad_res, jax.Array)
 
 
 # @pytest.mark.parametrize("num_datapoints", [1, 2, 10])
