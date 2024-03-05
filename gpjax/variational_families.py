@@ -37,7 +37,6 @@ from gpjax.gps import (
 )
 from gpjax.kernels.base import AbstractKernel
 from gpjax.likelihoods import (
-    AbstractLikelihood,
     Gaussian,
     NonGaussian,
 )
@@ -51,7 +50,7 @@ from gpjax.typing import (
 
 K = tp.TypeVar("K", bound=AbstractKernel)
 M = tp.TypeVar("M", bound=AbstractMeanFunction)
-L = tp.TypeVar("L", bound=AbstractLikelihood)
+L = tp.TypeVar("L", Gaussian, NonGaussian)
 NGL = tp.TypeVar("NGL", bound=NonGaussian)
 GL = tp.TypeVar("GL", bound=Gaussian)
 P = tp.TypeVar("P", bound=AbstractPrior)
