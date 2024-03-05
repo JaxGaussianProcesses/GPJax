@@ -14,6 +14,7 @@
 # ==============================================================================
 
 import beartype.typing as tp
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
 
@@ -22,14 +23,15 @@ from gpjax.kernels.computations import (
     DenseKernelComputation,
 )
 from gpjax.kernels.stationary.base import StationaryKernel
-from gpjax.parameters import (
-    Parameter,
-    PositiveReal,
-)
+from gpjax.parameters import PositiveReal
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
 )
+
+Lengthscale = tp.Union[Float[Array, "D"], ScalarArray]
+LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 
 
 class Periodic(StationaryKernel):
@@ -42,13 +44,13 @@ class Periodic(StationaryKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice, None] = None,
-        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
-        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
-        period: tp.Union[ScalarFloat, Parameter] = 1.0,
+        active_dims: tp.Union[list[int], int, slice],
+        lengthscale: tp.Union[LengthscaleCompatible, nnx.Variable[Lengthscale]] = 1.0,
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        period: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        if isinstance(period, Parameter):
+        if isinstance(period, nnx.Variable):
             self.period = period
         else:
             self.period = PositiveReal(period)
@@ -74,6 +76,8 @@ class Periodic(StationaryKernel):
         """
         x = self.slice_input(x)
         y = self.slice_input(y)
-        sine_squared = (jnp.sin(jnp.pi * (x - y) / self.period) / self.lengthscale) ** 2
-        K = self.variance * jnp.exp(-0.5 * jnp.sum(sine_squared, axis=0))
+        sine_squared = (
+            jnp.sin(jnp.pi * (x - y) / self.period.value) / self.lengthscale.value
+        ) ** 2
+        K = self.variance.value * jnp.exp(-0.5 * jnp.sum(sine_squared, axis=0))
         return K.squeeze()

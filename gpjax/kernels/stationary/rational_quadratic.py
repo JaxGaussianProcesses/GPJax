@@ -14,6 +14,7 @@
 # ==============================================================================
 
 import beartype.typing as tp
+from flax.experimental import nnx
 from jaxtyping import Float
 
 from gpjax.kernels.computations import (
@@ -22,14 +23,15 @@ from gpjax.kernels.computations import (
 )
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import squared_distance
-from gpjax.parameters import (
-    Parameter,
-    PositiveReal,
-)
+from gpjax.parameters import PositiveReal
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
 )
+
+Lengthscale = tp.Union[Float[Array, "D"], ScalarArray]
+LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 
 
 class RationalQuadratic(StationaryKernel):
@@ -37,13 +39,13 @@ class RationalQuadratic(StationaryKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice, None] = None,
-        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
-        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
-        alpha: tp.Union[ScalarFloat, Parameter] = 1.0,
+        active_dims: tp.Union[list[int], int, slice],
+        lengthscale: tp.Union[LengthscaleCompatible, nnx.Variable[Lengthscale]] = 1.0,
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        alpha: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        if isinstance(alpha, Parameter):
+        if isinstance(alpha, nnx.Variable):
             self.alpha = alpha
         else:
             self.alpha = PositiveReal(alpha)
@@ -66,9 +68,9 @@ class RationalQuadratic(StationaryKernel):
         Returns:
             ScalarFloat: The value of $`k(x, y)`$.
         """
-        x = self.slice_input(x) / self.lengthscale
-        y = self.slice_input(y) / self.lengthscale
-        K = self.variance * (1 + 0.5 * squared_distance(x, y) / self.alpha) ** (
-            -self.alpha
-        )
+        x = self.slice_input(x) / self.lengthscale.value
+        y = self.slice_input(y) / self.lengthscale.value
+        K = self.variance.value * (
+            1 + 0.5 * squared_distance(x, y) / self.alpha.value
+        ) ** (-self.alpha.value)
         return K.squeeze()

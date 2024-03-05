@@ -140,6 +140,8 @@ select = [
   "ISC",
 ]
 ignore = [
+  # calls in argument defaults
+  "B008",
   # space before : (needed for how black formats slicing)
   # "E203",  # not yet implemented
   # module level import not at top of file

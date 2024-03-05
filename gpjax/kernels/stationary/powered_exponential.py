@@ -14,6 +14,7 @@
 # ==============================================================================
 
 import beartype.typing as tp
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
 
@@ -23,14 +24,15 @@ from gpjax.kernels.computations import (
 )
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import euclidean_distance
-from gpjax.parameters import (
-    Parameter,
-    SigmoidBounded,
-)
+from gpjax.parameters import SigmoidBounded
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
 )
+
+Lengthscale = tp.Union[Float[Array, "D"], ScalarArray]
+LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 
 
 class PoweredExponential(StationaryKernel):
@@ -41,17 +43,18 @@ class PoweredExponential(StationaryKernel):
     https://en.wikipedia.org/wiki/Generalized_normal_distribution#Symmetric_version
 
     """
+
     name: str = "Powered Exponential"
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice, None] = None,
-        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
-        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
-        power: tp.Union[ScalarFloat, Parameter] = 1.0,
+        active_dims: tp.Union[list[int], int, slice],
+        lengthscale: tp.Union[LengthscaleCompatible, nnx.Variable[Lengthscale]] = 1.0,
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        power: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        if isinstance(power, Parameter):
+        if isinstance(power, nnx.Variable):
             self.power = power
         else:
             self.power = SigmoidBounded(power)
@@ -77,7 +80,9 @@ class PoweredExponential(StationaryKernel):
         -------
             ScalarFloat: The value of $`k(x, y)`$.
         """
-        x = self.slice_input(x) / self.lengthscale
-        y = self.slice_input(y) / self.lengthscale
-        K = self.variance * jnp.exp(-euclidean_distance(x, y) ** self.power)
+        x = self.slice_input(x) / self.lengthscale.value
+        y = self.slice_input(y) / self.lengthscale.value
+        K = self.variance.value * jnp.exp(
+            -(euclidean_distance(x, y) ** self.power.value)
+        )
         return K.squeeze()

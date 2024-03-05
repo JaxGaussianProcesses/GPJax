@@ -13,11 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import (
-    dataclass,
-    field,
-)
-
 from jax import config
 import jax.numpy as jnp
 from jaxtyping import (
@@ -25,7 +20,6 @@ from jaxtyping import (
     Float,
 )
 import pytest
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from gpjax.kernels.base import (
     AbstractKernel,
@@ -45,7 +39,6 @@ from gpjax.kernels.stationary import (
     RationalQuadratic,
 )
 from gpjax.parameters import (
-    Parameter,
     PositiveReal,
     Real,
 )
@@ -72,12 +65,12 @@ def test_abstract_kernel():
         def __call__(
             self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
         ) -> Float[Array, "1"]:
-            return x * self.test_b * y
+            return x * self.test_b.value * y
 
     # Initialise dummy kernel class and test __call__ method:
     dummy_kernel = DummyKernel()
-    assert dummy_kernel.test_a == jnp.array([1.0])
-    assert dummy_kernel.test_b == jnp.array([2.0])
+    assert dummy_kernel.test_a.value == jnp.array([1.0])
+    assert dummy_kernel.test_b.value == jnp.array([2.0])
     assert dummy_kernel(jnp.array([1.0]), jnp.array([2.0])) == 4.0
 
 

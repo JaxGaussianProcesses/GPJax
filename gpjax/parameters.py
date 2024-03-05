@@ -2,52 +2,59 @@ import typing as tp
 
 from flax.experimental import nnx
 import jax.numpy as jnp
+from jax.typing import ArrayLike
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.typing import Array
-
-T = tp.TypeVar("T")
+T = tp.TypeVar("T", bound=tp.Union[ArrayLike, list[float]])
 
 
 class Parameter(nnx.Variable[T]):
     """Parameter base class."""
 
     def __init__(self, value: T, **kwargs):
-        if not isinstance(value, (int, float, Array)):
-            raise ValueError(
-                f"Expected parameter value to be a scalar or array. Got {value}."
+        if not isinstance(value, (ArrayLike, list)):
+            raise TypeError(
+                f"Expected parameter value to be an array-like type. Got {type(value)}."
             )
-        if isinstance(value, (int, float)):
-            value = jnp.array(value)
-
+        value = jnp.asarray(value)
         super().__init__(value=value, **kwargs)
 
 
-class PositiveReal(Parameter):
+class PositiveReal(Parameter[T]):
     """Parameter that is strictly positive."""
 
-    def __init__(self, value: T):
-        if value < 0:
+    def __init__(self, value: T, **kwargs):
+        value = jnp.asarray(value)
+
+        if jnp.any(value < 0):
             raise ValueError(
                 f"Expected parameter value to be strictly positive. Got {value}."
             )
 
-        super().__init__(value=value)
+        super().__init__(value=value, **kwargs)
 
 
-class Real(Parameter):
+class Real(Parameter[T]):
     """Parameter that can take any real value."""
 
 
-class SigmoidBounded(Parameter):
+class SigmoidBounded(Parameter[T]):
     """Parameter that is bounded between 0 and 1."""
 
 
 class Static(nnx.Variable[T]):
     """Parameter that does not change during training."""
 
+    def __init__(self, value: T, **kwargs):
+        if not isinstance(value, (ArrayLike, list)):
+            raise TypeError(
+                f"Expected parameter value to be an array-like type. Got {type(value)}."
+            )
+        value = jnp.asarray(value)
+        super().__init__(value=value, **kwargs)
 
-class TransformedParameter(Parameter):
+
+class TransformedParameter(Parameter[T]):
     """Parameter that is transformed using a bijector."""
 
     bj = tfb.Bijector
