@@ -13,26 +13,16 @@
 # limitations under the License.
 # ==============================================================================
 
-import beartype.typing as tp
-from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.kernels.computations import (
-    AbstractKernelComputation,
-    DenseKernelComputation,
-)
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import (
     build_student_t_distribution,
     euclidean_distance,
 )
-from gpjax.typing import (
-    Array,
-    ScalarFloat,
-)
+from gpjax.typing import Array
 
 
 class Matern32(StationaryKernel):
@@ -62,10 +52,14 @@ class Matern32(StationaryKernel):
         -------
             ScalarFloat: The value of $k(x, y)$.
         """
-        x = self.slice_input(x) / self.lengthscale
-        y = self.slice_input(y) / self.lengthscale
+        x = self.slice_input(x) / self.lengthscale.value
+        y = self.slice_input(y) / self.lengthscale.value
         tau = euclidean_distance(x, y)
-        K = self.variance * (1.0 + jnp.sqrt(3.0) * tau) * jnp.exp(-jnp.sqrt(3.0) * tau)
+        K = (
+            self.variance.value
+            * (1.0 + jnp.sqrt(3.0) * tau)
+            * jnp.exp(-jnp.sqrt(3.0) * tau)
+        )
         return K.squeeze()
 
     @property

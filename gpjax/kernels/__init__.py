@@ -14,6 +14,7 @@
 # ==============================================================================
 
 """JaxKern."""
+
 from gpjax.kernels.approximations import RFF
 from gpjax.kernels.base import (
     AbstractKernel,

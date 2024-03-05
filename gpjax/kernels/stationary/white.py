@@ -14,6 +14,7 @@
 # ==============================================================================
 import typing as tp
 
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
 
@@ -22,9 +23,9 @@ from gpjax.kernels.computations import (
     ConstantDiagonalKernelComputation,
 )
 from gpjax.kernels.stationary.base import StationaryKernel
-from gpjax.parameters import Parameter
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
 )
 
@@ -34,8 +35,8 @@ class White(StationaryKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice, None] = None,
-        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
+        active_dims: tp.Union[list[int], int, slice],
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
         compute_engine: AbstractKernelComputation = ConstantDiagonalKernelComputation(),
     ):
         super().__init__(active_dims, 1.0, variance, compute_engine)
@@ -56,5 +57,5 @@ class White(StationaryKernel):
         -------
             ScalarFloat: The value of $`k(x, y)`$.
         """
-        K = jnp.all(jnp.equal(x, y)) * self.variance
+        K = jnp.all(jnp.equal(x, y)) * self.variance.value
         return K.squeeze()

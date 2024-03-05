@@ -35,6 +35,7 @@ KeyArray = Union[
 
 Array = Union[JAXArray, NumpyArray]
 
+ScalarArray = Float[Array, ""]
 ScalarBool = Union[bool, Bool[Array, ""]]
 ScalarInt = Union[int, Int[Array, ""]]
 ScalarFloat = Union[float, Float[Array, ""]]

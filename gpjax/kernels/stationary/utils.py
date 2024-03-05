@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-import typing as tp
-
 import jax.numpy as jnp
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
@@ -69,29 +67,3 @@ def euclidean_distance(x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFl
         ScalarFloat: The euclidean distance between the inputs.
     """
     return jnp.sqrt(jnp.maximum(squared_distance(x, y), 1e-36))
-
-
-# TODO: maybe improve the control flow here
-def _check_lengthscale_dims_compat(
-    lengthscale: tp.Union[ScalarFloat, Float[Array, " D"]], n_dims: tp.Union[int, None] 
-) -> tp.Union[int, None]:
-    r"""Check that the lengthscale parameter is compatible with the number of input dimensions.
-
-    Args:
-        lengthscale (Float[Array, " D"]): The lengthscale parameter.
-        n_dims (int): The number of input dimensions.
-    """
-    ls_shape = jnp.shape(lengthscale)
-
-    if ls_shape == ():
-        return n_dims 
-    else:
-        if n_dims is None:
-            return ls_shape[0]
-        else:
-            if ls_shape != (n_dims,):
-                raise ValueError(
-                    "Expected `lengthscale` to be compatible with the number " 
-                    f"of input dimensions. Got `lengthscale` with shape {ls_shape}, "
-                    f"but the number of input dimensions is {n_dims}."
-                )

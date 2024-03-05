@@ -40,18 +40,54 @@ from gpjax.typing import (
 
 
 class AbstractKernel(nnx.Module):
-    r"""Base kernel class."""
+    r"""Base kernel class.
 
-    n_dims: int
-    active_dims: tp.Union[list[int], int, slice, None]
+    This class is the base class for all kernels in GPJax. It provides the basic
+    functionality for evaluating a kernel function on a pair of inputs, as well as
+    the ability to combine kernels using addition and multiplication.
+
+    The class also provides a method for slicing the input matrix to select the
+    relevant columns for the kernel's evaluation.
+
+    Attributes:
+        active_dims (tp.Union[list[int], slice]): The indices of the input dimensions
+            that are active in the kernel's evaluation. If active_dims is a list, then
+            the input to the kernel is indexed by the list, and n_dims
+            is the length of the list. If active_dims is an integer, then the input to the
+            kernel is not indexed, and n_dims is the value of the integer.
+            If active_dims is a slice, then the input to the kernel is indexed by the slice,
+            and n_dims is the length of the slice. Importantly, n_dims must always be
+            inferable from active_dims.
+        compute_engine (AbstractKernelComputation): The computation engine that is used to
+            compute the kernel's cross-covariance and gram matrices.
+        n_dims (int): The number of input dimensions of the kernel.
+        name (str): The name of the kernel.
+    """
+
+    active_dims: tp.Union[list[int], slice]
     compute_engine: AbstractKernelComputation
+    n_dims: int
     name: str = "AbstractKernel"
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice, None] = None,
+        active_dims: tp.Union[list[int], int, slice],
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
+        """Initialise the AbstractKernel class.
+
+        Args:
+            active_dims (tp.Union[list[int], int, slice]): The indices of the input dimensions
+                that are active in the kernel's evaluation. If active_dims is a list, then
+                the input to the kernel is indexed by the list, and the number of input dimensions
+                is the length of the list. If active_dims is an integer, then the input to the
+                kernel is not indexed, and the number of input dimensions is the value of the integer.
+                If active_dims is a slice, then the input to the kernel is indexed by the slice,
+                and the number of input dimensions is the length of the slice. Importantly, the number
+                of active dimensions must be inferable from active_dims.
+            compute_engine (AbstractKernelComputation): The computation engine that is used to
+                compute the kernel's cross-covariance and gram matrices.
+        """
         self.n_dims, self.active_dims = _check_active_dims(active_dims)
         self.compute_engine = compute_engine
 
@@ -175,7 +211,7 @@ class Constant(AbstractKernel):
         -------
             ScalarFloat: The evaluated kernel function at the supplied inputs.
         """
-        return self.constant.squeeze()
+        return self.constant.value.squeeze()
 
 
 class CombinationKernel(AbstractKernel):
@@ -185,7 +221,7 @@ class CombinationKernel(AbstractKernel):
         self,
         kernels: list[AbstractKernel],
         operator: tp.Callable,
-        active_dims: tp.Union[list[int], int, slice, None] = None,
+        active_dims: tp.Union[list[int], int, slice],
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         # Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
@@ -228,32 +264,34 @@ def _check_active_dims(active_dims: list[int]) -> tuple[int, list[int]]:
 
 
 @tp.overload
-def _check_active_dims(active_dims: int) -> tuple[tp.Union[int, None], slice]:
+def _check_active_dims(active_dims: int) -> tuple[int, slice]:  # noqa: F811
     ...
 
 
 @tp.overload
-def _check_active_dims(active_dims: None) -> tuple[None, slice]:
+def _check_active_dims(active_dims: slice) -> tuple[int, slice]:  # noqa: F811
     ...
 
-def _check_active_dims(active_dims: tp.Union[list[int], int, slice, None]):
-    if isinstance(a := active_dims, list):
-        return len(a), active_dims
-    elif isinstance(a, int):
-        return a, slice(None)
-    elif isinstance(a, slice):
-        if a.stop is None:
+
+def _check_active_dims(active_dims: tp.Union[list[int], int, slice]):  # noqa: F811
+    if isinstance(active_dims, list):
+        return len(active_dims), active_dims
+    elif isinstance(active_dims, int):
+        return active_dims, slice(None)
+    elif isinstance(active_dims, slice):
+        if active_dims.stop is None:
             raise ValueError("active_dims slice must have a stop value.")
-        if a.stop < 0:
+        if active_dims.stop < 0:
             raise ValueError("active_dims slice stop value must be positive.")
 
-        start = a.start if a.start is not None else 0
-        step = a.step if a.step is not None else 1
-        return (a.stop - start) // step, a
-    elif a is None:
-        return None, slice(None)
+        start = active_dims.start if active_dims.start is not None else 0
+        step = active_dims.step if active_dims.step is not None else 1
+        return (active_dims.stop - start) // step, active_dims
     else:
-        raise ValueError("active_dims must be a list, int or slice.")
+        raise TypeError(
+            "Expected active_dims to be a list, int or slice."
+            f" Got {type(active_dims)} instead."
+        )
 
 
 SumKernel = ft.partial(CombinationKernel, operator=jnp.sum)

@@ -13,15 +13,10 @@
 # limitations under the License.
 # ==============================================================================
 
-import beartype.typing as tp
 import jax.numpy as jnp
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.kernels.computations import (
-    AbstractKernelComputation,
-    DenseKernelComputation,
-)
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import squared_distance
 from gpjax.typing import (
@@ -51,9 +46,9 @@ class RBF(StationaryKernel):
         Returns:
             ScalarFloat: The value of $`k(x, y)`$.
         """
-        x = self.slice_input(x) / self.lengthscale
-        y = self.slice_input(y) / self.lengthscale
-        K = self.variance * jnp.exp(-0.5 * squared_distance(x, y))
+        x = self.slice_input(x) / self.lengthscale.value
+        y = self.slice_input(y) / self.lengthscale.value
+        K = self.variance.value * jnp.exp(-0.5 * squared_distance(x, y))
         return K.squeeze()
 
     @property
