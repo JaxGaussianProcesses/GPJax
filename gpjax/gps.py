@@ -670,7 +670,7 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
         latent = latent or jr.normal(key, shape=(self.likelihood.num_datapoints, 1))
 
         # TODO: static or intermediate?
-        self.latent = latent if isinstance(latent, Parameter) else Static(latent)
+        self.latent = latent if isinstance(latent, nnx.Variable) else Static(latent)
 
     def predict(
         self, test_inputs: Num[Array, "N D"], train_data: Dataset

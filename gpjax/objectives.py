@@ -16,30 +16,22 @@ from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
 import typing_extensions as tpe
 
-import gpjax
 from gpjax.dataset import Dataset
 from gpjax.distributions import GaussianDistribution
+from gpjax.gps import (
+    ConjugatePosterior,
+    NonConjugatePosterior,
+)
 from gpjax.lower_cholesky import lower_cholesky
 from gpjax.typing import (
     Array,
     ScalarFloat,
 )
+from gpjax.variational_families import AbstractVariationalFamily
 
 tfd = tfp.distributions
 
-
-ConjugatePosterior = TypeVar(
-    "ConjugatePosterior",
-    bound="gpjax.gps.ConjugatePosterior",  # noqa: F821
-)
-NonConjugatePosterior = TypeVar(
-    "NonConjugatePosterior",
-    bound="gpjax.gps.NonConjugatePosterior",  # noqa: F821
-)
-VariationalFamily = TypeVar(
-    "VariationalFamily",
-    bound="gpjax.variational_families.AbstractVariationalFamily",  # noqa: F821
-)
+VF = TypeVar("VF", bound=AbstractVariationalFamily)
 
 
 Objective = tpe.Callable[
@@ -192,7 +184,7 @@ def conjugate_loocv(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat
     x, y = data.X, data.y
 
     # Observation noise o²
-    obs_var = posterior.likelihood.obs_stddev**2
+    obs_var = posterior.likelihood.obs_stddev.value**2
 
     mx = posterior.prior.mean_function(x)  # [N, M]
 
@@ -255,7 +247,7 @@ def log_posterior_density(
     mx = posterior.prior.mean_function(x)
 
     # Whitened function values, wx, corresponding to the inputs, x
-    wx = posterior.latent
+    wx = posterior.latent.value
 
     # f(x) = mx  +  Lx wx
     fx = mx + Lx @ wx
@@ -271,7 +263,7 @@ def log_posterior_density(
 non_conjugate_mll = log_posterior_density
 
 
-def elbo(variational_family: VariationalFamily, data: Dataset) -> ScalarFloat:
+def elbo(variational_family: VF, data: Dataset) -> ScalarFloat:
     r"""Compute the evidence lower bound of a variational approximation.
 
     Compute the evidence lower bound under this model. In short, this requires
@@ -307,7 +299,7 @@ def elbo(variational_family: VariationalFamily, data: Dataset) -> ScalarFloat:
 
 
 def variational_expectation(
-    variational_family: VariationalFamily,
+    variational_family: VF,
     data: Dataset,
 ) -> Float[Array, " N"]:
     r"""Compute the variational expectation.
@@ -351,7 +343,7 @@ def variational_expectation(
 # TODO: Replace code within CollapsedELBO to using (low rank structure of) LinOps and the GaussianDistribution object to be as succinct as e.g., the `ConjugateMLL`.
 
 
-def collapsed_elbo(variational_family: VariationalFamily, data: Dataset) -> ScalarFloat:
+def collapsed_elbo(variational_family: VF, data: Dataset) -> ScalarFloat:
     r"""Compute a single step of the collapsed evidence lower bound.
 
     Compute the evidence lower bound under this model. In short, this requires
@@ -380,8 +372,8 @@ def collapsed_elbo(variational_family: VariationalFamily, data: Dataset) -> Scal
 
     m = variational_family.num_inducing
 
-    noise = variational_family.posterior.likelihood.obs_stddev**2
-    z = variational_family.inducing_inputs
+    noise = variational_family.posterior.likelihood.obs_stddev.value**2
+    z = variational_family.inducing_inputs.value
     Kzz = kernel.gram(z)
     Kzz += I_like(Kzz) * variational_family.jitter
     Kzz = PSD(Kzz)
