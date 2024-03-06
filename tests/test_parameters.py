@@ -1,4 +1,5 @@
 from flax.experimental import nnx
+import jax.numpy as jnp
 
 from gpjax.parameters import (
     DEFAULT_BIJECTION,
@@ -20,15 +21,13 @@ def test_transform():
     # Test forward transformation
     t_params = transform(params, DEFAULT_BIJECTION)
     t_param1_expected = DEFAULT_BIJECTION[PositiveReal].forward(1.0)
-    assert t_params.variables["param1"].value == t_param1_expected
-    assert t_params.variables["param2"].value == 2.0
+    assert jnp.allclose(t_params["param1"].value, t_param1_expected)
+    assert jnp.allclose(t_params["param2"].value, 2.0)
 
     # Test inverse transformation
     t_params = transform(params, DEFAULT_BIJECTION, inverse=True)
-    t_param1_expected = DEFAULT_BIJECTION[PositiveReal].inverse(1.0)
-    assert t_params.variables["param1"].value == t_param1_expected
-    assert t_params.variables["param2"].value == 2.0
-
-
-# Run the tests
-test_transform()
+    t_param1_expected = DEFAULT_BIJECTION[PositiveReal].inverse(
+        t_params["param1"].value
+    )
+    assert jnp.allclose(t_params["param1"].value, 1.0)
+    assert jnp.allclose(t_params["param2"].value, 2.0)

@@ -104,7 +104,7 @@ def _check_lengthscale_dims_compat(
     if n_dims == 1:
         return
 
-    if ls_shape != (n_dims,):
+    if ls_shape != (n_dims,) and ls_shape != ():
         raise ValueError(
             "Expected `lengthscale` to be compatible with the number "
             f"of input dimensions. Got `lengthscale` with shape {ls_shape}, "
