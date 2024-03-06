@@ -41,6 +41,7 @@ from gpjax.lower_cholesky import lower_cholesky
 from gpjax.mean_functions import AbstractMeanFunction
 from gpjax.parameters import (
     Parameter,
+    Real,
     Static,
 )
 from gpjax.typing import (
@@ -690,9 +691,7 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
         latent = latent or jr.normal(key, shape=(self.likelihood.num_datapoints, 1))
 
         # TODO: static or intermediate?
-        self.latent = (
-            latent if isinstance(latent, nnx.Variable) else nnx.Intermediate(latent)
-        )
+        self.latent = latent if isinstance(latent, Parameter) else Real(latent)
         self.key = Static(key)
 
     def predict(

@@ -43,6 +43,7 @@ from jaxtyping import (
 )
 import matplotlib.pyplot as plt
 import optax as ox
+from flax.experimental import nnx
 import tensorflow_probability.substrates.jax as tfp
 from tqdm import trange
 
@@ -89,7 +90,7 @@ ax.scatter(x, y)
 # choose a Bernoulli likelihood with a probit link function.
 
 # %%
-kernel = gpx.kernels.RBF()
+kernel = gpx.kernels.RBF(1)
 meanf = gpx.mean_functions.Constant()
 prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 likelihood = gpx.likelihoods.Bernoulli(num_datapoints=D.n)
@@ -116,16 +117,15 @@ print(type(posterior))
 # Optax's optimisers.
 
 # %%
-negative_lpd = jax.jit(gpx.objectives.LogPosteriorDensity(negative=True))
 
 optimiser = ox.adam(learning_rate=0.01)
 
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=negative_lpd,
+    objective=gpx.objectives.log_posterior_density,
     train_data=D,
     optim=ox.adamw(learning_rate=0.01),
-    num_iters=1000,
+    num_iters=50,
     key=key,
 )
 
@@ -218,11 +218,19 @@ Kxx = opt_posterior.prior.kernel.gram(x)
 Kxx += identity_matrix(D.n) * jitter
 Kxx = cola.PSD(Kxx)
 Lx = lower_cholesky(Kxx)
-f_hat = Lx @ opt_posterior.latent
+f_hat = Lx @ opt_posterior.latent.value
 
 # Negative Hessian,  H = -∇²p_tilde(y|f):
-H = jax.jacfwd(jax.jacrev(negative_lpd))(opt_posterior, D).latent.latent[:, 0, :, 0]
+params, *static_state, graphdef = opt_posterior.split(gpx.parameters.Parameter, ...)
 
+
+def loss(params, D):
+    model = graphdef.merge(params, *static_state)
+    return -gpx.objectives.log_posterior_density(model, D)
+
+
+jacobian = jax.jacfwd(jax.jacrev(loss))(params, D)
+H = jacobian["latent"].value["latent"].value[:, 0, :, 0]
 L = jnp.linalg.cholesky(H + identity_matrix(D.n) * jitter)
 
 # H⁻¹ = H⁻¹ I = (LLᵀ)⁻¹ I = L⁻ᵀL⁻¹ I
@@ -345,16 +353,28 @@ ax.legend()
 num_adapt = 500
 num_samples = 500
 
-lpd = jax.jit(gpx.objectives.LogPosteriorDensity(negative=False))
-unconstrained_lpd = jax.jit(lambda tree: lpd(tree.constrain(), D))
+params, *static_state, graphdef = posterior.split(gpx.parameters.Parameter, ...)
+params_bijection = gpx.parameters.DEFAULT_BIJECTION
+params = gpx.parameters.transform(params, params_bijection)
+
+
+def logprob_fn(params):
+    params = gpx.parameters.transform(params, params_bijection, inverse=True)
+    model = graphdef.merge(params, *static_state)
+    return gpx.objectives.log_posterior_density(model, D)
+
+
+# jit compile
+logprob_fn = jax.jit(logprob_fn)
+_ = logprob_fn(params)
 
 adapt = blackjax.window_adaptation(
-    blackjax.nuts, unconstrained_lpd, num_adapt, target_acceptance_rate=0.65
+    blackjax.nuts, logprob_fn, num_adapt, target_acceptance_rate=0.65, progress_bar=True
 )
 
 # Initialise the chain
 start = time()
-last_state, kernel, _ = adapt.run(key, posterior.unconstrain())
+last_state, kernel, _ = adapt.run(key, params)
 print(f"Adaption time taken: {time() - start: .1f} seconds")
 
 
@@ -399,9 +419,9 @@ print(f"Acceptance rate: {acceptance_rate:.2f}")
 
 # %%
 fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(10, 3))
-ax0.plot(states.position.prior.kernel.lengthscale)
-ax1.plot(states.position.prior.kernel.variance)
-ax2.plot(states.position.latent[:, 1, :])
+ax0.plot(states.position.prior.kernel.lengthscale.value)
+ax1.plot(states.position.prior.kernel.variance.value)
+ax2.plot(states.position.latent.value[:, 1, :])
 ax0.set_title("Kernel Lengthscale")
 ax1.set_title("Kernel Variance")
 ax2.set_title("Latent Function (index = 1)")
@@ -426,10 +446,10 @@ thin_factor = 20
 posterior_samples = []
 
 for i in trange(0, num_samples, thin_factor, desc="Drawing posterior samples"):
-    sample = jtu.tree_map(lambda samples, i=i: samples[i], states.position)
-    sample = sample.constrain()
-    latent_dist = sample.predict(xtest, train_data=D)
-    predictive_dist = sample.likelihood(latent_dist)
+    sample_params = jtu.tree_map(lambda samples, i=i: samples[i], states.position)
+    model = graphdef.merge(sample_params, *static_state)
+    latent_dist = model.predict(xtest, train_data=D)
+    predictive_dist = model.likelihood(latent_dist)
     posterior_samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
 
 posterior_samples = jnp.vstack(posterior_samples)

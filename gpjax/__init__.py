@@ -26,6 +26,7 @@ from gpjax import (
     likelihoods,
     mean_functions,
     objectives,
+    parameters,
     variational_families,
 )
 from gpjax.citation import cite
@@ -50,6 +51,7 @@ __all__ = [
     "likelihoods",
     "mean_functions",
     "objectives",
+    "parameters",
     "variational_families",
     "Dataset",
     "cite",
