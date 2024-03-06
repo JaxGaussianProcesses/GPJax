@@ -13,10 +13,11 @@
 # limitations under the License.
 # ==============================================================================
 
-from beartype.typing import (
+from typing import (
     Callable,
     Union,
 )
+
 from jaxtyping import (
     Array as JAXArray,
     Bool,
