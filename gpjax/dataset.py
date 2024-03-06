@@ -139,16 +139,19 @@ class VerticalDataset(Pytree):
         
         if not self.mean_standardization:
             print("standardized inputs with max and min")
-            X3d_min = jnp.min(self.X3d_raw, axis=(0))
-            X3d_max = jnp.max(self.X3d_raw,axis=(0))
-            X3d = (self.X3d_raw-X3d_min[None,:,:]) / (X3d_max[None,:,:] - X3d_min[None,:,:])
+            X3d_max = jnp.max(self.X3d_raw,axis=(0,2))
+            X3d_min = jnp.min(self.X3d_raw, axis=(0,2))
+            X3d = (self.X3d_raw-X3d_min[None,:,None]) / (X3d_max[None,:,None] - X3d_min[None,:,None])
+            #X3d_max = jnp.max(self.X3d_raw,axis=(0))
+            #X3d_min = jnp.min(self.X3d_raw, axis=(0))
+            #X3d = (self.X3d_raw-X3d_min[None,:,:]) / (X3d_max[None,:,:] - X3d_min[None,:,:])
             #X3d = X3d - jnp.mean(X3d, 0)
             X2d_min = jnp.min(self.X2d_raw, axis=0)
             X2d_max = jnp.max(self.X2d_raw,axis=0)
             X2d = (self.X2d_raw - X2d_min) / (X2d_max - X2d_min)
             Xstatic_min = jnp.min(self.Xstatic_raw, axis=0)
             Xstatic_max = jnp.max(self.Xstatic_raw,axis=0)
-            Xstatic = (Xstatic_max - self.Xstatic_raw) / (Xstatic_max - Xstatic_min)
+            Xstatic = (self.Xstatic_raw - Xstatic_min) / (Xstatic_max - Xstatic_min)
         else:
             print("standardized inputs to be Gaussian")
             X3d_mean = jnp.means(self.X3d_raw,axis=(0))
