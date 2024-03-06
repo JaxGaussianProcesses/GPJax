@@ -13,10 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-
-from dataclasses import dataclass
-
-from jax import config
+from flax.experimental import nnx
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (
@@ -26,12 +23,7 @@ from jaxtyping import (
 import optax as ox
 import pytest
 import scipy
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import (
-    Module,
-    param_field,
-)
 from gpjax.dataset import Dataset
 from gpjax.fit import (
     fit,
@@ -49,46 +41,44 @@ from gpjax.mean_functions import (
     Constant,
 )
 from gpjax.objectives import (
-    ELBO,
-    Objective,
-    ConjugateMLL,
+    conjugate_mll,
+    elbo,
+)
+from gpjax.parameters import (
+    Parameter,
+    Static,
 )
 from gpjax.typing import Array
 from gpjax.variational_families import VariationalGaussian
 
-# Enable Float64 for more stable matrix inversions.
-config.update("jax_enable_x64", True)
 
-
-def test_simple_linear_model() -> None:
+def test_fit_simple() -> None:
     # Create dataset:
     X = jnp.linspace(0.0, 10.0, 100).reshape(-1, 1)
     y = 2.0 * X + 1.0 + 10 * jr.normal(jr.PRNGKey(0), X.shape).reshape(-1, 1)
     D = Dataset(X, y)
 
     # Define linear model:
-    @dataclass
-    class LinearModel(Module):
-        weight: float = param_field(bijector=tfb.Identity())
-        bias: float = param_field(bijector=tfb.Identity(), trainable=False)
+
+    class LinearModel(nnx.Module):
+        def __init__(self, weight: float, bias: float):
+            self.weight = Parameter(weight)
+            self.bias = Static(bias)
 
         def __call__(self, x):
-            return self.weight * x + self.bias
+            return self.weight.value * x + self.bias.value
 
     model = LinearModel(weight=1.0, bias=1.0)
 
     # Define loss function:
-    @dataclass
-    class MeanSqaureError(Objective):
-        def step(self, model: LinearModel, train_data: Dataset) -> float:
-            return jnp.mean((train_data.y - model(train_data.X)) ** 2)
-
-    loss = MeanSqaureError()
+    def mse(model, data):
+        pred = model(data.X)
+        return jnp.mean((pred - data.y) ** 2)
 
     # Train!
     trained_model, hist = fit(
         model=model,
-        objective=loss,
+        objective=mse,
         train_data=D,
         optim=ox.sgd(0.001),
         num_iters=100,
@@ -102,15 +92,38 @@ def test_simple_linear_model() -> None:
     assert isinstance(trained_model, LinearModel)
 
     # Test reduction in loss:
-    assert loss(trained_model, D) < loss(model, D)
+    assert mse(trained_model, D) < mse(model, D)
 
     # Test stop_gradient on bias:
-    assert trained_model.bias == 1.0
+    assert trained_model.bias.value == 1.0
+
+
+def test_fit_scipy_simple():
+    # Create dataset:
+    X = jnp.linspace(0.0, 10.0, 100).reshape(-1, 1)
+    y = 2.0 * X + 1.0 + 10 * jr.normal(jr.PRNGKey(0), X.shape).reshape(-1, 1)
+    D = Dataset(X, y)
+
+    # Define linear model:
+    class LinearModel(nnx.Module):
+        def __init__(self, weight: float, bias: float):
+            self.weight = Parameter(weight)
+            self.bias = Static(bias)
+
+        def __call__(self, x):
+            return self.weight.value * x + self.bias.value
+
+    model = LinearModel(weight=1.0, bias=1.0)
+
+    # Define loss function:
+    def mse(model, data):
+        pred = model(data.X)
+        return jnp.mean((pred - data.y) ** 2)
 
     # Train with bfgs!
     trained_model, hist = fit_scipy(
         model=model,
-        objective=loss,
+        objective=mse,
         train_data=D,
         max_iters=10,
     )
@@ -122,15 +135,15 @@ def test_simple_linear_model() -> None:
     assert isinstance(trained_model, LinearModel)
 
     # Test reduction in loss:
-    assert loss(trained_model, D) < loss(model, D)
+    assert mse(trained_model, D) < mse(model, D)
 
     # Test stop_gradient on bias:
-    assert trained_model.bias == 1.0
+    assert trained_model.bias.value == 1.0
 
 
 @pytest.mark.parametrize("n_data", [20])
 @pytest.mark.parametrize("verbose", [True, False])
-def test_gaussian_process_regression(n_data: int, verbose: bool) -> None:
+def test_fit_gp_regression(n_data: int, verbose: bool) -> None:
     # Create dataset:
     key = jr.PRNGKey(123)
     x = jnp.sort(
@@ -140,17 +153,14 @@ def test_gaussian_process_regression(n_data: int, verbose: bool) -> None:
     D = Dataset(X=x, y=y)
 
     # Define GP model:
-    prior = Prior(kernel=RBF(), mean_function=Constant())
+    prior = Prior(kernel=RBF(1), mean_function=Constant())
     likelihood = Gaussian(num_datapoints=n_data)
     posterior = prior * likelihood
-
-    # Define loss function:
-    mll = ConjugateMLL(negative=True)
 
     # Train!
     trained_model, history = fit(
         model=posterior,
-        objective=mll,
+        objective=conjugate_mll,
         train_data=D,
         optim=ox.adam(0.1),
         num_iters=15,
@@ -165,14 +175,31 @@ def test_gaussian_process_regression(n_data: int, verbose: bool) -> None:
     assert len(history) == 15
 
     # Ensure we reduce the loss
-    assert mll(trained_model, D) < mll(posterior, D)
+    assert conjugate_mll(trained_model, D) < conjugate_mll(posterior, D)
+
+
+@pytest.mark.parametrize("n_data", [20])
+@pytest.mark.parametrize("verbose", [True, False])
+def test_fit_scipy_gp_regression(n_data: int, verbose: bool) -> None:
+    # Create dataset:
+    key = jr.PRNGKey(123)
+    x = jnp.sort(
+        jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n_data, 1)), axis=0
+    )
+    y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
+    D = Dataset(X=x, y=y)
+
+    # Define GP model:
+    prior = Prior(kernel=RBF(1), mean_function=Constant())
+    likelihood = Gaussian(num_datapoints=n_data)
+    posterior = prior * likelihood
 
     # Train with BFGS!
     trained_model_bfgs, history_bfgs = fit_scipy(
         model=posterior,
-        objective=mll,
+        objective=conjugate_mll,
         train_data=D,
-        max_iters=15,
+        max_iters=40,
         verbose=verbose,
     )
 
@@ -183,47 +210,42 @@ def test_gaussian_process_regression(n_data: int, verbose: bool) -> None:
     assert len(history_bfgs) > 2
 
     # Ensure we reduce the loss
-    assert mll(trained_model_bfgs, D) < mll(posterior, D)
+    assert conjugate_mll(trained_model_bfgs, D) < conjugate_mll(posterior, D)
 
 
-def test_scipy_fit_error_raises() -> None:
+def test_fit_scipy_error_raises() -> None:
     # Create dataset:
     D = Dataset(
         X=jnp.array([[0.0]], dtype=jnp.float64), y=jnp.array([[0.0]], dtype=jnp.float64)
     )
 
     # build crazy mean function so that opt fails
-    @dataclass
     class CrazyMean(AbstractMeanFunction):
         def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N O"]:
             return jnp.heaviside(x, 100.0)
 
     # Define GP model with crazy mean function:
-    prior = Prior(kernel=RBF(), mean_function=CrazyMean())
+    prior = Prior(kernel=RBF(1), mean_function=CrazyMean())
     likelihood = Gaussian(num_datapoints=2)
     posterior = prior * likelihood
-
-    # Define loss function:
-    mll = ConjugateMLL(negative=True)
 
     with pytest.raises(scipy.optimize.OptimizeWarning):
         fit_scipy(
             model=posterior,
-            objective=mll,
+            objective=conjugate_mll,
             train_data=D,
             max_iters=10,
         )
 
     # also check fails if no given enough steps
-    prior = Prior(kernel=RBF(), mean_function=Constant())
+    prior = Prior(kernel=RBF(1), mean_function=Constant())
     likelihood = Gaussian(num_datapoints=2)
     posterior = prior * likelihood
-    mll = ConjugateMLL(negative=True)
 
     with pytest.raises(scipy.optimize.OptimizeWarning):
         fit_scipy(
             model=posterior,
-            objective=mll,
+            objective=conjugate_mll,
             train_data=D,
             max_iters=1,
         )
@@ -233,9 +255,7 @@ def test_scipy_fit_error_raises() -> None:
 @pytest.mark.parametrize("batch_size", [1, 20, 50])
 @pytest.mark.parametrize("n_data", [50])
 @pytest.mark.parametrize("verbose", [True, False])
-def test_batch_fitting(
-    num_iters: int, batch_size: int, n_data: int, verbose: bool
-) -> None:
+def test_fit_batch(num_iters: int, batch_size: int, n_data: int, verbose: bool) -> None:
     # Create dataset:
     key = jr.PRNGKey(123)
     x = jnp.sort(
@@ -245,16 +265,13 @@ def test_batch_fitting(
     D = Dataset(X=x, y=y)
 
     # Define GP model:
-    prior = Prior(kernel=RBF(), mean_function=Constant())
+    prior = Prior(kernel=RBF(1), mean_function=Constant())
     likelihood = Gaussian(num_datapoints=n_data)
     posterior = prior * likelihood
 
     # Define variational family:
     z = jnp.linspace(-2.0, 2.0, 10).reshape(-1, 1)
     q = VariationalGaussian(posterior=posterior, inducing_inputs=z)
-
-    # Define loss function:
-    elbo = ELBO(negative=True)
 
     # Train!
     trained_model, history = fit(
