@@ -98,14 +98,12 @@ def transform(
         else:
             transformed_value = bijector.forward(param.value)
 
-        return param.replace(value=transformed_value)
+        param.value = transformed_value
 
-    params.update(
-        jtu.tree_map(
-            lambda x: _inner(x),
-            params,
-            is_leaf=lambda x: isinstance(x, Parameter),
-        )
+        return param
+
+    return jtu.tree_map(
+        lambda x: _inner(x),
+        params,
+        is_leaf=lambda x: isinstance(x, Parameter),
     )
-
-    return params

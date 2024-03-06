@@ -22,14 +22,12 @@ from typing import (
 from jax import config
 import jax.numpy as jnp
 import jax.random as jr
-import jax.tree_util as jtu
 from jaxtyping import (
     Array,
     Float,
 )
 import numpy as np
 import pytest
-import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 
 from gpjax.likelihoods import (
@@ -79,7 +77,7 @@ class BaseTestLikelihood:
 
         # Check properties
         for field, value in fields.items():
-            assert getattr(likelihood, field) == value
+            assert getattr(likelihood, field).value == value
 
     @pytest.mark.parametrize("n", [1, 2, 10], ids=lambda x: f"n={x}")
     def test_link_functions(self, n: int):
@@ -139,7 +137,9 @@ class TestGaussian(BaseTestLikelihood):
 
         # Check predictive mean and variance.
         assert (pred_dist.mean() == latent_mean).all()
-        noise_matrix = jnp.eye(likelihood.num_datapoints) * likelihood.obs_stddev**2
+        noise_matrix = (
+            jnp.eye(likelihood.num_datapoints) * likelihood.obs_stddev.value**2
+        )
         assert np.allclose(
             pred_dist.scale_tril, jnp.linalg.cholesky(latent_cov + noise_matrix)
         )

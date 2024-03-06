@@ -51,7 +51,7 @@ class StationaryKernel(AbstractKernel):
     ):
         super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
-        self.n_dims = _check_lengthscale_dims_compat(lengthscale, self.n_dims)
+        _check_lengthscale_dims_compat(lengthscale, self.n_dims)
 
         if isinstance(lengthscale, nnx.Variable):
             self.lengthscale = lengthscale
@@ -101,11 +101,10 @@ def _check_lengthscale_dims_compat(
             f"{ls_shape}."
         )
 
-    if ls_shape == ():
-        return n_dims
-    elif n_dims is None:
-        return ls_shape[0]
-    elif ls_shape != (n_dims,):
+    if n_dims == 1:
+        return
+
+    if ls_shape != (n_dims,):
         raise ValueError(
             "Expected `lengthscale` to be compatible with the number "
             f"of input dimensions. Got `lengthscale` with shape {ls_shape}, "
