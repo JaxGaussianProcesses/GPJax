@@ -46,6 +46,16 @@ from gpjax.parameters import (
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 
+TESTED_KERNELS = [
+    RBF,
+    Matern12,
+    Matern32,
+    Matern52,
+    Polynomial,
+    Linear,
+    RationalQuadratic,
+]
+
 
 def test_abstract_kernel():
     # Test initialising abstract kernel raises TypeError with unimplemented __call__ method:
@@ -56,11 +66,14 @@ def test_abstract_kernel():
     class DummyKernel(AbstractKernel):
         def __init__(
             self,
+            active_dims: int,
             test_a: Float[Array, "1"] = jnp.array([1.0]),
             test_b: Float[Array, "1"] = jnp.array([2.0]),
         ):
             self.test_a = Real(test_a)
             self.test_b = PositiveReal(test_b)
+
+            super().__init__(active_dims)
 
         def __call__(
             self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
@@ -68,27 +81,26 @@ def test_abstract_kernel():
             return x * self.test_b.value * y
 
     # Initialise dummy kernel class and test __call__ method:
-    dummy_kernel = DummyKernel()
+    dummy_kernel = DummyKernel(1)
     assert dummy_kernel.test_a.value == jnp.array([1.0])
     assert dummy_kernel.test_b.value == jnp.array([2.0])
     assert dummy_kernel(jnp.array([1.0]), jnp.array([2.0])) == 4.0
 
 
 @pytest.mark.parametrize("combination_type", [SumKernel, ProductKernel])
-@pytest.mark.parametrize(
-    "kernel",
-    [RBF, RationalQuadratic, Linear, Matern12, Matern32, Matern52, Polynomial],
-)
+@pytest.mark.parametrize("kernel", TESTED_KERNELS)
 @pytest.mark.parametrize("n_kerns", [2, 3, 4])
 def test_combination_kernel(
-    combination_type: CombinationKernel, kernel: AbstractKernel, n_kerns: int
+    combination_type: type[CombinationKernel],
+    kernel: type[AbstractKernel],
+    n_kerns: int,
 ) -> None:
     # Create inputs
     n = 20
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
 
     # Create list of kernels
-    kernels = [kernel() for _ in range(n_kerns)]
+    kernels = [kernel(active_dims=1) for _ in range(n_kerns)]
 
     # Create combination kernel
     combination_kernel = combination_type(kernels=kernels)
@@ -114,13 +126,12 @@ def test_combination_kernel(
     assert (eigen_values > 0).all()
 
 
-@pytest.mark.parametrize(
-    "k1", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
-)
-@pytest.mark.parametrize(
-    "k2", [RBF(), Matern12(), Matern32(), Matern52(), Polynomial()]
-)
-def test_sum_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
+@pytest.mark.parametrize("k1", TESTED_KERNELS)
+@pytest.mark.parametrize("k2", TESTED_KERNELS)
+def test_sum_kern_value(k1: type[AbstractKernel], k2: type[AbstractKernel]) -> None:
+    k1 = k1(active_dims=1)
+    k2 = k2(active_dims=1)
+
     # Create inputs
     n = 10
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)
@@ -139,33 +150,12 @@ def test_sum_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
     assert jnp.all(Kxx.to_dense() == Kxx_k1.to_dense() + Kxx_k2.to_dense())
 
 
-@pytest.mark.parametrize(
-    "k1",
-    [
-        RBF(),
-        Matern12(),
-        Matern32(),
-        Matern52(),
-        Polynomial(),
-        Linear(),
-        Polynomial(),
-        RationalQuadratic(),
-    ],
-)
-@pytest.mark.parametrize(
-    "k2",
-    [
-        RBF(),
-        Matern12(),
-        Matern32(),
-        Matern52(),
-        Polynomial(),
-        Linear(),
-        Polynomial(),
-        RationalQuadratic(),
-    ],
-)
+@pytest.mark.parametrize("k1", TESTED_KERNELS)
+@pytest.mark.parametrize("k2", TESTED_KERNELS)
 def test_prod_kern_value(k1: AbstractKernel, k2: AbstractKernel) -> None:
+    k1 = k1(active_dims=1)
+    k2 = k2(active_dims=1)
+
     # Create inputs
     n = 10
     x = jnp.linspace(0.0, 1.0, num=n).reshape(-1, 1)

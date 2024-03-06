@@ -23,7 +23,6 @@ from jaxtyping import (
     Float,
     Num,
 )
-import tensorflow_probability.substrates.jax.distributions as tfd
 
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
@@ -176,10 +175,6 @@ class AbstractKernel(nnx.Module):
         else:
             return ProductKernel(kernels=[self, Constant(other)])
 
-    @property
-    def spectral_density(self) -> tp.Union[tfd.Distribution, None]:
-        return None
-
 
 class Constant(AbstractKernel):
     r"""
@@ -221,7 +216,6 @@ class CombinationKernel(AbstractKernel):
         self,
         kernels: list[AbstractKernel],
         operator: tp.Callable,
-        active_dims: tp.Union[list[int], int, slice],
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         # Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
@@ -237,6 +231,8 @@ class CombinationKernel(AbstractKernel):
 
         self.kernels = kernels_list
         self.operator = operator
+
+        active_dims = ft.reduce(lambda asum, x: asum + x.n_dims, kernels_list, 0)
 
         super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 

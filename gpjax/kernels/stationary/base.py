@@ -18,6 +18,7 @@ import beartype.typing as tp
 from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
+import tensorflow_probability.substrates.jax.distributions as tfd
 
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
@@ -69,6 +70,17 @@ class StationaryKernel(AbstractKernel):
             # static typing
             if tp.TYPE_CHECKING:
                 self.variance = tp.cast(PositiveReal[ScalarFloat], self.variance)
+
+    @property
+    def spectral_density(self) -> tfd.Distribution:
+        r"""The spectral density of the kernel.
+
+        Returns:
+            Callable[[Float[Array, "D"]], Float[Array, "D"]]: The spectral density function.
+        """
+        raise NotImplementedError(
+            f"Kernel {self.name} does not have a spectral density."
+        )
 
 
 # TODO: maybe improve the control flow here
