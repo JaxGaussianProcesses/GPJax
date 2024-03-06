@@ -25,7 +25,6 @@ import optax as ox
 import scipy
 from tensorflow_probability.substrates.jax.bijectors import Bijector
 
-from gpjax.base import Module
 from gpjax.dataset import Dataset
 from gpjax.objectives import Objective
 from gpjax.parameters import (
@@ -62,6 +61,7 @@ def fit(  # noqa: PLR0913
     Optimisers used here should originate from Optax.
 
     Example:
+    ```python
     >>> import jax.numpy as jnp
     >>> import jax.random as jr
     >>> import jax.random as jr
@@ -93,6 +93,7 @@ def fit(  # noqa: PLR0913
     >>> trained_model, history = gpx.fit(
     ...     model=model, objective=mse, train_data=D, optim=ox.sgd(0.001), num_iters=1000
     ... )
+    ```
 
 
     Args:
@@ -117,7 +118,7 @@ def fit(  # noqa: PLR0913
 
     Returns
     -------
-        Tuple[Module, Array]: A Tuple comprising the optimised model and training
+        Tuple[Model, Array]: A Tuple comprising the optimised model and training
             history respectively.
     """
     if safe:
@@ -139,31 +140,31 @@ def fit(  # noqa: PLR0913
         params = transform(params, params_bijection, inverse=True)
 
     # Loss definition
-    def loss(params, batch: Dataset) -> ScalarFloat:
+    def loss(params: nnx.State, batch: Dataset) -> ScalarFloat:
         params = transform(params, params_bijection)
         model = graphdef.merge(params, *static_state)
         return objective(model, batch)
 
     # Initialise optimiser state.
-    opt_state = optim.init(model)
+    opt_state = optim.init(params)
 
     # Mini-batch random keys to scan over.
     iter_keys = jr.split(key, num_iters)
 
     # Optimisation step.
     def step(carry, key):
-        model, opt_state = carry
+        params, opt_state = carry
 
         if batch_size != -1:
             batch = get_batch(train_data, batch_size, key)
         else:
             batch = train_data
 
-        loss_val, loss_gradient = jax.value_and_grad(loss)(model, batch)
-        updates, opt_state = optim.update(loss_gradient, opt_state, model)
-        model = ox.apply_updates(model, updates)
+        loss_val, loss_gradient = jax.value_and_grad(loss)(params, batch)
+        updates, opt_state = optim.update(loss_gradient, opt_state, params)
+        params = ox.apply_updates(params, updates)
 
-        carry = model, opt_state
+        carry = params, opt_state
         return carry, loss_val
 
     # Optimisation scan.
@@ -195,18 +196,18 @@ def fit_scipy(  # noqa: PLR0913
     Optimisers used here should originate from Optax. todo
 
     Args:
-        model (Module): The model Module to be optimised.
+        model (Model): The model Module to be optimised.
         objective (Objective): The objective function that we are optimising with
             respect to.
         train_data (Dataset): The training data to be used for the optimisation.
-        max_iters (Optional[int]): The maximum number of optimisation steps to run. Defaults
+        max_iters (int): The maximum number of optimisation steps to run. Defaults
             to 500.
-        verbose (Optional[bool]): Whether to print the information about the optimisation. Defaults
+        verbose (bool): Whether to print the information about the optimisation. Defaults
             to True.
 
     Returns
     -------
-        Tuple[Module, Array]: A Tuple comprising the optimised model and training
+        Tuple[Model, Array]: A Tuple comprising the optimised model and training
             history respectively.
     """
     if safe:
@@ -216,16 +217,20 @@ def fit_scipy(  # noqa: PLR0913
         _check_num_iters(max_iters)
         _check_verbose(verbose)
 
-    # Unconstrained space model.
-    model = model.unconstrain()
+    # Model state filtering
+    params, *static_state, graphdef = model.split(Parameter, ...)
 
-    # Unconstrained space loss function with stop-gradient rule for non-trainable params.
-    def loss(model: Module) -> ScalarFloat:
-        model = model.stop_gradient()
-        return objective(model.constrain(), train_data)
+    # Parameters bijection to unconstrained space
+    params = transform(params, DEFAULT_BIJECTION, inverse=True)
+
+    # Loss definition
+    def loss(params) -> ScalarFloat:
+        params = transform(params, DEFAULT_BIJECTION)
+        model = graphdef.merge(params, *static_state)
+        return objective(model, train_data)
 
     # convert to numpy for interface with scipy
-    x0, scipy_to_jnp = ravel_pytree(model)
+    x0, scipy_to_jnp = ravel_pytree(params)
 
     @jax.jit
     def scipy_wrapper(x0):
@@ -243,9 +248,15 @@ def fit_scipy(  # noqa: PLR0913
     )
     history = jnp.array(history)
 
-    # convert back to pytree and reconstrain
-    model = scipy_to_jnp(result.x)
-    model = model.constrain()
+    # convert back to nnx.State with JAX arrays
+    params = scipy_to_jnp(result.x)
+
+    # Parameters bijection to constrained space
+    params = transform(params, DEFAULT_BIJECTION)
+
+    # Reconstruct model
+    model = graphdef.merge(params, *static_state)
+
     return model, history
 
 
