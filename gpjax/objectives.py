@@ -34,9 +34,7 @@ tfd = tfp.distributions
 VF = TypeVar("VF", bound=AbstractVariationalFamily)
 
 
-Objective = tpe.Callable[
-    [nnx.State, tpe.Unpack[tuple[nnx.State, ...]], nnx.GraphDef, Dataset], ScalarFloat
-]
+Objective = tpe.Callable[[nnx.Module, Dataset], ScalarFloat]
 
 
 def conjugate_mll(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
