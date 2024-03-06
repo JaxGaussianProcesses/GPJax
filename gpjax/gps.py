@@ -539,7 +539,7 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
         t = test_inputs
 
         # Observation noise o²
-        obs_noise = self.likelihood.obs_stddev**2
+        obs_noise = self.likelihood.obs_stddev.value**2
         mx = self.prior.mean_function(x)
 
         # Precompute Gram matrix, Kxx, at training inputs, x
@@ -621,7 +621,7 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
 
         # sample weights v for canonical features
         # v = Σ⁻¹ (y + ε - ɸ⍵) for  Σ = Kxx + Io² and ε ᯈ N(0, o²)
-        obs_var = self.likelihood.obs_stddev**2
+        obs_var = self.likelihood.obs_stddev.value**2
         Kxx = self.prior.kernel.gram(train_data.X)  #  [N, N]
         Sigma = Kxx + I_like(Kxx) * (obs_var + self.jitter)  #  [N, N]
         eps = jnp.sqrt(obs_var) * jr.normal(key, [train_data.n, num_samples])  #  [N, B]
@@ -667,7 +667,7 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
     from, or optimise an approximation to, the posterior distribution.
     """
 
-    latent: Float[Array, "N 1"]
+    latent: nnx.Intermediate[Float[Array, "N 1"]]
 
     def __init__(
         self,
@@ -690,7 +690,10 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
         latent = latent or jr.normal(key, shape=(self.likelihood.num_datapoints, 1))
 
         # TODO: static or intermediate?
-        self.latent = latent if isinstance(latent, nnx.Variable) else Static(latent)
+        self.latent = (
+            latent if isinstance(latent, nnx.Variable) else nnx.Intermediate(latent)
+        )
+        self.key = Static(key)
 
     def predict(
         self, test_inputs: Num[Array, "N D"], train_data: Dataset
@@ -739,7 +742,7 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
         Lx_inv_Kxt = solve(Lx, Ktx.T, Cholesky())
 
         # Whitened function values, wx, corresponding to the inputs, x
-        wx = self.latent
+        wx = self.latent.value
 
         # μt + Ktx Lx⁻¹ wx
         mean = mean_t + jnp.matmul(Lx_inv_Kxt.T, wx)
@@ -816,7 +819,7 @@ def _build_fourier_features_fn(
 
     def eval_fourier_features(test_inputs: Float[Array, "N D"]) -> Float[Array, "N L"]:
         Phi = approximate_kernel.compute_features(x=test_inputs)
-        Phi *= jnp.sqrt(prior.kernel.variance / num_features)
+        Phi *= jnp.sqrt(prior.kernel.variance.value / num_features)
         return Phi
 
     return eval_fourier_features

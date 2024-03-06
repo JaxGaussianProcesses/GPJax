@@ -134,7 +134,7 @@ D = gpx.Dataset(X=x, y=y)
 
 # Construct the prior
 meanf = gpx.mean_functions.Zero()
-kernel = gpx.kernels.RBF()
+kernel = gpx.kernels.RBF(1)
 prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
 
 # Define a likelihood
@@ -146,13 +146,10 @@ posterior = prior * likelihood
 # Define an optimiser
 optimiser = ox.adam(learning_rate=1e-2)
 
-# Define the marginal log-likelihood
-negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True))
-
 # Obtain Type 2 MLEs of the hyperparameters
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=negative_mll,
+    objective=gpx.objectives.conjugate_mll,
     train_data=D,
     optim=optimiser,
     num_iters=500,

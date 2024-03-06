@@ -2,7 +2,6 @@ from jax import config
 
 config.update("jax_enable_x64", True)
 
-from jax import jit
 import jax.numpy as jnp
 import pytest
 
@@ -71,7 +70,7 @@ def test_arc_cosine():
 
 def test_graph_kernel():
     L = jnp.eye(3)
-    kernel = GraphKernel(laplacian=L)
+    kernel = GraphKernel(laplacian=L, active_dims=1)
     citation = cite(kernel)
 
     assert isinstance(citation, PaperCitation)
@@ -99,7 +98,6 @@ def test_rff(kernel):
 def test_missing_citation(kernel):
     citation = cite(kernel)
     assert isinstance(citation, NullCitation)
-
 
 
 def test_thompson_sampling():
@@ -158,4 +156,3 @@ def test_logarithmic_goldstein_price():
     assert citation.booktitle == "Structural and multidisciplinary optimization"
     assert citation.citation_type == "article"
     _check_no_fallback(citation)
-
