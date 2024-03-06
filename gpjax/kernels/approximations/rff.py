@@ -6,6 +6,7 @@ from jaxtyping import Float
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import BasisFunctionComputation
 from gpjax.kernels.stationary.base import StationaryKernel
+from gpjax.parameters import Static
 from gpjax.typing import (
     Array,
     KeyArray,
@@ -27,6 +28,8 @@ class RFF(AbstractKernel):
     - 'Random Features for Large-Scale Kernel Machines' by Rahimi and Recht (2008).
     - 'On the Error of Random Fourier Features' by Sutherland and Schneider (2015).
     """
+
+    compute_engine: BasisFunctionComputation
 
     def __init__(
         self,
@@ -56,8 +59,10 @@ class RFF(AbstractKernel):
 
         if self.frequencies is None:
             n_dims = self.base_kernel.n_dims
-            self.frequencies = self.base_kernel.spectral_density.sample(
-                seed=key, sample_shape=(self.num_basis_fns, n_dims)
+            self.frequencies = Static(
+                self.base_kernel.spectral_density.sample(
+                    seed=key, sample_shape=(self.num_basis_fns, n_dims)
+                )
             )
         self.name = f"{self.base_kernel.name} (RFF)"
 
@@ -72,14 +77,11 @@ class RFF(AbstractKernel):
         Args:
             kernel (AbstractKernel): The kernel to be checked.
         """
-        if kernel is None:
-            raise ValueError("Base kernel must be specified.")
-        error_msg = """
-        Base kernel must have a spectral density. Currently, only Matérn
-        and RBF kernels have implemented spectral densities.
-        """
-        if kernel.spectral_density is None:
-            raise ValueError(error_msg)
+        if not isinstance(kernel, StationaryKernel):
+            raise TypeError("RFF can only be applied to stationary kernels.")
+
+        # check that the kernel has a spectral density
+        _ = kernel.spectral_density
 
     def compute_features(self, x: Float[Array, "N D"]) -> Float[Array, "N L"]:
         r"""Compute the features for the inputs.

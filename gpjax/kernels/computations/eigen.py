@@ -21,11 +21,13 @@ from jaxtyping import (
     Num,
 )
 
-import gpjax
+import gpjax  # noqa: F401
 from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.typing import Array
 
-Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
+Kernel = tp.TypeVar(
+    "Kernel", bound="gpjax.kernels.non_euclidean.graph.GraphKernel"  # noqa: F821
+)
 
 
 class EigenKernelComputation(AbstractKernelComputation):
@@ -52,11 +54,14 @@ class EigenKernelComputation(AbstractKernelComputation):
         # Transform the eigenvalues of the graph Laplacian according to the
         # RBF kernel's SPDE form.
         S = jnp.power(
-            kernel.eigenvalues
-            + 2 * kernel.smoothness / kernel.lengthscale / kernel.lengthscale,
-            -kernel.smoothness,
+            kernel.eigenvalues.value
+            + 2
+            * kernel.smoothness.value
+            / kernel.lengthscale.value
+            / kernel.lengthscale.value,
+            -kernel.smoothness.value,
         )
         S = jnp.multiply(S, kernel.num_vertex / jnp.sum(S))
         # Scale the transform eigenvalues by the kernel variance
-        S = jnp.multiply(S, kernel.variance)
+        S = jnp.multiply(S, kernel.variance.value)
         return kernel(x, y, S=S)

@@ -219,8 +219,9 @@ class BaseTestKernel:
         elif isinstance(
             kernel, (White, Periodic, PoweredExponential, RationalQuadratic)
         ):
-            # Check that spectral_density property is None
-            assert kernel.spectral_density is None
+            # Check that error is raised if spectral density not implemented
+            with pytest.raises(NotImplementedError):
+                _ = kernel.spectral_density
 
 
 def prod(inp):
