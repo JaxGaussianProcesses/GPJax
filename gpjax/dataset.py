@@ -131,6 +131,8 @@ class VerticalDataset(Pytree):
     Xstatic: Num[Array, "N D"] = None
     y: Num[Array, "N 1"] = None
     standardize: bool = True
+    Y_mean: Num[Array, "1 1"] = None
+    Y_std: Num[Array, "1 1"] = None
     
 
     def __post_init__(self) -> None:
@@ -157,15 +159,16 @@ class VerticalDataset(Pytree):
             Xstatic = (self.Xstatic - Xstatic_min) / (Xstatic_max - Xstatic_min)
 
 
-            print(f"then standardized Y with max and min")
-            Y_min = jnp.min(self.y,0)
-            Y_max = jnp.max(self.y,0)
-            y = (self.y - Y_min) / (Y_max - Y_min)
+            print(f"then standardized Y as Gaussian")
+            self.Y_mean = jnp.mean(self.y,0)
+            self.Y_std = jnp.sqrt(jnp.var(self.y,0))
+            y = (self.y-self.Y_mean) / self.Y_std
             
             self.X3d = X3d
             self.X2d = X2d
             self.Xstatic = Xstatic
             self.y = y
+            
 
     @property
     def X(self):
@@ -181,12 +184,18 @@ class VerticalDataset(Pytree):
 
 
 
-    def get_subset(self, M: int, space_filling=False,use_output=False):
+    def get_subset(self, M: int, space_filling=False,use_output=False, no_3d=True):
         if space_filling:
             if use_output:
-                X = jnp.hstack([jnp.mean(self.X3d,-1), self.X2d, self.Xstatic, self.y])
+                if no_3d:
+                    X = jnp.hstack([self.X2d, self.Xstatic, self.y])
+                else:
+                    X = jnp.hstack([jnp.mean(self.X3d,-1), self.X2d, self.Xstatic, self.y])
             else:
-                X = jnp.hstack([jnp.mean(self.X3d,-1), self.X2d, self.Xstatic])
+                if no_3d:
+                    X = jnp.hstack([self.X2d, self.Xstatic])
+                else:
+                    X = jnp.hstack([jnp.mean(self.X3d,-1), self.X2d, self.Xstatic])
             assert X.shape[0] > M
             d = X.shape[1]
             #kernel = gpx.kernels.SumKernel(kernels=[gpx.kernels.RBF(active_dims=[i]) for i in range(d)])
@@ -215,9 +224,9 @@ class VerticalDataset(Pytree):
                 d_squared = jnp.maximum(d_squared, 1e-50)  # numerical stability
                 chosen_indicies.append(jnp.argmax(d_squared))  # get next element as point with largest score
             chosen_indicies = jnp.array(chosen_indicies, dtype=int)
-            return VerticalDataset(X3d=self.X3d[chosen_indicies], X2d=self.X2d[chosen_indicies], Xstatic=self.Xstatic[chosen_indicies], y=self.y[chosen_indicies], standardize=False)
+            return VerticalDataset(X3d=self.X3d[chosen_indicies], X2d=self.X2d[chosen_indicies], Xstatic=self.Xstatic[chosen_indicies], y=self.y[chosen_indicies], standardize=False, Y_mean=self.Y_mean, Y_std=self.Y_std)
         else:
-            return VerticalDataset(X3d=self.X3d[:M], X2d=self.X2d[:M], Xstatic=self.Xstatic[:M], y=self.y[:M], standardize=False)
+            return VerticalDataset(X3d=self.X3d[:M], X2d=self.X2d[:M], Xstatic=self.Xstatic[:M], y=self.y[:M], standardize=False, Y_mean=self.Y_mean, Y_std=self.Y_std)
 
 
 __all__ = [
