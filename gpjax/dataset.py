@@ -22,6 +22,8 @@ import jax.numpy as jnp
 from jaxtyping import Num
 from simple_pytree import Pytree
 from gpjax.typing import Array
+import gpjax as gpx
+from jax import vmap
 
 
 @dataclass
@@ -124,57 +126,46 @@ def _check_precision(
 
 @dataclass
 class VerticalDataset(Pytree):
-    X3d_raw: Num[Array, "N D L"] = None
-    X2d_raw: Num[Array, "N D"] = None
-    Xstatic_raw: Num[Array, "N D"] = None
-    y_raw: Num[Array, "N 1"] = None
-    mean_standardization: bool = False
+    X3d: Num[Array, "N D L"] = None
+    X2d: Num[Array, "N D"] = None
+    Xstatic: Num[Array, "N D"] = None
+    y: Num[Array, "N 1"] = None
+    standardize: bool = True
     
 
     def __post_init__(self) -> None:
-        _check_precision(self.X2d_raw, self.y_raw)
-        _check_precision(self.Xstatic_raw, self.y_raw)
-        _check_precision(self.X3d_raw, self.y_raw)
+        _check_precision(self.X2d, self.y)
+        _check_precision(self.Xstatic, self.y)
+        _check_precision(self.X3d, self.y)
+        self.X3d_raw = self.X3d
         
         
-        if not self.mean_standardization:
+        if self.standardize:
             print("standardized inputs with max and min")
-            X3d_max = jnp.max(self.X3d_raw,axis=(0,2))
-            X3d_min = jnp.min(self.X3d_raw, axis=(0,2))
-            X3d = (self.X3d_raw-X3d_min[None,:,None]) / (X3d_max[None,:,None] - X3d_min[None,:,None])
-            #X3d_max = jnp.max(self.X3d_raw,axis=(0))
-            #X3d_min = jnp.min(self.X3d_raw, axis=(0))
-            #X3d = (self.X3d_raw-X3d_min[None,:,:]) / (X3d_max[None,:,:] - X3d_min[None,:,:])
+            X3d_max = jnp.max(self.X3d,axis=(0,2))
+            X3d_min = jnp.min(self.X3d, axis=(0,2))
+            X3d = (self.X3d-X3d_min[None,:,None]) / (X3d_max[None,:,None] - X3d_min[None,:,None])
+            #X3d_max = jnp.max(self.X3d,axis=(0))
+            #X3d_min = jnp.min(self.X3d, axis=(0))
+            #X3d = (self.X3d-X3d_min[None,:,:]) / (X3d_max[None,:,:] - X3d_min[None,:,:])
             #X3d = X3d - jnp.mean(X3d, 0)
-            X2d_min = jnp.min(self.X2d_raw, axis=0)
-            X2d_max = jnp.max(self.X2d_raw,axis=0)
-            X2d = (self.X2d_raw - X2d_min) / (X2d_max - X2d_min)
-            Xstatic_min = jnp.min(self.Xstatic_raw, axis=0)
-            Xstatic_max = jnp.max(self.Xstatic_raw,axis=0)
-            Xstatic = (self.Xstatic_raw - Xstatic_min) / (Xstatic_max - Xstatic_min)
-        else:
-            print("standardized inputs to be Gaussian")
-            X3d_mean = jnp.means(self.X3d_raw,axis=(0))
-            # X3d_std = jnp.std(X3d, axis=(0,2))
-            # X3d = (X3d - X3d_mean[None,:,:]) / X3d_std[None,:,None]
-            X3d_std = jnp.std(self.X3d_raw, axis=(0))
-            X3d = (self.X3d_raw - X3d_mean[None,:,:]) / X3d_std[None,:,:]
-            X2d_std = jnp.std(self.X2d_raw, axis=0)
-            X2d_mean = jnp.mean(self.X2d_raw,axis=0)
-            X2d = (self.X2d_raw - X2d_mean) / X2d_std
-            Xstatic_std = jnp.std(self.Xstatic_raw, axis=0)
-            Xstatic_mean = jnp.mean(self.Xstatic_raw,axis=0)
-            Xstatic = (self.Xstatic_raw - Xstatic_mean) / Xstatic_std
+            X2d_min = jnp.min(self.X2d, axis=0)
+            X2d_max = jnp.max(self.X2d,axis=0)
+            X2d = (self.X2d - X2d_min) / (X2d_max - X2d_min)
+            Xstatic_min = jnp.min(self.Xstatic, axis=0)
+            Xstatic_max = jnp.max(self.Xstatic,axis=0)
+            Xstatic = (self.Xstatic - Xstatic_min) / (Xstatic_max - Xstatic_min)
 
 
-        print(f"then standardized Y as Gaussian")
-        self.Y_mean = jnp.mean(self.y_raw)
-        self.Y_std = jnp.std(self.y_raw)
-        Y = (self.y_raw - self.Y_mean) / self.Y_std
-        self.X3d = X3d
-        self.X2d = X2d
-        self.Xstatic = Xstatic
-        self.y = Y
+            print(f"then standardized Y with max and min")
+            Y_min = jnp.min(self.y,0)
+            Y_max = jnp.max(self.y,0)
+            y = (self.y - Y_min) / (Y_max - Y_min)
+            
+            self.X3d = X3d
+            self.X2d = X2d
+            self.Xstatic = Xstatic
+            self.y = y
 
     @property
     def X(self):
@@ -187,6 +178,47 @@ class VerticalDataset(Pytree):
     @property
     def dim(self):
         return self.X2d.shape[1] + self.X3d.shape[1] + self.Xstatic.shape[1]
+
+
+
+    def get_subset(self, M: int, space_filling=False,use_output=False):
+        if space_filling:
+            if use_output:
+                X = jnp.hstack([jnp.mean(self.X3d,-1), self.X2d, self.Xstatic, self.y])
+            else:
+                X = jnp.hstack([jnp.mean(self.X3d,-1), self.X2d, self.Xstatic])
+            assert X.shape[0] > M
+            d = X.shape[1]
+            #kernel = gpx.kernels.SumKernel(kernels=[gpx.kernels.RBF(active_dims=[i]) for i in range(d)])
+            kernel = gpx.kernels.RBF(lengthscale=jnp.array(.1, dtype=jnp.float64))
+            chosen_indicies = []  # iteratively store chosen points
+            N = X.shape[0]
+            c = jnp.zeros((M - 1, N), dtype=jnp.float64)  # [M-1,N]
+            d_squared = vmap(lambda x: kernel(x,x),0)(X) # [N]
+
+            chosen_indicies.append(jnp.argmax(d_squared))  # get first element
+            for m in range(M - 1):  # get remaining elements
+                ix = jnp.array(chosen_indicies[-1], dtype=int) # increment Cholesky with newest point
+                newest_point = X[ix]
+                d_temp = jnp.sqrt(d_squared[ix])  # [1]
+
+                L = kernel.cross_covariance(X, newest_point[None, :])[:, 0]  # [N]
+                if m == 0:
+                    e = L / d_temp
+                    c = e[None,:]  # [1,N]
+                else:
+                    c_temp = c[:, ix : ix + 1]  # [m,1]
+                    e = (L - jnp.matmul(jnp.transpose(c_temp), c[:m])) / d_temp  # [N]
+                    c = jnp.concatenate([c, e], axis=0)  # [m+1, N]
+                    # e = tf.squeeze(e, 0)
+                d_squared -= e**2
+                d_squared = jnp.maximum(d_squared, 1e-50)  # numerical stability
+                chosen_indicies.append(jnp.argmax(d_squared))  # get next element as point with largest score
+            chosen_indicies = jnp.array(chosen_indicies, dtype=int)
+            return VerticalDataset(X3d=self.X3d[chosen_indicies], X2d=self.X2d[chosen_indicies], Xstatic=self.Xstatic[chosen_indicies], y=self.y[chosen_indicies], standardize=False)
+        else:
+            return VerticalDataset(X3d=self.X3d[:M], X2d=self.X2d[:M], Xstatic=self.Xstatic[:M], y=self.y[:M], standardize=False)
+
 
 __all__ = [
     "Dataset",
