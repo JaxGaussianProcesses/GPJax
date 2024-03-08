@@ -103,4 +103,4 @@ plt.savefig("../_static/bijector_figure.svg", bbox_inches="tight")
 np.log(0.05)
 
 # %%
-x
+print(x)

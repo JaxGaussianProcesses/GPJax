@@ -17,7 +17,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
 import pandas as pd
-from docs.examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -197,7 +196,7 @@ for k, ax in zip(kernels, axes.ravel()):
 
 # %%
 # Forrester function
-def forrester(x: Float[Array, "N"]) -> Float[Array, "N"]:
+def forrester(x: Float[Array, "N"]) -> Float[Array, "N"]:  # noqa: F821
     return (6 * x - 2) ** 2 * jnp.sin(12 * x - 4)
 
 

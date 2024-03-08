@@ -30,7 +30,6 @@ import jax.random as jr
 from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import optax as ox
 from docs.examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):

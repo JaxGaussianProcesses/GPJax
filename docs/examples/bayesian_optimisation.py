@@ -403,7 +403,7 @@ initial_x = tfp.mcmc.sample_halton_sequence(
 initial_y = standardised_forrester(initial_x)
 D = gpx.Dataset(X=initial_x, y=initial_y)
 
-for i in range(bo_iters):
+for _ in range(bo_iters):
     key, subkey = jr.split(key)
 
     # Generate optimised posterior using previously observed data

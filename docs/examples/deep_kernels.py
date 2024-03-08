@@ -34,15 +34,10 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
 from scipy.signal import sawtooth
-from gpjax.base import static_field
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
-    from gpjax.base import param_field
-    import gpjax.kernels as jk
-    from gpjax.kernels import DenseKernelComputation
     from gpjax.kernels.base import AbstractKernel
-    from gpjax.kernels.computations import AbstractKernelComputation
 
 key = jr.key(123)
 plt.style.use(

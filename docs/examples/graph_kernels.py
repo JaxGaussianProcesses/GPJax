@@ -15,14 +15,12 @@ config.update("jax_enable_x64", True)
 
 import random
 
-from jax import jit
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import networkx as nx
-import optax as ox
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
