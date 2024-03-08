@@ -149,7 +149,7 @@ ignore = [
   # do not assign a lambda expression, use a def
   "E731",
   "E501",
-  "PGH001",
+  "S303",
   "RET504",
   "S101",
   "F722",
