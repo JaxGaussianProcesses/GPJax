@@ -63,36 +63,25 @@ def conjugate_mll(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
     ```
 
     Example:
-    ```python
         >>> import gpjax as gpx
-        >>>
+
         >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
         >>> ytrain = jnp.sin(xtrain)
         >>> D = gpx.Dataset(X=xtrain, y=ytrain)
-        >>>
+
         >>> meanf = gpx.mean_functions.Constant()
-        >>> kernel = gpx.kernels.RBF()
+        >>> kernel = gpx.kernels.RBF(active_dims=1)
         >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
         >>> prior = gpx.gps.Prior(mean_function = meanf, kernel=kernel)
         >>> posterior = prior * likelihood
-        >>>
-        >>> mll = gpx.objectives.ConjugateMLL(negative=True)
-        >>> mll(posterior, train_data = D)
-    ```
 
-    Our goal is to maximise the marginal log-likelihood. Therefore, when optimising
-    the model's parameters with respect to the parameters, we use the negative
-    marginal log-likelihood. This can be realised through
+        >>> gpx.objectives.conjugate_mll(posterior, D)
 
-    ```python
-        mll = gpx.objectives.ConjugateMLL(negative=True)
-    ```
+        Our goal is to maximise the marginal log-likelihood. Therefore, when optimising
+        the model's parameters with respect to the parameters, we use the negative
+        marginal log-likelihood. This can be realised through
 
-    For optimal performance, the marginal log-likelihood should be ``jax.jit``
-    compiled.
-    ```python
-        mll = jit(gpx.objectives.ConjugateMLL(negative=True))
-    ```
+        >>> nmll = lambda p, d: -gpx.objectives.conjugate_mll(p, d)
 
     Args:
         posterior (ConjugatePosterior): The posterior distribution for which
@@ -137,36 +126,25 @@ def conjugate_loocv(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat
     how the leave-one-out log predicitive probability can be evaluated.
 
     Example:
-    ```python
         >>> import gpjax as gpx
-        >>>
+        ...
         >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
         >>> ytrain = jnp.sin(xtrain)
         >>> D = gpx.Dataset(X=xtrain, y=ytrain)
-        >>>
+        ...
         >>> meanf = gpx.mean_functions.Constant()
-        >>> kernel = gpx.kernels.RBF()
+        >>> kernel = gpx.kernels.RBF(1)
         >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
         >>> prior = gpx.gps.Prior(mean_function = meanf, kernel=kernel)
         >>> posterior = prior * likelihood
-        >>>
-        >>> loocv = gpx.objectives.ConjugateLOOCV(negative=True)
-        >>> loocv(posterior, train_data = D)
-    ```
+        ...
+        >>> gpx.objectives.conjugate_loocv(posterior, D)
 
-    Our goal is to maximise the leave-one-out log predictive probability. Therefore, when
-    optimising the model's parameters with respect to the parameters, we use the negative
-    leave-one-out log predictive probability. This can be realised through
+        Our goal is to maximise the leave-one-out log predictive probability. Therefore, when
+        optimising the model's parameters with respect to the parameters, we use the negative
+        leave-one-out log predictive probability. This can be realised through
 
-    ```python
-        mll = gpx.objectives.ConjugateLOOCV(negative=True)
-    ```
-
-    For optimal performance, the objective should be ``jax.jit``
-    compiled.
-    ```python
-        mll = jit(gpx.objectives.ConjugateLOOCV(negative=True))
-    ```
+        >>> nloocv = lambda p, d: -gpx.objectives.conjugate_loocv(p, d)
 
     Args:
         posterior (ConjugatePosterior): The posterior distribution for which
