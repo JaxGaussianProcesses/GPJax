@@ -4,17 +4,13 @@ from jax import config
 config.update("jax_enable_x64", True)
 
 
-import jax
 import jax.numpy as jnp
-import jax.random as jr
 from jaxtyping import (
     Array,
     Float,
 )
-import optax as ox
 import pytest
 
-import gpjax as gpx
 from gpjax.mean_functions import (
     AbstractMeanFunction,
     Constant,

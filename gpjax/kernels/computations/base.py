@@ -22,7 +22,6 @@ from cola.ops.operators import (
     Diagonal,
     LinearOperator,
 )
-from flax.experimental import nnx
 from jax import vmap
 from jaxtyping import (
     Float,
