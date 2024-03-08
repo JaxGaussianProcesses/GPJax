@@ -42,7 +42,11 @@ from gpjax.likelihoods import (
 )
 from gpjax.lower_cholesky import lower_cholesky
 from gpjax.mean_functions import AbstractMeanFunction
-from gpjax.parameters import Static
+from gpjax.parameters import (
+    LowerTriangular,
+    Real,
+    Static,
+)
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -140,11 +144,10 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
     ):
         super().__init__(posterior, inducing_inputs, jitter)
 
-        # TODO: when is a parameter "Static" and when is it "Intermediate?"
-        self.variational_mean = Static(
+        self.variational_mean = Real(
             variational_mean or jnp.zeros((self.num_inducing, 1))
         )
-        self.variational_root_covariance = Static(
+        self.variational_root_covariance = LowerTriangular(
             variational_root_covariance or jnp.eye(self.num_inducing)
         )
 

@@ -9,87 +9,42 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 T = tp.TypeVar("T", bound=tp.Union[ArrayLike, list[float]])
 
 
-class Parameter(nnx.Variable[T]):
-    """Parameter base class."""
-
-    def __init__(self, value: T, **kwargs):
-        if not isinstance(value, (ArrayLike, list)):
-            raise TypeError(
-                f"Expected parameter value to be an array-like type. Got {type(value)}."
-            )
-        value = jnp.asarray(value)
-        super().__init__(value=value, **kwargs)
-
-
-class PositiveReal(Parameter[T]):
-    """Parameter that is strictly positive."""
-
-    def __init__(self, value: T, **kwargs):
-        value = jnp.asarray(value)
-
-        if jnp.any(value < 0):
-            raise ValueError(
-                f"Expected parameter value to be strictly positive. Got {value}."
-            )
-
-        super().__init__(value=value, **kwargs)
-
-
-class Real(Parameter[T]):
-    """Parameter that can take any real value."""
-
-
-class SigmoidBounded(Parameter[T]):
-    """Parameter that is bounded between 0 and 1."""
-
-
-class Static(nnx.Variable[T]):
-    """Parameter that does not change during training."""
-
-    def __init__(self, value: T, **kwargs):
-        if not isinstance(value, (ArrayLike, list)):
-            raise TypeError(
-                f"Expected parameter value to be an array-like type. Got {type(value)}."
-            )
-        value = jnp.asarray(value)
-        super().__init__(value=value, **kwargs)
-
-
-class TransformedParameter(Parameter[T]):
-    """Parameter that is transformed using a bijector."""
-
-    bj = tfb.Bijector
-
-    def create_value(self, value: T):
-        return self.bj.inverse(value)
-
-    def get_value(self) -> T:
-        return self.bj.forward(self.value)
-
-    def set_value(self, value: T):
-        return self.replace(value=self.bj.forward(value))
-
-
-# class SigmoidBounded(TransformedParameter[T]):
-#     bj = tfb.Sigmoid(low=0.0, high=1.0)
-
-
-# class SoftplusPositive(TransformedParameter[T]):
-#     bj = tfb.Softplus()
-
-
-DEFAULT_BIJECTION = {
-    PositiveReal: tfb.Softplus(),
-    Real: tfb.Identity(),
-    SigmoidBounded: tfb.Sigmoid(low=0.0, high=1.0),
-}
-
-
 def transform(
     params: nnx.State,
     params_bijection: tp.Dict[tp.Type, tfb.Bijector],
     inverse: bool = False,
 ):
+    r"""Transforms parameters using a bijector.
+
+    Example:
+        >>> from gpjax.parameters import PositiveReal, transform
+        >>> import jax.numpy as jnp
+        >>> import tensorflow_probability.substrates.jax.bijectors as tfb
+        >>> from flax.experimental import nnx
+        >>> params = nnx.State(
+        ...     {
+        ...         "a": PositiveReal(jnp.array([1.0])),
+        ...         "b": PositiveReal(jnp.array([2.0])),
+        ...     }
+        ... )
+        >>> params_bijection = {PositiveReal: tfb.Softplus()}
+        >>> transformed_params = transform(params, params_bijection)
+        >>> transformed_params["a"]
+        PositiveReal(
+            raw_value=Array([1.3132617],
+            dtype=float32)
+        )
+
+
+    Args:
+        params: A nnx.State object containing parameters to be transformed.
+        params_bijection: A dictionary mapping parameter types to bijectors.
+        inverse: Whether to apply the inverse transformation.
+
+    Returns:
+        A new nnx.State object containing the transformed parameters.
+    """
+
     def _inner(param: Parameter):
         bijector = params_bijection.get(type(param), tfb.Identity())
 
@@ -107,3 +62,123 @@ def transform(
         params,
         is_leaf=lambda x: isinstance(x, Parameter),
     )
+
+
+class Parameter(nnx.Variable[T]):
+    """Parameter base class.
+
+    All trainable parameters in GPJax should inherit from this class.
+
+    """
+
+    def __init__(self, value: T, **kwargs):
+        _check_is_arraylike(value)
+
+        super().__init__(value=jnp.asarray(value), **kwargs)
+
+
+class PositiveReal(Parameter[T]):
+    """Parameter that is strictly positive."""
+
+    def __init__(self, value: T, **kwargs):
+        super().__init__(value=value, **kwargs)
+
+        _check_is_positive(self.value)
+
+
+class Real(Parameter[T]):
+    """Parameter that can take any real value."""
+
+
+class SigmoidBounded(Parameter[T]):
+    """Parameter that is bounded between 0 and 1."""
+
+    def __init__(self, value: T, **kwargs):
+        super().__init__(value=value, **kwargs)
+
+        _check_in_bounds(self.value, 0.0, 1.0)
+
+
+class Static(nnx.Variable[T]):
+    """Static parameter that is not trainable."""
+
+    def __init__(self, value: T, **kwargs):
+        _check_is_arraylike(value)
+
+        super().__init__(value=jnp.asarray(value), **kwargs)
+
+
+class LowerTriangular(Parameter[T]):
+    """Parameter that is a lower triangular matrix."""
+
+    def __init__(self, value: T, **kwargs):
+        super().__init__(value=value, **kwargs)
+
+        _check_is_square(self.value)
+        _check_is_lower_triangular(self.value)
+
+
+DEFAULT_BIJECTION = {
+    PositiveReal: tfb.Softplus(),
+    Real: tfb.Identity(),
+    SigmoidBounded: tfb.Sigmoid(low=0.0, high=1.0),
+    LowerTriangular: tfb.FillTriangular(),
+}
+
+
+def _check_is_arraylike(value: T):
+    if not isinstance(value, (ArrayLike, list)):
+        raise TypeError(
+            f"Expected parameter value to be an array-like type. Got {value}."
+        )
+
+
+def _check_is_positive(value: T):
+    if jnp.any(value < 0):
+        raise ValueError(
+            f"Expected parameter value to be strictly positive. Got {value}."
+        )
+
+
+def _check_is_square(value: T):
+    if value.shape[0] != value.shape[1]:
+        raise ValueError(
+            f"Expected parameter value to be a square matrix. Got {value}."
+        )
+
+
+def _check_is_lower_triangular(value: T):
+    if not jnp.all(jnp.tril(value) == value):
+        raise ValueError(
+            f"Expected parameter value to be a lower triangular matrix. Got {value}."
+        )
+
+
+def _check_in_bounds(value: T, low: float, high: float):
+    if jnp.any((value < low) | (value > high)):
+        raise ValueError(
+            f"Expected parameter value to be bounded between {low} and {high}. Got {value}."
+        )
+
+
+# class TransformedParameter(Parameter[T]):
+#     """Parameter that is transformed using a bijector."""
+
+#     bj = tfb.Bijector
+
+#     def create_value(self, value: T):
+#         return self.bj.inverse(value)
+
+#     def get_value(self) -> T:
+#         return self.bj.forward(self.value)
+
+#     def set_value(self, value: T):
+#         return self.replace(value=self.bj.forward(value))
+
+
+# class SigmoidBounded(TransformedParameter[T]):
+#     bj = tfb.Sigmoid(low=0.0, high=1.0)
+
+
+# class SoftplusPositive(TransformedParameter[T]):
+#     bj = tfb.Softplus()
