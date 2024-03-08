@@ -41,7 +41,14 @@ tfd = tfp.distributions
 
 
 class AbstractLikelihood(nnx.Module):
-    r"""Abstract base class for likelihoods."""
+    r"""Abstract base class for likelihoods.
+
+    Attributes:
+        num_datapoints (int): The number of data points.
+        integrator (AbstractIntegrator): The integrator to be used for computing
+            expected log likelihoods.
+
+    """
 
     def __init__(
         self,
@@ -59,8 +66,7 @@ class AbstractLikelihood(nnx.Module):
             **kwargs (Any): Keyword arguments to be passed to the likelihood's
                 `predict` method.
 
-        Returns
-        -------
+        Returns:
             tfd.Distribution: The predictive distribution.
         """
         return self.predict(*args, **kwargs)
@@ -74,8 +80,7 @@ class AbstractLikelihood(nnx.Module):
             **kwargs (Any): Keyword arguments to be passed to the likelihood's
                 `predict` method.
 
-        Returns
-        -------
+        Returns:
             tfd.Distribution: The predictive distribution.
         """
         raise NotImplementedError
@@ -84,8 +89,10 @@ class AbstractLikelihood(nnx.Module):
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         r"""Return the link function of the likelihood function.
 
-        Returns
-        -------
+        Args:
+            f (Float[Array, "..."]): the latent Gaussian process values.
+
+        Returns:
             tfd.Distribution: The distribution of observations, y, given values of the
                 Gaussian process, f.
         """

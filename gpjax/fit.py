@@ -22,7 +22,7 @@ from jax.flatten_util import ravel_pytree
 import jax.numpy as jnp
 import jax.random as jr
 import optax as ox
-import scipy
+from scipy.optimize import minimize
 from tensorflow_probability.substrates.jax.bijectors import Bijector
 
 from gpjax.dataset import Dataset
@@ -61,39 +61,36 @@ def fit(  # noqa: PLR0913
     Optimisers used here should originate from Optax.
 
     Example:
-    ```python
-    >>> import jax.numpy as jnp
-    >>> import jax.random as jr
-    >>> import jax.random as jr
-    >>> import optax as ox
-    >>> import gpjax as gpx
-    >>> from gpjax.parameters import Parameter, Static
-    ...
-    >>> # (1) Create a dataset:
-    >>> X = jnp.linspace(0.0, 10.0, 100)[:, None]
-    >>> y = 2.0 * X + 1.0 + 10 * jr.normal(jr.PRNGKey(0), X.shape)
-    >>> D = gpx.Dataset(X, y)
-    >>> # (2) Define your model:
-    >>> class LinearModel(nnx.Module):
-    ...     def __init__(self, weight: float, bias: float):
-    ...         self.weight = Parameter(weight)
-    ...         self.bias = Static(bias)
-    ...
-    ...     def __call__(self, x):
-    ...         return self.weight * x + self.bias
-    ...
-    >>> model = LinearModel(weight=1.0, bias=1.0)
-    ...
-    >>> # (3) Define your loss function:
-    >>> def mse(model, data):
-    ...     pred = model(data.X)
-    ...     return jnp.mean((pred - data.y) ** 2)
-    ...
-    >>> # (4) Train!
-    >>> trained_model, history = gpx.fit(
-    ...     model=model, objective=mse, train_data=D, optim=ox.sgd(0.001), num_iters=1000
-    ... )
-    ```
+        >>> import jax.numpy as jnp
+        >>> import jax.random as jr
+        >>> import optax as ox
+        >>> import gpjax as gpx
+        >>> from gpjax.parameters import Parameter, Static
+        ...
+        >>> # (1) Create a dataset:
+        >>> X = jnp.linspace(0.0, 10.0, 100)[:, None]
+        >>> y = 2.0 * X + 1.0 + 10 * jr.normal(jr.PRNGKey(0), X.shape)
+        >>> D = gpx.Dataset(X, y)
+        >>> # (2) Define your model:
+        >>> class LinearModel(nnx.Module):
+        ...     def __init__(self, weight: float, bias: float):
+        ...         self.weight = Parameter(weight)
+        ...         self.bias = Static(bias)
+        ...
+        ...     def __call__(self, x):
+        ...         return self.weight.value * x + self.bias.value
+        ...
+        >>> model = LinearModel(weight=1.0, bias=1.0)
+        ...
+        >>> # (3) Define your loss function:
+        >>> def mse(model, data):
+        ...     pred = model(data.X)
+        ...     return jnp.mean((pred - data.y) ** 2)
+        ...
+        >>> # (4) Train!
+        >>> trained_model, history = gpx.fit(
+        ...     model=model, objective=mse, train_data=D, optim=ox.sgd(0.001), num_iters=1000
+        ... )
 
 
     Args:
@@ -116,8 +113,7 @@ def fit(  # noqa: PLR0913
         unroll (int): The number of unrolled steps to use for the optimisation.
             Defaults to 1.
 
-    Returns
-    -------
+    Returns:
         Tuple[Model, Array]: A Tuple comprising the optimised model and training
             history respectively.
     """
@@ -205,8 +201,7 @@ def fit_scipy(  # noqa: PLR0913
         verbose (bool): Whether to print the information about the optimisation. Defaults
             to True.
 
-    Returns
-    -------
+    Returns:
         Tuple[Model, Array]: A Tuple comprising the optimised model and training
             history respectively.
     """
@@ -239,7 +234,7 @@ def fit_scipy(  # noqa: PLR0913
         return value, scipy_grads
 
     history = [scipy_wrapper(x0)[0]]
-    result = scipy.optimize.minimize(
+    result = minimize(
         fun=scipy_wrapper,
         x0=x0,
         jac=True,
