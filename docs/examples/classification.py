@@ -122,10 +122,11 @@ optimiser = ox.adam(learning_rate=0.01)
 
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=gpx.objectives.log_posterior_density,
+    # we use the negative lpd as we are minimising
+    objective=lambda p, d: -gpx.objectives.log_posterior_density(p, d),
     train_data=D,
     optim=ox.adamw(learning_rate=0.01),
-    num_iters=50,
+    num_iters=1000,
     key=key,
 )
 
@@ -166,7 +167,7 @@ ax.plot(
 )
 
 ax.legend()
-
+plt.savefig("fit.png")
 # %% [markdown]
 # Here we projected the map estimates $\hat{\boldsymbol{f}}$ for the function values
 # $\boldsymbol{f}$ at the data points $\boldsymbol{x}$ to get predictions over the
@@ -350,16 +351,18 @@ ax.legend()
 # drawing more samples will be necessary.
 
 # %%
-num_adapt = 500
-num_samples = 500
+num_adapt = 600
+num_samples = 600
 
 params, *static_state, graphdef = posterior.split(gpx.parameters.Parameter, ...)
 params_bijection = gpx.parameters.DEFAULT_BIJECTION
-params = gpx.parameters.transform(params, params_bijection)
+
+# Transform the parameters to the unconstrained space
+params = gpx.parameters.transform(params, params_bijection, inverse=True)
 
 
 def logprob_fn(params):
-    params = gpx.parameters.transform(params, params_bijection, inverse=True)
+    params = gpx.parameters.transform(params, params_bijection)
     model = graphdef.merge(params, *static_state)
     return gpx.objectives.log_posterior_density(model, D)
 
@@ -384,7 +387,7 @@ def inference_loop(rng_key, kernel, initial_state, num_samples):
         return state, (state, info)
 
     keys = jax.random.split(rng_key, num_samples)
-    _, (states, infos) = jax.lax.scan(one_step, initial_state, keys)
+    _, (states, infos) = jax.lax.scan(one_step, initial_state, keys, unroll=10)
 
     return states, infos
 
@@ -425,6 +428,7 @@ ax2.plot(states.position.latent.value[:, 1, :])
 ax0.set_title("Kernel Lengthscale")
 ax1.set_title("Kernel Variance")
 ax2.set_title("Latent Function (index = 1)")
+plt.savefig("trace_plots.png")
 
 # %% [markdown]
 # ## Prediction
@@ -447,6 +451,7 @@ posterior_samples = []
 
 for i in trange(0, num_samples, thin_factor, desc="Drawing posterior samples"):
     sample_params = jtu.tree_map(lambda samples, i=i: samples[i], states.position)
+    sample_params = gpx.parameters.transform(sample_params, params_bijection)
     model = graphdef.merge(sample_params, *static_state)
     latent_dist = model.predict(xtest, train_data=D)
     predictive_dist = model.likelihood(latent_dist)
@@ -488,6 +493,7 @@ ax.plot(
     linewidth=1,
 )
 ax.legend()
+plt.savefig("mcmc_fit.png")
 
 # %% [markdown]
 # ## System configuration

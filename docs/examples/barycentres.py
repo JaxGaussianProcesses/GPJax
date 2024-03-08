@@ -137,14 +137,15 @@ def fit_gp(x: jax.Array, y: jax.Array) -> tfd.MultivariateNormalFullCovariance:
     likelihood = gpx.likelihoods.Gaussian(num_datapoints=n)
     posterior = (
         gpx.gps.Prior(
-            mean_function=gpx.mean_functions.Constant(), kernel=gpx.kernels.RBF()
+            mean_function=gpx.mean_functions.Constant(), kernel=gpx.kernels.RBF(1)
         )
         * likelihood
     )
 
+    nmll = lambda p, d: -gpx.objectives.conjugate_mll(p, d)
     opt_posterior, _ = gpx.fit_scipy(
         model=posterior,
-        objective=gpx.objectives.ConjugateMLL(negative=True),
+        objective=nmll,
         train_data=D,
     )
     latent_dist = opt_posterior.predict(xtest, train_data=D)
@@ -205,7 +206,7 @@ step_fn = jax.jit(wasserstein_barycentres(posterior_preds, weights))
 initial_covariance = jnp.eye(n_test)
 
 barycentre_covariance, sequence = jax.lax.scan(
-    step_fn, initial_covariance, jnp.arange(100)
+    step_fn, initial_covariance, jnp.arange(50)
 )
 L = jnp.linalg.cholesky(barycentre_covariance)
 
