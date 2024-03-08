@@ -38,7 +38,6 @@ from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
-from docs.examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -107,7 +106,7 @@ plt.show()
 
 # %%
 meanf = gpx.mean_functions.Constant()
-kernel = gpx.kernels.RBF()
+kernel = gpx.kernels.RBF(active_dims=1)  # 1-dimensional inputs
 likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
 prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 posterior = prior * likelihood
@@ -124,29 +123,6 @@ q = gpx.variational_families.CollapsedVariationalGaussian(
 )
 
 # %% [markdown]
-# We define our variational inference algorithm through `CollapsedVI`. This defines
-# the collapsed variational free energy bound considered in
-# <strong data-cite="titsias2009">Titsias (2009)</strong>.
-
-# %%
-elbo = gpx.objectives.CollapsedELBO(negative=True)
-
-# %% [markdown]
-# For researchers, GPJax has the capacity to print the bibtex citation for objects such
-# as the ELBO through the `cite()` function.
-
-# %%
-print(gpx.cite(elbo))
-
-# %% [markdown]
-# JIT-compiling expensive-to-compute functions such as the ELBO is
-# advisable. This can be achieved by wrapping the function in `jax.jit()`.
-
-# %%
-
-elbo = jit(elbo)
-
-# %% [markdown]
 # We now train our model akin to a Gaussian process regression model via the `fit`
 # abstraction. Unlike the regression example given in the
 # [conjugate regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/),
@@ -157,7 +133,8 @@ elbo = jit(elbo)
 # %%
 opt_posterior, history = gpx.fit(
     model=q,
-    objective=elbo,
+    # we want want to minimize the *negative* ELBO
+    objective=lambda p, d: -gpx.objectives.collapsed_elbo(p, d),
     train_data=D,
     optim=ox.adamw(learning_rate=1e-2),
     num_iters=500,
@@ -176,7 +153,7 @@ ax.set(xlabel="Training iterate", ylabel="ELBO")
 latent_dist = opt_posterior(xtest, train_data=D)
 predictive_dist = opt_posterior.posterior.likelihood(latent_dist)
 
-inducing_points = opt_posterior.inducing_inputs
+inducing_points = opt_posterior.inducing_inputs.value
 
 samples = latent_dist.sample(seed=key, sample_shape=(20,))
 
@@ -244,17 +221,17 @@ plt.show()
 
 # %%
 full_rank_model = gpx.gps.Prior(
-    mean_function=gpx.mean_functions.Zero(), kernel=gpx.kernels.RBF()
+    mean_function=gpx.mean_functions.Zero(), kernel=gpx.kernels.RBF(1)
 ) * gpx.likelihoods.Gaussian(num_datapoints=D.n)
-negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True).step)
-# %timeit negative_mll(full_rank_model, D).block_until_ready()
+nmll = jit(lambda: -gpx.objectives.conjugate_mll(full_rank_model, D))
+# %timeit nmll().block_until_ready()
 
 # %%
-negative_elbo = jit(gpx.objectives.CollapsedELBO(negative=True).step)
-# %timeit negative_elbo(q, D).block_until_ready()
+nelbo = jit(lambda: -gpx.objectives.collapsed_elbo(q, D))
+# %timeit nelbo().block_until_ready()
 
 # %% [markdown]
-# As we can see, the sparse approximation given here is around 50 times faster when
+# As we can see, the sparse approximation given here is much faster when
 # compared against a full-rank model.
 
 # %% [markdown]

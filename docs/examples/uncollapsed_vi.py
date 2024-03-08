@@ -204,7 +204,8 @@ ax.set(xlabel=r"$x$", ylabel=r"$f(x)$")
 # %%
 meanf = gpx.mean_functions.Zero()
 likelihood = gpx.likelihoods.Gaussian(num_datapoints=n)
-prior = gpx.gps.Prior(mean_function=meanf, kernel=jk.RBF())
+kernel = jk.RBF(active_dims=1)  # 1-dimensional inputs
+prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 p = prior * likelihood
 q = gpx.variational_families.VariationalGaussian(posterior=p, inducing_inputs=z)
 
@@ -228,25 +229,6 @@ q = gpx.variational_families.VariationalGaussian(posterior=p, inducing_inputs=z)
 # see Sections 3.1 and 4.1 of the excellent review paper
 # <strong data-cite="leibfried2020tutorial"></strong>.
 #
-# Since Optax's optimisers work to minimise functions, to maximise the ELBO we return
-# its negative.
-
-# %%
-negative_elbo = gpx.objectives.ELBO(negative=True)
-
-# %% [markdown]
-# For researchers, GPJax has the capacity to print the bibtex citation for objects such
-# as the ELBO through the `cite()` function.
-
-# %%
-print(gpx.cite(negative_elbo))
-
-# %% [markdown]
-# JIT-compiling expensive-to-compute functions such as the ELBO is
-# advisable. This can be achieved by wrapping the function in `jax.jit()`.
-
-# %%
-negative_elbo = jit(negative_elbo)
 
 # %% [markdown]
 # ### Mini-batching
@@ -258,15 +240,16 @@ negative_elbo = jit(negative_elbo)
 # %%
 schedule = ox.warmup_cosine_decay_schedule(
     init_value=0.0,
-    peak_value=0.01,
+    peak_value=0.02,
     warmup_steps=75,
-    decay_steps=1500,
+    decay_steps=2000,
     end_value=0.001,
 )
 
 opt_posterior, history = gpx.fit(
     model=q,
-    objective=negative_elbo,
+    # we are minimizing the elbo so we negate it
+    objective=lambda p, d: -gpx.objectives.elbo(p, d),
     train_data=D,
     optim=ox.adam(learning_rate=schedule),
     num_iters=3000,
@@ -301,7 +284,7 @@ ax.fill_between(
     label="Two sigma",
 )
 ax.vlines(
-    opt_posterior.inducing_inputs,
+    opt_posterior.inducing_inputs.value,
     ymin=y.min(),
     ymax=y.max(),
     alpha=0.3,
@@ -314,24 +297,25 @@ ax.legend()
 # %% [markdown]
 # ## Custom transformations
 #
-# To train a covariance matrix, GPJax uses `tfb.FillScaleTriL` transformation by
-# default. `tfb.FillScaleTriL` fills a 1d vector into a lower triangular matrix and
-# then applies `Softplus` transformation on the diagonal to satisfy the necessary
-# conditions for a valid Cholesky matrix. Users can change this default transformation
+# To train a covariance matrix, GPJax uses `tfb.FillTriangular` transformation by
+# default. `tfb.FillTriangular` fills a 1d vector into a lower triangular matrix.
+# Users can change this default transformation
 # with another valid transformation of their choice. For example, `Square`
 # transformation on the diagonal can also serve the purpose.
 
 # %%
-triangular_transform = tfb.FillScaleTriL(
+
+params_bijection = gpx.parameters.DEFAULT_BIJECTION.copy()
+params_bijection[gpx.parameters.LowerTriangular] = tfb.FillScaleTriL(
     diag_bijector=tfb.Square(), diag_shift=jnp.array(q.jitter)
 )
-reparameterised_q = q.replace_bijector(variational_root_covariance=triangular_transform)
 
 # %%
 opt_rep, history = gpx.fit(
-    model=reparameterised_q,
-    objective=negative_elbo,
+    model=q,
+    objective=lambda p, d: -gpx.objectives.elbo(p, d),
     train_data=D,
+    params_bijection=params_bijection,
     optim=ox.adam(learning_rate=0.01),
     num_iters=3000,
     key=jr.key(42),
@@ -358,7 +342,7 @@ ax.fill_between(
     label="Two sigma",
 )
 ax.vlines(
-    opt_rep.inducing_inputs,
+    opt_rep.inducing_inputs.value,
     ymin=y.min(),
     ymax=y.max(),
     alpha=0.3,
