@@ -46,7 +46,7 @@ black = "^23.1.0"
 isort = "^5.12.0"
 pylint = "^2.17.1"
 nox = "^2022.11.21"
-ruff = "^0.0.259"
+ruff = "^0.3.0"
 pre-commit = "^3.2.2"
 nbstripout = "^0.6.1"
 pydocstyle = "^6.3.0"
@@ -108,12 +108,12 @@ xfail_strict = true
 [tool.ruff] # https://github.com/charliermarsh/ruff
 fix = true
 cache-dir = "~/.cache/ruff"
-dummy-variable-rgx = "^_$"
-exclude = ["docs/"]
-ignore-init-module-imports = true
 line-length = 88
+src = ["gpjax", "tests"]
+target-version = "py38"
+
+[tool.ruff.lint]
 select = [
-  # pyflakes
   "F",
   # pycodestyle
   "E",
@@ -155,13 +155,14 @@ ignore = [
   "PLR0913",
 ]
 unfixable = ["ERA001", "F401", "F841", "T201", "T203"]
-src = ["gpjax", "tests"]
-target-version = "py38"
+exclude = ["docs/"]
+ignore-init-module-imports = true
+dummy-variable-rgx = "^_$"
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "gpjax/__init__.py" = ['I', 'F401', 'E402', 'D104']
 "gpjax/progress_bar.py" = ["TCH004"]
 "gpjax/scan.py" = ["PLR0913"]
