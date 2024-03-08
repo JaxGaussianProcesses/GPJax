@@ -17,7 +17,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
 import pandas as pd
-from docs.examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -197,7 +196,7 @@ for k, ax in zip(kernels, axes.ravel()):
 
 # %%
 # Forrester function
-def forrester(x: Float[Array, "N"]) -> Float[Array, "N"]:
+def forrester(x: Float[Array, "N"]) -> Float[Array, "N"]:  # noqa: F821
     return (6 * x - 2) ** 2 * jnp.sin(12 * x - 4)
 
 
@@ -249,15 +248,22 @@ opt_posterior, history = gpx.fit_scipy(
 # with the optimised hyperparameters, and compare them to the predictions made using the
 # posterior with the default hyperparameters:
 
+
 # %%
 def plot_ribbon(ax, x, dist, color):
     mean = dist.mean()
     std = dist.stddev()
     ax.plot(x, mean, label="Predictive mean", color=color)
-    ax.fill_between(x.squeeze(), mean - 2 * std, mean + 2 * std, alpha=0.2, label="Two sigma", color=color)
+    ax.fill_between(
+        x.squeeze(),
+        mean - 2 * std,
+        mean + 2 * std,
+        alpha=0.2,
+        label="Two sigma",
+        color=color,
+    )
     ax.plot(x, mean - 2 * std, linestyle="--", linewidth=1, color=color)
     ax.plot(x, mean + 2 * std, linestyle="--", linewidth=1, color=color)
-
 
 
 # %%

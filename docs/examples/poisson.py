@@ -200,7 +200,7 @@ thin_factor = 10
 samples = []
 
 for i in range(num_adapt, num_samples + num_adapt, thin_factor):
-    sample = jtu.tree_map(lambda samples: samples[i], states.position)
+    sample = jtu.tree_map(lambda samples: samples[i], states.position)  # noqa: B023
     sample = sample.constrain()
     latent_dist = sample.predict(xtest, train_data=D)
     predictive_dist = sample.likelihood(latent_dist)

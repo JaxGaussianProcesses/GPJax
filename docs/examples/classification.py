@@ -43,7 +43,6 @@ from jaxtyping import (
 )
 import matplotlib.pyplot as plt
 import optax as ox
-from flax.experimental import nnx
 import tensorflow_probability.substrates.jax as tfp
 from tqdm import trange
 

@@ -28,7 +28,6 @@ from jax import config
 config.update("jax_enable_x64", True)
 
 from dataclasses import dataclass
-from typing import Dict
 
 from jax import jit
 import jax.numpy as jnp
@@ -39,13 +38,10 @@ from jaxtyping import (
     install_import_hook,
 )
 import matplotlib.pyplot as plt
-import numpy as np
-from simple_pytree import static_field
 import tensorflow_probability.substrates.jax as tfp
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
-    from gpjax.base.param import param_field
 
 key = jr.PRNGKey(123)
 tfb = tfp.bijectors
