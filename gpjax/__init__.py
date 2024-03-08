@@ -12,8 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+from warnings import filterwarnings
+
+from beartype.roar import BeartypeDecorHintPep585DeprecationWarning
+
+filterwarnings("ignore", category=BeartypeDecorHintPep585DeprecationWarning)
+
 from gpjax import (
-    base,
     decision_making,
     gps,
     integrators,
@@ -21,11 +26,8 @@ from gpjax import (
     likelihoods,
     mean_functions,
     objectives,
+    parameters,
     variational_families,
-)
-from gpjax.base import (
-    Module,
-    param_field,
 )
 from gpjax.citation import cite
 from gpjax.dataset import Dataset
@@ -49,6 +51,7 @@ __all__ = [
     "likelihoods",
     "mean_functions",
     "objectives",
+    "parameters",
     "variational_families",
     "Dataset",
     "cite",

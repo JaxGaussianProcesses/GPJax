@@ -13,42 +13,33 @@
 # limitations under the License.
 # ==============================================================================
 
-
-from dataclasses import dataclass
-
-from beartype.typing import Union
+import beartype.typing as tp
 import jax.numpy as jnp
 from jaxtyping import (
     Float,
     Int,
     Num,
 )
-import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.base import (
-    param_field,
-    static_field,
-)
-from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
     EigenKernelComputation,
 )
 from gpjax.kernels.non_euclidean.utils import jax_gather_nd
+from gpjax.kernels.stationary.base import StationaryKernel
+from gpjax.parameters import (
+    Parameter,
+    PositiveReal,
+    Static,
+)
 from gpjax.typing import (
     Array,
     ScalarFloat,
     ScalarInt,
 )
 
-tfb = tfp.bijectors
 
-
-##########################################
-# Graph kernels
-##########################################
-@dataclass
-class GraphKernel(AbstractKernel):
+class GraphKernel(StationaryKernel):
     r"""The Matérn graph kernel defined on the vertex set of a graph.
 
     A Matérn graph kernel defined on the vertices of a graph. The key reference
@@ -59,26 +50,33 @@ class GraphKernel(AbstractKernel):
             of a graph.
     """
 
-    laplacian: Union[Num[Array, "N N"], None] = static_field(None)
-    lengthscale: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    smoothness: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    eigenvalues: Union[Float[Array, "N 1"], None] = static_field(None)
-    eigenvectors: Union[Float[Array, "N N"], None] = static_field(None)
-    num_vertex: Union[ScalarInt, None] = static_field(None)
-    compute_engine: AbstractKernelComputation = static_field(
-        EigenKernelComputation(), repr=False
-    )
+    num_vertex: tp.Union[ScalarInt, None]
+    laplacian: Static[Float[Array, "N N"]]
+    eigenvalues: Static[Float[Array, "N 1"]]
+    eigenvectors: Static[Float[Array, "N N"]]
     name: str = "Graph Matérn"
 
-    def __post_init__(self):
-        if self.laplacian is None:
-            raise ValueError("Graph laplacian must be specified")
+    def __init__(
+        self,
+        laplacian: Num[Array, "N N"],
+        active_dims: tp.Union[list[int], int, slice],
+        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
+        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
+        smoothness: ScalarFloat = 1.0,
+        compute_engine: AbstractKernelComputation = EigenKernelComputation(),
+    ):
+        if isinstance(smoothness, Parameter):
+            self.smoothness = smoothness
+        else:
+            self.smoothness = PositiveReal(smoothness)
 
-        evals, self.eigenvectors = jnp.linalg.eigh(self.laplacian)
-        self.eigenvalues = evals.reshape(-1, 1)
-        if self.num_vertex is None:
-            self.num_vertex = self.eigenvalues.shape[0]
+        self.laplacian = Static(laplacian)
+        evals, eigenvectors = jnp.linalg.eigh(self.laplacian.value)
+        self.eigenvectors = Static(eigenvectors)
+        self.eigenvalues = Static(evals.reshape(-1, 1))
+        self.num_vertex = self.eigenvalues.value.shape[0]
+
+        super().__init__(active_dims, lengthscale, variance, compute_engine)
 
     def __call__(  # TODO not consistent with general kernel interface
         self,
@@ -101,7 +99,7 @@ class GraphKernel(AbstractKernel):
         -------
             ScalarFloat: The value of $k(v_i, v_j)$.
         """
-        Kxx = (jax_gather_nd(self.eigenvectors, x) * S.squeeze()) @ jnp.transpose(
-            jax_gather_nd(self.eigenvectors, y)
+        Kxx = (jax_gather_nd(self.eigenvectors.value, x) * S.squeeze()) @ jnp.transpose(
+            jax_gather_nd(self.eigenvectors.value, y)
         )  # shape (n,n)
         return Kxx.squeeze()

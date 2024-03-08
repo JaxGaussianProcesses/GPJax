@@ -13,24 +13,29 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
-from beartype.typing import Union
+import beartype.typing as tp
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import param_field
-from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import euclidean_distance
+from gpjax.parameters import SigmoidBounded
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
 )
 
+Lengthscale = tp.Union[Float[Array, "D"], ScalarArray]
+LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 
-@dataclass
-class PoweredExponential(AbstractKernel):
+
+class PoweredExponential(StationaryKernel):
     r"""The powered exponential family of kernels. This also equivalent to the symmetric generalized normal distribution.
 
     See Diggle and Ribeiro (2007) - "Model-based Geostatistics".
@@ -39,14 +44,26 @@ class PoweredExponential(AbstractKernel):
 
     """
 
-    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
-    )
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    power: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Sigmoid())
     name: str = "Powered Exponential"
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], int, slice],
+        lengthscale: tp.Union[LengthscaleCompatible, nnx.Variable[Lengthscale]] = 1.0,
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        power: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        if isinstance(power, nnx.Variable):
+            self.power = power
+        else:
+            self.power = SigmoidBounded(power)
+
+        super().__init__(active_dims, lengthscale, variance, compute_engine)
+
+    def __call__(
+        self, x: Float[Array, " D"], y: Float[Array, " D"]
+    ) -> Float[Array, ""]:
         r"""Compute the Powered Exponential kernel between a pair of arrays.
 
         Evaluate the kernel on a pair of inputs $`(x, y)`$ with length-scale parameter
@@ -63,7 +80,9 @@ class PoweredExponential(AbstractKernel):
         -------
             ScalarFloat: The value of $`k(x, y)`$.
         """
-        x = self.slice_input(x) / self.lengthscale
-        y = self.slice_input(y) / self.lengthscale
-        K = self.variance * jnp.exp(-euclidean_distance(x, y) ** self.power)
+        x = self.slice_input(x) / self.lengthscale.value
+        y = self.slice_input(y) / self.lengthscale.value
+        K = self.variance.value * jnp.exp(
+            -(euclidean_distance(x, y) ** self.power.value)
+        )
         return K.squeeze()

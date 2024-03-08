@@ -80,18 +80,14 @@ def vscan(
     This is based on code from this [excellent blog post](https://www.jeremiecoullon.com/2021/01/29/jax_progress_bar/).
 
     Example:
-    ```python
         >>> import jax.numpy as jnp
-        >>>
+        ...
         >>> def f(carry, x):
-                return carry + x, carry + x
+        ...     return carry + x, carry + x
         >>> init = 0
         >>> xs = jnp.arange(10)
         >>> vscan(f, init, xs)
-    ```
-    ```console
-        (45, DeviceArray([ 0,  1,  3,  6, 10, 15, 21, 28, 36, 45], dtype=int32))
-    ```
+        (Array(45, dtype=int32), Array([ 0,  1,  3,  6, 10, 15, 21, 28, 36, 45], dtype=int32))
 
     Args:
         f (Callable[[Carry, X], Tuple[Carry, Y]]): A function that takes in a carry and

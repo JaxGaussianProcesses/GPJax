@@ -1,29 +1,28 @@
-from dataclasses import dataclass
 import typing as tp
 
-import jax.numpy as jnp
-from jaxtyping import Float
-
-from gpjax.kernels.computations.base import AbstractKernelComputation
-from gpjax.typing import Array
-
-Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
-
-from cola import PSD
-from cola.ops import (
+from cola.annotations import PSD
+from cola.ops.operators import (
     Dense,
     LinearOperator,
 )
+import jax.numpy as jnp
+from jaxtyping import Float
+
+import gpjax
+from gpjax.kernels.computations.base import AbstractKernelComputation
+from gpjax.typing import Array
+
+K = tp.TypeVar("K", bound="gpjax.kernels.approximations.RFF")  # noqa: F821
+
 
 # TODO: Use low rank linear operator!
 
 
-@dataclass
 class BasisFunctionComputation(AbstractKernelComputation):
     r"""Compute engine class for finite basis function approximations to a kernel."""
 
     def cross_covariance(
-        self, kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"]
+        self, kernel: K, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
         r"""Compute an approximate cross-covariance matrix.
 
@@ -41,7 +40,7 @@ class BasisFunctionComputation(AbstractKernelComputation):
         z2 = self.compute_features(kernel, y)
         return self.scaling(kernel) * jnp.matmul(z1, z2.T)
 
-    def gram(self, kernel: Kernel, inputs: Float[Array, "N D"]) -> LinearOperator:
+    def gram(self, kernel: K, inputs: Float[Array, "N D"]) -> LinearOperator:
         r"""Compute an approximate Gram matrix.
 
         For the Gram matrix, we can save computations by computing only one matrix
@@ -59,7 +58,7 @@ class BasisFunctionComputation(AbstractKernelComputation):
         return PSD(Dense(self.scaling(kernel) * jnp.matmul(z1, z1.T)))
 
     def compute_features(
-        self, kernel: Kernel, x: Float[Array, "N D"]
+        self, kernel: K, x: Float[Array, "N D"]
     ) -> Float[Array, "N L"]:
         r"""Compute the features for the inputs.
 
@@ -71,13 +70,13 @@ class BasisFunctionComputation(AbstractKernelComputation):
         -------
             Float[Array, "N L"]: A $`N \times L`$ array of features where $`L = 2M`$.
         """
-        frequencies = kernel.frequencies
-        scaling_factor = kernel.base_kernel.lengthscale
+        frequencies = kernel.frequencies.value
+        scaling_factor = kernel.base_kernel.lengthscale.value
         z = jnp.matmul(x, (frequencies / scaling_factor).T)
         z = jnp.concatenate([jnp.cos(z), jnp.sin(z)], axis=-1)
         return z
 
-    def scaling(self, kernel: Kernel):
+    def scaling(self, kernel: K):
         r"""Compute the scaling factor for the covariance matrix.
 
         Args:
@@ -87,4 +86,4 @@ class BasisFunctionComputation(AbstractKernelComputation):
         -------
             Float[Array, ""]: A scalar array.
         """
-        return kernel.base_kernel.variance / kernel.num_basis_fns
+        return kernel.base_kernel.variance.value / kernel.num_basis_fns

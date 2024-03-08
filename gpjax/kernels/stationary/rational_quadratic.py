@@ -13,30 +13,44 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
-from beartype.typing import Union
-import jax.numpy as jnp
+import beartype.typing as tp
+from flax.experimental import nnx
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import param_field
-from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import squared_distance
+from gpjax.parameters import PositiveReal
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
 )
 
+Lengthscale = tp.Union[Float[Array, "D"], ScalarArray]
+LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 
-@dataclass
-class RationalQuadratic(AbstractKernel):
-    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
-    )
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    alpha: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+
+class RationalQuadratic(StationaryKernel):
     name: str = "Rational Quadratic"
+
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], int, slice],
+        lengthscale: tp.Union[LengthscaleCompatible, nnx.Variable[Lengthscale]] = 1.0,
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        alpha: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        if isinstance(alpha, nnx.Variable):
+            self.alpha = alpha
+        else:
+            self.alpha = PositiveReal(alpha)
+
+        super().__init__(active_dims, lengthscale, variance, compute_engine)
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the Powered Exponential kernel between a pair of arrays.
@@ -54,9 +68,9 @@ class RationalQuadratic(AbstractKernel):
         Returns:
             ScalarFloat: The value of $`k(x, y)`$.
         """
-        x = self.slice_input(x) / self.lengthscale
-        y = self.slice_input(y) / self.lengthscale
-        K = self.variance * (1 + 0.5 * squared_distance(x, y) / self.alpha) ** (
-            -self.alpha
-        )
+        x = self.slice_input(x) / self.lengthscale.value
+        y = self.slice_input(y) / self.lengthscale.value
+        K = self.variance.value * (
+            1 + 0.5 * squared_distance(x, y) / self.alpha.value
+        ) ** (-self.alpha.value)
         return K.squeeze()

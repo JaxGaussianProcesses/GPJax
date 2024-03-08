@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
 from dataclasses import dataclass
 import warnings
 
 from beartype.typing import Optional
+import jax
 import jax.numpy as jnp
 from jaxtyping import Num
-from simple_pytree import Pytree
 
 from gpjax.typing import Array
 
 
 @dataclass
-class Dataset(Pytree):
+@jax.tree_util.register_pytree_node_class
+class Dataset:
     r"""Base class for datasets.
 
     Attributes
@@ -45,7 +45,7 @@ class Dataset(Pytree):
 
     def __repr__(self) -> str:
         r"""Returns a string representation of the dataset."""
-        repr = f"- Number of observations: {self.n}\n- Input dimension: {self.in_dim}"
+        repr = f"Dataset(Number of observations: {self.n:=} - Input dimension: {self.in_dim})"
         return repr
 
     def is_supervised(self) -> bool:
@@ -78,6 +78,13 @@ class Dataset(Pytree):
     def in_dim(self) -> int:
         r"""Dimension of the inputs, $`X`$."""
         return self.X.shape[1]
+
+    def tree_flatten(self):
+        return (self.X, self.y), None
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children):
+        return cls(*children)
 
 
 def _check_shape(

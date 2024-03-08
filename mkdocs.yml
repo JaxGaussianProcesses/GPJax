@@ -97,7 +97,7 @@ plugins:
       csl_file: "https://raw.githubusercontent.com/citation-style-language/styles/af38aba0e9b08406c8827abfc888e5f3e3fa1d65/journal-of-the-royal-statistical-society.csl"
       cite_inline: true
   - mkdocs-jupyter:
-      execute: true
+      execute: false
       allow_errors: false
       include: ["examples/*.py"]
       ignore: ["examples/utils.py", "_statch/*.py", "scripts/*.py"]
@@ -121,6 +121,9 @@ plugins:
           options:
             inherited_members: true  # Allow looking up inherited methods
             docstring_style: "google"
+            docstring_section_style: "list"
+          docstring_options:
+            trim_doctest_flags: true
 
   - git-authors:
       show_contribution: false

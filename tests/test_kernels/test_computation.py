@@ -1,11 +1,12 @@
 import cola
-from cola.ops import (
+from cola.ops.operators import (
     Dense,
     Diagonal,
 )
 import jax.numpy as jnp
 import pytest
 
+from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
     ConstantDiagonalKernelComputation,
     DiagonalKernelComputation,
@@ -28,18 +29,18 @@ from gpjax.kernels.stationary import (
 @pytest.mark.parametrize(
     "kernel",
     [
-        RBF(),
-        Matern12(),
-        Matern32(),
-        Matern52(),
-        RationalQuadratic(),
-        PoweredExponential(),
-        Periodic(),
-        Linear(),
-        Polynomial(),
+        RBF(1),
+        Matern12(1),
+        Matern32(1),
+        Matern52(1),
+        RationalQuadratic(1),
+        PoweredExponential(1),
+        Periodic(1),
+        Linear(1),
+        Polynomial(1),
     ],
 )
-def test_change_computation(kernel):
+def test_change_computation(kernel: AbstractKernel):
     x = jnp.linspace(-3.0, 3.0, 5).reshape(-1, 1)
 
     # The default computation is DenseKernelComputation
@@ -51,7 +52,7 @@ def test_change_computation(kernel):
     assert cola.PSD in dense_linop.annotations
 
     # Let's now change the computation to DiagonalKernelComputation
-    kernel = kernel.replace(compute_engine=DiagonalKernelComputation())
+    kernel.compute_engine = DiagonalKernelComputation()
     diagonal_linop = kernel.gram(x)
     diagonal_matrix = diagonal_linop.to_dense()
     diag_entries = jnp.diag(diagonal_matrix)
@@ -66,7 +67,7 @@ def test_change_computation(kernel):
     assert jnp.allclose(diagonal_matrix - jnp.diag(diag_entries), 0.0)
 
     # Let's now change the computation to ConstantDiagonalKernelComputation
-    kernel = kernel.replace(compute_engine=ConstantDiagonalKernelComputation())
+    kernel.compute_engine = ConstantDiagonalKernelComputation()
     constant_diagonal_linop = kernel.gram(x)
     constant_diagonal_matrix = constant_diagonal_linop.to_dense()
     constant_entries = jnp.diag(constant_diagonal_matrix)

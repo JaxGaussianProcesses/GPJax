@@ -13,33 +13,53 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
+import beartype.typing as tp
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import (
-    param_field,
-    static_field,
-)
 from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
+from gpjax.parameters import PositiveReal
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
-    ScalarInt,
 )
 
 
-@dataclass
 class Polynomial(AbstractKernel):
     """The Polynomial kernel with variable degree."""
 
-    degree: ScalarInt = static_field(2)
-    shift: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], int, slice],
+        degree: int = 2,
+        shift: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 0.0,
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
 
-    def __post_init__(self):
+        self.degree = degree
+
+        if isinstance(shift, nnx.Variable):
+            self.shift = shift
+        else:
+            self.shift = PositiveReal(shift)
+            if tp.TYPE_CHECKING:
+                self.shift = tp.cast(PositiveReal[ScalarArray], self.shift)
+
+        if isinstance(variance, nnx.Variable):
+            self.variance = variance
+        else:
+            self.variance = PositiveReal(variance)
+            if tp.TYPE_CHECKING:
+                self.variance = tp.cast(PositiveReal[ScalarArray], self.variance)
+
         self.name = f"Polynomial (degree {self.degree})"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
@@ -62,5 +82,7 @@ class Polynomial(AbstractKernel):
         """
         x = self.slice_input(x)
         y = self.slice_input(y)
-        K = jnp.power(self.shift + self.variance * jnp.dot(x, y), self.degree)
+        K = jnp.power(
+            self.shift.value + self.variance.value * jnp.dot(x, y), self.degree
+        )
         return K.squeeze()

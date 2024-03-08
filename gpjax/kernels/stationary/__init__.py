@@ -13,6 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.matern12 import Matern12
 from gpjax.kernels.stationary.matern32 import Matern32
 from gpjax.kernels.stationary.matern52 import Matern52
@@ -30,5 +31,6 @@ __all__ = [
     "PoweredExponential",
     "RationalQuadratic",
     "RBF",
+    "StationaryKernel",
     "White",
 ]

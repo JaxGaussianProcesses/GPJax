@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import is_dataclass
 from itertools import product
 from typing import (
     Callable,
@@ -23,14 +22,12 @@ from typing import (
 from jax import config
 import jax.numpy as jnp
 import jax.random as jr
-import jax.tree_util as jtu
 from jaxtyping import (
     Array,
     Float,
 )
 import numpy as np
 import pytest
-import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 
 from gpjax.likelihoods import (
@@ -71,7 +68,6 @@ class BaseTestLikelihood:
     @pytest.mark.parametrize("n", [1, 2, 10], ids=lambda x: f"n={x}")
     def test_initialisation(self, fields: dict, n: int) -> None:
         # Check that likelihood is a dataclass
-        assert is_dataclass(self.likelihood)
 
         # Input fields as JAX arrays
         fields = {k: jnp.array([v]) for k, v in fields.items()}
@@ -81,28 +77,7 @@ class BaseTestLikelihood:
 
         # Check properties
         for field, value in fields.items():
-            assert getattr(likelihood, field) == value
-
-        # Test that pytree returns param_field objects (and not static_field)
-        leaves = jtu.tree_leaves(likelihood)
-        assert len(leaves) == len(set(fields) - set(self.static_fields))
-
-        # Test dtype of params
-        for v in leaves:
-            assert v.dtype == jnp.float64
-
-        # Check meta leaves
-        meta = likelihood._pytree__meta
-        assert not any(f in meta for f in self.static_fields)
-        assert list(meta.keys()) == sorted(set(fields) - set(self.static_fields))
-
-        for field in meta:
-            # Bijectors
-            if field in ["obs_stddev"]:
-                assert isinstance(meta[field]["bijector"], tfb.Softplus)
-
-            # Trainability state
-            assert meta[field]["trainable"] is True
+            assert getattr(likelihood, field).value == value
 
     @pytest.mark.parametrize("n", [1, 2, 10], ids=lambda x: f"n={x}")
     def test_link_functions(self, n: int):
@@ -162,7 +137,9 @@ class TestGaussian(BaseTestLikelihood):
 
         # Check predictive mean and variance.
         assert (pred_dist.mean() == latent_mean).all()
-        noise_matrix = jnp.eye(likelihood.num_datapoints) * likelihood.obs_stddev**2
+        noise_matrix = (
+            jnp.eye(likelihood.num_datapoints) * likelihood.obs_stddev.value**2
+        )
         assert np.allclose(
             pred_dist.scale_tril, jnp.linalg.cholesky(latent_cov + noise_matrix)
         )

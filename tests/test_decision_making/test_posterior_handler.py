@@ -39,9 +39,9 @@ from gpjax.likelihoods import (
 )
 from gpjax.mean_functions import Constant
 from gpjax.objectives import (
-    AbstractObjective,
-    ConjugateMLL,
-    NonConjugateMLL,
+    Objective,
+    conjugate_mll,
+    non_conjugate_mll,
 )
 
 
@@ -58,15 +58,14 @@ def test_posterior_handler_erroneous_num_optimization_iterations_raises_error(
     num_optimization_iters: int,
 ):
     mean_function = Constant()
-    kernel = Matern52()
+    kernel = Matern52(1)
     prior = Prior(mean_function=mean_function, kernel=kernel)
     likelihood_builder = gaussian_likelihood_builder
-    training_objective = ConjugateMLL(negative=True)
     with pytest.raises(ValueError):
         PosteriorHandler(
             prior=prior,
             likelihood_builder=likelihood_builder,
-            optimization_objective=training_objective,
+            optimization_objective=conjugate_mll,
             optimizer=ox.adam(learning_rate=0.01),
             num_optimization_iters=num_optimization_iters,
         )
@@ -77,14 +76,13 @@ def test_posterior_handler_erroneous_num_optimization_iterations_raises_error(
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_get_optimized_posterior_with_no_key_raises_error():
     mean_function = Constant()
-    kernel = Matern52()
+    kernel = Matern52(1)
     prior = Prior(mean_function=mean_function, kernel=kernel)
     likelihood_builder = gaussian_likelihood_builder
-    training_objective = ConjugateMLL(negative=True)
     posterior_handler = PosteriorHandler(
         prior=prior,
         likelihood_builder=likelihood_builder,
-        optimization_objective=training_objective,
+        optimization_objective=conjugate_mll,
         optimizer=ox.adam(learning_rate=0.01),
         num_optimization_iters=10,
     )
@@ -99,14 +97,13 @@ def test_get_optimized_posterior_with_no_key_raises_error():
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_update_and_optimize_posterior_with_no_key_raises_error():
     mean_function = Constant()
-    kernel = Matern52()
+    kernel = Matern52(1)
     prior = Prior(mean_function=mean_function, kernel=kernel)
     likelihood_builder = gaussian_likelihood_builder
-    training_objective = ConjugateMLL(negative=True)
     posterior_handler = PosteriorHandler(
         prior=prior,
         likelihood_builder=likelihood_builder,
-        optimization_objective=training_objective,
+        optimization_objective=conjugate_mll,
         optimizer=ox.adam(learning_rate=0.01),
         num_optimization_iters=10,
     )
@@ -123,10 +120,10 @@ def test_update_and_optimize_posterior_with_no_key_raises_error():
 @pytest.mark.parametrize(
     "likelihood_builder, training_objective, test_function",
     [
-        (gaussian_likelihood_builder, ConjugateMLL(negative=True), Forrester()),
+        (gaussian_likelihood_builder, conjugate_mll, Forrester()),
         (
             poisson_likelihood_builder,
-            NonConjugateMLL(negative=True),
+            non_conjugate_mll,
             PoissonTestFunction(),
         ),
     ],
@@ -137,11 +134,11 @@ def test_update_and_optimize_posterior_with_no_key_raises_error():
 def test_get_posterior_no_optimization_correct_num_datapoints_and_not_optimized(
     num_datapoints: int,
     likelihood_builder: Callable[[int], AbstractLikelihood],
-    training_objective: AbstractObjective,
+    training_objective: Objective,
     test_function: Union[Forrester, PoissonTestFunction],
 ):
     mean_function = Constant(constant=jnp.array([1.0]))
-    kernel = Matern52(lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
+    kernel = Matern52(1, lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
     prior = Prior(mean_function=mean_function, kernel=kernel)
     posterior_handler = PosteriorHandler(
         prior=prior,
@@ -155,19 +152,19 @@ def test_get_posterior_no_optimization_correct_num_datapoints_and_not_optimized(
     )
     posterior = posterior_handler.get_posterior(dataset=dataset, optimize=False)
     assert posterior.likelihood.num_datapoints == num_datapoints
-    assert posterior.prior.mean_function.constant == jnp.array([1.0])
-    assert posterior.prior.kernel.lengthscale == jnp.array([0.5])
-    assert posterior.prior.kernel.variance == jnp.array(1.0)
+    assert posterior.prior.mean_function.constant.value == jnp.array([1.0])
+    assert posterior.prior.kernel.lengthscale.value == jnp.array([0.5])
+    assert posterior.prior.kernel.variance.value == jnp.array(1.0)
 
 
 @pytest.mark.parametrize("num_datapoints", [5, 50])
 @pytest.mark.parametrize(
     "likelihood_builder, training_objective, test_function",
     [
-        (gaussian_likelihood_builder, ConjugateMLL(negative=True), Forrester()),
+        (gaussian_likelihood_builder, conjugate_mll, Forrester()),
         (
             poisson_likelihood_builder,
-            NonConjugateMLL(negative=True),
+            non_conjugate_mll,
             PoissonTestFunction(),
         ),
     ],
@@ -178,11 +175,11 @@ def test_get_posterior_no_optimization_correct_num_datapoints_and_not_optimized(
 def test_get_posterior_with_optimization_correct_num_datapoints_and_optimized(
     num_datapoints: int,
     likelihood_builder: Callable[[int], AbstractLikelihood],
-    training_objective: AbstractObjective,
+    training_objective: Objective,
     test_function: Union[Forrester, PoissonTestFunction],
 ):
     mean_function = Constant(constant=jnp.array([1.0]))
-    kernel = Matern52(lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
+    kernel = Matern52(1, lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
     prior = Prior(mean_function=mean_function, kernel=kernel)
     non_optimized_posterior = prior * likelihood_builder(num_datapoints)
     posterior_handler = PosteriorHandler(
@@ -211,10 +208,10 @@ def test_get_posterior_with_optimization_correct_num_datapoints_and_optimized(
 @pytest.mark.parametrize(
     "likelihood_builder, training_objective, test_function",
     [
-        (gaussian_likelihood_builder, ConjugateMLL(negative=True), Forrester()),
+        (gaussian_likelihood_builder, conjugate_mll, Forrester()),
         (
             poisson_likelihood_builder,
-            NonConjugateMLL(negative=True),
+            non_conjugate_mll,
             PoissonTestFunction(),
         ),
     ],
@@ -225,11 +222,11 @@ def test_get_posterior_with_optimization_correct_num_datapoints_and_optimized(
 def test_update_posterior_no_optimize_same_prior_parameters_and_different_num_datapoints(
     initial_num_datapoints: int,
     likelihood_builder: Callable[[int], AbstractLikelihood],
-    training_objective: AbstractObjective,
+    training_objective: Objective,
     test_function: Union[Forrester, PoissonTestFunction],
 ):
     mean_function = Constant(constant=jnp.array([1.0]))
-    kernel = Matern52(lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
+    kernel = Matern52(1, lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
     prior = Prior(mean_function=mean_function, kernel=kernel)
     posterior_handler = PosteriorHandler(
         prior=prior,
@@ -270,10 +267,10 @@ def test_update_posterior_no_optimize_same_prior_parameters_and_different_num_da
 @pytest.mark.parametrize(
     "likelihood_builder, training_objective, test_function",
     [
-        (gaussian_likelihood_builder, ConjugateMLL(negative=True), Forrester()),
+        (gaussian_likelihood_builder, conjugate_mll, Forrester()),
         (
             poisson_likelihood_builder,
-            NonConjugateMLL(negative=True),
+            non_conjugate_mll,
             PoissonTestFunction(),
         ),
     ],
@@ -284,11 +281,11 @@ def test_update_posterior_no_optimize_same_prior_parameters_and_different_num_da
 def test_update_posterior_with_optimization_updated_prior_parameters_and_different_num_datapoints(
     initial_num_datapoints: int,
     likelihood_builder: Callable[[int], AbstractLikelihood],
-    training_objective: AbstractObjective,
+    training_objective: Objective,
     test_function: Union[Forrester, PoissonTestFunction],
 ):
     mean_function = Constant(constant=jnp.array([1.0]))
-    kernel = Matern52(lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
+    kernel = Matern52(1, lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
     prior = Prior(mean_function=mean_function, kernel=kernel)
     posterior_handler = PosteriorHandler(
         prior=prior,

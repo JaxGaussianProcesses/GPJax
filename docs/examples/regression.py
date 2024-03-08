@@ -25,7 +25,6 @@ from jax import config
 
 config.update("jax_enable_x64", True)
 
-from jax import jit
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import install_import_hook
@@ -106,7 +105,7 @@ ax.legend(loc="best")
 # kernel.
 
 # %%
-kernel = gpx.kernels.RBF()
+kernel = gpx.kernels.RBF(active_dims=1)  # 1-dimensional input
 meanf = gpx.mean_functions.Zero()
 prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 
@@ -181,33 +180,7 @@ posterior = prior * likelihood
 # these parameters by optimising the marginal log-likelihood (MLL).
 
 # %%
-negative_mll = gpx.objectives.ConjugateMLL(negative=True)
-negative_mll(posterior, train_data=D)
-
-
-# static_tree = jax.tree_map(lambda x: not(x), posterior.trainables)
-# optim = ox.chain(
-#     ox.adam(learning_rate=0.01),
-#     ox.masked(ox.set_to_zero(), static_tree)
-#     )
-# %% [markdown]
-# For researchers, GPJax has the capacity to print the bibtex citation for objects such
-# as the marginal log-likelihood through the `cite()` function.
-
-# %%
-print(gpx.cite(negative_mll))
-
-# %% [markdown]
-# JIT-compiling expensive-to-compute functions such as the marginal log-likelihood is
-# advisable. This can be achieved by wrapping the function in `jax.jit()`.
-
-# %%
-negative_mll = jit(negative_mll)
-
-# %% [markdown]
-# Since most optimisers (including here) minimise a given function, we have realised
-# the negative marginal log-likelihood and just-in-time (JIT) compiled this to
-# accelerate training.
+print(-gpx.objectives.conjugate_mll(posterior, D))
 
 # %% [markdown]
 # We can now define an optimiser. For this example we'll use the `bfgs`
@@ -216,9 +189,12 @@ negative_mll = jit(negative_mll)
 # %%
 opt_posterior, history = gpx.fit_scipy(
     model=posterior,
-    objective=negative_mll,
+    # we use the negative mll as we are minimising
+    objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     train_data=D,
 )
+
+print(-gpx.objectives.conjugate_mll(opt_posterior, D))
 
 # %% [markdown]
 # ## Prediction

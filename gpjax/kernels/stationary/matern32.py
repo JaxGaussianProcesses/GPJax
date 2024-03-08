@@ -13,41 +13,28 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
-from beartype.typing import Union
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.base import param_field
-from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import (
     build_student_t_distribution,
     euclidean_distance,
 )
-from gpjax.typing import (
-    Array,
-    ScalarFloat,
-)
+from gpjax.typing import Array
 
 
-@dataclass
-class Matern32(AbstractKernel):
+class Matern32(StationaryKernel):
     r"""The Matérn kernel with smoothness parameter fixed at 1.5."""
 
-    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
-    )
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Matérn32"
 
     def __call__(
         self,
         x: Float[Array, " D"],
         y: Float[Array, " D"],
-    ) -> ScalarFloat:
+    ) -> Float[Array, ""]:
         r"""Compute the Matérn 3/2 kernel between a pair of arrays.
 
         Evaluate the kernel on a pair of inputs $`(x, y)`$ with
@@ -65,10 +52,14 @@ class Matern32(AbstractKernel):
         -------
             ScalarFloat: The value of $k(x, y)$.
         """
-        x = self.slice_input(x) / self.lengthscale
-        y = self.slice_input(y) / self.lengthscale
+        x = self.slice_input(x) / self.lengthscale.value
+        y = self.slice_input(y) / self.lengthscale.value
         tau = euclidean_distance(x, y)
-        K = self.variance * (1.0 + jnp.sqrt(3.0) * tau) * jnp.exp(-jnp.sqrt(3.0) * tau)
+        K = (
+            self.variance.value
+            * (1.0 + jnp.sqrt(3.0) * tau)
+            * jnp.exp(-jnp.sqrt(3.0) * tau)
+        )
         return K.squeeze()
 
     @property

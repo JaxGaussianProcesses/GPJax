@@ -14,14 +14,15 @@
 # ==============================================================================
 
 import beartype.typing as tp
-from cola import PSD
-from cola.ops import (
+from cola.annotations import PSD
+from cola.ops.operators import (
     Diagonal,
     LinearOperator,
 )
 from jax import vmap
 from jaxtyping import Float
 
+import gpjax  # noqa: F401
 from gpjax.kernels.computations import AbstractKernelComputation
 from gpjax.typing import Array
 

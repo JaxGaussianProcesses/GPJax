@@ -13,26 +13,43 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
+import beartype.typing as tp
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
+from gpjax.parameters import PositiveReal
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
 )
 
 
-@dataclass
 class Linear(AbstractKernel):
     r"""The linear kernel."""
 
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Linear"
+
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], int, slice],
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
+
+        if isinstance(variance, nnx.Variable):
+            self.variance = variance
+        else:
+            self.variance = PositiveReal(variance)
+            if tp.TYPE_CHECKING:
+                self.variance = tp.cast(PositiveReal[ScalarArray], self.variance)
 
     def __call__(
         self,
@@ -55,5 +72,5 @@ class Linear(AbstractKernel):
         """
         x = self.slice_input(x)
         y = self.slice_input(y)
-        K = self.variance * jnp.matmul(x.T, y)
+        K = self.variance.value * jnp.matmul(x.T, y)
         return K.squeeze()

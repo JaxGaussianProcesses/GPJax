@@ -13,10 +13,11 @@
 # limitations under the License.
 # ==============================================================================
 
-from beartype.typing import (
+from typing import (
     Callable,
     Union,
 )
+
 from jaxtyping import (
     Array as JAXArray,
     Bool,
@@ -35,6 +36,7 @@ KeyArray = Union[
 
 Array = Union[JAXArray, NumpyArray]
 
+ScalarArray = Float[Array, ""]
 ScalarBool = Union[bool, Bool[Array, ""]]
 ScalarInt = Union[int, Int[Array, ""]]
 ScalarFloat = Union[float, Float[Array, ""]]

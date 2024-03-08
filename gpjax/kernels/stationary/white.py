@@ -12,35 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+import typing as tp
 
-from dataclasses import dataclass
-
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import (
-    param_field,
-    static_field,
-)
-from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
     ConstantDiagonalKernelComputation,
 )
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
 )
 
 
-@dataclass
-class White(AbstractKernel):
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    compute_engine: AbstractKernelComputation = static_field(
-        ConstantDiagonalKernelComputation(), repr=False
-    )
+class White(StationaryKernel):
     name: str = "White"
+
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], int, slice],
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        compute_engine: AbstractKernelComputation = ConstantDiagonalKernelComputation(),
+    ):
+        super().__init__(active_dims, 1.0, variance, compute_engine)
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the White noise kernel between a pair of arrays.
@@ -58,5 +57,5 @@ class White(AbstractKernel):
         -------
             ScalarFloat: The value of $`k(x, y)`$.
         """
-        K = jnp.all(jnp.equal(x, y)) * self.variance
+        K = jnp.all(jnp.equal(x, y)) * self.variance.value
         return K.squeeze()

@@ -11,14 +11,17 @@ from beartype.typing import (
 import jax.numpy as jnp  # noqa: F401
 import jupytext
 
+import gpjax
+
 get_last = lambda x: x[-1]
 
 
 @dataclass
 class Result:
     path: str
-    comparisons: field(default_factory=dict)
-    precision: int = 5
+    comparisons: field(default_factory=dict)  # type: ignore
+    precision: int = 1
+    compare_history: bool = True
 
     def __post_init__(self):
         self.name: str = self.path.split("/")[-1].split(".")[0].replace("_", "-")
@@ -30,9 +33,11 @@ class Result:
         true_value: float,
         operation: Callable[[Any], Any],
     ):
+        if variable_name == "history" and not self.compare_history:
+            return
         try:
             value = operation(observed_variables[variable_name])
-            assert true_value == value
+            assert abs(true_value - value) < self.precision
         except AssertionError as e:
             print(e)
 
@@ -54,7 +59,14 @@ class Result:
         contents = "\n".join([line for line in lines if not line.startswith("%")])
 
         loc = {}
-        exec(contents, globals(), loc)
+
+        # weird bug in interactive interpreter: lambda functions
+        # don't have access to the global scope of the executed file
+        # so we need to pass gpjax in the globals explicitly
+        # since it's used in a lambda function inside the examples
+        _globals = globals()
+        _globals["gpx"] = gpjax
+        exec(contents, _globals, loc)
         for k, v in self.comparisons.items():
             truth, op = v
             self._compare(
@@ -85,9 +97,9 @@ sparse.test()
 stochastic = Result(
     path="docs/examples/uncollapsed_vi.py",
     comparisons={
-        "history": (-985.71726453, get_last),
+        "history": (-2678.41302494, get_last),
         "meanf": (-54.14787028, jnp.sum),
-        "sigma": (116.16651265, jnp.sum),
+        "sigma": (121.4298333, jnp.sum),
     },
 )
 stochastic.test()

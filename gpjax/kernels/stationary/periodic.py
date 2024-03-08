@@ -13,36 +13,53 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
-from beartype.typing import Union
+import beartype.typing as tp
+from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import param_field
-from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
+from gpjax.kernels.stationary.base import StationaryKernel
+from gpjax.parameters import PositiveReal
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
 )
 
+Lengthscale = tp.Union[Float[Array, "D"], ScalarArray]
+LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 
-@dataclass
-class Periodic(AbstractKernel):
+
+class Periodic(StationaryKernel):
     r"""The periodic kernel.
 
     Key reference is MacKay 1998 - "Introduction to Gaussian processes".
     """
 
-    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
-    )
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    period: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
     name: str = "Periodic"
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], int, slice],
+        lengthscale: tp.Union[LengthscaleCompatible, nnx.Variable[Lengthscale]] = 1.0,
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        period: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        if isinstance(period, nnx.Variable):
+            self.period = period
+        else:
+            self.period = PositiveReal(period)
+
+        super().__init__(active_dims, lengthscale, variance, compute_engine)
+
+    def __call__(
+        self, x: Float[Array, " D"], y: Float[Array, " D"]
+    ) -> Float[Array, ""]:
         r"""Compute the Periodic kernel between a pair of arrays.
 
         Evaluate the kernel on a pair of inputs $`(x, y)`$ with length-scale parameter $`\ell`$, variance $`\sigma^2`$
@@ -59,6 +76,8 @@ class Periodic(AbstractKernel):
         """
         x = self.slice_input(x)
         y = self.slice_input(y)
-        sine_squared = (jnp.sin(jnp.pi * (x - y) / self.period) / self.lengthscale) ** 2
-        K = self.variance * jnp.exp(-0.5 * jnp.sum(sine_squared, axis=0))
+        sine_squared = (
+            jnp.sin(jnp.pi * (x - y) / self.period.value) / self.lengthscale.value
+        ) ** 2
+        K = self.variance.value * jnp.exp(-0.5 * jnp.sum(sine_squared, axis=0))
         return K.squeeze()

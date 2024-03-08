@@ -40,7 +40,7 @@ https://github.com/secondmind-labs/trieste/blob/develop/trieste/observer.py
 
 
 def build_function_evaluator(
-    functions: Dict[str, Callable[[Float[Array, "N D"]], Float[Array, "N 1"]]]
+    functions: Dict[str, Callable[[Float[Array, "N D"]], Float[Array, "N 1"]]],
 ) -> FunctionEvaluator:
     """
     Takes a dictionary of functions and returns a `FunctionEvaluator` which can be

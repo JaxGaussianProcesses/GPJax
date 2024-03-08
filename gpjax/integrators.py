@@ -1,37 +1,30 @@
-from abc import abstractmethod
-from dataclasses import dataclass
-from typing import (
-    TypeVar,
-    Union,
-)
+import abc
 
-from beartype.typing import Callable
+import beartype.typing as tp
 import jax.numpy as jnp
 from jaxtyping import Float
 import numpy as np
 
-import gpjax
 from gpjax.typing import Array
 
-Likelihood = TypeVar(
-    "Likelihood",
-    bound=Union["gpjax.likelihoods.AbstractLikelihood", None],  # noqa: F821
+L = tp.TypeVar(
+    "L",
+    bound="gpjax.likelihoods.AbstractLikelihood",  # noqa: F821
 )
-Gaussian = TypeVar("Gaussian", bound="gpjax.likelihoods.Gaussian")  # noqa: F821
+GL = tp.TypeVar("GL", bound="gpjax.likelihoods.Gaussian")  # noqa: F821
 
 
-@dataclass
 class AbstractIntegrator:
     r"""Base class for integrators."""
 
-    @abstractmethod
+    @abc.abstractmethod
     def integrate(
         self,
-        fun: Callable,
+        fun: tp.Callable,
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: Likelihood,
+        likelihood: L | None,
     ) -> Float[Array, " N"]:
         r"""Integrate a function with respect to a Gaussian distribution.
 
@@ -50,11 +43,11 @@ class AbstractIntegrator:
 
     def __call__(
         self,
-        fun: Callable,
+        fun: tp.Callable,
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: Likelihood,
+        likelihood: L | None,
     ) -> Float[Array, " N"]:
         r"""Integrate a function with respect to a Gaussian distribution.
 
@@ -72,7 +65,6 @@ class AbstractIntegrator:
         return self.integrate(fun, y, mean, variance, likelihood)
 
 
-@dataclass
 class GHQuadratureIntegrator(AbstractIntegrator):
     r"""Compute an integral using Gauss-Hermite quadrature.
 
@@ -85,15 +77,23 @@ class GHQuadratureIntegrator(AbstractIntegrator):
     polynomial $`H_J(t)`$ that we can look up in table
     [link](https://keisan.casio.com/exec/system/1281195844).
     """
-    num_points: int = 20
+
+    def __init__(self, num_points: int = 20):
+        r"""Initialize the integrator.
+
+        Args:
+            num_points (int, optional): The number of points to use in the
+                quadrature. Defaults to 20.
+        """
+        self.num_points = num_points
 
     def integrate(
         self,
-        fun: Callable,
+        fun: tp.Callable,
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: Likelihood,
+        likelihood: L | None,
     ) -> Float[Array, " N"]:
         r"""Compute a quadrature integral.
 
@@ -116,7 +116,6 @@ class GHQuadratureIntegrator(AbstractIntegrator):
         return val
 
 
-@dataclass
 class AnalyticalGaussianIntegrator(AbstractIntegrator):
     r"""Compute the analytical integral of a Gaussian likelihood.
 
@@ -131,11 +130,11 @@ class AnalyticalGaussianIntegrator(AbstractIntegrator):
 
     def integrate(
         self,
-        fun: Callable,
+        fun: tp.Callable,
         y: Float[Array, "N D"],
         mean: Float[Array, "N D"],
         variance: Float[Array, "N D"],
-        likelihood: Gaussian,
+        likelihood: GL,
     ) -> Float[Array, " N"]:
         r"""Compute a Gaussian integral.
 
@@ -150,7 +149,7 @@ class AnalyticalGaussianIntegrator(AbstractIntegrator):
         Returns:
             Float[Array, 'N']: The expected log likelihood.
         """
-        obs_stddev = likelihood.obs_stddev.squeeze()
+        obs_stddev = likelihood.obs_stddev.value.squeeze()
         sq_error = jnp.square(y - mean)
         log2pi = jnp.log(2.0 * jnp.pi)
         val = jnp.sum(
