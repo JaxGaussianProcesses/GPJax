@@ -43,7 +43,7 @@ def test_abstract_single_batch_utility_maximizer():
     "test_function, dimensionality",
     [(Forrester(), 1), (LogarithmicGoldsteinPrice(), 2)],
 )
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
@@ -86,7 +86,7 @@ def test_continuous_maximizer_raises_error_with_erroneous_num_restarts(
     "test_function, dimensionality",
     [(Forrester(), 1), (LogarithmicGoldsteinPrice(), 2)],
 )
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.parametrize("num_restarts", [1, 3])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
@@ -128,7 +128,7 @@ def test_continous_maximizer_returns_same_point_with_same_key(
         (LogarithmicGoldsteinPrice(), 2),
     ],
 )
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.parametrize("num_restarts", [1, 3])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
@@ -154,7 +154,7 @@ def test_continuous_maximizer_finds_correct_point(
     assert jnp.allclose(maximizer, true_utility_maximizer, atol=1e-6).all()
 
 
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10), jr.PRNGKey(1)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10), jr.key(1)])
 @pytest.mark.parametrize("num_restarts", [1, 3])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"

@@ -73,7 +73,7 @@ def fit(  # noqa: PLR0913
         >>>
         >>> # (1) Create a dataset:
         >>> X = jnp.linspace(0.0, 10.0, 100)[:, None]
-        >>> y = 2.0 * X + 1.0 + 10 * jr.normal(jr.PRNGKey(0), X.shape)
+        >>> y = 2.0 * X + 1.0 + 10 * jr.normal(jr.key(0), X.shape)
         >>> D = gpx.Dataset(X, y)
         >>>
         >>> # (2) Define your model:
@@ -111,7 +111,7 @@ def fit(  # noqa: PLR0913
         batch_size (Optional[int]): The size of the mini-batch to use. Defaults to -1
             (i.e. full batch).
         key (Optional[KeyArray]): The random key to use for the optimisation batch
-            selection. Defaults to jr.PRNGKey(42).
+            selection. Defaults to jr.key(42).
         log_rate (Optional[int]): How frequently the objective function's value should
             be printed. Defaults to 10.
         verbose (Optional[bool]): Whether to print the training loading bar. Defaults
@@ -131,7 +131,7 @@ def fit(  # noqa: PLR0913
         _check_optim(optim)
         _check_num_iters(num_iters)
         _check_batch_size(batch_size)
-        _check_prng_key(key)
+        _check_prng_key("fit", key)
         _check_log_rate(log_rate)
         _check_verbose(verbose)
 

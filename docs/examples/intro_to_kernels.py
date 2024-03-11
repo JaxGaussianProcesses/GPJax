@@ -24,7 +24,7 @@ with install_import_hook("gpjax", "beartype.beartype"):
 from gpjax.typing import Array
 from sklearn.preprocessing import StandardScaler
 
-key = jr.PRNGKey(42)
+key = jr.key(42)
 plt.style.use(
     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
 )
@@ -249,15 +249,22 @@ opt_posterior, history = gpx.fit_scipy(
 # with the optimised hyperparameters, and compare them to the predictions made using the
 # posterior with the default hyperparameters:
 
+
 # %%
 def plot_ribbon(ax, x, dist, color):
     mean = dist.mean()
     std = dist.stddev()
     ax.plot(x, mean, label="Predictive mean", color=color)
-    ax.fill_between(x.squeeze(), mean - 2 * std, mean + 2 * std, alpha=0.2, label="Two sigma", color=color)
+    ax.fill_between(
+        x.squeeze(),
+        mean - 2 * std,
+        mean + 2 * std,
+        alpha=0.2,
+        label="Two sigma",
+        color=color,
+    )
     ax.plot(x, mean - 2 * std, linestyle="--", linewidth=1, color=color)
     ax.plot(x, mean + 2 * std, linestyle="--", linewidth=1, color=color)
-
 
 
 # %%

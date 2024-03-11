@@ -41,7 +41,7 @@ def test_frequency_sampler(kernel: AbstractKernel, num_basis_fns: int, n_dims: i
 @pytest.mark.parametrize("n_dims", [1, 2, 5])
 @pytest.mark.parametrize("n_data", [50, 100])
 def test_gram(kernel: AbstractKernel, num_basis_fns: int, n_dims: int, n_data: int):
-    key = jr.PRNGKey(123)
+    key = jr.key(123)
     x = jr.uniform(key, shape=(n_data, 1), minval=-3.0, maxval=3.0).reshape(-1, 1)
     if n_dims > 1:
         x = jnp.hstack([x] * n_dims)
@@ -74,7 +74,7 @@ def test_cross_covariance(
     n_datas: Tuple[int, int],
 ):
     nd1, nd2 = n_datas
-    key = jr.PRNGKey(123)
+    key = jr.key(123)
     x1 = jr.uniform(key, shape=(nd1, 1), minval=-3.0, maxval=3.0)
     if n_dims > 1:
         x1 = jnp.hstack([x1] * n_dims)
@@ -97,7 +97,7 @@ def test_cross_covariance(
 @pytest.mark.parametrize("n_dim", [1, 2, 5])
 def test_improvement(kernel, n_dim):
     n_data = 100
-    key = jr.PRNGKey(123)
+    key = jr.key(123)
 
     x = jr.uniform(key, minval=-3.0, maxval=3.0, shape=(n_data, n_dim))
     base_kernel = kernel(active_dims=list(range(n_dim)))
@@ -120,7 +120,7 @@ def test_improvement(kernel, n_dim):
 @pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
 def test_exactness(kernel):
     n_data = 100
-    key = jr.PRNGKey(123)
+    key = jr.key(123)
 
     x = jr.uniform(key, minval=-3.0, maxval=3.0, shape=(n_data, 1))
     exact_linop = kernel.gram(x).to_dense()
@@ -143,7 +143,7 @@ def test_value_error(kernel):
 
 @pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
 def test_stochastic_init(kernel: AbstractKernel):
-    k1 = RFF(base_kernel=kernel, num_basis_fns=10, key=jr.PRNGKey(123))
-    k2 = RFF(base_kernel=kernel, num_basis_fns=10, key=jr.PRNGKey(42))
+    k1 = RFF(base_kernel=kernel, num_basis_fns=10, key=jr.key(123))
+    k2 = RFF(base_kernel=kernel, num_basis_fns=10, key=jr.key(42))
 
     assert (k1.frequencies != k2.frequencies).any()

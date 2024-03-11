@@ -158,7 +158,7 @@ ax.legend(loc="best")
 # determines the correlation of the multivariate Gaussian.
 
 # %%
-key = jr.PRNGKey(123)
+key = jr.key(123)
 
 d1 = tfd.MultivariateNormalDiag(loc=jnp.zeros(2), scale_diag=jnp.ones(2))
 d2 = tfd.MultivariateNormalTriL(

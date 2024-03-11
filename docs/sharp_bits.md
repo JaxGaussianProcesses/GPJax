@@ -12,7 +12,7 @@ To examine what it means for a PRNG to be stateful, consider the following examp
 ```python
 import numpy as np
 import jax.random as jr
-key = jr.PRNGKey(123)
+key = jr.key(123)
 
 # NumPy
 print('NumPy:')

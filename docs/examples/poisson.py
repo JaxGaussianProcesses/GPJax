@@ -40,7 +40,7 @@ with install_import_hook("gpjax", "beartype.beartype"):
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 tfd = tfp.distributions
-key = jr.PRNGKey(123)
+key = jr.key(123)
 plt.style.use(
     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
 )

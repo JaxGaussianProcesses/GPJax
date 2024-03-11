@@ -14,7 +14,7 @@ class Sparse:
     params = [[10000, 20000, 50000], [10, 20, 50, 100, 200], [32, 64, 128, 256]]
 
     def setup(self, n_datapoints: int, n_inducing: int, batch_size: int):
-        key = jr.PRNGKey(123)
+        key = jr.key(123)
         self.X = jr.normal(key=key, shape=(n_datapoints, 1))
         self.y = jnp.sin(self.X[:, :1])
         self.data = gpx.Dataset(X=self.X, y=self.y)
@@ -25,15 +25,17 @@ class Sparse:
         self.posterior = self.prior * self.likelihood
 
         Z = jnp.linspace(self.X.min(), self.X.max(), n_inducing).reshape(-1, 1)
-        self.q = gpx.VariationalGaussian(posterior=self.posterior, inducing_inputs=Z)
-        self.objective = gpx.ELBO(negative=True)
+        self.q = gpx.variational_families.VariationalGaussian(
+            posterior=self.posterior, inducing_inputs=Z
+        )
+        self.objective = gpx.objectives.ELBO(negative=True)
 
     def time_eval(self, n_datapoints: int, n_dims: int, batch_size: int):
-        key = jr.PRNGKey(123)
+        key = jr.key(123)
         batch = get_batch(train_data=self.data, batch_size=batch_size, key=key)
         self.objective(self.q, batch)
 
     def time_grad(self, n_datapoints: int, n_dims: int, batch_size: int):
-        key = jr.PRNGKey(123)
+        key = jr.key(123)
         batch = get_batch(train_data=self.data, batch_size=batch_size, key=key)
         jax.grad(self.objective)(self.q, batch)

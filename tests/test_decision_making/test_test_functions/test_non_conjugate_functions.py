@@ -29,8 +29,8 @@ from gpjax.typing import KeyArray
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_correct_dtypes(test_function: PoissonTestFunction):
-    dataset = test_function.generate_dataset(10, jr.PRNGKey(42))
-    test_x = test_function.generate_test_points(10, jr.PRNGKey(42))
+    dataset = test_function.generate_dataset(10, jr.key(42))
+    test_x = test_function.generate_test_points(10, jr.key(42))
     assert dataset.X.dtype == jnp.float64
     assert dataset.y.dtype == jnp.integer
     assert test_x.dtype == jnp.float64
@@ -47,7 +47,7 @@ def test_correct_dtypes(test_function: PoissonTestFunction):
 def test_test_points_shape(
     test_function: PoissonTestFunction, dimensionality: int, num_samples: int
 ):
-    test_X = test_function.generate_test_points(num_samples, jr.PRNGKey(42))
+    test_X = test_function.generate_test_points(num_samples, jr.key(42))
     assert test_X.shape == (num_samples, dimensionality)
 
 
@@ -62,14 +62,14 @@ def test_test_points_shape(
 def test_dataset_shapes(
     test_function: PoissonTestFunction, dimensionality: int, num_samples: int
 ):
-    dataset = test_function.generate_dataset(num_samples, jr.PRNGKey(42))
+    dataset = test_function.generate_dataset(num_samples, jr.key(42))
     assert dataset.X.shape == (num_samples, dimensionality)
     assert dataset.y.shape == (num_samples, 1)
 
 
 @pytest.mark.parametrize("test_function", [PoissonTestFunction()])
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
@@ -84,7 +84,7 @@ def test_same_key_same_dataset(
 
 @pytest.mark.parametrize("test_function", [PoissonTestFunction()])
 @pytest.mark.parametrize("num_samples", [10, 100])
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
@@ -100,7 +100,7 @@ def test_different_key_different_dataset(
 
 @pytest.mark.parametrize("test_function", [PoissonTestFunction()])
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
@@ -114,7 +114,7 @@ def test_same_key_same_test_points(
 
 @pytest.mark.parametrize("test_function", [PoissonTestFunction()])
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort

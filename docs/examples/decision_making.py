@@ -49,7 +49,7 @@ from gpjax.typing import (
     Float,
 )
 
-key = jr.PRNGKey(42)
+key = jr.key(42)
 plt.style.use(
     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
 )

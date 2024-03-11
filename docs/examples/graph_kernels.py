@@ -27,7 +27,7 @@ import optax as ox
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-key = jr.PRNGKey(123)
+key = jr.key(123)
 plt.style.use(
     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
 )

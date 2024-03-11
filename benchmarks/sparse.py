@@ -13,7 +13,7 @@ class Sparse:
     params = [[2000, 5000, 10000, 20000], [10, 20, 50, 100, 200]]
 
     def setup(self, n_datapoints: int, n_inducing: int):
-        key = jr.PRNGKey(123)
+        key = jr.key(123)
         self.X = jr.normal(key=key, shape=(n_datapoints, 1))
         self.y = jnp.sin(self.X[:, :1])
         self.data = gpx.Dataset(X=self.X, y=self.y)
@@ -24,10 +24,10 @@ class Sparse:
         self.posterior = self.prior * self.likelihood
 
         Z = jnp.linspace(self.X.min(), self.X.max(), n_inducing).reshape(-1, 1)
-        self.q = gpx.CollapsedVariationalGaussian(
+        self.q = gpx.variational_families.CollapsedVariationalGaussian(
             posterior=self.posterior, inducing_inputs=Z
         )
-        self.objective = gpx.CollapsedELBO(negative=True)
+        self.objective = gpx.objectives.CollapsedELBO(negative=True)
 
     def time_eval(self, n_datapoints: int, n_dims: int):
         self.objective(self.q, self.data)

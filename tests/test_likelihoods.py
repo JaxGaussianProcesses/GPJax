@@ -43,7 +43,7 @@ from gpjax.likelihoods import (
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
-_initialise_key = jr.PRNGKey(123)
+_initialise_key = jr.key(123)
 
 
 class BaseTestLikelihood:

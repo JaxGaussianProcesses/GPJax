@@ -31,7 +31,7 @@ from cola.ops import (
 
 from gpjax.distributions import GaussianDistribution
 
-_key = jr.PRNGKey(seed=42)
+_key = jr.key(seed=42)
 
 from tensorflow_probability.substrates.jax.distributions import (
     MultivariateNormalDiag,
