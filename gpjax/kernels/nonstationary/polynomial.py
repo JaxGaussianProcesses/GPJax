@@ -36,13 +36,14 @@ class Polynomial(AbstractKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], slice, None] = None,
         degree: int = 2,
         shift: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 0.0,
         variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
+        super().__init__(active_dims, n_dims, compute_engine)
 
         self.degree = degree
 

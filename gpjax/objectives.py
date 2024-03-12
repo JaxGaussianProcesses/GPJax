@@ -70,7 +70,7 @@ def conjugate_mll(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
         >>> D = gpx.Dataset(X=xtrain, y=ytrain)
 
         >>> meanf = gpx.mean_functions.Constant()
-        >>> kernel = gpx.kernels.RBF(active_dims=1)
+        >>> kernel = gpx.kernels.RBF()
         >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
         >>> prior = gpx.gps.Prior(mean_function = meanf, kernel=kernel)
         >>> posterior = prior * likelihood
@@ -133,7 +133,7 @@ def conjugate_loocv(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat
         >>> D = gpx.Dataset(X=xtrain, y=ytrain)
         ...
         >>> meanf = gpx.mean_functions.Constant()
-        >>> kernel = gpx.kernels.RBF(1)
+        >>> kernel = gpx.kernels.RBF()
         >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
         >>> prior = gpx.gps.Prior(mean_function = meanf, kernel=kernel)
         >>> posterior = prior * likelihood

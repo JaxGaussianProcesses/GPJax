@@ -39,10 +39,11 @@ class RationalQuadratic(StationaryKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], slice, None] = None,
         lengthscale: tp.Union[LengthscaleCompatible, nnx.Variable[Lengthscale]] = 1.0,
         variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
         alpha: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         if isinstance(alpha, nnx.Variable):
@@ -50,7 +51,7 @@ class RationalQuadratic(StationaryKernel):
         else:
             self.alpha = PositiveReal(alpha)
 
-        super().__init__(active_dims, lengthscale, variance, compute_engine)
+        super().__init__(active_dims, lengthscale, variance, n_dims, compute_engine)
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the Powered Exponential kernel between a pair of arrays.

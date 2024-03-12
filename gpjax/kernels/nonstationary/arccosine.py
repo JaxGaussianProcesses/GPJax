@@ -50,13 +50,14 @@ class ArcCosine(AbstractKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], slice, None] = None,
         order: tp.Literal[0, 1, 2] = 0,
         variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
         weight_variance: tp.Union[
             WeightVarianceCompatible, nnx.Variable[WeightVariance]
         ] = 1.0,
         bias_variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         if order not in [0, 1, 2]:
@@ -91,7 +92,7 @@ class ArcCosine(AbstractKernel):
 
         self.name = f"ArcCosine (order {self.order})"
 
-        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
+        super().__init__(active_dims, n_dims, compute_engine)
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarArray:
         r"""Evaluate the kernel on a pair of inputs $`(x, y)`$

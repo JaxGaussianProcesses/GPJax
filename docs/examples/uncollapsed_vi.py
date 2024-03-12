@@ -203,7 +203,7 @@ ax.set(xlabel=r"$x$", ylabel=r"$f(x)$")
 # %%
 meanf = gpx.mean_functions.Zero()
 likelihood = gpx.likelihoods.Gaussian(num_datapoints=n)
-kernel = jk.RBF(active_dims=1)  # 1-dimensional inputs
+kernel = jk.RBF()  # 1-dimensional inputs
 prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 p = prior * likelihood
 q = gpx.variational_families.VariationalGaussian(posterior=p, inducing_inputs=z)

@@ -104,7 +104,7 @@ ax.legend(loc="best")
 # kernel.
 
 # %%
-kernel = gpx.kernels.RBF(active_dims=1)  # 1-dimensional input
+kernel = gpx.kernels.RBF()  # 1-dimensional input
 meanf = gpx.mean_functions.Zero()
 prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 

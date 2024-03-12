@@ -136,7 +136,7 @@ def fit_gp(x: jax.Array, y: jax.Array) -> tfd.MultivariateNormalFullCovariance:
     likelihood = gpx.likelihoods.Gaussian(num_datapoints=n)
     posterior = (
         gpx.gps.Prior(
-            mean_function=gpx.mean_functions.Constant(), kernel=gpx.kernels.RBF(1)
+            mean_function=gpx.mean_functions.Constant(), kernel=gpx.kernels.RBF()
         )
         * likelihood
     )

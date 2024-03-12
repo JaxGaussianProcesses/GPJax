@@ -49,45 +49,44 @@ class AbstractKernel(nnx.Module):
     relevant columns for the kernel's evaluation.
 
     Attributes:
-        active_dims (tp.Union[list[int], slice]): The indices of the input dimensions
-            that are active in the kernel's evaluation. If active_dims is a list, then
-            the input to the kernel is indexed by the list, and n_dims
-            is the length of the list. If active_dims is an integer, then the input to the
-            kernel is not indexed, and n_dims is the value of the integer.
-            If active_dims is a slice, then the input to the kernel is indexed by the slice,
-            and n_dims is the length of the slice. Importantly, n_dims must always be
-            inferable from active_dims.
-        compute_engine (AbstractKernelComputation): The computation engine that is used to
+        active_dims: The indices of the input dimensions
+            that are active in the kernel's evaluation, represented by a list of integers
+            or a slice object.
+        compute_engine: The computation engine that is used to
             compute the kernel's cross-covariance and gram matrices.
-        n_dims (int): The number of input dimensions of the kernel.
-        name (str): The name of the kernel.
+        n_dims: The number of input dimensions of the kernel.
+        name: The name of the kernel.
     """
 
-    active_dims: tp.Union[list[int], slice]
+    active_dims: tp.Union[list[int], slice] = slice(None)
     compute_engine: AbstractKernelComputation
-    n_dims: int
+    n_dims: tp.Union[int, None]
     name: str = "AbstractKernel"
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], slice, None] = None,
+        n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         """Initialise the AbstractKernel class.
 
         Args:
-            active_dims (tp.Union[list[int], int, slice]): The indices of the input dimensions
-                that are active in the kernel's evaluation. If active_dims is a list, then
-                the input to the kernel is indexed by the list, and the number of input dimensions
-                is the length of the list. If active_dims is an integer, then the input to the
-                kernel is not indexed, and the number of input dimensions is the value of the integer.
-                If active_dims is a slice, then the input to the kernel is indexed by the slice,
-                and the number of input dimensions is the length of the slice. Importantly, the number
-                of active dimensions must be inferable from active_dims.
-            compute_engine (AbstractKernelComputation): The computation engine that is used to
-                compute the kernel's cross-covariance and gram matrices.
+            active_dims: the indices of the input dimensions
+                that are active in the kernel's evaluation, represented by a list of
+                integers or a slice object. Defaults to a full slice.
+            n_dims: the number of input dimensions of the kernel.
+            compute_engine: the computation engine that is used to compute the kernel's
+                cross-covariance and gram matrices. Defaults to DenseKernelComputation.
         """
-        self.n_dims, self.active_dims = _check_active_dims(active_dims)
+
+        active_dims = active_dims or slice(None)
+
+        _check_active_dims(active_dims)
+        _check_n_dims(n_dims)
+
+        self.active_dims, self.n_dims = _check_dims_compat(active_dims, n_dims)
+
         self.compute_engine = compute_engine
 
     def cross_covariance(self, x: Num[Array, "N D"], y: Num[Array, "M D"]):
@@ -184,7 +183,7 @@ class Constant(AbstractKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice, None] = 1,
+        active_dims: tp.Union[list[int], slice, None] = None,
         constant: tp.Union[ScalarFloat, Parameter[ScalarFloat]] = jnp.array(0.0),
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
@@ -232,9 +231,7 @@ class CombinationKernel(AbstractKernel):
         self.kernels = kernels_list
         self.operator = operator
 
-        active_dims = ft.reduce(lambda asum, x: asum + x.n_dims, kernels_list, 0)
-
-        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
+        super().__init__(compute_engine=compute_engine)
 
     def __call__(
         self,
@@ -254,40 +251,54 @@ class CombinationKernel(AbstractKernel):
         return self.operator(jnp.stack([k(x, y) for k in self.kernels]))
 
 
-@tp.overload
-def _check_active_dims(active_dims: list[int]) -> tuple[int, list[int]]:
-    ...
-
-
-@tp.overload
-def _check_active_dims(active_dims: int) -> tuple[int, slice]:  # noqa: F811
-    ...
-
-
-@tp.overload
-def _check_active_dims(active_dims: slice) -> tuple[int, slice]:  # noqa: F811
-    ...
-
-
-def _check_active_dims(active_dims: tp.Union[list[int], int, slice]):  # noqa: F811
-    if isinstance(active_dims, list):
-        return len(active_dims), active_dims
-    elif isinstance(active_dims, int):
-        return active_dims, slice(None)
-    elif isinstance(active_dims, slice):
-        if active_dims.stop is None:
-            raise ValueError("active_dims slice must have a stop value.")
-        if active_dims.stop < 0:
-            raise ValueError("active_dims slice stop value must be positive.")
-
-        start = active_dims.start if active_dims.start is not None else 0
-        step = active_dims.step if active_dims.step is not None else 1
-        return (active_dims.stop - start) // step, active_dims
-    else:
+def _check_active_dims(active_dims: tp.Any):
+    if not isinstance(active_dims, (list, slice)):
         raise TypeError(
-            "Expected active_dims to be a list, int or slice."
-            f" Got {type(active_dims)} instead."
+            f"Expected active_dims to be a list or slice. Got {active_dims} instead."
         )
+
+
+def _check_n_dims(n_dims: tp.Any):
+    if not isinstance(n_dims, (int, type(None))):
+        raise TypeError(
+            "Expected n_dims to be an integer or None (unspecified)."
+            f" Got {n_dims} instead."
+        )
+
+
+def _check_dims_compat(
+    active_dims: tp.Union[list[int], slice],
+    n_dims: tp.Union[int, None],
+):
+    err = ValueError(
+        "Expected the length of active_dims to be equal to the specified n_dims."
+        f" Got {active_dims} active dimensions and {n_dims} input dimensions."
+    )
+
+    if isinstance(active_dims, list) and isinstance(n_dims, int):
+        if len(active_dims) != n_dims:
+            raise err
+
+    if isinstance(active_dims, slice) and isinstance(n_dims, int):
+        start = active_dims.start or 0
+        stop = active_dims.stop or n_dims
+        step = active_dims.step or 1
+        if len(range(start, stop, step)) != n_dims:
+            raise err
+
+    if isinstance(active_dims, list) and n_dims is None:
+        n_dims = len(active_dims)
+
+    if isinstance(active_dims, slice) and n_dims is None:
+        if active_dims == slice(None):
+            pass
+        else:
+            start = active_dims.start or 0
+            stop = active_dims.stop or n_dims
+            step = active_dims.step or 1
+            n_dims = len(range(start, stop, step))
+
+    return active_dims, n_dims
 
 
 SumKernel = ft.partial(CombinationKernel, operator=jnp.sum)

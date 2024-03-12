@@ -36,22 +36,26 @@ LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 
 
 class PoweredExponential(StationaryKernel):
-    r"""The powered exponential family of kernels. This also equivalent to the symmetric generalized normal distribution.
+    r"""The powered exponential family of kernels.
 
+    This also equivalent to the symmetric generalized normal distribution.
     See Diggle and Ribeiro (2007) - "Model-based Geostatistics".
     and
     https://en.wikipedia.org/wiki/Generalized_normal_distribution#Symmetric_version
 
+    Attributes:
+        power: The power of the kernel.
     """
 
     name: str = "Powered Exponential"
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], slice, None] = None,
         lengthscale: tp.Union[LengthscaleCompatible, nnx.Variable[Lengthscale]] = 1.0,
         variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
         power: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         if isinstance(power, nnx.Variable):
@@ -59,7 +63,7 @@ class PoweredExponential(StationaryKernel):
         else:
             self.power = SigmoidBounded(power)
 
-        super().__init__(active_dims, lengthscale, variance, compute_engine)
+        super().__init__(active_dims, lengthscale, variance, n_dims, compute_engine)
 
     def __call__(
         self, x: Float[Array, " D"], y: Float[Array, " D"]

@@ -63,7 +63,9 @@ def search_space() -> ContinuousSearchSpace:
 def posterior_handler() -> PosteriorHandler:
     mean = gpx.mean_functions.Zero()
     kernel = gpx.kernels.Matern52(
-        1, lengthscale=jnp.array(1.0), variance=jnp.array(1.0)
+        lengthscale=jnp.array(1.0),
+        variance=jnp.array(1.0),
+        n_dims=1,
     )
     prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
     likelihood_builder = lambda x: gpx.likelihoods.Gaussian(
