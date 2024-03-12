@@ -397,9 +397,9 @@ class RBF(Module):
         init=False, bijector=tfb.Softplus(), trainable=True
     )
     variance: float = param_field(init=False, bijector=tfb.Softplus(), trainable=True)
-    key: jr.KeyArray = field(default_factory = lambda: jr.PRNGKey(42))
+    key: jax.Array = field(default_factory = lambda: jr.key(42))
     # Note, for Python <3.11 you may use the following:
-    # key: jr.KeyArray = jr.PRNGKey(42)
+    # key: jax.Array = jr.key(42)
 
     def __post_init__(self):
         # Split key into two keys
@@ -444,7 +444,7 @@ class RBF(Module):
         init=False, bijector=tfb.Softplus(), trainable=True
     )
     variance: float = param_field(init=False, bijector=tfb.Softplus(), trainable=True)
-    key: jr.KeyArray = static_field(default_factory=lambda: jr.PRNGKey(42))
+    key: jax.Array = static_field(default_factory=lambda: jr.key(42))
 
     def __post_init__(self):
         # Split key into two keys

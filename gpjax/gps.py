@@ -147,6 +147,7 @@ class Prior(AbstractPrior[MeanFunction, Kernel]):
         >>> prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
     ```
     """
+
     if TYPE_CHECKING:
 
         @overload
@@ -315,7 +316,7 @@ class Prior(AbstractPrior[MeanFunction, Kernel]):
             >>> import gpjax as gpx
             >>> import jax.numpy as jnp
             >>> import jax.random as jr
-            >>> key = jr.PRNGKey(123)
+            >>> key = jr.key(123)
             >>>
             >>> meanf = gpx.mean_functions.Zero()
             >>> kernel = gpx.kernels.RBF()

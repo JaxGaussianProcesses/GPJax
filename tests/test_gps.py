@@ -14,9 +14,9 @@
 # ==============================================================================
 
 try:
-    import beartype
+    import jaxtyping
 
-    ValidationErrors = (ValueError, beartype.roar.BeartypeCallHintParamViolation)
+    ValidationErrors = (ValueError, jaxtyping.TypeCheckError)
 except ImportError:
     ValidationErrors = ValueError
 
@@ -122,7 +122,7 @@ def test_conjugate_posterior(
     kernel: AbstractKernel,
 ) -> None:
     # Create a dataset.
-    key = jr.PRNGKey(123)
+    key = jr.key(123)
     x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1))
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
     D = Dataset(X=x, y=y)
@@ -169,7 +169,7 @@ def test_nonconjugate_posterior(
     kernel: AbstractKernel,
 ) -> None:
     # Create a dataset.
-    key = jr.PRNGKey(123)
+    key = jr.key(123)
     x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 1))
     y = jnp.sin(x) + jr.normal(key=key, shape=x.shape) * 0.1
     D = Dataset(X=x, y=y)
@@ -277,7 +277,7 @@ def test_posterior_construct(
 def test_prior_sample_approx(num_datapoints, kernel, mean_function):
     kern = kernel(lengthscale=jnp.array([5.0, 1.0]), variance=0.1)
     p = Prior(kernel=kern, mean_function=mean_function)
-    key = jr.PRNGKey(123)
+    key = jr.key(123)
 
     with pytest.raises(ValueError):
         p.sample_approx(-1, key)
@@ -304,7 +304,7 @@ def test_prior_sample_approx(num_datapoints, kernel, mean_function):
     max_delta = jnp.max(jnp.abs(evals - evals_2))
     assert max_delta == 0.0  # samples same for same seed
 
-    new_key = jr.PRNGKey(12345)
+    new_key = jr.key(12345)
     sampled_fn_3 = p.sample_approx(1, new_key, 100)
     evals_3 = sampled_fn_3(x)
     max_delta = jnp.max(jnp.abs(evals - evals_3))
@@ -332,7 +332,7 @@ def test_conjugate_posterior_sample_approx(num_datapoints, kernel, mean_function
     p = Prior(kernel=kern, mean_function=mean_function) * Gaussian(
         num_datapoints=num_datapoints
     )
-    key = jr.PRNGKey(123)
+    key = jr.key(123)
 
     x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 2))
     y = (
@@ -366,7 +366,7 @@ def test_conjugate_posterior_sample_approx(num_datapoints, kernel, mean_function
     max_delta = jnp.max(jnp.abs(evals - evals_2))
     assert max_delta == 0.0  # samples same for same seed
 
-    new_key = jr.PRNGKey(12345)
+    new_key = jr.key(12345)
     sampled_fn_3 = p.sample_approx(1, D, new_key, 100)
     evals_3 = sampled_fn_3(x)
     max_delta = jnp.max(jnp.abs(evals - evals_3))

@@ -221,7 +221,7 @@ def test_collapsed_variational_gaussian(
     n_test: int, n_inducing: int, n_datapoints: int, point_dim: int
 ) -> None:
     x = jnp.linspace(-5.0, 5.0, n_datapoints).reshape(-1, 1)
-    y = jnp.sin(x) + jr.normal(key=jr.PRNGKey(123), shape=x.shape) * 0.1
+    y = jnp.sin(x) + jr.normal(key=jr.key(123), shape=x.shape) * 0.1
     x = jnp.hstack([x] * point_dim)
     D = gpx.Dataset(X=x, y=y)
 

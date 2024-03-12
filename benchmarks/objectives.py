@@ -16,7 +16,7 @@ class Gaussian:
     params = [[10, 100, 200, 500, 1000], [1, 2, 5]]
 
     def setup(self, n_datapoints: int, n_dims: int):
-        key = jr.PRNGKey(123)
+        key = jr.key(123)
         self.X = jr.normal(key=key, shape=(n_datapoints, n_dims))
         self.y = jnp.sin(self.X[:, :1])
         self.data = gpx.Dataset(X=self.X, y=self.y)
@@ -24,7 +24,7 @@ class Gaussian:
         meanf = gpx.mean_functions.Constant()
         self.prior = gpx.gps.Prior(kernel=kernel, mean_function=meanf)
         self.likelihood = gpx.likelihoods.Gaussian(num_datapoints=self.data.n)
-        self.objective = gpx.ConjugateMLL()
+        self.objective = gpx.objectives.ConjugateMLL()
         self.posterior = self.prior * self.likelihood
 
     def time_eval(self, n_datapoints: int, n_dims: int):
@@ -42,7 +42,7 @@ class Bernoulli:
     params = [[10, 100, 200, 500, 1000], [1, 2, 5]]
 
     def setup(self, n_datapoints: int, n_dims: int):
-        key = jr.PRNGKey(123)
+        key = jr.key(123)
         self.X = jr.normal(key=key, shape=(n_datapoints, n_dims))
         self.y = jnp.where(jnp.sin(self.X[:, :1]) > 0, 1, 0)
         self.data = gpx.Dataset(X=self.X, y=self.y)
@@ -50,7 +50,7 @@ class Bernoulli:
         meanf = gpx.mean_functions.Constant()
         self.prior = gpx.gps.Prior(kernel=kernel, mean_function=meanf)
         self.likelihood = gpx.likelihoods.Bernoulli(num_datapoints=self.data.n)
-        self.objective = gpx.LogPosteriorDensity()
+        self.objective = gpx.objectives.LogPosteriorDensity()
         self.posterior = self.prior * self.likelihood
 
     def time_eval(self, n_datapoints: int, n_dims: int):
@@ -68,7 +68,7 @@ class Poisson:
     params = [[10, 100, 200, 500, 1000], [1, 2, 5]]
 
     def setup(self, n_datapoints: int, n_dims: int):
-        key = jr.PRNGKey(123)
+        key = jr.key(123)
         self.X = jr.normal(key=key, shape=(n_datapoints, n_dims))
         f = lambda x: 2.0 * jnp.sin(3 * x) + 0.5 * x  # latent function
         self.y = jr.poisson(key, jnp.exp(f(self.X)))
@@ -77,7 +77,7 @@ class Poisson:
         meanf = gpx.mean_functions.Constant()
         self.prior = gpx.gps.Prior(kernel=kernel, mean_function=meanf)
         self.likelihood = gpx.likelihoods.Poisson(num_datapoints=self.data.n)
-        self.objective = gpx.LogPosteriorDensity()
+        self.objective = gpx.objectives.LogPosteriorDensity()
         self.posterior = self.prior * self.likelihood
 
     def time_eval(self, n_datapoints: int, n_dims: int):

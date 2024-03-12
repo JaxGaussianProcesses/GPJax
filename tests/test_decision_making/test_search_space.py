@@ -115,7 +115,7 @@ def test_continous_search_space_invalid_sample_num_points(
     continuous_search_space: ContinuousSearchSpace, num_points: int
 ):
     with pytest.raises(ValueError):
-        continuous_search_space.sample(num_points=num_points, key=jr.PRNGKey(42))
+        continuous_search_space.sample(num_points=num_points, key=jr.key(42))
 
 
 @pytest.mark.parametrize(
@@ -138,7 +138,7 @@ def test_continous_search_space_invalid_sample_num_points(
 def test_continuous_search_space_sample_shape(
     continuous_search_space: ContinuousSearchSpace, dimensionality: int, num_points: int
 ):
-    samples = continuous_search_space.sample(num_points=num_points, key=jr.PRNGKey(42))
+    samples = continuous_search_space.sample(num_points=num_points, key=jr.key(42))
     assert samples.shape[0] == num_points
     assert samples.shape[1] == dimensionality
 
@@ -151,12 +151,12 @@ def test_continuous_search_space_sample_shape(
         ContinuousSearchSpace(jnp.array([0.0, 0.0, 0.0]), jnp.array([1.0, 1.0, 1.0])),
     ],
 )
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(5)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(5)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_continous_search_space_sample_same_key_same_samples(
-    continuous_search_space: ContinuousSearchSpace, key: jr.PRNGKey
+    continuous_search_space: ContinuousSearchSpace, key: jr.key
 ):
     sample_one = continuous_search_space.sample(num_points=100, key=key)
     sample_two = continuous_search_space.sample(num_points=100, key=key)
@@ -173,15 +173,15 @@ def test_continous_search_space_sample_same_key_same_samples(
 )
 @pytest.mark.parametrize(
     "key_one, key_two",
-    [(jr.PRNGKey(42), jr.PRNGKey(5)), (jr.PRNGKey(1), jr.PRNGKey(2))],
+    [(jr.key(42), jr.key(5)), (jr.key(1), jr.key(2))],
 )
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_continuous_search_space_different_keys_different_samples(
     continuous_search_space: ContinuousSearchSpace,
-    key_one: jr.PRNGKey,
-    key_two: jr.PRNGKey,
+    key_one: jr.key,
+    key_two: jr.key,
 ):
     sample_one = continuous_search_space.sample(num_points=100, key=key_one)
     sample_two = continuous_search_space.sample(num_points=100, key=key_two)
@@ -212,7 +212,7 @@ def test_continuous_search_space_different_keys_different_samples(
 def test_continuous_search_space_valid_sample_ranges(
     continuous_search_space: ContinuousSearchSpace,
 ):
-    samples = continuous_search_space.sample(num_points=100, key=jr.PRNGKey(42))
+    samples = continuous_search_space.sample(num_points=100, key=jr.key(42))
     for i in range(continuous_search_space.dimensionality):
         assert jnp.all(samples[:, i] >= continuous_search_space.lower_bounds[i])
         assert jnp.all(samples[:, i] <= continuous_search_space.upper_bounds[i])

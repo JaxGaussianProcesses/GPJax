@@ -12,7 +12,7 @@ class Kernels:
     params = [[10, 100, 500, 1000, 2000], [1, 2, 5]]
 
     def setup(self, n_datapoints: int, n_dims: int):
-        key = jr.PRNGKey(123)
+        key = jr.key(123)
         self.X = jr.uniform(
             key=key, minval=-3.0, maxval=3.0, shape=(n_datapoints, n_dims)
         )

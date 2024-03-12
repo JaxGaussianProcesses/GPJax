@@ -47,7 +47,7 @@ with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     from gpjax.base.param import param_field
 
-key = jr.PRNGKey(123)
+key = jr.key(123)
 tfb = tfp.bijectors
 plt.style.use(
     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"

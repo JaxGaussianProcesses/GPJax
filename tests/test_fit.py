@@ -63,7 +63,7 @@ config.update("jax_enable_x64", True)
 def test_simple_linear_model() -> None:
     # Create dataset:
     X = jnp.linspace(0.0, 10.0, 100).reshape(-1, 1)
-    y = 2.0 * X + 1.0 + 10 * jr.normal(jr.PRNGKey(0), X.shape).reshape(-1, 1)
+    y = 2.0 * X + 1.0 + 10 * jr.normal(jr.key(0), X.shape).reshape(-1, 1)
     D = Dataset(X, y)
 
     # Define linear model:
@@ -92,7 +92,7 @@ def test_simple_linear_model() -> None:
         train_data=D,
         optim=ox.sgd(0.001),
         num_iters=100,
-        key=jr.PRNGKey(123),
+        key=jr.key(123),
     )
 
     # Ensure we return a history of the correct length
@@ -132,7 +132,7 @@ def test_simple_linear_model() -> None:
 @pytest.mark.parametrize("verbose", [True, False])
 def test_gaussian_process_regression(n_data: int, verbose: bool) -> None:
     # Create dataset:
-    key = jr.PRNGKey(123)
+    key = jr.key(123)
     x = jnp.sort(
         jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n_data, 1)), axis=0
     )
@@ -155,7 +155,7 @@ def test_gaussian_process_regression(n_data: int, verbose: bool) -> None:
         optim=ox.adam(0.1),
         num_iters=15,
         verbose=verbose,
-        key=jr.PRNGKey(123),
+        key=jr.key(123),
     )
 
     # Ensure the trained model is a Gaussian process posterior
@@ -237,7 +237,7 @@ def test_batch_fitting(
     num_iters: int, batch_size: int, n_data: int, verbose: bool
 ) -> None:
     # Create dataset:
-    key = jr.PRNGKey(123)
+    key = jr.key(123)
     x = jnp.sort(
         jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n_data, 1)), axis=0
     )
@@ -265,7 +265,7 @@ def test_batch_fitting(
         num_iters=num_iters,
         batch_size=batch_size,
         verbose=verbose,
-        key=jr.PRNGKey(123),
+        key=jr.key(123),
     )
 
     # Ensure the trained model is a Gaussian process posterior
@@ -282,7 +282,7 @@ def test_batch_fitting(
 @pytest.mark.parametrize("n_dim", [1, 2, 3])
 @pytest.mark.parametrize("batch_size", [1, 2, 50])
 def test_get_batch(n_data: int, n_dim: int, batch_size: int):
-    key = jr.PRNGKey(123)
+    key = jr.key(123)
 
     # Create dataset:
     x = jnp.sort(

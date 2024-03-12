@@ -57,7 +57,7 @@ def build_data(num_datapoints: int, num_dims: int, key, binary: bool):
 def test_conjugate_mll(
     num_datapoints: int, num_dims: int, negative: bool, jit_compile: bool, key_val: int
 ):
-    key = jr.PRNGKey(key_val)
+    key = jr.key(key_val)
     D = build_data(num_datapoints, num_dims, key, binary=False)
 
     # Build model
@@ -87,7 +87,7 @@ def test_conjugate_mll(
 def test_conjugate_loocv(
     num_datapoints: int, num_dims: int, negative: bool, jit_compile: bool, key_val: int
 ):
-    key = jr.PRNGKey(key_val)
+    key = jr.key(key_val)
     D = build_data(num_datapoints, num_dims, key, binary=False)
 
     # Build model
@@ -117,7 +117,7 @@ def test_conjugate_loocv(
 def test_non_conjugate_mll(
     num_datapoints: int, num_dims: int, negative: bool, jit_compile: bool, key_val: int
 ):
-    key = jr.PRNGKey(key_val)
+    key = jr.key(key_val)
     D = build_data(num_datapoints, num_dims, key, binary=True)
 
     # Build model
@@ -152,7 +152,7 @@ def test_non_conjugate_mll(
 def test_collapsed_elbo(
     num_datapoints: int, num_dims: int, negative: bool, jit_compile: bool, key_val: int
 ):
-    key = jr.PRNGKey(key_val)
+    key = jr.key(key_val)
     D = build_data(num_datapoints, num_dims, key, binary=False)
     z = jr.uniform(
         key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints // 2, num_dims)
@@ -202,7 +202,7 @@ def test_elbo(
     key_val: int,
     binary: bool,
 ):
-    key = jr.PRNGKey(key_val)
+    key = jr.key(key_val)
     D = build_data(num_datapoints, num_dims, key, binary=binary)
     z = jr.uniform(
         key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints // 2, num_dims)

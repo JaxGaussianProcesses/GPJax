@@ -28,7 +28,7 @@ with install_import_hook("gpjax", "beartype.beartype"):
 from gpjax.typing import Array, FunctionalSample, ScalarFloat
 from jaxopt import ScipyBoundedMinimize
 
-key = jr.PRNGKey(42)
+key = jr.key(42)
 plt.style.use(
     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
 )

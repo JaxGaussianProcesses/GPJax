@@ -66,7 +66,7 @@ plt.style.use(
     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
 )
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
-key = jr.PRNGKey(123)
+key = jr.key(123)
 
 
 n = 50

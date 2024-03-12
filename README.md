@@ -123,7 +123,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import optax as ox
 
-key = jr.PRNGKey(123)
+key = jr.key(123)
 
 f = lambda x: 10 * jnp.sin(x)
 

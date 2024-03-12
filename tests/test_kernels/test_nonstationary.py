@@ -38,7 +38,7 @@ from gpjax.kernels.nonstationary import (
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
-_initialise_key = jr.PRNGKey(123)
+_initialise_key = jr.key(123)
 _jitter = 1e-6
 
 
@@ -198,7 +198,7 @@ class TestArcCosine(BaseTestKernel):
         kernel: AbstractKernel = self.kernel(
             weight_variance=jnp.array([1.0, 1.0]), bias_variance=1e-25, order=order
         )
-        key = jr.PRNGKey(123)
+        key = jr.key(123)
 
         # Inputs close(ish) together
         a = jnp.array([[0.0, 0.0]])

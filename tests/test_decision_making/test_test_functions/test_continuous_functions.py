@@ -50,7 +50,7 @@ def test_minimizer_evaluates_to_minimum(test_function: AbstractContinuousTestFun
 @pytest.mark.parametrize(
     "test_function", [Quadratic(), Forrester(), LogarithmicGoldsteinPrice()]
 )
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
@@ -71,8 +71,8 @@ def test_correct_minimum(test_function: AbstractContinuousTestFunction, key: Key
 def test_correct_dtypes(test_function: AbstractContinuousTestFunction):
     minimizer = test_function.minimizer
     minimum = test_function.minimum
-    dataset = test_function.generate_dataset(10, jr.PRNGKey(42))
-    test_x = test_function.generate_test_points(10, jr.PRNGKey(42))
+    dataset = test_function.generate_dataset(10, jr.key(42))
+    test_x = test_function.generate_test_points(10, jr.key(42))
     assert minimizer.dtype == jnp.float64
     assert minimum.dtype == jnp.float64
     assert dataset.X.dtype == jnp.float64
@@ -91,7 +91,7 @@ def test_correct_dtypes(test_function: AbstractContinuousTestFunction):
 def test_test_points_shape(
     test_function: AbstractContinuousTestFunction, dimensionality: int, num_samples: int
 ):
-    test_X = test_function.generate_test_points(num_samples, jr.PRNGKey(42))
+    test_X = test_function.generate_test_points(num_samples, jr.key(42))
     assert test_X.shape == (num_samples, dimensionality)
 
 
@@ -106,7 +106,7 @@ def test_test_points_shape(
 def test_dataset_shapes(
     test_function: AbstractContinuousTestFunction, dimensionality: int, num_samples: int
 ):
-    dataset = test_function.generate_dataset(num_samples, jr.PRNGKey(42))
+    dataset = test_function.generate_dataset(num_samples, jr.key(42))
     assert dataset.X.shape == (num_samples, dimensionality)
     assert dataset.y.shape == (num_samples, 1)
 
@@ -115,7 +115,7 @@ def test_dataset_shapes(
     "test_function", [Quadratic(), Forrester(), LogarithmicGoldsteinPrice()]
 )
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
@@ -132,7 +132,7 @@ def test_same_key_same_dataset(
     "test_function", [Quadratic(), Forrester(), LogarithmicGoldsteinPrice()]
 )
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
@@ -150,7 +150,7 @@ def test_different_key_different_dataset(
     "test_function", [Quadratic(), Forrester(), LogarithmicGoldsteinPrice()]
 )
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
@@ -166,7 +166,7 @@ def test_same_key_same_test_points(
     "test_function", [Quadratic(), Forrester(), LogarithmicGoldsteinPrice()]
 )
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
