@@ -84,7 +84,7 @@ def test_prior(
     mean_function: Type[AbstractMeanFunction],
 ) -> None:
     # Create prior.
-    prior = Prior(mean_function=mean_function(), kernel=kernel(active_dims=1))
+    prior = Prior(mean_function=mean_function(), kernel=kernel())
 
     # Check types.
     assert isinstance(prior, Prior)
@@ -120,7 +120,7 @@ def test_conjugate_posterior(
     D = Dataset(X=x, y=y)
 
     # Define prior.
-    prior = Prior(mean_function=mean_function(), kernel=kernel(active_dims=1))
+    prior = Prior(mean_function=mean_function(), kernel=kernel())
 
     # Define a likelihood.
     likelihood = Gaussian(num_datapoints=num_datapoints)
@@ -161,7 +161,7 @@ def test_nonconjugate_posterior(
     D = Dataset(X=x, y=y)
 
     # Define prior.
-    prior = Prior(mean_function=mean_function(), kernel=kernel(active_dims=1))
+    prior = Prior(mean_function=mean_function(), kernel=kernel())
 
     # Define a likelihood.
     likelihood = Bernoulli(num_datapoints=num_datapoints)
@@ -202,7 +202,7 @@ def test_posterior_construct(
     mean_function: type[AbstractMeanFunction],
 ) -> None:
     # Define prior.
-    prior = Prior(mean_function=mean_function(), kernel=kernel(active_dims=1))
+    prior = Prior(mean_function=mean_function(), kernel=kernel())
 
     # Construct the posterior via the three methods.
     likelihood: AbstractLikelihood = likelihood(num_datapoints=num_datapoints)
@@ -231,7 +231,7 @@ def test_posterior_construct(
 @pytest.mark.parametrize("kernel", [RBF, Matern52])
 @pytest.mark.parametrize("mean_function", [Zero, Constant])
 def test_prior_sample_approx(num_datapoints, kernel, mean_function):
-    kern = kernel(2, lengthscale=jnp.array([5.0, 1.0]), variance=0.1)
+    kern = kernel(n_dims=2, lengthscale=jnp.array([5.0, 1.0]), variance=0.1)
     p = Prior(kernel=kern, mean_function=mean_function())
     key = jr.PRNGKey(123)
 
@@ -284,7 +284,7 @@ def test_prior_sample_approx(num_datapoints, kernel, mean_function):
 @pytest.mark.parametrize("kernel", [RBF, Matern52])
 @pytest.mark.parametrize("mean_function", [Zero, Constant])
 def test_conjugate_posterior_sample_approx(num_datapoints, kernel, mean_function):
-    kern = kernel(2, lengthscale=jnp.array([5.0, 1.0]), variance=0.1)
+    kern = kernel(lengthscale=jnp.array([5.0, 1.0]), variance=0.1)
     p = Prior(kernel=kern, mean_function=mean_function()) * Gaussian(
         num_datapoints=num_datapoints
     )

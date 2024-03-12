@@ -32,7 +32,9 @@ def test_graph_kernel():
     L = nx.laplacian_matrix(G).toarray() + jnp.eye(n_verticies) * 1e-12
 
     # Create graph kernel
-    kern = GraphKernel(laplacian=L, active_dims=1)
+    kern = GraphKernel(
+        laplacian=L,
+    )
     assert isinstance(kern, GraphKernel)
     assert kern.num_vertex == n_verticies
     assert kern.eigenvalues.value.shape == (n_verticies, 1)

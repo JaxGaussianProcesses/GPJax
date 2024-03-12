@@ -114,7 +114,7 @@ def test_variational_gaussians(
 ) -> None:
     # Initialise variational family:
     prior = gpx.gps.Prior(
-        kernel=gpx.kernels.RBF(1), mean_function=gpx.mean_functions.Constant()
+        kernel=gpx.kernels.RBF(), mean_function=gpx.mean_functions.Constant()
     )
     likelihood = gpx.likelihoods.Gaussian(123)
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
@@ -187,7 +187,7 @@ def test_collapsed_variational_gaussian(
     D = gpx.Dataset(X=x, y=y)
 
     prior = gpx.gps.Prior(
-        kernel=gpx.kernels.RBF(1), mean_function=gpx.mean_functions.Constant()
+        kernel=gpx.kernels.RBF(), mean_function=gpx.mean_functions.Constant()
     )
 
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)

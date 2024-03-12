@@ -38,11 +38,12 @@ class Linear(AbstractKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], slice, None] = None,
         variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
+        super().__init__(active_dims, n_dims, compute_engine)
 
         if isinstance(variance, nnx.Variable):
             self.variance = variance

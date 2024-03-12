@@ -153,7 +153,7 @@ def test_fit_gp_regression(n_data: int, verbose: bool) -> None:
     D = Dataset(X=x, y=y)
 
     # Define GP model:
-    prior = Prior(kernel=RBF(1), mean_function=Constant())
+    prior = Prior(kernel=RBF(), mean_function=Constant())
     likelihood = Gaussian(num_datapoints=n_data)
     posterior = prior * likelihood
 
@@ -190,7 +190,7 @@ def test_fit_scipy_gp_regression(n_data: int, verbose: bool) -> None:
     D = Dataset(X=x, y=y)
 
     # Define GP model:
-    prior = Prior(kernel=RBF(1), mean_function=Constant())
+    prior = Prior(kernel=RBF(), mean_function=Constant())
     likelihood = Gaussian(num_datapoints=n_data)
     posterior = prior * likelihood
 
@@ -225,7 +225,7 @@ def test_fit_scipy_error_raises() -> None:
             return jnp.heaviside(x, 100.0)
 
     # Define GP model with crazy mean function:
-    prior = Prior(kernel=RBF(1), mean_function=CrazyMean())
+    prior = Prior(kernel=RBF(), mean_function=CrazyMean())
     likelihood = Gaussian(num_datapoints=2)
     posterior = prior * likelihood
 
@@ -238,7 +238,7 @@ def test_fit_scipy_error_raises() -> None:
         )
 
     # also check fails if no given enough steps
-    prior = Prior(kernel=RBF(1), mean_function=Constant())
+    prior = Prior(kernel=RBF(), mean_function=Constant())
     likelihood = Gaussian(num_datapoints=2)
     posterior = prior * likelihood
 
@@ -265,7 +265,7 @@ def test_fit_batch(num_iters: int, batch_size: int, n_data: int, verbose: bool) 
     D = Dataset(X=x, y=y)
 
     # Define GP model:
-    prior = Prior(kernel=RBF(1), mean_function=Constant())
+    prior = Prior(kernel=RBF(), mean_function=Constant())
     likelihood = Gaussian(num_datapoints=n_data)
     posterior = prior * likelihood
 

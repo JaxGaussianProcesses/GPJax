@@ -123,7 +123,7 @@ def test_improvement(kernel: type[StationaryKernel], n_dim: int):
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
 def test_exactness(kernel: type[StationaryKernel]):
-    kernel = kernel(active_dims=1)
+    kernel = kernel(n_dims=1)
 
     n_data = 100
     key = jr.PRNGKey(123)
@@ -131,7 +131,7 @@ def test_exactness(kernel: type[StationaryKernel]):
     x = jr.uniform(key, minval=-3.0, maxval=3.0, shape=(n_data, 1))
     exact_linop = kernel.gram(x).to_dense()
 
-    better_approximation = RFF(base_kernel=kernel, num_basis_fns=500)
+    better_approximation = RFF(base_kernel=kernel, num_basis_fns=300)
     b_linop = better_approximation.gram(x).to_dense()
 
     max_delta = jnp.max(exact_linop - b_linop)
@@ -150,12 +150,16 @@ def test_nonstationary_raises_error(kernel):
 )
 def test_missing_spectral_density_raises_error(kernel):
     with pytest.raises(NotImplementedError):
-        RFF(base_kernel=kernel(1), num_basis_fns=10)
+        RFF(base_kernel=kernel(), num_basis_fns=10)
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
 def test_stochastic_init(kernel: type[StationaryKernel]):
-    kernel = kernel(active_dims=1)
+    with pytest.raises(ValueError):
+        # n_dims is not specified, but should be
+        RFF(base_kernel=kernel(), num_basis_fns=10, frequencies=jnp.zeros((10, 1)))
+
+    kernel = kernel(n_dims=1)
 
     k1 = RFF(base_kernel=kernel, num_basis_fns=10, key=jr.PRNGKey(123))
     k2 = RFF(base_kernel=kernel, num_basis_fns=10, key=jr.PRNGKey(42))

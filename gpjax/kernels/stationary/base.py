@@ -37,21 +37,39 @@ LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 
 
 class StationaryKernel(AbstractKernel):
-    """Base class for stationary kernels."""
+    """Base class for stationary kernels.
+
+    Stationary kernels are a class of kernels that are invariant to translations
+    in the input space. They can be isotropic or anisotropic, meaning that they
+    can have a single lengthscale for all input dimensions or a different lengthscale
+    for each input dimension.
+
+    Attributes:
+        lengthscale: The lengthscale(s) of the kernel. If a scalar or an array of
+            length 1, the kernel is isotropic, meaning that the same lengthscale is
+            used for all input dimensions. If an array with length > 1, the kernel is
+            anisotropic, meaning that a different lengthscale is used for each input.
+        variance: The variance of the kernel.
+    """
 
     lengthscale: nnx.Variable[Lengthscale]
     variance: nnx.Variable[ScalarArray]
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], slice, None] = None,
         lengthscale: tp.Union[LengthscaleCompatible, nnx.Variable[Lengthscale]] = 1.0,
         variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
-        super().__init__(active_dims=active_dims, compute_engine=compute_engine)
+        super().__init__(active_dims, n_dims, compute_engine)
 
-        _check_lengthscale_dims_compat(lengthscale, self.n_dims)
+        _check_lengthscale(lengthscale)
+
+        lengthscale, self.n_dims = _check_lengthscale_dims_compat(
+            lengthscale, self.n_dims
+        )
 
         if isinstance(lengthscale, nnx.Variable):
             self.lengthscale = lengthscale
@@ -83,30 +101,52 @@ class StationaryKernel(AbstractKernel):
         )
 
 
-# TODO: maybe improve the control flow here
 def _check_lengthscale_dims_compat(
-    lengthscale: tp.Union[LengthscaleCompatible, nnx.Variable[Lengthscale]], n_dims: int
-) -> tp.Union[int, None]:
-    r"""Check that the lengthscale parameter is compatible with the number of input dimensions.
+    lengthscale: tp.Union[LengthscaleCompatible, nnx.Variable[Lengthscale]],
+    n_dims: tp.Union[int, None],
+) -> tuple[tp.Union[Lengthscale, nnx.Variable[Lengthscale]], tp.Union[int, None]]:
+    r"""Check that the lengthscale is compatible with n_dims.
 
-    Args:
-        lengthscale (Float[Array, " D"]): The lengthscale parameter.
-        n_dims (int): The number of input dimensions.
+    If possible, infer the number of input dimensions from the lengthscale.
     """
+
+    if isinstance(lengthscale, nnx.Variable):
+        return _check_lengthscale_dims_compat(lengthscale.value, n_dims)
+
+    lengthscale = jnp.asarray(lengthscale)
     ls_shape = jnp.shape(lengthscale)
 
-    if len(ls_shape) > 1:
-        raise ValueError(
-            "Expected `lengthscale` to be a scalar or 1D array. Got `lengthscale` with shape "
-            f"{ls_shape}."
-        )
+    if ls_shape == ():
+        return lengthscale, n_dims
+    elif ls_shape != () and n_dims is None:
+        return lengthscale, ls_shape[0]
+    elif ls_shape != () and n_dims is not None:
+        if ls_shape != (n_dims,):
+            raise ValueError(
+                "Expected `lengthscale` to be compatible with the number "
+                f"of input dimensions. Got `lengthscale` with shape {ls_shape}, "
+                f"but the number of input dimensions is {n_dims}."
+            )
+        return lengthscale, n_dims
 
-    if n_dims == 1:
+
+def _check_lengthscale(lengthscale: tp.Any):
+    """Check that the lengthscale is a valid value."""
+
+    if isinstance(lengthscale, nnx.Variable):
+        _check_lengthscale(lengthscale.value)
         return
 
-    if ls_shape in ((n_dims,), ()):
-        raise ValueError(
-            "Expected `lengthscale` to be compatible with the number "
-            f"of input dimensions. Got `lengthscale` with shape {ls_shape}, "
-            f"but the number of input dimensions is {n_dims}."
+    if not isinstance(lengthscale, (int, float, jnp.ndarray, list, tuple)):
+        raise TypeError(
+            f"Expected `lengthscale` to be a array-like. Got {lengthscale}."
         )
+
+    if isinstance(lengthscale, (jnp.ndarray, list)):
+        ls_shape = jnp.shape(jnp.asarray(lengthscale))
+
+        if len(ls_shape) > 1:
+            raise ValueError(
+                f"Expected `lengthscale` to be a scalar or 1D array. "
+                f"Got `lengthscale` with shape {ls_shape}."
+            )

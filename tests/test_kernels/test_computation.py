@@ -29,15 +29,15 @@ from gpjax.kernels.stationary import (
 @pytest.mark.parametrize(
     "kernel",
     [
-        RBF(1),
-        Matern12(1),
-        Matern32(1),
-        Matern52(1),
-        RationalQuadratic(1),
-        PoweredExponential(1),
-        Periodic(1),
-        Linear(1),
-        Polynomial(1),
+        RBF(),
+        Matern12(),
+        Matern32(),
+        Matern52(),
+        RationalQuadratic(),
+        PoweredExponential(),
+        Periodic(),
+        Linear(),
+        Polynomial(),
     ],
 )
 def test_change_computation(kernel: AbstractKernel):

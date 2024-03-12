@@ -35,11 +35,12 @@ class White(StationaryKernel):
 
     def __init__(
         self,
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], slice, None] = None,
         variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = ConstantDiagonalKernelComputation(),
     ):
-        super().__init__(active_dims, 1.0, variance, compute_engine)
+        super().__init__(active_dims, 1.0, variance, n_dims, compute_engine)
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         r"""Compute the White noise kernel between a pair of arrays.

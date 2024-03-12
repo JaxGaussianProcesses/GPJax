@@ -43,7 +43,7 @@ def _check_no_fallback(citation: AbstractCitation):
     )
 
 
-@pytest.mark.parametrize("kernel", [Matern12(1), Matern32(1), Matern52(1)])
+@pytest.mark.parametrize("kernel", [Matern12(), Matern32(), Matern52()])
 def test_matern_kernels(kernel):
     citation = cite(kernel)
     # Check type
@@ -57,7 +57,7 @@ def test_matern_kernels(kernel):
 
 
 def test_arc_cosine():
-    kernel = ArcCosine(1)
+    kernel = ArcCosine()
     citation = cite(kernel)
 
     assert isinstance(citation, PaperCitation)
@@ -70,7 +70,9 @@ def test_arc_cosine():
 
 def test_graph_kernel():
     L = jnp.eye(3)
-    kernel = GraphKernel(laplacian=L, active_dims=1)
+    kernel = GraphKernel(
+        laplacian=L,
+    )
     citation = cite(kernel)
 
     assert isinstance(citation, PaperCitation)
@@ -80,9 +82,9 @@ def test_graph_kernel():
     _check_no_fallback(citation)
 
 
-@pytest.mark.parametrize("kernel", [RBF(1), Matern12(1), Matern32(1), Matern52(1)])
+@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
 def test_rff(kernel):
-    base_kernel = kernel
+    base_kernel = kernel(n_dims=1)
     rff = RFF(base_kernel=base_kernel)
     citation = cite(rff)
 
@@ -94,7 +96,7 @@ def test_rff(kernel):
     _check_no_fallback(citation)
 
 
-@pytest.mark.parametrize("kernel", [RBF(1), Linear(1)])
+@pytest.mark.parametrize("kernel", [RBF(), Linear()])
 def test_missing_citation(kernel):
     citation = cite(kernel)
     assert isinstance(citation, NullCitation)

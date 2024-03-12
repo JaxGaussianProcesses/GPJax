@@ -59,10 +59,11 @@ class GraphKernel(StationaryKernel):
     def __init__(
         self,
         laplacian: Num[Array, "N N"],
-        active_dims: tp.Union[list[int], int, slice],
+        active_dims: tp.Union[list[int], slice, None] = None,
         lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
         variance: tp.Union[ScalarFloat, Parameter] = 1.0,
         smoothness: ScalarFloat = 1.0,
+        n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = EigenKernelComputation(),
     ):
         if isinstance(smoothness, Parameter):
@@ -76,7 +77,7 @@ class GraphKernel(StationaryKernel):
         self.eigenvalues = Static(evals.reshape(-1, 1))
         self.num_vertex = self.eigenvalues.value.shape[0]
 
-        super().__init__(active_dims, lengthscale, variance, compute_engine)
+        super().__init__(active_dims, lengthscale, variance, n_dims, compute_engine)
 
     def __call__(  # TODO not consistent with general kernel interface
         self,

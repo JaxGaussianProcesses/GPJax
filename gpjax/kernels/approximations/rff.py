@@ -59,6 +59,12 @@ class RFF(AbstractKernel):
 
         if self.frequencies is None:
             n_dims = self.base_kernel.n_dims
+            if n_dims is None:
+                raise ValueError(
+                    "Expected the number of dimensions to be specified for the base kernel. "
+                    "Please specify the n_dims argument for the base kernel."
+                )
+
             self.frequencies = Static(
                 self.base_kernel.spectral_density.sample(
                     seed=key, sample_shape=(self.num_basis_fns, n_dims)

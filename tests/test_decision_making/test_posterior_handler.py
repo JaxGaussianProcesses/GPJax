@@ -58,7 +58,7 @@ def test_posterior_handler_erroneous_num_optimization_iterations_raises_error(
     num_optimization_iters: int,
 ):
     mean_function = Constant()
-    kernel = Matern52(1)
+    kernel = Matern52()
     prior = Prior(mean_function=mean_function, kernel=kernel)
     likelihood_builder = gaussian_likelihood_builder
     with pytest.raises(ValueError):
@@ -76,7 +76,7 @@ def test_posterior_handler_erroneous_num_optimization_iterations_raises_error(
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_get_optimized_posterior_with_no_key_raises_error():
     mean_function = Constant()
-    kernel = Matern52(1)
+    kernel = Matern52()
     prior = Prior(mean_function=mean_function, kernel=kernel)
     likelihood_builder = gaussian_likelihood_builder
     posterior_handler = PosteriorHandler(
@@ -97,7 +97,7 @@ def test_get_optimized_posterior_with_no_key_raises_error():
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_update_and_optimize_posterior_with_no_key_raises_error():
     mean_function = Constant()
-    kernel = Matern52(1)
+    kernel = Matern52()
     prior = Prior(mean_function=mean_function, kernel=kernel)
     likelihood_builder = gaussian_likelihood_builder
     posterior_handler = PosteriorHandler(
@@ -138,7 +138,7 @@ def test_get_posterior_no_optimization_correct_num_datapoints_and_not_optimized(
     test_function: Union[Forrester, PoissonTestFunction],
 ):
     mean_function = Constant(constant=jnp.array([1.0]))
-    kernel = Matern52(1, lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
+    kernel = Matern52(lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
     prior = Prior(mean_function=mean_function, kernel=kernel)
     posterior_handler = PosteriorHandler(
         prior=prior,
@@ -179,7 +179,7 @@ def test_get_posterior_with_optimization_correct_num_datapoints_and_optimized(
     test_function: Union[Forrester, PoissonTestFunction],
 ):
     mean_function = Constant(constant=jnp.array([1.0]))
-    kernel = Matern52(1, lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
+    kernel = Matern52(lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
     prior = Prior(mean_function=mean_function, kernel=kernel)
     non_optimized_posterior = prior * likelihood_builder(num_datapoints)
     posterior_handler = PosteriorHandler(
@@ -226,7 +226,7 @@ def test_update_posterior_no_optimize_same_prior_parameters_and_different_num_da
     test_function: Union[Forrester, PoissonTestFunction],
 ):
     mean_function = Constant(constant=jnp.array([1.0]))
-    kernel = Matern52(1, lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
+    kernel = Matern52(lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
     prior = Prior(mean_function=mean_function, kernel=kernel)
     posterior_handler = PosteriorHandler(
         prior=prior,
@@ -285,7 +285,7 @@ def test_update_posterior_with_optimization_updated_prior_parameters_and_differe
     test_function: Union[Forrester, PoissonTestFunction],
 ):
     mean_function = Constant(constant=jnp.array([1.0]))
-    kernel = Matern52(1, lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
+    kernel = Matern52(lengthscale=jnp.array([0.5]), variance=jnp.array(1.0))
     prior = Prior(mean_function=mean_function, kernel=kernel)
     posterior_handler = PosteriorHandler(
         prior=prior,

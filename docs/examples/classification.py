@@ -89,7 +89,7 @@ ax.scatter(x, y)
 # choose a Bernoulli likelihood with a probit link function.
 
 # %%
-kernel = gpx.kernels.RBF(1)
+kernel = gpx.kernels.RBF()
 meanf = gpx.mean_functions.Constant()
 prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 likelihood = gpx.likelihoods.Bernoulli(num_datapoints=D.n)

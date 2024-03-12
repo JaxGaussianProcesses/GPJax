@@ -17,7 +17,6 @@ import typing as tp
 
 from flax.experimental import nnx
 import jax
-from jax._src.random import _check_prng_key
 from jax.flatten_util import ravel_pytree
 import jax.numpy as jnp
 import jax.random as jr
@@ -124,7 +123,6 @@ def fit(  # noqa: PLR0913
         _check_optim(optim)
         _check_num_iters(num_iters)
         _check_batch_size(batch_size)
-        _check_prng_key(key)
         _check_log_rate(log_rate)
         _check_verbose(verbose)
 

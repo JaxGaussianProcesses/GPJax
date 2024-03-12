@@ -45,7 +45,7 @@ from gpjax.typing import KeyArray
 
 def generate_dummy_conjugate_posterior(dataset: Dataset) -> ConjugatePosterior:
     n_dims = dataset.X.shape[1]
-    kernel = RBF(active_dims=n_dims, lengthscale=jnp.ones(n_dims))
+    kernel = RBF(n_dims=n_dims, lengthscale=jnp.ones(n_dims))
     mean_function = Zero()
     prior = Prior(kernel=kernel, mean_function=mean_function)
     likelihood = Gaussian(num_datapoints=dataset.n)
@@ -55,7 +55,7 @@ def generate_dummy_conjugate_posterior(dataset: Dataset) -> ConjugatePosterior:
 
 def generate_dummy_non_conjugate_posterior(dataset: Dataset) -> NonConjugatePosterior:
     n_dims = dataset.X.shape[1]
-    kernel = RBF(active_dims=n_dims, lengthscale=jnp.ones(n_dims))
+    kernel = RBF(n_dims=n_dims, lengthscale=jnp.ones(n_dims))
     mean_function = Zero()
     prior = Prior(kernel=kernel, mean_function=mean_function)
     likelihood = Poisson(num_datapoints=dataset.n)
