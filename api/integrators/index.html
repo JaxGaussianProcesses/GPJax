@@ -2564,7 +2564,6 @@
 
 
 
-
 <h4 id="gpjax.integrators" class="doc doc-heading">
           <code>gpjax.integrators</code>
 
@@ -2587,7 +2586,6 @@
 
 
 
-
 <h5 id="gpjax.integrators.Likelihood" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">Likelihood</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Likelihood&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="s1">&#39;gpjax.likelihoods.AbstractLikelihood&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span></code>
   
@@ -2604,7 +2602,6 @@
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2627,7 +2624,6 @@
 
 
 
-
 <h5 id="gpjax.integrators.__all__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AbstractIntegrator&#39;</span><span class="p">,</span> <span class="s1">&#39;GHQuadratureIntegrator&#39;</span><span class="p">,</span> <span class="s1">&#39;AnalyticalGaussianIntegrator&#39;</span><span class="p">]</span></code>
   
@@ -2645,7 +2641,6 @@
 
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -2681,6 +2676,22 @@
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.integrators.AbstractIntegrator.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -2796,7 +2807,6 @@ distribution.</p>
 
 
 
-
 <h6 id="gpjax.integrators.AbstractIntegrator.__call__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">fun</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">mean</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">variance</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">likelihood</span><span class="p">:</span> <span class="n">Likelihood</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; N&#39;</span><span class="p">]</span></code>
 
@@ -2906,10 +2916,10 @@ distribution.</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -2969,7 +2979,6 @@ polynomial <span class="katex"><span class="katex-mathml"><math xmlns="http://ww
 
 
 
-
 <h6 id="gpjax.integrators.GHQuadratureIntegrator.num_points" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span></code>
   
@@ -2990,7 +2999,6 @@ polynomial <span class="katex"><span class="katex-mathml"><math xmlns="http://ww
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3100,6 +3108,22 @@ distribution.</p>
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.integrators.GHQuadratureIntegrator.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -3234,10 +3258,10 @@ distribution.</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -3296,7 +3320,6 @@ log-likelihood is given by
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3406,6 +3429,22 @@ distribution.</p>
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.integrators.AnalyticalGaussianIntegrator.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -3539,6 +3578,7 @@ distribution.</p>
   </div>
 
   </div>
+
 
 </div>
 

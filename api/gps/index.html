@@ -2564,7 +2564,6 @@
 
 
 
-
 <h4 id="gpjax.gps" class="doc doc-heading">
           <code>gpjax.gps</code>
 
@@ -2587,7 +2586,6 @@
 
 
 
-
 <h5 id="gpjax.gps.Kernel" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">Kernel</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Kernel&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">AbstractKernel</span><span class="p">)</span></code>
   
@@ -2604,7 +2602,6 @@
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2627,7 +2624,6 @@
 
 
 
-
 <h5 id="gpjax.gps.Likelihood" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">Likelihood</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Likelihood&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">AbstractLikelihood</span><span class="p">)</span></code>
   
@@ -2644,7 +2640,6 @@
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2667,7 +2662,6 @@
 
 
 
-
 <h5 id="gpjax.gps.GaussianLikelihood" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">GaussianLikelihood</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;GaussianLikelihood&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Gaussian</span><span class="p">)</span></code>
   
@@ -2684,7 +2678,6 @@
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2707,7 +2700,6 @@
 
 
 
-
 <h5 id="gpjax.gps.__all__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AbstractPrior&#39;</span><span class="p">,</span> <span class="s1">&#39;Prior&#39;</span><span class="p">,</span> <span class="s1">&#39;AbstractPosterior&#39;</span><span class="p">,</span> <span class="s1">&#39;ConjugatePosterior&#39;</span><span class="p">,</span> <span class="s1">&#39;NonConjugatePosterior&#39;</span><span class="p">,</span> <span class="s1">&#39;construct_posterior&#39;</span><span class="p">]</span></code>
   
@@ -2725,7 +2717,6 @@
 
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -2762,7 +2753,6 @@
 
 
 
-
 <h6 id="gpjax.gps.AbstractPrior.kernel" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span></code>
   
@@ -2782,7 +2772,6 @@
 
 
 
-
 <h6 id="gpjax.gps.AbstractPrior.mean_function" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">mean_function</span><span class="p">:</span> <span class="n">MeanFunction</span></code>
   
@@ -2799,7 +2788,6 @@
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2826,7 +2814,6 @@
 
 
 
-
 <h6 id="gpjax.gps.AbstractPrior.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -2841,7 +2828,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -2897,7 +2883,6 @@
 
 
 
-
 <h6 id="gpjax.gps.AbstractPrior.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -2947,7 +2932,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3003,7 +2987,6 @@
 
 
 
-
 <h6 id="gpjax.gps.AbstractPrior.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3023,7 +3006,6 @@
 
 
 
-
 <h6 id="gpjax.gps.AbstractPrior.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3040,7 +3022,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3066,7 +3047,6 @@
 
 
 
-
 <h6 id="gpjax.gps.AbstractPrior.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3086,7 +3066,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3112,7 +3091,6 @@
 
 
 
-
 <h6 id="gpjax.gps.AbstractPrior.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3128,6 +3106,22 @@
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.gps.AbstractPrior.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">mean_function</span><span class="p">:</span> <span class="n">MeanFunction</span><span class="p">,</span> <span class="n">jitter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -3202,7 +3196,6 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3281,10 +3274,10 @@ this method must be implemented.</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -3351,7 +3344,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 
-
 <h6 id="gpjax.gps.Prior.kernel" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span></code>
   
@@ -3371,7 +3363,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 
-
 <h6 id="gpjax.gps.Prior.mean_function" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">mean_function</span><span class="p">:</span> <span class="n">MeanFunction</span></code>
   
@@ -3388,7 +3379,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -3415,7 +3405,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 
-
 <h6 id="gpjax.gps.Prior.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -3430,7 +3419,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3486,7 +3474,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 
-
 <h6 id="gpjax.gps.Prior.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3536,7 +3523,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3592,7 +3578,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 
-
 <h6 id="gpjax.gps.Prior.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3612,7 +3597,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 
-
 <h6 id="gpjax.gps.Prior.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3629,7 +3613,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3655,7 +3638,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 
-
 <h6 id="gpjax.gps.Prior.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3675,7 +3657,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3701,7 +3682,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 
-
 <h6 id="gpjax.gps.Prior.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3716,7 +3696,6 @@ function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3794,6 +3773,22 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
 
 
 
+<h6 id="gpjax.gps.Prior.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">mean_function</span><span class="p">:</span> <span class="n">MeanFunction</span><span class="p">,</span> <span class="n">jitter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
 
 <h6 id="gpjax.gps.Prior.__mul__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>
@@ -3854,7 +3849,6 @@ Args:
 
 
 
-
 <h6 id="gpjax.gps.Prior.__rmul__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>
 
@@ -3909,7 +3903,6 @@ dataset.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3981,7 +3974,6 @@ prior distribution.</p>
 
 
 
-
 <h6 id="gpjax.gps.Prior.sample_approx" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">sample_approx</span><span class="p">(</span><span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">,</span> <span class="n">num_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunctionalSample</span></code>
 
@@ -4027,7 +4019,7 @@ build and evaluate an approximate sample.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">gpjax</span> <span class="k">as</span> <span class="nn">gpx</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">jax.random</span> <span class="k">as</span> <span class="nn">jr</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">meanf</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">mean_functions</span><span class="o">.</span><span class="n">Zero</span><span class="p">()</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">kernel</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">()</span>
@@ -4110,10 +4102,10 @@ kernel.</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -4152,7 +4144,6 @@ posterior objects should inherit from this class.</p>
 
 
 
-
 <h6 id="gpjax.gps.AbstractPosterior.prior" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span><span class="p">[</span><span class="n">MeanFunction</span><span class="p">,</span> <span class="n">Kernel</span><span class="p">]</span></code>
   
@@ -4172,7 +4163,6 @@ posterior objects should inherit from this class.</p>
 
 
 
-
 <h6 id="gpjax.gps.AbstractPosterior.likelihood" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">likelihood</span><span class="p">:</span> <span class="n">Likelihood</span></code>
   
@@ -4189,7 +4179,6 @@ posterior objects should inherit from this class.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -4216,7 +4205,6 @@ posterior objects should inherit from this class.</p>
 
 
 
-
 <h6 id="gpjax.gps.AbstractPosterior.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -4231,7 +4219,6 @@ posterior objects should inherit from this class.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4287,7 +4274,6 @@ posterior objects should inherit from this class.</p>
 
 
 
-
 <h6 id="gpjax.gps.AbstractPosterior.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4337,7 +4323,6 @@ posterior objects should inherit from this class.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4393,7 +4378,6 @@ posterior objects should inherit from this class.</p>
 
 
 
-
 <h6 id="gpjax.gps.AbstractPosterior.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4413,7 +4397,6 @@ posterior objects should inherit from this class.</p>
 
 
 
-
 <h6 id="gpjax.gps.AbstractPosterior.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4430,7 +4413,6 @@ posterior objects should inherit from this class.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4456,7 +4438,6 @@ posterior objects should inherit from this class.</p>
 
 
 
-
 <h6 id="gpjax.gps.AbstractPosterior.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4476,7 +4457,6 @@ posterior objects should inherit from this class.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4502,7 +4482,6 @@ posterior objects should inherit from this class.</p>
 
 
 
-
 <h6 id="gpjax.gps.AbstractPosterior.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4518,6 +4497,22 @@ posterior objects should inherit from this class.</p>
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.gps.AbstractPosterior.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span><span class="p">[</span><span class="n">MeanFunction</span><span class="p">,</span> <span class="n">Kernel</span><span class="p">],</span> <span class="n">likelihood</span><span class="p">:</span> <span class="n">Likelihood</span><span class="p">,</span> <span class="n">jitter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -4595,7 +4590,6 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
 
 
 
-
 <h6 id="gpjax.gps.AbstractPosterior.predict" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
   
@@ -4670,10 +4664,10 @@ this method must be implemented.</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -4761,7 +4755,6 @@ where
 
 
 
-
 <h6 id="gpjax.gps.ConjugatePosterior.prior" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span><span class="p">[</span><span class="n">MeanFunction</span><span class="p">,</span> <span class="n">Kernel</span><span class="p">]</span></code>
   
@@ -4781,7 +4774,6 @@ where
 
 
 
-
 <h6 id="gpjax.gps.ConjugatePosterior.likelihood" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">likelihood</span><span class="p">:</span> <span class="n">Likelihood</span></code>
   
@@ -4798,7 +4790,6 @@ where
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -4825,7 +4816,6 @@ where
 
 
 
-
 <h6 id="gpjax.gps.ConjugatePosterior.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -4840,7 +4830,6 @@ where
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4896,7 +4885,6 @@ where
 
 
 
-
 <h6 id="gpjax.gps.ConjugatePosterior.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4946,7 +4934,6 @@ where
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5002,7 +4989,6 @@ where
 
 
 
-
 <h6 id="gpjax.gps.ConjugatePosterior.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5022,7 +5008,6 @@ where
 
 
 
-
 <h6 id="gpjax.gps.ConjugatePosterior.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5039,7 +5024,6 @@ where
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5065,7 +5049,6 @@ where
 
 
 
-
 <h6 id="gpjax.gps.ConjugatePosterior.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5085,7 +5068,6 @@ where
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5111,7 +5093,6 @@ where
 
 
 
-
 <h6 id="gpjax.gps.ConjugatePosterior.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5126,7 +5107,6 @@ where
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5202,6 +5182,22 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.gps.ConjugatePosterior.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span><span class="p">[</span><span class="n">MeanFunction</span><span class="p">,</span> <span class="n">Kernel</span><span class="p">],</span> <span class="n">likelihood</span><span class="p">:</span> <span class="n">Likelihood</span><span class="p">,</span> <span class="n">jitter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -5304,7 +5300,6 @@ output data used for training dataset.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5427,10 +5422,10 @@ process prior.
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -5475,7 +5470,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 
-
 <h6 id="gpjax.gps.NonConjugatePosterior.prior" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span><span class="p">[</span><span class="n">MeanFunction</span><span class="p">,</span> <span class="n">Kernel</span><span class="p">]</span></code>
   
@@ -5495,7 +5489,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 
-
 <h6 id="gpjax.gps.NonConjugatePosterior.likelihood" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">likelihood</span><span class="p">:</span> <span class="n">Likelihood</span></code>
   
@@ -5512,7 +5505,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -5536,7 +5528,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 
-
 <h6 id="gpjax.gps.NonConjugatePosterior.latent" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">latent</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></code>
   
@@ -5554,7 +5545,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -5581,7 +5571,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 
-
 <h6 id="gpjax.gps.NonConjugatePosterior.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -5596,7 +5585,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5652,7 +5640,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 
-
 <h6 id="gpjax.gps.NonConjugatePosterior.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5702,7 +5689,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5758,7 +5744,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 
-
 <h6 id="gpjax.gps.NonConjugatePosterior.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5778,7 +5763,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 
-
 <h6 id="gpjax.gps.NonConjugatePosterior.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5795,7 +5779,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5821,7 +5804,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 
-
 <h6 id="gpjax.gps.NonConjugatePosterior.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5841,7 +5823,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5867,7 +5848,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 
-
 <h6 id="gpjax.gps.NonConjugatePosterior.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5882,7 +5862,6 @@ from, or optimise an approximation to, the posterior distribution.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5960,6 +5939,22 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
 
 
 
+<h6 id="gpjax.gps.NonConjugatePosterior.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span><span class="p">[</span><span class="n">MeanFunction</span><span class="p">,</span> <span class="n">Kernel</span><span class="p">],</span> <span class="n">likelihood</span><span class="p">:</span> <span class="n">Likelihood</span><span class="p">,</span> <span class="n">jitter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">),</span> <span class="n">latent</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">42</span><span class="p">)))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
 
 <h6 id="gpjax.gps.NonConjugatePosterior.__post_init__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
@@ -5975,7 +5970,6 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -6041,12 +6035,12 @@ and output data used for training dataset.</p>
 
   </div>
 
+
 </div>
 
 
 
 <div class="doc doc-object doc-function">
-
 
 
 

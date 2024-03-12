@@ -6,7 +6,7 @@
 
 # import gpjax.kernels as jk
 
-# key = jr.PRNGKey(123)
+# key = jr.key(123)
 
 
 # def set_font(font_path):

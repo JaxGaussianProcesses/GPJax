@@ -2564,7 +2564,6 @@
 
 
 
-
 <h4 id="gpjax.fit" class="doc doc-heading">
           <code>gpjax.fit</code>
 
@@ -2587,7 +2586,6 @@
 
 
 
-
 <h5 id="gpjax.fit.ModuleModel" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">ModuleModel</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;ModuleModel&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Module</span><span class="p">)</span></code>
   
@@ -2604,7 +2602,6 @@
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2630,7 +2627,6 @@
 
 
 
-
 <h5 id="gpjax.fit.fit" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">fit</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">ModuleModel</span><span class="p">,</span> <span class="n">objective</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractObjective</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ModuleModel</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">],</span> <span class="n">ScalarFloat</span><span class="p">]],</span> <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">optim</span><span class="p">:</span> <span class="n">ox</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">,</span> <span class="n">num_iters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">log_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">unroll</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">safe</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ModuleModel</span><span class="p">,</span> <span class="n">Array</span><span class="p">]</span></code>
 
@@ -2649,7 +2645,7 @@ Optimisers used here should originate from Optax.</p>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="c1"># (1) Create a dataset:</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">X</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">y</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">X</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">jr</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">y</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">X</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">jr</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">jr</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="n">D</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="o">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="o">&gt;&gt;&gt;</span> <span class="c1"># (2) Define your model:</span>
@@ -2784,7 +2780,7 @@ to 100.</p>
           <td>
             <div class="doc-md-description">
               <p>The random key to use for the optimisation batch
-selection. Defaults to jr.PRNGKey(42).</p>
+selection. Defaults to jr.key(42).</p>
             </div>
           </td>
           <td>
@@ -2849,7 +2845,6 @@ Defaults to 1.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -2963,7 +2958,6 @@ to True.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 

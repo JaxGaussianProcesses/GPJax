@@ -2564,7 +2564,6 @@
 
 
 
-
 <h4 id="gpjax.objectives" class="doc doc-heading">
           <code>gpjax.objectives</code>
 
@@ -2587,7 +2586,6 @@
 
 
 
-
 <h5 id="gpjax.objectives.tfd" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">tfd</span> <span class="o">=</span> <span class="n">tfp</span><span class="o">.</span><span class="n">distributions</span></code>
   
@@ -2604,7 +2602,6 @@
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2627,7 +2624,6 @@
 
 
 
-
 <h5 id="gpjax.objectives.NonConjugatePosterior" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">NonConjugatePosterior</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;NonConjugatePosterior&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s1">&#39;gpjax.gps.NonConjugatePosterior&#39;</span><span class="p">)</span></code>
   
@@ -2644,7 +2640,6 @@
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2667,7 +2662,6 @@
 
 
 
-
 <h5 id="gpjax.objectives.NonConjugateMLL" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">NonConjugateMLL</span> <span class="o">=</span> <span class="n">LogPosteriorDensity</span></code>
   
@@ -2685,7 +2679,6 @@
 
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -2722,7 +2715,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.AbstractObjective.negative" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></code>
   
@@ -2740,7 +2732,6 @@
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2767,7 +2758,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.AbstractObjective.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -2782,7 +2772,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -2838,7 +2827,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.AbstractObjective.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -2888,7 +2876,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -2944,7 +2931,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.AbstractObjective.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -2964,7 +2950,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.AbstractObjective.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -2981,7 +2966,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3007,7 +2991,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.AbstractObjective.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3027,7 +3010,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3053,7 +3035,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.AbstractObjective.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3069,6 +3050,22 @@
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.objectives.AbstractObjective.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">constant</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -3089,7 +3086,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.AbstractObjective.__hash__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__hash__</span><span class="p">()</span></code>
 
@@ -3107,7 +3103,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.AbstractObjective.__call__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarFloat</span></code>
 
@@ -3122,7 +3117,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3148,16 +3142,20 @@
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
 
 
 
-
 <h5 id="gpjax.objectives.ConjugateMLL" class="doc doc-heading">
           <code>ConjugateMLL</code>
 
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
 
 </h5>
 
@@ -3182,7 +3180,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateMLL.negative" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></code>
   
@@ -3200,7 +3197,6 @@
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -3227,7 +3223,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateMLL.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -3242,7 +3237,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3298,7 +3292,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateMLL.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3348,7 +3341,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3404,7 +3396,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateMLL.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3424,7 +3415,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateMLL.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3441,7 +3431,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3467,7 +3456,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateMLL.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3487,7 +3475,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3513,7 +3500,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateMLL.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3528,7 +3514,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3549,7 +3534,6 @@
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateMLL.__hash__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__hash__</span><span class="p">()</span></code>
 
@@ -3564,7 +3548,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3583,6 +3566,22 @@
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.objectives.ConjugateMLL.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">constant</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -3713,16 +3712,20 @@ marginal log-likelihood.</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
 
 
 
-
 <h5 id="gpjax.objectives.ConjugateLOOCV" class="doc doc-heading">
           <code>ConjugateLOOCV</code>
 
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
 
 </h5>
 
@@ -3747,7 +3750,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateLOOCV.negative" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></code>
   
@@ -3765,7 +3767,6 @@ marginal log-likelihood.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -3792,7 +3793,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateLOOCV.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -3807,7 +3807,6 @@ marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3863,7 +3862,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateLOOCV.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3913,7 +3911,6 @@ marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3969,7 +3966,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateLOOCV.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3989,7 +3985,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateLOOCV.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4006,7 +4001,6 @@ marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4032,7 +4026,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateLOOCV.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4052,7 +4045,6 @@ marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4078,7 +4070,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateLOOCV.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4093,7 +4084,6 @@ marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4114,7 +4104,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ConjugateLOOCV.__hash__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__hash__</span><span class="p">()</span></code>
 
@@ -4129,7 +4118,6 @@ marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4148,6 +4136,22 @@ marginal log-likelihood.</p>
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.objectives.ConjugateLOOCV.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">constant</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -4255,16 +4259,20 @@ leave-one-out log predictive probability..</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
 
 
 
-
 <h5 id="gpjax.objectives.LogPosteriorDensity" class="doc doc-heading">
           <code>LogPosteriorDensity</code>
 
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
 
 </h5>
 
@@ -4292,7 +4300,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.LogPosteriorDensity.negative" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></code>
   
@@ -4310,7 +4317,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -4337,7 +4343,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.LogPosteriorDensity.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -4352,7 +4357,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4408,7 +4412,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.LogPosteriorDensity.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4458,7 +4461,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4514,7 +4516,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.LogPosteriorDensity.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4534,7 +4535,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.LogPosteriorDensity.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4551,7 +4551,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4577,7 +4576,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.LogPosteriorDensity.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4597,7 +4595,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4623,7 +4620,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.LogPosteriorDensity.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4638,7 +4634,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4659,7 +4654,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.LogPosteriorDensity.__hash__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__hash__</span><span class="p">()</span></code>
 
@@ -4674,7 +4668,6 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4693,6 +4686,22 @@ sometimes referred to as the marginal log-likelihood.</p>
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.objectives.LogPosteriorDensity.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">constant</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -4777,16 +4786,20 @@ marginal log-likelihood.</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
 
 
 
-
 <h5 id="gpjax.objectives.ELBO" class="doc doc-heading">
           <code>ELBO</code>
 
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
 
 </h5>
 
@@ -4811,7 +4824,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ELBO.negative" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></code>
   
@@ -4829,7 +4841,6 @@ marginal log-likelihood.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -4856,7 +4867,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ELBO.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -4871,7 +4881,6 @@ marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4927,7 +4936,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ELBO.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4977,7 +4985,6 @@ marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5033,7 +5040,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ELBO.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5053,7 +5059,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ELBO.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5070,7 +5075,6 @@ marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5096,7 +5100,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ELBO.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5116,7 +5119,6 @@ marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5142,7 +5144,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ELBO.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5157,7 +5158,6 @@ marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5178,7 +5178,6 @@ marginal log-likelihood.</p>
 
 
 
-
 <h6 id="gpjax.objectives.ELBO.__hash__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__hash__</span><span class="p">()</span></code>
 
@@ -5193,7 +5192,6 @@ marginal log-likelihood.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5212,6 +5210,22 @@ marginal log-likelihood.</p>
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.objectives.ELBO.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">constant</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -5291,16 +5305,20 @@ ELBO with respect to.</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
 
 
 
-
 <h5 id="gpjax.objectives.CollapsedELBO" class="doc doc-heading">
           <code>CollapsedELBO</code>
 
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
 
 </h5>
 
@@ -5330,7 +5348,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.objectives.CollapsedELBO.negative" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></code>
   
@@ -5348,7 +5365,6 @@ in Sparse Gaussian Processes.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -5375,7 +5391,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.objectives.CollapsedELBO.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -5390,7 +5405,6 @@ in Sparse Gaussian Processes.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5446,7 +5460,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.objectives.CollapsedELBO.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5496,7 +5509,6 @@ in Sparse Gaussian Processes.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5552,7 +5564,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.objectives.CollapsedELBO.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5572,7 +5583,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.objectives.CollapsedELBO.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5589,7 +5599,6 @@ in Sparse Gaussian Processes.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5615,7 +5624,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.objectives.CollapsedELBO.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5635,7 +5643,6 @@ in Sparse Gaussian Processes.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5661,7 +5668,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.objectives.CollapsedELBO.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5676,7 +5682,6 @@ in Sparse Gaussian Processes.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5697,7 +5702,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.objectives.CollapsedELBO.__hash__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__hash__</span><span class="p">()</span></code>
 
@@ -5712,7 +5716,6 @@ in Sparse Gaussian Processes.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5731,6 +5734,22 @@ in Sparse Gaussian Processes.</p>
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.objectives.CollapsedELBO.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">constant</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -5810,12 +5829,12 @@ ELBO with respect to.</p>
 
   </div>
 
+
 </div>
 
 
 
 <div class="doc doc-object doc-function">
-
 
 
 

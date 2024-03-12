@@ -2562,7 +2562,6 @@
 
 
 
-
 <h4 id="gpjax.variational_families" class="doc doc-heading">
           <code>gpjax.variational_families</code>
 
@@ -2585,7 +2584,6 @@
 
 
 
-
 <h5 id="gpjax.variational_families.__all__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AbstractVariationalFamily&#39;</span><span class="p">,</span> <span class="s1">&#39;AbstractVariationalGaussian&#39;</span><span class="p">,</span> <span class="s1">&#39;VariationalGaussian&#39;</span><span class="p">,</span> <span class="s1">&#39;WhitenedVariationalGaussian&#39;</span><span class="p">,</span> <span class="s1">&#39;NaturalVariationalGaussian&#39;</span><span class="p">,</span> <span class="s1">&#39;ExpectationVariationalGaussian&#39;</span><span class="p">,</span> <span class="s1">&#39;CollapsedVariationalGaussian&#39;</span><span class="p">]</span></code>
   
@@ -2603,7 +2601,6 @@
 
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -2641,7 +2638,6 @@ used within variational inference.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalFamily.posterior" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span></code>
   
@@ -2664,7 +2660,6 @@ used within variational inference.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalFamily.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -2679,7 +2674,6 @@ used within variational inference.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -2735,7 +2729,6 @@ used within variational inference.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalFamily.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -2785,7 +2778,6 @@ used within variational inference.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -2841,7 +2833,6 @@ used within variational inference.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalFamily.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -2861,7 +2852,6 @@ used within variational inference.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalFamily.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -2878,7 +2868,6 @@ used within variational inference.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -2904,7 +2893,6 @@ used within variational inference.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalFamily.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -2924,7 +2912,6 @@ used within variational inference.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -2950,7 +2937,6 @@ used within variational inference.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalFamily.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -2966,6 +2952,22 @@ used within variational inference.</p>
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.variational_families.AbstractVariationalFamily.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -3035,7 +3037,6 @@ method.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3112,10 +3113,10 @@ method.</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -3152,7 +3153,6 @@ method.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalGaussian.posterior" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span></code>
   
@@ -3169,7 +3169,6 @@ method.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -3192,7 +3191,6 @@ method.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalGaussian.jitter" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">jitter</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">)</span></code>
   
@@ -3210,7 +3208,6 @@ method.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -3238,7 +3235,6 @@ method.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalGaussian.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -3253,7 +3249,6 @@ method.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3309,7 +3304,6 @@ method.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalGaussian.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3359,7 +3353,6 @@ method.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3415,7 +3408,6 @@ method.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalGaussian.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3435,7 +3427,6 @@ method.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalGaussian.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3452,7 +3443,6 @@ method.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3478,7 +3468,6 @@ method.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalGaussian.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3498,7 +3487,6 @@ method.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3524,7 +3512,6 @@ method.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalGaussian.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3539,7 +3526,6 @@ method.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3612,7 +3598,6 @@ method.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.AbstractVariationalGaussian.predict" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
   
@@ -3681,15 +3666,32 @@ method.</p>
 </div>
 
 
+<div class="doc doc-object doc-function">
 
-  </div>
+
+
+<h6 id="gpjax.variational_families.AbstractVariationalGaussian.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span><span class="p">,</span> <span class="n">inducing_inputs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">jitter</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
 
   </div>
 
 </div>
 
-<div class="doc doc-object doc-class">
 
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
 
 
 
@@ -3746,7 +3748,6 @@ and the distribution over the inducing inputs is
 
 
 
-
 <h6 id="gpjax.variational_families.VariationalGaussian.posterior" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span></code>
   
@@ -3763,7 +3764,6 @@ and the distribution over the inducing inputs is
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -3786,7 +3786,6 @@ and the distribution over the inducing inputs is
 
 
 
-
 <h6 id="gpjax.variational_families.VariationalGaussian.jitter" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">jitter</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">)</span></code>
   
@@ -3804,7 +3803,6 @@ and the distribution over the inducing inputs is
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -3829,7 +3827,6 @@ and the distribution over the inducing inputs is
 
 
 
-
 <h6 id="gpjax.variational_families.VariationalGaussian.variational_mean" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">variational_mean</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></code>
   
@@ -3847,7 +3844,6 @@ and the distribution over the inducing inputs is
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -3874,7 +3870,6 @@ and the distribution over the inducing inputs is
 
 
 
-
 <h6 id="gpjax.variational_families.VariationalGaussian.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -3889,7 +3884,6 @@ and the distribution over the inducing inputs is
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3945,7 +3939,6 @@ and the distribution over the inducing inputs is
 
 
 
-
 <h6 id="gpjax.variational_families.VariationalGaussian.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -3995,7 +3988,6 @@ and the distribution over the inducing inputs is
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4051,7 +4043,6 @@ and the distribution over the inducing inputs is
 
 
 
-
 <h6 id="gpjax.variational_families.VariationalGaussian.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4071,7 +4062,6 @@ and the distribution over the inducing inputs is
 
 
 
-
 <h6 id="gpjax.variational_families.VariationalGaussian.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4088,7 +4078,6 @@ and the distribution over the inducing inputs is
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4114,7 +4103,6 @@ and the distribution over the inducing inputs is
 
 
 
-
 <h6 id="gpjax.variational_families.VariationalGaussian.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4134,7 +4122,6 @@ and the distribution over the inducing inputs is
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4160,7 +4147,6 @@ and the distribution over the inducing inputs is
 
 
 
-
 <h6 id="gpjax.variational_families.VariationalGaussian.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4175,7 +4161,6 @@ and the distribution over the inducing inputs is
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4248,6 +4233,22 @@ method.</p>
 
 
 
+<h6 id="gpjax.variational_families.VariationalGaussian.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span><span class="p">,</span> <span class="n">inducing_inputs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">jitter</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">),</span> <span class="n">variational_mean</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">variational_root_covariance</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N N&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">FillTriangular</span><span class="p">()))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
 
 <h6 id="gpjax.variational_families.VariationalGaussian.__post_init__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
@@ -4263,7 +4264,6 @@ method.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4312,7 +4312,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4391,10 +4390,10 @@ make a prediction.</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -4451,7 +4450,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 
-
 <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.posterior" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span></code>
   
@@ -4468,7 +4466,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -4491,7 +4488,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 
-
 <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.jitter" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">jitter</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">)</span></code>
   
@@ -4509,7 +4505,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -4534,7 +4529,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 
-
 <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.variational_mean" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">variational_mean</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></code>
   
@@ -4552,7 +4546,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -4579,7 +4572,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 
-
 <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -4594,7 +4586,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4650,7 +4641,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 
-
 <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4700,7 +4690,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4756,7 +4745,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 
-
 <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4776,7 +4764,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 
-
 <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4793,7 +4780,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4819,7 +4805,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 
-
 <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4839,7 +4824,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4865,7 +4849,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 
-
 <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -4880,7 +4863,6 @@ over <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -4953,7 +4935,6 @@ method.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.WhitenedVariationalGaussian.__post_init__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
 
@@ -4969,6 +4950,22 @@ method.</p>
 
 <div class="doc doc-object doc-function">
 
+
+
+<h6 id="gpjax.variational_families.WhitenedVariationalGaussian.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span><span class="p">,</span> <span class="n">inducing_inputs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">jitter</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">),</span> <span class="n">variational_mean</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">variational_root_covariance</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N N&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">bijector</span><span class="o">=</span><span class="n">tfb</span><span class="o">.</span><span class="n">FillTriangular</span><span class="p">()))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
 
 
 
@@ -5015,7 +5012,6 @@ the Gaussian process prior.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5094,10 +5090,10 @@ make a prediction.</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -5156,7 +5152,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 
-
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.posterior" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span></code>
   
@@ -5173,7 +5168,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -5196,7 +5190,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 
-
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.jitter" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">jitter</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">)</span></code>
   
@@ -5214,7 +5207,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -5239,7 +5231,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 
-
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.natural_vector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">natural_vector</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M 1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
@@ -5257,7 +5248,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -5284,7 +5274,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 
-
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -5299,7 +5288,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5355,7 +5343,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 
-
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5405,7 +5392,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5461,7 +5447,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 
-
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5481,7 +5466,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 
-
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5498,7 +5482,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5524,7 +5507,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 
-
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5544,7 +5526,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5570,7 +5551,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 
-
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -5585,7 +5565,6 @@ where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5658,6 +5637,22 @@ method.</p>
 
 
 
+<h6 id="gpjax.variational_families.NaturalVariationalGaussian.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span><span class="p">,</span> <span class="n">inducing_inputs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">jitter</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">),</span> <span class="n">natural_vector</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M 1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">natural_matrix</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M M&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
 
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.__post_init__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
@@ -5673,7 +5668,6 @@ method.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -5724,7 +5718,6 @@ with $\mu$ and $S$ computed from the natural parameterisation $\theta  = (S^{-1}
 
 
 
-
 <h6 id="gpjax.variational_families.NaturalVariationalGaussian.predict" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
 
@@ -5771,10 +5764,10 @@ with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -5834,7 +5827,6 @@ inference over.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.posterior" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span></code>
   
@@ -5851,7 +5843,6 @@ inference over.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -5874,7 +5865,6 @@ inference over.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.jitter" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">jitter</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">)</span></code>
   
@@ -5892,7 +5882,6 @@ inference over.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -5917,7 +5906,6 @@ inference over.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.expectation_vector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">expectation_vector</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M 1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
   
@@ -5935,7 +5923,6 @@ inference over.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -5962,7 +5949,6 @@ inference over.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -5977,7 +5963,6 @@ inference over.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -6033,7 +6018,6 @@ inference over.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -6083,7 +6067,6 @@ inference over.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -6139,7 +6122,6 @@ inference over.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -6159,7 +6141,6 @@ inference over.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -6176,7 +6157,6 @@ inference over.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -6202,7 +6182,6 @@ inference over.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -6222,7 +6201,6 @@ inference over.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -6248,7 +6226,6 @@ inference over.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -6263,7 +6240,6 @@ inference over.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -6336,6 +6312,22 @@ method.</p>
 
 
 
+<h6 id="gpjax.variational_families.ExpectationVariationalGaussian.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span><span class="p">,</span> <span class="n">inducing_inputs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">jitter</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">),</span> <span class="n">expectation_vector</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M 1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">expectation_matrix</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;M M&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
 
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.__post_init__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
@@ -6351,7 +6343,6 @@ method.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -6405,7 +6396,6 @@ distribution.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.ExpectationVariationalGaussian.predict" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GaussianDistribution</span></code>
 
@@ -6453,10 +6443,10 @@ $\eta = (\mu, S + uu^\top)$.</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -6496,7 +6486,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.CollapsedVariationalGaussian.posterior" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span></code>
   
@@ -6513,7 +6502,6 @@ in Sparse Gaussian Processes.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -6536,7 +6524,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.CollapsedVariationalGaussian.jitter" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">jitter</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">)</span></code>
   
@@ -6554,7 +6541,6 @@ in Sparse Gaussian Processes.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -6582,7 +6568,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.CollapsedVariationalGaussian.__init_subclass__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
@@ -6597,7 +6582,6 @@ in Sparse Gaussian Processes.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -6653,7 +6637,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.CollapsedVariationalGaussian.replace_meta" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -6703,7 +6686,6 @@ in Sparse Gaussian Processes.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -6759,7 +6741,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.CollapsedVariationalGaussian.replace_trainable" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -6779,7 +6760,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.CollapsedVariationalGaussian.replace_bijector" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -6796,7 +6776,6 @@ in Sparse Gaussian Processes.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -6822,7 +6801,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.CollapsedVariationalGaussian.unconstrain" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -6842,7 +6820,6 @@ in Sparse Gaussian Processes.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -6868,7 +6845,6 @@ in Sparse Gaussian Processes.</p>
 
 
 
-
 <h6 id="gpjax.variational_families.CollapsedVariationalGaussian.trainables" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
 
@@ -6883,7 +6859,6 @@ in Sparse Gaussian Processes.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -6956,6 +6931,22 @@ method.</p>
 
 
 
+<h6 id="gpjax.variational_families.CollapsedVariationalGaussian.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span><span class="p">,</span> <span class="n">inducing_inputs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">],</span> <span class="n">jitter</span><span class="p">:</span> <span class="n">ScalarFloat</span> <span class="o">=</span> <span class="n">static_field</span><span class="p">(</span><span class="mf">1e-06</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
 
 <h6 id="gpjax.variational_families.CollapsedVariationalGaussian.__post_init__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
@@ -6971,7 +6962,6 @@ method.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -7043,6 +7033,7 @@ predictions.</p>
   </div>
 
   </div>
+
 
 </div>
 

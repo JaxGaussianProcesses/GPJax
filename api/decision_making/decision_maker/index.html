@@ -2564,7 +2564,6 @@
 
 
 
-
 <h4 id="gpjax.decision_making.decision_maker" class="doc doc-heading">
           <code>gpjax.decision_making.decision_maker</code>
 
@@ -2585,7 +2584,6 @@
 
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -2627,7 +2625,7 @@ the black-box function of interest at this point.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>search_space</code></td>
+          <td><code><a class="autorefs autorefs-internal" title="gpjax.decision_making.decision_maker.AbstractDecisionMaker.search_space" href="#gpjax.decision_making.decision_maker.AbstractDecisionMaker.search_space">search_space</a></code></td>
           <td>
                 <code><a class="autorefs autorefs-internal" title="gpjax.decision_making.search_space.AbstractSearchSpace" href="../search_space/#gpjax.decision_making.search_space.AbstractSearchSpace">AbstractSearchSpace</a></code>
           </td>
@@ -2638,7 +2636,7 @@ the black-box function of interest at this point.</p>
           </td>
         </tr>
         <tr>
-          <td><code>posterior_handlers</code></td>
+          <td><code><a class="autorefs autorefs-internal" title="gpjax.decision_making.decision_maker.AbstractDecisionMaker.posterior_handlers" href="#gpjax.decision_making.decision_maker.AbstractDecisionMaker.posterior_handlers">posterior_handlers</a></code></td>
           <td>
                 <code><span title="beartype.typing.Dict">Dict</span>[str, <a class="autorefs autorefs-internal" title="gpjax.decision_making.posterior_handler.PosteriorHandler" href="../posterior_handler/#gpjax.decision_making.posterior_handler.PosteriorHandler">PosteriorHandler</a>]</code>
           </td>
@@ -2655,7 +2653,7 @@ decision_making.utils.</p>
           </td>
         </tr>
         <tr>
-          <td><code>datasets</code></td>
+          <td><code><a class="autorefs autorefs-internal" title="gpjax.decision_making.decision_maker.AbstractDecisionMaker.datasets" href="#gpjax.decision_making.decision_maker.AbstractDecisionMaker.datasets">datasets</a></code></td>
           <td>
                 <code><span title="beartype.typing.Dict">Dict</span>[str, <a class="autorefs autorefs-internal" title="gpjax.dataset.Dataset" href="../../dataset/#gpjax.dataset.Dataset">Dataset</a>]</code>
           </td>
@@ -2669,7 +2667,7 @@ to distinguish datasets, and correspond to tags in <code>posterior_handlers</cod
           </td>
         </tr>
         <tr>
-          <td><code>key</code></td>
+          <td><code><a class="autorefs autorefs-internal" title="gpjax.decision_making.decision_maker.AbstractDecisionMaker.key" href="#gpjax.decision_making.decision_maker.AbstractDecisionMaker.key">key</a></code></td>
           <td>
                 <code><a class="autorefs autorefs-internal" title="gpjax.typing.KeyArray" href="../../typing/#gpjax.typing.KeyArray">KeyArray</a></code>
           </td>
@@ -2680,7 +2678,7 @@ to distinguish datasets, and correspond to tags in <code>posterior_handlers</cod
           </td>
         </tr>
         <tr>
-          <td><code>batch_size</code></td>
+          <td><code><a class="autorefs autorefs-internal" title="gpjax.decision_making.decision_maker.AbstractDecisionMaker.batch_size" href="#gpjax.decision_making.decision_maker.AbstractDecisionMaker.batch_size">batch_size</a></code></td>
           <td>
                 <code>int</code>
           </td>
@@ -2693,7 +2691,7 @@ one point to be queried at each iteration of the decision making loop.</p>
           </td>
         </tr>
         <tr>
-          <td><code>post_ask</code></td>
+          <td><code><a class="autorefs autorefs-internal" title="gpjax.decision_making.decision_maker.AbstractDecisionMaker.post_ask" href="#gpjax.decision_making.decision_maker.AbstractDecisionMaker.post_ask">post_ask</a></code></td>
           <td>
                 <code><span title="beartype.typing.List">List</span>[<span title="beartype.typing.Callable">Callable</span>]</code>
           </td>
@@ -2704,7 +2702,7 @@ one point to be queried at each iteration of the decision making loop.</p>
           </td>
         </tr>
         <tr>
-          <td><code>post_tell</code></td>
+          <td><code><a class="autorefs autorefs-internal" title="gpjax.decision_making.decision_maker.AbstractDecisionMaker.post_tell" href="#gpjax.decision_making.decision_maker.AbstractDecisionMaker.post_tell">post_tell</a></code></td>
           <td>
                 <code><span title="beartype.typing.List">List</span>[<span title="beartype.typing.Callable">Callable</span>]</code>
           </td>
@@ -2733,7 +2731,6 @@ step.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.decision_maker.AbstractDecisionMaker.search_space" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">search_space</span><span class="p">:</span> <span class="n">AbstractSearchSpace</span></code>
   
@@ -2750,7 +2747,6 @@ step.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2773,7 +2769,6 @@ step.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.decision_maker.AbstractDecisionMaker.datasets" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">datasets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span></code>
   
@@ -2790,7 +2785,6 @@ step.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2813,7 +2807,6 @@ step.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.decision_maker.AbstractDecisionMaker.batch_size" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span></code>
   
@@ -2833,7 +2826,6 @@ step.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.decision_maker.AbstractDecisionMaker.post_ask" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">post_ask</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span></code>
   
@@ -2850,7 +2842,6 @@ step.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2876,6 +2867,22 @@ step.</p>
 
 
 
+<h6 id="gpjax.decision_making.decision_maker.AbstractDecisionMaker.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">search_space</span><span class="p">:</span> <span class="n">AbstractSearchSpace</span><span class="p">,</span> <span class="n">posterior_handlers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PosteriorHandler</span><span class="p">],</span> <span class="n">datasets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">post_ask</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">],</span> <span class="n">post_tell</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
 
 <h6 id="gpjax.decision_making.decision_maker.AbstractDecisionMaker.__post_init__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
@@ -2895,7 +2902,6 @@ corresponding datasets.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -2976,7 +2982,6 @@ corresponding datasets.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.decision_maker.AbstractDecisionMaker.tell" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">tell</span><span class="p">(</span><span class="n">observation_datasets</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">)</span></code>
 
@@ -3037,7 +3042,6 @@ corresponding datasets.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3160,10 +3164,10 @@ evaluates the black box functions of interest at supplied points.</p>
 
   </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -3215,7 +3219,7 @@ to plot values of interest during the optimization process.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>utility_function_builder</code></td>
+          <td><code><a class="autorefs autorefs-internal" title="gpjax.decision_making.decision_maker.UtilityDrivenDecisionMaker.utility_function_builder" href="#gpjax.decision_making.decision_maker.UtilityDrivenDecisionMaker.utility_function_builder">utility_function_builder</a></code></td>
           <td>
                 <code><a class="autorefs autorefs-internal" title="gpjax.decision_making.utility_functions.AbstractUtilityFunctionBuilder" href="../utility_functions/base/#gpjax.decision_making.utility_functions.base.AbstractUtilityFunctionBuilder">AbstractUtilityFunctionBuilder</a></code>
           </td>
@@ -3229,7 +3233,7 @@ to plot values of interest during the optimization process.</p>
           </td>
         </tr>
         <tr>
-          <td><code>utility_maximizer</code></td>
+          <td><code><a class="autorefs autorefs-internal" title="gpjax.decision_making.decision_maker.UtilityDrivenDecisionMaker.utility_maximizer" href="#gpjax.decision_making.decision_maker.UtilityDrivenDecisionMaker.utility_maximizer">utility_maximizer</a></code></td>
           <td>
                 <code><a class="autorefs autorefs-internal" title="gpjax.decision_making.utility_maximizer.AbstractUtilityMaximizer" href="../utility_maximizer/#gpjax.decision_making.utility_maximizer.AbstractUtilityMaximizer">AbstractUtilityMaximizer</a></code>
           </td>
@@ -3258,7 +3262,6 @@ utility functions over the search space.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.decision_maker.UtilityDrivenDecisionMaker.search_space" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">search_space</span><span class="p">:</span> <span class="n">AbstractSearchSpace</span></code>
   
@@ -3275,7 +3278,6 @@ utility functions over the search space.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -3298,7 +3300,6 @@ utility functions over the search space.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.decision_maker.UtilityDrivenDecisionMaker.datasets" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">datasets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span></code>
   
@@ -3315,7 +3316,6 @@ utility functions over the search space.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -3338,7 +3338,6 @@ utility functions over the search space.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.decision_maker.UtilityDrivenDecisionMaker.batch_size" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span></code>
   
@@ -3355,7 +3354,6 @@ utility functions over the search space.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -3378,7 +3376,6 @@ utility functions over the search space.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.decision_maker.UtilityDrivenDecisionMaker.post_tell" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">post_tell</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span></code>
   
@@ -3395,7 +3392,6 @@ utility functions over the search space.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -3418,7 +3414,6 @@ utility functions over the search space.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.decision_maker.UtilityDrivenDecisionMaker.utility_maximizer" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">utility_maximizer</span><span class="p">:</span> <span class="n">AbstractUtilityMaximizer</span></code>
   
@@ -3438,7 +3433,6 @@ utility functions over the search space.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3502,7 +3496,6 @@ utility functions over the search space.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3624,6 +3617,22 @@ evaluates the black box functions of interest at supplied points.</p>
 
 
 
+<h6 id="gpjax.decision_making.decision_maker.UtilityDrivenDecisionMaker.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">search_space</span><span class="p">:</span> <span class="n">AbstractSearchSpace</span><span class="p">,</span> <span class="n">posterior_handlers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PosteriorHandler</span><span class="p">],</span> <span class="n">datasets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">post_ask</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">],</span> <span class="n">post_tell</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">],</span> <span class="n">utility_function_builder</span><span class="p">:</span> <span class="n">AbstractUtilityFunctionBuilder</span><span class="p">,</span> <span class="n">utility_maximizer</span><span class="p">:</span> <span class="n">AbstractUtilityMaximizer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
 
 <h6 id="gpjax.decision_making.decision_maker.UtilityDrivenDecisionMaker.__post_init__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
@@ -3639,7 +3648,6 @@ evaluates the black box functions of interest at supplied points.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3728,6 +3736,7 @@ order to obtain <code>self.batch_size</code> points to query next.</p>
   </div>
 
   </div>
+
 
 </div>
 

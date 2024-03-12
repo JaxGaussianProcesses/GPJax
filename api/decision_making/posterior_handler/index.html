@@ -2564,7 +2564,6 @@
 
 
 
-
 <h4 id="gpjax.decision_making.posterior_handler" class="doc doc-heading">
           <code>gpjax.decision_making.posterior_handler</code>
 
@@ -2584,7 +2583,6 @@
 
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2608,7 +2606,6 @@ return a likelihood object initialised with the given number of datapoints.</p>
 
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -2642,7 +2639,7 @@ observed.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>prior</code></td>
+          <td><code><a class="autorefs autorefs-internal" title="gpjax.decision_making.posterior_handler.PosteriorHandler.prior" href="#gpjax.decision_making.posterior_handler.PosteriorHandler.prior">prior</a></code></td>
           <td>
                 <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPrior" href="../../gps/#gpjax.gps.AbstractPrior">AbstractPrior</a></code>
           </td>
@@ -2653,7 +2650,7 @@ observed.</p>
           </td>
         </tr>
         <tr>
-          <td><code>likelihood_builder</code></td>
+          <td><code><a class="autorefs autorefs-internal" title="gpjax.decision_making.posterior_handler.PosteriorHandler.likelihood_builder" href="#gpjax.decision_making.posterior_handler.PosteriorHandler.likelihood_builder">likelihood_builder</a></code></td>
           <td>
                 <code><a class="autorefs autorefs-internal" title="gpjax.decision_making.posterior_handler.LikelihoodBuilder" href="#gpjax.decision_making.posterior_handler.LikelihoodBuilder">LikelihoodBuilder</a></code>
           </td>
@@ -2664,7 +2661,7 @@ observed.</p>
           </td>
         </tr>
         <tr>
-          <td><code>optimization_objective</code></td>
+          <td><code><a class="autorefs autorefs-internal" title="gpjax.decision_making.posterior_handler.PosteriorHandler.optimization_objective" href="#gpjax.decision_making.posterior_handler.PosteriorHandler.optimization_objective">optimization_objective</a></code></td>
           <td>
                 <code><a class="autorefs autorefs-internal" title="gpjax.objectives.AbstractObjective" href="../../objectives/#gpjax.objectives.AbstractObjective">AbstractObjective</a></code>
           </td>
@@ -2675,7 +2672,7 @@ observed.</p>
           </td>
         </tr>
         <tr>
-          <td><code>optimizer</code></td>
+          <td><code><a class="autorefs autorefs-internal" title="gpjax.decision_making.posterior_handler.PosteriorHandler.optimizer" href="#gpjax.decision_making.posterior_handler.PosteriorHandler.optimizer">optimizer</a></code></td>
           <td>
                 <code><span title="optax.GradientTransformation">GradientTransformation</span></code>
           </td>
@@ -2686,7 +2683,7 @@ observed.</p>
           </td>
         </tr>
         <tr>
-          <td><code>num_optimization_iterations</code></td>
+          <td><code><span title="gpjax.decision_making.posterior_handler.PosteriorHandler.num_optimization_iterations">num_optimization_iterations</span></code></td>
           <td>
                 <code>int</code>
           </td>
@@ -2714,7 +2711,6 @@ observed.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.posterior_handler.PosteriorHandler.prior" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span></code>
   
@@ -2731,7 +2727,6 @@ observed.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2754,7 +2749,6 @@ observed.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.posterior_handler.PosteriorHandler.optimization_objective" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">optimization_objective</span><span class="p">:</span> <span class="n">AbstractObjective</span></code>
   
@@ -2774,7 +2768,6 @@ observed.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.posterior_handler.PosteriorHandler.optimizer" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">optimizer</span><span class="p">:</span> <span class="n">ox</span><span class="o">.</span><span class="n">GradientTransformation</span></code>
   
@@ -2791,7 +2784,6 @@ observed.</p>
 </div>
 
 <div class="doc doc-object doc-attribute">
-
 
 
 
@@ -2817,6 +2809,22 @@ observed.</p>
 
 
 
+<h6 id="gpjax.decision_making.posterior_handler.PosteriorHandler.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">prior</span><span class="p">:</span> <span class="n">AbstractPrior</span><span class="p">,</span> <span class="n">likelihood_builder</span><span class="p">:</span> <span class="n">LikelihoodBuilder</span><span class="p">,</span> <span class="n">optimization_objective</span><span class="p">:</span> <span class="n">AbstractObjective</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">:</span> <span class="n">ox</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">num_optimization_iters</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
 
 <h6 id="gpjax.decision_making.posterior_handler.PosteriorHandler.__post_init__" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">__post_init__</span><span class="p">()</span></code>
@@ -2832,7 +2840,6 @@ observed.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -2937,7 +2944,6 @@ observed.</p>
 
 
 
-
 <h6 id="gpjax.decision_making.posterior_handler.PosteriorHandler.update_posterior" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">update_posterior</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">previous_posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span><span class="p">,</span> <span class="n">optimize</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">KeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AbstractPosterior</span></code>
 
@@ -3036,6 +3042,7 @@ set as in the <code>likelihood_builder</code> function.</p>
   </div>
 
   </div>
+
 
 </div>
 
