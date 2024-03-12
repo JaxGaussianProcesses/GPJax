@@ -634,6 +634,24 @@ class VariationalPrecipGP(ApproxPrecipGP):
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
         )
 
+    def predict_indiv_mean(
+        self,
+        test_inputs: Num[Array, "N D"],
+        component_list: Optional[List[List[int]]]=None,
+    ):
+        predictor = lambda x: self.predict(x,  component_list).mean()
+        return jax.vmap(predictor,1)(test_inputs[:,None,:])
+    
+    def predict_indiv_var(
+        self,
+        test_inputs: Num[Array, "N D"],
+        component_list: Optional[List[List[int]]]=None,
+    ):
+        predictor = lambda x: self.predict(x,  component_list).variance()
+        return jax.vmap(predictor,1)(test_inputs[:,None,:])
+
+
+
 
     def loss_fn(self, negative=False, log_prior: Optional[Callable] = None)->gpx.objectives.AbstractObjective:
         class Loss(gpx.objectives.AbstractObjective):
@@ -677,48 +695,61 @@ class VariationalPrecipGP(ApproxPrecipGP):
     
     
     
-    
     def get_sobol_indicies(self, train_data: VerticalDataset, component_list: List[List[int]], use_range=False) -> Num[Array, "c"]:
-        raise NotImplementedError
-        # if not isinstance(component_list, List):
-        #     raise ValueError("Use get_sobol_index if you want to calc for single components (TODO)")
-        # x,y = self.smoother.smooth_data(train_data)
-        # m_x = self.mean_function(x)
-        # if self.second_order_empirical:
-        #     x_all = jnp.vstack([x,x]) # waste of memory here
-        #     Kxx_indiv = jnp.stack([k.cross_covariance(x_all,x_all) for k in self.base_kernels], axis=0) # [d, 2N, 2N]
-        #     Kxx_components = [jnp.prod(Kxx_indiv[c, :, :],0) for c in component_list]  
-        #     Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, N]
-        #     Kxx_components =  self._orthogonalise_empirical(Kxx_components, num_ref = jnp.shape(x)[0]) # [d, N, N]
-        #     Kxx_components = [self.interaction_variances[len(c)]*Kxx_components[i, :, :] for i, c in enumerate(component_list)]
-        #     Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, N]
-            
-        # else:
-        #     if self.measure == "empirical":
-        #         x_all = jnp.vstack([x,x]) # waste of memory here
-        #         Kxx_indiv = jnp.stack([k.cross_covariance(x_all,x_all) for k in self.base_kernels], axis=0) # [d, 2N, 2N]
-        #         Kxx_indiv =  self._orthogonalise_empirical(Kxx_indiv, num_ref = jnp.shape(x)[0]) # [d, N, N]
-        #     elif self.measure is None:
-        #         Kxx_indiv = jnp.stack([k.cross_covariance(x,x) for k in self.base_kernels], axis=0) # [d, N, N]
-        #     else:
-        #         raise ValueError("measure must be empirical, uniform or None")
-        #     Kxx_components = [self.interaction_variances[len(c)]*jnp.prod(Kxx_indiv[c, :, :], axis=0) for c in component_list] 
-        #     Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, N]
+        if not isinstance(component_list, List):
+            raise ValueError("Use get_sobol_index if you want to calc for single components (TODO)")
+        x,y = self.smoother.smooth_data(train_data)
+        mu = self.variational_mean
+        sqrt = self.variational_root_covariance
+        z = self.inducing_inputs
+        m_x = self.mean_function(x)
+        m_z = self.mean_function(z)
         
-        # assert Kxx_components.shape[0] == len(component_list)
+        if self.second_order_empirical:
+            raise NotImplemented
+            # x_all = jnp.vstack([x,x]) # waste of memory here
+            # Kxx_indiv = jnp.stack([k.cross_covariance(x_all,x_all) for k in self.base_kernels], axis=0) # [d, 2N, 2N]
+            # Kxx_components = [jnp.prod(Kxx_indiv[c, :, :],0) for c in component_list]  
+            # Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, N]
+            # Kxx_components =  self._orthogonalise_empirical(Kxx_components, num_ref = jnp.shape(x)[0]) # [d, N, N]
+            # Kxx_components = [self.interaction_variances[len(c)]*Kxx_components[i, :, :] for i, c in enumerate(component_list)]
+            # Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, N]
+        else:
+            if self.measure == "empirical":
+                x_all = jnp.vstack([x,z]) # waste of memory here
+                z_all = jnp.vstack([z,z]) # waste of memory here
+                Kxz_indiv = jnp.stack([k.cross_covariance(x_all,z_all) for k in self.base_kernels], axis=0) # [d, N + M, M + M]
+                Kxz_indiv =  self._orthogonalise_empirical(Kxz_indiv, num_ref = jnp.shape(z)[0]) # [d, N, M]
+            elif self.measure is None:
+                Kxz_indiv = jnp.stack([k.cross_covariance(x,z) for k in self.base_kernels], axis=0) # [d, N, M]
+            else:
+                raise ValueError("measure must be empirical, uniform or None")
+            Kxz_components = [self.interaction_variances[len(c)]*jnp.prod(Kxz_indiv[c, :, :], axis=0) for c in component_list] 
+            Kxz_components = jnp.stack(Kxz_components, axis=0) # [c, N, N]
+        
+        assert Kxz_components.shape[0] == len(component_list)
 
-        # Kxx = self.eval_K_xt(x,x, ref=x)
-        # Sigma = cola.PSD(Kxx + cola.ops.I_like(Kxx) * (self.likelihood.obs_stddev**2+self.jitter))
+        Kzz = self.eval_K_xt(z, z, ref = z)
+        Kzz = cola.PSD(Kzz + cola.ops.I_like(Kzz) * self.jitter)
+        Kxz = self.eval_K_xt(x,z, ref = z)
+        Lz = lower_cholesky(Kzz)
 
-        # def get_mean_from_covar(K): # [N,N] -> [N, 1]
-        #     Sigma_inv_Kxx = cola.solve(Sigma, K)
-        #     return m_x + jnp.matmul(Sigma_inv_Kxx.T, y - m_x) # [N, 1] 
+        def get_mean_from_covar(K): # [N,N] -> [N, 1]
+            Lz_inv_Kzt = cola.solve(Lz, K.T, Cholesky())
+            Kzz_inv_Kzt = cola.solve(Lz.T, Lz_inv_Kzt, Cholesky())
+            return m_x + jnp.matmul(Kzz_inv_Kzt.T, mu - m_z)
+        
 
-        # mean_overall =  get_mean_from_covar(Kxx) # [N, 1]
-        # mean_components = vmap(get_mean_from_covar)(Kxx_components) # [c, N, 1]
+        mean_overall =  get_mean_from_covar(Kxz) # [N, 1]
+        mean_components = vmap(get_mean_from_covar)(Kxz_components) # [c, N, 1]
 
-        # if use_range:
-        #     sobols = jnp.max(mean_components[:,:,0], axis=-1) - jnp.min(mean_components[:,:,0], axis=-1) # [c]
-        # else:
-        #     sobols = jnp.var(mean_components[:,:,0], axis=-1) / jnp.var(mean_overall) # [c]
-        # return sobols
+        if use_range:
+            sobols = jnp.max(mean_components[:,:,0], axis=-1) - jnp.min(mean_components[:,:,0], axis=-1) # [c]
+        else:
+            sobols = jnp.var(mean_components[:,:,0], axis=-1) / jnp.var(mean_overall) # [c]
+        return sobols
+    
+    
+
+
+       

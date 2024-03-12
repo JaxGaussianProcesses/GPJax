@@ -15,7 +15,7 @@ tfd = tfp.distributions
 
 
 # custom bits
-from gpjax.precip_gp import VerticalDataset, ProblemInfo
+from gpjax.precip_gp import VerticalDataset, ProblemInfo, ConjugatePrecipGP
 
 
 
@@ -66,12 +66,8 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
         for j in range(i+1,problem_info.num_variables):
             idx_2.append([i,j])
     idxs = [[]] + [[i] for i in range(problem_info.num_variables)] + idx_2
-    if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
-        sobols = model.get_sobol_indicies(idxs,use_range=use_range)
-        z = model.inducing_inputs
-    else:
-        sobols = model.get_sobol_indicies(data, idxs,use_range=use_range)
-        z = model.smoother.smooth_data(data)[0]
+    sobols = model.get_sobol_indicies(data, idxs,use_range=use_range)
+    z = model.smoother.smooth_data(data)[0]
     sobols = sobols / jnp.sum(sobols)
 
     plt.plot(sobols)
@@ -86,7 +82,7 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
         sampler = qmc.Halton(d=problem_info.num_variables)
         x_plot = sampler.random(n=num_plot) * (jnp.max(z, axis=0) - jnp.min(z, axis=0)) + jnp.min(z, axis=0)
         if len(chosen_idx)==1:
-            if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
+            if isinstance(model,ConjugatePrecipGP):
                 mean = model.predict_indiv_mean(x_plot,chosen_idx)
                 std = jnp.sqrt(model.predict_indiv_var(x_plot,chosen_idx))
             else:
@@ -99,9 +95,12 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
             plt.scatter(x_plot[:,chosen_idx[0]],mean- 1.96*std, color="red") 
             plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])
             plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black")
+            if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
+                ip = model.inducing_inputs
+                plt.scatter(ip[:,chosen_idx[0]],jnp.zeros_like(ip[:,chosen_idx[0]]), color="green")
             plt.title(f"Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}with sobol index {sobols[idx]}")
         elif len(chosen_idx)==2:
-            if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
+            if isinstance(model,ConjugatePrecipGP):
                 mean = model.predict_indiv_mean(x_plot,chosen_idx)
             else:
                 mean = model.predict_indiv_mean(x_plot, data, chosen_idx)
@@ -110,58 +109,61 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
             plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
             plt.colorbar(col)
             plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black")
+            if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
+                ip = model.inducing_inputs
+                plt.scatter(ip[:,chosen_idx[0]],ip[:,chosen_idx[1]], color="green")
             plt.title(f"Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]} with sobol index {sobols[idx]}")
         plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])   
        
         
         
-def plot_component(problem_info:ProblemInfo, model, data,chosen_idx):
-        plt.figure()
+# def plot_component(problem_info:ProblemInfo, model, data,chosen_idx):
+#         plt.figure()
         
-        if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
-            z = model.inducing_inputs
-        else:
-            z = model.smoother.smooth_data(data)[0]
+#         if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
+#             z = model.inducing_inputs
+#         else:
+#             z = model.smoother.smooth_data(data)[0]
         
-        num_plot = 1_000 if len(chosen_idx)==1 else 10_000
-        from scipy.stats import qmc
-        sampler = qmc.Halton(d=problem_info.num_variables)
-        x_plot = sampler.random(n=num_plot) * (jnp.max(z, axis=0) - jnp.min(z, axis=0)) + jnp.min(z, axis=0)
+#         num_plot = 1_000 if len(chosen_idx)==1 else 10_000
+#         from scipy.stats import qmc
+#         sampler = qmc.Halton(d=problem_info.num_variables)
+#         x_plot = sampler.random(n=num_plot) * (jnp.max(z, axis=0) - jnp.min(z, axis=0)) + jnp.min(z, axis=0)
 
-        if len(chosen_idx) in [0,1]:
-            if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
-                mean = model.predict_indiv_mean(x_plot,chosen_idx)
-                std = jnp.sqrt(model.predict_indiv_var(x_plot,chosen_idx))
-            else:
-                mean = model.predict_indiv_mean(x_plot, data, chosen_idx)
-                std = jnp.sqrt(model.predict_indiv_var(x_plot, data, chosen_idx))
-            mean = mean * (data.Y_std)#+ data.Y_mean
-            std = std* (data.Y_std)
-            if len(chosen_idx)==0:
-                plt.scatter(x_plot[:,0],mean, color="blue")
-                plt.scatter(x_plot[:,0
-                                   ],mean+ 1.96*std, color="red")
-                plt.scatter(x_plot[:,0],mean- 1.96*std, color="red")
-            else:
-                plt.scatter(x_plot[:,chosen_idx[0]],mean, color="blue") 
-                plt.scatter(x_plot[:,chosen_idx[0]],mean+ 1.96*std, color="red") 
-                plt.scatter(x_plot[:,chosen_idx[0]],mean- 1.96*std, color="red") 
-                plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])
-                plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black")
-                plt.title(f"Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}")
-                plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])  
-        elif len(chosen_idx)==2:
-            if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
-                mean = model.predict_indiv_mean(x_plot,chosen_idx)
-            else:
-                mean = model.predict_indiv_mean(x_plot, data, chosen_idx)
-            mean = mean * (data.Y_std)# + data.Y_mean
-            col = plt.scatter(x_plot[:,chosen_idx[0]],x_plot[:,chosen_idx[1]],c=mean)
-            plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
-            plt.colorbar(col)
-            plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black")
-            plt.title(f"Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]}")
-            plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])   
+#         if len(chosen_idx) in [0,1]:
+#             if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
+#                 mean = model.predict_indiv_mean(x_plot,chosen_idx)
+#                 std = jnp.sqrt(model.predict_indiv_var(x_plot,chosen_idx))
+#             else:
+#                 mean = model.predict_indiv_mean(x_plot, data, chosen_idx)
+#                 std = jnp.sqrt(model.predict_indiv_var(x_plot, data, chosen_idx))
+#             mean = mean * (data.Y_std)#+ data.Y_mean
+#             std = std* (data.Y_std)
+#             if len(chosen_idx)==0:
+#                 plt.scatter(x_plot[:,0],mean, color="blue")
+#                 plt.scatter(x_plot[:,0
+#                                    ],mean+ 1.96*std, color="red")
+#                 plt.scatter(x_plot[:,0],mean- 1.96*std, color="red")
+#             else:
+#                 plt.scatter(x_plot[:,chosen_idx[0]],mean, color="blue") 
+#                 plt.scatter(x_plot[:,chosen_idx[0]],mean+ 1.96*std, color="red") 
+#                 plt.scatter(x_plot[:,chosen_idx[0]],mean- 1.96*std, color="red") 
+#                 plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])
+#                 plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black")
+#                 plt.title(f"Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}")
+#                 plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])  
+#         elif len(chosen_idx)==2:
+#             if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
+#                 mean = model.predict_indiv_mean(x_plot,chosen_idx)
+#             else:
+#                 mean = model.predict_indiv_mean(x_plot, data, chosen_idx)
+#             mean = mean * (data.Y_std)# + data.Y_mean
+#             col = plt.scatter(x_plot[:,chosen_idx[0]],x_plot[:,chosen_idx[1]],c=mean)
+#             plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
+#             plt.colorbar(col)
+#             plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black")
+#             plt.title(f"Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]}")
+#             plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])   
        
         
 
