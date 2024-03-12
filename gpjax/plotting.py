@@ -15,7 +15,7 @@ tfd = tfp.distributions
 
 
 # custom bits
-from gpjax.precip_gp import VerticalDataset, ProblemInfo, ConjugatePrecipGP
+from gpjax.precip_gp import VerticalDataset, ProblemInfo, ConjugatePrecipGP, VariationalPrecipGP
 
 
 
@@ -24,8 +24,6 @@ from gpjax.precip_gp import VerticalDataset, ProblemInfo, ConjugatePrecipGP
 
 
 def plot_params(problem_info:ProblemInfo, model,data,title="", print_corr=False):
-    if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
-        model = model.posterior
     plt.figure()
     lengthscales = jnp.array([model.base_kernels[i].lengthscale[0] for i in range(data.dim)])
     z_to_plot = jnp.linspace(jnp.min(model.smoother.Z_levels),jnp.max(model.smoother.Z_levels),100)
@@ -82,7 +80,7 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
         sampler = qmc.Halton(d=problem_info.num_variables)
         x_plot = sampler.random(n=num_plot) * (jnp.max(z, axis=0) - jnp.min(z, axis=0)) + jnp.min(z, axis=0)
         if len(chosen_idx)==1:
-            if isinstance(model,ConjugatePrecipGP):
+            if isinstance(model,VariationalPrecipGP):
                 mean = model.predict_indiv_mean(x_plot,chosen_idx)
                 std = jnp.sqrt(model.predict_indiv_var(x_plot,chosen_idx))
             else:
@@ -95,12 +93,12 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
             plt.scatter(x_plot[:,chosen_idx[0]],mean- 1.96*std, color="red") 
             plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])
             plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black")
-            if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
+            if isinstance(model, VariationalPrecipGP):
                 ip = model.inducing_inputs
                 plt.scatter(ip[:,chosen_idx[0]],jnp.zeros_like(ip[:,chosen_idx[0]]), color="green")
             plt.title(f"Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}with sobol index {sobols[idx]}")
         elif len(chosen_idx)==2:
-            if isinstance(model,ConjugatePrecipGP):
+            if isinstance(model,VariationalPrecipGP):
                 mean = model.predict_indiv_mean(x_plot,chosen_idx)
             else:
                 mean = model.predict_indiv_mean(x_plot, data, chosen_idx)
@@ -109,7 +107,7 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
             plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
             plt.colorbar(col)
             plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black")
-            if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
+            if isinstance(model, VariationalPrecipGP):
                 ip = model.inducing_inputs
                 plt.scatter(ip[:,chosen_idx[0]],ip[:,chosen_idx[1]], color="green")
             plt.title(f"Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]} with sobol index {sobols[idx]}")

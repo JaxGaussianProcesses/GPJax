@@ -138,21 +138,43 @@ class VerticalDataset(Pytree):
                 #X3d = X3d - jnp.mean(X3d, 0)
             
 
+                print("Standardized X2d and Xstatic as Gaussin")
+                X2d_mean = jnp.mean(self.X2d, axis=0)
+                X2d_std = jnp.std(self.X2d,axis=0)
+                X2d = (self.X2d - X2d_mean) / (X2d_std)
+                Xstatic_mean = jnp.mean(self.Xstatic, axis=0)
+                Xstatic_std = jnp.std(self.Xstatic,axis=0)
+                Xstatic = (self.Xstatic - Xstatic_mean) / (Xstatic_std)
+                
+                print("then standardized X3d as Gaussian")
+                # X3d_mean = jnp.mean(self.X3d,axis=(0,2))
+                # X3d_std = jnp.std(self.X3d, axis=(0,2))
+                # X3d = (self.X3d-X3d_mean[None,:,None]) / (X3d_std[None,:,None])
+                X3d_mean = jnp.mean(self.X3d,axis=(0))
+                X3d_std = jnp.std(self.X3d, axis=(0))
+                X3d = (self.X3d-X3d_mean[None,:,:]) / (X3d_std[None,:,:])
 
-                print(f"then standardized Y as Gaussian")
-                self.Y_mean = jnp.mean(self.y,0)
-                self.Y_std = jnp.sqrt(jnp.var(self.y,0))
-                y = (self.y-self.Y_mean) / self.Y_std
+
+
+
+
+
+
+
+                # print(f"then standardized Y as Gaussian")
+                # self.Y_mean = jnp.mean(self.y,0)
+                # self.Y_std = jnp.sqrt(jnp.var(self.y,0))
+                # y = (self.y-self.Y_mean) / self.Y_std
             
                 # print(f"then standardized Y with max and min")
                 # self.Y_mean = None
                 # self.Y_std = None
                 # y = (self.y - jnp.min(self.y)) / (jnp.max(self.y) - jnp.min(self.y))
                 
-                # print(f"no Y standarisation")
-                # y=self.y
-                # self.Y_mean = 0.0
-                # self.Y_std = 1.0
+                print(f"no Y standarisation")
+                y=self.y
+                self.Y_mean = 0.0
+                self.Y_std = 1.0
                 
                 self.X3d = X3d
                 self.X2d = X2d
@@ -240,8 +262,11 @@ class VerticalSmoother(Module):
     
     def smooth_data(self, dataset: VerticalDataset) -> Num[Array, "N D"]:
         x3d, x2d, xstatic, y = dataset.X3d, dataset.X2d, dataset.Xstatic, dataset.y
-        delta = self.Z_levels[:,1:] - self.Z_levels[:,:-1]
-        x3d_smooth = jnp.sum(jnp.multiply(self.smooth()[:,:-1]*delta , x3d[:,:,:-1]), axis=-1) # [N, D_3d]
+        delta = self.Z_levels[:,1:] - self.Z_levels[:,:-1] # [1 L-1]
+        weights=self.smooth()[:,:-1] # [D L]
+        #weights = weights / jnp.sum(weights, axis=-1, keepdims=True)
+        #x3d_smooth = jnp.mean(jnp.multiply(weights[None,:,:] , x3d[:,:,:-1]), axis=-1) # [N, D_3d]
+        x3d_smooth = jnp.sum(jnp.multiply(jnp.multiply(weights[None,:,:],delta[None,:,:]) , x3d[:,:,:-1]), axis=-1) # [N, D_3d]
         #standard = jnp.sum(jnp.multiply(delta , x3d[:,:,:-1]), axis=-1) # [N, D_3d]
         #x3d_smooth = x3d_smooth / standard
         x3d_smooth = x3d_smooth / (jnp.max(self.Z_levels) - jnp.min(self.Z_levels))
@@ -280,8 +305,7 @@ class ConjugatePrecipGP(Module):
             self.pairs = jnp.array(pairs)
         assert self.measure in ["empirical", None]
         
-        assert isinstance(self.likelihood, gpx.likelihoods.Gaussian)
-        
+
         
     def predict(
         self,
@@ -706,14 +730,14 @@ class VariationalPrecipGP(ApproxPrecipGP):
         m_z = self.mean_function(z)
         
         if self.second_order_empirical:
-            raise NotImplemented
-            # x_all = jnp.vstack([x,x]) # waste of memory here
-            # Kxx_indiv = jnp.stack([k.cross_covariance(x_all,x_all) for k in self.base_kernels], axis=0) # [d, 2N, 2N]
-            # Kxx_components = [jnp.prod(Kxx_indiv[c, :, :],0) for c in component_list]  
-            # Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, N]
-            # Kxx_components =  self._orthogonalise_empirical(Kxx_components, num_ref = jnp.shape(x)[0]) # [d, N, N]
-            # Kxx_components = [self.interaction_variances[len(c)]*Kxx_components[i, :, :] for i, c in enumerate(component_list)]
-            # Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, N]
+            x_all = jnp.vstack([x,z]) # waste of memory here
+            z_all = jnp.vstack([z,z]) # waste of memory here
+            Kxx_indiv = jnp.stack([k.cross_covariance(x_all,z_all) for k in self.base_kernels], axis=0) # [d, N+M, 2M]
+            Kxx_components = [jnp.prod(Kxx_indiv[c, :, :],0) for c in component_list]  
+            Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, N]
+            Kxx_components =  self._orthogonalise_empirical(Kxx_components, num_ref = jnp.shape(x)[0]) # [d, N, M]
+            Kxx_components = [self.interaction_variances[len(c)]*Kxx_components[i, :, :] for i, c in enumerate(component_list)]
+            Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, M]
         else:
             if self.measure == "empirical":
                 x_all = jnp.vstack([x,z]) # waste of memory here
