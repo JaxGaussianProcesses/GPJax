@@ -49,7 +49,7 @@ from gpjax.base import (
     param_field,
     static_field,
 )
-from gpjax.dataset import Dataset, VerticalDataset
+from gpjax.dataset import Dataset
 from gpjax.distributions import GaussianDistribution
 from gpjax.kernels import RFF
 from gpjax.kernels.base import AbstractKernel
@@ -808,138 +808,6 @@ __all__ = [
     "NonConjugatePosterior",
     "construct_posterior",
 ]
-
-
-
-
-##############################################################################################################################
-##############################################################################################################################
-##############################################################################################################################
-
-
-@dataclass
-class VerticalSmoother(Module):
-    smoother_mean: Float[Array, "1 D"]  = param_field(None)
-    smoother_input_scale: Float[Array, "1 D"] = param_field(None, bijector=tfb.Softplus())
-    Z_levels: Float[Array, "1 L"] = static_field(jnp.array([[1.0]]))
-    
-    def smooth_fn(self, x):
-        return jnp.exp(-0.5 * ((x - self.smoother_mean.T) / self.smoother_input_scale.T) ** 2)
-        #return  jax.scipy.stats.norm.pdf(x, self.smoother_mean.T, self.smoother_input_scale.T)
-
-    def smooth(self) -> Num[Array, "D L"]:
-        return self.smooth_fn(self.Z_levels)
-        
-        #smoothing_weights = jnp.exp(-0.5*((self.Z_levels-self.smoother_mean.T)/(self.smoother_input_scale.T))**2) # [D, L]
-        #return   (smoothing_weights/ jnp.sum(smoothing_weights, axis=-1, keepdims=True)) # [D, L]
-        #return  (smoothing_weights/ jnp.sqrt(jnp.sum(smoothing_weights**2, axis=-1, keepdims=True))) # [D, L]
-    
-    
-    def smooth_data(self, dataset: VerticalDataset) -> Num[Array, "N D"]:
-        x3d, x2d, xstatic, y = dataset.X3d, dataset.X2d, dataset.Xstatic, dataset.y
-        delta = self.Z_levels[:,1:] - self.Z_levels[:,:-1]
-        x3d_smooth = jnp.sum(jnp.multiply(self.smooth()[:,:-1]*delta , x3d[:,:,:-1]), axis=-1) # [N, D_3d]
-        #standard = jnp.sum(jnp.multiply(delta , x3d[:,:,:-1]), axis=-1) # [N, D_3d]
-        #x3d_smooth = x3d_smooth / standard
-        x3d_smooth = x3d_smooth / (jnp.max(self.Z_levels) - jnp.min(self.Z_levels))
-        #x3d_smooth = (x3d_smooth - jnp.mean(x3d_smooth, axis=0)) / jnp.std(x3d_smooth, axis=0)
-        #x3d_smooth = (x3d_smooth - jnp.min(x3d_smooth, 0)) / (jnp.max(x3d_smooth,0)-jnp.min(x3d_smooth, 0))
-        x = jnp.hstack([x3d_smooth, x2d, xstatic]) # [N, D_3d + D_2d +D_static]
-        return x, y
-
-
-
-@dataclass
-class CustomConjugatePosterior(ConjugatePosterior):
-    smoother: VerticalSmoother = VerticalSmoother()
-    
-    def predict(
-        self,
-        test_inputs: Num[Array, "N D"],
-        train_data: VerticalDataset,
-        kernel_between_train: Optional[AbstractKernel] = None,
-        kernel_with_test: Optional[AbstractKernel] = None,
-    ) -> GaussianDistribution:
-
-        # smooth data to get in form for preds
-        x,y = self.smoother.smooth_data(train_data)
-
-        
-        smoothed_train_data = Dataset(x, y)
-        return super().predict(test_inputs, smoothed_train_data, kernel_between_train, kernel_with_test)
-
-
-class CustomAdditiveConjugatePosterior(CustomConjugatePosterior):
-    def __post__init__(self):
-        assert isinstance(self.prior.kernel, AdditiveKernel), "AdditiveConjugatePosterior requires an AdditiveKernel"
-
-    def predict_additive_component(
-        self,
-        test_inputs: Num[Array, "N D"],
-        train_data: VerticalDataset,
-        component_list: List[List[int]]
-    ) -> GaussianDistribution:
-        r"""Get the posterior predictive distribution for a specific additive component."""
-        specific_kernel = self.prior.kernel.get_specific_kernel(component_list)
-        return self.predict(test_inputs, train_data, kernel_with_test = specific_kernel)
-
-    def get_sobol_index(self, train_data: VerticalDataset, component_list: List[int]) -> ScalarFloat:
-        """ Return the sobol index for the additive component corresponding to component_list. """
-        if isinstance(component_list[0], List):
-            raise ValueError("Use get_sobol_indicies if you want to calc for multiple components")
-        x,y = self.smoother.smooth_data(train_data)
-        component_posterior = self.predict_additive_component(x, train_data, component_list)
-        full_posterior= self.predict(x, train_data) # wasteful as only need means
-        return jnp.var(component_posterior.mean()) / jnp.var(full_posterior.mean())
-    
-    def get_sobol_indicies(self, train_data: VerticalDataset, component_list: List[List[int]]) -> Num[Array, "c"]:
-        if not isinstance(component_list, List):
-            raise ValueError("Use get_sobol_index if you want to calc for single components")
-        x,y = self.smoother.smooth_data(train_data)
-        m_x = self.prior.mean_function(x).T
-
-        base_kernels = self.prior.kernel.kernels
-        Kxx_indiv = jnp.stack([k.gram(x).to_dense() for k in base_kernels], axis=0) # [d, N, N]
-        interaction_variances = self.prior.kernel.interaction_variances
-        Kxx_components = [interaction_variances[len(c)]*jnp.prod(Kxx_indiv[c, :, :], axis=0) for c in component_list] 
-        Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, N]
-        assert Kxx_components.shape[0] == len(component_list)
-
-        Kxx = self.prior.kernel.gram(x).to_dense() # [N, N]
-        Sigma = cola.PSD(Kxx + cola.ops.I_like(Kxx) * self.likelihood.obs_stddev**2)
-
-        def get_mean_from_covar(K): # [N,N] -> [N, 1]
-            Sigma_inv_Kxx = cola.solve(Sigma, K)
-            return m_x.T + jnp.matmul(Sigma_inv_Kxx.T, y - m_x) # [N, 1] 
-
-        mean_overall =  get_mean_from_covar(Kxx) # [N, 1]
-        mean_components = vmap(get_mean_from_covar)(Kxx_components) # [c, N, 1]
-
-        sobols = jnp.var(mean_components[:,:,0], axis=-1) / jnp.var(mean_overall) # [c]
-
-        k=5
-        top_idx = jax.lax.top_k(sobols, k)[1]
-        zeroth = self.predict_additive_component(x, train_data, []).mean()[0]
-
-        from matplotlib import pyplot as plt
-        plt.figure()
-        plt.hist(train_data.y.T)
-        plt.title("true")
-        plt.figure()
-        plt.title("all iteractions")
-        plt.hist(jnp.sum(mean_components[:,:,0],0).T+ zeroth)
-        plt.figure()
-        plt.title(f"best {k} iteractions")
-        plt.hist(jnp.sum(mean_components[:,:,0][top_idx],0).T + zeroth)
-        plt.figure()
-
-
-        #return jnp.max(mean_components[:,:,0], axis=-1) - jnp.min(mean_components[:,:,0], axis=-1)
-        return sobols
-    
-    
-    
-
 
 
 

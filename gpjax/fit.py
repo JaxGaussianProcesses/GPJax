@@ -35,7 +35,8 @@ import optax as ox
 import scipy
 
 from gpjax.base import Module
-from gpjax.dataset import Dataset, VerticalDataset
+from gpjax.dataset import Dataset
+from gpjax.precip_gp import VerticalDataset
 from gpjax.objectives import AbstractObjective
 from gpjax.scan import vscan
 from gpjax.typing import (
@@ -181,7 +182,7 @@ def fit_scipy(  # noqa: PLR0913
     *,
     model: ModuleModel,
     objective: Union[AbstractObjective, Callable[[ModuleModel, Dataset], ScalarFloat]],
-    train_data: Dataset,
+    train_data: Union[ VerticalDataset, Dataset],
     max_iters: Optional[int] = 500,
     verbose: Optional[bool] = True,
     safe: Optional[bool] = True,
@@ -268,7 +269,8 @@ def get_batch(train_data: Union[Dataset, VerticalDataset], batch_size: int, key:
             X3d=x3d[indices], 
             X2d = x2d[indices],
             Xstatic = xstatic[indices],
-            y=y[indices]
+            y=y[indices],
+            standardize = False,
             )   
         
     else:

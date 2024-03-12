@@ -13,11 +13,10 @@ from gpjax.base import (
     Module,
     static_field,
 )
-from gpjax.dataset import Dataset, VerticalDataset
+from gpjax.dataset import Dataset
 from gpjax.distributions import GaussianDistribution
 from gpjax.kernels.base import AdditiveKernel
 from gpjax.lower_cholesky import lower_cholesky
-from gpjax.gps import CustomConjugatePosterior, CustomAdditiveConjugatePosterior
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -506,66 +505,66 @@ class CollapsedELBO(AbstractObjective):
 ##############################################################################################################################
 
 
-class CustomConjugateMLL(ConjugateMLL):
-    def step(
-        self,
-        posterior: CustomConjugatePosterior,
-        train_data: VerticalDataset,
-    ) -> ScalarFloat:
-        x,y = posterior.smoother.smooth_data(train_data)
+# class CustomConjugateMLL(ConjugateMLL):
+#     def step(
+#         self,
+#         posterior: CustomConjugatePosterior,
+#         train_data: VerticalDataset,
+#     ) -> ScalarFloat:
+#         x,y = posterior.smoother.smooth_data(train_data)
         
-        log_prob =0.0
-        if self.log_prior is not None:
-            log_prob += self.log_prior(posterior)
-        return super().step(posterior, Dataset(x, y)) + self.constant*log_prob
+#         log_prob =0.0
+#         if self.log_prior is not None:
+#             log_prob += self.log_prior(posterior)
+#         return super().step(posterior, Dataset(x, y)) + self.constant*log_prob
 
 
-class CustomConjugateLOOCV(ConjugateLOOCV):
-    def step(
-        self,
-        posterior: CustomConjugatePosterior,
-        train_data: VerticalDataset,
-    ) -> ScalarFloat:
-        x,y = posterior.smoother.smooth_data(train_data)
-        d = jnp.shape(x)[1]
-        log_prob =0.0
+# class CustomConjugateLOOCV(ConjugateLOOCV):
+#     def step(
+#         self,
+#         posterior: CustomConjugatePosterior,
+#         train_data: VerticalDataset,
+#     ) -> ScalarFloat:
+#         x,y = posterior.smoother.smooth_data(train_data)
+#         d = jnp.shape(x)[1]
+#         log_prob =0.0
 
-        return super().step(posterior, Dataset(x, y)) + log_prob
-
-
+#         return super().step(posterior, Dataset(x, y)) + log_prob
 
 
-class CustomELBO(AbstractObjective):
-    def step(
-        self,
-        variational_family: VariationalFamily,
-        train_data: VerticalDataset,
-    ) -> ScalarFloat:
-        return self.constant * (
-            jnp.sum(custom_variational_expectation(variational_family, train_data))
-            * variational_family.posterior.likelihood.num_datapoints
-            / train_data.n
-            - variational_family.prior_kl()
-        )
 
 
-def custom_variational_expectation(
-    variational_family: VariationalFamily,
-    train_data: VerticalDataset,
-) -> Float[Array, " N"]:
-    # Unpack training batch
-    x,y = variational_family.posterior.smoother.smooth_data(train_data)
+# class CustomELBO(AbstractObjective):
+#     def step(
+#         self,
+#         variational_family: VariationalFamily,
+#         train_data: VerticalDataset,
+#     ) -> ScalarFloat:
+#         return self.constant * (
+#             jnp.sum(custom_variational_expectation(variational_family, train_data))
+#             * variational_family.posterior.likelihood.num_datapoints
+#             / train_data.n
+#             - variational_family.prior_kl()
+#         )
 
-    q = variational_family
 
-    def q_moments(x):
-        qx = q(x)
-        return qx.mean().squeeze(), qx.covariance().squeeze()
+# def custom_variational_expectation(
+#     variational_family: VariationalFamily,
+#     train_data: VerticalDataset,
+# ) -> Float[Array, " N"]:
+#     # Unpack training batch
+#     x,y = variational_family.posterior.smoother.smooth_data(train_data)
 
-    mean, variance = vmap(q_moments)(x[:, None])
+#     q = variational_family
 
-    expectation = q.posterior.likelihood.expected_log_likelihood(
-        y, mean[:, None], variance[:, None]
-    )
-    return expectation
+#     def q_moments(x):
+#         qx = q(x)
+#         return qx.mean().squeeze(), qx.covariance().squeeze()
+
+#     mean, variance = vmap(q_moments)(x[:, None])
+
+#     expectation = q.posterior.likelihood.expected_log_likelihood(
+#         y, mean[:, None], variance[:, None]
+#     )
+#     return expectation
 
