@@ -32,7 +32,15 @@ from gpjax.typing import (
 
 
 class Polynomial(AbstractKernel):
-    """The Polynomial kernel with variable degree."""
+    r"""The Polynomial kernel with variable degree.
+
+    Computes the covariance for pairs of inputs $`(x, y)`$ with variance $`\sigma^2`$:
+    ```math
+    k(x, y) = (\alpha + \sigma^2 x y)^d
+    ```
+    where $`\sigma^\in \mathbb{R}_{>0}`$ is the kernel's variance parameter, shift
+    parameter $`\alpha`$ and integer degree $`d`$.
+    """
 
     def __init__(
         self,
@@ -43,6 +51,17 @@ class Polynomial(AbstractKernel):
         n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
+        """Initializes the kernel.
+
+        Args:
+            active_dims: The indices of the input dimensions that the kernel operates on.
+            degree: The degree of the polynomial.
+            shift: The shift parameter of the kernel.
+            variance: The variance of the kernel.
+            n_dims: The number of input dimensions.
+            compute_engine: The computation engine that the kernel uses to compute the
+                covariance matrix.
+        """
         super().__init__(active_dims, n_dims, compute_engine)
 
         self.degree = degree
@@ -64,23 +83,6 @@ class Polynomial(AbstractKernel):
         self.name = f"Polynomial (degree {self.degree})"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
-        r"""Compute the polynomial kernel of degree $`d`$ between a pair of arrays.
-
-        For a pair of inputs $`x, y \in \mathbb{R}^{D}`$, let's evaluate the polynomial
-        kernel $`k(x, y)=\left( \alpha + \sigma^2 x y\right)^{d}`$ where
-        $`\sigma^\in \mathbb{R}_{>0}`$ is the kernel's variance parameter, shift
-        parameter $`\alpha`$ and integer degree $`d`$.
-
-        Args:
-            x (Float[Array, " D"]): The left hand argument of the kernel function's
-                call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's
-                call
-
-        Returns
-        -------
-            ScalarFloat: The value of $`k(x, y)`$.
-        """
         x = self.slice_input(x)
         y = self.slice_input(y)
         K = jnp.power(

@@ -98,15 +98,14 @@ class GHQuadratureIntegrator(AbstractIntegrator):
         r"""Compute a quadrature integral.
 
         Args:
-            fun (Callable): The likelihood to be integrated.
-            y (Float[Array, 'N D']): The observed response variable.
-            mean (Float[Array, 'N D']): The mean of the variational distribution.
-            variance (Float[Array, 'N D']): The variance of the variational
-                distribution.
-            likelihood (AbstractLikelihood): The likelihood function.
+            fun: the likelihood to be integrated.
+            y: the observed response variable.
+            mean: the mean of the variational distribution.
+            variance: the variance of the variational distribution.
+            likelihood: the likelihood function.
 
         Returns:
-            Float[Array, 'N']: The expected log likelihood.
+            The expected log likelihood as an array of shape (N,).
         """
         gh_points, gh_weights = np.polynomial.hermite.hermgauss(self.num_points)
         sd = jnp.sqrt(variance)

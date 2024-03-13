@@ -26,29 +26,21 @@ from gpjax.typing import Array
 
 
 class Matern52(StationaryKernel):
-    r"""The Matérn kernel with smoothness parameter fixed at 2.5."""
+    r"""The Matérn kernel with smoothness parameter fixed at 2.5.
+
+
+    Computes the covariance for pairs of inputs $`(x, y)`$ with
+    lengthscale parameter $`\ell`$ and variance $`\sigma^2`$.
+    ```math
+    k(x, y) = \sigma^2 \exp \Bigg(1+ \frac{\sqrt{5}\lvert x-y \rvert}{\ell^2} + \frac{5\lvert x - y \rvert^2}{3\ell^2} \Bigg)\exp\Bigg(-\frac{\sqrt{5}\lvert x-y\rvert}{\ell^2} \Bigg)
+    ```
+    """
 
     name: str = "Matérn52"
 
     def __call__(
         self, x: Float[Array, " D"], y: Float[Array, " D"]
     ) -> Float[Array, ""]:
-        r"""Compute the Matérn 5/2 kernel between a pair of arrays.
-
-        Evaluate the kernel on a pair of inputs $`(x, y)`$ with
-        lengthscale parameter $`\ell`$ and variance $`\sigma^2`$.
-        ```math
-        k(x, y) = \sigma^2 \exp \Bigg(1+ \frac{\sqrt{5}\lvert x-y \rvert}{\ell^2} + \frac{5\lvert x - y \rvert^2}{3\ell^2} \Bigg)\exp\Bigg(-\frac{\sqrt{5}\lvert x-y\rvert}{\ell^2} \Bigg)
-        ```
-
-        Args:
-            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
-
-        Returns
-        -------
-            ScalarFloat: The value of $`k(x, y)`$.
-        """
         x = self.slice_input(x) / self.lengthscale.value
         y = self.slice_input(y) / self.lengthscale.value
         tau = euclidean_distance(x, y)

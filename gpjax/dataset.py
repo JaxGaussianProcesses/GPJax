@@ -28,10 +28,9 @@ from gpjax.typing import Array
 class Dataset:
     r"""Base class for datasets.
 
-    Attributes
-    ----------
-        X (Optional[Num[Array, "N D"]]): input data.
-        y (Optional[Num[Array, "N Q"]]): output data.
+    Parameters:
+        X: input data.
+        y: output data.
     """
 
     X: Optional[Num[Array, "N D"]] = None

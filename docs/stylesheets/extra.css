@@ -83,3 +83,12 @@ div.doc-contents:not(.first) {
  .highlight .gp, .highlight .go { /* Generic.Prompt, Generic.Output */
   user-select: none;
 }
+
+.language-pycon .gp, .language-pycon .go { /* Generic.Prompt, Generic.Output */
+  user-select: none;
+}
+
+/* Maximum space for text block */
+.md-grid {
+  max-width: 65%; /* or 100%, if you want to stretch to full-width */
+}

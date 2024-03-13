@@ -42,10 +42,10 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 # Intuitively, for a function $f$, the kernel defines the notion of *similarity* between
 # the value of the function at two points, $f(\mathbf{x})$ and $f(\mathbf{x}')$, and
 # will be denoted as $k(\mathbf{x}, \mathbf{x}')$:
-#
-# $$\begin{aligned} k(\mathbf{x}, \mathbf{x}') &= \text{Cov}[f(\mathbf{x}),
-# f(\mathbf{x}')] \\ &= \mathbb{E}[(f(\mathbf{x}) - \mathbb{E}[f(\mathbf{x})])(f(\mathbf{x}') - \mathbb{E}[f(\mathbf{x}')])] \end{aligned}$$
-#
+# \begin{aligned}
+#   k(\mathbf{x}, \mathbf{x}') &= \text{Cov}[f(\mathbf{x}), f(\mathbf{x}')] \\
+#   &= \mathbb{E}[(f(\mathbf{x}) - \mathbb{E}[f(\mathbf{x})])(f(\mathbf{x}') - \mathbb{E}[f(\mathbf{x}')])]
+# \end{aligned}
 #  One would expect that, given a previously unobserved test point $\mathbf{x}^*$, the
 #  training points which are *closest* to this unobserved point will be most similar to
 #  it. As such, the kernel is used to define this notion of similarity within the GP

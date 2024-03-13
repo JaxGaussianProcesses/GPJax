@@ -86,7 +86,7 @@ def conjugate_mll(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
     Args:
         posterior (ConjugatePosterior): The posterior distribution for which
             we want to compute the marginal log-likelihood.
-        data: (Dataset): The training dataset used to compute the
+        data:: The training dataset used to compute the
             marginal log-likelihood.
 
     Returns
@@ -149,7 +149,7 @@ def conjugate_loocv(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat
     Args:
         posterior (ConjugatePosterior): The posterior distribution for which
             we want to compute the marginal log-likelihood.
-        data: (Dataset): The training dataset used to compute the
+        data:: The training dataset used to compute the
             marginal log-likelihood.
 
     Returns
@@ -203,7 +203,7 @@ def log_posterior_density(
     Args:
         posterior (NonConjugatePosterior): The posterior distribution for which
             we want to compute the marginal log-likelihood.
-        data (Dataset): The training dataset used to compute the
+        data: The training dataset used to compute the
             marginal log-likelihood.
 
     Returns
@@ -249,10 +249,10 @@ def elbo(variational_family: VF, data: Dataset) -> ScalarFloat:
     relative to the full dataset size.
 
     Args:
-        variational_family (AbstractVariationalFamily): The variational
+        variational_family: The variational
             approximation for whose parameters we should maximise the ELBO with
             respect to.
-        train_data (Dataset): The training data for which we should maximise the
+        data: The training data for which we should maximise the
             ELBO with respect to.
 
     Returns
@@ -284,9 +284,9 @@ def variational_expectation(
     distribution. Batching can be done here to speed up computation.
 
     Args:
-        variational_family (AbstractVariationalFamily): The variational family that we
+        variational_family: The variational family that we
             are using to approximate the posterior.
-        train_data (Dataset): The batch for which the expectation should be computed for.
+        data: The batch for which the expectation should be computed for.
 
     Returns
     -------
@@ -329,10 +329,10 @@ def collapsed_elbo(variational_family: VF, data: Dataset) -> ScalarFloat:
     relative to the full dataset size.
 
     Args:
-        variational_family (AbstractVariationalFamily): The variational
+        variational_family: The variational
             approximation for whose parameters we should maximise the ELBO with
             respect to.
-        train_data (Dataset): The training data for which we should maximise the
+        data: The training data for which we should maximise the
             ELBO with respect to.
 
     Returns

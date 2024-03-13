@@ -26,6 +26,8 @@ class CustomNav(Nav):
                     title = "GPs"
                 elif key == "rbf":
                     title = "RBF"
+                elif key == "rff":
+                    title = "RFF"
                 else:
                     title = key.title()
 
@@ -65,11 +67,13 @@ for path in sorted(Path("gpjax").rglob("*.py")):
             title = "GPs"
         elif title == "Rbf":
             title = "RBF"
+        elif title == "Rff":
+            title = "RFF"
 
         if "Matern" in title:
             title = title.replace("Matern", "Matérn")
 
-        print(f"# {title}\n", file=fd)
+        # print(f"# {title}\n", file=fd)
         print("::: " + identifier, file=fd)  #
 
     mkdocs_gen_files.set_edit_path(full_doc_path, path)

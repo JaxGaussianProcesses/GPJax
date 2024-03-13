@@ -42,16 +42,13 @@ class PosteriorHandler:
     observed.
 
     Attributes:
-        prior (AbstractPrior): Prior to use when forming the posterior.
-        likelihood_builder (LikelihoodBuilder): Function which takes the number of
-        datapoints as input and returns a likelihood object initialised with the given
-        number of datapoints.
-        optimization_objective (Objective): Objective to use for optimizing the
-        posterior hyperparameters.
-        optimizer (ox.GradientTransformation): Optax optimizer to use for optimizing the
-        posterior hyperparameters.
-        num_optimization_iterations (int): Number of iterations to optimize
-        the posterior hyperparameters for.
+        prior: prior to use when forming the posterior.
+        likelihood_builder: function which takes the number of datapoints as input and
+            returns a likelihood object initialised with the given number of datapoints.
+        optimization_objective: objective to use for optimizing the posterior hyperparameters.
+        optimizer: an optax optimizer to use for optimizing the posterior hyperparameters.
+        num_optimization_iterations: the number of iterations to optimize
+            the posterior hyperparameters for.
     """
 
     prior: AbstractPrior
@@ -71,10 +68,10 @@ class PosteriorHandler:
         Initialise (and optionally optimize) a posterior using the given dataset.
 
         Args:
-            dataset (Dataset): Dataset to get posterior for.
-            optimize (bool): Whether to optimize the posterior hyperparameters.
-            key (Optional[KeyArray]): A JAX PRNG key which is used for optimizing the posterior
-            hyperparameters.
+            dataset: dataset to get posterior for.
+            optimize: whether to optimize the posterior hyperparameters.
+            key: a JAX PRNG key which is used for optimizing the posterior
+                hyperparameters.
 
         Returns:
             Posterior for the given dataset.
@@ -108,14 +105,14 @@ class PosteriorHandler:
         set as in the `likelihood_builder` function.
 
         Args:
-            dataset: Dataset to get posterior for.
-            previous_posterior: Posterior being updated. This is supplied as one may
-            wish to simply increase the number of datapoints in the likelihood, without
-            optimizing the posterior hyperparameters, in which case the previous
-            posterior can be used to obtain the previously set prior hyperparameters.
-            optimize: Whether to optimize the posterior hyperparameters.
+            dataset: dataset to get posterior for.
+            previous_posterior: posterior being updated. This is supplied as one may
+                wish to simply increase the number of datapoints in the likelihood, without
+                optimizing the posterior hyperparameters, in which case the previous
+                posterior can be used to obtain the previously set prior hyperparameters.
+            optimize: whether to optimize the posterior hyperparameters.
             key: A JAX PRNG key which is used for optimizing the posterior
-            hyperparameters.
+                hyperparameters.
         """
         posterior = previous_posterior.prior * self.likelihood_builder(dataset.n)
 

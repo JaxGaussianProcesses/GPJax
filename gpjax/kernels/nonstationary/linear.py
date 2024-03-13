@@ -32,7 +32,13 @@ from gpjax.typing import (
 
 
 class Linear(AbstractKernel):
-    r"""The linear kernel."""
+    r"""The linear kernel.
+
+    Computes the covariance for pairs of inputs $`(x, y)`$ with variance $`\sigma^2`$:
+    ```math
+    k(x, y) = \sigma^2 x^{\top}y
+    ```
+    """
 
     name: str = "Linear"
 
@@ -43,6 +49,16 @@ class Linear(AbstractKernel):
         n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
+        """Initializes the kernel.
+
+        Args:
+            active_dims: The indices of the input dimensions that the kernel operates on.
+            variance: the variance of the kernel σ.
+            n_dims: The number of input dimensions.
+            compute_engine: The computation engine that the kernel uses to compute the
+                covariance matrix.
+        """
+
         super().__init__(active_dims, n_dims, compute_engine)
 
         if isinstance(variance, nnx.Variable):
@@ -57,20 +73,6 @@ class Linear(AbstractKernel):
         x: Float[Array, " D"],
         y: Float[Array, " D"],
     ) -> ScalarFloat:
-        r"""Compute the linear kernel between a pair of arrays.
-
-        For a pair of inputs $`x, y \in \mathbb{R}^{D}`$, let's evaluate the linear
-        kernel $`k(x, y)=\sigma^2 x^{\top}y`$ where $`\sigma^\in \mathbb{R}_{>0}`$ is the
-        kernel's variance parameter.
-
-        Args:
-            x (Float[Array, " D"]): The left hand input of the kernel function.
-            y (Float[Array, " D"]): The right hand input of the kernel function.
-
-        Returns
-        -------
-            ScalarFloat: The evaluated kernel function $`k(x, y)`$ at the supplied inputs.
-        """
         x = self.slice_input(x)
         y = self.slice_input(y)
         K = self.variance.value * jnp.matmul(x.T, y)

@@ -23,7 +23,7 @@ class RBF(Kernels):
         super().setup(n_datapoints, n_dims)
         self.kernel = kernels.RBF(active_dims=list(range(n_dims)))
 
-    def time_covfunc_call(self, n_datapoints: int, n_dims: int):
+    def time_covfunc__call__(self, n_datapoints: int, n_dims: int):
         self.kernel.gram(self.X)
 
 
@@ -32,7 +32,7 @@ class Matern12(Kernels):
         super().setup(n_datapoints, n_dims)
         self.kernel = kernels.Matern12(active_dims=list(range(n_dims)))
 
-    def time_covfunc_call(self, n_datapoints: int, n_dims: int):
+    def time_covfunc__call__(self, n_datapoints: int, n_dims: int):
         self.kernel.gram(self.X)
 
 
@@ -41,7 +41,7 @@ class Matern32(Kernels):
         super().setup(n_datapoints, n_dims)
         self.kernel = kernels.Matern32(active_dims=list(range(n_dims)))
 
-    def time_covfunc_call(self, n_datapoints: int, n_dims: int):
+    def time_covfunc__call__(self, n_datapoints: int, n_dims: int):
         self.kernel.gram(self.X)
 
 
@@ -50,7 +50,7 @@ class Matern52(Kernels):
         super().setup(n_datapoints, n_dims)
         self.kernel = kernels.Matern52(active_dims=list(range(n_dims)))
 
-    def time_covfunc_call(self, n_datapoints: int, n_dims: int):
+    def time_covfunc__call__(self, n_datapoints: int, n_dims: int):
         self.kernel.gram(self.X)
 
 
@@ -59,7 +59,7 @@ class PoweredExponential(Kernels):
         super().setup(n_datapoints, n_dims)
         self.kernel = kernels.PoweredExponential(active_dims=list(range(n_dims)))
 
-    def time_covfunc_call(self, n_datapoints: int, n_dims: int):
+    def time_covfunc__call__(self, n_datapoints: int, n_dims: int):
         self.kernel.gram(self.X)
 
 
@@ -68,7 +68,7 @@ class RationalQuadratic(Kernels):
         super().setup(n_datapoints, n_dims)
         self.kernel = kernels.RationalQuadratic(active_dims=list(range(n_dims)))
 
-    def time_covfunc_call(self, n_datapoints: int, n_dims: int):
+    def time_covfunc__call__(self, n_datapoints: int, n_dims: int):
         self.kernel.gram(self.X)
 
 
@@ -77,7 +77,7 @@ class Polynomial(Kernels):
         super().setup(n_datapoints, n_dims)
         self.kernel = kernels.Polynomial(active_dims=list(range(n_dims)))
 
-    def time_covfunc_call(self, n_datapoints: int, n_dims: int):
+    def time_covfunc__call__(self, n_datapoints: int, n_dims: int):
         self.kernel.gram(self.X)
 
 
@@ -86,7 +86,7 @@ class Linear(Kernels):
         super().setup(n_datapoints, n_dims)
         self.kernel = kernels.Linear(active_dims=list(range(n_dims)))
 
-    def time_covfunc_call(self, n_datapoints: int, n_dims: int):
+    def time_covfunc__call__(self, n_datapoints: int, n_dims: int):
         self.kernel.gram(self.X)
 
 
@@ -95,5 +95,5 @@ class ArcCosine(Kernels):
         super().setup(n_datapoints, n_dims)
         self.kernel = kernels.ArcCosine(active_dims=list(range(n_dims)))
 
-    def time_covfunc_call(self, n_datapoints: int, n_dims: int):
+    def time_covfunc__call__(self, n_datapoints: int, n_dims: int):
         self.kernel.gram(self.X)

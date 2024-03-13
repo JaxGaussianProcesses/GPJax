@@ -37,6 +37,11 @@ LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 class Periodic(StationaryKernel):
     r"""The periodic kernel.
 
+    Computes the covariance for pairs of inputs $`(x, y)`$ with length-scale
+    parameter $`\ell`$, variance $`\sigma^2`$ and period $`p`$.
+    ```math
+    k(x, y) = \sigma^2 \exp \left( -\frac{1}{2} \sum_{i=1}^{D} \left(\frac{\sin (\pi (x_i - y_i)/p)}{\ell}\right)^2 \right)
+    ```
     Key reference is MacKay 1998 - "Introduction to Gaussian processes".
     """
 
@@ -51,6 +56,22 @@ class Periodic(StationaryKernel):
         n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
+        """Initializes the kernel.
+
+        Args:
+            active_dims: the indices of the input dimensions that the kernel operates on.
+            lengthscale: the lengthscale(s) of the kernel ℓ. If a scalar or an array of
+                length 1, the kernel is isotropic, meaning that the same lengthscale is
+                used for all input dimensions. If an array with length > 1, the kernel is
+                anisotropic, meaning that a different lengthscale is used for each input.
+            variance: the variance of the kernel σ.
+            period: the period of the kernel p.
+            n_dims: the number of input dimensions. If `lengthscale` is an array, this
+                argument is ignored.
+            compute_engine: the computation engine that the kernel uses to compute the
+                covariance matrix.
+        """
+
         if isinstance(period, nnx.Variable):
             self.period = period
         else:
@@ -61,20 +82,6 @@ class Periodic(StationaryKernel):
     def __call__(
         self, x: Float[Array, " D"], y: Float[Array, " D"]
     ) -> Float[Array, ""]:
-        r"""Compute the Periodic kernel between a pair of arrays.
-
-        Evaluate the kernel on a pair of inputs $`(x, y)`$ with length-scale parameter $`\ell`$, variance $`\sigma^2`$
-        and period $`p`$.
-        ```math
-        k(x, y) = \sigma^2 \exp \left( -\frac{1}{2} \sum_{i=1}^{D} \left(\frac{\sin (\pi (x_i - y_i)/p)}{\ell}\right)^2 \right)
-        ```
-
-        Args:
-            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's call
-        Returns:
-            ScalarFloat: The value of $`k(x, y)`$.
-        """
         x = self.slice_input(x)
         y = self.slice_input(y)
         sine_squared = (

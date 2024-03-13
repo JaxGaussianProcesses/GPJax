@@ -38,13 +38,16 @@ LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 class PoweredExponential(StationaryKernel):
     r"""The powered exponential family of kernels.
 
+    Computes the covariance for pairs of inputs $`(x, y)`$ with length-scale parameter
+    $`\ell`$, $`\sigma`$ and power $`\kappa`$.
+    ```math
+    k(x, y)=\sigma^2\exp\Bigg(-\Big(\frac{\lVert x-y\rVert^2}{\ell^2}\Big)^\kappa\Bigg)
+    ```
+
     This also equivalent to the symmetric generalized normal distribution.
     See Diggle and Ribeiro (2007) - "Model-based Geostatistics".
     and
     https://en.wikipedia.org/wiki/Generalized_normal_distribution#Symmetric_version
-
-    Attributes:
-        power: The power of the kernel.
     """
 
     name: str = "Powered Exponential"
@@ -58,6 +61,21 @@ class PoweredExponential(StationaryKernel):
         n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
+        """Initializes the kernel.
+
+        Args:
+            active_dims: the indices of the input dimensions that the kernel operates on.
+            lengthscale: the lengthscale(s) of the kernel ℓ. If a scalar or an array of
+                length 1, the kernel is isotropic, meaning that the same lengthscale is
+                used for all input dimensions. If an array with length > 1, the kernel is
+                anisotropic, meaning that a different lengthscale is used for each input.
+            variance: the variance of the kernel σ.
+            power: the power of the kernel κ.
+            n_dims: the number of input dimensions. If `lengthscale` is an array, this
+                argument is ignored.
+            compute_engine: the computation engine that the kernel uses to compute the
+                covariance matrix.
+        """
         if isinstance(power, nnx.Variable):
             self.power = power
         else:
@@ -68,22 +86,6 @@ class PoweredExponential(StationaryKernel):
     def __call__(
         self, x: Float[Array, " D"], y: Float[Array, " D"]
     ) -> Float[Array, ""]:
-        r"""Compute the Powered Exponential kernel between a pair of arrays.
-
-        Evaluate the kernel on a pair of inputs $`(x, y)`$ with length-scale parameter
-        $`\ell`$, $`\sigma`$ and power $`\kappa`$.
-        ```math
-        k(x, y)=\sigma^2\exp\Bigg(-\Big(\frac{\lVert x-y\rVert^2}{\ell^2}\Big)^\kappa\Bigg)
-        ```
-
-        Args:
-            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's call
-
-        Returns
-        -------
-            ScalarFloat: The value of $`k(x, y)`$.
-        """
         x = self.slice_input(x) / self.lengthscale.value
         y = self.slice_input(y) / self.lengthscale.value
         K = self.variance.value * jnp.exp(

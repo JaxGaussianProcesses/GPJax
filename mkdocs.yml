@@ -62,13 +62,17 @@ theme:
 markdown_extensions:
   - admonition
   - pymdownx.details # Enhance admonitions with collapse/expand
-  - markdown_katex:
-      no_inline_svg: True
-      insert_fonts_css: True
+  - pymdownx.highlight:
+      use_pygments: true
+      pygments_lang_class: true
+      anchor_linenums: true
+  - pymdownx.arithmatex:
+      generic: true
+  # - markdown_katex:
+      # no_inline_svg: True
+      # insert_fonts_css: True
   - pymdownx.tabbed:
       alternate_style: true
-  - pymdownx.highlight:
-      anchor_linenums: true
   - pymdownx.superfences
   - pymdownx.snippets:
       check_paths: true
@@ -77,12 +81,10 @@ markdown_extensions:
       permalink: ''
       toc_depth: 4
   - footnotes
-  # - pymdownx.arithmatex:
-  #     generic: true
   - attr_list
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 plugins:
   - search
@@ -92,47 +94,39 @@ plugins:
         - docs/scripts/notebook_converter.py  # or any other name or path
   - literate-nav:
       nav_file: SUMMARY.md
-  - bibtex:
-      bib_file: "docs/refs.bib"
-      csl_file: "https://raw.githubusercontent.com/citation-style-language/styles/af38aba0e9b08406c8827abfc888e5f3e3fa1d65/journal-of-the-royal-statistical-society.csl"
-      cite_inline: true
   - mkdocs-jupyter:
       execute: false
       allow_errors: false
       include: ["examples/*.py"]
       ignore: ["examples/utils.py", "_statch/*.py", "scripts/*.py"]
-    # binder: true
-    # binder_service_name: "gh"
-#     binder_branch: "main"
   - mkdocstrings:
-      watch:
-        - gpjax
       default_handler: python
       handlers:
         python:
+          paths: ["gpjax"]
           rendering:
-            show_root_heading: true
-            show_root_full_path: true
-            show_if_no_docstring: true
+            show_symbol_type_toc: true
             show_signature_annotations: true
-            show_source: false
-            members_order: source  # order methods according to their order of definition in the source code, not alphabetical order
-            heading_level: 4
           options:
-            inherited_members: true  # Allow looking up inherited methods
+            members_order: source
+            inherited_members: true
+            show_source: false
+            show_root_heading: false
+            show_root_toc_entry: false
+            allow_inspection: false
             docstring_style: "google"
             docstring_section_style: "list"
-          docstring_options:
-            trim_doctest_flags: true
-
-  - git-authors:
-      show_contribution: false
-      show_line_count: true
-      show_email_address: false
-      count_empty_lines: true
-      fallback_to_empty: false
-      sort_authors_by: contribution
-      enabled: true
+            merge_init_into_class: true
+            separate_signature: true
+            filters:
+              - "!^_" # filter private members
+              - "!^__"
+              - "^__init__$" # except...
+              - "^__call__$"
+              - "^__*add__$"
+              - "^__*mul__$"
+            docstring_options:
+              ignore_init_summary: true
 
 extra:
   analytics:
@@ -140,13 +134,12 @@ extra:
     property: G-L15440C0N0
 
 extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css
   - stylesheets/extra.css
   - stylesheets/permalinks.css
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css
 
 extra_javascript:
-  # - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
-  # - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js
   - javascripts/katex.js

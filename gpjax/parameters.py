@@ -13,7 +13,7 @@ def transform(
     params: nnx.State,
     params_bijection: tp.Dict[tp.Type, tfb.Bijector],
     inverse: bool = False,
-):
+) -> nnx.State:
     r"""Transforms parameters using a bijector.
 
     Example:
@@ -42,7 +42,7 @@ def transform(
         inverse: Whether to apply the inverse transformation.
 
     Returns:
-        A new nnx.State object containing the transformed parameters.
+        State: A new nnx.State object containing the transformed parameters.
     """
 
     def _inner(param: Parameter):

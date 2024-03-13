@@ -47,15 +47,6 @@ class AbstractKernel(nnx.Module):
 
     The class also provides a method for slicing the input matrix to select the
     relevant columns for the kernel's evaluation.
-
-    Attributes:
-        active_dims: The indices of the input dimensions
-            that are active in the kernel's evaluation, represented by a list of integers
-            or a slice object.
-        compute_engine: The computation engine that is used to
-            compute the kernel's cross-covariance and gram matrices.
-        n_dims: The number of input dimensions of the kernel.
-        name: The name of the kernel.
     """
 
     active_dims: tp.Union[list[int], slice] = slice(None)
@@ -89,27 +80,6 @@ class AbstractKernel(nnx.Module):
 
         self.compute_engine = compute_engine
 
-    def cross_covariance(self, x: Num[Array, "N D"], y: Num[Array, "M D"]):
-        return self.compute_engine.cross_covariance(self, x, y)
-
-    def gram(self, x: Num[Array, "N D"]):
-        return self.compute_engine.gram(self, x)
-
-    def slice_input(self, x: Float[Array, "... D"]) -> Float[Array, "... Q"]:
-        r"""Slice out the relevant columns of the input matrix.
-
-        Select the relevant columns of the supplied matrix to be used within the
-        kernel's evaluation.
-
-        Args:
-            x (Float[Array, "... D"]): The matrix or vector that is to be sliced.
-
-        Returns
-        -------
-            Float[Array, "... Q"]: A sliced form of the input matrix.
-        """
-        return x[..., self.active_dims] if self.active_dims is not None else x
-
     @abc.abstractmethod
     def __call__(
         self,
@@ -119,14 +89,63 @@ class AbstractKernel(nnx.Module):
         r"""Evaluate the kernel on a pair of inputs.
 
         Args:
-            x (Num[Array, " D"]): The left hand input of the kernel function.
-            y (Num[Array, " D"]): The right hand input of the kernel function.
+            x: the left hand input of the kernel function.
+            y: The right hand input of the kernel function.
 
-        Returns
-        -------
-            ScalarFloat: The evaluated kernel function at the supplied inputs.
+        Returns:
+            The evaluated kernel function at the supplied inputs.
         """
-        raise NotImplementedError
+        ...
+
+    def cross_covariance(
+        self, x: Num[Array, "N D"], y: Num[Array, "M D"]
+    ) -> Float[Array, "N M"]:
+        r"""Compute the cross-covariance matrix of the kernel.
+
+        Args:
+            x: the first input matrix of shape `(N, D)`.
+            y: the second input matrix of shape `(M, D)`.
+
+        Returns:
+            The cross-covariance matrix of the kernel of shape `(N, M)`.
+        """
+        return self.compute_engine.cross_covariance(self, x, y)
+
+    def gram(self, x: Num[Array, "N D"]) -> Float[Array, "N N"]:
+        r"""Compute the gram matrix of the kernel.
+
+        Args:
+            x: the input matrix of shape `(N, D)`.
+
+        Returns:
+            The gram matrix of the kernel of shape `(N, N)`.
+        """
+        return self.compute_engine.gram(self, x)
+
+    def diagonal(self, x: Num[Array, "N D"]) -> Float[Array, " N"]:
+        r"""Compute the diagonal of the gram matrix of the kernel.
+
+        Args:
+            x: the input matrix of shape `(N, D)`.
+
+        Returns:
+            The diagonal of the gram matrix of the kernel of shape `(N,)`.
+        """
+        return self.compute_engine.diagonal(self, x)
+
+    def slice_input(self, x: Float[Array, "... D"]) -> Float[Array, "... Q"]:
+        r"""Slice out the relevant columns of the input matrix.
+
+        Select the relevant columns of the supplied matrix to be used within the
+        kernel's evaluation.
+
+        Args:
+            x: the matrix or vector that is to be sliced.
+
+        Returns:
+            The sliced form of the input matrix.
+        """
+        return x[..., self.active_dims] if self.active_dims is not None else x
 
     def __add__(
         self, other: tp.Union["AbstractKernel", ScalarFloat]
@@ -135,8 +154,7 @@ class AbstractKernel(nnx.Module):
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
 
-        Returns
-        -------
+        Returns:
             AbstractKernel: A new kernel that is the sum of the two kernels.
         """
         if isinstance(other, AbstractKernel):
@@ -151,8 +169,7 @@ class AbstractKernel(nnx.Module):
         Args:
             other (AbstractKernel): The kernel to be added to the current kernel.
 
-        Returns
-        -------
+        Returns:
             AbstractKernel: A new kernel that is the sum of the two kernels.
         """
         return self.__add__(other)
@@ -165,14 +182,32 @@ class AbstractKernel(nnx.Module):
         Args:
             other (AbstractKernel): The kernel to be multiplied with the current kernel.
 
-        Returns
-        -------
+        Returns:
             AbstractKernel: A new kernel that is the product of the two kernels.
         """
         if isinstance(other, AbstractKernel):
             return ProductKernel(kernels=[self, other])
         else:
             return ProductKernel(kernels=[self, Constant(other)])
+
+    def __init_subclass__(cls, **kwargs):
+        # we use this to inherit docstrings from parent classes
+        # even when the methods are overridden in the subclass
+
+        super().__init_subclass__(**kwargs)
+        # Iterate over attributes of the subclass
+        for attr_name, attr_value in cls.__dict__.items():
+            if callable(attr_value) and attr_value.__doc__ is None:
+                # If the subclass method does not have a docstring,
+                # check if the parent (or any ancestor) has a method with a docstring to inherit.
+                for parent in cls.mro()[
+                    1:
+                ]:  # cls.mro() includes cls itself, so skip it with [1:]
+                    if hasattr(parent, attr_name):
+                        parent_attr_value = getattr(parent, attr_name)
+                        if parent_attr_value.__doc__:
+                            attr_value.__doc__ = parent_attr_value.__doc__
+                            break
 
 
 class Constant(AbstractKernel):
@@ -201,8 +236,7 @@ class Constant(AbstractKernel):
             x (Float[Array, " D"]): The left hand input of the kernel function.
             y (Float[Array, " D"]): The right hand input of the kernel function.
 
-        Returns
-        -------
+        Returns:
             ScalarFloat: The evaluated kernel function at the supplied inputs.
         """
         return self.constant.value.squeeze()
@@ -244,8 +278,7 @@ class CombinationKernel(AbstractKernel):
             x (Float[Array, " D"]): The left hand input of the kernel function.
             y (Float[Array, " D"]): The right hand input of the kernel function.
 
-        Returns
-        -------
+        Returns:
             ScalarFloat: The evaluated kernel function at the supplied inputs.
         """
         return self.operator(jnp.stack([k(x, y) for k in self.kernels]))

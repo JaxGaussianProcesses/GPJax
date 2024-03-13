@@ -43,13 +43,6 @@ class StationaryKernel(AbstractKernel):
     in the input space. They can be isotropic or anisotropic, meaning that they
     can have a single lengthscale for all input dimensions or a different lengthscale
     for each input dimension.
-
-    Attributes:
-        lengthscale: The lengthscale(s) of the kernel. If a scalar or an array of
-            length 1, the kernel is isotropic, meaning that the same lengthscale is
-            used for all input dimensions. If an array with length > 1, the kernel is
-            anisotropic, meaning that a different lengthscale is used for each input.
-        variance: The variance of the kernel.
     """
 
     lengthscale: nnx.Variable[Lengthscale]
@@ -63,6 +56,21 @@ class StationaryKernel(AbstractKernel):
         n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
+        """Initializes the kernel.
+
+        Args:
+            active_dims: The indices of the input dimensions that the kernel operates on.
+            lengthscale: the lengthscale(s) of the kernel ℓ. If a scalar or an array of
+                length 1, the kernel is isotropic, meaning that the same lengthscale is
+                used for all input dimensions. If an array with length > 1, the kernel is
+                anisotropic, meaning that a different lengthscale is used for each input.
+            variance: the variance of the kernel σ.
+            n_dims: The number of input dimensions. If `lengthscale` is an array, this
+                argument is ignored.
+            compute_engine: The computation engine that the kernel uses to compute the
+                covariance matrix.
+        """
+
         super().__init__(active_dims, n_dims, compute_engine)
 
         _check_lengthscale(lengthscale)
