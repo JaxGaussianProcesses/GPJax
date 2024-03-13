@@ -93,9 +93,9 @@ class RFF(AbstractKernel):
         r"""Compute the features for the inputs.
 
         Args:
-            x: A $`N \times D`$ array of inputs.
+            x: A $N \times D$ array of inputs.
 
         Returns:
-            Float[Array, "N L"]: A $`N \times L`$ array of features where $`L = 2M`$.
+            Float[Array, "N L"]: A $N \times L$ array of features where $L = 2M$.
         """
         return self.compute_engine.compute_features(self, x)

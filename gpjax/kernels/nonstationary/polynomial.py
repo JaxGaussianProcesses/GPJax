@@ -34,12 +34,12 @@ from gpjax.typing import (
 class Polynomial(AbstractKernel):
     r"""The Polynomial kernel with variable degree.
 
-    Computes the covariance for pairs of inputs $`(x, y)`$ with variance $`\sigma^2`$:
-    ```math
+    Computes the covariance for pairs of inputs $(x, y)$ with variance $\sigma^2$:
+    $$
     k(x, y) = (\alpha + \sigma^2 x y)^d
-    ```
-    where $`\sigma^\in \mathbb{R}_{>0}`$ is the kernel's variance parameter, shift
-    parameter $`\alpha`$ and integer degree $`d`$.
+    $$
+    where $\sigma^\in \mathbb{R}_{>0}$ is the kernel's variance parameter, shift
+    parameter $\alpha$ and integer degree $d$.
     """
 
     def __init__(

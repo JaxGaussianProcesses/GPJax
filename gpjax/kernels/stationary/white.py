@@ -33,10 +33,10 @@ from gpjax.typing import (
 class White(StationaryKernel):
     r"""The White noise kernel.
 
-    Computes the covariance for pairs of inputs $`(x, y)`$ with variance $`\sigma^2`$:
-    ```math
+    Computes the covariance for pairs of inputs $(x, y)$ with variance $\sigma^2$:
+    $$
     k(x, y) = \sigma^2 \delta(x-y)
-    ```
+    $$
     """
     name: str = "White"
 
@@ -54,7 +54,7 @@ class White(StationaryKernel):
             variance: the variance of the kernel σ.
             n_dims: The number of input dimensions.
             compute_engine: The computation engine that the kernel uses to compute the
-                covariance matrix.
+                covariance matrix
         """
         super().__init__(active_dims, 1.0, variance, n_dims, compute_engine)
 

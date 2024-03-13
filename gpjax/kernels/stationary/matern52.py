@@ -29,11 +29,12 @@ class Matern52(StationaryKernel):
     r"""The Matérn kernel with smoothness parameter fixed at 2.5.
 
 
-    Computes the covariance for pairs of inputs $`(x, y)`$ with
-    lengthscale parameter $`\ell`$ and variance $`\sigma^2`$.
-    ```math
+    Computes the covariance for pairs of inputs $(x, y)$ with
+    lengthscale parameter $\ell$ and variance $\sigma^2$.
+
+    $$
     k(x, y) = \sigma^2 \exp \Bigg(1+ \frac{\sqrt{5}\lvert x-y \rvert}{\ell^2} + \frac{5\lvert x - y \rvert^2}{3\ell^2} \Bigg)\exp\Bigg(-\frac{\sqrt{5}\lvert x-y\rvert}{\ell^2} \Bigg)
-    ```
+    $$
     """
 
     name: str = "Matérn52"

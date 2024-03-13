@@ -505,18 +505,19 @@ types = ["chardet (>=5.1.0)", "mypy", "pytest", "pytest-cov", "pytest-dependency
 
 [[package]]
 name = "cola-ml"
-version = "0.0.4"
+version = "0.0.5"
 description = ""
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "cola-ml-0.0.4.tar.gz", hash = "sha256:1ec6b84fd448ffbda9a6c872e7e4236f9dcd1419fd8f1af470a005759c4dd695"},
-    {file = "cola_ml-0.0.4-py3-none-any.whl", hash = "sha256:b4ae416a4810503995f624a552c68d90009796ba96635b85e040fa82ca7ba81d"},
+    {file = "cola-ml-0.0.5.tar.gz", hash = "sha256:afdd92fcf2a28c3d28cc5538b0059783f994d58a61377ed2985cb0ca522813da"},
+    {file = "cola_ml-0.0.5-py3-none-any.whl", hash = "sha256:f445279d7e877bf89db02e4d8f6d89e8de3c0c14e635f5c5e17f0a5a3136021f"},
 ]
 
 [package.dependencies]
-cola-plum-dispatch = "0.1.1"
+cola-plum-dispatch = "0.1.4"
 optree = "*"
+pytreeclass = "*"
 scipy = "*"
 tqdm = ">=4.38"
 
@@ -525,20 +526,21 @@ dev = ["pre-commit", "pytest", "pytest-cov", "setuptools-scm"]
 
 [[package]]
 name = "cola-plum-dispatch"
-version = "0.1.1"
+version = "0.1.4"
 description = "Multiple dispatch in Python (with additional features for the CoLA library)"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "cola_plum_dispatch-0.1.1-py3-none-any.whl", hash = "sha256:cbdc6097495fa7e5f8d688cf1bc4deb1ea96d505eaadcb623b061401e6799d34"},
-    {file = "cola_plum_dispatch-0.1.1.tar.gz", hash = "sha256:95a0399da0e310bab97ce057379df5f920b55b6839f2743eabb8db96eb6a0e7f"},
+    {file = "cola_plum_dispatch-0.1.4-py3-none-any.whl", hash = "sha256:c74a1a53597198a2ed1999f7c64b5c9557675fffe70b1fce583efaf4e43f35cc"},
+    {file = "cola_plum_dispatch-0.1.4.tar.gz", hash = "sha256:bdcaaeb4db31d5cb3fe5c80db2833ed8cc547db87cfe6e3a85e824479fd6dda6"},
 ]
 
 [package.dependencies]
-beartype = "*"
+beartype = ">=0.16.2"
+typing-extensions = {version = "*", markers = "python_version <= \"3.10\""}
 
 [package.extras]
-dev = ["black (==22.10.0)", "build", "coveralls", "ghp-import", "ipython", "jupyter-book", "numpy", "pre-commit", "pytest (>=6)", "pytest-cov", "tox", "wheel"]
+dev = ["black (==23.9.0)", "build", "coveralls", "ghp-import", "ipython", "jupyter-book", "mypy", "numpy", "pre-commit", "pyright (>=1.1.323)", "pytest (>=6)", "pytest-cov", "tox", "wheel"]
 
 [[package]]
 name = "colorama"
@@ -877,17 +879,17 @@ orbax-checkpoint = "*"
 PyYAML = ">=5.4.1"
 rich = ">=11.1"
 tensorstore = "*"
-typing-extensions = ">=4.2"
+typing_extensions = ">=4.2"
 
 [package.extras]
 all = ["matplotlib"]
-testing = ["black[jupyter] (==23.7.0)", "clu", "clu (<=0.0.9)", "einops", "gymnasium[accept-rom-license,atari]", "jaxlib", "jraph (>=0.0.6dev0)", "ml-collections", "mypy", "nbstripout", "opencv-python", "pytest", "pytest-cov", "pytest-custom-exit-code", "pytest-xdist", "pytype", "sentencepiece", "tensorflow", "tensorflow-datasets", "tensorflow-text (>=2.11.0)", "torch"]
+testing = ["black[jupyter] (==23.7.0)", "clu", "clu (<=0.0.9)", "einops", "gymnasium[accept-rom-license,atari]", "jaxlib", "jraph (>=0.0.6dev0)", "ml-collections", "mypy", "nbstripout", "opencv-python", "pytest", "pytest-cov", "pytest-custom_exit_code", "pytest-xdist", "pytype", "sentencepiece", "tensorflow", "tensorflow_datasets", "tensorflow_text (>=2.11.0)", "torch"]
 
 [package.source]
 type = "git"
 url = "https://github.com/google/flax.git"
 reference = "HEAD"
-resolved_reference = "6f2b08e024c2fd2f8cec42a6c82408cb35412319"
+resolved_reference = "ce8a3c74d8d1f4a7d8f14b9fb84b2cc76d7f8dbf"
 
 [[package]]
 name = "fsspec"
@@ -1012,13 +1014,13 @@ testing = ["flufl.flake8", "importlib-resources (>=1.3)", "packaging", "pyfakefs
 
 [[package]]
 name = "importlib-resources"
-version = "6.1.3"
+version = "6.3.0"
 description = "Read resources from Python packages"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "importlib_resources-6.1.3-py3-none-any.whl", hash = "sha256:4c0269e3580fe2634d364b39b38b961540a7738c02cb984e98add8b4221d793d"},
-    {file = "importlib_resources-6.1.3.tar.gz", hash = "sha256:56fb4525197b78544a3354ea27793952ab93f935bb4bf746b846bb1015020f2b"},
+    {file = "importlib_resources-6.3.0-py3-none-any.whl", hash = "sha256:783407aa1cd05550e3aa123e8f7cfaebee35ffa9cb0242919e2d1e4172222705"},
+    {file = "importlib_resources-6.3.0.tar.gz", hash = "sha256:166072a97e86917a9025876f34286f549b9caf1d10b35a1b372bffa1600c6569"},
 ]
 
 [package.extras]
@@ -1864,13 +1866,13 @@ files = [
 
 [[package]]
 name = "nbclient"
-version = "0.9.1"
+version = "0.10.0"
 description = "A client library for executing notebooks. Formerly nbconvert's ExecutePreprocessor."
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "nbclient-0.9.1-py3-none-any.whl", hash = "sha256:2c50a866e8dd6c5f655de47d2e252c82d2ebe978574e760ac229f5950593a434"},
-    {file = "nbclient-0.9.1.tar.gz", hash = "sha256:4f7b78c6c2a380e228f8a3bb469b847cb24e5b8ad6fda410691b5621e05ce5a2"},
+    {file = "nbclient-0.10.0-py3-none-any.whl", hash = "sha256:f13e3529332a1f1f81d82a53210322476a168bb7090a0289c795fe9cc11c9d3f"},
+    {file = "nbclient-0.10.0.tar.gz", hash = "sha256:4b3f1b7dba531e498449c4db4f53da339c91d449dc11e9af3a43b4eb5c5abb09"},
 ]
 
 [package.dependencies]
@@ -2516,6 +2518,21 @@ files = [
 
 [package.dependencies]
 six = ">=1.5"
+
+[[package]]
+name = "pytreeclass"
+version = "0.9.2"
+description = "Visualize, create, and operate on JAX PyTree in the most intuitive way possible."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pytreeclass-0.9.2-py3-none-any.whl", hash = "sha256:de379df40a58bce323e4be1a55453fd8adcaa482f27c4024fa5bc05768589163"},
+    {file = "pytreeclass-0.9.2.tar.gz", hash = "sha256:dbc2b13cead4c4ab3bb2cb026fce44ae673938d38d3e091e7f7c87ccaa1b7db8"},
+]
+
+[package.dependencies]
+jax = ">=0.4.7"
+typing-extensions = "*"
 
 [[package]]
 name = "pywin32"
@@ -3421,20 +3438,20 @@ tests-strict = ["pytest (==4.6.0)", "pytest (==4.6.0)", "pytest (==6.2.5)", "pyt
 
 [[package]]
 name = "zipp"
-version = "3.17.0"
+version = "3.18.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "zipp-3.17.0-py3-none-any.whl", hash = "sha256:0e923e726174922dce09c53c59ad483ff7bbb8e572e00c7f7c46b88556409f31"},
-    {file = "zipp-3.17.0.tar.gz", hash = "sha256:84e64a1c28cf7e91ed2078bb8cc8c259cb19b76942096c8d7b84947690cabaf0"},
+    {file = "zipp-3.18.0-py3-none-any.whl", hash = "sha256:c1bb803ed69d2cce2373152797064f7e79bc43f0a3748eb494096a867e0ebf79"},
+    {file = "zipp-3.18.0.tar.gz", hash = "sha256:df8d042b02765029a09b157efd8e820451045890acc30f8e37dd2f94a060221f"},
 ]
 
 [package.extras]
-docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (<7.2.5)", "sphinx (>=3.5)", "sphinx-lint"]
-testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-ignore-flaky", "pytest-mypy (>=0.9.1)", "pytest-ruff"]
+docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
+testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-ignore-flaky", "pytest-mypy", "pytest-ruff (>=0.2.1)"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "7e4b80014169cf8dce644f8df4896238ad3c5408a89d09d71614481611839e8a"
+content-hash = "ae66b9965fd2c0f2e7a82dd7b7bd653bb178d8e837eda500b06787abd424f021"

@@ -60,7 +60,6 @@ def fit(  # noqa: PLR0913
     Optimisers used here should originate from Optax.
 
     Example:
-    ```pycon
         >>> import jax.numpy as jnp
         >>> import jax.random as jr
         >>> import optax as ox
@@ -91,22 +90,27 @@ def fit(  # noqa: PLR0913
         >>> trained_model, history = gpx.fit(
         ...     model=model, objective=mse, train_data=D, optim=ox.sgd(0.001), num_iters=1000
         ... )
-    ```
+
 
     Args:
-        model: the model to be optimised.
-        objective: a callable that takes as input the model and a `Dataset` and
-            outputs a scalar array, representing objective function that we
-            are optimising with respect to.
-        train_data: the training data to be used for the optimisation.
-        optim: an `optax` optimiser that is to be used for gradient-based optimization.
-        num_iters: the number of optimisation steps to run.
-        batch_size: the size of the mini-batch to use. Defaults to -1, meaning that
-            the whole dataset is used.
-        key: the random key to use for the optimisation batch selection.
-        log_rate: how frequently the objective function's value should be printed.
-        verbose: whether to print the training loading bar.
-        unroll: the number of unrolled steps to use for the optimisation.
+        model (Model): The model Module to be optimised.
+        objective (Objective): The objective function that we are optimising with
+            respect to.
+        train_data (Dataset): The training data to be used for the optimisation.
+        optim (GradientTransformation): The Optax optimiser that is to be used for
+            learning a parameter set.
+        num_iters (int): The number of optimisation steps to run. Defaults
+            to 100.
+        batch_size (int): The size of the mini-batch to use. Defaults to -1
+            (i.e. full batch).
+        key (KeyArray): The random key to use for the optimisation batch
+            selection. Defaults to jr.PRNGKey(42).
+        log_rate (int): How frequently the objective function's value should
+            be printed. Defaults to 10.
+        verbose (bool): Whether to print the training loading bar. Defaults
+            to True.
+        unroll (int): The number of unrolled steps to use for the optimisation.
+            Defaults to 1.
 
     Returns:
         A tuple comprising the optimised model and training history.
@@ -181,17 +185,18 @@ def fit_scipy(  # noqa: PLR0913
     verbose: bool = True,
     safe: bool = True,
 ) -> tuple[Model, Array]:
-    r"""Train a Module model with respect to a supplied objective function
-    using the `scipy.optimize.minimize` function.
+    r"""Train a Module model with respect to a supplied Objective function.
+    Optimisers used here should originate from Optax. todo
 
     Args:
-        model: the model to be optimised.
-        objective: a callable that takes as input the model and a `Dataset` and
-            outputs a scalar array, representing objective function that we
-            are optimising with respect to.
-        train_data: the training data to be used for the optimisation.
-        max_iters: the number of optimisation steps to run.
-        verbose: whether to print the training loading bar.
+        model: the model Module to be optimised.
+        objective: The objective function that we are optimising with
+            respect to.
+        train_data (Dataset): The training data to be used for the optimisation.
+        max_iters (int): The maximum number of optimisation steps to run. Defaults
+            to 500.
+        verbose (bool): Whether to print the information about the optimisation. Defaults
+            to True.
 
     Returns:
         A tuple comprising the optimised model and training history.
@@ -338,4 +343,7 @@ def _check_batch_size(batch_size: tp.Any) -> None:
         raise ValueError(f"Expected batch_size to be positive or -1. Got {batch_size}.")
 
 
-__all__ = ["fit", "fit_scipy"]
+__all__ = [
+    "fit",
+    "get_batch",
+]

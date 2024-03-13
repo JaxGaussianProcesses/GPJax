@@ -16,24 +16,24 @@ nav:
     - 🌳 GPJax PyTrees: examples/pytrees.md
     - 📎 JAX 101 [External]: https://jax.readthedocs.io/en/latest/jax-101/index.html
   - 💡 Background:
-    - Intro to GPs: examples/intro_to_gps.py
-    - Intro to Kernels: examples/intro_to_kernels.py
+    - Intro to GPs: examples/intro_to_gps.md
+    - Intro to Kernels: examples/intro_to_kernels.md
   - 🎓 Tutorials:
-    - Regression: examples/regression.py
-    - Classification: examples/classification.py
-    - Poisson regression: examples/poisson.py
-    - Barycentres: examples/barycentres.py
-    - Deep kernel learning: examples/deep_kernels.py
-    - Graph kernels: examples/graph_kernels.py
-    - Sparse GPs: examples/uncollapsed_vi.py
-    - Stochastic sparse GPs: examples/collapsed_vi.py
-    - Bayesian Optimisation: examples/bayesian_optimisation.py
-    - Decision Making: examples/decision_making.py
-    - Multi-output GPs for Ocean Modelling: examples/oceanmodelling.py
+    - Regression: examples/regression.md
+    - Classification: examples/classification.md
+    - Poisson regression: examples/poisson.md
+    - Barycentres: examples/barycentres.md
+    - Deep kernel learning: examples/deep_kernels.md
+    - Graph kernels: examples/graph_kernels.md
+    - Sparse GPs: examples/uncollapsed_vi.md
+    - Stochastic sparse GPs: examples/collapsed_vi.md
+    - Bayesian Optimisation: examples/bayesian_optimisation.md
+    - Decision Making: examples/decision_making.md
+    - Multi-output GPs for Ocean Modelling: examples/oceanmodelling.md
   - 📖 Guides for customisation:
-    - Kernels: examples/constructing_new_kernels.py
-    - Likelihoods: examples/likelihoods_guide.py
-    - UCI regression: examples/yacht.py
+    - Kernels: examples/constructing_new_kernels.md
+    - Likelihoods: examples/likelihoods_guide.md
+    - UCI regression: examples/yacht.md
   - 💻 Raw tutorial code: give_me_the_code.md
   - Community:
     - 👥 Code of conduct: CODE_OF_CONDUCT.md
@@ -60,28 +60,18 @@ theme:
   favicon: _static/favicon.ico
 
 markdown_extensions:
-  - admonition
-  - pymdownx.details # Enhance admonitions with collapse/expand
   - pymdownx.highlight:
-      use_pygments: true
-      pygments_lang_class: true
       anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
   - pymdownx.arithmatex:
       generic: true
-  # - markdown_katex:
-      # no_inline_svg: True
-      # insert_fonts_css: True
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.superfences
-  - pymdownx.snippets:
-      check_paths: true
-  - pymdownx.tabbed
   - toc:
       permalink: ''
       toc_depth: 4
-  - footnotes
-  - attr_list
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
@@ -90,15 +80,11 @@ plugins:
   - search
   - gen-files:
       scripts:
-        - docs/scripts/gen_pages.py  # or any other name or path
-        - docs/scripts/notebook_converter.py  # or any other name or path
+        - docs/scripts/gen_pages.py
+        - docs/scripts/gen_examples.py
+        # - docs/scripts/notebook_converter.py  # or any other name or path
   - literate-nav:
       nav_file: SUMMARY.md
-  - mkdocs-jupyter:
-      execute: false
-      allow_errors: false
-      include: ["examples/*.py"]
-      ignore: ["examples/utils.py", "_statch/*.py", "scripts/*.py"]
   - mkdocstrings:
       default_handler: python
       handlers:
@@ -134,12 +120,12 @@ extra:
     property: G-L15440C0N0
 
 extra_css:
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css
   - stylesheets/extra.css
   - stylesheets/permalinks.css
 
 extra_javascript:
   - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js
   - javascripts/katex.js

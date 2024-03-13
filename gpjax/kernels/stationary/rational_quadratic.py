@@ -37,11 +37,11 @@ LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 class RationalQuadratic(StationaryKernel):
     r"""The Rational Quadratic kernel.
 
-    Computes the covariance for pairs of inputs $`(x, y)`$ with lengthscale parameter
-    $`\ell`$ and variance $`\sigma^2`$.
-    ```math
+    Computes the covariance for pairs of inputs $(x, y)$ with lengthscale parameter
+    $\ell$ and variance $\sigma^2$.
+    $$
     k(x,y)=\sigma^2\exp\Bigg(1+\frac{\lVert x-y\rVert^2_2}{2\alpha\ell^2}\Bigg)
-    ```
+    $$
     """
     name: str = "Rational Quadratic"
 

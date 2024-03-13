@@ -110,8 +110,8 @@ class AbstractLikelihood(nnx.Module):
     ) -> Float[Array, " N"]:
         r"""Compute the expected log likelihood.
 
-        For a variational distribution $`q(f)\sim\mathcal{N}(m, s)`$ and a likelihood
-        $`p(y|f)`$, compute the expected log likelihood:
+        For a variational distribution $q(f)\sim\mathcal{N}(m, s)$ and a likelihood
+        $p(y|f)$, compute the expected log likelihood:
         ```math
         \mathbb{E}_{q(f)}\left[\log p(y|f)\right]
         ```

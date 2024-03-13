@@ -199,9 +199,9 @@ def _frobenius_norm_squared(matrix: Float[Array, "N N"]) -> ScalarFloat:
 def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> ScalarFloat:
     r"""KL-divergence between two Gaussians.
 
-    Computes the KL divergence, $`\operatorname{KL}[q\mid\mid p]`$, between two
-    multivariate Gaussian distributions $`q(x) = \mathcal{N}(x; \mu_q, \Sigma_q)`$
-    and $`p(x) = \mathcal{N}(x; \mu_p, \Sigma_p)`$.
+    Computes the KL divergence, $\operatorname{KL}[q\mid\mid p]$, between two
+    multivariate Gaussian distributions $q(x) = \mathcal{N}(x; \mu_q, \Sigma_q)$
+    and $p(x) = \mathcal{N}(x; \mu_p, \Sigma_p)$.
 
     Args:
         q: a multivariate Gaussian distribution.

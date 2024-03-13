@@ -56,9 +56,9 @@ class Prior(AbstractPrior):
     [mean](https://docs.jaxgaussianprocesses.com/api/mean_functions/)
     and [kernel](https://docs.jaxgaussianprocesses.com/api/kernels/base/) function.
 
-    A Gaussian process prior parameterised by a mean function $`m(\cdot)`$ and a kernel
-    function $`k(\cdot, \cdot)`$ is given by
-    $`p(f(\cdot)) = \mathcal{GP}(m(\cdot), k(\cdot, \cdot))`$.
+    A Gaussian process prior parameterised by a mean function $m(\cdot)$ and a kernel
+    function $k(\cdot, \cdot)$ is given by
+    $p(f(\cdot)) = \mathcal{GP}(m(\cdot), k(\cdot, \cdot))$.
 
     To invoke a `Prior` distribution, a kernel and mean function must be specified.
 
@@ -91,4 +91,4 @@ We adopt the following convention when documenting objects:
 
 !!! attention "Note"
 
-    Inline math in docstrings needs to be rendered within both `$` and `` symbols to be correctly rendered by MkDocs. For instance, where one would typically write `$k(x,y)$` in standard LaTeX, in docstrings you are required to write ``$`k(x,y)`$`` in order for the math to be correctly rendered by MkDocs.
+    Inline math in docstrings needs to be rendered within both $ and `` symbols to be correctly rendered by MkDocs. For instance, where one would typically write $k(x,y)$ in standard LaTeX, in docstrings you are required to write `$k(x,y)$` in order for the math to be correctly rendered by MkDocs.

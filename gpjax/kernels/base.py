@@ -17,6 +17,7 @@ import abc
 import functools as ft
 
 import beartype.typing as tp
+from cola.ops.operator_base import LinearOperator
 from flax.experimental import nnx
 import jax.numpy as jnp
 from jaxtyping import (
@@ -111,7 +112,7 @@ class AbstractKernel(nnx.Module):
         """
         return self.compute_engine.cross_covariance(self, x, y)
 
-    def gram(self, x: Num[Array, "N D"]) -> Float[Array, "N N"]:
+    def gram(self, x: Num[Array, "N D"]) -> LinearOperator:
         r"""Compute the gram matrix of the kernel.
 
         Args:

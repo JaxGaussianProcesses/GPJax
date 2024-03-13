@@ -32,7 +32,7 @@ Tag for the objective dataset/function in standard utility functions.
 
 FunctionEvaluator = Callable[[Float[Array, "N D"]], Dict[str, Dataset]]
 """
-Type alias for function evaluators, which take an array of points of shape $`[N, D]`$
+Type alias for function evaluators, which take an array of points of shape $[N, D]$
 and evaluate a set of functions at each point, returning a mapping from function tags
 to datasets of the evaluated points. This is the same as the `Observer` in Trieste:
 https://github.com/secondmind-labs/trieste/blob/develop/trieste/observer.py

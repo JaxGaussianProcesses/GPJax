@@ -38,11 +38,11 @@ LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 class PoweredExponential(StationaryKernel):
     r"""The powered exponential family of kernels.
 
-    Computes the covariance for pairs of inputs $`(x, y)`$ with length-scale parameter
-    $`\ell`$, $`\sigma`$ and power $`\kappa`$.
-    ```math
+    Computes the covariance for pairs of inputs $(x, y)$ with length-scale parameter
+    $\ell$, $\sigma$ and power $\kappa$.
+    $$
     k(x, y)=\sigma^2\exp\Bigg(-\Big(\frac{\lVert x-y\rVert^2}{\ell^2}\Big)^\kappa\Bigg)
-    ```
+    $$
 
     This also equivalent to the symmetric generalized normal distribution.
     See Diggle and Ribeiro (2007) - "Model-based Geostatistics".

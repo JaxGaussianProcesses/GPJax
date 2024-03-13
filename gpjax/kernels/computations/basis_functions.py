@@ -39,7 +39,7 @@ class BasisFunctionComputation(AbstractKernelComputation):
             x: the inputs to the kernel function of shape `(N, D)`.
 
         Returns:
-            A matrix of shape $`N \times L`$ representing the random fourier features where $`L = 2M`$.
+            A matrix of shape $N \times L$ representing the random fourier features where $L = 2M$.
         """
         frequencies = kernel.frequencies.value
         scaling_factor = kernel.base_kernel.lengthscale.value
