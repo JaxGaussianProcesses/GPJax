@@ -16,12 +16,10 @@
 # $\mathbf{y}$ for which we construct a model. The parameters $\theta$ of our
 # model are unknown, and our goal is to conduct inference to determine their
 # range of likely values. To achieve this, we apply Bayes' theorem
-# $$
 # \begin{align}
 #     \label{eq:BayesTheorem}
 #     p(\theta\,|\, \mathbf{y}) = \frac{p(\theta)p(\mathbf{y}\,|\,\theta)}{p(\mathbf{y})} = \frac{p(\theta)p(\mathbf{y}\,|\,\theta)}{\int_{\theta}p(\mathbf{y}, \theta)\mathrm{d}\theta}\,,
 # \end{align}
-# $$
 # where $p(\mathbf{y}\,|\,\theta)$ denotes the _likelihood_, or model, and
 # quantifies how likely the observed dataset $\mathbf{y}$ is, given the
 # parameter estimate $\theta$. The _prior_ distribution $p(\theta)$ reflects our
@@ -58,11 +56,9 @@
 # new points $\mathbf{y}^{\star}$ through the _posterior predictive
 # distribution_. This is achieved by integrating out the parameter set $\theta$
 # from our posterior distribution through
-# $$
 # \begin{align}
 #     p(\mathbf{y}^{\star}\mid \mathbf{y}) = \int p(\mathbf{y}^{\star} \,|\, \theta, \mathbf{y} ) p(\theta\,|\, \mathbf{y})\mathrm{d}\theta\,.
 # \end{align}
-# $$
 # As with the marginal log-likelihood, evaluating this quantity requires
 # computing an integral which may not be tractable, particularly when $\theta$
 # is high-dimensional.

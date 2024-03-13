@@ -29,22 +29,8 @@ class DenseKernelComputation(AbstractKernelComputation):
     a dense gram matrix structure.
     """
 
-    def cross_covariance(
+    def _cross_covariance(
         self, kernel: K, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
-        r"""Compute the cross-covariance matrix.
-
-        For a given kernel, compute the NxM covariance matrix on a pair of input
-        matrices of shape $`NxD`$ and $`MxD`$.
-
-        Args:
-            kernel (Kernel): the kernel function.
-            x (Float[Array,"N D"]): The input matrix.
-            y (Float[Array,"M D"]): The input matrix.
-
-        Returns
-        -------
-            Float[Array, "N M"]: The computed cross-covariance.
-        """
         cross_cov = vmap(lambda x: vmap(lambda y: kernel(x, y))(y))(x)
         return cross_cov

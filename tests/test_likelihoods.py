@@ -92,7 +92,7 @@ class BaseTestLikelihood:
         assert isinstance(likelihood.link_function(x), tfd.Distribution)
 
     @pytest.mark.parametrize("n", [1, 2, 10], ids=lambda x: f"n={x}")
-    def test_call(self, fields: dict, n: int):
+    def test__call__(self, fields: dict, n: int):
         # Input fields as JAX arrays
         fields = {k: jnp.array([v]) for k, v in fields.items()}
 

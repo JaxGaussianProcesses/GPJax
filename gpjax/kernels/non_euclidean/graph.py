@@ -42,12 +42,16 @@ from gpjax.typing import (
 class GraphKernel(StationaryKernel):
     r"""The Matérn graph kernel defined on the vertex set of a graph.
 
-    A Matérn graph kernel defined on the vertices of a graph. The key reference
-    for this object is borovitskiy et. al., (2020).
+    A Matérn graph kernel defined on the vertices of a graph.
 
-    Args:
-        laplacian (Float[Array]): An $`N \times N`$ matrix representing the Laplacian matrix
-            of a graph.
+    Computes the covariance for pairs of vertices $`(v_i, v_j)`$ with variance $`\sigma^2`$:
+    ```math
+    k(v_i, v_j) = \sigma^2 \exp\Bigg(-\frac{\lVert v_i - v_j \rVert^2_2}{2\ell^2}\Bigg)
+    ```
+    where $`\ell`$ is the lengthscale parameter and $`\sigma^2`$ is the variance.
+
+    The key reference for this object is Borovitskiy et. al., (2020).
+
     """
 
     num_vertex: tp.Union[ScalarInt, None]
@@ -66,6 +70,23 @@ class GraphKernel(StationaryKernel):
         n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = EigenKernelComputation(),
     ):
+        """Initializes the kernel.
+
+        Args:
+            laplacian: the Laplacian matrix of the graph.
+            active_dims: The indices of the input dimensions that the kernel operates on.
+            lengthscale: the lengthscale(s) of the kernel ℓ. If a scalar or an array of
+                length 1, the kernel is isotropic, meaning that the same lengthscale is
+                used for all input dimensions. If an array with length > 1, the kernel is
+                anisotropic, meaning that a different lengthscale is used for each input.
+            variance: the variance of the kernel σ.
+            smoothness: the smoothness parameter of the Matérn kernel.
+            n_dims: The number of input dimensions. If `lengthscale` is an array, this
+                argument is ignored.
+            compute_engine: The computation engine that the kernel uses to compute the
+                covariance matrix.
+        """
+
         if isinstance(smoothness, Parameter):
             self.smoothness = smoothness
         else:
@@ -86,20 +107,7 @@ class GraphKernel(StationaryKernel):
         *,
         S,
         **kwargs,
-    ):
-        r"""Compute the (co)variance between a vertex pair.
-
-        For a graph $`\mathcal{G} = \{V, E\}`$ where $`V = \{v_1, v_2, \ldots v_n \}`$,
-        evaluate the graph kernel on a pair of vertices $`(v_i, v_j)`$ for any $`i,j<n`$.
-
-        Args:
-            x (Float[Array, "N 1"]): Index of the $`i`$th vertex.
-            y (Float[Array, "N 1"]): Index of the $`j`$th vertex.
-
-        Returns
-        -------
-            ScalarFloat: The value of $k(v_i, v_j)$.
-        """
+    ) -> Float[Array, ""]:
         Kxx = (jax_gather_nd(self.eigenvectors.value, x) * S.squeeze()) @ jnp.transpose(
             jax_gather_nd(self.eigenvectors.value, y)
         )  # shape (n,n)

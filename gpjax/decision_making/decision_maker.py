@@ -58,26 +58,23 @@ class AbstractDecisionMaker(ABC):
     the black-box function of interest at this point.
 
     Attributes:
-        search_space (AbstractSearchSpace): Search space over which we can evaluate the
-        function(s) of interest.
-        posterior_handlers (Dict[str, PosteriorHandler]): Dictionary of posterior
-            handlers, which are used to update posteriors throughout the decision making
-            loop. Note that the word `posteriors` is used for consistency with GPJax, but these
-            objects are typically referred to as `models` in the model-based decision
-            making literature. Tags are used to distinguish between posteriors. In a typical
-            Bayesian optimisation setup one of the tags will be `OBJECTIVE`, defined in
-            decision_making.utils.
-        datasets (Dict[str, Dataset]): Dictionary of datasets, which are augmented with
+        search_space: Search space over which we can evaluate the function(s) of interest.
+        posterior_handlers: dictionary of posterior handlers, which are used to update
+            posteriors throughout the decision making loop. Note that the word `posteriors`
+            is used for consistency with GPJax, but these objects are typically referred to
+            as `models` in the model-based decision making literature. Tags are used to
+            distinguish between posteriors. In a typical Bayesian optimisation setup one of
+            the tags will be `OBJECTIVE`, defined in `decision_making.utils`.
+        datasets: dictionary of datasets, which are augmented with
             observations throughout the decision making loop. In a typical setup they are
             also used to update the posteriors, using the `posterior_handlers`. Tags are used
             to distinguish datasets, and correspond to tags in `posterior_handlers`.
-        key (KeyArray): JAX random key, used to generate random numbers.
-        batch_size (int): Number of points to query at each step of the decision making
+        key: JAX random key, used to generate random numbers.
+        batch_size: Number of points to query at each step of the decision making
             loop. Note that `SinglePointUtilityFunction`s are only capable of generating
             one point to be queried at each iteration of the decision making loop.
-        post_ask (List[Callable]): List of functions to be executed after each ask step.
-        post_tell (List[Callable]): List of functions to be executed after each tell
-            step.
+        post_ask: List of functions to be executed after each ask step.
+        post_tell: List of functions to be executed after each tell step.
     """
 
     search_space: AbstractSearchSpace
@@ -140,10 +137,10 @@ class AbstractDecisionMaker(ABC):
         Add newly observed data to datasets and update the corresponding posteriors.
 
         Args:
-            observation_datasets (Mapping[str, Dataset]): Dictionary of datasets
-            containing new observations. Tags are used to distinguish datasets, and
-            correspond to tags in `posterior_handlers` and `self.datasets`.
-            key (KeyArray): JAX PRNG key for controlling random state.
+            observation_datasets: dictionary of datasets containing new observations.
+                Tags are used to distinguish datasets, and correspond to tags in
+                `posterior_handlers` and `self.datasets`.
+            key: JAX PRNG key for controlling random state.
         """
         if observation_datasets.keys() != self.datasets.keys():
             raise ValueError(

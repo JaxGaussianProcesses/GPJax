@@ -35,6 +35,14 @@ LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 
 
 class RationalQuadratic(StationaryKernel):
+    r"""The Rational Quadratic kernel.
+
+    Computes the covariance for pairs of inputs $`(x, y)`$ with lengthscale parameter
+    $`\ell`$ and variance $`\sigma^2`$.
+    ```math
+    k(x,y)=\sigma^2\exp\Bigg(1+\frac{\lVert x-y\rVert^2_2}{2\alpha\ell^2}\Bigg)
+    ```
+    """
     name: str = "Rational Quadratic"
 
     def __init__(
@@ -46,6 +54,21 @@ class RationalQuadratic(StationaryKernel):
         n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
+        """Initializes the kernel.
+
+        Args:
+            active_dims: The indices of the input dimensions that the kernel operates on.
+            lengthscale: the lengthscale(s) of the kernel ℓ. If a scalar or an array of
+                length 1, the kernel is isotropic, meaning that the same lengthscale is
+                used for all input dimensions. If an array with length > 1, the kernel is
+                anisotropic, meaning that a different lengthscale is used for each input.
+            variance: the variance of the kernel σ.
+            alpha: the alpha parameter of the kernel α.
+            n_dims: The number of input dimensions. If `lengthscale` is an array, this
+                argument is ignored.
+            compute_engine: The computation engine that the kernel uses to compute the
+                covariance matrix.
+        """
         if isinstance(alpha, nnx.Variable):
             self.alpha = alpha
         else:
@@ -54,21 +77,6 @@ class RationalQuadratic(StationaryKernel):
         super().__init__(active_dims, lengthscale, variance, n_dims, compute_engine)
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
-        r"""Compute the Powered Exponential kernel between a pair of arrays.
-
-        Evaluate the kernel on a pair of inputs $`(x, y)`$ with lengthscale parameter
-        $`\ell`$ and variance $`\sigma^2`$.
-        ```math
-        k(x,y)=\sigma^2\exp\Bigg(1+\frac{\lVert x-y\rVert^2_2}{2\alpha\ell^2}\Bigg)
-        ```
-
-        Args:
-            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
-
-        Returns:
-            ScalarFloat: The value of $`k(x, y)`$.
-        """
         x = self.slice_input(x) / self.lengthscale.value
         y = self.slice_input(y) / self.lengthscale.value
         K = self.variance.value * (

@@ -29,25 +29,17 @@ from gpjax.typing import (
 
 
 class Matern12(StationaryKernel):
-    r"""The Matérn kernel with smoothness parameter fixed at 0.5."""
+    r"""The Matérn kernel with smoothness parameter fixed at 0.5.
 
+    Computes the covariance on a pair of inputs $`(x, y)`$ with
+    lengthscale parameter $`\ell`$ and variance $`\sigma^2`$.
+    ```math
+    k(x, y) = \sigma^2\exp\Bigg(-\frac{\lvert x-y \rvert}{2\ell^2}\Bigg)
+    ```
+    """
     name: str = "Matérn12"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
-        r"""Compute the Matérn 1/2 kernel between a pair of arrays.
-
-        Evaluate the kernel on a pair of inputs $`(x, y)`$ with
-        lengthscale parameter $`\ell`$ and variance $`\sigma^2`$.
-        ```math
-        k(x, y) = \sigma^2\exp\Bigg(-\frac{\lvert x-y \rvert}{2\ell^2}\Bigg)
-        ```
-
-        Args:
-            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's call
-        Returns:
-            ScalarFloat: The value of $`k(x, y)`$
-        """
         x = self.slice_input(x) / self.lengthscale.value
         y = self.slice_input(y) / self.lengthscale.value
         K = self.variance.value * jnp.exp(-euclidean_distance(x, y))

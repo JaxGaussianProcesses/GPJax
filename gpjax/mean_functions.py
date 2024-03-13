@@ -48,8 +48,7 @@ class AbstractMeanFunction(nnx.Module):
         Args:
             x (Float[Array, " D"]): The point at which to evaluate the mean function.
 
-        Returns
-        -------
+        Returns:
             Float[Array, "1]: The evaluated mean function.
         """
         raise NotImplementedError
@@ -62,8 +61,7 @@ class AbstractMeanFunction(nnx.Module):
         Args:
             other (AbstractMeanFunction): The other mean function to add.
 
-        Returns
-        -------
+        Returns:
             AbstractMeanFunction: The sum of the two mean functions.
         """
         if isinstance(other, AbstractMeanFunction):
@@ -82,8 +80,7 @@ class AbstractMeanFunction(nnx.Module):
         Args:
             other (AbstractMeanFunction): The other mean function to add.
 
-        Returns
-        -------
+        Returns:
             AbstractMeanFunction: The sum of the two mean functions.
         """
         return self.__add__(other)
@@ -99,8 +96,7 @@ class AbstractMeanFunction(nnx.Module):
         Args:
             other (AbstractMeanFunction): The other mean function to multiply.
 
-        Returns
-        -------
+        Returns:
             AbstractMeanFunction: The product of the two mean functions.
         """
         if isinstance(other, AbstractMeanFunction):
@@ -119,8 +115,7 @@ class AbstractMeanFunction(nnx.Module):
         Args:
             other (AbstractMeanFunction): The other mean function to multiply.
 
-        Returns
-        -------
+        Returns:
             AbstractMeanFunction: The product of the two mean functions.
         """
         return self.__mul__(other)
@@ -148,8 +143,7 @@ class Constant(AbstractMeanFunction):
         Args:
             x (Float[Array, " D"]): The point at which to evaluate the mean function.
 
-        Returns
-        -------
+        Returns:
             Float[Array, "1"]: The evaluated mean function.
         """
         return jnp.ones((x.shape[0], 1)) * self.constant.value
@@ -201,8 +195,7 @@ class CombinationMeanFunction(AbstractMeanFunction):
         Args:
             x (Float[Array, " D"]): The point at which to evaluate the mean function.
 
-        Returns
-        -------
+        Returns:
             Float[Array, " Q"]: The evaluated mean function.
         """
         return self.operator(jnp.stack([m(x) for m in self.means]))

@@ -69,8 +69,8 @@ class AbstractPrior(nnx.Module, tp.Generic[M, K]):
         r"""Construct a Gaussian process prior.
 
         Args:
-            kernel (AbstractKernel): The kernel function.
-            mean_function (AbstractMeanFunction): The mean function.
+            kernel: kernel object inheriting from AbstractKernel.
+            mean_function: mean function object inheriting from AbstractMeanFunction.
         """
         self.kernel = kernel
         self.mean_function = mean_function
@@ -92,8 +92,7 @@ class AbstractPrior(nnx.Module, tp.Generic[M, K]):
             *args (Any): The arguments to pass to the GP's `predict` method.
             **kwargs (Any): The keyword arguments to pass to the GP's `predict` method.
 
-        Returns
-        -------
+        Returns:
             GaussianDistribution: A multivariate normal random variable representation
                 of the Gaussian process.
         """
@@ -111,8 +110,7 @@ class AbstractPrior(nnx.Module, tp.Generic[M, K]):
             *args (Any): Arguments to the predict method.
             **kwargs (Any): Keyword arguments to the predict method.
 
-        Returns
-        -------
+        Returns:
             GaussianDistribution: A multivariate normal random variable representation
                 of the Gaussian process.
         """
@@ -176,13 +174,14 @@ class Prior(AbstractPrior[M, K]):
         where $`p(y | f(\cdot))`$ is the likelihood and $`p(f(\cdot))`$ is the prior.
 
         Example:
-            >>> import gpjax as gpx
-            >>> meanf = gpx.mean_functions.Zero()
-            >>> kernel = gpx.kernels.RBF()
-            >>> prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
-            >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=100)
-            >>> prior * likelihood
-
+        ```pycon
+        >>> import gpjax as gpx
+        >>> meanf = gpx.mean_functions.Zero()
+        >>> kernel = gpx.kernels.RBF()
+        >>> prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
+        >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=100)
+        >>> prior * likelihood
+        ```
         Args:
             other (Likelihood): The likelihood distribution of the observed dataset.
 
@@ -237,12 +236,14 @@ class Prior(AbstractPrior[M, K]):
         and then evaluate it on the interval :math:`[0, 1]`:
 
         Example:
-            >>> import gpjax as gpx
-            >>> import jax.numpy as jnp
-            >>> kernel = gpx.kernels.RBF()
-            >>> mean_function = gpx.mean_functions.Zero()
-            >>> prior = gpx.gps.Prior(mean_function=mean_function, kernel=kernel)
-            >>> prior.predict(jnp.linspace(0, 1, 100)[:, None])
+        ```pycon
+        >>> import gpjax as gpx
+        >>> import jax.numpy as jnp
+        >>> kernel = gpx.kernels.RBF()
+        >>> mean_function = gpx.mean_functions.Zero()
+        >>> prior = gpx.gps.Prior(mean_function=mean_function, kernel=kernel)
+        >>> prior.predict(jnp.linspace(0, 1, 100)[:, None])
+        ```
 
         Args:
             test_inputs (Float[Array, "N D"]): The inputs at which to evaluate the
@@ -291,17 +292,19 @@ class Prior(AbstractPrior[M, K]):
         build and evaluate an approximate sample.
 
         Example:
-            >>> import gpjax as gpx
-            >>> import jax.numpy as jnp
-            >>> import jax.random as jr
-            >>> key = jr.PRNGKey(123)
-            ...
-            >>> meanf = gpx.mean_functions.Zero()
-            >>> kernel = gpx.kernels.RBF()
-            >>> prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
-            ...
-            >>> sample_fn = prior.sample_approx(10, key)
-            >>> sample_fn(jnp.linspace(0, 1, 100).reshape(-1, 1))
+        ```pycon
+        >>> import gpjax as gpx
+        >>> import jax.numpy as jnp
+        >>> import jax.random as jr
+        >>> key = jr.PRNGKey(123)
+        >>>
+        >>> meanf = gpx.mean_functions.Zero()
+        >>> kernel = gpx.kernels.RBF()
+        >>> prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
+        >>>
+        >>> sample_fn = prior.sample_approx(10, key)
+        >>> sample_fn(jnp.linspace(0, 1, 100).reshape(-1, 1))
+        ```
 
         Args:
             num_samples (int): The desired number of samples.
@@ -378,8 +381,7 @@ class AbstractPosterior(nnx.Module, tp.Generic[P, L]):
             *args (Any): The arguments to pass to the GP's `predict` method.
             **kwargs (Any): The keyword arguments to pass to the GP's `predict` method.
 
-        Returns
-        -------
+        Returns:
             GaussianDistribution: A multivariate normal random variable representation
                 of the Gaussian process.
         """
@@ -395,8 +397,7 @@ class AbstractPosterior(nnx.Module, tp.Generic[P, L]):
             *args (Any): Arguments to the predict method.
             **kwargs (Any): Keyword arguments to the predict method.
 
-        Returns
-        -------
+        Returns:
             GaussianDistribution: A multivariate normal random variable representation
                 of the Gaussian process.
         """
@@ -431,16 +432,18 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
     ```
 
     Example:
-        >>> import gpjax as gpx
-        >>> import jax.numpy as jnp
-        ...
-        >>> prior = gpx.gps.Prior(
-                mean_function = gpx.mean_functions.Zero(),
-                kernel = gpx.kernels.RBF()
-            )
-        >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=100)
-        ...
-        >>> posterior = prior * likelihood
+    ```pycon
+    >>> import gpjax as gpx
+    >>> import jax.numpy as jnp
+    >>>
+    >>> prior = gpx.gps.Prior(
+            mean_function = gpx.mean_functions.Zero(),
+            kernel = gpx.kernels.RBF()
+        )
+    >>> likelihood = gpx.likelihoods.Gaussian(num_datapoints=100)
+    >>>
+    >>> posterior = prior * likelihood
+    ```
     """
 
     def predict(
@@ -470,17 +473,19 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
         are made on a regular Jax array.
 
         Example:
-            >>> import gpjax as gpx
-            >>> import jax.numpy as jnp
-            ...
-            >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
-            >>> ytrain = jnp.sin(xtrain)
-            >>> D = gpx.Dataset(X=xtrain, y=ytrain)
-            >>> xtest = jnp.linspace(0, 1).reshape(-1, 1)
-            ...
-            >>> prior = gpx.gps.Prior(mean_function = gpx.mean_functions.Zero(), kernel = gpx.kernels.RBF())
-            >>> posterior = prior * gpx.likelihoods.Gaussian(num_datapoints = D.n)
-            >>> predictive_dist = posterior(xtest, D)
+        ```pycon
+        >>> import gpjax as gpx
+        >>> import jax.numpy as jnp
+        >>>
+        >>> xtrain = jnp.linspace(0, 1).reshape(-1, 1)
+        >>> ytrain = jnp.sin(xtrain)
+        >>> D = gpx.Dataset(X=xtrain, y=ytrain)
+        >>> xtest = jnp.linspace(0, 1).reshape(-1, 1)
+        >>>
+        >>> prior = gpx.gps.Prior(mean_function = gpx.mean_functions.Zero(), kernel = gpx.kernels.RBF())
+        >>> posterior = prior * gpx.likelihoods.Gaussian(num_datapoints = D.n)
+        >>> predictive_dist = posterior(xtest, D)
+        ```
 
         Args:
             test_inputs (Num[Array, "N D"]): A Jax array of test inputs at which the
@@ -565,8 +570,7 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
             num_features (int): The number of features used when approximating the
                 kernel.
 
-        Returns
-        -------
+        Returns:
             FunctionalSample: A function representing an approximate sample from the Gaussian
             process prior.
         """
@@ -669,8 +673,7 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
             train_data (Dataset): A `gpx.Dataset` object that contains the input
                 and output data used for training dataset.
 
-        Returns
-        -------
+        Returns:
             GaussianDistribution: A function that accepts an
                 input array and returns the predictive distribution as
                 a `dx.Distribution`.

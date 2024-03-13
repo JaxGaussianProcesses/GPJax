@@ -43,11 +43,8 @@ tfd = tfp.distributions
 class AbstractLikelihood(nnx.Module):
     r"""Abstract base class for likelihoods.
 
-    Attributes:
-        num_datapoints (int): The number of data points.
-        integrator (AbstractIntegrator): The integrator to be used for computing
-            expected log likelihoods.
-
+    All likelihoods must inherit from this class and implement the `predict` and
+    `link_function` methods.
     """
 
     def __init__(
@@ -55,6 +52,13 @@ class AbstractLikelihood(nnx.Module):
         num_datapoints: int,
         integrator: AbstractIntegrator = GHQuadratureIntegrator(),
     ):
+        """Initializes the likelihood.
+
+        Args:
+            num_datapoints: the number of data points.
+            integrator: The integrator to be used for computing expected log
+                likelihoods. Must be an instance of `AbstractIntegrator`.
+        """
         self.num_datapoints = num_datapoints
         self.integrator = integrator
 
@@ -67,7 +71,7 @@ class AbstractLikelihood(nnx.Module):
                 `predict` method.
 
         Returns:
-            tfd.Distribution: The predictive distribution.
+            The predictive distribution.
         """
         return self.predict(*args, **kwargs)
 
@@ -127,19 +131,20 @@ class AbstractLikelihood(nnx.Module):
 
 
 class Gaussian(AbstractLikelihood):
-    r"""Gaussian likelihood object.
-
-    Args:
-        obs_stddev (Union[ScalarFloat, Float[Array, "#N"]]): the standard deviation
-            of the Gaussian observation noise.
-
-    """
+    r"""Gaussian likelihood object."""
 
     def __init__(
         self,
         num_datapoints: int,
         obs_stddev: tp.Union[ScalarFloat, Float[Array, "#N"], PositiveReal] = 1.0,
     ):
+        r"""Initializes the Gaussian likelihood.
+
+        Args:
+            num_datapoints (int): the number of data points.
+            obs_stddev (Union[ScalarFloat, Float[Array, "#N"]]): the standard deviation
+                of the Gaussian observation noise.
+        """
         if isinstance(obs_stddev, Parameter):
             self.obs_stddev = obs_stddev
         else:
@@ -153,8 +158,7 @@ class Gaussian(AbstractLikelihood):
         Args:
             f (Float[Array, "..."]): Function values.
 
-        Returns
-        -------
+        Returns:
             tfd.Normal: The likelihood function.
         """
         return tfd.Normal(loc=f, scale=self.obs_stddev.value.astype(f.dtype))
@@ -173,8 +177,7 @@ class Gaussian(AbstractLikelihood):
             dist (tfd.Distribution): The Gaussian process posterior,
                 evaluated at a finite set of test points.
 
-        Returns
-        -------
+        Returns:
             tfd.Distribution: The predictive distribution.
         """
         n_data = dist.event_shape[0]
@@ -191,8 +194,7 @@ class Bernoulli(AbstractLikelihood):
         Args:
             f (Float[Array, "..."]): Function values.
 
-        Returns
-        -------
+        Returns:
             tfd.Distribution: The likelihood function.
         """
         return tfd.Bernoulli(probs=inv_probit(f))
@@ -207,8 +209,7 @@ class Bernoulli(AbstractLikelihood):
             dist (tfd.Distribution): The Gaussian process posterior, evaluated
                 at a finite set of test points.
 
-        Returns
-        -------
+        Returns:
             tfd.Distribution: The pointwise predictive distribution.
         """
         variance = jnp.diag(dist.covariance())

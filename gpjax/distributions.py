@@ -40,65 +40,28 @@ from gpjax.typing import (
 
 tfd = tfp.distributions
 
-from cola.linalg.decompositions.decompositions import Cholesky
-
-
-def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
-    r"""Checks that the inputs are correct."""
-    if loc is None and scale is None:
-        raise ValueError("At least one of `loc` or `scale` must be specified.")
-
-    if loc is not None and loc.ndim < 1:
-        raise ValueError("The parameter `loc` must have at least one dimension.")
-
-    if scale is not None and len(scale.shape) < 2:  # scale.ndim < 2:
-        raise ValueError(
-            "The `scale` must have at least two dimensions, but "
-            f"`scale.shape = {scale.shape}`."
-        )
-
-    if scale is not None and not isinstance(scale, LinearOperator):
-        raise ValueError(
-            f"The `scale` must be a CoLA LinearOperator but got {type(scale)}"
-        )
-
-    if scale is not None and (scale.shape[-1] != scale.shape[-2]):
-        raise ValueError(
-            f"The `scale` must be a square matrix, but `scale.shape = {scale.shape}`."
-        )
-
-    if loc is not None:
-        num_dims = loc.shape[-1]
-        if scale is not None and (scale.shape[-1] != num_dims):
-            raise ValueError(
-                f"Shapes are not compatible: `loc.shape = {loc.shape}` and "
-                f"`scale.shape = {scale.shape}`."
-            )
+from cola.linalg.decompositions import Cholesky
 
 
 class GaussianDistribution(tfd.Distribution):
-    r"""Multivariate Gaussian distribution with a linear operator scale matrix.
-
-    Args:
-        loc (Optional[Float[Array, " N"]]): The mean of the distribution. Defaults to None.
-        scale (Optional[LinearOperator]): The scale matrix of the distribution. Defaults to None.
-
-    Returns
-    -------
-        GaussianDistribution: A multivariate Gaussian distribution with a linear operator scale matrix.
-    """
+    r"""Multivariate Gaussian distribution with a linear operator scale matrix."""
 
     # TODO: Consider `distrax.transformed.Transformed` object. Can we create a LinearOperator to `distrax.bijector` representation
     # and modify `distrax.MultivariateNormalFromBijector`?
-
     # TODO: Consider natural and expectation parameterisations in future work.
+    # TODO: we don't really need to inherit from `tfd.Distribution` here
 
     def __init__(
         self,
         loc: Optional[Float[Array, " N"]] = None,
         scale: Optional[LinearOperator] = None,
     ) -> None:
-        r"""Initialises the distribution."""
+        r"""Initialises the distribution.
+
+        Args:
+            loc: the mean of the distribution as an array of shape (n_points,).
+            scale: the scale matrix of the distribution as a LinearOperator object.
+        """
         _check_loc_scale(loc, scale)
 
         # Find dimensionality of the distribution.
@@ -159,11 +122,10 @@ class GaussianDistribution(tfd.Distribution):
         r"""Calculates the log pdf of the multivariate Gaussian.
 
         Args:
-            y (Optional[Float[Array, " N"]]): the value of which to calculate the log probability.
+            y: the value of which to calculate the log probability.
 
-        Returns
-        -------
-            ScalarFloat: The log probability of the value.
+        Returns:
+            The log probability of the value as a scalar array.
         """
         mu = self.loc
         sigma = self.scale
@@ -185,9 +147,8 @@ class GaussianDistribution(tfd.Distribution):
         Args:
             key (KeyArray): The key to use for sampling.
 
-        Returns
-        -------
-            Float[Array, "n N"]: The samples.
+        Returns:
+            The samples as an array of shape (n_samples, n_points).
         """
         # Obtain covariance root.
         sqrt = lower_cholesky(self.scale)
@@ -243,11 +204,10 @@ def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> ScalarFl
     and $`p(x) = \mathcal{N}(x; \mu_p, \Sigma_p)`$.
 
     Args:
-        q (GaussianDistribution): A multivariate Gaussian distribution.
-        p (GaussianDistribution): A multivariate Gaussian distribution.
+        q: a multivariate Gaussian distribution.
+        p: another multivariate Gaussian distribution.
 
-    Returns
-    -------
+    Returns:
         ScalarFloat: The KL divergence between q and p.
     """
     n_dim = _check_and_return_dimension(q, p)
@@ -283,6 +243,39 @@ def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> ScalarFl
         + cola.logdet(sigma_p, Cholesky(), Cholesky())
         + trace
     ) / 2.0
+
+
+def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
+    r"""Checks that the inputs are correct."""
+    if loc is None and scale is None:
+        raise ValueError("At least one of `loc` or `scale` must be specified.")
+
+    if loc is not None and loc.ndim < 1:
+        raise ValueError("The parameter `loc` must have at least one dimension.")
+
+    if scale is not None and len(scale.shape) < 2:  # scale.ndim < 2:
+        raise ValueError(
+            "The `scale` must have at least two dimensions, but "
+            f"`scale.shape = {scale.shape}`."
+        )
+
+    if scale is not None and not isinstance(scale, LinearOperator):
+        raise ValueError(
+            f"The `scale` must be a CoLA LinearOperator but got {type(scale)}"
+        )
+
+    if scale is not None and (scale.shape[-1] != scale.shape[-2]):
+        raise ValueError(
+            f"The `scale` must be a square matrix, but `scale.shape = {scale.shape}`."
+        )
+
+    if loc is not None:
+        num_dims = loc.shape[-1]
+        if scale is not None and (scale.shape[-1] != num_dims):
+            raise ValueError(
+                f"Shapes are not compatible: `loc.shape = {loc.shape}` and "
+                f"`scale.shape = {scale.shape}`."
+            )
 
 
 __all__ = [

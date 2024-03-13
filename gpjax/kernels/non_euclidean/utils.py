@@ -30,15 +30,14 @@ def jax_gather_nd(
     [link](https://www.tensorflow.org/api_docs/python/tf/gather_nd)
 
     Args:
-        params (Float[Array]): An arbitrary array with leading axes of length $N$ upon
+        params: an arbitrary array with leading axes of length $N$ upon
             which we shall slice.
-        indices (Float[Int]): An integer array of length $M$ with values in the range
+        indices: an integer array of length $M$ with values in the range
             $[0, N)$ whose value at index $i$ will be used to slice `params` at
             index $i$.
 
-    Returns
-    -------
-        Float[Array: An arbitrary array with leading axes of length $M$.
+    Returns:
+        An arbitrary array with leading axes of length $M$.
     """
     tuple_indices = tuple(indices[..., i] for i in range(indices.shape[-1]))
     return params[tuple_indices]

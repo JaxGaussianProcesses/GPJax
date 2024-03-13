@@ -81,8 +81,7 @@ class AbstractVariationalFamily(nnx.Module, tp.Generic[L]):
             **kwargs (Any): Keyword arguments of the variational family's `predict`
                 method.
 
-        Returns
-        -------
+        Returns:
             GaussianDistribution: The output of the variational family's `predict` method.
         """
         return self.predict(*args, **kwargs)
@@ -97,8 +96,7 @@ class AbstractVariationalFamily(nnx.Module, tp.Generic[L]):
             **kwargs (Any): Keyword arguments of the variational family's
                 ``predict`` method.
 
-        Returns
-        -------
+        Returns:
             GaussianDistribution: The output of the variational family's ``predict`` method.
         """
         raise NotImplementedError
@@ -166,9 +164,8 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         ```
         where $`u = f(z)`$ and $`z`$ are the inducing inputs.
 
-        Returns
-        -------
-             ScalarFloat: The KL-divergence between our variational
+        Returns:
+            ScalarFloat: The KL-divergence between our variational
                 approximation and the GP prior.
         """
         # Unpack variational parameters
@@ -205,8 +202,7 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
             test_inputs (Float[Array, "N D"]): The test inputs at which we wish to
                 make a prediction.
 
-        Returns
-        -------
+        Returns:
             GaussianDistribution: The predictive distribution of the low-rank GP at
                 the test inputs.
         """
@@ -278,8 +274,7 @@ class WhitenedVariationalGaussian(VariationalGaussian[L]):
         \end{align}
         ```
 
-        Returns
-        -------
+        Returns:
             ScalarFloat: The KL-divergence between our variational
                 approximation and the GP prior.
         """
@@ -308,8 +303,7 @@ class WhitenedVariationalGaussian(VariationalGaussian[L]):
             test_inputs (Float[Array, "N D"]): The test inputs at which we wish to
                 make a prediction.
 
-        Returns
-        -------
+        Returns:
             GaussianDistribution: The predictive distribution of the low-rank GP at
                 the test inputs.
         """
@@ -397,8 +391,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
         ```
         with $\mu$ and $S$ computed from the natural parameterisation $\theta  = (S^{-1}\mu  , -S^{-1}/2)$.
 
-        Returns
-        -------
+        Returns:
             ScalarFloat: The KL-divergence between our variational approximation and
                 the GP prior.
         """
@@ -451,8 +444,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
         with $`\mu`$ and $`S`$ computed from the natural parameterisation
         $`\theta = (S^{-1}\mu  , -S^{-1}/2)`$.
 
-        Returns
-        -------
+        Returns:
             GaussianDistribution: A function that accepts a set of test points and will
                 return the predictive distribution at those points.
         """
@@ -566,8 +558,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
         distribution and $m_z$ and $K_{zz}$ are the mean and covariance of the prior
         distribution.
 
-        Returns
-        -------
+        Returns:
             ScalarFloat: The KL-divergence between our variational approximation and
                 the GP prior.
         """
@@ -611,8 +602,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
         with $\mu$ and $S$ computed from the expectation parameterisation
         $\eta = (\mu, S + uu^\top)$.
 
-        Returns
-        -------
+        Returns:
             GaussianDistribution: The predictive distribution of the GP at the
                 test inputs $t$.
         """
@@ -702,8 +692,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian[GL]):
                 predictions.
             train_data (Dataset): The training data that was used to fit the GP.
 
-        Returns
-        -------
+        Returns:
             GaussianDistribution: The predictive distribution of the collapsed
                 variational Gaussian process at the test inputs $t$.
         """

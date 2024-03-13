@@ -60,6 +60,20 @@ class ArcCosine(AbstractKernel):
         n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
+        """Initializes the kernel.
+
+        Args:
+            active_dims: The indices of the input dimensions that the kernel operates on.
+            order: The order of the kernel. Must be 0, 1 or 2.
+            variance: The variance of the kernel σ.
+            weight_variance: The weight variance of the kernel.
+            bias_variance: The bias variance of the kernel.
+            n_dims: The number of input dimensions. If `lengthscale` is an array, this
+                argument is ignored.
+            compute_engine: The computation engine that the kernel uses to compute the
+                covariance matrix.
+        """
+
         if order not in [0, 1, 2]:
             raise ValueError("ArcCosine kernel only implemented for orders 0, 1 and 2.")
 
@@ -95,19 +109,6 @@ class ArcCosine(AbstractKernel):
         super().__init__(active_dims, n_dims, compute_engine)
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarArray:
-        r"""Evaluate the kernel on a pair of inputs $`(x, y)`$
-
-        Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's
-                call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's
-                call
-
-        Returns
-        -------
-            ScalarArray: The value of $`k(x, y)`$.
-        """
-
         x = self.slice_input(x)
         y = self.slice_input(y)
 
@@ -134,8 +135,7 @@ class ArcCosine(AbstractKernel):
         Args:
             x (Float[Array, "D"]): The left hand argument.
             y (Float[Array, "D"]): The right hand argument.
-        Returns
-        -------
+        Returns:
             ScalarFloat: The value of the weighted product between the two arguments``.
         """
         return jnp.inner(self.weight_variance.value * x, y) + self.bias_variance.value
@@ -146,8 +146,7 @@ class ArcCosine(AbstractKernel):
         Args:
             theta (Float[Array, "1"]): The weighted angle between inputs.
 
-        Returns
-        -------
+        Returns:
             Float[Array, "1"]: The value of the angular dependency function`.
         """
 

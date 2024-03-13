@@ -29,14 +29,14 @@ import jax.numpy as jnp
 
 
 @dispatch
-def lower_cholesky(A: LinearOperator):  # noqa: F811
+def lower_cholesky(A: LinearOperator) -> Triangular:  # noqa: F811
     """Returns the lower Cholesky factor of a linear operator.
 
     Args:
-        A (cola.ops.LinearOperator): A linear operator.
+        A: The input linear operator.
 
     Returns:
-        cola.ops.LinearOperator: The lower Cholesky factor of A.
+        Triangular: The lower Cholesky factor of A.
     """
 
     if PSD not in A.annotations:

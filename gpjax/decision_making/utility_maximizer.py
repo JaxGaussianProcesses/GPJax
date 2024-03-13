@@ -41,13 +41,12 @@ def _get_discrete_maximizer(
     """Get the point which maximises the utility function evaluated at a given set of points.
 
     Args:
-        query_points (Float[Array, "N D"]): Set of points at which to evaluate the
-        utility function.
-        utility_function (SinglePointUtilityFunction): Single point utility function to
-        be evaluated at "query_points".
+        query_points: set of points at which to evaluate the utility function, as an array
+            of shape `[n_points, n_dims]`.
+        utility_function: the single point utility function to be evaluated at `query_points`.
 
     Returns:
-        Float[Array, "1 D"]: Point in `query_points` which maximises the utility function.
+        Array of shape `[1, n_dims]` representing the point which maximises the utility function.
     """
     utility_function_values = utility_function(query_points)
     max_utility_function_value_idx = jnp.argmax(
@@ -73,11 +72,9 @@ class AbstractSinglePointUtilityMaximizer(ABC):
         """Maximize the given utility function over the search space provided.
 
         Args:
-            utility_function (UtilityFunction): Utility function to be
-            maximized.
-            search_space (AbstractSearchSpace): Search space over which to maximize
-            the utility function.
-            key (KeyArray): JAX PRNG key.
+            utility_function: utility function to be maximized.
+            search_space: search space over which to maximize the utility function.
+            key: JAX PRNG key.
 
         Returns:
             Float[Array, "1 D"]: Point at which the utility function is maximized.
