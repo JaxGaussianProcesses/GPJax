@@ -56,7 +56,7 @@ class AbstractSearchSpace(ABC):
 
 @dataclass
 class ContinuousSearchSpace(AbstractSearchSpace):
-    """The `ContinuousSearchSpace` class is used to bound the domain of continuous real functions of dimension $`D`$."""
+    """The `ContinuousSearchSpace` class is used to bound the domain of continuous real functions of dimension $D$."""
 
     lower_bounds: Float[Array, " D"]
     upper_bounds: Float[Array, " D"]

@@ -53,9 +53,9 @@ Parameters such as the kernel's lengthscale or variance have their support defin
 a constrained subset of the real-line. During gradient-based optimisation, as we
 approach the set's boundary, it becomes possible that we could step outside of the
 set's support and introduce a numerical and mathematical error into our model. For
-example, consider the lengthscale parameter $`\ell`$, which we know must be strictly
-positive. If at $`t^{\text{th}}`$ iterate, our current estimate of $`\ell`$ was
-0.02 and our derivative informed us that $`\ell`$ should decrease, then if our
+example, consider the lengthscale parameter $\ell$, which we know must be strictly
+positive. If at $t^{\text{th}}$ iterate, our current estimate of $\ell$ was
+0.02 and our derivative informed us that $\ell$ should decrease, then if our
 learning rate is greater is than 0.03, we would end up with a negative variance term.
 We visualise this issue below where the red cross denotes the invalid lengthscale value
 that would be obtained, were we to optimise in the unconstrained parameter space.
@@ -95,23 +95,23 @@ The Gram matrix of a kernel, a concept that we explore more in our
 symmetric positive definite matrix. As such, we
 have a range of tools at our disposal to make subsequent operations on the covariance
 matrix faster. One of these tools is the Cholesky factorisation that uniquely decomposes
-any symmetric positive-definite matrix $`\mathbf{\Sigma}`$ by
+any symmetric positive-definite matrix $\mathbf{\Sigma}$ by
 
 ```math
 \begin{align}
     \mathbf{\Sigma} = \mathbf{L}\mathbf{L}^{\top}\,,
 \end{align}
 ```
-where $`\mathbf{L}`$ is a lower triangular matrix.
+where $\mathbf{L}$ is a lower triangular matrix.
 
 We make use of this result in GPJax when solving linear systems of equations of the
-form $`\mathbf{A}\boldsymbol{x} = \boldsymbol{b}`$. Whilst seemingly abstract at first,
+form $\mathbf{A}\boldsymbol{x} = \boldsymbol{b}$. Whilst seemingly abstract at first,
 such problems are frequently encountered when constructing Gaussian process models. One
 such example is frequently encountered in the regression setting for learning Gaussian
 process kernel hyperparameters. Here we have labels
-$`\boldsymbol{y} \sim \mathcal{N}(f(\boldsymbol{x}), \sigma^2\mathbf{I})`$ with $`f(\boldsymbol{x}) \sim \mathcal{N}(\boldsymbol{0}, \mathbf{K}_{\boldsymbol{xx}})`$ arising from zero-mean
-Gaussian process prior and Gram matrix $`\mathbf{K}_{\boldsymbol{xx}}`$ at the inputs
-$`\boldsymbol{x}`$. Here the marginal log-likelihood comprises the following form
+$\boldsymbol{y} \sim \mathcal{N}(f(\boldsymbol{x}), \sigma^2\mathbf{I})$ with $f(\boldsymbol{x}) \sim \mathcal{N}(\boldsymbol{0}, \mathbf{K}_{\boldsymbol{xx}})$ arising from zero-mean
+Gaussian process prior and Gram matrix $\mathbf{K}_{\boldsymbol{xx}}$ at the inputs
+$\boldsymbol{x}$. Here the marginal log-likelihood comprises the following form
 
 ```math
 \begin{align}
@@ -120,8 +120,8 @@ $`\boldsymbol{x}`$. Here the marginal log-likelihood comprises the following for
 ```
 
 and the goal of inference is to maximise kernel hyperparameters (contained in the Gram
-matrix $`\mathbf{K}_{\boldsymbol{xx}}`$) and likelihood hyperparameters (contained in the
-noise covariance $`\sigma^2\mathbf{I}`$). Computing the marginal log-likelihood (and its
+matrix $\mathbf{K}_{\boldsymbol{xx}}$) and likelihood hyperparameters (contained in the
+noise covariance $\sigma^2\mathbf{I}$). Computing the marginal log-likelihood (and its
 gradients), draws our attention to the term
 
 ```math
@@ -131,13 +131,13 @@ gradients), draws our attention to the term
 ```
 
 then we can see a solution can be obtained by solving the corresponding system of
-equations. By working with $`\mathbf{L} = \operatorname{chol}{\mathbf{A}}`$ instead of
-$`\mathbf{A}`$, we save a significant amount of floating-point operations (flops) by
-solving two triangular systems of equations (one for $`\mathbf{L}`$ and another for
-$`\mathbf{L}^{\top}`$) instead of one dense system of equations. Solving two triangular systems
-of equations has complexity $`\mathcal{O}(n^3/6)`$; a vast improvement compared to
-regular solvers that have $`\mathcal{O}(n^3)`$ complexity in the number of datapoints
-$`n`$.
+equations. By working with $\mathbf{L} = \operatorname{chol}{\mathbf{A}}$ instead of
+$\mathbf{A}$, we save a significant amount of floating-point operations (flops) by
+solving two triangular systems of equations (one for $\mathbf{L}$ and another for
+$\mathbf{L}^{\top}$) instead of one dense system of equations. Solving two triangular systems
+of equations has complexity $\mathcal{O}(n^3/6)$; a vast improvement compared to
+regular solvers that have $\mathcal{O}(n^3)$ complexity in the number of datapoints
+$n$.
 
 ### The Cholesky drawback
 
@@ -152,7 +152,7 @@ factor since this requires that the input matrix is _numerically_ positive-defin
 negative eigenvalues, this violates the requirements and results in a "Cholesky failure".
 
 To resolve this, we apply some numerical _jitter_ to the diagonals of any Gram matrix.
-Typically this is very small, with $`10^{-6}`$ being the system default. However,
+Typically this is very small, with $10^{-6}$ being the system default. However,
 for some problems, this amount may need to be increased.
 
 ## Slow-to-evaluate

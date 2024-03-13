@@ -506,18 +506,19 @@ types = ["chardet (>=5.1.0)", "mypy", "pytest", "pytest-cov", "pytest-dependency
 
 [[package]]
 name = "cola-ml"
-version = "0.0.4"
+version = "0.0.5"
 description = ""
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "cola-ml-0.0.4.tar.gz", hash = "sha256:1ec6b84fd448ffbda9a6c872e7e4236f9dcd1419fd8f1af470a005759c4dd695"},
-    {file = "cola_ml-0.0.4-py3-none-any.whl", hash = "sha256:b4ae416a4810503995f624a552c68d90009796ba96635b85e040fa82ca7ba81d"},
+    {file = "cola-ml-0.0.5.tar.gz", hash = "sha256:afdd92fcf2a28c3d28cc5538b0059783f994d58a61377ed2985cb0ca522813da"},
+    {file = "cola_ml-0.0.5-py3-none-any.whl", hash = "sha256:f445279d7e877bf89db02e4d8f6d89e8de3c0c14e635f5c5e17f0a5a3136021f"},
 ]
 
 [package.dependencies]
-cola-plum-dispatch = "0.1.1"
+cola-plum-dispatch = "0.1.4"
 optree = "*"
+pytreeclass = "*"
 scipy = "*"
 tqdm = ">=4.38"
 
@@ -526,20 +527,21 @@ dev = ["pre-commit", "pytest", "pytest-cov", "setuptools-scm"]
 
 [[package]]
 name = "cola-plum-dispatch"
-version = "0.1.1"
+version = "0.1.4"
 description = "Multiple dispatch in Python (with additional features for the CoLA library)"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "cola_plum_dispatch-0.1.1-py3-none-any.whl", hash = "sha256:cbdc6097495fa7e5f8d688cf1bc4deb1ea96d505eaadcb623b061401e6799d34"},
-    {file = "cola_plum_dispatch-0.1.1.tar.gz", hash = "sha256:95a0399da0e310bab97ce057379df5f920b55b6839f2743eabb8db96eb6a0e7f"},
+    {file = "cola_plum_dispatch-0.1.4-py3-none-any.whl", hash = "sha256:c74a1a53597198a2ed1999f7c64b5c9557675fffe70b1fce583efaf4e43f35cc"},
+    {file = "cola_plum_dispatch-0.1.4.tar.gz", hash = "sha256:bdcaaeb4db31d5cb3fe5c80db2833ed8cc547db87cfe6e3a85e824479fd6dda6"},
 ]
 
 [package.dependencies]
-beartype = "*"
+beartype = ">=0.16.2"
+typing-extensions = {version = "*", markers = "python_version <= \"3.10\""}
 
 [package.extras]
-dev = ["black (==22.10.0)", "build", "coveralls", "ghp-import", "ipython", "jupyter-book", "numpy", "pre-commit", "pytest (>=6)", "pytest-cov", "tox", "wheel"]
+dev = ["black (==23.9.0)", "build", "coveralls", "ghp-import", "ipython", "jupyter-book", "mypy", "numpy", "pre-commit", "pyright (>=1.1.323)", "pytest (>=6)", "pytest-cov", "tox", "wheel"]
 
 [[package]]
 name = "colorama"
@@ -2570,6 +2572,21 @@ files = [
 six = ">=1.5"
 
 [[package]]
+name = "pytreeclass"
+version = "0.9.2"
+description = "Visualize, create, and operate on JAX PyTree in the most intuitive way possible."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pytreeclass-0.9.2-py3-none-any.whl", hash = "sha256:de379df40a58bce323e4be1a55453fd8adcaa482f27c4024fa5bc05768589163"},
+    {file = "pytreeclass-0.9.2.tar.gz", hash = "sha256:dbc2b13cead4c4ab3bb2cb026fce44ae673938d38d3e091e7f7c87ccaa1b7db8"},
+]
+
+[package.dependencies]
+jax = ">=0.4.7"
+typing-extensions = "*"
+
+[[package]]
 name = "pywin32"
 version = "306"
 description = "Python for Window Extensions"
@@ -3461,4 +3478,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "7e4b80014169cf8dce644f8df4896238ad3c5408a89d09d71614481611839e8a"
+content-hash = "ae66b9965fd2c0f2e7a82dd7b7bd653bb178d8e837eda500b06787abd424f021"

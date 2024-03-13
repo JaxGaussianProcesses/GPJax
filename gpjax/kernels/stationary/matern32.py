@@ -28,11 +28,12 @@ from gpjax.typing import Array
 class Matern32(StationaryKernel):
     r"""The Matérn kernel with smoothness parameter fixed at 1.5.
 
-    Computes the covariance for pairs of inputs $`(x, y)`$ with
-    lengthscale parameter $`\ell`$ and variance $`\sigma^2`$.
-    ```math
-        k(x, y) = \sigma^2 \exp \Bigg(1+ \frac{\sqrt{3}\lvert x-y \rvert}{\ell^2} \ \Bigg)\exp\Bigg(-\frac{\sqrt{3}\lvert x-y\rvert}{\ell^2} \Bigg)
-    ```
+    Computes the covariance for pairs of inputs $(x, y)$ with
+    lengthscale parameter $\ell$ and variance $\sigma^2$.
+
+    $$
+    k(x, y) = \sigma^2 \exp \Bigg(1+ \frac{\sqrt{3}\lvert x-y \rvert}{\ell^2} \ \Bigg)\exp\Bigg(-\frac{\sqrt{3}\lvert x-y\rvert}{\ell^2} \Bigg)
+    $$
     """
 
     name: str = "Matérn32"

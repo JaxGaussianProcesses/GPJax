@@ -28,11 +28,11 @@ from gpjax.typing import (
 class RBF(StationaryKernel):
     r"""The Radial Basis Function (RBF) kernel.
 
-    Computes the covariance for pair of inputs $`(x, y)`$ with lengthscale parameter
-    $`\ell`$ and variance $`\sigma^2`$:
-    ```math
+    Computes the covariance for pair of inputs $(x, y)$ with lengthscale parameter
+    $\ell$ and variance $\sigma^2$:
+    $$
     k(x,y)=\sigma^2\exp\Bigg(- \frac{\lVert x - y \rVert^2_2}{2 \ell^2} \Bigg)
-    ```
+    $$
     """
 
     name: str = "RBF"

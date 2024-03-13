@@ -16,10 +16,12 @@
 # $\mathbf{y}$ for which we construct a model. The parameters $\theta$ of our
 # model are unknown, and our goal is to conduct inference to determine their
 # range of likely values. To achieve this, we apply Bayes' theorem
+#
 # \begin{align}
 #     \label{eq:BayesTheorem}
 #     p(\theta\,|\, \mathbf{y}) = \frac{p(\theta)p(\mathbf{y}\,|\,\theta)}{p(\mathbf{y})} = \frac{p(\theta)p(\mathbf{y}\,|\,\theta)}{\int_{\theta}p(\mathbf{y}, \theta)\mathrm{d}\theta}\,,
 # \end{align}
+#
 # where $p(\mathbf{y}\,|\,\theta)$ denotes the _likelihood_, or model, and
 # quantifies how likely the observed dataset $\mathbf{y}$ is, given the
 # parameter estimate $\theta$. The _prior_ distribution $p(\theta)$ reflects our
@@ -386,7 +388,7 @@ with warnings.catch_warnings():
 # the set of _test points_.
 # This process is visualised below
 #
-# ![](generating_process.png)
+# ![](intro_to_gps/generating_process.png)
 #
 # As we shall go on to see, GPs offer an appealing workflow for scenarios such
 # as this, all under a Bayesian framework.
@@ -499,7 +501,7 @@ with warnings.catch_warnings():
 # Optimising with respect to the marginal log-likelihood balances these two
 # objectives when identifying the optimal solution, as visualised below.
 #
-# ![](decomposed_mll.png)
+# ![](intro_to_gps/decomposed_mll.png)
 #
 # ## Conclusions
 #

@@ -70,11 +70,11 @@ class GHQuadratureIntegrator(AbstractIntegrator):
 
     Gauss-Hermite quadrature is a method for approximating integrals through a
     weighted sum of function evaluations at specific points
-    ```math
+    $$
     \int F(t)\exp(-t^2)\mathrm{d}t \approx \sum_{j=1}^J w_j F(t_j)
-    ```
-    where $`t_j`$ and $`w_j`$ are the roots and weights of the $`J`$-th order Hermite
-    polynomial $`H_J(t)`$ that we can look up in table
+    $$
+    where $t_j$ and $w_j$ are the roots and weights of the $J$-th order Hermite
+    polynomial $H_J(t)$ that we can look up in table
     [link](https://keisan.casio.com/exec/system/1281195844).
     """
 
@@ -119,12 +119,12 @@ class AnalyticalGaussianIntegrator(AbstractIntegrator):
     r"""Compute the analytical integral of a Gaussian likelihood.
 
     When the likelihood function is Gaussian, the integral can be computed in closed
-    form. For a Gaussian likelihood $`p(y|f) = \mathcal{N}(y|f, \sigma^2)`$ and a
-    variational distribution $`q(f) = \mathcal{N}(f|m, s)`$, the expected
+    form. For a Gaussian likelihood $p(y|f) = \mathcal{N}(y|f, \sigma^2)$ and a
+    variational distribution $q(f) = \mathcal{N}(f|m, s)$, the expected
     log-likelihood is given by
-    ```math
+    $$
     \mathbb{E}_{q(f)}[\log p(y|f)] = -\frac{1}{2}\left(\log(2\pi\sigma^2) + \frac{1}{\sigma^2}((y-m)^2 + s)\right)
-    ```
+    $$
     """
 
     def integrate(

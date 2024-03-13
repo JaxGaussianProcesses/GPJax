@@ -37,11 +37,11 @@ LengthscaleCompatible = tp.Union[ScalarFloat, list[float], Lengthscale]
 class Periodic(StationaryKernel):
     r"""The periodic kernel.
 
-    Computes the covariance for pairs of inputs $`(x, y)`$ with length-scale
-    parameter $`\ell`$, variance $`\sigma^2`$ and period $`p`$.
-    ```math
+    Computes the covariance for pairs of inputs $(x, y)$ with length-scale
+    parameter $\ell$, variance $\sigma^2$ and period $p$.
+    $$
     k(x, y) = \sigma^2 \exp \left( -\frac{1}{2} \sum_{i=1}^{D} \left(\frac{\sin (\pi (x_i - y_i)/p)}{\ell}\right)^2 \right)
-    ```
+    $$
     Key reference is MacKay 1998 - "Introduction to Gaussian processes".
     """
 

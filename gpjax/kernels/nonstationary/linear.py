@@ -34,10 +34,10 @@ from gpjax.typing import (
 class Linear(AbstractKernel):
     r"""The linear kernel.
 
-    Computes the covariance for pairs of inputs $`(x, y)`$ with variance $`\sigma^2`$:
-    ```math
+    Computes the covariance for pairs of inputs $(x, y)$ with variance $\sigma^2$:
+    $$
     k(x, y) = \sigma^2 x^{\top}y
-    ```
+    $$
     """
 
     name: str = "Linear"

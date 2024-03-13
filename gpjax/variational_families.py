@@ -125,11 +125,11 @@ class AbstractVariationalGaussian(AbstractVariationalFamily[L]):
 class VariationalGaussian(AbstractVariationalGaussian[L]):
     r"""The variational Gaussian family of probability distributions.
 
-    The variational family is $`q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u`$, where
-    $`u = f(z)`$ are the function values at the inducing inputs $`z`$
+    The variational family is $q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u$, where
+    $u = f(z)$ are the function values at the inducing inputs $z$
     and the distribution over the inducing inputs is
-    $`q(u) = \mathcal{N}(\mu, S)`$.  We parameterise this over
-    $`\mu`$ and $`sqrt`$ with $`S = sqrt sqrt^{\top}`$.
+    $q(u) = \mathcal{N}(\mu, S)$.  We parameterise this over
+    $\mu$ and $sqrt$ with $S = sqrt sqrt^{\top}$.
     """
 
     def __init__(
@@ -162,7 +162,7 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         & = \operatorname{KL}[ \mathcal{N}(\mu, S) \mid\mid N(\mu z, \mathbf{K}_{zz}) ],
         \end{align}
         ```
-        where $`u = f(z)`$ and $`z`$ are the inducing inputs.
+        where $u = f(z)$ and $z$ are the inducing inputs.
 
         Returns:
             ScalarFloat: The KL-divergence between our variational
@@ -192,7 +192,7 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
     def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
         r"""Compute the predictive distribution of the GP at the test inputs t.
 
-        This is the integral $`q(f(t)) = \int p(f(t)\mid u) q(u) \mathrm{d}u`$, which
+        This is the integral $q(f(t)) = \int p(f(t)\mid u) q(u) \mathrm{d}u$, which
         can be computed in closed form as:
         ```math
             \mathcal{N}\left(f(t); \mu t + \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} (\mu - \mu z),  \mathbf{K}_{tt} - \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} \mathbf{K}_{zt} + \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} S \mathbf{K}_{zz}^{-1} \mathbf{K}_{zt}\right).
@@ -255,11 +255,11 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
 class WhitenedVariationalGaussian(VariationalGaussian[L]):
     r"""The whitened variational Gaussian family of probability distributions.
 
-    The variational family is $`q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u`$,
-    where $`u = f(z)`$
-    are the function values at the inducing inputs $`z`$ and the distribution over
-    the inducing inputs is $`q(u) = \mathcal{N}(Lz \mu + mz, Lz S Lz^{\top})`$. We parameterise this
-    over $`\mu`$ and $`sqrt`$ with $`S = sqrt sqrt^{\top}`$.
+    The variational family is $q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u$,
+    where $u = f(z)$
+    are the function values at the inducing inputs $z$ and the distribution over
+    the inducing inputs is $q(u) = \mathcal{N}(Lz \mu + mz, Lz S Lz^{\top})$. We parameterise this
+    over $\mu$ and $sqrt$ with $S = sqrt sqrt^{\top}$.
     """
 
     def prior_kl(self) -> ScalarFloat:
@@ -352,13 +352,13 @@ class WhitenedVariationalGaussian(VariationalGaussian[L]):
 class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
     r"""The natural variational Gaussian family of probability distributions.
 
-    The variational family is $`q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u`$,
-    where $`u = f(z)`$ are
-    the function values at the inducing inputs $`z`$ and the distribution over the
-    inducing inputs is $`q(u) = N(\mu, S)`$. Expressing the variational distribution, in
-    the form of the exponential family, $`q(u) = exp(\theta^{\top} T(u) - a(\theta))`$, gives rise to the
-    natural parameterisation $`\theta  = (\theta_{1}, \theta_{2}) = (S^{-1}\mu, -S^{-1}/2)`$, to perform model inference,
-    where $`T(u) = [u, uu^{\top}]`$ are the sufficient statistics.
+    The variational family is $q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u$,
+    where $u = f(z)$ are
+    the function values at the inducing inputs $z$ and the distribution over the
+    inducing inputs is $q(u) = N(\mu, S)$. Expressing the variational distribution, in
+    the form of the exponential family, $q(u) = exp(\theta^{\top} T(u) - a(\theta))$, gives rise to the
+    natural parameterisation $\theta  = (\theta_{1}, \theta_{2}) = (S^{-1}\mu, -S^{-1}/2)$, to perform model inference,
+    where $T(u) = [u, uu^{\top}]$ are the sufficient statistics.
     """
 
     def __init__(
@@ -436,13 +436,13 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
     def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
         r"""Compute the predictive distribution of the GP at the test inputs $t$.
 
-        This is the integral $`q(f(t)) = \int p(f(t)\mid u) q(u) \mathrm{d}u`$, which
+        This is the integral $q(f(t)) = \int p(f(t)\mid u) q(u) \mathrm{d}u$, which
         can be computed in closed form as
         ```math
              \mathcal{N}\left(f(t); \mu  t + \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} (\mu   - \mu  z),  \mathbf{K}_{tt} - \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} \mathbf{K}_{zt} + \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} S \mathbf{K}_{zz}^{-1} \mathbf{K}_{zt} \right),
         ```
-        with $`\mu`$ and $`S`$ computed from the natural parameterisation
-        $`\theta = (S^{-1}\mu  , -S^{-1}/2)`$.
+        with $\mu$ and $S$ computed from the natural parameterisation
+        $\theta = (S^{-1}\mu  , -S^{-1}/2)$.
 
         Returns:
             GaussianDistribution: A function that accepts a set of test points and will
@@ -513,13 +513,13 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
 class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
     r"""The natural variational Gaussian family of probability distributions.
 
-    The variational family is $`q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u`$, where $`u = f(z)`$ are the
-    function values at the inducing inputs $`z`$ and the distribution over the inducing
-    inputs is $`q(u) = \mathcal{N}(\mu, S)`$. Expressing the variational distribution, in the form of
-    the exponential family, $`q(u) = exp(\theta^{\top} T(u) - a(\theta))`$, gives rise to the natural
-    parameterisation $`\theta  = (\theta_{1}, \theta_{2}) = (S^{-1}\mu  , -S^{-1}/2)`$ and sufficient statistics
-    $`T(u) = [u, uu^{\top}]`$. The expectation parameters are given by $`\nu = \int T(u) q(u) \mathrm{d}u`$.
-    This gives a parameterisation, $`\nu = (\nu_{1}, \nu_{2}) = (\mu  , S + uu^{\top})`$ to perform model
+    The variational family is $q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u$, where $u = f(z)$ are the
+    function values at the inducing inputs $z$ and the distribution over the inducing
+    inputs is $q(u) = \mathcal{N}(\mu, S)$. Expressing the variational distribution, in the form of
+    the exponential family, $q(u) = exp(\theta^{\top} T(u) - a(\theta))$, gives rise to the natural
+    parameterisation $\theta  = (\theta_{1}, \theta_{2}) = (S^{-1}\mu  , -S^{-1}/2)$ and sufficient statistics
+    $T(u) = [u, uu^{\top}]$. The expectation parameters are given by $\nu = \int T(u) q(u) \mathrm{d}u$.
+    This gives a parameterisation, $\nu = (\nu_{1}, \nu_{2}) = (\mu  , S + uu^{\top})$ to perform model
     inference over.
     """
 

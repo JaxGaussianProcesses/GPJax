@@ -203,7 +203,7 @@ for ax in axes.ravel():
 #
 # The final method that is associated with a likelihood function in GPJax is the
 # expected log-likelihood. This term is evaluated in the
-# [stochastic variational Gaussian process](uncollaped_vi.py) in the ELBO term. For a
+# [stochastic variational Gaussian process](uncollapsed_vi.py) in the ELBO term. For a
 # variational approximation $q(f)= \mathcal{N}(f\mid m, S)$, the ELBO can be written as
 # $$
 # \begin{align}

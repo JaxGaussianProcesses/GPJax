@@ -46,9 +46,9 @@ def conjugate_mll(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
     given here enables exact estimation of the Gaussian process' latent
     function values.
 
-    For a training dataset $`\{x_n, y_n\}_{n=1}^N`$, set of test inputs
-    $`\mathbf{x}^{\star}`$ the corresponding latent function evaluations are given
-    by $`\mathbf{f}=f(\mathbf{x})`$ and $`\mathbf{f}^{\star}f(\mathbf{x}^{\star})`$,
+    For a training dataset $\{x_n, y_n\}_{n=1}^N$, set of test inputs
+    $\mathbf{x}^{\star}$ the corresponding latent function evaluations are given
+    by $\mathbf{f}=f(\mathbf{x})$ and $\mathbf{f}^{\star}f(\mathbf{x}^{\star})$,
     the marginal log-likelihood is given by:
 
     ```math

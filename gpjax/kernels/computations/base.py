@@ -75,17 +75,6 @@ class AbstractKernelComputation:
     def _cross_covariance(
         self, kernel: K, x: Num[Array, "N D"], y: Num[Array, "M D"]
     ) -> Float[Array, "N M"]:
-        r"""For a given kernel, compute the cross-covariance matrix on an a pair
-        of input matrices with shape `(N, D)` and `(M, D)`.
-
-        Args:
-            kernel: the kernel function.
-            x: the first input matrix of shape `(N, D)`.
-            y: the second input matrix of shape `(M, D)`.
-
-        Returns:
-            The computed cross-covariance of shape `(N, M)`.
-        """
         ...
 
     def cross_covariance(

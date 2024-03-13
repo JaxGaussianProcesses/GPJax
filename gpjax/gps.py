@@ -128,9 +128,9 @@ class Prior(AbstractPrior[M, K]):
     and [kernel](https://docs.jaxgaussianprocesses.com/api/kernels/base/)
     function.
 
-    A Gaussian process prior parameterised by a mean function $`m(\cdot)`$ and a kernel
-    function $`k(\cdot, \cdot)`$ is given by
-    $`p(f(\cdot)) = \mathcal{GP}(m(\cdot), k(\cdot, \cdot))`$.
+    A Gaussian process prior parameterised by a mean function $m(\cdot)$ and a kernel
+    function $k(\cdot, \cdot)$ is given by
+    $p(f(\cdot)) = \mathcal{GP}(m(\cdot), k(\cdot, \cdot))$.
 
     To invoke a `Prior` distribution, a kernel and mean function must be specified.
 
@@ -168,7 +168,7 @@ class Prior(AbstractPrior[M, K]):
         ```math
         p(f(\cdot) \mid y) \propto p(y \mid f(\cdot))p(f(\cdot)),
         ```
-        where $`p(y | f(\cdot))`$ is the likelihood and $`p(f(\cdot))`$ is the prior.
+        where $p(y | f(\cdot))$ is the likelihood and $p(f(\cdot))$ is the prior.
 
         Example:
         ```pycon
@@ -269,9 +269,9 @@ class Prior(AbstractPrior[M, K]):
 
         In particular, we approximate the Gaussian processes' prior as the
         finite feature approximation
-        $`\hat{f}(x) = \sum_{i=1}^m\phi_i(x)\theta_i`$ where $`\phi_i`$ are $`m`$ features
+        $\hat{f}(x) = \sum_{i=1}^m\phi_i(x)\theta_i$ where $\phi_i$ are $m$ features
         sampled from the Fourier feature decomposition of the model's kernel and
-        $`\theta_i`$ are samples from a unit Gaussian.
+        $\theta_i$ are samples from a unit Gaussian.
 
         A key property of such functional samples is that the same sample draw is
         evaluated for all queries. Consistency is a property that is prohibitively costly
@@ -280,7 +280,7 @@ class Prior(AbstractPrior[M, K]):
         can be evaluated with constant cost regardless of the required number of queries.
 
         In the following example, we build 10 such samples and then evaluate them
-        over the interval $`[0, 1]`$:
+        over the interval $[0, 1]$:
 
         For a `prior` distribution, the following code snippet will
         build and evaluate an approximate sample.
@@ -403,14 +403,14 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
 
     A Gaussian process posterior distribution when the constituent likelihood
     function is a Gaussian distribution. In such cases, the latent function values
-    $`f`$ can be analytically integrated out of the posterior distribution.
+    $f$ can be analytically integrated out of the posterior distribution.
     As such, many computational operations can be simplified; something we make use
     of in this object.
 
-    For a Gaussian process prior $`p(\mathbf{f})`$ and a Gaussian likelihood
-    $`p(y | \mathbf{f}) = \mathcal{N}(y\mid \mathbf{f}, \sigma^2))`$ where
-    $`\mathbf{f} = f(\mathbf{x})`$, the predictive posterior distribution at
-    a set of inputs $`\mathbf{x}`$ is given by
+    For a Gaussian process prior $p(\mathbf{f})$ and a Gaussian likelihood
+    $p(y | \mathbf{f}) = \mathcal{N}(y\mid \mathbf{f}, \sigma^2))$ where
+    $\mathbf{f} = f(\mathbf{x})$, the predictive posterior distribution at
+    a set of inputs $\mathbf{x}$ is given by
     ```math
     \begin{align}
     p(\mathbf{f}^{\star}\mid \mathbf{y}) & = \int p(\mathbf{f}^{\star}, \mathbf{f} \mid \mathbf{y})\\
@@ -545,12 +545,12 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
 
         In particular, we approximate the Gaussian processes' posterior as the finite
         feature approximation
-        $`\hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i + \sum{j=1}^N v_jk(.,x_j)`$
-        where $`\phi_i`$ are m features sampled from the Fourier feature decomposition of
-        the model's kernel and $`k(., x_j)`$ are N canonical features. The Fourier
-        weights $`\theta_i`$ are samples from a unit Gaussian. See
+        $\hat{f}(x) = \sum_{i=1}^m \phi_i(x)\theta_i + \sum{j=1}^N v_jk(.,x_j)$
+        where $\phi_i$ are m features sampled from the Fourier feature decomposition of
+        the model's kernel and $k(., x_j)$ are N canonical features. The Fourier
+        weights $\theta_i$ are samples from a unit Gaussian. See
         [Wilson et. al. (2020)](https://arxiv.org/abs/2002.09309) for expressions
-        for the canonical weights $`v_j`$.
+        for the canonical weights $v_j$.
 
         A key property of such functional samples is that the same sample draw is
         evaluated for all queries. Consistency is a property that is prohibitively costly

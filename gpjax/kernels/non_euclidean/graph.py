@@ -44,11 +44,11 @@ class GraphKernel(StationaryKernel):
 
     A Matérn graph kernel defined on the vertices of a graph.
 
-    Computes the covariance for pairs of vertices $`(v_i, v_j)`$ with variance $`\sigma^2`$:
-    ```math
+    Computes the covariance for pairs of vertices $(v_i, v_j)$ with variance $\sigma^2$:
+    $$
     k(v_i, v_j) = \sigma^2 \exp\Bigg(-\frac{\lVert v_i - v_j \rVert^2_2}{2\ell^2}\Bigg)
-    ```
-    where $`\ell`$ is the lengthscale parameter and $`\sigma^2`$ is the variance.
+    $$
+    where $\ell$ is the lengthscale parameter and $\sigma^2$ is the variance.
 
     The key reference for this object is Borovitskiy et. al., (2020).
 
@@ -86,7 +86,6 @@ class GraphKernel(StationaryKernel):
             compute_engine: The computation engine that the kernel uses to compute the
                 covariance matrix.
         """
-
         if isinstance(smoothness, Parameter):
             self.smoothness = smoothness
         else:
