@@ -174,7 +174,6 @@ def fit(  # noqa: PLR0913
 
     # Constrained space.
     model = model.constrain()
-
     return model, history
 
 

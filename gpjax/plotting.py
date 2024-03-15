@@ -25,7 +25,17 @@ from gpjax.precip_gp import VerticalDataset, ProblemInfo, ConjugatePrecipGP, Var
 
 def plot_params(problem_info:ProblemInfo, model,data,title="", print_corr=False):
     plt.figure()
-    lengthscales = jnp.array([model.base_kernels[i].lengthscale[0] for i in range(data.dim)])
+    lengthscales = []
+    for i in range(data.dim):
+        try:
+            lengthscales.append(model.base_kernels[i].lengthscale[0])
+        except:
+            try:
+                lengthscales.append(model.base_kernels[i].kernels[0].lengthscale[0])
+            except:
+                raise ValueError("model.base_kernels[i].lengthscale[0] failed")
+    lengthscales = jnp.array(lengthscales)
+  
     z_to_plot = jnp.linspace(jnp.min(model.smoother.Z_levels),jnp.max(model.smoother.Z_levels),100)
     smoothing_weights = model.smoother.smooth_fn(z_to_plot) 
     z_unscaled = z_to_plot * problem_info.pressure_std+ problem_info.pressure_mean
@@ -56,16 +66,24 @@ def plot_params(problem_info:ProblemInfo, model,data,title="", print_corr=False)
 
 
 
-def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=False):
+def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=False, use_inducing_points=False):
         
     plt.figure()
     idx_2 = []
     for i in range(problem_info.num_variables):
         for j in range(i+1,problem_info.num_variables):
             idx_2.append([i,j])
-    idxs = [[]] + [[i] for i in range(problem_info.num_variables)] + idx_2
-    sobols = model.get_sobol_indicies(data, idxs,use_range=use_range)
+    idxs = [[]] + [[i] for i in range(problem_info.num_variables)] 
+    if model.max_interaction_depth==2:
+        idxs = idxs + idx_2
+    if isinstance(model, VariationalPrecipGP):
+        sobols = model.get_sobol_indicies(data, idxs,use_range=use_range, use_inducing_points=use_inducing_points)   
+    else:
+        sobols = model.get_sobol_indicies(data, idxs,use_range=use_range)   
     z = model.smoother.smooth_data(data)[0]
+    zmax = jnp.max(z, axis=0)
+    zmin = jnp.min(z, axis=0)
+
     sobols = sobols / jnp.sum(sobols)
 
     plt.plot(sobols)
@@ -78,8 +96,17 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
         num_plot = 1_000 if len(chosen_idx)==1 else 10_000
         from scipy.stats import qmc
         sampler = qmc.Halton(d=problem_info.num_variables)
-        x_plot = sampler.random(n=num_plot) * (jnp.max(z, axis=0) - jnp.min(z, axis=0)) + jnp.min(z, axis=0)
-        if len(chosen_idx)==1:
+        x_plot = sampler.random(n=num_plot) * (zmax - zmin) + zmin
+        lsm_idx = problem_info.names_short.index("LSM")
+        
+        choices = [problem_info.names_short[idx] for idx in chosen_idx]
+        if list(set(["O_sd", "flux_s_land","flux_l_land"]) & set(choices)) != []:
+            x_plot = x_plot.at[:, lsm_idx].set(jr.uniform(key,shape=[x_plot.shape[0]], minval=problem_info.lsm_threshold))  
+        elif list(set(["T_surface", "flux_s_sea","flux_l_sea"]) & set(choices)) != []:
+            x_plot = x_plot.at[:, lsm_idx].set(jr.uniform(key,shape=[x_plot.shape[0]], maxval=problem_info.lsm_threshold))  
+            
+    
+        if len(chosen_idx)==1:     
             if isinstance(model,VariationalPrecipGP):
                 mean = model.predict_indiv_mean(x_plot,chosen_idx)
                 std = jnp.sqrt(model.predict_indiv_var(x_plot,chosen_idx))
@@ -91,11 +118,11 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
             plt.scatter(x_plot[:,chosen_idx[0]],mean, color="blue") 
             plt.scatter(x_plot[:,chosen_idx[0]],mean+ 1.96*std, color="red") 
             plt.scatter(x_plot[:,chosen_idx[0]],mean- 1.96*std, color="red") 
-            plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])
-            plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black")
-            if isinstance(model, VariationalPrecipGP):
-                ip = model.inducing_inputs
-                plt.scatter(ip[:,chosen_idx[0]],jnp.zeros_like(ip[:,chosen_idx[0]]), color="green")
+            #plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])
+            plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black",alpha=0.01)
+            # if isinstance(model, VariationalPrecipGP):
+            #     ip = model._smoothed_inducing_points()
+            #     plt.scatter(ip[:,chosen_idx[0]],jnp.zeros_like(ip[:,chosen_idx[0]]), color="green")
             plt.title(f"Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}with sobol index {sobols[idx]}")
         elif len(chosen_idx)==2:
             if isinstance(model,VariationalPrecipGP):
@@ -104,66 +131,61 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
                 mean = model.predict_indiv_mean(x_plot, data, chosen_idx)
             mean = mean * (data.Y_std)# + data.Y_mean
             col = plt.scatter(x_plot[:,chosen_idx[0]],x_plot[:,chosen_idx[1]],c=mean)
-            plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
+            #plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
             plt.colorbar(col)
-            plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black")
-            if isinstance(model, VariationalPrecipGP):
-                ip = model.inducing_inputs
-                plt.scatter(ip[:,chosen_idx[0]],ip[:,chosen_idx[1]], color="green")
+            plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black",alpha=0.01)
+            # if isinstance(model, VariationalPrecipGP):
+            #     ip = model._smoothed_inducing_points()
+            #     plt.scatter(ip[:,chosen_idx[0]],ip[:,chosen_idx[1]], color="green")
             plt.title(f"Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]} with sobol index {sobols[idx]}")
-        plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])   
+            #plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])   
        
         
         
-# def plot_component(problem_info:ProblemInfo, model, data,chosen_idx):
-#         plt.figure()
+def plot_component(problem_info:ProblemInfo, model, data, chosen_idx, show_data=False):
         
-#         if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
-#             z = model.inducing_inputs
-#         else:
-#             z = model.smoother.smooth_data(data)[0]
-        
-#         num_plot = 1_000 if len(chosen_idx)==1 else 10_000
-#         from scipy.stats import qmc
-#         sampler = qmc.Halton(d=problem_info.num_variables)
-#         x_plot = sampler.random(n=num_plot) * (jnp.max(z, axis=0) - jnp.min(z, axis=0)) + jnp.min(z, axis=0)
+    
+    z = model.smoother.smooth_data(data)[0]
+    zmax = jnp.max(z, axis=0)
+    zmin = jnp.min(z, axis=0)
 
-#         if len(chosen_idx) in [0,1]:
-#             if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
-#                 mean = model.predict_indiv_mean(x_plot,chosen_idx)
-#                 std = jnp.sqrt(model.predict_indiv_var(x_plot,chosen_idx))
-#             else:
-#                 mean = model.predict_indiv_mean(x_plot, data, chosen_idx)
-#                 std = jnp.sqrt(model.predict_indiv_var(x_plot, data, chosen_idx))
-#             mean = mean * (data.Y_std)#+ data.Y_mean
-#             std = std* (data.Y_std)
-#             if len(chosen_idx)==0:
-#                 plt.scatter(x_plot[:,0],mean, color="blue")
-#                 plt.scatter(x_plot[:,0
-#                                    ],mean+ 1.96*std, color="red")
-#                 plt.scatter(x_plot[:,0],mean- 1.96*std, color="red")
-#             else:
-#                 plt.scatter(x_plot[:,chosen_idx[0]],mean, color="blue") 
-#                 plt.scatter(x_plot[:,chosen_idx[0]],mean+ 1.96*std, color="red") 
-#                 plt.scatter(x_plot[:,chosen_idx[0]],mean- 1.96*std, color="red") 
-#                 plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])
-#                 plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black")
-#                 plt.title(f"Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}")
-#                 plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])  
-#         elif len(chosen_idx)==2:
-#             if isinstance(model, gpx.variational_families.AbstractVariationalFamily):
-#                 mean = model.predict_indiv_mean(x_plot,chosen_idx)
-#             else:
-#                 mean = model.predict_indiv_mean(x_plot, data, chosen_idx)
-#             mean = mean * (data.Y_std)# + data.Y_mean
-#             col = plt.scatter(x_plot[:,chosen_idx[0]],x_plot[:,chosen_idx[1]],c=mean)
-#             plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
-#             plt.colorbar(col)
-#             plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black")
-#             plt.title(f"Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]}")
-#             plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])   
+    plt.figure()
+    num_plot = 1_000 if len(chosen_idx)==1 else 10_000
+    from scipy.stats import qmc
+    sampler = qmc.Halton(d=problem_info.num_variables)
+    x_plot = sampler.random(n=num_plot) * (zmax - zmin) + zmin
+    lsm_idx = problem_info.names_short.index("LSM")
+    
+    if len(chosen_idx)==1:     
+        if isinstance(model,VariationalPrecipGP):
+            mean = model.predict_indiv_mean(x_plot,chosen_idx)
+            std = jnp.sqrt(model.predict_indiv_var(x_plot,chosen_idx))
+        else:
+            mean = model.predict_indiv_mean(x_plot, data, chosen_idx)
+            std = jnp.sqrt(model.predict_indiv_var(x_plot, data, chosen_idx))
+        mean = mean * (data.Y_std)#+ data.Y_mean
+        std = std* (data.Y_std)
+        plt.scatter(x_plot[:,chosen_idx[0]],mean, color="blue") 
+        plt.scatter(x_plot[:,chosen_idx[0]],mean+ 1.96*std, color="red") 
+        plt.scatter(x_plot[:,chosen_idx[0]],mean- 1.96*std, color="red") 
+        #plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])
+        if show_data:
+            plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black",alpha=0.1)
+        plt.title(f"Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}")
+    elif len(chosen_idx)==2:
+        if isinstance(model,VariationalPrecipGP):
+            mean = model.predict_indiv_mean(x_plot,chosen_idx)
+        else:
+            mean = model.predict_indiv_mean(x_plot, data, chosen_idx)
+        mean = mean * (data.Y_std)# + data.Y_mean
+        col = plt.scatter(x_plot[:,chosen_idx[0]],x_plot[:,chosen_idx[1]],c=mean)
+        #plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
+        plt.colorbar(col)
+        if show_data:
+            plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black",alpha=0.1)
+        plt.title(f"Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]}")
+        #plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])   
        
-        
 
 
 
@@ -199,7 +221,7 @@ def plot_data(problem_info:ProblemInfo, data:VerticalDataset):
 
 
 
-def plot_smoothed(ax,data, title="",scale=1000):
+def plot_smoothed(ax,data,Y,title="",scale=1000):
         idx = jnp.argsort(data)
         data = data[idx]
         y = Y[idx,0]
@@ -215,13 +237,13 @@ def plot_marginals(problem_info:ProblemInfo, D,scale=1000):
     for i in range(problem_info.num_3d_variables):
         fig, ax= plt.subplots()
         for j in range(len(problem_info.pressure_levels[0])):
-            plot_smoothed(ax,D.X3d[:,i,j], problem_info.names_3d_short[i], scale)
+            plot_smoothed(ax,D.X3d[:,i,j],D.y, problem_info.names_3d_short[i], scale)
     for j in range(problem_info.num_3d_variables, problem_info.num_3d_variables+problem_info.num_2d_variables):
         fig, ax= plt.subplots()
-        plot_smoothed(ax,D.X2d[:,j-problem_info.num_3d_variables], problem_info.names_2d_short[j-problem_info.num_3d_variables], scale)
+        plot_smoothed(ax,D.X2d[:,j-problem_info.num_3d_variables],D.y, problem_info.names_2d_short[j-problem_info.num_3d_variables], scale)
     for k in range(problem_info.num_3d_variables+problem_info.num_2d_variables, problem_info.num_variables):
         fig, ax= plt.subplots()
-        plot_smoothed(ax,D.Xstatic[:,k-problem_info.num_3d_variables-problem_info.num_2d_variables], problem_info.names_static_short[k-problem_info.num_3d_variables-problem_info.num_2d_variables], scale)
+        plot_smoothed(ax,D.Xstatic[:,k-problem_info.num_3d_variables-problem_info.num_2d_variables],D.y, problem_info.names_static_short[k-problem_info.num_3d_variables-problem_info.num_2d_variables], scale)
 
     
 

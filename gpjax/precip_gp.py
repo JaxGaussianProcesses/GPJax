@@ -67,11 +67,13 @@ class ProblemInfo(Pytree):
     names_2d: List[str]= static_field(None)
     names_3d: List[str]= static_field(None)
     names: List[str]= static_field(None)
+    names_short: List[str]= static_field(None)
     names_static: List[str]= static_field(None)
     num_variables: int= static_field(None)
     pressure_levels:  Num[Array, "1 L"]= static_field(None)
     pressure_mean: float= static_field(None)
     pressure_std: float= static_field(None)
+    lsm_threshold: float= static_field(None)
     
 
 
@@ -127,35 +129,47 @@ class VerticalDataset(Pytree):
                 Xstatic_max = jnp.max(self.Xstatic,axis=0)
                 Xstatic = (self.Xstatic - Xstatic_min) / (Xstatic_max - Xstatic_min)
                 
+                # print("robust scale of X2d and gaussian of Xstatic")
+                # X2d_median = jnp.median(self.X2d, axis=0)
+                # X2d_lower_quartile = jnp.percentile(self.X2d, 25, axis=0)
+                # X2d_upper_quartile = jnp.percentile(self.X2d, 75, axis=0)
+                # X2d = (self.X2d - X2d_median) / (X2d_upper_quartile - X2d_lower_quartile)
+
+                         
                 
-                print("then standardized X3d with max and min")
-                X3d_max = jnp.max(self.X3d,axis=(0,2))
-                X3d_min = jnp.min(self.X3d, axis=(0,2))
-                X3d = (self.X3d-X3d_min[None,:,None]) / (X3d_max[None,:,None] - X3d_min[None,:,None])
-                #X3d_max = jnp.max(self.X3d,axis=(0))
-                #X3d_min = jnp.min(self.X3d, axis=(0))
-                #X3d = (self.X3d-X3d_min[None,:,:]) / (X3d_max[None,:,:] - X3d_min[None,:,:])
-                #X3d = X3d - jnp.mean(X3d, 0)
+                
+                
+                print(" remove mean then overall standardized X3d with max and min")
+                X3d = self.X3d
+                X3d = (self.X3d - jnp.mean(self.X3d, 0)) / jnp.std(self.X3d, 0)
+                X3d_max = jnp.max(X3d,axis=(0,2))
+                X3d_min = jnp.min(X3d, axis=(0,2))
+                X3d = (X3d-X3d_min[None,:,None]) / (X3d_max[None,:,None] - X3d_min[None,:,None])
+                # X3d_max = jnp.max(self.X3d,axis=(0))
+                # X3d_min = jnp.min(self.X3d, axis=(0))
+                # X3d = (self.X3d-X3d_min[None,:,:]) / (X3d_max[None,:,:] - X3d_min[None,:,:])
+                # X3d = X3d - jnp.mean(X3d, 0)
             
 
-                print("Standardized X2d and Xstatic as Gaussin")
-                X2d_mean = jnp.mean(self.X2d, axis=0)
-                X2d_std = jnp.std(self.X2d,axis=0)
-                X2d = (self.X2d - X2d_mean) / (X2d_std)
-                Xstatic_mean = jnp.mean(self.Xstatic, axis=0)
-                Xstatic_std = jnp.std(self.Xstatic,axis=0)
-                Xstatic = (self.Xstatic - Xstatic_mean) / (Xstatic_std)
+                # print("Standardized X2d and Xstatic as Gaussin")
+                # X2d_mean = jnp.mean(self.X2d, axis=0)
+                # X2d_std = jnp.std(self.X2d,axis=0)
+                # X2d = (self.X2d - X2d_mean) / (X2d_std)
+                # Xstatic_mean = jnp.mean(self.Xstatic, axis=0)
+                # Xstatic_std = jnp.std(self.Xstatic,axis=0)
+                # Xstatic = (self.Xstatic - Xstatic_mean) / (Xstatic_std)
                 
-                print("then standardized X3d as Gaussian")
-                # X3d_mean = jnp.mean(self.X3d,axis=(0,2))
-                # X3d_std = jnp.std(self.X3d, axis=(0,2))
-                # X3d = (self.X3d-X3d_mean[None,:,None]) / (X3d_std[None,:,None])
-                X3d_mean = jnp.mean(self.X3d,axis=(0))
-                X3d_std = jnp.std(self.X3d, axis=(0))
-                X3d = (self.X3d-X3d_mean[None,:,:]) / (X3d_std[None,:,:])
-
-
-
+                # # print("do nothing to 3d")
+                # # X3d = self.X3d
+                
+                # print("then standardized X3d as Gaussian")
+                # X3d = (self.X3d - jnp.mean(self.X3d, 0))
+                # X3d_mean = jnp.mean(X3d,axis=(0,2))
+                # X3d_std = jnp.std(X3d, axis=(0,2))
+                # X3d = (X3d-X3d_mean[None,:,None]) / (X3d_std[None,:,None])
+                
+                # X3d_std = jnp.std(self.X3d, axis=(0))
+                # X3d = (self.X3d-X3d_mean[None,:,:]) / (X3d_std[None,:,:])
 
 
 
@@ -203,15 +217,17 @@ class VerticalDataset(Pytree):
                     X = jnp.hstack([self.X2d, self.Xstatic, self.y])
                 else:
                     X = jnp.hstack([jnp.mean(self.X3d,-1), self.X2d, self.Xstatic, self.y])
+                    #X = jnp.hstack([jnp.reshape(self.X3d,(jnp.shape(self.X3d)[0],-1)), self.X2d, self.Xstatic, self.y])
             else:
                 if no_3d:
                     X = jnp.hstack([self.X2d, self.Xstatic])
                 else:
                     X = jnp.hstack([jnp.mean(self.X3d,-1), self.X2d, self.Xstatic])
+                    #X = jnp.hstack([jnp.reshape(self.X3d,(jnp.shape(self.X3d)[0],-1)), self.X2d, self.Xstatic])
             assert X.shape[0] > M
             d = X.shape[1]
-            #kernel = gpx.kernels.SumKernel(kernels=[gpx.kernels.RBF(active_dims=[i]) for i in range(d)])
-            kernel = gpx.kernels.RBF(lengthscale=jnp.array(.1, dtype=jnp.float64))
+            #kernel = gpx.kernels.SumKernel(kernels=[gpx.kernels.RBF(active_dims=[i], lengthscale=jnp.array(0.1 , dtype=jnp.float64)) for i in range(d)])
+            kernel = gpx.kernels.RBF(lengthscale=jnp.array(0.1, dtype=jnp.float64))
             chosen_indicies = []  # iteratively store chosen points
             N = X.shape[0]
             c = jnp.zeros((M - 1, N), dtype=jnp.float64)  # [M-1,N]
@@ -234,7 +250,8 @@ class VerticalDataset(Pytree):
                     # e = tf.squeeze(e, 0)
                 d_squared -= e**2
                 d_squared = jnp.maximum(d_squared, 1e-50)  # numerical stability
-                chosen_indicies.append(jnp.argmax(d_squared))  # get next element as point with largest score
+                print(d_squared)
+                chosen_indicies.append(jnp.nanargmax(d_squared))  # get next element as point with largest score
             chosen_indicies = jnp.array(chosen_indicies, dtype=int)
             return VerticalDataset(X3d=self.X3d[chosen_indicies], X2d=self.X2d[chosen_indicies], Xstatic=self.Xstatic[chosen_indicies], y=self.y[chosen_indicies], standardize=False, Y_mean=self.Y_mean, Y_std=self.Y_std)
         else:
@@ -247,10 +264,14 @@ class VerticalSmoother(Module):
     smoother_mean: Float[Array, "1 D"]  = param_field(None)
     smoother_input_scale: Float[Array, "1 D"] = param_field(None, bijector=tfb.Softplus())
     Z_levels: Float[Array, "1 L"] = static_field(jnp.array([[1.0]]))
+    eps: float = static_field(1e-6)
     
     def smooth_fn(self, x):
-        return jnp.exp(-0.5 * ((x - self.smoother_mean.T) / self.smoother_input_scale.T) ** 2)
-        #return  jax.scipy.stats.norm.pdf(x, self.smoother_mean.T, self.smoother_input_scale.T)
+        #return jnp.exp(-0.5 * ((x - self.smoother_mean.T) / self.smoother_input_scale.T) ** 2)
+        lower = jax.scipy.stats.norm.cdf(jnp.min(self.Z_levels)-0.01, loc = self.smoother_mean.T, scale = self.smoother_input_scale.T)
+        upper = jax.scipy.stats.norm.cdf(jnp.max(self.Z_levels)+0.01, loc = self.smoother_mean.T, scale = self.smoother_input_scale.T)
+        return  jax.scipy.stats.norm.pdf(x, self.smoother_mean.T, self.smoother_input_scale.T) / (upper - lower)
+        #return  jax.scipy.stats.truncnorm.pdf(x, a = jnp.min(self.Z_levels)-0.1, b = jnp.max(self.Z_levels)+0.1, loc = self.smoother_mean.T, scale = self.smoother_input_scale.T)
 
     def smooth(self) -> Num[Array, "D L"]:
         return self.smooth_fn(self.Z_levels)
@@ -260,20 +281,20 @@ class VerticalSmoother(Module):
         #return  (smoothing_weights/ jnp.sqrt(jnp.sum(smoothing_weights**2, axis=-1, keepdims=True))) # [D, L]
     
     
-    def smooth_data(self, dataset: VerticalDataset) -> Num[Array, "N D"]:
+    def smooth_data(self, dataset: VerticalDataset, batch_size: Optional[int]=None) -> VerticalDataset:
         x3d, x2d, xstatic, y = dataset.X3d, dataset.X2d, dataset.Xstatic, dataset.y
-        delta = self.Z_levels[:,1:] - self.Z_levels[:,:-1] # [1 L-1]
-        weights=self.smooth()[:,:-1] # [D L]
-        #weights = weights / jnp.sum(weights, axis=-1, keepdims=True)
-        #x3d_smooth = jnp.mean(jnp.multiply(weights[None,:,:] , x3d[:,:,:-1]), axis=-1) # [N, D_3d]
-        x3d_smooth = jnp.sum(jnp.multiply(jnp.multiply(weights[None,:,:],delta[None,:,:]) , x3d[:,:,:-1]), axis=-1) # [N, D_3d]
-        #standard = jnp.sum(jnp.multiply(delta , x3d[:,:,:-1]), axis=-1) # [N, D_3d]
-        #x3d_smooth = x3d_smooth / standard
-        x3d_smooth = x3d_smooth / (jnp.max(self.Z_levels) - jnp.min(self.Z_levels))
-        #x3d_smooth = (x3d_smooth - jnp.mean(x3d_smooth, axis=0)) / jnp.std(x3d_smooth, axis=0)
-        #x3d_smooth = (x3d_smooth - jnp.min(x3d_smooth, 0)) / (jnp.max(x3d_smooth,0)-jnp.min(x3d_smooth, 0))
+        x3d_smooth = self.smooth_X(x3d)
         x = jnp.hstack([x3d_smooth, x2d, xstatic]) # [N, D_3d + D_2d +D_static]
         return x, y
+
+    def smooth_X(self, X3d):
+        delta = self.Z_levels[:,1:] - self.Z_levels[:,:-1] # [1 L-1]
+        weights=self.smooth()[:,:-1] # [D L]
+        x3d_smooth = jnp.sum(jnp.multiply(jnp.multiply(weights[None,:,:],delta[None,:,:]) , X3d[:,:,:-1]), axis=-1) # [N, D_3d]
+        #x3d_smooth = x3d_smooth / (jnp.max(self.Z_levels) - jnp.min(self.Z_levels))
+        #x3d_smooth = (x3d_smooth - jnp.min(x3d_smooth, axis=0)) / (jnp.max(x3d_smooth, axis=0) - jnp.min(x3d_smooth, axis=0))
+        #x3d_smooth = (x3d_smooth - jnp.mean(x3d_smooth, axis=0)) / jnp.sqrt(jnp.var(x3d_smooth, axis=0)+ self.eps)
+        return x3d_smooth        
 
 
 
@@ -391,7 +412,7 @@ class ConjugatePrecipGP(Module):
        
     def _orthogonalise_empirical(self, ks: Num[Array, "d N+n M+n"], num_ref: int)->Num[Array, "d N M"]:
         ks_xt, ks_xX, ks_Xt, ks_XX = ks[:,:-num_ref,:-num_ref], ks[:,:-num_ref,-num_ref:], ks[:,-num_ref:,:-num_ref], ks[:,-num_ref:,-num_ref:] # [d, N, M], [d, N, n], [d, n, M], [d, n, n]
-        denom = jnp.mean(ks_XX, (1,2))[:, None, None] # [d, 1, 1]
+        denom = jnp.mean(ks_XX, (1,2))[:, None, None]+self.jitter # [d, 1, 1]
         Kx =  jnp.mean(ks_xX, 2) # [d, N]
         Kt = jnp.mean(ks_Xt, 1) # [d, M]
         numerator = jnp.matmul(Kx[:,:,None], Kt[:, None, :])# [d, N, M]
@@ -557,13 +578,20 @@ class VariationalPrecipGP(ApproxPrecipGP):
     variational_root_covariance: Float[Array, "N N"] = param_field(
         None, bijector=tfb.FillTriangular()
     )
-    inducing_inputs: Float[Array, "N D"] = param_field(None)
+    inducing_inputs_3d: Float[Array, "N D L"] = param_field(None)
+    inducing_inputs_2d: Float[Array, "N D"] = param_field(None)
+    inducing_inputs_static: Float[Array, "N D"] = param_field(None)
 
     @property
     def num_inducing(self) -> int:
         """The number of inducing inputs."""
-        return self.inducing_inputs.shape[0]
+        return self.inducing_inputs_3d.shape[0]
 
+
+    def _smoothed_inducing_points(self):
+        z_smoothed_3d = self.inducing_inputs_3d#self.smoother.smooth_X(self.inducing_inputs_3d)
+        return jnp.hstack([z_smoothed_3d,self.inducing_inputs_2d, self.inducing_inputs_static])
+        
 
     def prior_kl(self) -> ScalarFloat:
         r"""Compute the prior KL divergence.
@@ -588,8 +616,9 @@ class VariationalPrecipGP(ApproxPrecipGP):
         # Unpack variational parameters
         mu = self.variational_mean
         sqrt = self.variational_root_covariance
-        z = self.inducing_inputs
-
+        
+        z = self._smoothed_inducing_points()
+        
         # Unpack mean function and kernel
         mean_function = self.mean_function
         muz = mean_function(z)
@@ -598,7 +627,7 @@ class VariationalPrecipGP(ApproxPrecipGP):
         Kzz = cola.PSD(Kzz + cola.ops.I_like(Kzz) * self.jitter)
 
         sqrt = cola.ops.Triangular(sqrt)
-        S = sqrt @ sqrt.T
+        S = sqrt @ sqrt.T + jnp.eye(self.num_inducing) * self.jitter
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
         pu = GaussianDistribution(loc=jnp.atleast_1d(muz.squeeze()), scale=Kzz)
         return qu.kl_divergence(pu)
@@ -617,7 +646,7 @@ class VariationalPrecipGP(ApproxPrecipGP):
         # Unpack variational parameters
         mu = self.variational_mean
         sqrt = self.variational_root_covariance
-        z = self.inducing_inputs
+        z = self._smoothed_inducing_points()
         
         Kzz = self.eval_K_xt(z, z, ref = z)
         Kzz = cola.PSD(Kzz + cola.ops.I_like(Kzz) * self.jitter)
@@ -690,7 +719,7 @@ class VariationalPrecipGP(ApproxPrecipGP):
                     * model.likelihood.num_datapoints
                     / train_data.n
                     - model.prior_kl()
-                )
+                ) 
                 log_prob =jnp.array(0.0, dtype=jnp.float64)
                 if log_prior is not None:
                     log_prob += log_prior(model)
@@ -719,13 +748,17 @@ class VariationalPrecipGP(ApproxPrecipGP):
     
     
     
-    def get_sobol_indicies(self, train_data: VerticalDataset, component_list: List[List[int]], use_range=False) -> Num[Array, "c"]:
+    def get_sobol_indicies(self, train_data: Optional[VerticalDataset], component_list: List[List[int]], use_range=False, use_inducing_points=False) -> Num[Array, "c"]:
         if not isinstance(component_list, List):
             raise ValueError("Use get_sobol_index if you want to calc for single components (TODO)")
-        x,y = self.smoother.smooth_data(train_data)
+        if use_inducing_points:
+            x = self._smoothed_inducing_points()
+        else:
+            x,y = self.smoother.smooth_data(train_data)
+        
         mu = self.variational_mean
         sqrt = self.variational_root_covariance
-        z = self.inducing_inputs
+        z = self._smoothed_inducing_points()
         m_x = self.mean_function(x)
         m_z = self.mean_function(z)
         
@@ -753,6 +786,9 @@ class VariationalPrecipGP(ApproxPrecipGP):
         
         assert Kxz_components.shape[0] == len(component_list)
 
+
+
+
         Kzz = self.eval_K_xt(z, z, ref = z)
         Kzz = cola.PSD(Kzz + cola.ops.I_like(Kzz) * self.jitter)
         Kxz = self.eval_K_xt(x,z, ref = z)
@@ -767,6 +803,11 @@ class VariationalPrecipGP(ApproxPrecipGP):
         mean_overall =  get_mean_from_covar(Kxz) # [N, 1]
         mean_components = vmap(get_mean_from_covar)(Kxz_components) # [c, N, 1]
 
+        if not isinstance(self.likelihood, gpx.likelihoods.Gaussian):
+            mean_overall = self.likelihood.link_function(mean_overall).mean()
+            mean_components = self.likelihood.link_function(mean_components).mean()
+
+
         if use_range:
             sobols = jnp.max(mean_components[:,:,0], axis=-1) - jnp.min(mean_components[:,:,0], axis=-1) # [c]
         else:
@@ -777,3 +818,39 @@ class VariationalPrecipGP(ApproxPrecipGP):
 
 
        
+@dataclass
+class SwitchKernelPositive(gpx.kernels.AbstractKernel):
+    r"""The linear kernel."""
+    threshold: float = static_field(0.5)
+    name: str = "SwitchKernel"
+
+    def __call__(
+        self,
+        x: Float[Array, " D"],
+        y: Float[Array, " D"],
+    ) -> ScalarFloat:
+        x = self.slice_input(x)
+        y = self.slice_input(y)
+        x_yes = x[0] > self.threshold
+        y_yes = y[0] > self.threshold
+        return (x_yes*y_yes).squeeze()
+    
+    
+@dataclass
+class SwitchKernelNegative(gpx.kernels.AbstractKernel):
+    r"""The linear kernel."""
+    threshold: float = static_field(0.5)
+    name: str = "SwitchKernel"
+
+    def __call__(
+        self,
+        x: Float[Array, " D"],
+        y: Float[Array, " D"],
+    ) -> ScalarFloat:
+        x = self.slice_input(x)
+        y = self.slice_input(y)
+        x_yes = x[0] < self.threshold
+        y_yes = y[0] < self.threshold
+        return (x_yes*y_yes).squeeze()
+    
+    

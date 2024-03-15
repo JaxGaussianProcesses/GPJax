@@ -276,7 +276,45 @@ class Exponential(AbstractLikelihood):
         Returns:
             tfd.Distribution: The pointwise predictive distribution.
         """
-        return self.link_function(dist.mean())
+        raise NotImplementedError
+
+
+
+@dataclass
+class Gamma(AbstractLikelihood):
+    
+    scale: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
+    )
+    
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
+        r"""The link function of the Poisson likelihood.
+
+        Args:
+            f (Float[Array, "..."]): Function values.
+
+        Returns:
+            tfd.Distribution: The likelihood function.
+        """
+        #return tfd.Gamma(concentration=self.scale, rate=jnp.exp(-f)*self.scale)
+        return  tfd.Gamma(concentration=jnp.exp(f)*self.scale, rate=self.scale)
+
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        r"""Evaluate the pointwise predictive distribution.
+
+        Evaluate the pointwise predictive distribution, given a Gaussian
+        process posterior and likelihood parameters.
+
+        Args:
+            dist (tfd.Distribution): The Gaussian process posterior, evaluated
+                at a finite set of test points.
+
+        Returns:
+            tfd.Distribution: The pointwise predictive distribution.
+        """
+        raise NotImplementedError
+
+
 
 
 
