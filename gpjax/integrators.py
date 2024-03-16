@@ -85,7 +85,7 @@ class GHQuadratureIntegrator(AbstractIntegrator):
     polynomial $`H_J(t)`$ that we can look up in table
     [link](https://keisan.casio.com/exec/system/1281195844).
     """
-    num_points: int = 20
+    num_points: int = 100
 
     def integrate(
         self,

@@ -118,11 +118,11 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
             plt.scatter(x_plot[:,chosen_idx[0]],mean, color="blue") 
             plt.scatter(x_plot[:,chosen_idx[0]],mean+ 1.96*std, color="red") 
             plt.scatter(x_plot[:,chosen_idx[0]],mean- 1.96*std, color="red") 
-            #plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])
+            plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])
             plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black",alpha=0.01)
-            # if isinstance(model, VariationalPrecipGP):
-            #     ip = model._smoothed_inducing_points()
-            #     plt.scatter(ip[:,chosen_idx[0]],jnp.zeros_like(ip[:,chosen_idx[0]]), color="green")
+            if isinstance(model, VariationalPrecipGP):
+                ip = model._smoothed_inducing_points()
+                plt.scatter(ip[:,chosen_idx[0]],jnp.zeros_like(ip[:,chosen_idx[0]]), color="green")
             plt.title(f"Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}with sobol index {sobols[idx]}")
         elif len(chosen_idx)==2:
             if isinstance(model,VariationalPrecipGP):
@@ -134,11 +134,12 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
             #plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
             plt.colorbar(col)
             plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black",alpha=0.01)
-            # if isinstance(model, VariationalPrecipGP):
-            #     ip = model._smoothed_inducing_points()
-            #     plt.scatter(ip[:,chosen_idx[0]],ip[:,chosen_idx[1]], color="green")
+            if isinstance(model, VariationalPrecipGP):
+                ip = model._smoothed_inducing_points()
+                plt.scatter(ip[:,chosen_idx[0]],ip[:,chosen_idx[1]], color="green")
             plt.title(f"Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]} with sobol index {sobols[idx]}")
-            #plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])   
+            plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])]) 
+            plt.ylim([jnp.min(x_plot[:,chosen_idx[1]]),jnp.max(x_plot[:,chosen_idx[1]])])   
        
         
         

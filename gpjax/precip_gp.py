@@ -627,7 +627,7 @@ class VariationalPrecipGP(ApproxPrecipGP):
         Kzz = cola.PSD(Kzz + cola.ops.I_like(Kzz) * self.jitter)
 
         sqrt = cola.ops.Triangular(sqrt)
-        S = sqrt @ sqrt.T + jnp.eye(self.num_inducing) * self.jitter
+        S = sqrt @ sqrt.T #+ jnp.eye(self.num_inducing) * self.jitter
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
         pu = GaussianDistribution(loc=jnp.atleast_1d(muz.squeeze()), scale=Kzz)
         return qu.kl_divergence(pu)
@@ -719,7 +719,7 @@ class VariationalPrecipGP(ApproxPrecipGP):
                     * model.likelihood.num_datapoints
                     / train_data.n
                     - model.prior_kl()
-                ) 
+                ) / model.likelihood.num_datapoints
                 log_prob =jnp.array(0.0, dtype=jnp.float64)
                 if log_prior is not None:
                     log_prob += log_prior(model)
