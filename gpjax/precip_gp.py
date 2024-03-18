@@ -13,7 +13,8 @@ from gpjax.base import (
 )
 from gpjax.typing import Array
 
-
+from abc import ABC
+import abc
 from jaxtyping import Num, Float
 from simple_pytree import Pytree
 from gpjax.typing import Array
@@ -22,7 +23,7 @@ from jax import vmap
 import tensorflow_probability.substrates.jax.bijectors as tfb
 from gpjax.base import Module, param_field,static_field
 from gpjax.lower_cholesky import lower_cholesky
-
+import jax.scipy as jsp
 
 import jax
 from dataclasses import dataclass
@@ -268,8 +269,8 @@ class VerticalSmoother(Module):
     
     def smooth_fn(self, x):
         #return jnp.exp(-0.5 * ((x - self.smoother_mean.T) / self.smoother_input_scale.T) ** 2)
-        lower = jax.scipy.stats.norm.cdf(jnp.min(self.Z_levels)-0.01, loc = self.smoother_mean.T, scale = self.smoother_input_scale.T)
-        upper = jax.scipy.stats.norm.cdf(jnp.max(self.Z_levels)+0.01, loc = self.smoother_mean.T, scale = self.smoother_input_scale.T)
+        lower = jax.scipy.stats.norm.cdf(jnp.min(self.Z_levels)-1e-3, loc = self.smoother_mean.T, scale = self.smoother_input_scale.T)
+        upper = jax.scipy.stats.norm.cdf(jnp.max(self.Z_levels)+1e-3, loc = self.smoother_mean.T, scale = self.smoother_input_scale.T)
         return  jax.scipy.stats.norm.pdf(x, self.smoother_mean.T, self.smoother_input_scale.T) / (upper - lower)
         #return  jax.scipy.stats.truncnorm.pdf(x, a = jnp.min(self.Z_levels)-0.1, b = jnp.max(self.Z_levels)+0.1, loc = self.smoother_mean.T, scale = self.smoother_input_scale.T)
 
@@ -572,120 +573,35 @@ class ApproxPrecipGP(ConjugatePrecipGP):
     
 
 @dataclass
-class VariationalPrecipGP(ApproxPrecipGP):
+class AbstractVariationalPrecipGP(ApproxPrecipGP, ABC):
+    inducing_inputs: Float[Array, "N D L"] = param_field(None)
 
-    variational_mean: Union[Float[Array, "N 1"], None] = param_field(None)
-    variational_root_covariance: Float[Array, "N N"] = param_field(
-        None, bijector=tfb.FillTriangular()
-    )
-    inducing_inputs_3d: Float[Array, "N D L"] = param_field(None)
-    inducing_inputs_2d: Float[Array, "N D"] = param_field(None)
-    inducing_inputs_static: Float[Array, "N D"] = param_field(None)
-
-    @property
-    def num_inducing(self) -> int:
-        """The number of inducing inputs."""
-        return self.inducing_inputs_3d.shape[0]
-
-
-    def _smoothed_inducing_points(self):
-        z_smoothed_3d = self.inducing_inputs_3d#self.smoother.smooth_X(self.inducing_inputs_3d)
-        return jnp.hstack([z_smoothed_3d,self.inducing_inputs_2d, self.inducing_inputs_static])
-        
-
-    def prior_kl(self) -> ScalarFloat:
-        r"""Compute the prior KL divergence.
-
-        Compute the KL-divergence between our variational approximation and the
-        Gaussian process prior.
-
-        For this variational family, we have
-        ```math
-        \begin{align}
-        \operatorname{KL}[q(f(\cdot))\mid\mid p(\cdot)] & = \operatorname{KL}[q(u)\mid\mid p(u)]\\
-        & = \operatorname{KL}[ \mathcal{N}(\mu, S) \mid\mid N(\mu z, \mathbf{K}_{zz}) ],
-        \end{align}
-        ```
-        where $`u = f(z)`$ and $`z`$ are the inducing inputs.
-
-        Returns
-        -------
-             ScalarFloat: The KL-divergence between our variational
-                approximation and the GP prior.
-        """
-        # Unpack variational parameters
-        mu = self.variational_mean
-        sqrt = self.variational_root_covariance
-        
-        z = self._smoothed_inducing_points()
-        
-        # Unpack mean function and kernel
-        mean_function = self.mean_function
-        muz = mean_function(z)
-        Kzz = self.eval_K_xt(z, z, ref = z) # [N, N]
-        
-        Kzz = cola.PSD(Kzz + cola.ops.I_like(Kzz) * self.jitter)
-
-        sqrt = cola.ops.Triangular(sqrt)
-        S = sqrt @ sqrt.T #+ jnp.eye(self.num_inducing) * self.jitter
-        qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
-        pu = GaussianDistribution(loc=jnp.atleast_1d(muz.squeeze()), scale=Kzz)
-        return qu.kl_divergence(pu)
-   
-   
     def __call__(self, *args: Any, **kwargs: Any) -> GaussianDistribution:
         return self.predict(*args, **kwargs)
+    
+    @abc.abstractmethod
+    def prior_kl(self) -> ScalarFloat:
+        pass
+
+    @abc.abstractmethod
     def predict(
         self,
         test_inputs: Num[Array, "N D"],
         component_list: Optional[List[List[int]]]=None,
     ) -> Union[GaussianDistribution,  Num[Array, "N 1"]]:
-        r"""Get the posterior predictive distribution (for a specific additive component if componen specified)."""
+        pass
 
-        
-        # Unpack variational parameters
-        mu = self.variational_mean
-        sqrt = self.variational_root_covariance
-        z = self._smoothed_inducing_points()
-        
-        Kzz = self.eval_K_xt(z, z, ref = z)
-        Kzz = cola.PSD(Kzz + cola.ops.I_like(Kzz) * self.jitter)
-        Lz = lower_cholesky(Kzz)
-        muz = self.mean_function(z)
+    @abc.abstractmethod
+    def get_sobol_indicies(self, train_data: VerticalDataset, component_list: List[List[int]], use_range=False) -> Num[Array, "c"]:
+        pass
 
 
-        # Unpack test inputs
-        t = test_inputs
-        if component_list is None:
-            Ktt = self.eval_K_xt(t,t,ref=z)
-            Kzt = self.eval_K_xt(z,t, ref=z)
-        else:
-            Ktt = self.eval_specific_K_xt(t, t, component_list, ref = z)
-            Kzt = self.eval_specific_K_xt(z, t, component_list, ref = z)  
-        mut = self.mean_function(t)
-        
-        # Lz⁻¹ Kzt
-        Lz_inv_Kzt = cola.solve(Lz, Kzt, Cholesky())
+    @property
+    def num_inducing(self) -> int:
+        """The number of inducing inputs."""
+        return self.inducing_inputs.shape[0]
 
-        # Kzz⁻¹ Kzt
-        Kzz_inv_Kzt = cola.solve(Lz.T, Lz_inv_Kzt, Cholesky())
 
-        # Ktz Kzz⁻¹ sqrt
-        Ktz_Kzz_inv_sqrt = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
-
-        # μt + Ktz Kzz⁻¹ (μ - μz)
-        mean = mut + jnp.matmul(Kzz_inv_Kzt.T, mu - muz)
-
-        # Ktt - Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
-        covariance = (
-            Ktt
-            - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
-            + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
-        )
-        covariance += cola.ops.I_like(covariance) * self.jitter
-        return GaussianDistribution(
-            loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
-        )
 
     def predict_indiv_mean(
         self,
@@ -746,19 +662,157 @@ class VariationalPrecipGP(ApproxPrecipGP):
     
     
     
+
+@dataclass
+class VariationalPrecipGP(AbstractVariationalPrecipGP):
+    variational_mean: Union[Float[Array, "N 1"], None] = param_field(None)
+    variational_root_covariance: Float[Array, "N N"] = param_field(
+        None, bijector=tfb.FillTriangular()
+    )
+    parameterisation: str = static_field("standard") # "standard" or "white"
+
+
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        assert self.parameterisation in ["standard", "white"]
+
+        if self.variational_mean is None:
+            self.variational_mean = jnp.zeros((jnp.shape(self.inducing_inputs)[0], 1))
+
+        if self.variational_root_covariance is None:
+            self.variational_root_covariance = jnp.eye(jnp.shape(self.inducing_inputs)[0])
+
+
+    def prior_kl(self) -> ScalarFloat:
+        r"""Compute the prior KL divergence.
+
+        Compute the KL-divergence between our variational approximation and the
+        Gaussian process prior.
+
+        For this variational family, we have
+        ```math
+        \begin{align}
+        \operatorname{KL}[q(f(\cdot))\mid\mid p(\cdot)] & = \operatorname{KL}[q(u)\mid\mid p(u)]\\
+        & = \operatorname{KL}[ \mathcal{N}(\mu, S) \mid\mid N(\mu z, \mathbf{K}_{zz}) ],
+        \end{align}
+        ```
+        where $`u = f(z)`$ and $`z`$ are the inducing inputs.
+
+        Returns
+        -------
+             ScalarFloat: The KL-divergence between our variational
+                approximation and the GP prior.
+        """
+        # Unpack variational parameters
+        mu = self.variational_mean
+        sqrt = self.variational_root_covariance
+        z = self.inducing_inputs
+        
+        sqrt = cola.ops.Triangular(sqrt)
+        # S = LLᵀ
+        S = sqrt @ sqrt.T + jnp.eye(self.num_inducing) * self.jitter
+        qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
+
+        if self.parameterisation == "white":
+            pu = GaussianDistribution(loc=jnp.zeros_like(jnp.atleast_1d(mu.squeeze())))
+        else:
+            muz = self.mean_function(z)
+            Kzz = self.eval_K_xt(z, z, ref = z) # [N, N]
+            Kzz = cola.PSD(Kzz + cola.ops.I_like(Kzz) * self.jitter)
+            pu = GaussianDistribution(loc=jnp.atleast_1d(muz.squeeze()), scale=Kzz)
+
+        return qu.kl_divergence(pu)
+   
+
+    def predict(
+        self,
+        test_inputs: Num[Array, "N D"],
+        component_list: Optional[List[List[int]]]=None,
+    ) -> Union[GaussianDistribution,  Num[Array, "N 1"]]:
+        r"""Get the posterior predictive distribution (for a specific additive component if componen specified)."""
+
+        
+        # Unpack variational parameters
+        mu = self.variational_mean
+        sqrt = self.variational_root_covariance
+        z = self.inducing_inputs
+        
+        Kzz = self.eval_K_xt(z, z, ref = z)
+        Kzz = cola.PSD(Kzz + cola.ops.I_like(Kzz) * self.jitter)
+        Lz = lower_cholesky(Kzz)
+        muz = self.mean_function(z)
+
+
+        # Unpack test inputs
+        t = test_inputs
+        if component_list is None:
+            Ktt = self.eval_K_xt(t,t,ref=z)
+            Kzt = self.eval_K_xt(z,t, ref=z)
+        else:
+            Ktt = self.eval_specific_K_xt(t, t, component_list, ref = z)
+            Kzt = self.eval_specific_K_xt(z, t, component_list, ref = z)  
+        mut = self.mean_function(t)
+
+
+        if self.parameterisation == "white":
+            # Lz⁻¹ Kzt
+            Lz_inv_Kzt = cola.solve(Lz, Kzt, Cholesky())
+
+            # Ktz Lz⁻ᵀ sqrt
+            Ktz_Lz_invT_sqrt = jnp.matmul(Lz_inv_Kzt.T, sqrt)
+
+            # μt  +  Ktz Lz⁻ᵀ μ
+            mean = mut + jnp.matmul(Lz_inv_Kzt.T, mu)
+
+            # Ktt  -  Ktz Kzz⁻¹ Kzt  +  Ktz Lz⁻ᵀ S Lz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
+            covariance = (
+                Ktt
+                - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
+                + jnp.matmul(Ktz_Lz_invT_sqrt, Ktz_Lz_invT_sqrt.T)
+            )
+
+        else:
+            # Lz⁻¹ Kzt
+            Lz_inv_Kzt = cola.solve(Lz, Kzt, Cholesky())
+
+            # Kzz⁻¹ Kzt
+            Kzz_inv_Kzt = cola.solve(Lz.T, Lz_inv_Kzt, Cholesky())
+
+            # Ktz Kzz⁻¹ sqrt
+            Ktz_Kzz_inv_sqrt = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
+
+            # μt + Ktz Kzz⁻¹ (μ - μz)
+            mean = mut + jnp.matmul(Kzz_inv_Kzt.T, mu - muz)
+
+            # Ktt - Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
+            covariance = (
+                Ktt
+                - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
+                + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
+            )
+
+
+        covariance += cola.ops.I_like(covariance) * self.jitter
+        return GaussianDistribution(
+            loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
+        )
+
+
     
     
     def get_sobol_indicies(self, train_data: Optional[VerticalDataset], component_list: List[List[int]], use_range=False, use_inducing_points=False) -> Num[Array, "c"]:
         if not isinstance(component_list, List):
             raise ValueError("Use get_sobol_index if you want to calc for single components (TODO)")
         if use_inducing_points:
-            x = self._smoothed_inducing_points()
+            x = self.inducing_inputs
         else:
             x,y = self.smoother.smooth_data(train_data)
         
         mu = self.variational_mean
         sqrt = self.variational_root_covariance
-        z = self._smoothed_inducing_points()
+        z = self.inducing_inputs
         m_x = self.mean_function(x)
         m_z = self.mean_function(z)
         
@@ -794,11 +848,17 @@ class VariationalPrecipGP(ApproxPrecipGP):
         Kxz = self.eval_K_xt(x,z, ref = z)
         Lz = lower_cholesky(Kzz)
 
-        def get_mean_from_covar(K): # [N,N] -> [N, 1]
-            Lz_inv_Kzt = cola.solve(Lz, K.T, Cholesky())
-            Kzz_inv_Kzt = cola.solve(Lz.T, Lz_inv_Kzt, Cholesky())
-            return m_x + jnp.matmul(Kzz_inv_Kzt.T, mu - m_z)
-        
+
+        if self.parameterisation == "white":
+            def get_mean_from_covar(K): # [N,N] -> [N, 1]
+                Lz_inv_Kzt = cola.solve(Lz, K.T, Cholesky())
+                return m_x + jnp.matmul(Lz_inv_Kzt.T, mu)
+        else:
+            def get_mean_from_covar(K): # [N,N] -> [N, 1]
+                Lz_inv_Kzt = cola.solve(Lz, K.T, Cholesky())
+                Kzz_inv_Kzt = cola.solve(Lz.T, Lz_inv_Kzt, Cholesky())
+                return m_x + jnp.matmul(Kzz_inv_Kzt.T, mu - m_z)
+            
 
         mean_overall =  get_mean_from_covar(Kxz) # [N, 1]
         mean_components = vmap(get_mean_from_covar)(Kxz_components) # [c, N, 1]
@@ -814,7 +874,7 @@ class VariationalPrecipGP(ApproxPrecipGP):
             sobols = jnp.var(mean_components[:,:,0], axis=-1) / jnp.var(mean_overall) # [c]
         return sobols
     
-    
+
 
 
        

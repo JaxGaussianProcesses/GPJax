@@ -286,9 +286,6 @@ class Gamma(AbstractLikelihood):
     scale1: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
     )
-    scale2: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
-    )
     
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         r"""The link function of the Poisson likelihood.
@@ -299,7 +296,7 @@ class Gamma(AbstractLikelihood):
         Returns:
             tfd.Distribution: The likelihood function.
         """
-        return tfd.Gamma(concentration=self.scale1, rate=jnp.exp(-f)*self.scale2)
+        return tfd.Gamma(concentration=self.scale1, rate=jnp.exp(-f))
         #return  tfd.Gamma(concentration=jnp.exp(f)*self.scale, rate=self.scale)
 
     def predict(self, dist: tfd.Distribution) -> tfd.Distribution:

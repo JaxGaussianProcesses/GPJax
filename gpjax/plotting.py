@@ -121,7 +121,7 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
             plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])
             plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black",alpha=0.01)
             if isinstance(model, VariationalPrecipGP):
-                ip = model._smoothed_inducing_points()
+                ip = model.inducing_inputs
                 plt.scatter(ip[:,chosen_idx[0]],jnp.zeros_like(ip[:,chosen_idx[0]]), color="green")
             plt.title(f"Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}with sobol index {sobols[idx]}")
         elif len(chosen_idx)==2:
@@ -135,7 +135,7 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
             plt.colorbar(col)
             plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black",alpha=0.01)
             if isinstance(model, VariationalPrecipGP):
-                ip = model._smoothed_inducing_points()
+                ip = model.inducing_inputs
                 plt.scatter(ip[:,chosen_idx[0]],ip[:,chosen_idx[1]], color="green")
             plt.title(f"Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]} with sobol index {sobols[idx]}")
             plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])]) 
