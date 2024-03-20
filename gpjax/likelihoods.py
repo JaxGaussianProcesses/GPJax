@@ -204,6 +204,18 @@ class Bernoulli(AbstractLikelihood):
         return self.link_function(mean / jnp.sqrt(1.0 + variance))
 
 
+
+@dataclass
+class LogitBernoulli(AbstractLikelihood):
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
+        prob = jnp.exp(f) / (1 + jnp.exp(f))
+        return tfd.Bernoulli(probs=prob)
+
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        raise NotImplementedError
+
+
+
 @dataclass
 class Poisson(AbstractLikelihood):
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
@@ -313,7 +325,6 @@ class Gamma(AbstractLikelihood):
             tfd.Distribution: The pointwise predictive distribution.
         """
         raise NotImplementedError
-
 
 
 

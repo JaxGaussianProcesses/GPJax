@@ -123,12 +123,16 @@ class VerticalDataset(Pytree):
                 
             else:
                 print("Standardized X2d and Xstatic with max and min")
-                X2d_min = jnp.min(self.X2d, axis=0)
-                X2d_max = jnp.max(self.X2d,axis=0)
-                X2d = (self.X2d - X2d_min) / (X2d_max - X2d_min)
-                Xstatic_min = jnp.min(self.Xstatic, axis=0)
-                Xstatic_max = jnp.max(self.Xstatic,axis=0)
-                Xstatic = (self.Xstatic - Xstatic_min) / (Xstatic_max - Xstatic_min)
+                lower = 0.1
+                upper = 0.999
+                X2d_min = jnp.quantile(self.X2d, lower, axis=0)
+                X2d_max = jnp.quantile(self.X2d,upper, axis=0)
+                X2d = jnp.clip(self.X2d, X2d_min, X2d_max)
+                X2d = (X2d - X2d_min) / (X2d_max - X2d_min)
+                Xstatic_min = jnp.quantile(self.Xstatic,lower, axis=0)
+                Xstatic_max = jnp.quantile(self.Xstatic,upper, axis=0)
+                Xstatic = jnp.clip(self.Xstatic, Xstatic_min, Xstatic_max)
+                Xstatic = (Xstatic - Xstatic_min) / (Xstatic_max - Xstatic_min)
                 
                 # print("robust scale of X2d and gaussian of Xstatic")
                 # X2d_median = jnp.median(self.X2d, axis=0)
@@ -147,7 +151,7 @@ class VerticalDataset(Pytree):
                 X3d_min = jnp.min(X3d, axis=(0,2))
                 X3d = (X3d-X3d_min[None,:,None]) / (X3d_max[None,:,None] - X3d_min[None,:,None])
                 # X3d_max = jnp.max(self.X3d,axis=(0))
-                # X3d_min = jnp.min(self.X3d, axis=(0))
+                # X3d_min = jnp.(self.X3d, axis=(0))
                 # X3d = (self.X3d-X3d_min[None,:,:]) / (X3d_max[None,:,:] - X3d_min[None,:,:])
                 # X3d = X3d - jnp.mean(X3d, 0)
             
@@ -914,3 +918,99 @@ class SwitchKernelNegative(gpx.kernels.AbstractKernel):
         return (x_yes*y_yes).squeeze()
     
     
+    
+def thin_model(problem_info:ProblemInfo, D_test:VerticalDataset, model:VariationalPrecipGP, target_num):
+    def test_model_without_component(D: VerticalDataset, model:VariationalPrecipGP, idx:int, return_model = False, num_samples=100):
+        new_base_kernels = []
+        for i in range(len(model.base_kernels)):
+            if i != idx:
+                new_base_kernels.append(model.base_kernels[i])
+            else:
+                new_base_kernels.append(gpx.kernels.Constant(constant=jnp.array(0.0, dtype=jnp.float64), active_dims=[i]))
+        new_model = model.replace(base_kernels=new_base_kernels)
+        if return_model:
+            return new_model 
+        test_inputs = new_model.smoother.smooth_data(D)[0]
+        predictor_mean = lambda x: new_model.predict(x).mean()
+        predictor_var = lambda x: new_model.predict(x).variance()
+        mean = jax.vmap(predictor_mean,1)(test_inputs[:,None,:])[0] # [N]
+        var = jax.vmap(predictor_var,1)(test_inputs[:,None,:])[0] # [N]
+        samples_f = tfd.MultivariateNormalDiag(mean, jnp.sqrt(var)).sample(seed=key, sample_shape=(num_samples))# [S, N]
+        log_probs = new_model.likelihood.link_function(samples_f.T).log_prob(D.y) # [N, S]
+        return jnp.mean(log_probs)
+
+
+    thinned_model = model
+    target_num = 5
+    kept_idxs = [i for i in range(len(model.base_kernels))]
+    previous_best_loss = test_model_without_component(D_test, model, -1)
+    for _ in range(len(model.base_kernels)-target_num):
+        scores = jnp.array([test_model_without_component(D_test, thinned_model, i) for i in kept_idxs])
+        chosen_idx = jnp.argmax(scores)
+        actual_idx = kept_idxs[chosen_idx]
+        del kept_idxs[chosen_idx]
+        found_best_loss = scores[chosen_idx]
+        thinned_model = test_model_without_component(D_test, thinned_model, actual_idx, return_model=True)
+
+        print(f"removed {problem_info.names_short[actual_idx]}")
+        print(f"with a loss in performance of {previous_best_loss-found_best_loss}")
+        previous_best_loss = found_best_loss
+    
+    return thinned_model
+
+
+
+
+
+
+# @dataclass
+# class MultipleLatentVariationalPrecipGP(Module):
+#     latents:List[VariationalPrecipGP]
+#     likelihood: gpx.likelihoods.AbstractLikelihood
+#     num_latents: int = static_field(0) # lazy init
+    
+    
+#     def __post_init__(self):
+#         print(f"note we ignore the likelihoods of the latent GPs now, useing the new joint one isntead")
+#         self.num_latents = len(self.latents)
+    
+    
+#     def loss_fn(self, negative=False, log_prior: Optional[Callable] = None)->gpx.objectives.AbstractObjective:
+#         class Loss(gpx.objectives.AbstractObjective):
+#             def step(
+#                 self,
+#                 model:MultipleLatentVariationalPrecipGP,
+#                 train_data: VerticalDataset,
+#             ) -> ScalarFloat:
+#                 #smooth data to get in form for preds
+#                 elbo = (
+#                     jnp.sum(model._custom_variational_expectation(model, train_data))
+#                     * model.likelihood.num_datapoints
+#                     / train_data.n
+#                     - jnp.sum(jnp.stack([m.prior_kl() for m in model.latent]))
+#                 ) 
+#                 return self.constant * (elbo.squeeze())
+#         return Loss(negative=negative)
+    
+    
+#     def _custom_variational_expectation(
+#         self,
+#         model: MultipleLatentVariationalPrecipGP,
+#         train_data: VerticalDataset,
+#     ) -> Float[Array, " N"]:
+#         # Unpack training batch
+#         x,y = model.smoother.smooth_data(train_data)
+#         def q_moments(x):
+#             means = jnp.zeros((jnp.shape(x)[0], self.num_latents), dtype=jnp.float64)
+#             vars = jnp.zeros((jnp.shape(x)[0], self.num_latents), dtype=jnp.float64)
+#             for i in range(self.num_latents):
+#                 qx = model.latents[i](x)
+#                 means = means.at[:,i].set(qx.mean().squeeze())
+#                 vars = vars.at[:,i].set(qx.variance().squeeze())
+#             return means, vars
+
+#         mean, variance = vmap(q_moments)(x[:, None])
+#         expectation = model.likelihood.expected_log_likelihood(
+#             y, mean, variance
+#         )
+#         return expectation
