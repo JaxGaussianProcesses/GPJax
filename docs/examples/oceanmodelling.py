@@ -195,16 +195,14 @@ dataset_ground_truth = dataset_3d(pos_test, vel_test)
 
 
 # %%
-
-
-@dataclass
 class VelocityKernel(gpx.kernels.AbstractKernel):
-    kernel0: gpx.kernels.AbstractKernel = field(
-        default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
-    )
-    kernel1: gpx.kernels.AbstractKernel = field(
-        default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
-    )
+    def __init__(
+        self,
+        kernel0: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1]),
+        kernel1: gpx.kernels.AbstractKernel = gpx.kernels.RBF(active_dims=[0, 1]),
+    ):
+        self.kernel0 = kernel0
+        self.kernel1 = kernel1
 
     def __call__(
         self, X: Float[Array, "1 D"], Xp: Float[Array, "1 D"]
