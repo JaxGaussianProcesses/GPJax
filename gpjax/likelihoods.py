@@ -34,6 +34,7 @@ from gpjax.integrators import (
     AbstractIntegrator,
     AnalyticalGaussianIntegrator,
     GHQuadratureIntegrator,
+    TwoDimGHQuadratureIntegrator,
 )
 from gpjax.typing import (
     Array,
@@ -93,9 +94,9 @@ class AbstractLikelihood(Module):
 
     def expected_log_likelihood(
         self,
-        y: Float[Array, "N D"],
-        mean: Float[Array, "N D"],
-        variance: Float[Array, "N D"],
+        y: Float[Array, "N n"],
+        mean: Float[Array, "N L n"],
+        variance: Float[Array, "N L n"],
     ) -> Float[Array, " N"]:
         r"""Compute the expected log likelihood.
 
@@ -295,11 +296,11 @@ class Exponential(AbstractLikelihood):
 @dataclass
 class Gamma(AbstractLikelihood):
     
-    scale1: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
+    scale1: Union[ScalarFloat, Float[Array, "N"]] = param_field(
         jnp.array(1.0), bijector=tfb.Softplus()
     )
     
-    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
+    def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
         r"""The link function of the Poisson likelihood.
 
         Args:
@@ -308,8 +309,9 @@ class Gamma(AbstractLikelihood):
         Returns:
             tfd.Distribution: The likelihood function.
         """
-        return tfd.Gamma(concentration=self.scale1, rate=jnp.exp(-f))
-        #return  tfd.Gamma(concentration=jnp.exp(f)*self.scale, rate=self.scale)
+        assert jnp.shape(f)[0]==1
+        #return tfd.Gamma(concentration=self.scale1, rate=jnp.exp(-f[0,:]))
+        return tfd.Gamma(concentration=jnp.exp(f[0,:]), rate=self.scale1)
 
     def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
         r"""Evaluate the pointwise predictive distribution.
@@ -327,6 +329,20 @@ class Gamma(AbstractLikelihood):
         raise NotImplementedError
 
 
+
+
+@dataclass
+class Gamma2(AbstractLikelihood):
+    integrator: AbstractIntegrator = static_field(TwoDimGHQuadratureIntegrator())
+    initial_scale: Union[ScalarFloat, Float[Array, "N"]] = static_field(jnp.array(1.0))
+
+    def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
+        assert jnp.shape(f)[0]==2
+        #return tfd.Gamma(concentration=self.initial_scale*jnp.exp(f[1,:]), rate=jnp.exp(-f[0,:]))
+        return tfd.Gamma(concentration=jnp.exp(f[0,:]+f[1,:]), rate=self.initial_scale*jnp.exp(f[1,:]))
+
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        raise NotImplementedError
 
 
 

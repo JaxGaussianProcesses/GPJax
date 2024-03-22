@@ -144,7 +144,7 @@ class VerticalDataset(Pytree):
                 
                 
                 
-                print(" remove mean then overall standardized X3d with max and min")
+                print(" overall standardized X3d with max and min")
                 X3d = self.X3d
                 X3d = (self.X3d - jnp.mean(self.X3d, 0)) / jnp.std(self.X3d, 0)
                 X3d_max = jnp.max(X3d,axis=(0,2))
@@ -639,7 +639,7 @@ class AbstractVariationalPrecipGP(ApproxPrecipGP, ABC):
                     * model.likelihood.num_datapoints
                     / train_data.n
                     - model.prior_kl()
-                ) / model.likelihood.num_datapoints
+                ) 
                 log_prob =jnp.array(0.0, dtype=jnp.float64)
                 if log_prior is not None:
                     log_prob += log_prior(model)
@@ -921,30 +921,29 @@ class SwitchKernelNegative(gpx.kernels.AbstractKernel):
     
 def thin_model(problem_info:ProblemInfo, D_test:VerticalDataset, model:VariationalPrecipGP, target_num):
     def test_model_without_component(D: VerticalDataset, model:VariationalPrecipGP, idx:int, return_model = False, num_samples=100):
-        new_base_kernels = []
-        for i in range(len(model.base_kernels)):
-            if i != idx:
-                new_base_kernels.append(model.base_kernels[i])
-            else:
-                new_base_kernels.append(gpx.kernels.Constant(constant=jnp.array(0.0, dtype=jnp.float64), active_dims=[i]))
-        new_model = model.replace(base_kernels=new_base_kernels)
+        list_of_list_of_base_kernels = []
+        for j in range(model.num_latents):
+            new_base_kernels = []
+            for i in range(len(model.list_of_list_of_base_kernels[j])):
+                if i != idx:
+                    new_base_kernels.append(model.list_of_list_of_base_kernels[j][i])
+                else:
+                    new_base_kernels.append(gpx.kernels.Constant(constant=jnp.array(0.0, dtype=jnp.float64), active_dims=[i]))
+            list_of_list_of_base_kernels.append(new_base_kernels)
+        new_model = model.replace(list_of_list_of_base_kernels=list_of_list_of_base_kernels)
         if return_model:
             return new_model 
         test_inputs = new_model.smoother.smooth_data(D)[0]
-        predictor_mean = lambda x: new_model.predict(x).mean()
-        predictor_var = lambda x: new_model.predict(x).variance()
-        mean = jax.vmap(predictor_mean,1)(test_inputs[:,None,:])[0] # [N]
-        var = jax.vmap(predictor_var,1)(test_inputs[:,None,:])[0] # [N]
-        samples_f = tfd.MultivariateNormalDiag(mean, jnp.sqrt(var)).sample(seed=key, sample_shape=(num_samples))# [S, N]
-        log_probs = new_model.likelihood.link_function(samples_f.T).log_prob(D.y) # [N, S]
+        mean, var = new_model.predict_indiv(test_inputs)
+        samples_f = jnp.stack([tfd.MultivariateNormalDiag(mean[i], jnp.sqrt(var[i])).sample(seed=key, sample_shape=(num_samples)) for i in range(model.num_latents)])# [S, n, N]
+        log_probs = new_model.likelihood.link_function(samples_f).log_prob(D.y.T) # [N, S]
         return jnp.mean(log_probs)
 
 
     thinned_model = model
-    target_num = 5
-    kept_idxs = [i for i in range(len(model.base_kernels))]
+    kept_idxs = [i for i in range(len(model.list_of_list_of_base_kernels[0]))]
     previous_best_loss = test_model_without_component(D_test, model, -1)
-    for _ in range(len(model.base_kernels)-target_num):
+    for _ in range(len(model.list_of_list_of_base_kernels[0])-target_num):
         scores = jnp.array([test_model_without_component(D_test, thinned_model, i) for i in kept_idxs])
         chosen_idx = jnp.argmax(scores)
         actual_idx = kept_idxs[chosen_idx]
@@ -960,57 +959,3 @@ def thin_model(problem_info:ProblemInfo, D_test:VerticalDataset, model:Variation
 
 
 
-
-
-
-# @dataclass
-# class MultipleLatentVariationalPrecipGP(Module):
-#     latents:List[VariationalPrecipGP]
-#     likelihood: gpx.likelihoods.AbstractLikelihood
-#     num_latents: int = static_field(0) # lazy init
-    
-    
-#     def __post_init__(self):
-#         print(f"note we ignore the likelihoods of the latent GPs now, useing the new joint one isntead")
-#         self.num_latents = len(self.latents)
-    
-    
-#     def loss_fn(self, negative=False, log_prior: Optional[Callable] = None)->gpx.objectives.AbstractObjective:
-#         class Loss(gpx.objectives.AbstractObjective):
-#             def step(
-#                 self,
-#                 model:MultipleLatentVariationalPrecipGP,
-#                 train_data: VerticalDataset,
-#             ) -> ScalarFloat:
-#                 #smooth data to get in form for preds
-#                 elbo = (
-#                     jnp.sum(model._custom_variational_expectation(model, train_data))
-#                     * model.likelihood.num_datapoints
-#                     / train_data.n
-#                     - jnp.sum(jnp.stack([m.prior_kl() for m in model.latent]))
-#                 ) 
-#                 return self.constant * (elbo.squeeze())
-#         return Loss(negative=negative)
-    
-    
-#     def _custom_variational_expectation(
-#         self,
-#         model: MultipleLatentVariationalPrecipGP,
-#         train_data: VerticalDataset,
-#     ) -> Float[Array, " N"]:
-#         # Unpack training batch
-#         x,y = model.smoother.smooth_data(train_data)
-#         def q_moments(x):
-#             means = jnp.zeros((jnp.shape(x)[0], self.num_latents), dtype=jnp.float64)
-#             vars = jnp.zeros((jnp.shape(x)[0], self.num_latents), dtype=jnp.float64)
-#             for i in range(self.num_latents):
-#                 qx = model.latents[i](x)
-#                 means = means.at[:,i].set(qx.mean().squeeze())
-#                 vars = vars.at[:,i].set(qx.variance().squeeze())
-#             return means, vars
-
-#         mean, variance = vmap(q_moments)(x[:, None])
-#         expectation = model.likelihood.expected_log_likelihood(
-#             y, mean, variance
-#         )
-#         return expectation
