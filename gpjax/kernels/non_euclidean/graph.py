@@ -106,7 +106,7 @@ class GraphKernel(StationaryKernel):
         *,
         S,
         **kwargs,
-    ) -> Float[Array, ""]:
+    ):
         Kxx = (jax_gather_nd(self.eigenvectors.value, x) * S.squeeze()) @ jnp.transpose(
             jax_gather_nd(self.eigenvectors.value, y)
         )  # shape (n,n)

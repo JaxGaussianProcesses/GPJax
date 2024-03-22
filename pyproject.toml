@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gpjax"
-version = "0.8.0"
+version = "0.9.0"
 description = "Gaussian processes in JAX."
 authors = [
   "Thomas Pinder <tompinder@live.co.uk>",
@@ -19,7 +19,7 @@ packages = [{ include = "gpjax" }]
 python = ">=3.10,<3.12"
 jax = ">=0.4.10"
 jaxlib = ">=0.4.10"
-flax = {git = "https://github.com/google/flax.git"}
+flax = { git = "https://github.com/google/flax.git" }
 optax = "^0.2.1"
 jaxtyping = "^0.2.10"
 tqdm = "^4.66.2"
