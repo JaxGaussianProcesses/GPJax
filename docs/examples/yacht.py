@@ -31,6 +31,7 @@ config.update("jax_enable_x64", True)
 
 from jax import jit
 import jax.random as jr
+import jax.numpy as jnp
 from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -169,8 +170,8 @@ scaled_Xte = x_scaler.transform(Xte)
 n_train, n_covariates = scaled_Xtr.shape
 kernel = gpx.kernels.RBF(
     active_dims=list(range(n_covariates)),
-    variance=np.var(scaled_ytr),
-    lengthscale=0.1 * np.ones((n_covariates,)),
+    variance=jnp.var(scaled_ytr),
+    lengthscale=0.1 * jnp.ones((n_covariates,)),
 )
 meanf = gpx.mean_functions.Zero()
 prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
@@ -188,13 +189,14 @@ posterior = prior * likelihood
 # %%
 training_data = gpx.Dataset(X=scaled_Xtr, y=scaled_ytr)
 
-negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True))
-
 opt_posterior, history = gpx.fit_scipy(
     model=posterior,
-    objective=negative_mll,
+    # we use the negative mll as we are minimising
+    objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     train_data=training_data,
 )
+
+print(-gpx.objectives.conjugate_mll(opt_posterior, training_data))
 
 # %% [markdown]
 # ## Prediction
