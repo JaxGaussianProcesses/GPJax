@@ -84,11 +84,11 @@ x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 
 meanf = gpx.mean_functions.Zero()
 
-for k, ax in zip(kernels, axes.ravel()):
+for k, ax, c in zip(kernels, axes.ravel(), cols):
     prior = gpx.gps.Prior(mean_function=meanf, kernel=k)
     rv = prior(x)
     y = rv.sample(seed=key, sample_shape=(10,))
-    ax.plot(x, y.T, alpha=0.7)
+    ax.plot(x, y.T, alpha=0.7, color=c)
     ax.set_title(k.name)
 
 # %% [markdown]
@@ -205,24 +205,43 @@ fig.colorbar(im3, ax=ax[3], fraction=0.05)
 
 
 # %%
+import beartype.typing as tp
+from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
+from gpjax.parameters import DEFAULT_BIJECTION, Static, PositiveReal
+
+
 def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
 
 
 bij = tfb.SoftClip(low=jnp.array(4.0, dtype=jnp.float64))
 
+DEFAULT_BIJECTION["polar"] = bij
 
-@dataclass
+
 class Polar(gpx.kernels.AbstractKernel):
-    period: float = static_field(2 * jnp.pi)
-    tau: float = param_field(jnp.array([5.0]), bijector=bij)
+    period: Static
+    tau: PositiveReal
+
+    def __init__(
+        self,
+        tau: float = 5.0,
+        period: float = 2 * jnp.pi,
+        active_dims: list[int] | slice | None = None,
+        n_dims: int | None = None,
+    ):
+        super().__init__(active_dims, n_dims, DenseKernelComputation())
+        self.period = Static(jnp.array(period))
+        self.tau = PositiveReal(jnp.array(tau), tag="polar")
 
     def __call__(
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
-        c = self.period / 2.0
+        c = self.period.value / 2.0
         t = angular_distance(x, y, c)
-        K = (1 + self.tau * t / c) * jnp.clip(1 - t / c, 0, jnp.inf) ** self.tau
+        K = (1 + self.tau.value * t / c) * jnp.clip(
+            1 - t / c, 0, jnp.inf
+        ) ** self.tau.value
         return K.squeeze()
 
 
@@ -265,7 +284,7 @@ circular_posterior = gpx.gps.Prior(mean_function=meanf, kernel=PKern) * likeliho
 # Optimise GP's marginal log-likelihood using BFGS
 opt_posterior, history = gpx.fit_scipy(
     model=circular_posterior,
-    objective=jit(gpx.objectives.ConjugateMLL(negative=True)),
+    objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     train_data=D,
 )
 

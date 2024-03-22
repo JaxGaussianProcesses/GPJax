@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # Introduction to Kernels
 
@@ -10,6 +27,7 @@ from jax import config
 
 config.update("jax_enable_x64", True)
 
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import install_import_hook, Float
@@ -213,6 +231,8 @@ test_y = forrester(test_x)
 # First we define our model, using the Matérn52 kernel, and construct our posterior *without* optimising the kernel hyperparameters:
 
 # %%
+from gpjax.parameters import PositiveReal
+
 mean = gpx.mean_functions.Zero()
 kernel = gpx.kernels.Matern52(
     lengthscale=jnp.array(0.1)
@@ -221,9 +241,8 @@ kernel = gpx.kernels.Matern52(
 prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 
 likelihood = gpx.likelihoods.Gaussian(
-    num_datapoints=D.n, obs_stddev=jnp.array(1e-3)
+    num_datapoints=D.n, obs_stddev=PositiveReal(value=jnp.array(1e-3), tag="Static")
 )  # Our function is noise-free, so we set the observation noise's standard deviation to a very small value
-likelihood = likelihood.replace_trainable(obs_stddev=False)
 
 no_opt_posterior = prior * likelihood
 
@@ -231,14 +250,13 @@ no_opt_posterior = prior * likelihood
 # We can then optimise the hyperparameters by minimising the negative log marginal likelihood of the data:
 
 # %%
-negative_mll = gpx.objectives.ConjugateMLL(negative=True)
-negative_mll(no_opt_posterior, train_data=D)
+gpx.objectives.conjugate_mll(no_opt_posterior, data=D)
 
 
 # %%
 opt_posterior, history = gpx.fit_scipy(
     model=no_opt_posterior,
-    objective=negative_mll,
+    objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     train_data=D,
 )
 
@@ -499,17 +517,20 @@ likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
 
 posterior = prior * likelihood
 
+
 # %% [markdown]
 # With our model constructed, let's now fit it to the data, by minimising the negative log
 # marginal likelihood of the data:
 
+
 # %%
-negative_mll = gpx.objectives.ConjugateMLL(negative=True)
-negative_mll(posterior, train_data=D)
+def loss(posterior, data):
+    return -gpx.objectives.conjugate_mll(posterior, data)
+
 
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=negative_mll,
+    objective=loss,
     train_data=D,
     optim=ox.adamw(learning_rate=1e-2),
     num_iters=500,
