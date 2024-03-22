@@ -145,6 +145,9 @@ class Gaussian(AbstractLikelihood):
             num_datapoints (int): the number of data points.
             obs_stddev (Union[ScalarFloat, Float[Array, "#N"]]): the standard deviation
                 of the Gaussian observation noise.
+            integrator: The integrator to be used for computing expected log
+                likelihoods. Must be an instance of `AbstractIntegrator`. For the Gaussian likelihood, this defaults to
+                the `AnalyticalGaussianIntegrator`, as the expected log likelihood can be computed analytically.
         """
         if isinstance(obs_stddev, Parameter):
             self.obs_stddev = obs_stddev
