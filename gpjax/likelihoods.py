@@ -137,6 +137,7 @@ class Gaussian(AbstractLikelihood):
         self,
         num_datapoints: int,
         obs_stddev: tp.Union[ScalarFloat, Float[Array, "#N"], PositiveReal] = 1.0,
+        integrator: AbstractIntegrator = AnalyticalGaussianIntegrator(),
     ):
         r"""Initializes the Gaussian likelihood.
 
@@ -150,7 +151,7 @@ class Gaussian(AbstractLikelihood):
         else:
             self.obs_stddev = PositiveReal(jnp.asarray(obs_stddev))
 
-        super().__init__(num_datapoints, AnalyticalGaussianIntegrator())
+        super().__init__(num_datapoints, integrator)
 
     def link_function(self, f: Float[Array, "..."]) -> tfd.Normal:
         r"""The link function of the Gaussian likelihood.
