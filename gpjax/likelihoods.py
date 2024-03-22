@@ -55,8 +55,8 @@ class AbstractLikelihood(nnx.Module):
         """Initializes the likelihood.
 
         Args:
-            num_datapoints: the number of data points.
-            integrator: The integrator to be used for computing expected log
+            num_datapoints (int): the number of data points.
+            integrator (AbstractIntegrator): The integrator to be used for computing expected log
                 likelihoods. Must be an instance of `AbstractIntegrator`.
         """
         self.num_datapoints = num_datapoints
@@ -145,7 +145,7 @@ class Gaussian(AbstractLikelihood):
             num_datapoints (int): the number of data points.
             obs_stddev (Union[ScalarFloat, Float[Array, "#N"]]): the standard deviation
                 of the Gaussian observation noise.
-            integrator: The integrator to be used for computing expected log
+            integrator (AbstractIntegrator): The integrator to be used for computing expected log
                 likelihoods. Must be an instance of `AbstractIntegrator`. For the Gaussian likelihood, this defaults to
                 the `AnalyticalGaussianIntegrator`, as the expected log likelihood can be computed analytically.
         """
