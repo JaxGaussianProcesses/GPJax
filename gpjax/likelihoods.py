@@ -55,8 +55,8 @@ class AbstractLikelihood(nnx.Module):
         """Initializes the likelihood.
 
         Args:
-            num_datapoints: the number of data points.
-            integrator: The integrator to be used for computing expected log
+            num_datapoints (int): the number of data points.
+            integrator (AbstractIntegrator): The integrator to be used for computing expected log
                 likelihoods. Must be an instance of `AbstractIntegrator`.
         """
         self.num_datapoints = num_datapoints
@@ -137,6 +137,7 @@ class Gaussian(AbstractLikelihood):
         self,
         num_datapoints: int,
         obs_stddev: tp.Union[ScalarFloat, Float[Array, "#N"], PositiveReal] = 1.0,
+        integrator: AbstractIntegrator = AnalyticalGaussianIntegrator(),
     ):
         r"""Initializes the Gaussian likelihood.
 
@@ -144,13 +145,16 @@ class Gaussian(AbstractLikelihood):
             num_datapoints (int): the number of data points.
             obs_stddev (Union[ScalarFloat, Float[Array, "#N"]]): the standard deviation
                 of the Gaussian observation noise.
+            integrator (AbstractIntegrator): The integrator to be used for computing expected log
+                likelihoods. Must be an instance of `AbstractIntegrator`. For the Gaussian likelihood, this defaults to
+                the `AnalyticalGaussianIntegrator`, as the expected log likelihood can be computed analytically.
         """
         if isinstance(obs_stddev, Parameter):
             self.obs_stddev = obs_stddev
         else:
             self.obs_stddev = PositiveReal(jnp.asarray(obs_stddev))
 
-        super().__init__(num_datapoints, AnalyticalGaussianIntegrator())
+        super().__init__(num_datapoints, integrator)
 
     def link_function(self, f: Float[Array, "..."]) -> tfd.Normal:
         r"""The link function of the Gaussian likelihood.
