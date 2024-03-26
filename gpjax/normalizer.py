@@ -53,6 +53,8 @@ class Normalizer(Module):
                 train_data: gpx.Dataset,
             ) -> ScalarFloat:
                 bij = posterior.get_bijector()
-                return self.constant * (jnp.mean((0.5 * jnp.mean(jnp.square(bij(posterior.x)),0) - jnp.mean(bij.forward_log_det_jacobian(posterior.x),0))**2))
+                return self.constant * (
+                    jnp.mean((0.5 * jnp.square(bij(posterior.x))))
+                    - jnp.mean(bij.forward_log_det_jacobian(posterior.x,event_ndims=0)))
         return KL(negative=negative)
 

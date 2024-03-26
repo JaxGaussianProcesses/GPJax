@@ -19,11 +19,12 @@ from beartype.typing import (
     Union,
 )
 from jax import vmap
+from jax import custom_jvp
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
-
+import jax
 from gpjax.base import (
     Module,
     param_field,
@@ -35,6 +36,7 @@ from gpjax.integrators import (
     AnalyticalGaussianIntegrator,
     GHQuadratureIntegrator,
     TwoDimGHQuadratureIntegrator,
+    ThreeDimGHQuadratureIntegrator,
 )
 from gpjax.typing import (
     Array,
@@ -311,7 +313,7 @@ class Gamma(AbstractLikelihood):
         """
         assert jnp.shape(f)[0]==1
         #return tfd.Gamma(concentration=self.scale1, rate=jnp.exp(-f[0,:]))
-        return tfd.Gamma(concentration=jnp.exp(f[0,:]), rate=self.scale1)
+        return tfd.Gamma(concentration=jnp.exp(-f[0,:]), rate=self.scale1)
 
     def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
         r"""Evaluate the pointwise predictive distribution.
@@ -339,8 +341,79 @@ class Gamma2(AbstractLikelihood):
     def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
         assert jnp.shape(f)[0]==2
         #return tfd.Gamma(concentration=self.initial_scale*jnp.exp(f[1,:]), rate=jnp.exp(-f[0,:]))
-        return tfd.Gamma(concentration=jnp.exp(f[0,:]+f[1,:]), rate=self.initial_scale*jnp.exp(f[1,:]))
+        return tfd.Gamma(concentration=jnp.exp(-f[0,:]-f[1,:]), rate=self.initial_scale*jnp.exp(-f[1,:]))
 
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        raise NotImplementedError
+
+
+
+
+
+
+
+
+class FiddleMixture(tfd.Mixture):
+    
+
+    def log_prob(self, x): # [B, 1]
+        log_probs = jnp.log(self.cat.probs)[...,1] # [n]
+        log_gamma_probs = self.components[0].log_prob(jnp.clip(x,1e-20)) # zeros will be masked anyqay
+    
+        return _log_prob(x, log_probs, log_gamma_probs)
+        
+
+    
+@custom_jvp
+def _log_prob(x, a, b):
+    return  jnp.where(x==0,a, (1-a)*b)
+    
+@_log_prob.defjvp
+def _log_prop_jvp(primals, tangents):
+    x, a, b = primals
+    x_dot, a_dot, b_dot = tangents
+    primal_out = _log_prob(x, a, b)
+    tangent_out =  jnp.where(x==0,a_dot, b_dot*(1-a) -a_dot*b) +x_dot # NOTE THIS DOESNT WORK FOR Xdot
+    return primal_out, tangent_out
+    
+
+        
+
+@dataclass
+class BernoulliGamma(AbstractLikelihood):
+    integrator: AbstractIntegrator = static_field(TwoDimGHQuadratureIntegrator())
+    initial_scale: Union[ScalarFloat, Float[Array, "N"]] = static_field(jnp.array(1.0))
+
+    def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
+        assert jnp.shape(f)[0]==2
+        prob = inv_probit(f[0,:])
+        #gamma =  tfd.Gamma(concentration=self.initial_scale*jnp.exp(f[1,:]), rate=jnp.exp(-f[0,:]))
+        gamma = tfd.Gamma(concentration=jnp.exp(-f[1,:]), rate=self.initial_scale)
+        bernoulli_gamma = FiddleMixture(
+            cat=tfd.Categorical(probs=jnp.stack([prob, 1.-prob],-1)),
+                components=[gamma,tfd.Deterministic(jnp.zeros_like(gamma.mean()))]
+                )
+        return bernoulli_gamma
+    
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        raise NotImplementedError
+
+@dataclass
+class BernoulliGamma2(AbstractLikelihood):
+    integrator: AbstractIntegrator = static_field(ThreeDimGHQuadratureIntegrator())
+    initial_scale: Union[ScalarFloat, Float[Array, "N"]] = static_field(jnp.array(1.0))
+
+    def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
+        assert jnp.shape(f)[0]==3
+        prob = inv_probit(f[0,:])
+        #gamma =  tfd.Gamma(concentration=self.initial_scale*jnp.exp(f[1,:]), rate=jnp.exp(-f[0,:]))
+        gamma = tfd.Gamma(concentration=jnp.exp(-f[1,:]-f[2,:]), rate=self.initial_scale*jnp.exp(-f[2,:]))
+        bernoulli_gamma = FiddleMixture(
+            cat=tfd.Categorical(probs=jnp.stack([prob, 1.-prob],-1)),
+                components=[gamma,tfd.Deterministic(jnp.zeros_like(gamma.mean()))]
+                )
+        return bernoulli_gamma
+    
     def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
         raise NotImplementedError
 

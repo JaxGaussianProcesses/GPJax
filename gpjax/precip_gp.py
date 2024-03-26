@@ -91,6 +91,7 @@ class VerticalDataset(Pytree):
     standardize_with_NF: bool = False
     Y_mean: Num[Array, "1 1"] = None
     Y_std: Num[Array, "1 1"] = None
+    problem_info: ProblemInfo = None
     
 
     def __post_init__(self) -> None:
@@ -105,100 +106,69 @@ class VerticalDataset(Pytree):
         if self.standardize:
             if self.standardize_with_NF:
                 print("standardized X2d and Xstatic inputs with NF")
-                def fit_normaliser(data):
+                def fit_normaliser(data, num_transforms):
                     d = jnp.shape(data)[1]
-                    normaliser = gpx.normalizer.Normalizer(x=data, sinharcsinh_skewness=jnp.array([0.0]*d), sinharcsinh_tailweight=jnp.array([1.0]*d), standardizer_scale=jnp.array([1.0/jnp.std(data,0)]), standardizer_shift=jnp.array([-jnp.mean(data,0)]))
-                    opt_normaliser, history = gpx.fit_scipy(model = normaliser, objective = normaliser.loss_fn(negative=False), train_data = None, safe=False)
-                    return opt_normaliser.get_bijector()(data)
+                    for i in range(num_transforms):
+                        normaliser = gpx.normalizer.Normalizer(x=data, sinharcsinh_skewness=jnp.array([0.0]*d), sinharcsinh_tailweight=jnp.array([1.0]*d), standardizer_scale=jnp.array([1.0/jnp.std(data,0)]), standardizer_shift=jnp.array([-jnp.mean(data,0)]))
+                        opt_normaliser, history = gpx.fit_scipy(model = normaliser, objective = normaliser.loss_fn(negative=False), train_data = None, safe=False)
+                        data = opt_normaliser.get_bijector()(data)
+                    return data
                 
                 X2d, Xstatic = self.X2d, self.Xstatic
-                for _ in range(2):
-                    X2d = fit_normaliser(X2d)
-                    Xstatic = fit_normaliser(Xstatic)
-                    
-                print("then standardized X3d as Gaussian")
-                X3d_mean= jnp.mean(self.X3d,axis=(0,2))
-                X3d_std= jnp.std(self.X3d, axis=(0,2))
-                X3d = (self.X3d-X3d_mean[None,:,None]) / (X3d_std[None,:,None])
+                num_transforms = 1
+
+                for i in range(len(self.problem_info.names_2d)):
+                    print(f"standardizing {self.problem_info.names_2d[i]}")
+                    X2d = X2d.at[:,i:i+1].set(fit_normaliser(X2d[:,i:i+1], num_transforms))
                 
+
+                # for i in range(len(self.problem_info.names_static)):
+                #     print(f"standardizing {self.problem_info.names_static[i]}")
+                #     #if self.problem_info.names_static[i]=="Land-sea Mask"
+                #     Xstatic = Xstatic.at[:,i:i+1].set(fit_normaliser(Xstatic[:,i:i+1], num_transforms))
             else:
-                print("Standardized X2d and Xstatic with max and min")
-                lower = 0.1
-                upper = 0.999
-                X2d_min = jnp.quantile(self.X2d, lower, axis=0)
-                X2d_max = jnp.quantile(self.X2d,upper, axis=0)
-                X2d = jnp.clip(self.X2d, X2d_min, X2d_max)
-                X2d = (X2d - X2d_min) / (X2d_max - X2d_min)
-                Xstatic_min = jnp.quantile(self.Xstatic,lower, axis=0)
-                Xstatic_max = jnp.quantile(self.Xstatic,upper, axis=0)
-                Xstatic = jnp.clip(self.Xstatic, Xstatic_min, Xstatic_max)
-                Xstatic = (Xstatic - Xstatic_min) / (Xstatic_max - Xstatic_min)
-                
-                # print("robust scale of X2d and gaussian of Xstatic")
-                # X2d_median = jnp.median(self.X2d, axis=0)
-                # X2d_lower_quartile = jnp.percentile(self.X2d, 25, axis=0)
-                # X2d_upper_quartile = jnp.percentile(self.X2d, 75, axis=0)
-                # X2d = (self.X2d - X2d_median) / (X2d_upper_quartile - X2d_lower_quartile)
+                X2d = self.X2d
+                Xstatic = self.Xstatic
 
-                         
-                
-                
-                
-                print(" overall standardized X3d with max and min")
-                X3d = self.X3d
-                X3d = (self.X3d - jnp.mean(self.X3d, 0)) / jnp.std(self.X3d, 0)
-                X3d_max = jnp.max(X3d,axis=(0,2))
-                X3d_min = jnp.min(X3d, axis=(0,2))
-                X3d = (X3d-X3d_min[None,:,None]) / (X3d_max[None,:,None] - X3d_min[None,:,None])
-                # X3d_max = jnp.max(self.X3d,axis=(0))
-                # X3d_min = jnp.(self.X3d, axis=(0))
-                # X3d = (self.X3d-X3d_min[None,:,:]) / (X3d_max[None,:,:] - X3d_min[None,:,:])
-                # X3d = X3d - jnp.mean(X3d, 0)
+            print("Standardized X2d and Xstatic with max and min")
+            lower = 0.001
+            upper = 0.999
+            X2d_min = jnp.quantile(X2d, lower, axis=0)
+            X2d_max = jnp.quantile(X2d,upper, axis=0)
+            X2d = jnp.clip(X2d, X2d_min, X2d_max)
+            X2d = (X2d - X2d_min) / (X2d_max - X2d_min)
+            Xstatic_min = jnp.quantile(Xstatic,lower, axis=0)
+            Xstatic_max = jnp.quantile(Xstatic,upper, axis=0)
+            Xstatic = jnp.clip(Xstatic, Xstatic_min, Xstatic_max)
+            Xstatic = (Xstatic - Xstatic_min) / (Xstatic_max - Xstatic_min)
+            
+            # print("robust scale of X2d and gaussian of Xstatic")
+            # X2d_median = jnp.median(self.X2d, axis=0)
+            # X2d_lower_quartile = jnp.percentile(self.X2d, 25, axis=0)
+            # X2d_upper_quartile = jnp.percentile(self.X2d, 75, axis=0)
+            # X2d = (self.X2d - X2d_median) / (X2d_upper_quartile - X2d_lower_quartile)
+
+                        
             
 
-                # print("Standardized X2d and Xstatic as Gaussin")
-                # X2d_mean = jnp.mean(self.X2d, axis=0)
-                # X2d_std = jnp.std(self.X2d,axis=0)
-                # X2d = (self.X2d - X2d_mean) / (X2d_std)
-                # Xstatic_mean = jnp.mean(self.Xstatic, axis=0)
-                # Xstatic_std = jnp.std(self.Xstatic,axis=0)
-                # Xstatic = (self.Xstatic - Xstatic_mean) / (Xstatic_std)
-                
-                # # print("do nothing to 3d")
-                # # X3d = self.X3d
-                
-                # print("then standardized X3d as Gaussian")
-                # X3d = (self.X3d - jnp.mean(self.X3d, 0))
-                # X3d_mean = jnp.mean(X3d,axis=(0,2))
-                # X3d_std = jnp.std(X3d, axis=(0,2))
-                # X3d = (X3d-X3d_mean[None,:,None]) / (X3d_std[None,:,None])
-                
-                # X3d_std = jnp.std(self.X3d, axis=(0))
-                # X3d = (self.X3d-X3d_mean[None,:,:]) / (X3d_std[None,:,:])
-
-
-
-
-
-                # print(f"then standardized Y as Gaussian")
-                # self.Y_mean = jnp.mean(self.y,0)
-                # self.Y_std = jnp.sqrt(jnp.var(self.y,0))
-                # y = (self.y-self.Y_mean) / self.Y_std
+            print(" overall standardized X3d with max and min")
+            X3d = self.X3d
+            X3d = (self.X3d - jnp.mean(self.X3d, 0)) / jnp.std(self.X3d, 0)
+            X3d_max = jnp.max(X3d,axis=(0,2))
+            X3d_min = jnp.min(X3d, axis=(0,2))
+            X3d = (X3d-X3d_min[None,:,None]) / (X3d_max[None,:,None] - X3d_min[None,:,None])
+               
+               
+               
+            print(f"no Y standarisation")
+            y=self.y
+            self.Y_mean = 0.0
+            self.Y_std = 1.0
             
-                # print(f"then standardized Y with max and min")
-                # self.Y_mean = None
-                # self.Y_std = None
-                # y = (self.y - jnp.min(self.y)) / (jnp.max(self.y) - jnp.min(self.y))
-                
-                print(f"no Y standarisation")
-                y=self.y
-                self.Y_mean = 0.0
-                self.Y_std = 1.0
-                
-                self.X3d = X3d
-                self.X2d = X2d
-                self.Xstatic = Xstatic
-                self.y = y
+            self.X3d = X3d
+            self.X2d = X2d
+            self.Xstatic = Xstatic
+            self.y = y
             
 
     @property
@@ -215,24 +185,26 @@ class VerticalDataset(Pytree):
 
 
 
-    def get_subset(self, M: int, space_filling=False,use_output=False, no_3d=True):
+    def get_subset(self, M: int, space_filling=False,use_output=False, no_3d=True, smoother=None):
         if space_filling:
             if use_output:
                 if no_3d:
                     X = jnp.hstack([self.X2d, self.Xstatic, self.y])
                 else:
-                    X = jnp.hstack([jnp.mean(self.X3d,-1), self.X2d, self.Xstatic, self.y])
-                    #X = jnp.hstack([jnp.reshape(self.X3d,(jnp.shape(self.X3d)[0],-1)), self.X2d, self.Xstatic, self.y])
+                    #X = jnp.hstack([jnp.mean(self.X3d,-1), self.X2d, self.Xstatic, self.y])
+                    X = jnp.hstack([jnp.reshape(self.X3d,(jnp.shape(self.X3d)[0],-1)), self.X2d, self.Xstatic, self.y])
             else:
                 if no_3d:
                     X = jnp.hstack([self.X2d, self.Xstatic])
                 else:
-                    X = jnp.hstack([jnp.mean(self.X3d,-1), self.X2d, self.Xstatic])
+                    if smoother is not None:
+                        smoothed = smoother.smooth_X(self.X3d)
+                    X = jnp.hstack([smoothed, self.X2d, self.Xstatic])
                     #X = jnp.hstack([jnp.reshape(self.X3d,(jnp.shape(self.X3d)[0],-1)), self.X2d, self.Xstatic])
             assert X.shape[0] > M
             d = X.shape[1]
-            #kernel = gpx.kernels.SumKernel(kernels=[gpx.kernels.RBF(active_dims=[i], lengthscale=jnp.array(0.1 , dtype=jnp.float64)) for i in range(d)])
-            kernel = gpx.kernels.RBF(lengthscale=jnp.array(0.1, dtype=jnp.float64))
+            kernel = gpx.kernels.SumKernel(kernels=[gpx.kernels.RBF(active_dims=[i], lengthscale=jnp.array(0.1 , dtype=jnp.float64)) for i in range(d)])
+            #kernel = gpx.kernels.RBF(lengthscale=jnp.array(0.1, dtype=jnp.float64))
             chosen_indicies = []  # iteratively store chosen points
             N = X.shape[0]
             c = jnp.zeros((M - 1, N), dtype=jnp.float64)  # [M-1,N]
@@ -255,9 +227,11 @@ class VerticalDataset(Pytree):
                     # e = tf.squeeze(e, 0)
                 d_squared -= e**2
                 d_squared = jnp.maximum(d_squared, 1e-50)  # numerical stability
-                print(d_squared)
+                #print(d_squared)
                 chosen_indicies.append(jnp.nanargmax(d_squared))  # get next element as point with largest score
             chosen_indicies = jnp.array(chosen_indicies, dtype=int)
+            if jnp.all(d_squared==1e-50):
+                print("space filling probs didnt work")
             return VerticalDataset(X3d=self.X3d[chosen_indicies], X2d=self.X2d[chosen_indicies], Xstatic=self.Xstatic[chosen_indicies], y=self.y[chosen_indicies], standardize=False, Y_mean=self.Y_mean, Y_std=self.Y_std)
         else:
             return VerticalDataset(X3d=self.X3d[:M], X2d=self.X2d[:M], Xstatic=self.Xstatic[:M], y=self.y[:M], standardize=False, Y_mean=self.Y_mean, Y_std=self.Y_std)
@@ -919,43 +893,31 @@ class SwitchKernelNegative(gpx.kernels.AbstractKernel):
     
     
     
-def thin_model(problem_info:ProblemInfo, D_test:VerticalDataset, model:VariationalPrecipGP, target_num):
-    def test_model_without_component(D: VerticalDataset, model:VariationalPrecipGP, idx:int, return_model = False, num_samples=100):
-        list_of_list_of_base_kernels = []
-        for j in range(model.num_latents):
-            new_base_kernels = []
-            for i in range(len(model.list_of_list_of_base_kernels[j])):
-                if i != idx:
-                    new_base_kernels.append(model.list_of_list_of_base_kernels[j][i])
-                else:
-                    new_base_kernels.append(gpx.kernels.Constant(constant=jnp.array(0.0, dtype=jnp.float64), active_dims=[i]))
-            list_of_list_of_base_kernels.append(new_base_kernels)
-        new_model = model.replace(list_of_list_of_base_kernels=list_of_list_of_base_kernels)
-        if return_model:
-            return new_model 
-        test_inputs = new_model.smoother.smooth_data(D)[0]
-        mean, var = new_model.predict_indiv(test_inputs)
-        samples_f = jnp.stack([tfd.MultivariateNormalDiag(mean[i], jnp.sqrt(var[i])).sample(seed=key, sample_shape=(num_samples)) for i in range(model.num_latents)])# [S, n, N]
-        log_probs = new_model.likelihood.link_function(samples_f).log_prob(D.y.T) # [N, S]
-        return jnp.mean(log_probs)
+def init_smoother():
+    smoother_input_scale_bijector = tfb.Softplus(low=jnp.array(0.1, dtype=jnp.float64))
+    smoother_mean_bijector =  tfb.SoftClip(low=jnp.min(pressure_levels), high=jnp.max(pressure_levels))
+    smoother = VerticalSmoother(
+        jnp.array([[0.0]*num_3d_variables]), 
+        jnp.array([[1.0]*num_3d_variables]), 
+        Z_levels=pressure_levels
+        ).replace_bijector(smoother_input_scale=smoother_input_scale_bijector,smoother_mean=smoother_mean_bijector)
+    return smoother
 
 
-    thinned_model = model
-    kept_idxs = [i for i in range(len(model.list_of_list_of_base_kernels[0]))]
-    previous_best_loss = test_model_without_component(D_test, model, -1)
-    for _ in range(len(model.list_of_list_of_base_kernels[0])-target_num):
-        scores = jnp.array([test_model_without_component(D_test, thinned_model, i) for i in kept_idxs])
-        chosen_idx = jnp.argmax(scores)
-        actual_idx = kept_idxs[chosen_idx]
-        del kept_idxs[chosen_idx]
-        found_best_loss = scores[chosen_idx]
-        thinned_model = test_model_without_component(D_test, thinned_model, actual_idx, return_model=True)
-
-        print(f"removed {problem_info.names_short[actual_idx]}")
-        print(f"with a loss in performance of {previous_best_loss-found_best_loss}")
-        previous_best_loss = found_best_loss
+def init_kernels(data, linear=False):
+    lengthscale_bij = tfb.SoftClip(low=jnp.array(1e-1, dtype=jnp.float64), high=jnp.array(1e2, dtype=jnp.float64))
+    kernels = []
+    if linear:
+        kernel = gpx.kernels.Linear(active_dims=[i for i in range(len(names_short))])
+        kernels.append(kernel)
+    else:
+        lsm_idx = names_short.index("LSM")
+        for i, name in enumerate(names_short):
+            kernel = gpx.kernels.RBF(lengthscale=jnp.array([1.1]), active_dims=[i]).replace_trainable(variance=False).replace_bijector(lengthscale = lengthscale_bij)
+            # if name in ["O_sd"]:
+            #     kernel *= SwitchKernelPositive(threshold = jnp.array([problem_info.lsm_threshold]), active_dims=[lsm_idx])
+            # elif name in ["T_surface"]:
+            #     kernel *= SwitchKernelNegative(threshold = jnp.array([problem_info.lsm_threshold]), active_dims=[lsm_idx])
+            kernels.append(kernel)
+    return kernels
     
-    return thinned_model
-
-
-

@@ -123,7 +123,7 @@ class GHQuadratureIntegrator(AbstractIntegrator):
 
 @dataclass
 class TwoDimGHQuadratureIntegrator(GHQuadratureIntegrator):
-    num_points_per_dim: int = 25
+    num_points_per_dim: int = 10
     def integrate(
         self,
         fun: Callable,
@@ -153,9 +153,53 @@ class TwoDimGHQuadratureIntegrator(GHQuadratureIntegrator):
         X = jnp.transpose(X, (1,0,2)) # [N L n]
         X = X[:,:,:,None] + X[:,:,None,:] #[N L n n]
         X = jnp.reshape(X, (jnp.shape(X)[0], jnp.shape(X)[1], -1))  # [N L n*n]
-        W = gh_weights / jnp.sqrt(jnp.pi) #[n]
+        W = gh_weights / (jnp.sqrt(jnp.pi)**2) #[n]
         W = jnp.repeat(W[None,:],self.num_points_per_dim,0) * jnp.repeat(W[:, None],self.num_points_per_dim,1) #[n n]
         W = jnp.reshape(W, (1,-1)) # [1, n*n]
+        val = jnp.sum(fun(X, y)* W, axis=1)
+        return val
+
+
+@dataclass
+class ThreeDimGHQuadratureIntegrator(GHQuadratureIntegrator):
+    num_points_per_dim: int = 25
+    def integrate(
+        self,
+        fun: Callable,
+        y: Float[Array, "N 1"],
+        mean: Float[Array, "L N"],
+        variance: Float[Array, "L N"],
+        likelihood: Likelihood,
+    ) -> Float[Array, " N"]:
+        r"""Compute a quadrature integral.
+
+        Args:
+            fun (Callable): The likelihood to be integrated.
+            y (Float[Array, 'N D']): The observed response variable.
+            mean (Float[Array, 'N D']): The mean of the variational distribution.
+            variance (Float[Array, 'N D']): The variance of the variational
+                distribution.
+            likelihood (AbstractLikelihood): The likelihood function.
+
+        Returns:
+            Float[Array, 'N']: The expected log likelihood.
+        """
+        assert jnp.shape(mean)[0]==3, "This integrator only works for 2d latents"
+        assert jnp.shape(variance)[0]==3, "This integrator only works for 2d latents"
+        gh_points, gh_weights = np.polynomial.hermite.hermgauss(self.num_points_per_dim) # [n] [n]
+        sd = jnp.sqrt(variance) # [L N]
+        X = mean[:,:,None] + jnp.sqrt(2.0) * sd[:,:,None] * gh_points[None, None, :] # [L N n]
+        X = jnp.transpose(X, (1,0,2)) # [N L n]
+        X = X[:,:,:,None,None] + X[:,:,None,None,:] + X[:,:,None,:,None] #[N L n n n]
+        X = jnp.reshape(X, (jnp.shape(X)[0], jnp.shape(X)[1], -1))  # [N L n*n*n]
+        W = gh_weights / (jnp.sqrt(jnp.pi)**3) #[n]
+    
+        W = (
+            jnp.repeat(jnp.repeat(W[None,:],self.num_points_per_dim,0)[None,:,:], self.num_points_per_dim,0)
+            * jnp.repeat(jnp.repeat(W[:,None],self.num_points_per_dim,1)[None,:,:], self.num_points_per_dim,0)
+            * jnp.repeat(jnp.repeat(W[:, None],self.num_points_per_dim,1)[:,:, None], self.num_points_per_dim,-1)
+        )#[n n n]
+        W = jnp.reshape(W, (1,-1)) # [1, n*n*n]
         val = jnp.sum(fun(X, y)* W, axis=1)
         return val
 

@@ -31,7 +31,7 @@ def plot_params(problem_info:ProblemInfo, model,data,title="", print_corr=False)
             try:
                 lengthscales.append(model.list_of_list_of_base_kernels[j][i].lengthscale[0])
             except:
-                raise ValueError("model.list_of_list_of_base_kernels[j][i].lengthscale[0]")
+                lengthscales.append(0)
         lengthscales = jnp.array(lengthscales)
     
         z_to_plot = jnp.linspace(jnp.min(model.smoother.Z_levels),jnp.max(model.smoother.Z_levels),100)
@@ -44,7 +44,7 @@ def plot_params(problem_info:ProblemInfo, model,data,title="", print_corr=False)
     #smoothed = model.smoother.smooth_data(data)[0]
     # plt.figure()
     # for i in range(problem_info.num_3d_variables):
-    #     plt.hist(smoothed[i,:], label=problem_info.names_3d_short[i], alpha=0.5)
+    #     plt.hist(smoothed[i,:], label=problem_info.names_3d_short[i], alpha=0.01)
     # plt.legend()
 
 
@@ -64,7 +64,7 @@ def plot_params(problem_info:ProblemInfo, model,data,title="", print_corr=False)
 
 
 
-def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=False, use_inducing_points=False):
+def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=False, use_inducing_points=False, use_ref=False, greedy=True):
         
     
     idx_2 = []
@@ -75,17 +75,18 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
     if model.max_interaction_depth==2:
         idxs = idxs + idx_2
 
-    sobols = model.get_sobol_indicies(data, idxs,use_range=use_range, use_inducing_points=use_inducing_points)   
+    sobols = model.get_sobol_indicies(data, idxs,use_inducing_points=use_inducing_points, use_ref=use_ref, greedy=greedy)   
+    sobols_not_greedy = model.get_sobol_indicies(data, idxs,use_inducing_points=use_inducing_points, use_ref=use_ref, greedy=False)   
 
     z = model.smoother.smooth_data(data)[0]
     zmax = jnp.max(z, axis=0)
     zmin = jnp.min(z, axis=0)
 
-    sobols = sobols / jnp.sum(sobols,-1, keepdims=True) # [2,c]
+    sobols_not_greedy = sobols_not_greedy / jnp.sum(sobols_not_greedy,-1, keepdims=True) # [2,c]
 
     for j in range(model.num_latents):
         plt.figure()
-        plt.plot(sobols[j])
+        plt.plot(sobols_not_greedy[j])
         plt.title(f"Latent {j}: sobol indicies (red lines between orders)")
         plt.axvline(x=1, color="red")
         plt.axvline(x=problem_info.num_variables+1, color="red")
@@ -99,10 +100,10 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
             lsm_idx = problem_info.names_short.index("LSM")
             
             choices = [problem_info.names_short[idx] for idx in chosen_idx]
-            if list(set(["O_sd", "flux_s_land","flux_l_land"]) & set(choices)) != []:
-                x_plot = x_plot.at[:, lsm_idx].set(jr.uniform(key,shape=[x_plot.shape[0]], minval=problem_info.lsm_threshold))  
-            elif list(set(["T_surface", "flux_s_sea","flux_l_sea"]) & set(choices)) != []:
-                x_plot = x_plot.at[:, lsm_idx].set(jr.uniform(key,shape=[x_plot.shape[0]], maxval=problem_info.lsm_threshold))  
+            # if list(set(["O_sd", "flux_s_land","flux_l_land"]) & set(choices)) != []:
+            #     x_plot = x_plot.at[:, lsm_idx].set(jr.uniform(key,shape=[x_plot.shape[0]], minval=problem_info.lsm_threshold))  
+            # elif list(set(["T_surface", "flux_s_sea","flux_l_sea"]) & set(choices)) != []:
+            #     x_plot = x_plot.at[:, lsm_idx].set(jr.uniform(key,shape=[x_plot.shape[0]], maxval=problem_info.lsm_threshold))  
         
             if len(chosen_idx)==1:     
                 mean, var = model.predict_indiv(x_plot,chosen_idx)
@@ -112,23 +113,23 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
                 plt.scatter(x_plot[:,chosen_idx[0]],mean, color="blue") 
                 plt.scatter(x_plot[:,chosen_idx[0]],mean+ 1.96*std, color="red") 
                 plt.scatter(x_plot[:,chosen_idx[0]],mean- 1.96*std, color="red") 
-                plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])])
-                plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black",alpha=0.5)
-                ip = model.inducing_inputs
+                plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black",alpha=0.01)
+                ip = model.get_inducing_locations()
+                plt.xlim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]]))])
                 plt.scatter(ip[:,chosen_idx[0]],jnp.zeros_like(ip[:,chosen_idx[0]]), color="green")
-                plt.title(f"Latent {j} rank {j}: Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}with sobol index {sobols[j][idx]}")
+                plt.title(f"Latent {j} rank {j}: Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}with sobol index {sobols_not_greedy[j][idx]}")
             elif len(chosen_idx)==2:
                 mean, _ = model.predict_indiv(x_plot,chosen_idx)
                 mean = mean[j:j+1,:] * (data.Y_std)# + data.Y_mean
                 col = plt.scatter(x_plot[:,chosen_idx[0]],x_plot[:,chosen_idx[1]],c=mean)
                 #plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
                 plt.colorbar(col)
-                plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black",alpha=0.5)
-                ip = model.inducing_inputs
+                plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black",alpha=0.01)
+                ip = model.get_inducing_locations()
                 plt.scatter(ip[:,chosen_idx[0]],ip[:,chosen_idx[1]], color="green")
-                plt.title(f"Latent {j} rank {j}: Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]} with sobol index {sobols[j][idx]}")
-                plt.xlim([jnp.min(x_plot[:,chosen_idx[0]]),jnp.max(x_plot[:,chosen_idx[0]])]) 
-                plt.ylim([jnp.min(x_plot[:,chosen_idx[1]]),jnp.max(x_plot[:,chosen_idx[1]])])   
+                plt.title(f"Latent {j} rank {j}: Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]} with sobol index {sobols_not_greedy[j][idx]}")
+                plt.xlim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]]))])
+                plt.ylim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[1]],ip[:,chosen_idx[1]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[1]],ip[:,chosen_idx[1]]]))])
        
         
 
