@@ -387,8 +387,8 @@ class BernoulliGamma(AbstractLikelihood):
     def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
         assert jnp.shape(f)[0]==2
         prob = inv_probit(f[0,:])
-        #gamma =  tfd.Gamma(concentration=self.initial_scale*jnp.exp(f[1,:]), rate=jnp.exp(-f[0,:]))
-        gamma = tfd.Gamma(concentration=jnp.exp(-f[1,:]), rate=self.initial_scale)
+        gamma =  tfd.Gamma(concentration=self.initial_scale, rate=jnp.exp(-f[1,:]))
+        #gamma = tfd.Gamma(concentration=jnp.exp(-f[1,:]), rate=self.initial_scale)
         bernoulli_gamma = FiddleMixture(
             cat=tfd.Categorical(probs=jnp.stack([prob, 1.-prob],-1)),
                 components=[gamma,tfd.Deterministic(jnp.zeros_like(gamma.mean()))]
@@ -406,8 +406,8 @@ class BernoulliGamma2(AbstractLikelihood):
     def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
         assert jnp.shape(f)[0]==3
         prob = inv_probit(f[0,:])
-        #gamma =  tfd.Gamma(concentration=self.initial_scale*jnp.exp(f[1,:]), rate=jnp.exp(-f[0,:]))
-        gamma = tfd.Gamma(concentration=jnp.exp(-f[1,:]-f[2,:]), rate=self.initial_scale*jnp.exp(-f[2,:]))
+        gamma =  tfd.Gamma(concentration=self.initial_scale*jnp.exp(f[2,:]), rate=jnp.exp(-f[1,:]))
+        #gamma = tfd.Gamma(concentration=jnp.exp(-f[1,:]-f[2,:]), rate=self.initial_scale*jnp.exp(-f[2,:]))
         bernoulli_gamma = FiddleMixture(
             cat=tfd.Categorical(probs=jnp.stack([prob, 1.-prob],-1)),
                 components=[gamma,tfd.Deterministic(jnp.zeros_like(gamma.mean()))]

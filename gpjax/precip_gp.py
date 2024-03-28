@@ -203,8 +203,8 @@ class VerticalDataset(Pytree):
                     #X = jnp.hstack([jnp.reshape(self.X3d,(jnp.shape(self.X3d)[0],-1)), self.X2d, self.Xstatic])
             assert X.shape[0] > M
             d = X.shape[1]
-            kernel = gpx.kernels.SumKernel(kernels=[gpx.kernels.RBF(active_dims=[i], lengthscale=jnp.array(0.1 , dtype=jnp.float64)) for i in range(d)])
-            #kernel = gpx.kernels.RBF(lengthscale=jnp.array(0.1, dtype=jnp.float64))
+            #kernel = gpx.kernels.SumKernel(kernels=[gpx.kernels.RBF(active_dims=[i], lengthscale=jnp.array(1.0 , dtype=jnp.float64)) for i in range(d)])
+            kernel = gpx.kernels.RBF(lengthscale=jnp.array(0.1, dtype=jnp.float64))
             chosen_indicies = []  # iteratively store chosen points
             N = X.shape[0]
             c = jnp.zeros((M - 1, N), dtype=jnp.float64)  # [M-1,N]
@@ -218,20 +218,21 @@ class VerticalDataset(Pytree):
 
                 L = kernel.cross_covariance(X, newest_point[None, :])[:, 0]  # [N]
                 if m == 0:
-                    e = L / d_temp
+                    e = L / (d_temp+1e-3)
                     c = e[None,:]  # [1,N]
                 else:
                     c_temp = c[:, ix : ix + 1]  # [m,1]
-                    e = (L - jnp.matmul(jnp.transpose(c_temp), c[:m])) / d_temp  # [N]
+                    e = (L - jnp.matmul(jnp.transpose(c_temp), c[:m])) / (d_temp+1e-3)  # [N]
                     c = jnp.concatenate([c, e], axis=0)  # [m+1, N]
                     # e = tf.squeeze(e, 0)
                 d_squared -= e**2
                 d_squared = jnp.maximum(d_squared, 1e-50)  # numerical stability
                 #print(d_squared)
-                chosen_indicies.append(jnp.nanargmax(d_squared))  # get next element as point with largest score
+                chosen_indicies.append(jnp.argmax(d_squared))  # get next element as point with largest score
             chosen_indicies = jnp.array(chosen_indicies, dtype=int)
             if jnp.all(d_squared==1e-50):
                 print("space filling probs didnt work")
+            print(d_squared)
             return VerticalDataset(X3d=self.X3d[chosen_indicies], X2d=self.X2d[chosen_indicies], Xstatic=self.Xstatic[chosen_indicies], y=self.y[chosen_indicies], standardize=False, Y_mean=self.Y_mean, Y_std=self.Y_std)
         else:
             return VerticalDataset(X3d=self.X3d[:M], X2d=self.X2d[:M], Xstatic=self.Xstatic[:M], y=self.y[:M], standardize=False, Y_mean=self.Y_mean, Y_std=self.Y_std)

@@ -123,7 +123,7 @@ class GHQuadratureIntegrator(AbstractIntegrator):
 
 @dataclass
 class TwoDimGHQuadratureIntegrator(GHQuadratureIntegrator):
-    num_points_per_dim: int = 10
+    num_points_per_dim: int = 25
     def integrate(
         self,
         fun: Callable,
@@ -162,7 +162,7 @@ class TwoDimGHQuadratureIntegrator(GHQuadratureIntegrator):
 
 @dataclass
 class ThreeDimGHQuadratureIntegrator(GHQuadratureIntegrator):
-    num_points_per_dim: int = 25
+    num_points_per_dim: int = 10
     def integrate(
         self,
         fun: Callable,
