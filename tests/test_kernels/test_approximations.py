@@ -1,6 +1,9 @@
 from typing import Tuple
 
-from cola.ops import Dense
+from cola.ops import (
+    Dense,
+    Diagonal,
+)
 import jax
 from jax import config
 import jax.numpy as jnp
@@ -61,6 +64,32 @@ def test_gram(kernel: AbstractKernel, num_basis_fns: int, n_dims: int, n_data: i
     # Check that the Gram matrix is PSD
     evals, _ = jnp.linalg.eigh(Kxx)
     assert jnp.all(evals > 0)
+
+
+@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
+@pytest.mark.parametrize("num_basis_fns", [2, 10, 20])
+@pytest.mark.parametrize("n_dims", [1, 2, 5])
+@pytest.mark.parametrize("n_data", [50, 100])
+def test_diagonal(kernel: AbstractKernel, num_basis_fns: int, n_dims: int, n_data: int):
+    key = jr.key(123)
+    x = jr.uniform(key, shape=(n_data, 1), minval=-3.0, maxval=3.0).reshape(-1, 1)
+    if n_dims > 1:
+        x = jnp.hstack([x] * n_dims)
+    base_kernel = kernel(active_dims=list(range(n_dims)))
+    approximate = RFF(base_kernel=base_kernel, num_basis_fns=num_basis_fns)
+
+    linop = approximate.diagonal(x)
+
+    # Check the return type
+    assert isinstance(linop, Diagonal)
+
+    Kxx = linop.diag + _jitter
+
+    # Check that the shape is correct
+    assert Kxx.shape == (n_data,)
+
+    # Check that the diagonal is positive
+    assert jnp.all(Kxx > 0)
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])

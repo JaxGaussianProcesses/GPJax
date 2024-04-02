@@ -17,7 +17,10 @@
 from dataclasses import is_dataclass
 from itertools import product
 
-from cola.ops import LinearOperator
+from cola.ops import (
+    Diagonal,
+    LinearOperator,
+)
 import jax
 from jax import config
 import jax.numpy as jnp
@@ -132,6 +135,21 @@ class BaseTestKernel:
         assert isinstance(Kxx, LinearOperator)
         assert Kxx.shape == (n, n)
         assert jnp.all(jnp.linalg.eigvalsh(Kxx.to_dense() + jnp.eye(n) * 1e-6) > 0.0)
+
+    @pytest.mark.parametrize("n", [1, 2, 5], ids=lambda x: f"n={x}")
+    @pytest.mark.parametrize("dim", [1, 3], ids=lambda x: f"dim={x}")
+    def test_diagonal(self, dim: int, n: int) -> None:
+        # Initialise kernel
+        kernel: AbstractKernel = self.kernel()
+
+        # Inputs
+        x = jnp.linspace(0.0, 1.0, n * dim).reshape(n, dim)
+
+        # Test diagonal
+        Kxx = kernel.diagonal(x)
+        assert isinstance(Kxx, Diagonal)
+        assert Kxx.shape == (n, n)
+        assert jnp.all(Kxx.diag + 1e-6 > 0.0)
 
     @pytest.mark.parametrize("n_a", [1, 2, 5], ids=lambda x: f"n_a={x}")
     @pytest.mark.parametrize("n_b", [1, 2, 5], ids=lambda x: f"n_b={x}")
