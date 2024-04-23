@@ -377,18 +377,63 @@ def _log_prop_jvp(primals, tangents):
     return primal_out, tangent_out
     
 
+
+
+
+@dataclass
+class Bernoulli(AbstractLikelihood):
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
+        r"""The probit link function of the Bernoulli likelihood.
+
+        Args:
+            f (Float[Array, "..."]): Function values.
+
+        Returns
+        -------
+            tfd.Distribution: The likelihood function.
+        """
+        probs = inv_probit(f)
+        #probs = jnp.clip(f,1e-5,1.0-1e-5)
+        return tfd.Bernoulli(probs=probs)
+
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        r"""Evaluate the pointwise predictive distribution.
+
+        Evaluate the pointwise predictive distribution, given a Gaussian
+        process posterior and likelihood parameters.
+
+        Args:
+            dist (tfd.Distribution): The Gaussian process posterior, evaluated
+                at a finite set of test points.
+
+        Returns
+        -------
+            tfd.Distribution: The pointwise predictive distribution.
+        """
+        variance = jnp.diag(dist.covariance())
+        mean = dist.mean().ravel()
+        return self.link_function(mean / jnp.sqrt(1.0 + variance))
+
+
+
+
         
 
 @dataclass
 class BernoulliGamma(AbstractLikelihood):
     integrator: AbstractIntegrator = static_field(TwoDimGHQuadratureIntegrator())
     initial_scale: Union[ScalarFloat, Float[Array, "N"]] = static_field(jnp.array(1.0))
+    initial_scale_2: Union[ScalarFloat, Float[Array, "N"]] = static_field(jnp.array(1.0))
 
     def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
         assert jnp.shape(f)[0]==2
         prob = inv_probit(f[0,:])
-        gamma =  tfd.Gamma(concentration=self.initial_scale, rate=jnp.exp(-f[1,:]))
-        #gamma = tfd.Gamma(concentration=jnp.exp(-f[1,:]), rate=self.initial_scale)
+        # f_1 =
+        # prob = jnp.clip(f[0,:],1e-5,1.0-1e-5)
+        # f_1 = jnp.clip(f[1,:],1e-5)
+
+        #gamma =  tfd.Gamma(concentration=self.initial_scale, rate=self.initial_scale_2 * f_1)
+        gamma = tfd.Gamma(concentration=jnp.exp(-f[1,:]), rate=self.initial_scale)
         bernoulli_gamma = FiddleMixture(
             cat=tfd.Categorical(probs=jnp.stack([prob, 1.-prob],-1)),
                 components=[gamma,tfd.Deterministic(jnp.zeros_like(gamma.mean()))]
@@ -402,12 +447,21 @@ class BernoulliGamma(AbstractLikelihood):
 class BernoulliGamma2(AbstractLikelihood):
     integrator: AbstractIntegrator = static_field(ThreeDimGHQuadratureIntegrator())
     initial_scale: Union[ScalarFloat, Float[Array, "N"]] = static_field(jnp.array(1.0))
+    initial_scale_2: Union[ScalarFloat, Float[Array, "N"]] = static_field(jnp.array(1.0))
+    
 
     def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
         assert jnp.shape(f)[0]==3
         prob = inv_probit(f[0,:])
-        gamma =  tfd.Gamma(concentration=self.initial_scale*jnp.exp(f[2,:]), rate=jnp.exp(-f[1,:]))
-        #gamma = tfd.Gamma(concentration=jnp.exp(-f[1,:]-f[2,:]), rate=self.initial_scale*jnp.exp(-f[2,:]))
+        # f_1 = jnp.exp(-f[1,:])
+        # f_2 = jnp.exp(f[2,:])
+        
+        # prob = jnp.clip(f[0,:],1e-5,1.0-1e-5)
+        # f_1 = jnp.clip(f[1,:],1e-5)
+        # f_2 = jnp.clip(f[2,:],1e-5)
+        
+        #gamma =  tfd.Gamma(concentration=self.initial_scale*f_2, rate=self.initial_scale_2 * f_1)
+        gamma = tfd.Gamma(concentration=jnp.exp(-f[1,:]-f[2,:]), rate=self.initial_scale*jnp.exp(-f[2,:]))
         bernoulli_gamma = FiddleMixture(
             cat=tfd.Categorical(probs=jnp.stack([prob, 1.-prob],-1)),
                 components=[gamma,tfd.Deterministic(jnp.zeros_like(gamma.mean()))]

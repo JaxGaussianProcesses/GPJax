@@ -29,7 +29,8 @@ import jax
 from dataclasses import dataclass
 import jax.numpy as jnp
 import jax.random as jr
-
+from sklearn.mixture import GaussianMixture
+from matplotlib import pyplot as plt
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 #with install_import_hook("gpjax", "beartype.beartype"):
@@ -275,6 +276,44 @@ class VerticalSmoother(Module):
         #x3d_smooth = (x3d_smooth - jnp.min(x3d_smooth, axis=0)) / (jnp.max(x3d_smooth, axis=0) - jnp.min(x3d_smooth, axis=0))
         #x3d_smooth = (x3d_smooth - jnp.mean(x3d_smooth, axis=0)) / jnp.sqrt(jnp.var(x3d_smooth, axis=0)+ self.eps)
         return x3d_smooth        
+
+
+
+
+
+# @dataclass
+# class Measure(Pytree):
+#     D: VerticalDataset
+#     max_num_components: int = static_field(10)
+#     max_interaction_order: int = static_field(1)
+#     plotting: bool = static_field(False)
+    
+#     def __post__init(self):
+#         assert self.max_interaction_order == 1
+        
+        
+
+    
+
+#     def _fit_gmm(self, data: Num[Array, "N 1"]) -> Num[Array, "c 2"]:
+#         scores=[]
+#         gms = []
+#         for i in range(1,self.max_num_components):
+#             gm = GaussianMixture(n_components=i, random_state=0).fit(data)
+#             scores.append(gm.aic(data))
+#             gms.append(gm)
+#             if i>2 and (scores[-2] -scores[-1])<0.1*(scores[-3] - scores[-2]):
+#                 scores = scores[:-1]
+#                 break
+#         chosen = scores.index(min(scores))
+#         if self.plotting:
+#             plt.figure()
+#             plt.hist(data[:,0], density=True, bins=50)
+#             x_plot = jnp.linspace(0,1,100)[:,None]
+#             plt.plot(x_plot,jnp.exp(gms[chosen].score_samples(x_plot)))
+#             plt.title(f"{chosen+1} components")
+#             plt.ylim(0,1)
+#         return jnp.stack([gms[chosen].means_[:,0],gms[chosen].covariances_[:,0,0]], -1)
 
 
 
@@ -691,7 +730,7 @@ class VariationalPrecipGP(AbstractVariationalPrecipGP):
         
         sqrt = cola.ops.Triangular(sqrt)
         # S = LLᵀ
-        S = sqrt @ sqrt.T + jnp.eye(self.num_inducing) * self.jitter
+        S = sqrt @ sqrt.T #+ jnp.eye(self.num_inducing) * self.jitter
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
 
         if self.parameterisation == "white":

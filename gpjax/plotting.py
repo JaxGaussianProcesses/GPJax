@@ -31,7 +31,7 @@ def plot_params(problem_info:ProblemInfo, model,data,title="", print_corr=False)
             try:
                 lengthscales.append(model.list_of_list_of_base_kernels[j][i].lengthscale[0])
             except:
-                lengthscales.append(0)
+                lengthscales.append(model.list_of_kernels[j].lengthscale[i])
         lengthscales = jnp.array(lengthscales)
     
         z_to_plot = jnp.linspace(jnp.min(model.smoother.Z_levels),jnp.max(model.smoother.Z_levels),100)
