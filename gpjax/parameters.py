@@ -7,11 +7,14 @@ from jax.typing import ArrayLike
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 T = tp.TypeVar("T", bound=tp.Union[ArrayLike, list[float]])
+ParameterTag = tp.Union[
+    str, tp.Literal["positive", "real", "sigmoid", "lower_triangular", "static"]
+]
 
 
 def transform(
     params: nnx.State,
-    params_bijection: tp.Dict[tp.Type, tfb.Bijector],
+    params_bijection: tp.Dict[str, tfb.Bijector],
     inverse: bool = False,
 ) -> nnx.State:
     r"""Transforms parameters using a bijector.
@@ -46,7 +49,7 @@ def transform(
     """
 
     def _inner(param: Parameter):
-        bijector = params_bijection.get(type(param), tfb.Identity())
+        bijector = params_bijection.get(param._tag, tfb.Identity())
 
         if inverse:
             transformed_value = bijector.inverse(param.value)
@@ -71,17 +74,18 @@ class Parameter(nnx.Variable[T]):
 
     """
 
-    def __init__(self, value: T, **kwargs):
+    def __init__(self, value: T, tag: ParameterTag, **kwargs):
         _check_is_arraylike(value)
 
         super().__init__(value=jnp.asarray(value), **kwargs)
+        self._tag = tag
 
 
 class PositiveReal(Parameter[T]):
     """Parameter that is strictly positive."""
 
-    def __init__(self, value: T, **kwargs):
-        super().__init__(value=value, **kwargs)
+    def __init__(self, value: T, tag: ParameterTag = "positive", **kwargs):
+        super().__init__(value=value, tag=tag, **kwargs)
 
         _check_is_positive(self.value)
 
@@ -89,12 +93,15 @@ class PositiveReal(Parameter[T]):
 class Real(Parameter[T]):
     """Parameter that can take any real value."""
 
+    def __init__(self, value: T, tag: ParameterTag = "real", **kwargs):
+        super().__init__(value, tag, **kwargs)
+
 
 class SigmoidBounded(Parameter[T]):
     """Parameter that is bounded between 0 and 1."""
 
-    def __init__(self, value: T, **kwargs):
-        super().__init__(value=value, **kwargs)
+    def __init__(self, value: T, tag: ParameterTag = "sigmoid", **kwargs):
+        super().__init__(value=value, tag=tag, **kwargs)
 
         _check_in_bounds(self.value, 0.0, 1.0)
 
@@ -102,27 +109,28 @@ class SigmoidBounded(Parameter[T]):
 class Static(nnx.Variable[T]):
     """Static parameter that is not trainable."""
 
-    def __init__(self, value: T, **kwargs):
+    def __init__(self, value: T, tag: ParameterTag = "static", **kwargs):
         _check_is_arraylike(value)
 
-        super().__init__(value=jnp.asarray(value), **kwargs)
+        super().__init__(value=jnp.asarray(value), tag=tag, **kwargs)
+        self._tag = tag
 
 
 class LowerTriangular(Parameter[T]):
     """Parameter that is a lower triangular matrix."""
 
-    def __init__(self, value: T, **kwargs):
-        super().__init__(value=value, **kwargs)
+    def __init__(self, value: T, tag: ParameterTag = "lower_triangular", **kwargs):
+        super().__init__(value=value, tag=tag, **kwargs)
 
         _check_is_square(self.value)
         _check_is_lower_triangular(self.value)
 
 
 DEFAULT_BIJECTION = {
-    PositiveReal: tfb.Softplus(),
-    Real: tfb.Identity(),
-    SigmoidBounded: tfb.Sigmoid(low=0.0, high=1.0),
-    LowerTriangular: tfb.FillTriangular(),
+    "positive": tfb.Softplus(),
+    "real": tfb.Identity(),
+    "sigmoid": tfb.Sigmoid(low=0.0, high=1.0),
+    "lower_triangular": tfb.FillTriangular(),
 }
 
 
@@ -159,26 +167,3 @@ def _check_in_bounds(value: T, low: float, high: float):
         raise ValueError(
             f"Expected parameter value to be bounded between {low} and {high}. Got {value}."
         )
-
-
-# class TransformedParameter(Parameter[T]):
-#     """Parameter that is transformed using a bijector."""
-
-#     bj = tfb.Bijector
-
-#     def create_value(self, value: T):
-#         return self.bj.inverse(value)
-
-#     def get_value(self) -> T:
-#         return self.bj.forward(self.value)
-
-#     def set_value(self, value: T):
-#         return self.replace(value=self.bj.forward(value))
-
-
-# class SigmoidBounded(TransformedParameter[T]):
-#     bj = tfb.Sigmoid(low=0.0, high=1.0)
-
-
-# class SoftplusPositive(TransformedParameter[T]):
-#     bj = tfb.Softplus()
