@@ -1,7 +1,6 @@
 from flax.experimental import nnx
 import jax.numpy as jnp
 import pytest
-
 from gpjax.parameters import (
     DEFAULT_BIJECTION,
     LowerTriangular,
@@ -11,6 +10,10 @@ from gpjax.parameters import (
     SigmoidBounded,
     Static,
     transform,
+    Real,
+    SigmoidBounded,
+    Static,
+    LowerTriangular,
 )
 
 

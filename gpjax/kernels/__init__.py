@@ -46,6 +46,7 @@ from gpjax.kernels.stationary import (
     RationalQuadratic,
     White,
 )
+from gpjax.kernels import stationary
 
 __all__ = [
     "AbstractKernel",
