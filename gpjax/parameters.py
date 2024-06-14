@@ -18,23 +18,25 @@ def transform(
     r"""Transforms parameters using a bijector.
 
     Example:
+    ```pycon
         >>> from gpjax.parameters import PositiveReal, transform
         >>> import jax.numpy as jnp
         >>> import tensorflow_probability.substrates.jax.bijectors as tfb
         >>> from flax.experimental import nnx
         >>> params = nnx.State(
-        ...     {
-        ...         "a": PositiveReal(jnp.array([1.0])),
-        ...         "b": PositiveReal(jnp.array([2.0])),
-        ...     }
-        ... )
+        >>>     {
+        >>>         "a": PositiveReal(jnp.array([1.0])),
+        >>>         "b": PositiveReal(jnp.array([2.0])),
+        >>>     }
+        >>> )
         >>> params_bijection = {'positive': tfb.Softplus()}
         >>> transformed_params = transform(params, params_bijection)
         >>> transformed_params["a"]
-        PositiveReal(
-            raw_value=Array([1.3132617],
-            dtype=float32)
-        )
+         PositiveReal(
+            raw_value=Array([1.3132617], dtype=float32),
+            _tag='positive'
+          )
+    ```
 
 
     Args:
