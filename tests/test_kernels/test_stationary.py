@@ -35,7 +35,6 @@ from gpjax.kernels.stationary import (
 )
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.parameters import (
-    Parameter,
     PositiveReal,
     Static,
 )
@@ -104,12 +103,12 @@ def test_init_override_paramtype(kernel_request):
     for param, value in params.items():
         new_params[param] = Static(value)
 
-    kwargs = {**new_params, "variance": Parameter(variance)}
+    kwargs = {**new_params, "variance": PositiveReal(variance)}
     if kernel != White:
-        kwargs["lengthscale"] = Parameter(lengthscale)
+        kwargs["lengthscale"] = PositiveReal(lengthscale)
 
     k = kernel(**kwargs)
-    assert isinstance(k.variance, Parameter)
+    assert isinstance(k.variance, PositiveReal)
 
     for param in params.keys():
         assert isinstance(getattr(k, param), Static)

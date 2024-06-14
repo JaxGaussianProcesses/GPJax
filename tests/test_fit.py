@@ -45,7 +45,7 @@ from gpjax.objectives import (
     elbo,
 )
 from gpjax.parameters import (
-    Parameter,
+    PositiveReal,
     Static,
 )
 from gpjax.typing import Array
@@ -62,7 +62,7 @@ def test_fit_simple() -> None:
 
     class LinearModel(nnx.Module):
         def __init__(self, weight: float, bias: float):
-            self.weight = Parameter(weight)
+            self.weight = PositiveReal(weight)
             self.bias = Static(bias)
 
         def __call__(self, x):
@@ -107,7 +107,7 @@ def test_fit_scipy_simple():
     # Define linear model:
     class LinearModel(nnx.Module):
         def __init__(self, weight: float, bias: float):
-            self.weight = Parameter(weight)
+            self.weight = PositiveReal(weight)
             self.bias = Static(bias)
 
         def __call__(self, x):
