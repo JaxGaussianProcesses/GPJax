@@ -31,7 +31,6 @@ from gpjax.kernels.nonstationary import (
     Polynomial,
 )
 from gpjax.parameters import (
-    Parameter,
     PositiveReal,
     Static,
 )
@@ -94,8 +93,8 @@ def test_init_override_paramtype(kernel_request):
             continue
         new_params[param] = Static(value)
 
-    k = kernel(**new_params, variance=Parameter(variance))
-    assert isinstance(k.variance, Parameter)
+    k = kernel(**new_params, variance=PositiveReal(variance))
+    assert isinstance(k.variance, PositiveReal)
 
     for param in params.keys():
         if param in ("degree", "order"):
