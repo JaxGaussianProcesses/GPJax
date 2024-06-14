@@ -39,7 +39,7 @@ jobs:
       # Install the dependencies
       - name: Install Package
         run: |
-          poetry install --all-extras --with docs
+          poetry install --with docs
 
       # Run the unit tests and build the coverage report
       - name: Run Integration Tests
