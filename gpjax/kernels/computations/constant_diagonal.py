@@ -19,6 +19,7 @@ from cola.annotations import PSD
 from cola.ops.operators import (
     Diagonal,
     Identity,
+    Product,
 )
 from jax import vmap
 import jax.numpy as jnp
@@ -29,12 +30,13 @@ from gpjax.kernels.computations import AbstractKernelComputation
 from gpjax.typing import Array
 
 K = tp.TypeVar("K", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
+ConstantDiagonalType = Product
 
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):
     r"""Computation engine for constant diagonal kernels."""
 
-    def _gram(self, kernel: K, x: Float[Array, "N D"]) -> Diagonal:
+    def gram(self, kernel: K, x: Float[Array, "N D"]) -> Product:
         value = kernel(x[0], x[0])
         dtype = value.dtype
         shape = (x.shape[0], x.shape[0])
