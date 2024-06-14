@@ -26,6 +26,7 @@ tqdm = "^4.66.2"
 tensorflow-probability = "^0.20.0"
 beartype = "^0.16.1"
 cola-ml = "0.0.5"
+jaxopt = "^0.8.3"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.0"

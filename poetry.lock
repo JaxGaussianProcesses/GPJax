@@ -1210,6 +1210,23 @@ numpy = ">=1.22"
 scipy = ">=1.9"
 
 [[package]]
+name = "jaxopt"
+version = "0.8.3"
+description = "Hardware accelerated, batchable and differentiable optimizers in JAX."
+optional = false
+python-versions = "*"
+files = [
+    {file = "jaxopt-0.8.3-py3-none-any.whl", hash = "sha256:4be2f82798393682529c9ca5046e5397ac6c8657b8acb6bf275e773b28df15b6"},
+    {file = "jaxopt-0.8.3.tar.gz", hash = "sha256:4b06dfa6f915a4f3291699606245af6069371a48dc5c92d4c507840d62990646"},
+]
+
+[package.dependencies]
+jax = ">=0.2.18"
+jaxlib = ">=0.1.69"
+numpy = ">=1.18.4"
+scipy = ">=1.0.0"
+
+[[package]]
 name = "jaxtyping"
 version = "0.2.31"
 description = "Type annotations and runtime checking for shape and dtype of JAX arrays, and PyTrees."
@@ -3478,4 +3495,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "ae66b9965fd2c0f2e7a82dd7b7bd653bb178d8e837eda500b06787abd424f021"
+content-hash = "741f441298513caee277c4223335d3917fd6aaebc539a55f580cad64db505230"
