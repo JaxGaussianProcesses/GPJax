@@ -28,7 +28,7 @@ def transform(
         ...         "b": PositiveReal(jnp.array([2.0])),
         ...     }
         ... )
-        >>> params_bijection = {PositiveReal: tfb.Softplus()}
+        >>> params_bijection = {'positive': tfb.Softplus()}
         >>> transformed_params = transform(params, params_bijection)
         >>> transformed_params["a"]
         PositiveReal(
