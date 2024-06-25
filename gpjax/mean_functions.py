@@ -18,7 +18,7 @@ import abc
 import functools as ft
 
 import beartype.typing as tp
-from flax.experimental import nnx
+from flax import nnx
 import jax.numpy as jnp
 from jaxtyping import (
     Float,

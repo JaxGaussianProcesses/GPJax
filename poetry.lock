@@ -973,36 +973,32 @@ typing = ["typing-extensions (>=4.8)"]
 
 [[package]]
 name = "flax"
-version = "0.8.2"
+version = "0.8.4"
 description = "Flax: A neural network library for JAX designed for flexibility"
 optional = false
 python-versions = ">=3.9"
-files = []
-develop = false
+files = [
+    {file = "flax-0.8.4-py3-none-any.whl", hash = "sha256:785707e3a48f782a1bec17aa665697b7618c113a357d5f975791dcb090d818d8"},
+    {file = "flax-0.8.4.tar.gz", hash = "sha256:968683f850198e1aa5eb2d9d1e20bead880ef7423c14f042db9d60848cb1c90b"},
+]
 
 [package.dependencies]
 jax = ">=0.4.19"
 msgpack = "*"
 numpy = [
-    {version = ">=1.22", markers = "python_version < \"3.11\""},
     {version = ">=1.23.2", markers = "python_version >= \"3.11\""},
+    {version = ">=1.22", markers = "python_version < \"3.11\""},
 ]
 optax = "*"
 orbax-checkpoint = "*"
 PyYAML = ">=5.4.1"
 rich = ">=11.1"
 tensorstore = "*"
-typing_extensions = ">=4.2"
+typing-extensions = ">=4.2"
 
 [package.extras]
 all = ["matplotlib"]
-testing = ["black[jupyter] (==23.7.0)", "clu", "clu (<=0.0.9)", "einops", "gymnasium[accept-rom-license,atari]", "jaxlib", "jraph (>=0.0.6dev0)", "ml-collections", "mypy", "nbstripout", "opencv-python", "pytest", "pytest-cov", "pytest-custom_exit_code", "pytest-xdist", "pytype", "sentencepiece", "tensorflow", "tensorflow_datasets", "tensorflow_text (>=2.11.0)", "torch"]
-
-[package.source]
-type = "git"
-url = "https://github.com/google/flax.git"
-reference = "HEAD"
-resolved_reference = "ce8a3c74d8d1f4a7d8f14b9fb84b2cc76d7f8dbf"
+testing = ["black[jupyter] (==23.7.0)", "clu", "clu (<=0.0.9)", "einops", "gymnasium[accept-rom-license,atari]", "jaxlib", "jraph (>=0.0.6dev0)", "ml-collections", "mypy", "nbstripout", "opencv-python", "penzai", "pytest", "pytest-cov", "pytest-custom-exit-code", "pytest-xdist", "pytype", "sentencepiece", "tensorflow", "tensorflow-datasets", "tensorflow-text (>=2.11.0)", "torch"]
 
 [[package]]
 name = "fonttools"
@@ -1071,13 +1067,13 @@ woff = ["brotli (>=1.0.1)", "brotlicffi (>=0.8.0)", "zopfli (>=0.1.4)"]
 
 [[package]]
 name = "fsspec"
-version = "2024.2.0"
+version = "2024.6.0"
 description = "File-system specification"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "fsspec-2024.2.0-py3-none-any.whl", hash = "sha256:817f969556fa5916bc682e02ca2045f96ff7f586d45110fcb76022063ad2c7d8"},
-    {file = "fsspec-2024.2.0.tar.gz", hash = "sha256:b6ad1a679f760dda52b1168c859d01b7b80648ea6f7f7c7f5a8a91dc3f3ecb84"},
+    {file = "fsspec-2024.6.0-py3-none-any.whl", hash = "sha256:58d7122eb8a1a46f7f13453187bfea4972d66bf01618d37366521b1998034cee"},
+    {file = "fsspec-2024.6.0.tar.gz", hash = "sha256:f579960a56e6d8038a9efc8f9c77279ec12e6299aa86b0769a7e9c46b94527c2"},
 ]
 
 [package.extras]
@@ -1085,7 +1081,8 @@ abfs = ["adlfs"]
 adl = ["adlfs"]
 arrow = ["pyarrow (>=1)"]
 dask = ["dask", "distributed"]
-devel = ["pytest", "pytest-cov"]
+dev = ["pre-commit", "ruff"]
+doc = ["numpydoc", "sphinx", "sphinx-design", "sphinx-rtd-theme", "yarl"]
 dropbox = ["dropbox", "dropboxdrivefs", "requests"]
 full = ["adlfs", "aiohttp (!=4.0.0a0,!=4.0.0a1)", "dask", "distributed", "dropbox", "dropboxdrivefs", "fusepy", "gcsfs", "libarchive-c", "ocifs", "panel", "paramiko", "pyarrow (>=1)", "pygit2", "requests", "s3fs", "smbprotocol", "tqdm"]
 fuse = ["fusepy"]
@@ -1102,6 +1099,9 @@ s3 = ["s3fs"]
 sftp = ["paramiko"]
 smb = ["smbprotocol"]
 ssh = ["paramiko"]
+test = ["aiohttp (!=4.0.0a0,!=4.0.0a1)", "numpy", "pytest", "pytest-asyncio (!=0.22.0)", "pytest-benchmark", "pytest-cov", "pytest-mock", "pytest-recording", "pytest-rerunfailures", "requests"]
+test-downstream = ["aiobotocore (>=2.5.4,<3.0.0)", "dask-expr", "dask[dataframe,test]", "moto[server] (>4,<5)", "pytest-timeout", "xarray"]
+test-full = ["adlfs", "aiohttp (!=4.0.0a0,!=4.0.0a1)", "cloudpickle", "dask", "distributed", "dropbox", "dropboxdrivefs", "fastparquet", "fusepy", "gcsfs", "jinja2", "kerchunk", "libarchive-c", "lz4", "notebook", "numpy", "ocifs", "pandas", "panel", "paramiko", "pyarrow", "pyarrow (>=1)", "pyftpdlib", "pygit2", "pytest", "pytest-asyncio (!=0.22.0)", "pytest-benchmark", "pytest-cov", "pytest-mock", "pytest-recording", "pytest-rerunfailures", "python-snappy", "requests", "smbprotocol", "tqdm", "urllib3", "zarr", "zstandard"]
 tqdm = ["tqdm"]
 
 [[package]]
@@ -1192,18 +1192,18 @@ testing = ["flufl.flake8", "importlib-resources (>=1.3)", "packaging", "pyfakefs
 
 [[package]]
 name = "importlib-resources"
-version = "6.3.0"
+version = "6.4.0"
 description = "Read resources from Python packages"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "importlib_resources-6.3.0-py3-none-any.whl", hash = "sha256:783407aa1cd05550e3aa123e8f7cfaebee35ffa9cb0242919e2d1e4172222705"},
-    {file = "importlib_resources-6.3.0.tar.gz", hash = "sha256:166072a97e86917a9025876f34286f549b9caf1d10b35a1b372bffa1600c6569"},
+    {file = "importlib_resources-6.4.0-py3-none-any.whl", hash = "sha256:50d10f043df931902d4194ea07ec57960f66a80449ff867bfe782b4c486ba78c"},
+    {file = "importlib_resources-6.4.0.tar.gz", hash = "sha256:cdb2b453b8046ca4e3798eb1d84f3cce1446a0e8e7b5ef4efb600f19fc398145"},
 ]
 
 [package.extras]
 docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (<7.2.5)", "sphinx (>=3.5)", "sphinx-lint"]
-testing = ["jaraco.collections", "pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy", "pytest-ruff (>=0.2.1)", "zipp (>=3.17)"]
+testing = ["jaraco.test (>=5.4)", "pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy", "pytest-ruff (>=0.2.1)", "zipp (>=3.17)"]
 
 [[package]]
 name = "iniconfig"
@@ -1345,8 +1345,8 @@ files = [
 [package.dependencies]
 ml-dtypes = ">=0.2.0"
 numpy = [
-    {version = ">=1.22", markers = "python_version < \"3.11\""},
     {version = ">=1.23.2", markers = "python_version >= \"3.11\""},
+    {version = ">=1.22", markers = "python_version < \"3.11\""},
 ]
 opt-einsum = "*"
 scipy = ">=1.9"
@@ -2199,8 +2199,8 @@ files = [
 
 [package.dependencies]
 numpy = [
-    {version = ">=1.21.2", markers = "python_version >= \"3.10\" and python_version < \"3.11\""},
     {version = ">=1.23.3", markers = "python_version >= \"3.11\""},
+    {version = ">=1.21.2", markers = "python_version >= \"3.10\" and python_version < \"3.11\""},
 ]
 
 [package.extras]
@@ -2543,13 +2543,13 @@ torch = ["torch"]
 
 [[package]]
 name = "orbax-checkpoint"
-version = "0.5.5"
+version = "0.5.16"
 description = "Orbax Checkpoint"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "orbax_checkpoint-0.5.5-py3-none-any.whl", hash = "sha256:e01d51e60f94e3393a08e8c07292c811b93ac58672dde80fc23844c16f2eddb7"},
-    {file = "orbax_checkpoint-0.5.5.tar.gz", hash = "sha256:cebcb96f22f11736a1f9ee76c78c888baae8537268c7ff6663ad9cba3076c655"},
+    {file = "orbax_checkpoint-0.5.16-py3-none-any.whl", hash = "sha256:1b4329ff477c59e061ac15bc09eea34a248f2048b1c5b43eae9b530e068e5974"},
+    {file = "orbax_checkpoint-0.5.16.tar.gz", hash = "sha256:c64d2a3ba6dd7e41330c3efd2bb669743480e62ad242eac5517e67369c26a38e"},
 ]
 
 [package.dependencies]
@@ -2562,11 +2562,11 @@ nest_asyncio = "*"
 numpy = "*"
 protobuf = "*"
 pyyaml = "*"
-tensorstore = ">=0.1.51"
+tensorstore = ">=0.1.60"
 typing_extensions = "*"
 
 [package.extras]
-testing = ["flax", "pytest", "pytest-xdist"]
+testing = ["flax", "google-cloud-logging", "mock", "pytest", "pytest-xdist"]
 
 [[package]]
 name = "packaging"
@@ -2627,8 +2627,8 @@ files = [
 
 [package.dependencies]
 numpy = [
-    {version = ">=1.21.0", markers = "python_version >= \"3.10\" and python_version < \"3.11\""},
     {version = ">=1.23.2", markers = "python_version >= \"3.11\""},
+    {version = ">=1.21.0", markers = "python_version >= \"3.10\" and python_version < \"3.11\""},
 ]
 python-dateutil = ">=2.8.1"
 pytz = ">=2020.1"
@@ -2851,22 +2851,22 @@ wcwidth = "*"
 
 [[package]]
 name = "protobuf"
-version = "4.25.3"
+version = "5.27.1"
 description = ""
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "protobuf-4.25.3-cp310-abi3-win32.whl", hash = "sha256:d4198877797a83cbfe9bffa3803602bbe1625dc30d8a097365dbc762e5790faa"},
-    {file = "protobuf-4.25.3-cp310-abi3-win_amd64.whl", hash = "sha256:209ba4cc916bab46f64e56b85b090607a676f66b473e6b762e6f1d9d591eb2e8"},
-    {file = "protobuf-4.25.3-cp37-abi3-macosx_10_9_universal2.whl", hash = "sha256:f1279ab38ecbfae7e456a108c5c0681e4956d5b1090027c1de0f934dfdb4b35c"},
-    {file = "protobuf-4.25.3-cp37-abi3-manylinux2014_aarch64.whl", hash = "sha256:e7cb0ae90dd83727f0c0718634ed56837bfeeee29a5f82a7514c03ee1364c019"},
-    {file = "protobuf-4.25.3-cp37-abi3-manylinux2014_x86_64.whl", hash = "sha256:7c8daa26095f82482307bc717364e7c13f4f1c99659be82890dcfc215194554d"},
-    {file = "protobuf-4.25.3-cp38-cp38-win32.whl", hash = "sha256:f4f118245c4a087776e0a8408be33cf09f6c547442c00395fbfb116fac2f8ac2"},
-    {file = "protobuf-4.25.3-cp38-cp38-win_amd64.whl", hash = "sha256:c053062984e61144385022e53678fbded7aea14ebb3e0305ae3592fb219ccfa4"},
-    {file = "protobuf-4.25.3-cp39-cp39-win32.whl", hash = "sha256:19b270aeaa0099f16d3ca02628546b8baefe2955bbe23224aaf856134eccf1e4"},
-    {file = "protobuf-4.25.3-cp39-cp39-win_amd64.whl", hash = "sha256:e3c97a1555fd6388f857770ff8b9703083de6bf1f9274a002a332d65fbb56c8c"},
-    {file = "protobuf-4.25.3-py3-none-any.whl", hash = "sha256:f0700d54bcf45424477e46a9f0944155b46fb0639d69728739c0e47bab83f2b9"},
-    {file = "protobuf-4.25.3.tar.gz", hash = "sha256:25b5d0b42fd000320bd7830b349e3b696435f3b329810427a6bcce6a5492cc5c"},
+    {file = "protobuf-5.27.1-cp310-abi3-win32.whl", hash = "sha256:3adc15ec0ff35c5b2d0992f9345b04a540c1e73bfee3ff1643db43cc1d734333"},
+    {file = "protobuf-5.27.1-cp310-abi3-win_amd64.whl", hash = "sha256:25236b69ab4ce1bec413fd4b68a15ef8141794427e0b4dc173e9d5d9dffc3bcd"},
+    {file = "protobuf-5.27.1-cp38-abi3-macosx_10_9_universal2.whl", hash = "sha256:4e38fc29d7df32e01a41cf118b5a968b1efd46b9c41ff515234e794011c78b17"},
+    {file = "protobuf-5.27.1-cp38-abi3-manylinux2014_aarch64.whl", hash = "sha256:917ed03c3eb8a2d51c3496359f5b53b4e4b7e40edfbdd3d3f34336e0eef6825a"},
+    {file = "protobuf-5.27.1-cp38-abi3-manylinux2014_x86_64.whl", hash = "sha256:ee52874a9e69a30271649be88ecbe69d374232e8fd0b4e4b0aaaa87f429f1631"},
+    {file = "protobuf-5.27.1-cp38-cp38-win32.whl", hash = "sha256:7a97b9c5aed86b9ca289eb5148df6c208ab5bb6906930590961e08f097258107"},
+    {file = "protobuf-5.27.1-cp38-cp38-win_amd64.whl", hash = "sha256:f6abd0f69968792da7460d3c2cfa7d94fd74e1c21df321eb6345b963f9ec3d8d"},
+    {file = "protobuf-5.27.1-cp39-cp39-win32.whl", hash = "sha256:dfddb7537f789002cc4eb00752c92e67885badcc7005566f2c5de9d969d3282d"},
+    {file = "protobuf-5.27.1-cp39-cp39-win_amd64.whl", hash = "sha256:39309898b912ca6febb0084ea912e976482834f401be35840a008da12d189340"},
+    {file = "protobuf-5.27.1-py3-none-any.whl", hash = "sha256:4ac7249a1530a2ed50e24201d6630125ced04b30619262f06224616e0030b6cf"},
+    {file = "protobuf-5.27.1.tar.gz", hash = "sha256:df5e5b8e39b7d1c25b186ffdf9f44f40f810bbcc9d2b71d9d3156fee5a9adf15"},
 ]
 
 [[package]]
@@ -3782,33 +3782,33 @@ tfds = ["tensorflow-datasets (>=2.2.0)"]
 
 [[package]]
 name = "tensorstore"
-version = "0.1.54"
+version = "0.1.61"
 description = "Read and write large, multi-dimensional arrays"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "tensorstore-0.1.54-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:54dbc2d5de635ff55c4dd1e85eb8d326ed7c0c90489ab8e9dbbc93ad70f4ebf6"},
-    {file = "tensorstore-0.1.54-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:3d62cec4f3257e7e1d60220d6b1a604cf1e6d2f4684407669a3baa4c53b81f47"},
-    {file = "tensorstore-0.1.54-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7f5e0e9a81b41cba6c7462b57531855e3c0be320ae05b071b220206f04ab3b99"},
-    {file = "tensorstore-0.1.54-cp310-cp310-win_amd64.whl", hash = "sha256:2ccfc236cab7d5d7c0fdd6a1e13fbe9e5aa69a8dd0c472f479dd2b8c4c66f563"},
-    {file = "tensorstore-0.1.54-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:d2c032e5eb31ab0835fc21c74f5134274fe6d1f147917e1571876e4aa011d206"},
-    {file = "tensorstore-0.1.54-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:bcf6925cc1b1793d888d6c81f3f2bafe8b78352c792a5e77cc519b4fc8fd9482"},
-    {file = "tensorstore-0.1.54-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:dab3fb3fca3ec23f43d502641fc7ce3f40bdb864eca63b2b10a5a6592014f00b"},
-    {file = "tensorstore-0.1.54-cp311-cp311-win_amd64.whl", hash = "sha256:ba5d560d321ad353af866910bcdfb396ccd822b89d50e3275a22193dcbd6e35b"},
-    {file = "tensorstore-0.1.54-cp312-cp312-macosx_10_14_x86_64.whl", hash = "sha256:608212a855808f0f55a3cb66a562514632023df9df26e11c8497803102e17303"},
-    {file = "tensorstore-0.1.54-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:02077de82f9a388badc831b8bef0242f82ce47830076130e0f947bc2db88ecc1"},
-    {file = "tensorstore-0.1.54-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5e19ef2c20e7139a5ba3f33b3170ff1418d2cffec01b46f16b0428b66984894e"},
-    {file = "tensorstore-0.1.54-cp312-cp312-win_amd64.whl", hash = "sha256:68dc970e7f69f46d4b7bcbbcb924e0c5ad71e9a2f16481679430edb1deb65fb0"},
-    {file = "tensorstore-0.1.54-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:70de04ad2177fb771f17db1a61cc1ed3295147676021cb3d63649b8a9faf2f45"},
-    {file = "tensorstore-0.1.54-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:954f321049ae0fd97904b76f2b8fc49257a04fa5813c8ca4b5aafa92567e743e"},
-    {file = "tensorstore-0.1.54-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:30ddc9c99b34afe3d64e4c2585238ace9d8a9e1818a9ffcdce356e4e20e98648"},
-    {file = "tensorstore-0.1.54-cp39-cp39-win_amd64.whl", hash = "sha256:9b0501b40107c0bec29c48ce926353eee92b2b6d3b5d5bce0983c35de007eaaf"},
-    {file = "tensorstore-0.1.54.tar.gz", hash = "sha256:e1a9dcb0be7c828f752375409537d4b39c658dd6c6a0873fe21a24a556ec0e2a"},
+    {file = "tensorstore-0.1.61-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:a5f8cf8b1927c2467f214362ed497ded1411a8daa8e6fd602d02e3e158609389"},
+    {file = "tensorstore-0.1.61-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:3cb26b96f4459d979967caeebbfdfea3db9e2dd984c6ba5819e2d1f381627d6d"},
+    {file = "tensorstore-0.1.61-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:52a0266411b71323d77b75d5b51ae1adf19258e25c2375a42e7ada50a4b1a1f2"},
+    {file = "tensorstore-0.1.61-cp310-cp310-win_amd64.whl", hash = "sha256:7b1093f2926ddf8d07ad0b53685b556ddfacc3d4c596b2000a1042122ac2c1d9"},
+    {file = "tensorstore-0.1.61-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:0720d29fd6d0c429d2736ba90532a69821b53e802abe04026bece09efbabec3a"},
+    {file = "tensorstore-0.1.61-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:088f958e390521dc81d155b0a725c94cf5e7411411b4a47175c2e3e3b6826609"},
+    {file = "tensorstore-0.1.61-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7189f17e3a2241462a76adcfb25d4559780d2fc6516b19c3cccfb2f201bb1803"},
+    {file = "tensorstore-0.1.61-cp311-cp311-win_amd64.whl", hash = "sha256:1bfaa3dbfb994f96c1cbd101331a179ee0a25b145df7493a77b1fd8a4917a87e"},
+    {file = "tensorstore-0.1.61-cp312-cp312-macosx_10_14_x86_64.whl", hash = "sha256:d79427808c766a27a96e04fee29ca40db4d998ebdd6ee4ef55399b3abfefc6c5"},
+    {file = "tensorstore-0.1.61-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:4508321bb38a8a1ed75ebe829ec3addb8414a261ba561798d18abfb4d606ad36"},
+    {file = "tensorstore-0.1.61-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2870363e5cd2bb0a9f7d6daa4344dee9ae639ca1221ad89351a6873c5757b041"},
+    {file = "tensorstore-0.1.61-cp312-cp312-win_amd64.whl", hash = "sha256:f203b9dc69b95f1a7713cfc625de345cfc576929f845d78c3c802693bfcc5c59"},
+    {file = "tensorstore-0.1.61-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:9089639545fff924289f09ce187f134b799f1943aab945f2700fad09c8fab9cd"},
+    {file = "tensorstore-0.1.61-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:b46f58590003a8958cd2e8f5fad7a9f4c8f9ab9111fa000a93322844b3046dd0"},
+    {file = "tensorstore-0.1.61-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:02e059cf9a9806886801b57cd002a22ef1c97bbdbcf8f15cdca2334e281f29db"},
+    {file = "tensorstore-0.1.61-cp39-cp39-win_amd64.whl", hash = "sha256:4e7bcfee332178a7b49a716fee9d8334ef03eeb99062166bf93983bf374402c6"},
+    {file = "tensorstore-0.1.61.tar.gz", hash = "sha256:0bedf96e8347b48740cfd3bfd2138649dcca76f634dc4038e2fd06dd773b20d1"},
 ]
 
 [package.dependencies]
 ml-dtypes = ">=0.3.1"
-numpy = ">=1.16.0"
+numpy = ">=1.22.0"
 
 [[package]]
 name = "tinycss2"
@@ -4113,4 +4113,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "9304597b78d4fe7ce999c4d52c0fb5ad3e9a09e120f2eacb6e2e7980954d8e50"
+content-hash = "e13249c68517cb69430b8264e6252960a11cf423398698b86fc0b7d67807b8f2"
