@@ -1,4 +1,4 @@
-from flax.experimental import nnx
+from flax import nnx
 import jax.numpy as jnp
 import pytest
 from gpjax.parameters import (

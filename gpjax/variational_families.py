@@ -24,7 +24,7 @@ from cola.ops.operators import (
     I_like,
     Triangular,
 )
-from flax.experimental import nnx
+from flax import nnx
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Float

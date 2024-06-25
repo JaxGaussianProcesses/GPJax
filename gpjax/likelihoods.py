@@ -14,7 +14,7 @@
 import abc
 
 import beartype.typing as tp
-from flax.experimental import nnx
+from flax import nnx
 from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp

@@ -8,7 +8,7 @@ from cola.linalg.inverse.inv import (
 )
 from cola.linalg.trace.diag_trace import diag
 from cola.ops.operators import I_like
-from flax.experimental import nnx
+from flax import nnx
 from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp

@@ -1,6 +1,6 @@
 import typing as tp
 
-from flax.experimental import nnx
+from flax import nnx
 import jax.numpy as jnp
 import jax.tree_util as jtu
 from jax.typing import ArrayLike
@@ -24,7 +24,7 @@ def transform(
         >>> from gpjax.parameters import PositiveReal, transform
         >>> import jax.numpy as jnp
         >>> import tensorflow_probability.substrates.jax.bijectors as tfb
-        >>> from flax.experimental import nnx
+        >>> from flax import nnx
         >>> params = nnx.State(
         >>>     {
         >>>         "a": PositiveReal(jnp.array([1.0])),
@@ -50,7 +50,7 @@ def transform(
         State: A new nnx.State object containing the transformed parameters.
     """
 
-    def _inner(param: Parameter):
+    def _inner(param):
         bijector = params_bijection.get(param._tag, tfb.Identity())
 
         if inverse:
@@ -62,11 +62,12 @@ def transform(
 
         return param
 
-    return jtu.tree_map(
+    transformed_params = jtu.tree_map(
         lambda x: _inner(x),
         params,
         is_leaf=lambda x: isinstance(x, Parameter),
     )
+    return transformed_params
 
 
 class Parameter(nnx.Variable[T]):

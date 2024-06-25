@@ -974,12 +974,14 @@ typing = ["typing-extensions (>=4.8)"]
 
 [[package]]
 name = "flax"
-version = "0.8.6"
+version = "0.8.5"
 description = "Flax: A neural network library for JAX designed for flexibility"
 optional = false
-python-versions = ">=3.10"
-files = []
-develop = false
+python-versions = ">=3.9"
+files = [
+    {file = "flax-0.8.5-py3-none-any.whl", hash = "sha256:c96e46d1c48a300d010ebf5c4846f163bdd7acc6efff5ff2bfb1cb5b08aa65d8"},
+    {file = "flax-0.8.5.tar.gz", hash = "sha256:4a9cb7950ece54b0addaa73d77eba24e46138dbe783d01987be79d20ccb2b09b"},
+]
 
 [package.dependencies]
 jax = ">=0.4.27"
@@ -993,17 +995,11 @@ orbax-checkpoint = "*"
 PyYAML = ">=5.4.1"
 rich = ">=11.1"
 tensorstore = "*"
-typing_extensions = ">=4.2"
+typing-extensions = ">=4.2"
 
 [package.extras]
 all = ["matplotlib"]
-testing = ["black[jupyter] (==23.7.0)", "clu", "clu (<=0.0.9)", "einops", "gymnasium[accept-rom-license,atari]", "jaxlib", "jaxtyping", "jraph (>=0.0.6dev0)", "ml-collections", "mypy", "nbstripout", "opencv-python", "penzai (>=0.1.2)", "pytest", "pytest-cov", "pytest-custom_exit_code", "pytest-xdist", "pytype", "sentencepiece", "tensorflow (>=2.12.0)", "tensorflow_datasets", "tensorflow_text (>=2.11.0)", "torch"]
-
-[package.source]
-type = "git"
-url = "https://github.com/google/flax.git"
-reference = "HEAD"
-resolved_reference = "4e9111392d2f04b2b2d58533d868175f5fb8560a"
+testing = ["black[jupyter] (==23.7.0)", "clu", "clu (<=0.0.9)", "einops", "gymnasium[accept-rom-license,atari]", "jaxlib", "jaxtyping", "jraph (>=0.0.6dev0)", "ml-collections", "mypy", "nbstripout", "opencv-python", "penzai (>=0.1.2)", "pytest", "pytest-cov", "pytest-custom-exit-code", "pytest-xdist", "pytype", "sentencepiece", "tensorflow (>=2.12.0)", "tensorflow-datasets", "tensorflow-text (>=2.11.0)", "torch"]
 
 [[package]]
 name = "fonttools"
@@ -4146,4 +4142,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "9304597b78d4fe7ce999c4d52c0fb5ad3e9a09e120f2eacb6e2e7980954d8e50"
+content-hash = "e13249c68517cb69430b8264e6252960a11cf423398698b86fc0b7d67807b8f2"

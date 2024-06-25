@@ -14,7 +14,7 @@
 # ==============================================================================
 import typing as tp
 
-from flax.experimental import nnx
+from flax import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
 
@@ -38,6 +38,7 @@ class White(StationaryKernel):
     k(x, y) = \sigma^2 \delta(x-y)
     $$
     """
+
     name: str = "White"
 
     def __init__(

@@ -1,4 +1,4 @@
-from flax.experimental import nnx
+from flax import nnx
 import jax
 from jax import config
 import jax.numpy as jnp

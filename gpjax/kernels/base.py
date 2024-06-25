@@ -18,7 +18,7 @@ import functools as ft
 
 import beartype.typing as tp
 from cola.ops.operator_base import LinearOperator
-from flax.experimental import nnx
+from flax import nnx
 import jax.numpy as jnp
 from jaxtyping import (
     Float,
