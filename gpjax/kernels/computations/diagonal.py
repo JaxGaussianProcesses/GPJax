@@ -34,7 +34,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
     a diagonal Gram matrix.
     """
 
-    def _gram(self, kernel: Kernel, x: Float[Array, "N D"]) -> LinearOperator:
+    def gram(self, kernel: Kernel, x: Float[Array, "N D"]) -> LinearOperator:
         return PSD(Diagonal(diag=vmap(lambda x: kernel(x, x))(x)))
 
     def _cross_covariance(

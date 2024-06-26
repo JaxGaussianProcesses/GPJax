@@ -17,7 +17,7 @@
 # %% [markdown]
 # # Regression
 #
-# In this notebook we demonstate how to fit a Gaussian process regression model.
+# In this notebook we demonstrate how to fit a Gaussian process regression model.
 
 # %%
 # Enable Float64 for more stable matrix inversions.

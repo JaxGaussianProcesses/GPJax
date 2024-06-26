@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gpjax"
-version = "0.8.0"
+version = "0.9.0"
 description = "Gaussian processes in JAX."
 authors = [
   "Thomas Pinder <tompinder@live.co.uk>",
@@ -19,13 +19,14 @@ packages = [{ include = "gpjax" }]
 python = ">=3.10,<3.12"
 jax = ">=0.4.10"
 jaxlib = ">=0.4.10"
-flax = {git = "https://github.com/google/flax.git"}
+flax = { git = "https://github.com/google/flax.git" }
 optax = "^0.2.1"
 jaxtyping = "^0.2.10"
 tqdm = "^4.66.2"
 tensorflow-probability = "^0.20.0"
 beartype = "^0.16.1"
 cola-ml = "0.0.5"
+jaxopt = "^0.8.3"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.0"
@@ -50,18 +51,17 @@ mkdocs-jupyter = "^0.24.3"
 mkdocs-gen-files = "^0.5.0"
 mkdocs-literate-nav = "^0.6.0"
 mkdocs-git-authors-plugin = "^0.7.0"
-# markdown-katex = "^202112.1034"
-# pymdown-extensions = "^9.11"
-# matplotlib = "^3.7.1"
-# seaborn = "^0.12.2"
-# networkx = "^3.0"
-# jupytext = "^1.14.5"
-# ipython = "^8.11.0"
-# ipykernel = "^6.22.0"
-# watermark = "^2.3.1"
-# blackjax = "^0.9.6"
-# ipywidgets = "^8.0.5"
-# pandas = "^1.5.3"
+markdown-katex = "^202112.1034"
+matplotlib = "^3.7.1"
+seaborn = "^0.12.2"
+networkx = "^3.0"
+jupytext = "^1.14.5"
+ipython = "^8.11.0"
+ipykernel = "^6.22.0"
+watermark = "^2.3.1"
+blackjax = "^0.9.6"
+ipywidgets = "^8.0.5"
+pandas = "^1.5.3"
 pymdown-extensions = "^10.7.1"
 nbconvert = "^7.16.2"
 

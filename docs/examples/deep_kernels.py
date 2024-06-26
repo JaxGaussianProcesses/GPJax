@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # Deep Kernel Learning
 #
@@ -18,10 +35,12 @@ from dataclasses import (
     dataclass,
     field,
 )
-from typing import Any
 
-import flax
-from flax import linen as nn
+from flax.experimental import nnx
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
 import jax
 import jax.numpy as jnp
 import jax.random as jr
@@ -95,25 +114,17 @@ ax.legend(loc="best")
 # %%
 @dataclass
 class DeepKernelFunction(AbstractKernel):
-    base_kernel: AbstractKernel = None
-    network: nn.Module = static_field(None)
-    dummy_x: jax.Array = static_field(None)
-    key: jr.PRNGKeyArray = static_field(jr.PRNGKey(123))
-    nn_params: Any = field(init=False, repr=False)
-
-    def __post_init__(self):
-        if self.base_kernel is None:
-            raise ValueError("base_kernel must be specified")
-        if self.network is None:
-            raise ValueError("network must be specified")
-        self.nn_params = flax.core.unfreeze(self.network.init(key, self.dummy_x))
+    base_kernel: AbstractKernel
+    network: nnx.Module
+    compute_engine: AbstractKernelComputation = field(
+        default_factory=lambda: DenseKernelComputation()
+    )
 
     def __call__(
         self, x: Float[Array, " D"], y: Float[Array, " D"]
     ) -> Float[Array, "1"]:
-        state = self.network.init(self.key, x)
-        xt = self.network.apply(state, x)
-        yt = self.network.apply(state, y)
+        xt = self.network(x)
+        yt = self.network(y)
         return self.base_kernel(xt, yt)
 
 
@@ -135,20 +146,25 @@ class DeepKernelFunction(AbstractKernel):
 feature_space_dim = 3
 
 
-class Network(nn.Module):
-    """A simple MLP."""
+class Network(nnx.Module):
+    def __init__(
+        self, rngs: nnx.Rngs, *, input_dim: int, inner_dim: int, feature_space_dim: int
+    ) -> None:
+        self.layer1 = nnx.Linear(input_dim, inner_dim, rngs=rngs)
+        self.output_layer = nnx.Linear(inner_dim, feature_space_dim, rngs=rngs)
+        self.rngs = rngs
 
-    @nn.compact
-    def __call__(self, x):
-        x = nn.Dense(features=32)(x)
-        x = nn.relu(x)
-        x = nn.Dense(features=64)(x)
-        x = nn.relu(x)
-        x = nn.Dense(features=feature_space_dim)(x)
+    def __call__(self, x: jax.Array) -> jax.Array:
+        x = x.reshape((x.shape[0], -1))
+        x = self.layer1(x)
+        x = jax.nn.relu(x)
+        x = self.output_layer(x).squeeze()
         return x
 
 
-forward_linear = Network()
+forward_linear = Network(
+    nnx.Rngs(123), feature_space_dim=feature_space_dim, inner_dim=32, input_dim=1
+)
 
 # %% [markdown]
 # ## Defining a model
@@ -162,9 +178,7 @@ base_kernel = gpx.kernels.Matern52(
     active_dims=list(range(feature_space_dim)),
     lengthscale=jnp.ones((feature_space_dim,)),
 )
-kernel = DeepKernelFunction(
-    network=forward_linear, base_kernel=base_kernel, key=key, dummy_x=x
-)
+kernel = DeepKernelFunction(network=forward_linear, base_kernel=base_kernel)
 meanf = gpx.mean_functions.Zero()
 prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
@@ -202,7 +216,7 @@ optimiser = ox.chain(
 
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=jax.jit(gpx.objectives.ConjugateMLL(negative=True)),
+    objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     train_data=D,
     optim=optimiser,
     num_iters=800,
