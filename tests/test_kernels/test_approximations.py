@@ -157,7 +157,7 @@ def test_missing_spectral_density_raises_error(kernel):
 def test_stochastic_init(kernel: type[StationaryKernel]):
     with pytest.raises(ValueError):
         # n_dims is not specified, but should be
-        RFF(base_kernel=kernel(), num_basis_fns=10, frequencies=jnp.zeros((10, 1)))
+        RFF(base_kernel=kernel(), num_basis_fns=10)
 
     kernel = kernel(n_dims=1)
 

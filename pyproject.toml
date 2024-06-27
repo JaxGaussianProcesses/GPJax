@@ -17,16 +17,17 @@ packages = [{ include = "gpjax" }]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
-jax = ">=0.4.10"
-jaxlib = ">=0.4.10"
+jax = "<0.4.28"
+jaxlib = "<0.4.28"
 optax = "^0.2.1"
 jaxtyping = "^0.2.10"
 tqdm = "^4.66.2"
-tensorflow-probability = "^0.20.0"
+tensorflow-probability = "^0.24.0"
 beartype = "^0.16.1"
 cola-ml = "0.0.5"
 jaxopt = "^0.8.3"
 flax = "^0.8.4"
+numpy = "<2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.0"

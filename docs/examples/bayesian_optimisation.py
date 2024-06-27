@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # Introduction to Bayesian Optimisation
 #
@@ -208,23 +225,22 @@ D = gpx.Dataset(X=initial_x, y=initial_y)
 
 
 # %%
+from gpjax.parameters import Static
+
+
 def return_optimised_posterior(
-    data: gpx.Dataset, prior: gpx.base.Module, key: Array
-) -> gpx.base.Module:
+    data: gpx.Dataset, prior: gpx.gps.Prior, key: Array
+) -> gpx.gps.AbstractPosterior:
+    # Our function is noise-free, so we set the observation noise's standard deviation to a very small value
     likelihood = gpx.likelihoods.Gaussian(
-        num_datapoints=data.n, obs_stddev=jnp.array(1e-6)
-    )  # Our function is noise-free, so we set the observation noise's standard deviation to a very small value
-    likelihood = likelihood.replace_trainable(obs_stddev=False)
+        num_datapoints=data.n, obs_stddev=Static(jnp.array(1e-6))
+    )
 
     posterior = prior * likelihood
 
-    negative_mll = gpx.objectives.ConjugateMLL(negative=True)
-    negative_mll(posterior, train_data=data)
-    negative_mll = jit(negative_mll)
-
     opt_posterior, _ = gpx.fit(
         model=posterior,
-        objective=negative_mll,
+        objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
         train_data=data,
         optim=ox.adam(learning_rate=0.01),
         num_iters=1000,
@@ -237,7 +253,7 @@ def return_optimised_posterior(
 
 
 mean = gpx.mean_functions.Zero()
-kernel = gpx.kernels.Matern52()
+kernel = gpx.kernels.Matern52(n_dims=1)
 prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 opt_posterior = return_optimised_posterior(D, prior, key)
 
@@ -323,7 +339,7 @@ y_star = standardised_forrester(x_star)
 
 # %%
 def plot_bayes_opt(
-    posterior: gpx.base.Module,
+    posterior: gpx.gps.AbstractPosterior,
     sample: FunctionalSample,
     dataset: gpx.Dataset,
     queried_x: ScalarFloat,
@@ -408,7 +424,7 @@ for _ in range(bo_iters):
 
     # Generate optimised posterior using previously observed data
     mean = gpx.mean_functions.Zero()
-    kernel = gpx.kernels.Matern52()
+    kernel = gpx.kernels.Matern52(n_dims=1)
     prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
     opt_posterior = return_optimised_posterior(D, prior, subkey)
 
