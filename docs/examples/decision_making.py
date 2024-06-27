@@ -1,3 +1,19 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # Introduction to Decision Making with GPJax
 #
@@ -137,7 +153,7 @@ initial_datasets = function_evaluator(initial_x)
 
 # %%
 mean = gpx.mean_functions.Zero()
-kernel = gpx.kernels.Matern52()
+kernel = gpx.kernels.Matern52(n_dims=1)
 prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 
 # %% [markdown]
@@ -174,7 +190,7 @@ likelihood_builder = lambda n: gpx.likelihoods.Gaussian(
 posterior_handler = PosteriorHandler(
     prior,
     likelihood_builder=likelihood_builder,
-    optimization_objective=gpx.objectives.ConjugateMLL(negative=True),
+    optimization_objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     optimizer=ox.adam(learning_rate=0.01),
     num_optimization_iters=1000,
 )

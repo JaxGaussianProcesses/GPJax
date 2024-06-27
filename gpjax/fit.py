@@ -137,7 +137,7 @@ def fit(  # noqa: PLR0913
     # Loss definition
     def loss(params: nnx.State, batch: Dataset) -> ScalarFloat:
         params = transform(params, params_bijection)
-        model = graphdef.merge(params, *static_state)
+        model = nnx.merge(graphdef, params, *static_state)
         return objective(model, batch)
 
     # Initialise optimiser state.
@@ -173,7 +173,7 @@ def fit(  # noqa: PLR0913
         params = transform(params, params_bijection)
 
     # Reconstruct model
-    model = graphdef.merge(params, *static_state)
+    model = nnx.merge(graphdef, params, *static_state)
 
     return model, history
 
@@ -211,7 +211,7 @@ def fit_scipy(  # noqa: PLR0913
         _check_verbose(verbose)
 
     # Model state filtering
-    params, *static_state, graphdef = nnx.split(model, Parameter, ...)
+    graphdef, params, *static_state = nnx.split(model, Parameter, ...)
 
     # Parameters bijection to unconstrained space
     params = transform(params, DEFAULT_BIJECTION, inverse=True)
@@ -219,7 +219,7 @@ def fit_scipy(  # noqa: PLR0913
     # Loss definition
     def loss(params) -> ScalarFloat:
         params = transform(params, DEFAULT_BIJECTION)
-        model = graphdef.merge(params, *static_state)
+        model = nnx.merge(graphdef, params, *static_state)
         return objective(model, train_data)
 
     # convert to numpy for interface with scipy
@@ -248,7 +248,7 @@ def fit_scipy(  # noqa: PLR0913
     params = transform(params, DEFAULT_BIJECTION)
 
     # Reconstruct model
-    model = graphdef.merge(params, *static_state)
+    model = nnx.merge(graphdef, params, *static_state)
 
     return model, history
 

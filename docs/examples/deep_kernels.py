@@ -36,7 +36,7 @@ from dataclasses import (
     field,
 )
 
-from flax.experimental import nnx
+from flax import nnx
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
     DenseKernelComputation,

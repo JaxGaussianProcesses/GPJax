@@ -65,7 +65,7 @@ def transform(
     transformed_params = jtu.tree_map(
         lambda x: _inner(x),
         params,
-        is_leaf=lambda x: isinstance(x, Parameter),
+        is_leaf=lambda x: isinstance(x, nnx.VariableState),
     )
     return transformed_params
 

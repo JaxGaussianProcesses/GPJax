@@ -1,3 +1,19 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: gpjax
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # Gaussian Processes for Vector Fields and Ocean Current Modelling
 #
@@ -195,6 +211,9 @@ dataset_ground_truth = dataset_3d(pos_test, vel_test)
 
 
 # %%
+from gpjax.kernels.computations import DenseKernelComputation
+
+
 class VelocityKernel(gpx.kernels.AbstractKernel):
     def __init__(
         self,
@@ -203,6 +222,7 @@ class VelocityKernel(gpx.kernels.AbstractKernel):
     ):
         self.kernel0 = kernel0
         self.kernel1 = kernel1
+        super().__init__(compute_engine=DenseKernelComputation())
 
     def __call__(
         self, X: Float[Array, "1 D"], Xp: Float[Array, "1 D"]
@@ -248,7 +268,7 @@ velocity_posterior = initialise_gp(kernel, mean, dataset_train)
 # %%
 def optimise_mll(posterior, dataset, NIters=1000, key=key):
     # define the MLL using dataset_train
-    objective = gpx.objectives.ConjugateMLL(negative=True)
+    objective = lambda p, d: -gpx.objectives.conjugate_mll(p, d)
     # Optimise to minimise the MLL
     opt_posterior, history = gpx.fit_scipy(
         model=posterior,
@@ -431,14 +451,15 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_velocity)
 # for either $z$.
 # %%
 @dataclass
-class HelmholtzKernel(gpx.kernels.AbstractKernel):
+class HelmholtzKernel(gpx.kernels.stationary.StationaryKernel):
     # initialise Phi and Psi kernels as any stationary kernel in gpJax
-    potential_kernel: gpx.kernels.AbstractKernel = field(
+    potential_kernel: gpx.kernels.stationary.StationaryKernel = field(
         default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
     )
-    stream_kernel: gpx.kernels.AbstractKernel = field(
+    stream_kernel: gpx.kernels.stationary.StationaryKernel = field(
         default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
     )
+    compute_engine = DenseKernelComputation()
 
     def __call__(
         self, X: Float[Array, "1 D"], Xp: Float[Array, "1 D"]
