@@ -22,7 +22,10 @@ from gpjax.decision_making.utility_functions.base import (
     SinglePointUtilityFunction,
 )
 from gpjax.decision_making.utils import OBJECTIVE
-from gpjax.gps import ConjugatePosterior
+from gpjax.gps import (
+    ConjugatePosterior,
+    NonConjugatePosterior,
+)
 from gpjax.typing import KeyArray
 
 
@@ -56,7 +59,7 @@ class ThompsonSampling(AbstractSinglePointUtilityFunctionBuilder):
 
     def build_utility_function(
         self,
-        posteriors: Mapping[str, ConjugatePosterior],
+        posteriors: Mapping[str, ConjugatePosterior | NonConjugatePosterior],
         datasets: Mapping[str, Dataset],
         key: KeyArray,
     ) -> SinglePointUtilityFunction:
