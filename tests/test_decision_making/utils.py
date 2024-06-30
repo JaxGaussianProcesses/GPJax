@@ -13,6 +13,8 @@
 # limitations under the License.
 # ==============================================================================
 
+import jax.numpy as jnp
+
 from beartype.typing import Mapping
 
 from gpjax.dataset import Dataset
@@ -21,8 +23,14 @@ from gpjax.decision_making.utility_functions import (
     AbstractSinglePointUtilityFunctionBuilder,
     SinglePointUtilityFunction,
 )
-from gpjax.gps import ConjugatePosterior
+from gpjax.gps import ConjugatePosterior, NonConjugatePosterior, Prior
 from gpjax.typing import KeyArray
+from gpjax.kernels import RBF
+from gpjax.likelihoods import (
+    Gaussian,
+    Poisson,
+)
+from gpjax.mean_functions import Zero
 
 
 class QuadraticSinglePointUtilityFunctionBuilder(
@@ -45,3 +53,21 @@ class QuadraticSinglePointUtilityFunctionBuilder(
         return lambda x: -1.0 * test_function.evaluate(
             x
         )  # Utility functions are *maximised*
+
+
+def generate_dummy_conjugate_posterior(dataset: Dataset) -> ConjugatePosterior:
+    kernel = RBF(lengthscale=jnp.ones(dataset.X.shape[1]))
+    mean_function = Zero()
+    prior = Prior(kernel=kernel, mean_function=mean_function)
+    likelihood = Gaussian(num_datapoints=dataset.n)
+    posterior = prior * likelihood
+    return posterior
+
+
+def generate_dummy_non_conjugate_posterior(dataset: Dataset) -> NonConjugatePosterior:
+    kernel = RBF(lengthscale=jnp.ones(dataset.X.shape[1]))
+    mean_function = Zero()
+    prior = Prior(kernel=kernel, mean_function=mean_function)
+    likelihood = Poisson(num_datapoints=dataset.n)
+    posterior = prior * likelihood
+    return posterior
