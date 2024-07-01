@@ -23,7 +23,7 @@ from gpjax.decision_making.test_functions.continuous_functions import Forrester
 from gpjax.decision_making.utility_functions.probability_of_improvement import (
     ProbabilityOfImprovement,
 )
-from gpjax.decision_making.utils import OBJECTIVE
+from gpjax.decision_making.utils import OBJECTIVE, gaussian_cdf
 from tests.test_decision_making.utils import generate_dummy_conjugate_posterior
 
 
@@ -43,19 +43,13 @@ def test_probability_of_improvement_gives_correct_value_for_a_seed():
     test_X = forrester.generate_test_points(num_points=10, key=key)
     utility_values = pi_utility(test_X)
 
-    expected_utility_values = jnp.array(
-        [
-            7.30230451e-05,
-            5.00322831e-05,
-            1.06219741e-03,
-            2.19520435e-03,
-            3.49279363e-05,
-            1.66031943e-04,
-            2.78478912e-04,
-            3.35871920e-04,
-            1.38265233e-04,
-            3.63297977e-05,
-        ]
+    # Computing the expected utility values
+    predictive_dist = posterior.predict(test_X, train_data=dataset)
+    predictive_mean = predictive_dist.mean()
+    predictive_std = predictive_dist.stddev()
+
+    expected_utility_values = gaussian_cdf(
+        (dataset.y.min() - predictive_mean) / predictive_std
     ).reshape(-1, 1)
 
     assert utility_values.shape == (10, 1)
