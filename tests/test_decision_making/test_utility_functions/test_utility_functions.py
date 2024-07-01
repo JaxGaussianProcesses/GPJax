@@ -28,13 +28,12 @@ from gpjax.decision_making.test_functions.continuous_functions import (
 from gpjax.decision_making.utility_functions.base import (
     AbstractSinglePointUtilityFunctionBuilder,
 )
-from gpjax.decision_making.utility_functions.thompson_sampling import ThompsonSampling
 from gpjax.decision_making.utility_functions.probability_of_improvement import (
     ProbabilityOfImprovement,
 )
+from gpjax.decision_making.utility_functions.thompson_sampling import ThompsonSampling
 from gpjax.decision_making.utils import OBJECTIVE
 from gpjax.typing import KeyArray
-
 from tests.test_decision_making.utils import (
     generate_dummy_conjugate_posterior,
     generate_dummy_non_conjugate_posterior,

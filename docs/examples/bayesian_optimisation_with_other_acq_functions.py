@@ -15,7 +15,7 @@ import jax
 from jax import jit
 import jax.numpy as jnp
 import jax.random as jr
-from jaxtyping import install_import_hook, Float, Int
+from jaxtyping import install_import_hook, Float
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -25,8 +25,7 @@ from typing import List, Tuple
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
-from gpjax.typing import Array, FunctionalSample, ScalarFloat
-from jaxopt import ScipyBoundedMinimize
+from gpjax.typing import Array, ScalarFloat
 
 key = jr.key(1337)
 plt.style.use(

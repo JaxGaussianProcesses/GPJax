@@ -28,10 +28,7 @@ from gpjax.decision_making.test_functions.continuous_functions import (
 from gpjax.decision_making.utility_functions.thompson_sampling import ThompsonSampling
 from gpjax.decision_making.utils import OBJECTIVE
 from gpjax.typing import KeyArray
-
-from tests.test_decision_making.utils import (
-    generate_dummy_conjugate_posterior,
-)
+from tests.test_decision_making.utils import generate_dummy_conjugate_posterior
 
 
 @pytest.mark.parametrize("num_rff_features", [0, -1, -10])

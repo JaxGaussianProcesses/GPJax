@@ -22,9 +22,15 @@ from gpjax.decision_making.utility_functions.base import (
     AbstractSinglePointUtilityFunctionBuilder,
     SinglePointUtilityFunction,
 )
-from gpjax.decision_making.utils import OBJECTIVE, gaussian_cdf
+from gpjax.decision_making.utils import (
+    OBJECTIVE,
+    gaussian_cdf,
+)
 from gpjax.gps import ConjugatePosterior
-from gpjax.typing import KeyArray, Array
+from gpjax.typing import (
+    Array,
+    KeyArray,
+)
 
 
 @dataclass

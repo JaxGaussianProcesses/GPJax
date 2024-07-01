@@ -13,9 +13,8 @@
 # limitations under the License.
 # ==============================================================================
 
-import jax.numpy as jnp
-
 from beartype.typing import Mapping
+import jax.numpy as jnp
 
 from gpjax.dataset import Dataset
 from gpjax.decision_making.test_functions import Quadratic
@@ -23,14 +22,18 @@ from gpjax.decision_making.utility_functions import (
     AbstractSinglePointUtilityFunctionBuilder,
     SinglePointUtilityFunction,
 )
-from gpjax.gps import ConjugatePosterior, NonConjugatePosterior, Prior
-from gpjax.typing import KeyArray
+from gpjax.gps import (
+    ConjugatePosterior,
+    NonConjugatePosterior,
+    Prior,
+)
 from gpjax.kernels import RBF
 from gpjax.likelihoods import (
     Gaussian,
     Poisson,
 )
 from gpjax.mean_functions import Zero
+from gpjax.typing import KeyArray
 
 
 class QuadraticSinglePointUtilityFunctionBuilder(

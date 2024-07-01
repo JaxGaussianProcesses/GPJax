@@ -17,7 +17,6 @@ from beartype.typing import (
     Dict,
     Final,
 )
-
 import jax
 import jax.numpy as jnp
 
