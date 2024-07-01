@@ -33,6 +33,7 @@ import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax as tfp
 from jax import config
 from jaxtyping import install_import_hook
+from flax import nnx
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -132,18 +133,34 @@ print(type(posterior))
 
 # %%
 # Adapted from BlackJax's introduction notebook.
-num_adapt = 100
-num_samples = 200
+num_adapt = 1000
+num_samples = 500
 
-lpd = jax.jit(gpx.objectives.LogPosteriorDensity(negative=False))
-unconstrained_lpd = jax.jit(lambda tree: lpd(tree.constrain(), D))
+
+graphdef, params, *static_state = nnx.split(posterior, gpx.parameters.Parameter, ...)
+params_bijection = gpx.parameters.DEFAULT_BIJECTION
+
+# Transform the parameters to the unconstrained space
+params = gpx.parameters.transform(params, params_bijection, inverse=True)
+
+
+def logprob_fn(params):
+    params = gpx.parameters.transform(params, params_bijection)
+    model = nnx.merge(graphdef, params, *static_state)
+    return gpx.objectives.log_posterior_density(model, D)
+
+
+# jit compile
+logprob_fn = jax.jit(logprob_fn)
+_ = logprob_fn(params)
+
 
 adapt = blackjax.window_adaptation(
-    blackjax.nuts, unconstrained_lpd, num_adapt, target_acceptance_rate=0.65
+    blackjax.nuts, logprob_fn, num_adapt, target_acceptance_rate=0.65, progress_bar=True
 )
 
 # Initialise the chain
-last_state, kernel, _ = adapt.run(key, posterior.unconstrain())
+last_state, kernel, _ = adapt.run(key, params)
 
 
 def inference_loop(rng_key, kernel, initial_state, num_samples):
@@ -152,13 +169,14 @@ def inference_loop(rng_key, kernel, initial_state, num_samples):
         return state, (state, info)
 
     keys = jax.random.split(rng_key, num_samples)
-    _, (states, infos) = jax.lax.scan(one_step, initial_state, keys)
+    _, (states, infos) = jax.lax.scan(one_step, initial_state, keys, unroll=10)
 
     return states, infos
 
 
 # Sample from the posterior distribution
 states, infos = inference_loop(key, kernel, last_state, num_samples)
+
 
 # %% [markdown]
 # ### Sampler efficiency
@@ -173,12 +191,12 @@ print(f"Acceptance rate: {acceptance_rate:.2f}")
 
 # %%
 fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(10, 3))
-ax0.plot(states.position.constrain().prior.kernel.variance)
-ax1.plot(states.position.constrain().prior.kernel.lengthscale)
-ax2.plot(states.position.constrain().prior.mean_function.constant)
-ax0.set_title("Kernel variance")
-ax1.set_title("Kernel lengthscale")
-ax2.set_title("Mean function constant")
+ax0.plot(states.position.prior.kernel.lengthscale.value)
+ax1.plot(states.position.prior.kernel.variance.value)
+ax2.plot(states.position.latent.value[:, 1, :])
+ax0.set_title("Kernel Lengthscale")
+ax1.set_title("Kernel Variance")
+ax2.set_title("Latent Function (index = 1)")
 
 # %% [markdown]
 # ## Prediction
@@ -196,20 +214,21 @@ ax2.set_title("Mean function constant")
 # factors, we employ a thin factor of 10 for demonstration purposes.
 
 # %%
-thin_factor = 10
-samples = []
+thin_factor = 20
+posterior_samples = []
 
-for i in range(num_adapt, num_samples + num_adapt, thin_factor):
-    sample = jtu.tree_map(lambda samples: samples[i], states.position)  # noqa: B023
-    sample = sample.constrain()
-    latent_dist = sample.predict(xtest, train_data=D)
-    predictive_dist = sample.likelihood(latent_dist)
-    samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
+for i in range(0, num_samples, thin_factor):
+    sample_params = jtu.tree_map(lambda samples, i=i: samples[i], states.position)
+    sample_params = gpx.parameters.transform(sample_params, params_bijection)
+    model = nnx.merge(graphdef, sample_params, *static_state)
+    latent_dist = model.predict(xtest, train_data=D)
+    predictive_dist = model.likelihood(latent_dist)
+    posterior_samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
 
-samples = jnp.vstack(samples)
+posterior_samples = jnp.vstack(posterior_samples)
+lower_ci, upper_ci = jnp.percentile(posterior_samples, jnp.array([2.5, 97.5]), axis=0)
+expected_val = jnp.mean(posterior_samples, axis=0)
 
-lower_ci, upper_ci = jnp.percentile(samples, jnp.array([2.5, 97.5]), axis=0)
-expected_val = jnp.mean(samples, axis=0)
 
 # %% [markdown]
 #

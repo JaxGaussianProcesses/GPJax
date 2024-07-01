@@ -20,7 +20,7 @@ from cola.annotations import PSD
 from cola.linalg.decompositions.decompositions import Cholesky
 from cola.linalg.inverse.inv import solve
 from cola.ops.operators import I_like
-from flax.experimental import nnx
+from flax import nnx
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (

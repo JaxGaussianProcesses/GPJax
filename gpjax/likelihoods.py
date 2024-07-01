@@ -14,7 +14,7 @@
 import abc
 
 import beartype.typing as tp
-from flax.experimental import nnx
+from flax import nnx
 from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
@@ -30,6 +30,7 @@ from gpjax.integrators import (
 from gpjax.parameters import (
     Parameter,
     PositiveReal,
+    Static,
 )
 from gpjax.typing import (
     Array,
@@ -136,7 +137,9 @@ class Gaussian(AbstractLikelihood):
     def __init__(
         self,
         num_datapoints: int,
-        obs_stddev: tp.Union[ScalarFloat, Float[Array, "#N"], PositiveReal] = 1.0,
+        obs_stddev: tp.Union[
+            ScalarFloat, Float[Array, "#N"], PositiveReal, Static
+        ] = 1.0,
         integrator: AbstractIntegrator = AnalyticalGaussianIntegrator(),
     ):
         r"""Initializes the Gaussian likelihood.

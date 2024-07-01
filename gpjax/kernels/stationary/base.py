@@ -15,7 +15,7 @@
 
 
 import beartype.typing as tp
-from flax.experimental import nnx
+from flax import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax.distributions as tfd

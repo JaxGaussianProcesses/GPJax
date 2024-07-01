@@ -15,6 +15,10 @@
 #     name: python3
 # ---
 
+# %%
+# %load_ext autoreload
+# %autoreload 2
+
 # %% [markdown]
 # # Classification
 #
@@ -31,6 +35,7 @@ config.update("jax_enable_x64", True)
 
 from time import time
 import blackjax
+from flax import nnx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
@@ -131,6 +136,11 @@ opt_posterior, history = gpx.fit(
     key=key,
 )
 
+# %%
+import jax
+
+jax.__version__
+
 # %% [markdown]
 # From which we can make predictions at novel inputs, as illustrated below.
 
@@ -168,7 +178,6 @@ ax.plot(
 )
 
 ax.legend()
-plt.savefig("fit.png")
 # %% [markdown]
 # Here we projected the map estimates $\hat{\boldsymbol{f}}$ for the function values
 # $\boldsymbol{f}$ at the data points $\boldsymbol{x}$ to get predictions over the
@@ -223,11 +232,13 @@ Lx = lower_cholesky(Kxx)
 f_hat = Lx @ opt_posterior.latent.value
 
 # Negative Hessian,  H = -∇²p_tilde(y|f):
-params, *static_state, graphdef = opt_posterior.split(gpx.parameters.Parameter, ...)
+graphdef, params, *static_state = nnx.split(
+    opt_posterior, gpx.parameters.Parameter, ...
+)
 
 
 def loss(params, D):
-    model = graphdef.merge(params, *static_state)
+    model = nnx.merge(graphdef, params, *static_state)
     return -gpx.objectives.log_posterior_density(model, D)
 
 
@@ -355,7 +366,7 @@ ax.legend()
 num_adapt = 600
 num_samples = 600
 
-params, *static_state, graphdef = posterior.split(gpx.parameters.Parameter, ...)
+graphdef, params, *static_state = nnx.split(posterior, gpx.parameters.Parameter, ...)
 params_bijection = gpx.parameters.DEFAULT_BIJECTION
 
 # Transform the parameters to the unconstrained space
@@ -364,7 +375,7 @@ params = gpx.parameters.transform(params, params_bijection, inverse=True)
 
 def logprob_fn(params):
     params = gpx.parameters.transform(params, params_bijection)
-    model = graphdef.merge(params, *static_state)
+    model = nnx.merge(graphdef, params, *static_state)
     return gpx.objectives.log_posterior_density(model, D)
 
 
@@ -429,7 +440,6 @@ ax2.plot(states.position.latent.value[:, 1, :])
 ax0.set_title("Kernel Lengthscale")
 ax1.set_title("Kernel Variance")
 ax2.set_title("Latent Function (index = 1)")
-plt.savefig("trace_plots.png")
 
 # %% [markdown]
 # ## Prediction
@@ -453,7 +463,7 @@ posterior_samples = []
 for i in trange(0, num_samples, thin_factor, desc="Drawing posterior samples"):
     sample_params = jtu.tree_map(lambda samples, i=i: samples[i], states.position)
     sample_params = gpx.parameters.transform(sample_params, params_bijection)
-    model = graphdef.merge(sample_params, *static_state)
+    model = nnx.merge(graphdef, sample_params, *static_state)
     latent_dist = model.predict(xtest, train_data=D)
     predictive_dist = model.likelihood(latent_dist)
     posterior_samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
@@ -494,7 +504,6 @@ ax.plot(
     linewidth=1,
 )
 ax.legend()
-plt.savefig("mcmc_fit.png")
 
 # %% [markdown]
 # ## System configuration

@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import beartype.typing as tp
-from flax.experimental import nnx
+from flax import nnx
 from jaxtyping import Float
 
 from gpjax.kernels.computations import (
@@ -43,6 +43,7 @@ class RationalQuadratic(StationaryKernel):
     k(x,y)=\sigma^2\exp\Bigg(1+\frac{\lVert x-y\rVert^2_2}{2\alpha\ell^2}\Bigg)
     $$
     """
+
     name: str = "Rational Quadratic"
 
     def __init__(

@@ -1,4 +1,4 @@
-from flax.experimental import nnx
+from flax import nnx
 import jax
 from jax import config
 import jax.numpy as jnp
@@ -65,10 +65,10 @@ def test_conjugate_mll(n_points: int, n_dims: int, key_val: int):
     assert res_simple.shape == ()
 
     # test call wrapped in loss function
-    state, *states, graphdef = post.split(Parameter, ...)
+    graphdef, state, *states = nnx.split(post, Parameter, ...)
 
     def loss(params):
-        posterior = graphdef.merge(params, *states)
+        posterior = nnx.merge(graphdef, params, *states)
         return -conjugate_mll(posterior, D)
 
     res_wrapped = loss(state)
@@ -106,10 +106,10 @@ def test_conjugate_loocv(n_points, n_dims, key_val):
     assert res_simple.shape == ()
 
     # test call wrapped in loss function
-    state, *states, graphdef = post.split(Parameter, ...)
+    graphdef, state, *states = nnx.split(post, Parameter, ...)
 
     def loss(params):
-        posterior = graphdef.merge(params, *states)
+        posterior = nnx.merge(graphdef, params, *states)
         return -conjugate_loocv(posterior, D)
 
     res_wrapped = loss(state)
@@ -147,10 +147,10 @@ def test_non_conjugate_mll(n_points, n_dims, key_val):
     assert res_simple.shape == ()
 
     # test call wrapped in loss function
-    state, *states, graphdef = post.split(Parameter, ...)
+    graphdef, state, *states = nnx.split(post, Parameter, ...)
 
     def loss(params):
-        posterior = graphdef.merge(params, *states)
+        posterior = nnx.merge(graphdef, params, *states)
         return -non_conjugate_mll(posterior, D)
 
     res_wrapped = loss(state)
@@ -227,10 +227,10 @@ def test_elbo(n_points, n_dims, key_val, binary: bool):
     assert res_simple.shape == ()
 
     # test call wrapped in loss function
-    state, *states, graphdef = q.split(Parameter, ...)
+    graphdef, state, *states = nnx.split(q, Parameter, ...)
 
     def loss(params):
-        posterior = graphdef.merge(params, *states)
+        posterior = nnx.merge(graphdef, params, *states)
         return -elbo(posterior, D)
 
     res_wrapped = loss(state)

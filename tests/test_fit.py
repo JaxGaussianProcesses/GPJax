@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from flax.experimental import nnx
+from flax import nnx
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (
