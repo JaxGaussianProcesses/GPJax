@@ -116,9 +116,9 @@ def test_invalid_batch_size_raises_error(
     utility_maximizer: AbstractSinglePointUtilityMaximizer,
     batch_size: int,
 ):
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     posterior_handlers = {OBJECTIVE: posterior_handler}
-    objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
+    objective_dataset = get_dataset(num_points=5, key=jr.key(42))
     datasets = {"OBJECTIVE": objective_dataset}
     with pytest.raises(ValueError):
         UtilityDrivenDecisionMaker(
@@ -143,9 +143,9 @@ def test_non_thompson_sampling_non_one_batch_size_raises_error(
     utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
     utility_maximizer: AbstractSinglePointUtilityMaximizer,
 ):
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     posterior_handlers = {OBJECTIVE: posterior_handler}
-    objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
+    objective_dataset = get_dataset(num_points=5, key=jr.key(42))
     datasets = {"OBJECTIVE": objective_dataset}
     with pytest.raises(NotImplementedError):
         UtilityDrivenDecisionMaker(
@@ -170,9 +170,9 @@ def test_invalid_tags_raises_error(
     utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
     utility_maximizer: AbstractSinglePointUtilityMaximizer,
 ):
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     posterior_handlers = {OBJECTIVE: posterior_handler}
-    dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
+    dataset = get_dataset(num_points=5, key=jr.key(42))
     datasets = {"CONSTRAINT": dataset}  # Dataset tag doesn't match posterior tag
     with pytest.raises(ValueError):
         UtilityDrivenDecisionMaker(
@@ -197,10 +197,10 @@ def test_initialisation_optimizes_posterior_hyperparameters(
     utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
     utility_maximizer: AbstractSinglePointUtilityMaximizer,
 ):
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     posterior_handlers = {OBJECTIVE: posterior_handler, CONSTRAINT: posterior_handler}
-    objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
-    constraint_dataset = get_dataset(num_points=5, key=jr.PRNGKey(10))
+    objective_dataset = get_dataset(num_points=5, key=jr.key(42))
+    constraint_dataset = get_dataset(num_points=5, key=jr.key(10))
     datasets = {"OBJECTIVE": objective_dataset, CONSTRAINT: constraint_dataset}
     decision_maker = UtilityDrivenDecisionMaker(
         search_space=search_space,
@@ -241,9 +241,9 @@ def test_decision_maker_ask(
     utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
     utility_maximizer: AbstractSinglePointUtilityMaximizer,
 ):
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     posterior_handlers = {OBJECTIVE: posterior_handler}
-    objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
+    objective_dataset = get_dataset(num_points=5, key=jr.key(42))
     datasets = {"OBJECTIVE": objective_dataset}
     decision_maker = UtilityDrivenDecisionMaker(
         search_space=search_space,
@@ -277,9 +277,9 @@ def test_decision_maker_ask_multi_batch_ts(
     utility_maximizer: AbstractSinglePointUtilityMaximizer,
     batch_size: int,
 ):
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     posterior_handlers = {OBJECTIVE: posterior_handler}
-    objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
+    objective_dataset = get_dataset(num_points=5, key=jr.key(42))
     datasets = {"OBJECTIVE": objective_dataset}
     decision_maker = UtilityDrivenDecisionMaker(
         search_space=search_space,
@@ -313,10 +313,10 @@ def test_decision_maker_tell_with_inconsistent_observations_raises_error(
     utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
     utility_maximizer: AbstractSinglePointUtilityMaximizer,
 ):
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     posterior_handlers = {OBJECTIVE: posterior_handler, CONSTRAINT: posterior_handler}
-    initial_objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
-    initial_constraint_dataset = get_dataset(num_points=5, key=jr.PRNGKey(10))
+    initial_objective_dataset = get_dataset(num_points=5, key=jr.key(42))
+    initial_constraint_dataset = get_dataset(num_points=5, key=jr.key(10))
     datasets = {
         OBJECTIVE: initial_objective_dataset,
         CONSTRAINT: initial_constraint_dataset,
@@ -332,8 +332,8 @@ def test_decision_maker_tell_with_inconsistent_observations_raises_error(
         post_tell=[],
         batch_size=1,
     )
-    mock_objective_observation = get_dataset(num_points=1, key=jr.PRNGKey(1))
-    mock_constraint_observation = get_dataset(num_points=1, key=jr.PRNGKey(2))
+    mock_objective_observation = get_dataset(num_points=1, key=jr.key(1))
+    mock_constraint_observation = get_dataset(num_points=1, key=jr.key(2))
     observations = {
         OBJECTIVE: mock_objective_observation,
         "CONSTRAINT_ONE": mock_constraint_observation,  # Deliberately incorrect tag
@@ -351,10 +351,10 @@ def test_decision_maker_tell_updates_datasets_and_models(
     utility_function_builder: AbstractSinglePointUtilityFunctionBuilder,
     utility_maximizer: AbstractSinglePointUtilityMaximizer,
 ):
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     posterior_handlers = {OBJECTIVE: posterior_handler, CONSTRAINT: posterior_handler}
-    initial_objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
-    initial_constraint_dataset = get_dataset(num_points=5, key=jr.PRNGKey(10))
+    initial_objective_dataset = get_dataset(num_points=5, key=jr.key(42))
+    initial_constraint_dataset = get_dataset(num_points=5, key=jr.key(10))
     datasets = {
         "OBJECTIVE": initial_objective_dataset,
         CONSTRAINT: initial_constraint_dataset,
@@ -373,8 +373,8 @@ def test_decision_maker_tell_updates_datasets_and_models(
     initial_decision_maker_key = decision_maker.key
     initial_objective_posterior = decision_maker.posteriors[OBJECTIVE]
     initial_constraint_posterior = decision_maker.posteriors[CONSTRAINT]
-    mock_objective_observation = get_dataset(num_points=1, key=jr.PRNGKey(1))
-    mock_constraint_observation = get_dataset(num_points=1, key=jr.PRNGKey(2))
+    mock_objective_observation = get_dataset(num_points=1, key=jr.key(1))
+    mock_constraint_observation = get_dataset(num_points=1, key=jr.key(2))
     observations = {
         OBJECTIVE: mock_objective_observation,
         CONSTRAINT: mock_constraint_observation,
@@ -416,9 +416,9 @@ def test_decision_maker_run(
     utility_maximizer: AbstractSinglePointUtilityMaximizer,
     n_steps: int,
 ):
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     posterior_handlers = {OBJECTIVE: posterior_handler}
-    initial_objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
+    initial_objective_dataset = get_dataset(num_points=5, key=jr.key(42))
     initial_datasets = {
         "OBJECTIVE": initial_objective_dataset,
     }
@@ -464,9 +464,9 @@ def test_decision_maker_run_ts(
     n_steps: int,
     batch_size: int,
 ):
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     posterior_handlers = {OBJECTIVE: posterior_handler}
-    initial_objective_dataset = get_dataset(num_points=5, key=jr.PRNGKey(42))
+    initial_objective_dataset = get_dataset(num_points=5, key=jr.key(42))
     initial_datasets = {
         "OBJECTIVE": initial_objective_dataset,
     }

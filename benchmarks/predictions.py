@@ -15,7 +15,7 @@ class Gaussian:
     params = [[100, 200, 500, 1000, 2000, 3000], [1, 2, 5]]
 
     def setup(self, n_test: int, n_dims: int):
-        key = jr.PRNGKey(123)
+        key = jr.key(123)
         self.X = jr.normal(key=key, shape=(100, n_dims))
         self.y = jnp.sin(self.X[:, :1])
         self.data = gpx.Dataset(X=self.X, y=self.y)
@@ -39,7 +39,7 @@ class Bernoulli:
     params = [[100, 200, 500, 1000, 2000, 3000], [1, 2, 5]]
 
     def setup(self, n_test: int, n_dims: int):
-        key = jr.PRNGKey(123)
+        key = jr.key(123)
         self.X = jr.normal(key=key, shape=(100, n_dims))
         self.y = jnp.sin(self.X[:, :1])
         self.y = jnp.array(jnp.where(self.y > 0, 1, 0), dtype=jnp.float64)
@@ -64,7 +64,7 @@ class Poisson:
     params = [[100, 200, 500, 1000, 2000, 3000], [1, 2, 5]]
 
     def setup(self, n_test: int, n_dims: int):
-        key = jr.PRNGKey(123)
+        key = jr.key(123)
         self.X = jr.normal(key=key, shape=(100, n_dims))
         f = lambda x: 2.0 * jnp.sin(3 * x) + 0.5 * x  # latent function
         self.y = jnp.array(jr.poisson(key, jnp.exp(f(self.X))), dtype=jnp.float64)

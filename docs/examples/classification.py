@@ -51,7 +51,7 @@ with install_import_hook("gpjax", "beartype.beartype"):
 
 tfd = tfp.distributions
 identity_matrix = jnp.eye
-key = jr.PRNGKey(123)
+key = jr.key(123)
 plt.style.use(
     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
 )

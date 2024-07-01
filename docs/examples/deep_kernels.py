@@ -44,7 +44,7 @@ with install_import_hook("gpjax", "beartype.beartype"):
     from gpjax.kernels.base import AbstractKernel
     from gpjax.kernels.computations import AbstractKernelComputation
 
-key = jr.PRNGKey(123)
+key = jr.key(123)
 plt.style.use(
     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
 )
@@ -103,7 +103,7 @@ class DeepKernelFunction(AbstractKernel):
     base_kernel: AbstractKernel = None
     network: nn.Module = static_field(None)
     dummy_x: jax.Array = static_field(None)
-    key: jr.PRNGKeyArray = static_field(jr.PRNGKey(123))
+    key: jax.Array = static_field(jr.key(123))
     nn_params: Any = field(init=False, repr=False)
 
     def __post_init__(self):

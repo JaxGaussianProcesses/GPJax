@@ -85,6 +85,6 @@ class PoissonTestFunction:
         Returns:
             Integer[Array, 'N 1']: Values of the test function at the points.
         """
-        key = jr.PRNGKey(42)
+        key = jr.key(42)
         f = lambda x: 2.0 * jnp.sin(3 * x) + 0.5 * x
         return jr.poisson(key, jnp.exp(f(x)))

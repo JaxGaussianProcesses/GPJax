@@ -49,7 +49,7 @@ with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     import gpjax.kernels as jk
 
-key = jr.PRNGKey(123)
+key = jr.key(123)
 tfb = tfp.bijectors
 plt.style.use(
     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
@@ -270,7 +270,7 @@ opt_posterior, history = gpx.fit(
     train_data=D,
     optim=ox.adam(learning_rate=schedule),
     num_iters=3000,
-    key=jr.PRNGKey(42),
+    key=jr.key(42),
     batch_size=128,
 )
 # %% [markdown]
@@ -334,7 +334,7 @@ opt_rep, history = gpx.fit(
     train_data=D,
     optim=ox.adam(learning_rate=0.01),
     num_iters=3000,
-    key=jr.PRNGKey(42),
+    key=jr.key(42),
     batch_size=128,
 )
 

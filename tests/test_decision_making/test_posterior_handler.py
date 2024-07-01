@@ -89,7 +89,7 @@ def test_get_optimized_posterior_with_no_key_raises_error():
         num_optimization_iters=10,
     )
     toy_function = Forrester()
-    dataset = toy_function.generate_dataset(num_points=5, key=jr.PRNGKey(42))
+    dataset = toy_function.generate_dataset(num_points=5, key=jr.key(42))
     with pytest.raises(ValueError):
         posterior_handler.get_posterior(dataset=dataset, optimize=True)
 
@@ -111,7 +111,7 @@ def test_update_and_optimize_posterior_with_no_key_raises_error():
         num_optimization_iters=10,
     )
     toy_function = Forrester()
-    dataset = toy_function.generate_dataset(num_points=5, key=jr.PRNGKey(42))
+    dataset = toy_function.generate_dataset(num_points=5, key=jr.key(42))
     initial_posterior = posterior_handler.get_posterior(dataset=dataset, optimize=False)
     with pytest.raises(ValueError):
         posterior_handler.update_posterior(
@@ -150,9 +150,7 @@ def test_get_posterior_no_optimization_correct_num_datapoints_and_not_optimized(
         optimizer=ox.adam(learning_rate=0.01),
         num_optimization_iters=10,
     )
-    dataset = test_function.generate_dataset(
-        num_points=num_datapoints, key=jr.PRNGKey(42)
-    )
+    dataset = test_function.generate_dataset(num_points=num_datapoints, key=jr.key(42))
     posterior = posterior_handler.get_posterior(dataset=dataset, optimize=False)
     assert posterior.likelihood.num_datapoints == num_datapoints
     assert posterior.prior.mean_function.constant == jnp.array([1.0])
@@ -192,11 +190,9 @@ def test_get_posterior_with_optimization_correct_num_datapoints_and_optimized(
         optimizer=ox.adam(learning_rate=0.01),
         num_optimization_iters=10,
     )
-    dataset = test_function.generate_dataset(
-        num_points=num_datapoints, key=jr.PRNGKey(42)
-    )
+    dataset = test_function.generate_dataset(num_points=num_datapoints, key=jr.key(42))
     optimized_posterior = posterior_handler.get_posterior(
-        dataset=dataset, optimize=True, key=jr.PRNGKey(42)
+        dataset=dataset, optimize=True, key=jr.key(42)
     )
     assert optimized_posterior.likelihood.num_datapoints == num_datapoints
     assert optimized_posterior.prior.mean_function.constant != jnp.array([1.0])
@@ -239,13 +235,13 @@ def test_update_posterior_no_optimize_same_prior_parameters_and_different_num_da
         num_optimization_iters=10,
     )
     initial_dataset = test_function.generate_dataset(
-        num_points=initial_num_datapoints, key=jr.PRNGKey(42)
+        num_points=initial_num_datapoints, key=jr.key(42)
     )
     initial_posterior = posterior_handler.get_posterior(
         dataset=initial_dataset, optimize=False
     )
     updated_dataset = initial_dataset + test_function.generate_dataset(
-        num_points=1, key=jr.PRNGKey(42)
+        num_points=1, key=jr.key(42)
     )
     assert updated_dataset.n == initial_dataset.n + 1
     updated_posterior = posterior_handler.update_posterior(
@@ -298,13 +294,13 @@ def test_update_posterior_with_optimization_updated_prior_parameters_and_differe
         num_optimization_iters=10,
     )
     initial_dataset = test_function.generate_dataset(
-        num_points=initial_num_datapoints, key=jr.PRNGKey(42)
+        num_points=initial_num_datapoints, key=jr.key(42)
     )
     initial_posterior = posterior_handler.get_posterior(
         dataset=initial_dataset, optimize=False
     )
     updated_dataset = initial_dataset + test_function.generate_dataset(
-        num_points=1, key=jr.PRNGKey(42)
+        num_points=1, key=jr.key(42)
     )
     assert updated_dataset.n == initial_dataset.n + 1
     non_optimized_updated_posterior = posterior_handler.update_posterior(
@@ -314,7 +310,7 @@ def test_update_posterior_with_optimization_updated_prior_parameters_and_differe
         dataset=updated_dataset,
         previous_posterior=initial_posterior,
         optimize=True,
-        key=jr.PRNGKey(42),
+        key=jr.key(42),
     )
     assert (
         optimized_updated_posterior.prior.kernel.lengthscale

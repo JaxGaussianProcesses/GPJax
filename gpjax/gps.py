@@ -147,6 +147,7 @@ class Prior(AbstractPrior[MeanFunction, Kernel]):
         >>> prior = gpx.gps.Prior(mean_function=meanf, kernel = kernel)
     ```
     """
+
     if TYPE_CHECKING:
 
         @overload
@@ -315,7 +316,7 @@ class Prior(AbstractPrior[MeanFunction, Kernel]):
             >>> import gpjax as gpx
             >>> import jax.numpy as jnp
             >>> import jax.random as jr
-            >>> key = jr.PRNGKey(123)
+            >>> key = jr.key(123)
             >>>
             >>> meanf = gpx.mean_functions.Zero()
             >>> kernel = gpx.kernels.RBF()
@@ -537,9 +538,10 @@ class ConjugatePosterior(AbstractPosterior[PriorType, GaussianLikelihood]):
         Sigma = cola.PSD(Sigma)
 
         mean_t = self.prior.mean_function(t)
-        Ktt = kernel_with_t.gram(t)
-        Kxt = kernel_with_t.cross_covariance(x, t)
-        Sigma_inv_Kxt = cola.solve(Sigma, Kxt)
+        Ktt = self.prior.kernel.gram(t)
+        Kxt = self.prior.kernel.cross_covariance(x, t)
+        Sigma_inv_Kxt = cola.solve(Sigma, Kxt, Cholesky())
+
 
         # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
         mean = mean_t + jnp.matmul(Sigma_inv_Kxt.T, y - mx)

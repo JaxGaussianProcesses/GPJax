@@ -65,7 +65,7 @@ def generate_dummy_non_conjugate_posterior(dataset: Dataset) -> NonConjugatePost
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_thompson_sampling_no_objective_posterior_raises_error():
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     forrester = Forrester()
     dataset = forrester.generate_dataset(num_points=10, key=key)
     posterior = generate_dummy_conjugate_posterior(dataset)
@@ -82,7 +82,7 @@ def test_thompson_sampling_no_objective_posterior_raises_error():
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_thompson_sampling_no_objective_dataset_raises_error():
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     forrester = Forrester()
     dataset = forrester.generate_dataset(num_points=10, key=key)
     posterior = generate_dummy_conjugate_posterior(dataset)
@@ -99,7 +99,7 @@ def test_thompson_sampling_no_objective_dataset_raises_error():
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_thompson_sampling_non_conjugate_posterior_raises_error():
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     forrester = Forrester()
     dataset = forrester.generate_dataset(num_points=10, key=key)
     posterior = generate_dummy_non_conjugate_posterior(dataset)
@@ -117,7 +117,7 @@ def test_thompson_sampling_non_conjugate_posterior_raises_error():
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_thompson_sampling_invalid_rff_num_raises_error(num_rff_features: int):
-    key = jr.PRNGKey(42)
+    key = jr.key(42)
     forrester = Forrester()
     dataset = forrester.generate_dataset(num_points=10, key=key)
     posterior = generate_dummy_conjugate_posterior(dataset)
@@ -135,7 +135,7 @@ def test_thompson_sampling_invalid_rff_num_raises_error(num_rff_features: int):
     [(Forrester()), (LogarithmicGoldsteinPrice())],
 )
 @pytest.mark.parametrize("num_test_points", [50, 100])
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
@@ -163,7 +163,7 @@ def test_thompson_sampling_utility_function_correct_shapes(
     [(Forrester()), (LogarithmicGoldsteinPrice())],
 )
 @pytest.mark.parametrize("num_test_points", [50, 100])
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
@@ -198,7 +198,7 @@ def test_thompson_sampling_utility_function_same_key_same_function(
     [(Forrester()), (LogarithmicGoldsteinPrice())],
 )
 @pytest.mark.parametrize("num_test_points", [50, 100])
-@pytest.mark.parametrize("key", [jr.PRNGKey(42), jr.PRNGKey(10)])
+@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
