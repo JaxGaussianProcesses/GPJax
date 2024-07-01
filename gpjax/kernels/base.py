@@ -63,6 +63,9 @@ class AbstractKernel(Module):
     def gram(self, x: Num[Array, "N D"]):
         return self.compute_engine.gram(self, x)
 
+    def diagonal(self, x: Num[Array, "N D"]):
+        return self.compute_engine.diagonal(self, x)
+
     def slice_input(self, x: Float[Array, "... D"]) -> Float[Array, "... Q"]:
         r"""Slice out the relevant columns of the input matrix.
 
