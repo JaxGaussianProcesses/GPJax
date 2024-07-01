@@ -52,7 +52,7 @@ def build_function_evaluator(
     return lambda x: {tag: Dataset(x, f(x)) for tag, f in functions.items()}
 
 
-def gaussian_cdf(x: Float[Array, "N"]) -> Float[Array, "N"]:
+def gaussian_cdf(x: Float[Array, " N"]) -> Float[Array, " N"]:
     """
     Compute the cumulative distribution function of the standard normal distribution at
     the points `x`.
