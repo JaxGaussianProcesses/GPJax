@@ -31,7 +31,6 @@ from gpjax.typing import KeyArray
 
 from tests.test_decision_making.utils import (
     generate_dummy_conjugate_posterior,
-    generate_dummy_non_conjugate_posterior,
 )
 
 
