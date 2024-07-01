@@ -19,6 +19,9 @@ from gpjax.decision_making.utility_functions.base import (
     UtilityFunction,
 )
 from gpjax.decision_making.utility_functions.thompson_sampling import ThompsonSampling
+from gpjax.decision_making.utility_functions.probability_of_improvement import (
+    ProbabilityOfImprovement,
+)
 
 __all__ = [
     "UtilityFunction",
@@ -26,4 +29,5 @@ __all__ = [
     "AbstractSinglePointUtilityFunctionBuilder",
     "SinglePointUtilityFunction",
     "ThompsonSampling",
+    "ProbabilityOfImprovement",
 ]
