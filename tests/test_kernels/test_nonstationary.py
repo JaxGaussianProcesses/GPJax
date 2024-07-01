@@ -241,4 +241,4 @@ class TestArcCosine(BaseTestKernel):
         integrands = H_a * H_b * (weights_a**order) * (weights_b**order)
         Kab_approx = 2.0 * jnp.mean(integrands)
 
-        assert jnp.max(Kab_approx - Kab_exact) < 1e-4
+        assert jnp.max(jnp.abs(Kab_approx - Kab_exact)) < 1e-4
