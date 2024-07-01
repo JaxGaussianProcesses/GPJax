@@ -35,8 +35,30 @@ from gpjax.typing import (
 
 @dataclass
 class ProbabilityOfImprovement(AbstractSinglePointUtilityFunctionBuilder):
-    """
-    TODO: write.
+    r"""
+    An acquisition function which returns the probability of improvement
+    of the objective function over the best observed value.
+
+    More precisely, given a predictive posterior distribution of the objective
+    function, the probability of improvement at a test point $`x`$ is defined as:
+    $$`\text{PI}(x) = \text{Prob}[f(x) < f(x_{\text{best}})]`$$
+    where $`x_{\text{best}}`$ is the minimizer of $`f`$ in the dataset.
+
+    The probability of improvement can be easily computed using the
+    cumulative distribution function of the standard normal distribution $`\Phi`$:
+    $$`\text{PI}(x) = \Phi\left(\frac{f(x_{\text{best}}) - \mu}{\sigma}\right)`$$
+    where $`\mu`$ and $`\sigma`$ are the mean and standard deviation of the
+    predictive distribution of the objective function at $`x`$.
+
+    References
+    ----------
+    [1] Kushner, H. J. (1964).
+    A new method of locating the maximum point of an arbitrary multipeak curve in the presence of noise.
+    Journal of Basic Engineering, 86(1), 97-106.
+
+    [2] Shahriari, B., Swersky, K., Wang, Z., Adams, R. P., & de Freitas, N. (2016).
+    Taking the human out of the loop: A review of Bayesian optimization.
+    Proceedings of the IEEE, 104(1), 148-175. doi: 10.1109/JPROC.2015.2494218
     """
 
     def build_utility_function(
@@ -46,9 +68,8 @@ class ProbabilityOfImprovement(AbstractSinglePointUtilityFunctionBuilder):
         key: KeyArray,
     ) -> SinglePointUtilityFunction:
         """
-        Draw an approximate sample from the posterior of the objective model and return
-        the *negative* of this sample as a utility function, as utility functions
-        are *maximised*.
+        Constructs the probability of improvement utility function
+        using the predictive posterior of the objective function.
 
         Args:
             posteriors (Mapping[str, AbstractPosterior]): Dictionary of posteriors to be
@@ -59,13 +80,11 @@ class ProbabilityOfImprovement(AbstractSinglePointUtilityFunctionBuilder):
             to form the utility function. Keys in `datasets` should correspond to
             keys in `posteriors`. One of the datasets must correspond
             to the `OBJECTIVE` key.
-            key (KeyArray): JAX PRNG key used for random number generation. This can be
-            changed to draw different samples.
+            key (KeyArray): JAX PRNG key used for random number generation. Since the probability of improvement is computed deterministically
+            from the predictive posterior, the key is not used.
 
         Returns:
-            SinglePointUtilityFunction: An appproximate sample from the objective model
-            posterior to to be *maximised* in order to decide which point to query
-            next.
+            SinglePointUtilityFunction: the probability of improvement utility function.
         """
         self.check_objective_present(posteriors, datasets)
 
@@ -87,4 +106,4 @@ class ProbabilityOfImprovement(AbstractSinglePointUtilityFunctionBuilder):
                 (best_y - predictive_dist.mean()) / predictive_dist.stddev()
             ).reshape(-1, 1)
 
-        return probability_of_improvement  # Utility functions are *maximised*
+        return probability_of_improvement

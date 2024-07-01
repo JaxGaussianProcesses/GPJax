@@ -756,5 +756,3 @@ plt.show()
 # %%
 # %reload_ext watermark
 # %watermark -n -u -v -iv -w -a 'Thomas Christie'
-
-# %%
