@@ -40,7 +40,7 @@ class ProbabilityOfImprovement(AbstractSinglePointUtilityFunctionBuilder):
     of the objective function over the best observed value.
 
     More precisely, given a predictive posterior distribution of the objective
-    function, the probability of improvement at a test point $`x`$ is defined as:
+    function $`f`$, the probability of improvement at a test point $`x`$ is defined as:
     $$`\text{PI}(x) = \text{Prob}[f(x) < f(x_{\text{best}})]`$$
     where $`x_{\text{best}}`$ is the minimizer of $`f`$ in the dataset.
 
@@ -80,7 +80,8 @@ class ProbabilityOfImprovement(AbstractSinglePointUtilityFunctionBuilder):
             to form the utility function. Keys in `datasets` should correspond to
             keys in `posteriors`. One of the datasets must correspond
             to the `OBJECTIVE` key.
-            key (KeyArray): JAX PRNG key used for random number generation. Since the probability of improvement is computed deterministically
+            key (KeyArray): JAX PRNG key used for random number generation. Since
+            the probability of improvement is computed deterministically
             from the predictive posterior, the key is not used.
 
         Returns:
