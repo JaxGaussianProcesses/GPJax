@@ -5,6 +5,31 @@
 # a framework for optimising black-box function that leverages the
 # uncertainty estimates that come from Gaussian processes.
 
+# %% [markdown]
+
+# In a few words, Bayesian optimisation starts by fitting a Gaussian
+# process to the data we have collected so far about the objective function,
+# and then uses this model to construct an **acquisition function**
+# which tells us which parts of the input domain have the potential
+# of improving our optimization. Unlike the black-box objective, the
+# acquisition function is easy to query and optimize.
+#
+# Acquisition functions come in many flavors. In the previous guide,
+# we sampled from the Gaussian Process' predictive posterior and
+# optimized said sample. This is known as **Thompson Sampling**,
+# and it is a popular acquisition function due to its simplicity
+# and ease of parallelization.
+#
+# In this guide we will introduce a new acquisition function:
+# *Probability of Improvement* [[Kushner, 1964]](https://asmedigitalcollection.asme.org/fluidsengineering/article/86/1/97/392213/A-New-Method-of-Locating-the-Maximum-Point-of-an). This acquisition function can be formally
+# defined as
+# $$ \text{PI}(x) = \text{Prob}[f(x) < f(x_{\text{best}})] $$
+# where $f(x)$ is the objective functionw we aim at **minimizing**,
+# and $x_{\text{best}}$ is the best point we have seen so far (i.e.
+# the point with the lowest value for $f$). The name is clear: it measures
+# the probability that a given point $x$ will **improve** our
+# optimization trace.
+
 # %%
 # Enable Float64 for more stable matrix inversions.
 from jax import config
@@ -34,60 +59,46 @@ plt.style.use(
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
-
-# In a few words, Bayesian optimisation starts by fitting a Gaussian
-# process to the data we have collected so far about the objective function,
-# and then uses this model to construct an **acquisition function**
-# which tells us which parts of the input domain have the potential
-# of improving our optimization. Unlike the black-box objective, the
-# acquisition function is easy to query and optimize.
-
-# Acquisition functions come in many flavors. In the previous guide,
-# we sampled from the Gaussian Process' predictive posterior and
-# optimized said sample. This is known as Thompson Sampling,
-# and it is a popular acquisition function due to its simplicity
-# and ease of parallelization.
-
-# In this guide we will introduce a new acquisition function:
-# probability of improvement [TODO:ADDCITE](). This acquisition function can be formally
-# defined as
-
-# $$ \text{PI}(x) = \text{Prob}(f(x) < f(x_{\text{best}})) $$
-
-# where $f(x)$ is the objective functionw we aim at **minimizing**,
-# and $x_{\text{best}}$ is the best point we have seen so far (i.e.
-# the point with the lowest value of $f$). The name is clear: it measures
-# the probability that a given point $x$ will **improve** our
-# optimization trace.
-
-# %% [markdown]
-# ## Optimizing a 1D function: Forrester
+# ## Optimizing Logarithmic Goldstein-Price
 #
-# Just like in our previous guide, let's start by defining the
-# [Forrester objective function](https://www.sfu.ca/~ssurjano/forretal08.html).
-
-
-# %%
-def standardised_forrester(x: Float[Array, "N 1"]) -> Float[Array, "N 1"]:
-    mean = 0.45321
-    std = 4.4258
-    return ((6 * x - 2) ** 2 * jnp.sin(12 * x - 4) - mean) / std
-
+# Our module for `decision_making` includes a couple of test functions
+# you can use to test whether your model fitting/optimization algorithms are
+# working properly. One of these is the [Logarithmic Goldstein-Price function](https://www.sfu.ca/~ssurjano/goldpr.html).
+#
+# These test functions we provide contain a search space, minimizer, and minimum
+# attributes, as well as methods for generating training and testing datasets.
 
 # %%
-lower_bound = jnp.array([0.0])
-upper_bound = jnp.array([1.0])
-initial_sample_num = 5
+from gpjax.decision_making.test_functions import LogarithmicGoldsteinPrice
 
-initial_x = tfp.mcmc.sample_halton_sequence(
-    dim=1, num_results=initial_sample_num, seed=key, dtype=jnp.float64
-).reshape(-1, 1)
-initial_y = standardised_forrester(initial_x)
-D = gpx.Dataset(X=initial_x, y=initial_y)
+logarithmic_goldstein_price = LogarithmicGoldsteinPrice()
+
+example_dataset = logarithmic_goldstein_price.generate_dataset(num_points=5, key=key)
+example_values = logarithmic_goldstein_price.evaluate(example_dataset.X)
+print(f"Example Dataset: {example_dataset.X}")
+print(f"Example Values: {example_values}")
+print(f"Minimizer: {logarithmic_goldstein_price.minimizer}")
+print(f"Minimum: {logarithmic_goldstein_price.minimum}")
 
 # %% [markdown]
 
-# ...defining the Gaussian Process model...
+# Let's plot this function to see what it looks like. As you might have noticed from the dataset, this function takes as input points in
+
+# %%
+
+domain = jnp.linspace(0, 1, 1000).reshape(-1, 1)
+objective_values = logarithmic_goldstein_price.evaluate(domain)
+
+fig, ax = plt.subplots()
+ax.plot(domain, objective_values, label="Logarithmic Goldstein-Price Function")
+ax.scatter(
+    example_dataset.X.flatten(), example_dataset.y, label="Observations", color=cols[2]
+)
+
+# %% [markdown]
+
+# Just like in the previous guide, we can fit a Gaussian Process to
+# a dataset rendering an optimised posterior:
 
 
 # %%
@@ -119,42 +130,66 @@ def return_optimised_posterior(
     return opt_posterior
 
 
+D = logarithmic_goldstein_price.generate_dataset(num_points=10, key=key)
+
 mean = gpx.mean_functions.Zero()
 kernel = gpx.kernels.Matern52()
 prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 opt_posterior = return_optimised_posterior(D, prior, key)
 
+# %% [markdown]
 
+# Using this optimised posterior, we can construct the Probability of Improvement
+# acquisition function.
+
+# %%
+
+from gpjax.decision_making.utility_functions.base import SinglePointUtilityFunction
 from gpjax.decision_making.utility_functions.probability_of_improvement import (
     ProbabilityOfImprovement,
 )
 
-utility_function_builder = ProbabilityOfImprovement()
-utility_function = utility_function_builder.build_utility_function(
-    posteriors={"OBJECTIVE": opt_posterior}, datasets={"OBJECTIVE": D}, key=key
-)
+
+def construct_acquisition_function(
+    opt_posterior: gpx.base.Module,
+    dataset: gpx.Dataset,
+    key: Array,
+) -> SinglePointUtilityFunction:
+    # ProbabilityOfImprovement is a builder of acquisition functions
+    utility_function_builder = ProbabilityOfImprovement()
+
+    utility_function = utility_function_builder.build_utility_function(
+        posteriors={"OBJECTIVE": opt_posterior},
+        datasets={"OBJECTIVE": dataset},
+        key=key,
+    )
+
+    return utility_function
+
+
+utility_function = construct_acquisition_function(opt_posterior, D, key)
+
+# %% [markdown]
+
+# Our module for decision making also provides a maximizer of utility functions. With it, we can construct a simple `optimize_acquisition_function` function that will return the point that maximizes the Probability of Improvement.
+
+# %%
 
 from gpjax.decision_making.utility_maximizer import (
     ContinuousSinglePointUtilityMaximizer,
 )
-from gpjax.decision_making.utility_functions.base import SinglePointUtilityFunction
 from gpjax.decision_making.search_space import ContinuousSearchSpace
 
 
 def optimize_acquisition_function(
     utility_function: SinglePointUtilityFunction,
     key: Array,
-    lower_bounds: Float[Array, "D"],
-    upper_bounds: Float[Array, "D"],
+    search_space: ContinuousSearchSpace,
     num_initial_samples: int = 100,
     num_restarts: int = 5,
 ):
     optimizer = ContinuousSinglePointUtilityMaximizer(
         num_initial_samples=num_initial_samples, num_restarts=num_restarts
-    )
-
-    search_space = ContinuousSearchSpace(
-        lower_bounds=lower_bounds, upper_bounds=upper_bounds
     )
 
     x_next_best = optimizer.maximize(
@@ -164,20 +199,11 @@ def optimize_acquisition_function(
     return x_next_best
 
 
-# %%
-def construct_acquisition_function(
-    opt_posterior: gpx.base.Module,
-    dataset: gpx.Dataset,
-    key: Array,
-) -> SinglePointUtilityFunction:
-    utility_function_builder = ProbabilityOfImprovement()
-    utility_function = utility_function_builder.build_utility_function(
-        posteriors={"OBJECTIVE": opt_posterior},
-        datasets={"OBJECTIVE": dataset},
-        key=key,
-    )
+# %% [markdown]
 
-    return utility_function
+# ...remembering the basics of a BO loop.
+
+# %%
 
 
 def propose_next_candidate(
