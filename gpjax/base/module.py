@@ -87,7 +87,7 @@ def static_field(  # noqa: PLR0913
     )
 
 
-def _inherited_metadata(cls: type) -> Dict[str]:
+def _inherited_metadata(cls: type) -> Dict[str, Any]:
     meta_data = dict()
     for parent_class in cls.mro():
         if parent_class is not cls and parent_class is not Module:
