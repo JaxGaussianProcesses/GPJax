@@ -237,6 +237,12 @@ acquisition_maximizer = ContinuousSinglePointUtilityMaximizer(
     num_initial_samples=100, num_restarts=1
 )
 
+# %% [markdown]
+
+# It is worth noting that `ThompsonSampling` is not the only utility function we could use,
+# since our module also provides e.g. `ProbabilityOfImprovement`,
+# which was briefly discussed in [our previous introduction to Bayesian optimisation](https://docs.jaxgaussianprocesses.com/examples/bayesian_optimisation/).
+
 
 # %% [markdown]
 # ## Putting it All Together with the Decision Maker
