@@ -62,7 +62,3 @@ def test_probability_of_improvement_gives_correct_value_for_a_seed():
 
     assert utility_values.shape == (10, 1)
     assert jnp.isclose(utility_values, expected_utility_values).all()
-
-
-if __name__ == "__main__":
-    test_probability_of_improvement_gives_correct_value_for_a_seed()

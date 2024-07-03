@@ -40,7 +40,8 @@ class ProbabilityOfImprovement(AbstractSinglePointUtilityFunctionBuilder):
     More precisely, given a predictive posterior distribution of the objective
     function $`f`$, the probability of improvement at a test point $`x`$ is defined as:
     $$`\text{PI}(x) = \text{Prob}[f(x) < f(x_{\text{best}})]`$$
-    where $`x_{\text{best}}`$ is the minimizer of $`f`$ in the dataset.
+    where $`x_{\text{best}}`$ is the minimiser of the posterior mean
+    at previously observed values (to handle noisy observations).
 
     The probability of improvement can be easily computed using the
     cumulative distribution function of the standard normal distribution $`\Phi`$:
