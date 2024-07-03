@@ -50,11 +50,3 @@ def build_function_evaluator(
     dictionary of datasets storing the evaluated points.
     """
     return lambda x: {tag: Dataset(x, f(x)) for tag, f in functions.items()}
-
-
-def gaussian_cdf(x: Float[Array, " N"]) -> Float[Array, " N"]:
-    """
-    Compute the cumulative distribution function of the standard normal distribution at
-    the points `x`.
-    """
-    return 0.5 * (1 + jax.scipy.special.erf(x / jnp.sqrt(2)))
