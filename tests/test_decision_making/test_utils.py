@@ -21,7 +21,6 @@ import jax.numpy as jnp
 from gpjax.decision_making.utils import (
     OBJECTIVE,
     build_function_evaluator,
-    gaussian_cdf,
 )
 from gpjax.typing import (
     Array,
@@ -45,9 +44,3 @@ def test_build_function_evaluator():
     assert jnp.equal(datasets[OBJECTIVE].y, _square(x)).all()
     assert jnp.equal(datasets["CONSTRAINT"].X, x).all()
     assert jnp.equal(datasets["CONSTRAINT"].y, _cube(x)).all()
-
-
-def test_gaussian_cdf():
-    x = jnp.array([0.0, 1.0, 2.0])
-    cdf = jnp.array([0.5, 0.84134475, 0.97724987])
-    assert jnp.allclose(cdf, gaussian_cdf(x))

@@ -148,11 +148,11 @@ def test_utility_functions_have_correct_shapes(
     posterior = generate_dummy_conjugate_posterior(dataset)
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
-    ts_utility_builder = utility_function_builder(**utility_function_kwargs)
-    ts_utility_function = ts_utility_builder.build_utility_function(
+    utility_builder = utility_function_builder(**utility_function_kwargs)
+    utility_function = utility_builder.build_utility_function(
         posteriors=posteriors, datasets=datasets, key=key
     )
     test_key, _ = jr.split(key)
     test_X = test_target_function.generate_test_points(num_test_points, test_key)
-    ts_utility_function_values = ts_utility_function(test_X)
+    ts_utility_function_values = utility_function(test_X)
     assert ts_utility_function_values.shape == (num_test_points, 1)
