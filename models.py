@@ -226,24 +226,20 @@ class ConjugatePrecipGP(Module):
     
 
 
-    def predict_indiv_mean(
+    def predict_indiv(
         self,
         test_inputs: Num[Array, "N D"],
         train_data: gpx.Dataset,
         component_list: Optional[List[List[int]]]=None,
     ):
-        predictor = lambda x: self.predict(x, train_data, component_list).mean()
-        return jax.vmap(predictor,1)(test_inputs[:,None,:]).T
+        predictor_mean = lambda x: self.predict(x, train_data, component_list).mean()
+        means = jax.vmap(predictor_mean,1)(test_inputs[:,None,:]).T
+        predictor_var = lambda x: self.predict(x, train_data, component_list).variance()
+        vars = jax.vmap(predictor_var,1)(test_inputs[:,None,:]).T
+        return means, vars
     
-    def predict_indiv_var(
-        self,
-        test_inputs: Num[Array, "N D"],
-        train_data: gpx.Dataset,
-        component_list: Optional[List[List[int]]]=None,
-    ):
-        predictor = lambda x: self.predict(x, train_data, component_list).variance()
-        return jax.vmap(predictor,1)(test_inputs[:,None,:]).T
-
+    
+   
 
     def get_sobol_indicies(self, train_data: gpx.Dataset, component_list: List[List[int]], use_range=False, greedy=False) -> Num[Array, "c"]:
 
@@ -317,7 +313,7 @@ class ConjugatePrecipGP(Module):
 
 @dataclass
 class VariationalPrecipGP(ConjugatePrecipGP):
-    base_kernels:List[gpx.kernels.AbstractKernel]
+    base_kernels: List[gpx.kernels.AbstractKernel]
     likelihood: gpx.likelihoods.AbstractLikelihood
     variational_mean: Union[Float[Array, "L N 1"], None] = param_field(None)
     variational_root_covariance: Float[Array, "L N N"] = param_field(
@@ -415,6 +411,7 @@ class VariationalPrecipGP(ConjugatePrecipGP):
     def _predict(
         self,
         test_inputs: Num[Array, "N D"],
+        component_list: Optional[List[List[int]]]=None,
     ) -> Union[GaussianDistribution,  Num[Array, "N 1"]]:
         r"""Get the posterior predictive distribution."""
 
@@ -432,8 +429,12 @@ class VariationalPrecipGP(ConjugatePrecipGP):
 
         # Unpack test inputs
         t = test_inputs
-        Ktt = self.eval_K_xt(t,t, ref=z) # [L, N, N]
-        Kzt = self.eval_K_xt(z,t,ref=z) # [L, M, N]
+        if component_list is None:
+            Ktt = self.eval_K_xt(t,t, ref=z) # [L, N, N]
+            Kzt = self.eval_K_xt(z,t, ref=z) # [L, M, N]
+        else:
+            Ktt = self.eval_specific_K_xt(t,t, component_list, ref = z) # [L, N, N]
+            Kzt = self.eval_specific_K_xt(z,t, component_list, ref = z) # [L, N, N]
         mut = self.mean_function(t)[None,:,:] # [1, M, 1]
 
         if self.parameterisation == "white":
@@ -478,4 +479,118 @@ class VariationalPrecipGP(ConjugatePrecipGP):
         return mean, covariance
 
 
+    def eval_K_xt(self, x: Num[Array, "N d"], t: Num[Array, "M d"], ref:  Num[Array, "n d"]) -> Num[Array, "L N M"]:
+        if self.measure == "empirical":
+            x_all, t_all = jnp.vstack([x, ref]), jnp.vstack([t, ref])  # [N+n, d] [M+n, d]
+            ks_all = jnp.stack([k.cross_covariance(x_all,t_all) for k in self.base_kernels]) # [d, N+n, M+n]
+            ks_all = self._orthogonalise_empirical(ks_all, num_ref = jnp.shape(ref)[0])  # [d, N, M]
+        elif self.measure is None:
+            ks_all = jnp.stack([k.cross_covariance(x,t) for k in self.base_kernels]) # [d, N, M]
+        else:
+            raise ValueError("measure must be empirical, uniform or None")
+        k = jnp.sum(self._compute_additive_terms_girad_newton(ks_all) * self.interaction_variances[:, None, None], 0) # [N, M]
+        return jnp.tile(k[None,:,:], (self.num_latents, 1, 1)) # [L, N, M]
 
+
+    def eval_specific_K_xt(self, x: Num[Array, "N d"], t: Num[Array, "M d"], component_list: List[int], ref =  Num[Array, "n d"])-> Num[Array, "L N M"]:
+        
+        if len(component_list) == 0:
+            return self.interaction_variances[:,0, None,None] * jnp.ones((self.num_latents, jnp.shape(x)[0], jnp.shape(t)[0])) # [L N M]
+        
+        if self.measure == "empirical":
+            x_all, t_all = jnp.vstack([x, ref]), jnp.vstack([t, ref])  # [N+n, d] [M+n, d]
+            ks_all = jnp.stack([self.base_kernels[i].cross_covariance(x_all,t_all) for i in component_list]) # [p, N+n, M+n]
+            ks_all = self._orthogonalise_empirical(ks_all, num_ref = jnp.shape(ref)[0]) # [p, N, M] 
+        elif self.measure is None:
+            ks_all = jnp.stack([self.base_kernels[i].cross_covariance(x,t) for i in component_list]) # [p, N, M]
+        else:
+            raise ValueError("measure must be empirical, uniform or None")
+        k = self.interaction_variances[len(component_list), None, None] * jnp.prod(ks_all,0) # [N, M] 
+        return  jnp.tile(k[None,:,:], (self.num_latents, 1, 1)) # [L, N, M]
+
+
+    def predict_indiv(
+        self,
+        test_inputs: Num[Array, "N D"],
+        component_list: Optional[List[List[int]]]=None,
+    ):
+        def q_moments(x):
+            qx = self._predict(x, component_list=component_list)
+            return qx[0], qx[1]
+        mean, var = vmap(q_moments)(test_inputs[:, None,:]) 
+        return mean[:,:,0,0], var[:,:,0,0]
+
+
+
+    def get_sobol_indicies(self, data:gpx.Dataset, component_list: List[List[int]], greedy=True, use_range=False) -> Num[Array, "L c"]:
+        if use_range:
+            raise NotImplementedError("use_range not implemented yet")
+        
+        if not isinstance(component_list, List):
+            raise ValueError("Use get_sobol_index if you want to calc for single components (TODO)")
+
+
+        mu = self.variational_mean
+        sqrt = self.variational_root_covariance
+        z = self.get_inducing_locations()
+        m_z = jnp.tile(self.mean_function(z)[None,:,:], (self.num_latents, 1, 1))
+        m_x = jnp.tile(self.mean_function(z)[None,:,:], (self.num_latents, 1, 1))
+
+
+        if self.measure == "empirical":
+            z_all = jnp.vstack([z,z]) # waste of memory here
+            Kxz_indiv = jnp.stack([k.cross_covariance(z_all,z_all) for k in self.base_kernels], axis=0)  # [d, N + M, M + M]
+            Kxz_indiv =  self._orthogonalise_empirical(Kxz_indiv, num_ref = jnp.shape(z)[0]) # [d, N, M]
+        elif self.measure is None:
+            Kxz_indiv = jnp.stack([k.cross_covariance(z,z) for k in self.base_kernels], axis=0)  # [d, N, M]
+        else:
+            raise ValueError("measure must be empirical, uniform or None")
+        Kxz_components = [self.interaction_variances[len(c),None,None]*jnp.prod(Kxz_indiv[c, :, :], axis=0) for c in component_list] 
+        Kxz_components = jnp.stack(Kxz_components, axis=0) # [c, N, N]
+        
+        Kxz_components = jnp.tile(Kxz_components[None,:,:, :], (self.num_latents, 1, 1, 1)) # [L, c, N, N]
+        assert Kxz_components.shape[1] == len(component_list)
+
+
+        Kzz = self.eval_K_xt(z, z, ref =  z) # [L, M, M]
+        Kzz =Kzz + jnp.eye(self.num_inducing)[None,:,:] * self.jitter
+        Kxz = self.eval_K_xt(z,z, ref =  z)
+        Lz = jnp.linalg.cholesky(Kzz)
+
+
+        if self.parameterisation == "white":
+            def get_mean_from_covar(K): # [L,N,N] -> [L,N, 1]
+                Lz_inv_Kzt = jnp.linalg.solve(Lz, jnp.transpose(K, (0,2,1)))
+                return m_x + jnp.matmul(jnp.transpose(Lz_inv_Kzt, (0,2,1)), mu)
+        else:
+            def get_mean_from_covar(K): # [L,N,N] -> [LN, 1]
+                Lz_inv_Kzt = jnp.linalg.solve(Lz, jnp.transpose(K, (0,2,1)))
+                Kzz_inv_Kzt = jnp.linalg.solve(jnp.transpose(Lz, (0,2,1)), Lz_inv_Kzt)
+                return m_x + jnp.matmul(jnp.transpose(Kzz_inv_Kzt, (0,2,1)), mu - m_z)
+            
+
+
+        mean_overall =  get_mean_from_covar(Kxz) # [L,N, 1]
+        mean_components = jnp.transpose(vmap(get_mean_from_covar)(jnp.transpose(Kxz_components,(1,0,2,3))), (1,0,2,3)) # [L,c, N, 1]
+        
+        if not greedy:
+            sobols = jnp.var(mean_components[:,:,:,0], axis=-1) / jnp.var(mean_overall[:,:,0], axis=-1) # [L, c]
+        else:
+            raise ValueError("greedy doesnt work")
+            sobols = jnp.zeros((self.num_latents,len(component_list)))
+            cumulative_pred = jnp.zeros((self.num_latents, jnp.shape(z)[0])) # [L, N]
+            for i in range(len(component_list)):
+                # v_12 = jnp.var(mean_components[:,:,:,0] - cumulative_pred[:,None,:], axis=-1)  # [L, c]
+                # v_1 = jnp.var(mean_components[:,:,:,0],-1)# [L, c]
+                # v_2 = jnp.var(cumulative_pred[:,None,:],-1)# [L, 1]
+                # cov = 0.5 * (v_1 + v_2 - v_12) # [L, c]
+                # current_sobols = v_1 - cov**2/(v_2+1e-6)
+                current_sobols = jnp.var(mean_components[:,:,:,0] - cumulative_pred[:,None,:], axis=-1)  # [L, c]
+                print(current_sobols)
+                max_idx = jnp.argmax(current_sobols,1) #[L]
+                for j in range(self.num_latents):
+                    sobols = sobols.at[j,max_idx[j]].set(len(component_list) - i)
+                cumulative_pred += jnp.stack([mean_components[j,max_idx[j],:,0] for j in range(self.num_latents)]) # [L, N]
+                for j in range(self.num_latents):
+                    mean_components = mean_components.at[j,max_idx[j]].set(jnp.zeros((jnp.shape(z)[0],1)))
+        return sobols

@@ -108,9 +108,10 @@ class GHQuadratureIntegrator(AbstractIntegrator):
         Returns:
             Float[Array, 'N']: The expected log likelihood.
         """
+        assert mean.shape[0] == 1 # [L, N]
         gh_points, gh_weights = np.polynomial.hermite.hermgauss(self.num_points)
-        sd = jnp.sqrt(variance)
-        X = mean + jnp.sqrt(2.0) * sd * gh_points
+        sd = jnp.sqrt(variance).T[:, None, :]
+        X = mean.T[:, None, :] + jnp.sqrt(2.0) * sd * gh_points # [N, 1, L]
         W = gh_weights / jnp.sqrt(jnp.pi)
         val = jnp.sum(fun(X, y) * W, axis=1)
         return val

@@ -35,6 +35,8 @@ import tensorflow_probability.substrates.jax.bijectors as tfb
 
 #with install_import_hook("gpjax", "beartype.beartype"):
 import gpjax as gpx
+from gpjax.likelihoods import AbstractLikelihood
+from gpjax.integrators import AbstractIntegrator
 from gpjax.distributions import GaussianDistribution
 
 key = jr.PRNGKey(123)
@@ -77,4 +79,55 @@ class ProblemInfo(Pytree):
     pressure_std: float= static_field(None)
     lsm_threshold: float= static_field(None)
     
+
+
+
+
+@dataclass
+class Exponential(AbstractLikelihood):
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
+        r"""The link function of the Poisson likelihood.
+
+        Args:
+            f (Float[Array, "..."]): Function values.
+
+        Returns:
+            tfd.Distribution: The likelihood function.
+        """
+        assert f.shape[0] == 1
+        rate = jnp.clip(f[0,:], a_min=1e-6)
+        # rate = jnp.exp(-f[0,:])
+        return tfd.Exponential(rate=rate)
+
+
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        raise NotImplementedError
+
+
+
+@dataclass
+class Gamma(AbstractLikelihood):
+    
+    scale1: Union[ScalarFloat, Float[Array, "N"]] = param_field(
+        jnp.array(1.0), bijector=tfb.Softplus()
+    )
+    
+    def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
+        r"""The link function of the Poisson likelihood.
+
+        Args:
+            f (Float[Array, "..."]): Function values.
+
+        Returns:
+            tfd.Distribution: The likelihood function.
+        """
+        assert jnp.shape(f)[0]==1
+        rate = jnp.clip(f[0,:], a_min=1e-6)
+        # rate = jnp.exp(-f[0,:])
+        return tfd.Gamma(concentration=self.scale1, rate=rate)
+
+
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        raise NotImplementedError
+
 

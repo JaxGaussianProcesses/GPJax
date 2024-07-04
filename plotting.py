@@ -57,47 +57,61 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
     zmin = jnp.min(z, axis=0)
 
 
-    plt.figure()
-    plt.plot(sobols_for_plot)
-    plt.title(f" sobol indicies (red lines between orders)")
-    plt.axvline(x=0, color="red")
-    plt.axvline(x=problem_info.num_variables, color="red")
-    for idx in jax.lax.top_k(sobols, k)[1]:
-        chosen_idx = idxs[idx]
+    
+    for j in range(model.num_latents):
         plt.figure()
-        num_plot = 1_000 if len(chosen_idx)==1 else 5_000
-        from scipy.stats import qmc
-        sampler = qmc.Halton(d=problem_info.num_variables)
-        x_plot = sampler.random(n=num_plot)* (zmax - zmin) + zmin
-        if len(chosen_idx)==1:     
-            mean= model.predict_indiv_mean(x_plot,data, chosen_idx)
-            var = model.predict_indiv_var(x_plot,data, chosen_idx)
-            std = jnp.sqrt(var)
-            # mean = mean[j:j+1,:] #* (data.Y_std)#+ data.Y_mean
-            # std = std[j:j+1,:]#* (data.Y_std)
-            plt.scatter(x_plot[:,chosen_idx[0]],mean, color="blue") 
-            plt.scatter(x_plot[:,chosen_idx[0]],mean+ 1.96*std, color="red") 
-            plt.scatter(x_plot[:,chosen_idx[0]],mean- 1.96*std, color="red") 
-            plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black",alpha=0.1)
-            # ip = model.get_inducing_locations()
-            # plt.xlim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]]))])
-            # plt.scatter(ip[:,chosen_idx[0]],jnp.zeros_like(ip[:,chosen_idx[0]]), color="green")
-            plt.title(f" Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}with sobol index {sobols[idx]}")
-            if lim is not None:
-                plt.xlim(-lim,lim)
-        elif len(chosen_idx)==2:
-            mean = model.predict_indiv_mean(x_plot,data,chosen_idx)
-            #mean = mean[j:j+1,:] #* (data.Y_std)# + data.Y_mean
-            col = plt.scatter(x_plot[:,chosen_idx[0]],x_plot[:,chosen_idx[1]],c=mean)
-            #plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
-            plt.colorbar(col)
-            plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black",alpha=0.1)
-            #ip = model.get_inducing_locations()
-            #plt.scatter(ip[:,chosen_idx[0]],ip[:,chosen_idx[1]], color="green")
-            plt.title(f"Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]} with sobol index {sobols[idx]}")
-            # plt.xlim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]]))])
-            # plt.ylim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[1]],ip[:,chosen_idx[1]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[1]],ip[:,chosen_idx[1]]]))])
-            if lim is not None:
-                plt.xlim(-lim,lim)  
-                plt.ylim(-lim,lim)    
+        plt.plot(sobols_for_plot[j])
+        plt.title(f"latent{j} has sobol indicies (red lines between orders)")
+        plt.axvline(x=0, color="red")
+        plt.axvline(x=problem_info.num_variables, color="red")
+    
+    
+        for i, idx in enumerate(jax.lax.top_k(sobols[j], k)[1]):
+            chosen_idx = idxs[idx]
+            plt.figure()
+            num_plot = 1_000 if len(chosen_idx)==1 else 5_000
+            from scipy.stats import qmc
+            sampler = qmc.Halton(d=problem_info.num_variables)
+            x_plot = sampler.random(n=num_plot)* (zmax - zmin) + zmin
+            if len(chosen_idx)==1:     
+                try:
+                    mean, var = model.predict_indiv(x_plot,data, chosen_idx)
+                except:
+                    mean, var = model.predict_indiv(x_plot,chosen_idx)
+                std = jnp.sqrt(var)
+                mean = mean[:,j:j+1] #* (data.Y_std)#+ data.Y_mean
+                std = std[:,j:j+1]#* (data.Y_std)
+                plt.scatter(x_plot[:,chosen_idx[0]],mean, color="blue") 
+                plt.scatter(x_plot[:,chosen_idx[0]],mean+ 1.96*std, color="red") 
+                plt.scatter(x_plot[:,chosen_idx[0]],mean- 1.96*std, color="red") 
+                plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black",alpha=0.01)
+                ip = model.get_inducing_locations()
+                plt.xlim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]]))])
+                plt.scatter(ip[:,chosen_idx[0]],jnp.zeros_like(ip[:,chosen_idx[0]]), color="green")
+                plt.title(f"Latent {j} with rank {i}: Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}with sobol index {sobols[j][idx]}")
+                if lim is not None:
+                    plt.xlim(-lim,lim)
+                else:
+                    plt.xlim(jnp.min(ip[:,chosen_idx[0]]), jnp.max(ip[:,chosen_idx[0]]))
+            elif len(chosen_idx)==2:
+                try:
+                    mean, _ = model.predict_indiv(x_plot,data,chosen_idx)
+                except:
+                    mean, _ = model.predict_indiv(x_plot,chosen_idx)
+                mean = mean[:, j:j+1] #* (data.Y_std)# + data.Y_mean
+                col = plt.scatter(x_plot[:,chosen_idx[0]],x_plot[:,chosen_idx[1]],c=mean)
+                #plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
+                plt.colorbar(col)
+                plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black",alpha=0.01)
+                #ip = model.get_inducing_locations()
+                #plt.scatter(ip[:,chosen_idx[0]],ip[:,chosen_idx[1]], color="green")
+                plt.title(f"Latent {j} with rank {i}: Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]} with sobol index {sobols[j][idx]}")
+                # plt.xlim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]]))])
+                # plt.ylim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[1]],ip[:,chosen_idx[1]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[1]],ip[:,chosen_idx[1]]]))])
+                if lim is not None:
+                    plt.xlim(-lim,lim)  
+                    plt.ylim(-lim,lim)  
+                else:
+                    plt.xlim(jnp.min(ip[:,chosen_idx[0]]), jnp.max(ip[:,chosen_idx[0]])) 
+                    plt.xlim(jnp.min(ip[:,chosen_idx[1]]), jnp.max(ip[:,chosen_idx[1]]))  
         
