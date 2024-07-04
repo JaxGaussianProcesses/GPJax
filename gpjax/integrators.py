@@ -109,12 +109,96 @@ class GHQuadratureIntegrator(AbstractIntegrator):
             Float[Array, 'N']: The expected log likelihood.
         """
         assert mean.shape[0] == 1 # [L, N]
-        gh_points, gh_weights = np.polynomial.hermite.hermgauss(self.num_points)
-        sd = jnp.sqrt(variance).T[:, None, :]
-        X = mean.T[:, None, :] + jnp.sqrt(2.0) * sd * gh_points # [N, 1, L]
-        W = gh_weights / jnp.sqrt(jnp.pi)
+        gh_points, gh_weights = np.polynomial.hermite.hermgauss(self.num_points) # [n] [n]
+        sd = jnp.sqrt(variance).T[:, :, None] # [128, L, 1]
+        X = mean.T[:, :, None] + jnp.sqrt(2.0) * sd * gh_points[None,None,:] # [N, n, L]
+        W = gh_weights / jnp.sqrt(jnp.pi) # [n]
         val = jnp.sum(fun(X, y) * W, axis=1)
         return val
+
+
+
+class TwoDimGHQuadratureIntegrator(GHQuadratureIntegrator):
+    num_points: int = 25
+    def integrate(
+        self,
+        fun: Callable,
+        y: Float[Array, "N 1"],
+        mean: Float[Array, "L N"],
+        variance: Float[Array, "L N"],
+        likelihood: Likelihood,
+    ) -> Float[Array, " N"]:
+        r"""Compute a quadrature integral.
+
+        Args:
+            fun (Callable): The likelihood to be integrated.
+            y (Float[Array, 'N D']): The observed response variable.
+            mean (Float[Array, 'N D']): The mean of the variational distribution.
+            variance (Float[Array, 'N D']): The variance of the variational
+                distribution.
+            likelihood (AbstractLikelihood): The likelihood function.
+
+        Returns:
+            Float[Array, 'N']: The expected log likelihood.
+        """
+        assert mean.shape[0] == 2 # [L, N]
+        gh_points, gh_weights = np.polynomial.hermite.hermgauss(self.num_points) # [n] [n]
+        sd = jnp.sqrt(variance).T[:, :, None] # [128, L, 1]
+        X = mean.T[:, :, None] + jnp.sqrt(2.0) * sd * gh_points[None,None,:] # [N, L, n]
+        X = X[:,:,None,:] + X[:,:,:,None] #[N  L n n]
+        X = jnp.reshape(X, (jnp.shape(X)[0], mean.shape[0], -1))  # [N L n*n] TODO THIS MIGHT BE DODGE
+        W = gh_weights / (jnp.sqrt(jnp.pi)**2) #[n]
+        W = jnp.repeat(W[None,:],self.num_points,0) * jnp.repeat(W[:, None],self.num_points,1) #[n n]
+        W = jnp.reshape(W, (1, -1))[0] # [n*n] TODO THIS MIGHT BE DODGE
+        val = jnp.sum(fun(X, y)* W, axis=1) 
+        return val
+
+
+
+class ThreeDimGHQuadratureIntegrator(GHQuadratureIntegrator):
+    num_points: int = 10
+    def integrate(
+        self,
+        fun: Callable,
+        y: Float[Array, "N 1"],
+        mean: Float[Array, "L N"],
+        variance: Float[Array, "L N"],
+        likelihood: Likelihood,
+    ) -> Float[Array, " N"]:
+        r"""Compute a quadrature integral.
+
+        Args:
+            fun (Callable): The likelihood to be integrated.
+            y (Float[Array, 'N D']): The observed response variable.
+            mean (Float[Array, 'N D']): The mean of the variational distribution.
+            variance (Float[Array, 'N D']): The variance of the variational
+                distribution.
+            likelihood (AbstractLikelihood): The likelihood function.
+
+        Returns:
+            Float[Array, 'N']: The expected log likelihood.
+        """
+        assert mean.shape[0] == 3 # [L, N]
+        gh_points, gh_weights = np.polynomial.hermite.hermgauss(self.num_points) # [n] [n]
+        sd = jnp.sqrt(variance).T[:, :, None] # [128, L, 1]
+        X = mean.T[:, :, None] + jnp.sqrt(2.0) * sd * gh_points[None,None,:] # [N, L, n]
+        X = X[:,:,None,None,:] + X[:,:,:,None,None] + X[:,:,None,:,None] #[N  L n n, n]
+        X = jnp.reshape(X, (jnp.shape(X)[0], mean.shape[0], -1))  # [N L n*n*n] TODO THIS MIGHT BE DODGE
+        W = gh_weights / (jnp.sqrt(jnp.pi)**2) #[n]
+        W = (
+            jnp.repeat(jnp.repeat(W[None,:],self.num_points,0)[None,:,:], self.num_points,0)
+            * jnp.repeat(jnp.repeat(W[:,None],self.num_points,1)[None,:,:], self.num_points,0)
+            * jnp.repeat(jnp.repeat(W[:, None],self.num_points,1)[:,:, None], self.num_points,-1)
+        )#[n n n]
+        W = jnp.reshape(W, (1, -1))[0] # [n*n*n] TODO THIS MIGHT BE DODGE
+        val = jnp.sum(fun(X, y)* W, axis=1) 
+        return val
+
+
+
+
+
+
 
 
 @dataclass

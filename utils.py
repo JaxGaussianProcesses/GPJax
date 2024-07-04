@@ -109,18 +109,10 @@ class Exponential(AbstractLikelihood):
 class Gamma(AbstractLikelihood):
     
     scale1: Union[ScalarFloat, Float[Array, "N"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
+        jnp.array(1.0, dtype=jnp.float64), bijector=tfb.Softplus()
     )
     
     def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
-        r"""The link function of the Poisson likelihood.
-
-        Args:
-            f (Float[Array, "..."]): Function values.
-
-        Returns:
-            tfd.Distribution: The likelihood function.
-        """
         assert jnp.shape(f)[0]==1
         rate = jnp.clip(f[0,:], a_min=1e-6)
         # rate = jnp.exp(-f[0,:])
@@ -131,3 +123,81 @@ class Gamma(AbstractLikelihood):
         raise NotImplementedError
 
 
+
+
+
+@dataclass
+class Gamma2(AbstractLikelihood):
+    integrator: AbstractIntegrator = static_field(gpx.integrators.TwoDimGHQuadratureIntegrator())
+    initial_scale: Union[ScalarFloat, Float[Array, "N"]] = static_field(jnp.array(1.0))
+
+    def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
+        assert jnp.shape(f)[0]==2
+        rate = jnp.clip(f[0,:], a_min=1e-6)
+        concentration = jnp.clip(f[1,:], a_min=1e-6)
+        #return tfd.Gamma(concentration=self.initial_scale*jnp.exp(f[1,:]), rate=jnp.exp(-f[0,:]))
+        return tfd.Gamma(concentration=concentration, rate=rate)
+
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        raise NotImplementedError
+
+from jax import custom_jvp
+
+class FiddleMixture(tfd.Mixture):
+
+    def log_prob(self, x): # [B, 1]
+        log_probs = jnp.log(self.cat.probs)[...,1] # [n]
+        log_gamma_probs = self.components[0].log_prob(jnp.clip(x,1e-20)) # zeros will be masked anyqay
+    
+        return _log_prob(x, log_probs, log_gamma_probs)
+        
+    
+@custom_jvp
+def _log_prob(x, a, b):
+    return  jnp.where(x==0,a, (1-a)*b)
+    
+@_log_prob.defjvp
+def _log_prop_jvp(primals, tangents):
+    x, a, b = primals
+    x_dot, a_dot, b_dot = tangents
+    primal_out = _log_prob(x, a, b)
+    tangent_out =  jnp.where(x==0,a_dot, b_dot*(1-a) -a_dot*b) +x_dot # NOTE THIS DOESNT WORK FOR Xdot
+    return primal_out, tangent_out
+    
+@dataclass
+class BernoulliGamma(AbstractLikelihood):
+    integrator: AbstractIntegrator = static_field(gpx.integrators.ThreeDimGHQuadratureIntegrator())
+    def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
+        assert jnp.shape(f)[0]==3
+        prob = jnp.clip(f[0,:], a_min=1e-6, a_max=1.0-1e-6)
+        rate = jnp.clip(f[1,:], a_min=1e-6)
+        concentration = jnp.clip(f[2,:], a_min=1e-6)
+        
+        gamma = tfd.Gamma(concentration=concentration, rate=rate)
+        bernoulli_gamma = FiddleMixture(
+            cat=tfd.Categorical(probs=jnp.stack([prob, 1.-prob],-1)),
+                components=[gamma,tfd.Deterministic(jnp.zeros_like(gamma.mean()))]
+                )
+        return bernoulli_gamma
+    
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        raise NotImplementedError
+    
+    
+@dataclass
+class BernoulliExponential(AbstractLikelihood):
+    integrator: AbstractIntegrator = static_field(gpx.integrators.TwoDimGHQuadratureIntegrator())
+    def link_function(self, f: Float[Array, "L n"]) -> tfd.Distribution:
+        assert jnp.shape(f)[0]==2
+        prob = jnp.clip(f[0,:], a_min=1e-6, a_max=1.0-1e-6)
+        rate = jnp.clip(f[1,:], a_min=1e-6)
+        
+        gamma = tfd.Exponential(rate=rate)
+        bernoulli_gamma = FiddleMixture(
+            cat=tfd.Categorical(probs=jnp.stack([prob, 1.-prob],-1)),
+                components=[gamma,tfd.Deterministic(jnp.zeros_like(gamma.mean()))]
+                )
+        return bernoulli_gamma
+    
+    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+        raise NotImplementedError

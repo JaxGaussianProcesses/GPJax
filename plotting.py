@@ -87,7 +87,7 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
                 plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black",alpha=0.01)
                 ip = model.get_inducing_locations()
                 plt.xlim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]]))])
-                plt.scatter(ip[:,chosen_idx[0]],jnp.zeros_like(ip[:,chosen_idx[0]]), color="green")
+                plt.scatter(ip[:,chosen_idx[0]],jnp.zeros_like(ip[:,chosen_idx[0]]), color="orange")
                 plt.title(f"Latent {j} with rank {i}: Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}with sobol index {sobols[j][idx]}")
                 if lim is not None:
                     plt.xlim(-lim,lim)
@@ -103,8 +103,8 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
                 #plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
                 plt.colorbar(col)
                 plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black",alpha=0.01)
-                #ip = model.get_inducing_locations()
-                #plt.scatter(ip[:,chosen_idx[0]],ip[:,chosen_idx[1]], color="green")
+                ip = model.get_inducing_locations()
+                plt.scatter(ip[:,chosen_idx[0]],ip[:,chosen_idx[1]], color="orange")
                 plt.title(f"Latent {j} with rank {i}: Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]} with sobol index {sobols[j][idx]}")
                 # plt.xlim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]]))])
                 # plt.ylim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[1]],ip[:,chosen_idx[1]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[1]],ip[:,chosen_idx[1]]]))])
@@ -113,5 +113,5 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
                     plt.ylim(-lim,lim)  
                 else:
                     plt.xlim(jnp.min(ip[:,chosen_idx[0]]), jnp.max(ip[:,chosen_idx[0]])) 
-                    plt.xlim(jnp.min(ip[:,chosen_idx[1]]), jnp.max(ip[:,chosen_idx[1]]))  
+                    plt.ylim(jnp.min(ip[:,chosen_idx[1]]), jnp.max(ip[:,chosen_idx[1]]))  
         

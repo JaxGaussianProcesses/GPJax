@@ -312,7 +312,7 @@ class ConjugatePrecipGP(Module):
 
 
 @dataclass
-class VariationalPrecipGP(ConjugatePrecipGP):
+class VariationalPrecipGP(Module):
     base_kernels: List[gpx.kernels.AbstractKernel]
     likelihood: gpx.likelihoods.AbstractLikelihood
     variational_mean: Union[Float[Array, "L N 1"], None] = param_field(None)
@@ -323,11 +323,15 @@ class VariationalPrecipGP(ConjugatePrecipGP):
     jitter: float = static_field(1e-6)
     parameterisation: str = static_field("standard") # "standard" or "white"
     inducing_inputs: Float[Array, "N D"] = param_field(None)
-
+    max_interaction_depth: bool = static_field(2)
+    interaction_variances: Float[Array, " D"] = param_field(jnp.array([1.0,1.0,1.0]), bijector=tfb.Softplus(low=jnp.array(1e-5, dtype=jnp.float64)))
+    jitter: float = static_field(1e-6)
+    measure:str = static_field("empirical")
     
-
     def __post_init__(self):
         self.mean_function = gpx.mean_functions.Zero()
+        if not self.max_interaction_depth == len(self.interaction_variances) - 1:
+            raise ValueError("Number of interaction variances must be equal to max_interaction_depth + 1")
         assert jnp.shape(self.variational_mean)[0] == self.num_latents
         assert jnp.shape(self.variational_root_covariance)[0] == self.num_latents
 
@@ -574,23 +578,30 @@ class VariationalPrecipGP(ConjugatePrecipGP):
         mean_components = jnp.transpose(vmap(get_mean_from_covar)(jnp.transpose(Kxz_components,(1,0,2,3))), (1,0,2,3)) # [L,c, N, 1]
         
         if not greedy:
-            sobols = jnp.var(mean_components[:,:,:,0], axis=-1) / jnp.var(mean_overall[:,:,0], axis=-1) # [L, c]
+            sobols = jnp.var(mean_components[:,:,:,0], axis=-1) / jnp.var(mean_overall[:,:,0], axis=-1, keepdims=True) # [L, c]
         else:
             raise ValueError("greedy doesnt work")
-            sobols = jnp.zeros((self.num_latents,len(component_list)))
-            cumulative_pred = jnp.zeros((self.num_latents, jnp.shape(z)[0])) # [L, N]
-            for i in range(len(component_list)):
-                # v_12 = jnp.var(mean_components[:,:,:,0] - cumulative_pred[:,None,:], axis=-1)  # [L, c]
-                # v_1 = jnp.var(mean_components[:,:,:,0],-1)# [L, c]
-                # v_2 = jnp.var(cumulative_pred[:,None,:],-1)# [L, 1]
-                # cov = 0.5 * (v_1 + v_2 - v_12) # [L, c]
-                # current_sobols = v_1 - cov**2/(v_2+1e-6)
-                current_sobols = jnp.var(mean_components[:,:,:,0] - cumulative_pred[:,None,:], axis=-1)  # [L, c]
-                print(current_sobols)
-                max_idx = jnp.argmax(current_sobols,1) #[L]
-                for j in range(self.num_latents):
-                    sobols = sobols.at[j,max_idx[j]].set(len(component_list) - i)
-                cumulative_pred += jnp.stack([mean_components[j,max_idx[j],:,0] for j in range(self.num_latents)]) # [L, N]
-                for j in range(self.num_latents):
-                    mean_components = mean_components.at[j,max_idx[j]].set(jnp.zeros((jnp.shape(z)[0],1)))
         return sobols
+    
+    def _orthogonalise_empirical(self, ks: Num[Array, "d N+n M+n"], num_ref: int)->Num[Array, "d N M"]:
+        ks_xt, ks_xX, ks_Xt, ks_XX = ks[:,:-num_ref,:-num_ref], ks[:,:-num_ref,-num_ref:], ks[:,-num_ref:,:-num_ref], ks[:,-num_ref:,-num_ref:] # [d, N, M], [d, N, n], [d, n, M], [d, n, n]
+        denom = jnp.mean(ks_XX, (1,2))[:, None, None]+self.jitter # [d, 1, 1]
+        Kx =  jnp.mean(ks_xX, 2) # [d, N]
+        Kt = jnp.mean(ks_Xt, 1) # [d, M]
+        numerator = jnp.matmul(Kx[:,:,None], Kt[:, None, :])# [d, N, M]
+        
+        return ks_xt -  numerator / denom 
+    
+
+
+    @jax.jit   
+    def _compute_additive_terms_girad_newton(self, ks: Num[Array, "D N M"]) -> Num[Array, "p N M"]:
+        N = jnp.shape(ks)[-2]
+        M = jnp.shape(ks)[-1]
+        powers = jnp.arange(self.max_interaction_depth + 1)[:, None] # [p + 1, 1]
+        s = jnp.power(ks[None, :,:,:],powers[:,:,None,None]) # [p + 1, d, 1,1]
+        e = jnp.ones(shape=(self.max_interaction_depth+1, N, M), dtype=jnp.float64) # [p+1, N, N]lazy init then populate
+        for n in range(1, self.max_interaction_depth + 1): # has to be for loop because iterative
+            thing = jax.vmap(lambda k: ((-1.0)**(k-1))*e[n-k]*jnp.sum(s[k], 0))(jnp.arange(1, n+1))
+            e = e.at[n].set((1.0/n) *jnp.sum(thing,0))
+        return e
