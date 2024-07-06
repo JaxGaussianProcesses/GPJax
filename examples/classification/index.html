@@ -1535,6 +1535,26 @@
   
   
     <li class="md-nav__item">
+      <a href="../../api/decision_making/utility_functions/probability_of_improvement/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Probability Of Improvement
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../api/decision_making/utility_functions/thompson_sampling/" class="md-nav__link">
         
   
@@ -3130,7 +3150,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6a6b32af">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a09d531c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3144,7 +3164,7 @@ Carlo (MCMC). We focus on a classification task here and use
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ac295048">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=216fef6d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3233,7 +3253,7 @@ cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f554e26c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ee7c1a5e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3249,7 +3269,7 @@ later.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=caacb394">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5afa8eb7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3299,7 +3319,7 @@ ax.scatter(x, y)</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[2]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;matplotlib.collections.PathCollection at 0x7f1b39da04f0&gt;</pre>
+<pre>&lt;matplotlib.collections.PathCollection at 0x7fa6f40d4550&gt;</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -3312,7 +3332,7 @@ ax.scatter(x, y)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ff40048a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=22f2b144">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3325,7 +3345,7 @@ choose a Bernoulli likelihood with a probit link function.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b553b656">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4652281f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3358,7 +3378,7 @@ likelihood = gpx.likelihoods.Bernoulli(num_datapoints=D.n)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2758912b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3825014e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3369,7 +3389,7 @@ likelihood = gpx.likelihoods.Bernoulli(num_datapoints=D.n)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5b591ecf">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8dacde18">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3411,7 +3431,7 @@ print(type(posterior))</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c56552dd">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fcfeb400">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3429,7 +3449,7 @@ marginal log-likelihood.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=30391d6c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7ab230ca">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3441,7 +3461,7 @@ Optax's optimisers.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2e5a31d1">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d335172e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3494,12 +3514,12 @@ opt_posterior, history = gpx.fit(
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="1b37d81a-065f-4113-af86-5d52c73c9052" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="82f20c19-1449-4292-a2ac-3c2c097b9f8e" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('1b37d81a-065f-4113-af86-5d52c73c9052');
+var element = document.getElementById('82f20c19-1449-4292-a2ac-3c2c097b9f8e');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
-{"version_major": 2, "version_minor": 0, "model_id": "c2184f42d4d44811afec001a5710f9df"}
+{"version_major": 2, "version_minor": 0, "model_id": "16658016ba824d6185e00e6e750e0a21"}
 </script>
 </div>
 </div>
@@ -3507,7 +3527,7 @@ var element = document.getElementById('1b37d81a-065f-4113-af86-5d52c73c9052');
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=beb74af9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0c15ae76">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3518,7 +3538,7 @@ var element = document.getElementById('1b37d81a-065f-4113-af86-5d52c73c9052');
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e27b82c6">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=010b9b77">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3614,7 +3634,7 @@ ax.legend()</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;matplotlib.legend.Legend at 0x7f1b394406a0&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7fa6ee75abc0&gt;</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -3627,7 +3647,7 @@ ax.legend()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ace383a5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=63b58897">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3643,7 +3663,7 @@ p(f(\cdot)| \mathcal{D})  \approx q_{map}(f(\cdot)) := \int p(f(\cdot)| \boldsym
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ff73e443">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=80f691ce">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3655,7 +3675,7 @@ quantification, providing only a single piece of information about the posterior
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a4dbd1ba">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5e89e2a3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3685,7 +3705,7 @@ datapoints below.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b368e24b">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a74bbf72">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3756,7 +3776,7 @@ laplace_approximation = tfd.MultivariateNormalTriL(f_hat.squeeze(), LH)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1e8aa2a6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=84a35872">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3776,7 +3796,7 @@ to the covariance to construct $q_{Laplace}(f(\cdot))$.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0ea14846">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2850a25f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3837,7 +3857,7 @@ to the covariance to construct $q_{Laplace}(f(\cdot))$.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9b1771a5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=badb3434">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3848,7 +3868,7 @@ to the covariance to construct $q_{Laplace}(f(\cdot))$.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=167214a9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=fc22e4c0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3942,7 +3962,7 @@ ax.legend()</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;matplotlib.legend.Legend at 0x7f1b31e4fd60&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7fa6ec1665c0&gt;</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -3955,7 +3975,7 @@ ax.legend()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e6186ec7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b52101f6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3968,7 +3988,7 @@ MCMC methods allow us to learn all information about the posterior distribution.
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=09d0ba69">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f1ecbd0e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4001,7 +4021,7 @@ drawing more samples will be necessary.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9fb73e66">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=be91d10c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4093,14 +4113,14 @@ print(f"Sampling time taken: {time() - start: .1f} seconds")</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Adaption time taken:  91.0 seconds
+<pre>Adaption time taken:  90.8 seconds
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Sampling time taken:  169.2 seconds
+<pre>Sampling time taken:  171.1 seconds
 </pre>
 </div>
 </div>
@@ -4108,7 +4128,7 @@ print(f"Sampling time taken: {time() - start: .1f} seconds")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a326e2b8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c9779768">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4124,7 +4144,7 @@ versus a chain that is too jumpy with frequent small steps.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cc80d838">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e74ab1cf">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4166,7 +4186,7 @@ print(f"Acceptance rate: {acceptance_rate:.2f}")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=04596cdd">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cbe885b2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4183,7 +4203,7 @@ for brevity.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=577bd7fb">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a419cfab">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4240,7 +4260,7 @@ ax2.set_title("Latent Function (index = 1)")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=40c17465">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b44f7181">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4260,7 +4280,7 @@ factors, we employ a thin factor of 10 for demonstration purposes.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b40775e5">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=af3a17a2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4322,85 +4342,85 @@ expected_val = jnp.mean(posterior_samples, axis=0)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples:   4%|▍         | 1/25 [00:00&lt;00:08,  2.73it/s]</pre>
+<pre>Drawing posterior samples:   4%|▍         | 1/25 [00:00&lt;00:08,  2.95it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples:  12%|█▏        | 3/25 [00:00&lt;00:03,  7.26it/s]</pre>
+<pre>Drawing posterior samples:  12%|█▏        | 3/25 [00:00&lt;00:02,  7.76it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples:  20%|██        | 5/25 [00:00&lt;00:02,  9.80it/s]</pre>
+<pre>Drawing posterior samples:  20%|██        | 5/25 [00:00&lt;00:01, 10.95it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples:  28%|██▊       | 7/25 [00:00&lt;00:01, 11.97it/s]</pre>
+<pre>Drawing posterior samples:  28%|██▊       | 7/25 [00:00&lt;00:01, 12.67it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples:  36%|███▌      | 9/25 [00:00&lt;00:01, 13.42it/s]</pre>
+<pre>Drawing posterior samples:  36%|███▌      | 9/25 [00:00&lt;00:01, 14.23it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples:  44%|████▍     | 11/25 [00:00&lt;00:00, 14.56it/s]</pre>
+<pre>Drawing posterior samples:  44%|████▍     | 11/25 [00:00&lt;00:00, 15.40it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples:  52%|█████▏    | 13/25 [00:01&lt;00:00, 15.21it/s]</pre>
+<pre>Drawing posterior samples:  52%|█████▏    | 13/25 [00:01&lt;00:00, 16.26it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples:  60%|██████    | 15/25 [00:01&lt;00:00, 15.71it/s]</pre>
+<pre>Drawing posterior samples:  60%|██████    | 15/25 [00:01&lt;00:00, 16.30it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples:  68%|██████▊   | 17/25 [00:01&lt;00:00, 16.17it/s]</pre>
+<pre>Drawing posterior samples:  68%|██████▊   | 17/25 [00:01&lt;00:00, 16.24it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples:  76%|███████▌  | 19/25 [00:01&lt;00:00, 16.34it/s]</pre>
+<pre>Drawing posterior samples:  76%|███████▌  | 19/25 [00:01&lt;00:00, 16.22it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples:  84%|████████▍ | 21/25 [00:01&lt;00:00, 16.56it/s]</pre>
+<pre>Drawing posterior samples:  84%|████████▍ | 21/25 [00:01&lt;00:00, 16.22it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples:  92%|█████████▏| 23/25 [00:01&lt;00:00, 16.64it/s]</pre>
+<pre>Drawing posterior samples:  92%|█████████▏| 23/25 [00:01&lt;00:00, 16.18it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples: 100%|██████████| 25/25 [00:01&lt;00:00, 16.76it/s]</pre>
+<pre>Drawing posterior samples: 100%|██████████| 25/25 [00:01&lt;00:00, 15.92it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Drawing posterior samples: 100%|██████████| 25/25 [00:01&lt;00:00, 13.90it/s]</pre>
+<pre>Drawing posterior samples: 100%|██████████| 25/25 [00:01&lt;00:00, 14.16it/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -4414,7 +4434,7 @@ expected_val = jnp.mean(posterior_samples, axis=0)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2b14cdff">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3d603a57">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4426,7 +4446,7 @@ against the observed data.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7bd0177d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0ce0f567">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4508,7 +4528,7 @@ ax.legend()</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[14]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;matplotlib.legend.Legend at 0x7f1b3152df00&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7fa6d48622c0&gt;</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -4521,7 +4541,7 @@ ax.legend()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=560c00f4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=495879ae">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4532,7 +4552,7 @@ ax.legend()</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d9ffab0c">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8c023707">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4568,18 +4588,18 @@ ax.legend()</div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>Author: Thomas Pinder &amp; Daniel Dodd
 
-Last updated: Mon Jul 01 2024
+Last updated: Sat Jul 06 2024
 
 Python implementation: CPython
 Python version       : 3.10.14
 IPython version      : 8.22.2
 
-jax                   : 0.4.25
 matplotlib            : 3.8.3
-optax                 : 0.1.9
-cola                  : 0.0.5
-blackjax              : 0.9.6
 tensorflow_probability: 0.22.1
+cola                  : 0.0.5
+optax                 : 0.1.9
+jax                   : 0.4.25
+blackjax              : 0.9.6
 gpjax                 : 0.8.2
 
 Watermark: 2.4.3
