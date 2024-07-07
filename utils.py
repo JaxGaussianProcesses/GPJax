@@ -47,6 +47,9 @@ tfd = tfp.distributions
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 
+from optax import GradientTransformation
+import jax.tree_util as jtu
+
 
 from typing import List, Union, Callable
 from jaxtyping import Num, Float
@@ -201,3 +204,84 @@ class BernoulliExponential(AbstractLikelihood):
     
     def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
         raise NotImplementedError
+    
+    
+    
+    
+from models import VariationalPrecipGP
+    
+
+def thin_model(problem_info:ProblemInfo, D:gpx.Dataset, model:VariationalPrecipGP, target_num, num_test=100):
+    def test_model_without_component(D: gpx.Dataset, model:VariationalPrecipGP, idx:List[int], return_model = False, num_samples=100):
+        base_kernels = []
+        for j in range(model.num_latents):
+            new_base_kernels = []
+            for i in range(len(model.base_kernels[j])):
+                if i == idx[1] and j == idx[0]:
+                    new_base_kernels.append(gpx.kernels.Constant(constant=jnp.array(0.0, dtype=jnp.float64), active_dims=[i]))
+                else:
+                    new_base_kernels.append(model.base_kernels[j][i])
+                    
+            base_kernels.append(new_base_kernels)
+        new_model = model.replace(base_kernels=base_kernels)
+        if return_model:
+            return new_model 
+        mean, var = new_model.predict_indiv(D.X[-num_test:,:])
+        samples_f = jnp.stack([tfd.MultivariateNormalDiag(mean.T[i:i+1], jnp.sqrt(var.T[i:i+1])).sample(seed=key, sample_shape=(num_samples)) for i in range(model.num_latents)])# [S, n, N]
+        log_probs = new_model.likelihood.link_function(samples_f).log_prob(D.y[-num_test:,:].T) # [N, S]
+        return jnp.mean(log_probs)
+
+
+    thinned_model = model
+    kept_idxs = [[i for i in range(len(base_kernels))] for base_kernels in model.base_kernels]
+    for _ in range(len(model.base_kernels[0])-target_num):
+        for j in range(model.num_latents):
+            scores = jnp.array([test_model_without_component(D, thinned_model, [j,i]) for i in kept_idxs[j]])
+            #print(scores)
+            chosen_idx = jnp.argmax(scores)
+            actual_idx = kept_idxs[j][chosen_idx]
+            del kept_idxs[j][chosen_idx]
+            thinned_model = test_model_without_component(D, thinned_model, [j, actual_idx], return_model=True)
+            print(f"removed {problem_info.names_short[actual_idx]} from latent {j}")
+    
+    return thinned_model
+
+
+
+def optim_builder(optim_pytree):
+
+    def _init_leaf(o, p):
+        if isinstance(o, GradientTransformation):
+            return o.init(p)
+        else:
+            return None
+
+    def _update_leaf(o, u, s, p):
+        if isinstance(o, GradientTransformation):
+            return tuple(o.update(u, s, p))
+        else:
+            return jtu.tree_map(jnp.zeros_like, p)
+
+    def _get_updates(o, u, p):
+        if isinstance(o, GradientTransformation):
+            return u[0]
+        else:
+            return u
+    
+    def _get_state(o, u):
+        if isinstance(o, GradientTransformation):
+            return u[1]
+        else:
+            return None
+
+    def init_fn(params):
+        return jtu.tree_map(_init_leaf, optim_pytree, params, is_leaf=lambda x: isinstance(x, GradientTransformation))
+
+    def update_fn(updates, state, params):
+        updates_state = jtu.tree_map(_update_leaf, optim_pytree, updates, state, params, is_leaf=lambda x: isinstance(x, GradientTransformation))
+        updates = jtu.tree_map(_get_updates, optim_pytree, updates_state, params, is_leaf=lambda x: isinstance(x, GradientTransformation))
+        state = jtu.tree_map(_get_state, optim_pytree, updates_state, is_leaf=lambda x: isinstance(x, GradientTransformation))
+
+        return updates, state
+
+    return GradientTransformation(init_fn, update_fn)

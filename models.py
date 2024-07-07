@@ -57,263 +57,13 @@ from cola.linalg.decompositions.decompositions import Cholesky
 from jax import vmap
 
 
-
-
-
-
-
-@dataclass
-class ConjugatePrecipGP(Module):
-    base_kernels:List[gpx.kernels.AbstractKernel]
-    likelihood: gpx.likelihoods.AbstractLikelihood
-    max_interaction_depth: bool = static_field(2)
-    interaction_variances: Float[Array, " D"] = param_field(jnp.array([1.0,1.0,1.0]), bijector=tfb.Softplus(low=jnp.array(1e-5, dtype=jnp.float64)))
-    jitter: float = static_field(1e-6)
-    measure:str = static_field("empirical")
-    second_order_empirical: bool = static_field(False)
-    pairs: Optional[Num[Array, "d 2"]] = static_field(None) # lazy init
-    
-    def __post_init__(self):
-        self.mean_function = gpx.mean_functions.Zero()
-        if not self.max_interaction_depth == len(self.interaction_variances) - 1:
-            raise ValueError("Number of interaction variances must be equal to max_interaction_depth + 1")
-
-        if self.second_order_empirical:
-            assert self.measure == "empirical"
-            assert self.max_interaction_depth == 2
-            pairs= []
-            for i in range(len(self.base_kernels)):
-                for j in range(i):
-                    pairs.append([i,j])
-            self.pairs = jnp.array(pairs)
-        assert self.measure in ["empirical", None]
-
-
-    def predict(
-        self,
-        test_inputs: Num[Array, "N D"],
-        train_data: gpx.Dataset,
-        component_list: Optional[List[List[int]]]=None,
-    ) -> Union[GaussianDistribution,  Num[Array, "N 1"]]:
-        r"""Get the posterior predictive distribution (for a specific additive component if componen specified)."""
-        #smooth data to get in form for preds
-        x, y = train_data.X, train_data.y
-        t = test_inputs
-        
-        obs_noise = self.likelihood.obs_stddev**2
-        mx = self.mean_function(x)
-        mt = self.mean_function(t)
-        
-        
-        Kxx = self.eval_K_xt(x, x, ref = x) # [N, N]
-        Kxx += cola.ops.I_like(Kxx) * self.jitter
-        Sigma = Kxx + cola.ops.I_like(Kxx) * obs_noise
-        Sigma = cola.PSD(Sigma)
-        
-        if component_list is None:
-            Ktt = self.eval_K_xt(t,t,ref=x)
-            Kxt = self.eval_K_xt(x,t, ref=x)
-        else:
-            Ktt = self.eval_specific_K_xt(t, t, component_list, ref = x)
-            Kxt = self.eval_specific_K_xt(x, t, component_list, ref = x)
-        Sigma_inv_Kxt = cola.solve(Sigma, Kxt, Cholesky())
-        
-        mean = mt + jnp.matmul(Sigma_inv_Kxt.T, y - mx)
-        covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
-        covariance += cola.ops.I_like(covariance) * self.jitter
-        covariance = cola.PSD(covariance)
-        return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
-    
-
-    def get_second_order(self, ks: Num[Array, "d N M"])->Num[Array, "d N M"]: # turn [d, N, M] into [d+(d**2-d)/2 N M]        
-        ks_second = ks[None,:,:,:] * ks[:,None,:,:] # [d, d, N+n, M+n]
-        ks_second = jax.vmap(lambda x: ks_second[x[0],x[1],:,:])(self.pairs) # [(d**2-d)/2, N+n, M+n]
-        return jnp.vstack([ks, ks_second]) # [d + (d**2-d)/2, N+n, M+n]
-        
-
-    def eval_K_xt(self, x: Num[Array, "N d"], t: Num[Array, "M d"], ref:  Num[Array, "n d"]) -> Num[Array, "N M"]:
-        if self.measure == "empirical":
-            x_all, t_all = jnp.vstack([x, ref]), jnp.vstack([t, ref])  # [N+n, d] [M+n, d]
-            ks_all = jnp.stack([k.cross_covariance(x_all,t_all) for k in self.base_kernels]) # [d, N+n, M+n]
-            if self.second_order_empirical:
-                ks_all = self.get_second_order(ks_all) # [d + (d**2-d)/2), N+n, M+n]
-            ks_all = self._orthogonalise_empirical(ks_all, num_ref = jnp.shape(ref)[0])  # [d, N, M]
-        elif self.measure is None:
-            ks_all = jnp.stack([k.cross_covariance(x,t) for k in self.base_kernels]) # [d, N, M]
-        else:
-            raise ValueError("measure must be empirical, uniform or None")
-        
-        if self.second_order_empirical:
-            return self.interaction_variances[0] + self.interaction_variances[1] * jnp.sum(ks_all[:jnp.shape(x)[1],:,:], 0) + self.interaction_variances[2] * jnp.sum(ks_all[jnp.shape(x)[1]:,:,:], 0)
-        else:
-            return jnp.sum(self._compute_additive_terms_girad_newton(ks_all) * self.interaction_variances[:, None, None], 0)
-
-        
-    def eval_specific_K_xt(self, x: Num[Array, "N d"], t: Num[Array, "M d"], component_list: List[int], ref =  Num[Array, "n d"])-> Num[Array, "N M"]:
-        if len(component_list) == 0:
-            return self.interaction_variances[0] * jnp.ones((jnp.shape(x)[0], jnp.shape(t)[0]))
-        
-        if self.measure == "empirical":
-            x_all, t_all = jnp.vstack([x, ref]), jnp.vstack([t, ref])  # [N+n, d] [M+n, d]
-            ks_all = jnp.stack([self.base_kernels[i].cross_covariance(x_all,t_all) for i in component_list]) # [p, N+n, M+n]
-            if self.second_order_empirical: # do prod before orthog
-                ks_all = jnp.prod(ks_all, 0 , keepdims=True) # [1, N+n, M+n]
-            ks_all = self._orthogonalise_empirical(ks_all, num_ref = jnp.shape(ref)[0]) # [p, N, M]
-                
-        elif self.measure is None:
-            ks_all = jnp.stack([self.base_kernels[i].cross_covariance(x,t) for i in component_list]) # [d, N, M]
-        else:
-            raise ValueError("measure must be empirical, uniform or None")
-            
-        return self.interaction_variances[len(component_list)] * jnp.prod(ks_all,0) # [N, M] 
-       
-       
-       
-       
-    def _orthogonalise_empirical(self, ks: Num[Array, "d N+n M+n"], num_ref: int)->Num[Array, "d N M"]:
-        ks_xt, ks_xX, ks_Xt, ks_XX = ks[:,:-num_ref,:-num_ref], ks[:,:-num_ref,-num_ref:], ks[:,-num_ref:,:-num_ref], ks[:,-num_ref:,-num_ref:] # [d, N, M], [d, N, n], [d, n, M], [d, n, n]
-        denom = jnp.mean(ks_XX, (1,2))[:, None, None]+self.jitter # [d, 1, 1]
-        Kx =  jnp.mean(ks_xX, 2) # [d, N]
-        Kt = jnp.mean(ks_Xt, 1) # [d, M]
-        numerator = jnp.matmul(Kx[:,:,None], Kt[:, None, :])# [d, N, M]
-        
-        return ks_xt -  numerator / denom 
-    
-
-
-    @jax.jit   
-    def _compute_additive_terms_girad_newton(self, ks: Num[Array, "D N M"]) -> Num[Array, "p N M"]:
-        N = jnp.shape(ks)[-2]
-        M = jnp.shape(ks)[-1]
-        powers = jnp.arange(self.max_interaction_depth + 1)[:, None] # [p + 1, 1]
-        s = jnp.power(ks[None, :,:,:],powers[:,:,None,None]) # [p + 1, d, 1,1]
-        e = jnp.ones(shape=(self.max_interaction_depth+1, N, M), dtype=jnp.float64) # [p+1, N, N]lazy init then populate
-        for n in range(1, self.max_interaction_depth + 1): # has to be for loop because iterative
-            thing = jax.vmap(lambda k: ((-1.0)**(k-1))*e[n-k]*jnp.sum(s[k], 0))(jnp.arange(1, n+1))
-            e = e.at[n].set((1.0/n) *jnp.sum(thing,0))
-        return e
-    
-    def loss_fn(self, negative=False)->gpx.objectives.AbstractObjective:
-        class Loss_mll(gpx.objectives.AbstractObjective):
-            def step(
-                self,
-                posterior: ConjugatePrecipGP,
-                train_data: gpx.Dataset,
-            ) -> ScalarFloat:
-                #smooth data to get in form for preds
-                x, y = train_data.X, train_data.y
-                
-                obs_noise = posterior.likelihood.obs_stddev**2
-                mx = posterior.mean_function(x)
-                Kxx = posterior.eval_K_xt(x,x, ref=x) # [N, N]
-                
-                # Σ = (Kxx + Io²) = LLᵀ
-                Kxx += cola.ops.I_like(Kxx) * posterior.jitter
-                Sigma = Kxx + cola.ops.I_like(Kxx) * obs_noise
-                Sigma = cola.PSD(Sigma)
-
-                # p(y | x, θ), where θ are the model hyperparameters:
-                mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
-
-                log_prob = 0.0
-                lengthscales = jnp.array([k.lengthscale for k in posterior.base_kernels])
-                log_prob += jnp.sum(tfd.LogNormal(loc=0.0, scale=1.0).log_prob(lengthscales))
-                log_prob += jnp.sum(tfd.LogNormal(loc=0.0, scale=1.0).log_prob(posterior.interaction_variances))
-                return self.constant * (mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze() + log_prob.squeeze())
-            
-
-        return Loss_mll(negative=negative)
-    
-
-
-    def predict_indiv(
-        self,
-        test_inputs: Num[Array, "N D"],
-        train_data: gpx.Dataset,
-        component_list: Optional[List[List[int]]]=None,
-    ):
-        predictor_mean = lambda x: self.predict(x, train_data, component_list).mean()
-        means = jax.vmap(predictor_mean,1)(test_inputs[:,None,:]).T
-        predictor_var = lambda x: self.predict(x, train_data, component_list).variance()
-        vars = jax.vmap(predictor_var,1)(test_inputs[:,None,:]).T
-        return means, vars
-    
-    
-   
-
-    def get_sobol_indicies(self, train_data: gpx.Dataset, component_list: List[List[int]], use_range=False, greedy=False) -> Num[Array, "c"]:
-
-        
-        if not isinstance(component_list, List):
-            raise ValueError("Use get_sobol_index if you want to calc for single components (TODO)")
-        x,y = train_data.X, train_data.y
-        m_x = self.mean_function(x)
-        if self.second_order_empirical:
-            x_all = jnp.vstack([x,x]) # waste of memory here
-            Kxx_indiv = jnp.stack([k.cross_covariance(x_all,x_all) for k in self.base_kernels], axis=0) # [d, 2N, 2N]
-            Kxx_components = [jnp.prod(Kxx_indiv[c, :, :],0) for c in component_list]  
-            Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, N]
-            Kxx_components =  self._orthogonalise_empirical(Kxx_components, num_ref = jnp.shape(x)[0]) # [d, N, N]
-            Kxx_components = [self.interaction_variances[len(c)]*Kxx_components[i, :, :] for i, c in enumerate(component_list)]
-            Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, N]
-            
-        else:
-            if self.measure == "empirical":
-                x_all = jnp.vstack([x,x]) # waste of memory here
-                Kxx_indiv = jnp.stack([k.cross_covariance(x_all,x_all) for k in self.base_kernels], axis=0) # [d, 2N, 2N]
-                Kxx_indiv =  self._orthogonalise_empirical(Kxx_indiv, num_ref = jnp.shape(x)[0]) # [d, N, N]
-            elif self.measure is None:
-                Kxx_indiv = jnp.stack([k.cross_covariance(x,x) for k in self.base_kernels], axis=0) # [d, N, N]
-            else:
-                raise ValueError("measure must be empirical, uniform or None")
-            Kxx_components = [self.interaction_variances[len(c)]*jnp.prod(Kxx_indiv[c, :, :], axis=0) for c in component_list] 
-            Kxx_components = jnp.stack(Kxx_components, axis=0) # [c, N, N]
-        
-        assert Kxx_components.shape[0] == len(component_list)
-
-        Kxx = self.eval_K_xt(x,x, ref=x)
-        Sigma = cola.PSD(Kxx + cola.ops.I_like(Kxx) * (self.likelihood.obs_stddev**2+self.jitter))
-
-        def get_mean_from_covar(K): # [N,N] -> [N, 1]
-            Sigma_inv_Kxx = cola.solve(Sigma, K)
-            return m_x + jnp.matmul(Sigma_inv_Kxx.T, y - m_x) # [N, 1] 
-
-        mean_overall =  get_mean_from_covar(Kxx) # [N, 1]
-        mean_components = vmap(get_mean_from_covar)(Kxx_components) # [c, N, 1]
-
-        if use_range:
-            sobols = jnp.max(mean_components[:,:,0], axis=-1) - jnp.min(mean_components[:,:,0], axis=-1) # [c]
-        else:
-            sobols = jnp.var(mean_components[:,:,0], axis=-1) / jnp.var(mean_overall) # [c]
-        
-        if greedy:
-            sobols = jnp.zeros((len(component_list)))
-            cumulative_pred = jnp.zeros((jnp.shape(x)[0])) # [ N]
-            for i in range(len(component_list)):
-                if use_range:
-                    current_sobols = jnp.max(mean_components[:,:,0] - cumulative_pred[None,:], axis=-1) - jnp.min(mean_components[:,:,0] - cumulative_pred[None,:], axis=-1)
-                else:
-                    current_sobols = jnp.var(mean_components[:,:,0] - cumulative_pred[None,:], axis=-1)  / jnp.var(mean_overall - cumulative_pred) # [L, c]
-
-                max_idx = jnp.argmax(current_sobols)
-                sobols = sobols.at[max_idx].set(len(component_list) - i)
-                cumulative_pred += mean_components[max_idx,:,0] # [N]
-                mean_components = mean_components.at[max_idx].set(jnp.zeros((jnp.shape(x)[0],1)))
-       
-
-        return sobols
-        
-        
-        
-        
-        
         
         
 
 
 @dataclass
 class VariationalPrecipGP(Module):
-    base_kernels: List[gpx.kernels.AbstractKernel]
+    base_kernels: List[List[gpx.kernels.AbstractKernel]]
     likelihood: gpx.likelihoods.AbstractLikelihood
     variational_mean: Union[Float[Array, "L N 1"], None] = param_field(None)
     variational_root_covariance: Float[Array, "L N N"] = param_field(
@@ -324,18 +74,26 @@ class VariationalPrecipGP(Module):
     parameterisation: str = static_field("standard") # "standard" or "white"
     inducing_inputs: Float[Array, "N D"] = param_field(None)
     max_interaction_depth: bool = static_field(2)
-    interaction_variances: Float[Array, " D"] = param_field(jnp.array([1.0,1.0,1.0]), bijector=tfb.Softplus(low=jnp.array(1e-5, dtype=jnp.float64)))
+    interaction_variances: Float[Array, "L D"] = param_field(jnp.array([[1.0,1.0,1.0]]), bijector=tfb.Softplus(low=jnp.array(1e-5, dtype=jnp.float64)))
     jitter: float = static_field(1e-6)
     measure:str = static_field("empirical")
+    use_shared_kernel: bool=static_field(True)
+    dists: dict = static_field(None)
     
     def __post_init__(self):
         self.mean_function = gpx.mean_functions.Zero()
-        if not self.max_interaction_depth == len(self.interaction_variances) - 1:
+        if not self.max_interaction_depth == len(self.interaction_variances[0]) - 1:
             raise ValueError("Number of interaction variances must be equal to max_interaction_depth + 1")
         assert jnp.shape(self.variational_mean)[0] == self.num_latents
         assert jnp.shape(self.variational_root_covariance)[0] == self.num_latents
-
-
+        if self.use_shared_kernel:
+            assert len(self.base_kernels) == 1
+        else:
+            assert len(self.base_kernels) == self.num_latents
+        for kernels in self.base_kernels:
+            for k in kernels:
+                assert isinstance(k, Union[gpx.kernels.RBF, gpx.kernels.Constant])
+        
 
     def predict(
         self,
@@ -440,6 +198,7 @@ class VariationalPrecipGP(Module):
             Ktt = self.eval_specific_K_xt(t,t, component_list, ref = z) # [L, N, N]
             Kzt = self.eval_specific_K_xt(z,t, component_list, ref = z) # [L, N, N]
         mut = self.mean_function(t)[None,:,:] # [1, M, 1]
+        
 
         if self.parameterisation == "white":
             # Lz⁻¹ Kzt
@@ -486,14 +245,20 @@ class VariationalPrecipGP(Module):
     def eval_K_xt(self, x: Num[Array, "N d"], t: Num[Array, "M d"], ref:  Num[Array, "n d"]) -> Num[Array, "L N M"]:
         if self.measure == "empirical":
             x_all, t_all = jnp.vstack([x, ref]), jnp.vstack([t, ref])  # [N+n, d] [M+n, d]
-            ks_all = jnp.stack([k.cross_covariance(x_all,t_all) for k in self.base_kernels]) # [d, N+n, M+n]
-            ks_all = self._orthogonalise_empirical(ks_all, num_ref = jnp.shape(ref)[0])  # [d, N, M]
+            ks_all = jnp.stack([jnp.stack([k.cross_covariance(x_all,t_all) for k in kernels]) for kernels in self.base_kernels]) # [L, d, N+n, M+n]
+            ks_all = self._orthogonalise_empirical(ks_all, num_ref = jnp.shape(ref)[0])  # [L, d, N, M]
+        elif self.measure == "Gaussian":
+            ks_all = jnp.stack([jnp.stack([k.cross_covariance(x,t) for k in kernels]) for kernels in self.base_kernels]) # [L, d, N, M]
+            ks_all = self._orthogonalise_gaussian(ks_all, x, t) # [L, d, N, M]
         elif self.measure is None:
-            ks_all = jnp.stack([k.cross_covariance(x,t) for k in self.base_kernels]) # [d, N, M]
+            ks_all = jnp.stack([jnp.stack([k.cross_covariance(x,t) for k in kernels]) for kernels in self.base_kernels]) # [L, d, N, M]
         else:
             raise ValueError("measure must be empirical, uniform or None")
-        k = jnp.sum(self._compute_additive_terms_girad_newton(ks_all) * self.interaction_variances[:, None, None], 0) # [N, M]
-        return jnp.tile(k[None,:,:], (self.num_latents, 1, 1)) # [L, N, M]
+        k = jnp.sum(self._compute_additive_terms_girad_newton(ks_all) * self.interaction_variances[:,:, None, None], 1) # [L, N, M]
+        if self.use_shared_kernel:
+            k = jnp.tile(k, (self.num_latents, 1, 1))
+        return k
+
 
 
     def eval_specific_K_xt(self, x: Num[Array, "N d"], t: Num[Array, "M d"], component_list: List[int], ref =  Num[Array, "n d"])-> Num[Array, "L N M"]:
@@ -503,14 +268,21 @@ class VariationalPrecipGP(Module):
         
         if self.measure == "empirical":
             x_all, t_all = jnp.vstack([x, ref]), jnp.vstack([t, ref])  # [N+n, d] [M+n, d]
-            ks_all = jnp.stack([self.base_kernels[i].cross_covariance(x_all,t_all) for i in component_list]) # [p, N+n, M+n]
+            ks_all = jnp.stack([jnp.stack([kernels[i].cross_covariance(x_all,t_all) for i in component_list]) for kernels in self.base_kernels]) # [L, p, N+n, M+n]
             ks_all = self._orthogonalise_empirical(ks_all, num_ref = jnp.shape(ref)[0]) # [p, N, M] 
+        elif self.measure == "Gaussian":
+            ks_all = jnp.stack([jnp.stack([k.cross_covariance(x,t) for k in kernels]) for kernels in self.base_kernels]) # [L, d, N, M]
+            ks_all = self._orthogonalise_gaussian(ks_all, x, t) # [L, d, N, M]
+            ks_all = ks_all[:,component_list,:,:] # [L, p, N, M
         elif self.measure is None:
-            ks_all = jnp.stack([self.base_kernels[i].cross_covariance(x,t) for i in component_list]) # [p, N, M]
+            ks_all = jnp.stack([jnp.stack([kernels[i].cross_covariance(x,t) for i in component_list]) for kernels in self.base_kernels]) # [L, p, N, M]
         else:
             raise ValueError("measure must be empirical, uniform or None")
-        k = self.interaction_variances[len(component_list), None, None] * jnp.prod(ks_all,0) # [N, M] 
-        return  jnp.tile(k[None,:,:], (self.num_latents, 1, 1)) # [L, N, M]
+        k = self.interaction_variances[:,len(component_list), None, None] * jnp.prod(ks_all,1) # [L N, M] 
+        if self.use_shared_kernel:
+            k = jnp.tile(k, (self.num_latents, 1, 1))
+        return k
+
 
 
     def predict_indiv(
@@ -526,39 +298,50 @@ class VariationalPrecipGP(Module):
 
 
 
-    def get_sobol_indicies(self, data:gpx.Dataset, component_list: List[List[int]], greedy=True, use_range=False) -> Num[Array, "L c"]:
-        if use_range:
-            raise NotImplementedError("use_range not implemented yet")
-        
+
+
+
+    def get_sobol_indicies(self, data:gpx.Dataset, component_list: List[List[int]], greedy=True, use_range=False, num_samples=100) -> Num[Array, "L c"]:
+
         if not isinstance(component_list, List):
             raise ValueError("Use get_sobol_index if you want to calc for single components (TODO)")
 
 
         mu = self.variational_mean
         sqrt = self.variational_root_covariance
+        x = data.X[-num_samples:,:]
         z = self.get_inducing_locations()
         m_z = jnp.tile(self.mean_function(z)[None,:,:], (self.num_latents, 1, 1))
-        m_x = jnp.tile(self.mean_function(z)[None,:,:], (self.num_latents, 1, 1))
+        m_x = jnp.tile(self.mean_function(x)[None,:,:], (self.num_latents, 1, 1))
 
 
         if self.measure == "empirical":
+            x_all = jnp.vstack([x,x]) # waste of memory here
             z_all = jnp.vstack([z,z]) # waste of memory here
-            Kxz_indiv = jnp.stack([k.cross_covariance(z_all,z_all) for k in self.base_kernels], axis=0)  # [d, N + M, M + M]
-            Kxz_indiv =  self._orthogonalise_empirical(Kxz_indiv, num_ref = jnp.shape(z)[0]) # [d, N, M]
+            Kxz_indiv = jnp.stack([jnp.stack([k.cross_covariance(x_all,z_all) for k in kernels], axis=0) for kernels in self.base_kernels])  # [L, d, N + M, M + M]
+            Kxz_indiv =  self._orthogonalise_empirical(Kxz_indiv, num_ref = jnp.shape(z)[0]) # [L, d, N, M]
+        elif self.measure == "Gaussian":
+            Kxz_indiv = jnp.stack([jnp.stack([k.cross_covariance(x, z) for k in kernels]) for kernels in self.base_kernels]) # [L, p, N, M]
+            Kxz_indiv  = self._orthogonalise_gaussian(Kxz_indiv , x,z) # [L, d, N, M]
         elif self.measure is None:
-            Kxz_indiv = jnp.stack([k.cross_covariance(z,z) for k in self.base_kernels], axis=0)  # [d, N, M]
+            Kxz_indiv = jnp.stack([jnp.stack([k.cross_covariance(x,z) for k in kernels], axis=0) for kernels in self.base_kernels])  # [L, d, N, M]
         else:
             raise ValueError("measure must be empirical, uniform or None")
-        Kxz_components = [self.interaction_variances[len(c),None,None]*jnp.prod(Kxz_indiv[c, :, :], axis=0) for c in component_list] 
-        Kxz_components = jnp.stack(Kxz_components, axis=0) # [c, N, N]
         
-        Kxz_components = jnp.tile(Kxz_components[None,:,:, :], (self.num_latents, 1, 1, 1)) # [L, c, N, N]
+        
+        Kxz_components = [self.interaction_variances[:,len(c),None,None]*jnp.prod(Kxz_indiv[:,c, :, :], axis=1) for c in component_list] 
+        Kxz_components = jnp.stack(Kxz_components, axis=0) # [c,L, N, N]
+        Kxz_components = jnp.transpose(Kxz_components, (1,0,2,3)) # [L, c, N, N]
+    
+        
+        if self.use_shared_kernel:
+            Kxz_components = jnp.tile(Kxz_components, (self.num_latents, 1, 1))
         assert Kxz_components.shape[1] == len(component_list)
 
 
         Kzz = self.eval_K_xt(z, z, ref =  z) # [L, M, M]
         Kzz =Kzz + jnp.eye(self.num_inducing)[None,:,:] * self.jitter
-        Kxz = self.eval_K_xt(z,z, ref =  z)
+        Kxz = self.eval_K_xt(x,z, ref =  z)
         Lz = jnp.linalg.cholesky(Kzz)
 
 
@@ -573,35 +356,51 @@ class VariationalPrecipGP(Module):
                 return m_x + jnp.matmul(jnp.transpose(Kzz_inv_Kzt, (0,2,1)), mu - m_z)
             
 
-
+       
         mean_overall =  get_mean_from_covar(Kxz) # [L,N, 1]
         mean_components = jnp.transpose(vmap(get_mean_from_covar)(jnp.transpose(Kxz_components,(1,0,2,3))), (1,0,2,3)) # [L,c, N, 1]
         
-        if not greedy:
-            sobols = jnp.var(mean_components[:,:,:,0], axis=-1) / jnp.var(mean_overall[:,:,0], axis=-1, keepdims=True) # [L, c]
-        else:
+        # print("NOTE THAT WE ARE CLIPPING BELOW 0 for SOBOL")
+        # mean_overall = jnp.clip(mean_overall, a_min=1e-6)
+        # mean_components = jnp.clip(mean_components, a_min=1e-6) 
+        if greedy:
             raise ValueError("greedy doesnt work")
+        
+        
+        if use_range:
+            sobols = jnp.max(mean_components[:,:,:,0], axis=-1) - jnp.min(mean_components[:,:,:,0], axis=-1) # [L, c]  
+        else:
+            sobols = jnp.var(mean_components[:,:,:,0], axis=-1) / jnp.var(mean_overall[:,:,0], axis=-1, keepdims=True) # [L, c]  
         return sobols
     
-    def _orthogonalise_empirical(self, ks: Num[Array, "d N+n M+n"], num_ref: int)->Num[Array, "d N M"]:
-        ks_xt, ks_xX, ks_Xt, ks_XX = ks[:,:-num_ref,:-num_ref], ks[:,:-num_ref,-num_ref:], ks[:,-num_ref:,:-num_ref], ks[:,-num_ref:,-num_ref:] # [d, N, M], [d, N, n], [d, n, M], [d, n, n]
-        denom = jnp.mean(ks_XX, (1,2))[:, None, None]+self.jitter # [d, 1, 1]
-        Kx =  jnp.mean(ks_xX, 2) # [d, N]
-        Kt = jnp.mean(ks_Xt, 1) # [d, M]
-        numerator = jnp.matmul(Kx[:,:,None], Kt[:, None, :])# [d, N, M]
-        
-        return ks_xt -  numerator / denom 
     
+    def _orthogonalise_empirical(self, ks: Num[Array, "L d N+n M+n"], num_ref: int)->Num[Array, "L d N M"]:
+        ks_xt, ks_xX, ks_Xt, ks_XX = ks[:,:,:-num_ref,:-num_ref], ks[:,:,:-num_ref,-num_ref:], ks[:,:,-num_ref:,:-num_ref], ks[:,:,-num_ref:,-num_ref:] # [L, d, N, M], [L, d, N, n], [L, d, n, M], [L, d, n, n]
+        denom = jnp.mean(ks_XX, (2,3))[:,:, None, None]+self.jitter # [L, d, 1, 1]
+        Kx =  jnp.mean(ks_xX, 3) # [L, d, N]
+        Kt = jnp.mean(ks_Xt, 2) # [L, d, M]
+        numerator = jnp.matmul(Kx[:, :,:,None], Kt[:, :, None, :])# [L, d, N, M]
+        return ks_xt -  numerator / denom 
+
+    def _orthogonalise_gaussian(self, ks: Num[Array, "L d N M"],x: Num[Array, "N d"], t: Num[Array, "M d"])->Num[Array, "L d N M"]:
+            l2 =jnp.stack([jnp.array([k.lengthscale[0] if isinstance(k, gpx.kernels.RBF) else 0.0 for k in kernels ]) for kernels in self.base_kernels])[:,:,None,None]**2 # [L, d, 1 , 1]
+            cov_x_s = jnp.sqrt(l2 / (l2 + 1.0)) * jnp.exp(-0.5 * (x.T ** 2)[None, :,:,None] / (l2 + 1.0)) # [L, d, N, 1]
+            cov_t_s = jnp.sqrt(l2 / (l2 + 1.0)) * jnp.exp(-0.5 * (t.T ** 2)[None, :,None,:] / (l2 + 1.0)) # [L, d, 1, M]
+            var_s = jnp.clip(jnp.sqrt(l2 / (l2 + 2.0)), a_min=1e-5) # [L, d, 1, 1]
+            return   ks -  cov_x_s * cov_t_s / var_s # [L, d, N, M]
+        
 
 
     @jax.jit   
-    def _compute_additive_terms_girad_newton(self, ks: Num[Array, "D N M"]) -> Num[Array, "p N M"]:
+    def _compute_additive_terms_girad_newton(self, ks: Num[Array, "L D N M"]) -> Num[Array, "L p N M"]:
+        L = jnp.shape(ks)[0]
         N = jnp.shape(ks)[-2]
         M = jnp.shape(ks)[-1]
         powers = jnp.arange(self.max_interaction_depth + 1)[:, None] # [p + 1, 1]
-        s = jnp.power(ks[None, :,:,:],powers[:,:,None,None]) # [p + 1, d, 1,1]
-        e = jnp.ones(shape=(self.max_interaction_depth+1, N, M), dtype=jnp.float64) # [p+1, N, N]lazy init then populate
+        s = jnp.power(ks[:, None, :,:,:],powers[None, :,:,None,None]) # [L, p + 1, d, N,M]
+        e = jnp.ones(shape=(L,self.max_interaction_depth+1, N, M), dtype=jnp.float64) # [L, p+1, N, M]lazy init
         for n in range(1, self.max_interaction_depth + 1): # has to be for loop because iterative
-            thing = jax.vmap(lambda k: ((-1.0)**(k-1))*e[n-k]*jnp.sum(s[k], 0))(jnp.arange(1, n+1))
-            e = e.at[n].set((1.0/n) *jnp.sum(thing,0))
+            thing = jax.vmap(lambda k: ((-1.0)**(k-1))*e[:,n-k]*jnp.sum(s[:,k], 1))(jnp.arange(1, n+1))
+            e = e.at[:,n].set((1.0/n) *jnp.sum(thing,0))
         return e
+
