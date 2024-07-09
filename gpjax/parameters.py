@@ -7,9 +7,7 @@ from jax.typing import ArrayLike
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 T = tp.TypeVar("T", bound=tp.Union[ArrayLike, list[float]])
-ParameterTag = tp.Union[
-    str, tp.Literal["positive", "real", "sigmoid", "lower_triangular", "static"]
-]
+ParameterTag = str
 
 
 def transform(

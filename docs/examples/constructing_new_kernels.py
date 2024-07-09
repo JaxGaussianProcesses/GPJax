@@ -202,8 +202,7 @@ fig.colorbar(im3, ax=ax[3], fraction=0.05)
 
 
 # %%
-import beartype.typing as tp
-from gpjax.kernels.computations import AbstractKernelComputation, DenseKernelComputation
+from gpjax.kernels.computations import DenseKernelComputation
 from gpjax.parameters import DEFAULT_BIJECTION, Static, PositiveReal
 
 

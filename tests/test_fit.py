@@ -145,7 +145,7 @@ def test_fit_scipy_simple():
 @pytest.mark.parametrize("verbose", [True, False])
 def test_fit_gp_regression(n_data: int, verbose: bool) -> None:
     # Create dataset:
-    key = jr.key(123)
+    key = jr.PRNGKey(123)
     x = jnp.sort(
         jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(n_data, 1)), axis=0
     )
@@ -165,7 +165,7 @@ def test_fit_gp_regression(n_data: int, verbose: bool) -> None:
         optim=ox.adam(0.1),
         num_iters=15,
         verbose=verbose,
-        key=jr.key(123),
+        key=jr.PRNGKey(123),
     )
 
     # Ensure the trained model is a Gaussian process posterior
