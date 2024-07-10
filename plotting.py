@@ -34,7 +34,7 @@ def plot_data(problem_info:ProblemInfo, data:gpx.Dataset):
 
 
 
-def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=False, greedy=False, lim=None):
+def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=False, greedy=False, lim=None, bij_list_of_lists=None):
         
     
     idx_2 = []
@@ -53,8 +53,9 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
         sobols = sobols_for_plot
 
     z = data.X
-    zmax = jnp.max(z, axis=0)
-    zmin = jnp.min(z, axis=0)
+    ip = model.get_inducing_locations()
+    zmax = jnp.max(ip, axis=0)
+    zmin = jnp.min(ip, axis=0)
 
 
     
@@ -81,37 +82,60 @@ def plot_interactions(problem_info:ProblemInfo, model, data, k=10,use_range=Fals
                 std = jnp.sqrt(var)
                 mean = mean[:,j:j+1] #* (data.Y_std)#+ data.Y_mean
                 std = std[:,j:j+1]#* (data.Y_std)
-                plt.scatter(x_plot[:,chosen_idx[0]],mean, color="blue") 
-                plt.scatter(x_plot[:,chosen_idx[0]],mean+ 1.96*std, color="red") 
-                plt.scatter(x_plot[:,chosen_idx[0]],mean- 1.96*std, color="red") 
-                plt.scatter(z[:,chosen_idx[0]],jnp.zeros_like(z[:,chosen_idx[0]]), color="black",alpha=0.01)
-                ip = model.get_inducing_locations()
-                plt.xlim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]]))])
-                plt.scatter(ip[:,chosen_idx[0]],jnp.zeros_like(ip[:,chosen_idx[0]]), color="orange")
+                ip = model.get_inducing_locations()[:,chosen_idx[0]:chosen_idx[0]+1]
+                x_plot_1 = x_plot[:,chosen_idx[0]:chosen_idx[0]+1]
+                z_1 = z[:,chosen_idx[0]:chosen_idx[0]+1]
+                if bij_list_of_lists is not None:
+                    for bij in bij_list_of_lists[chosen_idx[0]][::-1]:
+                        ip = bij.inverse(ip)
+                        x_plot_1 = bij.inverse(x_plot_1)
+                        z_1 = bij.inverse(z_1)
+                
+                
+                
+                
+                plt.scatter(x_plot_1,mean, color="blue") 
+                plt.scatter(x_plot_1,mean+ 1.96*std, color="red") 
+                plt.scatter(x_plot_1,mean- 1.96*std, color="red") 
+                # plt.scatter(z_1,jnp.zeros_like(z_1), color="black",alpha=0.01)
+                # plt.scatter(ip,jnp.zeros_like(ip), color="orange")
                 plt.title(f"Latent {j} with rank {i}: Best guess (and uncertainty) at additive contributions from {[problem_info.names[i] for i in chosen_idx]}with sobol index {sobols[j][idx]}")
                 if lim is not None:
                     plt.xlim(-lim,lim)
+                    # plt.ylim(-1.5,3.0)
                 else:
-                    plt.xlim(jnp.min(ip[:,chosen_idx[0]]), jnp.max(ip[:,chosen_idx[0]]))
+                    plt.xlim(jnp.min(ip), jnp.max(ip))
             elif len(chosen_idx)==2:
                 try:
                     mean, _ = model.predict_indiv(x_plot,data,chosen_idx)
                 except:
                     mean, _ = model.predict_indiv(x_plot,chosen_idx)
                 mean = mean[:, j:j+1] #* (data.Y_std)# + data.Y_mean
-                col = plt.scatter(x_plot[:,chosen_idx[0]],x_plot[:,chosen_idx[1]],c=mean)
-                #plt.ylim([jnp.min(z[:,chosen_idx[1]]),jnp.max(z[:,chosen_idx[1]])])
+                
+
+                ip_1 = model.get_inducing_locations()[:,chosen_idx[0]:chosen_idx[0]+1]
+                ip_2 = model.get_inducing_locations()[:,chosen_idx[1]:chosen_idx[1]+1]
+                x_plot_1 = x_plot[:,chosen_idx[0]:chosen_idx[0]+1]
+                x_plot_2 = x_plot[:,chosen_idx[1]:chosen_idx[1]+1]
+                z_1 = z[:,chosen_idx[0]:chosen_idx[0]+1]
+                z_2 = z[:,chosen_idx[1]:chosen_idx[1]+1]
+                if bij_list_of_lists is not None:
+                    for bij in bij_list_of_lists[chosen_idx[0]][::-1]:
+                        ip_1 = bij.inverse(ip_1)
+                        x_plot_1 = bij.inverse(x_plot_1)
+                    for bij in bij_list_of_lists[chosen_idx[1]][::-1]:
+                        ip_2 = bij.inverse(ip_2)
+                        x_plot_2 = bij.inverse(x_plot_2)
+                
+                col = plt.scatter(x_plot_1,x_plot_2,c=mean)
                 plt.colorbar(col)
-                plt.scatter(z[:,chosen_idx[0]],z[:,chosen_idx[1]], color="black",alpha=0.01)
-                ip = model.get_inducing_locations()
-                plt.scatter(ip[:,chosen_idx[0]],ip[:,chosen_idx[1]], color="orange")
+                #plt.scatter(z_1,z_2, color="black",alpha=0.01)
+                # plt.scatter(ip_1,ip_2, color="orange")
                 plt.title(f"Latent {j} with rank {i}: Best guess at additive contribution from {[problem_info.names[i] for i in chosen_idx]} with sobol index {sobols[j][idx]}")
-                # plt.xlim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[0]],ip[:,chosen_idx[0]]]))])
-                # plt.ylim([jnp.min(jnp.hstack([x_plot[:,chosen_idx[1]],ip[:,chosen_idx[1]]])),jnp.max(jnp.hstack([x_plot[:,chosen_idx[1]],ip[:,chosen_idx[1]]]))])
                 if lim is not None:
                     plt.xlim(-lim,lim)  
                     plt.ylim(-lim,lim)  
                 else:
-                    plt.xlim(jnp.min(ip[:,chosen_idx[0]]), jnp.max(ip[:,chosen_idx[0]])) 
-                    plt.ylim(jnp.min(ip[:,chosen_idx[1]]), jnp.max(ip[:,chosen_idx[1]]))  
+                    plt.xlim(jnp.min(ip_1), jnp.max(ip_1)) 
+                    plt.ylim(jnp.min(ip_2), jnp.max(ip_2))  
         

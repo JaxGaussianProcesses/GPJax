@@ -79,6 +79,7 @@ class VariationalPrecipGP(Module):
     measure:str = static_field("empirical")
     use_shared_kernel: bool=static_field(True)
     dists: dict = static_field(None)
+    ref: gpx.Dataset = static_field(None)
     
     def __post_init__(self):
         self.mean_function = gpx.mean_functions.Zero()
@@ -148,6 +149,12 @@ class VariationalPrecipGP(Module):
         return expectation
       
 
+    def _get_ref(self):
+        if self.ref is None:
+            return self.get_inducing_locations()
+        else:
+            return self.ref.X
+
 
     def prior_kl(self) -> ScalarFloat:
         # Unpack variational parameters
@@ -162,7 +169,7 @@ class VariationalPrecipGP(Module):
             pus = [tfd.MultivariateNormalFullCovariance(loc=jnp.zeros_like(mu[j]),covariance_matrix=jnp.eye(self.num_inducing)) for j in range(self.num_latents)]
         else:
             muz = self.mean_function(z)[None, :, :] # [1, M, 1]
-            Kzz = self.eval_K_xt(z, z, ref=z) # [L, M M]
+            Kzz = self.eval_K_xt(z, z, ref=self._get_ref()) # [L, M M]
             Kzz = Kzz + jnp.eye(self.num_inducing)[None,:,:] * self.jitter# [L, M M]
             pus = [tfd.MultivariateNormalFullCovariance(loc=muz[j], covariance_matrix=Kzz[j]) for j in range(self.num_latents)]# [L, M M]
 
@@ -183,7 +190,7 @@ class VariationalPrecipGP(Module):
         sqrt = self.variational_root_covariance # [L, M, M]
         z = self.get_inducing_locations()# [N, d]
         
-        Kzz = self.eval_K_xt(z, z, ref=z) # [L, M, M]
+        Kzz = self.eval_K_xt(z, z, ref=self._get_ref()) # [L, M, M]
         Kzz = Kzz + jnp.eye(jnp.shape(z)[0])[None,:,:] * self.jitter # [L, M, M]
         Lz = jnp.linalg.cholesky(Kzz) # [L, M, M]
         muz = self.mean_function(z)[None,:,:] # [1, M, 1]
@@ -192,11 +199,11 @@ class VariationalPrecipGP(Module):
         # Unpack test inputs
         t = test_inputs
         if component_list is None:
-            Ktt = self.eval_K_xt(t,t, ref=z) # [L, N, N]
-            Kzt = self.eval_K_xt(z,t, ref=z) # [L, M, N]
+            Ktt = self.eval_K_xt(t,t, ref=self._get_ref()) # [L, N, N]
+            Kzt = self.eval_K_xt(z,t, ref=self._get_ref()) # [L, M, N]
         else:
-            Ktt = self.eval_specific_K_xt(t,t, component_list, ref = z) # [L, N, N]
-            Kzt = self.eval_specific_K_xt(z,t, component_list, ref = z) # [L, N, N]
+            Ktt = self.eval_specific_K_xt(t,t, component_list, ref = self._get_ref()) # [L, N, N]
+            Kzt = self.eval_specific_K_xt(z,t, component_list, ref = self._get_ref()) # [L, N, N]
         mut = self.mean_function(t)[None,:,:] # [1, M, 1]
         
 
@@ -316,10 +323,11 @@ class VariationalPrecipGP(Module):
 
 
         if self.measure == "empirical":
-            x_all = jnp.vstack([x,x]) # waste of memory here
-            z_all = jnp.vstack([z,z]) # waste of memory here
+            ref = self._get_ref()
+            x_all = jnp.vstack([x,ref]) # waste of memory here
+            z_all = jnp.vstack([z,ref]) # waste of memory here
             Kxz_indiv = jnp.stack([jnp.stack([k.cross_covariance(x_all,z_all) for k in kernels], axis=0) for kernels in self.base_kernels])  # [L, d, N + M, M + M]
-            Kxz_indiv =  self._orthogonalise_empirical(Kxz_indiv, num_ref = jnp.shape(z)[0]) # [L, d, N, M]
+            Kxz_indiv =  self._orthogonalise_empirical(Kxz_indiv, num_ref = jnp.shape(ref)[0]) # [L, d, N, M]
         elif self.measure == "Gaussian":
             Kxz_indiv = jnp.stack([jnp.stack([k.cross_covariance(x, z) for k in kernels]) for kernels in self.base_kernels]) # [L, p, N, M]
             Kxz_indiv  = self._orthogonalise_gaussian(Kxz_indiv , x,z) # [L, d, N, M]
@@ -339,9 +347,9 @@ class VariationalPrecipGP(Module):
         assert Kxz_components.shape[1] == len(component_list)
 
 
-        Kzz = self.eval_K_xt(z, z, ref =  z) # [L, M, M]
+        Kzz = self.eval_K_xt(z, z, ref =  self._get_ref()) # [L, M, M]
         Kzz =Kzz + jnp.eye(self.num_inducing)[None,:,:] * self.jitter
-        Kxz = self.eval_K_xt(x,z, ref =  z)
+        Kxz = self.eval_K_xt(x,z, ref =  self._get_ref())
         Lz = jnp.linalg.cholesky(Kzz)
 
 
