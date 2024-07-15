@@ -47,7 +47,7 @@ asv = "^0.6.0"
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.5.3"
 mkdocs-material = "^9.5.12"
-mkdocstrings = { version = "^0.24.1", extras = ["python"] }
+mkdocstrings = { version = "^0.25.1", extras = ["python"] }
 mkdocs-jupyter = "^0.24.3"
 mkdocs-gen-files = "^0.5.0"
 mkdocs-literate-nav = "^0.6.0"
