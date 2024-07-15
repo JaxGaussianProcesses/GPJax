@@ -244,8 +244,8 @@ def test_posterior_construct(
     assert is_dataclass(posterior_manual)
 
     # Ensure that the posterior is the same type in all three cases.
-    assert type(posterior_mul) == type(posterior_rmul)
-    assert type(posterior_mul) == type(posterior_manual)
+    assert type(posterior_mul) is type(posterior_rmul)
+    assert type(posterior_mul) is type(posterior_manual)
 
     # Ensure the tree leaves are the same in all three cases.
     leaves_mul = jtu.tree_leaves(posterior_mul)
