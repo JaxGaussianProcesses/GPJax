@@ -125,6 +125,7 @@ def test_update_and_optimize_posterior_with_no_key_raises_error():
         ),
     ],
 )
+@pytest.mark.filterwarnings("ignore:y is not of type float64")
 def test_get_posterior_no_optimization_correct_num_datapoints_and_not_optimized(
     num_datapoints: int,
     likelihood_builder: Callable[[int], AbstractLikelihood],
@@ -161,6 +162,7 @@ def test_get_posterior_no_optimization_correct_num_datapoints_and_not_optimized(
         ),
     ],
 )
+@pytest.mark.filterwarnings("ignore:y is not of type float64")
 def test_get_posterior_with_optimization_correct_num_datapoints_and_optimized(
     num_datapoints: int,
     likelihood_builder: Callable[[int], AbstractLikelihood],
@@ -203,6 +205,7 @@ def test_get_posterior_with_optimization_correct_num_datapoints_and_optimized(
         ),
     ],
 )
+@pytest.mark.filterwarnings("ignore:y is not of type float64")
 def test_update_posterior_no_optimize_same_prior_parameters_and_different_num_datapoints(
     initial_num_datapoints: int,
     likelihood_builder: Callable[[int], AbstractLikelihood],
@@ -259,6 +262,7 @@ def test_update_posterior_no_optimize_same_prior_parameters_and_different_num_da
         ),
     ],
 )
+@pytest.mark.filterwarnings("ignore:y is not of type float64")
 def test_update_posterior_with_optimization_updated_prior_parameters_and_different_num_datapoints(
     initial_num_datapoints: int,
     likelihood_builder: Callable[[int], AbstractLikelihood],
