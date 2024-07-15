@@ -30,7 +30,7 @@ flax = "^0.8.4"
 numpy = "<2.0.0"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.3.0"
+ruff = "~0"
 pre-commit = "^3.2.2"
 interrogate = "^1.5.0"
 codespell = "^2.2.4"
@@ -39,6 +39,7 @@ pytest-cov = "^4.0.0"
 pytest-pretty = "^1.1.1"
 pytest-xdist = "^3.2.1"
 coverage = "^7.2.2"
+absolufy-imports = "^0.3.1"
 xdoctest = "^1.1.1"
 mktestdocs = "^0.2.1"
 asv = "^0.6.0"
@@ -83,11 +84,13 @@ xfail_strict = true
 [tool.ruff] # https://github.com/charliermarsh/ruff
 fix = true
 cache-dir = "~/.cache/ruff"
+exclude = ["docs/", "examples/"]
 line-length = 88
 src = ["gpjax", "tests"]
 target-version = "py38"
 
 [tool.ruff.lint]
+dummy-variable-rgx = "^_$"
 select = [
   "F",
   # pycodestyle
@@ -122,7 +125,7 @@ ignore = [
   # do not assign a lambda expression, use a def
   "E731",
   "E501",
-  "S303",
+  "S307",
   "RET504",
   "S101",
   "F722",
@@ -130,9 +133,6 @@ ignore = [
   "PLR0913",
 ]
 unfixable = ["ERA001", "F401", "F841", "T201", "T203"]
-exclude = ["docs/"]
-ignore-init-module-imports = true
-dummy-variable-rgx = "^_$"
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
