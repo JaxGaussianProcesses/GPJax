@@ -23,7 +23,10 @@ from gpjax.decision_making.utility_functions.base import (
     AbstractSinglePointUtilityFunctionBuilder,
     SinglePointUtilityFunction,
 )
-from gpjax.decision_making.utils import OBJECTIVE
+from gpjax.decision_making.utils import (
+    OBJECTIVE,
+    get_best_latent_observation_val,
+)
 from gpjax.gps import ConjugatePosterior
 from gpjax.typing import (
     Array,
@@ -107,14 +110,9 @@ class ProbabilityOfImprovement(AbstractSinglePointUtilityFunctionBuilder):
             )
 
         def probability_of_improvement(x_test: Num[Array, "N D"]):
-            # Computing the posterior mean for the training dataset
-            # for computing the best_y value (as the minimum
-            # posterior mean of the objective function)
-            predictive_dist_for_training = objective_posterior.predict(
-                objective_dataset.X, objective_dataset
+            best_y = get_best_latent_observation_val(
+                objective_posterior, objective_dataset
             )
-            best_y = predictive_dist_for_training.mean().min()
-
             predictive_dist = objective_posterior.predict(x_test, objective_dataset)
 
             normal_dist = tfp.distributions.Normal(

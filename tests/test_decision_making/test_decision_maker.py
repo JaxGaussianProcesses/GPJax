@@ -106,9 +106,6 @@ def test_abstract_decision_maker_raises_error():
 
 
 @pytest.mark.parametrize("batch_size", [0, -1, -10])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_invalid_batch_size_raises_error(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
@@ -134,9 +131,6 @@ def test_invalid_batch_size_raises_error(
         )
 
 
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_non_thompson_sampling_non_one_batch_size_raises_error(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
@@ -161,9 +155,6 @@ def test_non_thompson_sampling_non_one_batch_size_raises_error(
         )
 
 
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_invalid_tags_raises_error(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
@@ -188,9 +179,6 @@ def test_invalid_tags_raises_error(
         )
 
 
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_initialisation_optimizes_posterior_hyperparameters(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
@@ -232,9 +220,6 @@ def test_initialisation_optimizes_posterior_hyperparameters(
     )
 
 
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_decision_maker_ask(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
@@ -267,9 +252,6 @@ def test_decision_maker_ask(
 
 
 @pytest.mark.parametrize("batch_size", [1, 2, 5])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_decision_maker_ask_multi_batch_ts(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
@@ -304,9 +286,6 @@ def test_decision_maker_ask_multi_batch_ts(
     ).all()  # Ensure decision maker key is unchanged
 
 
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_decision_maker_tell_with_inconsistent_observations_raises_error(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
@@ -342,9 +321,6 @@ def test_decision_maker_tell_with_inconsistent_observations_raises_error(
         decision_maker.tell(observation_datasets=observations, key=key)
 
 
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_decision_maker_tell_updates_datasets_and_models(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
@@ -406,9 +382,6 @@ def test_decision_maker_tell_updates_datasets_and_models(
 
 
 @pytest.mark.parametrize("n_steps", [1, 3])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_decision_maker_run(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,
@@ -453,9 +426,6 @@ def test_decision_maker_run(
 
 @pytest.mark.parametrize("n_steps", [1, 3])
 @pytest.mark.parametrize("batch_size", [1, 3])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_decision_maker_run_ts(
     search_space: AbstractSearchSpace,
     posterior_handler: PosteriorHandler,

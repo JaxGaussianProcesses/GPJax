@@ -14,6 +14,10 @@
 # ==============================================================================
 from jax import config
 
+from gpjax.decision_making.utility_functions.expected_improvement import (
+    ExpectedImprovement,
+)
+
 config.update("jax_enable_x64", True)
 
 from beartype.typing import Type
@@ -46,6 +50,7 @@ from tests.test_decision_making.utils import (
 @pytest.mark.parametrize(
     "utility_function_builder, utility_function_kwargs",
     [
+        (ExpectedImprovement, {}),
         (ProbabilityOfImprovement, {}),
         (ThompsonSampling, {"num_features": 100}),
     ],
@@ -73,6 +78,7 @@ def test_utility_function_no_objective_posterior_raises_error(
 @pytest.mark.parametrize(
     "utility_function_builder, utility_function_kwargs",
     [
+        (ExpectedImprovement, {}),
         (ProbabilityOfImprovement, {}),
         (ThompsonSampling, {"num_features": 100}),
     ],
@@ -100,6 +106,7 @@ def test_utility_function_no_objective_dataset_raises_error(
 @pytest.mark.parametrize(
     "utility_function_builder, utility_function_kwargs",
     [
+        (ExpectedImprovement, {}),
         (ProbabilityOfImprovement, {}),
         (ThompsonSampling, {"num_features": 100}),
     ],
@@ -124,6 +131,7 @@ def test_non_conjugate_posterior_raises_error(
 @pytest.mark.parametrize(
     "utility_function_builder, utility_function_kwargs",
     [
+        (ExpectedImprovement, {}),
         (ProbabilityOfImprovement, {}),
         (ThompsonSampling, {"num_features": 100}),
     ],
@@ -154,5 +162,5 @@ def test_utility_functions_have_correct_shapes(
     )
     test_key, _ = jr.split(key)
     test_X = test_target_function.generate_test_points(num_test_points, test_key)
-    ts_utility_function_values = utility_function(test_X)
-    assert ts_utility_function_values.shape == (num_test_points, 1)
+    utility_function_values = utility_function(test_X)
+    assert utility_function_values.shape == (num_test_points, 1)

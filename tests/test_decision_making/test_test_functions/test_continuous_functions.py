@@ -19,6 +19,7 @@ config.update("jax_enable_x64", True)
 import jax.numpy as jnp
 import jax.random as jr
 import pytest
+import tensorflow_probability.substrates.jax as tfp
 
 from gpjax.decision_making.test_functions import (
     AbstractContinuousTestFunction,
@@ -51,9 +52,6 @@ def test_minimizer_evaluates_to_minimum(test_function: AbstractContinuousTestFun
     "test_function", [Quadratic(), Forrester(), LogarithmicGoldsteinPrice()]
 )
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_correct_minimum(test_function: AbstractContinuousTestFunction, key: KeyArray):
     test_x = test_function.generate_test_points(100000, key)
     function_vals = test_function.evaluate(test_x)
@@ -65,9 +63,6 @@ def test_correct_minimum(test_function: AbstractContinuousTestFunction, key: Key
 @pytest.mark.parametrize(
     "test_function", [Quadratic(), Forrester(), LogarithmicGoldsteinPrice()]
 )
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_correct_dtypes(test_function: AbstractContinuousTestFunction):
     minimizer = test_function.minimizer
     minimum = test_function.minimum
@@ -85,9 +80,6 @@ def test_correct_dtypes(test_function: AbstractContinuousTestFunction):
     [(Quadratic(), 1), (Forrester(), 1), (LogarithmicGoldsteinPrice(), 2)],
 )
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_test_points_shape(
     test_function: AbstractContinuousTestFunction, dimensionality: int, num_samples: int
 ):
@@ -100,9 +92,6 @@ def test_test_points_shape(
     [(Quadratic(), 1), (Forrester(), 1), (LogarithmicGoldsteinPrice(), 2)],
 )
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_dataset_shapes(
     test_function: AbstractContinuousTestFunction, dimensionality: int, num_samples: int
 ):
@@ -112,13 +101,39 @@ def test_dataset_shapes(
 
 
 @pytest.mark.parametrize(
+    "test_function",
+    [Quadratic(), Forrester(), LogarithmicGoldsteinPrice()],
+)
+def test_noiseless_dataset(test_function: AbstractContinuousTestFunction):
+    dataset = test_function.generate_dataset(100, jr.key(42))
+    expected_y = test_function(dataset.X)
+    assert jnp.all(dataset.y == expected_y)
+
+
+@pytest.mark.parametrize(
+    "test_function",
+    [Quadratic(), Forrester(), LogarithmicGoldsteinPrice()],
+)
+@pytest.mark.parametrize("obs_stddev", [1.0, 2.3])
+def test_noisy_dataset(
+    test_function: AbstractContinuousTestFunction, obs_stddev: float
+):
+    num_points = 100
+    dataset = test_function.generate_dataset(num_points, jr.key(42), obs_stddev)
+    noise = tfp.distributions.Normal(
+        jnp.zeros(num_points), obs_stddev * jnp.ones(num_points)
+    )
+    expected_y = test_function(dataset.X) + jnp.transpose(
+        noise.sample(sample_shape=[1], seed=jr.key(42))
+    )
+    assert jnp.all(dataset.y == expected_y)
+
+
+@pytest.mark.parametrize(
     "test_function", [Quadratic(), Forrester(), LogarithmicGoldsteinPrice()]
 )
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_same_key_same_dataset(
     test_function: AbstractContinuousTestFunction, num_samples: int, key: KeyArray
 ):
@@ -133,9 +148,6 @@ def test_same_key_same_dataset(
 )
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_different_key_different_dataset(
     test_function: AbstractContinuousTestFunction, num_samples: int, key: KeyArray
 ):
@@ -151,9 +163,6 @@ def test_different_key_different_dataset(
 )
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_same_key_same_test_points(
     test_function: AbstractContinuousTestFunction, num_samples: int, key: KeyArray
 ):
@@ -167,9 +176,6 @@ def test_same_key_same_test_points(
 )
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_different_key_different_test_points(
     test_function: AbstractContinuousTestFunction, num_samples: int, key: KeyArray
 ):

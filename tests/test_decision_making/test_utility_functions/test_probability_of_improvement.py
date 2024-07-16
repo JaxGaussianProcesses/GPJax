@@ -1,4 +1,4 @@
-# Copyright 2023 The GPJax Contributors. All Rights Reserved.
+# Copyright 2024 The GPJax Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ def test_probability_of_improvement_gives_correct_value_for_a_seed():
     key = jr.key(42)
     forrester = Forrester()
     dataset = forrester.generate_dataset(num_points=10, key=key)
-    posterior = generate_dummy_conjugate_posterior(dataset)
+    posterior = generate_dummy_conjugate_posterior(dataset, forrester)
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
 

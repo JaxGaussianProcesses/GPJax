@@ -44,9 +44,6 @@ def test_abstract_single_batch_utility_maximizer():
     [(Forrester(), 1), (LogarithmicGoldsteinPrice(), 2)],
 )
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_discrete_maximizer_returns_correct_point(
     test_function: AbstractContinuousTestFunction,
     dimensionality: int,
@@ -88,9 +85,6 @@ def test_continuous_maximizer_raises_error_with_erroneous_num_restarts(
 )
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.parametrize("num_restarts", [1, 3])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_continous_maximizer_returns_same_point_with_same_key(
     test_function: AbstractContinuousTestFunction,
     dimensionality: int,
@@ -130,9 +124,6 @@ def test_continous_maximizer_returns_same_point_with_same_key(
 )
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
 @pytest.mark.parametrize("num_restarts", [1, 3])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_continuous_maximizer_finds_correct_point(
     test_function: AbstractContinuousTestFunction,
     dimensionality: int,
@@ -156,9 +147,6 @@ def test_continuous_maximizer_finds_correct_point(
 
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(10), jr.key(1)])
 @pytest.mark.parametrize("num_restarts", [1, 3])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_continuous_maximizer_jaxopt_component(key: KeyArray, num_restarts: int):
     quadratic = Quadratic()
     continuous_utility_maximizer = ContinuousSinglePointUtilityMaximizer(
