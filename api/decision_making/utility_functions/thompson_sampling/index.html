@@ -1433,6 +1433,26 @@
   
   
     <li class="md-nav__item">
+      <a href="../expected_improvement/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Expected Improvement
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../probability_of_improvement/" class="md-nav__link">
         
   
@@ -2822,7 +2842,7 @@ datasets.</p>
 
 
 <h6 id="gpjax.decision_making.utility_functions.thompson_sampling.ThompsonSampling.build_utility_function" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">build_utility_function</span><span class="p">(</span><span class="n">posteriors</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ConjugatePosterior</span> <span class="o">|</span> <span class="n">NonConjugatePosterior</span><span class="p">],</span> <span class="n">datasets</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SinglePointUtilityFunction</span></code>
+          <code class="highlight language-python"><span class="n">build_utility_function</span><span class="p">(</span><span class="n">posteriors</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ConjugatePosterior</span><span class="p">],</span> <span class="n">datasets</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SinglePointUtilityFunction</span></code>
 
 </h6>
 
@@ -2849,11 +2869,11 @@ are <em>maximised</em>.</p>
         <tr>
           <td><code>posteriors</code></td>
           <td>
-                <code><span title="beartype.typing.Mapping">Mapping</span>[str, AbstractPosterior]</code>
+                <code><span title="beartype.typing.Mapping">Mapping</span>[str, <a class="autorefs autorefs-internal" title="gpjax.gps.ConjugatePosterior" href="../../../gps/#gpjax.gps.ConjugatePosterior">ConjugatePosterior</a>]</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Dictionary of posteriors to be</p>
+              <p>Dictionary of posteriors to</p>
             </div>
           </td>
           <td>

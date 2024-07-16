@@ -1433,6 +1433,26 @@
   
   
     <li class="md-nav__item">
+      <a href="../utility_functions/expected_improvement/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Expected Improvement
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../utility_functions/probability_of_improvement/" class="md-nav__link">
         
   
@@ -2680,6 +2700,28 @@ https://github.com/secondmind-labs/trieste/blob/develop/trieste/observer.py</p>
       <p>Takes a dictionary of functions and returns a <code>FunctionEvaluator</code> which can be
 used to evaluate each of the functions at a supplied set of points and return a
 dictionary of datasets storing the evaluated points.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="gpjax.decision_making.utils.get_best_latent_observation_val" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">get_best_latent_observation_val</span><span class="p">(</span><span class="n">posterior</span><span class="p">:</span> <span class="n">AbstractPosterior</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span></code>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Takes a posterior and dataset and returns the best (latent) function value in the
+dataset, corresponding to the minimum of the posterior mean value evaluated at
+locations in the dataset. In the noiseless case, this corresponds to the minimum
+value in the dataset.</p>
 
   </div>
 

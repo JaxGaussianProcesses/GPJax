@@ -1480,6 +1480,26 @@
   
   
     <li class="md-nav__item">
+      <a href="../../utility_functions/expected_improvement/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Expected Improvement
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../utility_functions/probability_of_improvement/" class="md-nav__link">
         
   
@@ -2859,7 +2879,7 @@ https://docs.jaxgaussianprocesses.com/examples/poisson/#dataset.</p>
     <tbody>
         <tr>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, &#39;N D&#39;]</code>
+                <code><span title="gpjax.typing.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2880,7 +2900,7 @@ https://docs.jaxgaussianprocesses.com/examples/poisson/#dataset.</p>
 
 
 <h6 id="gpjax.decision_making.test_functions.non_conjugate_functions.PoissonTestFunction.evaluate" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Integer</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">]</span></code>
+          <code class="highlight language-python"><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Int</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">]</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -2910,7 +2930,7 @@ https://docs.jaxgaussianprocesses.com/examples/poisson/#dataset.</p>
         <tr>
           <td><code>x</code></td>
           <td>
-                <code><span title="jaxtyping.Float">Float</span>[<span title="jaxtyping.Array">Array</span>, &#39;N D&#39;]</code>
+                <code><span title="gpjax.typing.Float">Float</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;N D&#39;]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2937,11 +2957,11 @@ https://docs.jaxgaussianprocesses.com/examples/poisson/#dataset.</p>
     <tbody>
         <tr>
           <td>
-                <code><span title="jaxtyping.Integer">Integer</span>[<span title="jaxtyping.Array">Array</span>, &#39;N 1&#39;]</code>
+                <code><span title="gpjax.typing.Int">Int</span>[<a class="autorefs autorefs-internal" title="gpjax.typing.Array" href="../../../typing/#gpjax.typing.Array">Array</a>, &#39;N 1&#39;]</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Integer[Array, 'N 1']: Values of the test function at the points.</p>
+              <p>Float[Array, 'N 1']: Values of the test function at the points.</p>
             </div>
           </td>
         </tr>

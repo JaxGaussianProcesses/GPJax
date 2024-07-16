@@ -1480,6 +1480,26 @@
   
   
     <li class="md-nav__item">
+      <a href="../../utility_functions/expected_improvement/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Expected Improvement
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../utility_functions/probability_of_improvement/" class="md-nav__link">
         
   
@@ -2610,13 +2630,17 @@
 <h5 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction" class="doc doc-heading">
           <code>AbstractContinuousTestFunction</code>
 
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
 
 </h5>
 
 
   <div class="doc doc-contents ">
           <p class="doc doc-class-bases">
-            Bases: <code><span title="abc.ABC">ABC</span></code></p>
+            Bases: <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code></p>
 
   
       <p>Abstract base class for continuous test functions.</p>
@@ -2744,8 +2768,527 @@
 
 
 
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__init_subclass__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.replace" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the values of the fields of the object.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.replace--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.replace--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.replace_meta" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the metadata of the fields.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the metadata of the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.replace_meta--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.replace_meta--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the metadata of the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.update_meta" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">update_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Update the metadata of the fields. The metadata must already exist.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.update_meta--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.update_meta--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.replace_trainable" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the trainability status of local nodes of the Module.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.replace_bijector" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the bijectors of local nodes of the Module.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.constrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">constrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the constrained space according to their defined bijectors.</p>
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.constrain--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.constrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the constrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.unconstrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the unconstrained space according to their defined bijectors.</p>
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.unconstrain--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.unconstrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the unconstrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.stop_gradient" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">stop_gradient</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Stop gradients flowing through the Module.</p>
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.stop_gradient--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.stop_gradient--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with gradients stopped.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.trainables" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__add__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__add__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__add__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__radd__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__radd__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__radd__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__mul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__mul__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__mul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__rmul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__rmul__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__rmul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
 <h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.generate_dataset" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">generate_dataset</span><span class="p">(</span><span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span></code>
+          <code class="highlight language-python"><span class="n">generate_dataset</span><span class="p">(</span><span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">,</span> <span class="n">obs_stddev</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span></code>
 
 </h6>
 
@@ -2793,6 +3336,20 @@
           </td>
           <td>
               <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>obs_stddev</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>(Optional) standard deviation of Gaussian distributed</p>
+            </div>
+          </td>
+          <td>
+                <code>0.0</code>
           </td>
         </tr>
     </tbody>
@@ -2908,6 +3465,23 @@
         </tr>
     </tbody>
   </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.AbstractContinuousTestFunction.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">]</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
 
   </div>
 
@@ -3116,8 +3690,527 @@ variance over <span class="katex"><span class="katex-mathml"><math xmlns="http:/
 
 
 
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.__init_subclass__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.replace" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the values of the fields of the object.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.replace--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Forrester.replace--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.replace_meta" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the metadata of the fields.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the metadata of the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.replace_meta--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Forrester.replace_meta--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the metadata of the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.update_meta" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">update_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Update the metadata of the fields. The metadata must already exist.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.update_meta--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Forrester.update_meta--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.replace_trainable" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the trainability status of local nodes of the Module.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.replace_bijector" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the bijectors of local nodes of the Module.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.constrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">constrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the constrained space according to their defined bijectors.</p>
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.constrain--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Forrester.constrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the constrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.unconstrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the unconstrained space according to their defined bijectors.</p>
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.unconstrain--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Forrester.unconstrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the unconstrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.stop_gradient" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">stop_gradient</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Stop gradients flowing through the Module.</p>
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.stop_gradient--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Forrester.stop_gradient--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with gradients stopped.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.trainables" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">]</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.__add__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.__add__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Forrester.__add__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.__radd__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.__radd__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Forrester.__radd__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.__mul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.__mul__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Forrester.__mul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.__rmul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.__rmul__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Forrester.__rmul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
 <h6 id="gpjax.decision_making.test_functions.continuous_functions.Forrester.generate_dataset" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">generate_dataset</span><span class="p">(</span><span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span></code>
+          <code class="highlight language-python"><span class="n">generate_dataset</span><span class="p">(</span><span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">,</span> <span class="n">obs_stddev</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span></code>
 
 </h6>
 
@@ -3165,6 +4258,20 @@ variance over <span class="katex"><span class="katex-mathml"><math xmlns="http:/
           </td>
           <td>
               <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>obs_stddev</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>(Optional) standard deviation of Gaussian distributed</p>
+            </div>
+          </td>
+          <td>
+                <code>0.0</code>
           </td>
         </tr>
     </tbody>
@@ -3445,8 +4552,527 @@ and unit variance over <span class="katex"><span class="katex-mathml"><math xmln
 
 
 
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__init_subclass__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.replace" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the values of the fields of the object.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.replace--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.replace--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.replace_meta" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the metadata of the fields.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the metadata of the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.replace_meta--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.replace_meta--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the metadata of the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.update_meta" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">update_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Update the metadata of the fields. The metadata must already exist.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.update_meta--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.update_meta--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.replace_trainable" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the trainability status of local nodes of the Module.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.replace_bijector" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the bijectors of local nodes of the Module.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.constrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">constrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the constrained space according to their defined bijectors.</p>
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.constrain--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.constrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the constrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.unconstrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the unconstrained space according to their defined bijectors.</p>
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.unconstrain--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.unconstrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the unconstrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.stop_gradient" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">stop_gradient</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Stop gradients flowing through the Module.</p>
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.stop_gradient--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.stop_gradient--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with gradients stopped.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.trainables" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">]</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__add__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__add__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__add__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__radd__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__radd__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__radd__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__mul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__mul__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__mul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__rmul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__rmul__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.__rmul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
 <h6 id="gpjax.decision_making.test_functions.continuous_functions.LogarithmicGoldsteinPrice.generate_dataset" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">generate_dataset</span><span class="p">(</span><span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span></code>
+          <code class="highlight language-python"><span class="n">generate_dataset</span><span class="p">(</span><span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">,</span> <span class="n">obs_stddev</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span></code>
 
 </h6>
 
@@ -3494,6 +5120,20 @@ and unit variance over <span class="katex"><span class="katex-mathml"><math xmln
           </td>
           <td>
               <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>obs_stddev</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>(Optional) standard deviation of Gaussian distributed</p>
+            </div>
+          </td>
+          <td>
+                <code>0.0</code>
           </td>
         </tr>
     </tbody>
@@ -3772,8 +5412,527 @@ and unit variance over <span class="katex"><span class="katex-mathml"><math xmln
 
 
 
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.__init_subclass__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">__init_subclass__</span><span class="p">(</span><span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.replace" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the values of the fields of the object.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.replace--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Quadratic.replace--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.replace_meta" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the metadata of the fields.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the metadata of the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.replace_meta--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Quadratic.replace_meta--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the metadata of the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.update_meta" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">update_meta</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Update the metadata of the fields. The metadata must already exist.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><span title="beartype.typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>keyword arguments to replace the fields of the object.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.update_meta--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Quadratic.update_meta--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with the fields replaced.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.replace_trainable" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_trainable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the trainability status of local nodes of the Module.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.replace_bijector" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">replace_bijector</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tfb</span><span class="o">.</span><span class="n">Bijector</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Replace the bijectors of local nodes of the Module.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.constrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">constrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the constrained space according to their defined bijectors.</p>
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.constrain--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Quadratic.constrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the constrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.unconstrain" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">unconstrain</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Transform model parameters to the unconstrained space according to their defined bijectors.</p>
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.unconstrain--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Quadratic.unconstrain--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: transformed to the unconstrained space.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.stop_gradient" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">stop_gradient</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Stop gradients flowing through the Module.</p>
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.stop_gradient--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Quadratic.stop_gradient--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>Module: with gradients stopped.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.trainables" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">trainables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Num</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N D&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39;N 1&#39;</span><span class="p">]</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.__add__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.__add__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Quadratic.__add__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.__radd__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to add.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.__radd__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Quadratic.__radd__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The sum of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.__mul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.__mul__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Quadratic.__mul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.__rmul__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__rmul__</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AbstractMeanFunction</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">&#39; O&#39;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">AbstractMeanFunction</span></code>
+
+</h6>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Multiply two mean functions.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>other</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gpjax.mean_functions.AbstractMeanFunction" href="../../../mean_functions/#gpjax.mean_functions.AbstractMeanFunction">AbstractMeanFunction</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The other mean function to multiply.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.__rmul__--returns">Returns<a class="headerlink" href="#gpjax.decision_making.test_functions.continuous_functions.Quadratic.__rmul__--returns" title="Permanent link"></a></h6>
+<div class="highlight"><pre><span></span><code>AbstractMeanFunction: The product of the two mean functions.
+</code></pre></div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
 <h6 id="gpjax.decision_making.test_functions.continuous_functions.Quadratic.generate_dataset" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">generate_dataset</span><span class="p">(</span><span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span></code>
+          <code class="highlight language-python"><span class="n">generate_dataset</span><span class="p">(</span><span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">KeyArray</span><span class="p">,</span> <span class="n">obs_stddev</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span></code>
 
 </h6>
 
@@ -3821,6 +5980,20 @@ and unit variance over <span class="katex"><span class="katex-mathml"><math xmln
           </td>
           <td>
               <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>obs_stddev</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>(Optional) standard deviation of Gaussian distributed</p>
+            </div>
+          </td>
+          <td>
+                <code>0.0</code>
           </td>
         </tr>
     </tbody>
