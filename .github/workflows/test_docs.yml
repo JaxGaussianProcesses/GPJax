@@ -61,4 +61,4 @@ jobs:
           cp docs/examples/gpjax.mplstyle .
           poetry install --all-extras --with docs
           conda install pandoc
-          poetry run mkdocs build
+          poetry run python docs/scripts/gen_examples.py && poetry run mkdocs build
