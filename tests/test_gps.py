@@ -211,8 +211,8 @@ def test_posterior_construct(
     posterior_manual = construct_posterior(prior=prior, likelihood=likelihood)
 
     # Ensure that the posterior is the same type in all three cases.
-    assert type(posterior_mul) == type(posterior_rmul)
-    assert type(posterior_mul) == type(posterior_manual)
+    assert type(posterior_mul) is type(posterior_rmul)
+    assert type(posterior_mul) is type(posterior_manual)
 
     # Ensure we have the correct likelihood and prior.
     assert posterior_mul.likelihood == likelihood

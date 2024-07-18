@@ -4,7 +4,7 @@ GPJax is a didactic Gaussian process (GP) library in JAX, supporting GPU
 acceleration and just-in-time compilation. We seek to provide a flexible
 API to enable researchers to rapidly prototype and develop new ideas.
 
-![Gaussian process posterior.](./_static/GP.svg)
+![Gaussian process posterior.](static/GP.svg)
 
 
 ## "Hello, GP!"
@@ -40,7 +40,7 @@ would write on paper, as shown below.
 
 !!! Install
 
-    GPJax can be installed via pip. See our [installation guide](https://docs.jaxgaussianprocesses.com/installation/) for further details.
+    GPJax can be installed via pip. See our [installation guide](installation.md) for further details.
 
     ```bash
     pip install gpjax
@@ -48,7 +48,7 @@ would write on paper, as shown below.
 
 !!! New
 
-    New to GPs? Then why not check out our [introductory notebook](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/) that starts from Bayes' theorem and univariate Gaussian distributions.
+    New to GPs? Then why not check out our [introductory notebook](_examples/intro_to_gps.md) that starts from Bayes' theorem and univariate Gaussian distributions.
 
 !!! Begin
 

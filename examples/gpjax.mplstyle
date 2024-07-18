@@ -14,10 +14,7 @@ axes.axisbelow: true
 
 ### Fonts
 mathtext.fontset: cm
-font.family: serif
-font.serif: Computer Modern Roman
 font.size: 10
-text.usetex: True
 
 # Axes ticks
 ytick.left: True
