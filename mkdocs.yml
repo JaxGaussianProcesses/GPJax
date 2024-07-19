@@ -33,6 +33,7 @@ nav:
   - 📖 Guides for customisation:
     - Kernels: examples/constructing_new_kernels.md
     - Likelihoods: examples/likelihoods_guide.md
+    - Model Guide: examples/backend.md
     - UCI regression: examples/yacht.md
   - 💻 Raw tutorial code: give_me_the_code.md
   - Community:
