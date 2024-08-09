@@ -56,16 +56,18 @@ def transform(
         else:
             transformed_value = bijector.forward(param.value)
 
-        param.value = transformed_value
+        param.replace(transformed_value)
 
         return param
 
-    transformed_params = jtu.tree_map(
+    gp_params, *other_params = params.split(Parameter, ...)
+
+    transformed_gp_params: nnx.State = jtu.tree_map(
         lambda x: _inner(x),
-        params,
+        gp_params,
         is_leaf=lambda x: isinstance(x, nnx.VariableState),
     )
-    return transformed_params
+    return nnx.State.merge(transformed_gp_params, *other_params)
 
 
 class Parameter(nnx.Variable[T]):
