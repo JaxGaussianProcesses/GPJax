@@ -12,6 +12,7 @@ Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa
 from cola import PSD
 from cola.ops import (
     Dense,
+    Diagonal,
     LinearOperator,
 )
 
@@ -57,6 +58,20 @@ class BasisFunctionComputation(AbstractKernelComputation):
         """
         z1 = self.compute_features(kernel, inputs)
         return PSD(Dense(self.scaling(kernel) * jnp.matmul(z1, z1.T)))
+
+    def diagonal(self, kernel: Kernel, inputs: Float[Array, "N D"]) -> Diagonal:
+        r"""For a given kernel, compute the elementwise diagonal of the
+        NxN gram matrix on an input matrix of shape NxD.
+
+        Args:
+            kernel (AbstractKernel): the kernel function.
+            inputs (Float[Array, "N D"]): The input matrix.
+
+        Returns
+        -------
+            Diagonal: The computed diagonal variance entries.
+        """
+        return super().diagonal(kernel.base_kernel, inputs)
 
     def compute_features(
         self, kernel: Kernel, x: Float[Array, "N D"]

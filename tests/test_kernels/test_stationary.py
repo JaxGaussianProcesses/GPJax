@@ -17,7 +17,10 @@
 from dataclasses import is_dataclass
 from itertools import product
 
-from cola.ops import LinearOperator
+from cola.ops import (
+    Diagonal,
+    LinearOperator,
+)
 import jax
 from jax import config
 import jax.numpy as jnp
@@ -129,9 +132,28 @@ class BaseTestKernel:
 
         # Test gram matrix
         Kxx = kernel.gram(x)
+        Kxx_cross = kernel.cross_covariance(x, x)
         assert isinstance(Kxx, LinearOperator)
         assert Kxx.shape == (n, n)
         assert jnp.all(jnp.linalg.eigvalsh(Kxx.to_dense() + jnp.eye(n) * 1e-6) > 0.0)
+        assert jnp.allclose(Kxx_cross, Kxx.to_dense())
+
+    @pytest.mark.parametrize("n", [1, 2, 5], ids=lambda x: f"n={x}")
+    @pytest.mark.parametrize("dim", [1, 3], ids=lambda x: f"dim={x}")
+    def test_diagonal(self, dim: int, n: int) -> None:
+        # Initialise kernel
+        kernel: AbstractKernel = self.kernel()
+
+        # Inputs
+        x = jnp.linspace(0.0, 1.0, n * dim).reshape(n, dim)
+
+        # Test diagonal
+        Kxx = kernel.diagonal(x)
+        Kxx_gram = jnp.diagonal(kernel.gram(x).to_dense())
+        assert isinstance(Kxx, Diagonal)
+        assert Kxx.shape == (n, n)
+        assert jnp.all(Kxx.diag + 1e-6 > 0.0)
+        assert jnp.allclose(Kxx_gram, Kxx.diag)
 
     @pytest.mark.parametrize("n_a", [1, 2, 5], ids=lambda x: f"n_a={x}")
     @pytest.mark.parametrize("n_b", [1, 2, 5], ids=lambda x: f"n_b={x}")
@@ -143,11 +165,14 @@ class BaseTestKernel:
         # Inputs
         a = jnp.linspace(-1.0, 1.0, n_a * dim).reshape(n_a, dim)
         b = jnp.linspace(3.0, 4.0, n_b * dim).reshape(n_b, dim)
+        c = jnp.vstack((a, b))
 
         # Test cross-covariance
         Kab = kernel.cross_covariance(a, b)
+        Kab_gram = kernel.gram(c).to_dense()[:n_a, n_a:]
         assert isinstance(Kab, jnp.ndarray)
         assert Kab.shape == (n_a, n_b)
+        assert jnp.allclose(Kab, Kab_gram)
 
     def test_spectral_density(self):
         # Initialise kernel
