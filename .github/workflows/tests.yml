@@ -26,10 +26,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       # Install Poetry
-      - name: Install Poetry
-        uses: snok/install-poetry@v1.3.3
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
         with:
           version: 1.5.1
+          virtualenvs-create: false
+          virtualenvs-in-project: false
+          installer-parallel: true
 
       # Configure Poetry to use the virtual environment in the project
       - name: Setup Poetry
@@ -39,7 +42,7 @@ jobs:
       # Install the dependencies
       - name: Install Package
         run: |
-          poetry install --with tests
+          poetry install --with dev
 
       - name: Check docstrings
         run: |
