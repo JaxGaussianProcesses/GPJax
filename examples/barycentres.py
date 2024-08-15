@@ -50,9 +50,12 @@ with install_import_hook("gpjax", "beartype.beartype"):
 
 
 key = jr.key(123)
+
+# set the default style for plotting
 plt.style.use(
     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
 )
+
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]

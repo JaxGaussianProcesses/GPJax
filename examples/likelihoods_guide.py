@@ -25,12 +25,12 @@
 # In this section we'll provide a short introduction to likelihoods and why they are
 # important. For users who are already familiar with likelihoods, feel free to skip to
 # the next section, and for users who would like more information than is provided
-# here, please see our [introduction to Gaussian processes notebook](intro_to_gps.py).
+# here, please see our [introduction to Gaussian processes notebook](intro_to_gps.md).
 #
 # ### What is a likelihood?
 #
 # We adopt the notation of our
-# [introduction to Gaussian processes notebook](intro_to_gps.py) where we have a
+# [introduction to Gaussian processes notebook](intro_to_gps.md) where we have a
 # Gaussian process (GP) $f(\cdot)\sim\mathcal{GP}(m(\cdot), k(\cdot, \cdot))$ and a
 # dataset $\mathbf{y} = \{y_n\}_{n=1}^N$ observed at corresponding inputs
 # $\mathbf{x} = \{x_n\}_{n=1}^N$. The evaluation of $f$ at $\mathbf{x}$ is denoted by
@@ -128,9 +128,7 @@ gpx.likelihoods.Gaussian(num_datapoints=D.n)
 gpx.likelihoods.Gaussian(num_datapoints=D.n, obs_stddev=0.5)
 
 # %% [markdown]
-# To control other properties of the observation noise such as trainability and value
-# constraints, see our [PyTree guide](pytrees.md).
-#
+
 # ### Prediction
 #
 # The `predict` method of a likelihood object transforms the latent distribution of
@@ -224,7 +222,7 @@ for ax in axes.ravel():
 #
 # The final method that is associated with a likelihood function in GPJax is the
 # expected log-likelihood. This term is evaluated in the
-# [stochastic variational Gaussian process](uncollapsed_vi.py) in the ELBO term. For a
+# [stochastic variational Gaussian process](uncollapsed_vi.md) in the ELBO term. For a
 # variational approximation $q(f)= \mathcal{N}(f\mid m, S)$, the ELBO can be written as
 # $$
 # \begin{align}
