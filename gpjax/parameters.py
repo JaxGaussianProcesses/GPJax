@@ -33,7 +33,7 @@ def transform(
         >>> transformed_params = transform(params, params_bijection)
         >>> transformed_params["a"]
          PositiveReal(
-            raw_value=Array([1.3132617], dtype=float32),
+            value=Array([1.3132617], dtype=float32),
             _tag='positive'
           )
     ```
