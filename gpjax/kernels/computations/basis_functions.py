@@ -11,6 +11,7 @@ from gpjax.typing import Array
 
 K = tp.TypeVar("K", bound="gpjax.kernels.approximations.RFF")  # noqa: F821
 
+from cola.ops import Diagonal
 
 # TODO: Use low rank linear operator!
 
@@ -28,6 +29,20 @@ class BasisFunctionComputation(AbstractKernelComputation):
     def _gram(self, kernel: K, inputs: Float[Array, "N D"]) -> Dense:
         z1 = self.compute_features(kernel, inputs)
         return PSD(Dense(self.scaling(kernel) * jnp.matmul(z1, z1.T)))
+
+    def diagonal(self, kernel: K, inputs: Float[Array, "N D"]) -> Diagonal:
+        r"""For a given kernel, compute the elementwise diagonal of the
+        NxN gram matrix on an input matrix of shape NxD.
+
+        Args:
+            kernel (AbstractKernel): the kernel function.
+            inputs (Float[Array, "N D"]): The input matrix.
+
+        Returns
+        -------
+            Diagonal: The computed diagonal variance entries.
+        """
+        return super().diagonal(kernel.base_kernel, inputs)
 
     def compute_features(
         self, kernel: K, x: Float[Array, "N D"]

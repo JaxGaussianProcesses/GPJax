@@ -1,4 +1,4 @@
-# Copyright 2023 The JaxGaussianProcesses Contributors. All Rights Reserved.
+# Copyright 2023 The GPJax Contributors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,11 @@
 # limitations under the License.
 # ==============================================================================
 
-from beartype.typing import Mapping
+from beartype.typing import (
+    Mapping,
+    Optional,
+)
+import jax.numpy as jnp
 
 from gpjax.dataset import Dataset
 from gpjax.decision_making.test_functions import Quadratic
@@ -21,7 +25,20 @@ from gpjax.decision_making.utility_functions import (
     AbstractSinglePointUtilityFunctionBuilder,
     SinglePointUtilityFunction,
 )
-from gpjax.gps import ConjugatePosterior
+from gpjax.gps import (
+    ConjugatePosterior,
+    NonConjugatePosterior,
+    Prior,
+)
+from gpjax.kernels import RBF
+from gpjax.likelihoods import (
+    Gaussian,
+    Poisson,
+)
+from gpjax.mean_functions import (
+    AbstractMeanFunction,
+    Zero,
+)
 from gpjax.typing import KeyArray
 
 
@@ -45,3 +62,29 @@ class QuadraticSinglePointUtilityFunctionBuilder(
         return lambda x: -1.0 * test_function.evaluate(
             x
         )  # Utility functions are *maximised*
+
+
+def generate_dummy_conjugate_posterior(
+    dataset: Dataset,
+    mean_function: Optional[AbstractMeanFunction] = None,
+) -> ConjugatePosterior:
+    kernel = RBF(lengthscale=jnp.ones(dataset.X.shape[1]))
+    if mean_function is None:
+        mean_function = Zero()
+    prior = Prior(kernel=kernel, mean_function=mean_function)
+    likelihood = Gaussian(num_datapoints=dataset.n, obs_stddev=1e-6)
+    posterior = prior * likelihood
+    return posterior
+
+
+def generate_dummy_non_conjugate_posterior(
+    dataset: Dataset,
+    mean_function: Optional[AbstractMeanFunction] = None,
+) -> NonConjugatePosterior:
+    kernel = RBF(lengthscale=jnp.ones(dataset.X.shape[1]))
+    if mean_function is None:
+        mean_function = Zero()
+    prior = Prior(kernel=kernel, mean_function=mean_function)
+    likelihood = Poisson(num_datapoints=dataset.n)
+    posterior = prior * likelihood
+    return posterior

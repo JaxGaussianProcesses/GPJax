@@ -125,6 +125,7 @@ ignore = [
   # do not assign a lambda expression, use a def
   "E731",
   "E501",
+  "S303",
   "S307",
   "RET504",
   "S101",

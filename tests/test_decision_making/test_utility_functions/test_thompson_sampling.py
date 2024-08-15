@@ -17,11 +17,9 @@ from jax import config
 config.update("jax_enable_x64", True)
 
 from beartype.typing import Callable
-import jax.numpy as jnp
 import jax.random as jr
 import pytest
 
-from gpjax.dataset import Dataset
 from gpjax.decision_making.test_functions.continuous_functions import (
     AbstractContinuousTestFunction,
     Forrester,
@@ -29,89 +27,8 @@ from gpjax.decision_making.test_functions.continuous_functions import (
 )
 from gpjax.decision_making.utility_functions.thompson_sampling import ThompsonSampling
 from gpjax.decision_making.utils import OBJECTIVE
-from gpjax.gps import (
-    ConjugatePosterior,
-    NonConjugatePosterior,
-    Prior,
-)
-from gpjax.kernels import RBF
-from gpjax.likelihoods import (
-    Gaussian,
-    Poisson,
-)
-from gpjax.mean_functions import Zero
 from gpjax.typing import KeyArray
-
-
-def generate_dummy_conjugate_posterior(dataset: Dataset) -> ConjugatePosterior:
-    n_dims = dataset.X.shape[1]
-    kernel = RBF(n_dims=n_dims, lengthscale=jnp.ones(n_dims))
-    mean_function = Zero()
-    prior = Prior(kernel=kernel, mean_function=mean_function)
-    likelihood = Gaussian(num_datapoints=dataset.n)
-    posterior = prior * likelihood
-    return posterior
-
-
-def generate_dummy_non_conjugate_posterior(dataset: Dataset) -> NonConjugatePosterior:
-    n_dims = dataset.X.shape[1]
-    kernel = RBF(n_dims=n_dims, lengthscale=jnp.ones(n_dims))
-    mean_function = Zero()
-    prior = Prior(kernel=kernel, mean_function=mean_function)
-    likelihood = Poisson(num_datapoints=dataset.n)
-    posterior = prior * likelihood
-    return posterior
-
-
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
-def test_thompson_sampling_no_objective_posterior_raises_error():
-    key = jr.key(42)
-    forrester = Forrester()
-    dataset = forrester.generate_dataset(num_points=10, key=key)
-    posterior = generate_dummy_conjugate_posterior(dataset)
-    posteriors = {"CONSTRAINT": posterior}
-    datasets = {OBJECTIVE: dataset}
-    with pytest.raises(ValueError):
-        ts_utility_builder = ThompsonSampling(num_features=100)
-        ts_utility_builder.build_utility_function(
-            posteriors=posteriors, datasets=datasets, key=key
-        )
-
-
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
-def test_thompson_sampling_no_objective_dataset_raises_error():
-    key = jr.key(42)
-    forrester = Forrester()
-    dataset = forrester.generate_dataset(num_points=10, key=key)
-    posterior = generate_dummy_conjugate_posterior(dataset)
-    posteriors = {OBJECTIVE: posterior}
-    datasets = {"CONSTRAINT": dataset}
-    with pytest.raises(ValueError):
-        ts_utility_builder = ThompsonSampling(num_features=100)
-        ts_utility_builder.build_utility_function(
-            posteriors=posteriors, datasets=datasets, key=key
-        )
-
-
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
-def test_thompson_sampling_non_conjugate_posterior_raises_error():
-    key = jr.key(42)
-    forrester = Forrester()
-    dataset = forrester.generate_dataset(num_points=10, key=key)
-    posterior = generate_dummy_non_conjugate_posterior(dataset)
-    posteriors = {OBJECTIVE: posterior}
-    datasets = {OBJECTIVE: dataset}
-    with pytest.raises(ValueError):
-        ts_utility_builder = ThompsonSampling(num_features=100)
-        ts_utility_builder.build_utility_function(
-            posteriors=posteriors, datasets=datasets, key=key
-        )
+from tests.test_decision_making.utils import generate_dummy_conjugate_posterior
 
 
 @pytest.mark.parametrize("num_rff_features", [0, -1, -10])
@@ -130,34 +47,6 @@ def test_thompson_sampling_invalid_rff_num_raises_error(num_rff_features: int):
         ts_utility_builder.build_utility_function(
             posteriors=posteriors, datasets=datasets, key=key
         )
-
-
-@pytest.mark.parametrize(
-    "test_target_function",
-    [(Forrester()), (LogarithmicGoldsteinPrice())],
-)
-@pytest.mark.parametrize("num_test_points", [50, 100])
-@pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
-def test_thompson_sampling_utility_function_correct_shapes(
-    test_target_function: AbstractContinuousTestFunction,
-    num_test_points: int,
-    key: KeyArray,
-):
-    dataset = test_target_function.generate_dataset(num_points=10, key=key)
-    posterior = generate_dummy_conjugate_posterior(dataset)
-    posteriors = {OBJECTIVE: posterior}
-    datasets = {OBJECTIVE: dataset}
-    ts_utility_builder = ThompsonSampling(num_features=100)
-    ts_utility_function = ts_utility_builder.build_utility_function(
-        posteriors=posteriors, datasets=datasets, key=key
-    )
-    test_key, _ = jr.split(key)
-    test_X = test_target_function.generate_test_points(num_test_points, test_key)
-    ts_utility_function_values = ts_utility_function(test_X)
-    assert ts_utility_function_values.shape == (num_test_points, 1)
 
 
 @pytest.mark.parametrize(
