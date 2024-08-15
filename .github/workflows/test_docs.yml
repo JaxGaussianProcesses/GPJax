@@ -51,14 +51,13 @@ jobs:
       - name: Install and configure Poetry
         uses: snok/install-poetry@v1
         with:
-          version: 1.2.2
+          version: 1.5.1
           virtualenvs-create: false
           virtualenvs-in-project: false
           installer-parallel: true
 
       - name: Build the documentation with MKDocs
         run: |
-          cp docs/examples/gpjax.mplstyle .
           poetry install --all-extras --with docs
           conda install pandoc
-          poetry run mkdocs build
+          poetry run python docs/scripts/gen_examples.py && poetry run mkdocs build
