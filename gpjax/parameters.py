@@ -33,7 +33,7 @@ def transform(
         >>> transformed_params = transform(params, params_bijection)
         >>> transformed_params["a"]
          PositiveReal(
-            raw_value=Array([1.3132617], dtype=float32),
+            value=Array([1.3132617], dtype=float32),
             _tag='positive'
           )
     ```
@@ -50,22 +50,21 @@ def transform(
 
     def _inner(param):
         bijector = params_bijection.get(param._tag, tfb.Identity())
-
         if inverse:
             transformed_value = bijector.inverse(param.value)
         else:
             transformed_value = bijector.forward(param.value)
 
-        param.value = transformed_value
-
+        param = param.replace(transformed_value)
         return param
 
-    transformed_params = jtu.tree_map(
+    gp_params, *other_params = params.split(Parameter, ...)
+    transformed_gp_params: nnx.State = jtu.tree_map(
         lambda x: _inner(x),
-        params,
+        gp_params,
         is_leaf=lambda x: isinstance(x, nnx.VariableState),
     )
-    return transformed_params
+    return nnx.State.merge(transformed_gp_params, *other_params)
 
 
 class Parameter(nnx.Variable[T]):

@@ -1,6 +1,6 @@
- Like the technical community as a whole, the GPJax team and community is made up of a mixture of professionals and volunteers from all over the world, working on every aspect of the mission - including mentorship, teaching and connecting people.
+Like the technical community as a whole, the GPJax team and community is made up of a mixture of professionals and volunteers from all over the world, working on every aspect of the mission - including mentorship, teaching and connecting people.
 
-Diversity is one of our huge strengths, but it can also lead to communication issues and unhappiness. To that end, we have a few ground rules that we ask people to adhere to when they're participating within this community and project. These rules apply equally to founders, mentors and those seeking help and guidance.
+Diversity is one of our huge strengths, but it can also lead to communication issues and unhappiness. To that end, we have a few ground rules that we ask people to adhere to when they're participating within this community and project. These rules apply equally to founders, mentors, and those seeking help and guidance.
 
 This isn't an exhaustive list of things that you can't do. Rather, take it in the spirit in which it's intended - a guide to make it easier to enrich all of us, the technical community and the conferences and usergroups we hope to guide new speakers to.
 
@@ -19,5 +19,7 @@ This code of conduct applies to all communication: this includes IRC, the mailin
   - Advocating for, or encouraging, any of the above behaviour.
   - Repeated harassment of others. In general, if someone asks you to stop, then stop.
 - When we disagree, we try to understand why. Disagreements, both social and technical, happen all the time and GPJax is no exception. It is important that we resolve disagreements and differing views constructively. Remember that we're different. The strength of GPJax comes from its varied community, people from a wide range of backgrounds. Different people have different perspectives on issues. Being unable to understand why someone holds a viewpoint doesn't mean that they're wrong. Don't forget that it is human to err and blaming each other doesn't get us anywhere, rather offer to help resolving issues and to help learn from mistakes.
+
+If you have experienced or witnessed any behaviour that violates anything in this document, then please report it through [our contact form](https://jaxgaussianprocesses.com/contact/).
 
 Text adapted from the [Speak Up! project](http://web.archive.org/web/20141109123859/http://speakup.io/coc.html) and [Django](https://www.djangoproject.com/conduct/)

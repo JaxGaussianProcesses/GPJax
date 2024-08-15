@@ -25,9 +25,7 @@ from gpjax.typing import KeyArray
 
 
 @pytest.mark.parametrize("test_function", [PoissonTestFunction()])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
+@pytest.mark.filterwarnings("ignore:y is not of type float64")
 def test_correct_dtypes(test_function: PoissonTestFunction):
     dataset = test_function.generate_dataset(10, jr.key(42))
     test_x = test_function.generate_test_points(10, jr.key(42))
@@ -41,9 +39,6 @@ def test_correct_dtypes(test_function: PoissonTestFunction):
     [(PoissonTestFunction(), 1)],
 )
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
 def test_test_points_shape(
     test_function: PoissonTestFunction, dimensionality: int, num_samples: int
 ):
@@ -56,9 +51,7 @@ def test_test_points_shape(
     [(PoissonTestFunction(), 1)],
 )
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
+@pytest.mark.filterwarnings("ignore:y is not of type float64")
 def test_dataset_shapes(
     test_function: PoissonTestFunction, dimensionality: int, num_samples: int
 ):
@@ -70,9 +63,7 @@ def test_dataset_shapes(
 @pytest.mark.parametrize("test_function", [PoissonTestFunction()])
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
+@pytest.mark.filterwarnings("ignore:y is not of type float64")
 def test_same_key_same_dataset(
     test_function: PoissonTestFunction, num_samples: int, key: KeyArray
 ):
@@ -85,9 +76,7 @@ def test_same_key_same_dataset(
 @pytest.mark.parametrize("test_function", [PoissonTestFunction()])
 @pytest.mark.parametrize("num_samples", [10, 100])
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
+@pytest.mark.filterwarnings("ignore:y is not of type float64")
 def test_different_key_different_dataset(
     test_function: PoissonTestFunction, num_samples: int, key: KeyArray
 ):
@@ -101,9 +90,7 @@ def test_different_key_different_dataset(
 @pytest.mark.parametrize("test_function", [PoissonTestFunction()])
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
+@pytest.mark.filterwarnings("ignore:y is not of type float64")
 def test_same_key_same_test_points(
     test_function: PoissonTestFunction, num_samples: int, key: KeyArray
 ):
@@ -115,9 +102,7 @@ def test_same_key_same_test_points(
 @pytest.mark.parametrize("test_function", [PoissonTestFunction()])
 @pytest.mark.parametrize("num_samples", [1, 10, 100])
 @pytest.mark.parametrize("key", [jr.key(42), jr.key(10)])
-@pytest.mark.filterwarnings(
-    "ignore::UserWarning"
-)  # Sampling with tfp causes JAX to raise a UserWarning due to some internal logic around jnp.argsort
+@pytest.mark.filterwarnings("ignore:y is not of type float64")
 def test_different_key_different_test_points(
     test_function: PoissonTestFunction, num_samples: int, key: KeyArray
 ):

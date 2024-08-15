@@ -136,11 +136,6 @@ opt_posterior, history = gpx.fit(
     key=key,
 )
 
-# %%
-import jax
-
-jax.__version__
-
 # %% [markdown]
 # From which we can make predictions at novel inputs, as illustrated below.
 

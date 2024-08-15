@@ -17,15 +17,15 @@ from dataclasses import dataclass
 
 import jax.numpy as jnp
 import jax.random as jr
-from jaxtyping import (
-    Array,
-    Float,
-    Integer,
-)
 
 from gpjax.dataset import Dataset
 from gpjax.decision_making.search_space import ContinuousSearchSpace
-from gpjax.typing import KeyArray
+from gpjax.typing import (
+    Array,
+    Float,
+    Int,
+    KeyArray,
+)
 
 
 @dataclass
@@ -74,7 +74,7 @@ class PoissonTestFunction:
         return self.search_space.sample(num_points=num_points, key=key)
 
     @abstractmethod
-    def evaluate(self, x: Float[Array, "N 1"]) -> Integer[Array, "N 1"]:
+    def evaluate(self, x: Float[Array, "N 1"]) -> Int[Array, "N 1"]:
         """
         Evaluate the test function at a set of points. Function taken from
         https://docs.jaxgaussianprocesses.com/examples/poisson/#dataset.
@@ -83,7 +83,7 @@ class PoissonTestFunction:
             x (Float[Array, 'N D']): Points to evaluate the test function at.
 
         Returns:
-            Integer[Array, 'N 1']: Values of the test function at the points.
+            Float[Array, 'N 1']: Values of the test function at the points.
         """
         key = jr.key(42)
         f = lambda x: 2.0 * jnp.sin(3 * x) + 0.5 * x

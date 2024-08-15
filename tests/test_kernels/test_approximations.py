@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from cola.ops.operators import Dense
+from cola.ops import Dense
 import jax
 from jax import config
 import jax.numpy as jnp

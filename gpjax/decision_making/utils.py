@@ -17,8 +17,10 @@ from beartype.typing import (
     Dict,
     Final,
 )
+import jax.numpy as jnp
 
 from gpjax.dataset import Dataset
+from gpjax.gps import AbstractPosterior
 from gpjax.typing import (
     Array,
     Float,
@@ -48,3 +50,15 @@ def build_function_evaluator(
     dictionary of datasets storing the evaluated points.
     """
     return lambda x: {tag: Dataset(x, f(x)) for tag, f in functions.items()}
+
+
+def get_best_latent_observation_val(
+    posterior: AbstractPosterior, dataset: Dataset
+) -> Float[Array, ""]:
+    """
+    Takes a posterior and dataset and returns the best (latent) function value in the
+    dataset, corresponding to the minimum of the posterior mean value evaluated at
+    locations in the dataset. In the noiseless case, this corresponds to the minimum
+    value in the dataset.
+    """
+    return jnp.min(posterior(dataset.X, dataset).mean())
