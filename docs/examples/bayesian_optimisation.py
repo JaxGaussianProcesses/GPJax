@@ -29,7 +29,6 @@ from jax import config
 config.update("jax_enable_x64", True)
 
 import jax
-from jax import jit
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import install_import_hook, Float, Int
