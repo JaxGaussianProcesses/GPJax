@@ -30,7 +30,7 @@ import jax.random as jr
 from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from examples.utils import clean_legend, mpl_use_gpjaxstyle
+from examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -38,7 +38,9 @@ with install_import_hook("gpjax", "beartype.beartype"):
 key = jr.key(123)
 
 # set the default style for plotting
-mpl_use_gpjaxstyle()
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
@@ -56,7 +58,7 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %%
 n = 100
-noise = 0.3 
+noise = 0.3
 
 key, subkey = jr.split(key)
 x = jr.uniform(key=key, minval=-3.0, maxval=3.0, shape=(n,)).reshape(-1, 1)

@@ -44,7 +44,6 @@ import jax.scipy.linalg as jsl
 from jaxtyping import install_import_hook
 import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax.distributions as tfd
-from examples.utils import mpl_use_gpjaxstyle
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
@@ -53,7 +52,9 @@ with install_import_hook("gpjax", "beartype.beartype"):
 key = jr.key(123)
 
 # set the default style for plotting
-mpl_use_gpjaxstyle()
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
