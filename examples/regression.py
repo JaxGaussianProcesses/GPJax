@@ -30,15 +30,18 @@ import jax.random as jr
 from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from docs.examples.utils import clean_legend
+from examples.utils import clean_legend
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
 key = jr.key(123)
+
+# set the default style for plotting
 plt.style.use(
     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
 )
+
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
@@ -97,6 +100,7 @@ ax.legend(loc="best")
 # smoothness of the outputs that our GP can generate.
 #
 # For simplicity, we consider a radial basis function (RBF) kernel:
+#
 # $$k(x, x') = \sigma^2 \exp\left(-\frac{\lVert x - x' \rVert_2^2}{2 \ell^2}\right).$$
 #
 # On paper a GP is written as $f(\cdot) \sim \mathcal{GP}(\textbf{0}, k(\cdot, \cdot'))$,
@@ -146,7 +150,9 @@ ax = clean_legend(ax)
 # notion of a likelihood function $p(\mathcal{D} | f(\cdot))$. While the choice of
 # likelihood is a critical in Bayesian modelling, for simplicity we consider a
 # Gaussian with noise parameter $\alpha$
+#
 # $$p(\mathcal{D} | f(\cdot)) = \mathcal{N}(\boldsymbol{y}; f(\boldsymbol{x}), \textbf{I} \alpha^2).$$
+#
 # This is defined in GPJax through calling a `Gaussian` instance.
 
 # %%

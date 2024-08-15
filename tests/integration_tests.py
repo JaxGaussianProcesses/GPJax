@@ -75,7 +75,7 @@ class Result:
 
 
 regression = Result(
-    path="docs/examples/regression.py",
+    path="examples/regression.py",
     comparisons={
         "history": (55.07405622, get_last),
         "predictive_mean": (36.24383416, jnp.sum),
@@ -85,7 +85,7 @@ regression = Result(
 regression.test()
 
 sparse = Result(
-    path="docs/examples/collapsed_vi.py",
+    path="examples/collapsed_vi.py",
     comparisons={
         "history": (1924.7634809, get_last),
         "predictive_mean": (-8.39869652, jnp.sum),
@@ -95,7 +95,7 @@ sparse = Result(
 sparse.test()
 
 stochastic = Result(
-    path="docs/examples/uncollapsed_vi.py",
+    path="examples/uncollapsed_vi.py",
     comparisons={
         "history": (-2678.41302494, get_last),
         "meanf": (-54.14787028, jnp.sum),

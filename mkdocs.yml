@@ -4,7 +4,7 @@ site_url: https://docs.jaxgaussianprocesses.com/
 repo_url: https://github.com/JaxGaussianProcesses/GPJax
 repo_name: JaxGaussianProcesses/GPJax
 
-edit_uri: ""
+# edit_uri: ""
 
 nav:
   - 🏡 Home: index.md
@@ -13,29 +13,28 @@ nav:
     - 🎨 Design principles: design.md
     - 🤝 Contributing: contributing.md
     - 🔪 Sharp bits: sharp_bits.md
-    - 🌳 GPJax PyTrees: examples/pytrees.md
     - 📎 JAX 101 [External]: https://jax.readthedocs.io/en/latest/jax-101/index.html
   - 💡 Background:
-    - Intro to GPs: examples/intro_to_gps.md
-    - Intro to Kernels: examples/intro_to_kernels.md
+    - Intro to GPs: _examples/intro_to_gps.md
+    - Intro to Kernels: _examples/intro_to_kernels.md
   - 🎓 Tutorials:
-    - Regression: examples/regression.md
-    - Classification: examples/classification.md
-    - Poisson regression: examples/poisson.md
-    - Barycentres: examples/barycentres.md
-    - Deep kernel learning: examples/deep_kernels.md
-    - Graph kernels: examples/graph_kernels.md
-    - Sparse GPs: examples/uncollapsed_vi.md
-    - Stochastic sparse GPs: examples/collapsed_vi.md
-    - Bayesian Optimisation: examples/bayesian_optimisation.md
-    - Decision Making: examples/decision_making.md
-    - Multi-output GPs for Ocean Modelling: examples/oceanmodelling.md
+    - Regression: _examples/regression.md
+    - Classification: _examples/classification.md
+    - Poisson regression: _examples/poisson.md
+    - Barycentres: _examples/barycentres.md
+    - Deep kernel learning: _examples/deep_kernels.md
+    - Graph kernels: _examples/graph_kernels.md
+    - Sparse GPs: _examples/uncollapsed_vi.md
+    - Stochastic sparse GPs: _examples/collapsed_vi.md
+    - Bayesian Optimisation: _examples/bayesian_optimisation.md
+    - Decision Making: _examples/decision_making.md
+    - Multi-output GPs for Ocean Modelling: _examples/oceanmodelling.md
   - 📖 Guides for customisation:
-    - Kernels: examples/constructing_new_kernels.md
-    - Likelihoods: examples/likelihoods_guide.md
+    - Kernels: _examples/constructing_new_kernels.md
+    - Likelihoods: _examples/likelihoods_guide.md
     - Model Guide: examples/backend.md
-    - UCI regression: examples/yacht.md
-  - 💻 Raw tutorial code: give_me_the_code.md
+    - UCI regression: _examples/yacht.md
+  # - 💻 Raw tutorial code: give_me_the_code.md
   - Community:
     - 👥 Code of conduct: CODE_OF_CONDUCT.md
     - 📜 Governance: GOVERNANCE.md
@@ -57,16 +56,23 @@ theme:
     - content.code.annotate # Allow individual lines of code to be annotated
   icon:
     repo: fontawesome/brands/github
-  logo: _static/favicon.ico
-  favicon: _static/favicon.ico
+  logo: static/favicon.ico
+  favicon: static/favicon.ico
 
 markdown_extensions:
+  - admonition
+  - markdown_katex:
+      no_inline_svg: True
+      insert_fonts_css: True
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
       pygments_lang_class: true
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.inlinehilite
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      check_paths: true
   - pymdownx.superfences
   - pymdownx.arithmatex:
       generic: true
@@ -82,12 +88,9 @@ plugins:
   - gen-files:
       scripts:
         - docs/scripts/gen_pages.py
-        - docs/scripts/gen_examples.py
-        # - docs/scripts/notebook_converter.py  # or any other name or path
   - literate-nav:
       nav_file: SUMMARY.md
   - mkdocstrings:
-      default_handler: python
       handlers:
         python:
           paths: ["gpjax"]
