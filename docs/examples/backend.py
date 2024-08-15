@@ -61,7 +61,7 @@ from gpjax.parameters import Real
 
 constant_param = Real(value=1.0)
 meanf = Constant(constant_param)
-meanf
+print(meanf)
 
 # %% [markdown]
 # However, suppose you wish your mean function's constant parameter to be strictly
@@ -72,7 +72,7 @@ from gpjax.parameters import PositiveReal
 
 constant_param = PositiveReal(value=1.0)
 meanf = Constant(constant_param)
-meanf
+print(meanf)
 
 # %% [markdown]
 # Were we to try and instantiate the `PositiveReal` class with a negative value, then an
@@ -144,7 +144,7 @@ prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 
 likelihood = gpx.likelihoods.Gaussian(100)
 posterior = likelihood * prior
-posterior
+print(posterior)
 
 # %% [markdown]
 # Now contained within the posterior PyGraph here there are four parameters: the
@@ -159,7 +159,7 @@ posterior
 from flax import nnx
 
 graphdef, state = nnx.split(posterior)
-state
+print(state)
 
 # %% [markdown]
 # The `State` object behaves just like a PyTree and, consequently, we may use JAX's
@@ -171,7 +171,7 @@ state
 import jax.tree_util as jtu
 
 updated_state = jtu.tree_map(lambda x: x + 1, state)
-updated_state
+print(updated_state)
 
 # %% [markdown]
 # Let us now use NNX's `merge` function to reconstruct the posterior distribution using
@@ -179,16 +179,16 @@ updated_state
 
 # %%
 updated_posterior = nnx.merge(graphdef, updated_state)
-updated_posterior
+print(updated_posterior)
 
 # %% [markdown]
 # However, we begun this point of conversation with bijectors in mind, so let us now see
 # how bijectors may be applied to a collection of parameters in GPJax. Fortunately, this
-# is very straightforward, and we may simply use the `trasnform` function as before.
+# is very straightforward, and we may simply use the `transform` function as before.
 
 # %%
 transformed_state = transform(state, DEFAULT_BIJECTION, inverse=True)
-transformed_state
+print(transformed_state)
 
 # %% [markdown]
 # We may also (re-)constrain the parameters' values by setting the `inverse` argument of
@@ -196,7 +196,7 @@ transformed_state
 
 # %%
 retransformed_state = transform(transformed_state, DEFAULT_BIJECTION, inverse=False)
-retransformed_state == transformed_state
+print(retransformed_state == transformed_state)
 
 # %% [markdown]
 # ### Fine-Scale Control
@@ -204,10 +204,10 @@ retransformed_state == transformed_state
 # One of the advantages of being able to split and re-merge the PyGraph is that we are
 # able to gain fine-scale control over the parameters' whose state we wish to realise.
 # This is by virtue of the fact that each of our parameters now inherit from
-# `gpjax.parameters.Parameter`. In the former, we were simply extracting and `Parameter`
-# from the posterior. However, suppose we only wish to extract those parameters whose
-# support is the positive real line. This is easily achieved by altering the way in
-# which we invoke `nnx.split`.
+# `gpjax.parameters.Parameter`. In the former, we were simply extracting any
+# `Parameter`subclass from the posterior. However, suppose we only wish to extract those
+# parameters whose support is the positive real line. This is easily achieved by
+# altering the way in which we invoke `nnx.split`.
 
 # %%
 from gpjax.parameters import PositiveReal
@@ -306,7 +306,7 @@ posterior = likelihood * prior
 
 # %%
 graphdef, params, others = nnx.split(posterior, Parameter, ...)
-params = transform(params, DEFAULT_BIJECTION)
+params = transform(params, DEFAULT_BIJECTION, inverse=True)
 
 
 def loss_fn(params: nnx.State, data: gpx.Dataset) -> ScalarFloat:
@@ -322,7 +322,7 @@ grad(loss_fn)(params, D)
 #
 # In this notebook we have explored how GPJax's Flax-based backend may be easily
 # manipulated and extended. For a more applied look at this, see how we construct a
-# kernel on polar coordinated in our [Kernel
+# kernel on polar coordinates in our [Kernel
 # Guide](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#custom-kernel)
 # notebook.
 #
