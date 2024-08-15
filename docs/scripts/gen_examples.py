@@ -1,6 +1,6 @@
-""" Convert python files in "examples" directory to markdown files using jupytext and nbconvert. 
+""" Convert python files in "examples" directory to markdown files using jupytext and nbconvert.
 
-There's only a minor inconvenience with how supporting files are handled by nbconvert, 
+There's only a minor inconvenience with how supporting files are handled by nbconvert,
 see https://github.com/jupyter/nbconvert/issues/1164. But these will be under a private
 directory `_examples` in the docs folder, so it's not a big deal.
 
@@ -13,9 +13,9 @@ import shutil
 
 EXCLUDE = ["utils.py"]
 
+
 def process_file(file: Path, out_file: Path | None = None, execute: bool = False):
     """Converts a python file to markdown using jupytext and nbconvert."""
-
 
     out_dir = out_file.parent
     command = f"cd {out_dir.as_posix()} && "
@@ -39,15 +39,12 @@ def is_modified(file: Path, out_file: Path):
 
 
 def main(args):
-
     # project root directory
     wdir = Path(__file__).parents[2]
-
 
     # output directory
     out_dir: Path = args.outdir
     out_dir.mkdir(exist_ok=True, parents=True)
-
 
     # copy directories in "examples" to output directory
     for dir in wdir.glob("examples/*"):
@@ -55,11 +52,10 @@ def main(args):
             (out_dir / dir.name).mkdir(exist_ok=True, parents=True)
             for file in dir.glob("*"):
                 # copy, not move!
-                shutil.copy(out_dir / dir.name / file.name)
+                shutil.copy(file, out_dir / dir.name / file.name)
 
     # list of files to be processed
     files = [f for f in wdir.glob("examples/*.py") if f.name not in EXCLUDE]
-
 
     # process only modified files
     if args.only_modified:
@@ -69,12 +65,15 @@ def main(args):
 
     # process files in parallel
     with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
-
         futures = []
         for file in files:
             out_file = out_dir / f"{file.stem}.md"
-            futures.append(executor.submit(process_file, file, out_file=out_file, execute=args.execute))
-        
+            futures.append(
+                executor.submit(
+                    process_file, file, out_file=out_file, execute=args.execute
+                )
+            )
+
         for future in as_completed(futures):
             try:
                 future.result()
