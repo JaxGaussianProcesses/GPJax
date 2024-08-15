@@ -744,7 +744,7 @@ plt.show()
 #
 # - **Expected Improvement (EI)** ([Močkus, 1974](https://link.springer.com/chapter/10.1007/3-540-07165-2_55)) - EI goes beyond PI by not only considering the
 #   probability of improving on the current best observed point, but also taking into
-#   account the \textit{magnitude} of improvement. Mathematically, this is defined as
+#   account the *magnitude* of improvement. Mathematically, this is defined as
 #   follows:
 #   $$
 #   \begin{aligned}

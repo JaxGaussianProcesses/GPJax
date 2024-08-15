@@ -66,16 +66,16 @@ class ThompsonSampling(AbstractSinglePointUtilityFunctionBuilder):
         are *maximised*.
 
         Args:
-            posteriors: Dictionary of posteriors to be
-                used to form the utility function. One of the posteriors must correspond
-                to the `OBJECTIVE` key, as we sample from the objective posterior to form
-                the utility function.
-            datasets: Dictionary of datasets which may be used
-                to form the utility function. Keys in `datasets` should correspond to
-                keys in `posteriors`. One of the datasets must correspond
-                to the `OBJECTIVE` key.
-            key: JAX PRNG key used for random number generation. This can be
-                changed to draw different samples.
+            posteriors (Mapping[str, ConjugatePosterior]): Dictionary of posteriors to
+            be used to form the utility function. One of the posteriors must correspond
+            to the `OBJECTIVE` key, as we sample from the objective posterior to form
+            the utility function.
+            datasets (Mapping[str, Dataset]): Dictionary of datasets which may be used
+            to form the utility function. Keys in `datasets` should correspond to
+            keys in `posteriors`. One of the datasets must correspond
+            to the `OBJECTIVE` key.
+            key (KeyArray): JAX PRNG key used for random number generation. This can be
+            changed to draw different samples.
 
         Returns:
             SinglePointUtilityFunction: An appproximate sample from the objective model

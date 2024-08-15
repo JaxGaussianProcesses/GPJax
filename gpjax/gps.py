@@ -518,7 +518,7 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
         mean_t = self.prior.mean_function(t)
         Ktt = self.prior.kernel.gram(t)
         Kxt = self.prior.kernel.cross_covariance(x, t)
-        Sigma_inv_Kxt = solve(Sigma, Kxt)
+        Sigma_inv_Kxt = solve(Sigma, Kxt, Cholesky())
 
         # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
         mean = mean_t + jnp.matmul(Sigma_inv_Kxt.T, y - mx)

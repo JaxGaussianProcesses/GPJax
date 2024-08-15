@@ -50,18 +50,15 @@ def transform(
 
     def _inner(param):
         bijector = params_bijection.get(param._tag, tfb.Identity())
-
         if inverse:
             transformed_value = bijector.inverse(param.value)
         else:
             transformed_value = bijector.forward(param.value)
 
-        param.replace(transformed_value)
-
+        param = param.replace(transformed_value)
         return param
 
     gp_params, *other_params = params.split(Parameter, ...)
-
     transformed_gp_params: nnx.State = jtu.tree_map(
         lambda x: _inner(x),
         gp_params,
