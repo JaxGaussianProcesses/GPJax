@@ -1808,18 +1808,17 @@ testing = ["coverage", "pytest", "pytest-cov", "pytest-regressions"]
 
 [[package]]
 name = "markdown-katex"
-version = "202112.1034"
+version = "202406.1035"
 description = "katex extension for Python Markdown"
 optional = false
 python-versions = ">=2.7"
 files = [
-    {file = "markdown-katex-202112.1034.tar.gz", hash = "sha256:27892f4cdd6763816f00e4187d0475500697c090aba16630ec4803a6564bf810"},
-    {file = "markdown_katex-202112.1034-py2.py3-none-any.whl", hash = "sha256:9ccc5b4b37db7592cc3ea113d763fafe9ffd1b1587e2c217d6145e44a10b4f6d"},
+    {file = "markdown-katex-202406.1035.tar.gz", hash = "sha256:e82f7bf9a8536451da8f01768d847516fa1827feb17140b8eaa0bea9826bdab0"},
+    {file = "markdown_katex-202406.1035-py2.py3-none-any.whl", hash = "sha256:c1713e85854ddecb641ad96243a8b6cd67367bf1bf8d39b43b3680d7f2b1884d"},
 ]
 
 [package.dependencies]
 Markdown = {version = ">=3.0", markers = "python_version >= \"3.6\""}
-pathlib2 = "*"
 setuptools = "*"
 
 [[package]]
@@ -2755,20 +2754,6 @@ files = [
 [package.extras]
 qa = ["flake8 (==5.0.4)", "mypy (==0.971)", "types-setuptools (==67.2.0.1)"]
 testing = ["docopt", "pytest"]
-
-[[package]]
-name = "pathlib2"
-version = "2.3.7.post1"
-description = "Object-oriented filesystem paths"
-optional = false
-python-versions = "*"
-files = [
-    {file = "pathlib2-2.3.7.post1-py2.py3-none-any.whl", hash = "sha256:5266a0fd000452f1b3467d782f079a4343c63aaa119221fbdc4e39577489ca5b"},
-    {file = "pathlib2-2.3.7.post1.tar.gz", hash = "sha256:9fe0edad898b83c0c3e199c842b27ed216645d2e177757b2dd67384d4113c641"},
-]
-
-[package.dependencies]
-six = "*"
 
 [[package]]
 name = "pathspec"
@@ -4228,4 +4213,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "cf389d14ca30272cf9b8d08cddce7996ec75d922cbc4322bff9522c2e7d6e714"
+content-hash = "4b2ae7bad45029e7becc027913e0adbf40d21a2632971f4eb50c3a4096f20766"
