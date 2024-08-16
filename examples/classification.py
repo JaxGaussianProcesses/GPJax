@@ -15,17 +15,11 @@
 #     name: python3
 # ---
 
-# %%
-# %load_ext autoreload
-# %autoreload 2
-
 # %% [markdown]
 # # Classification
 #
 # In this notebook we demonstrate how to perform inference for Gaussian process models
-# with non-Gaussian likelihoods via maximum a posteriori (MAP) and Markov chain Monte
-# Carlo (MCMC). We focus on a classification task here and use
-# [BlackJax](https://github.com/blackjax-devs/blackjax/) for sampling.
+# with non-Gaussian likelihoods via maximum a posteriori (MAP). We focus on a classification task here.
 
 # %%
 # Enable Float64 for more stable matrix inversions.
@@ -54,12 +48,15 @@ from tqdm import trange
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
+from examples.utils import use_mpl_style
+
 tfd = tfp.distributions
 identity_matrix = jnp.eye
-key = jr.key(123)
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
+
+# set the default style for plotting
+use_mpl_style()
+
+key = jr.key(42)
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
@@ -314,186 +311,6 @@ ax.plot(
 ax.plot(
     xtest,
     predictive_mean + predictive_std,
-    color=cols[1],
-    linestyle="--",
-    linewidth=1,
-)
-ax.legend()
-
-# %% [markdown]
-# However, the Laplace approximation is still limited by considering information about
-# the posterior at a single location. On the other hand, through approximate sampling,
-# MCMC methods allow us to learn all information about the posterior distribution.
-
-# %% [markdown]
-# ## MCMC inference
-#
-# An MCMC sampler works by starting at an initial position and
-# drawing a sample from a cheap-to-simulate distribution known as the _proposal_. The
-# next step is to determine whether this sample could be considered a draw from the
-# posterior. We accomplish this using an _acceptance probability_ determined via the
-# sampler's _transition kernel_ which depends on the current position and the
-# unnormalised target posterior distribution. If the new sample is more _likely_, we
-# accept it; otherwise, we reject it and stay in our current position. Repeating these
-# steps results in a Markov chain (a random sequence that depends only on the last
-# state) whose stationary distribution (the long-run empirical distribution of the
-# states visited) is the posterior. For a gentle introduction, see the first chapter
-# of [A Handbook of Markov Chain Monte Carlo](https://www.mcmchandbook.net/HandbookChapter1.pdf).
-#
-# ### MCMC through BlackJax
-#
-# Rather than implementing a suite of MCMC samplers, GPJax relies on MCMC-specific
-# libraries for sampling functionality. We focus on
-# [BlackJax](https://github.com/blackjax-devs/blackjax/) in this notebook, which we
-# recommend adopting for general applications.
-#
-# We'll use the No U-Turn Sampler (NUTS) implementation given in BlackJax for sampling.
-# For the interested reader, NUTS is a Hamiltonian Monte Carlo sampling scheme where
-# the number of leapfrog integration steps is computed at each step of the change
-# according to the NUTS algorithm. In general, samplers constructed under this
-# framework are very efficient.
-#
-# We begin by generating _sensible_ initial positions for our sampler before defining
-# an inference loop and sampling 500 values from our Markov chain. In practice,
-# drawing more samples will be necessary.
-
-# %%
-num_adapt = 600
-num_samples = 600
-
-graphdef, params, *static_state = nnx.split(posterior, gpx.parameters.Parameter, ...)
-params_bijection = gpx.parameters.DEFAULT_BIJECTION
-
-# Transform the parameters to the unconstrained space
-params = gpx.parameters.transform(params, params_bijection, inverse=True)
-
-
-def logprob_fn(params):
-    params = gpx.parameters.transform(params, params_bijection)
-    model = nnx.merge(graphdef, params, *static_state)
-    return gpx.objectives.log_posterior_density(model, D)
-
-
-# jit compile
-logprob_fn = jax.jit(logprob_fn)
-_ = logprob_fn(params)
-
-adapt = blackjax.window_adaptation(
-    blackjax.nuts, logprob_fn, num_adapt, target_acceptance_rate=0.65, progress_bar=True
-)
-
-# Initialise the chain
-start = time()
-last_state, kernel, _ = adapt.run(key, params)
-print(f"Adaption time taken: {time() - start: .1f} seconds")
-
-
-def inference_loop(rng_key, kernel, initial_state, num_samples):
-    def one_step(state, rng_key):
-        state, info = kernel(rng_key, state)
-        return state, (state, info)
-
-    keys = jax.random.split(rng_key, num_samples)
-    _, (states, infos) = jax.lax.scan(one_step, initial_state, keys, unroll=10)
-
-    return states, infos
-
-
-# Sample from the posterior distribution
-start = time()
-states, infos = inference_loop(key, kernel, last_state, num_samples)
-print(f"Sampling time taken: {time() - start: .1f} seconds")
-
-# %% [markdown]
-# ### Sampler efficiency
-#
-# BlackJax gives us easy access to our sampler's efficiency through metrics such as the
-# sampler's _acceptance probability_ (the number of times that our chain accepted a
-# proposed sample, divided by the total number of steps run by the chain). For NUTS and
-# Hamiltonian Monte Carlo sampling, we typically seek an acceptance rate of 60-70% to
-# strike the right balance between having a chain which is _stuck_ and rarely moves
-# versus a chain that is too jumpy with frequent small steps.
-
-# %%
-acceptance_rate = jnp.mean(infos.acceptance_probability)
-print(f"Acceptance rate: {acceptance_rate:.2f}")
-
-# %% [markdown]
-# Our acceptance rate is slightly too large, prompting an examination of the chain's
-# trace plots. A well-mixing chain will have very few (if any) flat spots in its trace
-# plot whilst also not having too many steps in the same direction. In addition to
-# the model's hyperparameters, there will be 500 samples for each of the 100 latent
-# function values in the `states.position` dictionary. We depict the chains that
-# correspond to the model hyperparameters and the first value of the latent function
-# for brevity.
-
-# %%
-fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(10, 3))
-ax0.plot(states.position.prior.kernel.lengthscale.value)
-ax1.plot(states.position.prior.kernel.variance.value)
-ax2.plot(states.position.latent.value[:, 1, :])
-ax0.set_title("Kernel Lengthscale")
-ax1.set_title("Kernel Variance")
-ax2.set_title("Latent Function (index = 1)")
-
-# %% [markdown]
-# ## Prediction
-#
-# Having obtained samples from the posterior, we draw ten instances from our model's
-# predictive distribution per MCMC sample. Using these draws, we will be able to
-# compute credible values and expected values under our posterior distribution.
-#
-# An ideal Markov chain would have samples completely uncorrelated with their
-# neighbours after a single lag. However, in practice, correlations often exist
-# within our chain's sample set. A commonly used technique to try and reduce this
-# correlation is _thinning_ whereby we select every $n$th sample where $n$ is the
-# minimum lag length at which we believe the samples are uncorrelated. Although further
-# analysis of the chain's autocorrelation is required to find appropriate thinning
-# factors, we employ a thin factor of 10 for demonstration purposes.
-
-# %%
-thin_factor = 20
-posterior_samples = []
-
-for i in trange(0, num_samples, thin_factor, desc="Drawing posterior samples"):
-    sample_params = jtu.tree_map(lambda samples, i=i: samples[i], states.position)
-    sample_params = gpx.parameters.transform(sample_params, params_bijection)
-    model = nnx.merge(graphdef, sample_params, *static_state)
-    latent_dist = model.predict(xtest, train_data=D)
-    predictive_dist = model.likelihood(latent_dist)
-    posterior_samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
-
-posterior_samples = jnp.vstack(posterior_samples)
-lower_ci, upper_ci = jnp.percentile(posterior_samples, jnp.array([2.5, 97.5]), axis=0)
-expected_val = jnp.mean(posterior_samples, axis=0)
-
-# %% [markdown]
-#
-# Finally, we end this tutorial by plotting the predictions obtained from our model
-# against the observed data.
-
-# %%
-fig, ax = plt.subplots()
-ax.scatter(x, y, color=cols[0], label="Observations", zorder=2, alpha=0.7)
-ax.plot(xtest, expected_val, color=cols[1], label="Predicted mean", zorder=1)
-ax.fill_between(
-    xtest.flatten(),
-    lower_ci.flatten(),
-    upper_ci.flatten(),
-    alpha=0.2,
-    color=cols[1],
-    label="95\\% CI",
-)
-ax.plot(
-    xtest,
-    lower_ci.flatten(),
-    color=cols[1],
-    linestyle="--",
-    linewidth=1,
-)
-ax.plot(
-    xtest,
-    upper_ci.flatten(),
     color=cols[1],
     linestyle="--",
     linewidth=1,

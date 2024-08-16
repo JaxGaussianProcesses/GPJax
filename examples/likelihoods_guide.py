@@ -78,13 +78,15 @@ import jax.random as jr
 import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax as tfp
 
-tfd = tfp.distributions
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
-cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
-key = jr.key(123)
+from examples.utils import use_mpl_style
 
+tfd = tfp.distributions
+
+# set the default style for plotting
+use_mpl_style()
+cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+
+key = jr.key(42)
 
 n = 50
 x = jnp.sort(jr.uniform(key=key, shape=(n, 1), minval=-3.0, maxval=3.0), axis=0)
