@@ -29,14 +29,31 @@
 
 # %%
 # Enable Float64 for more stable matrix inversions.
-from jax import config, grad
+from jax import (
+    config,
+    grad,
+)
 
 config.update("jax_enable_x64", True)
 
 import jax.numpy as jnp
+from jaxtyping import (
+    Float,
+    install_import_hook,
+)
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import gpjax as gpx
+
+from gpjax.mean_functions import Constant
+from gpjax.parameters import (
+    Parameter,
+    Real,
+)
+
+with install_import_hook("gpjax", "beartype.beartype"):
+    import gpjax as gpx
+
+from flax import nnx
 
 from examples.utils import use_mpl_style
 
@@ -58,20 +75,23 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 # parameter as follows:
 
 # %%
-from gpjax.mean_functions import Constant
-from gpjax.parameters import Real
-
-constant_param = Real(value=1.0)
+constant_param = Parameter(value=1.0, tag=None)
 meanf = Constant(constant_param)
 print(meanf)
 
 # %% [markdown]
 # However, suppose you wish your mean function's constant parameter to be strictly
-# positive. This is easy to achieve by using the correct Parameter type.
+# positive. This is easy to achieve by using the correct Parameter type which, in this case, will be the `PositiveReal`. However, any Parameter that subclasses from `Parameter` will be transformed by GPJax.
 
 # %%
 from gpjax.parameters import PositiveReal
 
+issubclass(PositiveReal, Parameter)
+
+# %% [markdown]
+# Injecting this newly constrained parameter into our mean function is then identical to before.
+
+# %%
 constant_param = PositiveReal(value=1.0)
 meanf = Constant(constant_param)
 print(meanf)
@@ -114,10 +134,12 @@ print(DEFAULT_BIJECTION[constant_param._tag])
 
 # %% [markdown]
 # We see here that the Softplus bijector is specified as the default for strictly
-# positive parameters. To apply this, we may invoke the following
+# positive parameters. To apply this, we must first realise the _state_ of our model. This is achieved using the `split` function provided by `nnx`.
 
 # %%
-transform(meanf, DEFAULT_BIJECTION, inverse=True)
+_, _params = nnx.split(meanf, Parameter)
+
+tranformed_params = transform(_params, DEFAULT_BIJECTION, inverse=True)
 
 # %% [markdown]
 # The parameter's value was changed here from 1. to 0.54132485. This is the result of
@@ -126,7 +148,9 @@ transform(meanf, DEFAULT_BIJECTION, inverse=True)
 # would be more pronounced.
 
 # %%
-transform(Constant(PositiveReal(value=1e-6)), DEFAULT_BIJECTION, inverse=True)
+_, _close_to_zero_state = nnx.split(Constant(PositiveReal(value=1e-6)), Parameter)
+
+transform(_close_to_zero_state, DEFAULT_BIJECTION, inverse=True)
 
 # %% [markdown]
 # ### Transforming Multiple Parameters
@@ -158,8 +182,6 @@ print(posterior)
 # from a give `State`.
 
 # %%
-from flax import nnx
-
 graphdef, state = nnx.split(posterior)
 print(state)
 
@@ -316,7 +338,28 @@ def loss_fn(params: nnx.State, data: gpx.Dataset) -> ScalarFloat:
     return -gpx.objectives.conjugate_mll(model, data)
 
 
-grad(loss_fn)(params, D)
+param_grads = grad(loss_fn)(params, D)
+
+# %% [markdown]
+# In practice, you would wish to perform multiple iterations of gradient descent to learn the optimal parameter values. However, for the purposes of illustration, we use another `tree_map` in the below to update the parameters' state using their previously computed gradients. As you can see, the really beauty in having access to the model's state is that we have full control over the operations that we perform to the state.
+
+# %%
+LEARNING_RATE = 0.01
+optimised_params = jtu.tree_map(
+    lambda _params, _grads: _params + LEARNING_RATE * _grads, params, param_grads
+)
+
+# %% [markdown]
+# Now we will plot the updated mean function alongside its initial form. To achieve this, we first merge the state back into the model using `merge`, and we then simply invoke the model as normal.
+
+# %%
+optimised_posterior = nnx.merge(graphdef, optimised_params, *others)
+
+fig, ax = plt.subplots()
+ax.plot(X, optimised_posterior.prior.mean_function(X), label="Updated mean function")
+ax.plot(X, meanf(X), label="Initial mean function")
+ax.legend()
+ax.set(xlabel="x", ylabel="m(x)")
 
 # %% [markdown]
 # ## Conclusions

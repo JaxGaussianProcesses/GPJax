@@ -55,13 +55,14 @@ def transform(
         param = param.replace(transformed_value)
         return param
 
-    graphdef, gp_params, *other_params = nnx.split(params, Parameter, ...)
+    gp_params, *other_params = params.split(Parameter, ...)
+
     transformed_gp_params: nnx.State = jtu.tree_map(
         lambda x: _inner(x),
         gp_params,
         is_leaf=lambda x: isinstance(x, nnx.VariableState),
     )
-    return nnx.merge(graphdef, transformed_gp_params, *other_params)
+    return nnx.State.merge(transformed_gp_params, *other_params)
 
 
 class Parameter(nnx.Variable[T]):
