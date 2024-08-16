@@ -117,7 +117,7 @@ print(DEFAULT_BIJECTION[constant_param._tag])
 # positive parameters. To apply this, we may invoke the following
 
 # %%
-transform(constant_param, DEFAULT_BIJECTION, inverse=True)
+transform(meanf, DEFAULT_BIJECTION, inverse=True)
 
 # %% [markdown]
 # The parameter's value was changed here from 1. to 0.54132485. This is the result of
@@ -126,7 +126,7 @@ transform(constant_param, DEFAULT_BIJECTION, inverse=True)
 # would be more pronounced.
 
 # %%
-transform(PositiveReal(value=1e-6), DEFAULT_BIJECTION, inverse=True)
+transform(Constant(PositiveReal(value=1e-6)), DEFAULT_BIJECTION, inverse=True)
 
 # %% [markdown]
 # ### Transforming Multiple Parameters
@@ -198,7 +198,6 @@ print(transformed_state)
 
 # %%
 retransformed_state = transform(transformed_state, DEFAULT_BIJECTION, inverse=False)
-print(retransformed_state == transformed_state)
 
 # %% [markdown]
 # ### Fine-Scale Control
