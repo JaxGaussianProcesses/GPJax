@@ -58,11 +58,15 @@ with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     from gpjax.kernels.base import AbstractKernel
 
-key = jr.key(123)
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
+
+from examples.utils import use_mpl_style
+
+# set the default style for plotting
+use_mpl_style()
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
+
+key = jr.key(42)
+
 
 # %% [markdown]
 # ## Dataset

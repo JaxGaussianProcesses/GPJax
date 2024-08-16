@@ -121,11 +121,14 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import tensorflow_probability.substrates.jax as tfp
-from docs.examples.utils import confidence_ellipse
+from examples.utils import confidence_ellipse, use_mpl_style
 
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
+# set the default style for plotting
+use_mpl_style()
+
+key = jr.key(42)
+
+
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 tfd = tfp.distributions
 

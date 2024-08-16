@@ -38,9 +38,11 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import gpjax as gpx
 
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
+from examples.utils import use_mpl_style
+
+# set the default style for plotting
+use_mpl_style()
+
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]

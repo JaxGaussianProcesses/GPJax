@@ -45,11 +45,13 @@ import tensorflow_probability as tfp
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-# Enable Float64 for more stable matrix inversions.
-key = jr.key(123)
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
+from examples.utils import use_mpl_style
+
+# set the default style for plotting
+use_mpl_style()
+
+key = jr.key(42)
+
 colors = rcParams["axes.prop_cycle"].by_key()["color"]
 
 

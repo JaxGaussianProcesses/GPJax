@@ -38,14 +38,17 @@ from flax import nnx
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
+from examples.utils import use_mpl_style
+
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 tfd = tfp.distributions
-key = jr.key(123)
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
+
+# set the default style for plotting
+use_mpl_style()
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
+
+key = jr.key(42)
 
 # %% [markdown]
 # ## Dataset

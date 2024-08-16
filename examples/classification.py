@@ -15,10 +15,6 @@
 #     name: python3
 # ---
 
-# %%
-# %load_ext autoreload
-# %autoreload 2
-
 # %% [markdown]
 # # Classification
 #
@@ -54,12 +50,15 @@ from tqdm import trange
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
+from examples.utils import use_mpl_style
+
 tfd = tfp.distributions
 identity_matrix = jnp.eye
-key = jr.key(123)
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
+
+# set the default style for plotting
+use_mpl_style()
+
+key = jr.key(42)
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
