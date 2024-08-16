@@ -81,7 +81,9 @@ print(meanf)
 
 # %% [markdown]
 # However, suppose you wish your mean function's constant parameter to be strictly
-# positive. This is easy to achieve by using the correct Parameter type which, in this case, will be the `PositiveReal`. However, any Parameter that subclasses from `Parameter` will be transformed by GPJax.
+# positive. This is easy to achieve by using the correct Parameter type which, in this
+# case, will be the `PositiveReal`. However, any Parameter that subclasses from
+# `Parameter` will be transformed by GPJax.
 
 # %%
 from gpjax.parameters import PositiveReal
@@ -134,7 +136,8 @@ print(DEFAULT_BIJECTION[constant_param._tag])
 
 # %% [markdown]
 # We see here that the Softplus bijector is specified as the default for strictly
-# positive parameters. To apply this, we must first realise the _state_ of our model. This is achieved using the `split` function provided by `nnx`.
+# positive parameters. To apply this, we must first realise the _state_ of our model.
+# This is achieved using the `split` function provided by `nnx`.
 
 # %%
 _, _params = nnx.split(meanf, Parameter)
@@ -341,7 +344,11 @@ def loss_fn(params: nnx.State, data: gpx.Dataset) -> ScalarFloat:
 param_grads = grad(loss_fn)(params, D)
 
 # %% [markdown]
-# In practice, you would wish to perform multiple iterations of gradient descent to learn the optimal parameter values. However, for the purposes of illustration, we use another `tree_map` in the below to update the parameters' state using their previously computed gradients. As you can see, the really beauty in having access to the model's state is that we have full control over the operations that we perform to the state.
+# In practice, you would wish to perform multiple iterations of gradient descent to
+# learn the optimal parameter values. However, for the purposes of illustration, we use
+# another `tree_map` in the below to update the parameters' state using their previously
+# computed gradients. As you can see, the really beauty in having access to the model's
+# state is that we have full control over the operations that we perform to the state.
 
 # %%
 LEARNING_RATE = 0.01
@@ -350,7 +357,9 @@ optimised_params = jtu.tree_map(
 )
 
 # %% [markdown]
-# Now we will plot the updated mean function alongside its initial form. To achieve this, we first merge the state back into the model using `merge`, and we then simply invoke the model as normal.
+# Now we will plot the updated mean function alongside its initial form. To achieve
+# this, we first merge the state back into the model using `merge`, and we then simply
+# invoke the model as normal.
 
 # %%
 optimised_posterior = nnx.merge(graphdef, optimised_params, *others)
