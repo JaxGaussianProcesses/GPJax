@@ -72,10 +72,9 @@ helped to shape GPJax into the package it is today.
 ## Notebook examples
 
 > - [**Conjugate Inference**](https://docs.jaxgaussianprocesses.com/examples/regression/)
-> - [**Classification with MCMC**](https://docs.jaxgaussianprocesses.com/examples/classification/)
+> - [**Classification**](https://docs.jaxgaussianprocesses.com/examples/classification/)
 > - [**Sparse Variational Inference**](https://docs.jaxgaussianprocesses.com/examples/collapsed_vi/)
 > - [**Stochastic Variational Inference**](https://docs.jaxgaussianprocesses.com/examples/uncollapsed_vi/)
-> - [**BlackJax Integration**](https://docs.jaxgaussianprocesses.com/examples/classification/#mcmc-inference)
 > - [**Laplace Approximation**](https://docs.jaxgaussianprocesses.com/examples/classification/#laplace-approximation)
 > - [**Inference on Non-Euclidean Spaces**](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#custom-kernel)
 > - [**Inference on Graphs**](https://docs.jaxgaussianprocesses.com/examples/graph_kernels/)
@@ -146,13 +145,10 @@ posterior = prior * likelihood
 # Define an optimiser
 optimiser = ox.adam(learning_rate=1e-2)
 
-# Define the marginal log-likelihood
-negative_mll = jit(gpx.objectives.ConjugateMLL(negative=True))
-
 # Obtain Type 2 MLEs of the hyperparameters
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=negative_mll,
+    objective=gpx.objectives.conjugate_mll,
     train_data=D,
     optim=optimiser,
     num_iters=500,

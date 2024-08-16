@@ -23,13 +23,6 @@ from gpjax.kernels import (
     Matern32,
     Matern52,
 )
-from gpjax.objectives import (
-    ELBO,
-    CollapsedELBO,
-    ConjugateMLL,
-    LogPosteriorDensity,
-    NonConjugateMLL,
-)
 
 CitationType = Union[None, str, Dict[str, str]]
 
@@ -154,46 +147,6 @@ def _(tree) -> PaperCitation:
         title="Random features for large-scale kernel machines",
         year="2007",
         booktitle="Advances in neural information processing systems",
-        citation_type="article",
-    )
-
-
-####################
-# Objective citations
-####################
-@cite.register(ConjugateMLL)
-@cite.register(NonConjugateMLL)
-@cite.register(LogPosteriorDensity)
-def _(tree) -> BookCitation:
-    return BookCitation(
-        citation_key="rasmussen2006gaussian",
-        title="Gaussian Processes for Machine Learning",
-        authors="Rasmussen, Carl Edward and Williams, Christopher K",
-        year="2006",
-        publisher="MIT press Cambridge, MA",
-        volume="2",
-    )
-
-
-@cite.register(CollapsedELBO)
-def _(tree) -> PaperCitation:
-    return PaperCitation(
-        citation_key="titsias2009variational",
-        title="Variational learning of inducing variables in sparse Gaussian processes",
-        authors="Titsias, Michalis",
-        year="2009",
-        booktitle="International Conference on Artificial Intelligence and Statistics",
-    )
-
-
-@cite.register(ELBO)
-def _(tree) -> PaperCitation:
-    return PaperCitation(
-        citation_key="hensman2013gaussian",
-        title="Gaussian Processes for Big Data",
-        authors="Hensman, James and Fusi, Nicolo and Lawrence, Neil D",
-        year="2013",
-        booktitle="Uncertainty in Artificial Intelligence",
         citation_type="article",
     )
 

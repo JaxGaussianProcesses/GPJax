@@ -13,47 +13,67 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
+import beartype.typing as tp
+from flax import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import param_field
 from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
+from gpjax.parameters import PositiveReal
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
 )
 
 
-@dataclass
 class Linear(AbstractKernel):
-    r"""The linear kernel."""
+    r"""The linear kernel.
 
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    Computes the covariance for pairs of inputs $(x, y)$ with variance $\sigma^2$:
+    $$
+    k(x, y) = \sigma^2 x^{\top}y
+    $$
+    """
+
     name: str = "Linear"
+
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], slice, None] = None,
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        n_dims: tp.Union[int, None] = None,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        """Initializes the kernel.
+
+        Args:
+            active_dims: The indices of the input dimensions that the kernel operates on.
+            variance: the variance of the kernel σ.
+            n_dims: The number of input dimensions.
+            compute_engine: The computation engine that the kernel uses to compute the
+                covariance matrix.
+        """
+
+        super().__init__(active_dims, n_dims, compute_engine)
+
+        if isinstance(variance, nnx.Variable):
+            self.variance = variance
+        else:
+            self.variance = PositiveReal(variance)
+            if tp.TYPE_CHECKING:
+                self.variance = tp.cast(PositiveReal[ScalarArray], self.variance)
 
     def __call__(
         self,
         x: Float[Array, " D"],
         y: Float[Array, " D"],
     ) -> ScalarFloat:
-        r"""Compute the linear kernel between a pair of arrays.
-
-        For a pair of inputs $`x, y \in \mathbb{R}^{D}`$, let's evaluate the linear
-        kernel $`k(x, y)=\sigma^2 x^{\top}y`$ where $`\sigma^\in \mathbb{R}_{>0}`$ is the
-        kernel's variance parameter.
-
-        Args:
-            x (Float[Array, " D"]): The left hand input of the kernel function.
-            y (Float[Array, " D"]): The right hand input of the kernel function.
-
-        Returns
-        -------
-            ScalarFloat: The evaluated kernel function $`k(x, y)`$ at the supplied inputs.
-        """
         x = self.slice_input(x)
         y = self.slice_input(y)
-        K = self.variance * jnp.matmul(x.T, y)
+        K = self.variance.value * jnp.matmul(x.T, y)
         return K.squeeze()

@@ -13,28 +13,16 @@
 # limitations under the License.
 # ==============================================================================
 
-
-from dataclasses import is_dataclass
 from itertools import product
+from typing import Any
 
-from cola.ops import (
-    Diagonal,
-    LinearOperator,
-)
+from cola.ops.operator_base import LinearOperator
 import jax
 from jax import config
 import jax.numpy as jnp
-import jax.tree_util as jtu
 import pytest
-import tensorflow_probability.substrates.jax.bijectors as tfb
-import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.kernels.base import AbstractKernel
-from gpjax.kernels.computations import (
-    AbstractKernelComputation,
-    ConstantDiagonalKernelComputation,
-    DenseKernelComputation,
-)
+from gpjax.kernels.computations import AbstractKernelComputation
 from gpjax.kernels.stationary import (
     RBF,
     Matern12,
@@ -45,230 +33,189 @@ from gpjax.kernels.stationary import (
     RationalQuadratic,
     White,
 )
-from gpjax.kernels.stationary.utils import build_student_t_distribution
+from gpjax.kernels.stationary.base import StationaryKernel
+from gpjax.parameters import (
+    PositiveReal,
+    Static,
+)
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 
 
-class BaseTestKernel:
-    """A base class that contains all tests applied on stationary kernels."""
-
-    kernel: AbstractKernel
-    default_compute_engine = AbstractKernelComputation
-    spectral_density_name: str
-
-    def pytest_generate_tests(self, metafunc):
-        """This is called automatically by pytest."""
-
-        # function for pretty test name
-        def id_func(x):
-            return "-".join([f"{k}={v}" for k, v in x.items()])
-
-        # get arguments for the test function
-        funcarglist = metafunc.cls.params.get(metafunc.function.__name__, None)
-        if funcarglist is None:
-            return
-        else:
-            # equivalent of pytest.mark.parametrize applied on the metafunction
-            metafunc.parametrize("fields", funcarglist, ids=id_func)
-
-    @pytest.mark.parametrize("dim", [None, 1, 3], ids=lambda x: f"dim={x}")
-    def test_initialization(self, fields: dict, dim: int) -> None:
-        # Check that kernel is a dataclass
-        assert is_dataclass(self.kernel)
-
-        # Input fields as JAX arrays
-        fields = {k: jnp.array(v) for k, v in fields.items()}
-
-        # Test number of dimensions
-        if dim is None:
-            kernel: AbstractKernel = self.kernel(**fields)
-            assert kernel.ndims == 1
-        else:
-            kernel: AbstractKernel = self.kernel(active_dims=list(range(dim)), **fields)
-            assert kernel.ndims == dim
-
-        # Check default compute engine
-        assert kernel.compute_engine == self.default_compute_engine
-
-        # Check properties
-        for field, value in fields.items():
-            assert getattr(kernel, field) == value
-
-        # Check pytree structure
-        leaves = jtu.tree_leaves(kernel)
-        assert len(leaves) == len(fields)
-
-        # Test dtype of params
-        for v in leaves:
-            assert v.dtype == jnp.float64
-
-        # meta
-        meta = kernel._pytree__meta
-        assert meta.keys() == fields.keys()
-        for field in fields:
-            # Bijectors
-            if field in ["variance", "lengthscale", "period", "alpha"]:
-                assert isinstance(meta[field]["bijector"], tfb.Softplus)
-            if field in ["power"]:
-                assert isinstance(meta[field]["bijector"], tfb.Sigmoid)
-
-            # Trainability state
-            assert meta[field]["trainable"] is True
-
-        # Test kernel call
-        x = jnp.linspace(0.0, 1.0, 10 * kernel.ndims).reshape(10, kernel.ndims)
-        jax.vmap(kernel)(x, x)
-
-    @pytest.mark.parametrize("n", [1, 2, 5], ids=lambda x: f"n={x}")
-    @pytest.mark.parametrize("dim", [1, 3], ids=lambda x: f"dim={x}")
-    def test_gram(self, dim: int, n: int) -> None:
-        # Initialise kernel
-        kernel: AbstractKernel = self.kernel()
-
-        # Inputs
-        x = jnp.linspace(0.0, 1.0, n * dim).reshape(n, dim)
-
-        # Test gram matrix
-        Kxx = kernel.gram(x)
-        Kxx_cross = kernel.cross_covariance(x, x)
-        assert isinstance(Kxx, LinearOperator)
-        assert Kxx.shape == (n, n)
-        assert jnp.all(jnp.linalg.eigvalsh(Kxx.to_dense() + jnp.eye(n) * 1e-6) > 0.0)
-        assert jnp.allclose(Kxx_cross, Kxx.to_dense())
-
-    @pytest.mark.parametrize("n", [1, 2, 5], ids=lambda x: f"n={x}")
-    @pytest.mark.parametrize("dim", [1, 3], ids=lambda x: f"dim={x}")
-    def test_diagonal(self, dim: int, n: int) -> None:
-        # Initialise kernel
-        kernel: AbstractKernel = self.kernel()
-
-        # Inputs
-        x = jnp.linspace(0.0, 1.0, n * dim).reshape(n, dim)
-
-        # Test diagonal
-        Kxx = kernel.diagonal(x)
-        Kxx_gram = jnp.diagonal(kernel.gram(x).to_dense())
-        assert isinstance(Kxx, Diagonal)
-        assert Kxx.shape == (n, n)
-        assert jnp.all(Kxx.diag + 1e-6 > 0.0)
-        assert jnp.allclose(Kxx_gram, Kxx.diag)
-
-    @pytest.mark.parametrize("n_a", [1, 2, 5], ids=lambda x: f"n_a={x}")
-    @pytest.mark.parametrize("n_b", [1, 2, 5], ids=lambda x: f"n_b={x}")
-    @pytest.mark.parametrize("dim", [1, 2, 5], ids=lambda x: f"dim={x}")
-    def test_cross_covariance(self, n_a: int, n_b: int, dim: int) -> None:
-        # Initialise kernel
-        kernel: AbstractKernel = self.kernel()
-
-        # Inputs
-        a = jnp.linspace(-1.0, 1.0, n_a * dim).reshape(n_a, dim)
-        b = jnp.linspace(3.0, 4.0, n_b * dim).reshape(n_b, dim)
-        c = jnp.vstack((a, b))
-
-        # Test cross-covariance
-        Kab = kernel.cross_covariance(a, b)
-        Kab_gram = kernel.gram(c).to_dense()[:n_a, n_a:]
-        assert isinstance(Kab, jnp.ndarray)
-        assert Kab.shape == (n_a, n_b)
-        assert jnp.allclose(Kab, Kab_gram)
-
-    def test_spectral_density(self):
-        # Initialise kernel
-        kernel: AbstractKernel = self.kernel()
-
-        if self.kernel not in [RBF, Matern12, Matern32, Matern52]:
-            # Check that spectral_density property is None
-            assert not kernel.spectral_density
-        else:
-            # Check that spectral_density property is correct
-            sdensity = kernel.spectral_density
-            assert sdensity.name == self.spectral_density_name
-            assert sdensity.loc == jnp.array(0.0)
-            assert sdensity.scale == jnp.array(1.0)
-
-    @pytest.mark.parametrize("dim", [1, 3], ids=lambda x: f"dim={x}")
-    def test_isotropic(self, dim: int):
-        # Initialise kernel
-        kernel: AbstractKernel = self.kernel(active_dims=list(range(dim)))
-        if self.kernel not in [White]:
-            assert kernel.lengthscale.shape == ()
+def params_product(params: dict[str, list]) -> list[dict[str, Any]]:
+    return [dict(zip(params.keys(), values)) for values in product(*params.values())]
 
 
-def prod(inp):
-    return [
-        dict(zip(inp.keys(), values, strict=True)) for values in product(*inp.values())
-    ]
+TESTED_KERNELS = [
+    (RBF, [{}]),
+    (Matern12, [{}]),
+    (Matern32, [{}]),
+    (Matern52, [{}]),
+    (White, [{}]),
+    (Periodic, params_product({"period": [0.1, 1.0]})),
+    (PoweredExponential, params_product({"power": [0.1, 0.9]})),
+    (RationalQuadratic, params_product({"alpha": [0.1, 1.0]})),
+]
+
+LENGTHSCALES = [
+    0.1,
+    jnp.array(0.1),
+    [0.1, 0.2],
+    jnp.array([0.1, 0.2]),
+]
+
+VARIANCES = [0.1]
 
 
-class TestRBF(BaseTestKernel):
-    kernel = RBF
-    fields = prod({"lengthscale": [0.1, 1.0], "variance": [0.1, 1.0]})
-    params = {"test_initialization": fields}
-    default_compute_engine = DenseKernelComputation()
-    spectral_density_name = "Normal"
+@pytest.fixture
+def kernel_request(
+    kernel,
+    params,
+    lengthscale,
+    variance,
+):
+    return kernel, params, lengthscale, variance
 
 
-class TestMatern12(BaseTestKernel):
-    kernel = Matern12
-    fields = prod({"lengthscale": [0.1, 1.0], "variance": [0.1, 1.0]})
-    params = {"test_initialization": fields}
-    default_compute_engine = DenseKernelComputation()
-    spectral_density_name = "StudentT"
+@pytest.fixture
+def test_init(kernel_request):
+    kernel, params, lengthscale, variance = kernel_request
+
+    # Initialise kernel
+    if kernel == White:
+        k = kernel(variance=variance, **params)
+    else:
+        k = kernel(lengthscale=lengthscale, variance=variance, **params)
+
+    return k
 
 
-class TestMatern32(BaseTestKernel):
-    kernel = Matern32
-    fields = prod({"lengthscale": [0.1, 1.0], "variance": [0.1, 1.0]})
-    params = {"test_initialization": fields}
-    default_compute_engine = DenseKernelComputation()
-    spectral_density_name = "StudentT"
+@pytest.mark.parametrize(
+    "kernel, params", [(cls, p) for cls, params in TESTED_KERNELS for p in params]
+)
+@pytest.mark.parametrize("lengthscale", LENGTHSCALES)
+@pytest.mark.parametrize("variance", VARIANCES)
+def test_init_override_paramtype(kernel_request):
+    kernel, params, lengthscale, variance = kernel_request
+
+    new_params = {}  # otherwise we change the fixture and next test fails
+    for param, value in params.items():
+        new_params[param] = Static(value)
+
+    kwargs = {**new_params, "variance": PositiveReal(variance)}
+    if kernel != White:
+        kwargs["lengthscale"] = PositiveReal(lengthscale)
+
+    k = kernel(**kwargs)
+    assert isinstance(k.variance, PositiveReal)
+
+    for param in params.keys():
+        assert isinstance(getattr(k, param), Static)
 
 
-class TestMatern52(BaseTestKernel):
-    kernel = Matern52
-    fields = prod({"lengthscale": [0.1, 1.0], "variance": [0.1, 1.0]})
-    params = {"test_initialization": fields}
-    default_compute_engine = DenseKernelComputation()
-    spectral_density_name = "StudentT"
+@pytest.mark.parametrize("kernel", [k[0] for k in TESTED_KERNELS])
+def test_init_defaults(kernel: type[StationaryKernel]):
+    # Initialise kernel
+    k = kernel()
+
+    # Check that the parameters are set correctly
+    assert isinstance(k.compute_engine, type(AbstractKernelComputation()))
+    assert isinstance(k.variance, PositiveReal)
+    assert isinstance(k.lengthscale, PositiveReal)
 
 
-class TestWhite(BaseTestKernel):
-    kernel = White
-    fields = prod({"variance": [0.1, 1.0]})
-    params = {"test_initialization": fields}
-    default_compute_engine = ConstantDiagonalKernelComputation()
+@pytest.mark.parametrize("kernel", [k[0] for k in TESTED_KERNELS])
+@pytest.mark.parametrize("lengthscale", LENGTHSCALES)
+def test_init_lengthscales(kernel: type[StationaryKernel], lengthscale):
+    # We can skip the White kernel as it does not have a lengthscale
+    if kernel == White:
+        return
+
+    # Initialise kernel
+    k = kernel(lengthscale=lengthscale)
+
+    # Check that the parameters are set correctly
+    assert isinstance(k.lengthscale, PositiveReal)
+    assert jnp.allclose(k.lengthscale.value, jnp.asarray(lengthscale))
+
+    # Check that error is raised if lengthscale is not valid
+    with pytest.raises(ValueError):
+        k = kernel(lengthscale=-1.0)
+
+    # with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
+        # type error according to beartype + jaxtyping
+        # would be ValueError otherwise
+        k = kernel(lengthscale=jnp.ones((2, 2)))
+
+    with pytest.raises(TypeError):
+        k = kernel(lengthscale="invalid type")
+
+    # Check that error is raised if lengthscale is not compatible with n_dims
+    with pytest.raises(ValueError):
+        k = kernel(lengthscale=jnp.ones(2), n_dims=1)
 
 
-class TestPeriodic(BaseTestKernel):
-    kernel = Periodic
-    fields = prod(
-        {"lengthscale": [0.1, 1.0], "variance": [0.1, 1.0], "period": [0.1, 1.0]}
-    )
-    params = {"test_initialization": fields}
-    default_compute_engine = DenseKernelComputation()
+@pytest.mark.parametrize("kernel", [k[0] for k in TESTED_KERNELS])
+@pytest.mark.parametrize("variance", VARIANCES)
+def test_init_variances(kernel: type[StationaryKernel], variance):
+    # Initialise kernel
+    k = kernel(variance=variance)
+
+    # Check that the parameters are set correctly
+    assert isinstance(k.variance, PositiveReal)
+    assert jnp.allclose(k.variance.value, jnp.asarray(variance))
+
+    # Check that error is raised if variance is not valid
+    with pytest.raises(ValueError):
+        k = kernel(variance=-1.0)
+
+    with pytest.raises(TypeError):
+        k = kernel(variance=jnp.ones((2, 2)))
+
+    with pytest.raises(TypeError):
+        k = kernel(variance="invalid type")
 
 
-class TestPoweredExponential(BaseTestKernel):
-    kernel = PoweredExponential
-    fields = prod(
-        {"lengthscale": [0.1, 1.0], "variance": [0.1, 1.0], "power": [0.1, 0.9]}
-    )
-    params = {"test_initialization": fields}
-    default_compute_engine = DenseKernelComputation()
+@pytest.mark.parametrize(
+    "kernel, params", [(cls, p) for cls, params in TESTED_KERNELS for p in params]
+)
+@pytest.mark.parametrize("lengthscale", LENGTHSCALES)
+@pytest.mark.parametrize("variance", VARIANCES)
+@pytest.mark.parametrize("n", [1, 2, 5], ids=lambda x: f"n={x}")
+def test_gram(test_init: StationaryKernel, n: int):
+    # kernel is initialized in the test_init fixture
+    k = test_init
+    n_dims = k.n_dims or 1
+
+    # Inputs
+    x = jnp.linspace(0.0, 1.0, n * n_dims).reshape(n, n_dims)
+
+    # Test gram matrix
+    Kxx = k.gram(x)
+    assert isinstance(Kxx, LinearOperator)
+    assert Kxx.shape == (n, n)
+    assert jnp.all(jnp.linalg.eigvalsh(Kxx.to_dense() + jnp.eye(n) * 1e-6) > 0.0)
 
 
-class TestRationalQuadratic(BaseTestKernel):
-    kernel = RationalQuadratic
-    fields = prod(
-        {"lengthscale": [0.1, 1.0], "variance": [0.1, 1.0], "alpha": [0.1, 1.0]}
-    )
-    params = {"test_initialization": fields}
-    default_compute_engine = DenseKernelComputation()
+@pytest.mark.parametrize(
+    "kernel, params", [(cls, p) for cls, params in TESTED_KERNELS for p in params]
+)
+@pytest.mark.parametrize("lengthscale", LENGTHSCALES)
+@pytest.mark.parametrize("variance", VARIANCES)
+@pytest.mark.parametrize("n_a", [1, 2, 5], ids=lambda x: f"n_a={x}")
+@pytest.mark.parametrize("n_b", [1, 2, 5], ids=lambda x: f"n_b={x}")
+def test_cross_covariance(test_init: StationaryKernel, n_a: int, n_b: int):
+    # kernel is initialized in the test_init fixture
+    k = test_init
+    n_dims = k.n_dims or 1
 
+    # Inputs
+    x = jnp.linspace(0.0, 1.0, n_a * n_dims).reshape(n_a, n_dims)
+    y = jnp.linspace(0.0, 1.0, n_b * n_dims).reshape(n_b, n_dims)
 
-@pytest.mark.parametrize("smoothness", [1, 2, 3])
-def test_build_studentt_dist(smoothness: int) -> None:
-    dist = build_student_t_distribution(smoothness)
-    assert isinstance(dist, tfd.Distribution)
+    # Test cross covariance matrix
+    Kxy = k.cross_covariance(x, y)
+    assert isinstance(Kxy, jax.Array)
+    assert Kxy.shape == (n_a, n_b)

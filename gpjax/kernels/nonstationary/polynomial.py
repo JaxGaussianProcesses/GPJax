@@ -13,54 +13,79 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
+import beartype.typing as tp
+from flax import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import (
-    param_field,
-    static_field,
-)
 from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
+from gpjax.parameters import PositiveReal
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
-    ScalarInt,
 )
 
 
-@dataclass
 class Polynomial(AbstractKernel):
-    """The Polynomial kernel with variable degree."""
+    r"""The Polynomial kernel with variable degree.
 
-    degree: ScalarInt = static_field(2)
-    shift: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    Computes the covariance for pairs of inputs $(x, y)$ with variance $\sigma^2$:
+    $$
+    k(x, y) = (\alpha + \sigma^2 x y)^d
+    $$
+    where $\sigma^\in \mathbb{R}_{>0}$ is the kernel's variance parameter, shift
+    parameter $\alpha$ and integer degree $d$.
+    """
 
-    def __post_init__(self):
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], slice, None] = None,
+        degree: int = 2,
+        shift: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 0.0,
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        n_dims: tp.Union[int, None] = None,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        """Initializes the kernel.
+
+        Args:
+            active_dims: The indices of the input dimensions that the kernel operates on.
+            degree: The degree of the polynomial.
+            shift: The shift parameter of the kernel.
+            variance: The variance of the kernel.
+            n_dims: The number of input dimensions.
+            compute_engine: The computation engine that the kernel uses to compute the
+                covariance matrix.
+        """
+        super().__init__(active_dims, n_dims, compute_engine)
+
+        self.degree = degree
+
+        if isinstance(shift, nnx.Variable):
+            self.shift = shift
+        else:
+            self.shift = PositiveReal(shift)
+            if tp.TYPE_CHECKING:
+                self.shift = tp.cast(PositiveReal[ScalarArray], self.shift)
+
+        if isinstance(variance, nnx.Variable):
+            self.variance = variance
+        else:
+            self.variance = PositiveReal(variance)
+            if tp.TYPE_CHECKING:
+                self.variance = tp.cast(PositiveReal[ScalarArray], self.variance)
+
         self.name = f"Polynomial (degree {self.degree})"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
-        r"""Compute the polynomial kernel of degree $`d`$ between a pair of arrays.
-
-        For a pair of inputs $`x, y \in \mathbb{R}^{D}`$, let's evaluate the polynomial
-        kernel $`k(x, y)=\left( \alpha + \sigma^2 x y\right)^{d}`$ where
-        $`\sigma^\in \mathbb{R}_{>0}`$ is the kernel's variance parameter, shift
-        parameter $`\alpha`$ and integer degree $`d`$.
-
-        Args:
-            x (Float[Array, " D"]): The left hand argument of the kernel function's
-                call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's
-                call
-
-        Returns
-        -------
-            ScalarFloat: The value of $`k(x, y)`$.
-        """
         x = self.slice_input(x)
         y = self.slice_input(y)
-        K = jnp.power(self.shift + self.variance * jnp.dot(x, y), self.degree)
+        K = jnp.power(
+            self.shift.value + self.variance.value * jnp.dot(x, y), self.degree
+        )
         return K.squeeze()

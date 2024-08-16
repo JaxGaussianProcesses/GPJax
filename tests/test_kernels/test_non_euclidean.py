@@ -32,11 +32,13 @@ def test_graph_kernel():
     L = nx.laplacian_matrix(G).toarray() + jnp.eye(n_verticies) * 1e-12
 
     # Create graph kernel
-    kern = GraphKernel(laplacian=L)
+    kern = GraphKernel(
+        laplacian=L,
+    )
     assert isinstance(kern, GraphKernel)
     assert kern.num_vertex == n_verticies
-    assert kern.eigenvalues.shape == (n_verticies, 1)
-    assert kern.eigenvectors.shape == (n_verticies, n_verticies)
+    assert kern.eigenvalues.value.shape == (n_verticies, 1)
+    assert kern.eigenvectors.value.shape == (n_verticies, n_verticies)
 
     # Compute gram matrix
     Kxx = kern.gram(x)

@@ -104,7 +104,7 @@ class Forrester(AbstractContinuousTestFunction):
     """
     Forrester function introduced in 'Engineering design via surrogate modelling: a
     practical guide' (Forrester et al. 2008), rescaled to have zero mean and unit
-    variance over $`[0, 1]`$.
+    variance over $[0, 1]$.
     """
 
     search_space = ContinuousSearchSpace(
@@ -125,7 +125,7 @@ class LogarithmicGoldsteinPrice(AbstractContinuousTestFunction):
     """
     Logarithmic Goldstein-Price function introduced in 'A benchmark of kriging-based
     infill criteria for noisy optimization' (Picheny et al. 2013), which has zero mean
-    and unit variance over $`[0, 1]^2`$.
+    and unit variance over $[0, 1]^2$.
     """
 
     search_space = ContinuousSearchSpace(
@@ -160,7 +160,7 @@ class LogarithmicGoldsteinPrice(AbstractContinuousTestFunction):
 @dataclass
 class Quadratic(AbstractContinuousTestFunction):
     """
-    Toy quadratic function defined over $`[0, 1]`$.
+    Toy quadratic function defined over $[0, 1]$.
     """
 
     search_space = ContinuousSearchSpace(

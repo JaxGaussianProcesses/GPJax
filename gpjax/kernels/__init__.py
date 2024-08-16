@@ -14,6 +14,8 @@
 # ==============================================================================
 
 """JaxKern."""
+
+from gpjax.kernels import stationary
 from gpjax.kernels.approximations import RFF
 from gpjax.kernels.base import (
     AbstractKernel,
@@ -68,4 +70,5 @@ __all__ = [
     "White",
     "BasisFunctionComputation",
     "RFF",
+    "stationary",
 ]

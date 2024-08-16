@@ -152,3 +152,4 @@ package-lock.json
 node_modules/
 
 docs/api
+docs/_examples

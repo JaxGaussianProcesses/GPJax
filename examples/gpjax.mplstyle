@@ -1,0 +1,51 @@
+figure.figsize: 5.5, 2.5
+figure.constrained_layout.use: True
+figure.autolayout: False
+savefig.bbox: tight
+figure.dpi: 120
+
+# Axes
+axes.spines.left: True  # display axis spines
+axes.spines.bottom: True
+axes.spines.top: False
+axes.spines.right: False
+axes.grid: true
+axes.axisbelow: true
+
+### Fonts
+mathtext.fontset: cm
+font.size: 10
+
+# Axes ticks
+ytick.left: True
+xtick.bottom: True
+xtick.direction: out
+ytick.direction: out
+
+# Colour palettes
+axes.prop_cycle: cycler("color", ["2F83B4","B5121B", "F77F00", "0B6E4F", "7A68A6", "C5BB36", "8c564b", "e377c2"])
+lines.color: B5121B
+scatter.marker: x
+image.cmap: inferno
+
+### Grids
+grid.linestyle: -
+grid.linewidth: 0.2
+grid.color: cbcbcb
+
+### Legend
+legend.frameon: True
+legend.loc: best
+legend.fontsize: 8
+legend.fancybox: True
+legend.scatterpoints: 1
+legend.numpoints: 1
+
+patch.antialiased: True
+
+# set text objects edidable in Adobe Illustrator
+pdf.fonttype: 42
+ps.fonttype: 42
+
+# no background
+savefig.transparent: True

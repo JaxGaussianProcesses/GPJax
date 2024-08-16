@@ -2,7 +2,6 @@ from jax import config
 
 config.update("jax_enable_x64", True)
 
-from jax import jit
 import jax.numpy as jnp
 import pytest
 
@@ -28,13 +27,6 @@ from gpjax.kernels import (
     Matern12,
     Matern32,
     Matern52,
-)
-from gpjax.objectives import (
-    ELBO,
-    CollapsedELBO,
-    ConjugateMLL,
-    LogPosteriorDensity,
-    NonConjugateMLL,
 )
 
 
@@ -78,7 +70,9 @@ def test_arc_cosine():
 
 def test_graph_kernel():
     L = jnp.eye(3)
-    kernel = GraphKernel(laplacian=L)
+    kernel = GraphKernel(
+        laplacian=L,
+    )
     citation = cite(kernel)
 
     assert isinstance(citation, PaperCitation)
@@ -88,9 +82,9 @@ def test_graph_kernel():
     _check_no_fallback(citation)
 
 
-@pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
+@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
 def test_rff(kernel):
-    base_kernel = kernel
+    base_kernel = kernel(n_dims=1)
     rff = RFF(base_kernel=base_kernel)
     citation = cite(rff)
 
@@ -106,50 +100,6 @@ def test_rff(kernel):
 def test_missing_citation(kernel):
     citation = cite(kernel)
     assert isinstance(citation, NullCitation)
-
-
-@pytest.mark.parametrize(
-    "mll", [ConjugateMLL(), NonConjugateMLL(), LogPosteriorDensity()]
-)
-def test_mlls(mll):
-    citation = cite(mll)
-    assert isinstance(citation, BookCitation)
-    assert citation.citation_key == "rasmussen2006gaussian"
-    assert citation.title == "Gaussian Processes for Machine Learning"
-    assert citation.publisher == "MIT press Cambridge, MA"
-    _check_no_fallback(citation)
-
-
-def test_uncollapsed_elbo():
-    elbo = ELBO()
-    citation = cite(elbo)
-
-    assert isinstance(citation, PaperCitation)
-    assert citation.citation_key == "hensman2013gaussian"
-    assert citation.title == "Gaussian Processes for Big Data"
-    assert citation.authors == "Hensman, James and Fusi, Nicolo and Lawrence, Neil D"
-    assert citation.year == "2013"
-    assert citation.booktitle == "Uncertainty in Artificial Intelligence"
-    _check_no_fallback(citation)
-
-
-def test_collapsed_elbo():
-    elbo = CollapsedELBO()
-    citation = cite(elbo)
-
-    assert isinstance(citation, PaperCitation)
-    assert citation.citation_key == "titsias2009variational"
-    assert (
-        citation.title
-        == "Variational learning of inducing variables in sparse Gaussian processes"
-    )
-    assert citation.authors == "Titsias, Michalis"
-    assert citation.year == "2009"
-    assert (
-        citation.booktitle
-        == "International Conference on Artificial Intelligence and Statistics"
-    )
-    _check_no_fallback(citation)
 
 
 def test_thompson_sampling():
@@ -208,12 +158,3 @@ def test_logarithmic_goldstein_price():
     assert citation.booktitle == "Structural and multidisciplinary optimization"
     assert citation.citation_type == "article"
     _check_no_fallback(citation)
-
-
-@pytest.mark.parametrize(
-    "objective",
-    [ELBO(), CollapsedELBO(), LogPosteriorDensity(), ConjugateMLL()],
-)
-def test_jitted_fallback(objective):
-    with pytest.raises(RuntimeError):
-        _ = cite(jit(objective))

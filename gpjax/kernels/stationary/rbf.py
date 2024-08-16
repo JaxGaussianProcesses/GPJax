@@ -13,16 +13,11 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
-from beartype.typing import Union
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
-import tensorflow_probability.substrates.jax.distributions as tfd
+import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.base import param_field
-from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import squared_distance
 from gpjax.typing import (
     Array,
@@ -30,37 +25,24 @@ from gpjax.typing import (
 )
 
 
-@dataclass
-class RBF(AbstractKernel):
-    r"""The Radial Basis Function (RBF) kernel."""
+class RBF(StationaryKernel):
+    r"""The Radial Basis Function (RBF) kernel.
 
-    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
-    )
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    Computes the covariance for pair of inputs $(x, y)$ with lengthscale parameter
+    $\ell$ and variance $\sigma^2$:
+    $$
+    k(x,y)=\sigma^2\exp\Bigg(- \frac{\lVert x - y \rVert^2_2}{2 \ell^2} \Bigg)
+    $$
+    """
+
     name: str = "RBF"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
-        r"""Compute the RBF kernel between a pair of arrays.
-
-        Evaluate the kernel on a pair of inputs $`(x, y)`$ with lengthscale parameter
-        $`\ell`$ and variance $`\sigma^2`$:
-        ```math
-        k(x,y)=\sigma^2\exp\Bigg(- \frac{\lVert x - y \rVert^2_2}{2 \ell^2} \Bigg)
-        ```
-
-        Args:
-            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
-
-        Returns:
-            ScalarFloat: The value of $`k(x, y)`$.
-        """
-        x = self.slice_input(x) / self.lengthscale
-        y = self.slice_input(y) / self.lengthscale
-        K = self.variance * jnp.exp(-0.5 * squared_distance(x, y))
+        x = self.slice_input(x) / self.lengthscale.value
+        y = self.slice_input(y) / self.lengthscale.value
+        K = self.variance.value * jnp.exp(-0.5 * squared_distance(x, y))
         return K.squeeze()
 
     @property
-    def spectral_density(self) -> tfd.Normal:
-        return tfd.Normal(loc=0.0, scale=1.0)
+    def spectral_density(self) -> tfp.distributions.Normal:
+        return tfp.distributions.Normal(0.0, 1.0)

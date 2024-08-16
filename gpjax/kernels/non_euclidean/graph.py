@@ -13,72 +13,91 @@
 # limitations under the License.
 # ==============================================================================
 
-
-from dataclasses import dataclass
-
-from beartype.typing import Union
+import beartype.typing as tp
 import jax.numpy as jnp
 from jaxtyping import (
     Float,
     Int,
     Num,
 )
-import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.base import (
-    param_field,
-    static_field,
-)
-from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
     AbstractKernelComputation,
     EigenKernelComputation,
 )
 from gpjax.kernels.non_euclidean.utils import jax_gather_nd
+from gpjax.kernels.stationary.base import StationaryKernel
+from gpjax.parameters import (
+    Parameter,
+    PositiveReal,
+    Static,
+)
 from gpjax.typing import (
     Array,
     ScalarFloat,
     ScalarInt,
 )
 
-tfb = tfp.bijectors
 
-
-##########################################
-# Graph kernels
-##########################################
-@dataclass
-class GraphKernel(AbstractKernel):
+class GraphKernel(StationaryKernel):
     r"""The Matérn graph kernel defined on the vertex set of a graph.
 
-    A Matérn graph kernel defined on the vertices of a graph. The key reference
-    for this object is borovitskiy et. al., (2020).
+    A Matérn graph kernel defined on the vertices of a graph.
 
-    Args:
-        laplacian (Float[Array]): An $`N \times N`$ matrix representing the Laplacian matrix
-            of a graph.
+    Computes the covariance for pairs of vertices $(v_i, v_j)$ with variance $\sigma^2$:
+    $$
+    k(v_i, v_j) = \sigma^2 \exp\Bigg(-\frac{\lVert v_i - v_j \rVert^2_2}{2\ell^2}\Bigg)
+    $$
+    where $\ell$ is the lengthscale parameter and $\sigma^2$ is the variance.
+
+    The key reference for this object is Borovitskiy et. al., (2020).
+
     """
 
-    laplacian: Union[Num[Array, "N N"], None] = static_field(None)
-    lengthscale: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    smoothness: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    eigenvalues: Union[Float[Array, "N 1"], None] = static_field(None)
-    eigenvectors: Union[Float[Array, "N N"], None] = static_field(None)
-    num_vertex: Union[ScalarInt, None] = static_field(None)
-    compute_engine: AbstractKernelComputation = static_field(
-        EigenKernelComputation(), repr=False
-    )
+    num_vertex: tp.Union[ScalarInt, None]
+    laplacian: Static[Float[Array, "N N"]]
+    eigenvalues: Static[Float[Array, "N 1"]]
+    eigenvectors: Static[Float[Array, "N N"]]
     name: str = "Graph Matérn"
 
-    def __post_init__(self):
-        if self.laplacian is None:
-            raise ValueError("Graph laplacian must be specified")
+    def __init__(
+        self,
+        laplacian: Num[Array, "N N"],
+        active_dims: tp.Union[list[int], slice, None] = None,
+        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
+        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
+        smoothness: ScalarFloat = 1.0,
+        n_dims: tp.Union[int, None] = None,
+        compute_engine: AbstractKernelComputation = EigenKernelComputation(),
+    ):
+        """Initializes the kernel.
 
-        evals, self.eigenvectors = jnp.linalg.eigh(self.laplacian)
-        self.eigenvalues = evals.reshape(-1, 1)
-        if self.num_vertex is None:
-            self.num_vertex = self.eigenvalues.shape[0]
+        Args:
+            laplacian: the Laplacian matrix of the graph.
+            active_dims: The indices of the input dimensions that the kernel operates on.
+            lengthscale: the lengthscale(s) of the kernel ℓ. If a scalar or an array of
+                length 1, the kernel is isotropic, meaning that the same lengthscale is
+                used for all input dimensions. If an array with length > 1, the kernel is
+                anisotropic, meaning that a different lengthscale is used for each input.
+            variance: the variance of the kernel σ.
+            smoothness: the smoothness parameter of the Matérn kernel.
+            n_dims: The number of input dimensions. If `lengthscale` is an array, this
+                argument is ignored.
+            compute_engine: The computation engine that the kernel uses to compute the
+                covariance matrix.
+        """
+        if isinstance(smoothness, Parameter):
+            self.smoothness = smoothness
+        else:
+            self.smoothness = PositiveReal(smoothness)
+
+        self.laplacian = Static(laplacian)
+        evals, eigenvectors = jnp.linalg.eigh(self.laplacian.value)
+        self.eigenvectors = Static(eigenvectors)
+        self.eigenvalues = Static(evals.reshape(-1, 1))
+        self.num_vertex = self.eigenvalues.value.shape[0]
+
+        super().__init__(active_dims, lengthscale, variance, n_dims, compute_engine)
 
     def __call__(  # TODO not consistent with general kernel interface
         self,
@@ -88,20 +107,7 @@ class GraphKernel(AbstractKernel):
         S,
         **kwargs,
     ):
-        r"""Compute the (co)variance between a vertex pair.
-
-        For a graph $`\mathcal{G} = \{V, E\}`$ where $`V = \{v_1, v_2, \ldots v_n \}`$,
-        evaluate the graph kernel on a pair of vertices $`(v_i, v_j)`$ for any $`i,j<n`$.
-
-        Args:
-            x (Float[Array, "N 1"]): Index of the $`i`$th vertex.
-            y (Float[Array, "N 1"]): Index of the $`j`$th vertex.
-
-        Returns
-        -------
-            ScalarFloat: The value of $k(v_i, v_j)$.
-        """
-        Kxx = (jax_gather_nd(self.eigenvectors, x) * S.squeeze()) @ jnp.transpose(
-            jax_gather_nd(self.eigenvectors, y)
+        Kxx = (jax_gather_nd(self.eigenvectors.value, x) * S.squeeze()) @ jnp.transpose(
+            jax_gather_nd(self.eigenvectors.value, y)
         )  # shape (n,n)
         return Kxx.squeeze()

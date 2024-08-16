@@ -4,7 +4,7 @@ site_url: https://docs.jaxgaussianprocesses.com/
 repo_url: https://github.com/JaxGaussianProcesses/GPJax
 repo_name: JaxGaussianProcesses/GPJax
 
-edit_uri: ""
+# edit_uri: ""
 
 nav:
   - 🏡 Home: index.md
@@ -13,28 +13,28 @@ nav:
     - 🎨 Design principles: design.md
     - 🤝 Contributing: contributing.md
     - 🔪 Sharp bits: sharp_bits.md
-    - 🌳 GPJax PyTrees: examples/pytrees.md
     - 📎 JAX 101 [External]: https://jax.readthedocs.io/en/latest/jax-101/index.html
   - 💡 Background:
-    - Intro to GPs: examples/intro_to_gps.py
-    - Intro to Kernels: examples/intro_to_kernels.py
+    - Intro to GPs: _examples/intro_to_gps.md
+    - Intro to Kernels: _examples/intro_to_kernels.md
   - 🎓 Tutorials:
-    - Regression: examples/regression.py
-    - Classification: examples/classification.py
-    - Poisson regression: examples/poisson.py
-    - Barycentres: examples/barycentres.py
-    - Deep kernel learning: examples/deep_kernels.py
-    - Graph kernels: examples/graph_kernels.py
-    - Sparse GPs: examples/uncollapsed_vi.py
-    - Stochastic sparse GPs: examples/collapsed_vi.py
-    - Bayesian Optimisation: examples/bayesian_optimisation.py
-    - Decision Making: examples/decision_making.py
-    - Multi-output GPs for Ocean Modelling: examples/oceanmodelling.py
+    - Regression: _examples/regression.md
+    - Classification: _examples/classification.md
+    - Poisson regression: _examples/poisson.md
+    - Barycentres: _examples/barycentres.md
+    - Deep kernel learning: _examples/deep_kernels.md
+    - Graph kernels: _examples/graph_kernels.md
+    - Sparse GPs: _examples/uncollapsed_vi.md
+    - Stochastic sparse GPs: _examples/collapsed_vi.md
+    - Bayesian Optimisation: _examples/bayesian_optimisation.md
+    - Decision Making: _examples/decision_making.md
+    - Multi-output GPs for Ocean Modelling: _examples/oceanmodelling.md
   - 📖 Guides for customisation:
-    - Kernels: examples/constructing_new_kernels.py
-    - Likelihoods: examples/likelihoods_guide.py
-    - UCI regression: examples/yacht.py
-  - 💻 Raw tutorial code: give_me_the_code.md
+    - Kernels: _examples/constructing_new_kernels.md
+    - Likelihoods: _examples/likelihoods_guide.md
+    - Model Guide: _examples/backend.md
+    - UCI regression: _examples/yacht.md
+  # - 💻 Raw tutorial code: give_me_the_code.md
   - Community:
     - 👥 Code of conduct: CODE_OF_CONDUCT.md
     - 📜 Governance: GOVERNANCE.md
@@ -56,80 +56,67 @@ theme:
     - content.code.annotate # Allow individual lines of code to be annotated
   icon:
     repo: fontawesome/brands/github
-  logo: _static/favicon.ico
-  favicon: _static/favicon.ico
+  logo: static/favicon.ico
+  favicon: static/favicon.ico
 
 markdown_extensions:
   - admonition
-  - pymdownx.details # Enhance admonitions with collapse/expand
   - markdown_katex:
       no_inline_svg: True
       insert_fonts_css: True
-  - pymdownx.tabbed:
-      alternate_style: true
   - pymdownx.highlight:
       anchor_linenums: true
-  - pymdownx.superfences
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.inlinehilite
   - pymdownx.snippets:
       check_paths: true
-  - pymdownx.tabbed
+  - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
   - toc:
       permalink: ''
       toc_depth: 4
-  - footnotes
-  # - pymdownx.arithmatex:
-  #     generic: true
-  - attr_list
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 plugins:
   - search
   - gen-files:
       scripts:
-        - docs/scripts/gen_pages.py  # or any other name or path
-        - docs/scripts/notebook_converter.py  # or any other name or path
+        - docs/scripts/gen_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
-  - bibtex:
-      bib_file: "docs/refs.bib"
-      csl_file: "https://raw.githubusercontent.com/citation-style-language/styles/af38aba0e9b08406c8827abfc888e5f3e3fa1d65/journal-of-the-royal-statistical-society.csl"
-      cite_inline: true
-  - mkdocs-jupyter:
-      execute: true
-      allow_errors: false
-      include: ["examples/*.py"]
-      ignore: ["examples/utils.py", "_statch/*.py", "scripts/*.py"]
-    # binder: true
-    # binder_service_name: "gh"
-#     binder_branch: "main"
   - mkdocstrings:
-      watch:
-        - gpjax
-      default_handler: python
       handlers:
         python:
+          paths: ["gpjax"]
           rendering:
-            show_root_heading: true
-            show_root_full_path: true
-            show_if_no_docstring: true
+            show_symbol_type_toc: true
             show_signature_annotations: true
-            show_source: false
-            members_order: source  # order methods according to their order of definition in the source code, not alphabetical order
-            heading_level: 4
           options:
-            inherited_members: true  # Allow looking up inherited methods
+            members_order: source
+            inherited_members: true
+            show_source: false
+            show_root_heading: false
+            show_root_toc_entry: false
+            allow_inspection: false
             docstring_style: "google"
-
-  - git-authors:
-      show_contribution: false
-      show_line_count: true
-      show_email_address: false
-      count_empty_lines: true
-      fallback_to_empty: false
-      sort_authors_by: contribution
-      enabled: true
+            docstring_section_style: "list"
+            merge_init_into_class: true
+            separate_signature: true
+            filters:
+              - "!^_" # filter private members
+              - "!^__"
+              - "^__init__$" # except...
+              - "^__call__$"
+              - "^__*add__$"
+              - "^__*mul__$"
+            docstring_options:
+              ignore_init_summary: true
 
 extra:
   analytics:
@@ -137,13 +124,12 @@ extra:
     property: G-L15440C0N0
 
 extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css
   - stylesheets/extra.css
   - stylesheets/permalinks.css
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css
 
 extra_javascript:
-  # - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
-  # - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js
   - javascripts/katex.js

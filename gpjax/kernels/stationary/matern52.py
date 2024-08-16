@@ -13,58 +13,40 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
-from beartype.typing import Union
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 import tensorflow_probability.substrates.jax.distributions as tfd
 
-from gpjax.base import param_field
-from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import (
     build_student_t_distribution,
     euclidean_distance,
 )
-from gpjax.typing import (
-    Array,
-    ScalarFloat,
-)
+from gpjax.typing import Array
 
 
-@dataclass
-class Matern52(AbstractKernel):
-    r"""The Matérn kernel with smoothness parameter fixed at 2.5."""
+class Matern52(StationaryKernel):
+    r"""The Matérn kernel with smoothness parameter fixed at 2.5.
 
-    lengthscale: Union[ScalarFloat, Float[Array, " D"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
-    )
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+
+    Computes the covariance for pairs of inputs $(x, y)$ with
+    lengthscale parameter $\ell$ and variance $\sigma^2$.
+
+    $$
+    k(x, y) = \sigma^2 \exp \Bigg(1+ \frac{\sqrt{5}\lvert x-y \rvert}{\ell^2} + \frac{5\lvert x - y \rvert^2}{3\ell^2} \Bigg)\exp\Bigg(-\frac{\sqrt{5}\lvert x-y\rvert}{\ell^2} \Bigg)
+    $$
+    """
+
     name: str = "Matérn52"
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
-        r"""Compute the Matérn 5/2 kernel between a pair of arrays.
-
-        Evaluate the kernel on a pair of inputs $`(x, y)`$ with
-        lengthscale parameter $`\ell`$ and variance $`\sigma^2`$.
-        ```math
-        k(x, y) = \sigma^2 \exp \Bigg(1+ \frac{\sqrt{5}\lvert x-y \rvert}{\ell^2} + \frac{5\lvert x - y \rvert^2}{3\ell^2} \Bigg)\exp\Bigg(-\frac{\sqrt{5}\lvert x-y\rvert}{\ell^2} \Bigg)
-        ```
-
-        Args:
-            x (Float[Array, " D"]): The left hand argument of the kernel function's call.
-            y (Float[Array, " D"]): The right hand argument of the kernel function's call.
-
-        Returns
-        -------
-            ScalarFloat: The value of $`k(x, y)`$.
-        """
-        x = self.slice_input(x) / self.lengthscale
-        y = self.slice_input(y) / self.lengthscale
+    def __call__(
+        self, x: Float[Array, " D"], y: Float[Array, " D"]
+    ) -> Float[Array, ""]:
+        x = self.slice_input(x) / self.lengthscale.value
+        y = self.slice_input(y) / self.lengthscale.value
         tau = euclidean_distance(x, y)
         K = (
-            self.variance
+            self.variance.value
             * (1.0 + jnp.sqrt(5.0) * tau + 5.0 / 3.0 * jnp.square(tau))
             * jnp.exp(-jnp.sqrt(5.0) * tau)
         )

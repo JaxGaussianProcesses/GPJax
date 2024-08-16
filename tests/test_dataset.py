@@ -46,7 +46,10 @@ def test_dataset_init(n: int, in_dim: int) -> None:
     assert D.in_dim == in_dim
 
     # Test representation
-    assert D.__repr__() == f"- Number of observations: {n}\n- Input dimension: {in_dim}"
+    assert (
+        D.__repr__()
+        == f"Dataset(Number of observations: {n} - Input dimension: {in_dim})"
+    )
 
     # Ensure dataclass
     assert is_dataclass(D)
@@ -83,7 +86,7 @@ def test_dataset_add(n1: int, n2: int, in_dim: int) -> None:
     # Test representation
     assert (
         D.__repr__()
-        == f"- Number of observations: {n1 + n2}\n- Input dimension: {in_dim}"
+        == f"Dataset(Number of observations: {n1 + n2} - Input dimension: {in_dim})"
     )
 
     # Ensure dataclass

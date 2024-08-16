@@ -14,14 +14,15 @@
 # ==============================================================================
 
 import beartype.typing as tp
-from cola import PSD
-from cola.ops import (
+from cola.annotations import PSD
+from cola.ops.operators import (
     Diagonal,
     LinearOperator,
 )
 from jax import vmap
 from jaxtyping import Float
 
+import gpjax  # noqa: F401
 from gpjax.kernels.computations import AbstractKernelComputation
 from gpjax.typing import Array
 
@@ -34,38 +35,12 @@ class DiagonalKernelComputation(AbstractKernelComputation):
     """
 
     def gram(self, kernel: Kernel, x: Float[Array, "N D"]) -> LinearOperator:
-        r"""Compute the Gram matrix.
-
-        For a kernel with diagonal structure, compute the $`N\times N`$ Gram matrix on
-        an input matrix of shape $`N\times D`$.
-
-        Args:
-            kernel (Kernel): the kernel function.
-            x (Float[Array, "N D"]): The input matrix.
-
-        Returns
-        -------
-            LinearOperator: The computed square Gram matrix.
-        """
         return PSD(Diagonal(diag=vmap(lambda x: kernel(x, x))(x)))
 
-    def cross_covariance(
+    def _cross_covariance(
         self, kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
-        r"""Compute the cross-covariance matrix.
-
-        For a given kernel, compute the $`N\times M`$ covariance matrix on a pair of
-        input matrices of shape $`N\times D`$ and $`M\times D`$.
-
-        Args:
-            kernel (Kernel): the kernel function.
-            x (Float[Array,"N D"]): The input matrix.
-            y (Float[Array,"M D"]): The input matrix.
-
-        Returns
-        -------
-            Float[Array, "N M"]: The computed cross-covariance.
-        """
-        # TODO: This is currently a dense implementation. We should implement a sparse LinearOperator for non-square cross-covariance matrices.
+        # TODO: This is currently a dense implementation.
+        # We should implement a sparse LinearOperator for non-square cross-covariance matrices.
         cross_cov = vmap(lambda x: vmap(lambda y: kernel(x, y))(y))(x)
         return cross_cov

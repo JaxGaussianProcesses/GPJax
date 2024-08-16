@@ -12,40 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
 from dataclasses import dataclass
 import warnings
 
 from beartype.typing import Optional
+import jax
 import jax.numpy as jnp
 from jaxtyping import Num
-from simple_pytree import Pytree
 
 from gpjax.typing import Array
 
 
 @dataclass
-class Dataset(Pytree):
+@jax.tree_util.register_pytree_node_class
+class Dataset:
     r"""Base class for datasets.
 
-    Attributes
-    ----------
-        X (Optional[Num[Array, "N D"]]): input data.
-        y (Optional[Num[Array, "N Q"]]): output data.
+    Args:
+        X: input data.
+        y: output data.
     """
 
     X: Optional[Num[Array, "N D"]] = None
     y: Optional[Num[Array, "N Q"]] = None
 
     def __post_init__(self) -> None:
-        r"""Checks that the shapes of $`X`$ and $`y`$ are compatible,
-        and provides warnings regarding the precision of $`X`$ and $`y`$."""
+        r"""Checks that the shapes of $X$ and $y$ are compatible,
+        and provides warnings regarding the precision of $X$ and $y$."""
         _check_shape(self.X, self.y)
         _check_precision(self.X, self.y)
 
     def __repr__(self) -> str:
         r"""Returns a string representation of the dataset."""
-        repr = f"- Number of observations: {self.n}\n- Input dimension: {self.in_dim}"
+        repr = f"Dataset(Number of observations: {self.n:=} - Input dimension: {self.in_dim})"
         return repr
 
     def is_supervised(self) -> bool:
@@ -76,14 +75,21 @@ class Dataset(Pytree):
 
     @property
     def in_dim(self) -> int:
-        r"""Dimension of the inputs, $`X`$."""
+        r"""Dimension of the inputs, $X$."""
         return self.X.shape[1]
+
+    def tree_flatten(self):
+        return (self.X, self.y), None
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children):
+        return cls(*children)
 
 
 def _check_shape(
     X: Optional[Num[Array, "..."]], y: Optional[Num[Array, "..."]]
 ) -> None:
-    r"""Checks that the shapes of $`X`$ and $`y`$ are compatible."""
+    r"""Checks that the shapes of $X$ and $y$ are compatible."""
     if X is not None and y is not None and X.shape[0] != y.shape[0]:
         raise ValueError(
             "Inputs, X, and outputs, y, must have the same number of rows."
@@ -104,7 +110,7 @@ def _check_shape(
 def _check_precision(
     X: Optional[Num[Array, "..."]], y: Optional[Num[Array, "..."]]
 ) -> None:
-    r"""Checks the precision of $`X`$ and $`y`."""
+    r"""Checks the precision of $X$ and $y`."""
     if X is not None and X.dtype != jnp.float64:
         warnings.warn(
             "X is not of type float64. "

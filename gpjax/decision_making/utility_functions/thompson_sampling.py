@@ -79,8 +79,8 @@ class ThompsonSampling(AbstractSinglePointUtilityFunctionBuilder):
 
         Returns:
             SinglePointUtilityFunction: An appproximate sample from the objective model
-            posterior to to be *maximised* in order to decide which point to query
-            next.
+                posterior to to be *maximised* in order to decide which point to query
+                next.
         """
         self.check_objective_present(posteriors, datasets)
 

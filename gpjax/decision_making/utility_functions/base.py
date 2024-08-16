@@ -35,8 +35,8 @@ from gpjax.typing import (
 SinglePointUtilityFunction = Callable[[Float[Array, "N D"]], Float[Array, "N 1"]]
 """
 Type alias for utility functions which don't support batching, and instead characterise
-the utility of querying a single point, rather than a batch of points. They take an array of points of shape $`[N, D]`$
-and return the value of the utility function at each point in an array of shape $`[N, 1]`$.
+the utility of querying a single point, rather than a batch of points. They take an array of points of shape $[N, D]$
+and return the value of the utility function at each point in an array of shape $[N, 1]$.
 """
 
 
@@ -65,14 +65,12 @@ class AbstractSinglePointUtilityFunctionBuilder(ABC):
         datasets.
 
         Args:
-            posteriors (Mapping[str, AbstractPosterior]): Dictionary of posteriors to be
-            used to form the utility function.
-            datasets (Mapping[str, Dataset]): Dictionary of datasets which may be used
-            to form the utility function.
+            posteriors: dictionary of posteriors to be used to form the utility function.
+            datasets: dictionary of datasets which may be used to form the utility function.
 
         Raises:
             ValueError: If the objective posterior or dataset are not present in the
-            posteriors or datasets.
+                posteriors or datasets.
         """
         if OBJECTIVE not in posteriors.keys():
             raise ValueError("Objective posterior not found in posteriors")
@@ -90,15 +88,13 @@ class AbstractSinglePointUtilityFunctionBuilder(ABC):
         Build a `UtilityFunction` from a set of posteriors and datasets.
 
         Args:
-            posteriors (Mapping[str, AbstractPosterior]): Dictionary of posteriors to be
-            used to form the utility function.
-            datasets (Mapping[str, Dataset]): Dictionary of datasets which may be used
-            to form the utility function.
-            key (KeyArray): JAX PRNG key used for random number generation.
+            posteriors: dictionary of posteriors to be used to form the utility function.
+            datasets: dictionary of datasets which may be used to form the utility function.
+            key: JAX PRNG key used for random number generation.
 
         Returns:
             SinglePointUtilityFunction: Utility function to be *maximised* in order to
-            decide which point to query next.
+                decide which point to query next.
         """
         raise NotImplementedError
 

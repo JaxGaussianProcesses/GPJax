@@ -13,30 +13,24 @@
 # limitations under the License.
 # ==============================================================================
 
+import typing as tp
 
-from beartype.typing import (
-    Any,
-    Callable,
-    Optional,
-    Tuple,
-    TypeVar,
-    Union,
-)
+from flax import nnx
 import jax
-from jax import (
-    jit,
-    value_and_grad,
-)
-from jax._src.random import _check_prng_key
 from jax.flatten_util import ravel_pytree
 import jax.numpy as jnp
 import jax.random as jr
 import optax as ox
-import scipy
+from scipy.optimize import minimize
+from tensorflow_probability.substrates.jax.bijectors import Bijector
 
-from gpjax.base import Module
 from gpjax.dataset import Dataset
-from gpjax.objectives import AbstractObjective
+from gpjax.objectives import Objective
+from gpjax.parameters import (
+    DEFAULT_BIJECTION,
+    Parameter,
+    transform,
+)
 from gpjax.scan import vscan
 from gpjax.typing import (
     Array,
@@ -44,85 +38,83 @@ from gpjax.typing import (
     ScalarFloat,
 )
 
-ModuleModel = TypeVar("ModuleModel", bound=Module)
+Model = tp.TypeVar("Model", bound=nnx.Module)
 
 
 def fit(  # noqa: PLR0913
     *,
-    model: ModuleModel,
-    objective: Union[AbstractObjective, Callable[[ModuleModel, Dataset], ScalarFloat]],
+    model: Model,
+    objective: Objective,
     train_data: Dataset,
     optim: ox.GradientTransformation,
-    key: KeyArray,
-    num_iters: Optional[int] = 100,
-    batch_size: Optional[int] = -1,
-    log_rate: Optional[int] = 10,
-    verbose: Optional[bool] = True,
-    unroll: Optional[int] = 1,
-    safe: Optional[bool] = True,
-) -> Tuple[ModuleModel, Array]:
-    r"""Train a Module model with respect to a supplied Objective function.
+    params_bijection: tp.Union[dict[Parameter, Bijector], None] = DEFAULT_BIJECTION,
+    key: KeyArray = jr.PRNGKey(42),
+    num_iters: int = 100,
+    batch_size: int = -1,
+    log_rate: int = 10,
+    verbose: bool = True,
+    unroll: int = 1,
+    safe: bool = True,
+) -> tuple[Model, jax.Array]:
+    r"""Train a Module model with respect to a supplied objective function.
     Optimisers used here should originate from Optax.
 
     Example:
-    ```python
+    ```pycon
         >>> import jax.numpy as jnp
         >>> import jax.random as jr
         >>> import optax as ox
         >>> import gpjax as gpx
+        >>> from gpjax.parameters import PositiveReal, Static
         >>>
         >>> # (1) Create a dataset:
         >>> X = jnp.linspace(0.0, 10.0, 100)[:, None]
-        >>> y = 2.0 * X + 1.0 + 10 * jr.normal(jr.key(0), X.shape)
+        >>> y = 2.0 * X + 1.0 + 10 * jr.normal(jr.PRNGKey(0), X.shape)
         >>> D = gpx.Dataset(X, y)
-        >>>
         >>> # (2) Define your model:
-        >>> class LinearModel(gpx.base.Module):
-                weight: float = gpx.base.param_field()
-                bias: float = gpx.base.param_field()
-
-                def __call__(self, x):
-                    return self.weight * x + self.bias
-
+        >>> class LinearModel(nnx.Module):
+        >>>     def __init__(self, weight: float, bias: float):
+        >>>         self.weight = PositiveReal(weight)
+        >>>         self.bias = Static(bias)
+        >>>
+        >>>     def __call__(self, x):
+        >>>         return self.weight.value * x + self.bias.value
+        >>>
         >>> model = LinearModel(weight=1.0, bias=1.0)
         >>>
         >>> # (3) Define your loss function:
-        >>> class MeanSquareError(gpx.objectives.AbstractObjective):
-                def evaluate(self, model: LinearModel, train_data: gpx.Dataset) -> float:
-                    return jnp.mean((train_data.y - model(train_data.X)) ** 2)
-        >>>
-        >>> loss = MeanSqaureError()
+        >>> def mse(model, data):
+        >>>     pred = model(data.X)
+        >>>     return jnp.mean((pred - data.y) ** 2)
         >>>
         >>> # (4) Train!
         >>> trained_model, history = gpx.fit(
-                model=model, objective=loss, train_data=D, optim=ox.sgd(0.001), num_iters=1000
-            )
+        >>>     model=model, objective=mse, train_data=D, optim=ox.sgd(0.001), num_iters=1000
+        >>> )
     ```
 
     Args:
-        model (Module): The model Module to be optimised.
+        model (Model): The model Module to be optimised.
         objective (Objective): The objective function that we are optimising with
             respect to.
         train_data (Dataset): The training data to be used for the optimisation.
         optim (GradientTransformation): The Optax optimiser that is to be used for
             learning a parameter set.
-        num_iters (Optional[int]): The number of optimisation steps to run. Defaults
+        num_iters (int): The number of optimisation steps to run. Defaults
             to 100.
-        batch_size (Optional[int]): The size of the mini-batch to use. Defaults to -1
+        batch_size (int): The size of the mini-batch to use. Defaults to -1
             (i.e. full batch).
-        key (Optional[KeyArray]): The random key to use for the optimisation batch
-            selection. Defaults to jr.key(42).
-        log_rate (Optional[int]): How frequently the objective function's value should
+        key (KeyArray): The random key to use for the optimisation batch
+            selection. Defaults to jr.PRNGKey(42).
+        log_rate (int): How frequently the objective function's value should
             be printed. Defaults to 10.
-        verbose (Optional[bool]): Whether to print the training loading bar. Defaults
+        verbose (bool): Whether to print the training loading bar. Defaults
             to True.
         unroll (int): The number of unrolled steps to use for the optimisation.
             Defaults to 1.
 
-    Returns
-    -------
-        Tuple[Module, Array]: A Tuple comprising the optimised model and training
-            history respectively.
+    Returns:
+        A tuple comprising the optimised model and training history.
     """
     if safe:
         # Check inputs.
@@ -131,78 +123,85 @@ def fit(  # noqa: PLR0913
         _check_optim(optim)
         _check_num_iters(num_iters)
         _check_batch_size(batch_size)
-        _check_prng_key("fit", key)
         _check_log_rate(log_rate)
         _check_verbose(verbose)
 
-    # Unconstrained space loss function with stop-gradient rule for non-trainable params.
-    def loss(model: Module, batch: Dataset) -> ScalarFloat:
-        model = model.stop_gradient()
-        return objective(model.constrain(), batch)
+    # Model state filtering
 
-    # Unconstrained space model.
-    model = model.unconstrain()
+    graphdef, params, *static_state = nnx.split(model, Parameter, ...)
+
+    # Parameters bijection to unconstrained space
+    if params_bijection is not None:
+        params = transform(params, params_bijection, inverse=True)
+
+    # Loss definition
+    def loss(params: nnx.State, batch: Dataset) -> ScalarFloat:
+        params = transform(params, params_bijection)
+        model = nnx.merge(graphdef, params, *static_state)
+        return objective(model, batch)
 
     # Initialise optimiser state.
-    state = optim.init(model)
+    opt_state = optim.init(params)
 
     # Mini-batch random keys to scan over.
     iter_keys = jr.split(key, num_iters)
 
     # Optimisation step.
     def step(carry, key):
-        model, opt_state = carry
+        params, opt_state = carry
 
         if batch_size != -1:
             batch = get_batch(train_data, batch_size, key)
         else:
             batch = train_data
 
-        loss_val, loss_gradient = jax.value_and_grad(loss)(model, batch)
-        updates, opt_state = optim.update(loss_gradient, opt_state, model)
-        model = ox.apply_updates(model, updates)
+        loss_val, loss_gradient = jax.value_and_grad(loss)(params, batch)
+        updates, opt_state = optim.update(loss_gradient, opt_state, params)
+        params = ox.apply_updates(params, updates)
 
-        carry = model, opt_state
+        carry = params, opt_state
         return carry, loss_val
 
     # Optimisation scan.
     scan = vscan if verbose else jax.lax.scan
 
     # Optimisation loop.
-    (model, _), history = scan(step, (model, state), (iter_keys), unroll=unroll)
+    (params, _), history = scan(step, (params, opt_state), (iter_keys), unroll=unroll)
 
-    # Constrained space.
-    model = model.constrain()
+    # Parameters bijection to constrained space
+    if params_bijection is not None:
+        params = transform(params, params_bijection)
+
+    # Reconstruct model
+    model = nnx.merge(graphdef, params, *static_state)
 
     return model, history
 
 
 def fit_scipy(  # noqa: PLR0913
     *,
-    model: ModuleModel,
-    objective: Union[AbstractObjective, Callable[[ModuleModel, Dataset], ScalarFloat]],
+    model: Model,
+    objective: Objective,
     train_data: Dataset,
-    max_iters: Optional[int] = 500,
-    verbose: Optional[bool] = True,
-    safe: Optional[bool] = True,
-) -> Tuple[ModuleModel, Array]:
+    max_iters: int = 500,
+    verbose: bool = True,
+    safe: bool = True,
+) -> tuple[Model, Array]:
     r"""Train a Module model with respect to a supplied Objective function.
     Optimisers used here should originate from Optax. todo
 
     Args:
-        model (Module): The model Module to be optimised.
-        objective (Objective): The objective function that we are optimising with
+        model: the model Module to be optimised.
+        objective: The objective function that we are optimising with
             respect to.
         train_data (Dataset): The training data to be used for the optimisation.
-        max_iters (Optional[int]): The maximum number of optimisation steps to run. Defaults
+        max_iters (int): The maximum number of optimisation steps to run. Defaults
             to 500.
-        verbose (Optional[bool]): Whether to print the information about the optimisation. Defaults
+        verbose (bool): Whether to print the information about the optimisation. Defaults
             to True.
 
-    Returns
-    -------
-        Tuple[Module, Array]: A Tuple comprising the optimised model and training
-            history respectively.
+    Returns:
+        A tuple comprising the optimised model and training history.
     """
     if safe:
         # Check inputs.
@@ -211,25 +210,29 @@ def fit_scipy(  # noqa: PLR0913
         _check_num_iters(max_iters)
         _check_verbose(verbose)
 
-    # Unconstrained space model.
-    model = model.unconstrain()
+    # Model state filtering
+    graphdef, params, *static_state = nnx.split(model, Parameter, ...)
 
-    # Unconstrained space loss function with stop-gradient rule for non-trainable params.
-    def loss(model: Module) -> ScalarFloat:
-        model = model.stop_gradient()
-        return objective(model.constrain(), train_data)
+    # Parameters bijection to unconstrained space
+    params = transform(params, DEFAULT_BIJECTION, inverse=True)
+
+    # Loss definition
+    def loss(params) -> ScalarFloat:
+        params = transform(params, DEFAULT_BIJECTION)
+        model = nnx.merge(graphdef, params, *static_state)
+        return objective(model, train_data)
 
     # convert to numpy for interface with scipy
-    x0, scipy_to_jnp = ravel_pytree(model)
+    x0, scipy_to_jnp = ravel_pytree(params)
 
-    @jit
+    @jax.jit
     def scipy_wrapper(x0):
-        value, grads = value_and_grad(loss)(scipy_to_jnp(jnp.array(x0)))
+        value, grads = jax.value_and_grad(loss)(scipy_to_jnp(jnp.array(x0)))
         scipy_grads = ravel_pytree(grads)[0]
         return value, scipy_grads
 
     history = [scipy_wrapper(x0)[0]]
-    result = scipy.optimize.minimize(
+    result = minimize(
         fun=scipy_wrapper,
         x0=x0,
         jac=True,
@@ -238,9 +241,15 @@ def fit_scipy(  # noqa: PLR0913
     )
     history = jnp.array(history)
 
-    # convert back to pytree and reconstrain
-    model = scipy_to_jnp(result.x)
-    model = model.constrain()
+    # convert back to nnx.State with JAX arrays
+    params = scipy_to_jnp(result.x)
+
+    # Parameters bijection to constrained space
+    params = transform(params, DEFAULT_BIJECTION)
+
+    # Reconstruct model
+    model = nnx.merge(graphdef, params, *static_state)
+
     return model, history
 
 
@@ -264,55 +273,76 @@ def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:
     return Dataset(X=x[indices], y=y[indices])
 
 
-def _check_model(model: Any) -> None:
-    """Check that the model is of type Module. Check trainables and bijectors tree structure."""
-    if not isinstance(model, Module):
-        raise TypeError("model must be of type gpjax.Module")
+def _check_model(model: tp.Any) -> None:
+    """Check that the model is a subclass of nnx.Module."""
+    if not isinstance(model, nnx.Module):
+        raise TypeError(
+            "Expected model to be a subclass of nnx.Module. "
+            f"Got {model} of type {type(model)}."
+        )
 
 
-def _check_train_data(train_data: Any) -> None:
-    """Check that the train_data is of type Dataset."""
+def _check_train_data(train_data: tp.Any) -> None:
+    """Check that the train_data is of type gpjax.Dataset."""
     if not isinstance(train_data, Dataset):
-        raise TypeError("train_data must be of type gpjax.Dataset")
+        raise TypeError(
+            "Expected train_data to be of type gpjax.Dataset. "
+            f"Got {train_data} of type {type(train_data)}."
+        )
 
 
-def _check_optim(optim: Any) -> None:
+def _check_optim(optim: tp.Any) -> None:
     """Check that the optimiser is of type GradientTransformation."""
     if not isinstance(optim, ox.GradientTransformation):
-        raise TypeError("optax_optim must be of type optax.GradientTransformation")
+        raise TypeError(
+            "Expected optim to be of type optax.GradientTransformation. "
+            f"Got {optim} of type {type(optim)}."
+        )
 
 
-def _check_num_iters(num_iters: Any) -> None:
+def _check_num_iters(num_iters: tp.Any) -> None:
     """Check that the number of iterations is of type int and positive."""
     if not isinstance(num_iters, int):
-        raise TypeError("num_iters must be of type int")
+        raise TypeError(
+            "Expected num_iters to be of type int. "
+            f"Got {num_iters} of type {type(num_iters)}."
+        )
 
-    if not num_iters > 0:
-        raise ValueError("num_iters must be positive")
+    if num_iters <= 0:
+        raise ValueError(f"Expected num_iters to be positive. Got {num_iters}.")
 
 
-def _check_log_rate(log_rate: Any) -> None:
+def _check_log_rate(log_rate: tp.Any) -> None:
     """Check that the log rate is of type int and positive."""
     if not isinstance(log_rate, int):
-        raise TypeError("log_rate must be of type int")
+        raise TypeError(
+            "Expected log_rate to be of type int. "
+            f"Got {log_rate} of type {type(log_rate)}."
+        )
 
     if not log_rate > 0:
-        raise ValueError("log_rate must be positive")
+        raise ValueError(f"Expected log_rate to be positive. Got {log_rate}.")
 
 
-def _check_verbose(verbose: Any) -> None:
+def _check_verbose(verbose: tp.Any) -> None:
     """Check that the verbose is of type bool."""
     if not isinstance(verbose, bool):
-        raise TypeError("verbose must be of type bool")
+        raise TypeError(
+            "Expected verbose to be of type bool. "
+            f"Got {verbose} of type {type(verbose)}."
+        )
 
 
-def _check_batch_size(batch_size: Any) -> None:
+def _check_batch_size(batch_size: tp.Any) -> None:
     """Check that the batch size is of type int and positive if not minus 1."""
     if not isinstance(batch_size, int):
-        raise TypeError("batch_size must be of type int")
+        raise TypeError(
+            "Expected batch_size to be of type int. "
+            f"Got {batch_size} of type {type(batch_size)}."
+        )
 
     if not batch_size == -1 and not batch_size > 0:
-        raise ValueError("batch_size must be positive")
+        raise ValueError(f"Expected batch_size to be positive or -1. Got {batch_size}.")
 
 
 __all__ = [

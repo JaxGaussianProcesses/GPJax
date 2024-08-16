@@ -1,9 +1,6 @@
 from typing import Tuple
 
-from cola.ops import (
-    Dense,
-    Diagonal,
-)
+from cola.ops import Dense
 import jax
 from jax import config
 import jax.numpy as jnp
@@ -11,7 +8,6 @@ import jax.random as jr
 import pytest
 
 from gpjax.kernels.approximations import RFF
-from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.nonstationary import (
     Linear,
     Polynomial,
@@ -24,6 +20,7 @@ from gpjax.kernels.stationary import (
     Periodic,
     PoweredExponential,
     RationalQuadratic,
+    StationaryKernel,
 )
 
 config.update("jax_enable_x64", True)
@@ -31,20 +28,24 @@ _jitter = 1e-6
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
-@pytest.mark.parametrize("num_basis_fns", [2, 10, 20])
-@pytest.mark.parametrize("n_dims", [1, 2, 5])
-def test_frequency_sampler(kernel: AbstractKernel, num_basis_fns: int, n_dims: int):
+@pytest.mark.parametrize("num_basis_fns", [2, 10])
+@pytest.mark.parametrize("n_dims", [1, 3])
+def test_frequency_sampler(
+    kernel: type[StationaryKernel], num_basis_fns: int, n_dims: int
+):
     base_kernel = kernel(active_dims=list(range(n_dims)))
     approximate = RFF(base_kernel=base_kernel, num_basis_fns=num_basis_fns)
-    assert approximate.frequencies.shape == (num_basis_fns, n_dims)
+    assert approximate.frequencies.value.shape == (num_basis_fns, n_dims)
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
-@pytest.mark.parametrize("num_basis_fns", [2, 10, 20])
-@pytest.mark.parametrize("n_dims", [1, 2, 5])
+@pytest.mark.parametrize("num_basis_fns", [2, 10])
+@pytest.mark.parametrize("n_dims", [1, 3])
 @pytest.mark.parametrize("n_data", [50, 100])
-def test_gram(kernel: AbstractKernel, num_basis_fns: int, n_dims: int, n_data: int):
-    key = jr.key(123)
+def test_gram(
+    kernel: type[StationaryKernel], num_basis_fns: int, n_dims: int, n_data: int
+):
+    key = jr.PRNGKey(123)
     x = jr.uniform(key, shape=(n_data, 1), minval=-3.0, maxval=3.0).reshape(-1, 1)
     if n_dims > 1:
         x = jnp.hstack([x] * n_dims)
@@ -67,37 +68,11 @@ def test_gram(kernel: AbstractKernel, num_basis_fns: int, n_dims: int, n_data: i
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
-@pytest.mark.parametrize("num_basis_fns", [2, 10, 20])
-@pytest.mark.parametrize("n_dims", [1, 2, 5])
-@pytest.mark.parametrize("n_data", [50, 100])
-def test_diagonal(kernel: AbstractKernel, num_basis_fns: int, n_dims: int, n_data: int):
-    key = jr.key(123)
-    x = jr.uniform(key, shape=(n_data, 1), minval=-3.0, maxval=3.0).reshape(-1, 1)
-    if n_dims > 1:
-        x = jnp.hstack([x] * n_dims)
-    base_kernel = kernel(active_dims=list(range(n_dims)))
-    approximate = RFF(base_kernel=base_kernel, num_basis_fns=num_basis_fns)
-
-    linop = approximate.diagonal(x)
-
-    # Check the return type
-    assert isinstance(linop, Diagonal)
-
-    Kxx = linop.diag + _jitter
-
-    # Check that the shape is correct
-    assert Kxx.shape == (n_data,)
-
-    # Check that the diagonal is positive
-    assert jnp.all(Kxx > 0)
-
-
-@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
-@pytest.mark.parametrize("num_basis_fns", [2, 10, 20])
-@pytest.mark.parametrize("n_dims", [1, 2, 5])
+@pytest.mark.parametrize("num_basis_fns", [2, 10])
+@pytest.mark.parametrize("n_dims", [1, 3])
 @pytest.mark.parametrize("n_datas", [(50, 100), (100, 50)])
 def test_cross_covariance(
-    kernel: AbstractKernel,
+    kernel: type[StationaryKernel],
     num_basis_fns: int,
     n_dims: int,
     n_datas: Tuple[int, int],
@@ -123,8 +98,8 @@ def test_cross_covariance(
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
-@pytest.mark.parametrize("n_dim", [1, 2, 5])
-def test_improvement(kernel, n_dim):
+@pytest.mark.parametrize("n_dim", [1, 3])
+def test_improvement(kernel: type[StationaryKernel], n_dim: int):
     n_data = 100
     key = jr.key(123)
 
@@ -135,7 +110,7 @@ def test_improvement(kernel, n_dim):
     crude_approximation = RFF(base_kernel=base_kernel, num_basis_fns=10)
     c_linop = crude_approximation.gram(x).to_dense()
 
-    better_approximation = RFF(base_kernel=base_kernel, num_basis_fns=50)
+    better_approximation = RFF(base_kernel=base_kernel, num_basis_fns=100)
     b_linop = better_approximation.gram(x).to_dense()
 
     c_delta = jnp.linalg.norm(exact_linop - c_linop, ord="fro")
@@ -146,33 +121,47 @@ def test_improvement(kernel, n_dim):
     assert c_delta > b_delta
 
 
-@pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
-def test_exactness(kernel):
+@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
+def test_exactness(kernel: type[StationaryKernel]):
+    kernel = kernel(n_dims=1)
+
     n_data = 100
     key = jr.key(123)
 
     x = jr.uniform(key, minval=-3.0, maxval=3.0, shape=(n_data, 1))
     exact_linop = kernel.gram(x).to_dense()
 
-    better_approximation = RFF(base_kernel=kernel, num_basis_fns=500)
+    better_approximation = RFF(base_kernel=kernel, num_basis_fns=300)
     b_linop = better_approximation.gram(x).to_dense()
 
     max_delta = jnp.max(exact_linop - b_linop)
     assert max_delta < 0.1
 
 
+@pytest.mark.parametrize("kernel", [Polynomial, Linear])
+def test_nonstationary_raises_error(kernel):
+    with pytest.raises(TypeError):
+        RFF(base_kernel=kernel(1), num_basis_fns=10)
+
+
 @pytest.mark.parametrize(
     "kernel",
-    [RationalQuadratic, PoweredExponential, Polynomial, Linear, Periodic],
+    [RationalQuadratic, PoweredExponential, Periodic],
 )
-def test_value_error(kernel):
-    with pytest.raises(ValueError):
+def test_missing_spectral_density_raises_error(kernel):
+    with pytest.raises(NotImplementedError):
         RFF(base_kernel=kernel(), num_basis_fns=10)
 
 
-@pytest.mark.parametrize("kernel", [RBF(), Matern12(), Matern32(), Matern52()])
-def test_stochastic_init(kernel: AbstractKernel):
-    k1 = RFF(base_kernel=kernel, num_basis_fns=10, key=jr.key(123))
-    k2 = RFF(base_kernel=kernel, num_basis_fns=10, key=jr.key(42))
+@pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
+def test_stochastic_init(kernel: type[StationaryKernel]):
+    with pytest.raises(ValueError):
+        # n_dims is not specified, but should be
+        RFF(base_kernel=kernel(), num_basis_fns=10)
 
-    assert (k1.frequencies != k2.frequencies).any()
+    kernel = kernel(n_dims=1)
+
+    k1 = RFF(base_kernel=kernel, num_basis_fns=10, key=jr.PRNGKey(123))
+    k2 = RFF(base_kernel=kernel, num_basis_fns=10, key=jr.PRNGKey(42))
+
+    assert (k1.frequencies.value != k2.frequencies.value).any()

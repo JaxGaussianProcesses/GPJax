@@ -13,26 +13,27 @@
 # limitations under the License.
 # ==============================================================================
 
-from dataclasses import dataclass
-
-from beartype.typing import Union
+import beartype.typing as tp
+from flax import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.bijectors as tfb
 
-from gpjax.base import (
-    param_field,
-    static_field,
-)
 from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
+from gpjax.parameters import PositiveReal
 from gpjax.typing import (
     Array,
+    ScalarArray,
     ScalarFloat,
-    ScalarInt,
 )
 
+WeightVariance = tp.Union[Float[Array, "D"], ScalarArray]
+WeightVarianceCompatible = tp.Union[ScalarFloat, list[float], WeightVariance]
 
-@dataclass
+
 class ArcCosine(AbstractKernel):
     r"""The ArCosine kernel.
 
@@ -42,33 +43,72 @@ class ArcCosine(AbstractKernel):
     additional details.
     """
 
-    order: ScalarInt = static_field(0)
-    variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
-    weight_variance: Union[ScalarFloat, Float[Array, " D"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
-    )
-    bias_variance: ScalarFloat = param_field(jnp.array(1.0), bijector=tfb.Softplus())
+    variance: nnx.Variable[ScalarArray]
+    weight_variance: nnx.Variable[WeightVariance]
+    bias_variance: nnx.Variable[ScalarArray]
+    name = "ArcCosine"
 
-    def __post_init__(self):
-        if self.order not in [0, 1, 2]:
+    def __init__(
+        self,
+        active_dims: tp.Union[list[int], slice, None] = None,
+        order: tp.Literal[0, 1, 2] = 0,
+        variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        weight_variance: tp.Union[
+            WeightVarianceCompatible, nnx.Variable[WeightVariance]
+        ] = 1.0,
+        bias_variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
+        n_dims: tp.Union[int, None] = None,
+        compute_engine: AbstractKernelComputation = DenseKernelComputation(),
+    ):
+        """Initializes the kernel.
+
+        Args:
+            active_dims: The indices of the input dimensions that the kernel operates on.
+            order: The order of the kernel. Must be 0, 1 or 2.
+            variance: The variance of the kernel σ.
+            weight_variance: The weight variance of the kernel.
+            bias_variance: The bias variance of the kernel.
+            n_dims: The number of input dimensions. If `lengthscale` is an array, this
+                argument is ignored.
+            compute_engine: The computation engine that the kernel uses to compute the
+                covariance matrix.
+        """
+
+        if order not in [0, 1, 2]:
             raise ValueError("ArcCosine kernel only implemented for orders 0, 1 and 2.")
+
+        self.order = order
+
+        if isinstance(weight_variance, nnx.Variable):
+            self.weight_variance = weight_variance
+        else:
+            self.weight_variance = PositiveReal(weight_variance)
+            if tp.TYPE_CHECKING:
+                self.weight_variance = tp.cast(
+                    PositiveReal[WeightVariance], self.weight_variance
+                )
+
+        if isinstance(variance, nnx.Variable):
+            self.variance = variance
+        else:
+            self.variance = PositiveReal(variance)
+            if tp.TYPE_CHECKING:
+                self.variance = tp.cast(PositiveReal[ScalarArray], self.variance)
+
+        if isinstance(bias_variance, nnx.Variable):
+            self.bias_variance = bias_variance
+        else:
+            self.bias_variance = PositiveReal(bias_variance)
+            if tp.TYPE_CHECKING:
+                self.bias_variance = tp.cast(
+                    PositiveReal[ScalarArray], self.bias_variance
+                )
 
         self.name = f"ArcCosine (order {self.order})"
 
-    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
-        r"""Evaluate the kernel on a pair of inputs $`(x, y)`$
+        super().__init__(active_dims, n_dims, compute_engine)
 
-        Args:
-            x (Float[Array, "D"]): The left hand argument of the kernel function's
-                call.
-            y (Float[Array, "D"]): The right hand argument of the kernel function's
-                call
-
-        Returns
-        -------
-            ScalarFloat: The value of $`k(x, y)`$.
-        """
-
+    def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarArray:
         x = self.slice_input(x)
         y = self.slice_input(y)
 
@@ -83,7 +123,7 @@ class ArcCosine(AbstractKernel):
         K = self._J(theta)
         K *= jnp.sqrt(x_x) ** self.order
         K *= jnp.sqrt(y_y) ** self.order
-        K *= self.variance / jnp.pi
+        K *= self.variance.value / jnp.pi
 
         return K.squeeze()
 
@@ -95,11 +135,10 @@ class ArcCosine(AbstractKernel):
         Args:
             x (Float[Array, "D"]): The left hand argument.
             y (Float[Array, "D"]): The right hand argument.
-        Returns
-        -------
+        Returns:
             ScalarFloat: The value of the weighted product between the two arguments``.
         """
-        return jnp.inner(self.weight_variance * x, y) + self.bias_variance
+        return jnp.inner(self.weight_variance.value * x, y) + self.bias_variance.value
 
     def _J(self, theta: ScalarFloat) -> ScalarFloat:
         r"""Evaluate the angular dependency function corresponding to the desired order.
@@ -107,8 +146,7 @@ class ArcCosine(AbstractKernel):
         Args:
             theta (Float[Array, "1"]): The weighted angle between inputs.
 
-        Returns
-        -------
+        Returns:
             Float[Array, "1"]: The value of the angular dependency function`.
         """
 

@@ -14,14 +14,12 @@
 # ==============================================================================
 
 import abc
-from dataclasses import dataclass
 import typing as tp
 
-from cola import PSD
-from cola.ops import (
+from cola.annotations import PSD
+from cola.ops.operators import (
     Dense,
     Diagonal,
-    LinearOperator,
 )
 from jax import vmap
 from jaxtyping import (
@@ -29,61 +27,84 @@ from jaxtyping import (
     Num,
 )
 
+import gpjax
 from gpjax.typing import Array
 
-Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
+K = tp.TypeVar("K", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
 
 
-@dataclass
 class AbstractKernelComputation:
-    r"""Abstract class for kernel computations."""
+    r"""Abstract class for kernel computations.
+
+    This class defines the interface for computing the covariance matrix of a kernel
+    function. It is used to compute the Gram matrix, cross-covariance, and diagonal
+    variance of a kernel function. Each computation engine implements the computation
+    of these quantities in a different way. Subclasses implement computations as private
+    methods. If a non-standard interface is required, the subclass should override the
+    public methods of this class.
+
+    """
+
+    def _gram(
+        self,
+        kernel: K,
+        x: Num[Array, "N D"],
+    ) -> Float[Array, "N N"]:
+        Kxx = self.cross_covariance(kernel, x, x)
+        return Kxx
 
     def gram(
         self,
-        kernel: Kernel,
+        kernel: K,
         x: Num[Array, "N D"],
-    ) -> LinearOperator:
-        r"""Compute Gram covariance operator of the kernel function.
+    ) -> Dense:
+        r"""For a given kernel, compute Gram covariance operator of the kernel function
+        on an input matrix of shape `(N, D)`.
 
         Args:
-            kernel (AbstractKernel): the kernel function.
-            x (Num[Array, "N N"]): The inputs to the kernel function.
+            kernel: the kernel function.
+            x: the inputs to the kernel function of shape `(N, D)`.
 
-        Returns
-        -------
-            LinearOperator: Gram covariance operator of the kernel function.
+        Returns:
+            The Gram covariance of the kernel function as a linear operator.
         """
         Kxx = self.cross_covariance(kernel, x, x)
         return PSD(Dense(Kxx))
 
     @abc.abstractmethod
-    def cross_covariance(
-        self, kernel: Kernel, x: Num[Array, "N D"], y: Num[Array, "M D"]
+    def _cross_covariance(
+        self, kernel: K, x: Num[Array, "N D"], y: Num[Array, "M D"]
     ) -> Float[Array, "N M"]:
-        r"""For a given kernel, compute the NxM gram matrix on an a pair
-        of input matrices with shape NxD and MxD.
+        ...
+
+    def cross_covariance(
+        self, kernel: K, x: Num[Array, "N D"], y: Num[Array, "M D"]
+    ) -> Float[Array, "N M"]:
+        r"""For a given kernel, compute the cross-covariance matrix on an a pair
+        of input matrices with shape `(N, D)` and `(M, D)`.
 
         Args:
-            kernel (AbstractKernel): the kernel function.
-            x (Num[Array,"N D"]): The first input matrix.
-            y (Num[Array,"M D"]): The second input matrix.
+            kernel: the kernel function.
+            x: the first input matrix of shape `(N, D)`.
+            y: the second input matrix of shape `(M, D)`.
 
-        Returns
-        -------
-            Float[Array, "N M"]: The computed cross-covariance.
+        Returns:
+            The computed cross-covariance of shape `(N, M)`.
         """
-        raise NotImplementedError
+        return self._cross_covariance(kernel, x, y)
 
-    def diagonal(self, kernel: Kernel, inputs: Num[Array, "N D"]) -> Diagonal:
-        r"""For a given kernel, compute the elementwise diagonal of the
-        NxN gram matrix on an input matrix of shape NxD.
-
-        Args:
-            kernel (AbstractKernel): the kernel function.
-            inputs (Float[Array, "N D"]): The input matrix.
-
-        Returns
-        -------
-            Diagonal: The computed diagonal variance entries.
-        """
+    def _diagonal(self, kernel: K, inputs: Num[Array, "N D"]) -> Diagonal:
         return PSD(Diagonal(diag=vmap(lambda x: kernel(x, x))(inputs)))
+
+    def diagonal(self, kernel: K, inputs: Num[Array, "N D"]) -> Diagonal:
+        r"""For a given kernel, compute the elementwise diagonal of the
+        NxN gram matrix on an input matrix of shape `(N, D)`.
+
+        Args:
+            kernel: the kernel function.
+            inputs: the input matrix of shape `(N, D)`.
+
+        Returns:
+            The computed diagonal variance as a `Diagonal` linear operator.
+        """
+        return self._diagonal(kernel, inputs)

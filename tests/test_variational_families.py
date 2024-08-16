@@ -21,7 +21,6 @@ from typing import (
 from jax import config
 import jax.numpy as jnp
 import jax.random as jr
-import jax.tree_util as jtu
 from jaxtyping import (
     Array,
     Float,
@@ -129,70 +128,32 @@ def test_variational_gaussians(
     assert isinstance(q, AbstractVariationalFamily)
 
     if isinstance(q, VariationalGaussian):
-        assert q.variational_mean.shape == vector_shape(n_inducing)
-        assert q.variational_root_covariance.shape == matrix_shape(n_inducing)
-        assert (q.variational_mean == vector_val(0.0)(n_inducing)).all()
-        assert (q.variational_root_covariance == diag_matrix_val(1.0)(n_inducing)).all()
-
-        # Test pytree structure (nodes are alphabetically flattened, hence the ordering)
-        true_leaves = (
-            [inducing_inputs, *jtu.tree_leaves(posterior)]
-            + [vector_val(0.0)(n_inducing)]
-            + [diag_matrix_val(1.0)(n_inducing)]
-        )
-
-        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves, strict=True):
-            assert (l1 == l2).all()
+        assert q.variational_mean.value.shape == vector_shape(n_inducing)
+        assert q.variational_root_covariance.value.shape == matrix_shape(n_inducing)
+        assert (q.variational_mean.value == vector_val(0.0)(n_inducing)).all()
+        assert (
+            q.variational_root_covariance.value == diag_matrix_val(1.0)(n_inducing)
+        ).all()
 
     elif isinstance(q, WhitenedVariationalGaussian):
-        assert q.variational_mean.shape == vector_shape(n_inducing)
-        assert q.variational_root_covariance.shape == matrix_shape(n_inducing)
-        assert (q.variational_mean == vector_val(0.0)(n_inducing)).all()
-        assert (q.variational_root_covariance == diag_matrix_val(1.0)(n_inducing)).all()
-
-        # Test pytree structure (nodes are alphabetically flattened, hence the ordering)
-        true_leaves = (
-            [inducing_inputs, *jtu.tree_leaves(posterior)]
-            + [vector_val(0.0)(n_inducing)]
-            + [diag_matrix_val(1.0)(n_inducing)]
-        )
-
-        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves, strict=True):
-            assert (l1 == l2).all()
+        assert q.variational_mean.value.shape == vector_shape(n_inducing)
+        assert q.variational_root_covariance.value.shape == matrix_shape(n_inducing)
+        assert (q.variational_mean.value == vector_val(0.0)(n_inducing)).all()
+        assert (
+            q.variational_root_covariance.value == diag_matrix_val(1.0)(n_inducing)
+        ).all()
 
     elif isinstance(q, NaturalVariationalGaussian):
-        assert q.natural_vector.shape == vector_shape(n_inducing)
-        assert q.natural_matrix.shape == matrix_shape(n_inducing)
-        assert (q.natural_vector == vector_val(0.0)(n_inducing)).all()
-        assert (q.natural_matrix == diag_matrix_val(-0.5)(n_inducing)).all()
-
-        # Test pytree structure (nodes are alphabetically flattened, hence the ordering)
-        true_leaves = (
-            [inducing_inputs]
-            + [diag_matrix_val(-0.5)(n_inducing)]
-            + [vector_val(0.0)(n_inducing)]
-            + jtu.tree_leaves(posterior)
-        )
-
-        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves, strict=True):
-            assert (l1 == l2).all()
+        assert q.natural_vector.value.shape == vector_shape(n_inducing)
+        assert q.natural_matrix.value.shape == matrix_shape(n_inducing)
+        assert (q.natural_vector.value == vector_val(0.0)(n_inducing)).all()
+        assert (q.natural_matrix.value == diag_matrix_val(-0.5)(n_inducing)).all()
 
     elif isinstance(q, ExpectationVariationalGaussian):
-        assert q.expectation_vector.shape == vector_shape(n_inducing)
-        assert q.expectation_matrix.shape == matrix_shape(n_inducing)
-        assert (q.expectation_vector == vector_val(0.0)(n_inducing)).all()
-        assert (q.expectation_matrix == diag_matrix_val(1.0)(n_inducing)).all()
-
-        # Test pytree structure (nodes are alphabetically flattened, hence the ordering)
-        true_leaves = (
-            [diag_matrix_val(1.0)(n_inducing)]
-            + [vector_val(0.0)(n_inducing)]
-            + [inducing_inputs]
-            + jtu.tree_leaves(posterior)
-        )
-
-        for l1, l2 in zip(jtu.tree_leaves(q), true_leaves, strict=True):
-            assert (l1 == l2).all()
+        assert q.expectation_vector.value.shape == vector_shape(n_inducing)
+        assert q.expectation_matrix.value.shape == matrix_shape(n_inducing)
+        assert (q.expectation_vector.value == vector_val(0.0)(n_inducing)).all()
+        assert (q.expectation_matrix.value == diag_matrix_val(1.0)(n_inducing)).all()
 
     # Test KL
     kl = q.prior_kl()
@@ -250,8 +211,8 @@ def test_collapsed_variational_gaussian(
 
     # Test init
     assert variational_family.num_inducing == n_inducing
-    assert (variational_family.inducing_inputs == inducing_inputs).all()
-    assert variational_family.posterior.likelihood.obs_stddev == 1.0
+    assert (variational_family.inducing_inputs.value == inducing_inputs).all()
+    assert variational_family.posterior.likelihood.obs_stddev.value == 1.0
 
     # Test predictions
     predictive_dist = variational_family(test_inputs, D)
@@ -264,10 +225,3 @@ def test_collapsed_variational_gaussian(
     assert isinstance(sigma, jnp.ndarray)
     assert mu.shape == (n_test,)
     assert sigma.shape == (n_test, n_test)
-
-    # Test pytree structure (nodes are alphabetically flattened, hence the ordering)
-    true_leaves = [inducing_inputs, *jtu.tree_leaves(posterior)]
-
-    for l1, l2 in zip(jtu.tree_leaves(variational_family), true_leaves, strict=True):
-        assert l1.shape == l2.shape
-        assert (l1 == l2).all()

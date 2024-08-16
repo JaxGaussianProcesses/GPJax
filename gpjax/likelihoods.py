@@ -12,28 +12,25 @@
 # ==============================================================================
 
 import abc
-from dataclasses import dataclass
 
-from beartype.typing import (
-    Any,
-    Union,
-)
+import beartype.typing as tp
+from flax import nnx
 from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
 
-from gpjax.base import (
-    Module,
-    param_field,
-    static_field,
-)
 from gpjax.distributions import GaussianDistribution
 from gpjax.integrators import (
     AbstractIntegrator,
     AnalyticalGaussianIntegrator,
     GHQuadratureIntegrator,
+)
+from gpjax.parameters import (
+    Parameter,
+    PositiveReal,
+    Static,
 )
 from gpjax.typing import (
     Array,
@@ -44,14 +41,29 @@ tfb = tfp.bijectors
 tfd = tfp.distributions
 
 
-@dataclass
-class AbstractLikelihood(Module):
-    r"""Abstract base class for likelihoods."""
+class AbstractLikelihood(nnx.Module):
+    r"""Abstract base class for likelihoods.
 
-    num_datapoints: int = static_field()
-    integrator: AbstractIntegrator = static_field(GHQuadratureIntegrator())
+    All likelihoods must inherit from this class and implement the `predict` and
+    `link_function` methods.
+    """
 
-    def __call__(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
+    def __init__(
+        self,
+        num_datapoints: int,
+        integrator: AbstractIntegrator = GHQuadratureIntegrator(),
+    ):
+        """Initializes the likelihood.
+
+        Args:
+            num_datapoints (int): the number of data points.
+            integrator (AbstractIntegrator): The integrator to be used for computing expected log
+                likelihoods. Must be an instance of `AbstractIntegrator`.
+        """
+        self.num_datapoints = num_datapoints
+        self.integrator = integrator
+
+    def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> tfd.Distribution:
         r"""Evaluate the likelihood function at a given predictive distribution.
 
         Args:
@@ -59,14 +71,13 @@ class AbstractLikelihood(Module):
             **kwargs (Any): Keyword arguments to be passed to the likelihood's
                 `predict` method.
 
-        Returns
-        -------
-            tfd.Distribution: The predictive distribution.
+        Returns:
+            The predictive distribution.
         """
         return self.predict(*args, **kwargs)
 
     @abc.abstractmethod
-    def predict(self, *args: Any, **kwargs: Any) -> tfd.Distribution:
+    def predict(self, *args: tp.Any, **kwargs: tp.Any) -> tfd.Distribution:
         r"""Evaluate the likelihood function at a given predictive distribution.
 
         Args:
@@ -74,8 +85,7 @@ class AbstractLikelihood(Module):
             **kwargs (Any): Keyword arguments to be passed to the likelihood's
                 `predict` method.
 
-        Returns
-        -------
+        Returns:
             tfd.Distribution: The predictive distribution.
         """
         raise NotImplementedError
@@ -84,8 +94,10 @@ class AbstractLikelihood(Module):
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         r"""Return the link function of the likelihood function.
 
-        Returns
-        -------
+        Args:
+            f (Float[Array, "..."]): the latent Gaussian process values.
+
+        Returns:
             tfd.Distribution: The distribution of observations, y, given values of the
                 Gaussian process, f.
         """
@@ -99,8 +111,8 @@ class AbstractLikelihood(Module):
     ) -> Float[Array, " N"]:
         r"""Compute the expected log likelihood.
 
-        For a variational distribution $`q(f)\sim\mathcal{N}(m, s)`$ and a likelihood
-        $`p(y|f)`$, compute the expected log likelihood:
+        For a variational distribution $q(f)\sim\mathcal{N}(m, s)$ and a likelihood
+        $p(y|f)$, compute the expected log likelihood:
         ```math
         \mathbb{E}_{q(f)}\left[\log p(y|f)\right]
         ```
@@ -119,20 +131,33 @@ class AbstractLikelihood(Module):
         )
 
 
-@dataclass
 class Gaussian(AbstractLikelihood):
-    r"""Gaussian likelihood object.
+    r"""Gaussian likelihood object."""
 
-    Args:
-        obs_stddev (Union[ScalarFloat, Float[Array, "#N"]]): the standard deviation
-            of the Gaussian observation noise.
+    def __init__(
+        self,
+        num_datapoints: int,
+        obs_stddev: tp.Union[
+            ScalarFloat, Float[Array, "#N"], PositiveReal, Static
+        ] = 1.0,
+        integrator: AbstractIntegrator = AnalyticalGaussianIntegrator(),
+    ):
+        r"""Initializes the Gaussian likelihood.
 
-    """
+        Args:
+            num_datapoints (int): the number of data points.
+            obs_stddev (Union[ScalarFloat, Float[Array, "#N"]]): the standard deviation
+                of the Gaussian observation noise.
+            integrator (AbstractIntegrator): The integrator to be used for computing expected log
+                likelihoods. Must be an instance of `AbstractIntegrator`. For the Gaussian likelihood, this defaults to
+                the `AnalyticalGaussianIntegrator`, as the expected log likelihood can be computed analytically.
+        """
+        if isinstance(obs_stddev, Parameter):
+            self.obs_stddev = obs_stddev
+        else:
+            self.obs_stddev = PositiveReal(jnp.asarray(obs_stddev))
 
-    obs_stddev: Union[ScalarFloat, Float[Array, "#N"]] = param_field(
-        jnp.array(1.0), bijector=tfb.Softplus()
-    )
-    integrator: AbstractIntegrator = static_field(AnalyticalGaussianIntegrator())
+        super().__init__(num_datapoints, integrator)
 
     def link_function(self, f: Float[Array, "..."]) -> tfd.Normal:
         r"""The link function of the Gaussian likelihood.
@@ -140,14 +165,13 @@ class Gaussian(AbstractLikelihood):
         Args:
             f (Float[Array, "..."]): Function values.
 
-        Returns
-        -------
+        Returns:
             tfd.Normal: The likelihood function.
         """
-        return tfd.Normal(loc=f, scale=self.obs_stddev.astype(f.dtype))
+        return tfd.Normal(loc=f, scale=self.obs_stddev.value.astype(f.dtype))
 
     def predict(
-        self, dist: Union[tfd.MultivariateNormalTriL, GaussianDistribution]
+        self, dist: tp.Union[tfd.MultivariateNormalTriL, GaussianDistribution]
     ) -> tfd.MultivariateNormalFullCovariance:
         r"""Evaluate the Gaussian likelihood.
 
@@ -160,18 +184,16 @@ class Gaussian(AbstractLikelihood):
             dist (tfd.Distribution): The Gaussian process posterior,
                 evaluated at a finite set of test points.
 
-        Returns
-        -------
+        Returns:
             tfd.Distribution: The predictive distribution.
         """
         n_data = dist.event_shape[0]
         cov = dist.covariance()
-        noisy_cov = cov.at[jnp.diag_indices(n_data)].add(self.obs_stddev**2)
+        noisy_cov = cov.at[jnp.diag_indices(n_data)].add(self.obs_stddev.value**2)
 
         return tfd.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
 
 
-@dataclass
 class Bernoulli(AbstractLikelihood):
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         r"""The probit link function of the Bernoulli likelihood.
@@ -179,8 +201,7 @@ class Bernoulli(AbstractLikelihood):
         Args:
             f (Float[Array, "..."]): Function values.
 
-        Returns
-        -------
+        Returns:
             tfd.Distribution: The likelihood function.
         """
         return tfd.Bernoulli(probs=inv_probit(f))
@@ -195,8 +216,7 @@ class Bernoulli(AbstractLikelihood):
             dist (tfd.Distribution): The Gaussian process posterior, evaluated
                 at a finite set of test points.
 
-        Returns
-        -------
+        Returns:
             tfd.Distribution: The pointwise predictive distribution.
         """
         variance = jnp.diag(dist.covariance())
@@ -204,7 +224,6 @@ class Bernoulli(AbstractLikelihood):
         return self.link_function(mean / jnp.sqrt(1.0 + variance))
 
 
-@dataclass
 class Poisson(AbstractLikelihood):
     def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
         r"""The link function of the Poisson likelihood.
@@ -247,7 +266,7 @@ def inv_probit(x: Float[Array, " *N"]) -> Float[Array, " *N"]:
     return 0.5 * (1.0 + jsp.special.erf(x / jnp.sqrt(2.0))) * (1 - 2 * jitter) + jitter
 
 
-NonGaussian = Union[Poisson, Bernoulli]
+NonGaussian = tp.Union[Poisson, Bernoulli]
 
 __all__ = [
     "AbstractLikelihood",

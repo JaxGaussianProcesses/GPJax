@@ -13,48 +13,57 @@
 # limitations under the License.
 # ==============================================================================
 
-import cola
+from cola.annotations import PSD
+from cola.fns import dispatch
+from cola.ops.operator_base import LinearOperator
+from cola.ops.operators import (
+    BlockDiag,
+    Diagonal,
+    Identity,
+    Kronecker,
+    Triangular,
+)
 import jax.numpy as jnp
 
 # TODO: Once this functionality is supported in CoLA, remove this.
 
 
-@cola.dispatch
-def lower_cholesky(A: cola.ops.LinearOperator):  # noqa: F811
+@dispatch
+def lower_cholesky(A: LinearOperator) -> Triangular:  # noqa: F811
     """Returns the lower Cholesky factor of a linear operator.
 
     Args:
-        A (cola.ops.LinearOperator): A linear operator.
+        A: The input linear operator.
 
     Returns:
-        cola.ops.LinearOperator: The lower Cholesky factor of A.
+        Triangular: The lower Cholesky factor of A.
     """
 
-    if cola.PSD not in A.annotations:
+    if PSD not in A.annotations:
         raise ValueError(
             "Expected LinearOperator to be PSD, did you forget to use cola.PSD?"
         )
 
-    return cola.ops.Triangular(jnp.linalg.cholesky(A.to_dense()), lower=True)
+    return Triangular(jnp.linalg.cholesky(A.to_dense()), lower=True)
 
 
 @lower_cholesky.dispatch
-def _(A: cola.ops.Diagonal):  # noqa: F811
-    return cola.ops.Diagonal(jnp.sqrt(A.diag))
+def _(A: Diagonal):  # noqa: F811
+    return Diagonal(jnp.sqrt(A.diag))
 
 
 @lower_cholesky.dispatch
-def _(A: cola.ops.Identity):  # noqa: F811
+def _(A: Identity):  # noqa: F811
     return A
 
 
 @lower_cholesky.dispatch
-def _(A: cola.ops.Kronecker):  # noqa: F811
-    return cola.ops.Kronecker(*[lower_cholesky(Ai) for Ai in A.Ms])
+def _(A: Kronecker):  # noqa: F811
+    return Kronecker(*[lower_cholesky(Ai) for Ai in A.Ms])
 
 
 @lower_cholesky.dispatch
-def _(A: cola.ops.BlockDiag):  # noqa: F811
-    return cola.ops.BlockDiag(
+def _(A: BlockDiag):  # noqa: F811
+    return BlockDiag(
         *[lower_cholesky(Ai) for Ai in A.Ms], multiplicities=A.multiplicities
     )
