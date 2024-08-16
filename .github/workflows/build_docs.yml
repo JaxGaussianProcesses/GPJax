@@ -52,16 +52,11 @@ jobs:
           virtualenvs-in-project: false
           installer-parallel: true
 
-      - name: Install LaTex
-        run: |
-          sudo apt-get update
-          sudo apt-get install texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra dvipng cm-super
-
       - name: Build the documentation with MKDocs
         run: |
           poetry install --all-extras --with docs
           conda install pandoc
-          poetry run mkdocs build
+          poetry run python docs/scripts/gen_examples.py --execute && poetry run mkdocs build
 
       - name: Deploy Page 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.1

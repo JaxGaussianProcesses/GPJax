@@ -72,10 +72,9 @@ helped to shape GPJax into the package it is today.
 ## Notebook examples
 
 > - [**Conjugate Inference**](https://docs.jaxgaussianprocesses.com/examples/regression/)
-> - [**Classification with MCMC**](https://docs.jaxgaussianprocesses.com/examples/classification/)
+> - [**Classification**](https://docs.jaxgaussianprocesses.com/examples/classification/)
 > - [**Sparse Variational Inference**](https://docs.jaxgaussianprocesses.com/examples/collapsed_vi/)
 > - [**Stochastic Variational Inference**](https://docs.jaxgaussianprocesses.com/examples/uncollapsed_vi/)
-> - [**BlackJax Integration**](https://docs.jaxgaussianprocesses.com/examples/classification/#mcmc-inference)
 > - [**Laplace Approximation**](https://docs.jaxgaussianprocesses.com/examples/classification/#laplace-approximation)
 > - [**Inference on Non-Euclidean Spaces**](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#custom-kernel)
 > - [**Inference on Graphs**](https://docs.jaxgaussianprocesses.com/examples/graph_kernels/)

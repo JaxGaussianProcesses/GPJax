@@ -31,11 +31,8 @@ def transform(
         >>> )
         >>> params_bijection = {'positive': tfb.Softplus()}
         >>> transformed_params = transform(params, params_bijection)
-        >>> transformed_params["a"]
-         PositiveReal(
-            value=Array([1.3132617], dtype=float32),
-            _tag='positive'
-          )
+        >>> print(transformed_params["a"].value)
+         [1.3132617]
     ```
 
 
@@ -59,6 +56,7 @@ def transform(
         return param
 
     gp_params, *other_params = params.split(Parameter, ...)
+
     transformed_gp_params: nnx.State = jtu.tree_map(
         lambda x: _inner(x),
         gp_params,

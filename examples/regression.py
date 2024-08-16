@@ -35,12 +35,12 @@ from examples.utils import clean_legend
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
+from examples.utils import use_mpl_style
+
 key = jr.key(123)
 
 # set the default style for plotting
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
+use_mpl_style()
 
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 

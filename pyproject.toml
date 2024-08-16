@@ -66,6 +66,7 @@ pandas = "^1.5.3"
 pymdown-extensions = "^10.7.1"
 nbconvert = "^7.16.2"
 markdown-katex = "^202406.1035"
+scikit-learn = "^1.5.1"
 
 [build-system]
 requires = ["poetry-core"]

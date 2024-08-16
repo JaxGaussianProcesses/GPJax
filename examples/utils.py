@@ -73,3 +73,8 @@ def clean_legend(ax):
     by_label = dict(zip(labels, handles))
     ax.legend(by_label.values(), by_label.keys())
     return ax
+
+
+def use_mpl_style():
+    style_file = Path(__file__).parent / "gpjax.mplstyle"
+    plt.style.use(style_file)

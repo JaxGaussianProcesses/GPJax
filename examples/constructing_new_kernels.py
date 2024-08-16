@@ -40,11 +40,15 @@ import tensorflow_probability.substrates.jax as tfp
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-key = jr.key(123)
+from examples.utils import use_mpl_style
+
 tfb = tfp.bijectors
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
+
+# set the default style for plotting
+use_mpl_style()
+
+key = jr.key(42)
+
 cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]

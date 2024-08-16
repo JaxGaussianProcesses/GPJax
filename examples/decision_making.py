@@ -65,10 +65,15 @@ from gpjax.typing import (
     Float,
 )
 
+
+from examples.utils import use_mpl_style
+
+# set the default style for plotting
+use_mpl_style()
+
 key = jr.key(42)
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
+
+
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 
