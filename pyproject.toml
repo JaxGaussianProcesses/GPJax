@@ -73,7 +73,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black] # https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-via-a-file
 line-length = 88
-target-version = ["py38"]
+target-version = ["py310"]
 
 [tool.pytest.ini_options] # https://docs.pytest.org/en/latest/reference/reference.html#ini-options-ref
 # addopts = "--color=yes --doctest-modules --exitfirst --failed-first --strict-config --strict-markers --typeguard-packages=my_package --verbosity=2 --junitxml=reports/pytest.xml"
@@ -87,7 +87,7 @@ cache-dir = "~/.cache/ruff"
 exclude = ["docs/", "examples/"]
 line-length = 88
 src = ["gpjax", "tests"]
-target-version = "py38"
+target-version = "py310"
 
 [tool.ruff.lint]
 dummy-variable-rgx = "^_$"
