@@ -16,11 +16,11 @@
         <link rel="prev" href="../contributing/">
       
       
-        <link rel="next" href="../examples/pytrees/">
+        <link rel="next" href="../_examples/intro_to_gps/">
       
       
-      <link rel="icon" href="../_static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.6">
+      <link rel="icon" href="../static/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.31">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.0e669242.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.3cba04c6.min.css">
       
       
 
@@ -49,11 +49,11 @@
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    
       <link rel="stylesheet" href="../stylesheets/extra.css">
     
       <link rel="stylesheet" href="../stylesheets/permalinks.css">
-    
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css">
     
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -77,9 +77,6 @@
   
     <body dir="ltr">
   
-    
-    
-      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -105,7 +102,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="GPJax" class="md-header__button md-logo" aria-label="GPJax" data-md-component="logo">
       
-  <img src="../_static/favicon.ico" alt="logo">
+  <img src="../static/favicon.ico" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -128,6 +125,9 @@
         </div>
       </div>
     </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -158,7 +158,7 @@
       
     </form>
     <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
             Initializing search
@@ -175,7 +175,7 @@
         <a href="https://github.com/JaxGaussianProcesses/GPJax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
   </div>
   <div class="md-source__repository">
     JaxGaussianProcesses/GPJax
@@ -210,7 +210,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="GPJax" class="md-nav__button md-logo" aria-label="GPJax" data-md-component="logo">
       
-  <img src="../_static/favicon.ico" alt="logo">
+  <img src="../static/favicon.ico" alt="logo">
 
     </a>
     GPJax
@@ -220,7 +220,7 @@
       <a href="https://github.com/JaxGaussianProcesses/GPJax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
   </div>
   <div class="md-source__repository">
     JaxGaussianProcesses/GPJax
@@ -232,6 +232,7 @@
     
       
       
+  
   
   
   
@@ -256,20 +257,24 @@
     
   
   
+  
     
     
     
       
+        
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -289,6 +294,7 @@
             
               
                 
+  
   
   
   
@@ -312,6 +318,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../design/" class="md-nav__link">
         
@@ -329,6 +336,7 @@
             
               
                 
+  
   
   
   
@@ -352,6 +360,7 @@
   
   
     
+  
   
   
     <li class="md-nav__item md-nav__item--active">
@@ -400,21 +409,27 @@
       
         <li class="md-nav__item">
   <a href="#pseudo-randomness" class="md-nav__link">
-    Pseudo-randomness
+    <span class="md-ellipsis">
+      Pseudo-randomness
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#bijectors" class="md-nav__link">
-    Bijectors
+    <span class="md-ellipsis">
+      Bijectors
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#positive-definiteness" class="md-nav__link">
-    Positive-definiteness
+    <span class="md-ellipsis">
+      Positive-definiteness
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Positive-definiteness">
@@ -422,14 +437,18 @@
         
           <li class="md-nav__item">
   <a href="#why-is-positive-definiteness-important" class="md-nav__link">
-    Why is positive-definiteness important?
+    <span class="md-ellipsis">
+      Why is positive-definiteness important?
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#the-cholesky-drawback" class="md-nav__link">
-    The Cholesky drawback
+    <span class="md-ellipsis">
+      The Cholesky drawback
+    </span>
   </a>
   
 </li>
@@ -441,7 +460,9 @@
       
         <li class="md-nav__item">
   <a href="#slow-to-evaluate" class="md-nav__link">
-    Slow-to-evaluate
+    <span class="md-ellipsis">
+      Slow-to-evaluate
+    </span>
   </a>
   
 </li>
@@ -458,25 +479,6 @@
               
                 
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../examples/pytrees/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    🌳 GPJax PyTrees
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
   
   
   
@@ -507,22 +509,26 @@
   
   
   
+  
     
     
     
       
+        
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
-        
-        
         
         
           
         
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
         
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -545,12 +551,13 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/intro_to_gps/" class="md-nav__link">
+      <a href="../_examples/intro_to_gps/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    New to Gaussian Processes?
+    Intro to GPs
   </span>
   
 
@@ -565,12 +572,13 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/intro_to_kernels/" class="md-nav__link">
+      <a href="../_examples/intro_to_kernels/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Introduction to Kernels
+    Intro to Kernels
   </span>
   
 
@@ -592,22 +600,26 @@
   
   
   
+  
     
     
     
       
+        
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
-        
-        
         
         
           
         
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
         
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -630,8 +642,9 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/regression/" class="md-nav__link">
+      <a href="../_examples/regression/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -650,8 +663,9 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/classification/" class="md-nav__link">
+      <a href="../_examples/classification/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -670,12 +684,13 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/poisson/" class="md-nav__link">
+      <a href="../_examples/poisson/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Count data regression
+    Poisson regression
   </span>
   
 
@@ -690,12 +705,13 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/barycentres/" class="md-nav__link">
+      <a href="../_examples/barycentres/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Gaussian Processes Barycentres
+    Barycentres
   </span>
   
 
@@ -710,12 +726,13 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/deep_kernels/" class="md-nav__link">
+      <a href="../_examples/deep_kernels/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Deep Kernel Learning
+    Deep kernel learning
   </span>
   
 
@@ -730,12 +747,13 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/graph_kernels/" class="md-nav__link">
+      <a href="../_examples/graph_kernels/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Graph Kernels
+    Graph kernels
   </span>
   
 
@@ -750,12 +768,13 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/uncollapsed_vi/" class="md-nav__link">
+      <a href="../_examples/uncollapsed_vi/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Sparse Stochastic Variational Inference
+    Sparse GPs
   </span>
   
 
@@ -770,12 +789,13 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/collapsed_vi/" class="md-nav__link">
+      <a href="../_examples/collapsed_vi/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Sparse Gaussian Process Regression
+    Stochastic sparse GPs
   </span>
   
 
@@ -790,12 +810,13 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/bayesian_optimisation/" class="md-nav__link">
+      <a href="../_examples/bayesian_optimisation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Introduction to Bayesian Optimisation
+    Bayesian Optimisation
   </span>
   
 
@@ -810,12 +831,13 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/decision_making/" class="md-nav__link">
+      <a href="../_examples/decision_making/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Introduction to Decision Making with GPJax
+    Decision Making
   </span>
   
 
@@ -830,12 +852,13 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/oceanmodelling/" class="md-nav__link">
+      <a href="../_examples/oceanmodelling/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Gaussian Processes for Vector Fields and Ocean Current Modelling
+    Multi-output GPs for Ocean Modelling
   </span>
   
 
@@ -857,22 +880,26 @@
   
   
   
+  
     
     
     
       
+        
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
-        
-        
         
         
           
         
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
         
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -895,12 +922,13 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/constructing_new_kernels/" class="md-nav__link">
+      <a href="../_examples/constructing_new_kernels/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Kernel Guide
+    Kernels
   </span>
   
 
@@ -915,12 +943,13 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/likelihoods_guide/" class="md-nav__link">
+      <a href="../_examples/likelihoods_guide/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Likelihood guide
+    Likelihoods
   </span>
   
 
@@ -935,12 +964,34 @@
   
   
   
+  
     <li class="md-nav__item">
-      <a href="../examples/yacht/" class="md-nav__link">
+      <a href="../_examples/backend/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    UCI Data Benchmarking
+    Model Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../_examples/yacht/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    UCI regression
   </span>
   
 
@@ -962,41 +1013,26 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../give_me_the_code/" class="md-nav__link">
+  
+    
+    
+    
+      
         
-  
-  <span class="md-ellipsis">
-    💻 Raw tutorial code
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
+        
       
-      
-  
-  
-  
     
-    
-    
-      
     
     <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        
-        
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
         
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -1007,8 +1043,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             Community
           </label>
@@ -1016,6 +1052,7 @@
             
               
                 
+  
   
   
   
@@ -1039,6 +1076,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../GOVERNANCE/" class="md-nav__link">
         
@@ -1056,6 +1094,7 @@
             
               
                 
+  
   
   
   
@@ -1086,22 +1125,26 @@
   
   
   
+  
     
     
     
       
+        
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        
-        
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
         
-          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -1112,8 +1155,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             📕 Reference
           </label>
@@ -1124,20 +1167,23 @@
   
   
   
+  
     
+    
+    
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        
-        
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1" >
         
-          <label class="md-nav__link" for="__nav_8_1" id="__nav_8_1_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_7_1" id="__nav_7_1_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -1148,8 +1194,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1">
             <span class="md-nav__icon md-icon"></span>
             GPJax
           </label>
@@ -1158,89 +1204,6 @@
               
                 
   
-  
-  
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1_1" >
-        
-          <label class="md-nav__link" for="__nav_8_1_1" id="__nav_8_1_1_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    Base
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_8_1_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1_1">
-            <span class="md-nav__icon md-icon"></span>
-            Base
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/base/module/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Module
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/base/param/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Param
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
   
   
   
@@ -1264,6 +1227,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/dataset/" class="md-nav__link">
         
@@ -1284,20 +1248,23 @@
   
   
   
+  
     
+    
+    
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        
-        
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1_4" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_3" >
         
-          <label class="md-nav__link" for="__nav_8_1_4" id="__nav_8_1_4_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_7_1_3" id="__nav_7_1_3_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -1308,8 +1275,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_8_1_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1_4">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_3">
             <span class="md-nav__icon md-icon"></span>
             Decision Making
           </label>
@@ -1317,6 +1284,7 @@
             
               
                 
+  
   
   
   
@@ -1340,6 +1308,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/decision_making/posterior_handler/" class="md-nav__link">
         
@@ -1357,6 +1326,7 @@
             
               
                 
+  
   
   
   
@@ -1380,20 +1350,23 @@
   
   
   
+  
     
+    
+    
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        
-        
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1_4_4" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_3_4" >
         
-          <label class="md-nav__link" for="__nav_8_1_4_4" id="__nav_8_1_4_4_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_7_1_3_4" id="__nav_7_1_3_4_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -1404,8 +1377,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_8_1_4_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1_4_4">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_3_4">
             <span class="md-nav__icon md-icon"></span>
             Test Functions
           </label>
@@ -1413,6 +1386,7 @@
             
               
                 
+  
   
   
   
@@ -1433,6 +1407,7 @@
             
               
                 
+  
   
   
   
@@ -1464,20 +1439,23 @@
   
   
   
+  
     
+    
+    
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        
-        
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1_4_5" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_3_5" >
         
-          <label class="md-nav__link" for="__nav_8_1_4_5" id="__nav_8_1_4_5_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_7_1_3_5" id="__nav_7_1_3_5_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -1488,8 +1466,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_8_1_4_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1_4_5">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_3_5">
             <span class="md-nav__icon md-icon"></span>
             Utility Functions
           </label>
@@ -1497,6 +1475,7 @@
             
               
                 
+  
   
   
   
@@ -1520,6 +1499,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/decision_making/utility_functions/expected_improvement/" class="md-nav__link">
         
@@ -1540,6 +1520,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/decision_making/utility_functions/probability_of_improvement/" class="md-nav__link">
         
@@ -1557,6 +1538,7 @@
             
               
                 
+  
   
   
   
@@ -1588,6 +1570,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/decision_making/utility_maximizer/" class="md-nav__link">
         
@@ -1605,6 +1588,7 @@
             
               
                 
+  
   
   
   
@@ -1636,6 +1620,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/distributions/" class="md-nav__link">
         
@@ -1653,6 +1638,7 @@
             
               
                 
+  
   
   
   
@@ -1676,6 +1662,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/gps/" class="md-nav__link">
         
@@ -1693,6 +1680,7 @@
             
               
                 
+  
   
   
   
@@ -1716,20 +1704,23 @@
   
   
   
+  
     
+    
+    
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        
-        
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1_9" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_8" >
         
-          <label class="md-nav__link" for="__nav_8_1_9" id="__nav_8_1_9_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_7_1_8" id="__nav_7_1_8_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -1740,8 +1731,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_8_1_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1_9">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_8">
             <span class="md-nav__icon md-icon"></span>
             Kernels
           </label>
@@ -1752,20 +1743,23 @@
   
   
   
+  
     
+    
+    
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        
-        
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1_9_1" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_8_1" >
         
-          <label class="md-nav__link" for="__nav_8_1_9_1" id="__nav_8_1_9_1_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_7_1_8_1" id="__nav_7_1_8_1_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -1776,8 +1770,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_8_1_9_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1_9_1">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_8_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_8_1">
             <span class="md-nav__icon md-icon"></span>
             Approximations
           </label>
@@ -1788,12 +1782,13 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/kernels/approximations/rff/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Rff
+    RFF
   </span>
   
 
@@ -1813,6 +1808,7 @@
             
               
                 
+  
   
   
   
@@ -1836,20 +1832,23 @@
   
   
   
+  
     
+    
+    
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        
-        
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1_9_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_8_3" >
         
-          <label class="md-nav__link" for="__nav_8_1_9_3" id="__nav_8_1_9_3_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_7_1_8_3" id="__nav_7_1_8_3_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -1860,8 +1859,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_8_1_9_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1_9_3">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_8_3">
             <span class="md-nav__icon md-icon"></span>
             Computations
           </label>
@@ -1869,6 +1868,7 @@
             
               
                 
+  
   
   
   
@@ -1892,6 +1892,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/kernels/computations/basis_functions/" class="md-nav__link">
         
@@ -1909,6 +1910,7 @@
             
               
                 
+  
   
   
   
@@ -1932,6 +1934,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/kernels/computations/dense/" class="md-nav__link">
         
@@ -1952,6 +1955,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/kernels/computations/diagonal/" class="md-nav__link">
         
@@ -1969,6 +1973,7 @@
             
               
                 
+  
   
   
   
@@ -2000,20 +2005,23 @@
   
   
   
+  
     
+    
+    
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        
-        
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1_9_4" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_8_4" >
         
-          <label class="md-nav__link" for="__nav_8_1_9_4" id="__nav_8_1_9_4_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_7_1_8_4" id="__nav_7_1_8_4_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -2024,8 +2032,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_8_1_9_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1_9_4">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_8_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_8_4">
             <span class="md-nav__icon md-icon"></span>
             Non Euclidean
           </label>
@@ -2033,6 +2041,7 @@
             
               
                 
+  
   
   
   
@@ -2053,6 +2062,7 @@
             
               
                 
+  
   
   
   
@@ -2084,20 +2094,23 @@
   
   
   
+  
     
+    
+    
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        
-        
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1_9_5" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_8_5" >
         
-          <label class="md-nav__link" for="__nav_8_1_9_5" id="__nav_8_1_9_5_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_7_1_8_5" id="__nav_7_1_8_5_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -2108,8 +2121,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_8_1_9_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1_9_5">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_8_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_8_5">
             <span class="md-nav__icon md-icon"></span>
             Nonstationary
           </label>
@@ -2117,6 +2130,7 @@
             
               
                 
+  
   
   
   
@@ -2140,6 +2154,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/kernels/nonstationary/linear/" class="md-nav__link">
         
@@ -2157,6 +2172,7 @@
             
               
                 
+  
   
   
   
@@ -2188,20 +2204,23 @@
   
   
   
+  
     
+    
+    
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        
-        
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1_9_6" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_8_6" >
         
-          <label class="md-nav__link" for="__nav_8_1_9_6" id="__nav_8_1_9_6_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_7_1_8_6" id="__nav_7_1_8_6_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -2212,8 +2231,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_8_1_9_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1_9_6">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_8_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_8_6">
             <span class="md-nav__icon md-icon"></span>
             Stationary
           </label>
@@ -2221,6 +2240,28 @@
             
               
                 
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/kernels/stationary/base/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Base
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
   
   
   
@@ -2244,6 +2285,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/kernels/stationary/matern32/" class="md-nav__link">
         
@@ -2261,6 +2303,7 @@
             
               
                 
+  
   
   
   
@@ -2284,6 +2327,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/kernels/stationary/periodic/" class="md-nav__link">
         
@@ -2301,6 +2345,7 @@
             
               
                 
+  
   
   
   
@@ -2324,6 +2369,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/kernels/stationary/rational_quadratic/" class="md-nav__link">
         
@@ -2341,6 +2387,7 @@
             
               
                 
+  
   
   
   
@@ -2364,6 +2411,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/kernels/stationary/utils/" class="md-nav__link">
         
@@ -2381,6 +2429,7 @@
             
               
                 
+  
   
   
   
@@ -2420,6 +2469,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/likelihoods/" class="md-nav__link">
         
@@ -2437,6 +2487,7 @@
             
               
                 
+  
   
   
   
@@ -2460,6 +2511,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/mean_functions/" class="md-nav__link">
         
@@ -2477,6 +2529,7 @@
             
               
                 
+  
   
   
   
@@ -2500,6 +2553,28 @@
   
   
   
+  
+    <li class="md-nav__item">
+      <a href="../api/parameters/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Parameters
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="../api/progress_bar/" class="md-nav__link">
         
@@ -2517,6 +2592,7 @@
             
               
                 
+  
   
   
   
@@ -2540,6 +2616,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../api/typing/" class="md-nav__link">
         
@@ -2557,6 +2634,7 @@
             
               
                 
+  
   
   
   
@@ -2618,21 +2696,27 @@
       
         <li class="md-nav__item">
   <a href="#pseudo-randomness" class="md-nav__link">
-    Pseudo-randomness
+    <span class="md-ellipsis">
+      Pseudo-randomness
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#bijectors" class="md-nav__link">
-    Bijectors
+    <span class="md-ellipsis">
+      Bijectors
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#positive-definiteness" class="md-nav__link">
-    Positive-definiteness
+    <span class="md-ellipsis">
+      Positive-definiteness
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Positive-definiteness">
@@ -2640,14 +2724,18 @@
         
           <li class="md-nav__item">
   <a href="#why-is-positive-definiteness-important" class="md-nav__link">
-    Why is positive-definiteness important?
+    <span class="md-ellipsis">
+      Why is positive-definiteness important?
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#the-cholesky-drawback" class="md-nav__link">
-    The Cholesky drawback
+    <span class="md-ellipsis">
+      The Cholesky drawback
+    </span>
   </a>
   
 </li>
@@ -2659,7 +2747,9 @@
       
         <li class="md-nav__item">
   <a href="#slow-to-evaluate" class="md-nav__link">
-    Slow-to-evaluate
+    <span class="md-ellipsis">
+      Slow-to-evaluate
+    </span>
   </a>
   
 </li>
@@ -2677,6 +2767,9 @@
               <article class="md-content__inner md-typeset">
                 
                   
+
+  
+  
 
 
 <link rel="stylesheet"
@@ -2701,34 +2794,34 @@ However, the PRNG in JAX is stateless. This means that for a given function, the
 return always returns the same result unless the seed is changed. This is a good thing,
 but it means that we need to be careful when using JAX's PRNGs.</p>
 <p>To examine what it means for a PRNG to be stateful, consider the following example:</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span> <span class="nn">jax.random</span> <span class="k">as</span> <span class="nn">jr</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># NumPy</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;NumPy:&#39;</span><span class="p">)</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">())</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">())</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">JAX:&#39;</span><span class="p">)</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">jr</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nb">print</span><span class="p">(</span><span class="n">jr</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Splitting key&#39;</span><span class="p">)</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nb">print</span><span class="p">(</span><span class="n">jr</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">subkey</span><span class="p">))</span>
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="go">NumPy:</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="go">0.5194454541172852</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="go">0.9815886617924413</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="go">JAX:</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="go">0.95821166</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="go">0.95821166</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="go">Splitting key</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="go">0.23886406</span>
-</code></pre></div>
+<p><div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span> <span class="nn">jax.random</span> <span class="k">as</span> <span class="nn">jr</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># NumPy</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;NumPy:&#39;</span><span class="p">)</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">())</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">())</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">JAX:&#39;</span><span class="p">)</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">jr</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nb">print</span><span class="p">(</span><span class="n">jr</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Splitting key&#39;</span><span class="p">)</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nb">print</span><span class="p">(</span><span class="n">jr</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">subkey</span><span class="p">))</span>
+</span></code></pre></div>
+<div class="language-console highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="go">NumPy:</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="go">0.5194454541172852</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="go">0.9815886617924413</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="go">JAX:</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="go">0.95821166</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="go">0.95821166</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="go">Splitting key</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="go">0.23886406</span>
+</span></code></pre></div>
 We can see that, in libraries like NumPy, the PRNG key's state is incremented whenever
 a pseudorandom call is made. This can make debugging difficult to manage as it is not
 always clear when a PRNG is being used. In JAX, the PRNG key is not incremented,
@@ -2740,13 +2833,13 @@ for reproducibility.</p>
 a constrained subset of the real-line. During gradient-based optimisation, as we
 approach the set's boundary, it becomes possible that we could step outside of the
 set's support and introduce a numerical and mathematical error into our model. For
-example, consider the lengthscale parameter <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">ℓ</mi></mrow><annotation encoding="application/x-tex">\ell</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">ℓ</span></span></span></span>, which we know must be strictly
-positive. If at <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>t</mi><mtext>th</mtext></msup></mrow><annotation encoding="application/x-tex">t^{\text{th}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8491em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">th</span></span></span></span></span></span></span></span></span></span></span></span></span> iterate, our current estimate of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">ℓ</mi></mrow><annotation encoding="application/x-tex">\ell</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">ℓ</span></span></span></span> was
-0.02 and our derivative informed us that <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">ℓ</mi></mrow><annotation encoding="application/x-tex">\ell</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">ℓ</span></span></span></span> should decrease, then if our
+example, consider the lengthscale parameter <span class="arithmatex">\(\ell\)</span>, which we know must be strictly
+positive. If at <span class="arithmatex">\(t^{\text{th}}\)</span> iterate, our current estimate of <span class="arithmatex">\(\ell\)</span> was
+0.02 and our derivative informed us that <span class="arithmatex">\(\ell\)</span> should decrease, then if our
 learning rate is greater is than 0.03, we would end up with a negative variance term.
 We visualise this issue below where the red cross denotes the invalid lengthscale value
 that would be obtained, were we to optimise in the unconstrained parameter space.</p>
-<p><img alt="" src="../_static/step_size_figure.svg" /></p>
+<p><img alt="" src="../static/step_size_figure.svg" /></p>
 <p>A simple but impractical solution would be to use a tiny learning rate which would
 reduce the possibility of stepping outside of the parameter's support. However, this
 would be incredibly costly and does not eradicate the problem. An alternative solution
@@ -2754,7 +2847,7 @@ is to apply a functional mapping to the parameter that projects it from a constr
 subspace of the real-line onto the entire real-line. Here, gradient updates are
 applied in the unconstrained parameter space before transforming the value back to the
 original support of the parameters. Such a transformation is known as a bijection.</p>
-<p><img alt="" src="../_static/bijector_figure.svg" /></p>
+<p><img alt="" src="../static/bijector_figure.svg" /></p>
 <p>To help understand this, we show the effect of using a log-exp bijector in the above
 figure. We have six points on the positive real line that range from 0.1 to 3 depicted
 by a blue cross. We then apply the bijector by log-transforming the constrained value.
@@ -2762,42 +2855,39 @@ This gives us the points' unconstrained value which we depict by a red circle. I
 this value that we apply gradient updates to. When we wish to recover the constrained
 value, we apply the inverse of the bijector, which is the exponential function in this
 case. This gives us back the blue cross.</p>
-<p>In GPJax, we supply bijective functions using <a href="https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/bijectors">Tensorflow Probability</a>.
-In our <a href="../examples/pytrees/">PyTrees doc</a> document, we detail how the user can define
-their own bijectors and attach them to the parameter(s) of their model.</p>
+<p>In GPJax, we supply bijective functions using <a href="https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/bijectors">Tensorflow Probability</a>.</p>
 <h2 id="positive-definiteness">Positive-definiteness<a class="headerlink" href="#positive-definiteness" title="Permanent link"></a></h2>
 <blockquote>
-<p>"Symmetric positive definiteness is one of the highest accolades to which a matrix can aspire" - Nicholas Highman, Accuracy and stability of numerical algorithms (Higham, 2002)<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup></p>
+<p>"Symmetric positive definiteness is one of the highest accolades to which a matrix can aspire" - Nicholas Highman, Accuracy and stability of numerical algorithms [@higham2022accuracy]</p>
 </blockquote>
 <h3 id="why-is-positive-definiteness-important">Why is positive-definiteness important?<a class="headerlink" href="#why-is-positive-definiteness-important" title="Permanent link"></a></h3>
 <p>The Gram matrix of a kernel, a concept that we explore more in our
-<a href="../examples/constructing_new_kernels/">kernels notebook</a> and our <a href="../examples/pytrees/">PyTree notebook</a>, is a
-symmetric positive definite matrix. As such, we
+<a href="../_examples/constructing_new_kernels/">kernels notebook</a>. As such, we
 have a range of tools at our disposal to make subsequent operations on the covariance
 matrix faster. One of these tools is the Cholesky factorisation that uniquely decomposes
-any symmetric positive-definite matrix <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">Σ</mi></mrow><annotation encoding="application/x-tex">\mathbf{\Sigma}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">Σ</span></span></span></span> by</p>
+any symmetric positive-definite matrix <span class="arithmatex">\(\mathbf{\Sigma}\)</span> by</p>
 <p><p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right" columnspacing=""><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="bold">Σ</mi><mo>=</mo><mi mathvariant="bold">L</mi><msup><mi mathvariant="bold">L</mi><mi mathvariant="normal">⊤</mi></msup><mtext> </mtext><mo separator="true">,</mo></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{align}
     \mathbf{\Sigma} = \mathbf{L}\mathbf{L}^{\top}\,,
 \end{align}
 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.5591em;vertical-align:-0.5296em;"></span><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0296em;"><span style="top:-3.1304em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathbf">Σ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathbf">L</span><span class="mord"><span class="mord mathbf">L</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.5296em;"><span></span></span></span></span></span></span></span><span class="tag"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0296em;"><span style="top:-3.0296em;"><span class="pstrut" style="height:2.8991em;"></span><span class="eqn-num"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.5296em;"><span></span></span></span></span></span></span></span></span></p>
-where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">L</mi></mrow><annotation encoding="application/x-tex">\mathbf{L}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">L</span></span></span></span> is a lower triangular matrix.</p>
+where <span class="arithmatex">\(\mathbf{L}\)</span> is a lower triangular matrix.</p>
 <p>We make use of this result in GPJax when solving linear systems of equations of the
-form <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">A</mi><mi mathvariant="bold-italic">x</mi><mo>=</mo><mi mathvariant="bold-italic">b</mi></mrow><annotation encoding="application/x-tex">\mathbf{A}\boldsymbol{x} = \boldsymbol{b}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">A</span><span class="mord"><span class="mord"><span class="mord boldsymbol">x</span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol">b</span></span></span></span></span></span>. Whilst seemingly abstract at first,
+form <span class="arithmatex">\(\mathbf{A}\boldsymbol{x} = \boldsymbol{b}\)</span>. Whilst seemingly abstract at first,
 such problems are frequently encountered when constructing Gaussian process models. One
 such example is frequently encountered in the regression setting for learning Gaussian
 process kernel hyperparameters. Here we have labels
-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold-italic">y</mi><mo>∼</mo><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mi mathvariant="bold-italic">x</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="bold">I</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol{y} \sim \mathcal{N}(f(\boldsymbol{x}), \sigma^2\mathbf{I})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6389em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.03704em;">y</span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.14736em;">N</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord"><span class="mord"><span class="mord boldsymbol">x</span></span></span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathbf">I</span><span class="mclose">)</span></span></span></span> with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi mathvariant="bold-italic">x</mi><mo stretchy="false">)</mo><mo>∼</mo><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><mi mathvariant="bold">0</mi><mo separator="true">,</mo><msub><mi mathvariant="bold">K</mi><mi><mrow><mi mathvariant="bold-italic">x</mi><mi mathvariant="bold-italic">x</mi></mrow></mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">f(\boldsymbol{x}) \sim \mathcal{N}(\boldsymbol{0}, \mathbf{K}_{\boldsymbol{xx}})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord"><span class="mord"><span class="mord boldsymbol">x</span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.14736em;">N</span><span class="mopen">(</span><span class="mord"><span class="mord"><span class="mord mathbf">0</span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1611em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord boldsymbol mtight">xx</span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> arising from zero-mean
-Gaussian process prior and Gram matrix <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="bold">K</mi><mi><mrow><mi mathvariant="bold-italic">x</mi><mi mathvariant="bold-italic">x</mi></mrow></mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{K}_{\boldsymbol{xx}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8361em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1611em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord boldsymbol mtight">xx</span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> at the inputs
-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold-italic">x</mi></mrow><annotation encoding="application/x-tex">\boldsymbol{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4444em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol">x</span></span></span></span></span></span>. Here the marginal log-likelihood comprises the following form</p>
+<span class="arithmatex">\(\boldsymbol{y} \sim \mathcal{N}(f(\boldsymbol{x}), \sigma^2\mathbf{I})\)</span> with <span class="arithmatex">\(f(\boldsymbol{x}) \sim \mathcal{N}(\boldsymbol{0}, \mathbf{K}_{\boldsymbol{xx}})\)</span> arising from zero-mean
+Gaussian process prior and Gram matrix <span class="arithmatex">\(\mathbf{K}_{\boldsymbol{xx}}\)</span> at the inputs
+<span class="arithmatex">\(\boldsymbol{x}\)</span>. Here the marginal log-likelihood comprises the following form</p>
 <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right" columnspacing=""><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>log</mi><mo>⁡</mo><mi>p</mi><mo stretchy="false">(</mo><mi mathvariant="bold-italic">y</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.5</mn><mrow><mo fence="true">(</mo><mo>−</mo><msup><mi mathvariant="bold-italic">y</mi><mi mathvariant="normal">⊤</mi></msup><msup><mrow><mo fence="true">(</mo><msub><mi mathvariant="bold">K</mi><mi><mrow><mi mathvariant="bold-italic">x</mi><mi mathvariant="bold-italic">x</mi></mrow></mi></msub><mo>+</mo><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="bold">I</mi><mo fence="true">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi mathvariant="bold-italic">y</mi><mo>−</mo><mi>log</mi><mo>⁡</mo><mo stretchy="false">∣</mo><msub><mi mathvariant="bold">K</mi><mi><mrow><mi mathvariant="bold-italic">x</mi><mi mathvariant="bold-italic">x</mi></mrow></mi></msub><mo>+</mo><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="bold">I</mi><mo stretchy="false">∣</mo><mo>−</mo><mi>n</mi><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>2</mn><mi>π</mi><mo stretchy="false">)</mo><mo fence="true">)</mo></mrow><mo separator="true">,</mo></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{align}
     \log p(\boldsymbol{y}) = 0.5\left(-\boldsymbol{y}^{\top}\left(\mathbf{K}_{\boldsymbol{xx}} + \sigma^2\mathbf{I} \right)^{-1}\boldsymbol{y} -\log\lvert \mathbf{K}_{\boldsymbol{xx}} + \sigma^2\mathbf{I}\rvert -n\log(2\pi)\right) ,
 \end{align}
 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.1em;vertical-align:-0.8em;"></span><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3em;"><span style="top:-3.3em;"><span class="pstrut" style="height:3.15em;"></span><span class="mord"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.03704em;">y</span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0.5</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size2">(</span></span><span class="mord">−</span><span class="mord"><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.03704em;">y</span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size1">(</span></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1611em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord boldsymbol mtight">xx</span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathbf">I</span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size1">)</span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.0681em;"><span style="top:-3.317em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.03704em;">y</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mopen">∣</span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1611em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord boldsymbol mtight">xx</span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathbf">I</span><span class="mclose">∣</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mopen">(</span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="mclose">)</span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size2">)</span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8em;"><span></span></span></span></span></span></span></span><span class="tag"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3em;"><span style="top:-3.3em;"><span class="pstrut" style="height:3.15em;"></span><span class="eqn-num"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8em;"><span></span></span></span></span></span></span></span></span></p>
 <p>and the goal of inference is to maximise kernel hyperparameters (contained in the Gram
-matrix <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="bold">K</mi><mi><mrow><mi mathvariant="bold-italic">x</mi><mi mathvariant="bold-italic">x</mi></mrow></mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{K}_{\boldsymbol{xx}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8361em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1611em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord boldsymbol mtight">xx</span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>) and likelihood hyperparameters (contained in the
-noise covariance <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="bold">I</mi></mrow><annotation encoding="application/x-tex">\sigma^2\mathbf{I}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathbf">I</span></span></span></span>). Computing the marginal log-likelihood (and its
+matrix <span class="arithmatex">\(\mathbf{K}_{\boldsymbol{xx}}\)</span>) and likelihood hyperparameters (contained in the
+noise covariance <span class="arithmatex">\(\sigma^2\mathbf{I}\)</span>). Computing the marginal log-likelihood (and its
 gradients), draws our attention to the term</p>
 <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right" columnspacing=""><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><munder><munder><msup><mrow><mo fence="true">(</mo><msub><mi mathvariant="bold">K</mi><mi><mrow><mi mathvariant="bold-italic">x</mi><mi mathvariant="bold-italic">x</mi></mrow></mi></msub><mo>+</mo><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="bold">I</mi><mo fence="true">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="true">⏟</mo></munder><mi mathvariant="bold">A</mi></munder><mi mathvariant="bold-italic">y</mi><mo separator="true">,</mo></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{align}
@@ -2805,13 +2895,13 @@ gradients), draws our attention to the term</p>
 \end{align}
 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:3.0464em;vertical-align:-1.2732em;"></span><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.7732em;"><span style="top:-3.7732em;"><span class="pstrut" style="height:3.0681em;"></span><span class="mord"><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0681em;"><span style="top:-1.3898em;"><span class="pstrut" style="height:3.0681em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathbf mtight">A</span></span></span></span><span style="top:-3.0681em;"><span class="pstrut" style="height:3.0681em;"></span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0681em;"><span class="svg-align" style="top:-2.0701em;"><span class="pstrut" style="height:3.0681em;"></span><span class="stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDBlbSIgaGVpZ2h0PSIwLjU0OGVtIiB2aWV3Qm94PSIwIDAgNDAwMDAwIDU0OCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pbllNaW4gc2xpY2UiPjxwYXRoIGQ9Ik0wIDZsNi02aDE3YzEyLjY4OCAwIDE5LjMxMy4zIDIwIDEgNCA0IDcuMzEzIDguMyAxMCAxMwogMzUuMzEzIDUxLjMgODAuODEzIDkzLjggMTM2LjUgMTI3LjUgNTUuNjg4IDMzLjcgMTE3LjE4OCA1NS44IDE4NC41IDY2LjUuNjg4CiAwIDIgLjMgNCAxIDE4LjY4OCAyLjcgNzYgNC4zIDE3MiA1aDM5OTQ1MHYxMjBINDI5bC02LTFjLTEyNC42ODgtOC0yMzUtNjEuNwotMzMxLTE2MUM2MC42ODcgMTM4LjcgMzIuMzEyIDk5LjMgNyA1NEwwIDQxVjZ6Ii8+PC9zdmc+"/></span><span class="brace-center" style="height:0.548em;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDBlbSIgaGVpZ2h0PSIwLjU0OGVtIiB2aWV3Qm94PSIwIDAgNDAwMDAwIDU0OCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaW4gc2xpY2UiPjxwYXRoIGQ9Ik0xOTk1NzIgMjE0CmMxMDAuNyA4LjMgMTk1LjMgNDQgMjgwIDEwOCA1NS4zIDQyIDEwMS43IDkzIDEzOSAxNTNsOSAxNGMyLjctNCA1LjctOC43IDktMTQKIDUzLjMtODYuNyAxMjMuNy0xNTMgMjExLTE5OSA2Ni43LTM2IDEzNy4zLTU2LjMgMjEyLTYyaDE5OTU2OHYxMjBIMjAwNDMyYy0xNzguMwogMTEuNy0zMTEuNyA3OC4zLTQwMyAyMDEtNiA4LTkuNyAxMi0xMSAxMi0uNy43LTYuNyAxLTE4IDFzLTE3LjMtLjMtMTgtMWMtMS4zIDAKLTUtNC0xMS0xMi00NC43LTU5LjMtMTAxLjMtMTA2LjMtMTcwLTE0MXMtMTQ1LjMtNTQuMy0yMjktNjBIMFYyMTR6Ii8+PC9zdmc+"/></span><span class="brace-right" style="height:0.548em;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDBlbSIgaGVpZ2h0PSIwLjU0OGVtIiB2aWV3Qm94PSIwIDAgNDAwMDAwIDU0OCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1heFlNaW4gc2xpY2UiPjxwYXRoIGQ9Ik0zOTk5OTQgMGw2IDZ2MzVsLTYgMTFjLTU2IDEwNC0xMzUuMyAxODEuMy0yMzggMjMyLTU3LjMKIDI4LjctMTE3IDQ1LTE3OSA1MEgtMzAwVjIxNGgzOTk4OTdjNDMuMy03IDgxLTE1IDExMy0yNiAxMDAuNy0zMyAxNzkuNy05MSAyMzcKLTE3NCAyLjctNSA2LTkgMTAtMTMgLjctMSA3LjMtMSAyMC0xaDE3eiIvPjwvc3ZnPg=="/></span></span></span><span style="top:-3.0681em;"><span class="pstrut" style="height:3.0681em;"></span><span class="mord"><span class="minner"><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size1">(</span></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1611em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord boldsymbol mtight">xx</span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathbf">I</span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size1">)</span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.0681em;"><span style="top:-3.317em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.998em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.6783em;"><span></span></span></span></span></span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.03704em;">y</span></span></span><span class="mpunct">,</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2732em;"><span></span></span></span></span></span></span></span><span class="tag"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.7732em;"><span style="top:-3.7732em;"><span class="pstrut" style="height:3.0681em;"></span><span class="eqn-num"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2732em;"><span></span></span></span></span></span></span></span></span></p>
 <p>then we can see a solution can be obtained by solving the corresponding system of
-equations. By working with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">L</mi><mo>=</mo><mi mathvariant="normal">chol</mi><mo>⁡</mo><mi mathvariant="bold">A</mi></mrow><annotation encoding="application/x-tex">\mathbf{L} = \operatorname{chol}{\mathbf{A}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mop"><span class="mord mathrm">chol</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">A</span></span></span></span></span> instead of
-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">A</mi></mrow><annotation encoding="application/x-tex">\mathbf{A}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">A</span></span></span></span>, we save a significant amount of floating-point operations (flops) by
-solving two triangular systems of equations (one for <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">L</mi></mrow><annotation encoding="application/x-tex">\mathbf{L}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">L</span></span></span></span> and another for
-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="bold">L</mi><mi mathvariant="normal">⊤</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf{L}^{\top}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8491em;"></span><span class="mord"><span class="mord mathbf">L</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span></span></span></span></span>) instead of one dense system of equations. Solving two triangular systems
-of equations has complexity <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>3</mn></msup><mi mathvariant="normal">/</mi><mn>6</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(n^3/6)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mord">/6</span><span class="mclose">)</span></span></span></span>; a vast improvement compared to
-regular solvers that have <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>3</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(n^3)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> complexity in the number of datapoints
-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>.</p>
+equations. By working with <span class="arithmatex">\(\mathbf{L} = \operatorname{chol}{\mathbf{A}}\)</span> instead of
+<span class="arithmatex">\(\mathbf{A}\)</span>, we save a significant amount of floating-point operations (flops) by
+solving two triangular systems of equations (one for <span class="arithmatex">\(\mathbf{L}\)</span> and another for
+<span class="arithmatex">\(\mathbf{L}^{\top}\)</span>) instead of one dense system of equations. Solving two triangular systems
+of equations has complexity <span class="arithmatex">\(\mathcal{O}(n^3/6)\)</span>; a vast improvement compared to
+regular solvers that have <span class="arithmatex">\(\mathcal{O}(n^3)\)</span> complexity in the number of datapoints
+<span class="arithmatex">\(n\)</span>.</p>
 <h3 id="the-cholesky-drawback">The Cholesky drawback<a class="headerlink" href="#the-cholesky-drawback" title="Permanent link"></a></h3>
 <p>While the computational acceleration provided by using Cholesky factors instead of dense
 matrices is hopefully now apparent, an awkward numerical instability <em>gotcha</em> can arise
@@ -2823,41 +2913,34 @@ This becomes a problem when we want to compute a Cholesky
 factor since this requires that the input matrix is <em>numerically</em> positive-definite. If there are
 negative eigenvalues, this violates the requirements and results in a "Cholesky failure".</p>
 <p>To resolve this, we apply some numerical <em>jitter</em> to the diagonals of any Gram matrix.
-Typically this is very small, with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><msup><mn>0</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup></mrow><annotation encoding="application/x-tex">10^{-6}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span></span> being the system default. However,
+Typically this is very small, with <span class="arithmatex">\(10^{-6}\)</span> being the system default. However,
 for some problems, this amount may need to be increased.</p>
 <h2 id="slow-to-evaluate">Slow-to-evaluate<a class="headerlink" href="#slow-to-evaluate" title="Permanent link"></a></h2>
 <p>Famously, a regular Gaussian process model (as detailed in
-<a href="../examples/regression/">our regression notebook</a>) will scale cubically in the number of data points.
+<a href="../_examples/regression/">our regression notebook</a>) will scale cubically in the number of data points.
 Consequently, if you try to fit your Gaussian process model to a data set containing more
 than several thousand data points, then you will likely incur a significant
 computational overhead. In such cases, we recommend using Sparse Gaussian processes to
 alleviate this issue.</p>
 <p>When the data contains less than around 50000 data points, we recommend using
-the collapsed evidence lower bound objective (Titsias, 2009)<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> to optimise the parameters
+the collapsed evidence lower bound objective [@titsias2009] to optimise the parameters
 of your sparse Gaussian process model. Such a model will scale linearly in the number of
 data points and quadratically in the number of inducing points. We demonstrate its use
-in <a href="../examples/collapsed_vi/">our sparse regression notebook</a>.</p>
+in <a href="../_examples/collapsed_vi/">our sparse regression notebook</a>.</p>
 <p>For data sets exceeding 50000 data points, even the sparse Gaussian process outlined
 above will become computationally infeasible. In such cases, we recommend using the
-uncollapsed evidence lower bound objective (Hensman <em>et al.</em>, 2013)<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> that allows stochastic
+uncollapsed evidence lower bound objective [@hensman2013gaussian] that allows stochastic
 mini-batch optimisation of the parameters of your sparse Gaussian process model. Such a
 model will scale linearly in the batch size and quadratically in the number of inducing
 points. We demonstrate its use in
-<a href="../examples/uncollapsed_vi/">our sparse stochastic variational inference notebook</a>.</p>
-<div class="footnote">
-<hr />
-<ol>
-<li id="fn:1">
-<p>Higham, N. J. (2002) <em>Accuracy and Stability of Numerical Algorithms</em>. Second. Society for Industrial and Applied Mathematics. DOI: <a href="https://doi.org/10.1137/1.9780898718027">10.1137/1.9780898718027</a>.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
-</li>
-<li id="fn:2">
-<p>Titsias, M. (2009) Variational learning of inducing variables in sparse Gaussian processes. In: <em>Proceedings of the twelth international conference on artificial intelligence and statistics</em>, 2009, pp. 567–574. Proceedings of machine learning research. PMLR.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
-</li>
-<li id="fn:3">
-<p>Hensman, J., Fusi, N. and Lawrence, N. D. (2013) Gaussian processes for big data. <em>Artificial intelligence and statistics</em>.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
-</li>
-</ol>
-</div>
+<a href="../_examples/uncollapsed_vi/">our sparse stochastic variational inference notebook</a>.</p>
+
+
+
+
+
+
+
 
 
   
@@ -2870,13 +2953,14 @@ points. We demonstrate its use in
             </div>
           
           
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
-            
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
-            Back to top
-          </button>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
         
       </main>
       
@@ -2903,14 +2987,17 @@ points. We demonstrate its use in
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.78eede0e.min.js"></script>
+      <script src="../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
       
         <script src="../javascripts/katex.js"></script>
       

@@ -20,7 +20,9 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib import patches
 
-plt.style.use("../examples/gpjax.mplstyle")
+plt.style.use(
+    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+)
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %%
@@ -103,4 +105,4 @@ plt.savefig("../_static/bijector_figure.svg", bbox_inches="tight")
 np.log(0.05)
 
 # %%
-x
+print(x)

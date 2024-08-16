@@ -1,0 +1,3341 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The documentation for the GPJax software library.">
+      
+      
+      
+        <link rel="canonical" href="https://docs.jaxgaussianprocesses.com/_examples/intro_to_gps/">
+      
+      
+        <link rel="prev" href="../../sharp_bits/">
+      
+      
+        <link rel="next" href="../intro_to_kernels/">
+      
+      
+      <link rel="icon" href="../../static/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.31">
+    
+    
+      
+        <title>Intro to GPs - GPJax</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.3cba04c6.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/permalinks.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config","G-L15440C0N0"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document$.subscribe(function(){var a=document.forms.feedback;if(void 0!==a)for(var e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}),location$.subscribe(function(e){n("config","G-L15440C0N0",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=G-L15440C0N0",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#new-to-gaussian-processes" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="GPJax" class="md-header__button md-logo" aria-label="GPJax" data-md-component="logo">
+      
+  <img src="../../static/favicon.ico" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            GPJax
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Intro to GPs
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/JaxGaussianProcesses/GPJax" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    JaxGaussianProcesses/GPJax
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="GPJax" class="md-nav__button md-logo" aria-label="GPJax" data-md-component="logo">
+      
+  <img src="../../static/favicon.ico" alt="logo">
+
+    </a>
+    GPJax
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/JaxGaussianProcesses/GPJax" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    JaxGaussianProcesses/GPJax
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    🏡 Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Getting started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    🛠️ Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    🎨 Design principles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    🤝 Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sharp_bits/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    🔪 Sharp bits
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://jax.readthedocs.io/en/latest/jax-101/index.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📎 JAX 101 [External]
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    💡 Background
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            💡 Background
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Intro to GPs
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Intro to GPs
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bayes-theorem" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bayes' Theorem
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gaussian-random-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gaussian random variables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gaussian-processes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gaussian processes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gaussian-process-regression" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gaussian process regression
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conclusions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      System Configuration
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../intro_to_kernels/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Intro to Kernels
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    🎓 Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            🎓 Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../regression/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Regression
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../classification/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Classification
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../poisson/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Poisson regression
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../barycentres/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Barycentres
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deep_kernels/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Deep kernel learning
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../graph_kernels/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Graph kernels
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../uncollapsed_vi/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sparse GPs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../collapsed_vi/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stochastic sparse GPs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bayesian_optimisation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bayesian Optimisation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decision_making/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Decision Making
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oceanmodelling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Multi-output GPs for Ocean Modelling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    📖 Guides for customisation
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            📖 Guides for customisation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../constructing_new_kernels/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kernels
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../likelihoods_guide/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Likelihoods
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../backend/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Model Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../yacht/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    UCI regression
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Community
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Community
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CODE_OF_CONDUCT/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    👥 Code of conduct
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GOVERNANCE/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📜 Governance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://jaxgaussianprocesses.com/contact/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📨 Contact
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    📕 Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            📕 Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1" id="__nav_7_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    GPJax
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1">
+            <span class="md-nav__icon md-icon"></span>
+            GPJax
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/citation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Citation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/dataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1_3" id="__nav_7_1_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Decision Making
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            Decision Making
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/decision_making/decision_maker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Decision Maker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/decision_making/posterior_handler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Posterior Handler
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/decision_making/search_space/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Search Space
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1_3_4" id="__nav_7_1_3_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Test Functions
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Test Functions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/decision_making/test_functions/continuous_functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Continuous Functions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/decision_making/test_functions/non_conjugate_functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Non Conjugate Functions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1_3_5" id="__nav_7_1_3_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Utility Functions
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            Utility Functions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/decision_making/utility_functions/base/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Base
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/decision_making/utility_functions/expected_improvement/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Expected Improvement
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/decision_making/utility_functions/probability_of_improvement/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Probability Of Improvement
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/decision_making/utility_functions/thompson_sampling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Thompson Sampling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/decision_making/utility_maximizer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Utility Maximizer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/decision_making/utils/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Utils
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/distributions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Distributions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/fit/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fit
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/gps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    GPs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/integrators/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Integrators
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1_8" id="__nav_7_1_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Kernels
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            Kernels
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_8_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1_8_1" id="__nav_7_1_8_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Approximations
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_8_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_8_1">
+            <span class="md-nav__icon md-icon"></span>
+            Approximations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/approximations/rff/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RFF
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/base/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Base
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_8_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1_8_3" id="__nav_7_1_8_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Computations
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_8_3">
+            <span class="md-nav__icon md-icon"></span>
+            Computations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/computations/base/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Base
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/computations/basis_functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Basis Functions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/computations/constant_diagonal/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Constant Diagonal
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/computations/dense/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dense
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/computations/diagonal/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Diagonal
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/computations/eigen/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Eigen
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_8_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1_8_4" id="__nav_7_1_8_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Non Euclidean
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_8_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_8_4">
+            <span class="md-nav__icon md-icon"></span>
+            Non Euclidean
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/non_euclidean/graph/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Graph
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/non_euclidean/utils/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Utils
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_8_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1_8_5" id="__nav_7_1_8_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Nonstationary
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_8_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_8_5">
+            <span class="md-nav__icon md-icon"></span>
+            Nonstationary
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/nonstationary/arccosine/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Arccosine
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/nonstationary/linear/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Linear
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/nonstationary/polynomial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Polynomial
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_8_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1_8_6" id="__nav_7_1_8_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Stationary
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_8_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_8_6">
+            <span class="md-nav__icon md-icon"></span>
+            Stationary
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/stationary/base/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Base
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/stationary/matern12/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Matérn12
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/stationary/matern32/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Matérn32
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/stationary/matern52/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Matérn52
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/stationary/periodic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Periodic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/stationary/powered_exponential/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Powered Exponential
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/stationary/rational_quadratic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rational Quadratic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/stationary/rbf/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RBF
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/stationary/utils/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Utils
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/kernels/stationary/white/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    White
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/likelihoods/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Likelihoods
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/lower_cholesky/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Lower Cholesky
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/mean_functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mean Functions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/objectives/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Objectives
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/parameters/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Parameters
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/progress_bar/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Progress Bar
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/scan/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Scan
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/typing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Typing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/variational_families/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Variational Families
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bayes-theorem" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bayes' Theorem
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gaussian-random-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gaussian random variables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gaussian-processes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gaussian processes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gaussian-process-regression" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gaussian process regression
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conclusions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      System Configuration
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="new-to-gaussian-processes">New to Gaussian Processes?<a class="headerlink" href="#new-to-gaussian-processes" title="Permanent link"></a></h1>
+<p>Fantastic that you're here! This notebook is designed to be a gentle
+introduction to the mathematics of Gaussian processes (GPs). No prior
+knowledge of Bayesian inference or GPs is assumed, and this notebook is
+self-contained. At a high level, we begin by introducing Bayes' theorem and
+its implications within probabilistic modelling. We then proceed to introduce
+the Gaussian random variable along with its multivariate form. We conclude by
+showing how this notion can be extended to GPs.</p>
+<h2 id="bayes-theorem">Bayes' Theorem<a class="headerlink" href="#bayes-theorem" title="Permanent link"></a></h2>
+<p>A probabilistic modelling task is comprised of an observed dataset
+<span class="arithmatex">\(\mathbf{y}\)</span> for which we construct a model. The parameters <span class="arithmatex">\(\theta\)</span> of our
+model are unknown, and our goal is to conduct inference to determine their
+range of likely values. To achieve this, we apply Bayes' theorem</p>
+<div class="arithmatex">\[\begin{align}
+    \label{eq:BayesTheorem}
+    p(\theta\,|\, \mathbf{y}) = \frac{p(\theta)p(\mathbf{y}\,|\,\theta)}{p(\mathbf{y})} = \frac{p(\theta)p(\mathbf{y}\,|\,\theta)}{\int_{\theta}p(\mathbf{y}, \theta)\mathrm{d}\theta}\,,
+\end{align}\]</div>
+<p>where <span class="arithmatex">\(p(\mathbf{y}\,|\,\theta)\)</span> denotes the <em>likelihood</em>, or model, and
+quantifies how likely the observed dataset <span class="arithmatex">\(\mathbf{y}\)</span> is, given the
+parameter estimate <span class="arithmatex">\(\theta\)</span>. The <em>prior</em> distribution <span class="arithmatex">\(p(\theta)\)</span> reflects our
+initial beliefs about the value of <span class="arithmatex">\(\theta\)</span> before observing data, whilst the
+<em>posterior</em> <span class="arithmatex">\(p(\theta\,|\, \mathbf{y})\)</span> gives an updated estimate of the
+parameters' value, after observing <span class="arithmatex">\(\mathbf{y}\)</span>. The <em>marginal likelihood</em>, or
+Bayesian model evidence, <span class="arithmatex">\(p(\mathbf{y})\)</span> is the probability of the observed
+data under all possible hypotheses that our prior model can generate. Within
+Bayesian model selection, this property makes the marginal log-likelihood an
+indispensable tool. Selecting models under this criterion places a higher
+emphasis on models that can generalise better to new data points.</p>
+<p>When the posterior distribution belongs to the same family of probability
+distributions as the prior, we describe the prior and the likelihood as
+<em>conjugate</em> to each other. Such a scenario is convenient in Bayesian inference
+as it allows us to derive closed-form expressions for the posterior
+distribution. When the likelihood function is a member of the exponential
+family, then there exists a conjugate prior. However, the conjugate prior may
+not have a form that precisely reflects the practitioner's belief surrounding
+the parameter. For this reason, conjugate models seldom appear; one exception
+to this is GP regression that we present fully in our <a href="https://docs.jaxgaussianprocesses.com/examples/regression/">Regression notebook</a>.</p>
+<p>For models that do not contain a conjugate prior, the marginal log-likelihood
+must be calculated to normalise the posterior distribution and ensure it
+integrates to 1. For models with a single, 1-dimensional parameter, it may be
+possible to compute this integral analytically or through a quadrature scheme,
+such as Gauss-Hermite. However, in machine learning, the dimensionality of
+<span class="arithmatex">\(\theta\)</span> is often large and the corresponding integral required to compute
+<span class="arithmatex">\(p(\mathbf{y})\)</span> quickly becomes intractable as the dimension grows. Techniques
+such as Markov Chain Monte Carlo and variational inference allow us to
+approximate integrals such as the one seen in <span class="arithmatex">\(p(\mathbf{y})\)</span>.</p>
+<p>Once a posterior distribution has been obtained, we can make predictions at
+new points <span class="arithmatex">\(\mathbf{y}^{\star}\)</span> through the <em>posterior predictive
+distribution</em>. This is achieved by integrating out the parameter set <span class="arithmatex">\(\theta\)</span>
+from our posterior distribution through
+\begin{align}
+    p(\mathbf{y}^{\star}\mid \mathbf{y}) = \int p(\mathbf{y}^{\star} \,|\, \theta, \mathbf{y} ) p(\theta\,|\, \mathbf{y})\mathrm{d}\theta\,.
+\end{align}
+As with the marginal log-likelihood, evaluating this quantity requires
+computing an integral which may not be tractable, particularly when <span class="arithmatex">\(\theta\)</span>
+is high-dimensional.</p>
+<p>It is difficult to communicate statistics directly through a posterior
+distribution, so we often compute and report moments of the posterior
+distribution. Most commonly, we report the first moment and the centred second
+moment
+$$
+\begin{alignat}{2}
+    \mu  = \mathbb{E}[\theta\,|\,\mathbf{y}]  &amp; = \int \theta p(\theta\mid\mathbf{y})\mathrm{d}\theta\
+    \sigma^2  = \mathbb{V}[\theta\,|\,\mathbf{y}] &amp; = \int \left(\theta -
+    \mathbb{E}[\theta\,|\,\mathbf{y}]\right)^2p(\theta\,|\,\mathbf{y})\mathrm{d}\theta&amp;\,.
+\end{alignat}
+$$
+Through this pair of statistics, we can communicate our beliefs about the most
+likely value of <span class="arithmatex">\(\theta\)</span> i.e., <span class="arithmatex">\(\mu\)</span>, and the uncertainty <span class="arithmatex">\(\sigma\)</span> around the
+expected value. However, as with the marginal log-likelihood and predictive
+posterior distribution, computing these statistics again requires a
+potentially intractable integral.</p>
+<h2 id="gaussian-random-variables">Gaussian random variables<a class="headerlink" href="#gaussian-random-variables" title="Permanent link"></a></h2>
+<p>We begin our review with the simplest case; a univariate Gaussian random
+variable. For a random variable <span class="arithmatex">\(y\)</span>, let <span class="arithmatex">\(\mu\in\mathbb{R}\)</span> be a mean scalar
+and <span class="arithmatex">\(\sigma^2\in\mathbb{R}_{&gt;0}\)</span> a variance scalar. If <span class="arithmatex">\(y\)</span> is a Gaussian
+random variable, then the density of <span class="arithmatex">\(y\)</span> is
+$$
+\begin{align}
+    \mathcal{N}(y\,|\, \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(y-\mu)^2}{2\sigma^{2}}\right)\,.
+\end{align}
+$$
+We can plot three different parameterisations of this density.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span> <span class="nn">warnings</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">import</span> <span class="nn">jax.random</span> <span class="k">as</span> <span class="nn">jr</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="kn">import</span> <span class="nn">tensorflow_probability.substrates.jax</span> <span class="k">as</span> <span class="nn">tfp</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="kn">from</span> <span class="nn">examples.utils</span> <span class="kn">import</span> <span class="n">confidence_ellipse</span><span class="p">,</span> <span class="n">use_mpl_style</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1"># set the default style for plotting</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">use_mpl_style</span><span class="p">()</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="n">cols</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;axes.prop_cycle&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="n">tfd</span> <span class="o">=</span> <span class="n">tfp</span><span class="o">.</span><span class="n">distributions</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="n">ud1</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="n">ud2</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="n">ud3</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="n">xs</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ud1</span><span class="p">,</span> <span class="n">ud2</span><span class="p">,</span> <span class="n">ud3</span><span class="p">]:</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>        <span class="n">xs</span><span class="p">,</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>        <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">xs</span><span class="p">)),</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>        <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$</span><span class="se">\\</span><span class="s2">mathcal</span><span class="se">{{</span><span class="s2">N</span><span class="se">}}</span><span class="s2">(</span><span class="se">{{</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="si">}</span><span class="se">}}</span><span class="s2">,</span><span class="se">\\</span><span class="s2">  </span><span class="se">{{</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">stddev</span><span class="p">())</span><span class="si">}</span><span class="se">}}</span><span class="s2">^2)$&quot;</span><span class="p">,</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>    <span class="p">)</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">xs</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">xs</span><span class="p">)),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f5c50d7fcd0&gt;
+</code></pre></div>
+<p><img alt="png" src="../intro_to_gps_files/intro_to_gps_1_1.png" /></p>
+<p>A Gaussian random variable is uniquely defined in distribution by its mean
+<span class="arithmatex">\(\mu\)</span> and variance <span class="arithmatex">\(\sigma^2\)</span> and we therefore write <span class="arithmatex">\(y\sim\mathcal{N}(\mu,
+\sigma^2)\)</span> when describing a Gaussian random variable. We can compute
+these two quantities by
+$$
+\begin{align}
+    \mathbb{E}[y] = \mu\,, \quad \quad \mathbb{E}\left[(y-\mu)^2\right] =\sigma^2\,.
+\end{align}
+$$
+Extending this concept to vector-valued random variables reveals the
+multivariate Gaussian random variables which brings us closer to the full
+definition of a GP.</p>
+<p>Let <span class="arithmatex">\(\mathbf{y}\)</span> be a <span class="arithmatex">\(D\)</span>-dimensional random variable, <span class="arithmatex">\(\boldsymbol{\mu}\)</span> be a
+<span class="arithmatex">\(D\)</span>-dimensional mean vector and <span class="arithmatex">\(\boldsymbol{\Sigma}\)</span> be a <span class="arithmatex">\(D\times D\)</span>
+covariance matrix. If <span class="arithmatex">\(\mathbf{y}\)</span> is a Gaussian random variable, then the
+density of <span class="arithmatex">\(\mathbf{y}\)</span> is
+$$
+\begin{align}
+    \mathcal{N}(\mathbf{y}\,|\, \boldsymbol{\mu}, \boldsymbol{\Sigma}) = \frac{1}{\sqrt{2\pi}^{D/2} \lvert\boldsymbol{\Sigma}\rvert^{1/2}} \exp\left(-\frac{1}{2} \left(\mathbf{y} - \boldsymbol{\mu}\right)^T \boldsymbol{\Sigma}^{-1} \left(\mathbf{y}-\boldsymbol{\mu}\right) \right) \,.
+\end{align}
+$$
+Three example parameterisations of this can be visualised below where <span class="arithmatex">\(\rho\)</span>
+determines the correlation of the multivariate Gaussian.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">d1</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalDiag</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">scale_diag</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">d2</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalTriL</span><span class="p">(</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]))</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">d3</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">MultivariateNormalTriL</span><span class="p">(</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]))</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">)</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">dists</span> <span class="o">=</span> <span class="p">[</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">]</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">xvals</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="n">yvals</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">yvals</span><span class="p">)</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="n">pos</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">xx</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="n">pos</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="n">pos</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">yy</span><span class="p">)</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax0</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tight_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s2">&quot;$\rho = 0$&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;$\rho = 0.9$&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;$\rho = -0.5$&quot;</span><span class="p">]</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="n">cmap</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="s2">&quot;custom&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">N</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>
+</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">ax0</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">],</span> <span class="n">titles</span><span class="p">,</span> <span class="n">dists</span><span class="p">):</span>
+</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>    <span class="n">d_prob</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">prob</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">xx</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">yy</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>        <span class="n">xx</span><span class="o">.</span><span class="n">shape</span>
+</span><span id="__span-1-30"><a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a>    <span class="p">)</span>
+</span><span id="__span-1-31"><a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a>    <span class="n">cntf</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">d_prob</span><span class="p">),</span> <span class="n">levels</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">antialiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+</span><span id="__span-1-32"><a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a>    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cntf</span><span class="o">.</span><span class="n">collections</span><span class="p">:</span>
+</span><span id="__span-1-33"><a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a>        <span class="n">c</span><span class="o">.</span><span class="n">set_edgecolor</span><span class="p">(</span><span class="s2">&quot;face&quot;</span><span class="p">)</span>
+</span><span id="__span-1-34"><a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a>    <span class="n">a</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">2.75</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">)</span>
+</span><span id="__span-1-35"><a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a>    <span class="n">a</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">2.75</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">)</span>
+</span><span id="__span-1-36"><a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a>    <span class="n">samples</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">5000</span><span class="p">,))</span>
+</span><span id="__span-1-37"><a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>    <span class="n">xsample</span><span class="p">,</span> <span class="n">ysample</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+</span><span id="__span-1-38"><a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a>    <span class="n">confidence_ellipse</span><span class="p">(</span>
+</span><span id="__span-1-39"><a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a>        <span class="n">xsample</span><span class="p">,</span> <span class="n">ysample</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;#3f3f3f&quot;</span><span class="p">,</span> <span class="n">n_std</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span>
+</span><span id="__span-1-40"><a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a>    <span class="p">)</span>
+</span><span id="__span-1-41"><a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a>    <span class="n">confidence_ellipse</span><span class="p">(</span>
+</span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a>        <span class="n">xsample</span><span class="p">,</span> <span class="n">ysample</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;#3f3f3f&quot;</span><span class="p">,</span> <span class="n">n_std</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span>
+</span><span id="__span-1-43"><a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a>    <span class="p">)</span>
+</span><span id="__span-1-44"><a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a>    <span class="n">a</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">mew</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="__span-1-45"><a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a>    <span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code>/tmp/ipykernel_10842/1315003044.py:32: MatplotlibDeprecationWarning: The collections attribute was deprecated in Matplotlib 3.8 and will be removed in 3.10.
+  for c in cntf.collections:
+
+
+/tmp/ipykernel_10842/1315003044.py:32: MatplotlibDeprecationWarning: The collections attribute was deprecated in Matplotlib 3.8 and will be removed in 3.10.
+  for c in cntf.collections:
+/tmp/ipykernel_10842/1315003044.py:32: MatplotlibDeprecationWarning: The collections attribute was deprecated in Matplotlib 3.8 and will be removed in 3.10.
+  for c in cntf.collections:
+</code></pre></div>
+<p><img alt="png" src="../intro_to_gps_files/intro_to_gps_3_2.png" /></p>
+<p>Extending the intuition given for the moments of a univariate Gaussian random
+variables, we can obtain the mean and covariance by
+$$
+\begin{align}
+   \mathbb{E}[\mathbf{y}] = \mathbf{\mu}, \quad \operatorname{Cov}(\mathbf{y}) &amp; = \mathbf{E}\left[(\mathbf{y} - \mathbf{\mu)}(\mathbf{y} - \mathbf{\mu)}^{\top} \right]\
+      &amp; =\mathbb{E}[\mathbf{y}\mathbf{y}^{\top}] - \mathbb{E}[\mathbf{y}]\mathbb{E}[\mathbf{y}]^{\top} \
+      &amp; =\mathbf{\Sigma}\,.
+\end{align}
+$$
+The covariance matrix is a symmetric positive definite matrix that generalises
+the notion of variance to multiple dimensions. The matrix's diagonal entries
+contain the variance of each element, whilst the off-diagonal entries quantify
+the degree to which the respective pair of random variables are linearly
+related; this quantity is called the <em>covariance</em>.</p>
+<p>Assuming a Gaussian likelihood function in a Bayesian model is attractive as
+the mean and variance parameters are highly interpretable. This makes prior
+elicitation straightforward as the parameters' value can be intuitively
+contextualised within the scope of the problem at hand. Further, in models
+where the posterior distribution is Gaussian, we again use the distribution's
+mean and variance to describe our prediction and corresponding uncertainty
+around a given event occurring.</p>
+<p>Not only are Gaussian random variables highly interpretable, but linear
+operations involving them lead to analytical solutions. An example of this
+that will be useful in the sequel is the marginalisation and conditioning
+property of sets of Gaussian random variables. We will present these two
+results now for a pair of Gaussian random variables, but it should be stressed
+that these results hold for any finite set of Gaussian random variables.</p>
+<p>For a pair of random variables <span class="arithmatex">\(\mathbf{x}\)</span> and <span class="arithmatex">\(\mathbf{y}\)</span> defined on the
+same support, the distribution over them both is known as the <em>joint
+distribution</em>. The joint distribution <span class="arithmatex">\(p(\mathbf{x}, \mathbf{y})\)</span> quantifies
+the probability of two events, one from <span class="arithmatex">\(p(\mathbf{x})\)</span> and another from
+<span class="arithmatex">\(p(\mathbf{y})\)</span>, occurring at the same time. We visualise this idea below.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">n</span> <span class="o">=</span> <span class="mi">1000</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">x</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,))</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">y</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">subkey</span><span class="p">,</span> <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,))</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">subkey</span><span class="p">)</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">xfull</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">subkey</span><span class="p">,</span> <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,))</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">subkey</span><span class="p">)</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">yfull</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">subkey</span><span class="p">,</span> <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,))</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">subkey</span><span class="p">)</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;idx&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)})</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>        <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>        <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>        <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;idx&quot;</span><span class="p">,</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>        <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>        <span class="n">space</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>        <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>        <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>        <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>        <span class="n">marginal_ticks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>        <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>        <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;inferno&quot;</span><span class="p">,</span>
+</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>        <span class="n">marginal_kws</span><span class="o">=</span><span class="p">{</span>
+</span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>            <span class="s2">&quot;fill&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>            <span class="s2">&quot;linewidth&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a>            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-2-31"><a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a>            <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+</span><span id="__span-2-32"><a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>            <span class="s2">&quot;bw_adjust&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+</span><span id="__span-2-33"><a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a>            <span class="s2">&quot;cmap&quot;</span><span class="p">:</span> <span class="n">cmap</span><span class="p">,</span>
+</span><span id="__span-2-34"><a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a>        <span class="p">},</span>
+</span><span id="__span-2-35"><a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a>        <span class="n">joint_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s2">&quot;cmap&quot;</span><span class="p">:</span> <span class="n">cmap</span><span class="p">},</span>
+</span><span id="__span-2-36"><a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a>    <span class="p">)</span>
+</span><span id="__span-2-37"><a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a>    <span class="n">g</span><span class="o">.</span><span class="n">ax_joint</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$p(\mathbf</span><span class="si">{x}</span><span class="s2">, \mathbf</span><span class="si">{y}</span><span class="s2">)$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.75</span><span class="p">))</span>
+</span><span id="__span-2-38"><a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a>    <span class="n">g</span><span class="o">.</span><span class="n">ax_marg_x</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$p(\mathbf</span><span class="si">{x}</span><span class="s2">)$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">))</span>
+</span><span id="__span-2-39"><a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a>    <span class="n">g</span><span class="o">.</span><span class="n">ax_marg_y</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$p(\mathbf</span><span class="si">{y}</span><span class="s2">)$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.78</span><span class="p">))</span>
+</span><span id="__span-2-40"><a id="__codelineno-2-40" name="__codelineno-2-40" href="#__codelineno-2-40"></a>    <span class="n">confidence_ellipse</span><span class="p">(</span>
+</span><span id="__span-2-41"><a id="__codelineno-2-41" name="__codelineno-2-41" href="#__codelineno-2-41"></a>        <span class="n">xfull</span><span class="p">,</span>
+</span><span id="__span-2-42"><a id="__codelineno-2-42" name="__codelineno-2-42" href="#__codelineno-2-42"></a>        <span class="n">yfull</span><span class="p">,</span>
+</span><span id="__span-2-43"><a id="__codelineno-2-43" name="__codelineno-2-43" href="#__codelineno-2-43"></a>        <span class="n">g</span><span class="o">.</span><span class="n">ax_joint</span><span class="p">,</span>
+</span><span id="__span-2-44"><a id="__codelineno-2-44" name="__codelineno-2-44" href="#__codelineno-2-44"></a>        <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;#3f3f3f&quot;</span><span class="p">,</span>
+</span><span id="__span-2-45"><a id="__codelineno-2-45" name="__codelineno-2-45" href="#__codelineno-2-45"></a>        <span class="n">n_std</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+</span><span id="__span-2-46"><a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a>        <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
+</span><span id="__span-2-47"><a id="__codelineno-2-47" name="__codelineno-2-47" href="#__codelineno-2-47"></a>        <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+</span><span id="__span-2-48"><a id="__codelineno-2-48" name="__codelineno-2-48" href="#__codelineno-2-48"></a>    <span class="p">)</span>
+</span><span id="__span-2-49"><a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a>    <span class="n">confidence_ellipse</span><span class="p">(</span>
+</span><span id="__span-2-50"><a id="__codelineno-2-50" name="__codelineno-2-50" href="#__codelineno-2-50"></a>        <span class="n">xfull</span><span class="p">,</span>
+</span><span id="__span-2-51"><a id="__codelineno-2-51" name="__codelineno-2-51" href="#__codelineno-2-51"></a>        <span class="n">yfull</span><span class="p">,</span>
+</span><span id="__span-2-52"><a id="__codelineno-2-52" name="__codelineno-2-52" href="#__codelineno-2-52"></a>        <span class="n">g</span><span class="o">.</span><span class="n">ax_joint</span><span class="p">,</span>
+</span><span id="__span-2-53"><a id="__codelineno-2-53" name="__codelineno-2-53" href="#__codelineno-2-53"></a>        <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;#3f3f3f&quot;</span><span class="p">,</span>
+</span><span id="__span-2-54"><a id="__codelineno-2-54" name="__codelineno-2-54" href="#__codelineno-2-54"></a>        <span class="n">n_std</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+</span><span id="__span-2-55"><a id="__codelineno-2-55" name="__codelineno-2-55" href="#__codelineno-2-55"></a>        <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
+</span><span id="__span-2-56"><a id="__codelineno-2-56" name="__codelineno-2-56" href="#__codelineno-2-56"></a>        <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+</span><span id="__span-2-57"><a id="__codelineno-2-57" name="__codelineno-2-57" href="#__codelineno-2-57"></a>    <span class="p">)</span>
+</span><span id="__span-2-58"><a id="__codelineno-2-58" name="__codelineno-2-58" href="#__codelineno-2-58"></a>    <span class="n">confidence_ellipse</span><span class="p">(</span>
+</span><span id="__span-2-59"><a id="__codelineno-2-59" name="__codelineno-2-59" href="#__codelineno-2-59"></a>        <span class="n">xfull</span><span class="p">,</span>
+</span><span id="__span-2-60"><a id="__codelineno-2-60" name="__codelineno-2-60" href="#__codelineno-2-60"></a>        <span class="n">yfull</span><span class="p">,</span>
+</span><span id="__span-2-61"><a id="__codelineno-2-61" name="__codelineno-2-61" href="#__codelineno-2-61"></a>        <span class="n">g</span><span class="o">.</span><span class="n">ax_joint</span><span class="p">,</span>
+</span><span id="__span-2-62"><a id="__codelineno-2-62" name="__codelineno-2-62" href="#__codelineno-2-62"></a>        <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;#3f3f3f&quot;</span><span class="p">,</span>
+</span><span id="__span-2-63"><a id="__codelineno-2-63" name="__codelineno-2-63" href="#__codelineno-2-63"></a>        <span class="n">n_std</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+</span><span id="__span-2-64"><a id="__codelineno-2-64" name="__codelineno-2-64" href="#__codelineno-2-64"></a>        <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
+</span><span id="__span-2-65"><a id="__codelineno-2-65" name="__codelineno-2-65" href="#__codelineno-2-65"></a>        <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+</span><span id="__span-2-66"><a id="__codelineno-2-66" name="__codelineno-2-66" href="#__codelineno-2-66"></a>    <span class="p">)</span>
+</span></code></pre></div>
+<p><img alt="png" src="../intro_to_gps_files/intro_to_gps_5_0.png" /></p>
+<p>Formally, we can define this by letting <span class="arithmatex">\(p(\mathbf{x}, \mathbf{y})\)</span> be the
+joint probability distribution defined over
+<span class="arithmatex">\(\mathbf{x}\sim\mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}}, \boldsymbol{\Sigma}_{\mathbf{xx}})\)</span> and
+<span class="arithmatex">\(\mathbf{y}\sim\mathcal{N}(\boldsymbol{\mu}_{\mathbf{y}}, \boldsymbol{\Sigma}_{\mathbf{yy}})\)</span>.
+We define the joint distribution as
+$$
+\begin{align}
+    p\left(\begin{bmatrix}
+        \mathbf{x} \ \mathbf{y}
+    \end{bmatrix}\right) = \mathcal{N}\left(\begin{bmatrix}
+        \boldsymbol{\mu}<em>{\mathbf{x}} \ \boldsymbol{\mu}</em>{\mathbf{y}}
+    \end{bmatrix}, \begin{bmatrix}
+        \boldsymbol{\Sigma}<em>{\mathbf{xx}} &amp; \boldsymbol{\Sigma}</em>{\mathbf{xy}}\
+        \boldsymbol{\Sigma}<em>{\mathbf{yx}} &amp; \boldsymbol{\Sigma}</em>{\mathbf{yy}}
+    \end{bmatrix} \right)\,,
+\end{align}
+$$
+where <span class="arithmatex">\(\boldsymbol{\Sigma}_{\mathbf{x}\mathbf{y}}\)</span> is the cross-covariance
+matrix of <span class="arithmatex">\(\mathbf{x}\)</span> and <span class="arithmatex">\(\mathbf{y}\)</span>.</p>
+<p>When presented with a joint distribution, two tasks that we may wish to
+perform are <em>marginalisation</em> and <em>conditioning</em>. For a joint distribution
+<span class="arithmatex">\(p(\mathbf{x}, \mathbf{y})\)</span> where we are interested only in <span class="arithmatex">\(p(\mathbf{x})\)</span>,
+we must integrate over all possible values of <span class="arithmatex">\(\mathbf{y}\)</span> to obtain
+<span class="arithmatex">\(p(\mathbf{x})\)</span>. This process is marginalisation. Conditioning allows us to
+evaluate the probability of one random variable, given that the other random
+variable is fixed. For a joint Gaussian distribution, marginalisation and
+conditioning have analytical expressions where the resulting distribution is
+also a Gaussian random variable.</p>
+<p>For a joint Gaussian random variable, the marginalisation of <span class="arithmatex">\(\mathbf{x}\)</span> or
+<span class="arithmatex">\(\mathbf{y}\)</span> is given by
+$$
+\begin{alignat}{3}
+    &amp; \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{y} &amp;&amp; = p(\mathbf{x})
+    &amp;&amp; = \mathcal{N}(\boldsymbol{\mu}<em>{\mathbf{x}},\boldsymbol{\Sigma}</em>{\mathbf{xx}})\
+    &amp; \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{x} &amp;&amp; = p(\mathbf{y})
+    &amp;&amp; = \mathcal{N}(\boldsymbol{\mu}<em>{\mathbf{y}},
+    \boldsymbol{\Sigma}</em>{\mathbf{yy}})\,.
+\end{alignat}
+$$
+The conditional distributions are given by
+$$
+\begin{align}
+    p(\mathbf{y}\,|\, \mathbf{x}) &amp; = \mathcal{N}\left(\boldsymbol{\mu}<em>{\mathbf{y}} + \boldsymbol{\Sigma}</em>{\mathbf{yx}}\boldsymbol{\Sigma}<em>{\mathbf{xx}}^{-1}(\mathbf{x}-\boldsymbol{\mu}</em>{\mathbf{x}}), \boldsymbol{\Sigma}<em>{\mathbf{yy}}-\boldsymbol{\Sigma}</em>{\mathbf{yx}}\boldsymbol{\Sigma}<em>{\mathbf{xx}}^{-1}\boldsymbol{\Sigma}</em>{\mathbf{xy}}\right)\,.
+\end{align}
+$$</p>
+<p>Within this section, we have introduced the idea of multivariate Gaussian
+random variables and presented some key results concerning their properties.
+In the following section, we will lift our presentation of Gaussian random
+variables to GPs.</p>
+<h2 id="gaussian-processes">Gaussian processes<a class="headerlink" href="#gaussian-processes" title="Permanent link"></a></h2>
+<p>When transitioning from Gaussian random variables to GP there is a shift in
+thought required to parse the forthcoming material. Firstly, to be consistent
+with the general literature, we hereon use <span class="arithmatex">\(\mathbf{X}\)</span> to denote an observed
+vector of data points, not a random variable as has been true up until now. To
+distinguish between matrices and vectors, we use bold upper case characters
+e.g., <span class="arithmatex">\(\mathbf{X}\)</span> for matrices, and bold lower case characters for vectors
+e.g., <span class="arithmatex">\(\mathbf{x}\)</span>.</p>
+<p>We are interested in modelling supervised learning problems, where we have <span class="arithmatex">\(n\)</span>
+observations <span class="arithmatex">\(\mathbf{y}=\{y_1, y_2,\ldots ,y_n\}\subset\mathcal{Y}\)</span> at
+corresponding inputs
+<span class="arithmatex">\(\mathbf{X}=\{\mathbf{x}_1,\mathbf{x}_2,\ldots,\mathbf{x}_n\}\subset\mathcal{X}\)</span>.
+We aim to capture the relationship between <span class="arithmatex">\(\mathbf{X}\)</span> and <span class="arithmatex">\(\mathbf{y}\)</span> using
+a model <span class="arithmatex">\(f\)</span> with which we may make predictions at an unseen set of test points
+<span class="arithmatex">\(\mathbf{X}^{\star}\subset\mathcal{X}\)</span>. We formalise this by
+$$
+\begin{align}
+    y = f(\mathbf{X}) + \varepsilon\,,
+\end{align}
+$$
+where <span class="arithmatex">\(\varepsilon\)</span> is an observational noise term. We collectively refer to
+<span class="arithmatex">\((\mathbf{X}, \mathbf{y})\)</span> as the <em>training data</em> and <span class="arithmatex">\(\mathbf{X}^{\star}\)</span> as
+the set of <em>test points</em>.
+This process is visualised below</p>
+<p><img alt="" src="generating_process.png" /></p>
+<p>As we shall go on to see, GPs offer an appealing workflow for scenarios such
+as this, all under a Bayesian framework.</p>
+<p>We write a GP <span class="arithmatex">\(f(\cdot) \sim \mathcal{GP}(\mu(\cdot), k(\cdot, \cdot))\)</span> with
+mean function <span class="arithmatex">\(\mu: \mathcal{X} \rightarrow \mathbb{R}\)</span> and
+<span class="arithmatex">\(\boldsymbol{\theta}\)</span>-parameterised kernel
+<span class="arithmatex">\(k: \mathcal{X} \times \mathcal{X}\rightarrow \mathbb{R}\)</span>.
+When evaluating the GP on a finite set of points
+<span class="arithmatex">\(\mathbf{X}\subset\mathcal{X}\)</span>, <span class="arithmatex">\(k\)</span> gives rise to the Gram matrix
+<span class="arithmatex">\(\mathbf{K}_{ff}\)</span> such that the <span class="arithmatex">\((i, j)^{\text{th}}\)</span> entry of the matrix is
+given by <span class="arithmatex">\([\mathbf{K}_{ff}]_{i, j} = k(\mathbf{x}_i, \mathbf{x}_j)\)</span>. As is
+conventional within the literature, we centre our training data and assume
+<span class="arithmatex">\(\mu(\mathbf{X}):= 0\)</span> for all <span class="arithmatex">\(\mathbf{X}\in\mathcal{X}\)</span>. We further drop
+dependency on <span class="arithmatex">\(\boldsymbol{\theta}\)</span> and <span class="arithmatex">\(\mathbf{X}\)</span> for notational
+convenience in the remainder of this article.</p>
+<p>We define a joint GP prior over the latent function
+$$
+\begin{align}
+    p(\mathbf{f}, \mathbf{f}^{\star}) = \mathcal{N}\left(\mathbf{0}, \begin{bmatrix}
+        \mathbf{K}<em>{xf} &amp; \mathbf{K}</em>{xx}
+    \end{bmatrix}\right)\,,
+\end{align}
+$$
+where <span class="arithmatex">\(\mathbf{f}^{\star} = f(\mathbf{X}^{\star})\)</span>. Conditional on the GP's
+latent function <span class="arithmatex">\(f\)</span>, we assume a factorising likelihood generates our
+observations
+$$
+\begin{align}
+    p(\mathbf{y}\,|\,\mathbf{f}) = \prod_{i=1}^n p(y_i\,|\, f_i)\,.
+\end{align}
+$$
+Strictly speaking, the likelihood function is
+<span class="arithmatex">\(p(\mathbf{y}\,|\,\phi(\mathbf{f}))\)</span> where <span class="arithmatex">\(\phi\)</span> is the likelihood function's
+associated link function. Example link functions include the probit or
+logistic functions for a Bernoulli likelihood and the identity function for a
+Gaussian likelihood. We eschew this notation for now as this section primarily
+considers Gaussian likelihood functions where the role of <span class="arithmatex">\(\phi\)</span> is
+superfluous. However, this intuition will be helpful for models with a
+non-Gaussian likelihood, such as those encountered in
+<a href="https://docs.jaxgaussianprocesses.com/examples/classification">classification</a>.</p>
+<p>Applying Bayes' theorem \eqref{eq:BayesTheorem} yields the joint posterior distribution over the
+latent function
+$$
+\begin{align}
+    p(\mathbf{f}, \mathbf{f}^{\star}\,|\,\mathbf{y}) = \frac{p(\mathbf{y}\,|\,\mathbf{f})p(\mathbf{f},\mathbf{f}^{\star})}{p(\mathbf{y})}\,.
+\end{align}
+$$</p>
+<p>The choice of kernel function that we use to parameterise our GP is an
+important modelling decision as the choice of kernel dictates properties such
+as differentiability, variance and characteristic lengthscale of the functions
+that are admissible under the GP prior. A kernel is a positive-definite
+function with parameters <span class="arithmatex">\(\boldsymbol{\theta}\)</span> that maps pairs of inputs
+<span class="arithmatex">\(\mathbf{X}, \mathbf{X}' \in \mathcal{X}\)</span> onto the real line. We dedicate the
+entirety of the <a href="https://docs.jaxgaussianprocesses.com/examples/intro_to_kernels">Introduction to Kernels
+notebook</a> to
+exploring the different GPs each kernel can yield.</p>
+<h2 id="gaussian-process-regression">Gaussian process regression<a class="headerlink" href="#gaussian-process-regression" title="Permanent link"></a></h2>
+<p>When the likelihood function is a Gaussian distribution
+<span class="arithmatex">\(p(y_i\,|\, f_i) = \mathcal{N}(y_i\,|\, f_i, \sigma_n^2)\)</span>,
+marginalising <span class="arithmatex">\(\mathbf{f}\)</span> from the joint posterior to obtain
+the posterior predictive distribution is exact
+$$
+\begin{align}
+    p(\mathbf{f}^{\star}\mid \mathbf{y}) = \mathcal{N}(\mathbf{f}^{\star}\,|\,\boldsymbol{\mu}<em>{\,|\,\mathbf{y}}, \Sigma</em>{\,|\,\mathbf{y}})\,,
+\end{align}
+$$
+where
+$$
+\begin{align}
+    \mathbf{\mu}<em>{\mid \mathbf{y}} &amp; = \mathbf{K}</em>{\star f}\left( \mathbf{K}<em>{ff}+\sigma^2_n\mathbf{I}_n\right)^{-1}\mathbf{y} \
+    \Sigma</em>{\,|\,\mathbf{y}} &amp; = \mathbf{K}<em>{\star\star} - \mathbf{K}</em>{xf}\left(\mathbf{K}<em>{ff} + \sigma_n^2\mathbf{I}_n\right)^{-1}\mathbf{K}</em>{fx} \,.
+\end{align}
+$$
+Further, the log of the  marginal likelihood of the GP can
+be analytically expressed as
+$$
+\begin{align}
+        &amp; = 0.5\left(-\underbrace{\mathbf{y}^{\top}\left(\mathbf{K}<em>{ff} + \sigma_n^2\mathbf{I}_n \right)^{-1}\mathbf{y}}</em>{\text{Data fit}} -\underbrace{\log\lvert \mathbf{K}<em>{ff} + \sigma^2_n\rvert}</em>{\text{Complexity}} -\underbrace{n\log 2\pi}_{\text{Constant}} \right)\,.
+\end{align}
+$$</p>
+<p>Model selection can be performed for a GP through gradient-based optimisation
+of <span class="arithmatex">\(\log p(\mathbf{y})\)</span> with respect to the kernel's parameters
+<span class="arithmatex">\(\boldsymbol{\theta}\)</span> and the observational noise <span class="arithmatex">\(\sigma^2_n\)</span>. Collectively,
+we call these terms the model hyperparameters
+<span class="arithmatex">\(\boldsymbol{\xi} = \{\boldsymbol{\theta},\sigma_n^2\}\)</span>
+from which the maximum likelihood estimate is given by
+$$
+\begin{align<em>}
+    \boldsymbol{\xi}^{\star} = \operatorname{argmax}_{\boldsymbol{\xi} \in \Xi} \log p(\mathbf{y})\,.
+\end{align</em>}
+$$</p>
+<p>Observing the individual terms in the marginal log-likelihood can help
+understand exactly why optimising the marginal log-likelihood gives reasonable
+solutions. The <em>data fit</em> term is the only component of the marginal
+log-likelihood that includes the observed response <span class="arithmatex">\(\mathbf{y}\)</span> and will
+therefore encourage solutions that model the data well. Conversely, the
+<em>complexity</em> term contains a determinant operator and therefore measures the
+<em>volume</em> of the function space covered by the GP. Whilst a more complex
+function has a better chance of modelling the observed data well, this is only
+true to a point and functions that are overly complex will overfit the data.
+Optimising with respect to the marginal log-likelihood balances these two
+objectives when identifying the optimal solution, as visualised below.</p>
+<p><img alt="" src="decomposed_mll.png" /></p>
+<h2 id="conclusions">Conclusions<a class="headerlink" href="#conclusions" title="Permanent link"></a></h2>
+<p>Within this notebook we have built up the concept of a GP, starting from
+Bayes' theorem and the definition of a Gaussian random variable. Using the
+ideas presented in this notebook, the user should be in a position to dive
+into our <a href="https://docs.jaxgaussianprocesses.com/examples/regression/">Regression
+notebook</a> and
+start getting their hands on some code. For those looking to learn more about
+the underling theory of GPs, an excellent starting point is the <a href="http://gaussianprocess.org/gpml/">Gaussian
+Processes for Machine Learning</a> textbook.
+Alternatively, the <a href="https://arxiv.org/abs/2202.10613">thesis of Alexander
+Terenin</a> provides a rigorous exposition of
+GPs that served as the inspiration for this notebook.</p>
+<h2 id="system-configuration">System Configuration<a class="headerlink" href="#system-configuration" title="Permanent link"></a></h2>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="o">%</span><span class="n">reload_ext</span> <span class="n">watermark</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="o">%</span><span class="n">watermark</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">iv</span> <span class="o">-</span><span class="n">w</span> <span class="o">-</span><span class="n">a</span> <span class="s1">&#39;Thomas Pinder&#39;</span>
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code>Author: Thomas Pinder
+
+Last updated: Fri Aug 16 2024
+
+Python implementation: CPython
+Python version       : 3.10.14
+IPython version      : 8.26.0
+
+pandas                : 1.5.3
+jax                   : 0.4.27
+seaborn               : 0.12.2
+tensorflow_probability: 0.24.0
+matplotlib            : 3.9.2
+
+Watermark: 2.4.3
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+      
+        <script src="../../javascripts/katex.js"></script>
+      
+    
+  </body>
+</html>
