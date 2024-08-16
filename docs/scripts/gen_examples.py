@@ -28,7 +28,7 @@ def process_file(file: Path, out_file: Path | None = None, execute: bool = False
             f"| jupyter nbconvert --to markdown --execute --stdin --output {out_file}"
         )
     else:
-        command = f"jupytext --to markdown {file} --output {out_file}"
+        command += f"jupytext --to markdown {file} --output {out_file}"
 
     subprocess.run(command, shell=True, check=False)
 
