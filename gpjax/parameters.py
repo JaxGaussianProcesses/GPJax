@@ -31,11 +31,8 @@ def transform(
         >>> )
         >>> params_bijection = {'positive': tfb.Softplus()}
         >>> transformed_params = transform(params, params_bijection)
-        >>> transformed_params["a"]
-         PositiveReal(
-            value=Array([1.3132617], dtype=float32),
-            _tag='positive'
-          )
+        >>> print(transformed_params["a"].value)
+         [1.3132617]
     ```
 
 
