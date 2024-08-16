@@ -64,21 +64,26 @@ def main(args):
     print(files)
 
     # process files in parallel
-    with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
-        futures = []
+    if args.parallel:
+        with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
+            futures = []
+            for file in files:
+                out_file = out_dir / f"{file.stem}.md"
+                futures.append(
+                    executor.submit(
+                        process_file, file, out_file=out_file, execute=args.execute
+                    )
+                )
+
+            for future in as_completed(futures):
+                try:
+                    future.result()
+                except Exception as e:
+                    print(f"Error processing file: {e}")
+    else:
         for file in files:
             out_file = out_dir / f"{file.stem}.md"
-            futures.append(
-                executor.submit(
-                    process_file, file, out_file=out_file, execute=args.execute
-                )
-            )
-
-        for future in as_completed(futures):
-            try:
-                future.result()
-            except Exception as e:
-                print(f"Error processing file: {e}")
+            process_file(file, out_file=out_file, execute=args.execute)
 
 
 if __name__ == "__main__":
@@ -91,6 +96,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--outdir", type=Path, default=project_root / "docs" / "_examples"
     )
+    parser.add_argument("--parallel", type=bool, default=False)
     args = parser.parse_args()
 
     main(args)
