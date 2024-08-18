@@ -46,20 +46,15 @@ jobs:
       - name: Install KaTeX
         run: |
           npm install katex
-      # Install Poetry and build the documentation
-      - name: Install and configure Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 1.5.1
-          virtualenvs-create: false
-          virtualenvs-in-project: false
-          installer-parallel: true
+
+      # Install Hatch
+      - name: Install Hatch
+        uses: pypa/hatch@install
 
       - name: Build the documentation with MKDocs
         run: |
-          poetry install --all-extras --with docs
           conda install pandoc
-          poetry run python docs/scripts/gen_examples.py --execute && poetry run mkdocs build
+          hatch run docs:build
 
       - name: Deploy Page 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.1

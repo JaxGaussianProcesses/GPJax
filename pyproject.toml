@@ -93,6 +93,7 @@ format = [
   "ruff check --fix .",
 ]
 test = "pytest -vv -n auto ."
+coverage = "pytest -vv --cov=./gpjax --cov-report=xml:./coverage.xml"
 
 [project.urls]
 Documentation = "https://docs.jaxgaussianprocesses.com/"
@@ -101,11 +102,6 @@ Source = "https://github.com/JaxGaussianProcesses/GPJax"
 
 [tool.hatch.version]
 path = "src/gpjax/__init__.py"
-
-[tool.hatch.envs.types]
-extra-dependencies = ["mypy>=1.0.0"]
-[tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/gpjax tests}"
 
 [tool.coverage.run]
 source_pkgs = ["gpjax", "tests"]

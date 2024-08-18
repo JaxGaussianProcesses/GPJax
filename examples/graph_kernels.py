@@ -152,7 +152,7 @@ cbar = plt.colorbar(sm, ax=ax)
 # For this reason, we simply perform gradient descent on the GP's marginal
 # log-likelihood term as in the
 # [regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/).
-# We do this using the BFGS optimiser provided in `scipy` via 'jaxopt'.
+# We do this using the BFGS optimiser.
 
 # %%
 likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)

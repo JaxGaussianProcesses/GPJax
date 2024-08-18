@@ -25,32 +25,18 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Install Poetry
-      - name: Install and configure Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 1.5.1
-          virtualenvs-create: false
-          virtualenvs-in-project: false
-          installer-parallel: true
-
-      # Configure Poetry to use the virtual environment in the project
-      - name: Setup Poetry
-        run: |
-          poetry config virtualenvs.in-project true
+      # Install Hatch
+      - name: Install Hatch
+        uses: pypa/hatch@install
 
       # Install the dependencies
-      - name: Install Package
-        run: |
-          poetry install --with dev
-
       - name: Check docstrings
         run: |
-          poetry run xdoctest ./gpjax
+          hatch run xdoctest ./gpjax
 
       # Run the unit tests and build the coverage report
       - name: Run Tests
-        run: poetry run pytest -v --cov=./gpjax --cov-report=xml:./coverage.xml
+        run: hatch run dev:coverage
 
       - name: Upload code coverage
         uses: codecov/codecov-action@v3
