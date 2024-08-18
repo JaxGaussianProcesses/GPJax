@@ -32,7 +32,7 @@ jobs:
       # Install the dependencies
       - name: Check docstrings
         run: |
-          hatch run xdoctest ./gpjax
+          hatch run dev:docstrings
 
       # Run the unit tests and build the coverage report
       - name: Run Tests
