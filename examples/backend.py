@@ -269,10 +269,10 @@ print(positive_reals)
 # %%
 import typing as tp
 
-from jaxtyping import Float, Num
+from jaxtyping import Num
 
 from gpjax.mean_functions import AbstractMeanFunction
-from gpjax.parameters import Parameter, Real
+from gpjax.parameters import Parameter
 from gpjax.typing import ScalarFloat, Array
 
 
