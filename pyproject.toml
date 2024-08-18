@@ -67,6 +67,7 @@ python = "3.10"
 [tool.hatch.envs.docs.scripts]
 build = ["python docs/scripts/gen_examples.py --execute", "mkdocs build"]
 serve = "mkdocs serve --dev-addr localhost:8000"
+integration = "python tests/integration_tests.py"
 
 [tool.hatch.envs.dev]
 dependencies = [
@@ -87,13 +88,14 @@ dependencies = [
 
 [tool.hatch.envs.dev.scripts]
 format = [
-  "black ./src ./tests",
-  "isort ./src ./tests",
-  "ruff format ./src ./tests",
+  "black ./gpjax ./tests",
+  "isort ./gpjax ./tests",
+  "ruff format ./gpjax ./tests",
   "ruff check --fix .",
 ]
 test = "pytest -vv -n auto ."
 coverage = "pytest -vv --cov=./gpjax --cov-report=xml:./coverage.xml"
+docstrings = "xdoctest ./gpjax"
 
 [project.urls]
 Documentation = "https://docs.jaxgaussianprocesses.com/"
@@ -101,16 +103,16 @@ Issues = "https://github.com/JaxGaussianProcesses/GPJax/issues"
 Source = "https://github.com/JaxGaussianProcesses/GPJax"
 
 [tool.hatch.version]
-path = "src/gpjax/__init__.py"
+path = "gpjax/__init__.py"
 
 [tool.coverage.run]
 source_pkgs = ["gpjax", "tests"]
 branch = true
 parallel = true
-omit = ["src/gpjax/__init__.py"]
+omit = ["gpjax/__init__.py"]
 
 [tool.coverage.paths]
-gpjax = ["src/gpjax", "*/gpjax/src/gpjax"]
+gpjax = ["gpjax", "*/gpjax/"]
 tests = ["tests", "*/gpjax/tests"]
 
 [tool.coverage.report]
@@ -126,7 +128,7 @@ target-version = ["py310"]
 
 [tool.pytest.ini_options] # https://docs.pytest.org/en/latest/reference/reference.html#ini-options-ref
 filterwarnings = ["error", "ignore::DeprecationWarning"]
-testpaths = ["src/gpjax"]
+testpaths = ["gpjax"]
 xfail_strict = true
 
 [tool.ruff] # https://github.com/charliermarsh/ruff
@@ -134,7 +136,7 @@ fix = true
 cache-dir = "~/.cache/ruff"
 exclude = ["docs/", "examples/"]
 line-length = 88
-src = ["src/gpjax", "tests"]
+src = ["gpjax", "tests"]
 target-version = "py310"
 
 [tool.ruff.lint]
@@ -210,8 +212,8 @@ exclude = [
   "setup.py",
   "docs",
   "tests",
-  "src/gpjax/__init__.py",
-  "src/gpjax/citation.py",
+  "gpjax/__init__.py",
+  "gpjax/citation.py",
 ]
 verbose = 2
 quiet = false

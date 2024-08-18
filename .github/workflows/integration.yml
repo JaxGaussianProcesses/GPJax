@@ -31,4 +31,4 @@ jobs:
 
       # Run the unit tests and build the coverage report
       - name: Run Integration Tests
-        run: hatch run python tests/integration_tests.py
+        run: hatch run docs:integration
