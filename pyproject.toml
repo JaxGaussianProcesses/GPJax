@@ -32,6 +32,7 @@ dependencies = [
   "jaxopt==0.8.2",
   "flax>=0.8.5",
   "numpy<2.0.0",
+  "hypothesis",
 ]
 
 [tool.hatch.envs.default]
@@ -63,6 +64,7 @@ dependencies = [
   "scikit-learn>=1.5.1",
 ]
 python = "3.10"
+installer = "uv"
 
 [tool.hatch.envs.docs.scripts]
 build = ["python docs/scripts/gen_examples.py --execute", "mkdocs build"]
@@ -104,8 +106,8 @@ lint-format = ['ruff format ./gpjax ./tests ./examples']
 lint-check = ['ruff check --fix ./gpjax ./tests ./examples']
 format = ["black-format", "imports-format", "lint-format"]
 check = ["black-check", "imports-check", "lint-check"]
-test = "pytest . -v -n auto"
-coverage = "pytest . -v --cov=./gpjax --cov-report=xml:./coverage.xml"
+test = "pytest . -v --hypothesis-profile local_dev -n auto"
+coverage = "pytest . -v --hypothesis-profile ci --cov=./gpjax --cov-report=xml:./coverage.xml"
 docstrings = "xdoctest ./gpjax"
 all-tests = ['check', 'docstrings', 'test']
 

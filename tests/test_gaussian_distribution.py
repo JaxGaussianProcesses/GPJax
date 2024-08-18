@@ -16,20 +16,25 @@
 
 
 from jax import config
-import jax.numpy as jnp
-import jax.random as jr
-import pytest
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
-
 import cola
 from cola.ops import (
     Dense,
     Diagonal,
 )
+from hypothesis import (
+    given,
+    strategies as st,
+)
+import jax.numpy as jnp
+import jax.random as jr
+import pytest
 
 from gpjax.distributions import GaussianDistribution
+from gpjax.testing import sample_multivariate_gaussian_params
+from gpjax.typing import MultivariateParams
 
 _key = jr.key(seed=42)
 
@@ -38,20 +43,18 @@ from tensorflow_probability.substrates.jax.distributions import (
     MultivariateNormalFullCovariance,
 )
 
+MIN_DIM = 1
+MAX_DIM = 50
+
 
 def approx_equal(res: jnp.ndarray, actual: jnp.ndarray) -> bool:
     """Check if two arrays are approximately equal."""
     return jnp.linalg.norm(res - actual) < 1e-5
 
 
-@pytest.mark.parametrize("n", [1, 2, 5, 100])
-def test_array_arguments(n: int) -> None:
-    key_mean, key_sqrt = jr.split(_key, 2)
-    mean = jr.uniform(key_mean, shape=(n,))
-    sqrt = jr.uniform(key_sqrt, shape=(n, n))
-    covariance = sqrt @ sqrt.T
-    # check that cholesky does not error
-    _L = jnp.linalg.cholesky(covariance)  # noqa: F841
+@given(dim=st.integers(min_value=MIN_DIM, max_value=MAX_DIM), data=st.data())
+def test_array_arguments(dim: int, data: st.DataObject) -> None:
+    mean, covariance = data.draw(sample_multivariate_gaussian_params(dim))
 
     dist = GaussianDistribution(loc=mean, scale=cola.PSD(Dense(covariance)))
 
@@ -63,7 +66,7 @@ def test_array_arguments(n: int) -> None:
     assert isinstance(dist.scale, Dense)
     assert cola.PSD in dist.scale.annotations
 
-    y = jr.uniform(_key, shape=(n,))
+    y = jr.uniform(_key, shape=(dim,))
 
     tfp_dist = MultivariateNormalFullCovariance(loc=mean, covariance_matrix=covariance)
 
@@ -71,11 +74,17 @@ def test_array_arguments(n: int) -> None:
     assert approx_equal(dist.kl_divergence(dist), 0.0)
 
 
-@pytest.mark.parametrize("n", [1, 2, 5, 100])
-def test_diag_linear_operator(n: int) -> None:
-    key_mean, key_diag = jr.split(_key, 2)
-    mean = jr.uniform(key_mean, shape=(n,))
-    diag = jr.uniform(key_diag, shape=(n,))
+@given(
+    params=st.integers(min_value=MIN_DIM, max_value=MAX_DIM).flatmap(
+        lambda n: sample_multivariate_gaussian_params(dim=n)
+    )
+)
+def test_diag_linear_operator(
+    params: MultivariateParams,
+) -> None:
+    mean, _covariance = params
+    n = mean.shape[0]
+    diag = jnp.sqrt(jnp.diag(_covariance))
 
     # We purosely forget to add a PSD annotation to the diagonal matrix.
     dist_diag = GaussianDistribution(loc=mean, scale=Diagonal(diag**2))
@@ -104,15 +113,16 @@ def test_diag_linear_operator(n: int) -> None:
     assert approx_equal(dist_diag.kl_divergence(dist_diag), 0.0)
 
 
-@pytest.mark.parametrize("n", [1, 2, 5, 100])
-def test_dense_linear_operator(n: int) -> None:
-    key_mean, key_sqrt = jr.split(_key, 2)
-    mean = jr.uniform(key_mean, shape=(n,))
-    sqrt = jr.uniform(key_sqrt, shape=(n, n))
-    covariance = sqrt @ sqrt.T
-
-    sqrt = jnp.linalg.cholesky(covariance + jnp.eye(n) * 1e-10)
-
+@given(
+    params=st.integers(min_value=MIN_DIM, max_value=MAX_DIM).flatmap(
+        lambda n: sample_multivariate_gaussian_params(dim=n)
+    )
+)
+def test_dense_linear_operator(
+    params: MultivariateParams,
+) -> None:
+    mean, covariance = params
+    n = mean.shape[0]
     dist_dense = GaussianDistribution(loc=mean, scale=cola.PSD(Dense(covariance)))
     tfp_dist = MultivariateNormalFullCovariance(loc=mean, covariance_matrix=covariance)
 
@@ -134,16 +144,10 @@ def test_dense_linear_operator(n: int) -> None:
     assert approx_equal(dist_dense.kl_divergence(dist_dense), 0.0)
 
 
-@pytest.mark.parametrize("n", [1, 2, 5, 100])
-def test_kl_divergence(n: int) -> None:
-    key_a, key_b = jr.split(_key, 2)
-    mean_a = jr.uniform(key_a, shape=(n,))
-    mean_b = jr.uniform(key_b, shape=(n,))
-    sqrt_a = jr.uniform(key_a, shape=(n, n))
-    sqrt_b = jr.uniform(key_b, shape=(n, n))
-    covariance_a = sqrt_a @ sqrt_a.T
-    covariance_b = sqrt_b @ sqrt_b.T
-
+@given(dim=st.integers(min_value=MIN_DIM, max_value=MAX_DIM), data=st.data())
+def test_kl_divergence(dim: int, data: st.DataObject) -> None:
+    mean_a, covariance_a = data.draw(sample_multivariate_gaussian_params(dim))
+    mean_b, covariance_b = data.draw(sample_multivariate_gaussian_params(dim))
     dist_a = GaussianDistribution(loc=mean_a, scale=cola.PSD(Dense(covariance_a)))
     dist_b = GaussianDistribution(loc=mean_b, scale=cola.PSD(Dense(covariance_b)))
 
@@ -159,5 +163,5 @@ def test_kl_divergence(n: int) -> None:
     )
 
     with pytest.raises(ValueError):
-        incompatible = GaussianDistribution(loc=jnp.ones((2 * n,)))
+        incompatible = GaussianDistribution(loc=jnp.ones((2 * dim,)))
         incompatible.kl_divergence(dist_a)
