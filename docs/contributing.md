@@ -72,36 +72,19 @@ you through every detail!
   Always use a `feature` branch. It's good practice to avoid
   work on the ``main`` branch of any repository.
 
-4.  We use [Poetry](https://python-poetry.org/) for packaging and dependency management, and project requirements are in       ``pyproject.toml``. We suggest using a [virtual environment](https://docs.python-guide.org/dev/virtualenvs/) for
-development. For those using Apple Silicon chips, we advise using [Conda miniforge](https://github.com/conda-forge/miniforge). Once the virtual environment is activated, run:
+4.  We use [Hatch](https://hatch.pypa.io/latest/) for packaging and dependency management. Project requirements are in ``pyproject.toml``. To install GPJax into a Hatch virtual environment, run:
 
   ```bash
-  $ poetry install
+  $ hatch env create
   ```
 
   At this point we recommend you check your installation passes the supplied unit tests:
 
   ```bash
-  $ poetry run pytest
+  $ hatch run dev:all-tests
   ```
 
-5.  Install the pre-commit hooks.
-
-  ```bash
-  $ pre-commit install
-  ```
-
-  Please ensure you have done this before committing any files. If
-  successful, this will print the following output `pre-commit installed at
-  .git/hooks/pre-commit`.
-
-6.  At this point you can manually run the pre-commit hooks with the following command:
-
-  ```bash
-  poetry run pre-commit run --all-files
-  ```
-
-7.  Add changed files using `git add` and then `git commit` files to record your
+5.  Add changed files using `git add` and then `git commit` files to record your
   changes locally:
 
   ```bash
@@ -122,7 +105,7 @@ development. For those using Apple Silicon chips, we advise using [Conda minifor
   $ git push -u origin my-feature
   ```
 
-8.  Go to the GitHub web page of your fork of the GPJax repo. Click the 'Pull
+6.  Go to the GitHub web page of your fork of the GPJax repo. Click the 'Pull
   request' button to send your changes to the project's maintainers for
   review.
 
@@ -159,7 +142,7 @@ request, we recommend you check the following:
   accepted. Test coverage can be checked with:
 
     ```bash
-    $ poetry run pytest tests --cov=./ --cov-report=html
+    $ hatch run dev:coverage
     ```
 
   Navigate to the newly created folder `htmlcov` and open `index.html` to view
