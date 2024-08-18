@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.16.4
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -23,13 +23,15 @@
 #
 # Surface drifters are measurement devices that measure the dynamics and circulation patterns of the world's oceans. Studying and predicting ocean currents are important to climate research, for example, forecasting and predicting oil spills, oceanographic surveying of eddies and upwelling, or providing information on the distribution of biomass in ecosystems. We will be using the [Gulf Drifters Open dataset](https://zenodo.org/record/4421585), which contains all publicly available surface drifter trajectories from the Gulf of Mexico spanning 28 years.
 # %%
-from jax import config
+from dataclasses import (
+    dataclass,
+    field,
+)
 
-config.update("jax_enable_x64", True)
-from dataclasses import dataclass, field
-
-from jax import hessian
-from jax import config
+from jax import (
+    config,
+    hessian,
+)
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (
@@ -42,10 +44,15 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import tensorflow_probability as tfp
 
+from examples.utils import use_mpl_style
+from gpjax.kernels.computations import DenseKernelComputation
+
+config.update("jax_enable_x64", True)
+
+
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-from examples.utils import use_mpl_style
 
 # set the default style for plotting
 use_mpl_style()
@@ -213,7 +220,6 @@ dataset_ground_truth = dataset_3d(pos_test, vel_test)
 
 
 # %%
-from gpjax.kernels.computations import DenseKernelComputation
 
 
 class VelocityKernel(gpx.kernels.AbstractKernel):

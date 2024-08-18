@@ -1,4 +1,5 @@
-"""Compute Random Fourier Feature (RFF) kernel approximations.  """
+"""Compute Random Fourier Feature (RFF) kernel approximations."""
+
 import beartype.typing as tp
 import jax.random as jr
 from jaxtyping import Float

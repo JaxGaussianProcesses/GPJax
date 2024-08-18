@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.16.4
 #   kernelspec:
 #     display_name: base
 #     language: python
@@ -24,21 +24,22 @@
 
 # %%
 import blackjax
+from flax import nnx
 import jax
+from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
+from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax as tfp
-from jax import config
-from jaxtyping import install_import_hook
-from flax import nnx
+
+from examples.utils import use_mpl_style
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-from examples.utils import use_mpl_style
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)

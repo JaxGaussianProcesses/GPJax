@@ -85,18 +85,29 @@ dependencies = [
   "mktestdocs>=0.2.1",
   "isort",
   "networkx",
+  "black",
+  "jupytext",
 ]
 
 [tool.hatch.envs.dev.scripts]
-format = [
-  "black ./gpjax ./tests",
+black-format = ["black ./gpjax ./tests", "jupytext --pipe black examples/*.py"]
+black-check = "black --check --diff ./gpjax ./tests"
+imports-format = [
   "isort ./gpjax ./tests",
-  "ruff format ./gpjax ./tests",
-  "ruff check --fix .",
+  'isort examples/*.py --treat-comment-as-code "# %%" --float-to-top',
 ]
+imports-check = [
+  "isort ./gpjax ./tests -c",
+  'isort examples/*.py -c --treat-comment-as-code "# %%" --float-to-top',
+]
+lint-format = ['ruff format ./gpjax ./tests ./examples']
+lint-check = ['ruff check --fix ./gpjax ./tests ./examples']
+format = ["black-format", "imports-format", "lint-format"]
+check = ["black-check", "imports-check", "lint-check"]
 test = "pytest . -v -n auto"
 coverage = "pytest . -v --cov=./gpjax --cov-report=xml:./coverage.xml"
 docstrings = "xdoctest ./gpjax"
+all-tests = ['check', 'docstrings', 'test']
 
 [project.urls]
 Documentation = "https://docs.jaxgaussianprocesses.com/"

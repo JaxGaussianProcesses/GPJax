@@ -22,6 +22,7 @@ config.update("jax_enable_x64", True)
 
 from beartype.typing import Type
 import jax.random as jr
+from jaxtyping import TypeCheckError
 import pytest
 
 from gpjax.decision_making.test_functions.continuous_functions import (
@@ -42,7 +43,6 @@ from tests.test_decision_making.utils import (
     generate_dummy_conjugate_posterior,
     generate_dummy_non_conjugate_posterior,
 )
-from jaxtyping import TypeCheckError
 
 
 @pytest.mark.filterwarnings(

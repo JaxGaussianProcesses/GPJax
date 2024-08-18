@@ -26,7 +26,8 @@ from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.typing import Array
 
 Kernel = tp.TypeVar(
-    "Kernel", bound="gpjax.kernels.non_euclidean.graph.GraphKernel"  # noqa: F821
+    "Kernel",
+    bound="gpjax.kernels.non_euclidean.graph.GraphKernel",  # noqa: F821
 )
 
 

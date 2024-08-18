@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.16.4
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -25,13 +25,10 @@
 # [kernels notebook](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels).
 
 # %%
-# Enable Float64 for more stable matrix inversions.
-from jax import config
-
-config.update("jax_enable_x64", True)
-
 import random
 
+# Enable Float64 for more stable matrix inversions.
+from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import install_import_hook
@@ -39,11 +36,14 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import networkx as nx
 
+from examples.utils import use_mpl_style
+
+config.update("jax_enable_x64", True)
+
+
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-
-from examples.utils import use_mpl_style
 
 # set the default style for plotting
 use_mpl_style()

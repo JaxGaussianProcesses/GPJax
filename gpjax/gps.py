@@ -146,20 +146,17 @@ class Prior(AbstractPrior[M, K]):
     if tp.TYPE_CHECKING:
 
         @tp.overload
-        def __mul__(self, other: GL) -> "ConjugatePosterior[Prior[M, K], GL]":
-            ...
+        def __mul__(self, other: GL) -> "ConjugatePosterior[Prior[M, K], GL]": ...
 
         @tp.overload
         def __mul__(  # noqa: F811
             self, other: NGL
-        ) -> "NonConjugatePosterior[Prior[M, K], NGL]":
-            ...
+        ) -> "NonConjugatePosterior[Prior[M, K], NGL]": ...
 
         @tp.overload
         def __mul__(  # noqa: F811
             self, other: L
-        ) -> "AbstractPosterior[Prior[M, K], L]":
-            ...
+        ) -> "AbstractPosterior[Prior[M, K], L]": ...
 
     def __mul__(self, other):  # noqa: F811
         r"""Combine the prior with a likelihood to form a posterior distribution.
@@ -195,20 +192,17 @@ class Prior(AbstractPrior[M, K]):
     if tp.TYPE_CHECKING:
 
         @tp.overload
-        def __rmul__(self, other: GL) -> "ConjugatePosterior[Prior[M, K], GL]":
-            ...
+        def __rmul__(self, other: GL) -> "ConjugatePosterior[Prior[M, K], GL]": ...
 
         @tp.overload
         def __rmul__(  # noqa: F811
             self, other: NGL
-        ) -> "NonConjugatePosterior[Prior[M, K], NGL]":
-            ...
+        ) -> "NonConjugatePosterior[Prior[M, K], NGL]": ...
 
         @tp.overload
         def __rmul__(  # noqa: F811
             self, other: L
-        ) -> "AbstractPosterior[Prior[M, K], L]":
-            ...
+        ) -> "AbstractPosterior[Prior[M, K], L]": ...
 
     def __rmul__(self, other):  # noqa: F811
         r"""Combine the prior with a likelihood to form a posterior distribution.
@@ -722,15 +716,13 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
 
 
 @tp.overload
-def construct_posterior(prior: P, likelihood: GL) -> ConjugatePosterior[P, GL]:
-    ...
+def construct_posterior(prior: P, likelihood: GL) -> ConjugatePosterior[P, GL]: ...
 
 
 @tp.overload
 def construct_posterior(  # noqa: F811
     prior: P, likelihood: NGL
-) -> NonConjugatePosterior[P, NGL]:
-    ...
+) -> NonConjugatePosterior[P, NGL]: ...
 
 
 def construct_posterior(prior, likelihood):  # noqa: F811
