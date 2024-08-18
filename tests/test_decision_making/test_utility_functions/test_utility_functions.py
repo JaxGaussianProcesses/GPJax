@@ -42,6 +42,7 @@ from tests.test_decision_making.utils import (
     generate_dummy_conjugate_posterior,
     generate_dummy_non_conjugate_posterior,
 )
+from jaxtyping import TypeCheckError
 
 
 @pytest.mark.filterwarnings(
@@ -121,7 +122,7 @@ def test_non_conjugate_posterior_raises_error(
     posterior = generate_dummy_non_conjugate_posterior(dataset)
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeCheckError):
         utility_function = utility_function_builder(**utility_function_kwargs)
         utility_function.build_utility_function(
             posteriors=posteriors, datasets=datasets, key=key

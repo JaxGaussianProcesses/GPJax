@@ -94,8 +94,8 @@ format = [
   "ruff format ./gpjax ./tests",
   "ruff check --fix .",
 ]
-test = "pytest . -vv -n auto"
-coverage = "pytest . -vv --cov=./gpjax --cov-report=xml:./coverage.xml"
+test = "pytest . -v -n auto"
+coverage = "pytest . -v --cov=./gpjax --cov-report=xml:./coverage.xml"
 docstrings = "xdoctest ./gpjax"
 
 [project.urls]
