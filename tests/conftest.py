@@ -8,5 +8,5 @@ config.update("jax_enable_x64", True)
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax  # noqa: F401
 
-settings.register_profile("ci", max_examples=100, deadline=None)
+settings.register_profile("ci", max_examples=300, deadline=None)
 settings.register_profile("local_dev", max_examples=5, deadline=None)

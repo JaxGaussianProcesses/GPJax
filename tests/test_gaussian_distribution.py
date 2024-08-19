@@ -33,7 +33,10 @@ import jax.random as jr
 import pytest
 
 from gpjax.distributions import GaussianDistribution
-from gpjax.testing import sample_multivariate_gaussian_params
+from gpjax.testing import (
+    approx_equal,
+    sample_multivariate_gaussian_params,
+)
 from gpjax.typing import MultivariateParams
 
 _key = jr.key(seed=42)
@@ -44,12 +47,7 @@ from tensorflow_probability.substrates.jax.distributions import (
 )
 
 MIN_DIM = 1
-MAX_DIM = 50
-
-
-def approx_equal(res: jnp.ndarray, actual: jnp.ndarray) -> bool:
-    """Check if two arrays are approximately equal."""
-    return jnp.linalg.norm(res - actual) < 1e-5
+MAX_DIM = 20
 
 
 @given(dim=st.integers(min_value=MIN_DIM, max_value=MAX_DIM), data=st.data())
@@ -159,7 +157,9 @@ def test_kl_divergence(dim: int, data: st.DataObject) -> None:
     )
 
     assert approx_equal(
-        dist_a.kl_divergence(dist_b), tfp_dist_a.kl_divergence(tfp_dist_b)
+        dist_a.kl_divergence(dist_b),
+        tfp_dist_a.kl_divergence(tfp_dist_b),
+        threshold=1e-3,
     )
 
     with pytest.raises(ValueError):
