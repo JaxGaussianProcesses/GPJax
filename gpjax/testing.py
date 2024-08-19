@@ -1,4 +1,3 @@
-from beartype import typing as tp
 from hypothesis import strategies as st
 from hypothesis.extra.numpy import arrays
 import jax.numpy as jnp
@@ -7,7 +6,6 @@ from jaxtyping import Float
 from gpjax.typing import (
     Array,
     MultivariateParams,
-    ScalarFloat,
     UnivariateParams,
 )
 
