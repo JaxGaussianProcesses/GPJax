@@ -1,20 +1,3 @@
-# -*- coding: utf-8 -*-
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     custom_cell_magics: kql
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.11.2
-#   kernelspec:
-#     display_name: gpjax
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # Backend Module Design
 #
@@ -28,34 +11,48 @@
 #
 
 # %%
+import typing as tp
+
+from flax import nnx
+
 # Enable Float64 for more stable matrix inversions.
 from jax import (
     config,
     grad,
 )
-
-config.update("jax_enable_x64", True)
-
 import jax.numpy as jnp
+import jax.tree_util as jtu
 from jaxtyping import (
     Float,
+    Num,
     install_import_hook,
 )
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from gpjax.mean_functions import Constant
-from gpjax.parameters import (
-    Parameter,
-    Real,
+from examples.utils import use_mpl_style
+from gpjax.mean_functions import (
+    AbstractMeanFunction,
+    Constant,
 )
+from gpjax.parameters import (
+    DEFAULT_BIJECTION,
+    Parameter,
+    PositiveReal,
+    Real,
+    transform,
+)
+from gpjax.typing import (
+    Array,
+    ScalarFloat,
+)
+
+config.update("jax_enable_x64", True)
+
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-from flax import nnx
-
-from examples.utils import use_mpl_style
 
 # set the default style for plotting
 use_mpl_style()
@@ -86,7 +83,6 @@ print(meanf)
 # `Parameter` will be transformed by GPJax.
 
 # %%
-from gpjax.parameters import PositiveReal
 
 issubclass(PositiveReal, Parameter)
 
@@ -130,8 +126,6 @@ print(constant_param._tag)
 # see how you can define your own bijectors and parameter types.
 
 # %%
-from gpjax.parameters import DEFAULT_BIJECTION, transform
-
 print(DEFAULT_BIJECTION[constant_param._tag])
 
 # %% [markdown]
@@ -195,7 +189,6 @@ print(state)
 # parameter's value by 1.
 
 # %%
-import jax.tree_util as jtu
 
 updated_state = jtu.tree_map(lambda x: x + 1, state)
 print(updated_state)
@@ -236,7 +229,6 @@ retransformed_state = transform(transformed_state, DEFAULT_BIJECTION, inverse=Fa
 # altering the way in which we invoke `nnx.split`.
 
 # %%
-from gpjax.parameters import PositiveReal
 
 graphdef, positive_reals, other_params = nnx.split(posterior, PositiveReal, ...)
 print(positive_reals)
@@ -267,13 +259,6 @@ print(positive_reals)
 # mean function. Let's now implement that using the new NNX backend.
 
 # %%
-import typing as tp
-
-from jaxtyping import Float, Num
-
-from gpjax.mean_functions import AbstractMeanFunction
-from gpjax.parameters import Parameter, Real
-from gpjax.typing import ScalarFloat, Array
 
 
 class LinearMeanFunction(AbstractMeanFunction):

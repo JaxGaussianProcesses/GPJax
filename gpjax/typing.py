@@ -15,6 +15,7 @@
 
 from typing import (
     Callable,
+    Tuple,
     Union,
 )
 
@@ -42,6 +43,9 @@ ScalarInt = Union[int, Int[Array, ""]]
 ScalarFloat = Union[float, Float[Array, ""]]
 
 VecNOrMatNM = Union[Float[Array, " N"], Float[Array, "N M"]]
+
+UnivariateParams = Tuple[ScalarFloat, ScalarFloat]
+MultivariateParams = Tuple[Float[Array, " N"], Float[Array, "N N"]]
 
 FunctionalSample = Callable[[Float[Array, "N D"]], Float[Array, "N B"]]
 r""" Type alias for functions representing $B$ samples from a model, to be evaluated on

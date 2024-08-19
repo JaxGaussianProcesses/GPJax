@@ -38,13 +38,17 @@ from gpjax.parameters import (
     PositiveReal,
     Static,
 )
+from gpjax.testing import is_psd
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 
 
 def params_product(params: dict[str, list]) -> list[dict[str, Any]]:
-    return [dict(zip(params.keys(), values)) for values in product(*params.values())]
+    return [
+        dict(zip(params.keys(), values, strict=False))
+        for values in product(*params.values())
+    ]
 
 
 TESTED_KERNELS = [
@@ -196,7 +200,7 @@ def test_gram(test_init: StationaryKernel, n: int):
     Kxx = k.gram(x)
     assert isinstance(Kxx, LinearOperator)
     assert Kxx.shape == (n, n)
-    assert jnp.all(jnp.linalg.eigvalsh(Kxx.to_dense() + jnp.eye(n) * 1e-6) > 0.0)
+    assert is_psd(Kxx.to_dense() + jnp.eye(n) * 1e-6)
 
 
 @pytest.mark.parametrize(

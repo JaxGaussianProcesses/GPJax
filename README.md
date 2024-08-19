@@ -205,13 +205,14 @@ configuration in development mode.
 ```bash
 git clone https://github.com/JaxGaussianProcesses/GPJax.git
 cd GPJax
-poetry install
+hatch env create
+hatch shell
 ```
 
 > We recommend you check your installation passes the supplied unit tests:
 >
 > ```python
-> poetry run pytest
+> hatch run dev:test
 > ```
 
 # Citing GPJax

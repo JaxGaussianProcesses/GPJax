@@ -74,8 +74,7 @@ class AbstractKernelComputation:
     @abc.abstractmethod
     def _cross_covariance(
         self, kernel: K, x: Num[Array, "N D"], y: Num[Array, "M D"]
-    ) -> Float[Array, "N M"]:
-        ...
+    ) -> Float[Array, "N M"]: ...
 
     def cross_covariance(
         self, kernel: K, x: Num[Array, "N D"], y: Num[Array, "M D"]

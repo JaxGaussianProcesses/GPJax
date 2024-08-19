@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.16.4
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -66,19 +66,20 @@
 # a likelihood object. To do this, we'll need a dataset.
 
 # %%
+import jax
+
 # Enable Float64 for more stable matrix inversions.
 from jax import config
-
-config.update("jax_enable_x64", True)
-
-import gpjax as gpx
-import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax as tfp
 
 from examples.utils import use_mpl_style
+import gpjax as gpx
+
+config.update("jax_enable_x64", True)
+
 
 tfd = tfp.distributions
 
@@ -130,7 +131,7 @@ gpx.likelihoods.Gaussian(num_datapoints=D.n)
 gpx.likelihoods.Gaussian(num_datapoints=D.n, obs_stddev=0.5)
 
 # %% [markdown]
-
+#
 # ### Prediction
 #
 # The `predict` method of a likelihood object transforms the latent distribution of

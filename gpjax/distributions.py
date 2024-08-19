@@ -162,9 +162,7 @@ class GaussianDistribution(tfd.Distribution):
 
         return vmap(affine_transformation)(Z)
 
-    def sample(
-        self, seed: KeyArray, sample_shape: Tuple[int, ...]
-    ):  # pylint: disable=useless-super-delegation
+    def sample(self, seed: KeyArray, sample_shape: Tuple[int, ...]):  # pylint: disable=useless-super-delegation
         r"""See `Distribution.sample`."""
         return self._sample_n(
             seed, sample_shape[0]

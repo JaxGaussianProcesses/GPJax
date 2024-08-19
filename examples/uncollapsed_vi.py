@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.16.4
 #   kernelspec:
 #     display_name: gpjax_beartype
 #     language: python
@@ -33,9 +33,6 @@
 # %%
 # Enable Float64 for more stable matrix inversions.
 from jax import config
-
-config.update("jax_enable_x64", True)
-
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import install_import_hook
@@ -44,11 +41,15 @@ import matplotlib.pyplot as plt
 import optax as ox
 import tensorflow_probability.substrates.jax as tfp
 
+from examples.utils import use_mpl_style
+
+config.update("jax_enable_x64", True)
+
+
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     import gpjax.kernels as jk
 
-from examples.utils import use_mpl_style
 
 tfb = tfp.bijectors
 

@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.16.4
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -23,28 +23,43 @@
 # (GPs), so if you're not familiar with them, check out our [GP introduction notebook](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/).
 
 # %%
+from typing import (
+    List,
+    Tuple,
+)
+
+import jax
+
 # Enable Float64 for more stable matrix inversions.
 from jax import config
+import jax.numpy as jnp
+import jax.random as jr
+from jaxopt import ScipyBoundedMinimize
+from jaxtyping import (
+    Float,
+    Int,
+    install_import_hook,
+)
+import matplotlib as mpl
+from matplotlib import cm
+import matplotlib.pyplot as plt
+import optax as ox
+import tensorflow_probability.substrates.jax as tfp
+
+from examples.utils import use_mpl_style
+from gpjax.parameters import Static
+from gpjax.typing import (
+    Array,
+    FunctionalSample,
+    ScalarFloat,
+)
 
 config.update("jax_enable_x64", True)
 
-import jax
-import jax.numpy as jnp
-import jax.random as jr
-from jaxtyping import install_import_hook, Float, Int
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-from matplotlib import cm
-import optax as ox
-import tensorflow_probability.substrates.jax as tfp
-from typing import List, Tuple
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
-from gpjax.typing import Array, FunctionalSample, ScalarFloat
-from jaxopt import ScipyBoundedMinimize
 
-from examples.utils import use_mpl_style
 
 # set the default style for plotting
 use_mpl_style()
@@ -227,7 +242,6 @@ D = gpx.Dataset(X=initial_x, y=initial_y)
 
 
 # %%
-from gpjax.parameters import Static
 
 
 def return_optimised_posterior(

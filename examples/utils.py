@@ -1,8 +1,8 @@
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 from matplotlib import transforms
 from matplotlib.patches import Ellipse
+import matplotlib.pyplot as plt
 import numpy as np
 
 

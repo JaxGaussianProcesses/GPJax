@@ -31,7 +31,7 @@ hardware acceleration support as detailed in the
     ```bash
     git clone https://github.com/thomaspinder/GPJax.git
     cd GPJax
-    poetry install
+    hatch shell create
     ```
 
 !!! tip
@@ -45,5 +45,5 @@ hardware acceleration support as detailed in the
     and recommend you check your installation passes the supplied unit tests:
 
     ```bash
-    poetry run pytest tests/
+    hatch run dev:all-tests
     ```
