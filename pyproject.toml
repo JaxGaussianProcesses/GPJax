@@ -7,7 +7,7 @@ name = "gpjax"
 dynamic = ["version"]
 description = 'Gaussian processes in JAX.'
 readme = "README.md"
-requires-python = ">=3.9, <3.13"
+requires-python = ">=3.10, <3.13"
 license = "Apache-2.0"
 keywords = ["gaussian-processes jax machine-learning bayesian"]
 authors = [{ name = "Thomas Pinder", email = "tompinder@live.co.uk" }]
@@ -94,7 +94,7 @@ black-format = ["black ./gpjax ./tests", "jupytext --pipe black examples/*.py"]
 black-check = "black --check --diff ./gpjax ./tests"
 imports-format = [
   "isort ./gpjax ./tests",
-  'isort examples/*.py --treat-comment-as-code "# %%" --float-to-top',
+  "isort examples/*.py --treat-comment-as-code '# %%' --float-to-top",
 ]
 imports-check = [
   "isort ./gpjax ./tests -c",
