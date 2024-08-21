@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.16.4
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -24,9 +24,6 @@
 # %%
 # Enable Float64 for more stable matrix inversions.
 from jax import config
-
-config.update("jax_enable_x64", True)
-
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (
@@ -37,10 +34,20 @@ from jaxtyping import (
 import matplotlib.pyplot as plt
 import tensorflow_probability.substrates.jax as tfp
 
+from examples.utils import use_mpl_style
+from gpjax.kernels.computations import DenseKernelComputation
+from gpjax.parameters import (
+    DEFAULT_BIJECTION,
+    PositiveReal,
+    Static,
+)
+
+config.update("jax_enable_x64", True)
+
+
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-from examples.utils import use_mpl_style
 
 tfb = tfp.bijectors
 
@@ -206,8 +213,6 @@ fig.colorbar(im3, ax=ax[3], fraction=0.05)
 
 
 # %%
-from gpjax.kernels.computations import DenseKernelComputation
-from gpjax.parameters import DEFAULT_BIJECTION, Static, PositiveReal
 
 
 def angular_distance(x, y, c):

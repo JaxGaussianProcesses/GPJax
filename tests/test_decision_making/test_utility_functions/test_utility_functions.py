@@ -22,6 +22,7 @@ config.update("jax_enable_x64", True)
 
 from beartype.typing import Type
 import jax.random as jr
+from jaxtyping import TypeCheckError
 import pytest
 
 from gpjax.decision_making.test_functions.continuous_functions import (
@@ -121,7 +122,7 @@ def test_non_conjugate_posterior_raises_error(
     posterior = generate_dummy_non_conjugate_posterior(dataset)
     posteriors = {OBJECTIVE: posterior}
     datasets = {OBJECTIVE: dataset}
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeCheckError):
         utility_function = utility_function_builder(**utility_function_kwargs)
         utility_function.build_utility_function(
             posteriors=posteriors, datasets=datasets, key=key

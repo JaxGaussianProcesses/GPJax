@@ -1,85 +1,146 @@
-[tool.poetry]
-name = "gpjax"
-version = "0.9.0"
-description = "Gaussian processes in JAX."
-authors = [
-  "Thomas Pinder <tompinder@live.co.uk>",
-  "Daniel Dodd <daniel_dodd@icloud.com>",
-]
-license = "Apache-2.0"
-readme = "README.md"
-homepage = "https://github.com/JaxGaussianProcesses/GPJax"
-repository = "https://github.com/JaxGaussianProcesses/GPJax"
-include = ["LICENSE"]
-documentation = "https://docs.jaxgaussianprocesses.com/"
-keywords = ["gaussian-processes jax machine-learning bayesian"]
-packages = [{ include = "gpjax" }]
-
-[tool.poetry.dependencies]
-python = ">=3.10,<3.12"
-jax = "<0.4.28"
-jaxlib = "<0.4.28"
-optax = "^0.2.1"
-jaxtyping = "^0.2.10"
-tqdm = "^4.66.2"
-tensorflow-probability = "^0.24.0"
-beartype = "^0.16.1"
-cola-ml = "0.0.5"
-jaxopt = "^0.8.3"
-flax = "^0.8.4"
-numpy = "<2.0.0"
-
-[tool.poetry.group.dev.dependencies]
-ruff = "~0"
-pre-commit = "^3.2.2"
-interrogate = "^1.5.0"
-codespell = "^2.2.4"
-pytest = "^7.2.2"
-pytest-cov = "^4.0.0"
-pytest-pretty = "^1.1.1"
-pytest-xdist = "^3.2.1"
-coverage = "^7.2.2"
-absolufy-imports = "^0.3.1"
-xdoctest = "^1.1.1"
-mktestdocs = "^0.2.1"
-asv = "^0.6.0"
-
-
-[tool.poetry.group.docs.dependencies]
-mkdocs = "^1.5.3"
-mkdocs-material = "^9.5.12"
-mkdocstrings = { version = "^0.25.1", extras = ["python"] }
-mkdocs-jupyter = "^0.24.3"
-mkdocs-gen-files = "^0.5.0"
-mkdocs-literate-nav = "^0.6.0"
-mkdocs-git-authors-plugin = "^0.7.0"
-matplotlib = "^3.7.1"
-seaborn = "^0.12.2"
-networkx = "^3.0"
-jupytext = "^1.14.5"
-ipython = "^8.11.0"
-ipykernel = "^6.22.0"
-watermark = "^2.3.1"
-blackjax = "^0.9.6"
-ipywidgets = "^8.0.5"
-pandas = "^1.5.3"
-pymdown-extensions = "^10.7.1"
-nbconvert = "^7.16.2"
-markdown-katex = "^202406.1035"
-scikit-learn = "^1.5.1"
-
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gpjax"
+dynamic = ["version"]
+description = 'Gaussian processes in JAX.'
+readme = "README.md"
+requires-python = ">=3.10, <3.13"
+license = "Apache-2.0"
+keywords = ["gaussian-processes jax machine-learning bayesian"]
+authors = [{ name = "Thomas Pinder", email = "tompinder@live.co.uk" }]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "jax<0.4.28",
+  "jaxlib<0.4.28",
+  "optax>0.2.1",
+  "jaxtyping>0.2.10",
+  "tqdm>4.66.2",
+  "tensorflow-probability>=0.24.0",
+  "beartype>0.16.1",
+  "cola-ml==0.0.5",
+  "jaxopt==0.8.2",
+  "flax>=0.8.5",
+  "numpy<2.0.0",
+]
+
+[tool.hatch.envs.default]
+installer = "uv"
+python = "3.10"
+
+[tool.hatch.envs.docs]
+dependencies = [
+  "mkdocs>=1.5.3",
+  "mkdocs-material>=9.5.12",
+  "mkdocstrings[python]>=0.25.1",
+  "mkdocs-jupyter>=0.24.3",
+  "mkdocs-gen-files>=0.5.0",
+  "mkdocs-literate-nav>=0.6.0",
+  "mkdocs-git-authors-plugin>=0.7.0",
+  "matplotlib>=3.7.1",
+  "seaborn>=0.12.2",
+  "networkx>=3.0",
+  "jupytext>=1.14.5",
+  "ipython>=8.11.0",
+  "ipykernel>=6.22.0",
+  "watermark>=2.3.1",
+  "blackjax>=0.9.6",
+  "ipywidgets>=8.0.5",
+  "pandas>=1.5.3",
+  "pymdown-extensions>=10.7.1",
+  "nbconvert>=7.16.2",
+  "markdown-katex>=202406.1035",
+  "scikit-learn>=1.5.1",
+]
+python = "3.10"
+
+[tool.hatch.envs.docs.scripts]
+build = ["python docs/scripts/gen_examples.py --execute", "mkdocs build"]
+serve = "mkdocs serve --dev-addr localhost:8000"
+integration = "python tests/integration_tests.py"
+
+[tool.hatch.envs.dev]
+dependencies = [
+  "ruff>=0.6",
+  "pre-commit>=3.2.2",
+  "interrogate>=1.5.0",
+  "codespell>=2.2.4",
+  "pytest>=7.2.2",
+  "pytest-cov>=4.0.0",
+  "pytest-pretty>=1.1.1",
+  "pytest-xdist>=3.2.1",
+  "coverage>=7.2.2",
+  "absolufy-imports>=0.3.1",
+  "xdoctest>=1.1.1",
+  "mktestdocs>=0.2.1",
+  "isort",
+  "networkx",
+  "black",
+  "jupytext",
+]
+
+[tool.hatch.envs.dev.scripts]
+black-format = ["black ./gpjax ./tests", "jupytext --pipe black examples/*.py"]
+black-check = "black --check --diff ./gpjax ./tests"
+imports-format = [
+  "isort ./gpjax ./tests",
+  "isort examples/*.py --treat-comment-as-code '# %%' --float-to-top",
+]
+imports-check = [
+  "isort ./gpjax ./tests -c",
+  'isort examples/*.py -c --treat-comment-as-code "# %%" --float-to-top',
+]
+lint-format = ['ruff format ./gpjax ./tests ./examples']
+lint-check = ['ruff check --fix ./gpjax ./tests ./examples']
+format = ["black-format", "imports-format", "lint-format"]
+check = ["black-check", "imports-check", "lint-check"]
+test = "pytest . -v -n auto"
+coverage = "pytest . -v --cov=./gpjax --cov-report=xml:./coverage.xml"
+docstrings = "xdoctest ./gpjax"
+all-tests = ['check', 'docstrings', 'test']
+
+[project.urls]
+Documentation = "https://docs.jaxgaussianprocesses.com/"
+Issues = "https://github.com/JaxGaussianProcesses/GPJax/issues"
+Source = "https://github.com/JaxGaussianProcesses/GPJax"
+
+[tool.hatch.version]
+path = "gpjax/__init__.py"
+
+[tool.coverage.run]
+source_pkgs = ["gpjax", "tests"]
+branch = true
+parallel = true
+omit = ["gpjax/__init__.py"]
+
+[tool.coverage.paths]
+gpjax = ["gpjax", "*/gpjax/"]
+tests = ["tests", "*/gpjax/tests"]
+
+[tool.coverage.report]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+fail_under = 50
+precision = 1
+show_missing = true
+skip_covered = true
 
 [tool.black] # https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-via-a-file
 line-length = 88
 target-version = ["py310"]
 
 [tool.pytest.ini_options] # https://docs.pytest.org/en/latest/reference/reference.html#ini-options-ref
-# addopts = "--color=yes --doctest-modules --exitfirst --failed-first --strict-config --strict-markers --typeguard-packages=my_package --verbosity=2 --junitxml=reports/pytest.xml"
 filterwarnings = ["error", "ignore::DeprecationWarning"]
-testpaths = ["gpjax", "tests"]
+testpaths = ["gpjax"]
 xfail_strict = true
 
 [tool.ruff] # https://github.com/charliermarsh/ruff
@@ -148,39 +209,12 @@ convention = "numpy"
 "tests/test_objectives.py" = ["PLR0913"]
 "docs/examples/barycentres.py" = ["PLR0913"]
 
-
 [tool.isort]
 profile = "black"
 combine_as_imports = true
 force_sort_within_sections = true
 force_grid_wrap = 2
-skip = 'docs'
-
-[tool.coverage.report] # https://coverage.readthedocs.io/en/latest/config.html#report
-fail_under = 50
-precision = 1
-show_missing = true
-skip_covered = true
-exclude_lines = ["if TYPE_CHECKING:"]
-
-[tool.coverage.run] # https://coverage.readthedocs.io/en/latest/config.html#run
-branch = true
-command_line = "--module pytest"
-data_file = "reports/.coverage"
-source = ["src"]
-
-[tool.coverage.xml] # https://coverage.readthedocs.io/en/latest/config.html#xml
-output = "reports/coverage.xml"
-
-[tool.poetry-dynamic-versioning]
-enable = true
-vcs = "git"
-
-[tool.poetry-dynamic-versioning.substitution]
-files = ["gpjax/__init__.py"]
-
-[tool.codespell]
-ignore-words-list = "fro" # Frobenius
+skip = 'examples'
 
 [tool.interrogate]
 ignore-init-method = true

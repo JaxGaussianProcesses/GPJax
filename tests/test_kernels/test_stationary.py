@@ -44,7 +44,10 @@ config.update("jax_enable_x64", True)
 
 
 def params_product(params: dict[str, list]) -> list[dict[str, Any]]:
-    return [dict(zip(params.keys(), values)) for values in product(*params.values())]
+    return [
+        dict(zip(params.keys(), values, strict=False))
+        for values in product(*params.values())
+    ]
 
 
 TESTED_KERNELS = [

@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.16.4
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -24,23 +24,28 @@
 # %%
 # Enable Float64 for more stable matrix inversions.
 from jax import config
-
-config.update("jax_enable_x64", True)
-
 import jax.numpy as jnp
 import jax.random as jr
-from jaxtyping import install_import_hook, Float
+from jaxtyping import (
+    Float,
+    install_import_hook,
+)
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import optax as ox
 import pandas as pd
-
-with install_import_hook("gpjax", "beartype.beartype"):
-    import gpjax as gpx
-from gpjax.typing import Array
 from sklearn.preprocessing import StandardScaler
 
 from examples.utils import use_mpl_style
+from gpjax.parameters import PositiveReal
+from gpjax.typing import Array
+
+config.update("jax_enable_x64", True)
+
+
+with install_import_hook("gpjax", "beartype.beartype"):
+    import gpjax as gpx
+
 
 key = jr.key(42)
 
@@ -232,7 +237,6 @@ test_y = forrester(test_x)
 # First we define our model, using the Matérn52 kernel, and construct our posterior *without* optimising the kernel hyperparameters:
 
 # %%
-from gpjax.parameters import PositiveReal
 
 mean = gpx.mean_functions.Zero()
 kernel = gpx.kernels.Matern52(

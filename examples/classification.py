@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.16.4
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -22,19 +22,15 @@
 # with non-Gaussian likelihoods via maximum a posteriori (MAP). We focus on a classification task here.
 
 # %%
-# Enable Float64 for more stable matrix inversions.
-from jax import config
-
-config.update("jax_enable_x64", True)
-
-from time import time
-import blackjax
+import cola
 from flax import nnx
 import jax
+
+# Enable Float64 for more stable matrix inversions.
+from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
-import jax.tree_util as jtu
 from jaxtyping import (
     Array,
     Float,
@@ -43,12 +39,16 @@ from jaxtyping import (
 import matplotlib.pyplot as plt
 import optax as ox
 import tensorflow_probability.substrates.jax as tfp
-from tqdm import trange
+
+from examples.utils import use_mpl_style
+from gpjax.lower_cholesky import lower_cholesky
+
+config.update("jax_enable_x64", True)
+
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-from examples.utils import use_mpl_style
 
 tfd = tfp.distributions
 identity_matrix = jnp.eye
@@ -210,8 +210,7 @@ ax.legend()
 # datapoints below.
 
 # %%
-import cola
-from gpjax.lower_cholesky import lower_cholesky
+
 
 gram, cross_covariance = (kernel.gram, kernel.cross_covariance)
 jitter = 1e-6

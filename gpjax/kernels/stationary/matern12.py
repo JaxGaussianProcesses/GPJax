@@ -38,6 +38,7 @@ class Matern12(StationaryKernel):
     k(x, y) = \sigma^2\exp\Bigg(-\frac{\lvert x-y \rvert}{2\ell^2}\Bigg)
     $$
     """
+
     name: str = "Matérn12"
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:

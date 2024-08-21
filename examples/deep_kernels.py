@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.16.4
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -26,22 +26,16 @@
 # Gaussian process model's kernel through a neural network can offer a solution to this.
 
 # %%
-# Enable Float64 for more stable matrix inversions.
-from jax import config
-
-config.update("jax_enable_x64", True)
-
 from dataclasses import (
     dataclass,
     field,
 )
 
 from flax import nnx
-from gpjax.kernels.computations import (
-    AbstractKernelComputation,
-    DenseKernelComputation,
-)
 import jax
+
+# Enable Float64 for more stable matrix inversions.
+from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (
@@ -54,12 +48,19 @@ import matplotlib.pyplot as plt
 import optax as ox
 from scipy.signal import sawtooth
 
+from examples.utils import use_mpl_style
+from gpjax.kernels.computations import (
+    AbstractKernelComputation,
+    DenseKernelComputation,
+)
+
+config.update("jax_enable_x64", True)
+
+
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     from gpjax.kernels.base import AbstractKernel
 
-
-from examples.utils import use_mpl_style
 
 # set the default style for plotting
 use_mpl_style()

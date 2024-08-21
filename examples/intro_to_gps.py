@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.16.4
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -121,7 +121,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import tensorflow_probability.substrates.jax as tfp
-from examples.utils import confidence_ellipse, use_mpl_style
+
+from examples.utils import (
+    confidence_ellipse,
+    use_mpl_style,
+)
 
 # set the default style for plotting
 use_mpl_style()
