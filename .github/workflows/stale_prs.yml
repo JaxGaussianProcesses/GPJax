@@ -1,7 +1,7 @@
 name: Close stale issues
 on:
   schedule:
-    - cron: "30 1 * * *"
+    - cron: "30 8 * * *"
 
 jobs:
   close-issues:
@@ -12,11 +12,34 @@ jobs:
     steps:
       - uses: actions/stale@v9.0.0
         with:
-          days-before-issue-stale: 35
-          days-before-issue-close: 7
           stale-issue-label: "stale"
-          stale-issue-message: "This issue has been marked as stale because it has been open for 7 days with no activity."
-          close-issue-message: "This issue was closed because there has been no activity since being marked as stale."
-          days-before-pr-stale: -1
-          days-before-pr-close: -1
+          stale-pr-label: "stale"
+          exempt-issue-label: "no-stale,help-wanted"
+          exempt-pr-label: "no-stale,feedback-wanted"
+          remove-stale-when-updated: true
+          # Days before issue/PR is marked stale
+          days-before-stale: 70
+          # Days before an issue/PR is closed after marking 
+          days-before-close: 7
+          stale-issue-message: >
+            There has been no recent activity on this issue. To keep our issues log
+            clean, we remove old and inactive issues.
+
+            Please update to the latest version of GPJax and
+            check if that resolves the issue. Let us know if that works for you
+            by leaving a comment. 
+
+            This issue is now marked as stale and will be closed if no
+            further activity occurs. If you believe that this is incorrect, 
+            please comment. Thank you!
+          close-issue-message: >
+            There has been no activity on this PR for some time. Therefore, we will
+            be automatically closing the PR if no new activity occurs within the next
+            seven days. 
+            
+            Thank you for your contributions.
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          # Always start with the oldest issues
+          ascending: true
+          # Ensure that we do not encounter rate limits
+          operations-per-run: 60
