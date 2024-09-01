@@ -2960,7 +2960,7 @@ explanation of this model.).</p>
     kernel=Matern32(
       active_dims=slice(None, None, None),
       n_dims=None,
-      compute_engine=&lt;gpjax.kernels.computations.dense.DenseKernelComputation object at 0x7f18da60c0a0&gt;,
+      compute_engine=&lt;gpjax.kernels.computations.dense.DenseKernelComputation object at 0x7f2ad8db4040&gt;,
       lengthscale=PositiveReal(
         value=Array(1., dtype=float64, weak_type=True),
         _tag=&#39;positive&#39;
@@ -2984,7 +2984,7 @@ explanation of this model.).</p>
       _tag=&#39;positive&#39;
     ),
     num_datapoints=100,
-    integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f18da649ff0&gt;
+    integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f2ad8df5f00&gt;
   ),
   jitter=1e-06
 )
@@ -3076,7 +3076,7 @@ the updated state.</p>
 <div class="language-text highlight"><pre><span></span><code>ConjugatePosterior(
   jitter=1e-06,
   likelihood=Gaussian(
-    integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f18da649ff0&gt;,
+    integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f2ad8df5f00&gt;,
     num_datapoints=100,
     obs_stddev=PositiveReal(
       _tag=&#39;positive&#39;,
@@ -3087,7 +3087,7 @@ the updated state.</p>
     jitter=1e-06,
     kernel=Matern32(
       active_dims=slice(None, None, None),
-      compute_engine=&lt;gpjax.kernels.computations.dense.DenseKernelComputation object at 0x7f18da60c0a0&gt;,
+      compute_engine=&lt;gpjax.kernels.computations.dense.DenseKernelComputation object at 0x7f2ad8db4040&gt;,
       lengthscale=PositiveReal(
         _tag=&#39;positive&#39;,
         value=Array(2., dtype=float64, weak_type=True)
@@ -3235,7 +3235,7 @@ a linearly spaced set of inputs.</p>
 </span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">meanf</span> <span class="o">=</span> <span class="n">LinearMeanFunction</span><span class="p">(</span><span class="n">intercept</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">slope</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
 </span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">meanf</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>[&lt;matplotlib.lines.Line2D at 0x7f18d8ab8dc0&gt;]
+<div class="language-text highlight"><pre><span></span><code>[&lt;matplotlib.lines.Line2D at 0x7f2ad8250880&gt;]
 </code></pre></div>
 <p><img alt="png" src="../backend_files/backend_36_1.png" /></p>
 <p>Looks good! To conclude this section, let's now parameterise a GP with our new mean
@@ -3297,16 +3297,16 @@ notebook.</p>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Thomas Pinder
 
-Last updated: Sat Aug 31 2024
+Last updated: Sun Sep 01 2024
 
 Python implementation: CPython
 Python version       : 3.10.14
 IPython version      : 8.27.0
 
-flax      : 0.9.0
 matplotlib: 3.9.2
-jax       : 0.4.27
 gpjax     : 0.9.0
+jax       : 0.4.27
+flax      : 0.9.0
 
 Watermark: 2.4.3
 </code></pre></div>
