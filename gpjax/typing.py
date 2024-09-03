@@ -46,6 +46,7 @@ VecNOrMatNM = Union[Float[Array, " N"], Float[Array, "N M"]]
 
 UnivariateParams = Tuple[ScalarFloat, ScalarFloat]
 MultivariateParams = Tuple[Float[Array, " N"], Float[Array, "N N"]]
+SingletonArrayPair = Tuple[Float[Array, "N D"], Float[Array, "N 1"]]
 
 FunctionalSample = Callable[[Float[Array, "N D"]], Float[Array, "N B"]]
 r""" Type alias for functions representing $B$ samples from a model, to be evaluated on

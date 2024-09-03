@@ -9,6 +9,7 @@ from gpjax.testing import (
     is_psd,
     sample_multivariate_gaussian_params,
     sample_univariate_gaussian_params,
+    approx_equal,
 )
 from gpjax.typing import (
     MultivariateParams,

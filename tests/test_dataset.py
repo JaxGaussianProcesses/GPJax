@@ -21,34 +21,43 @@ try:
     ValidationErrors = (ValueError, beartype.roar.BeartypeCallHintParamViolation)
 except ImportError:
     ValidationErrors = ValueError
-
+from hypothesis import given, strategies as st
 from jax import config
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import pytest
 
 from gpjax.dataset import Dataset
+from gpjax.testing import sample_dynamic_jax_array_pair
+from gpjax.typing import SingletonArrayPair
 
 config.update("jax_enable_x64", True)
 
 
-@pytest.mark.parametrize("n", [1, 2, 10])
-@pytest.mark.parametrize("in_dim", [1, 2, 10])
-def test_dataset_init(n: int, in_dim: int) -> None:
+MIN_DIM = 1
+MAX_DIM = 20
+
+
+@given(
+    data_arrays=sample_dynamic_jax_array_pair(
+        min_length=1, max_length=100, min_dims=1, max_dims=20, singleton_output=True
+    )
+)
+def test_dataset_init(data_arrays: SingletonArrayPair) -> None:
     # Create dataset
-    x = jnp.ones((n, in_dim))
-    y = jnp.ones((n, 1))
+    x, y = data_arrays
+    num_data, data_dim = x.shape
 
     D = Dataset(X=x, y=y)
 
     # Test dataset shapes
-    assert D.n == n
-    assert D.in_dim == in_dim
+    assert D.n == num_data
+    assert D.in_dim == data_dim
 
     # Test representation
     assert (
         D.__repr__()
-        == f"Dataset(Number of observations: {n} - Input dimension: {in_dim})"
+        == f"Dataset(Number of observations: {num_data} - Input dimension: {data_dim})"
     )
 
     # Ensure dataclass
@@ -75,7 +84,6 @@ def test_dataset_add(n1: int, n2: int, in_dim: int) -> None:
     x2 = 2 * jnp.ones((n2, in_dim))
     y2 = 2 * jnp.ones((n2, 1))
     D2 = Dataset(X=x2, y=y2)
-
     # Add datasets
     D = D1 + D2
 
