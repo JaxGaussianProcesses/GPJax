@@ -2572,27 +2572,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../progress_bar/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Progress Bar
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../scan/" class="md-nav__link">
         
   
@@ -2803,7 +2782,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Type alias for utility functions which don't support batching, and instead characterise
+        <p>Type alias for utility functions which don't support batching, and instead characterise
 the utility of querying a single point, rather than a batch of points. They take an array of points of shape <span class="arithmatex">\([N, D]\)</span>
 and return the value of the utility function at each point in an array of shape <span class="arithmatex">\([N, 1]\)</span>.</p>
     </div>
@@ -2828,7 +2807,7 @@ and return the value of the utility function at each point in an array of shape 
 
     <div class="doc doc-contents ">
 
-      <p>Type alias for all utility functions. Currently we only support
+        <p>Type alias for all utility functions. Currently we only support
 <code>SinglePointUtilityFunction</code>s, but in future may support batched utility functions too.
 Note that <code>UtilityFunction</code>s are <em>maximised</em> in order to decide which point, or batch of points, to query next.</p>
     </div>
@@ -2853,7 +2832,7 @@ Note that <code>UtilityFunction</code>s are <em>maximised</em> in order to decid
 
     <div class="doc doc-contents ">
 
-      <p>Type alias for utility function builders. For now this only include single point utility
+        <p>Type alias for utility function builders. For now this only include single point utility
 function builders, but in the future we may support batched utility function builders.</p>
     </div>
 
@@ -2881,7 +2860,7 @@ function builders, but in the future we may support batched utility function bui
               Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-      <p>Abstract class for building utility functions which don't support batches. As such,
+        <p>Abstract class for building utility functions which don't support batches. As such,
 they characterise the utility of querying a single point next.</p>
 
 
@@ -2910,7 +2889,7 @@ they characterise the utility of querying a single point next.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Check that the objective posterior and dataset are present in the posteriors and
+        <p>Check that the objective posterior and dataset are present in the posteriors and
 datasets.</p>
 
 
@@ -2968,7 +2947,7 @@ posteriors or datasets.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Build a <code>UtilityFunction</code> from a set of posteriors and datasets.</p>
+        <p>Build a <code>UtilityFunction</code> from a set of posteriors and datasets.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

@@ -2569,27 +2569,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../progress_bar/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Progress Bar
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../scan/" class="md-nav__link">
         
   
@@ -2801,7 +2780,7 @@
               Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-      <p>The <code>AbstractSearchSpace</code> class is an abstract base class for
+        <p>The <code>AbstractSearchSpace</code> class is an abstract base class for
 search spaces, which are used to define domains for sampling and optimisation functionality in GPJax.</p>
 
 
@@ -2834,7 +2813,7 @@ search spaces, which are used to define domains for sampling and optimisation fu
 
     <div class="doc doc-contents ">
 
-      <p>Dimensionality of the search space.
+        <p>Dimensionality of the search space.
 Returns:
     int: Dimensionality of the search space.</p>
     </div>
@@ -2860,7 +2839,7 @@ Returns:
 
     <div class="doc doc-contents ">
 
-      <p>Sample points from the search space.
+        <p>Sample points from the search space.
 Args:
     num_points (int): Number of points to be sampled from the search space.
     key (KeyArray): JAX PRNG key.
@@ -2900,7 +2879,7 @@ Returns:
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.decision_making.search_space.AbstractSearchSpace" href="#gpjax.decision_making.search_space.AbstractSearchSpace">AbstractSearchSpace</a></code></p>
 
 
-      <p>The <code>ContinuousSearchSpace</code> class is used to bound the domain of continuous real functions of dimension <span class="arithmatex">\(D\)</span>.</p>
+        <p>The <code>ContinuousSearchSpace</code> class is used to bound the domain of continuous real functions of dimension <span class="arithmatex">\(D\)</span>.</p>
 
 
 
@@ -2928,7 +2907,7 @@ Returns:
 
     <div class="doc doc-contents ">
 
-      <p>Sample points from the search space using a Halton sequence.</p>
+        <p>Sample points from the search space using a Halton sequence.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2950,7 +2929,7 @@ Returns:
           </div>
         </li>
     </ul>
-      <p>Returns:
+        <p>Returns:
     Float[Array, "N D"]: <code>num_points</code> points sampled using the Halton sequence
     from the search space.</p>
 

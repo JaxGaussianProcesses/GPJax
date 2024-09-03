@@ -2596,27 +2596,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../progress_bar/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Progress Bar
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../scan/" class="md-nav__link">
         
   
@@ -2855,7 +2834,7 @@
               Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-      <p>AbstractDecisionMaker abstract base class which handles the core decision making
+        <p>AbstractDecisionMaker abstract base class which handles the core decision making
 loop, where we sequentially decide on points to query our function of interest at.
 The decision making loop is split into two key steps, <code>ask</code> and <code>tell</code>. The <code>ask</code>
 step is typically used to decide which point to query next. The <code>tell</code> step is
@@ -2965,7 +2944,7 @@ one point to be queried at each iteration of the decision making loop.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Get the point(s) to be queried next.</p>
+        <p>Get the point(s) to be queried next.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3009,7 +2988,7 @@ one point to be queried at each iteration of the decision making loop.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Add newly observed data to datasets and update the corresponding posteriors.</p>
+        <p>Add newly observed data to datasets and update the corresponding posteriors.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3051,7 +3030,7 @@ Tags are used to distinguish datasets, and correspond to tags in
 
     <div class="doc doc-contents ">
 
-      <p>Run the decision making loop continuously for for <code>n_steps</code>. This is broken down
+        <p>Run the decision making loop continuously for for <code>n_steps</code>. This is broken down
 into three main steps:
 1. Call the <code>ask</code> method to get the point to be queried next.
 2. Call the <code>black_box_function_evaluator</code> to evaluate the black box functions
@@ -3144,7 +3123,7 @@ evaluates the black box functions of interest at supplied points.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.decision_making.decision_maker.AbstractDecisionMaker" href="#gpjax.decision_making.decision_maker.AbstractDecisionMaker">AbstractDecisionMaker</a></code></p>
 
 
-      <p>UtilityDrivenDecisionMaker class which handles the core decision making loop in a
+        <p>UtilityDrivenDecisionMaker class which handles the core decision making loop in a
 typical model-based decision making setup. In this setup we use surrogate model(s)
 for the function(s) of interest, and define a utility function (often called the
 'acquisition function' in the context of Bayesian optimisation) which characterises
@@ -3214,7 +3193,7 @@ utility functions over the search space.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Add newly observed data to datasets and update the corresponding posteriors.</p>
+        <p>Add newly observed data to datasets and update the corresponding posteriors.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3256,7 +3235,7 @@ Tags are used to distinguish datasets, and correspond to tags in
 
     <div class="doc doc-contents ">
 
-      <p>Run the decision making loop continuously for for <code>n_steps</code>. This is broken down
+        <p>Run the decision making loop continuously for for <code>n_steps</code>. This is broken down
 into three main steps:
 1. Call the <code>ask</code> method to get the point to be queried next.
 2. Call the <code>black_box_function_evaluator</code> to evaluate the black box functions
@@ -3333,7 +3312,7 @@ evaluates the black box functions of interest at supplied points.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Get updated utility function(s) and return the point(s) which maximises it/them. This
+        <p>Get updated utility function(s) and return the point(s) which maximises it/them. This
 method also stores the utility function(s) in
 <code>self.current_utility_functions</code> so that they can be accessed after the ask
 function has been called. This is useful for non-deterministic utility

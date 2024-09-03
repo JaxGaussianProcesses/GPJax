@@ -2474,27 +2474,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../progress_bar/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Progress Bar
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../scan/" class="md-nav__link">
         
   
@@ -3323,7 +3302,7 @@
               Bases: <code><span title="flax.nnx.Module">Module</span></code>, <code><span title="beartype.typing.Generic">Generic</span>[<span title="gpjax.variational_families.L">L</span>]</code></p>
 
 
-      <p>Abstract base class used to represent families of distributions that can be
+        <p>Abstract base class used to represent families of distributions that can be
 used within variational inference.</p>
 
 
@@ -3352,7 +3331,7 @@ used within variational inference.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the variational family's density.</p>
+        <p>Evaluate the variational family's density.</p>
 <p>For a given set of parameters, compute the latent function's prediction
 under the variational approximation.</p>
 
@@ -3415,7 +3394,7 @@ method.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Predict the GP's output given the input.</p>
+        <p>Predict the GP's output given the input.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3485,7 +3464,7 @@ method.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.variational_families.AbstractVariationalFamily" href="#gpjax.variational_families.AbstractVariationalFamily">AbstractVariationalFamily</a>[<span title="gpjax.variational_families.L">L</span>]</code></p>
 
 
-      <p>The variational Gaussian family of probability distributions.</p>
+        <p>The variational Gaussian family of probability distributions.</p>
 
 
 
@@ -3516,7 +3495,7 @@ method.</p>
 
     <div class="doc doc-contents ">
 
-      <p>The number of inducing inputs.</p>
+        <p>The number of inducing inputs.</p>
     </div>
 
 </div>
@@ -3536,7 +3515,7 @@ method.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the variational family's density.</p>
+        <p>Evaluate the variational family's density.</p>
 <p>For a given set of parameters, compute the latent function's prediction
 under the variational approximation.</p>
 
@@ -3599,7 +3578,7 @@ method.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Predict the GP's output given the input.</p>
+        <p>Predict the GP's output given the input.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3669,7 +3648,7 @@ method.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.variational_families.AbstractVariationalGaussian" href="#gpjax.variational_families.AbstractVariationalGaussian">AbstractVariationalGaussian</a>[<span title="gpjax.variational_families.L">L</span>]</code></p>
 
 
-      <p>The variational Gaussian family of probability distributions.</p>
+        <p>The variational Gaussian family of probability distributions.</p>
 <p>The variational family is <span class="arithmatex">\(q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u\)</span>, where
 <span class="arithmatex">\(u = f(z)\)</span> are the function values at the inducing inputs <span class="arithmatex">\(z\)</span>
 and the distribution over the inducing inputs is
@@ -3705,7 +3684,7 @@ and the distribution over the inducing inputs is
 
     <div class="doc doc-contents ">
 
-      <p>The number of inducing inputs.</p>
+        <p>The number of inducing inputs.</p>
     </div>
 
 </div>
@@ -3725,7 +3704,7 @@ and the distribution over the inducing inputs is
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the variational family's density.</p>
+        <p>Evaluate the variational family's density.</p>
 <p>For a given set of parameters, compute the latent function's prediction
 under the variational approximation.</p>
 
@@ -3784,7 +3763,7 @@ method.</p>
 
     <div class="doc doc-contents ">
 
-      <link rel="stylesheet"
+        <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
   integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
   crossorigin="anonymous" />
@@ -3841,7 +3820,7 @@ approximation and the GP prior.</p>
 
     <div class="doc doc-contents ">
 
-      <link rel="stylesheet"
+        <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
   integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
   crossorigin="anonymous" />
@@ -3919,7 +3898,7 @@ the test inputs.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.variational_families.VariationalGaussian" href="#gpjax.variational_families.VariationalGaussian">VariationalGaussian</a>[<span title="gpjax.variational_families.L">L</span>]</code></p>
 
 
-      <p>The whitened variational Gaussian family of probability distributions.</p>
+        <p>The whitened variational Gaussian family of probability distributions.</p>
 <p>The variational family is <span class="arithmatex">\(q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u\)</span>,
 where <span class="arithmatex">\(u = f(z)\)</span>
 are the function values at the inducing inputs <span class="arithmatex">\(z\)</span> and the distribution over
@@ -3955,7 +3934,7 @@ over <span class="arithmatex">\(\mu\)</span> and <span class="arithmatex">\(sqrt
 
     <div class="doc doc-contents ">
 
-      <p>The number of inducing inputs.</p>
+        <p>The number of inducing inputs.</p>
     </div>
 
 </div>
@@ -3975,7 +3954,7 @@ over <span class="arithmatex">\(\mu\)</span> and <span class="arithmatex">\(sqrt
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the variational family's density.</p>
+        <p>Evaluate the variational family's density.</p>
 <p>For a given set of parameters, compute the latent function's prediction
 under the variational approximation.</p>
 
@@ -4034,7 +4013,7 @@ method.</p>
 
     <div class="doc doc-contents ">
 
-      <link rel="stylesheet"
+        <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
   integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
   crossorigin="anonymous" />
@@ -4089,7 +4068,7 @@ approximation and the GP prior.</p>
 
     <div class="doc doc-contents ">
 
-      <link rel="stylesheet"
+        <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
   integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
   crossorigin="anonymous" />
@@ -4167,7 +4146,7 @@ the test inputs.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.variational_families.AbstractVariationalGaussian" href="#gpjax.variational_families.AbstractVariationalGaussian">AbstractVariationalGaussian</a>[<span title="gpjax.variational_families.L">L</span>]</code></p>
 
 
-      <p>The natural variational Gaussian family of probability distributions.</p>
+        <p>The natural variational Gaussian family of probability distributions.</p>
 <p>The variational family is <span class="arithmatex">\(q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u\)</span>,
 where <span class="arithmatex">\(u = f(z)\)</span> are
 the function values at the inducing inputs <span class="arithmatex">\(z\)</span> and the distribution over the
@@ -4205,7 +4184,7 @@ where <span class="arithmatex">\(T(u) = [u, uu^{\top}]\)</span> are the sufficie
 
     <div class="doc doc-contents ">
 
-      <p>The number of inducing inputs.</p>
+        <p>The number of inducing inputs.</p>
     </div>
 
 </div>
@@ -4225,7 +4204,7 @@ where <span class="arithmatex">\(T(u) = [u, uu^{\top}]\)</span> are the sufficie
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the variational family's density.</p>
+        <p>Evaluate the variational family's density.</p>
 <p>For a given set of parameters, compute the latent function's prediction
 under the variational approximation.</p>
 
@@ -4284,7 +4263,7 @@ method.</p>
 
     <div class="doc doc-contents ">
 
-      <link rel="stylesheet"
+        <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
   integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
   crossorigin="anonymous" />
@@ -4340,7 +4319,7 @@ the GP prior.</p>
 
     <div class="doc doc-contents ">
 
-      <link rel="stylesheet"
+        <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
   integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
   crossorigin="anonymous" />
@@ -4406,7 +4385,7 @@ return the predictive distribution at those points.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.variational_families.AbstractVariationalGaussian" href="#gpjax.variational_families.AbstractVariationalGaussian">AbstractVariationalGaussian</a>[<span title="gpjax.variational_families.L">L</span>]</code></p>
 
 
-      <p>The natural variational Gaussian family of probability distributions.</p>
+        <p>The natural variational Gaussian family of probability distributions.</p>
 <p>The variational family is <span class="arithmatex">\(q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u\)</span>, where <span class="arithmatex">\(u = f(z)\)</span> are the
 function values at the inducing inputs <span class="arithmatex">\(z\)</span> and the distribution over the inducing
 inputs is <span class="arithmatex">\(q(u) = \mathcal{N}(\mu, S)\)</span>. Expressing the variational distribution, in the form of
@@ -4445,7 +4424,7 @@ inference over.</p>
 
     <div class="doc doc-contents ">
 
-      <p>The number of inducing inputs.</p>
+        <p>The number of inducing inputs.</p>
     </div>
 
 </div>
@@ -4465,7 +4444,7 @@ inference over.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the variational family's density.</p>
+        <p>Evaluate the variational family's density.</p>
 <p>For a given set of parameters, compute the latent function's prediction
 under the variational approximation.</p>
 
@@ -4524,7 +4503,7 @@ method.</p>
 
     <div class="doc doc-contents ">
 
-      <link rel="stylesheet"
+        <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
   integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
   crossorigin="anonymous" />
@@ -4583,7 +4562,7 @@ the GP prior.</p>
 
     <div class="doc doc-contents ">
 
-      <link rel="stylesheet"
+        <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
   integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
   crossorigin="anonymous" />
@@ -4650,7 +4629,7 @@ test inputs <span class="arithmatex">\(t\)</span>.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.variational_families.AbstractVariationalGaussian" href="#gpjax.variational_families.AbstractVariationalGaussian">AbstractVariationalGaussian</a>[<span title="gpjax.variational_families.GL">GL</span>]</code></p>
 
 
-      <p>Collapsed variational Gaussian.</p>
+        <p>Collapsed variational Gaussian.</p>
 <p>Collapsed variational Gaussian family of probability distributions.
 The key reference is Titsias, (2009) - Variational Learning of Inducing Variables
 in Sparse Gaussian Processes.</p>
@@ -4684,7 +4663,7 @@ in Sparse Gaussian Processes.</p>
 
     <div class="doc doc-contents ">
 
-      <p>The number of inducing inputs.</p>
+        <p>The number of inducing inputs.</p>
     </div>
 
 </div>
@@ -4704,7 +4683,7 @@ in Sparse Gaussian Processes.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the variational family's density.</p>
+        <p>Evaluate the variational family's density.</p>
 <p>For a given set of parameters, compute the latent function's prediction
 under the variational approximation.</p>
 
@@ -4763,7 +4742,7 @@ method.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Compute the predictive distribution of the GP at the test inputs.</p>
+        <p>Compute the predictive distribution of the GP at the test inputs.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

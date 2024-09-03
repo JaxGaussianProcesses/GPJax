@@ -2728,27 +2728,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../progress_bar/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Progress Bar
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../scan/" class="md-nav__link">
         
   
@@ -3115,7 +3094,7 @@
               Bases: <code><span title="flax.nnx.Module">Module</span></code>, <code><span title="beartype.typing.Generic">Generic</span>[<span title="gpjax.gps.M">M</span>, <span title="gpjax.gps.K">K</span>]</code></p>
 
 
-      <p>Abstract Gaussian process prior.</p>
+        <p>Abstract Gaussian process prior.</p>
 
 
 
@@ -3165,7 +3144,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the Gaussian process at the given points.</p>
+        <p>Evaluate the Gaussian process at the given points.</p>
 <p>The output of this function is a
 <a href="https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions">TensorFlow probability distribution</a> from which the
 the latent function's mean and covariance can be evaluated and the distribution
@@ -3233,7 +3212,7 @@ of the Gaussian process.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the predictive distribution.</p>
+        <p>Evaluate the predictive distribution.</p>
 <p>Compute the latent function's multivariate normal distribution for a
 given set of parameters. For any class inheriting the <code>AbstractPrior</code> class,
 this method must be implemented.</p>
@@ -3305,7 +3284,7 @@ of the Gaussian process.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPrior" href="#gpjax.gps.AbstractPrior">AbstractPrior</a>[<span title="gpjax.gps.M">M</span>, <span title="gpjax.gps.K">K</span>]</code></p>
 
 
-      <p>A Gaussian process prior object.</p>
+        <p>A Gaussian process prior object.</p>
 <p>The GP is parameterised by a
 <a href="https://docs.jaxgaussianprocesses.com/api/mean_functions/">mean</a>
 and <a href="https://docs.jaxgaussianprocesses.com/api/kernels/base/">kernel</a>
@@ -3369,7 +3348,7 @@ function <span class="arithmatex">\(k(\cdot, \cdot)\)</span> is given by
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the Gaussian process at the given points.</p>
+        <p>Evaluate the Gaussian process at the given points.</p>
 <p>The output of this function is a
 <a href="https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions">TensorFlow probability distribution</a> from which the
 the latent function's mean and covariance can be evaluated and the distribution
@@ -3433,7 +3412,7 @@ of the Gaussian process.</p>
 
     <div class="doc doc-contents ">
 
-      <link rel="stylesheet"
+        <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
   integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
   crossorigin="anonymous" />
@@ -3489,7 +3468,7 @@ Args:
 
     <div class="doc doc-contents ">
 
-      <p>Compute the predictive prior distribution for a given set of
+        <p>Compute the predictive prior distribution for a given set of
 parameters. The output of this function is a function that computes
 a TFP distribution for a given set of inputs.</p>
 <p>In the following example, we compute the predictive prior distribution
@@ -3547,7 +3526,7 @@ of the Gaussian process.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Approximate samples from the Gaussian process prior.</p>
+        <p>Approximate samples from the Gaussian process prior.</p>
 <p>Build an approximate sample from the Gaussian process prior. This method
 provides a function that returns the evaluations of a sample across any
 given inputs.</p>
@@ -3653,7 +3632,7 @@ Gaussian process prior.</p>
               Bases: <code><span title="flax.nnx.Module">Module</span></code>, <code><span title="beartype.typing.Generic">Generic</span>[<span title="gpjax.gps.P">P</span>, <span title="gpjax.gps.L">L</span>]</code></p>
 
 
-      <p>Abstract Gaussian process posterior.</p>
+        <p>Abstract Gaussian process posterior.</p>
 <p>The base GP posterior object conditioned on an observed dataset. All
 posterior objects should inherit from this class.</p>
 
@@ -3716,7 +3695,7 @@ covariance matrix to ensure numerical stability.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the Gaussian process posterior at the given points.</p>
+        <p>Evaluate the Gaussian process posterior at the given points.</p>
 <p>The output of this function is a
 <a href="https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions">TFP distribution</a>
 from which the the latent function's mean and covariance can be
@@ -3784,7 +3763,7 @@ of the Gaussian process.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Compute the latent function's multivariate normal distribution for a
+        <p>Compute the latent function's multivariate normal distribution for a
 given set of parameters. For any class inheriting the <code>AbstractPrior</code> class,
 this method must be implemented.</p>
 
@@ -3855,7 +3834,7 @@ of the Gaussian process.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPosterior" href="#gpjax.gps.AbstractPosterior">AbstractPosterior</a>[<span title="gpjax.gps.P">P</span>, <span title="gpjax.gps.GL">GL</span>]</code></p>
 
 
-      <link rel="stylesheet"
+        <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
   integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
   crossorigin="anonymous" />
@@ -3965,7 +3944,7 @@ covariance matrix to ensure numerical stability.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the Gaussian process posterior at the given points.</p>
+        <p>Evaluate the Gaussian process posterior at the given points.</p>
 <p>The output of this function is a
 <a href="https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions">TFP distribution</a>
 from which the the latent function's mean and covariance can be
@@ -4029,7 +4008,7 @@ of the Gaussian process.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Query the predictive posterior distribution.</p>
+        <p>Query the predictive posterior distribution.</p>
 <p>Conditional on a training data set, compute the GP's posterior
 predictive distribution for a given set of parameters. The returned function
 can be evaluated at a set of test inputs to compute the corresponding
@@ -4113,7 +4092,7 @@ returns the predictive distribution as a <code>GaussianDistribution</code>.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Draw approximate samples from the Gaussian process posterior.</p>
+        <p>Draw approximate samples from the Gaussian process posterior.</p>
 <p>Build an approximate sample from the Gaussian process posterior. This method
 provides a function that returns the evaluations of a sample across any given
 inputs.</p>
@@ -4216,7 +4195,7 @@ kernel.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.gps.AbstractPosterior" href="#gpjax.gps.AbstractPosterior">AbstractPosterior</a>[<span title="gpjax.gps.P">P</span>, <span title="gpjax.gps.NGL">NGL</span>]</code></p>
 
 
-      <p>A non-conjugate Gaussian process posterior object.</p>
+        <p>A non-conjugate Gaussian process posterior object.</p>
 <p>A Gaussian process posterior object for models where the likelihood is
 non-Gaussian. Unlike the <code>ConjugatePosterior</code> object, the
 <code>NonConjugatePosterior</code> object does not provide an exact marginal
@@ -4285,7 +4264,7 @@ covariance matrix to ensure numerical stability.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the Gaussian process posterior at the given points.</p>
+        <p>Evaluate the Gaussian process posterior at the given points.</p>
 <p>The output of this function is a
 <a href="https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/distributions">TFP distribution</a>
 from which the the latent function's mean and covariance can be
@@ -4349,7 +4328,7 @@ of the Gaussian process.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Query the predictive posterior distribution.</p>
+        <p>Query the predictive posterior distribution.</p>
 <p>Conditional on a set of training data, compute the GP's posterior
 predictive distribution for a given set of parameters. The returned
 function can be evaluated at a set of test inputs to compute the
@@ -4411,7 +4390,7 @@ a <code>dx.Distribution</code>.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Utility function for constructing a posterior object from a prior and
+        <p>Utility function for constructing a posterior object from a prior and
 likelihood. The function will automatically select the correct posterior
 object based on the likelihood.</p>
 
@@ -4436,7 +4415,7 @@ beliefs around the distribution of the data.</p>
           </div>
         </li>
     </ul>
-      <h4 id="gpjax.gps.construct_posterior--returns">Returns<a class="headerlink" href="#gpjax.gps.construct_posterior--returns" title="Permanent link"></a></h4>
+        <h4 id="gpjax.gps.construct_posterior--returns">Returns<a class="headerlink" href="#gpjax.gps.construct_posterior--returns" title="Permanent link"></a></h4>
 <div class="language-text highlight"><pre><span></span><code>AbstractPosterior: A posterior distribution. If the likelihood is
     Gaussian, then a `ConjugatePosterior` will be returned. Otherwise,
     a `NonConjugatePosterior` will be returned.

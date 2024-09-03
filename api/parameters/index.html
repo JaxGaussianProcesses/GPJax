@@ -16,7 +16,7 @@
         <link rel="prev" href="../objectives/">
       
       
-        <link rel="next" href="../progress_bar/">
+        <link rel="next" href="../scan/">
       
       
       <link rel="icon" href="../../static/favicon.ico">
@@ -2575,27 +2575,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../progress_bar/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Progress Bar
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../scan/" class="md-nav__link">
         
   
@@ -2809,7 +2788,7 @@
               Bases: <code><span title="flax.nnx.Variable">Variable</span>[<span title="gpjax.parameters.T">T</span>]</code></p>
 
 
-      <p>Parameter base class.</p>
+        <p>Parameter base class.</p>
 <p>All trainable parameters in GPJax should inherit from this class.</p>
 
 
@@ -2850,7 +2829,7 @@
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.parameters.Parameter" href="#gpjax.parameters.Parameter">Parameter</a>[<span title="gpjax.parameters.T">T</span>]</code></p>
 
 
-      <p>Parameter that is strictly positive.</p>
+        <p>Parameter that is strictly positive.</p>
 
 
 
@@ -2890,7 +2869,7 @@
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.parameters.Parameter" href="#gpjax.parameters.Parameter">Parameter</a>[<span title="gpjax.parameters.T">T</span>]</code></p>
 
 
-      <p>Parameter that can take any real value.</p>
+        <p>Parameter that can take any real value.</p>
 
 
 
@@ -2930,7 +2909,7 @@
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.parameters.Parameter" href="#gpjax.parameters.Parameter">Parameter</a>[<span title="gpjax.parameters.T">T</span>]</code></p>
 
 
-      <p>Parameter that is bounded between 0 and 1.</p>
+        <p>Parameter that is bounded between 0 and 1.</p>
 
 
 
@@ -2970,7 +2949,7 @@
               Bases: <code><span title="flax.nnx.Variable">Variable</span>[<span title="gpjax.parameters.T">T</span>]</code></p>
 
 
-      <p>Static parameter that is not trainable.</p>
+        <p>Static parameter that is not trainable.</p>
 
 
 
@@ -3010,7 +2989,7 @@
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.parameters.Parameter" href="#gpjax.parameters.Parameter">Parameter</a>[<span title="gpjax.parameters.T">T</span>]</code></p>
 
 
-      <p>Parameter that is a lower triangular matrix.</p>
+        <p>Parameter that is a lower triangular matrix.</p>
 
 
 
@@ -3047,7 +3026,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Transforms parameters using a bijector.</p>
+        <p>Transforms parameters using a bijector.</p>
 <p>Example:
 <div class="language-pycon highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="go">    &gt;&gt;&gt; from gpjax.parameters import PositiveReal, transform</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">    &gt;&gt;&gt; import jax.numpy as jnp</span>

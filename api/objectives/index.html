@@ -2656,27 +2656,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../progress_bar/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Progress Bar
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../scan/" class="md-nav__link">
         
   
@@ -2968,7 +2947,7 @@
 
     <div class="doc doc-contents ">
 
-      <link rel="stylesheet"
+        <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
   integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
   crossorigin="anonymous" />
@@ -3056,7 +3035,7 @@ marginal log-likelihood.</p>
           </div>
         </li>
     </ul>
-      <h4 id="gpjax.objectives.conjugate_mll--returns">Returns<a class="headerlink" href="#gpjax.objectives.conjugate_mll--returns" title="Permanent link"></a></h4>
+        <h4 id="gpjax.objectives.conjugate_mll--returns">Returns<a class="headerlink" href="#gpjax.objectives.conjugate_mll--returns" title="Permanent link"></a></h4>
 <div class="language-text highlight"><pre><span></span><code>ScalarFloat: The marginal log-likelihood of the Gaussian process.
 </code></pre></div>
 
@@ -3077,7 +3056,7 @@ marginal log-likelihood.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the leave-one-out log predictive probability of the Gaussian process following
+        <p>Evaluate the leave-one-out log predictive probability of the Gaussian process following
 section 5.4.2 of Rasmussen et al. 2006 - Gaussian Processes for Machine Learning. This metric
 calculates the average performance of all models that can be obtained by training on all but one
 data point, and then predicting the left out data point.</p>
@@ -3143,7 +3122,7 @@ marginal log-likelihood.</p>
           </div>
         </li>
     </ul>
-      <h4 id="gpjax.objectives.conjugate_loocv--returns">Returns<a class="headerlink" href="#gpjax.objectives.conjugate_loocv--returns" title="Permanent link"></a></h4>
+        <h4 id="gpjax.objectives.conjugate_loocv--returns">Returns<a class="headerlink" href="#gpjax.objectives.conjugate_loocv--returns" title="Permanent link"></a></h4>
 <div class="language-text highlight"><pre><span></span><code>ScalarFloat: The marginal log-likelihood of the Gaussian process.
 </code></pre></div>
 
@@ -3164,7 +3143,7 @@ marginal log-likelihood.</p>
 
     <div class="doc doc-contents ">
 
-      <p>The log-posterior density of a non-conjugate Gaussian process. This is
+        <p>The log-posterior density of a non-conjugate Gaussian process. This is
 sometimes referred to as the marginal log-likelihood.</p>
 <p>Evaluate the log-posterior density of a Gaussian process.</p>
 <p>Compute the marginal log-likelihood, or log-posterior density of the Gaussian
@@ -3201,7 +3180,7 @@ marginal log-likelihood.</p>
           </div>
         </li>
     </ul>
-      <h4 id="gpjax.objectives.log_posterior_density--returns">Returns<a class="headerlink" href="#gpjax.objectives.log_posterior_density--returns" title="Permanent link"></a></h4>
+        <h4 id="gpjax.objectives.log_posterior_density--returns">Returns<a class="headerlink" href="#gpjax.objectives.log_posterior_density--returns" title="Permanent link"></a></h4>
 <div class="language-text highlight"><pre><span></span><code>ScalarFloat: The log-posterior density of the Gaussian process.
 </code></pre></div>
 
@@ -3222,7 +3201,7 @@ marginal log-likelihood.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Compute the evidence lower bound of a variational approximation.</p>
+        <p>Compute the evidence lower bound of a variational approximation.</p>
 <p>Compute the evidence lower bound under this model. In short, this requires
 evaluating the expectation of the model's log-likelihood under the variational
 approximation. To this, we sum the KL divergence from the variational posterior
@@ -3252,7 +3231,7 @@ ELBO with respect to.</p>
           </div>
         </li>
     </ul>
-      <h4 id="gpjax.objectives.elbo--returns">Returns<a class="headerlink" href="#gpjax.objectives.elbo--returns" title="Permanent link"></a></h4>
+        <h4 id="gpjax.objectives.elbo--returns">Returns<a class="headerlink" href="#gpjax.objectives.elbo--returns" title="Permanent link"></a></h4>
 <div class="language-text highlight"><pre><span></span><code>ScalarFloat: The evidence lower bound of the variational approximation.
 </code></pre></div>
 
@@ -3273,7 +3252,7 @@ ELBO with respect to.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Compute the variational expectation.</p>
+        <p>Compute the variational expectation.</p>
 <p>Compute the expectation of our model's log-likelihood under our variational
 distribution. Batching can be done here to speed up computation.</p>
 
@@ -3298,7 +3277,7 @@ are using to approximate the posterior.</p>
           </div>
         </li>
     </ul>
-      <h4 id="gpjax.objectives.variational_expectation--returns">Returns<a class="headerlink" href="#gpjax.objectives.variational_expectation--returns" title="Permanent link"></a></h4>
+        <h4 id="gpjax.objectives.variational_expectation--returns">Returns<a class="headerlink" href="#gpjax.objectives.variational_expectation--returns" title="Permanent link"></a></h4>
 <div class="language-text highlight"><pre><span></span><code>Array: The expectation of the model&#39;s log-likelihood under our variational
     distribution.
 </code></pre></div>
@@ -3320,7 +3299,7 @@ are using to approximate the posterior.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Compute a single step of the collapsed evidence lower bound.</p>
+        <p>Compute a single step of the collapsed evidence lower bound.</p>
 <p>Compute the evidence lower bound under this model. In short, this requires
 evaluating the expectation of the model's log-likelihood under the variational
 approximation. To this, we sum the KL divergence from the variational posterior
@@ -3350,7 +3329,7 @@ ELBO with respect to.</p>
           </div>
         </li>
     </ul>
-      <h4 id="gpjax.objectives.collapsed_elbo--returns">Returns<a class="headerlink" href="#gpjax.objectives.collapsed_elbo--returns" title="Permanent link"></a></h4>
+        <h4 id="gpjax.objectives.collapsed_elbo--returns">Returns<a class="headerlink" href="#gpjax.objectives.collapsed_elbo--returns" title="Permanent link"></a></h4>
 <div class="language-text highlight"><pre><span></span><code>ScalarFloat: The evidence lower bound of the variational approximation.
 </code></pre></div>
 

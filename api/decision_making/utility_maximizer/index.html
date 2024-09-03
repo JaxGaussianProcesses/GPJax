@@ -2554,27 +2554,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../progress_bar/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Progress Bar
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../scan/" class="md-nav__link">
         
   
@@ -2767,7 +2746,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Type alias for a utility maximizer. Currently we only support single point utility
+        <p>Type alias for a utility maximizer. Currently we only support single point utility
 functions, but in future may support batched utility functions.</p>
     </div>
 
@@ -2795,7 +2774,7 @@ functions, but in future may support batched utility functions.</p>
               Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-      <p>Abstract base class for single point utility function maximizers.</p>
+        <p>Abstract base class for single point utility function maximizers.</p>
 
 
 
@@ -2827,7 +2806,7 @@ functions, but in future may support batched utility functions.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Maximize the given utility function over the search space provided.</p>
+        <p>Maximize the given utility function over the search space provided.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2903,7 +2882,7 @@ functions, but in future may support batched utility functions.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.decision_making.utility_maximizer.AbstractSinglePointUtilityMaximizer" href="#gpjax.decision_making.utility_maximizer.AbstractSinglePointUtilityMaximizer">AbstractSinglePointUtilityMaximizer</a></code></p>
 
 
-      <p>The <code>ContinuousUtilityMaximizer</code> class is used to maximize utility
+        <p>The <code>ContinuousUtilityMaximizer</code> class is used to maximize utility
 functions over the continuous domain with L-BFGS-B. First we sample the utility
 function at <code>num_initial_samples</code> points from the search space, and then we run
 L-BFGS-B from the best of these initial points. We run this process <code>num_restarts</code>

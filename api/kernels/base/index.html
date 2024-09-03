@@ -2746,27 +2746,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../progress_bar/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Progress Bar
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../scan/" class="md-nav__link">
         
   
@@ -3151,7 +3130,7 @@
               Bases: <code><span title="flax.nnx.Module">Module</span></code></p>
 
 
-      <p>Base kernel class.</p>
+        <p>Base kernel class.</p>
 <p>This class is the base class for all kernels in GPJax. It provides the basic
 functionality for evaluating a kernel function on a pair of inputs, as well as
 the ability to combine kernels using addition and multiplication.</p>
@@ -3227,7 +3206,7 @@ cross-covariance and gram matrices. Defaults to DenseKernelComputation.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the kernel on a pair of inputs.</p>
+        <p>Evaluate the kernel on a pair of inputs.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3279,7 +3258,7 @@ cross-covariance and gram matrices. Defaults to DenseKernelComputation.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Compute the cross-covariance matrix of the kernel.</p>
+        <p>Compute the cross-covariance matrix of the kernel.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3331,7 +3310,7 @@ cross-covariance and gram matrices. Defaults to DenseKernelComputation.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Compute the gram matrix of the kernel.</p>
+        <p>Compute the gram matrix of the kernel.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3375,7 +3354,7 @@ cross-covariance and gram matrices. Defaults to DenseKernelComputation.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Compute the diagonal of the gram matrix of the kernel.</p>
+        <p>Compute the diagonal of the gram matrix of the kernel.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3419,7 +3398,7 @@ cross-covariance and gram matrices. Defaults to DenseKernelComputation.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Slice out the relevant columns of the input matrix.</p>
+        <p>Slice out the relevant columns of the input matrix.</p>
 <p>Select the relevant columns of the supplied matrix to be used within the
 kernel's evaluation.</p>
 
@@ -3465,7 +3444,7 @@ kernel's evaluation.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Add two kernels together.
+        <p>Add two kernels together.
 Args:
     other (AbstractKernel): The kernel to be added to the current kernel.</p>
 
@@ -3498,7 +3477,7 @@ Args:
 
     <div class="doc doc-contents ">
 
-      <p>Multiply two kernels together.</p>
+        <p>Multiply two kernels together.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3554,7 +3533,7 @@ Args:
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code></p>
 
 
-      <p>A constant kernel. This kernel evaluates to a constant for all inputs.
+        <p>A constant kernel. This kernel evaluates to a constant for all inputs.
 The scalar value itself can be treated as a model hyperparameter and learned during training.</p>
 
 
@@ -3583,7 +3562,7 @@ The scalar value itself can be treated as a model hyperparameter and learned dur
 
     <div class="doc doc-contents ">
 
-      <p>Compute the cross-covariance matrix of the kernel.</p>
+        <p>Compute the cross-covariance matrix of the kernel.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3635,7 +3614,7 @@ The scalar value itself can be treated as a model hyperparameter and learned dur
 
     <div class="doc doc-contents ">
 
-      <p>Compute the gram matrix of the kernel.</p>
+        <p>Compute the gram matrix of the kernel.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3679,7 +3658,7 @@ The scalar value itself can be treated as a model hyperparameter and learned dur
 
     <div class="doc doc-contents ">
 
-      <p>Compute the diagonal of the gram matrix of the kernel.</p>
+        <p>Compute the diagonal of the gram matrix of the kernel.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3723,7 +3702,7 @@ The scalar value itself can be treated as a model hyperparameter and learned dur
 
     <div class="doc doc-contents ">
 
-      <p>Slice out the relevant columns of the input matrix.</p>
+        <p>Slice out the relevant columns of the input matrix.</p>
 <p>Select the relevant columns of the supplied matrix to be used within the
 kernel's evaluation.</p>
 
@@ -3769,7 +3748,7 @@ kernel's evaluation.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Add two kernels together.
+        <p>Add two kernels together.
 Args:
     other (AbstractKernel): The kernel to be added to the current kernel.</p>
 
@@ -3802,7 +3781,7 @@ Args:
 
     <div class="doc doc-contents ">
 
-      <p>Multiply two kernels together.</p>
+        <p>Multiply two kernels together.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3846,7 +3825,7 @@ Args:
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the kernel on a pair of inputs.</p>
+        <p>Evaluate the kernel on a pair of inputs.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3910,7 +3889,7 @@ Args:
               Bases: <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code></p>
 
 
-      <p>A base class for products or sums of MeanFunctions.</p>
+        <p>A base class for products or sums of MeanFunctions.</p>
 
 
 
@@ -3938,7 +3917,7 @@ Args:
 
     <div class="doc doc-contents ">
 
-      <p>Compute the cross-covariance matrix of the kernel.</p>
+        <p>Compute the cross-covariance matrix of the kernel.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3990,7 +3969,7 @@ Args:
 
     <div class="doc doc-contents ">
 
-      <p>Compute the gram matrix of the kernel.</p>
+        <p>Compute the gram matrix of the kernel.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4034,7 +4013,7 @@ Args:
 
     <div class="doc doc-contents ">
 
-      <p>Compute the diagonal of the gram matrix of the kernel.</p>
+        <p>Compute the diagonal of the gram matrix of the kernel.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4078,7 +4057,7 @@ Args:
 
     <div class="doc doc-contents ">
 
-      <p>Slice out the relevant columns of the input matrix.</p>
+        <p>Slice out the relevant columns of the input matrix.</p>
 <p>Select the relevant columns of the supplied matrix to be used within the
 kernel's evaluation.</p>
 
@@ -4124,7 +4103,7 @@ kernel's evaluation.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Add two kernels together.
+        <p>Add two kernels together.
 Args:
     other (AbstractKernel): The kernel to be added to the current kernel.</p>
 
@@ -4157,7 +4136,7 @@ Args:
 
     <div class="doc doc-contents ">
 
-      <p>Multiply two kernels together.</p>
+        <p>Multiply two kernels together.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4201,7 +4180,7 @@ Args:
 
     <div class="doc doc-contents ">
 
-      <p>Evaluate the kernel on a pair of inputs.</p>
+        <p>Evaluate the kernel on a pair of inputs.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
