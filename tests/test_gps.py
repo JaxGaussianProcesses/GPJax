@@ -25,7 +25,6 @@ from typing import (
     Type,
 )
 
-# from gpjax.dataset import Dataset
 from cola.linalg.algorithm_base import Auto
 from cola.linalg.decompositions.decompositions import Cholesky
 from cola.linalg.inverse.cg import CG
