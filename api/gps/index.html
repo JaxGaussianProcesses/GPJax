@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.35">
     
     
       
@@ -4087,7 +4087,7 @@ returns the predictive distribution as a <code>GaussianDistribution</code>.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">sample_approx</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">train_data</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">num_features</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">sample_approx</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">train_data</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">num_features</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">solver_algorithm</span><span class="o">=</span><span class="n">Cholesky</span><span class="p">())</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4143,6 +4143,20 @@ can be evaluated with constant cost regardless of the required number of queries
           <div class="doc-md-description">
             <p>The number of features used when approximating the
 kernel.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code>solver_algorithm</code></b>
+              (<code>Optional[<span title="cola.linalg.algorithm_base.Algorithm">Algorithm</span>]</code>, default:
+                  <code><span title="cola.linalg.decompositions.decompositions.Cholesky">Cholesky</span>()</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>The algorithm to use for the solves of
+the inverse of the covariance matrix. See the
+<a href="https://cola.readthedocs.io/en/latest/package/cola.linalg.html#algorithms">CoLA documentation</a>
+for which solver to pick. For PSD matrices, CoLA currently recommends Cholesky() for small
+matrices and CG() for larger matrices. Select Auto() to let CoLA decide. Defaults to Cholesky().</p>
           </div>
         </li>
     </ul>
@@ -4486,7 +4500,7 @@ beliefs around the distribution of the data.</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>
