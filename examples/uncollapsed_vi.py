@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.4
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: gpjax_beartype
 #     language: python
@@ -319,7 +319,6 @@ opt_rep, history = gpx.fit(
     model=q,
     objective=lambda p, d: -gpx.objectives.elbo(p, d),
     train_data=D,
-    params_bijection=params_bijection,
     optim=ox.adam(learning_rate=0.01),
     num_iters=3000,
     key=jr.key(42),
