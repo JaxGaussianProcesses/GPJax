@@ -28,7 +28,6 @@ from gpjax.integrators import (
     GHQuadratureIntegrator,
 )
 from gpjax.parameters import (
-    Parameter,
     PositiveReal,
     Static,
 )
@@ -152,10 +151,9 @@ class Gaussian(AbstractLikelihood):
                 likelihoods. Must be an instance of `AbstractIntegrator`. For the Gaussian likelihood, this defaults to
                 the `AnalyticalGaussianIntegrator`, as the expected log likelihood can be computed analytically.
         """
-        if isinstance(obs_stddev, Parameter):
-            self.obs_stddev = obs_stddev
-        else:
-            self.obs_stddev = PositiveReal(jnp.asarray(obs_stddev))
+        if not isinstance(obs_stddev, (PositiveReal, Static)):
+            obs_stddev = PositiveReal(jnp.asarray(obs_stddev))
+        self.obs_stddev = obs_stddev
 
         super().__init__(num_datapoints, integrator)
 
