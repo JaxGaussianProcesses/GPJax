@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.43">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.0253249f.min.css">
       
       
 
@@ -2880,12 +2880,12 @@ full model.</p>
 </span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">nmll</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="o">-</span><span class="n">gpx</span><span class="o">.</span><span class="n">objectives</span><span class="o">.</span><span class="n">conjugate_mll</span><span class="p">(</span><span class="n">full_rank_model</span><span class="p">,</span> <span class="n">D</span><span class="p">))</span>
 </span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="o">%</span><span class="n">timeit</span> <span class="n">nmll</span><span class="p">()</span><span class="o">.</span><span class="n">block_until_ready</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>666 ms ± 5.4 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+<div class="language-text highlight"><pre><span></span><code>653 ms ± 5.55 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 </code></pre></div>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">nelbo</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="o">-</span><span class="n">gpx</span><span class="o">.</span><span class="n">objectives</span><span class="o">.</span><span class="n">collapsed_elbo</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">D</span><span class="p">))</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="o">%</span><span class="n">timeit</span> <span class="n">nelbo</span><span class="p">()</span><span class="o">.</span><span class="n">block_until_ready</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>2.97 ms ± 1.17 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+<div class="language-text highlight"><pre><span></span><code>2.75 ms ± 855 μs per loop (mean ± std. dev. of 7 runs, 1 loop each)
 </code></pre></div>
 <p>As we can see, the sparse approximation given here is much faster when
 compared against a full-rank model.</p>
@@ -2895,17 +2895,17 @@ compared against a full-rank model.</p>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Daniel Dodd
 
-Last updated: Thu Oct 03 2024
+Last updated: Fri Nov 01 2024
 
 Python implementation: CPython
 Python version       : 3.10.15
-IPython version      : 8.28.0
+IPython version      : 8.29.0
 
 jax       : 0.4.27
-gpjax     : 0.9.2
+matplotlib: 3.9.2
 optax     : 0.2.3
 jaxtyping : 0.2.34
-matplotlib: 3.9.2
+gpjax     : 0.9.2
 
 Watermark: 2.5.0
 </code></pre></div>
@@ -2966,7 +2966,7 @@ Watermark: 2.5.0
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.525ec568.min.js"></script>
+      <script src="../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
