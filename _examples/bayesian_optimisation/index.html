@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://docs.jaxgaussianprocesses.com/_examples/bayesian_optimisation/">
       
       
-        <link rel="prev" href="../collapsed_vi/">
+        <link rel="prev" href="../uncollapsed_vi/">
       
       
         <link rel="next" href="../decision_making/">
@@ -474,7 +474,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../intro_to_kernels/" class="md-nav__link">
+      <a href="../intro_to_kernels.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -670,7 +670,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../uncollapsed_vi/" class="md-nav__link">
+      <a href="../collapsed_vi/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -691,7 +691,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../collapsed_vi/" class="md-nav__link">
+      <a href="../uncollapsed_vi/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3140,19 +3140,19 @@ each iteration.</p>
 </span><span id="__span-7-32"><a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a>    <span class="n">D</span> <span class="o">=</span> <span class="n">D</span> <span class="o">+</span> <span class="n">gpx</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">x_star</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_star</span><span class="p">)</span>
 </span></code></pre></div>
 <p><img alt="png" src="../bayesian_optimisation_files/bayesian_optimisation_18_0.png" /></p>
-<div class="language-text highlight"><pre><span></span><code>Queried Point: [[0.73097461]], Black-Box Function Value: [[-1.38629658]]
+<div class="language-text highlight"><pre><span></span><code>Queried Point: [[0.73097463]], Black-Box Function Value: [[-1.3862967]]
 </code></pre></div>
 <p><img alt="png" src="../bayesian_optimisation_files/bayesian_optimisation_18_2.png" /></p>
-<div class="language-text highlight"><pre><span></span><code>Queried Point: [[0.7513479]], Black-Box Function Value: [[-1.45864605]]
+<div class="language-text highlight"><pre><span></span><code>Queried Point: [[0.75134752]], Black-Box Function Value: [[-1.45864553]]
 </code></pre></div>
 <p><img alt="png" src="../bayesian_optimisation_files/bayesian_optimisation_18_4.png" /></p>
-<div class="language-text highlight"><pre><span></span><code>Queried Point: [[0.75543104]], Black-Box Function Value: [[-1.46237852]]
+<div class="language-text highlight"><pre><span></span><code>Queried Point: [[0.7554317]], Black-Box Function Value: [[-1.46237881]]
 </code></pre></div>
 <p><img alt="png" src="../bayesian_optimisation_files/bayesian_optimisation_18_6.png" /></p>
-<div class="language-text highlight"><pre><span></span><code>Queried Point: [[0.75605009]], Black-Box Function Value: [[-1.46260234]]
+<div class="language-text highlight"><pre><span></span><code>Queried Point: [[0.75605019]], Black-Box Function Value: [[-1.46260237]]
 </code></pre></div>
 <p><img alt="png" src="../bayesian_optimisation_files/bayesian_optimisation_18_8.png" /></p>
-<div class="language-text highlight"><pre><span></span><code>Queried Point: [[0.75621512]], Black-Box Function Value: [[-1.46264657]]
+<div class="language-text highlight"><pre><span></span><code>Queried Point: [[0.75621524]], Black-Box Function Value: [[-1.46264661]]
 </code></pre></div>
 <p>Below we plot the best observed black-box function value against the number of times
 the black-box function has been evaluated. Note that the first 5 samples are randomly
@@ -3298,31 +3298,31 @@ BO Iteration: 2, Queried Point: [[ 1.41837478 -1.        ]], Black-Box Function 
 BO Iteration: 3, Queried Point: [[ 0.06971748 -1.        ]], Black-Box Function Value: [[-1.00254889]]
 
 
-BO Iteration: 4, Queried Point: [[ 0.35825722 -0.73189492]], Black-Box Function Value: [[-1.62151773]]
+BO Iteration: 4, Queried Point: [[ 0.35825723 -0.73189492]], Black-Box Function Value: [[-1.62151773]]
 
 
-BO Iteration: 5, Queried Point: [[1.66807604 0.0442017 ]], Black-Box Function Value: [[0.84289922]]
+BO Iteration: 5, Queried Point: [[1.66807605 0.0442017 ]], Black-Box Function Value: [[0.84289922]]
 
 
-BO Iteration: 6, Queried Point: [[ 0.19527337 -0.7953453 ]], Black-Box Function Value: [[-1.75590159]]
+BO Iteration: 6, Queried Point: [[ 0.19527336 -0.79534531]], Black-Box Function Value: [[-1.75590157]]
 
 
-BO Iteration: 7, Queried Point: [[-1.93068214 -0.98560747]], Black-Box Function Value: [[3.11483417]]
+BO Iteration: 7, Queried Point: [[-1.93068107 -0.98560766]], Black-Box Function Value: [[3.11482697]]
 
 
-BO Iteration: 8, Queried Point: [[ 0.1586017 -0.7278912]], Black-Box Function Value: [[-1.82149956]]
+BO Iteration: 8, Queried Point: [[ 0.15860697 -0.72789668]], Black-Box Function Value: [[-1.82149641]]
 
 
-BO Iteration: 9, Queried Point: [[ 0.11680112 -0.70263651]], Black-Box Function Value: [[-1.83438287]]
+BO Iteration: 9, Queried Point: [[ 0.11679628 -0.70263662]], Black-Box Function Value: [[-1.83438378]]
 
 
-BO Iteration: 10, Queried Point: [[ 0.12291673 -0.67120828]], Black-Box Function Value: [[-1.82163744]]
+BO Iteration: 10, Queried Point: [[ 0.12291985 -0.6712136 ]], Black-Box Function Value: [[-1.82163961]]
 
 
-BO Iteration: 11, Queried Point: [[ 0.09744995 -0.70936262]], Black-Box Function Value: [[-1.83741246]]
+BO Iteration: 11, Queried Point: [[ 0.09745643 -0.70936147]], Black-Box Function Value: [[-1.83741206]]
 
 
-BO Iteration: 12, Queried Point: [[ 0.09169574 -0.71166932]], Black-Box Function Value: [[-1.83768108]]
+BO Iteration: 12, Queried Point: [[ 0.09169289 -0.7116706 ]], Black-Box Function Value: [[-1.83768113]]
 Starting Experiment: 2
 
 
@@ -3332,34 +3332,34 @@ BO Iteration: 1, Queried Point: [[ 0.17622687 -1.        ]], Black-Box Function 
 BO Iteration: 2, Queried Point: [[0.00616011 1.        ]], Black-Box Function Value: [[-0.95434732]]
 
 
-BO Iteration: 3, Queried Point: [[-0.02838519  0.01429419]], Black-Box Function Value: [[-0.95801818]]
+BO Iteration: 3, Queried Point: [[-0.02838519  0.01429417]], Black-Box Function Value: [[-0.95801818]]
 
 
-BO Iteration: 4, Queried Point: [[0.24091311 0.0083065 ]], Black-Box Function Value: [[-0.76663582]]
+BO Iteration: 4, Queried Point: [[0.24091315 0.00830647]], Black-Box Function Value: [[-0.76663577]]
 
 
-BO Iteration: 5, Queried Point: [[-1.02156846  0.78975006]], Black-Box Function Value: [[-0.51667276]]
+BO Iteration: 5, Queried Point: [[-1.02156844  0.78975001]], Black-Box Function Value: [[-0.51667279]]
 
 
-BO Iteration: 6, Queried Point: [[-0.32675118 -0.65917443]], Black-Box Function Value: [[-1.26944316]]
+BO Iteration: 6, Queried Point: [[-0.32675118 -0.65917441]], Black-Box Function Value: [[-1.26944314]]
 
 
-BO Iteration: 7, Queried Point: [[ 1.94410266 -1.        ]], Black-Box Function Value: [[0.03817044]]
+BO Iteration: 7, Queried Point: [[ 1.94410264 -1.        ]], Black-Box Function Value: [[0.0381703]]
 
 
-BO Iteration: 8, Queried Point: [[-0.01339889 -0.59885886]], Black-Box Function Value: [[-1.73530909]]
+BO Iteration: 8, Queried Point: [[-0.01339887 -0.59885894]], Black-Box Function Value: [[-1.73530919]]
 
 
-BO Iteration: 9, Queried Point: [[-0.05524705 -0.56032575]], Black-Box Function Value: [[-1.65624519]]
+BO Iteration: 9, Queried Point: [[-0.05524705 -0.5603258 ]], Black-Box Function Value: [[-1.65624526]]
 
 
-BO Iteration: 10, Queried Point: [[ 0.15310835 -0.65788391]], Black-Box Function Value: [[-1.80231597]]
+BO Iteration: 10, Queried Point: [[ 0.15310832 -0.65788393]], Black-Box Function Value: [[-1.802316]]
 
 
-BO Iteration: 11, Queried Point: [[ 0.14984094 -0.62720234]], Black-Box Function Value: [[-1.77653386]]
+BO Iteration: 11, Queried Point: [[ 0.14983869 -0.62720232]], Black-Box Function Value: [[-1.77653487]]
 
 
-BO Iteration: 12, Queried Point: [[ 0.08816482 -0.66278325]], Black-Box Function Value: [[-1.82161011]]
+BO Iteration: 12, Queried Point: [[ 0.10449439 -0.68050745]], Black-Box Function Value: [[-1.82970516]]
 Starting Experiment: 3
 
 
@@ -3369,34 +3369,34 @@ BO Iteration: 1, Queried Point: [[ 1.11866365 -0.03937436]], Black-Box Function 
 BO Iteration: 2, Queried Point: [[-0.11517237  1.        ]], Black-Box Function Value: [[-1.01289565]]
 
 
-BO Iteration: 3, Queried Point: [[ 0.40523541 -1.        ]], Black-Box Function Value: [[-0.79250777]]
+BO Iteration: 3, Queried Point: [[ 0.40523542 -1.        ]], Black-Box Function Value: [[-0.79250776]]
 
 
-BO Iteration: 4, Queried Point: [[-1.39892183  0.45487241]], Black-Box Function Value: [[-0.11636531]]
+BO Iteration: 4, Queried Point: [[-1.39892183  0.45487241]], Black-Box Function Value: [[-0.11636532]]
 
 
-BO Iteration: 5, Queried Point: [[-0.46285002  1.        ]], Black-Box Function Value: [[-0.70357506]]
+BO Iteration: 5, Queried Point: [[-0.46285  1.     ]], Black-Box Function Value: [[-0.70357508]]
 
 
-BO Iteration: 6, Queried Point: [[-0.14918689  0.70403817]], Black-Box Function Value: [[-1.82522377]]
+BO Iteration: 6, Queried Point: [[-0.1491869   0.70403817]], Black-Box Function Value: [[-1.82522377]]
 
 
-BO Iteration: 7, Queried Point: [[-0.148957    0.71611721]], Black-Box Function Value: [[-1.82634922]]
+BO Iteration: 7, Queried Point: [[-0.14895701  0.71611722]], Black-Box Function Value: [[-1.82634922]]
 
 
-BO Iteration: 8, Queried Point: [[-0.12642028  0.71553725]], Black-Box Function Value: [[-1.83332743]]
+BO Iteration: 8, Queried Point: [[-0.12642055  0.71553769]], Black-Box Function Value: [[-1.83332736]]
 
 
-BO Iteration: 9, Queried Point: [[0.12837952 0.74181146]], Black-Box Function Value: [[-1.66550325]]
+BO Iteration: 9, Queried Point: [[0.12839064 0.74181596]], Black-Box Function Value: [[-1.66548389]]
 
 
-BO Iteration: 10, Queried Point: [[-0.09067488  0.71056643]], Black-Box Function Value: [[-1.83766668]]
+BO Iteration: 10, Queried Point: [[-0.09068663  0.71057714]], Black-Box Function Value: [[-1.83766691]]
 
 
-BO Iteration: 11, Queried Point: [[-0.09096523  0.71145628]], Black-Box Function Value: [[-1.83768546]]
+BO Iteration: 11, Queried Point: [[-0.09096356  0.71145123]], Black-Box Function Value: [[-1.83768538]]
 
 
-BO Iteration: 12, Queried Point: [[-0.09105418  0.71465191]], Black-Box Function Value: [[-1.83767017]]
+BO Iteration: 12, Queried Point: [[-0.09105375  0.71465149]], Black-Box Function Value: [[-1.83767018]]
 Starting Experiment: 4
 
 
@@ -3424,16 +3424,16 @@ BO Iteration: 7, Queried Point: [[-0.23192887  1.        ]], Black-Box Function 
 BO Iteration: 8, Queried Point: [[ 0.1138837  -0.57407815]], Black-Box Function Value: [[-1.72368621]]
 
 
-BO Iteration: 9, Queried Point: [[ 0.14954105 -0.55868134]], Black-Box Function Value: [[-1.68648837]]
+BO Iteration: 9, Queried Point: [[ 0.14954105 -0.55868135]], Black-Box Function Value: [[-1.68648838]]
 
 
-BO Iteration: 10, Queried Point: [[-0.07673881 -0.28635684]], Black-Box Function Value: [[-1.17729148]]
+BO Iteration: 10, Queried Point: [[-0.07673894 -0.28635695]], Black-Box Function Value: [[-1.17729156]]
 
 
-BO Iteration: 11, Queried Point: [[-1.76863061  1.        ]], Black-Box Function Value: [[-0.62095394]]
+BO Iteration: 11, Queried Point: [[-1.76863047  1.        ]], Black-Box Function Value: [[-0.62095409]]
 
 
-BO Iteration: 12, Queried Point: [[ 0.09750077 -0.63245391]], Black-Box Function Value: [[-1.79701872]]
+BO Iteration: 12, Queried Point: [[ 0.09750117 -0.63245391]], Black-Box Function Value: [[-1.79701867]]
 Starting Experiment: 5
 
 
@@ -3449,28 +3449,28 @@ BO Iteration: 3, Queried Point: [[-2.          0.42018707]], Black-Box Function 
 BO Iteration: 4, Queried Point: [[ 0.91528993 -0.70711219]], Black-Box Function Value: [[-0.59721187]]
 
 
-BO Iteration: 5, Queried Point: [[-0.20299474  0.40108709]], Black-Box Function Value: [[-1.35129301]]
+BO Iteration: 5, Queried Point: [[-0.20299474  0.40108709]], Black-Box Function Value: [[-1.35129302]]
 
 
-BO Iteration: 6, Queried Point: [[-0.02996613  0.87468122]], Black-Box Function Value: [[-1.59084942]]
+BO Iteration: 6, Queried Point: [[-0.02996609  0.87468121]], Black-Box Function Value: [[-1.59084944]]
 
 
-BO Iteration: 7, Queried Point: [[-0.46392072  1.        ]], Black-Box Function Value: [[-0.70183095]]
+BO Iteration: 7, Queried Point: [[-0.46392073  1.        ]], Black-Box Function Value: [[-0.70183093]]
 
 
-BO Iteration: 8, Queried Point: [[-0.02846526  0.73223049]], Black-Box Function Value: [[-1.82131303]]
+BO Iteration: 8, Queried Point: [[-0.02846527  0.73223051]], Black-Box Function Value: [[-1.82131303]]
 
 
-BO Iteration: 9, Queried Point: [[-0.19060166  0.70000776]], Black-Box Function Value: [[-1.80266649]]
+BO Iteration: 9, Queried Point: [[-0.19060163  0.70000779]], Black-Box Function Value: [[-1.80266652]]
 
 
-BO Iteration: 10, Queried Point: [[0.0325098  0.56456673]], Black-Box Function Value: [[-1.67971379]]
+BO Iteration: 10, Queried Point: [[0.03251016 0.5645668 ]], Black-Box Function Value: [[-1.67971364]]
 
 
-BO Iteration: 11, Queried Point: [[ 0.31274705 -1.        ]], Black-Box Function Value: [[-0.90974709]]
+BO Iteration: 11, Queried Point: [[ 0.3126631 -1.       ]], Black-Box Function Value: [[-0.90983646]]
 
 
-BO Iteration: 12, Queried Point: [[-0.08837811  0.73725152]], Black-Box Function Value: [[-1.83330147]]
+BO Iteration: 12, Queried Point: [[-0.08838221  0.73725565]], Black-Box Function Value: [[-1.83330011]]
 </code></pre></div>
 <p>We'll also run a random benchmark, whereby we randomly sample from the search space for
 20 iterations. This is a useful benchmark to compare the performance of BO against in
@@ -3635,13 +3635,13 @@ Python implementation: CPython
 Python version       : 3.10.15
 IPython version      : 8.29.0
 
+matplotlib            : 3.9.2
+optax                 : 0.2.3
+jax                   : 0.4.27
+gpjax                 : 0.9.2
 jaxopt                : 0.8.2
 tensorflow_probability: 0.24.0
 jaxtyping             : 0.2.34
-optax                 : 0.2.3
-matplotlib            : 3.9.2
-jax                   : 0.4.27
-gpjax                 : 0.9.2
 
 Watermark: 2.5.0
 </code></pre></div>
