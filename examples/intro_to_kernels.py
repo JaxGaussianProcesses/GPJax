@@ -246,7 +246,7 @@ kernel = gpx.kernels.Matern52(
 prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 
 likelihood = gpx.likelihoods.Gaussian(
-    num_datapoints=D.n, obs_stddev=PositiveReal(value=jnp.array(1e-3), tag="Static")
+    num_datapoints=D.n, obs_stdev=Static(jnp.array(1e-3))
 )  # Our function is noise-free, so we set the observation noise's standard deviation to a very small value
 
 no_opt_posterior = prior * likelihood
