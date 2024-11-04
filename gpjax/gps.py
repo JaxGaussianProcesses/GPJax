@@ -652,7 +652,8 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
         """
         super().__init__(prior=prior, likelihood=likelihood, jitter=jitter)
 
-        latent = latent or jr.normal(key, shape=(self.likelihood.num_datapoints, 1))
+        if latent is None:
+            latent = jr.normal(key, shape=(self.likelihood.num_datapoints, 1))
 
         # TODO: static or intermediate?
         self.latent = latent if isinstance(latent, Parameter) else Real(latent)
