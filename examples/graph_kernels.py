@@ -88,7 +88,9 @@ nx.draw(
 #
 # Graph kernels use the _Laplacian matrix_ $L$ to quantify the smoothness of a signal
 # (or function) on a graph
+#
 # $$L=D-A,$$
+#
 # where $D$ is the diagonal _degree matrix_ containing each vertices' degree and $A$
 # is the _adjacency matrix_ that has an $(i,j)^{\text{th}}$ entry of 1 if $v_i, v_j$
 # are connected and 0 otherwise. [Networkx](https://networkx.org) gives us an easy
