@@ -474,7 +474,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../intro_to_kernels.md" class="md-nav__link">
+      <a href="../intro_to_kernels/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2892,7 +2892,7 @@ a likelihood object. To do this, we'll need a dataset.</p>
 </span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Latent function&quot;</span><span class="p">)</span>
 </span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7fdc52c45fc0&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f982ec09f30&gt;
 </code></pre></div>
 <p><img alt="png" src="../likelihoods_guide_files/likelihoods_guide_1_1.png" /></p>
 <p>In this example, our observations have support <span class="arithmatex">\([-3, 3]\)</span> and are generated from a
@@ -2911,7 +2911,7 @@ argument.</p>
     _tag=&#39;positive&#39;
   ),
   num_datapoints=50,
-  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7fdc52f3f8e0&gt;
+  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f982ed078b0&gt;
 )
 </code></pre></div>
 <h3 id="likelihood-parameters">Likelihood parameters<a class="headerlink" href="#likelihood-parameters" title="Permanent link"></a></h3>
@@ -2931,7 +2931,7 @@ this as follows:</p>
     _tag=&#39;positive&#39;
   ),
   num_datapoints=50,
-  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7fdc52f3f8e0&gt;
+  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f982ed078b0&gt;
 )
 </code></pre></div>
 <h3 id="prediction">Prediction<a class="headerlink" href="#prediction" title="Permanent link"></a></h3>
@@ -3018,24 +3018,22 @@ found <a href="https://en.wikipedia.org/wiki/Generalized_linear_model#Link_funct
 <p>The final method that is associated with a likelihood function in GPJax is the
 expected log-likelihood. This term is evaluated in the
 <a href="../uncollapsed_vi/">stochastic variational Gaussian process</a> in the ELBO term. For a
-variational approximation <span class="arithmatex">\(q(f)= \mathcal{N}(f\mid m, S)\)</span>, the ELBO can be written as
-$$
+variational approximation <span class="arithmatex">\(q(f)= \mathcal{N}(f\mid m, S)\)</span>, the ELBO can be written as</p>
+<div class="arithmatex">\[
 \begin{align}
-    \label{eq:elbo}
-    \mathcal{L}(q) = \mathbb{E}<em>{f\sim q(f)}\left[ p(\mathbf{y}\mid f)\right] - \mathrm{KL}\left(q(f)\mid\mid p(f)\right)\,.
+    \mathcal{L}(q) = \mathbb{E}_{f\sim q(f)}\left[ p(\mathbf{y}\mid f)\right] - \mathrm{KL}\left(q(f)\mid\mid p(f)\right)\,.
 \end{align}
-$$
-As both <span class="arithmatex">\(q(f)\)</span> and <span class="arithmatex">\(p(f)\)</span> are Gaussian distributions, the Kullback-Leibler term can
+\]</div>
+<p>As both <span class="arithmatex">\(q(f)\)</span> and <span class="arithmatex">\(p(f)\)</span> are Gaussian distributions, the Kullback-Leibler term can
 be analytically computed. However, the expectation term is not always so easy to
 compute. Fortunately, the bound in \eqref{eq:elbo} can be decomposed as a sum of the
-datapoints
-$$
+datapoints</p>
+<div class="arithmatex">\[
 \begin{align}
-    \label{eq:elbo_decomp}
-    \mathcal{L}(q) = \sum</em>{n=1}^N \mathbb{E}_{f\sim q(f)}\left[ p(y_n\mid f)\right] - \mathrm{KL}\left(q(f)\mid\mid p(f)\right)\,.
+    \mathcal{L}(q) = \sum_{n=1}^N \mathbb{E}_{f\sim q(f)}\left[ p(y_n\mid f)\right] - \mathrm{KL}\left(q(f)\mid\mid p(f)\right)\,.
 \end{align}
-$$
-This simplifies computation of the expectation as it is now a series of <span class="arithmatex">\(N\)</span>
+\]</div>
+<p>This simplifies computation of the expectation as it is now a series of <span class="arithmatex">\(N\)</span>
 1-dimensional integrals. As such, GPJax by default uses quadrature to compute these
 integrals. However, for some likelihoods, such as the Gaussian likelihood, the
 expectation can be computed analytically. In these cases, we can supply an object
@@ -3082,10 +3080,10 @@ Python implementation: CPython
 Python version       : 3.10.15
 IPython version      : 8.29.0
 
-jax                   : 0.4.27
-tensorflow_probability: 0.25.0
-gpjax                 : 0.9.3
 matplotlib            : 3.9.2
+jax                   : 0.4.27
+gpjax                 : 0.9.3
+tensorflow_probability: 0.25.0
 
 Watermark: 2.5.0
 </code></pre></div>

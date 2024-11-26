@@ -16,7 +16,7 @@
         <link rel="prev" href="../../sharp_bits/">
       
       
-        <link rel="next" href="../regression/">
+        <link rel="next" href="../intro_to_kernels/">
       
       
       <link rel="icon" href="../../static/favicon.ico">
@@ -568,7 +568,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../intro_to_kernels.md" class="md-nav__link">
+      <a href="../intro_to_kernels/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2752,10 +2752,11 @@ showing how this notion can be extended to GPs.</p>
 <span class="arithmatex">\(\mathbf{y}\)</span> for which we construct a model. The parameters <span class="arithmatex">\(\theta\)</span> of our
 model are unknown, and our goal is to conduct inference to determine their
 range of likely values. To achieve this, we apply Bayes' theorem</p>
-<div class="arithmatex">\[\begin{align}
-    \label{eq:BayesTheorem}
-    p(\theta\,|\, \mathbf{y}) = \frac{p(\theta)p(\mathbf{y}\,|\,\theta)}{p(\mathbf{y})} = \frac{p(\theta)p(\mathbf{y}\,|\,\theta)}{\int_{\theta}p(\mathbf{y}, \theta)\mathrm{d}\theta}\,,
-\end{align}\]</div>
+<div class="arithmatex">\[
+\begin{align}
+    p(\theta\mid\mathbf{y}) = \frac{p(\theta)p(\mathbf{y}\mid\theta)}{p(\mathbf{y})} = \frac{p(\theta)p(\mathbf{y}\mid\theta)}{\int_{\theta}p(\mathbf{y}, \theta)\mathrm{d}\theta},
+\end{align}
+\]</div>
 <p>where <span class="arithmatex">\(p(\mathbf{y}\,|\,\theta)\)</span> denotes the <em>likelihood</em>, or model, and
 quantifies how likely the observed dataset <span class="arithmatex">\(\mathbf{y}\)</span> is, given the
 parameter estimate <span class="arithmatex">\(\theta\)</span>. The <em>prior</em> distribution <span class="arithmatex">\(p(\theta)\)</span> reflects our
@@ -2788,25 +2789,28 @@ approximate integrals such as the one seen in <span class="arithmatex">\(p(\math
 <p>Once a posterior distribution has been obtained, we can make predictions at
 new points <span class="arithmatex">\(\mathbf{y}^{\star}\)</span> through the <em>posterior predictive
 distribution</em>. This is achieved by integrating out the parameter set <span class="arithmatex">\(\theta\)</span>
-from our posterior distribution through
+from our posterior distribution through</p>
+<div class="arithmatex">\[
 \begin{align}
     p(\mathbf{y}^{\star}\mid \mathbf{y}) = \int p(\mathbf{y}^{\star} \,|\, \theta, \mathbf{y} ) p(\theta\,|\, \mathbf{y})\mathrm{d}\theta\,.
 \end{align}
-As with the marginal log-likelihood, evaluating this quantity requires
+\]</div>
+<p>As with the marginal log-likelihood, evaluating this quantity requires
 computing an integral which may not be tractable, particularly when <span class="arithmatex">\(\theta\)</span>
 is high-dimensional.</p>
 <p>It is difficult to communicate statistics directly through a posterior
 distribution, so we often compute and report moments of the posterior
 distribution. Most commonly, we report the first moment and the centred second
-moment
-$$
+moment</p>
+<div class="arithmatex">\[
 \begin{alignat}{2}
-    \mu  = \mathbb{E}[\theta\,|\,\mathbf{y}]  &amp; = \int \theta p(\theta\mid\mathbf{y})\mathrm{d}\theta\
+    \mu  = \mathbb{E}[\theta\,|\,\mathbf{y}]  &amp; = \int \theta
+    p(\theta\mid\mathbf{y})\mathrm{d}\theta \quad \\
     \sigma^2  = \mathbb{V}[\theta\,|\,\mathbf{y}] &amp; = \int \left(\theta -
     \mathbb{E}[\theta\,|\,\mathbf{y}]\right)^2p(\theta\,|\,\mathbf{y})\mathrm{d}\theta&amp;\,.
 \end{alignat}
-$$
-Through this pair of statistics, we can communicate our beliefs about the most
+\]</div>
+<p>Through this pair of statistics, we can communicate our beliefs about the most
 likely value of <span class="arithmatex">\(\theta\)</span> i.e., <span class="arithmatex">\(\mu\)</span>, and the uncertainty <span class="arithmatex">\(\sigma\)</span> around the
 expected value. However, as with the marginal log-likelihood and predictive
 posterior distribution, computing these statistics again requires a
@@ -2862,7 +2866,7 @@ We can plot three different parameterisations of this density.</p>
 </span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">xs</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">xs</span><span class="p">)),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
 </span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7fc5949d0fa0&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f6e049c4f40&gt;
 </code></pre></div>
 <p><img alt="png" src="../intro_to_gps_files/intro_to_gps_1_1.png" /></p>
 <p>A Gaussian random variable is uniquely defined in distribution by its mean
@@ -2934,26 +2938,27 @@ determines the correlation of the multivariate Gaussian.</p>
 </span><span id="__span-1-44"><a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a>    <span class="n">a</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">mew</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </span><span id="__span-1-45"><a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a>    <span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>/tmp/ipykernel_26077/1315003044.py:32: MatplotlibDeprecationWarning: The collections attribute was deprecated in Matplotlib 3.8 and will be removed in 3.10.
+<div class="language-text highlight"><pre><span></span><code>/tmp/ipykernel_27277/1315003044.py:32: MatplotlibDeprecationWarning: The collections attribute was deprecated in Matplotlib 3.8 and will be removed in 3.10.
   for c in cntf.collections:
 
 
-/tmp/ipykernel_26077/1315003044.py:32: MatplotlibDeprecationWarning: The collections attribute was deprecated in Matplotlib 3.8 and will be removed in 3.10.
+/tmp/ipykernel_27277/1315003044.py:32: MatplotlibDeprecationWarning: The collections attribute was deprecated in Matplotlib 3.8 and will be removed in 3.10.
   for c in cntf.collections:
-/tmp/ipykernel_26077/1315003044.py:32: MatplotlibDeprecationWarning: The collections attribute was deprecated in Matplotlib 3.8 and will be removed in 3.10.
+/tmp/ipykernel_27277/1315003044.py:32: MatplotlibDeprecationWarning: The collections attribute was deprecated in Matplotlib 3.8 and will be removed in 3.10.
   for c in cntf.collections:
 </code></pre></div>
 <p><img alt="png" src="../intro_to_gps_files/intro_to_gps_3_2.png" /></p>
 <p>Extending the intuition given for the moments of a univariate Gaussian random
-variables, we can obtain the mean and covariance by
-$$
+variables, we can obtain the mean and covariance by</p>
+<div class="arithmatex">\[
 \begin{align}
-   \mathbb{E}[\mathbf{y}] = \mathbf{\mu}, \quad \operatorname{Cov}(\mathbf{y}) &amp; = \mathbf{E}\left[(\mathbf{y} - \mathbf{\mu)}(\mathbf{y} - \mathbf{\mu)}^{\top} \right]\
-      &amp; =\mathbb{E}[\mathbf{y}\mathbf{y}^{\top}] - \mathbb{E}[\mathbf{y}]\mathbb{E}[\mathbf{y}]^{\top} \
+    \mathbb{E}[\mathbf{y}] &amp; = \mathbf{\mu}, \\
+    \operatorname{Cov}(\mathbf{y}) &amp; = \mathbf{E}\left[(\mathbf{y} - \mathbf{\mu})(\mathbf{y} - \mathbf{\mu})^{\top} \right] \\
+      &amp; =\mathbb{E}[\mathbf{y}\mathbf{y}^{\top}] - \mathbb{E}[\mathbf{y}]\mathbb{E}[\mathbf{y}]^{\top} \\
       &amp; =\mathbf{\Sigma}\,.
 \end{align}
-$$
-The covariance matrix is a symmetric positive definite matrix that generalises
+\]</div>
+<p>The covariance matrix is a symmetric positive definite matrix that generalises
 the notion of variance to multiple dimensions. The matrix's diagonal entries
 contain the variance of each element, whilst the off-diagonal entries quantify
 the degree to which the respective pair of random variables are linearly
@@ -3048,20 +3053,20 @@ the probability of two events, one from <span class="arithmatex">\(p(\mathbf{x})
 joint probability distribution defined over
 <span class="arithmatex">\(\mathbf{x}\sim\mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}}, \boldsymbol{\Sigma}_{\mathbf{xx}})\)</span> and
 <span class="arithmatex">\(\mathbf{y}\sim\mathcal{N}(\boldsymbol{\mu}_{\mathbf{y}}, \boldsymbol{\Sigma}_{\mathbf{yy}})\)</span>.
-We define the joint distribution as
-$$
+We define the joint distribution as</p>
+<div class="arithmatex">\[
 \begin{align}
     p\left(\begin{bmatrix}
-        \mathbf{x} \ \mathbf{y}
+        \mathbf{x} \\ \mathbf{y}
     \end{bmatrix}\right) = \mathcal{N}\left(\begin{bmatrix}
-        \boldsymbol{\mu}<em>{\mathbf{x}} \ \boldsymbol{\mu}</em>{\mathbf{y}}
+        \boldsymbol{\mu}_{\mathbf{x}} \\ \boldsymbol{\mu}_{\mathbf{y}}
     \end{bmatrix}, \begin{bmatrix}
-        \boldsymbol{\Sigma}<em>{\mathbf{xx}} &amp; \boldsymbol{\Sigma}</em>{\mathbf{xy}}\
-        \boldsymbol{\Sigma}<em>{\mathbf{yx}} &amp; \boldsymbol{\Sigma}</em>{\mathbf{yy}}
+        \boldsymbol{\Sigma}_{\mathbf{xx}} &amp; \boldsymbol{\Sigma}_{\mathbf{xy}}\\
+        \boldsymbol{\Sigma}_{\mathbf{yx}} &amp; \boldsymbol{\Sigma}_{\mathbf{yy}}
     \end{bmatrix} \right)\,,
 \end{align}
-$$
-where <span class="arithmatex">\(\boldsymbol{\Sigma}_{\mathbf{x}\mathbf{y}}\)</span> is the cross-covariance
+\]</div>
+<p>where <span class="arithmatex">\(\boldsymbol{\Sigma}_{\mathbf{x}\mathbf{y}}\)</span> is the cross-covariance
 matrix of <span class="arithmatex">\(\mathbf{x}\)</span> and <span class="arithmatex">\(\mathbf{y}\)</span>.</p>
 <p>When presented with a joint distribution, two tasks that we may wish to
 perform are <em>marginalisation</em> and <em>conditioning</em>. For a joint distribution
@@ -3073,22 +3078,22 @@ variable is fixed. For a joint Gaussian distribution, marginalisation and
 conditioning have analytical expressions where the resulting distribution is
 also a Gaussian random variable.</p>
 <p>For a joint Gaussian random variable, the marginalisation of <span class="arithmatex">\(\mathbf{x}\)</span> or
-<span class="arithmatex">\(\mathbf{y}\)</span> is given by
-$$
+<span class="arithmatex">\(\mathbf{y}\)</span> is given by</p>
+<div class="arithmatex">\[
 \begin{alignat}{3}
     &amp; \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{y} &amp;&amp; = p(\mathbf{x})
-    &amp;&amp; = \mathcal{N}(\boldsymbol{\mu}<em>{\mathbf{x}},\boldsymbol{\Sigma}</em>{\mathbf{xx}})\
+    &amp;&amp; = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}},\boldsymbol{\Sigma}_{\mathbf{xx}})\\
     &amp; \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{x} &amp;&amp; = p(\mathbf{y})
-    &amp;&amp; = \mathcal{N}(\boldsymbol{\mu}<em>{\mathbf{y}},
-    \boldsymbol{\Sigma}</em>{\mathbf{yy}})\,.
+    &amp;&amp; = \mathcal{N}(\boldsymbol{\mu}_{\mathbf{y}},
+    \boldsymbol{\Sigma}_{\mathbf{yy}})\,.
 \end{alignat}
-$$
-The conditional distributions are given by
-$$
+\]</div>
+<p>The conditional distributions are given by</p>
+<div class="arithmatex">\[
 \begin{align}
-    p(\mathbf{y}\,|\, \mathbf{x}) &amp; = \mathcal{N}\left(\boldsymbol{\mu}<em>{\mathbf{y}} + \boldsymbol{\Sigma}</em>{\mathbf{yx}}\boldsymbol{\Sigma}<em>{\mathbf{xx}}^{-1}(\mathbf{x}-\boldsymbol{\mu}</em>{\mathbf{x}}), \boldsymbol{\Sigma}<em>{\mathbf{yy}}-\boldsymbol{\Sigma}</em>{\mathbf{yx}}\boldsymbol{\Sigma}<em>{\mathbf{xx}}^{-1}\boldsymbol{\Sigma}</em>{\mathbf{xy}}\right)\,.
+    p(\mathbf{y}\,|\, \mathbf{x}) &amp; = \mathcal{N}\left(\boldsymbol{\mu}_{\mathbf{y}} + \boldsymbol{\Sigma}_{\mathbf{yx}}\boldsymbol{\Sigma}_{\mathbf{xx}}^{-1}(\mathbf{x}-\boldsymbol{\mu}_{\mathbf{x}}), \boldsymbol{\Sigma}_{\mathbf{yy}}-\boldsymbol{\Sigma}_{\mathbf{yx}}\boldsymbol{\Sigma}_{\mathbf{xx}}^{-1}\boldsymbol{\Sigma}_{\mathbf{xy}}\right)\,.
 \end{align}
-$$</p>
+\]</div>
 <p>Within this section, we have introduced the idea of multivariate Gaussian
 random variables and presented some key results concerning their properties.
 In the following section, we will lift our presentation of Gaussian random
@@ -3107,8 +3112,8 @@ corresponding inputs
 <span class="arithmatex">\(\mathbf{X}=\{\mathbf{x}_1,\mathbf{x}_2,\ldots,\mathbf{x}_n\}\subset\mathcal{X}\)</span>.
 We aim to capture the relationship between <span class="arithmatex">\(\mathbf{X}\)</span> and <span class="arithmatex">\(\mathbf{y}\)</span> using
 a model <span class="arithmatex">\(f\)</span> with which we may make predictions at an unseen set of test points
-<span class="arithmatex">\(\mathbf{X}^{\star}\subset\mathcal{X}\)</span>. We formalise this by
-$$
+<span class="arithmatex">\(\mathbf{X}^{\star}\subset\mathcal{X}\)</span>. We formalise this by</p>
+<p>$$
 \begin{align}
     y = f(\mathbf{X}) + \varepsilon\,,
 \end{align}
@@ -3132,23 +3137,23 @@ conventional within the literature, we centre our training data and assume
 <span class="arithmatex">\(\mu(\mathbf{X}):= 0\)</span> for all <span class="arithmatex">\(\mathbf{X}\in\mathcal{X}\)</span>. We further drop
 dependency on <span class="arithmatex">\(\boldsymbol{\theta}\)</span> and <span class="arithmatex">\(\mathbf{X}\)</span> for notational
 convenience in the remainder of this article.</p>
-<p>We define a joint GP prior over the latent function
-$$
+<p>We define a joint GP prior over the latent function</p>
+<div class="arithmatex">\[
 \begin{align}
     p(\mathbf{f}, \mathbf{f}^{\star}) = \mathcal{N}\left(\mathbf{0}, \begin{bmatrix}
-        \mathbf{K}<em>{xf} &amp; \mathbf{K}</em>{xx}
+        \mathbf{K}_{xf} &amp; \mathbf{K}_{xx}
     \end{bmatrix}\right)\,,
 \end{align}
-$$
-where <span class="arithmatex">\(\mathbf{f}^{\star} = f(\mathbf{X}^{\star})\)</span>. Conditional on the GP's
+\]</div>
+<p>where <span class="arithmatex">\(\mathbf{f}^{\star} = f(\mathbf{X}^{\star})\)</span>. Conditional on the GP's
 latent function <span class="arithmatex">\(f\)</span>, we assume a factorising likelihood generates our
-observations
-$$
+observations</p>
+<div class="arithmatex">\[
 \begin{align}
     p(\mathbf{y}\,|\,\mathbf{f}) = \prod_{i=1}^n p(y_i\,|\, f_i)\,.
 \end{align}
-$$
-Strictly speaking, the likelihood function is
+\]</div>
+<p>Strictly speaking, the likelihood function is
 <span class="arithmatex">\(p(\mathbf{y}\,|\,\phi(\mathbf{f}))\)</span> where <span class="arithmatex">\(\phi\)</span> is the likelihood function's
 associated link function. Example link functions include the probit or
 logistic functions for a Bernoulli likelihood and the identity function for a
@@ -3177,37 +3182,37 @@ exploring the different GPs each kernel can yield.</p>
 <p>When the likelihood function is a Gaussian distribution
 <span class="arithmatex">\(p(y_i\,|\, f_i) = \mathcal{N}(y_i\,|\, f_i, \sigma_n^2)\)</span>,
 marginalising <span class="arithmatex">\(\mathbf{f}\)</span> from the joint posterior to obtain
-the posterior predictive distribution is exact
-$$
+the posterior predictive distribution is exact</p>
+<div class="arithmatex">\[
 \begin{align}
-    p(\mathbf{f}^{\star}\mid \mathbf{y}) = \mathcal{N}(\mathbf{f}^{\star}\,|\,\boldsymbol{\mu}<em>{\,|\,\mathbf{y}}, \Sigma</em>{\,|\,\mathbf{y}})\,,
+    p(\mathbf{f}^{\star}\mid \mathbf{y}) = \mathcal{N}(\mathbf{f}^{\star}\,|\,\boldsymbol{\mu}_{\,|\,\mathbf{y}}, \Sigma_{\,|\,\mathbf{y}})\,,
 \end{align}
-$$
-where
-$$
+\]</div>
+<p>where</p>
+<div class="arithmatex">\[
 \begin{align}
-    \mathbf{\mu}<em>{\mid \mathbf{y}} &amp; = \mathbf{K}</em>{\star f}\left( \mathbf{K}<em>{ff}+\sigma^2_n\mathbf{I}_n\right)^{-1}\mathbf{y} \
-    \Sigma</em>{\,|\,\mathbf{y}} &amp; = \mathbf{K}<em>{\star\star} - \mathbf{K}</em>{xf}\left(\mathbf{K}<em>{ff} + \sigma_n^2\mathbf{I}_n\right)^{-1}\mathbf{K}</em>{fx} \,.
+    \mathbf{\mu}_{\mid \mathbf{y}} &amp; = \mathbf{K}_{\star f}\left( \mathbf{K}_{ff}+\sigma^2_n\mathbf{I}_n\right)^{-1}\mathbf{y} \\
+    \Sigma_{\,|\,\mathbf{y}} &amp; = \mathbf{K}_{\star\star} - \mathbf{K}_{xf}\left(\mathbf{K}_{ff} + \sigma_n^2\mathbf{I}_n\right)^{-1}\mathbf{K}_{fx} \,.
 \end{align}
-$$
-Further, the log of the  marginal likelihood of the GP can
-be analytically expressed as
-$$
+\]</div>
+<p>Further, the log of the  marginal likelihood of the GP can
+be analytically expressed as</p>
+<div class="arithmatex">\[
 \begin{align}
-        &amp; = 0.5\left(-\underbrace{\mathbf{y}^{\top}\left(\mathbf{K}<em>{ff} + \sigma_n^2\mathbf{I}_n \right)^{-1}\mathbf{y}}</em>{\text{Data fit}} -\underbrace{\log\lvert \mathbf{K}<em>{ff} + \sigma^2_n\rvert}</em>{\text{Complexity}} -\underbrace{n\log 2\pi}_{\text{Constant}} \right)\,.
+        &amp; = 0.5\left(-\underbrace{\mathbf{y}^{\top}\left(\mathbf{K}_{ff} + \sigma_n^2\mathbf{I}_n \right)^{-1}\mathbf{y}}_{\text{Data fit}} -\underbrace{\log\lvert \mathbf{K}_{ff} + \sigma^2_n\rvert}_{\text{Complexity}} -\underbrace{n\log 2\pi}_{\text{Constant}} \right)\,.
 \end{align}
-$$</p>
+\]</div>
 <p>Model selection can be performed for a GP through gradient-based optimisation
 of <span class="arithmatex">\(\log p(\mathbf{y})\)</span> with respect to the kernel's parameters
 <span class="arithmatex">\(\boldsymbol{\theta}\)</span> and the observational noise <span class="arithmatex">\(\sigma^2_n\)</span>. Collectively,
 we call these terms the model hyperparameters
 <span class="arithmatex">\(\boldsymbol{\xi} = \{\boldsymbol{\theta},\sigma_n^2\}\)</span>
-from which the maximum likelihood estimate is given by
-$$
-\begin{align<em>}
+from which the maximum likelihood estimate is given by</p>
+<div class="arithmatex">\[
+\begin{align*}
     \boldsymbol{\xi}^{\star} = \operatorname{argmax}_{\boldsymbol{\xi} \in \Xi} \log p(\mathbf{y})\,.
-\end{align</em>}
-$$</p>
+\end{align*}
+\]</div>
 <p>Observing the individual terms in the marginal log-likelihood can help
 understand exactly why optimising the marginal log-likelihood gives reasonable
 solutions. The <em>data fit</em> term is the only component of the marginal
@@ -3245,10 +3250,10 @@ Python version       : 3.10.15
 IPython version      : 8.29.0
 
 matplotlib            : 3.9.2
-seaborn               : 0.13.2
+jax                   : 0.4.27
 pandas                : 2.2.3
 tensorflow_probability: 0.25.0
-jax                   : 0.4.27
+seaborn               : 0.13.2
 
 Watermark: 2.5.0
 </code></pre></div>

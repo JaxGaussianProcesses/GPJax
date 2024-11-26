@@ -474,7 +474,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../intro_to_kernels.md" class="md-nav__link">
+      <a href="../intro_to_kernels/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2987,9 +2987,9 @@ information into the computation of the kernel.
 We therefore make new 3D datasets <span class="arithmatex">\(D_{T,3D} = \left\{\left( \mathbf{X}_{T,i},\mathbf{Y}_{T,i} \right) \right\} _{i=0}^{2N_T}\)</span> and <span class="arithmatex">\(D_{0,3D} = \left\{\left( \mathbf{X}_{0,i},\mathbf{Y}_{0,i} \right) \right\} _{i=0}^{2N}\)</span> that incorporates this new labelling, such that for each dataset (indicated by the subscript <span class="arithmatex">\(D = 0\)</span> or <span class="arithmatex">\(D=T\)</span>),</p>
 <div class="arithmatex">\[
 X_{D,i} = \left( \mathbf{x}_{D,i}, z \right),
-$$
-and
-$$
+\]</div>
+<p>and</p>
+<div class="arithmatex">\[
 Y_{D,i} = y_{D,i}^{(z)},
 \]</div>
 <p>where <span class="arithmatex">\(z = 0\)</span> if <span class="arithmatex">\(i\)</span> is odd and <span class="arithmatex">\(z=1\)</span> if <span class="arithmatex">\(i\)</span> is even.</p>
@@ -3102,7 +3102,7 @@ z=z^{\prime} \\ 0 &amp; \text { if } z \neq z^{\prime}, \end{cases}
 </span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
 </span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="n">dataset_latent_velocity</span> <span class="o">=</span> <span class="n">dataset_3d</span><span class="p">(</span><span class="n">pos_test</span><span class="p">,</span> <span class="n">velocity_mean</span><span class="p">)</span>
 </span></code></pre></div>
-<p>We now replot the ground truth (testing data) <span class="arithmatex">\(D_0\)</span>, the predicted latent vector field <span class="arithmatex">\(\mathbf{F}_{\text{latent}}(\mathbf{x_i})\)</span>, and a heatmap of the residuals at each location $\mathbf{R}(\mathbf{x}<em>{0,i}) = \mathbf{y}</em>{0,i} - \mathbf{F}<em>{\text{latent}}(\mathbf{x}</em>{0,i}) $, as well as <span class="arithmatex">\(\left|\left|\mathbf{R}(\mathbf{x}_{0,i})\right|\right|\)</span>.</p>
+<p>We now replot the ground truth (testing data) <span class="arithmatex">\(D_0\)</span>, the predicted latent vector field <span class="arithmatex">\(\mathbf{F}_{\text{latent}}(\mathbf{x_i})\)</span>, and a heatmap of the residuals at each location <span class="arithmatex">\(\mathbf{R}(\mathbf{x}_{0,i}) = \mathbf{y}_{0,i} - \mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i})\)</span>, as well as <span class="arithmatex">\(\left|\left|\mathbf{R}(\mathbf{x}_{0,i})\right|\right|\)</span>.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Residuals between ground truth and estimate</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
@@ -3324,12 +3324,12 @@ Python implementation: CPython
 Python version       : 3.10.15
 IPython version      : 8.29.0
 
+gpjax                 : 0.9.3
 tensorflow_probability: 0.25.0
 jaxtyping             : 0.2.36
 matplotlib            : 3.9.2
-jax                   : 0.4.27
-gpjax                 : 0.9.3
 pandas                : 2.2.3
+jax                   : 0.4.27
 
 Watermark: 2.5.0
 </code></pre></div>

@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://docs.jaxgaussianprocesses.com/_examples/regression/">
       
       
-        <link rel="prev" href="../intro_to_gps/">
+        <link rel="prev" href="../intro_to_kernels/">
       
       
         <link rel="next" href="../classification/">
@@ -474,7 +474,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../intro_to_kernels.md" class="md-nav__link">
+      <a href="../intro_to_kernels/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2796,7 +2796,7 @@ function and the observed data that is subject to Gaussian noise.</p>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xtest</span><span class="p">,</span> <span class="n">ytest</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Latent function&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f7f149a0a00&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f6c68234670&gt;
 </code></pre></div>
 <p><img alt="png" src="../regression_files/regression_5_1.png" /></p>
 <p>Our aim in this tutorial will be to reconstruct the latent function from our noisy
@@ -2943,7 +2943,7 @@ latent function of interest.</p>
 </span><span id="__span-10-28"><a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xtest</span><span class="p">,</span> <span class="n">predictive_mean</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Predictive mean&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 </span><span id="__span-10-29"><a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f7f14878970&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f6c60967d60&gt;
 </code></pre></div>
 <p><img alt="png" src="../regression_files/regression_21_1.png" /></p>
 <h2 id="system-configuration">System configuration<a class="headerlink" href="#system-configuration" title="Permanent link"></a></h2>
@@ -2958,10 +2958,10 @@ Python implementation: CPython
 Python version       : 3.10.15
 IPython version      : 8.29.0
 
-gpjax     : 0.9.3
 jaxtyping : 0.2.36
-jax       : 0.4.27
+gpjax     : 0.9.3
 matplotlib: 3.9.2
+jax       : 0.4.27
 
 Watermark: 2.5.0
 </code></pre></div>
