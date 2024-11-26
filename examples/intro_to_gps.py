@@ -17,6 +17,7 @@
 # %% [markdown]
 # # New to Gaussian Processes?
 #
+#
 # Fantastic that you're here! This notebook is designed to be a gentle
 # introduction to the mathematics of Gaussian processes (GPs). No prior
 # knowledge of Bayesian inference or GPs is assumed, and this notebook is
@@ -33,10 +34,11 @@
 # model are unknown, and our goal is to conduct inference to determine their
 # range of likely values. To achieve this, we apply Bayes' theorem
 #
+# $$
 # \begin{align}
-#     \label{eq:BayesTheorem}
-#     p(\theta\,|\, \mathbf{y}) = \frac{p(\theta)p(\mathbf{y}\,|\,\theta)}{p(\mathbf{y})} = \frac{p(\theta)p(\mathbf{y}\,|\,\theta)}{\int_{\theta}p(\mathbf{y}, \theta)\mathrm{d}\theta}\,,
+#     p(\theta\mid\mathbf{y}) = \frac{p(\theta)p(\mathbf{y}\mid\theta)}{p(\mathbf{y})} = \frac{p(\theta)p(\mathbf{y}\mid\theta)}{\int_{\theta}p(\mathbf{y}, \theta)\mathrm{d}\theta},
 # \end{align}
+# $$
 #
 # where $p(\mathbf{y}\,|\,\theta)$ denotes the _likelihood_, or model, and
 # quantifies how likely the observed dataset $\mathbf{y}$ is, given the
@@ -74,9 +76,13 @@
 # new points $\mathbf{y}^{\star}$ through the _posterior predictive
 # distribution_. This is achieved by integrating out the parameter set $\theta$
 # from our posterior distribution through
+#
+# $$
 # \begin{align}
 #     p(\mathbf{y}^{\star}\mid \mathbf{y}) = \int p(\mathbf{y}^{\star} \,|\, \theta, \mathbf{y} ) p(\theta\,|\, \mathbf{y})\mathrm{d}\theta\,.
 # \end{align}
+# $$
+#
 # As with the marginal log-likelihood, evaluating this quantity requires
 # computing an integral which may not be tractable, particularly when $\theta$
 # is high-dimensional.
@@ -85,13 +91,16 @@
 # distribution, so we often compute and report moments of the posterior
 # distribution. Most commonly, we report the first moment and the centred second
 # moment
+#
 # $$
 # \begin{alignat}{2}
-#     \mu  = \mathbb{E}[\theta\,|\,\mathbf{y}]  & = \int \theta p(\theta\mid\mathbf{y})\mathrm{d}\theta\\
+#     \mu  = \mathbb{E}[\theta\,|\,\mathbf{y}]  & = \int \theta
+#     p(\theta\mid\mathbf{y})\mathrm{d}\theta \quad \\
 #     \sigma^2  = \mathbb{V}[\theta\,|\,\mathbf{y}] & = \int \left(\theta -
 #     \mathbb{E}[\theta\,|\,\mathbf{y}]\right)^2p(\theta\,|\,\mathbf{y})\mathrm{d}\theta&\,.
 # \end{alignat}
 # $$
+#
 # Through this pair of statistics, we can communicate our beliefs about the most
 # likely value of $\theta$ i.e., $\mu$, and the uncertainty $\sigma$ around the
 # expected value. However, as with the marginal log-likelihood and predictive
@@ -228,13 +237,16 @@ for a, t, d in zip([ax0, ax1, ax2], titles, dists):
 # %% [markdown]
 # Extending the intuition given for the moments of a univariate Gaussian random
 # variables, we can obtain the mean and covariance by
+#
 # $$
 # \begin{align}
-#    \mathbb{E}[\mathbf{y}] = \mathbf{\mu}, \quad \operatorname{Cov}(\mathbf{y}) & = \mathbf{E}\left[(\mathbf{y} - \mathbf{\mu)}(\mathbf{y} - \mathbf{\mu)}^{\top} \right]\\
+#     \mathbb{E}[\mathbf{y}] & = \mathbf{\mu}, \\
+#     \operatorname{Cov}(\mathbf{y}) & = \mathbf{E}\left[(\mathbf{y} - \mathbf{\mu})(\mathbf{y} - \mathbf{\mu})^{\top} \right] \\
 #       & =\mathbb{E}[\mathbf{y}\mathbf{y}^{\top}] - \mathbb{E}[\mathbf{y}]\mathbb{E}[\mathbf{y}]^{\top} \\
 #       & =\mathbf{\Sigma}\,.
 # \end{align}
 # $$
+#
 # The covariance matrix is a symmetric positive definite matrix that generalises
 # the notion of variance to multiple dimensions. The matrix's diagonal entries
 # contain the variance of each element, whilst the off-diagonal entries quantify
@@ -336,6 +348,7 @@ with warnings.catch_warnings():
 # $\mathbf{x}\sim\mathcal{N}(\boldsymbol{\mu}_{\mathbf{x}}, \boldsymbol{\Sigma}_{\mathbf{xx}})$ and
 # $\mathbf{y}\sim\mathcal{N}(\boldsymbol{\mu}_{\mathbf{y}}, \boldsymbol{\Sigma}_{\mathbf{yy}})$.
 # We define the joint distribution as
+#
 # $$
 # \begin{align}
 #     p\left(\begin{bmatrix}
@@ -348,6 +361,7 @@ with warnings.catch_warnings():
 #     \end{bmatrix} \right)\,,
 # \end{align}
 # $$
+#
 # where $\boldsymbol{\Sigma}_{\mathbf{x}\mathbf{y}}$ is the cross-covariance
 # matrix of $\mathbf{x}$ and $\mathbf{y}$.
 #
@@ -363,6 +377,7 @@ with warnings.catch_warnings():
 #
 # For a joint Gaussian random variable, the marginalisation of $\mathbf{x}$ or
 # $\mathbf{y}$ is given by
+#
 # $$
 # \begin{alignat}{3}
 #     & \int p(\mathbf{x}, \mathbf{y})\mathrm{d}\mathbf{y} && = p(\mathbf{x})
@@ -372,7 +387,9 @@ with warnings.catch_warnings():
 #     \boldsymbol{\Sigma}_{\mathbf{yy}})\,.
 # \end{alignat}
 # $$
+#
 # The conditional distributions are given by
+#
 # $$
 # \begin{align}
 #     p(\mathbf{y}\,|\, \mathbf{x}) & = \mathcal{N}\left(\boldsymbol{\mu}_{\mathbf{y}} + \boldsymbol{\Sigma}_{\mathbf{yx}}\boldsymbol{\Sigma}_{\mathbf{xx}}^{-1}(\mathbf{x}-\boldsymbol{\mu}_{\mathbf{x}}), \boldsymbol{\Sigma}_{\mathbf{yy}}-\boldsymbol{\Sigma}_{\mathbf{yx}}\boldsymbol{\Sigma}_{\mathbf{xx}}^{-1}\boldsymbol{\Sigma}_{\mathbf{xy}}\right)\,.
@@ -401,6 +418,7 @@ with warnings.catch_warnings():
 # We aim to capture the relationship between $\mathbf{X}$ and $\mathbf{y}$ using
 # a model $f$ with which we may make predictions at an unseen set of test points
 # $\mathbf{X}^{\star}\subset\mathcal{X}$. We formalise this by
+#
 # $$
 # \begin{align}
 #     y = f(\mathbf{X}) + \varepsilon\,,
@@ -430,6 +448,7 @@ with warnings.catch_warnings():
 # convenience in the remainder of this article.
 #
 # We define a joint GP prior over the latent function
+#
 # $$
 # \begin{align}
 #     p(\mathbf{f}, \mathbf{f}^{\star}) = \mathcal{N}\left(\mathbf{0}, \begin{bmatrix}
@@ -437,14 +456,17 @@ with warnings.catch_warnings():
 #     \end{bmatrix}\right)\,,
 # \end{align}
 # $$
+#
 # where $\mathbf{f}^{\star} = f(\mathbf{X}^{\star})$. Conditional on the GP's
 # latent function $f$, we assume a factorising likelihood generates our
 # observations
+#
 # $$
 # \begin{align}
 #     p(\mathbf{y}\,|\,\mathbf{f}) = \prod_{i=1}^n p(y_i\,|\, f_i)\,.
 # \end{align}
 # $$
+#
 # Strictly speaking, the likelihood function is
 # $p(\mathbf{y}\,|\,\phi(\mathbf{f}))$ where $\phi$ is the likelihood function's
 # associated link function. Example link functions include the probit or
@@ -479,20 +501,25 @@ with warnings.catch_warnings():
 # $p(y_i\,|\, f_i) = \mathcal{N}(y_i\,|\, f_i, \sigma_n^2)$,
 # marginalising $\mathbf{f}$ from the joint posterior to obtain
 # the posterior predictive distribution is exact
+#
 # $$
 # \begin{align}
 #     p(\mathbf{f}^{\star}\mid \mathbf{y}) = \mathcal{N}(\mathbf{f}^{\star}\,|\,\boldsymbol{\mu}_{\,|\,\mathbf{y}}, \Sigma_{\,|\,\mathbf{y}})\,,
 # \end{align}
 # $$
+#
 # where
+#
 # $$
 # \begin{align}
 #     \mathbf{\mu}_{\mid \mathbf{y}} & = \mathbf{K}_{\star f}\left( \mathbf{K}_{ff}+\sigma^2_n\mathbf{I}_n\right)^{-1}\mathbf{y} \\
 #     \Sigma_{\,|\,\mathbf{y}} & = \mathbf{K}_{\star\star} - \mathbf{K}_{xf}\left(\mathbf{K}_{ff} + \sigma_n^2\mathbf{I}_n\right)^{-1}\mathbf{K}_{fx} \,.
 # \end{align}
 # $$
+#
 # Further, the log of the  marginal likelihood of the GP can
 # be analytically expressed as
+#
 # $$
 # \begin{align}
 #         & = 0.5\left(-\underbrace{\mathbf{y}^{\top}\left(\mathbf{K}_{ff} + \sigma_n^2\mathbf{I}_n \right)^{-1}\mathbf{y}}_{\text{Data fit}} -\underbrace{\log\lvert \mathbf{K}_{ff} + \sigma^2_n\rvert}_{\text{Complexity}} -\underbrace{n\log 2\pi}_{\text{Constant}} \right)\,.
@@ -505,6 +532,7 @@ with warnings.catch_warnings():
 # we call these terms the model hyperparameters
 # $\boldsymbol{\xi} = \{\boldsymbol{\theta},\sigma_n^2\}$
 # from which the maximum likelihood estimate is given by
+#
 # $$
 # \begin{align*}
 #     \boldsymbol{\xi}^{\star} = \operatorname{argmax}_{\boldsymbol{\xi} \in \Xi} \log p(\mathbf{y})\,.

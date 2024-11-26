@@ -227,22 +227,24 @@ for ax in axes.ravel():
 # expected log-likelihood. This term is evaluated in the
 # [stochastic variational Gaussian process](uncollapsed_vi.md) in the ELBO term. For a
 # variational approximation $q(f)= \mathcal{N}(f\mid m, S)$, the ELBO can be written as
+#
 # $$
 # \begin{align}
-#     \label{eq:elbo}
 #     \mathcal{L}(q) = \mathbb{E}_{f\sim q(f)}\left[ p(\mathbf{y}\mid f)\right] - \mathrm{KL}\left(q(f)\mid\mid p(f)\right)\,.
 # \end{align}
 # $$
+#
 # As both $q(f)$ and $p(f)$ are Gaussian distributions, the Kullback-Leibler term can
 # be analytically computed. However, the expectation term is not always so easy to
 # compute. Fortunately, the bound in \eqref{eq:elbo} can be decomposed as a sum of the
 # datapoints
+#
 # $$
 # \begin{align}
-#     \label{eq:elbo_decomp}
 #     \mathcal{L}(q) = \sum_{n=1}^N \mathbb{E}_{f\sim q(f)}\left[ p(y_n\mid f)\right] - \mathrm{KL}\left(q(f)\mid\mid p(f)\right)\,.
 # \end{align}
 # $$
+#
 # This simplifies computation of the expectation as it is now a series of $N$
 # 1-dimensional integrals. As such, GPJax by default uses quadrature to compute these
 # integrals. However, for some likelihoods, such as the Gaussian likelihood, the

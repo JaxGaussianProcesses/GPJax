@@ -170,7 +170,9 @@ plt.show()
 # $$
 # X_{D,i} = \left( \mathbf{x}_{D,i}, z \right),
 # $$
+#
 # and
+#
 # $$
 # Y_{D,i} = y_{D,i}^{(z)},
 # $$
@@ -311,7 +313,7 @@ dataset_latent_velocity = dataset_3d(pos_test, velocity_mean)
 
 
 # %% [markdown]
-# We now replot the ground truth (testing data) $D_0$, the predicted latent vector field $\mathbf{F}_{\text{latent}}(\mathbf{x_i})$, and a heatmap of the residuals at each location $\mathbf{R}(\mathbf{x}_{0,i}) = \mathbf{y}_{0,i} - \mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i}) $, as well as $\left|\left|\mathbf{R}(\mathbf{x}_{0,i})\right|\right|$.
+# We now replot the ground truth (testing data) $D_0$, the predicted latent vector field $\mathbf{F}_{\text{latent}}(\mathbf{x_i})$, and a heatmap of the residuals at each location $\mathbf{R}(\mathbf{x}_{0,i}) = \mathbf{y}_{0,i} - \mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i})$, as well as $\left|\left|\mathbf{R}(\mathbf{x}_{0,i})\right|\right|$.
 
 
 # %%

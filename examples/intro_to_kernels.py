@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.4
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -37,7 +37,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 from examples.utils import use_mpl_style
-from gpjax.parameters import PositiveReal
+from gpjax.parameters import PositiveReal, Static
 from gpjax.typing import Array
 
 config.update("jax_enable_x64", True)
@@ -54,11 +54,26 @@ use_mpl_style()
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 
 # %% [markdown]
-# Using Gaussian Processes (GPs) to model functions can offer several advantages over alternative methods, such as deep neural networks. One key advantage is their rich quantification of uncertainty; not only do they provide *point estimates* for the values taken by a function throughout its domain, but they provide a full predictive posterior *distribution* over the range of values the function may take. This rich quantification of uncertainty is useful in many applications, such as Bayesian optimisation, which relies on being able to make *uncertainty-aware* decisions.
+# Using Gaussian Processes (GPs) to model functions can offer several advantages over
+# alternative methods, such as deep neural networks. One key advantage is their rich
+# quantification of uncertainty; not only do they provide *point estimates* for the
+# values taken by a function throughout its domain, but they provide a full predictive
+# posterior *distribution* over the range of values the function may take. This rich
+# quantification of uncertainty is useful in many applications, such as Bayesian
+# optimisation, which relies on being able to make *uncertainty-aware* decisions.
 #
-# However, another advantage of GPs is the ability for one to place *priors* on the functions being modelled. For instance, one may know that the underlying function being modelled observes certain characteristics, such as being *periodic* or having a certain level of *smoothness*. The *kernel*, or *covariance function*, is the primary means through which one is able to encode such prior knowledge about the function being modelled. This enables one to equip the GP with inductive biases which enable it to learn from data more efficiently, whilst generalising to unseen data more effectively.
+# However, another advantage of GPs is the ability for one to place *priors* on the
+# functions being modelled. For instance, one may know that the underlying function
+# being modelled observes certain characteristics, such as being *periodic* or having a
+# certain level of *smoothness*. The *kernel*, or *covariance function*, is the primary
+# means through which one is able to encode such prior knowledge about the function
+# being modelled. This enables one to equip the GP with inductive biases which enable it
+# to learn from data more efficiently, whilst generalising to unseen data more
+# effectively.
 #
-# In this notebook we'll develop some intuition for what kinds of priors are encoded through the use of different kernels, and how this can be useful when modelling different types of functions.
+# In this notebook we'll develop some intuition for what kinds of priors are encoded
+# through the use of different kernels, and how this can be useful when modelling
+# different types of functions.
 
 # %% [markdown]
 # ## What is a Kernel?
@@ -66,20 +81,24 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 # Intuitively, for a function $f$, the kernel defines the notion of *similarity* between
 # the value of the function at two points, $f(\mathbf{x})$ and $f(\mathbf{x}')$, and
 # will be denoted as $k(\mathbf{x}, \mathbf{x}')$:
+#
+# $$
 # \begin{aligned}
 #   k(\mathbf{x}, \mathbf{x}') &= \text{Cov}[f(\mathbf{x}), f(\mathbf{x}')] \\
 #   &= \mathbb{E}[(f(\mathbf{x}) - \mathbb{E}[f(\mathbf{x})])(f(\mathbf{x}') - \mathbb{E}[f(\mathbf{x}')])]
 # \end{aligned}
-#  One would expect that, given a previously unobserved test point $\mathbf{x}^*$, the
-#  training points which are *closest* to this unobserved point will be most similar to
-#  it. As such, the kernel is used to define this notion of similarity within the GP
-#  framework. It is up to the user to select a kernel function which is appropriate for
-#  the function being modelled. In this notebook we are going to give some examples of
-#  commonly used kernels, and try to develop an understanding of when one may wish to use
-#  one kernel over another. However, before we do this, it is worth discussing the
-#  necessary conditions for a function to be a valid kernel/covariance function. This
-#  requires a little bit of maths, so for those of you who just wish to obtain an
-#  intuitive understanding, feel free to skip to the section introducing the Matérn
+# $$
+#
+# One would expect that, given a previously unobserved test point $\mathbf{x}^*$, the
+# training points which are *closest* to this unobserved point will be most similar to
+# it. As such, the kernel is used to define this notion of similarity within the GP
+# framework. It is up to the user to select a kernel function which is appropriate for
+# the function being modelled. In this notebook we are going to give some examples of
+# commonly used kernels, and try to develop an understanding of when one may wish to use
+# one kernel over another. However, before we do this, it is worth discussing the
+# necessary conditions for a function to be a valid kernel/covariance function. This
+# requires a little bit of maths, so for those of you who just wish to obtain an
+# intuitive understanding, feel free to skip to the section introducing the Matérn
 #  family of kernels.
 #
 # ### What are the necessary conditions for a function to be a valid kernel?
@@ -237,7 +256,6 @@ test_y = forrester(test_x)
 # First we define our model, using the Matérn52 kernel, and construct our posterior *without* optimising the kernel hyperparameters:
 
 # %%
-
 mean = gpx.mean_functions.Zero()
 kernel = gpx.kernels.Matern52(
     lengthscale=jnp.array(0.1)
@@ -246,7 +264,7 @@ kernel = gpx.kernels.Matern52(
 prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 
 likelihood = gpx.likelihoods.Gaussian(
-    num_datapoints=D.n, obs_stdev=Static(jnp.array(1e-3))
+    num_datapoints=D.n, obs_stddev=Static(jnp.array(1e-3))
 )  # Our function is noise-free, so we set the observation noise's standard deviation to a very small value
 
 no_opt_posterior = prior * likelihood
