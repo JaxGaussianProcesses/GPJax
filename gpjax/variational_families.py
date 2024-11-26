@@ -149,12 +149,14 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
     ):
         super().__init__(posterior, inducing_inputs, jitter)
 
-        self.variational_mean = Real(
-            variational_mean or jnp.zeros((self.num_inducing, 1))
-        )
-        self.variational_root_covariance = LowerTriangular(
-            variational_root_covariance or jnp.eye(self.num_inducing)
-        )
+        if variational_mean is None:
+            variational_mean = jnp.zeros((self.num_inducing, 1))
+
+        if variational_root_covariance is None:
+            variational_root_covariance = jnp.eye(self.num_inducing)
+
+        self.variational_mean = Real(variational_mean)
+        self.variational_root_covariance = LowerTriangular(variational_root_covariance)
 
     def prior_kl(self) -> ScalarFloat:
         r"""Compute the prior KL divergence.
@@ -378,12 +380,14 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
     ):
         super().__init__(posterior, inducing_inputs, jitter)
 
-        self.natural_vector = Static(
-            natural_vector or jnp.zeros((self.num_inducing, 1))
-        )
-        self.natural_matrix = Static(
-            natural_matrix or -0.5 * jnp.eye(self.num_inducing)
-        )
+        if natural_vector is None:
+            natural_vector = jnp.zeros((self.num_inducing, 1))
+
+        if natural_matrix is None:
+            natural_matrix = -0.5 * jnp.eye(self.num_inducing)
+
+        self.natural_vector = Static(natural_vector)
+        self.natural_matrix = Static(natural_matrix)
 
     def prior_kl(self) -> ScalarFloat:
         r"""Compute the KL-divergence between our current variational approximation
@@ -540,13 +544,14 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
     ):
         super().__init__(posterior, inducing_inputs, jitter)
 
-        # must come after super().__init__
-        self.expectation_vector = Static(
-            expectation_vector or jnp.zeros((self.num_inducing, 1))
-        )
-        self.expectation_matrix = Static(
-            expectation_matrix or jnp.eye(self.num_inducing)
-        )
+        if expectation_vector is None:
+            expectation_vector = jnp.zeros((self.num_inducing, 1))
+
+        if expectation_matrix is None:
+            expectation_matrix = jnp.eye(self.num_inducing)
+
+        self.expectation_vector = Static(expectation_vector)
+        self.expectation_matrix = Static(expectation_matrix)
 
     def prior_kl(self) -> ScalarFloat:
         r"""Evaluate the prior KL-divergence.
