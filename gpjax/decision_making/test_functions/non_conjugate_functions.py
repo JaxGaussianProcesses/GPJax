@@ -32,7 +32,7 @@ from gpjax.typing import (
 class PoissonTestFunction:
     """
     Test function for GPs utilising the Poisson likelihood. Function taken from
-    https://docs.jaxgaussianprocesses.com/examples/poisson/#dataset.
+    https://docs.jaxgaussianprocesses.com/_examples/poisson/#dataset.
 
     Attributes:
         search_space (ContinuousSearchSpace): Search space for the function.
@@ -77,7 +77,7 @@ class PoissonTestFunction:
     def evaluate(self, x: Float[Array, "N 1"]) -> Int[Array, "N 1"]:
         """
         Evaluate the test function at a set of points. Function taken from
-        https://docs.jaxgaussianprocesses.com/examples/poisson/#dataset.
+        https://docs.jaxgaussianprocesses.com/_examples/poisson/#dataset.
 
         Args:
             x (Float[Array, 'N D']): Points to evaluate the test function at.

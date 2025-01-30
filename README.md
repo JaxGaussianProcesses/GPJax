@@ -71,23 +71,23 @@ helped to shape GPJax into the package it is today.
 
 ## Notebook examples
 
-> - [**Conjugate Inference**](https://docs.jaxgaussianprocesses.com/examples/regression/)
-> - [**Classification**](https://docs.jaxgaussianprocesses.com/examples/classification/)
-> - [**Sparse Variational Inference**](https://docs.jaxgaussianprocesses.com/examples/collapsed_vi/)
-> - [**Stochastic Variational Inference**](https://docs.jaxgaussianprocesses.com/examples/uncollapsed_vi/)
-> - [**Laplace Approximation**](https://docs.jaxgaussianprocesses.com/examples/classification/#laplace-approximation)
-> - [**Inference on Non-Euclidean Spaces**](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#custom-kernel)
-> - [**Inference on Graphs**](https://docs.jaxgaussianprocesses.com/examples/graph_kernels/)
-> - [**Pathwise Sampling**](https://docs.jaxgaussianprocesses.com/examples/spatial/)
-> - [**Learning Gaussian Process Barycentres**](https://docs.jaxgaussianprocesses.com/examples/barycentres/)
-> - [**Deep Kernel Regression**](https://docs.jaxgaussianprocesses.com/examples/deep_kernels/)
-> - [**Poisson Regression**](https://docs.jaxgaussianprocesses.com/examples/poisson/)
-> - [**Bayesian Optimisation**](https://docs.jaxgaussianprocesses.com/examples/bayesian_optimisation/)
+> - [**Conjugate Inference**](https://docs.jaxgaussianprocesses.com/_examples/regression/)
+> - [**Classification**](https://docs.jaxgaussianprocesses.com/_examples/classification/)
+> - [**Sparse Variational Inference**](https://docs.jaxgaussianprocesses.com/_examples/collapsed_vi/)
+> - [**Stochastic Variational Inference**](https://docs.jaxgaussianprocesses.com/_examples/uncollapsed_vi/)
+> - [**Laplace Approximation**](https://docs.jaxgaussianprocesses.com/_examples/classification/#laplace-approximation)
+> - [**Inference on Non-Euclidean Spaces**](https://docs.jaxgaussianprocesses.com/_examples/constructing_new_kernels/#custom-kernel)
+> - [**Inference on Graphs**](https://docs.jaxgaussianprocesses.com/_examples/graph_kernels/)
+> - [**Pathwise Sampling**](https://docs.jaxgaussianprocesses.com/_examples/spatial/)
+> - [**Learning Gaussian Process Barycentres**](https://docs.jaxgaussianprocesses.com/_examples/barycentres/)
+> - [**Deep Kernel Regression**](https://docs.jaxgaussianprocesses.com/_examples/deep_kernels/)
+> - [**Poisson Regression**](https://docs.jaxgaussianprocesses.com/_examples/poisson/)
+> - [**Bayesian Optimisation**](https://docs.jaxgaussianprocesses.com/_examples/bayesian_optimisation/)
 
 ## Guides for customisation
 >
-> - [**Custom kernels**](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#custom-kernel)
-> - [**UCI regression**](https://docs.jaxgaussianprocesses.com/examples/yacht/)
+> - [**Custom kernels**](https://docs.jaxgaussianprocesses.com/_examples/constructing_new_kernels/#custom-kernel)
+> - [**UCI regression**](https://docs.jaxgaussianprocesses.com/_examples/yacht/)
 
 ## Conversion between `.ipynb` and `.py`
 Above examples are stored in [examples](docs/examples) directory in the double
