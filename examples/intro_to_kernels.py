@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.16.6
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -37,7 +37,10 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 from examples.utils import use_mpl_style
-from gpjax.parameters import PositiveReal, Static
+from gpjax.parameters import (
+    PositiveReal,
+    Static,
+)
 from gpjax.typing import Array
 
 config.update("jax_enable_x64", True)
