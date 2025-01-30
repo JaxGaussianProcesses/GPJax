@@ -122,7 +122,7 @@ print(constant_param._tag)
 # For most users, you will not need to worry about this as we provide a set of default
 # bijectors that are defined for all the parameter types we support. However, see our
 # [Kernel Guide
-# Notebook](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/) to
+# Notebook](https://docs.jaxgaussianprocesses.com/_examples/constructing_new_kernels/) to
 # see how you can define your own bijectors and parameter types.
 
 # %%
@@ -156,7 +156,7 @@ transform(_close_to_zero_state, DEFAULT_BIJECTION, inverse=True)
 # may be nested within several functions e.g., a kernel function within a GP model.
 # Fortunately, transforming several parameters is a simple operation that we here
 # demonstrate for a conjugate GP posterior (see our [Regression
-# Notebook](https://docs.jaxgaussianprocesses.com/examples/regression/) for detailed
+# Notebook](https://docs.jaxgaussianprocesses.com/_examples/regression/) for detailed
 # explanation of this model.).
 
 # %%
@@ -239,7 +239,7 @@ print(positive_reals)
 # useful as it allows us to efficiently operate on a subset of the parameters whilst
 # leaving the others untouched. Looking forward, we hope to use this functionality in
 # our [Variational Inference
-# Approximations](https://docs.jaxgaussianprocesses.com/examples/uncollapsed_vi/) to
+# Approximations](https://docs.jaxgaussianprocesses.com/_examples/uncollapsed_vi/) to
 # perform more efficient updates of the variational parameters and then the model's
 # hyperparameters.
 
@@ -361,7 +361,7 @@ ax.set(xlabel="x", ylabel="m(x)")
 # In this notebook we have explored how GPJax's Flax-based backend may be easily
 # manipulated and extended. For a more applied look at this, see how we construct a
 # kernel on polar coordinates in our [Kernel
-# Guide](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#custom-kernel)
+# Guide](https://docs.jaxgaussianprocesses.com/_examples/constructing_new_kernels/#custom-kernel)
 # notebook.
 #
 # ## System configuration

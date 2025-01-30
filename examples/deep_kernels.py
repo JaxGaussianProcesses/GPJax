@@ -141,7 +141,7 @@ class DeepKernelFunction(AbstractKernel):
 # activation functions between the layers. The first hidden layer contains 64 units,
 # while the second layer contains 32 units. Finally, we'll make the output of our
 # network a three units wide. The corresponding kernel that we define will then be of
-# [ARD form](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/#active-dimensions)
+# [ARD form](https://docs.jaxgaussianprocesses.com/_examples/constructing_new_kernels/#active-dimensions)
 # to allow for different lengthscales in each dimension of the feature space.
 # Users may wish to design more intricate network structures for more complex tasks,
 # which functionality is supported well in Haiku.

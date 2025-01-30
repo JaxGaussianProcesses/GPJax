@@ -20,7 +20,7 @@
 #
 # In this guide we introduce the Bayesian Optimisation (BO) paradigm for
 # optimising black-box functions. We'll assume an understanding of Gaussian processes
-# (GPs), so if you're not familiar with them, check out our [GP introduction notebook](https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/).
+# (GPs), so if you're not familiar with them, check out our [GP introduction notebook](https://docs.jaxgaussianprocesses.com/_examples/intro_to_gps/).
 
 # %%
 from typing import (
@@ -278,7 +278,7 @@ opt_posterior = return_optimised_posterior(D, prior, key)
 # will do this using the `sample_approx` method, which generates an approximate sample
 # from the posterior using decoupled sampling introduced in ([Wilson et al.,
 # 2020](https://proceedings.mlr.press/v119/wilson20a.html)) and discussed in our [Pathwise
-# Sampling Notebook](https://docs.jaxgaussianprocesses.com/examples/spatial/). This method
+# Sampling Notebook](https://docs.jaxgaussianprocesses.com/_examples/spatial/). This method
 # is used as it enables us to sample from the posterior in a manner which scales linearly
 # with the number of points sampled, $O(N)$, mitigating the cubic cost associated with
 # drawing exact samples from a GP posterior, $O(N^3)$. It also generates more accurate
