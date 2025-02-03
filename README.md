@@ -148,7 +148,7 @@ optimiser = ox.adam(learning_rate=1e-2)
 # Obtain Type 2 MLEs of the hyperparameters
 opt_posterior, history = gpx.fit(
     model=posterior,
-    objective=gpx.objectives.conjugate_mll,
+    objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     train_data=D,
     optim=optimiser,
     num_iters=500,
