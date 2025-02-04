@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.4
+#       jupytext_version: 1.16.6
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -22,7 +22,7 @@
 # of a graph using a Gaussian process with a Matérn kernel presented in
 # <strong data-cite="borovitskiy2021matern"></strong>. For a general discussion of the
 # kernels supported within GPJax, see the
-# [kernels notebook](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels).
+# [kernels notebook](https://docs.jaxgaussianprocesses.com/_examples/constructing_new_kernels).
 
 # %%
 import random
@@ -153,7 +153,7 @@ cbar = plt.colorbar(sm, ax=ax)
 # non-Euclidean, our likelihood is still Gaussian and the model is still conjugate.
 # For this reason, we simply perform gradient descent on the GP's marginal
 # log-likelihood term as in the
-# [regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/).
+# [regression notebook](https://docs.jaxgaussianprocesses.com/_examples/regression/).
 # We do this using the BFGS optimiser.
 
 # %%

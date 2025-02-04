@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.4
+#       jupytext_version: 1.16.6
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -22,7 +22,7 @@
 # such problems include Bayesian optimisation (BO) and experimental design. For an
 # in-depth introduction to Bayesian optimisation itself, be sure to checkout out our
 # [Introduction to BO
-# Notebook](https://docs.jaxgaussianprocesses.com/examples/bayesian_optimisation/).
+# Notebook](https://docs.jaxgaussianprocesses.com/_examples/bayesian_optimisation/).
 #
 # We'll be using BO as a case study to demonstrate how one may use the decision making
 # module to solve sequential decision making problems. The goal of the decision making
@@ -76,7 +76,7 @@ cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
 # ## The Black-Box Objective Function
 #
 # We'll be using the same problem as in the [Introduction to BO
-# Notebook](https://docs.jaxgaussianprocesses.com/examples/bayesian_optimisation/), but
+# Notebook](https://docs.jaxgaussianprocesses.com/_examples/bayesian_optimisation/), but
 # rather than focussing on the mechanics of BO we'll be looking at how one may use the
 # abstractions provided by the decision making module to implement the BO loop.
 #
@@ -181,7 +181,7 @@ likelihood_builder = lambda n: gpx.likelihoods.Gaussian(
 # this for us. This class takes as input a `prior` and `likeligood_builder`, which we have
 # defined above. We tend to also optimise the hyperparameters of the GP prior when
 # "fitting" our GP, as demonstrated in the [Regression
-# notebook](https://docs.jaxgaussianprocesses.com/examples/regression/). This will be
+# notebook](https://docs.jaxgaussianprocesses.com/_examples/regression/). This will be
 # using the GPJax `fit` method under the hood, which requires an `optimization_objective`,
 # `optimizer` and `num_optimization_iters`. Therefore, we also pass these to the
 # `PosteriorHandler` as demonstrated below:
@@ -257,7 +257,7 @@ acquisition_maximizer = ContinuousSinglePointUtilityMaximizer(
 #
 # It is worth noting that `ThompsonSampling` is not the only utility function we could use,
 # since our module also provides e.g. `ProbabilityOfImprovement`, `ExpectedImprovment`,
-# which were briefly discussed in [our previous introduction to Bayesian optimisation](https://docs.jaxgaussianprocesses.com/examples/bayesian_optimisation/).
+# which were briefly discussed in [our previous introduction to Bayesian optimisation](https://docs.jaxgaussianprocesses.com/_examples/bayesian_optimisation/).
 
 
 # %% [markdown]

@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.16.6
 #   kernelspec:
 #     display_name: gpjax_beartype
 #     language: python
@@ -25,7 +25,7 @@
 # non-conjugate Gaussian processes with more than ~5000 data points. However, for
 # conjugate models of less than 5000 data points, we recommend using the marginal
 # log-likelihood approach presented in the
-# [regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/).
+# [regression notebook](https://docs.jaxgaussianprocesses.com/_examples/regression/).
 # Though we illustrate SVGPs here with a conjugate regression example, the same GPJax
 # code works for general likelihoods, such as a Bernoulli for classification.
 
@@ -267,7 +267,7 @@ opt_posterior, history = gpx.fit(
 # predictions at novel inputs akin
 # to all other models within GPJax on our variational process object $q(\cdot)$ (for
 # example, see the
-# [regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/)).
+# [regression notebook](https://docs.jaxgaussianprocesses.com/_examples/regression/)).
 
 # %%
 latent_dist = opt_posterior(xtest)

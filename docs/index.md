@@ -1,11 +1,10 @@
-# Welcome to GPJax!
+# Welcome to GPJax
 
 GPJax is a didactic Gaussian process (GP) library in JAX, supporting GPU
 acceleration and just-in-time compilation. We seek to provide a flexible
 API to enable researchers to rapidly prototype and develop new ideas.
 
 ![Gaussian process posterior.](static/GP.svg)
-
 
 ## "Hello, GP!"
 
@@ -53,7 +52,7 @@ would write on paper, as shown below.
 !!! Begin
 
     Looking for a good place to start? Then why not begin with our [regression
-    notebook](https://docs.jaxgaussianprocesses.com/examples/regression/).
+    notebook](https://docs.jaxgaussianprocesses.com/_examples/regression/).
 
 ## Citing GPJax
 

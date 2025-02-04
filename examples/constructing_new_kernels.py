@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.4
+#       jupytext_version: 1.16.6
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -71,7 +71,7 @@ cols = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 # * White noise
 # * Linear.
 # * Polynomial.
-# * [Graph kernels](https://docs.jaxgaussianprocesses.com/examples/graph_kernels/).
+# * [Graph kernels](https://docs.jaxgaussianprocesses.com/_examples/graph_kernels/).
 #
 # While the syntax is consistent, each kernel's type influences the
 # characteristics of the sample paths drawn. We visualise this below with 10
@@ -185,7 +185,7 @@ fig.colorbar(im3, ax=ax[3], fraction=0.05)
 # We'll demonstrate this process now for a circular kernel --- an adaption of
 # the excellent guide given in the PYMC3 documentation. We encourage curious
 # readers to visit their notebook
-# [here](https://www.pymc.io/projects/docs/en/v3/pymc-examples/examples/gaussian_processes/GP-Circular.html).
+# [here](https://www.pymc.io/projects/docs/en/v3/pymc-_examples/_examples/gaussian_processes/GP-Circular.html).
 #
 # ### Circular kernel
 #
@@ -272,7 +272,7 @@ class Polar(gpx.kernels.AbstractKernel):
 #
 # We proceed to fit a GP with our custom circular kernel to a random sequence of
 # points on a circle (see the
-# [Regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/)
+# [Regression notebook](https://docs.jaxgaussianprocesses.com/_examples/regression/)
 # for further details on this process).
 
 # %%

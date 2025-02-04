@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.4
+#       jupytext_version: 1.16.6
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -154,9 +154,9 @@ plt.show()
 # We'll now independently learn Gaussian process posterior distributions for each
 # dataset. We won't spend any time here discussing how GP hyperparameters are
 # optimised. For advice on achieving this, see the
-# [Regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/)
+# [Regression notebook](https://docs.jaxgaussianprocesses.com/_examples/regression/)
 # for advice on optimisation and the
-# [Kernels notebook](https://docs.jaxgaussianprocesses.com/examples/constructing_new_kernels/) for
+# [Kernels notebook](https://docs.jaxgaussianprocesses.com/_examples/constructing_new_kernels/) for
 # advice on selecting an appropriate kernel.
 
 

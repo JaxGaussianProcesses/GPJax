@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.4
+#       jupytext_version: 1.16.6
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -65,14 +65,14 @@ key = jr.key(42)
 # covariates and a single positive, real valued response variable. There are 308
 # observations in the dataset, so we can comfortably use a conjugate regression
 # Gaussian process here (for more more details, checkout the
-# [Regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/)).
+# [Regression notebook](https://docs.jaxgaussianprocesses.com/_examples/regression/)).
 
 # %%
 try:
     yacht = pd.read_fwf("data/yacht_hydrodynamics.data", header=None).values[:-1, :]
 except FileNotFoundError:
     yacht = pd.read_fwf(
-        "docs/examples/data/yacht_hydrodynamics.data", header=None
+        "docs/_examples/data/yacht_hydrodynamics.data", header=None
     ).values[:-1, :]
 
 X = yacht[:, :-1]
@@ -149,9 +149,9 @@ scaled_Xte = x_scaler.transform(Xte)
 # With data now loaded and preprocessed, we'll proceed to defining a Gaussian process
 # model and optimising its parameters. This notebook purposefully does not go into
 # great detail on this process, so please see notebooks such as the
-# [Regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/)
+# [Regression notebook](https://docs.jaxgaussianprocesses.com/_examples/regression/)
 # and
-# [Classification notebook](https://docs.jaxgaussianprocesses.com/examples/classification)
+# [Classification notebook](https://docs.jaxgaussianprocesses.com/_examples/classification)
 # for further information.
 #
 # ### Model specification

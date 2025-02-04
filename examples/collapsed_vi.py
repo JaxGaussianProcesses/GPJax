@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.4
+#       jupytext_version: 1.16.6
 #   kernelspec:
 #     display_name: gpjax_beartype
 #     language: python
@@ -131,7 +131,7 @@ q = gpx.variational_families.CollapsedVariationalGaussian(
 # %% [markdown]
 # We now train our model akin to a Gaussian process regression model via the `fit`
 # abstraction. Unlike the regression example given in the
-# [conjugate regression notebook](https://docs.jaxgaussianprocesses.com/examples/regression/),
+# [conjugate regression notebook](https://docs.jaxgaussianprocesses.com/_examples/regression/),
 # the inducing locations that induce our variational posterior distribution are now
 # part of the model's parameters. Using a gradient-based optimiser, we can then
 # _optimise_ their location such that the evidence lower bound is maximised.
