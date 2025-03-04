@@ -219,7 +219,7 @@ for a, t, d in zip([ax0, ax1, ax2], titles, dists):
         xx.shape
     )
     cntf = a.contourf(xx, yy, jnp.exp(d_prob), levels=20, antialiased=True, cmap=cmap)
-    for c in cntf.collections:
+    for c in cntf.get_paths():
         c.set_edgecolor("face")
     a.set_xlim(-2.75, 2.75)
     a.set_ylim(-2.75, 2.75)
