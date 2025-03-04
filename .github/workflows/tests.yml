@@ -29,10 +29,10 @@ jobs:
       - name: Install Hatch
         uses: pypa/hatch@install
 
-      # # Install the dependencies
-      # - name: Check docstrings
-      #   run: |
-      #     hatch run dev:docstrings
+      # Install the dependencies
+      - name: Check docstrings
+        run: |
+          hatch run dev:docstrings
 
       # Run the unit tests and build the coverage report
       - name: Run Tests
