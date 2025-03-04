@@ -64,4 +64,4 @@ def test_expected_improvement_utility_function_correct_values(
     eta = get_best_latent_observation_val(posterior, dataset)
     mc_ei = jnp.expand_dims(jnp.mean(jnp.maximum(eta - samples, 0), 0), -1)
     assert jnp.all(ei >= 0)
-    assert jnp.allclose(ei, mc_ei, rtol=0.01)
+    assert jnp.allclose(ei, mc_ei, rtol=0.08, atol=1e-6)

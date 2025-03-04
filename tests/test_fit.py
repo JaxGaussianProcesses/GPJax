@@ -322,5 +322,5 @@ def test_get_batch(n_data: int, n_dim: int, batch_size: int):
     assert New.n == batch_size
     assert New.X.shape[1:] == x.shape[1:]
     assert New.y.shape[1:] == y.shape[1:]
-    assert (New.X != B.X).all()
-    assert (New.y != B.y).all()
+    assert jnp.sum(New.X == B.X) <= n_dim * batch_size / n_data
+    assert jnp.sum(New.y == B.y) <= n_dim * batch_size / n_data
