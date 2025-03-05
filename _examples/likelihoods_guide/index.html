@@ -2984,7 +2984,7 @@ a likelihood object. To do this, we'll need a dataset.</p>
 </span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Latent function&quot;</span><span class="p">)</span>
 </span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7ff77375c9a0&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f91b9554a30&gt;
 </code></pre></div>
 <p><img alt="png" src="../likelihoods_guide_files/likelihoods_guide_1_1.png" /></p>
 <p>In this example, our observations have support <span class="arithmatex">\([-3, 3]\)</span> and are generated from a
@@ -3003,7 +3003,7 @@ argument.</p>
     _tag=&#39;positive&#39;
   ),
   num_datapoints=50,
-  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7ff775156110&gt;
+  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f91baf4e140&gt;
 )
 </code></pre></div>
 <h3 id="likelihood-parameters">Likelihood parameters<a class="headerlink" href="#likelihood-parameters" title="Permanent link"></a></h3>
@@ -3023,7 +3023,7 @@ this as follows:</p>
     _tag=&#39;positive&#39;
   ),
   num_datapoints=50,
-  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7ff775156110&gt;
+  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f91baf4e140&gt;
 )
 </code></pre></div>
 <h3 id="prediction">Prediction<a class="headerlink" href="#prediction" title="Permanent link"></a></h3>
@@ -3166,15 +3166,15 @@ expectation can be computed analytically.</p>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Thomas Pinder
 
-Last updated: Tue Mar 04 2025
+Last updated: Wed Mar 05 2025
 
 Python implementation: CPython
 Python version       : 3.10.16
 IPython version      : 8.33.0
 
-gpjax                 : 0.9.4
-matplotlib            : 3.10.1
 tensorflow_probability: 0.25.0
+matplotlib            : 3.10.1
+gpjax                 : 0.9.4
 jax                   : 0.4.27
 
 Watermark: 2.5.0
