@@ -21,17 +21,16 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "jax<0.4.28",
-  "jaxlib<0.4.28",
+  "jax",
+  "jaxlib",
   "optax>0.2.1",
   "jaxtyping>0.2.10",
   "tqdm>4.66.2",
   "tensorflow-probability>=0.24.0",
   "beartype>0.16.1",
-  "cola-ml==0.0.5",
-  "jaxopt==0.8.2",
-  "flax<0.10.0",
-  "numpy<2.0.0",
+  "jaxopt",
+  "flax",
+  "numpy",
 ]
 
 [tool.hatch.envs.default]
