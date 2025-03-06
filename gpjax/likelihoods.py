@@ -26,10 +26,13 @@ from gpjax.integrators import (
     AbstractIntegrator,
     AnalyticalGaussianIntegrator,
     GHQuadratureIntegrator,
+    HeteroscedasticGaussianIntegrator,
 )
 from gpjax.parameters import (
     PositiveReal,
     Static,
+    Parameter,
+    Real,
 )
 from gpjax.typing import (
     Array,
@@ -250,6 +253,130 @@ class Poisson(AbstractLikelihood):
         return self.link_function(dist.mean())
 
 
+class HeteroscedasticGaussian(AbstractLikelihood):
+    r"""Heteroscedastic Gaussian likelihood object.
+
+    This likelihood models the observation noise as a function of the inputs, where
+    the noise variance is parameterized by a second latent GP:
+
+    y(x) = f(x) + ε(x), where ε(x) ~ N(0, exp(g(x)))
+
+    Here, f(x) is the signal GP and g(x) is the log-noise variance GP.
+    """
+
+    latent_g: nnx.Intermediate[Float[Array, "N 1"]]
+
+    def __init__(
+        self,
+        num_datapoints: int,
+        latent_g: tp.Union[Float[Array, "N 1"], Parameter, None] = None,
+        clip_min: float = -10.0,
+        clip_max: float = 10.0,
+        integrator: AbstractIntegrator = HeteroscedasticGaussianIntegrator(),
+    ):
+        r"""Initializes the heteroscedastic Gaussian likelihood.
+
+        Args:
+            num_datapoints (int): the number of data points.
+            latent_g (Union[Float[Array, "N 1"], Parameter, None]): the latent function values
+                for the log noise variance. If None, it will be initialized to zeros.
+            clip_min (float): minimum value to clip the log noise variance to avoid numerical issues.
+            clip_max (float): maximum value to clip the log noise variance to avoid numerical issues.
+            integrator (AbstractIntegrator): The integrator to be used for computing expected log
+                likelihoods. Must be an instance of `AbstractIntegrator`. Defaults to
+                HeteroscedasticGaussianIntegrator which provides an analytical approximation.
+        """
+        super().__init__(num_datapoints, integrator)
+
+        # Initialize or set the latent log noise variance function
+        if latent_g is None:
+            # Initialize with zeros (log(1.0) = 0.0)
+            self.latent_g = Parameter(jnp.zeros((num_datapoints, 1)))
+        elif isinstance(latent_g, Parameter):
+            self.latent_g = latent_g
+        else:
+            self.latent_g = Parameter(latent_g)
+
+        self.clip_min = clip_min
+        self.clip_max = clip_max
+
+    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
+        r"""The link function of the heteroscedastic Gaussian likelihood.
+
+        This method assumes that f contains both the signal and log noise variance
+        concatenated as [f_signal, f_noise].
+
+        Args:
+            f (Float[Array, "..."]): Function values containing both signal and log noise variance.
+
+        Returns:
+            tfd.Normal: The likelihood function.
+        """
+        # Split the input into signal and log noise variance
+        n = f.shape[0] // 2
+        f_signal = f[:n]
+        f_noise = f[n:]
+
+        # Clip log noise variance to avoid numerical issues
+        f_noise_clipped = jnp.clip(f_noise, self.clip_min, self.clip_max)
+
+        # Compute noise standard deviation
+        noise_variance = jnp.exp(f_noise_clipped)
+        noise_stddev = jnp.sqrt(noise_variance)
+
+        return tfd.Normal(loc=f_signal, scale=noise_stddev)
+
+    def predict(
+        self,
+        signal_dist: tp.Union[tfd.MultivariateNormalTriL, GaussianDistribution],
+        noise_dist: tp.Union[tfd.MultivariateNormalTriL, GaussianDistribution],
+    ) -> tfd.Normal:
+        r"""Evaluate the heteroscedastic Gaussian likelihood.
+
+        Args:
+            signal_dist (tfd.Distribution): The signal GP posterior, evaluated at test points.
+            noise_dist (tfd.Distribution): The log noise variance GP posterior, evaluated at test points.
+
+        Returns:
+            tfd.Normal: The predictive distribution with heteroscedastic noise.
+        """
+        # Get the mean of the signal and noise GPs
+        signal_mean = signal_dist.mean()
+        noise_mean = noise_dist.mean()
+
+        # Clip log noise variance to avoid numerical issues
+        noise_mean_clipped = jnp.clip(noise_mean, self.clip_min, self.clip_max)
+
+        # Compute noise standard deviation
+        noise_variance = jnp.exp(noise_mean_clipped)
+        noise_stddev = jnp.sqrt(noise_variance)
+
+        # Return a Normal distribution with heteroscedastic noise
+        return tfd.Normal(loc=signal_mean, scale=noise_stddev)
+
+    def expected_log_likelihood(
+        self,
+        y: Float[Array, "N D"],
+        mean: Float[Array, "N D"],
+        variance: Float[Array, "N D"],
+    ) -> Float[Array, " N"]:
+        r"""Compute the expected log likelihood for heteroscedastic Gaussian.
+
+        For a variational distribution over both signal f and log noise variance g,
+        compute the expected log likelihood.
+
+        Args:
+            y (Float[Array, 'N D']): The observed response variable.
+            mean (Float[Array, 'N D']): The variational mean for both signal and noise.
+            variance (Float[Array, 'N D']): The variational variance for both signal and noise.
+
+        Returns:
+            ScalarFloat: The expected log likelihood.
+        """
+        # Use the parent class implementation with our custom link function
+        return super().expected_log_likelihood(y, mean, variance)
+
+
 def inv_probit(x: Float[Array, " *N"]) -> Float[Array, " *N"]:
     r"""Compute the inverse probit function.
 
@@ -272,5 +399,6 @@ __all__ = [
     "Gaussian",
     "Bernoulli",
     "Poisson",
+    "HeteroscedasticGaussian",
     "inv_probit",
 ]

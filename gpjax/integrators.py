@@ -12,6 +12,7 @@ L = tp.TypeVar(
     bound="gpjax.likelihoods.AbstractLikelihood",  # noqa: F821
 )
 GL = tp.TypeVar("GL", bound="gpjax.likelihoods.Gaussian")  # noqa: F821
+HGL = tp.TypeVar("HGL", bound="gpjax.likelihoods.HeteroscedasticGaussian")  # noqa: F821
 
 
 class AbstractIntegrator:
@@ -158,8 +159,77 @@ class AnalyticalGaussianIntegrator(AbstractIntegrator):
         return -0.5 * val
 
 
+class HeteroscedasticGaussianIntegrator(AbstractIntegrator):
+    r"""Compute the expected log likelihood for a heteroscedastic Gaussian likelihood.
+
+    This integrator approximates the expected log likelihood for a heteroscedastic Gaussian
+    likelihood where the noise variance is parameterized by a latent GP.
+
+    For a heteroscedastic Gaussian likelihood with signal f and log noise variance g:
+    p(y|f,g) = N(y|f, exp(g))
+
+    And variational distributions:
+    q(f) = N(f|m_f, s_f)
+    q(g) = N(g|m_g, s_g)
+
+    We approximate the expected log likelihood using a first-order Taylor expansion
+    of the exp(g) term around the mean of g.
+    """
+
+    def integrate(
+        self,
+        fun: tp.Callable,
+        y: Float[Array, "N D"],
+        mean: Float[Array, "N D"],
+        variance: Float[Array, "N D"],
+        likelihood: HGL,
+    ) -> Float[Array, " N"]:
+        r"""Compute the expected log likelihood for heteroscedastic Gaussian.
+
+        Args:
+            fun (Callable): The heteroscedastic Gaussian likelihood to be integrated.
+            y (Float[Array, 'N D']): The observed response variable.
+            mean (Float[Array, 'N D']): The variational mean for both signal and noise.
+            variance (Float[Array, 'N D']): The variational variance for both signal and noise.
+            likelihood (HeteroscedasticGaussian): The heteroscedastic Gaussian likelihood.
+
+        Returns:
+            Float[Array, 'N']: The expected log likelihood.
+        """
+        # Split the inputs for signal and noise
+        n = mean.shape[0] // 2
+
+        # Signal mean and variance
+        mean_f = mean[:n]
+        var_f = variance[:n]
+
+        # Log noise variance mean and variance
+        mean_g = mean[n:]
+        var_g = variance[n:]
+
+        # Clip log noise variance to avoid numerical issues
+        mean_g_clipped = jnp.clip(mean_g, likelihood.clip_min, likelihood.clip_max)
+
+        # Compute expected noise variance: E[exp(g)] ≈ exp(E[g]) * (1 + 0.5*Var[g])
+        # This is a second-order Taylor approximation of E[exp(g)]
+        expected_noise_var = jnp.exp(mean_g_clipped) * (1.0 + 0.5 * var_g)
+
+        # Compute expected log likelihood
+        log2pi = jnp.log(2.0 * jnp.pi)
+        sq_error = jnp.square(y - mean_f)
+
+        # E[log p(y|f,g)] ≈ -0.5 * (log(2π) + E[g] + (y-E[f])²/E[exp(g)] + Var[f]/E[exp(g)])
+        val = jnp.sum(
+            log2pi + mean_g_clipped + (sq_error + var_f) / expected_noise_var,
+            axis=1,
+        )
+
+        return -0.5 * val
+
+
 __all__ = [
     "AbstractIntegrator",
     "GHQuadratureIntegrator",
     "AnalyticalGaussianIntegrator",
+    "HeteroscedasticGaussianIntegrator",
 ]
