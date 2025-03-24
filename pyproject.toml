@@ -28,11 +28,16 @@ dependencies = [
   "tqdm>4.66.2",
   "tensorflow-probability>=0.24.0",
   "beartype>0.16.1",
-  "cola-ml==0.0.5",
+  # Patch cola version to ensure compatability with JAX>0.4.26
+  # See https://github.com/wilson-labs/cola/commit/4810da7a4ff4141c4082efa7cdb4eb29a6bd465b
+  "cola-ml @ git+https://github.com/wilson-labs/cola.git@4810da7a4ff4141c4082efa7cdb4eb29a6bd465b",
   "jaxopt==0.8.2",
   "flax<0.10.0",
   "numpy<2.0.0",
 ]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.envs.default]
 installer = "uv"
