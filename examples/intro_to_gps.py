@@ -214,7 +214,7 @@ titles = [r"$\rho = 0$", r"$\rho = 0.9$", r"$\rho = -0.5$"]
 
 cmap = mpl.colors.LinearSegmentedColormap.from_list("custom", ["white", cols[1]], N=256)
 
-for a, t, d in zip([ax0, ax1, ax2], titles, dists):
+for a, t, d in zip([ax0, ax1, ax2], titles, dists, strict=False):
     d_prob = d.prob(jnp.hstack([xx.reshape(-1, 1), yy.reshape(-1, 1)])).reshape(
         xx.shape
     )
