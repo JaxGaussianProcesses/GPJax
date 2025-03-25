@@ -19,6 +19,7 @@ import jax.random as jr
 from jaxtyping import (
     Array,
     Float,
+    TypeCheckError,
 )
 import pytest
 
@@ -64,7 +65,7 @@ def test_continuous_search_space_dtype_consistency(
 def test_continous_search_space_bounds_shape_consistency(
     lower_bounds: Float[Array, " D1"], upper_bounds: Float[Array, " D2"]
 ):
-    with pytest.raises((BeartypeCallHintParamViolation, ValueError)):
+    with pytest.raises((BeartypeCallHintParamViolation, TypeCheckError, ValueError)):
         ContinuousSearchSpace(lower_bounds=lower_bounds, upper_bounds=upper_bounds)
 
 

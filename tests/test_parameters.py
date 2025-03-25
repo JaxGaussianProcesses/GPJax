@@ -39,7 +39,7 @@ def test_transform(param, value):
 
     # Test inverse transformation
     it_params = transform(t_params, DEFAULT_BIJECTION, inverse=True)
-    assert it_params == params
+    assert repr(it_params) == repr(params)
 
 
 @pytest.mark.parametrize(

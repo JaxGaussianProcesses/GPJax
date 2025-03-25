@@ -92,7 +92,7 @@ x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 
 meanf = gpx.mean_functions.Zero()
 
-for k, ax, c in zip(kernels, axes.ravel(), cols):
+for k, ax, c in zip(kernels, axes.ravel(), cols, strict=False):
     prior = gpx.gps.Prior(mean_function=meanf, kernel=k)
     rv = prior(x)
     y = rv.sample(seed=key, sample_shape=(10,))

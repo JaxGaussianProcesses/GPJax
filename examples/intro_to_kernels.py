@@ -37,10 +37,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 from examples.utils import use_mpl_style
-from gpjax.parameters import (
-    PositiveReal,
-    Static,
-)
+from gpjax.parameters import Static
 from gpjax.typing import Array
 
 config.update("jax_enable_x64", True)
@@ -204,7 +201,7 @@ x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 
 meanf = gpx.mean_functions.Zero()
 
-for k, ax in zip(kernels, axes.ravel()):
+for k, ax in zip(kernels, axes.ravel(), strict=False):
     prior = gpx.gps.Prior(mean_function=meanf, kernel=k)
     rv = prior(x)
     y = rv.sample(seed=key, sample_shape=(10,))

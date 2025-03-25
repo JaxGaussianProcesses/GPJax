@@ -15,8 +15,9 @@
 
 try:
     from beartype.roar import BeartypeCallHintParamViolation
+    from jaxtyping import TypeCheckError
 
-    ValidationErrors = (TypeError, BeartypeCallHintParamViolation)
+    ValidationErrors = (TypeError, BeartypeCallHintParamViolation, TypeCheckError)
 except ImportError:
     ValidationErrors = TypeError
 
