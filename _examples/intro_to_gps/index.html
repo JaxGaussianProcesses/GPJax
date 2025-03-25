@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.9">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
       
       
 
@@ -2958,7 +2958,7 @@ We can plot three different parameterisations of this density.</p>
 </span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">xs</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">xs</span><span class="p">)),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
 </span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f903677d540&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f1d42b017b0&gt;
 </code></pre></div>
 <p><img alt="png" src="../intro_to_gps_files/intro_to_gps_1_1.png" /></p>
 <p>A Gaussian random variable is uniquely defined in distribution by its mean
@@ -3010,7 +3010,7 @@ determines the correlation of the multivariate Gaussian.</p>
 </span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>
 </span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="n">cmap</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="s2">&quot;custom&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">N</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
 </span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>
-</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">ax0</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">],</span> <span class="n">titles</span><span class="p">,</span> <span class="n">dists</span><span class="p">):</span>
+</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">ax0</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">],</span> <span class="n">titles</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>    <span class="n">d_prob</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">prob</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">xx</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">yy</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
 </span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>        <span class="n">xx</span><span class="o">.</span><span class="n">shape</span>
 </span><span id="__span-1-30"><a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a>    <span class="p">)</span>
@@ -3028,13 +3028,13 @@ determines the correlation of the multivariate Gaussian.</p>
 </span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a>    <span class="n">a</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">mew</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </span><span id="__span-1-43"><a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a>    <span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>/tmp/ipykernel_26315/3163806150.py:31: UserWarning: The following kwargs were not used by contour: &#39;edgecolor&#39;
+<div class="language-text highlight"><pre><span></span><code>/tmp/ipykernel_26307/1173410688.py:31: UserWarning: The following kwargs were not used by contour: &#39;edgecolor&#39;
   cntf = a.contourf(xx, yy, jnp.exp(d_prob), levels=20, antialiased=True, cmap=cmap, edgecolor=&quot;face&quot;)
 
 
-/tmp/ipykernel_26315/3163806150.py:31: UserWarning: The following kwargs were not used by contour: &#39;edgecolor&#39;
+/tmp/ipykernel_26307/1173410688.py:31: UserWarning: The following kwargs were not used by contour: &#39;edgecolor&#39;
   cntf = a.contourf(xx, yy, jnp.exp(d_prob), levels=20, antialiased=True, cmap=cmap, edgecolor=&quot;face&quot;)
-/tmp/ipykernel_26315/3163806150.py:31: UserWarning: The following kwargs were not used by contour: &#39;edgecolor&#39;
+/tmp/ipykernel_26307/1173410688.py:31: UserWarning: The following kwargs were not used by contour: &#39;edgecolor&#39;
   cntf = a.contourf(xx, yy, jnp.exp(d_prob), levels=20, antialiased=True, cmap=cmap, edgecolor=&quot;face&quot;)
 </code></pre></div>
 <p><img alt="png" src="../intro_to_gps_files/intro_to_gps_3_2.png" /></p>
@@ -3333,17 +3333,17 @@ GPs that served as the inspiration for this notebook.</p>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Thomas Pinder
 
-Last updated: Wed Mar 05 2025
+Last updated: Tue Mar 25 2025
 
 Python implementation: CPython
 Python version       : 3.10.16
-IPython version      : 8.33.0
+IPython version      : 8.34.0
 
-tensorflow_probability: 0.25.0
 matplotlib            : 3.10.1
+tensorflow_probability: 0.25.0
 pandas                : 2.2.3
-seaborn               : 0.13.2
 jax                   : 0.4.27
+seaborn               : 0.13.2
 
 Watermark: 2.5.0
 </code></pre></div>

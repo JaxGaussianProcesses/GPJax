@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.9">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
       
       
 
@@ -2916,14 +2916,14 @@ We store our data <span class="arithmatex">\(\mathcal{D}\)</span> as a GPJax <co
 </span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xtest</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">xtest</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Rate $\lambda$&quot;</span><span class="p">)</span>
 </span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>/home/runner/.local/share/hatch/env/virtual/gpjax/9bz-h8Il/docs/lib/python3.10/site-packages/jaxtyping/_decorator.py:486: UserWarning: y is not of type float64.Got y.dtype=int64. This may lead to numerical instability.
+<div class="language-text highlight"><pre><span></span><code>/home/runner/.local/share/hatch/env/virtual/gpjax/9bz-h8Il/docs/lib/python3.10/site-packages/jaxtyping/_decorator.py:456: UserWarning: y is not of type float64.Got y.dtype=int64. This may lead to numerical instability.
   out = fn(*args, **kwargs)
 
 
 
 
 
-&lt;matplotlib.legend.Legend at 0x7f3888c1c9d0&gt;
+&lt;matplotlib.legend.Legend at 0x7ff4dd1dbd90&gt;
 </code></pre></div>
 <p><img alt="png" src="../poisson_files/poisson_3_2.png" /></p>
 <h2 id="gaussian-process-definition">Gaussian Process definition<a class="headerlink" href="#gaussian-process-definition" title="Permanent link"></a></h2>
@@ -3065,7 +3065,7 @@ against the observed data.</p>
 </span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;95% CI&quot;</span><span class="p">,</span>
 </span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.collections.FillBetweenPolyCollection at 0x7f3888291330&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.collections.FillBetweenPolyCollection at 0x7ff4d42de470&gt;
 </code></pre></div>
 <p><img alt="png" src="../poisson_files/poisson_17_1.png" /></p>
 <h2 id="system-configuration">System configuration<a class="headerlink" href="#system-configuration" title="Permanent link"></a></h2>
@@ -3074,19 +3074,19 @@ against the observed data.</p>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Francesco Zanetta
 
-Last updated: Wed Mar 05 2025
+Last updated: Tue Mar 25 2025
 
 Python implementation: CPython
 Python version       : 3.10.16
-IPython version      : 8.33.0
+IPython version      : 8.34.0
 
-flax                  : 0.9.0
+jax                   : 0.4.27
+gpjax                 : 0.9.4
 matplotlib            : 3.10.1
 tensorflow_probability: 0.25.0
-gpjax                 : 0.9.4
-jaxtyping             : 0.2.38
+jaxtyping             : 0.3.0
 blackjax              : 1.2.5
-jax                   : 0.4.27
+flax                  : 0.9.0
 
 Watermark: 2.5.0
 </code></pre></div>

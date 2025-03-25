@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.9">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
       
       
 
@@ -2962,24 +2962,21 @@
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardScaler</span>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="kn">from</span><span class="w"> </span><span class="nn">examples.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_mpl_style</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="kn">from</span><span class="w"> </span><span class="nn">gpjax.parameters</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">PositiveReal</span><span class="p">,</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">Static</span><span class="p">,</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="p">)</span>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="kn">from</span><span class="w"> </span><span class="nn">gpjax.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Array</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="kn">from</span><span class="w"> </span><span class="nn">gpjax.parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">Static</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="kn">from</span><span class="w"> </span><span class="nn">gpjax.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Array</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>
 </span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="k">with</span> <span class="n">install_import_hook</span><span class="p">(</span><span class="s2">&quot;gpjax&quot;</span><span class="p">,</span> <span class="s2">&quot;beartype.beartype&quot;</span><span class="p">):</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">gpjax</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpx</span>
 </span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="k">with</span> <span class="n">install_import_hook</span><span class="p">(</span><span class="s2">&quot;gpjax&quot;</span><span class="p">,</span> <span class="s2">&quot;beartype.beartype&quot;</span><span class="p">):</span>
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">gpjax</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpx</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 </span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>
-</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>
-</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>
-</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="c1"># set the default style for plotting</span>
-</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="n">use_mpl_style</span><span class="p">()</span>
-</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="n">cols</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;axes.prop_cycle&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="c1"># set the default style for plotting</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="n">use_mpl_style</span><span class="p">()</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="n">cols</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;axes.prop_cycle&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span>
 </span></code></pre></div>
 <p>Using Gaussian Processes (GPs) to model functions can offer several advantages over
 alternative methods, such as deep neural networks. One key advantage is their rich
@@ -3096,7 +3093,7 @@ can be expressed as the product of a polynomial of order <span class="arithmatex
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">meanf</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">mean_functions</span><span class="o">.</span><span class="n">Zero</span><span class="p">()</span>
 </span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">kernels</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">ravel</span><span class="p">()):</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">kernels</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">gps</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">mean_function</span><span class="o">=</span><span class="n">meanf</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
 </span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="n">rv</span> <span class="o">=</span> <span class="n">prior</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    <span class="n">y</span> <span class="o">=</span> <span class="n">rv</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,))</span>
@@ -3208,7 +3205,7 @@ posterior with the default hyperparameters:</p>
 </span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Posterior without Hyperparameter Optimisation&quot;</span><span class="p">)</span>
 </span><span id="__span-7-25"><a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7ff6c6a2bd30&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f4c13953e80&gt;
 </code></pre></div>
 <p><img alt="png" src="../intro_to_kernels_files/intro_to_kernels_20_1.png" /></p>
 <p>We can see that optimising the hyperparameters by minimising the negative log marginal likelihood of the data results in a more faithful fit of the GP to the data. In particular, we can observe that the GP using optimised hyperparameters is more accurately able to reflect uncertainty in its predictions, as opposed to the GP using the default parameters, which is overconfident in its predictions.</p>
@@ -3443,7 +3440,7 @@ training data, as well as 8 years before and after the training data:</p>
 </span><span id="__span-18-28"><a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Year&quot;</span><span class="p">)</span>
 </span><span id="__span-18-29"><a id="__codelineno-18-29" name="__codelineno-18-29" href="#__codelineno-18-29"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7ff6c53ee110&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f4c0ad0a3b0&gt;
 </code></pre></div>
 <p><img alt="png" src="../intro_to_kernels_files/intro_to_kernels_47_1.png" /></p>
 <p>We can see that the model seems to have captured the periodic trend in the data, as well
@@ -3490,7 +3487,7 @@ period from 2010 onwards:</p>
 </span><span id="__span-19-38"><a id="__codelineno-19-38" name="__codelineno-19-38" href="#__codelineno-19-38"></a><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Year&quot;</span><span class="p">)</span>
 </span><span id="__span-19-39"><a id="__codelineno-19-39" name="__codelineno-19-39" href="#__codelineno-19-39"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7ff6bedb2f50&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f4c0ad8d060&gt;
 </code></pre></div>
 <p><img alt="png" src="../intro_to_kernels_files/intro_to_kernels_49_1.png" /></p>
 <p>This certainly looks like a reasonable fit to the data, with sensible extrapolation
@@ -3503,7 +3500,7 @@ parameters of the kernel are interpretable. Let's take a look at the learned per
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Periodic Kernel Period: PositiveReal(
   _tag=&#39;positive&#39;,
-  value=Array(0.99949579, dtype=float64)
+  value=Array(0.99997933, dtype=float64)
 )
 </code></pre></div>
 <p>This tells us that the periodic trend learned has a period of <span class="arithmatex">\(\approx 1\)</span>. This makes
@@ -3524,19 +3521,19 @@ periodic trend tends to repeat itself roughly every year!</p>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Thomas Christie
 
-Last updated: Wed Mar 05 2025
+Last updated: Tue Mar 25 2025
 
 Python implementation: CPython
 Python version       : 3.10.16
-IPython version      : 8.33.0
+IPython version      : 8.34.0
 
-jaxtyping : 0.2.38
-optax     : 0.2.4
 jax       : 0.4.27
+sklearn   : 1.6.1
+jaxtyping : 0.3.0
 matplotlib: 3.10.1
 gpjax     : 0.9.4
-sklearn   : 1.6.1
 pandas    : 2.2.3
+optax     : 0.2.4
 
 Watermark: 2.5.0
 </code></pre></div>
