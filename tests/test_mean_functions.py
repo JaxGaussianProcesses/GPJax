@@ -5,12 +5,15 @@ config.update("jax_enable_x64", True)
 
 
 import jax.numpy as jnp
+import jax.random as jr 
+import optax as ox 
 from jaxtyping import (
     Array,
     Float,
 )
 import pytest
 
+import gpjax as gpx 
 from gpjax.mean_functions import (
     AbstractMeanFunction,
     Constant,
