@@ -49,7 +49,6 @@ def test_constant(constant: Float[Array, " Q"]) -> None:
     ).all()
 
 
-TODO: rewrite this test after work on fit
 def test_zero_mean_remains_zero() -> None:
     key = jr.PRNGKey(123)
 
