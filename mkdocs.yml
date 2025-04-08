@@ -27,7 +27,6 @@ nav:
     - Sparse GPs: _examples/collapsed_vi.md
     - Stochastic sparse GPs: _examples/uncollapsed_vi.md
     - Bayesian Optimisation: _examples/bayesian_optimisation.md
-    - Decision Making: _examples/decision_making.md
     - Multi-output GPs for Ocean Modelling: _examples/oceanmodelling.md
   - 📖 Guides for customisation:
     - Kernels: _examples/constructing_new_kernels.md

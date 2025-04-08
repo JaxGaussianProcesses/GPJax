@@ -19,7 +19,6 @@ from beartype.roar import BeartypeDecorHintPep585DeprecationWarning
 filterwarnings("ignore", category=BeartypeDecorHintPep585DeprecationWarning)
 
 from gpjax import (
-    decision_making,
     gps,
     integrators,
     kernels,
@@ -44,7 +43,6 @@ __version__ = "0.9.4"
 
 __all__ = [
     "base",
-    "decision_making",
     "gps",
     "integrators",
     "kernels",
