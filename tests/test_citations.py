@@ -7,7 +7,6 @@ import pytest
 
 from gpjax.citation import (
     AbstractCitation,
-    BookCitation,
     NullCitation,
     PaperCitation,
     PhDThesisCitation,
