@@ -112,7 +112,7 @@ def test_dataset_incorrect_lengths(nx: int, ny: int, in_dim: int) -> None:
     y = jnp.ones((ny, 1))
 
     # Ensure error is raised upon dataset creation
-    with pytest.raises(ValidationErrors):
+    with pytest.raises(ValueError):
         Dataset(X=x, y=y)
 
 
@@ -124,7 +124,7 @@ def test_2d_inputs(n: int, in_dim: int) -> None:
     y = jnp.ones((n,))
 
     # Ensure error is raised upon dataset creation
-    with pytest.raises(ValidationErrors):
+    with pytest.raises(ValueError):
         Dataset(X=x, y=y)
 
     # Create dataset where input dimension is incorrectly not 2D
@@ -132,7 +132,7 @@ def test_2d_inputs(n: int, in_dim: int) -> None:
     y = jnp.ones((n, 1))
 
     # Ensure error is raised upon dataset creation
-    with pytest.raises(ValidationErrors):
+    with pytest.raises(ValueError):
         Dataset(X=x, y=y)
 
 
