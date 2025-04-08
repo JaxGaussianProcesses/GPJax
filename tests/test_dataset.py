@@ -16,9 +16,10 @@
 from dataclasses import is_dataclass
 
 try:
-    import beartype
+    from beartype.roar import BeartypeCallHintParamViolation
+    from jaxtyping import TypeCheckError
 
-    ValidationErrors = (ValueError, beartype.roar.BeartypeCallHintParamViolation)
+    ValidationErrors = (TypeError, BeartypeCallHintParamViolation, TypeCheckError)
 except ImportError:
     ValidationErrors = ValueError
 
