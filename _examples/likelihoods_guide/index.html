@@ -2645,7 +2645,7 @@ a likelihood object. To do this, we'll need a dataset.</p>
 </span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Latent function&quot;</span><span class="p">)</span>
 </span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7faac2b2b580&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f77dc9c55d0&gt;
 </code></pre></div>
 <p><img alt="png" src="../likelihoods_guide_files/likelihoods_guide_1_1.png" /></p>
 <p>In this example, our observations have support <span class="arithmatex">\([-3, 3]\)</span> and are generated from a
@@ -2658,13 +2658,13 @@ instantiating a likelihood object. We do this by specifying the <code>num_datapo
 argument.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">gpx</span><span class="o">.</span><span class="n">likelihoods</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">num_datapoints</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>Gaussian(
-  obs_stddev=PositiveReal(
+<div class="language-text highlight"><pre><span></span><code>Gaussian( # PositiveReal: 1 (8 B)
+  obs_stddev=PositiveReal( # 1 (8 B)
     value=Array(1., dtype=float64, weak_type=True),
-    _tag=&#39;positive&#39;
+    _tag=&quot;&#39;positive&#39;&quot;
   ),
   num_datapoints=50,
-  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7faac2e91570&gt;
+  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f77dd302e30&gt;
 )
 </code></pre></div>
 <h3 id="likelihood-parameters">Likelihood parameters<a class="headerlink" href="#likelihood-parameters" title="Permanent link"></a></h3>
@@ -2678,13 +2678,13 @@ initialise the likelihood standard deviation with a value of <span class="arithm
 this as follows:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">gpx</span><span class="o">.</span><span class="n">likelihoods</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">num_datapoints</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">obs_stddev</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>Gaussian(
-  obs_stddev=PositiveReal(
+<div class="language-text highlight"><pre><span></span><code>Gaussian( # PositiveReal: 1 (8 B)
+  obs_stddev=PositiveReal( # 1 (8 B)
     value=Array(0.5, dtype=float64, weak_type=True),
-    _tag=&#39;positive&#39;
+    _tag=&quot;&#39;positive&#39;&quot;
   ),
   num_datapoints=50,
-  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7faac2e91570&gt;
+  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f77dd302e30&gt;
 )
 </code></pre></div>
 <h3 id="prediction">Prediction<a class="headerlink" href="#prediction" title="Permanent link"></a></h3>
@@ -2809,7 +2809,7 @@ the expected log-likelihood using the <code>expected_log_likelihood</code> metho
 likelihood object.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">likelihood</span><span class="o">.</span><span class="n">expected_log_likelihood</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="n">mean</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="n">variance</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>Array(-47.85484598, dtype=float64)
+<div class="language-text highlight"><pre><span></span><code>Array(-47.69541299, dtype=float64)
 </code></pre></div>
 <p>However, had we wanted to do this using quadrature, then we would have done the
 following:</p>
@@ -2834,9 +2834,9 @@ Python version       : 3.10.16
 IPython version      : 8.35.0
 
 matplotlib            : 3.10.1
-gpjax                 : 0.9.5
+jax                   : 0.5.3
+gpjax                 : 0.10.0
 tensorflow_probability: 0.25.0
-jax                   : 0.4.27
 
 Watermark: 2.5.0
 </code></pre></div>

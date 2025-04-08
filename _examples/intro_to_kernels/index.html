@@ -2808,7 +2808,7 @@ optimise kernel hyperparameters, see our <a href="https://docs.jaxgaussianproces
 <p>We can then optimise the hyperparameters by minimising the negative log marginal likelihood of the data:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">gpx</span><span class="o">.</span><span class="n">objectives</span><span class="o">.</span><span class="n">conjugate_mll</span><span class="p">(</span><span class="n">no_opt_posterior</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">D</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>Array(-132.18608226, dtype=float64)
+<div class="language-text highlight"><pre><span></span><code>Array(-19.18644709, dtype=float64)
 </code></pre></div>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">opt_posterior</span><span class="p">,</span> <span class="n">history</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">fit_scipy</span><span class="p">(</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">model</span><span class="o">=</span><span class="n">no_opt_posterior</span><span class="p">,</span>
@@ -2817,10 +2817,10 @@ optimise kernel hyperparameters, see our <a href="https://docs.jaxgaussianproces
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">)</span>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Optimization terminated successfully.
-         Current function value: 20.701877
-         Iterations: 40
-         Function evaluations: 42
-         Gradient evaluations: 42
+         Current function value: 2.543220
+         Iterations: 24
+         Function evaluations: 27
+         Gradient evaluations: 27
 </code></pre></div>
 <p>Having optimised the hyperparameters, we can now make predictions using the posterior
 with the optimised hyperparameters, and compare them to the predictions made using the
@@ -2866,7 +2866,7 @@ posterior with the default hyperparameters:</p>
 </span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Posterior without Hyperparameter Optimisation&quot;</span><span class="p">)</span>
 </span><span id="__span-7-25"><a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f3a50813c70&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7ff69c3d8100&gt;
 </code></pre></div>
 <p><img alt="png" src="../intro_to_kernels_files/intro_to_kernels_20_1.png" /></p>
 <p>We can see that optimising the hyperparameters by minimising the negative log marginal likelihood of the data results in a more faithful fit of the GP to the data. In particular, we can observe that the GP using optimised hyperparameters is more accurately able to reflect uncertainty in its predictions, as opposed to the GP using the default parameters, which is overconfident in its predictions.</p>
@@ -2881,20 +2881,20 @@ posterior with the default hyperparameters:</p>
 </span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    <span class="sa">f</span><span class="s2">&quot;Non-Optimised Lengthscale: </span><span class="si">{</span><span class="n">no_opt_lengthscale</span><span class="si">}</span><span class="s2"> and Variance: </span><span class="si">{</span><span class="n">no_opt_variance</span><span class="si">}</span><span class="s2">&quot;</span>
 </span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>Optimised Lengthscale: PositiveReal(
-  _tag=&#39;positive&#39;,
-  value=Array(0.39522429, dtype=float64)
-) and Variance: PositiveReal(
-  _tag=&#39;positive&#39;,
-  value=Array(250.80778094, dtype=float64)
-)
-Non-Optimised Lengthscale: PositiveReal(
-  value=Array(0.1, dtype=float64, weak_type=True),
-  _tag=&#39;positive&#39;
-) and Variance: PositiveReal(
-  value=Array(1., dtype=float64, weak_type=True),
-  _tag=&#39;positive&#39;
-)
+<div class="language-text highlight"><pre><span></span><code>Optimised Lengthscale: [38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+  [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0.27256299, dtype=float64),
+  [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+[38;2;255;213;3m)[0m and Variance: [38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+  [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(25.19180119, dtype=float64),
+  [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+[38;2;255;213;3m)[0m
+Non-Optimised Lengthscale: [38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+  [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0.1, dtype=float64, weak_type=True),
+  [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+[38;2;255;213;3m)[0m and Variance: [38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+  [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+  [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+[38;2;255;213;3m)[0m
 </code></pre></div>
 <h2 id="expressing-other-priors-with-different-kernels">Expressing Other Priors with Different Kernels<a class="headerlink" href="#expressing-other-priors-with-different-kernels" title="Permanent link"></a></h2>
 <p>Whilst the Matérn kernels are often used as a first choice of kernel, and they often perform well due to their smoothing properties often being well-aligned with the properties of the underlying function being modelled, sometimes more prior knowledge is known about the function being modelled. For instance, it may be known that the function being modelled is <em>periodic</em>. In this case, a suitable kernel choice would be the <em>periodic</em> kernel:</p>
@@ -3101,7 +3101,7 @@ training data, as well as 8 years before and after the training data:</p>
 </span><span id="__span-18-28"><a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Year&quot;</span><span class="p">)</span>
 </span><span id="__span-18-29"><a id="__codelineno-18-29" name="__codelineno-18-29" href="#__codelineno-18-29"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f3a502d63b0&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7ff694de51e0&gt;
 </code></pre></div>
 <p><img alt="png" src="../intro_to_kernels_files/intro_to_kernels_47_1.png" /></p>
 <p>We can see that the model seems to have captured the periodic trend in the data, as well
@@ -3148,7 +3148,7 @@ period from 2010 onwards:</p>
 </span><span id="__span-19-38"><a id="__codelineno-19-38" name="__codelineno-19-38" href="#__codelineno-19-38"></a><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Year&quot;</span><span class="p">)</span>
 </span><span id="__span-19-39"><a id="__codelineno-19-39" name="__codelineno-19-39" href="#__codelineno-19-39"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f3a4beb75e0&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7ff694c4ac50&gt;
 </code></pre></div>
 <p><img alt="png" src="../intro_to_kernels_files/intro_to_kernels_49_1.png" /></p>
 <p>This certainly looks like a reasonable fit to the data, with sensible extrapolation
@@ -3159,10 +3159,10 @@ parameters of the kernel are interpretable. Let's take a look at the learned per
 </span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">opt_posterior</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">kernel</span><span class="o">.</span><span class="n">kernels</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">Periodic</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">period</span><span class="si">}</span><span class="s2">&quot;</span>
 </span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>Periodic Kernel Period: PositiveReal(
-  _tag=&#39;positive&#39;,
-  value=Array(0.99997933, dtype=float64)
-)
+<div class="language-text highlight"><pre><span></span><code>Periodic Kernel Period: [38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+  [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0.99998098, dtype=float64),
+  [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+[38;2;255;213;3m)[0m
 </code></pre></div>
 <p>This tells us that the periodic trend learned has a period of <span class="arithmatex">\(\approx 1\)</span>. This makes
 intuitive sense, as the unit of the input data is years, and we can see that the
@@ -3188,13 +3188,13 @@ Python implementation: CPython
 Python version       : 3.10.16
 IPython version      : 8.35.0
 
-sklearn   : 1.6.1
-jax       : 0.4.27
-pandas    : 2.2.3
-optax     : 0.2.4
-gpjax     : 0.9.5
 jaxtyping : 0.3.1
+gpjax     : 0.10.0
+jax       : 0.5.3
 matplotlib: 3.10.1
+pandas    : 2.2.3
+sklearn   : 1.6.1
+optax     : 0.2.4
 
 Watermark: 2.5.0
 </code></pre></div>

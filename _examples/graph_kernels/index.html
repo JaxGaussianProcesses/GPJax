@@ -2654,10 +2654,10 @@ booktitle = {International Conference on Artificial Intelligence and Statistics}
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">train_data</span><span class="o">=</span><span class="n">D</span><span class="p">,</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>         Current function value: -118.270426
-         Iterations: 42
-         Function evaluations: 66
-         Gradient evaluations: 55
+<div class="language-text highlight"><pre><span></span><code>         Current function value: -114.067635
+         Iterations: 114
+         Function evaluations: 161
+         Gradient evaluations: 150
 
 
 /home/runner/.local/share/hatch/env/virtual/gpjax/9bz-h8Il/docs/lib/python3.10/site-packages/scipy/optimize/_minimize.py:733: OptimizeWarning: Desired error not necessarily achieved due to precision loss.
@@ -2683,8 +2683,8 @@ the predictive posterior for the full graph to compare the root-mean-squared err
 </span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">learned_rmse</span><span class="si">:</span><span class="s2"> .2f</span><span class="si">}</span><span class="s2">&quot;</span>
 </span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>RMSE with initial parameters:  8.42
-RMSE with learned parameters:  0.29
+<div class="language-text highlight"><pre><span></span><code>RMSE with initial parameters:  7.53
+RMSE with learned parameters:  0.20
 </code></pre></div>
 <p>We can also plot the source of error in our model's predictions on the graph by the
 following.</p>
@@ -2718,11 +2718,11 @@ Python implementation: CPython
 Python version       : 3.10.16
 IPython version      : 8.35.0
 
-jaxtyping : 0.3.1
-networkx  : 3.4.2
-jax       : 0.4.27
-gpjax     : 0.9.5
+jax       : 0.5.3
 matplotlib: 3.10.1
+jaxtyping : 0.3.1
+gpjax     : 0.10.0
+networkx  : 3.4.2
 
 Watermark: 2.5.0
 </code></pre></div>

@@ -2641,10 +2641,10 @@ like our RBF kernel to act on the first, second and fourth dimensions.</p>
 <p>The resulting kernel has one length-scale parameter per input dimension --- an ARD kernel.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Lengthscales: </span><span class="si">{</span><span class="n">slice_kernel</span><span class="o">.</span><span class="n">lengthscale</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>Lengthscales: PositiveReal(
-  value=Array([1., 1., 1.], dtype=float64),
-  _tag=&#39;positive&#39;
-)
+<div class="language-text highlight"><pre><span></span><code>Lengthscales: [38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 3 (24 B)[0m
+  [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray([1., 1., 1.], dtype=float64),
+  [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+[38;2;255;213;3m)[0m
 </code></pre></div>
 <p>We'll now simulate some data and evaluate the kernel on the previously selected
 input dimensions.</p>
@@ -2675,7 +2675,7 @@ a sum kernel is provided by the <code>SumKernel</code> class.</p>
 </span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
 </span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.colorbar.Colorbar at 0x7f22189dfe20&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.colorbar.Colorbar at 0x7fb83ab5d630&gt;
 </code></pre></div>
 <p><img alt="png" src="../constructing_new_kernels_files/constructing_new_kernels_11_1.png" /></p>
 <p>Similarly, products of kernels can be created through the <code>ProductKernel</code> class.</p>
@@ -2694,7 +2694,7 @@ a sum kernel is provided by the <code>SumKernel</code> class.</p>
 </span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
 </span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im3</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.colorbar.Colorbar at 0x7f2218696080&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.colorbar.Colorbar at 0x7fb840bf4d60&gt;
 </code></pre></div>
 <p><img alt="png" src="../constructing_new_kernels_files/constructing_new_kernels_13_1.png" /></p>
 <h2 id="custom-kernel">Custom kernel<a class="headerlink" href="#custom-kernel" title="Permanent link"></a></h2>
@@ -2803,10 +2803,10 @@ for further details on this process).</p>
 </span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="p">)</span>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Optimization terminated successfully.
-         Current function value: 3.959057
-         Iterations: 19
-         Function evaluations: 23
-         Gradient evaluations: 23
+         Current function value: 7.841574
+         Iterations: 11
+         Function evaluations: 15
+         Gradient evaluations: 15
 </code></pre></div>
 <h3 id="prediction">Prediction<a class="headerlink" href="#prediction" title="Permanent link"></a></h3>
 <p>We'll now query the GP's predictive posterior at linearly spaced novel inputs
@@ -2841,7 +2841,7 @@ and illustrate the results.</p>
 </span><span id="__span-10-24"><a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">D</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Observations&quot;</span><span class="p">)</span>
 </span><span id="__span-10-25"><a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f2212df4be0&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7fb8339d9900&gt;
 </code></pre></div>
 <p><img alt="png" src="../constructing_new_kernels_files/constructing_new_kernels_21_1.png" /></p>
 <h2 id="system-configuration">System configuration<a class="headerlink" href="#system-configuration" title="Permanent link"></a></h2>
@@ -2857,10 +2857,10 @@ Python version       : 3.10.16
 IPython version      : 8.35.0
 
 matplotlib            : 3.10.1
+jax                   : 0.5.3
+gpjax                 : 0.10.0
 jaxtyping             : 0.3.1
-jax                   : 0.4.27
 tensorflow_probability: 0.25.0
-gpjax                 : 0.9.5
 
 Watermark: 2.5.0
 </code></pre></div>

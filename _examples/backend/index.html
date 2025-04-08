@@ -2591,12 +2591,12 @@ parameter as follows:</p>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">meanf</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">constant_param</span><span class="p">)</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nb">print</span><span class="p">(</span><span class="n">meanf</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>Constant(
-  constant=Parameter(
-    value=Array(1., dtype=float64, weak_type=True),
-    _tag=None
-  )
-)
+<div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mConstant[0m[38;2;255;213;3m([0m[38;2;105;105;105m # Parameter: 1 (8 B)[0m
+  [38;2;156;220;254mconstant[0m[38;2;212;212;212m=[0m[38;2;79;201;177mParameter[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+    [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+    [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;None&#39;[0m
+  [38;2;255;213;3m)[0m
+[38;2;255;213;3m)[0m
 </code></pre></div>
 <p>However, suppose you wish your mean function's constant parameter to be strictly
 positive. This is easy to achieve by using the correct Parameter type which, in this
@@ -2611,12 +2611,12 @@ case, will be the <code>PositiveReal</code>. However, any Parameter that subclas
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">meanf</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">constant_param</span><span class="p">)</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nb">print</span><span class="p">(</span><span class="n">meanf</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>Constant(
-  constant=PositiveReal(
-    value=Array(1., dtype=float64, weak_type=True),
-    _tag=&#39;positive&#39;
-  )
-)
+<div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mConstant[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 1 (8 B)[0m
+  [38;2;156;220;254mconstant[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+    [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+    [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+  [38;2;255;213;3m)[0m
+[38;2;255;213;3m)[0m
 </code></pre></div>
 <p>Were we to try and instantiate the <code>PositiveReal</code> class with a negative value, then an
 explicit error would be raised.</p>
@@ -2664,7 +2664,7 @@ would be more pronounced.</p>
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">transform</span><span class="p">(</span><span class="n">_close_to_zero_state</span><span class="p">,</span> <span class="n">DEFAULT_BIJECTION</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>State({
-  &#39;constant&#39;: VariableState(
+  &#39;constant&#39;: VariableState( # 1 (8 B)
     type=PositiveReal,
     value=Array(-13.81551006, dtype=float64),
     _tag=&#39;positive&#39;
@@ -2687,39 +2687,39 @@ explanation of this model.).</p>
 </span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">posterior</span> <span class="o">=</span> <span class="n">likelihood</span> <span class="o">*</span> <span class="n">prior</span>
 </span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="nb">print</span><span class="p">(</span><span class="n">posterior</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>ConjugatePosterior(
-  prior=Prior(
-    kernel=Matern32(
-      active_dims=slice(None, None, None),
-      n_dims=None,
-      compute_engine=&lt;gpjax.kernels.computations.dense.DenseKernelComputation object at 0x7f7f0e504a60&gt;,
-      lengthscale=PositiveReal(
-        value=Array(1., dtype=float64, weak_type=True),
-        _tag=&#39;positive&#39;
-      ),
-      variance=PositiveReal(
-        value=Array(1., dtype=float64, weak_type=True),
-        _tag=&#39;positive&#39;
-      )
-    ),
-    mean_function=Constant(
-      constant=Real(
-        value=Array(0., dtype=float64, weak_type=True),
-        _tag=&#39;real&#39;
-      )
-    ),
-    jitter=1e-06
-  ),
-  likelihood=Gaussian(
-    obs_stddev=PositiveReal(
-      value=Array(1., dtype=float64, weak_type=True),
-      _tag=&#39;positive&#39;
-    ),
-    num_datapoints=100,
-    integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f7f0e148640&gt;
-  ),
-  jitter=1e-06
-)
+<div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mConjugatePosterior[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 3 (24 B), Real: 1 (8 B), Total: 4 (32 B)[0m
+  [38;2;156;220;254mprior[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPrior[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 2 (16 B), Real: 1 (8 B), Total: 3 (24 B)[0m
+    [38;2;156;220;254mkernel[0m[38;2;212;212;212m=[0m[38;2;79;201;177mMatern32[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 2 (16 B)[0m
+      [38;2;156;220;254mactive_dims[0m[38;2;212;212;212m=[0mslice(None, None, None),
+      [38;2;156;220;254mn_dims[0m[38;2;212;212;212m=[0m[38;2;86;156;214mNone[0m,
+      [38;2;156;220;254mcompute_engine[0m[38;2;212;212;212m=[0m&lt;gpjax.kernels.computations.dense.DenseKernelComputation object at 0x7effa21165c0&gt;,
+      [38;2;156;220;254mlengthscale[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+      [38;2;255;213;3m)[0m,
+      [38;2;156;220;254mvariance[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+      [38;2;255;213;3m)[0m
+    [38;2;255;213;3m)[0m,
+    [38;2;156;220;254mmean_function[0m[38;2;212;212;212m=[0m[38;2;79;201;177mConstant[0m[38;2;255;213;3m([0m[38;2;105;105;105m # Real: 1 (8 B)[0m
+      [38;2;156;220;254mconstant[0m[38;2;212;212;212m=[0m[38;2;79;201;177mReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;real&#39;&quot;[0m
+      [38;2;255;213;3m)[0m
+    [38;2;255;213;3m)[0m,
+    [38;2;156;220;254mjitter[0m[38;2;212;212;212m=[0m[38;2;182;207;169m1e-06[0m
+  [38;2;255;213;3m)[0m,
+  [38;2;156;220;254mlikelihood[0m[38;2;212;212;212m=[0m[38;2;79;201;177mGaussian[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 1 (8 B)[0m
+    [38;2;156;220;254mobs_stddev[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+      [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+    [38;2;255;213;3m)[0m,
+    [38;2;156;220;254mnum_datapoints[0m[38;2;212;212;212m=[0m[38;2;182;207;169m100[0m,
+    [38;2;156;220;254mintegrator[0m[38;2;212;212;212m=[0m&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7effa21b1db0&gt;
+  [38;2;255;213;3m)[0m,
+  [38;2;156;220;254mjitter[0m[38;2;212;212;212m=[0m[38;2;182;207;169m1e-06[0m
+[38;2;255;213;3m)[0m
 </code></pre></div>
 <p>Now contained within the posterior PyGraph here there are four parameters: the
 kernel's lengthscale and variance, the noise variance of the likelihood, and the
@@ -2731,36 +2731,36 @@ from a give <code>State</code>.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">graphdef</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">posterior</span><span class="p">)</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>State({
-  &#39;likelihood&#39;: {
-    &#39;obs_stddev&#39;: VariableState(
-      type=PositiveReal,
-      value=Array(1., dtype=float64, weak_type=True),
-      _tag=&#39;positive&#39;
-    )
-  },
-  &#39;prior&#39;: {
-    &#39;kernel&#39;: {
-      &#39;lengthscale&#39;: VariableState(
-        type=PositiveReal,
-        value=Array(1., dtype=float64, weak_type=True),
-        _tag=&#39;positive&#39;
-      ),
-      &#39;variance&#39;: VariableState(
-        type=PositiveReal,
-        value=Array(1., dtype=float64, weak_type=True),
-        _tag=&#39;positive&#39;
-      )
-    },
-    &#39;mean_function&#39;: {
-      &#39;constant&#39;: VariableState(
-        type=Real,
-        value=Array(0., dtype=float64, weak_type=True),
-        _tag=&#39;real&#39;
-      )
-    }
-  }
-})
+<div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mState[0m[38;2;255;213;3m({[0m[38;2;105;105;105m[0m
+  [38;2;156;220;254m&#39;likelihood&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+    [38;2;156;220;254m&#39;obs_stddev&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+      [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+      [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+    [38;2;255;213;3m)[0m
+  [38;2;255;213;3m}[0m,
+  [38;2;156;220;254m&#39;prior&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+    [38;2;156;220;254m&#39;kernel&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+      [38;2;156;220;254m&#39;lengthscale&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+      [38;2;255;213;3m)[0m,
+      [38;2;156;220;254m&#39;variance&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+      [38;2;255;213;3m)[0m
+    [38;2;255;213;3m}[0m,
+    [38;2;156;220;254m&#39;mean_function&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+      [38;2;156;220;254m&#39;constant&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mReal[0m,
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;real&#39;[0m
+      [38;2;255;213;3m)[0m
+    [38;2;255;213;3m}[0m
+  [38;2;255;213;3m}[0m
+[38;2;255;213;3m})[0m
 </code></pre></div>
 <p>The <code>State</code> object behaves just like a PyTree and, consequently, we may use JAX's
 <code>tree_map</code> function to alter the values of the <code>State</code>. The updated <code>State</code> can then
@@ -2769,75 +2769,75 @@ parameter's value by 1.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">updated_state</span> <span class="o">=</span> <span class="n">jtu</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">updated_state</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>State({
-  &#39;likelihood&#39;: {
-    &#39;obs_stddev&#39;: VariableState(
-      type=PositiveReal,
-      value=Array(2., dtype=float64, weak_type=True),
-      _tag=&#39;positive&#39;
-    )
-  },
-  &#39;prior&#39;: {
-    &#39;kernel&#39;: {
-      &#39;lengthscale&#39;: VariableState(
-        type=PositiveReal,
-        value=Array(2., dtype=float64, weak_type=True),
-        _tag=&#39;positive&#39;
-      ),
-      &#39;variance&#39;: VariableState(
-        type=PositiveReal,
-        value=Array(2., dtype=float64, weak_type=True),
-        _tag=&#39;positive&#39;
-      )
-    },
-    &#39;mean_function&#39;: {
-      &#39;constant&#39;: VariableState(
-        type=Real,
-        value=Array(1., dtype=float64, weak_type=True),
-        _tag=&#39;real&#39;
-      )
-    }
-  }
-})
+<div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mState[0m[38;2;255;213;3m({[0m[38;2;105;105;105m[0m
+  [38;2;156;220;254m&#39;likelihood&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+    [38;2;156;220;254m&#39;obs_stddev&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+      [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+      [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(2., dtype=float64, weak_type=True),
+      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+    [38;2;255;213;3m)[0m
+  [38;2;255;213;3m}[0m,
+  [38;2;156;220;254m&#39;prior&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+    [38;2;156;220;254m&#39;kernel&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+      [38;2;156;220;254m&#39;lengthscale&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(2., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+      [38;2;255;213;3m)[0m,
+      [38;2;156;220;254m&#39;variance&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(2., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+      [38;2;255;213;3m)[0m
+    [38;2;255;213;3m}[0m,
+    [38;2;156;220;254m&#39;mean_function&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+      [38;2;156;220;254m&#39;constant&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mReal[0m,
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;real&#39;[0m
+      [38;2;255;213;3m)[0m
+    [38;2;255;213;3m}[0m
+  [38;2;255;213;3m}[0m
+[38;2;255;213;3m})[0m
 </code></pre></div>
 <p>Let us now use NNX's <code>merge</code> function to reconstruct the posterior distribution using
 the updated state.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">updated_posterior</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">graphdef</span><span class="p">,</span> <span class="n">updated_state</span><span class="p">)</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">updated_posterior</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>ConjugatePosterior(
-  jitter=1e-06,
-  likelihood=Gaussian(
-    integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f7f0e148640&gt;,
-    num_datapoints=100,
-    obs_stddev=PositiveReal(
-      _tag=&#39;positive&#39;,
-      value=Array(2., dtype=float64, weak_type=True)
-    )
-  ),
-  prior=Prior(
-    jitter=1e-06,
-    kernel=Matern32(
-      active_dims=slice(None, None, None),
-      compute_engine=&lt;gpjax.kernels.computations.dense.DenseKernelComputation object at 0x7f7f0e504a60&gt;,
-      lengthscale=PositiveReal(
-        _tag=&#39;positive&#39;,
-        value=Array(2., dtype=float64, weak_type=True)
-      ),
-      n_dims=None,
-      variance=PositiveReal(
-        _tag=&#39;positive&#39;,
-        value=Array(2., dtype=float64, weak_type=True)
-      )
-    ),
-    mean_function=Constant(
-      constant=Real(
-        _tag=&#39;real&#39;,
-        value=Array(1., dtype=float64, weak_type=True)
-      )
-    )
-  )
-)
+<div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mConjugatePosterior[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 3 (24 B), Real: 1 (8 B), Total: 4 (32 B)[0m
+  [38;2;156;220;254mjitter[0m[38;2;212;212;212m=[0m[38;2;182;207;169m1e-06[0m,
+  [38;2;156;220;254mlikelihood[0m[38;2;212;212;212m=[0m[38;2;79;201;177mGaussian[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 1 (8 B)[0m
+    [38;2;156;220;254mintegrator[0m[38;2;212;212;212m=[0m&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7effa21b1db0&gt;,
+    [38;2;156;220;254mnum_datapoints[0m[38;2;212;212;212m=[0m[38;2;182;207;169m100[0m,
+    [38;2;156;220;254mobs_stddev[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+      [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(2., dtype=float64, weak_type=True),
+      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+    [38;2;255;213;3m)[0m
+  [38;2;255;213;3m)[0m,
+  [38;2;156;220;254mprior[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPrior[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 2 (16 B), Real: 1 (8 B), Total: 3 (24 B)[0m
+    [38;2;156;220;254mjitter[0m[38;2;212;212;212m=[0m[38;2;182;207;169m1e-06[0m,
+    [38;2;156;220;254mkernel[0m[38;2;212;212;212m=[0m[38;2;79;201;177mMatern32[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 2 (16 B)[0m
+      [38;2;156;220;254mactive_dims[0m[38;2;212;212;212m=[0mslice(None, None, None),
+      [38;2;156;220;254mcompute_engine[0m[38;2;212;212;212m=[0m&lt;gpjax.kernels.computations.dense.DenseKernelComputation object at 0x7effa21165c0&gt;,
+      [38;2;156;220;254mlengthscale[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(2., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+      [38;2;255;213;3m)[0m,
+      [38;2;156;220;254mn_dims[0m[38;2;212;212;212m=[0m[38;2;86;156;214mNone[0m,
+      [38;2;156;220;254mvariance[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(2., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+      [38;2;255;213;3m)[0m
+    [38;2;255;213;3m)[0m,
+    [38;2;156;220;254mmean_function[0m[38;2;212;212;212m=[0m[38;2;79;201;177mConstant[0m[38;2;255;213;3m([0m[38;2;105;105;105m # Real: 1 (8 B)[0m
+      [38;2;156;220;254mconstant[0m[38;2;212;212;212m=[0m[38;2;79;201;177mReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;real&#39;&quot;[0m
+      [38;2;255;213;3m)[0m
+    [38;2;255;213;3m)[0m
+  [38;2;255;213;3m)[0m
+[38;2;255;213;3m)[0m
 </code></pre></div>
 <p>However, we begun this point of conversation with bijectors in mind, so let us now see
 how bijectors may be applied to a collection of parameters in GPJax. Fortunately, this
@@ -2845,36 +2845,36 @@ is very straightforward, and we may simply use the <code>transform</code> functi
 <div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">transformed_state</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">DEFAULT_BIJECTION</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">transformed_state</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>State({
-  &#39;likelihood&#39;: {
-    &#39;obs_stddev&#39;: VariableState(
-      type=PositiveReal,
-      value=Array(0.54132485, dtype=float64),
-      _tag=&#39;positive&#39;
-    )
-  },
-  &#39;prior&#39;: {
-    &#39;kernel&#39;: {
-      &#39;lengthscale&#39;: VariableState(
-        type=PositiveReal,
-        value=Array(0.54132485, dtype=float64),
-        _tag=&#39;positive&#39;
-      ),
-      &#39;variance&#39;: VariableState(
-        type=PositiveReal,
-        value=Array(0.54132485, dtype=float64),
-        _tag=&#39;positive&#39;
-      )
-    },
-    &#39;mean_function&#39;: {
-      &#39;constant&#39;: VariableState(
-        type=Real,
-        value=Array(0., dtype=float64, weak_type=True),
-        _tag=&#39;real&#39;
-      )
-    }
-  }
-})
+<div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mState[0m[38;2;255;213;3m({[0m[38;2;105;105;105m[0m
+  [38;2;156;220;254m&#39;likelihood&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+    [38;2;156;220;254m&#39;obs_stddev&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+      [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+      [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0.54132485, dtype=float64),
+      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+    [38;2;255;213;3m)[0m
+  [38;2;255;213;3m}[0m,
+  [38;2;156;220;254m&#39;prior&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+    [38;2;156;220;254m&#39;kernel&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+      [38;2;156;220;254m&#39;lengthscale&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0.54132485, dtype=float64),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+      [38;2;255;213;3m)[0m,
+      [38;2;156;220;254m&#39;variance&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0.54132485, dtype=float64),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+      [38;2;255;213;3m)[0m
+    [38;2;255;213;3m}[0m,
+    [38;2;156;220;254m&#39;mean_function&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+      [38;2;156;220;254m&#39;constant&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mReal[0m,
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;real&#39;[0m
+      [38;2;255;213;3m)[0m
+    [38;2;255;213;3m}[0m
+  [38;2;255;213;3m}[0m
+[38;2;255;213;3m})[0m
 </code></pre></div>
 <p>We may also (re-)constrain the parameters' values by setting the <code>inverse</code> argument of
 <code>transform</code> to False.</p>
@@ -2891,29 +2891,29 @@ altering the way in which we invoke <code>nnx.split</code>.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">graphdef</span><span class="p">,</span> <span class="n">positive_reals</span><span class="p">,</span> <span class="n">other_params</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">posterior</span><span class="p">,</span> <span class="n">PositiveReal</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">positive_reals</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>State({
-  &#39;likelihood&#39;: {
-    &#39;obs_stddev&#39;: VariableState(
-      type=PositiveReal,
-      value=Array(1., dtype=float64, weak_type=True),
-      _tag=&#39;positive&#39;
-    )
-  },
-  &#39;prior&#39;: {
-    &#39;kernel&#39;: {
-      &#39;lengthscale&#39;: VariableState(
-        type=PositiveReal,
-        value=Array(1., dtype=float64, weak_type=True),
-        _tag=&#39;positive&#39;
-      ),
-      &#39;variance&#39;: VariableState(
-        type=PositiveReal,
-        value=Array(1., dtype=float64, weak_type=True),
-        _tag=&#39;positive&#39;
-      )
-    }
-  }
-})
+<div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mState[0m[38;2;255;213;3m({[0m[38;2;105;105;105m[0m
+  [38;2;156;220;254m&#39;likelihood&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+    [38;2;156;220;254m&#39;obs_stddev&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+      [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+      [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+    [38;2;255;213;3m)[0m
+  [38;2;255;213;3m}[0m,
+  [38;2;156;220;254m&#39;prior&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+    [38;2;156;220;254m&#39;kernel&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
+      [38;2;156;220;254m&#39;lengthscale&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+      [38;2;255;213;3m)[0m,
+      [38;2;156;220;254m&#39;variance&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+      [38;2;255;213;3m)[0m
+    [38;2;255;213;3m}[0m
+  [38;2;255;213;3m}[0m
+[38;2;255;213;3m})[0m
 </code></pre></div>
 <p>Now we see that we have two state objects: one containing the positive real parameters
 and the other containing the remaining parameters. This functionality is exceptionally
@@ -2967,7 +2967,7 @@ a linearly spaced set of inputs.</p>
 </span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">meanf</span> <span class="o">=</span> <span class="n">LinearMeanFunction</span><span class="p">(</span><span class="n">intercept</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">slope</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
 </span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">meanf</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>[&lt;matplotlib.lines.Line2D at 0x7f7f0ddde590&gt;]
+<div class="language-text highlight"><pre><span></span><code>[&lt;matplotlib.lines.Line2D at 0x7effa0d439d0&gt;]
 </code></pre></div>
 <p><img alt="png" src="../backend_files/backend_36_1.png" /></p>
 <p>Looks good! To conclude this section, let's now parameterise a GP with our new mean
@@ -3035,11 +3035,11 @@ Python implementation: CPython
 Python version       : 3.10.16
 IPython version      : 8.35.0
 
-gpjax     : 0.9.5
-jax       : 0.4.27
+gpjax     : 0.10.0
 jaxtyping : 0.3.1
-flax      : 0.9.0
 matplotlib: 3.10.1
+flax      : 0.10.5
+jax       : 0.5.3
 
 Watermark: 2.5.0
 </code></pre></div>
