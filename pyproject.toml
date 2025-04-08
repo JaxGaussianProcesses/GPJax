@@ -28,7 +28,7 @@ dependencies = [
   "tqdm>4.66.2",
   "tensorflow-probability>=0.24.0",
   "beartype>0.16.1",
-  "cola-ml==0.0.5",
+  "cola-ml>=0.0.7",
   "flax<0.10.0",
   "numpy<2.0.0",
 ]
