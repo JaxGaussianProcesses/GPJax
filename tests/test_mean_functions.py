@@ -5,20 +5,21 @@ config.update("jax_enable_x64", True)
 
 
 import jax.numpy as jnp
-import jax.random as jr 
-import optax as ox 
+import jax.random as jr
+import optax as ox
 from jaxtyping import (
     Array,
     Float,
 )
 import pytest
 
-import gpjax as gpx 
+import gpjax as gpx
 from gpjax.mean_functions import (
     AbstractMeanFunction,
     Constant,
     Zero,
 )
+from gpjax.parameters import Static
 
 
 def test_abstract() -> None:
@@ -59,30 +60,21 @@ def test_zero_mean_remains_zero() -> None:
     y = jnp.full((20, 1), 50, dtype=jnp.float64)  # Dataset with non-zero mean
     D = gpx.Dataset(X=x, y=y)
 
-    kernel = gpx.kernels.Constant(constant=jnp.array(0.0))
-    kernel = kernel.replace_trainable(
-        constant=False
-    )  # Prevent kernel from modelling non-zero mean
+    constant = Static(jnp.array(0.0))
+    kernel = gpx.kernels.Constant(constant=constant)
     meanf = Zero()
     prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
     likelihood = gpx.likelihoods.Gaussian(
         num_datapoints=D.n, obs_stddev=jnp.array(1e-3)
     )
-    likelihood = likelihood.replace_trainable(obs_stddev=False)
     posterior = prior * likelihood
 
-    negative_mll = gpx.objectives.ConjugateMLL(negative=True)
-    opt_posterior, _ = gpx.fit(
+    opt_posterior, _ = gpx.fit_scipy(
         model=posterior,
-        objective=negative_mll,
+        objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
         train_data=D,
-        optim=ox.adam(learning_rate=0.5),
-        num_iters=100,
-        safe=True,
-        key=key,
     )
-
-    assert opt_posterior.prior.mean_function.constant == 0.0
+    assert opt_posterior.prior.mean_function.constant.value == 0.0
 
 
 def test_initialising_zero_mean_with_constant_raises_error():
