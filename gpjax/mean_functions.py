@@ -28,6 +28,7 @@ from jaxtyping import (
 from gpjax.parameters import (
     Parameter,
     Real,
+    Static
 )
 from gpjax.typing import (
     Array,
@@ -130,9 +131,9 @@ class Constant(AbstractMeanFunction):
     """
 
     def __init__(
-        self, constant: tp.Union[ScalarFloat, Float[Array, " O"], Parameter] = 0.0
+        self, constant: tp.Union[ScalarFloat, Float[Array, " O"], Parameter, Static] = 0.0
     ):
-        if isinstance(constant, Parameter):
+        if isinstance(constant, Parameter) or isinstance(constant, Static):
             self.constant = constant
         else:
             self.constant = Real(jnp.array(constant))
@@ -158,7 +159,7 @@ class Zero(Constant):
     """
 
     def __init__(self):
-        super().__init__(constant=jnp.array(0.0))
+        super().__init__(constant=Static(jnp.array(0.0)))
 
 
 class CombinationMeanFunction(AbstractMeanFunction):

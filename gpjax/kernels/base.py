@@ -32,6 +32,7 @@ from gpjax.kernels.computations import (
 from gpjax.parameters import (
     Parameter,
     Real,
+    Static,
 )
 from gpjax.typing import (
     Array,
@@ -220,7 +221,9 @@ class Constant(AbstractKernel):
     def __init__(
         self,
         active_dims: tp.Union[list[int], slice, None] = None,
-        constant: tp.Union[ScalarFloat, Parameter[ScalarFloat]] = jnp.array(0.0),
+        constant: tp.Union[
+            ScalarFloat, Parameter[ScalarFloat], Static[ScalarFloat]
+        ] = jnp.array(0.0),
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         if isinstance(constant, Parameter):

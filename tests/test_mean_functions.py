@@ -5,17 +5,20 @@ config.update("jax_enable_x64", True)
 
 
 import jax.numpy as jnp
+import jax.random as jr
 from jaxtyping import (
     Array,
     Float,
 )
 import pytest
 
+import gpjax as gpx
 from gpjax.mean_functions import (
     AbstractMeanFunction,
     Constant,
     Zero,
 )
+from gpjax.parameters import Static
 
 
 def test_abstract() -> None:
@@ -49,38 +52,28 @@ def test_constant(constant: Float[Array, " Q"]) -> None:
     ).all()
 
 
-# TODO: rewrite this test after work on fit
-# def test_zero_mean_remains_zero() -> None:
-#     key = jr.PRNGKey(123)
+def test_zero_mean_remains_zero() -> None:
+    key = jr.PRNGKey(123)
 
-#     x = jr.uniform(key=key, minval=0, maxval=1, shape=(20, 1))
-#     y = jnp.full((20, 1), 50, dtype=jnp.float64)  # Dataset with non-zero mean
-#     D = gpx.Dataset(X=x, y=y)
+    x = jr.uniform(key=key, minval=0, maxval=1, shape=(20, 1))
+    y = jnp.full((20, 1), 50, dtype=jnp.float64)  # Dataset with non-zero mean
+    D = gpx.Dataset(X=x, y=y)
 
-#     kernel = gpx.kernels.Constant(constant=jnp.array(0.0))
-#     kernel = kernel.replace_trainable(
-#         constant=False
-#     )  # Prevent kernel from modelling non-zero mean
-#     meanf = Zero()
-#     prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
-#     likelihood = gpx.likelihoods.Gaussian(
-#         num_datapoints=D.n, obs_stddev=jnp.array(1e-3)
-#     )
-#     likelihood = likelihood.replace_trainable(obs_stddev=False)
-#     posterior = prior * likelihood
+    constant = Static(jnp.array(0.0))
+    kernel = gpx.kernels.Constant(constant=constant)
+    meanf = Zero()
+    prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
+    likelihood = gpx.likelihoods.Gaussian(
+        num_datapoints=D.n, obs_stddev=jnp.array(1e-3)
+    )
+    posterior = prior * likelihood
 
-#     negative_mll = gpx.objectives.ConjugateMLL(negative=True)
-#     opt_posterior, _ = gpx.fit(
-#         model=posterior,
-#         objective=negative_mll,
-#         train_data=D,
-#         optim=ox.adam(learning_rate=0.5),
-#         num_iters=1000,
-#         safe=True,
-#         key=key,
-#     )
-
-#     assert opt_posterior.prior.mean_function.constant == 0.0
+    opt_posterior, _ = gpx.fit_scipy(
+        model=posterior,
+        objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
+        train_data=D,
+    )
+    assert opt_posterior.prior.mean_function.constant.value == 0.0
 
 
 def test_initialising_zero_mean_with_constant_raises_error():
