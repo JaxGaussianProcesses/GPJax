@@ -2805,14 +2805,17 @@ model using Scipy.</p>
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
 </span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="nb">print</span><span class="p">(</span><span class="o">-</span><span class="n">gpx</span><span class="o">.</span><span class="n">objectives</span><span class="o">.</span><span class="n">conjugate_mll</span><span class="p">(</span><span class="n">opt_posterior</span><span class="p">,</span> <span class="n">training_data</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>Optimization terminated successfully.
-         Current function value: -9.307223
-         Iterations: 29
-         Function evaluations: 43
-         Gradient evaluations: 43
+<div class="language-text highlight"><pre><span></span><code>/home/runner/.local/share/hatch/env/virtual/gpjax/9bz-h8Il/docs/lib/python3.10/site-packages/scipy/optimize/_minimize.py:733: OptimizeWarning: Desired error not necessarily achieved due to precision loss.
+  res = _minimize_bfgs(fun, x0, args, jac, callback, **options)
 
 
--9.307222976699578
+         Current function value: -6.805748
+         Iterations: 22
+         Function evaluations: 61
+         Gradient evaluations: 49
+
+
+-6.805747503890231
 </code></pre></div>
 <h2 id="prediction">Prediction<a class="headerlink" href="#prediction" title="Permanent link"></a></h2>
 <p>With an optimal set of parameters learned, we can make predictions on the set of
@@ -2844,7 +2847,7 @@ can score less than 0.</p>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Results:</span><span class="se">\n\t</span><span class="s2">RMSE: </span><span class="si">{</span><span class="n">rmse</span><span class="si">:</span><span class="s2"> .4f</span><span class="si">}</span><span class="se">\n\t</span><span class="s2">R2: </span><span class="si">{</span><span class="n">r2</span><span class="si">:</span><span class="s2"> .2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Results:
-    RMSE:  0.0088
+    RMSE:  0.0102
     R2:  0.99
 </code></pre></div>
 <p>Both of these metrics seem very promising, so, based off these, we can be quite
@@ -2897,19 +2900,19 @@ the smaller response values.</p>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Thomas Pinder
 
-Last updated: Tue Apr 08 2025
+Last updated: Wed Apr 09 2025
 
 Python implementation: CPython
 Python version       : 3.10.16
 IPython version      : 8.35.0
 
-numpy     : 2.2.4
-gpjax     : 0.10.0
+jax       : 0.5.3
 pandas    : 2.2.3
 sklearn   : 1.6.1
-matplotlib: 3.10.1
-jax       : 0.5.3
 jaxtyping : 0.3.1
+gpjax     : 0.10.1
+matplotlib: 3.10.1
+numpy     : 2.2.4
 
 Watermark: 2.5.0
 </code></pre></div>
