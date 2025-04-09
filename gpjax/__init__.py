@@ -19,7 +19,6 @@ from beartype.roar import BeartypeDecorHintPep585DeprecationWarning
 filterwarnings("ignore", category=BeartypeDecorHintPep585DeprecationWarning)
 
 from gpjax import (
-    decision_making,
     gps,
     integrators,
     kernels,
@@ -40,11 +39,10 @@ __license__ = "MIT"
 __description__ = "Didactic Gaussian processes in JAX"
 __url__ = "https://github.com/JaxGaussianProcesses/GPJax"
 __contributors__ = "https://github.com/JaxGaussianProcesses/GPJax/graphs/contributors"
-__version__ = "0.9.4"
+__version__ = "0.10.0"
 
 __all__ = [
     "base",
-    "decision_making",
     "gps",
     "integrators",
     "kernels",
