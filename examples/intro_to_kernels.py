@@ -292,7 +292,7 @@ opt_posterior, history = gpx.fit_scipy(
 
 # %%
 def plot_ribbon(ax, x, dist, color):
-    mean = dist.mean()
+    mean = dist.mean
     std = dist.stddev()
     ax.plot(x, mean, label="Predictive mean", color=color)
     ax.fill_between(
@@ -311,7 +311,7 @@ def plot_ribbon(ax, x, dist, color):
 opt_latent_dist = opt_posterior.predict(test_x, train_data=D)
 opt_predictive_dist = opt_posterior.likelihood(opt_latent_dist)
 
-opt_predictive_mean = opt_predictive_dist.mean()
+opt_predictive_mean = opt_predictive_dist.mean
 opt_predictive_std = opt_predictive_dist.stddev()
 
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(5, 6))
@@ -569,7 +569,7 @@ opt_posterior, history = gpx.fit(
 latent_dist = opt_posterior.predict(test_x, train_data=D)
 predictive_dist = opt_posterior.likelihood(latent_dist)
 
-predictive_mean = predictive_dist.mean().reshape(-1, 1)
+predictive_mean = predictive_dist.mean.reshape(-1, 1)
 predictive_std = predictive_dist.stddev().reshape(-1, 1)
 
 # %% [markdown]

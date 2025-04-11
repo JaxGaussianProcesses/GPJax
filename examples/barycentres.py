@@ -231,7 +231,7 @@ def wasserstein_barycentres(
 # %%
 weights = jnp.ones((n_datasets,)) / n_datasets
 
-means = jnp.stack([d.mean() for d in posterior_preds])
+means = jnp.stack([d.mean for d in posterior_preds])
 barycentre_mean = jnp.tensordot(weights, means, axes=1)
 
 step_fn = jax.jit(wasserstein_barycentres(posterior_preds, weights))
@@ -262,7 +262,7 @@ def plot(
     linewidth: float = 1.0,
     zorder: int = 0,
 ):
-    mu = dist.mean()
+    mu = dist.mean
     sigma = dist.stddev()
     ax.plot(xtest, mu, linewidth=linewidth, color=color, label=label, zorder=zorder)
     ax.fill_between(

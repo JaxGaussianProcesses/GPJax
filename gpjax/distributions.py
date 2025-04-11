@@ -30,6 +30,7 @@ import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import Float
 import tensorflow_probability.substrates.jax as tfp
+from numpyro.distributions.distribution import Distribution
 
 from gpjax.lower_cholesky import lower_cholesky
 from gpjax.typing import (
@@ -38,53 +39,60 @@ from gpjax.typing import (
     ScalarFloat,
 )
 
+from cola.linalg.decompositions import Cholesky
+from numpyro.distributions import constraints
+from numpyro.distributions.util import is_prng_key
+
 tfd = tfp.distributions
 
-from cola.linalg.decompositions import Cholesky
 
-
-class GaussianDistribution(tfd.Distribution):
-    r"""Multivariate Gaussian distribution with a linear operator scale matrix."""
-
-    # TODO: Consider `distrax.transformed.Transformed` object. Can we create a LinearOperator to `distrax.bijector` representation
-    # and modify `distrax.MultivariateNormalFromBijector`?
-    # TODO: Consider natural and expectation parameterisations in future work.
-    # TODO: we don't really need to inherit from `tfd.Distribution` here
+class GaussianDistribution(Distribution):
+    support = constraints.real_vector
 
     def __init__(
         self,
-        loc: Optional[Float[Array, " N"]] = None,
-        scale: Optional[LinearOperator] = None,
-    ) -> None:
-        r"""Initialises the distribution.
-
-        Args:
-            loc: the mean of the distribution as an array of shape (n_points,).
-            scale: the scale matrix of the distribution as a LinearOperator object.
-        """
-        _check_loc_scale(loc, scale)
-
-        # Find dimensionality of the distribution.
-        if loc is not None:
-            num_dims = loc.shape[-1]
-
-        elif scale is not None:
-            num_dims = scale.shape[-1]
-
-        # Set the location to zero vector if unspecified.
-        if loc is None:
-            loc = jnp.zeros((num_dims,))
-
-        # If not specified, set the scale to the identity matrix.
-        if scale is None:
-            scale = Identity(shape=(num_dims, num_dims), dtype=loc.dtype)
-
+        loc: Optional[Float[Array, " N"]],
+        scale: Optional[LinearOperator],
+        validate_args=None,
+    ):
         self.loc = loc
         self.scale = cola.PSD(scale)
+        batch_shape = ()
+        event_shape = jnp.shape(self.loc)
+        super().__init__(batch_shape, event_shape, validate_args=validate_args)
 
+    def sample(self, key, sample_shape=()):
+        assert is_prng_key(key)
+        # Obtain covariance root.
+        covariance_root = lower_cholesky(self.scale)
+
+        # Gather n samples from standard normal distribution Z = [z₁, ..., zₙ]ᵀ.
+        white_noise = jr.normal(
+            key, shape=sample_shape + self.batch_shape + self.event_shape
+        )
+
+        # xᵢ ~ N(loc, cov) <=> xᵢ = loc + sqrt zᵢ, where zᵢ ~ N(0, I).
+        def affine_transformation(_x):
+            return self.loc + covariance_root @ _x
+
+        return vmap(affine_transformation)(white_noise)
+
+    @property
     def mean(self) -> Float[Array, " N"]:
         r"""Calculates the mean."""
         return self.loc
+
+    @property
+    def variance(self) -> Float[Array, " N"]:
+        r"""Calculates the variance."""
+        return cola.diag(self.scale)
+
+    def entropy(self) -> ScalarFloat:
+        r"""Calculates the entropy of the distribution."""
+        return 0.5 * (
+            self.event_shape[0] * (1.0 + jnp.log(2.0 * jnp.pi))
+            + cola.logdet(self.scale, Cholesky(), Cholesky())
+        )
 
     def median(self) -> Float[Array, " N"]:
         r"""Calculates the median."""
@@ -98,25 +106,14 @@ class GaussianDistribution(tfd.Distribution):
         r"""Calculates the covariance matrix."""
         return self.scale.to_dense()
 
-    def variance(self) -> Float[Array, " N"]:
-        r"""Calculates the variance."""
-        return cola.diag(self.scale)
-
     def stddev(self) -> Float[Array, " N"]:
         r"""Calculates the standard deviation."""
         return jnp.sqrt(cola.diag(self.scale))
 
-    @property
-    def event_shape(self) -> Tuple:
-        r"""Returns the event shape."""
-        return self.loc.shape[-1:]
-
-    def entropy(self) -> ScalarFloat:
-        r"""Calculates the entropy of the distribution."""
-        return 0.5 * (
-            self.event_shape[0] * (1.0 + jnp.log(2.0 * jnp.pi))
-            + cola.logdet(self.scale, Cholesky(), Cholesky())
-        )
+    #     @property
+    #     def event_shape(self) -> Tuple:
+    #         r"""Returns the event shape."""
+    #         return self.loc.shape[-1:]
 
     def log_prob(self, y: Float[Array, " N"]) -> ScalarFloat:
         r"""Calculates the log pdf of the multivariate Gaussian.
@@ -141,40 +138,37 @@ class GaussianDistribution(tfd.Distribution):
             + diff.T @ cola.solve(sigma, diff, Cholesky())
         )
 
-    def _sample_n(self, key: KeyArray, n: int) -> Float[Array, "n N"]:
-        r"""Samples from the distribution.
+    #     def _sample_n(self, key: KeyArray, n: int) -> Float[Array, "n N"]:
+    #         r"""Samples from the distribution.
 
-        Args:
-            key (KeyArray): The key to use for sampling.
+    #         Args:
+    #             key (KeyArray): The key to use for sampling.
 
-        Returns:
-            The samples as an array of shape (n_samples, n_points).
-        """
-        # Obtain covariance root.
-        sqrt = lower_cholesky(self.scale)
+    #         Returns:
+    #             The samples as an array of shape (n_samples, n_points).
+    #         """
+    #         # Obtain covariance root.
+    #         sqrt = lower_cholesky(self.scale)
 
-        # Gather n samples from standard normal distribution Z = [z₁, ..., zₙ]ᵀ.
-        Z = jr.normal(key, shape=(n, *self.event_shape))
+    #         # Gather n samples from standard normal distribution Z = [z₁, ..., zₙ]ᵀ.
+    #         Z = jr.normal(key, shape=(n, *self.event_shape))
 
-        # xᵢ ~ N(loc, cov) <=> xᵢ = loc + sqrt zᵢ, where zᵢ ~ N(0, I).
-        def affine_transformation(x):
-            return self.loc + sqrt @ x
+    #         # xᵢ ~ N(loc, cov) <=> xᵢ = loc + sqrt zᵢ, where zᵢ ~ N(0, I).
+    #         def affine_transformation(x):
+    #             return self.loc + sqrt @ x
 
-        return vmap(affine_transformation)(Z)
+    #         return vmap(affine_transformation)(Z)
 
-    def sample(
-        self, seed: KeyArray, sample_shape: Tuple[int, ...]
-    ):  # pylint: disable=useless-super-delegation
-        r"""See `Distribution.sample`."""
-        return self._sample_n(
-            seed, sample_shape[0]
-        )  # TODO this looks weird, why ignore the second entry?
+    #     def sample(
+    #         self, seed: KeyArray, sample_shape: Tuple[int, ...]
+    #     ):  # pylint: disable=useless-super-delegation
+    #         r"""See `Distribution.sample`."""
+    #         return self._sample_n(
+    #             seed, sample_shape[0]
+    #         )  # TODO this looks weird, why ignore the second entry?
 
     def kl_divergence(self, other: "GaussianDistribution") -> ScalarFloat:
         return _kl_divergence(self, other)
-
-
-DistrT = TypeVar("DistrT", bound=tfd.Distribution)
 
 
 def _check_and_return_dimension(
@@ -245,37 +239,37 @@ def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> ScalarFl
     ) / 2.0
 
 
-def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
-    r"""Checks that the inputs are correct."""
-    if loc is None and scale is None:
-        raise ValueError("At least one of `loc` or `scale` must be specified.")
+# def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
+#     r"""Checks that the inputs are correct."""
+#     if loc is None and scale is None:
+#         raise ValueError("At least one of `loc` or `scale` must be specified.")
 
-    if loc is not None and loc.ndim < 1:
-        raise ValueError("The parameter `loc` must have at least one dimension.")
+#     if loc is not None and loc.ndim < 1:
+#         raise ValueError("The parameter `loc` must have at least one dimension.")
 
-    if scale is not None and len(scale.shape) < 2:  # scale.ndim < 2:
-        raise ValueError(
-            "The `scale` must have at least two dimensions, but "
-            f"`scale.shape = {scale.shape}`."
-        )
+#     if scale is not None and len(scale.shape) < 2:  # scale.ndim < 2:
+#         raise ValueError(
+#             "The `scale` must have at least two dimensions, but "
+#             f"`scale.shape = {scale.shape}`."
+#         )
 
-    if scale is not None and not isinstance(scale, LinearOperator):
-        raise ValueError(
-            f"The `scale` must be a CoLA LinearOperator but got {type(scale)}"
-        )
+#     if scale is not None and not isinstance(scale, LinearOperator):
+#         raise ValueError(
+#             f"The `scale` must be a CoLA LinearOperator but got {type(scale)}"
+#         )
 
-    if scale is not None and (scale.shape[-1] != scale.shape[-2]):
-        raise ValueError(
-            f"The `scale` must be a square matrix, but `scale.shape = {scale.shape}`."
-        )
+#     if scale is not None and (scale.shape[-1] != scale.shape[-2]):
+#         raise ValueError(
+#             f"The `scale` must be a square matrix, but `scale.shape = {scale.shape}`."
+#         )
 
-    if loc is not None:
-        num_dims = loc.shape[-1]
-        if scale is not None and (scale.shape[-1] != num_dims):
-            raise ValueError(
-                f"Shapes are not compatible: `loc.shape = {loc.shape}` and "
-                f"`scale.shape = {scale.shape}`."
-            )
+#     if loc is not None:
+#         num_dims = loc.shape[-1]
+#         if scale is not None and (scale.shape[-1] != num_dims):
+#             raise ValueError(
+#                 f"Shapes are not compatible: `loc.shape = {loc.shape}` and "
+#                 f"`scale.shape = {scale.shape}`."
+#             )
 
 
 __all__ = [

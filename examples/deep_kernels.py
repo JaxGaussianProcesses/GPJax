@@ -238,7 +238,7 @@ opt_posterior, history = gpx.fit(
 latent_dist = opt_posterior(xtest, train_data=D)
 predictive_dist = opt_posterior.likelihood(latent_dist)
 
-predictive_mean = predictive_dist.mean()
+predictive_mean = predictive_dist.mean
 predictive_std = predictive_dist.stddev()
 
 fig, ax = plt.subplots()

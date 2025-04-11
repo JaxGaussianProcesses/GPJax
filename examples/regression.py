@@ -126,7 +126,7 @@ prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 # %%
 prior_dist = prior.predict(xtest)
 
-prior_mean = prior_dist.mean()
+prior_mean = prior_dist.mean
 prior_std = prior_dist.variance()
 samples = prior_dist.sample(seed=key, sample_shape=(20,))
 
@@ -217,7 +217,7 @@ print(-gpx.objectives.conjugate_mll(opt_posterior, D))
 latent_dist = opt_posterior.predict(xtest, train_data=D)
 predictive_dist = opt_posterior.likelihood(latent_dist)
 
-predictive_mean = predictive_dist.mean()
+predictive_mean = predictive_dist.mean
 predictive_std = predictive_dist.stddev()
 
 # %% [markdown]

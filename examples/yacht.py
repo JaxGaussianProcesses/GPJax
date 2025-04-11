@@ -211,7 +211,7 @@ print(-gpx.objectives.conjugate_mll(opt_posterior, training_data))
 latent_dist = opt_posterior(scaled_Xte, training_data)
 predictive_dist = likelihood(latent_dist)
 
-predictive_mean = predictive_dist.mean()
+predictive_mean = predictive_dist.mean
 predictive_stddev = predictive_dist.stddev()
 
 # %% [markdown]

@@ -194,8 +194,8 @@ opt_posterior, training_history = gpx.fit_scipy(
 initial_dist = likelihood(posterior(x, D))
 predictive_dist = opt_posterior.likelihood(opt_posterior(x, D))
 
-initial_mean = initial_dist.mean()
-learned_mean = predictive_dist.mean()
+initial_mean = initial_dist.mean
+learned_mean = predictive_dist.mean
 
 rmse = lambda ytrue, ypred: jnp.sum(jnp.sqrt(jnp.square(ytrue - ypred)))
 

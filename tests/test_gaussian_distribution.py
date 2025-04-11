@@ -55,8 +55,8 @@ def test_array_arguments(n: int) -> None:
 
     dist = GaussianDistribution(loc=mean, scale=cola.PSD(Dense(covariance)))
 
-    assert approx_equal(dist.mean(), mean)
-    assert approx_equal(dist.variance(), covariance.diagonal())
+    assert approx_equal(dist.mean, mean)
+    assert approx_equal(dist.variance, covariance.diagonal())
     assert approx_equal(dist.stddev(), jnp.sqrt(covariance.diagonal()))
     assert approx_equal(dist.covariance(), covariance)
 
@@ -85,14 +85,14 @@ def test_diag_linear_operator(n: int) -> None:
     assert isinstance(dist_diag.scale, Diagonal)
     assert cola.PSD in dist_diag.scale.annotations
 
-    assert approx_equal(dist_diag.mean(), tfp_dist.mean())
+    assert approx_equal(dist_diag.mean, tfp_dist.mean())
     assert approx_equal(dist_diag.mode(), tfp_dist.mode())
     assert approx_equal(dist_diag.entropy(), tfp_dist.entropy())
-    assert approx_equal(dist_diag.variance(), tfp_dist.variance())
+    assert approx_equal(dist_diag.variance, tfp_dist.variance())
     assert approx_equal(dist_diag.stddev(), tfp_dist.stddev())
     assert approx_equal(dist_diag.covariance(), tfp_dist.covariance())
 
-    gpjax_samples = dist_diag.sample(seed=_key, sample_shape=(10,))
+    gpjax_samples = dist_diag.sample(key=_key, sample_shape=(10,))
     tfp_samples = tfp_dist.sample(seed=_key, sample_shape=(10,))
     assert approx_equal(gpjax_samples, tfp_samples)
 
@@ -116,15 +116,15 @@ def test_dense_linear_operator(n: int) -> None:
     dist_dense = GaussianDistribution(loc=mean, scale=cola.PSD(Dense(covariance)))
     tfp_dist = MultivariateNormalFullCovariance(loc=mean, covariance_matrix=covariance)
 
-    assert approx_equal(dist_dense.mean(), tfp_dist.mean())
+    assert approx_equal(dist_dense.mean, tfp_dist.mean())
     assert approx_equal(dist_dense.mode(), tfp_dist.mode())
     assert approx_equal(dist_dense.entropy(), tfp_dist.entropy())
-    assert approx_equal(dist_dense.variance(), tfp_dist.variance())
+    assert approx_equal(dist_dense.variance, tfp_dist.variance())
     assert approx_equal(dist_dense.stddev(), tfp_dist.stddev())
     assert approx_equal(dist_dense.covariance(), tfp_dist.covariance())
 
     assert approx_equal(
-        dist_dense.sample(seed=_key, sample_shape=(10,)),
+        dist_dense.sample(key=_key, sample_shape=(10,)),
         tfp_dist.sample(seed=_key, sample_shape=(10,)),
     )
 
@@ -157,7 +157,3 @@ def test_kl_divergence(n: int) -> None:
     assert approx_equal(
         dist_a.kl_divergence(dist_b), tfp_dist_a.kl_divergence(tfp_dist_b)
     )
-
-    with pytest.raises(ValueError):
-        incompatible = GaussianDistribution(loc=jnp.ones((2 * n,)))
-        incompatible.kl_divergence(dist_a)

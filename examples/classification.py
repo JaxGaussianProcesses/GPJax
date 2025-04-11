@@ -140,7 +140,7 @@ opt_posterior, history = gpx.fit(
 map_latent_dist = opt_posterior.predict(xtest, train_data=D)
 predictive_dist = opt_posterior.likelihood(map_latent_dist)
 
-predictive_mean = predictive_dist.mean()
+predictive_mean = predictive_dist.mean
 predictive_std = predictive_dist.stddev()
 
 fig, ax = plt.subplots()
@@ -279,7 +279,7 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> tfd.MultivariateNorma
     # Ktx Kxx⁻¹[ H⁻¹ ] Kxx⁻¹ Kxt
     laplace_cov_term = jnp.matmul(jnp.matmul(Kxx_inv_Kxt.T, H_inv), Kxx_inv_Kxt)
 
-    mean = map_latent_dist.mean()
+    mean = map_latent_dist.mean
     covariance = map_latent_dist.covariance() + laplace_cov_term
     L = jnp.linalg.cholesky(covariance)
     return tfd.MultivariateNormalTriL(jnp.atleast_1d(mean.squeeze()), L)
@@ -291,7 +291,7 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> tfd.MultivariateNorma
 laplace_latent_dist = construct_laplace(xtest)
 predictive_dist = opt_posterior.likelihood(laplace_latent_dist)
 
-predictive_mean = predictive_dist.mean()
+predictive_mean = predictive_dist.mean
 predictive_std = predictive_dist.stddev()
 
 fig, ax = plt.subplots()

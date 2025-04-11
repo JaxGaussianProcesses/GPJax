@@ -260,7 +260,7 @@ q = gpx.variational_families.VariationalGaussian(posterior=posterior, inducing_i
 
 def q_moments(x):
     qx = q(x)
-    return qx.mean(), qx.variance()
+    return qx.mean, qx.variance
 
 
 mean, variance = jax.vmap(q_moments)(x[:, None])

@@ -23,6 +23,7 @@ from cola.ops.operators import (
     Dense,
     I_like,
     Triangular,
+    Identity,
 )
 from flax import nnx
 import jax.numpy as jnp
@@ -296,7 +297,10 @@ class WhitenedVariationalGaussian(VariationalGaussian[L]):
 
         # Compute whitened KL divergence
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
-        pu = GaussianDistribution(loc=jnp.zeros_like(jnp.atleast_1d(mu.squeeze())))
+        pu_S = Identity(shape=(self.num_inducing, self.num_inducing), dtype=mu.dtype)
+        pu = GaussianDistribution(
+            loc=jnp.zeros_like(jnp.atleast_1d(mu.squeeze())), scale=pu_S
+        )
         return qu.kl_divergence(pu)
 
     def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:

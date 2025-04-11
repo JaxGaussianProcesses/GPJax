@@ -162,7 +162,7 @@ latent_dist = opt_posterior(xtest, D)
 predictive_dist = opt_posterior.likelihood(latent_dist)
 
 # Obtain the predictive mean and standard deviation
-pred_mean = predictive_dist.mean()
+pred_mean = predictive_dist.mean
 pred_std = predictive_dist.stddev()
 ```
 

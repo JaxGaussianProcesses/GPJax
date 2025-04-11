@@ -305,7 +305,7 @@ def variational_expectation(
     # inputs, x
     def q_moments(x):
         qx = q(x)
-        return qx.mean().squeeze(), qx.covariance().squeeze()
+        return qx.mean.squeeze(), qx.covariance().squeeze()
 
     mean, variance = vmap(q_moments)(x[:, None])
 

@@ -307,7 +307,7 @@ opt_posterior, history = gpx.fit_scipy(
 
 # %%
 posterior_rv = opt_posterior.likelihood(opt_posterior.predict(angles, train_data=D))
-mu = posterior_rv.mean()
+mu = posterior_rv.mean
 one_sigma = posterior_rv.stddev()
 
 # %%

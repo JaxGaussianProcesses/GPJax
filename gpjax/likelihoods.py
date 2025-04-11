@@ -38,6 +38,7 @@ from gpjax.typing import (
 
 tfb = tfp.bijectors
 tfd = tfp.distributions
+# TODO: Remove tfd with numpyro
 
 
 class AbstractLikelihood(nnx.Module):

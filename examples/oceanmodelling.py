@@ -299,7 +299,7 @@ opt_velocity_posterior = optimise_mll(velocity_posterior, dataset_train)
 # %%
 def latent_distribution(opt_posterior, pos_3d, dataset_train):
     latent = opt_posterior.predict(pos_3d, train_data=dataset_train)
-    latent_mean = latent.mean()
+    latent_mean = latent.mean
     latent_std = latent.stddev()
     return latent_mean, latent_std
 

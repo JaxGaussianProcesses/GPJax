@@ -163,7 +163,7 @@ inducing_points = opt_posterior.inducing_inputs.value
 
 samples = latent_dist.sample(seed=key, sample_shape=(20,))
 
-predictive_mean = predictive_dist.mean()
+predictive_mean = predictive_dist.mean
 predictive_std = predictive_dist.stddev()
 
 fig, ax = plt.subplots()

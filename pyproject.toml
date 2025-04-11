@@ -86,6 +86,7 @@ dependencies = [
   "networkx",
   "black",
   "jupytext",
+  "pytest-beartype"
 ]
 
 [tool.hatch.envs.dev.scripts]
@@ -103,7 +104,7 @@ lint-format = ['ruff format ./gpjax ./tests ./examples']
 lint-check = ['ruff check --fix ./gpjax ./tests ./examples']
 format = ["black-format", "imports-format", "lint-format"]
 check = ["black-check", "imports-check", "lint-check"]
-test = "pytest . -v -n auto"
+test = "pytest . -v -n 4 --beartype-packages='gpjax'"
 coverage = "pytest . -v --cov=./gpjax --cov-report=xml:./coverage.xml"
 docstrings = "xdoctest ./gpjax"
 all-tests = ['check', 'docstrings', 'test']

@@ -39,6 +39,8 @@ from gpjax.variational_families import (
     WhitenedVariationalGaussian,
 )
 
+from numpyro.distributions import Distribution as NumpyroDistribution
+
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 tfd = tfp.distributions
@@ -163,9 +165,9 @@ def test_variational_gaussians(
 
     # Test predictions
     predictive_dist = q(test_inputs)
-    assert isinstance(predictive_dist, tfd.Distribution)
+    assert isinstance(predictive_dist, NumpyroDistribution)
 
-    mu = predictive_dist.mean()
+    mu = predictive_dist.mean
     sigma = predictive_dist.covariance()
 
     assert isinstance(mu, jnp.ndarray)
@@ -216,9 +218,9 @@ def test_collapsed_variational_gaussian(
 
     # Test predictions
     predictive_dist = variational_family(test_inputs, D)
-    assert isinstance(predictive_dist, tfd.Distribution)
+    assert isinstance(predictive_dist, NumpyroDistribution)
 
-    mu = predictive_dist.mean()
+    mu = predictive_dist.mean
     sigma = predictive_dist.covariance()
 
     assert isinstance(mu, jnp.ndarray)
