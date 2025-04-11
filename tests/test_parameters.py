@@ -1,6 +1,9 @@
 from flax import nnx
 import jax.numpy as jnp
 import pytest
+from jax import jit
+
+from gpjax.kernels import RBF
 
 from gpjax.parameters import (
     DEFAULT_BIJECTION,
@@ -11,7 +14,10 @@ from gpjax.parameters import (
     SigmoidBounded,
     Static,
     transform,
+    _check_is_positive,
+    _safe_assert,
 )
+from jax.experimental import checkify
 
 
 @pytest.mark.parametrize(
@@ -54,3 +60,25 @@ def test_transform(param, value):
 )
 def test_default_tags(param, tag):
     assert param._tag == tag
+
+
+def test_check_is_positive():
+    # Check singleton
+    _safe_assert(_check_is_positive, jnp.array(3.0))
+    # Check array
+    _safe_assert(_check_is_positive, jnp.array([3.0, 4.0]))
+
+    # Check negative singleton
+    with pytest.raises(ValueError):
+        _safe_assert(_check_is_positive, jnp.array(-3.0))
+
+    # Check negative array
+    with pytest.raises(ValueError):
+        _safe_assert(_check_is_positive, jnp.array([-3.0, 4.0]))
+
+    # Test that functions wrapping _check_is_positive are jittable
+    def _dummy_fn(value):
+        _safe_assert(_check_is_positive, value)
+
+    jitted_fn = jit(checkify.checkify(_dummy_fn))
+    jitted_fn(jnp.array(3.0))

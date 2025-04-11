@@ -2,9 +2,15 @@ import typing as tp
 
 from flax import nnx
 import jax.numpy as jnp
+import jax
+import jax.lax as lax
 import jax.tree_util as jtu
 from jax.typing import ArrayLike
 import tensorflow_probability.substrates.jax.bijectors as tfb
+import chex
+import jax
+import jax.numpy as jnp
+from jax.experimental import checkify
 
 T = tp.TypeVar("T", bound=tp.Union[ArrayLike, list[float]])
 ParameterTag = str
@@ -84,8 +90,7 @@ class PositiveReal(Parameter[T]):
 
     def __init__(self, value: T, tag: ParameterTag = "positive", **kwargs):
         super().__init__(value=value, tag=tag, **kwargs)
-
-        _check_is_positive(self.value)
+        _safe_assert(_check_is_positive, self.value)
 
 
 class Real(Parameter[T]):
@@ -101,7 +106,17 @@ class SigmoidBounded(Parameter[T]):
     def __init__(self, value: T, tag: ParameterTag = "sigmoid", **kwargs):
         super().__init__(value=value, tag=tag, **kwargs)
 
-        _check_in_bounds(self.value, 0.0, 1.0)
+        # Only perform validation in non-JIT contexts
+        if (
+            not isinstance(value, jnp.ndarray)
+            or not getattr(value, "aval", None) is None
+        ):
+            _safe_assert(
+                _check_in_bounds,
+                self.value,
+                low=jnp.array(0.0),
+                high=jnp.array(1.0),
+            )
 
 
 class Static(nnx.Variable[T]):
@@ -120,8 +135,13 @@ class LowerTriangular(Parameter[T]):
     def __init__(self, value: T, tag: ParameterTag = "lower_triangular", **kwargs):
         super().__init__(value=value, tag=tag, **kwargs)
 
-        _check_is_square(self.value)
-        _check_is_lower_triangular(self.value)
+        # Only perform validation in non-JIT contexts
+        if (
+            not isinstance(value, jnp.ndarray)
+            or not getattr(value, "aval", None) is None
+        ):
+            _safe_assert(_check_is_square, self.value)
+            _safe_assert(_check_is_lower_triangular, self.value)
 
 
 DEFAULT_BIJECTION = {
@@ -132,36 +152,83 @@ DEFAULT_BIJECTION = {
 }
 
 
-def _check_is_arraylike(value: T):
+def _check_is_arraylike(value: T) -> None:
+    """Check if a value is array-like.
+
+    Args:
+        value: The value to check.
+
+    Raises:
+        TypeError: If the value is not array-like.
+    """
     if not isinstance(value, (ArrayLike, list)):
         raise TypeError(
             f"Expected parameter value to be an array-like type. Got {value}."
         )
 
 
-def _check_is_positive(value: T):
-    if jnp.any(value < 0):
-        raise ValueError(
-            f"Expected parameter value to be strictly positive. Got {value}."
-        )
+@checkify.checkify
+def _check_is_positive(value):
+    checkify.check(
+        jnp.all(value > 0), "value needs to be positive, got {value}", value=value
+    )
 
 
-def _check_is_square(value: T):
-    if value.shape[0] != value.shape[1]:
-        raise ValueError(
-            f"Expected parameter value to be a square matrix. Got {value}."
-        )
+@checkify.checkify
+def _check_is_square(value: T) -> None:
+    """Check if a value is a square matrix.
+
+    Args:
+        value: The value to check.
+
+    Raises:
+        ValueError: If the value is not a square matrix.
+    """
+    checkify.check(
+        value.shape[0] == value.shape[1],
+        "value needs to be a square matrix, got {value}",
+        value=value,
+    )
 
 
-def _check_is_lower_triangular(value: T):
-    if not jnp.all(jnp.tril(value) == value):
-        raise ValueError(
-            f"Expected parameter value to be a lower triangular matrix. Got {value}."
-        )
+@checkify.checkify
+def _check_is_lower_triangular(value: T) -> None:
+    """Check if a value is a lower triangular matrix.
+
+    Args:
+        value: The value to check.
+
+    Raises:
+        ValueError: If the value is not a lower triangular matrix.
+    """
+    checkify.check(
+        jnp.all(jnp.tril(value) == value),
+        "value needs to be a lower triangular matrix, got {value}",
+        value=value,
+    )
 
 
-def _check_in_bounds(value: T, low: float, high: float):
-    if jnp.any((value < low) | (value > high)):
-        raise ValueError(
-            f"Expected parameter value to be bounded between {low} and {high}. Got {value}."
-        )
+@checkify.checkify
+def _check_in_bounds(value: T, low: T, high: T) -> None:
+    """Check if a value is bounded between low and high.
+
+    Args:
+        value: The value to check.
+        low: The lower bound.
+        high: The upper bound.
+
+    Raises:
+        ValueError: If any element of value is outside the bounds.
+    """
+    checkify.check(
+        jnp.all((value >= low) & (value <= high)),
+        "value needs to be bounded between {low} and {high}, got {value}",
+        value=value,
+        low=low,
+        high=high,
+    )
+
+
+def _safe_assert(fn: tp.Callable[[tp.Any], None], value: T, **kwargs) -> None:
+    error, _ = fn(value, **kwargs)
+    checkify.check_error(error)
