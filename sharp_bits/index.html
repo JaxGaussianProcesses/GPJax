@@ -485,6 +485,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#jit-compilation" class="md-nav__link">
+    <span class="md-ellipsis">
+      JIT compilation
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2485,6 +2494,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#jit-compilation" class="md-nav__link">
+    <span class="md-ellipsis">
+      JIT compilation
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2666,6 +2684,50 @@ mini-batch optimisation of the parameters of your sparse Gaussian process model.
 model will scale linearly in the batch size and quadratically in the number of inducing
 points. We demonstrate its use in
 <a href="../_examples/uncollapsed_vi/">our sparse stochastic variational inference notebook</a>.</p>
+<h2 id="jit-compilation">JIT compilation<a class="headerlink" href="#jit-compilation" title="Permanent link"></a></h2>
+<p>There are a subset of operations in GPJax that are not JIT compatible by default. This
+is because we have assertions in place to check the properties of the parameters. For
+example, we check that the lengthscale parameter that a user provides is positive. This
+makes for a better user experience as we can provide more informative error messages;
+however, JIT compiling functions wherein these assertions are made will break the code.
+As an example, consider the following code:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">gpjax</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpx</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">x</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">compute_gram</span><span class="p">(</span><span class="n">lengthscale</span><span class="p">):</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">k</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">RBF</span><span class="p">(</span><span class="n">active_dims</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lengthscale</span><span class="o">=</span><span class="n">lengthscale</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="k">return</span> <span class="n">k</span><span class="o">.</span><span class="n">gram</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="n">compute_gram</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+</span></code></pre></div>
+<p>so far so good. However, if we try to JIT compile this function, we will get an error:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">jit_compute_gram</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">compute_gram</span><span class="p">)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">try</span><span class="p">:</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">jit_compute_gram</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</span></code></pre></div>
+<p>This error is due to the fact that the <code>RBF</code> kernel contains an assertion that checks
+that the lengthscale is positive. It does not matter that the assertion is satisfied;
+the very presence of the assertion will break JIT compilation.</p>
+<p>To resolve this, we can use the <code>checkify</code> decorator to remove the assertion. This will
+allow the function to be JIT compiled.</p>
+<p><div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">jax.experimental</span><span class="w"> </span><span class="kn">import</span> <span class="n">checkify</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">jit_compute_gram</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">checkify</span><span class="o">.</span><span class="n">checkify</span><span class="p">(</span><span class="n">compute_gram</span><span class="p">))</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">error</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">jit_compute_gram</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+</span></code></pre></div>
+By virtue of the <code>checkify.checkify</code>, a tuple is returned where the first element is the
+output of the assertion, and the second element is the value of the function. </p>
+<p>This design is not perfect, and in an ideal world we would not enforce the user to wrap
+their code in <code>checkify.checkify</code>. We are actively looking into cleaner ways to provide
+guardrails in a less intrusive manner. However, for now, should you try to JIT compile
+a component of GPJax wherein there is an assertion, you will need to wrap the function
+in <code>checkify.checkify</code> as shown above.</p>
+<p>For more on <code>checkify</code>, please see the <a href="https://docs.jax.dev/en/latest/debugging/checkify_guide.html">JAX Checkify Doc</a>.</p>
 
 
 
