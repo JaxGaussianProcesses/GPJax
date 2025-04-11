@@ -1,16 +1,11 @@
 import typing as tp
 
 from flax import nnx
+from jax.experimental import checkify
 import jax.numpy as jnp
-import jax
-import jax.lax as lax
 import jax.tree_util as jtu
 from jax.typing import ArrayLike
 import tensorflow_probability.substrates.jax.bijectors as tfb
-import chex
-import jax
-import jax.numpy as jnp
-from jax.experimental import checkify
 
 T = tp.TypeVar("T", bound=tp.Union[ArrayLike, list[float]])
 ParameterTag = str

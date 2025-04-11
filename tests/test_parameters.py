@@ -1,9 +1,8 @@
 from flax import nnx
+from jax import jit
+from jax.experimental import checkify
 import jax.numpy as jnp
 import pytest
-from jax import jit
-
-from gpjax.kernels import RBF
 
 from gpjax.parameters import (
     DEFAULT_BIJECTION,
@@ -13,11 +12,10 @@ from gpjax.parameters import (
     Real,
     SigmoidBounded,
     Static,
-    transform,
     _check_is_positive,
     _safe_assert,
+    transform,
 )
-from jax.experimental import checkify
 
 
 @pytest.mark.parametrize(
