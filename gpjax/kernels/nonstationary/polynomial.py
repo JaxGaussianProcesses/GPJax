@@ -46,7 +46,7 @@ class Polynomial(AbstractKernel):
         self,
         active_dims: tp.Union[list[int], slice, None] = None,
         degree: int = 2,
-        shift: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 0.0,
+        shift: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
         variance: tp.Union[ScalarFloat, nnx.Variable[ScalarArray]] = 1.0,
         n_dims: tp.Union[int, None] = None,
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),

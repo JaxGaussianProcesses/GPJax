@@ -175,3 +175,60 @@ mini-batch optimisation of the parameters of your sparse Gaussian process model.
 model will scale linearly in the batch size and quadratically in the number of inducing
 points. We demonstrate its use in
 [our sparse stochastic variational inference notebook](_examples/uncollapsed_vi.md).
+
+## JIT compilation
+
+There are a subset of operations in GPJax that are not JIT compatible by default. This
+is because we have assertions in place to check the properties of the parameters. For
+example, we check that the lengthscale parameter that a user provides is positive. This
+makes for a better user experience as we can provide more informative error messages;
+however, JIT compiling functions wherein these assertions are made will break the code.
+As an example, consider the following code:
+
+```python
+import jax
+import jax.numpy as jnp
+import gpjax as gpx
+
+x = jnp.linspace(0, 1, 10)[:, None]
+
+def compute_gram(lengthscale):
+    k = gpx.kernels.RBF(active_dims=[0], lengthscale=lengthscale, variance=jnp.array(1.0))
+    return k.gram(x)
+
+compute_gram(1.0)
+```
+
+so far so good. However, if we try to JIT compile this function, we will get an error:
+
+```python
+jit_compute_gram = jax.jit(compute_gram)
+try:
+    jit_compute_gram(1.0)
+except Exception as e:
+    print(e)
+```
+
+This error is due to the fact that the `RBF` kernel contains an assertion that checks
+that the lengthscale is positive. It does not matter that the assertion is satisfied;
+the very presence of the assertion will break JIT compilation.
+
+To resolve this, we can use the `checkify` decorator to remove the assertion. This will
+allow the function to be JIT compiled.
+
+```python
+from jax.experimental import checkify
+
+jit_compute_gram = jax.jit(checkify.checkify(compute_gram))
+error, value = jit_compute_gram(1.0)
+```
+By virtue of the `checkify.checkify`, a tuple is returned where the first element is the
+output of the assertion, and the second element is the value of the function. 
+
+This design is not perfect, and in an ideal world we would not enforce the user to wrap
+their code in `checkify.checkify`. We are actively looking into cleaner ways to provide
+guardrails in a less intrusive manner. However, for now, should you try to JIT compile
+a component of GPJax wherein there is an assertion, you will need to wrap the function
+in `checkify.checkify` as shown above.
+
+For more on `checkify`, please see the [JAX Checkify Doc](https://docs.jax.dev/en/latest/debugging/checkify_guide.html).
