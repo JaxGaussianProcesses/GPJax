@@ -190,6 +190,7 @@ import jax
 import jax.numpy as jnp
 import gpjax as gpx
 
+x = jnp.linspace(0, 1, 10)[:, None]
 
 def compute_gram(lengthscale):
     k = gpx.kernels.RBF(active_dims=[0], lengthscale=lengthscale, variance=jnp.array(1.0))
@@ -202,7 +203,10 @@ so far so good. However, if we try to JIT compile this function, we will get an 
 
 ```python
 jit_compute_gram = jax.jit(compute_gram)
-jit_compute_gram(1.0)
+try:
+    jit_compute_gram(1.0)
+except Exception as e:
+    print(e)
 ```
 
 This error is due to the fact that the `RBF` kernel contains an assertion that checks
