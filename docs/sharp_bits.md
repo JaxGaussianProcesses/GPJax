@@ -187,7 +187,9 @@ As an example, consider the following code:
 
 ```python
 import jax
+import jax.numpy as jnp
 import gpjax as gpx
+
 
 def compute_gram(lengthscale):
     k = gpx.kernels.RBF(active_dims=[0], lengthscale=lengthscale, variance=jnp.array(1.0))
