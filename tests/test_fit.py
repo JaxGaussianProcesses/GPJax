@@ -13,6 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
+from beartype.typing import Any
 from flax import nnx
 import jax.numpy as jnp
 import jax.random as jr
@@ -26,6 +27,13 @@ import scipy
 
 from gpjax.dataset import Dataset
 from gpjax.fit import (
+    _check_batch_size,
+    _check_log_rate,
+    _check_model,
+    _check_num_iters,
+    _check_optim,
+    _check_train_data,
+    _check_verbose,
     fit,
     fit_scipy,
     get_batch,
@@ -324,3 +332,142 @@ def test_get_batch(n_data: int, n_dim: int, batch_size: int):
     assert New.y.shape[1:] == y.shape[1:]
     assert jnp.sum(New.X == B.X) <= n_dim * batch_size / n_data
     assert jnp.sum(New.y == B.y) <= n_dim * batch_size / n_data
+
+
+@pytest.fixture
+def valid_model() -> nnx.Module:
+    """Return a valid model for testing."""
+
+    class LinearModel(nnx.Module):
+        def __init__(self, weight: float, bias: float) -> None:
+            self.weight = PositiveReal(weight)
+            self.bias = Static(bias)
+
+        def __call__(self, x: Any) -> Any:
+            return self.weight.value * x + self.bias.value
+
+    return LinearModel(weight=1.0, bias=1.0)
+
+
+@pytest.fixture
+def valid_dataset() -> Dataset:
+    """Return a valid dataset for testing."""
+    X = jnp.array([[1.0], [2.0], [3.0]])
+    y = jnp.array([[1.0], [2.0], [3.0]])
+    return Dataset(X=X, y=y)
+
+
+def test_check_model_valid(valid_model: nnx.Module) -> None:
+    """Test that a valid model passes validation."""
+    _check_model(valid_model)
+
+
+def test_check_model_invalid() -> None:
+    """Test that an invalid model raises a TypeError."""
+    model = "not a model"
+    with pytest.raises(
+        TypeError, match="Expected model to be a subclass of nnx.Module"
+    ):
+        _check_model(model)
+
+
+def test_check_train_data_valid(valid_dataset: Dataset) -> None:
+    """Test that valid training data passes validation."""
+    _check_train_data(valid_dataset)
+
+
+def test_check_train_data_invalid() -> None:
+    """Test that invalid training data raises a TypeError."""
+    train_data = "not a dataset"
+    with pytest.raises(
+        TypeError, match="Expected train_data to be of type gpjax.Dataset"
+    ):
+        _check_train_data(train_data)
+
+
+def test_check_optim_valid() -> None:
+    """Test that a valid optimiser passes validation."""
+    optim = ox.sgd(0.1)
+    _check_optim(optim)
+
+
+def test_check_optim_invalid() -> None:
+    """Test that an invalid optimiser raises a TypeError."""
+    optim = "not an optimiser"
+    with pytest.raises(
+        TypeError, match="Expected optim to be of type optax.GradientTransformation"
+    ):
+        _check_optim(optim)
+
+
+@pytest.mark.parametrize("num_iters", [1, 10, 100])
+def test_check_num_iters_valid(num_iters: int) -> None:
+    """Test that valid number of iterations passes validation."""
+    _check_num_iters(num_iters)
+
+
+def test_check_num_iters_invalid_type() -> None:
+    """Test that an invalid num_iters type raises a TypeError."""
+    num_iters = "not an int"
+    with pytest.raises(TypeError, match="Expected num_iters to be of type int"):
+        _check_num_iters(num_iters)
+
+
+@pytest.mark.parametrize("num_iters", [0, -5])
+def test_check_num_iters_invalid_value(num_iters: int) -> None:
+    """Test that an invalid num_iters value raises a ValueError."""
+    with pytest.raises(ValueError, match="Expected num_iters to be positive"):
+        _check_num_iters(num_iters)
+
+
+@pytest.mark.parametrize("log_rate", [1, 10, 100])
+def test_check_log_rate_valid(log_rate: int) -> None:
+    """Test that a valid log rate passes validation."""
+    _check_log_rate(log_rate)
+
+
+def test_check_log_rate_invalid_type() -> None:
+    """Test that an invalid log_rate type raises a TypeError."""
+    log_rate = "not an int"
+    with pytest.raises(TypeError, match="Expected log_rate to be of type int"):
+        _check_log_rate(log_rate)
+
+
+@pytest.mark.parametrize("log_rate", [0, -5])
+def test_check_log_rate_invalid_value(log_rate: int) -> None:
+    """Test that an invalid log_rate value raises a ValueError."""
+    with pytest.raises(ValueError, match="Expected log_rate to be positive"):
+        _check_log_rate(log_rate)
+
+
+@pytest.mark.parametrize("verbose", [True, False])
+def test_check_verbose_valid(verbose: bool) -> None:
+    """Test that valid verbose values pass validation."""
+    _check_verbose(verbose)
+
+
+def test_check_verbose_invalid() -> None:
+    """Test that an invalid verbose value raises a TypeError."""
+    verbose = "not a bool"
+    with pytest.raises(TypeError, match="Expected verbose to be of type bool"):
+        _check_verbose(verbose)
+
+
+@pytest.mark.parametrize("batch_size", [1, 10, 100, -1])
+def test_check_batch_size_valid(batch_size: int) -> None:
+    """Test that valid batch sizes pass validation."""
+    _check_batch_size(batch_size)
+
+
+def test_check_batch_size_invalid_type() -> None:
+    """Test that an invalid batch_size type raises a TypeError."""
+    batch_size = "not an int"
+    with pytest.raises(TypeError, match="Expected batch_size to be of type int"):
+        _check_batch_size(batch_size)
+
+
+@pytest.mark.parametrize("batch_size", [0, -2, -5])
+def test_check_batch_size_invalid_value(batch_size: int) -> None:
+    """Test that invalid batch_size values raise a ValueError."""
+    with pytest.raises(ValueError, match="Expected batch_size to be positive or -1"):
+        _check_batch_size(batch_size)
