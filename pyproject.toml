@@ -24,13 +24,14 @@ dependencies = [
   "jax>=0.5.0",
   "jaxlib>=0.5.0",
   "optax>0.2.1",
-  "numpyro",
+  "numpyro>0.18.0",
   "jaxtyping>0.2.10",
   "tqdm>4.66.2",
   "beartype>0.16.1",
   "cola-ml>=0.0.7",
   "flax>=0.10.0",
   "numpy>=2.0.0",
+  "arviz"
 ]
 
 [tool.hatch.envs.default]
@@ -60,6 +61,7 @@ dependencies = [
   "nbconvert>=7.16.2",
   "markdown-katex>=202406.1035",
   "scikit-learn>=1.5.1",
+  "graphviz"
 ]
 python = "3.10"
 
