@@ -33,8 +33,6 @@ from gpjax.mean_functions import (
     AbstractMeanFunction,
     CombinationMeanFunction,
     Constant,
-    ProductMeanFunction,
-    SumMeanFunction,
     Zero,
 )
 from gpjax.parameters import Static
