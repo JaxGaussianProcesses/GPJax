@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -127,8 +127,8 @@ prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
 prior_dist = prior.predict(xtest)
 
 prior_mean = prior_dist.mean
-prior_std = prior_dist.variance()
-samples = prior_dist.sample(seed=key, sample_shape=(20,))
+prior_std = prior_dist.variance
+samples = prior_dist.sample(key=key, sample_shape=(20,))
 
 
 fig, ax = plt.subplots()
@@ -218,7 +218,7 @@ latent_dist = opt_posterior.predict(xtest, train_data=D)
 predictive_dist = opt_posterior.likelihood(latent_dist)
 
 predictive_mean = predictive_dist.mean
-predictive_std = predictive_dist.stddev()
+predictive_std = jnp.sqrt(predictive_dist.variance)
 
 # %% [markdown]
 # With the predictions and their uncertainty acquired, we illustrate the GP's

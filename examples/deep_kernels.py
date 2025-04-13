@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -239,7 +239,7 @@ latent_dist = opt_posterior(xtest, train_data=D)
 predictive_dist = opt_posterior.likelihood(latent_dist)
 
 predictive_mean = predictive_dist.mean
-predictive_std = predictive_dist.stddev()
+predictive_std = jnp.sqrt(predictive_dist.variance)
 
 fig, ax = plt.subplots()
 ax.plot(x, y, "o", label="Observations", color=cols[0])

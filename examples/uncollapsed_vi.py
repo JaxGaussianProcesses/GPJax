@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: gpjax_beartype
 #     language: python
@@ -38,8 +38,9 @@ import jax.random as jr
 from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpyro.distributions as npd
+import numpyro.distributions.transforms as npt
 import optax as ox
-import tensorflow_probability.substrates.jax as tfp
 
 from examples.utils import use_mpl_style
 
@@ -112,7 +113,7 @@ xtest = jnp.linspace(-5.5, 5.5, 500).reshape(-1, 1)
 # On the other hand, sparse variational Gaussian processes (SVGPs)
 # [approximate the posterior, not the model](https://www.secondmind.ai/labs/sparse-gps-approximate-the-posterior-not-the-model/).
 # These provide a low-rank approximation scheme via variational inference. Here we
-# posit a family of densities parameterised by “variational parameters”.
+# posit a family of densities parameterised by "variational parameters".
 # We then seek to find the closest family member to the posterior by minimising the
 # Kullback-Leibler divergence over the variational parameters.
 # The fitted variational density then serves as a proxy for the exact posterior.
@@ -274,7 +275,7 @@ latent_dist = opt_posterior(xtest)
 predictive_dist = opt_posterior.posterior.likelihood(latent_dist)
 
 meanf = predictive_dist.mean
-sigma = predictive_dist.stddev()
+sigma = jnp.sqrt(predictive_dist.variance)
 
 fig, ax = plt.subplots()
 ax.scatter(x, y, alpha=0.15, label="Training Data", color=cols[0])
@@ -297,68 +298,6 @@ ax.vlines(
     color=cols[2],
 )
 ax.legend()
-
-# %% [markdown]
-# ## Custom transformations
-#
-# To train a covariance matrix, GPJax uses `tfb.FillTriangular` transformation by
-# default. `tfb.FillTriangular` fills a 1d vector into a lower triangular matrix.
-# Users can change this default transformation
-# with another valid transformation of their choice. For example, `Square`
-# transformation on the diagonal can also serve the purpose.
-
-# %%
-
-params_bijection = gpx.parameters.DEFAULT_BIJECTION.copy()
-params_bijection[gpx.parameters.LowerTriangular] = tfb.FillScaleTriL(
-    diag_bijector=tfb.Square(), diag_shift=jnp.array(q.jitter)
-)
-
-# %%
-opt_rep, history = gpx.fit(
-    model=q,
-    objective=lambda p, d: -gpx.objectives.elbo(p, d),
-    train_data=D,
-    optim=ox.adam(learning_rate=0.01),
-    num_iters=3000,
-    key=jr.key(42),
-    batch_size=128,
-)
-
-
-# %%
-latent_dist = opt_rep(xtest)
-predictive_dist = opt_rep.posterior.likelihood(latent_dist)
-
-meanf = predictive_dist.mean
-sigma = predictive_dist.stddev()
-
-fig, ax = plt.subplots()
-ax.scatter(x, y, alpha=0.15, label="Training Data", color=cols[0])
-ax.plot(xtest, meanf, label="Posterior mean", color=cols[1])
-ax.fill_between(
-    xtest.flatten(),
-    meanf - 2 * sigma,
-    meanf + 2 * sigma,
-    alpha=0.3,
-    color=cols[1],
-    label="Two sigma",
-)
-ax.vlines(
-    opt_rep.inducing_inputs.value,
-    ymin=y.min(),
-    ymax=y.max(),
-    alpha=0.3,
-    linewidth=1,
-    label="Inducing point",
-    color=cols[2],
-)
-ax.legend()
-
-# %% [markdown]
-# We can see that `Square` transformation is able to get relatively better fit
-# compared to `Softplus` with the same number of iterations, but `Softplus` is
-# recommended over `Square` for stability of optimisation.
 
 # %% [markdown]
 # ## System configuration

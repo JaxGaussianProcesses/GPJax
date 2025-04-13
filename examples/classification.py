@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -37,8 +37,8 @@ from jaxtyping import (
     install_import_hook,
 )
 import matplotlib.pyplot as plt
+import numpyro.distributions as npd
 import optax as ox
-import tensorflow_probability.substrates.jax as tfp
 
 from examples.utils import use_mpl_style
 from gpjax.lower_cholesky import lower_cholesky
@@ -50,7 +50,6 @@ with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
 
-tfd = tfp.distributions
 identity_matrix = jnp.eye
 
 # set the default style for plotting
@@ -141,7 +140,7 @@ map_latent_dist = opt_posterior.predict(xtest, train_data=D)
 predictive_dist = opt_posterior.likelihood(map_latent_dist)
 
 predictive_mean = predictive_dist.mean
-predictive_std = predictive_dist.stddev()
+predictive_std = jnp.sqrt(predictive_dist.variance)
 
 fig, ax = plt.subplots()
 ax.scatter(x, y, label="Observations", color=cols[0])
@@ -246,7 +245,7 @@ L = jnp.linalg.cholesky(H + identity_matrix(D.n) * jitter)
 L_inv = jsp.linalg.solve_triangular(L, identity_matrix(D.n), lower=True)
 H_inv = jsp.linalg.solve_triangular(L.T, L_inv, lower=False)
 LH = jnp.linalg.cholesky(H_inv)
-laplace_approximation = tfd.MultivariateNormalTriL(f_hat.squeeze(), LH)
+laplace_approximation = npd.MultivariateNormal(f_hat.squeeze(), scale_tril=LH)
 
 
 # %% [markdown]
@@ -265,7 +264,7 @@ laplace_approximation = tfd.MultivariateNormalTriL(f_hat.squeeze(), LH)
 
 
 # %%
-def construct_laplace(test_inputs: Float[Array, "N D"]) -> tfd.MultivariateNormalTriL:
+def construct_laplace(test_inputs: Float[Array, "N D"]) -> npd.MultivariateNormal:
     map_latent_dist = opt_posterior.predict(xtest, train_data=D)
 
     Kxt = opt_posterior.prior.kernel.cross_covariance(x, test_inputs)
@@ -280,9 +279,9 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> tfd.MultivariateNorma
     laplace_cov_term = jnp.matmul(jnp.matmul(Kxx_inv_Kxt.T, H_inv), Kxx_inv_Kxt)
 
     mean = map_latent_dist.mean
-    covariance = map_latent_dist.covariance() + laplace_cov_term
+    covariance = map_latent_dist.covariance + laplace_cov_term
     L = jnp.linalg.cholesky(covariance)
-    return tfd.MultivariateNormalTriL(jnp.atleast_1d(mean.squeeze()), L)
+    return npd.MultivariateNormal(jnp.atleast_1d(mean.squeeze()), scale_tril=L)
 
 
 # %% [markdown]
@@ -292,7 +291,7 @@ laplace_latent_dist = construct_laplace(xtest)
 predictive_dist = opt_posterior.likelihood(laplace_latent_dist)
 
 predictive_mean = predictive_dist.mean
-predictive_std = predictive_dist.stddev()
+predictive_std = jnp.sqrt(predictive_dist.variance)
 
 fig, ax = plt.subplots()
 ax.scatter(x, y, label="Observations", color=cols[0])

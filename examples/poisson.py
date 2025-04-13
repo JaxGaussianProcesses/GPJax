@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: base
 #     language: python
@@ -33,7 +33,6 @@ import jax.tree_util as jtu
 from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import tensorflow_probability.substrates.jax as tfp
 
 from examples.utils import use_mpl_style
 
@@ -43,7 +42,6 @@ with install_import_hook("gpjax", "beartype.beartype"):
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
-tfd = tfp.distributions
 
 # set the default style for plotting
 use_mpl_style()

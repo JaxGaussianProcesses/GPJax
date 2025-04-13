@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -41,7 +41,7 @@ import jax.random as jr
 import jax.scipy.linalg as jsl
 from jaxtyping import install_import_hook
 import matplotlib.pyplot as plt
-import tensorflow_probability.substrates.jax.distributions as tfd
+import numpyro.distributions as npd
 
 from examples.utils import use_mpl_style
 
@@ -161,7 +161,7 @@ plt.show()
 
 
 # %%
-def fit_gp(x: jax.Array, y: jax.Array) -> tfd.MultivariateNormalFullCovariance:
+def fit_gp(x: jax.Array, y: jax.Array) -> npd.MultivariateNormal:
     if y.ndim == 1:
         y = y.reshape(-1, 1)
     D = gpx.Dataset(X=x, y=y)
@@ -204,9 +204,9 @@ def sqrtm(A: jax.Array):
 
 
 def wasserstein_barycentres(
-    distributions: tp.List[tfd.MultivariateNormalFullCovariance], weights: jax.Array
+    distributions: tp.List[npd.MultivariateNormal], weights: jax.Array
 ):
-    covariances = [d.covariance() for d in distributions]
+    covariances = [d.covariance_matrix for d in distributions]
     cov_stack = jnp.stack(covariances)
     stack_sqrt = jax.vmap(sqrtm)(cov_stack)
 
@@ -242,7 +242,7 @@ barycentre_covariance, sequence = jax.lax.scan(
 )
 L = jnp.linalg.cholesky(barycentre_covariance)
 
-barycentre_process = tfd.MultivariateNormalTriL(barycentre_mean, L)
+barycentre_process = npd.MultivariateNormal(barycentre_mean, scale_tril=L)
 
 # %% [markdown]
 # ## Plotting the result
@@ -254,7 +254,7 @@ barycentre_process = tfd.MultivariateNormalTriL(barycentre_mean, L)
 
 # %%
 def plot(
-    dist: tfd.MultivariateNormalTriL,
+    dist: npd.MultivariateNormal,
     ax,
     color: str,
     label: str = None,
@@ -263,7 +263,7 @@ def plot(
     zorder: int = 0,
 ):
     mu = dist.mean
-    sigma = dist.stddev()
+    sigma = jnp.sqrt(dist.variance)
     ax.plot(xtest, mu, linewidth=linewidth, color=color, label=label, zorder=zorder)
     ax.fill_between(
         xtest.squeeze(),

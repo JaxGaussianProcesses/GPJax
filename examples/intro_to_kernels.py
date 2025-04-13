@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -312,7 +312,7 @@ opt_latent_dist = opt_posterior.predict(test_x, train_data=D)
 opt_predictive_dist = opt_posterior.likelihood(opt_latent_dist)
 
 opt_predictive_mean = opt_predictive_dist.mean
-opt_predictive_std = opt_predictive_dist.stddev()
+opt_predictive_std = jnp.sqrt(opt_predictive_dist.variance)
 
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(5, 6))
 ax1.plot(
@@ -570,7 +570,7 @@ latent_dist = opt_posterior.predict(test_x, train_data=D)
 predictive_dist = opt_posterior.likelihood(latent_dist)
 
 predictive_mean = predictive_dist.mean.reshape(-1, 1)
-predictive_std = predictive_dist.stddev().reshape(-1, 1)
+predictive_std = jnp.sqrt(predictive_dist.variance).reshape(-1, 1)
 
 # %% [markdown]
 # Let's plot the model's predictions over this period of time:

@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -73,15 +73,12 @@ from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
-import tensorflow_probability.substrates.jax as tfp
 
 from examples.utils import use_mpl_style
 import gpjax as gpx
 
 config.update("jax_enable_x64", True)
 
-
-tfd = tfp.distributions
 
 # set the default style for plotting
 use_mpl_style()

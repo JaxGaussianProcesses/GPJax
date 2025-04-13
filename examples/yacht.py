@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -212,7 +212,7 @@ latent_dist = opt_posterior(scaled_Xte, training_data)
 predictive_dist = likelihood(latent_dist)
 
 predictive_mean = predictive_dist.mean
-predictive_stddev = predictive_dist.stddev()
+predictive_stddev = jnp.sqrt(predictive_dist.variance)
 
 # %% [markdown]
 # ## Evaluation
