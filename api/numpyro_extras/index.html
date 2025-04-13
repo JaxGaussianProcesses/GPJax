@@ -10,25 +10,25 @@
       
       
       
-        <link rel="canonical" href="https://docs.jaxgaussianprocesses.com/api/kernels/stationary/rational_quadratic/">
+        <link rel="canonical" href="https://docs.jaxgaussianprocesses.com/api/numpyro_extras/">
       
       
-        <link rel="prev" href="../powered_exponential/">
+        <link rel="prev" href="../mean_functions/">
       
       
-        <link rel="next" href="../rbf/">
+        <link rel="next" href="../objectives/">
       
       
-      <link rel="icon" href="../../../../static/favicon.ico">
+      <link rel="icon" href="../../static/favicon.ico">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
     
     
       
-        <title>Rational Quadratic - GPJax</title>
+        <title>Numpyro Extras - GPJax</title>
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
       
       
 
@@ -47,15 +47,15 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
     
-      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-      <link rel="stylesheet" href="../../../../stylesheets/permalinks.css">
+      <link rel="stylesheet" href="../../stylesheets/permalinks.css">
     
-    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic" class="md-skip">
+        <a href="#gpjax.numpyro_extras.FillTriangularTransform" class="md-skip">
           Skip to content
         </a>
       
@@ -100,9 +100,9 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../.." title="GPJax" class="md-header__button md-logo" aria-label="GPJax" data-md-component="logo">
+    <a href="../.." title="GPJax" class="md-header__button md-logo" aria-label="GPJax" data-md-component="logo">
       
-  <img src="../../../../static/favicon.ico" alt="logo">
+  <img src="../../static/favicon.ico" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -119,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Rational Quadratic
+              Numpyro Extras
             
           </span>
         </div>
@@ -211,9 +211,9 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../.." title="GPJax" class="md-nav__button md-logo" aria-label="GPJax" data-md-component="logo">
+    <a href="../.." title="GPJax" class="md-nav__button md-logo" aria-label="GPJax" data-md-component="logo">
       
-  <img src="../../../../static/favicon.ico" alt="logo">
+  <img src="../../static/favicon.ico" alt="logo">
 
     </a>
     GPJax
@@ -240,7 +240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../.." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -307,7 +307,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../installation/" class="md-nav__link">
+      <a href="../../installation/" class="md-nav__link">
         
   
   
@@ -330,7 +330,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../design/" class="md-nav__link">
+      <a href="../../design/" class="md-nav__link">
         
   
   
@@ -353,7 +353,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../contributing/" class="md-nav__link">
+      <a href="../../contributing/" class="md-nav__link">
         
   
   
@@ -376,7 +376,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../sharp_bits/" class="md-nav__link">
+      <a href="../../sharp_bits/" class="md-nav__link">
         
   
   
@@ -474,7 +474,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/intro_to_gps/" class="md-nav__link">
+      <a href="../../_examples/intro_to_gps/" class="md-nav__link">
         
   
   
@@ -497,7 +497,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/intro_to_kernels/" class="md-nav__link">
+      <a href="../../_examples/intro_to_kernels/" class="md-nav__link">
         
   
   
@@ -572,7 +572,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/regression/" class="md-nav__link">
+      <a href="../../_examples/regression/" class="md-nav__link">
         
   
   
@@ -595,7 +595,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/classification/" class="md-nav__link">
+      <a href="../../_examples/classification/" class="md-nav__link">
         
   
   
@@ -618,7 +618,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/poisson/" class="md-nav__link">
+      <a href="../../_examples/poisson/" class="md-nav__link">
         
   
   
@@ -641,7 +641,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/barycentres/" class="md-nav__link">
+      <a href="../../_examples/barycentres/" class="md-nav__link">
         
   
   
@@ -664,7 +664,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/deep_kernels/" class="md-nav__link">
+      <a href="../../_examples/deep_kernels/" class="md-nav__link">
         
   
   
@@ -687,7 +687,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/graph_kernels/" class="md-nav__link">
+      <a href="../../_examples/graph_kernels/" class="md-nav__link">
         
   
   
@@ -710,7 +710,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/collapsed_vi/" class="md-nav__link">
+      <a href="../../_examples/collapsed_vi/" class="md-nav__link">
         
   
   
@@ -733,7 +733,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/uncollapsed_vi/" class="md-nav__link">
+      <a href="../../_examples/uncollapsed_vi/" class="md-nav__link">
         
   
   
@@ -756,7 +756,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/oceanmodelling/" class="md-nav__link">
+      <a href="../../_examples/oceanmodelling/" class="md-nav__link">
         
   
   
@@ -831,7 +831,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/constructing_new_kernels.md" class="md-nav__link">
+      <a href="../../_examples/constructing_new_kernels.md" class="md-nav__link">
         
   
   
@@ -854,7 +854,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/likelihoods_guide/" class="md-nav__link">
+      <a href="../../_examples/likelihoods_guide/" class="md-nav__link">
         
   
   
@@ -877,7 +877,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/backend/" class="md-nav__link">
+      <a href="../../_examples/backend/" class="md-nav__link">
         
   
   
@@ -900,7 +900,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../_examples/yacht/" class="md-nav__link">
+      <a href="../../_examples/yacht/" class="md-nav__link">
         
   
   
@@ -975,7 +975,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../CODE_OF_CONDUCT/" class="md-nav__link">
+      <a href="../../CODE_OF_CONDUCT/" class="md-nav__link">
         
   
   
@@ -998,7 +998,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../GOVERNANCE/" class="md-nav__link">
+      <a href="../../GOVERNANCE/" class="md-nav__link">
         
   
   
@@ -1138,7 +1138,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../citation/" class="md-nav__link">
+      <a href="../citation/" class="md-nav__link">
         
   
   
@@ -1161,7 +1161,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../dataset/" class="md-nav__link">
+      <a href="../dataset/" class="md-nav__link">
         
   
   
@@ -1184,7 +1184,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../distributions/" class="md-nav__link">
+      <a href="../distributions/" class="md-nav__link">
         
   
   
@@ -1207,7 +1207,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../fit/" class="md-nav__link">
+      <a href="../fit/" class="md-nav__link">
         
   
   
@@ -1230,7 +1230,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gps/" class="md-nav__link">
+      <a href="../gps/" class="md-nav__link">
         
   
   
@@ -1253,7 +1253,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../integrators/" class="md-nav__link">
+      <a href="../integrators/" class="md-nav__link">
         
   
   
@@ -1273,8 +1273,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1284,11 +1282,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_1_7" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_7" >
         
           
           <label class="md-nav__link" for="__nav_7_1_7" id="__nav_7_1_7_label" tabindex="0">
@@ -1304,7 +1304,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_1_7_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_1_7_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_7_1_7">
             <span class="md-nav__icon md-icon"></span>
             Kernels
@@ -1360,7 +1360,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../approximations/rff/" class="md-nav__link">
+      <a href="../kernels/approximations/rff/" class="md-nav__link">
         
   
   
@@ -1391,7 +1391,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../base/" class="md-nav__link">
+      <a href="../kernels/base/" class="md-nav__link">
         
   
   
@@ -1456,7 +1456,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../computations/base/" class="md-nav__link">
+      <a href="../kernels/computations/base/" class="md-nav__link">
         
   
   
@@ -1479,7 +1479,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../computations/basis_functions/" class="md-nav__link">
+      <a href="../kernels/computations/basis_functions/" class="md-nav__link">
         
   
   
@@ -1502,7 +1502,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../computations/constant_diagonal/" class="md-nav__link">
+      <a href="../kernels/computations/constant_diagonal/" class="md-nav__link">
         
   
   
@@ -1525,7 +1525,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../computations/dense/" class="md-nav__link">
+      <a href="../kernels/computations/dense/" class="md-nav__link">
         
   
   
@@ -1548,7 +1548,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../computations/diagonal/" class="md-nav__link">
+      <a href="../kernels/computations/diagonal/" class="md-nav__link">
         
   
   
@@ -1571,7 +1571,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../computations/eigen/" class="md-nav__link">
+      <a href="../kernels/computations/eigen/" class="md-nav__link">
         
   
   
@@ -1644,7 +1644,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../non_euclidean/graph/" class="md-nav__link">
+      <a href="../kernels/non_euclidean/graph/" class="md-nav__link">
         
   
   
@@ -1667,7 +1667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../non_euclidean/utils/" class="md-nav__link">
+      <a href="../kernels/non_euclidean/utils/" class="md-nav__link">
         
   
   
@@ -1740,7 +1740,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nonstationary/arccosine/" class="md-nav__link">
+      <a href="../kernels/nonstationary/arccosine/" class="md-nav__link">
         
   
   
@@ -1763,7 +1763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nonstationary/linear/" class="md-nav__link">
+      <a href="../kernels/nonstationary/linear/" class="md-nav__link">
         
   
   
@@ -1786,7 +1786,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nonstationary/polynomial/" class="md-nav__link">
+      <a href="../kernels/nonstationary/polynomial/" class="md-nav__link">
         
   
   
@@ -1814,8 +1814,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1825,11 +1823,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_1_7_6" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_7_6" >
         
           
           <label class="md-nav__link" for="__nav_7_1_7_6" id="__nav_7_1_7_6_label" tabindex="0">
@@ -1845,7 +1845,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_7_6_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_1_7_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_7_1_7_6">
             <span class="md-nav__icon md-icon"></span>
             Stationary
@@ -1859,7 +1859,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../base/" class="md-nav__link">
+      <a href="../kernels/stationary/base/" class="md-nav__link">
         
   
   
@@ -1882,7 +1882,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../matern12/" class="md-nav__link">
+      <a href="../kernels/stationary/matern12/" class="md-nav__link">
         
   
   
@@ -1905,7 +1905,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../matern32/" class="md-nav__link">
+      <a href="../kernels/stationary/matern32/" class="md-nav__link">
         
   
   
@@ -1928,7 +1928,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../matern52/" class="md-nav__link">
+      <a href="../kernels/stationary/matern52/" class="md-nav__link">
         
   
   
@@ -1951,7 +1951,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../periodic/" class="md-nav__link">
+      <a href="../kernels/stationary/periodic/" class="md-nav__link">
         
   
   
@@ -1974,7 +1974,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../powered_exponential/" class="md-nav__link">
+      <a href="../kernels/stationary/powered_exponential/" class="md-nav__link">
         
   
   
@@ -1994,30 +1994,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Rational Quadratic
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../kernels/stationary/rational_quadratic/" class="md-nav__link">
         
   
   
@@ -2028,102 +2008,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic" class="md-nav__link">
-    <span class="md-ellipsis">
-      RationalQuadratic
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RationalQuadratic">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.spectral_density" class="md-nav__link">
-    <span class="md-ellipsis">
-      spectral_density
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.cross_covariance" class="md-nav__link">
-    <span class="md-ellipsis">
-      cross_covariance
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.gram" class="md-nav__link">
-    <span class="md-ellipsis">
-      gram
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.diagonal" class="md-nav__link">
-    <span class="md-ellipsis">
-      diagonal
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.slice_input" class="md-nav__link">
-    <span class="md-ellipsis">
-      slice_input
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.__add__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __add__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.__mul__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __mul__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2136,7 +2020,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../rbf/" class="md-nav__link">
+      <a href="../kernels/stationary/rbf/" class="md-nav__link">
         
   
   
@@ -2159,7 +2043,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../utils/" class="md-nav__link">
+      <a href="../kernels/stationary/utils/" class="md-nav__link">
         
   
   
@@ -2182,7 +2066,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../white/" class="md-nav__link">
+      <a href="../kernels/stationary/white/" class="md-nav__link">
         
   
   
@@ -2221,7 +2105,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../likelihoods/" class="md-nav__link">
+      <a href="../likelihoods/" class="md-nav__link">
         
   
   
@@ -2244,7 +2128,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../lower_cholesky/" class="md-nav__link">
+      <a href="../lower_cholesky/" class="md-nav__link">
         
   
   
@@ -2267,7 +2151,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../mean_functions/" class="md-nav__link">
+      <a href="../mean_functions/" class="md-nav__link">
         
   
   
@@ -2287,10 +2171,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../../numpyro_extras/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Numpyro Extras
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -2301,6 +2205,48 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.numpyro_extras.FillTriangularTransform" class="md-nav__link">
+    <span class="md-ellipsis">
+      FillTriangularTransform
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FillTriangularTransform">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.numpyro_extras.FillTriangularTransform.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -2313,7 +2259,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../objectives/" class="md-nav__link">
+      <a href="../objectives/" class="md-nav__link">
         
   
   
@@ -2336,7 +2282,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../parameters/" class="md-nav__link">
+      <a href="../parameters/" class="md-nav__link">
         
   
   
@@ -2359,7 +2305,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../scan/" class="md-nav__link">
+      <a href="../scan/" class="md-nav__link">
         
   
   
@@ -2382,7 +2328,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../typing/" class="md-nav__link">
+      <a href="../typing/" class="md-nav__link">
         
   
   
@@ -2405,7 +2351,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../variational_families/" class="md-nav__link">
+      <a href="../variational_families/" class="md-nav__link">
         
   
   
@@ -2461,73 +2407,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic" class="md-nav__link">
+  <a href="#gpjax.numpyro_extras.FillTriangularTransform" class="md-nav__link">
     <span class="md-ellipsis">
-      RationalQuadratic
+      FillTriangularTransform
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="RationalQuadratic">
+    <nav class="md-nav" aria-label="FillTriangularTransform">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.spectral_density" class="md-nav__link">
+  <a href="#gpjax.numpyro_extras.FillTriangularTransform.__call__" class="md-nav__link">
     <span class="md-ellipsis">
-      spectral_density
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.cross_covariance" class="md-nav__link">
-    <span class="md-ellipsis">
-      cross_covariance
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.gram" class="md-nav__link">
-    <span class="md-ellipsis">
-      gram
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.diagonal" class="md-nav__link">
-    <span class="md-ellipsis">
-      diagonal
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.slice_input" class="md-nav__link">
-    <span class="md-ellipsis">
-      slice_input
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.__add__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __add__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.__mul__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __mul__
+      __call__
     </span>
   </a>
   
@@ -2557,7 +2449,7 @@
   
 
 
-  <h1>Rational Quadratic</h1>
+  <h1>Numpyro Extras</h1>
 
 <div class="doc doc-object doc-module">
 
@@ -2586,96 +2478,21 @@
 
 
 
-<h2 id="gpjax.kernels.stationary.rational_quadratic.RationalQuadratic" class="doc doc-heading">
-            <span class="doc doc-object-name doc-class-name">RationalQuadratic</span>
+<h2 id="gpjax.numpyro_extras.FillTriangularTransform" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">FillTriangularTransform</span>
 
 
 </h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">RationalQuadratic</span><span class="p">(</span><span class="n">active_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lengthscale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">n_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compute_engine</span><span class="o">=</span><span class="n">DenseKernelComputation</span><span class="p">())</span>
-</span></code></pre></div>
+
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="gpjax.kernels.stationary.base.StationaryKernel" href="../base/#gpjax.kernels.stationary.base.StationaryKernel">StationaryKernel</a></code></p>
+              Bases: <code><span title="numpyro.distributions.transforms.Transform">Transform</span></code></p>
 
 
-        <p>The Rational Quadratic kernel.</p>
-<p>Computes the covariance for pairs of inputs <span class="arithmatex">\((x, y)\)</span> with lengthscale parameter
-<span class="arithmatex">\(\ell\)</span> and variance <span class="arithmatex">\(\sigma^2\)</span>.
-$$
-k(x,y)=\sigma^2\exp\Bigg(1+\frac{\lVert x-y\rVert^2_2}{2\alpha\ell^2}\Bigg)
-$$</p>
-
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>active_dims</code></b>
-              (<code><span title="beartype.typing.Union">Union</span>[<span title="list">list</span>[<span title="int">int</span>], <span title="slice">slice</span>, None]</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>The indices of the input dimensions that the kernel operates on.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>lengthscale</code></b>
-              (<code><span title="beartype.typing.Union">Union</span>[<span title="gpjax.kernels.stationary.rational_quadratic.LengthscaleCompatible">LengthscaleCompatible</span>, <span title="flax.nnx.Variable">Variable</span>[<span title="gpjax.kernels.stationary.rational_quadratic.Lengthscale">Lengthscale</span>]]</code>, default:
-                  <code>1.0</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>the lengthscale(s) of the kernel ℓ. If a scalar or an array of
-length 1, the kernel is isotropic, meaning that the same lengthscale is
-used for all input dimensions. If an array with length &gt; 1, the kernel is
-anisotropic, meaning that a different lengthscale is used for each input.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>variance</code></b>
-              (<code><span title="beartype.typing.Union">Union</span>[<span title="gpjax.typing.ScalarFloat">ScalarFloat</span>, <span title="flax.nnx.Variable">Variable</span>[<span title="gpjax.typing.ScalarArray">ScalarArray</span>]]</code>, default:
-                  <code>1.0</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>the variance of the kernel σ.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>alpha</code></b>
-              (<code><span title="beartype.typing.Union">Union</span>[<span title="gpjax.typing.ScalarFloat">ScalarFloat</span>, <span title="flax.nnx.Variable">Variable</span>[<span title="gpjax.typing.ScalarArray">ScalarArray</span>]]</code>, default:
-                  <code>1.0</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>the alpha parameter of the kernel α.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>n_dims</code></b>
-              (<code><span title="beartype.typing.Union">Union</span>[<span title="int">int</span>, None]</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>The number of input dimensions. If <code>lengthscale</code> is an array, this
-argument is ignored.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>compute_engine</code></b>
-              (<code><a class="autorefs autorefs-internal" title="gpjax.kernels.computations.AbstractKernelComputation" href="../../computations/base/#gpjax.kernels.computations.base.AbstractKernelComputation">AbstractKernelComputation</a></code>, default:
-                  <code><a class="autorefs autorefs-internal" title="gpjax.kernels.computations.DenseKernelComputation" href="../../computations/dense/#gpjax.kernels.computations.dense.DenseKernelComputation">DenseKernelComputation</a>()</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>The computation engine that the kernel uses to compute the
-covariance matrix.</p>
-          </div>
-        </li>
-    </ul>
+        <p>Transform that maps a vector of length n(n+1)/2 to an n x n lower triangular matrix.
+The ordering is assumed to be:
+   (0,0), (1,0), (1,1), (2,0), (2,1), (2,2), ..., (n-1, n-1)</p>
 
 
 
@@ -2693,301 +2510,29 @@ covariance matrix.</p>
 
 
 
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.spectral_density" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">spectral_density</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">spectral_density</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>The spectral density of the kernel.</p>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="numpyro.distributions.Normal">Normal</span> | <span title="numpyro.distributions.StudentT">StudentT</span></code>
-          –
-          <div class="doc-md-description">
-            <p>Callable[[Float[Array, "D"]], Float[Array, "D"]]: The spectral density function.</p>
-          </div>
-        </li>
-    </ul>
-    </div>
-
-</div>
-
 
 
 <div class="doc doc-object doc-function">
 
 
-<h3 id="gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.cross_covariance" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">cross_covariance</span>
+<h3 id="gpjax.numpyro_extras.FillTriangularTransform.__call__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__call__</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">cross_covariance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="nf">x</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Compute the cross-covariance matrix of the kernel.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>x</code></b>
-              (<code><span title="jaxtyping.Num">Num</span>[<span title="gpjax.typing.Array">Array</span>, &#39;N D&#39;]</code>)
-          –
-          <div class="doc-md-description">
-            <p>the first input matrix of shape <code>(N, D)</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>y</code></b>
-              (<code><span title="jaxtyping.Num">Num</span>[<span title="gpjax.typing.Array">Array</span>, &#39;M D&#39;]</code>)
-          –
-          <div class="doc-md-description">
-            <p>the second input matrix of shape <code>(M, D)</code>.</p>
-          </div>
-        </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="jaxtyping.Float">Float</span>[<span title="gpjax.typing.Array">Array</span>, &#39;N M&#39;]</code>
-          –
-          <div class="doc-md-description">
-            <p>The cross-covariance matrix of the kernel of shape <code>(N, M)</code>.</p>
-          </div>
-        </li>
-    </ul>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.gram" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">gram</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">gram</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Compute the gram matrix of the kernel.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>x</code></b>
-              (<code><span title="jaxtyping.Num">Num</span>[<span title="gpjax.typing.Array">Array</span>, &#39;N D&#39;]</code>)
-          –
-          <div class="doc-md-description">
-            <p>the input matrix of shape <code>(N, D)</code>.</p>
-          </div>
-        </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="cola.ops.operator_base.LinearOperator">LinearOperator</span></code>
-          –
-          <div class="doc-md-description">
-            <p>The gram matrix of the kernel of shape <code>(N, N)</code>.</p>
-          </div>
-        </li>
-    </ul>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.diagonal" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">diagonal</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">diagonal</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Compute the diagonal of the gram matrix of the kernel.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>x</code></b>
-              (<code><span title="jaxtyping.Num">Num</span>[<span title="gpjax.typing.Array">Array</span>, &#39;N D&#39;]</code>)
-          –
-          <div class="doc-md-description">
-            <p>the input matrix of shape <code>(N, D)</code>.</p>
-          </div>
-        </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="jaxtyping.Float">Float</span>[<span title="gpjax.typing.Array">Array</span>, &#39; N&#39;]</code>
-          –
-          <div class="doc-md-description">
-            <p>The diagonal of the gram matrix of the kernel of shape <code>(N,)</code>.</p>
-          </div>
-        </li>
-    </ul>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.slice_input" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">slice_input</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">slice_input</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Slice out the relevant columns of the input matrix.</p>
-<p>Select the relevant columns of the supplied matrix to be used within the
-kernel's evaluation.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>x</code></b>
-              (<code><span title="jaxtyping.Float">Float</span>[<span title="gpjax.typing.Array">Array</span>, &#39;... D&#39;]</code>)
-          –
-          <div class="doc-md-description">
-            <p>the matrix or vector that is to be sliced.</p>
-          </div>
-        </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="jaxtyping.Float">Float</span>[<span title="gpjax.typing.Array">Array</span>, &#39;... Q&#39;]</code>
-          –
-          <div class="doc-md-description">
-            <p>The sliced form of the input matrix.</p>
-          </div>
-        </li>
-    </ul>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.__add__" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">__add__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__add__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Add two kernels together.
-Args:
-    other (AbstractKernel): The kernel to be added to the current kernel.</p>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-<b><code>AbstractKernel</code></b> (              <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-)          –
-          <div class="doc-md-description">
-            <p>A new kernel that is the sum of the two kernels.</p>
-          </div>
-        </li>
-    </ul>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="gpjax.kernels.stationary.rational_quadratic.RationalQuadratic.__mul__" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">__mul__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__mul__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Multiply two kernels together.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>other</code></b>
-              (<code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The kernel to be multiplied with the current kernel.</p>
-          </div>
-        </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-<b><code>AbstractKernel</code></b> (              <code><a class="autorefs autorefs-internal" title="gpjax.kernels.base.AbstractKernel" href="../../base/#gpjax.kernels.base.AbstractKernel">AbstractKernel</a></code>
-)          –
-          <div class="doc-md-description">
-            <p>A new kernel that is the product of the two kernels.</p>
-          </div>
-        </li>
-    </ul>
+        <p>Forward transformation.</p>
+<h5 id="gpjax.numpyro_extras.FillTriangularTransform.__call__--parameters">Parameters<a class="headerlink" href="#gpjax.numpyro_extras.FillTriangularTransform.__call__--parameters" title="Permanent link"></a></h5>
+<p>x : array_like, shape (..., L)
+    Input vector with L = n(n+1)/2 for some integer n.</p>
+<h5 id="gpjax.numpyro_extras.FillTriangularTransform.__call__--returns">Returns<a class="headerlink" href="#gpjax.numpyro_extras.FillTriangularTransform.__call__--returns" title="Permanent link"></a></h5>
+<p>y : array_like, shape (..., n, n)
+    Lower-triangular matrix (with zeros in the upper triangle) filled in
+    row-major order (i.e. [ (0,0), (1,0), (1,1), ... ]).</p>
 
     </div>
 
@@ -3065,10 +2610,10 @@ Args:
     
     
       
-      <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
@@ -3076,7 +2621,7 @@ Args:
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
       
-        <script src="../../../../javascripts/katex.js"></script>
+        <script src="../../javascripts/katex.js"></script>
       
     
   </body>

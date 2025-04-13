@@ -966,7 +966,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../constructing_new_kernels/" class="md-nav__link">
+      <a href="../constructing_new_kernels.md" class="md-nav__link">
         
   
   
@@ -2309,6 +2309,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../api/numpyro_extras/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Numpyro Extras
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../api/objectives/" class="md-nav__link">
         
   
@@ -2641,7 +2664,7 @@ discontinuities. To highlight this, we will use a sawtooth function as our data.
 </span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xtest</span><span class="p">,</span> <span class="n">ytest</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;True function&quot;</span><span class="p">)</span>
 </span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f10a75a0fd0&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f7a737ae860&gt;
 </code></pre></div>
 <p><img alt="png" src="../deep_kernels_files/deep_kernels_3_1.png" /></p>
 <h2 id="deep-kernels">Deep kernels<a class="headerlink" href="#deep-kernels" title="Permanent link"></a></h2>
@@ -2763,8 +2786,8 @@ of the model. We can do this by simply applying the model to a test data set.</p
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">latent_dist</span> <span class="o">=</span> <span class="n">opt_posterior</span><span class="p">(</span><span class="n">xtest</span><span class="p">,</span> <span class="n">train_data</span><span class="o">=</span><span class="n">D</span><span class="p">)</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">predictive_dist</span> <span class="o">=</span> <span class="n">opt_posterior</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="n">latent_dist</span><span class="p">)</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">predictive_mean</span> <span class="o">=</span> <span class="n">predictive_dist</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">predictive_std</span> <span class="o">=</span> <span class="n">predictive_dist</span><span class="o">.</span><span class="n">stddev</span><span class="p">()</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">predictive_mean</span> <span class="o">=</span> <span class="n">predictive_dist</span><span class="o">.</span><span class="n">mean</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">predictive_std</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">predictive_dist</span><span class="o">.</span><span class="n">variance</span><span class="p">)</span>
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
 </span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Observations&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -2793,7 +2816,7 @@ of the model. We can do this by simply applying the model to a test data set.</p
 </span><span id="__span-6-31"><a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a><span class="p">)</span>
 </span><span id="__span-6-32"><a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f109d91a260&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f7a6bf3bdf0&gt;
 </code></pre></div>
 <p><img alt="png" src="../deep_kernels_files/deep_kernels_13_1.png" /></p>
 <h2 id="system-configuration">System configuration<a class="headerlink" href="#system-configuration" title="Permanent link"></a></h2>
@@ -2802,19 +2825,19 @@ of the model. We can do this by simply applying the model to a test data set.</p
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Thomas Pinder
 
-Last updated: Fri Apr 11 2025
+Last updated: Sun Apr 13 2025
 
 Python implementation: CPython
 Python version       : 3.10.16
 IPython version      : 8.35.0
 
-matplotlib: 3.10.1
-jax       : 0.5.3
 flax      : 0.10.5
-jaxtyping : 0.3.1
+matplotlib: 3.10.1
 scipy     : 1.15.2
+gpjax     : 0.11.0
+jax       : 0.5.3
+jaxtyping : 0.3.1
 optax     : 0.2.4
-gpjax     : 0.10.2
 
 Watermark: 2.5.0
 </code></pre></div>

@@ -831,7 +831,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/constructing_new_kernels/" class="md-nav__link">
+      <a href="../../_examples/constructing_new_kernels.md" class="md-nav__link">
         
   
   
@@ -2440,6 +2440,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../numpyro_extras/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Numpyro Extras
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../objectives/" class="md-nav__link">
         
   
@@ -2968,7 +2991,7 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+              <code><span title="numpyro.distributions.Distribution">Distribution</span></code>
           –
           <div class="doc-md-description">
             <p>The predictive distribution.</p>
@@ -3029,10 +3052,10 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+              <code><span title="numpyro.distributions.Distribution">Distribution</span></code>
           –
           <div class="doc-md-description">
-            <p>tfd.Distribution: The predictive distribution.</p>
+            <p>npd.Distribution: The predictive distribution.</p>
           </div>
         </li>
     </ul>
@@ -3077,10 +3100,10 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+              <code><span title="numpyro.distributions.Distribution">Distribution</span></code>
           –
           <div class="doc-md-description">
-            <p>tfd.Distribution: The distribution of observations, y, given values of the
+            <p>npd.Distribution: The distribution of observations, y, given values of the
 Gaussian process, f.</p>
           </div>
         </li>
@@ -3297,7 +3320,7 @@ the <code>AnalyticalGaussianIntegrator</code>, as the expected log likelihood ca
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+              <code><span title="numpyro.distributions.Distribution">Distribution</span></code>
           –
           <div class="doc-md-description">
             <p>The predictive distribution.</p>
@@ -3421,10 +3444,10 @@ the <code>AnalyticalGaussianIntegrator</code>, as the expected log likelihood ca
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gpjax.likelihoods.tfd.Normal">Normal</span></code>
+              <code><span title="numpyro.distributions.Normal">Normal</span></code>
           –
           <div class="doc-md-description">
-            <p>tfd.Normal: The likelihood function.</p>
+            <p>npd.Normal: The likelihood function.</p>
           </div>
         </li>
     </ul>
@@ -3457,7 +3480,7 @@ distribution's covariance matrix.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>dist</code></b>
-              (<code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>)
+              (<code><span title="numpyro.distributions.Distribution">Distribution</span></code>)
           –
           <div class="doc-md-description">
             <p>The Gaussian process posterior,
@@ -3470,10 +3493,10 @@ evaluated at a finite set of test points.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gpjax.likelihoods.tfd.MultivariateNormalFullCovariance">MultivariateNormalFullCovariance</span></code>
+              <code><span title="numpyro.distributions.MultivariateNormal">MultivariateNormal</span></code>
           –
           <div class="doc-md-description">
-            <p>tfd.Distribution: The predictive distribution.</p>
+            <p>npd.Distribution: The predictive distribution.</p>
           </div>
         </li>
     </ul>
@@ -3595,7 +3618,7 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+              <code><span title="numpyro.distributions.Distribution">Distribution</span></code>
           –
           <div class="doc-md-description">
             <p>The predictive distribution.</p>
@@ -3719,10 +3742,10 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+              <code><span title="numpyro.distributions.BernoulliProbs">BernoulliProbs</span></code>
           –
           <div class="doc-md-description">
-            <p>tfd.Distribution: The likelihood function.</p>
+            <p>npd.Bernoulli: The likelihood function.</p>
           </div>
         </li>
     </ul>
@@ -3753,11 +3776,11 @@ process posterior and likelihood parameters.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>dist</code></b>
-              (<code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>)
+              (<code>[npd.MultivariateNormal, GaussianDistribution].</code>)
           –
           <div class="doc-md-description">
-            <p>The Gaussian process posterior, evaluated
-at a finite set of test points.</p>
+            <p>The Gaussian
+process posterior, evaluated at a finite set of test points.</p>
           </div>
         </li>
     </ul>
@@ -3766,10 +3789,10 @@ at a finite set of test points.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+              <code><span title="numpyro.distributions.BernoulliProbs">BernoulliProbs</span></code>
           –
           <div class="doc-md-description">
-            <p>tfd.Distribution: The pointwise predictive distribution.</p>
+            <p>npd.Bernoulli: The pointwise predictive distribution.</p>
           </div>
         </li>
     </ul>
@@ -3891,7 +3914,7 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+              <code><span title="numpyro.distributions.Distribution">Distribution</span></code>
           –
           <div class="doc-md-description">
             <p>The predictive distribution.</p>
@@ -4015,10 +4038,10 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+              <code><span title="numpyro.distributions.Poisson">Poisson</span></code>
           –
           <div class="doc-md-description">
-            <p>tfd.Distribution: The likelihood function.</p>
+            <p>npd.Poisson: The likelihood function.</p>
           </div>
         </li>
     </ul>
@@ -4049,11 +4072,11 @@ process posterior and likelihood parameters.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>dist</code></b>
-              (<code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>)
+              (<code><span title="beartype.typing.Union">Union</span>[<span title="numpyro.distributions.MultivariateNormal">MultivariateNormal</span>, <a class="autorefs autorefs-internal" title="gpjax.distributions.GaussianDistribution" href="../distributions/#gpjax.distributions.GaussianDistribution">GaussianDistribution</a>]</code>)
           –
           <div class="doc-md-description">
-            <p>The Gaussian process posterior, evaluated
-at a finite set of test points.</p>
+            <p>The Gaussian
+process posterior, evaluated at a finite set of test points.</p>
           </div>
         </li>
     </ul>
@@ -4062,10 +4085,10 @@ at a finite set of test points.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gpjax.likelihoods.tfd.Distribution">Distribution</span></code>
+              <code><span title="numpyro.distributions.Poisson">Poisson</span></code>
           –
           <div class="doc-md-description">
-            <p>tfd.Distribution: The pointwise predictive distribution.</p>
+            <p>npd.Poisson: The pointwise predictive distribution.</p>
           </div>
         </li>
     </ul>

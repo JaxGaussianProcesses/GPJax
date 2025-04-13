@@ -831,7 +831,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/constructing_new_kernels/" class="md-nav__link">
+      <a href="../../_examples/constructing_new_kernels.md" class="md-nav__link">
         
   
   
@@ -2174,6 +2174,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../numpyro_extras/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Numpyro Extras
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../objectives/" class="md-nav__link">
         
   
@@ -2818,7 +2841,7 @@
 <p>Example:
 <div class="language-pycon highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="go">    &gt;&gt;&gt; from gpjax.parameters import PositiveReal, transform</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">    &gt;&gt;&gt; import jax.numpy as jnp</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">    &gt;&gt;&gt; import tensorflow_probability.substrates.jax.bijectors as tfb</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">    &gt;&gt;&gt; import numpyro.distributions.transforms as npt</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">    &gt;&gt;&gt; from flax import nnx</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="go">    &gt;&gt;&gt; params = nnx.State(</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">    &gt;&gt;&gt;     {</span>
@@ -2826,7 +2849,7 @@
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="go">    &gt;&gt;&gt;         &quot;b&quot;: PositiveReal(jnp.array([2.0])),</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="go">    &gt;&gt;&gt;     }</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="go">    &gt;&gt;&gt; )</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="go">    &gt;&gt;&gt; params_bijection = {&#39;positive&#39;: tfb.Softplus()}</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="go">    &gt;&gt;&gt; params_bijection = {&#39;positive&#39;: npt.SoftplusTransform()}</span>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="go">    &gt;&gt;&gt; transformed_params = transform(params, params_bijection)</span>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="go">    &gt;&gt;&gt; print(transformed_params[&quot;a&quot;].value)</span>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="go">     [1.3132617]</span>
@@ -2845,7 +2868,7 @@
         </li>
         <li class="doc-section-item field-body">
             <b><code>params_bijection</code></b>
-              (<code><span title="typing.Dict">Dict</span>[<span title="str">str</span>, <span title="tensorflow_probability.substrates.jax.bijectors.Bijector">Bijector</span>]</code>)
+              (<code><span title="typing.Dict">Dict</span>[<span title="str">str</span>, <span title="numpyro.distributions.transforms.Transform">Transform</span>]</code>)
           –
           <div class="doc-md-description">
             <p>A dictionary mapping parameter types to bijectors.</p>

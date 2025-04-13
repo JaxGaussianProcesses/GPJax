@@ -16,7 +16,7 @@
         <link rel="prev" href="../uncollapsed_vi/">
       
       
-        <link rel="next" href="../constructing_new_kernels/">
+        <link rel="next" href="../likelihoods_guide/">
       
       
       <link rel="icon" href="../../static/favicon.ico">
@@ -984,7 +984,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../constructing_new_kernels/" class="md-nav__link">
+      <a href="../constructing_new_kernels.md" class="md-nav__link">
         
   
   
@@ -2327,6 +2327,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../api/numpyro_extras/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Numpyro Extras
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../api/objectives/" class="md-nav__link">
         
   
@@ -2607,10 +2630,17 @@
 
 
 <h1 id="gaussian-processes-for-vector-fields-and-ocean-current-modelling">Gaussian Processes for Vector Fields and Ocean Current Modelling<a class="headerlink" href="#gaussian-processes-for-vector-fields-and-ocean-current-modelling" title="Permanent link"></a></h1>
-<p>In this notebook, we use Gaussian processes to learn vector-valued functions. We will be
-recreating the results by <a href="https://arxiv.org/pdf/2302.10364.pdf">Berlinghieri et al. (2023)</a> by an
-application to real-world ocean surface velocity data, collected via surface drifters.</p>
-<p>Surface drifters are measurement devices that measure the dynamics and circulation patterns of the world's oceans. Studying and predicting ocean currents are important to climate research, for example, forecasting and predicting oil spills, oceanographic surveying of eddies and upwelling, or providing information on the distribution of biomass in ecosystems. We will be using the <a href="https://zenodo.org/record/4421585">Gulf Drifters Open dataset</a>, which contains all publicly available surface drifter trajectories from the Gulf of Mexico spanning 28 years.</p>
+<p>In this notebook, we use Gaussian processes to learn vector-valued functions. We will
+be recreating the results by <a href="https://arxiv.org/pdf/2302.10364.pdf">Berlinghieri et al.
+(2023)</a> by an application to real-world ocean
+surface velocity data, collected via surface drifters.</p>
+<p>Surface drifters are measurement devices that measure the dynamics and circulation
+patterns of the world's oceans. Studying and predicting ocean currents are important
+to climate research, for example, forecasting and predicting oil spills, oceanographic
+surveying of eddies and upwelling, or providing information on the distribution of
+biomass in ecosystems. We will be using the <a href="https://zenodo.org/record/4421585">Gulf Drifters Open
+dataset</a>, which contains all publicly available
+surface drifter trajectories from the Gulf of Mexico spanning 28 years.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">dataclass</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">field</span><span class="p">,</span>
@@ -2629,8 +2659,8 @@ application to real-world ocean surface velocity data, collected via surface dri
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="p">)</span>
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">rcParams</span>
 </span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow_probability</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tfp</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpyro.distributions</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npd</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 </span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>
 </span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="kn">from</span><span class="w"> </span><span class="nn">examples.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_mpl_style</span>
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="kn">from</span><span class="w"> </span><span class="nn">gpjax.kernels.computations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DenseKernelComputation</span>
@@ -2650,13 +2680,20 @@ application to real-world ocean surface velocity data, collected via surface dri
 </span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="n">colors</span> <span class="o">=</span> <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;axes.prop_cycle&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span>
 </span></code></pre></div>
 <h2 id="data-loading-and-preprocessing">Data loading and preprocessing<a class="headerlink" href="#data-loading-and-preprocessing" title="Permanent link"></a></h2>
-<p>The real dataset has been binned into an <span class="arithmatex">\(N=34\times16\)</span> grid, equally spaced over the longitude-latitude interval <span class="arithmatex">\([-90.8,-83.8] \times [24.0,27.5]\)</span>. Each bin has a size <span class="arithmatex">\(\approx 0.21\times0.21\)</span>, and contains the average velocity across all measurements that fall inside it.</p>
-<p>We will call this binned ocean data the ground truth, and label it with the vector field
-$$
-\mathbf{F} \equiv \mathbf{F}(\mathbf{x}),
-$$
-where <span class="arithmatex">\(\mathbf{x} = (x^{(0)}\)</span>,<span class="arithmatex">\(x^{(1)})^\text{T}\)</span>, with a vector basis in the standard Cartesian directions (dimensions will be indicated by superscripts).</p>
-<p>We shall label the ground truth <span class="arithmatex">\(D_0=\left\{ \left(\mathbf{x}_{0,i} , \mathbf{y}_{0,i} \right)\right\}_{i=1}^N\)</span>, where <span class="arithmatex">\(\mathbf{y}_{0,i}\)</span> is the 2-dimensional velocity vector at the <span class="arithmatex">\(i\)</span>-th location, <span class="arithmatex">\(\mathbf{x}_{0,i}\)</span>. The training dataset contains simulated measurements from ocean drifters <span class="arithmatex">\(D_T=\left\{\left(\mathbf{x}_{T,i}, \mathbf{y}_{T,i} \right)\right\}_{i=1}^{N_T}\)</span>, <span class="arithmatex">\(N_T = 20\)</span> in this case (the subscripts indicate the ground truth and the simulated measurements respectively).</p>
+<p>The real dataset has been binned into an <span class="arithmatex">\(N=34\times16\)</span> grid, equally spaced over the
+longitude-latitude interval <span class="arithmatex">\([-90.8,-83.8] \times [24.0,27.5]\)</span>. Each bin has a size
+<span class="arithmatex">\(\approx 0.21\times0.21\)</span>, and contains the average velocity across all measurements
+that fall inside it.</p>
+<p>We will call this binned ocean data the ground truth, and label it with the vector
+field $$ \mathbf{F} \equiv \mathbf{F}(\mathbf{x}), $$ where <span class="arithmatex">\(\mathbf{x} =
+(x^{(0)}\)</span>,<span class="arithmatex">\(x^{(1)})^\text{T}\)</span>, with a vector basis in the standard Cartesian
+directions (dimensions will be indicated by superscripts).</p>
+<p>We shall label the ground truth <span class="arithmatex">\(D_0=\left\{ \left(\mathbf{x}_{0,i} , \mathbf{y}_{0,i}
+\right)\right\}_{i=1}^N\)</span>, where <span class="arithmatex">\(\mathbf{y}_{0,i}\)</span> is the 2-dimensional velocity
+vector at the <span class="arithmatex">\(i\)</span>-th location, <span class="arithmatex">\(\mathbf{x}_{0,i}\)</span>. The training dataset contains
+simulated measurements from ocean drifters <span class="arithmatex">\(D_T=\left\{\left(\mathbf{x}_{T,i},
+\mathbf{y}_{T,i} \right)\right\}_{i=1}^{N_T}\)</span>, <span class="arithmatex">\(N_T = 20\)</span> in this case (the subscripts
+indicate the ground truth and the simulated measurements respectively).</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># function to place data from csv into correct array shape</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">prepare_data</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">pos</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;lon&quot;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lat&quot;</span><span class="p">]])</span>
@@ -2716,35 +2753,45 @@ where <span class="arithmatex">\(\mathbf{x} = (x^{(0)}\)</span>,<span class="ari
 </span><span id="__span-1-57"><a id="__codelineno-1-57" name="__codelineno-1-57" href="#__codelineno-1-57"></a>    <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">),</span>
 </span><span id="__span-1-58"><a id="__codelineno-1-58" name="__codelineno-1-58" href="#__codelineno-1-58"></a>    <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;lower center&quot;</span><span class="p">,</span>
 </span><span id="__span-1-59"><a id="__codelineno-1-59" name="__codelineno-1-59" href="#__codelineno-1-59"></a><span class="p">)</span>
-</span><span id="__span-1-60"><a id="__codelineno-1-60" name="__codelineno-1-60" href="#__codelineno-1-60"></a><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </span></code></pre></div>
-<p><img alt="png" src="../oceanmodelling_files/oceanmodelling_3_0.png" /></p>
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7fa4ecbb6f80&gt;
+</code></pre></div>
+<p><img alt="png" src="../oceanmodelling_files/oceanmodelling_3_1.png" /></p>
 <h2 id="problem-setting">Problem Setting<a class="headerlink" href="#problem-setting" title="Permanent link"></a></h2>
-<p>We aim to obtain estimates for <span class="arithmatex">\(\mathbf{F}\)</span> at the set of points <span class="arithmatex">\(\left\{ \mathbf{x}_{0,i} \right\}_{i=1}^N\)</span> using Gaussian processes, followed by a comparison of the latent model to the ground truth <span class="arithmatex">\(D_0\)</span>. Note that <span class="arithmatex">\(D_0\)</span> is not passed into any functions used  by GPJax, and is only used to compare against the two GP models at the end of the notebook.</p>
-<p>Since <span class="arithmatex">\(\mathbf{F}\)</span> is a vector-valued function, we require GPs that can directly learn vector-valued functions<a href="#fn1"><sup>1</sup></a>. To implement this in GPJax, the problem can be changed to learn a scalar-valued function by 'massaging' the data into a  <span class="arithmatex">\(2N\times2N\)</span> problem, such that each dimension of our GP is associated with a <em>component</em> of <span class="arithmatex">\(\mathbf{y}_{T,i}\)</span>.</p>
-<p>For a particular measurement <span class="arithmatex">\(\mathbf{y}\)</span> (training or testing) at location <span class="arithmatex">\(\mathbf{x}\)</span>, the components <span class="arithmatex">\((y^{(0)}, y^{(1)})\)</span> are described by the latent vector field <span class="arithmatex">\(\mathbf{F}\)</span>, such that</p>
-<div class="arithmatex">\[
-\mathbf{y} = \mathbf{F}(\mathbf{x}) = \left(\begin{array}{l}
+<p>We aim to obtain estimates for <span class="arithmatex">\(\mathbf{F}\)</span> at the set of points <span class="arithmatex">\(\left\{
+\mathbf{x}_{0,i} \right\}_{i=1}^N\)</span> using Gaussian processes, followed by a comparison
+of the latent model to the ground truth <span class="arithmatex">\(D_0\)</span>. Note that <span class="arithmatex">\(D_0\)</span> is not passed into any
+functions used  by GPJax, and is only used to compare against the two GP models at the
+end of the notebook.</p>
+<p>Since <span class="arithmatex">\(\mathbf{F}\)</span> is a vector-valued function, we require GPs that can directly learn
+vector-valued functions<a href="#fn1"><sup>1</sup></a>. To implement this in GPJax, the problem
+can be changed to learn a scalar-valued function by 'massaging' the data into a
+<span class="arithmatex">\(2N\times2N\)</span> problem, such that each dimension of our GP is associated with a
+<em>component</em> of <span class="arithmatex">\(\mathbf{y}_{T,i}\)</span>.</p>
+<p>For a particular measurement <span class="arithmatex">\(\mathbf{y}\)</span> (training or testing) at location
+<span class="arithmatex">\(\mathbf{x}\)</span>, the components <span class="arithmatex">\((y^{(0)}, y^{(1)})\)</span> are described by the latent vector
+field <span class="arithmatex">\(\mathbf{F}\)</span>, such that</p>
+<div class="arithmatex">\[ \mathbf{y} = \mathbf{F}(\mathbf{x}) = \left(\begin{array}{l}
 f^{(0)}\left(\mathbf{x}\right) \\
-f^{(1)}\left(\mathbf{x}\right)
-\end{array}\right),
-\]</div>
-<p>where each <span class="arithmatex">\(f^{(z)}\left(\mathbf{x}\right), z \in \{0,1\}\)</span> is a scalar-valued function.</p>
-<p>Now consider the scalar-valued function <span class="arithmatex">\(g: \mathbb{R}^2 \times\{0,1\} \rightarrow \mathbb{R}\)</span>, such that</p>
-<div class="arithmatex">\[
-g \left(\mathbf{x} , 0 \right) = f^{(0)} ( \mathbf{x} ), \text{and } g \left( \mathbf{x}, 1 \right)=f^{(1)}\left(\mathbf{x}\right).
-\]</div>
-<p>We have increased the input dimension by 1, from the 2D <span class="arithmatex">\(\mathbf{x}\)</span> to the 3D <span class="arithmatex">\(\mathbf{X} = \left(\mathbf{x}, 0\right)\)</span> or <span class="arithmatex">\(\mathbf{X} = \left(\mathbf{x}, 1\right)\)</span>.</p>
+f^{(1)}\left(\mathbf{x}\right) \end{array}\right), \]</div>
+<p>where each <span class="arithmatex">\(f^{(z)}\left(\mathbf{x}\right), z \in \{0,1\}\)</span> is a scalar-valued
+function.</p>
+<p>Now consider the scalar-valued function <span class="arithmatex">\(g: \mathbb{R}^2 \times\{0,1\} \rightarrow
+\mathbb{R}\)</span>, such that</p>
+<div class="arithmatex">\[ g \left(\mathbf{x} , 0 \right) = f^{(0)} ( \mathbf{x} ), \text{and } g \left(
+\mathbf{x}, 1 \right)=f^{(1)}\left(\mathbf{x}\right).  \]</div>
+<p>We have increased the input dimension by 1, from the 2D <span class="arithmatex">\(\mathbf{x}\)</span> to the 3D
+<span class="arithmatex">\(\mathbf{X} = \left(\mathbf{x}, 0\right)\)</span> or <span class="arithmatex">\(\mathbf{X} = \left(\mathbf{x},
+1\right)\)</span>.</p>
 <p>By choosing the value of the third dimension, 0 or 1, we may now incorporate this
-information into the computation of the kernel.
-We therefore make new 3D datasets <span class="arithmatex">\(D_{T,3D} = \left\{\left( \mathbf{X}_{T,i},\mathbf{Y}_{T,i} \right) \right\} _{i=0}^{2N_T}\)</span> and <span class="arithmatex">\(D_{0,3D} = \left\{\left( \mathbf{X}_{0,i},\mathbf{Y}_{0,i} \right) \right\} _{i=0}^{2N}\)</span> that incorporates this new labelling, such that for each dataset (indicated by the subscript <span class="arithmatex">\(D = 0\)</span> or <span class="arithmatex">\(D=T\)</span>),</p>
-<div class="arithmatex">\[
-X_{D,i} = \left( \mathbf{x}_{D,i}, z \right),
-\]</div>
+information into the computation of the kernel.  We therefore make new 3D datasets
+<span class="arithmatex">\(D_{T,3D} = \left\{\left( \mathbf{X}_{T,i},\mathbf{Y}_{T,i} \right) \right\}
+_{i=0}^{2N_T}\)</span> and <span class="arithmatex">\(D_{0,3D} = \left\{\left( \mathbf{X}_{0,i},\mathbf{Y}_{0,i} \right)
+\right\} _{i=0}^{2N}\)</span> that incorporates this new labelling, such that for each dataset
+(indicated by the subscript <span class="arithmatex">\(D = 0\)</span> or <span class="arithmatex">\(D=T\)</span>),</p>
+<div class="arithmatex">\[ X_{D,i} = \left( \mathbf{x}_{D,i}, z \right), \]</div>
 <p>and</p>
-<div class="arithmatex">\[
-Y_{D,i} = y_{D,i}^{(z)},
-\]</div>
+<div class="arithmatex">\[ Y_{D,i} = y_{D,i}^{(z)}, \]</div>
 <p>where <span class="arithmatex">\(z = 0\)</span> if <span class="arithmatex">\(i\)</span> is odd and <span class="arithmatex">\(z=1\)</span> if <span class="arithmatex">\(i\)</span> is even.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Change vectors x -&gt; X = (x,z), and vectors y -&gt; Y = (y,z) via the artificial z label</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">label_position</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
@@ -2770,14 +2817,29 @@ Y_{D,i} = y_{D,i}^{(z)},
 </span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="n">dataset_ground_truth</span> <span class="o">=</span> <span class="n">dataset_3d</span><span class="p">(</span><span class="n">pos_test</span><span class="p">,</span> <span class="n">vel_test</span><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="velocity-dimension-decomposition">Velocity (dimension) decomposition<a class="headerlink" href="#velocity-dimension-decomposition" title="Permanent link"></a></h2>
-<p>Having labelled the data, we are now in a position to use GPJax to learn the function <span class="arithmatex">\(g\)</span>, and hence <span class="arithmatex">\(\mathbf{F}\)</span>. A naive approach to the problem is to apply a GP prior directly to the velocities of each dimension independently, which is called the <em>velocity</em> GP. For our prior, we choose an isotropic mean 0 over all dimensions of the GP, and a piecewise kernel that depends on the <span class="arithmatex">\(z\)</span> labels of the inputs, such that for two inputs <span class="arithmatex">\(\mathbf{X} = \left( \mathbf{x}, z \right )\)</span> and <span class="arithmatex">\(\mathbf{X}^\prime = \left( \mathbf{x}^\prime, z^\prime \right )\)</span>,</p>
-<div class="arithmatex">\[
-k_{\text{vel}} \left(\mathbf{X}, \mathbf{X}^{\prime}\right)=
+<p>Having labelled the data, we are now in a position to use GPJax to learn the function
+<span class="arithmatex">\(g\)</span>, and hence <span class="arithmatex">\(\mathbf{F}\)</span>. A naive approach to the problem is to apply a GP prior
+directly to the velocities of each dimension independently, which is called the
+<em>velocity</em> GP. For our prior, we choose an isotropic mean 0 over all dimensions of the
+GP, and a piecewise kernel that depends on the <span class="arithmatex">\(z\)</span> labels of the inputs, such that for
+two inputs <span class="arithmatex">\(\mathbf{X} = \left( \mathbf{x}, z \right )\)</span> and <span class="arithmatex">\(\mathbf{X}^\prime =
+\left( \mathbf{x}^\prime, z^\prime \right )\)</span>,</p>
+<div class="arithmatex">\[ k_{\text{vel}} \left(\mathbf{X}, \mathbf{X}^{\prime}\right)=
 \begin{cases}k^{(z)}\left(\mathbf{x}, \mathbf{x}^{\prime}\right) &amp; \text { if }
-z=z^{\prime} \\ 0 &amp; \text { if } z \neq z^{\prime}, \end{cases}
-\]</div>
-<p>where <span class="arithmatex">\(k^{(z)}\left(\mathbf{x}, \mathbf{x}^{\prime}\right)\)</span> are the user chosen kernels for each dimension. What this means is that there are no correlations between the <span class="arithmatex">\(x^{(0)}\)</span> and <span class="arithmatex">\(x^{(1)}\)</span> dimensions for all choices <span class="arithmatex">\(\mathbf{X}\)</span> and <span class="arithmatex">\(\mathbf{X}^{\prime}\)</span>, since there are no off-diagonal elements in the Gram matrix populated by this choice.</p>
-<p>To implement this approach in GPJax, we define <code>VelocityKernel</code> in the following cell, following the steps outlined in the <a href="https://docs.jaxgaussianprocesses.com/_examples/constructing_new_kernels/#custom-kernel">custom kernels notebook</a>. This modular implementation takes the choice of user kernels as its class attributes: <code>kernel0</code> and <code>kernel1</code>. We must additionally pass the argument <code>active_dims = [0,1]</code>, which is an attribute of the base class <code>AbstractKernel</code>, into the chosen kernels. This is necessary such that the subsequent likelihood optimisation does not optimise over the artificial label dimension.</p>
+z=z^{\prime} \\ 0 &amp; \text { if } z \neq z^{\prime}, \end{cases} \]</div>
+<p>where <span class="arithmatex">\(k^{(z)}\left(\mathbf{x}, \mathbf{x}^{\prime}\right)\)</span> are the user chosen
+kernels for each dimension. What this means is that there are no correlations between
+the <span class="arithmatex">\(x^{(0)}\)</span> and <span class="arithmatex">\(x^{(1)}\)</span> dimensions for all choices <span class="arithmatex">\(\mathbf{X}\)</span> and
+<span class="arithmatex">\(\mathbf{X}^{\prime}\)</span>, since there are no off-diagonal elements in the Gram matrix
+populated by this choice.</p>
+<p>To implement this approach in GPJax, we define <code>VelocityKernel</code> in the following cell,
+following the steps outlined in the <a href="https://docs.jaxgaussianprocesses.com/_examples/constructing_new_kernels/#custom-kernel">custom kernels
+notebook</a>.
+This modular implementation takes the choice of user kernels as its class attributes:
+<code>kernel0</code> and <code>kernel1</code>. We must additionally pass the argument <code>active_dims = [0,1]</code>,
+which is an attribute of the base class <code>AbstractKernel</code>, into the chosen kernels.
+This is necessary such that the subsequent likelihood optimisation does not optimise
+over the artificial label dimension.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">VelocityKernel</span><span class="p">(</span><span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">AbstractKernel</span><span class="p">):</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>        <span class="bp">self</span><span class="p">,</span>
@@ -2803,7 +2865,9 @@ z=z^{\prime} \\ 0 &amp; \text { if } z \neq z^{\prime}, \end{cases}
 </span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>        <span class="k">return</span> <span class="n">k0_switch</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel0</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Xp</span><span class="p">)</span> <span class="o">+</span> <span class="n">k1_switch</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel1</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Xp</span><span class="p">)</span>
 </span></code></pre></div>
 <h3 id="gpjax-implementation">GPJax implementation<a class="headerlink" href="#gpjax-implementation" title="Permanent link"></a></h3>
-<p>Next, we define the model in GPJax. The prior is defined using <span class="arithmatex">\(k_{\text{vel}}\left(\mathbf{X}, \mathbf{X}^\prime \right)\)</span> and 0 mean and 0 observation noise. We choose a Gaussian marginal log-likelihood (MLL).</p>
+<p>Next, we define the model in GPJax. The prior is defined using
+<span class="arithmatex">\(k_{\text{vel}}\left(\mathbf{X}, \mathbf{X}^\prime \right)\)</span> and 0 mean and 0
+observation noise. We choose a Gaussian marginal log-likelihood (MLL).</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">initialise_gp</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">prior</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">gps</span><span class="o">.</span><span class="n">Prior</span><span class="p">(</span><span class="n">mean_function</span><span class="o">=</span><span class="n">mean</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">)</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">likelihood</span> <span class="o">=</span> <span class="n">gpx</span><span class="o">.</span><span class="n">likelihoods</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span>
@@ -2818,7 +2882,12 @@ z=z^{\prime} \\ 0 &amp; \text { if } z \neq z^{\prime}, \end{cases}
 </span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="n">kernel</span> <span class="o">=</span> <span class="n">VelocityKernel</span><span class="p">()</span>
 </span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="n">velocity_posterior</span> <span class="o">=</span> <span class="n">initialise_gp</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">dataset_train</span><span class="p">)</span>
 </span></code></pre></div>
-<p>With a model now defined, we can proceed to optimise the hyperparameters of our likelihood over <span class="arithmatex">\(D_0\)</span>. This is done by minimising the MLL using <code>BFGS</code>. We also plot its value at each step to visually confirm that we have found the minimum. See the  <a href="https://docs.jaxgaussianprocesses.com/_examples/intro_to_gps/">introduction to Gaussian Processes</a> notebook for more information on optimising the MLL.</p>
+<p>With a model now defined, we can proceed to optimise the hyperparameters
+of our likelihood over <span class="arithmatex">\(D_0\)</span>. This is done by minimising the MLL using <code>BFGS</code>. We also
+plot its value at each step to visually confirm that we have found the minimum. See
+the  <a href="https://docs.jaxgaussianprocesses.com/_examples/intro_to_gps/">introduction to Gaussian
+Processes</a> notebook for
+more information on optimising the MLL.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">optimise_mll</span><span class="p">(</span><span class="n">posterior</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">NIters</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">):</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="c1"># define the MLL using dataset_train</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">objective</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">p</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="o">-</span><span class="n">gpx</span><span class="o">.</span><span class="n">objectives</span><span class="o">.</span><span class="n">conjugate_mll</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
@@ -2840,10 +2909,13 @@ z=z^{\prime} \\ 0 &amp; \text { if } z \neq z^{\prime}, \end{cases}
          Gradient evaluations: 70
 </code></pre></div>
 <h3 id="comparison">Comparison<a class="headerlink" href="#comparison" title="Permanent link"></a></h3>
-<p>We next obtain the latent distribution of the GP of <span class="arithmatex">\(g\)</span> at <span class="arithmatex">\(\mathbf{x}_{0,i}\)</span>, then extract its mean and standard at the test locations, <span class="arithmatex">\(\mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i})\)</span>, as well as the standard deviation (we will use it at the very end).</p>
+<p>We next obtain the latent distribution of the GP of <span class="arithmatex">\(g\)</span> at <span class="arithmatex">\(\mathbf{x}_{0,i}\)</span>, then
+extract its mean and standard at the test locations,
+<span class="arithmatex">\(\mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i})\)</span>, as well as the standard deviation (we
+will use it at the very end).</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">latent_distribution</span><span class="p">(</span><span class="n">opt_posterior</span><span class="p">,</span> <span class="n">pos_3d</span><span class="p">,</span> <span class="n">dataset_train</span><span class="p">):</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">latent</span> <span class="o">=</span> <span class="n">opt_posterior</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">pos_3d</span><span class="p">,</span> <span class="n">train_data</span><span class="o">=</span><span class="n">dataset_train</span><span class="p">)</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">latent_mean</span> <span class="o">=</span> <span class="n">latent</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">latent_mean</span> <span class="o">=</span> <span class="n">latent</span><span class="o">.</span><span class="n">mean</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">latent_std</span> <span class="o">=</span> <span class="n">latent</span><span class="o">.</span><span class="n">stddev</span><span class="p">()</span>
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="k">return</span> <span class="n">latent_mean</span><span class="p">,</span> <span class="n">latent_std</span>
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
@@ -2855,7 +2927,11 @@ z=z^{\prime} \\ 0 &amp; \text { if } z \neq z^{\prime}, \end{cases}
 </span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
 </span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="n">dataset_latent_velocity</span> <span class="o">=</span> <span class="n">dataset_3d</span><span class="p">(</span><span class="n">pos_test</span><span class="p">,</span> <span class="n">velocity_mean</span><span class="p">)</span>
 </span></code></pre></div>
-<p>We now replot the ground truth (testing data) <span class="arithmatex">\(D_0\)</span>, the predicted latent vector field <span class="arithmatex">\(\mathbf{F}_{\text{latent}}(\mathbf{x_i})\)</span>, and a heatmap of the residuals at each location <span class="arithmatex">\(\mathbf{R}(\mathbf{x}_{0,i}) = \mathbf{y}_{0,i} - \mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i})\)</span>, as well as <span class="arithmatex">\(\left|\left|\mathbf{R}(\mathbf{x}_{0,i})\right|\right|\)</span>.</p>
+<p>We now replot the ground truth (testing data) <span class="arithmatex">\(D_0\)</span>, the predicted
+latent vector field <span class="arithmatex">\(\mathbf{F}_{\text{latent}}(\mathbf{x_i})\)</span>, and a heatmap of the
+residuals at each location <span class="arithmatex">\(\mathbf{R}(\mathbf{x}_{0,i}) = \mathbf{y}_{0,i} -
+\mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i})\)</span>, as well as
+<span class="arithmatex">\(\left|\left|\mathbf{R}(\mathbf{x}_{0,i})\right|\right|\)</span>.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Residuals between ground truth and estimate</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
@@ -2946,43 +3022,58 @@ z=z^{\prime} \\ 0 &amp; \text { if } z \neq z^{\prime}, \end{cases}
 </span><span id="__span-7-88"><a id="__codelineno-7-88" name="__codelineno-7-88" href="#__codelineno-7-88"></a>        <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.03</span><span class="p">),</span>
 </span><span id="__span-7-89"><a id="__codelineno-7-89" name="__codelineno-7-89" href="#__codelineno-7-89"></a>        <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;lower center&quot;</span><span class="p">,</span>
 </span><span id="__span-7-90"><a id="__codelineno-7-90" name="__codelineno-7-90" href="#__codelineno-7-90"></a>    <span class="p">)</span>
-</span><span id="__span-7-91"><a id="__codelineno-7-91" name="__codelineno-7-91" href="#__codelineno-7-91"></a>    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span><span id="__span-7-91"><a id="__codelineno-7-91" name="__codelineno-7-91" href="#__codelineno-7-91"></a>
 </span><span id="__span-7-92"><a id="__codelineno-7-92" name="__codelineno-7-92" href="#__codelineno-7-92"></a>
-</span><span id="__span-7-93"><a id="__codelineno-7-93" name="__codelineno-7-93" href="#__codelineno-7-93"></a>
-</span><span id="__span-7-94"><a id="__codelineno-7-94" name="__codelineno-7-94" href="#__codelineno-7-94"></a><span class="n">plot_fields</span><span class="p">(</span><span class="n">dataset_ground_truth</span><span class="p">,</span> <span class="n">dataset_train</span><span class="p">,</span> <span class="n">dataset_latent_velocity</span><span class="p">)</span>
+</span><span id="__span-7-93"><a id="__codelineno-7-93" name="__codelineno-7-93" href="#__codelineno-7-93"></a><span class="n">plot_fields</span><span class="p">(</span><span class="n">dataset_ground_truth</span><span class="p">,</span> <span class="n">dataset_train</span><span class="p">,</span> <span class="n">dataset_latent_velocity</span><span class="p">)</span>
 </span></code></pre></div>
 <p><img alt="png" src="../oceanmodelling_files/oceanmodelling_15_0.png" /></p>
-<p>From the latent estimate we can see the velocity GP struggles to reconstruct features of the ground truth. This is because our construction of the kernel placed an independent prior on each physical dimension, which cannot be assumed. Therefore, we need a different approach that can implicitly incorporate this dependence at a fundamental level. To achieve this we will require a <em>Helmholtz Decomposition</em>.</p>
+<p>From the latent estimate we can see the velocity GP struggles to
+reconstruct features of the ground truth. This is because our construction of the
+kernel placed an independent prior on each physical dimension, which cannot be
+assumed. Therefore, we need a different approach that can implicitly incorporate this
+dependence at a fundamental level. To achieve this we will require a <em>Helmholtz
+Decomposition</em>.</p>
 <h2 id="helmholtz-decomposition">Helmholtz decomposition<a class="headerlink" href="#helmholtz-decomposition" title="Permanent link"></a></h2>
-<p>In 2 dimensions, a twice continuously differentiable and compactly supported vector field <span class="arithmatex">\(\mathbf{F}: \mathbb{R}^2 \rightarrow \mathbb{R}^2\)</span> can be expressed as the sum of the gradient of a scalar potential <span class="arithmatex">\(\Phi: \mathbb{R}^2 \rightarrow \mathbb{R}\)</span>, called the potential function, and the vorticity operator of another scalar potential <span class="arithmatex">\(\Psi: \mathbb{R}^2 \rightarrow \mathbb{R}\)</span>, called the stream function (<a href="https://arxiv.org/pdf/2302.10364.pdf">Berlinghieri et al. (2023)</a>) such that
-$$
-\mathbf{F}=\operatorname{grad} \Phi+\operatorname{rot} \Psi,
-$$
-where
-$$
-\operatorname{grad} \Phi:=\left[\begin{array}{l}
-\partial \Phi / \partial x^{(0)} \
-\partial \Phi / \partial x^{(1)}
-\end{array}\right] \text { and } \operatorname{rot} \Psi:=\left[\begin{array}{c}
-\partial \Psi / \partial x^{(1)} \
--\partial \Psi / \partial x^{(0)}
-\end{array}\right].
-$$</p>
-<p>This is reminiscent of a 3 dimensional <a href="https://en.wikipedia.org/wiki/Helmholtz_decomposition">Helmholtz decomposition</a>.</p>
-<p>The 2 dimensional decomposition motivates a different approach: placing priors on <span class="arithmatex">\(\Psi\)</span> and <span class="arithmatex">\(\Phi\)</span>, allowing us to make assumptions directly about fundamental properties of <span class="arithmatex">\(\mathbf{F}\)</span>. If we choose independent GP priors such that <span class="arithmatex">\(\Phi \sim \mathcal{G P}\left(0, k_{\Phi}\right)\)</span> and <span class="arithmatex">\(\Psi \sim \mathcal{G P}\left(0, k_{\Psi}\right)\)</span>, then <span class="arithmatex">\(\mathbf{F} \sim \mathcal{G P} \left(0, k_\text{Helm}\right)\)</span> (since acting linear operations on a GPs give GPs).</p>
-<p>For <span class="arithmatex">\(\mathbf{X}, \mathbf{X}^{\prime} \in \mathbb{R}^2 \times \left\{0,1\right\}\)</span> and <span class="arithmatex">\(z, z^\prime \in \{0,1\}\)</span>,</p>
-<div class="arithmatex">\[
-\boxed{ k_{\mathrm{Helm}}\left(\mathbf{x}, \mathbf{x}^{\prime}\right)_{z,z^\prime} =  \frac{\partial^2 k_{\Phi}\left(\mathbf{x}, \mathbf{x}^{\prime}\right)}{\partial x^{(z)} \partial\left(x^{\prime}\right)^{(z^\prime)}}+(-1)^{z+z^\prime} \frac{\partial^2 k_{\Psi}\left(\mathbf{x}, \mathbf{x}^{\prime}\right)}{\partial x^{(1-z)} \partial\left(x^{\prime}\right)^{(1-z^\prime)}}}.
-\]</div>
-<p>where <span class="arithmatex">\(x^{(z)}\)</span> and <span class="arithmatex">\((x^\prime)^{(z^\prime)}\)</span> are the <span class="arithmatex">\(z\)</span> and <span class="arithmatex">\(z^\prime\)</span> components of <span class="arithmatex">\(\mathbf{X}\)</span> and <span class="arithmatex">\({\mathbf{X}}^{\prime}\)</span> respectively.</p>
-<p>We compute the second derivatives using <code>jax.hessian</code>. In the following implementation, for a kernel <span class="arithmatex">\(k(\mathbf{x}, \mathbf{x}^{\prime})\)</span>, this computes the Hessian matrix with respect to the components of <span class="arithmatex">\(\mathbf{x}\)</span></p>
-<div class="arithmatex">\[
-\frac{\partial^2 k\left(\mathbf{x}, \mathbf{x}^{\prime}\right)}{\partial x^{(z)} \partial x^{(z^\prime)}}.
-\]</div>
-<p>Note that we have operated <span class="arithmatex">\(\dfrac{\partial}{\partial x^{(z)}}\)</span>, <em>not</em> <span class="arithmatex">\(\dfrac{\partial}{\partial \left(x^\prime \right)^{(z)}}\)</span>, as the boxed equation suggests. This is not an issue if we choose stationary kernels <span class="arithmatex">\(k(\mathbf{x}, \mathbf{x}^{\prime}) = k(\mathbf{x} - \mathbf{x}^{\prime})\)</span> , as the partial derivatives with respect to the components have the following exchange symmetry:</p>
-<div class="arithmatex">\[
-\frac{\partial}{\partial x^{(z)}} = - \frac{\partial}{\partial \left( x^\prime \right)^{(z)}},
-\]</div>
+<p>In 2 dimensions, a twice continuously differentiable and compactly supported vector
+field <span class="arithmatex">\(\mathbf{F}: \mathbb{R}^2 \rightarrow \mathbb{R}^2\)</span> can be expressed as the sum
+of the gradient of a scalar potential <span class="arithmatex">\(\Phi: \mathbb{R}^2 \rightarrow \mathbb{R}\)</span>,
+called the potential function, and the vorticity operator of another scalar potential
+<span class="arithmatex">\(\Psi: \mathbb{R}^2 \rightarrow \mathbb{R}\)</span>, called the stream function (<a href="https://arxiv.org/pdf/2302.10364.pdf">Berlinghieri
+et al. (2023)</a>) such that $$
+\mathbf{F}=\operatorname{grad} \Phi+\operatorname{rot} \Psi, $$ where $$
+\operatorname{grad} \Phi:=\left[\begin{array}{l} \partial \Phi / \partial x^{(0)} \
+\partial \Phi / \partial x^{(1)} \end{array}\right] \text { and } \operatorname{rot}
+\Psi:=\left[\begin{array}{c} \partial \Psi / \partial x^{(1)} \
+-\partial \Psi / \partial x^{(0)} \end{array}\right].  $$</p>
+<p>This is reminiscent of a 3 dimensional <a href="https://en.wikipedia.org/wiki/Helmholtz_decomposition">Helmholtz
+decomposition</a>.</p>
+<p>The 2 dimensional decomposition motivates a different approach: placing priors on
+<span class="arithmatex">\(\Psi\)</span> and <span class="arithmatex">\(\Phi\)</span>, allowing us to make assumptions directly about fundamental
+properties of <span class="arithmatex">\(\mathbf{F}\)</span>. If we choose independent GP priors such that <span class="arithmatex">\(\Phi \sim
+\mathcal{G P}\left(0, k_{\Phi}\right)\)</span> and <span class="arithmatex">\(\Psi \sim \mathcal{G P}\left(0,
+k_{\Psi}\right)\)</span>, then <span class="arithmatex">\(\mathbf{F} \sim \mathcal{G P} \left(0, k_\text{Helm}\right)\)</span>
+(since acting linear operations on a GPs give GPs).</p>
+<p>For <span class="arithmatex">\(\mathbf{X}, \mathbf{X}^{\prime} \in \mathbb{R}^2 \times \left\{0,1\right\}\)</span> and
+<span class="arithmatex">\(z, z^\prime \in \{0,1\}\)</span>,</p>
+<div class="arithmatex">\[ \boxed{ k_{\mathrm{Helm}}\left(\mathbf{x}, \mathbf{x}^{\prime}\right)_{z,z^\prime}
+=  \frac{\partial^2 k_{\Phi}\left(\mathbf{x}, \mathbf{x}^{\prime}\right)}{\partial
+x^{(z)} \partial\left(x^{\prime}\right)^{(z^\prime)}}+(-1)^{z+z^\prime}
+\frac{\partial^2 k_{\Psi}\left(\mathbf{x}, \mathbf{x}^{\prime}\right)}{\partial
+x^{(1-z)} \partial\left(x^{\prime}\right)^{(1-z^\prime)}}}.  \]</div>
+<p>where <span class="arithmatex">\(x^{(z)}\)</span> and <span class="arithmatex">\((x^\prime)^{(z^\prime)}\)</span> are the <span class="arithmatex">\(z\)</span> and <span class="arithmatex">\(z^\prime\)</span> components of
+<span class="arithmatex">\(\mathbf{X}\)</span> and <span class="arithmatex">\({\mathbf{X}}^{\prime}\)</span> respectively.</p>
+<p>We compute the second derivatives using <code>jax.hessian</code>. In the following
+implementation, for a kernel <span class="arithmatex">\(k(\mathbf{x}, \mathbf{x}^{\prime})\)</span>, this computes the
+Hessian matrix with respect to the components of <span class="arithmatex">\(\mathbf{x}\)</span></p>
+<div class="arithmatex">\[ \frac{\partial^2 k\left(\mathbf{x}, \mathbf{x}^{\prime}\right)}{\partial x^{(z)}
+\partial x^{(z^\prime)}}.  \]</div>
+<p>Note that we have operated <span class="arithmatex">\(\dfrac{\partial}{\partial x^{(z)}}\)</span>, <em>not</em>
+<span class="arithmatex">\(\dfrac{\partial}{\partial \left(x^\prime \right)^{(z)}}\)</span>, as the boxed equation
+suggests. This is not an issue if we choose stationary kernels <span class="arithmatex">\(k(\mathbf{x},
+\mathbf{x}^{\prime}) = k(\mathbf{x} - \mathbf{x}^{\prime})\)</span> , as the partial
+derivatives with respect to the components have the following exchange symmetry:</p>
+<div class="arithmatex">\[ \frac{\partial}{\partial x^{(z)}} = - \frac{\partial}{\partial \left( x^\prime
+\right)^{(z)}}, \]</div>
 <p>for either <span class="arithmatex">\(z\)</span>.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nd">@dataclass</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">HelmholtzKernel</span><span class="p">(</span><span class="n">gpx</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">stationary</span><span class="o">.</span><span class="n">StationaryKernel</span><span class="p">):</span>
@@ -3014,7 +3105,8 @@ $$</p>
 </span><span id="__span-8-28"><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>        <span class="k">return</span> <span class="n">potential_dvtve</span> <span class="o">+</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">stream_dvtve</span>
 </span></code></pre></div>
 <h3 id="gpjax-implementation_1">GPJax implementation<a class="headerlink" href="#gpjax-implementation_1" title="Permanent link"></a></h3>
-<p>We repeat the same steps as with the velocity GP model, replacing <code>VelocityKernel</code> with <code>HelmholtzKernel</code>.</p>
+<p>We repeat the same steps as with the velocity GP model, replacing <code>VelocityKernel</code>
+with <code>HelmholtzKernel</code>.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Redefine Gaussian process with Helmholtz kernel</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">kernel</span> <span class="o">=</span> <span class="n">HelmholtzKernel</span><span class="p">()</span>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">helmholtz_posterior</span> <span class="o">=</span> <span class="n">initialise_gp</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">dataset_train</span><span class="p">)</span>
@@ -3028,7 +3120,11 @@ $$</p>
          Gradient evaluations: 58
 </code></pre></div>
 <h3 id="comparison_1">Comparison<a class="headerlink" href="#comparison_1" title="Permanent link"></a></h3>
-<p>We again plot the ground truth (testing data) <span class="arithmatex">\(D_0\)</span>, the predicted latent vector field <span class="arithmatex">\(\mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i})\)</span>, and a heatmap of the residuals at each location <span class="arithmatex">\(R(\mathbf{x}_{0,i}) = \mathbf{y}_{0,i} - \mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i})\)</span> and <span class="arithmatex">\(\left|\left|R(\mathbf{x}_{0,i})  \right|\right|\)</span>.</p>
+<p>We again plot the ground truth (testing data) <span class="arithmatex">\(D_0\)</span>, the predicted latent vector field
+<span class="arithmatex">\(\mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i})\)</span>, and a heatmap of the residuals at each
+location <span class="arithmatex">\(R(\mathbf{x}_{0,i}) = \mathbf{y}_{0,i} -
+\mathbf{F}_{\text{latent}}(\mathbf{x}_{0,i})\)</span> and <span class="arithmatex">\(\left|\left|R(\mathbf{x}_{0,i})
+\right|\right|\)</span>.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># obtain latent distribution, extract x and y values over g</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">helmholtz_mean</span><span class="p">,</span> <span class="n">helmholtz_std</span> <span class="o">=</span> <span class="n">latent_distribution</span><span class="p">(</span>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="n">opt_helmholtz_posterior</span><span class="p">,</span> <span class="n">dataset_ground_truth</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">dataset_train</span>
@@ -3038,17 +3134,29 @@ $$</p>
 </span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">plot_fields</span><span class="p">(</span><span class="n">dataset_ground_truth</span><span class="p">,</span> <span class="n">dataset_train</span><span class="p">,</span> <span class="n">dataset_latent_helmholtz</span><span class="p">)</span>
 </span></code></pre></div>
 <p><img alt="png" src="../oceanmodelling_files/oceanmodelling_22_0.png" /></p>
-<p>Visually, the Helmholtz model performs better than the velocity model, preserving the local structure of the <span class="arithmatex">\(\mathbf{F}\)</span>. Since we placed priors on <span class="arithmatex">\(\Phi\)</span> and <span class="arithmatex">\(\Psi\)</span>, the construction of <span class="arithmatex">\(\mathbf{F}\)</span> allows for correlations between the dimensions (non-zero off-diagonal elements in the Gram matrix populated by <span class="arithmatex">\(k_\text{Helm}\left(\mathbf{X},\mathbf{X}^{\prime}\right)\)</span> ).</p>
+<p>Visually, the Helmholtz model performs better than the velocity model, preserving the
+local structure of the <span class="arithmatex">\(\mathbf{F}\)</span>. Since we placed priors on <span class="arithmatex">\(\Phi\)</span> and <span class="arithmatex">\(\Psi\)</span>, the
+construction of <span class="arithmatex">\(\mathbf{F}\)</span> allows for correlations between the dimensions (non-zero
+off-diagonal elements in the Gram matrix populated by
+<span class="arithmatex">\(k_\text{Helm}\left(\mathbf{X},\mathbf{X}^{\prime}\right)\)</span> ).</p>
 <h2 id="negative-log-predictive-densities">Negative log predictive densities<a class="headerlink" href="#negative-log-predictive-densities" title="Permanent link"></a></h2>
-<p>Lastly, we directly compare the velocity and Helmholtz models by computing the <a href="https://en.wikipedia.org/wiki/Negative_log_predictive_density">negative log predictive densities</a> for each model. This is a quantitative metric that measures the probability of the ground truth given the data.</p>
+<p>Lastly, we directly compare the velocity and Helmholtz models by computing the
+<a href="https://en.wikipedia.org/wiki/Negative_log_predictive_density">negative log predictive
+densities</a> for each
+model. This is a quantitative metric that measures the probability of the ground truth
+given the data.</p>
 <div class="arithmatex">\[
 \mathrm{NLPD}=-\sum_{i=1}^{2N} \log \left(  p\left(\mathcal{Y}_i = Y_{0,i} \mid \mathbf{X}_{i}\right) \right),
 \]</div>
-<p>where each <span class="arithmatex">\(p\left(\mathcal{Y}_i \mid \mathbf{X}_i \right)\)</span> is the marginal Gaussian distribution over <span class="arithmatex">\(\mathcal{Y}_i\)</span> at each test location, and <span class="arithmatex">\(Y_{i,0}\)</span> is the <span class="arithmatex">\(i\)</span>-th component of the (massaged) test data that we reserved at the beginning of the notebook in <span class="arithmatex">\(D_0\)</span>. A smaller value is better, since the deviation of the ground truth and the model are small in this case.</p>
+<p>where each <span class="arithmatex">\(p\left(\mathcal{Y}_i \mid \mathbf{X}_i \right)\)</span> is the marginal Gaussian
+distribution over <span class="arithmatex">\(\mathcal{Y}_i\)</span> at each test location, and <span class="arithmatex">\(Y_{i,0}\)</span> is the <span class="arithmatex">\(i\)</span>-th
+component of the (massaged) test data that we reserved at the beginning of the
+notebook in <span class="arithmatex">\(D_0\)</span>. A smaller value is better, since the deviation of the ground truth
+and the model are small in this case.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># ensure testing data alternates between x0 and x1 components</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">nlpd</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">,</span> <span class="n">vel_test</span><span class="p">):</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="n">vel_query</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">vel_test</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vel_test</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">normal</span> <span class="o">=</span> <span class="n">tfp</span><span class="o">.</span><span class="n">substrates</span><span class="o">.</span><span class="n">jax</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">mean</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">std</span><span class="p">)</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">normal</span> <span class="o">=</span> <span class="n">npd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">mean</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">std</span><span class="p">)</span>
 </span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="k">return</span> <span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">normal</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">vel_query</span><span class="p">))</span>
 </span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
 </span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
@@ -3071,18 +3179,18 @@ NLPD for Helmholtz: -280.59
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Ivan Shalashilin
 
-Last updated: Fri Apr 11 2025
+Last updated: Sun Apr 13 2025
 
 Python implementation: CPython
 Python version       : 3.10.16
 IPython version      : 8.35.0
 
-pandas                : 2.2.3
-tensorflow_probability: 0.25.0
-gpjax                 : 0.10.2
-jaxtyping             : 0.3.1
-jax                   : 0.5.3
-matplotlib            : 3.10.1
+matplotlib: 3.10.1
+jax       : 0.5.3
+pandas    : 2.2.3
+numpyro   : 0.18.0
+gpjax     : 0.11.0
+jaxtyping : 0.3.1
 
 Watermark: 2.5.0
 </code></pre></div>

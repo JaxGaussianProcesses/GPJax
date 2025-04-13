@@ -831,7 +831,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/constructing_new_kernels/" class="md-nav__link">
+      <a href="../../_examples/constructing_new_kernels.md" class="md-nav__link">
         
   
   
@@ -1240,18 +1240,36 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#gpjax.distributions.GaussianDistribution.event_shape" class="md-nav__link">
+  <a href="#gpjax.distributions.GaussianDistribution.mean" class="md-nav__link">
     <span class="md-ellipsis">
-      event_shape
+      mean
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#gpjax.distributions.GaussianDistribution.mean" class="md-nav__link">
+  <a href="#gpjax.distributions.GaussianDistribution.variance" class="md-nav__link">
     <span class="md-ellipsis">
-      mean
+      variance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.distributions.GaussianDistribution.covariance_matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      covariance_matrix
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.distributions.GaussianDistribution.entropy" class="md-nav__link">
+    <span class="md-ellipsis">
+      entropy
     </span>
   </a>
   
@@ -1285,15 +1303,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gpjax.distributions.GaussianDistribution.variance" class="md-nav__link">
-    <span class="md-ellipsis">
-      variance
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#gpjax.distributions.GaussianDistribution.stddev" class="md-nav__link">
     <span class="md-ellipsis">
       stddev
@@ -1303,27 +1312,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gpjax.distributions.GaussianDistribution.entropy" class="md-nav__link">
-    <span class="md-ellipsis">
-      entropy
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#gpjax.distributions.GaussianDistribution.log_prob" class="md-nav__link">
     <span class="md-ellipsis">
       log_prob
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.distributions.GaussianDistribution.sample" class="md-nav__link">
-    <span class="md-ellipsis">
-      sample
     </span>
   </a>
   
@@ -2317,6 +2308,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../numpyro_extras/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Numpyro Extras
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../objectives/" class="md-nav__link">
         
   
@@ -2475,18 +2489,36 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#gpjax.distributions.GaussianDistribution.event_shape" class="md-nav__link">
+  <a href="#gpjax.distributions.GaussianDistribution.mean" class="md-nav__link">
     <span class="md-ellipsis">
-      event_shape
+      mean
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#gpjax.distributions.GaussianDistribution.mean" class="md-nav__link">
+  <a href="#gpjax.distributions.GaussianDistribution.variance" class="md-nav__link">
     <span class="md-ellipsis">
-      mean
+      variance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.distributions.GaussianDistribution.covariance_matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      covariance_matrix
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.distributions.GaussianDistribution.entropy" class="md-nav__link">
+    <span class="md-ellipsis">
+      entropy
     </span>
   </a>
   
@@ -2520,15 +2552,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gpjax.distributions.GaussianDistribution.variance" class="md-nav__link">
-    <span class="md-ellipsis">
-      variance
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#gpjax.distributions.GaussianDistribution.stddev" class="md-nav__link">
     <span class="md-ellipsis">
       stddev
@@ -2538,27 +2561,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gpjax.distributions.GaussianDistribution.entropy" class="md-nav__link">
-    <span class="md-ellipsis">
-      entropy
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#gpjax.distributions.GaussianDistribution.log_prob" class="md-nav__link">
     <span class="md-ellipsis">
       log_prob
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gpjax.distributions.GaussianDistribution.sample" class="md-nav__link">
-    <span class="md-ellipsis">
-      sample
     </span>
   </a>
   
@@ -2622,41 +2627,13 @@
 
 
 </h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">GaussianDistribution</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">GaussianDistribution</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">validate_args</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="gpjax.distributions.tfd.Distribution">Distribution</span></code></p>
+              Bases: <code><span title="numpyro.distributions.distribution.Distribution">Distribution</span></code></p>
 
-
-        <p>Multivariate Gaussian distribution with a linear operator scale matrix.</p>
-
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>loc</code></b>
-              (<code><span title="beartype.typing.Optional">Optional</span>[<span title="jaxtyping.Float">Float</span>[<span title="gpjax.typing.Array">Array</span>, &#39; N&#39;]]</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>the mean of the distribution as an array of shape (n_points,).</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>scale</code></b>
-              (<code><span title="beartype.typing.Optional">Optional</span>[<span title="cola.ops.LinearOperator">LinearOperator</span>]</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>the scale matrix of the distribution as a LinearOperator object.</p>
-          </div>
-        </li>
-    </ul>
 
 
 
@@ -2678,8 +2655,8 @@
 
 
 
-<h3 id="gpjax.distributions.GaussianDistribution.event_shape" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">event_shape</span>
+<h3 id="gpjax.distributions.GaussianDistribution.mean" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">mean</span>
 
 
   <span class="doc doc-labels">
@@ -2687,12 +2664,58 @@
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_shape</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">mean</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Returns the event shape.</p>
+        <p>Calculates the mean.</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="gpjax.distributions.GaussianDistribution.variance" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">variance</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">variance</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Calculates the variance.</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="gpjax.distributions.GaussianDistribution.covariance_matrix" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">covariance_matrix</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">covariance_matrix</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Calculates the covariance matrix.</p>
     </div>
 
 </div>
@@ -2702,17 +2725,17 @@
 <div class="doc doc-object doc-function">
 
 
-<h3 id="gpjax.distributions.GaussianDistribution.mean" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">mean</span>
+<h3 id="gpjax.distributions.GaussianDistribution.entropy" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">entropy</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">mean</span><span class="p">()</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">entropy</span><span class="p">()</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Calculates the mean.</p>
+        <p>Calculates the entropy of the distribution.</p>
 
     </div>
 
@@ -2778,25 +2801,6 @@
 <div class="doc doc-object doc-function">
 
 
-<h3 id="gpjax.distributions.GaussianDistribution.variance" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">variance</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">variance</span><span class="p">()</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Calculates the variance.</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h3 id="gpjax.distributions.GaussianDistribution.stddev" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">stddev</span>
 
@@ -2808,25 +2812,6 @@
     <div class="doc doc-contents ">
 
         <p>Calculates the standard deviation.</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="gpjax.distributions.GaussianDistribution.entropy" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">entropy</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">entropy</span><span class="p">()</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Calculates the entropy of the distribution.</p>
 
     </div>
 
@@ -2871,25 +2856,6 @@
           </div>
         </li>
     </ul>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="gpjax.distributions.GaussianDistribution.sample" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">sample</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">sample</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">sample_shape</span><span class="p">)</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>See <code>Distribution.sample</code>.</p>
 
     </div>
 

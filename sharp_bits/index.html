@@ -942,7 +942,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../_examples/constructing_new_kernels/" class="md-nav__link">
+      <a href="../_examples/constructing_new_kernels.md" class="md-nav__link">
         
   
   
@@ -2285,6 +2285,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../api/numpyro_extras/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Numpyro Extras
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../api/objectives/" class="md-nav__link">
         
   
@@ -2605,14 +2628,14 @@ This gives us the points' unconstrained value which we depict by a red circle. I
 this value that we apply gradient updates to. When we wish to recover the constrained
 value, we apply the inverse of the bijector, which is the exponential function in this
 case. This gives us back the blue cross.</p>
-<p>In GPJax, we supply bijective functions using <a href="https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/bijectors">Tensorflow Probability</a>.</p>
+<p>In GPJax, we supply bijective functions using <a href="https://num.pyro.ai/en/stable/distributions.html#transforms">Numpyro</a>.</p>
 <h2 id="positive-definiteness">Positive-definiteness<a class="headerlink" href="#positive-definiteness" title="Permanent link"></a></h2>
 <blockquote>
 <p>"Symmetric positive definiteness is one of the highest accolades to which a matrix can aspire" - Nicholas Highman, Accuracy and stability of numerical algorithms [@higham2022accuracy]</p>
 </blockquote>
 <h3 id="why-is-positive-definiteness-important">Why is positive-definiteness important?<a class="headerlink" href="#why-is-positive-definiteness-important" title="Permanent link"></a></h3>
 <p>The Gram matrix of a kernel, a concept that we explore more in our
-<a href="../_examples/constructing_new_kernels/">kernels notebook</a>. As such, we
+<a href="_examples/constructing_new_kernels.md">kernels notebook</a>. As such, we
 have a range of tools at our disposal to make subsequent operations on the covariance
 matrix faster. One of these tools is the Cholesky factorisation that uniquely decomposes
 any symmetric positive-definite matrix <span class="arithmatex">\(\mathbf{\Sigma}\)</span> by</p>
