@@ -125,3 +125,79 @@ def test_grad_inverse():
     row, col = jnp.tril_indices(n)
     grad_expected = grad_expected.at[row, col].set(1.0)
     np.testing.assert_allclose(grad_g, grad_expected, rtol=1e-6)
+
+
+def test_invalid_dimension_error():
+    """
+    Test that the FillTriangularTransform correctly raises a ValueError when
+    the last dimension doesn't equal n(n+1)/2 for some integer n.
+    """
+    ft = FillTriangularTransform()
+
+    # Create vectors with invalid dimensions that aren't n(n+1)/2 for any integer n
+    invalid_dims = [2, 4, 5, 7, 8, 11, 13, 14, 17, 19, 20]
+
+    for dim in invalid_dims:
+        vec = jnp.ones(dim)
+        with pytest.raises(
+            ValueError,
+            match="Last dimension must equal n\\(n\\+1\\)/2 for some integer n\\.",
+        ):
+            ft(vec)
+
+    # Verify that valid dimensions don't raise errors
+    valid_dims = [1, 3, 6, 10, 15, 21]  # n(n+1)/2 for n=1,2,3,4,5,6
+
+    for dim in valid_dims:
+        vec = jnp.ones(dim)
+        try:
+            ft(vec)
+        except ValueError:
+            pytest.fail(
+                f"FillTriangularTransform raised ValueError for valid dimension {dim}"
+            )
+
+
+def test_inverse_dimension_error():
+    """
+    Test that the FillTriangularTransform.inv correctly raises a ValueError when
+    the input has less than two dimensions.
+    """
+    ft = FillTriangularTransform()
+
+    # Create a one-dimensional array
+    vec = jnp.ones(3)  # 1D array with 3 elements
+
+    # Try to call inverse on the 1D array, should fail
+    with pytest.raises(
+        ValueError, match="Input to inverse must be at least two-dimensional."
+    ):
+        ft.inv(vec)
+
+
+def test_inverse_non_square_error():
+    """
+    Test that the FillTriangularTransform.inv correctly raises a ValueError when
+    the input matrix is not square.
+    """
+    ft = FillTriangularTransform()
+
+    # Create non-square matrices of different shapes
+    non_square_matrices = [
+        jnp.ones((3, 4)),  # 3x4 matrix
+        jnp.ones((5, 2)),  # 5x2 matrix
+        jnp.ones((1, 3)),  # 1x3 matrix
+    ]
+
+    for matrix in non_square_matrices:
+        # Extract dimensions
+        dim1, dim2 = matrix.shape[-2:]
+        # Use a simpler regex pattern that doesn't include parentheses
+        error_pattern = f"Input matrix must be square; got shape"
+        with pytest.raises(ValueError, match=error_pattern):
+            ft.inv(matrix)
+
+    # Test with batched non-square matrices
+    batched_non_square = jnp.ones((2, 3, 4))  # Batch of 2 matrices of shape 3x4
+    with pytest.raises(ValueError, match="Input matrix must be square"):
+        ft.inv(batched_non_square)

@@ -207,5 +207,5 @@ SumMeanFunction = ft.partial(
     CombinationMeanFunction, operator=ft.partial(jnp.sum, axis=0)
 )
 ProductMeanFunction = ft.partial(
-    CombinationMeanFunction, operator=ft.partial(jnp.sum, axis=0)
+    CombinationMeanFunction, operator=ft.partial(jnp.prod, axis=0)
 )
