@@ -106,7 +106,7 @@ class SigmoidBounded(Parameter[T]):
         # Only perform validation in non-JIT contexts
         if (
             not isinstance(value, jnp.ndarray)
-            or not getattr(value, "aval", None) is None
+            or getattr(value, "aval", None) is not None
         ):
             _safe_assert(
                 _check_in_bounds,
@@ -135,7 +135,7 @@ class LowerTriangular(Parameter[T]):
         # Only perform validation in non-JIT contexts
         if (
             not isinstance(value, jnp.ndarray)
-            or not getattr(value, "aval", None) is None
+            or getattr(value, "aval", None) is not None
         ):
             _safe_assert(_check_is_square, self.value)
             _safe_assert(_check_is_lower_triangular, self.value)

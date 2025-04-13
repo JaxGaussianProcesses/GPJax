@@ -24,9 +24,9 @@ dependencies = [
   "jax>=0.5.0",
   "jaxlib>=0.5.0",
   "optax>0.2.1",
+  "numpyro",
   "jaxtyping>0.2.10",
   "tqdm>4.66.2",
-  "tensorflow-probability>=0.24.0",
   "beartype>0.16.1",
   "cola-ml>=0.0.7",
   "flax>=0.10.0",
@@ -86,7 +86,8 @@ dependencies = [
   "networkx",
   "black",
   "jupytext",
-  "pytest-beartype"
+  "pytest-beartype",
+  "autoflake"
 ]
 
 [tool.hatch.envs.dev.scripts]
@@ -104,6 +105,7 @@ lint-format = ['ruff format ./gpjax ./tests ./examples']
 lint-check = ['ruff check --fix ./gpjax ./tests ./examples']
 format = ["black-format", "imports-format", "lint-format"]
 check = ["black-check", "imports-check", "lint-check"]
+remove-unused = ["autoflake --remove-unused-variables --remove-all-unused-imports --recursive ./gpjax/*.py ./tests/*.py"]
 test = "pytest . -v -n 4 --beartype-packages='gpjax'"
 coverage = "pytest . -v --cov=./gpjax --cov-report=xml:./coverage.xml"
 docstrings = "xdoctest ./gpjax"

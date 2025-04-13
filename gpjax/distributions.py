@@ -15,15 +15,11 @@
 
 
 from beartype.typing import (
-    Any,
     Optional,
-    Tuple,
-    TypeVar,
 )
 import cola
 from cola.linalg.decompositions import Cholesky
 from cola.ops import (
-    Identity,
     LinearOperator,
 )
 from jax import vmap
@@ -37,7 +33,6 @@ from numpyro.distributions.util import is_prng_key
 from gpjax.lower_cholesky import lower_cholesky
 from gpjax.typing import (
     Array,
-    KeyArray,
     ScalarFloat,
 )
 
