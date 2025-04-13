@@ -68,7 +68,7 @@ class RFF(AbstractKernel):
 
             self.frequencies = Static(
                 self.base_kernel.spectral_density.sample(
-                    seed=key, sample_shape=(self.num_basis_fns, n_dims)
+                    key=key, sample_shape=(self.num_basis_fns, n_dims)
                 )
             )
         self.name = f"{self.base_kernel.name} (RFF)"

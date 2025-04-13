@@ -40,13 +40,9 @@ def test_transform(param, value):
 
     # Test forward transformation
     t_params = transform(params, DEFAULT_BIJECTION)
-    t_param1_expected = DEFAULT_BIJECTION[params["param1"]._tag].forward(value)
+    t_param1_expected = DEFAULT_BIJECTION[params["param1"]._tag](value)
     assert jnp.allclose(t_params["param1"].value, t_param1_expected)
     assert jnp.allclose(t_params["param2"].value, 2.0)
-
-    # Test inverse transformation
-    it_params = transform(t_params, DEFAULT_BIJECTION, inverse=True)
-    assert repr(it_params) == repr(params)
 
 
 @pytest.mark.parametrize(

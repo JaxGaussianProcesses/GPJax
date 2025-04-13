@@ -21,6 +21,7 @@ from beartype.typing import (
     TypeVar,
 )
 import cola
+from cola.linalg.decompositions import Cholesky
 from cola.ops import (
     Identity,
     LinearOperator,
@@ -29,8 +30,9 @@ from jax import vmap
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax as tfp
+from numpyro.distributions import constraints
 from numpyro.distributions.distribution import Distribution
+from numpyro.distributions.util import is_prng_key
 
 from gpjax.lower_cholesky import lower_cholesky
 from gpjax.typing import (
@@ -38,12 +40,6 @@ from gpjax.typing import (
     KeyArray,
     ScalarFloat,
 )
-
-from cola.linalg.decompositions import Cholesky
-from numpyro.distributions import constraints
-from numpyro.distributions.util import is_prng_key
-
-tfd = tfp.distributions
 
 
 class GaussianDistribution(Distribution):
@@ -105,6 +101,11 @@ class GaussianDistribution(Distribution):
     def covariance(self) -> Float[Array, "N N"]:
         r"""Calculates the covariance matrix."""
         return self.scale.to_dense()
+
+    @property
+    def covariance_matrix(self) -> Float[Array, "N N"]:
+        r"""Calculates the covariance matrix."""
+        return self.covariance()
 
     def stddev(self) -> Float[Array, " N"]:
         r"""Calculates the standard deviation."""

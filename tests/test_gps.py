@@ -32,9 +32,8 @@ from cola.linalg.inverse.cg import CG
 from jax import config
 import jax.numpy as jnp
 import jax.random as jr
-import pytest
-import tensorflow_probability.substrates.jax.distributions as tfd
 from numpyro.distributions import Distribution as NumpyroDistribution
+import pytest
 
 from gpjax.dataset import Dataset
 from gpjax.distributions import GaussianDistribution

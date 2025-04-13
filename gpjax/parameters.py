@@ -5,7 +5,9 @@ from jax.experimental import checkify
 import jax.numpy as jnp
 import jax.tree_util as jtu
 from jax.typing import ArrayLike
-import tensorflow_probability.substrates.jax.bijectors as tfb
+import numpyro.distributions.transforms as npt
+
+from gpjax.numpyro_extras import FillTriangularTransform
 
 T = tp.TypeVar("T", bound=tp.Union[ArrayLike, list[float]])
 ParameterTag = str
@@ -13,7 +15,7 @@ ParameterTag = str
 
 def transform(
     params: nnx.State,
-    params_bijection: tp.Dict[str, tfb.Bijector],
+    params_bijection: tp.Dict[str, npt.Transform],
     inverse: bool = False,
 ) -> nnx.State:
     r"""Transforms parameters using a bijector.
@@ -22,7 +24,7 @@ def transform(
     ```pycon
         >>> from gpjax.parameters import PositiveReal, transform
         >>> import jax.numpy as jnp
-        >>> import tensorflow_probability.substrates.jax.bijectors as tfb
+        >>> import numpyro.distributions.transforms as npt
         >>> from flax import nnx
         >>> params = nnx.State(
         >>>     {
@@ -30,7 +32,7 @@ def transform(
         >>>         "b": PositiveReal(jnp.array([2.0])),
         >>>     }
         >>> )
-        >>> params_bijection = {'positive': tfb.Softplus()}
+        >>> params_bijection = {'positive': npt.SoftplusTransform()}
         >>> transformed_params = transform(params, params_bijection)
         >>> print(transformed_params["a"].value)
          [1.3132617]
@@ -47,11 +49,11 @@ def transform(
     """
 
     def _inner(param):
-        bijector = params_bijection.get(param._tag, tfb.Identity())
+        bijector = params_bijection.get(param._tag, npt.IdentityTransform())
         if inverse:
-            transformed_value = bijector.inverse(param.value)
+            transformed_value = bijector.inv(param.value)
         else:
-            transformed_value = bijector.forward(param.value)
+            transformed_value = bijector(param.value)
 
         param = param.replace(transformed_value)
         return param
@@ -140,10 +142,10 @@ class LowerTriangular(Parameter[T]):
 
 
 DEFAULT_BIJECTION = {
-    "positive": tfb.Softplus(),
-    "real": tfb.Identity(),
-    "sigmoid": tfb.Sigmoid(low=0.0, high=1.0),
-    "lower_triangular": tfb.FillTriangular(),
+    "positive": npt.SoftplusTransform(),
+    "real": npt.IdentityTransform(),
+    "sigmoid": npt.SigmoidTransform(),
+    "lower_triangular": FillTriangularTransform(),
 }
 
 

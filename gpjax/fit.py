@@ -20,9 +20,9 @@ import jax
 from jax.flatten_util import ravel_pytree
 import jax.numpy as jnp
 import jax.random as jr
+from numpyro.distributions.transforms import Transform
 import optax as ox
 from scipy.optimize import minimize
-from tensorflow_probability.substrates.jax.bijectors import Bijector
 
 from gpjax.dataset import Dataset
 from gpjax.objectives import Objective
@@ -47,7 +47,7 @@ def fit(  # noqa: PLR0913
     objective: Objective,
     train_data: Dataset,
     optim: ox.GradientTransformation,
-    params_bijection: tp.Union[dict[Parameter, Bijector], None] = DEFAULT_BIJECTION,
+    params_bijection: tp.Union[dict[Parameter, Transform], None] = DEFAULT_BIJECTION,
     key: KeyArray = jr.PRNGKey(42),
     num_iters: int = 100,
     batch_size: int = -1,

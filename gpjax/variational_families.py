@@ -22,8 +22,8 @@ from cola.linalg.inverse.inv import solve
 from cola.ops.operators import (
     Dense,
     I_like,
-    Triangular,
     Identity,
+    Triangular,
 )
 from flax import nnx
 import jax.numpy as jnp

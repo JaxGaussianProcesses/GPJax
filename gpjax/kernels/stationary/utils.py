@@ -14,17 +14,15 @@
 # ==============================================================================
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax as tfp
+import numpyro.distributions as npd
 
 from gpjax.typing import (
     Array,
     ScalarFloat,
 )
 
-tfd = tfp.distributions
 
-
-def build_student_t_distribution(nu: int) -> tfd.Distribution:
+def build_student_t_distribution(nu: int) -> npd.StudentT:
     r"""Build a Student's t distribution with a fixed smoothness parameter.
 
     For a fixed half-integer smoothness parameter, compute the spectral density of a
@@ -37,7 +35,7 @@ def build_student_t_distribution(nu: int) -> tfd.Distribution:
     -------
         tfp.Distribution: A Student's t distribution with the same smoothness parameter.
     """
-    dist = tfd.StudentT(df=nu, loc=0.0, scale=1.0)
+    dist = npd.StudentT(df=nu, loc=0.0, scale=1.0)
     return dist
 
 

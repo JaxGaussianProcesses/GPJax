@@ -28,7 +28,7 @@ from jaxtyping import (
 from gpjax.parameters import (
     Parameter,
     Real,
-    Static
+    Static,
 )
 from gpjax.typing import (
     Array,
@@ -131,7 +131,8 @@ class Constant(AbstractMeanFunction):
     """
 
     def __init__(
-        self, constant: tp.Union[ScalarFloat, Float[Array, " O"], Parameter, Static] = 0.0
+        self,
+        constant: tp.Union[ScalarFloat, Float[Array, " O"], Parameter, Static] = 0.0,
     ):
         if isinstance(constant, Parameter) or isinstance(constant, Static):
             self.constant = constant
