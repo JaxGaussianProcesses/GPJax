@@ -1,8 +1,26 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: docs
+#     language: python
+#     name: python3
+# ---
+
+# %%
 from dataclasses import (
     dataclass,
     field,
 )
 
+# %%
 from beartype.typing import (
     Any,
     Callable,
@@ -11,11 +29,14 @@ from beartype.typing import (
 import jax.numpy as jnp  # noqa: F401
 import jupytext
 
+# %%
 import gpjax
 
+# %%
 get_last = lambda x: x[-1]
 
 
+# %%
 @dataclass
 class Result:
     path: str
@@ -74,6 +95,7 @@ class Result:
             )
 
 
+# %%
 regression = Result(
     path="examples/regression.py",
     comparisons={
@@ -84,6 +106,7 @@ regression = Result(
 )
 regression.test()
 
+# %%
 sparse = Result(
     path="examples/collapsed_vi.py",
     comparisons={
@@ -94,6 +117,7 @@ sparse = Result(
 )
 sparse.test()
 
+# %%
 stochastic = Result(
     path="examples/uncollapsed_vi.py",
     comparisons={
