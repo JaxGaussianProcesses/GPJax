@@ -159,13 +159,13 @@ key, subkey = jr.split(key)
 for ax in axes.ravel():
     subkey, _ = jr.split(subkey)
     ax.plot(
-        latent_dist.sample(sample_shape=(1,), seed=subkey).T,
+        latent_dist.sample(sample_shape=(1,), key=subkey).T,
         lw=1,
         color=cols[0],
         label="Latent samples",
     )
     ax.plot(
-        likelihood.predict(latent_dist).sample(sample_shape=(1,), seed=subkey).T,
+        likelihood.predict(latent_dist).sample(sample_shape=(1,), key=subkey).T,
         "o",
         markersize=5,
         alpha=0.3,
@@ -186,13 +186,13 @@ key, subkey = jr.split(key)
 for ax in axes.ravel():
     subkey, _ = jr.split(subkey)
     ax.plot(
-        latent_dist.sample(sample_shape=(1,), seed=subkey).T,
+        latent_dist.sample(sample_shape=(1,), key=subkey).T,
         lw=1,
         color=cols[0],
         label="Latent samples",
     )
     ax.plot(
-        likelihood.predict(latent_dist).sample(sample_shape=(1,), seed=subkey).T,
+        likelihood.predict(latent_dist).sample(sample_shape=(1,), key=subkey).T,
         "o",
         markersize=3,
         alpha=0.5,

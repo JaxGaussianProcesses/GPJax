@@ -161,7 +161,7 @@ predictive_dist = opt_posterior.posterior.likelihood(latent_dist)
 
 inducing_points = opt_posterior.inducing_inputs.value
 
-samples = latent_dist.sample(seed=key, sample_shape=(20,))
+samples = latent_dist.sample(key=key, sample_shape=(20,))
 
 predictive_mean = predictive_dist.mean
 predictive_std = jnp.sqrt(predictive_dist.variance)

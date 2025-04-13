@@ -155,7 +155,7 @@ for d in [ud1, ud2, ud3]:
     ax.plot(
         xs,
         jnp.exp(d.log_prob(xs)),
-        label=f"$\\mathcal{{N}}({{{float(d.mean())}}},\\  {{{float(d.stddev())}}}^2)$",
+        label=f"$\\mathcal{{N}}({{{float(d.mean)}}},\\  {{{float(jnp.sqrt(d.variance))}}}^2)$",
     )
     ax.fill_between(xs, jnp.zeros_like(xs), jnp.exp(d.log_prob(xs)), alpha=0.2)
 ax.legend(loc="best")
@@ -189,7 +189,7 @@ ax.legend(loc="best")
 # %%
 key = jr.key(123)
 
-d1 = npd.MultivariateNormal(loc=jnp.zeros(2), scale_diag=jnp.ones(2))
+d1 = npd.MultivariateNormal(loc=jnp.zeros(2), covariance_matrix=jnp.diag(jnp.ones(2)))
 d2 = npd.MultivariateNormal(
     jnp.zeros(2), scale_tril=jnp.linalg.cholesky(jnp.array([[1.0, 0.9], [0.9, 1.0]]))
 )
@@ -214,9 +214,9 @@ titles = [r"$\rho = 0$", r"$\rho = 0.9$", r"$\rho = -0.5$"]
 cmap = mpl.colors.LinearSegmentedColormap.from_list("custom", ["white", cols[1]], N=256)
 
 for a, t, d in zip([ax0, ax1, ax2], titles, dists, strict=False):
-    d_prob = d.prob(jnp.hstack([xx.reshape(-1, 1), yy.reshape(-1, 1)])).reshape(
-        xx.shape
-    )
+    d_prob = jnp.exp(
+        d.log_prob(jnp.hstack([xx.reshape(-1, 1), yy.reshape(-1, 1)]))
+    ).reshape(xx.shape)
     cntf = a.contourf(
         xx,
         yy,
@@ -228,7 +228,7 @@ for a, t, d in zip([ax0, ax1, ax2], titles, dists, strict=False):
     )
     a.set_xlim(-2.75, 2.75)
     a.set_ylim(-2.75, 2.75)
-    samples = d.sample(seed=key, sample_shape=(5000,))
+    samples = d.sample(key=key, sample_shape=(5000,))
     xsample, ysample = samples[:, 0], samples[:, 1]
     confidence_ellipse(
         xsample, ysample, a, edgecolor="#3f3f3f", n_std=1.0, linestyle="--", alpha=0.8

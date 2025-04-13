@@ -214,7 +214,7 @@ for i in range(0, num_samples, thin_factor):
     model = nnx.merge(graphdef, sample_params, *static_state)
     latent_dist = model.predict(xtest, train_data=D)
     predictive_dist = model.likelihood(latent_dist)
-    posterior_samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
+    posterior_samples.append(predictive_dist.sample(key=key, sample_shape=(10,)))
 
 posterior_samples = jnp.vstack(posterior_samples)
 lower_ci, upper_ci = jnp.percentile(posterior_samples, jnp.array([2.5, 97.5]), axis=0)

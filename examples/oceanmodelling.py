@@ -152,7 +152,6 @@ ax.legend(
     bbox_to_anchor=(0.5, -0.3),
     loc="lower center",
 )
-plt.show()
 
 # %% [markdown]
 # ## Problem Setting
@@ -462,7 +461,6 @@ def plot_fields(
         bbox_to_anchor=(0.5, -0.03),
         loc="lower center",
     )
-    plt.show()
 
 
 plot_fields(dataset_ground_truth, dataset_train, dataset_latent_velocity)
@@ -529,35 +527,39 @@ plot_fields(dataset_ground_truth, dataset_train, dataset_latent_velocity)
 # $$ \frac{\partial}{\partial x^{(z)}} = - \frac{\partial}{\partial \left( x^\prime
 # \right)^{(z)}}, $$
 #
-# for either $z$.  %%
-# @dataclass
-# class HelmholtzKernel(gpx.kernels.stationary.StationaryKernel):
-#     # initialise Phi and Psi kernels as any stationary kernel in gpJax
-#     potential_kernel: gpx.kernels.stationary.StationaryKernel = field(
-#         default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
-#     )
-#     stream_kernel: gpx.kernels.stationary.StationaryKernel = field(
-#         default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
-#     )
-#     compute_engine = DenseKernelComputation()
-#
-#     def __call__(
-#         self, X: Float[Array, "1 D"], Xp: Float[Array, "1 D"]
-#     ) -> Float[Array, "1"]:
-#         # obtain indices for k_helm, implement in the correct sign between the derivatives
-#         z = jnp.array(X[2], dtype=int)
-#         zp = jnp.array(Xp[2], dtype=int)
-#         sign = (-1) ** (z + zp)
-#
-#         # convert to array to correctly index, -ve sign due to exchange symmetry (only true for stationary kernels)
-#         potential_dvtve = -jnp.array(
-#             hessian(self.potential_kernel)(X, Xp), dtype=jnp.float64
-#         )[z][zp]
-#         stream_dvtve = -jnp.array(
-#             hessian(self.stream_kernel)(X, Xp), dtype=jnp.float64
-#         )[1 - z][1 - zp]
-#
-#         return potential_dvtve + sign * stream_dvtve
+# for either $z$.
+# %%
+
+
+@dataclass
+class HelmholtzKernel(gpx.kernels.stationary.StationaryKernel):
+    # initialise Phi and Psi kernels as any stationary kernel in gpJax
+    potential_kernel: gpx.kernels.stationary.StationaryKernel = field(
+        default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
+    )
+    stream_kernel: gpx.kernels.stationary.StationaryKernel = field(
+        default_factory=lambda: gpx.kernels.RBF(active_dims=[0, 1])
+    )
+    compute_engine = DenseKernelComputation()
+
+    def __call__(
+        self, X: Float[Array, "1 D"], Xp: Float[Array, "1 D"]
+    ) -> Float[Array, "1"]:
+        # obtain indices for k_helm, implement in the correct sign between the derivatives
+        z = jnp.array(X[2], dtype=int)
+        zp = jnp.array(Xp[2], dtype=int)
+        sign = (-1) ** (z + zp)
+
+        # convert to array to correctly index, -ve sign due to exchange symmetry (only true for stationary kernels)
+        potential_dvtve = -jnp.array(
+            hessian(self.potential_kernel)(X, Xp), dtype=jnp.float64
+        )[z][zp]
+        stream_dvtve = -jnp.array(
+            hessian(self.stream_kernel)(X, Xp), dtype=jnp.float64
+        )[1 - z][1 - zp]
+
+        return potential_dvtve + sign * stream_dvtve
+
 
 # %% [markdown]
 # ### GPJax implementation

@@ -119,7 +119,6 @@ print(type(posterior))
 # Optax's optimisers.
 
 # %%
-
 optimiser = ox.adam(learning_rate=0.01)
 
 opt_posterior, history = gpx.fit(
@@ -214,8 +213,6 @@ ax.legend()
 # datapoints below.
 
 # %%
-
-
 gram, cross_covariance = (kernel.gram, kernel.cross_covariance)
 jitter = 1e-6
 
@@ -279,7 +276,7 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> npd.MultivariateNorma
     laplace_cov_term = jnp.matmul(jnp.matmul(Kxx_inv_Kxt.T, H_inv), Kxx_inv_Kxt)
 
     mean = map_latent_dist.mean
-    covariance = map_latent_dist.covariance + laplace_cov_term
+    covariance = map_latent_dist.covariance_matrix + laplace_cov_term
     L = jnp.linalg.cholesky(covariance)
     return npd.MultivariateNormal(jnp.atleast_1d(mean.squeeze()), scale_tril=L)
 

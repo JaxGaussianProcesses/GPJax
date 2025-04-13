@@ -38,8 +38,6 @@ import jax.random as jr
 from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import numpyro.distributions as npd
-import numpyro.distributions.transforms as npt
 import optax as ox
 
 from examples.utils import use_mpl_style
@@ -50,9 +48,6 @@ config.update("jax_enable_x64", True)
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     import gpjax.kernels as jk
-
-
-tfb = tfp.bijectors
 
 key = jr.key(123)
 

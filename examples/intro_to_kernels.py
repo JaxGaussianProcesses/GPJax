@@ -204,7 +204,7 @@ meanf = gpx.mean_functions.Zero()
 for k, ax in zip(kernels, axes.ravel(), strict=False):
     prior = gpx.gps.Prior(mean_function=meanf, kernel=k)
     rv = prior(x)
-    y = rv.sample(seed=key, sample_shape=(10,))
+    y = rv.sample(key=key, sample_shape=(10,))
     ax.plot(x, y.T, alpha=0.7)
     ax.set_title(k.name)
 
@@ -293,7 +293,7 @@ opt_posterior, history = gpx.fit_scipy(
 # %%
 def plot_ribbon(ax, x, dist, color):
     mean = dist.mean
-    std = dist.stddev()
+    std = jnp.sqrt(dist.variance)
     ax.plot(x, mean, label="Predictive mean", color=color)
     ax.fill_between(
         x.squeeze(),
@@ -369,12 +369,11 @@ prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 
 x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 rv = prior(x)
-y = rv.sample(seed=key, sample_shape=(10,))
+y = rv.sample(key=key, sample_shape=(10,))
 
 fig, ax = plt.subplots()
 ax.plot(x, y.T, alpha=0.7)
 ax.set_title("Samples from the Periodic Kernel")
-plt.show()
 
 # %% [markdown]
 # In other scenarios, it may be known that the underlying function is *linear*, in which case the *linear* kernel would be a suitable choice:
@@ -392,12 +391,11 @@ prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 
 x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 rv = prior(x)
-y = rv.sample(seed=key, sample_shape=(10,))
+y = rv.sample(key=key, sample_shape=(10,))
 
 fig, ax = plt.subplots()
 ax.plot(x, y.T, alpha=0.7)
 ax.set_title("Samples from the Linear Kernel")
-plt.show()
 
 # %% [markdown]
 # ## Composing Kernels
@@ -428,11 +426,10 @@ prior = gpx.gps.Prior(mean_function=mean, kernel=sum_kernel)
 
 x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 rv = prior(x)
-y = rv.sample(seed=key, sample_shape=(10,))
+y = rv.sample(key=key, sample_shape=(10,))
 fig, ax = plt.subplots()
 ax.plot(x, y.T, alpha=0.7)
 ax.set_title("Samples from a GP Prior with Kernel = Linear + Periodic")
-plt.show()
 
 
 # %% [markdown]
@@ -453,11 +450,10 @@ prior = gpx.gps.Prior(mean_function=mean, kernel=sum_kernel)
 
 x = jnp.linspace(-3.0, 3.0, num=200).reshape(-1, 1)
 rv = prior(x)
-y = rv.sample(seed=key, sample_shape=(10,))
+y = rv.sample(key=key, sample_shape=(10,))
 fig, ax = plt.subplots()
 ax.plot(x, y.T, alpha=0.7)
 ax.set_title("Samples from a GP with Kernel = Linear x Periodic")
-plt.show()
 
 
 # %% [markdown]
@@ -498,7 +494,6 @@ ax.plot(train_x, train_y)
 ax.set_title("CO2 Concentration in the Atmosphere")
 ax.set_xlabel("Year")
 ax.set_ylabel("CO2 Concentration (ppm)")
-plt.show()
 
 # %% [markdown]
 # Looking at the data, we can see that there is clearly a periodic trend, with a period of

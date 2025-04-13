@@ -124,7 +124,7 @@ true_kernel = gpx.kernels.GraphKernel(
 prior = gpx.gps.Prior(mean_function=gpx.mean_functions.Zero(), kernel=true_kernel)
 
 fx = prior(x)
-y = fx.sample(seed=key, sample_shape=(1,)).reshape(-1, 1)
+y = fx.sample(key=key, sample_shape=(1,)).reshape(-1, 1)
 
 D = gpx.Dataset(X=x, y=y)
 
