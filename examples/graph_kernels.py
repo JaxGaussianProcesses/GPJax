@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -124,7 +124,7 @@ true_kernel = gpx.kernels.GraphKernel(
 prior = gpx.gps.Prior(mean_function=gpx.mean_functions.Zero(), kernel=true_kernel)
 
 fx = prior(x)
-y = fx.sample(seed=key, sample_shape=(1,)).reshape(-1, 1)
+y = fx.sample(key=key, sample_shape=(1,)).reshape(-1, 1)
 
 D = gpx.Dataset(X=x, y=y)
 
@@ -194,8 +194,8 @@ opt_posterior, training_history = gpx.fit_scipy(
 initial_dist = likelihood(posterior(x, D))
 predictive_dist = opt_posterior.likelihood(opt_posterior(x, D))
 
-initial_mean = initial_dist.mean()
-learned_mean = predictive_dist.mean()
+initial_mean = initial_dist.mean
+learned_mean = predictive_dist.mean
 
 rmse = lambda ytrue, ypred: jnp.sum(jnp.sqrt(jnp.square(ytrue - ypred)))
 

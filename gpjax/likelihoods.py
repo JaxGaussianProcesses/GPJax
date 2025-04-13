@@ -19,7 +19,7 @@ from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax as tfp
+import numpyro.distributions as npd
 
 from gpjax.distributions import GaussianDistribution
 from gpjax.integrators import (
@@ -35,9 +35,6 @@ from gpjax.typing import (
     Array,
     ScalarFloat,
 )
-
-tfb = tfp.bijectors
-tfd = tfp.distributions
 
 
 class AbstractLikelihood(nnx.Module):
@@ -62,7 +59,7 @@ class AbstractLikelihood(nnx.Module):
         self.num_datapoints = num_datapoints
         self.integrator = integrator
 
-    def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> tfd.Distribution:
+    def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> npd.Distribution:
         r"""Evaluate the likelihood function at a given predictive distribution.
 
         Args:
@@ -76,7 +73,7 @@ class AbstractLikelihood(nnx.Module):
         return self.predict(*args, **kwargs)
 
     @abc.abstractmethod
-    def predict(self, *args: tp.Any, **kwargs: tp.Any) -> tfd.Distribution:
+    def predict(self, *args: tp.Any, **kwargs: tp.Any) -> npd.Distribution:
         r"""Evaluate the likelihood function at a given predictive distribution.
 
         Args:
@@ -85,19 +82,19 @@ class AbstractLikelihood(nnx.Module):
                 `predict` method.
 
         Returns:
-            tfd.Distribution: The predictive distribution.
+            npd.Distribution: The predictive distribution.
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
+    def link_function(self, f: Float[Array, "..."]) -> npd.Distribution:
         r"""Return the link function of the likelihood function.
 
         Args:
             f (Float[Array, "..."]): the latent Gaussian process values.
 
         Returns:
-            tfd.Distribution: The distribution of observations, y, given values of the
+            npd.Distribution: The distribution of observations, y, given values of the
                 Gaussian process, f.
         """
         raise NotImplementedError
@@ -157,20 +154,20 @@ class Gaussian(AbstractLikelihood):
 
         super().__init__(num_datapoints, integrator)
 
-    def link_function(self, f: Float[Array, "..."]) -> tfd.Normal:
+    def link_function(self, f: Float[Array, "..."]) -> npd.Normal:
         r"""The link function of the Gaussian likelihood.
 
         Args:
             f (Float[Array, "..."]): Function values.
 
         Returns:
-            tfd.Normal: The likelihood function.
+            npd.Normal: The likelihood function.
         """
-        return tfd.Normal(loc=f, scale=self.obs_stddev.value.astype(f.dtype))
+        return npd.Normal(loc=f, scale=self.obs_stddev.value.astype(f.dtype))
 
     def predict(
-        self, dist: tp.Union[tfd.MultivariateNormalTriL, GaussianDistribution]
-    ) -> tfd.MultivariateNormalFullCovariance:
+        self, dist: tp.Union[npd.MultivariateNormal, GaussianDistribution]
+    ) -> npd.MultivariateNormal:
         r"""Evaluate the Gaussian likelihood.
 
         Evaluate the Gaussian likelihood function at a given predictive
@@ -179,75 +176,79 @@ class Gaussian(AbstractLikelihood):
         distribution's covariance matrix.
 
         Args:
-            dist (tfd.Distribution): The Gaussian process posterior,
+            dist (npd.Distribution): The Gaussian process posterior,
                 evaluated at a finite set of test points.
 
         Returns:
-            tfd.Distribution: The predictive distribution.
+            npd.Distribution: The predictive distribution.
         """
         n_data = dist.event_shape[0]
-        cov = dist.covariance()
+        cov = dist.covariance_matrix
         noisy_cov = cov.at[jnp.diag_indices(n_data)].add(self.obs_stddev.value**2)
 
-        return tfd.MultivariateNormalFullCovariance(dist.mean(), noisy_cov)
+        return npd.MultivariateNormal(dist.mean, noisy_cov)
 
 
 class Bernoulli(AbstractLikelihood):
-    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
+    def link_function(self, f: Float[Array, "..."]) -> npd.BernoulliProbs:
         r"""The probit link function of the Bernoulli likelihood.
 
         Args:
             f (Float[Array, "..."]): Function values.
 
         Returns:
-            tfd.Distribution: The likelihood function.
+            npd.Bernoulli: The likelihood function.
         """
-        return tfd.Bernoulli(probs=inv_probit(f))
+        return npd.Bernoulli(probs=inv_probit(f))
 
-    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+    def predict(
+        self, dist: tp.Union[npd.MultivariateNormal, GaussianDistribution]
+    ) -> npd.BernoulliProbs:
         r"""Evaluate the pointwise predictive distribution.
 
         Evaluate the pointwise predictive distribution, given a Gaussian
         process posterior and likelihood parameters.
 
         Args:
-            dist (tfd.Distribution): The Gaussian process posterior, evaluated
-                at a finite set of test points.
+            dist ([npd.MultivariateNormal, GaussianDistribution].): The Gaussian
+                process posterior, evaluated at a finite set of test points.
 
         Returns:
-            tfd.Distribution: The pointwise predictive distribution.
+            npd.Bernoulli: The pointwise predictive distribution.
         """
-        variance = jnp.diag(dist.covariance())
-        mean = dist.mean().ravel()
+        variance = jnp.diag(dist.covariance_matrix)
+        mean = dist.mean.ravel()
         return self.link_function(mean / jnp.sqrt(1.0 + variance))
 
 
 class Poisson(AbstractLikelihood):
-    def link_function(self, f: Float[Array, "..."]) -> tfd.Distribution:
+    def link_function(self, f: Float[Array, "..."]) -> npd.Poisson:
         r"""The link function of the Poisson likelihood.
 
         Args:
             f (Float[Array, "..."]): Function values.
 
         Returns:
-            tfd.Distribution: The likelihood function.
+            npd.Poisson: The likelihood function.
         """
-        return tfd.Poisson(rate=jnp.exp(f))
+        return npd.Poisson(rate=jnp.exp(f))
 
-    def predict(self, dist: tfd.Distribution) -> tfd.Distribution:
+    def predict(
+        self, dist: tp.Union[npd.MultivariateNormal, GaussianDistribution]
+    ) -> npd.Poisson:
         r"""Evaluate the pointwise predictive distribution.
 
         Evaluate the pointwise predictive distribution, given a Gaussian
         process posterior and likelihood parameters.
 
         Args:
-            dist (tfd.Distribution): The Gaussian process posterior, evaluated
-                at a finite set of test points.
+            dist (tp.Union[npd.MultivariateNormal, GaussianDistribution]): The Gaussian
+                process posterior, evaluated at a finite set of test points.
 
         Returns:
-            tfd.Distribution: The pointwise predictive distribution.
+            npd.Poisson: The pointwise predictive distribution.
         """
-        return self.link_function(dist.mean())
+        return self.link_function(dist.mean)
 
 
 def inv_probit(x: Float[Array, " *N"]) -> Float[Array, " *N"]:

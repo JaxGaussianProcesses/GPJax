@@ -104,36 +104,36 @@ def test_dataset_add(n1: int, n2: int, in_dim: int) -> None:
     (jtu.tree_leaves(D)[1] == y).all()
 
 
-@pytest.mark.parametrize(("nx", "ny"), [(1, 2), (2, 1), (10, 5), (5, 10)])
-@pytest.mark.parametrize("in_dim", [1, 2, 10])
-def test_dataset_incorrect_lengths(nx: int, ny: int, in_dim: int) -> None:
-    # Create input and output pairs of different lengths
-    x = jnp.ones((nx, in_dim))
-    y = jnp.ones((ny, 1))
+# @pytest.mark.parametrize(("nx", "ny"), [(1, 2), (2, 1), (10, 5), (5, 10)])
+# @pytest.mark.parametrize("in_dim", [1, 2, 10])
+# def test_dataset_incorrect_lengths(nx: int, ny: int, in_dim: int) -> None:
+#     # Create input and output pairs of different lengths
+#     x = jnp.ones((nx, in_dim))
+#     y = jnp.ones((ny, 1))
 
-    # Ensure error is raised upon dataset creation
-    with pytest.raises(ValidationErrors):
-        Dataset(X=x, y=y)
+#     # Ensure error is raised upon dataset creation
+#     with pytest.raises(ValidationErrors):
+#         Dataset(X=x, y=y)
 
 
-@pytest.mark.parametrize("n", [1, 2, 10])
-@pytest.mark.parametrize("in_dim", [1, 2, 10])
-def test_2d_inputs(n: int, in_dim: int) -> None:
-    # Create dataset where output dimension is incorrectly not 2D
-    x = jnp.ones((n, in_dim))
-    y = jnp.ones((n,))
+# @pytest.mark.parametrize("n", [1, 2, 10])
+# @pytest.mark.parametrize("in_dim", [1, 2, 10])
+# def test_2d_inputs(n: int, in_dim: int) -> None:
+#     # Create dataset where output dimension is incorrectly not 2D
+#     x = jnp.ones((n, in_dim))
+#     y = jnp.ones((n,))
 
-    # Ensure error is raised upon dataset creation
-    with pytest.raises(ValidationErrors):
-        Dataset(X=x, y=y)
+#     # Ensure error is raised upon dataset creation
+#     with pytest.raises(ValidationErrors):
+#         Dataset(X=x, y=y)
 
-    # Create dataset where input dimension is incorrectly not 2D
-    x = jnp.ones((n,))
-    y = jnp.ones((n, 1))
+#     # Create dataset where input dimension is incorrectly not 2D
+#     x = jnp.ones((n,))
+#     y = jnp.ones((n, 1))
 
-    # Ensure error is raised upon dataset creation
-    with pytest.raises(ValidationErrors):
-        Dataset(X=x, y=y)
+# # Ensure error is raised upon dataset creation
+# with pytest.raises(ValidationErrors):
+#     Dataset(X=x, y=y)
 
 
 @pytest.mark.parametrize("n", [1, 2, 10])

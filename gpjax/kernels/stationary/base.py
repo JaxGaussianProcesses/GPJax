@@ -18,7 +18,7 @@ import beartype.typing as tp
 from flax import nnx
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.distributions as tfd
+import numpyro.distributions as npd
 
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
@@ -92,7 +92,7 @@ class StationaryKernel(AbstractKernel):
                 self.variance = tp.cast(PositiveReal[ScalarFloat], self.variance)
 
     @property
-    def spectral_density(self) -> tfd.Distribution:
+    def spectral_density(self) -> npd.Normal | npd.StudentT:
         r"""The spectral density of the kernel.
 
         Returns:

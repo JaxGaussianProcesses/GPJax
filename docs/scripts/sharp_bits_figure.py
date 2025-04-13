@@ -69,12 +69,12 @@ ax.set_xlim(-0.07, 0.25)
 plt.savefig("../_static/step_size_figure.png", bbox_inches="tight")
 
 # %%
-import tensorflow_probability.substrates.jax.bijectors as tfb
+import numpyro.distributions.transforms as npt
 
-bij = tfb.Exp()
+bij = npt.ExpTransform()
 
 x = np.linspace(0.05, 3.0, 6)
-y = np.asarray(bij.inverse(x))
+y = np.asarray(bij.inv(x))
 lval = 0.5
 rval = 0.52
 

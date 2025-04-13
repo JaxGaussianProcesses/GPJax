@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -127,9 +127,9 @@ import jax.numpy as jnp
 import jax.random as jr
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpyro.distributions as npd
 import pandas as pd
 import seaborn as sns
-import tensorflow_probability.substrates.jax as tfp
 
 from examples.utils import (
     confidence_ellipse,
@@ -143,11 +143,10 @@ key = jr.key(42)
 
 
 cols = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
-tfd = tfp.distributions
 
-ud1 = tfd.Normal(0.0, 1.0)
-ud2 = tfd.Normal(-1.0, 0.5)
-ud3 = tfd.Normal(0.25, 1.5)
+ud1 = npd.Normal(0.0, 1.0)
+ud2 = npd.Normal(-1.0, 0.5)
+ud3 = npd.Normal(0.25, 1.5)
 
 xs = jnp.linspace(-5.0, 5.0, 500)
 
@@ -156,7 +155,7 @@ for d in [ud1, ud2, ud3]:
     ax.plot(
         xs,
         jnp.exp(d.log_prob(xs)),
-        label=f"$\\mathcal{{N}}({{{float(d.mean())}}},\\  {{{float(d.stddev())}}}^2)$",
+        label=f"$\\mathcal{{N}}({{{float(d.mean)}}},\\  {{{float(jnp.sqrt(d.variance))}}}^2)$",
     )
     ax.fill_between(xs, jnp.zeros_like(xs), jnp.exp(d.log_prob(xs)), alpha=0.2)
 ax.legend(loc="best")
@@ -190,12 +189,12 @@ ax.legend(loc="best")
 # %%
 key = jr.key(123)
 
-d1 = tfd.MultivariateNormalDiag(loc=jnp.zeros(2), scale_diag=jnp.ones(2))
-d2 = tfd.MultivariateNormalTriL(
-    jnp.zeros(2), jnp.linalg.cholesky(jnp.array([[1.0, 0.9], [0.9, 1.0]]))
+d1 = npd.MultivariateNormal(loc=jnp.zeros(2), covariance_matrix=jnp.diag(jnp.ones(2)))
+d2 = npd.MultivariateNormal(
+    jnp.zeros(2), scale_tril=jnp.linalg.cholesky(jnp.array([[1.0, 0.9], [0.9, 1.0]]))
 )
-d3 = tfd.MultivariateNormalTriL(
-    jnp.zeros(2), jnp.linalg.cholesky(jnp.array([[1.0, -0.5], [-0.5, 1.0]]))
+d3 = npd.MultivariateNormal(
+    jnp.zeros(2), scale_tril=jnp.linalg.cholesky(jnp.array([[1.0, -0.5], [-0.5, 1.0]]))
 )
 
 dists = [d1, d2, d3]
@@ -215,13 +214,21 @@ titles = [r"$\rho = 0$", r"$\rho = 0.9$", r"$\rho = -0.5$"]
 cmap = mpl.colors.LinearSegmentedColormap.from_list("custom", ["white", cols[1]], N=256)
 
 for a, t, d in zip([ax0, ax1, ax2], titles, dists, strict=False):
-    d_prob = d.prob(jnp.hstack([xx.reshape(-1, 1), yy.reshape(-1, 1)])).reshape(
-        xx.shape
+    d_prob = jnp.exp(
+        d.log_prob(jnp.hstack([xx.reshape(-1, 1), yy.reshape(-1, 1)]))
+    ).reshape(xx.shape)
+    cntf = a.contourf(
+        xx,
+        yy,
+        jnp.exp(d_prob),
+        levels=20,
+        antialiased=True,
+        cmap=cmap,
+        edgecolor="face",
     )
-    cntf = a.contourf(xx, yy, jnp.exp(d_prob), levels=20, antialiased=True, cmap=cmap, edgecolor="face")
     a.set_xlim(-2.75, 2.75)
     a.set_ylim(-2.75, 2.75)
-    samples = d.sample(seed=key, sample_shape=(5000,))
+    samples = d.sample(key=key, sample_shape=(5000,))
     xsample, ysample = samples[:, 0], samples[:, 1]
     confidence_ellipse(
         xsample, ysample, a, edgecolor="#3f3f3f", n_std=1.0, linestyle="--", alpha=0.8
@@ -274,13 +281,13 @@ for a, t, d in zip([ax0, ax1, ax2], titles, dists, strict=False):
 
 # %%
 n = 1000
-x = tfd.Normal(loc=0.0, scale=1.0).sample(seed=key, sample_shape=(n,))
+x = npd.Normal(loc=0.0, scale=1.0).sample(key, sample_shape=(n,))
 key, subkey = jr.split(key)
-y = tfd.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n,))
+y = npd.Normal(loc=0.25, scale=0.5).sample(subkey, sample_shape=(n,))
 key, subkey = jr.split(subkey)
-xfull = tfd.Normal(loc=0.0, scale=1.0).sample(seed=subkey, sample_shape=(n * 10,))
+xfull = npd.Normal(loc=0.0, scale=1.0).sample(subkey, sample_shape=(n * 10,))
 key, subkey = jr.split(subkey)
-yfull = tfd.Normal(loc=0.25, scale=0.5).sample(seed=subkey, sample_shape=(n * 10,))
+yfull = npd.Normal(loc=0.25, scale=0.5).sample(subkey, sample_shape=(n * 10,))
 key, subkey = jr.split(subkey)
 df = pd.DataFrame({"x": x, "y": y, "idx": jnp.ones(n)})
 

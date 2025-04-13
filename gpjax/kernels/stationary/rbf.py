@@ -15,7 +15,7 @@
 
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax as tfp
+import numpyro.distributions as npd
 
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import squared_distance
@@ -44,5 +44,5 @@ class RBF(StationaryKernel):
         return K.squeeze()
 
     @property
-    def spectral_density(self) -> tfp.distributions.Normal:
-        return tfp.distributions.Normal(0.0, 1.0)
+    def spectral_density(self) -> npd.Normal:
+        return npd.Normal(0.0, 1.0)

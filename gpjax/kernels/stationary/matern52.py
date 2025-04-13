@@ -15,7 +15,7 @@
 
 import jax.numpy as jnp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax.distributions as tfd
+import numpyro.distributions as npd
 
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import (
@@ -53,5 +53,5 @@ class Matern52(StationaryKernel):
         return K.squeeze()
 
     @property
-    def spectral_density(self) -> tfd.Distribution:
+    def spectral_density(self) -> npd.StudentT:
         return build_student_t_distribution(nu=5)

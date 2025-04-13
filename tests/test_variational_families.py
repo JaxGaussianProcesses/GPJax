@@ -25,8 +25,9 @@ from jaxtyping import (
     Array,
     Float,
 )
+import numpyro.distributions as npd
+from numpyro.distributions import Distribution as NumpyroDistribution
 import pytest
-import tensorflow_probability.substrates.jax as tfp
 
 import gpjax as gpx
 from gpjax.gps import AbstractPosterior
@@ -41,7 +42,6 @@ from gpjax.variational_families import (
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
-tfd = tfp.distributions
 
 
 def test_abstract_variational_family():
@@ -56,8 +56,8 @@ def test_abstract_variational_family():
             return AbstractPosterior
 
     class DummyVariationalFamily(AbstractVariationalFamily):
-        def predict(self, x: Float[Array, "N D"]) -> tfd.Distribution:
-            return tfd.MultivariateNormalDiag(loc=x)
+        def predict(self, x: Float[Array, "N D"]) -> npd.MultivariateNormal:
+            return npd.MultivariateNormal(loc=x, covariance_matrix=jnp.eye(x.shape[1]))
 
     # Test that the dummy variational family can be instantiated.
     dummy_variational_family = DummyVariationalFamily(posterior=DummyPosterior())
@@ -163,9 +163,9 @@ def test_variational_gaussians(
 
     # Test predictions
     predictive_dist = q(test_inputs)
-    assert isinstance(predictive_dist, tfd.Distribution)
+    assert isinstance(predictive_dist, NumpyroDistribution)
 
-    mu = predictive_dist.mean()
+    mu = predictive_dist.mean
     sigma = predictive_dist.covariance()
 
     assert isinstance(mu, jnp.ndarray)
@@ -216,9 +216,9 @@ def test_collapsed_variational_gaussian(
 
     # Test predictions
     predictive_dist = variational_family(test_inputs, D)
-    assert isinstance(predictive_dist, tfd.Distribution)
+    assert isinstance(predictive_dist, NumpyroDistribution)
 
-    mu = predictive_dist.mean()
+    mu = predictive_dist.mean
     sigma = predictive_dist.covariance()
 
     assert isinstance(mu, jnp.ndarray)

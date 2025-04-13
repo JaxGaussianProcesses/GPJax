@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: base
 #     language: python
@@ -33,7 +33,6 @@ import jax.tree_util as jtu
 from jaxtyping import install_import_hook
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import tensorflow_probability.substrates.jax as tfp
 
 from examples.utils import use_mpl_style
 
@@ -43,7 +42,6 @@ with install_import_hook("gpjax", "beartype.beartype"):
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
-tfd = tfp.distributions
 
 # set the default style for plotting
 use_mpl_style()
@@ -216,7 +214,7 @@ for i in range(0, num_samples, thin_factor):
     model = nnx.merge(graphdef, sample_params, *static_state)
     latent_dist = model.predict(xtest, train_data=D)
     predictive_dist = model.likelihood(latent_dist)
-    posterior_samples.append(predictive_dist.sample(seed=key, sample_shape=(10,)))
+    posterior_samples.append(predictive_dist.sample(key=key, sample_shape=(10,)))
 
 posterior_samples = jnp.vstack(posterior_samples)
 lower_ci, upper_ci = jnp.percentile(posterior_samples, jnp.array([2.5, 97.5]), axis=0)

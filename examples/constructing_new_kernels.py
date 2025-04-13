@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -24,6 +24,7 @@
 # %%
 # Enable Float64 for more stable matrix inversions.
 from jax import config
+from jax.nn import softplus
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import (
@@ -32,7 +33,9 @@ from jaxtyping import (
     install_import_hook,
 )
 import matplotlib.pyplot as plt
-import tensorflow_probability.substrates.jax as tfp
+import numpyro.distributions as npd
+from numpyro.distributions import constraints
+import numpyro.distributions.transforms as npt
 
 from examples.utils import use_mpl_style
 from gpjax.kernels.computations import DenseKernelComputation
@@ -225,9 +228,27 @@ def angular_distance(x, y, c):
     return jnp.abs((x - y + c) % (c * 2) - c)
 
 
-bij = tfb.SoftClip(low=jnp.array(4.0, dtype=jnp.float64))
+class ShiftedSoftplusTransform(npt.ParameterFreeTransform):
+    r"""
+    Transform from unconstrained space to the domain [4, infinity) via
+    :math:`y = 4 + \log(1 + \exp(x))`. The inverse is computed as
+    :math:`x = \log(\exp(y - 4) - 1)`.
+    """
 
-DEFAULT_BIJECTION["polar"] = bij
+    domain = constraints.real
+    codomain = constraints.interval(4.0, jnp.inf)  # updated codomain
+
+    def __call__(self, x):
+        return 4.0 + softplus(x)  # shift the softplus output by 4
+
+    def _inverse(self, y):
+        return npt._softplus_inv(y - 4.0)  # subtract the shift in the inverse
+
+    def log_abs_det_jacobian(self, x, y, intermediates=None):
+        return -softplus(-x)
+
+
+DEFAULT_BIJECTION["polar"] = ShiftedSoftplusTransform()
 
 
 class Polar(gpx.kernels.AbstractKernel):
@@ -307,7 +328,7 @@ opt_posterior, history = gpx.fit_scipy(
 
 # %%
 posterior_rv = opt_posterior.likelihood(opt_posterior.predict(angles, train_data=D))
-mu = posterior_rv.mean()
+mu = posterior_rv.mean
 one_sigma = posterior_rv.stddev()
 
 # %%

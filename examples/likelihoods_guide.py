@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: gpjax
 #     language: python
@@ -73,15 +73,12 @@ from jax import config
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
-import tensorflow_probability.substrates.jax as tfp
 
 from examples.utils import use_mpl_style
 import gpjax as gpx
 
 config.update("jax_enable_x64", True)
 
-
-tfd = tfp.distributions
 
 # set the default style for plotting
 use_mpl_style()
@@ -162,13 +159,13 @@ key, subkey = jr.split(key)
 for ax in axes.ravel():
     subkey, _ = jr.split(subkey)
     ax.plot(
-        latent_dist.sample(sample_shape=(1,), seed=subkey).T,
+        latent_dist.sample(sample_shape=(1,), key=subkey).T,
         lw=1,
         color=cols[0],
         label="Latent samples",
     )
     ax.plot(
-        likelihood.predict(latent_dist).sample(sample_shape=(1,), seed=subkey).T,
+        likelihood.predict(latent_dist).sample(sample_shape=(1,), key=subkey).T,
         "o",
         markersize=5,
         alpha=0.3,
@@ -189,13 +186,13 @@ key, subkey = jr.split(key)
 for ax in axes.ravel():
     subkey, _ = jr.split(subkey)
     ax.plot(
-        latent_dist.sample(sample_shape=(1,), seed=subkey).T,
+        latent_dist.sample(sample_shape=(1,), key=subkey).T,
         lw=1,
         color=cols[0],
         label="Latent samples",
     )
     ax.plot(
-        likelihood.predict(latent_dist).sample(sample_shape=(1,), seed=subkey).T,
+        likelihood.predict(latent_dist).sample(sample_shape=(1,), key=subkey).T,
         "o",
         markersize=3,
         alpha=0.5,
@@ -260,7 +257,7 @@ q = gpx.variational_families.VariationalGaussian(posterior=posterior, inducing_i
 
 def q_moments(x):
     qx = q(x)
-    return qx.mean(), qx.variance()
+    return qx.mean, qx.variance
 
 
 mean, variance = jax.vmap(q_moments)(x[:, None])

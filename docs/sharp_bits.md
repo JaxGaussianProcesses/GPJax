@@ -80,7 +80,7 @@ this value that we apply gradient updates to. When we wish to recover the constr
 value, we apply the inverse of the bijector, which is the exponential function in this
 case. This gives us back the blue cross.
 
-In GPJax, we supply bijective functions using [Tensorflow Probability](https://www.tensorflow.org/probability/api_docs/python/tfp/substrates/jax/bijectors).
+In GPJax, we supply bijective functions using [Numpyro](https://num.pyro.ai/en/stable/distributions.html#transforms).
 
 
 ## Positive-definiteness

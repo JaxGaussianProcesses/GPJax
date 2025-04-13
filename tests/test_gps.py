@@ -32,8 +32,8 @@ from cola.linalg.inverse.cg import CG
 from jax import config
 import jax.numpy as jnp
 import jax.random as jr
+from numpyro.distributions import Distribution as NumpyroDistribution
 import pytest
-import tensorflow_probability.substrates.jax.distributions as tfd
 
 from gpjax.dataset import Dataset
 from gpjax.distributions import GaussianDistribution
@@ -99,10 +99,10 @@ def test_prior(
 
     # Ensure that the marginal distribution is a Gaussian.
     assert isinstance(marginal_distribution, GaussianDistribution)
-    assert isinstance(marginal_distribution, tfd.Distribution)
+    assert isinstance(marginal_distribution, NumpyroDistribution)
 
     # Ensure that the marginal distribution has the correct shape.
-    mu = marginal_distribution.mean()
+    mu = marginal_distribution.mean
     sigma = marginal_distribution.covariance()
     assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
@@ -140,10 +140,10 @@ def test_conjugate_posterior(
 
     # Ensure that the marginal distribution is a Gaussian.
     assert isinstance(marginal_distribution, GaussianDistribution)
-    assert isinstance(marginal_distribution, tfd.Distribution)
+    assert isinstance(marginal_distribution, NumpyroDistribution)
 
     # Ensure that the marginal distribution has the correct shape.
-    mu = marginal_distribution.mean()
+    mu = marginal_distribution.mean
     sigma = marginal_distribution.covariance()
     assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
@@ -185,10 +185,10 @@ def test_nonconjugate_posterior(
 
     # Ensure that the marginal distribution is a Gaussian.
     assert isinstance(marginal_distribution, GaussianDistribution)
-    assert isinstance(marginal_distribution, tfd.Distribution)
+    assert isinstance(marginal_distribution, NumpyroDistribution)
 
     # Ensure that the marginal distribution has the correct shape.
-    mu = marginal_distribution.mean()
+    mu = marginal_distribution.mean
     sigma = marginal_distribution.covariance()
     assert mu.shape == (num_datapoints,)
     assert sigma.shape == (num_datapoints, num_datapoints)
@@ -275,7 +275,7 @@ def test_prior_sample_approx(num_datapoints, kernel, mean_function):
     approx_mean = jnp.mean(sampled_evals, -1)
     approx_var = jnp.var(sampled_evals, -1)
     true_predictive = p(x)
-    true_mean = true_predictive.mean()
+    true_mean = true_predictive.mean
     true_var = jnp.diagonal(true_predictive.covariance())
     max_error_in_mean = jnp.max(jnp.abs(approx_mean - true_mean))
     max_error_in_var = jnp.max(jnp.abs(approx_var - true_var))
@@ -342,7 +342,7 @@ def test_conjugate_posterior_sample_approx(
     approx_mean = jnp.mean(sampled_evals, -1)
     approx_var = jnp.var(sampled_evals, -1)
     true_predictive = p(x, train_data=D)
-    true_mean = true_predictive.mean()
+    true_mean = true_predictive.mean
     true_var = jnp.diagonal(true_predictive.covariance())
     max_error_in_mean = jnp.max(jnp.abs(approx_mean - true_mean))
     max_error_in_var = jnp.max(jnp.abs(approx_var - true_var))

@@ -13,7 +13,7 @@ from jax import vmap
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jaxtyping import Float
-import tensorflow_probability.substrates.jax as tfp
+import numpyro.distributions as npd
 import typing_extensions as tpe
 
 from gpjax.dataset import Dataset
@@ -28,8 +28,6 @@ from gpjax.typing import (
     ScalarFloat,
 )
 from gpjax.variational_families import AbstractVariationalFamily
-
-tfd = tfp.distributions
 
 VF = TypeVar("VF", bound=AbstractVariationalFamily)
 
@@ -175,7 +173,7 @@ def conjugate_loocv(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat
     loocv_means = mx + (y - mx) - Sigma_inv_y / Sigma_inv_diag
     loocv_stds = jnp.sqrt(1.0 / Sigma_inv_diag)
 
-    loocv_posterior = tfd.Normal(loc=loocv_means, scale=loocv_stds)
+    loocv_posterior = npd.Normal(loc=loocv_means, scale=loocv_stds)
     return jnp.sum(loocv_posterior.log_prob(y))
 
 
@@ -232,7 +230,7 @@ def log_posterior_density(
     likelihood = posterior.likelihood.link_function(fx)
 
     # Whitened latent function values prior, p(wx | θ) = N(0, I)
-    latent_prior = tfd.Normal(loc=0.0, scale=1.0)
+    latent_prior = npd.Normal(loc=0.0, scale=1.0)
     return likelihood.log_prob(y).sum() + latent_prior.log_prob(wx).sum()
 
 
@@ -305,7 +303,7 @@ def variational_expectation(
     # inputs, x
     def q_moments(x):
         qx = q(x)
-        return qx.mean().squeeze(), qx.covariance().squeeze()
+        return qx.mean.squeeze(), qx.covariance().squeeze()
 
     mean, variance = vmap(q_moments)(x[:, None])
 

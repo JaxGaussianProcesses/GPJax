@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.6
+#       jupytext_version: 1.16.7
 #   kernelspec:
 #     display_name: gpjax_beartype
 #     language: python
@@ -161,10 +161,10 @@ predictive_dist = opt_posterior.posterior.likelihood(latent_dist)
 
 inducing_points = opt_posterior.inducing_inputs.value
 
-samples = latent_dist.sample(seed=key, sample_shape=(20,))
+samples = latent_dist.sample(key=key, sample_shape=(20,))
 
-predictive_mean = predictive_dist.mean()
-predictive_std = predictive_dist.stddev()
+predictive_mean = predictive_dist.mean
+predictive_std = jnp.sqrt(predictive_dist.variance)
 
 fig, ax = plt.subplots()
 
