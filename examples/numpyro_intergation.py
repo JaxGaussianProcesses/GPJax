@@ -7,9 +7,9 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.17.0
 #   kernelspec:
-#     display_name: docs
+#     display_name: Python 3
 #     language: python
 #     name: python3
 # ---
@@ -58,9 +58,6 @@ data = gpx.Dataset(x_train, y_train)
 # %%
 plt.plot(x_train, y_train, "x")
 plt.plot(x_train, mu_true, label="True mean")
-
-# %%
-prior = gpx.gps.Prior(gpx.kernels.Matern52(), gpx.mean_functions.Constant(0.0))
 
 # %%
 from collections import namedtuple
@@ -211,13 +208,15 @@ def random_nnx_module(
 
 
 # %%
+prior = gpx.gps.Prior(gpx.kernels.Matern52(), gpx.mean_functions.Constant(0.0))
+
 def model(data: gpx.Dataset):
     gp_prior = random_nnx_module(
         "gp",
         prior,
         prior={
-            "kernel.lengthscale": dist.HalfNormal(scale=1),
-            "kernel.variance": dist.HalfNormal(scale=1),
+            "kernel.lengthscale": dist.HalfNormal(scale=0.05),
+            "kernel.variance": dist.HalfNormal(scale=0.1),
             "mean_function.constant": dist.Normal(loc=0, scale=1),
         },
     )
@@ -227,12 +226,11 @@ def model(data: gpx.Dataset):
     prior_cov = predictions.covariance_matrix
 
     sigma = numpyro.sample("sigma", dist.HalfNormal(scale=1))
-    prior_cov = prior_cov + sigma**2 * jnp.eye(data.n)
+    prior_cov = prior_cov+ sigma**2 * jnp.eye(data.n)
 
     numpyro.sample(
         "likelihood",
-        dist.MultivariateNormal(loc=prior_mean.squeeze(), covariance_matrix=prior_cov),
-        obs=data.y.squeeze(),
+        dist.MultivariateNormal(loc=prior_mean, covariance_matrix=prior_cov),
     )
 
 
@@ -256,17 +254,51 @@ idata = az.from_dict(
     },
 )
 
+fig, ax = plt.subplots()
+az.plot_hdi(
+    x,
+    idata["prior_predictive"]["likelihood"],
+    color="C1",
+    fill_kwargs={"alpha": 0.3, "label": "94% HDI"},
+    smooth=False,
+    ax=ax,
+)
+
+for i in range(1):
+    ax.plot(
+        x_train,
+        idata["prior_predictive"]["likelihood"].sel(chain=0, draw=i),
+        c="C2",
+        label="Prior Predictive Sample",
+    )
+
+ax.plot(
+    x_train,
+    idata["prior_predictive"]["likelihood"].mean(dim=("chain", "draw")),
+    color="C1",
+    linewidth=3,
+    label="SVI Posterior Mean",
+)
+ax.plot(x, mu_true, color="C0", label=r"$\mu$", linewidth=3)
+ax.set_title("Prior Predictive")
+ax.legend(bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)
+
+
 # %%
 # We condition the model on the training data
-conditioned_model = condition(model, data={"likelihood": y_train})
+conditioned_model = condition(model, data={"likelihood": y_train.squeeze()})
 
 guide = AutoNormal(model=conditioned_model)
-optimizer = numpyro.optim.Adam(step_size=0.025)
+optimizer = numpyro.optim.Adam(step_size=0.03)
 svi = SVI(conditioned_model, guide, optimizer, loss=Trace_ELBO())
-n_samples = 8_000
+n_samples = 1_000
 rng_key, rng_subkey = random.split(key=rng_key)
 svi_result = svi.run(rng_subkey, n_samples, data)
 
+# %%
+fig, ax = plt.subplots(figsize=(9, 6))
+ax.plot(svi_result.losses)
+ax.set_title("ELBO loss", fontsize=18, fontweight="bold");
 # %%
 params = svi_result.params
 posterior_predictive = Predictive(
@@ -275,12 +307,13 @@ posterior_predictive = Predictive(
     params=params,
     num_samples=2_000,
     return_sites=[
-        "kernel.lengthscale",
-        "kernel.variance",
-        "mean_function.constant",
+        "gp/kernel.lengthscale",
+        "gp/kernel.variance",
+        "gp/mean_function.constant",
         "mu",
         "sigma",
         "likelihood",
+        "prior_mean",
     ],
 )
 rng_key, rng_subkey = random.split(key=rng_key)
@@ -306,6 +339,7 @@ az.plot_hdi(
     idata["posterior_predictive"]["likelihood"],
     color="C1",
     fill_kwargs={"alpha": 0.3, "label": "94% HDI"},
+    smooth=False,
     ax=ax,
 )
 ax.plot(
@@ -315,7 +349,21 @@ ax.plot(
     linewidth=3,
     label="SVI Posterior Mean",
 )
-ax.plot(x, mu_true, color="C0", label=r"$\mu$", linewidth=3)
 
+for i in range(1):
+    ax.plot(
+        x_train,
+        idata["posterior_predictive"]["likelihood"].sel(chain=0, draw=i),
+        c="C2",
+        label="Posterior Predictive Sample",
+    )
+
+ax.plot(x, mu_true, color="C0", label=r"$\mu$", linewidth=3)
+ax.set_title("Posterior Predictive")
+ax.legend(bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)
 # %%
-az.plot_trace(idata["posterior_predictive"]["sigma"])
+az.plot_trace(
+    idata["posterior_predictive"],
+    var_names=["sigma", "gp/kernel.lengthscale", "gp/kernel.variance", "gp/mean_function.constant"],
+    backend_kwargs={"figsize": (12, 9), "layout": "constrained"},
+);
