@@ -418,6 +418,10 @@ updated_state = dict_to_state(samples, eager_params_state)
 updated_state
 # %%
 
+# eager_params_state.replace_by_pure_dict(updated_state)
+
+updated_state= dict_to_state({k.split(f"{name}/")[1]: v for k, v in posterior_predictive_samples.items() if name in k}, eager_params_state)
+
 eager_params_state.replace_by_pure_dict(updated_state)
 
 eager_params_state
