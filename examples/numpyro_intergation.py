@@ -210,6 +210,11 @@ def random_nnx_module(
 # %%
 prior = gpx.gps.Prior(gpx.kernels.Matern52(), gpx.mean_functions.Constant(0.0))
 
+prior.predict(data.X)
+
+# %%
+prior = gpx.gps.Prior(gpx.kernels.Matern52(), gpx.mean_functions.Constant(0.0))
+
 def model(data: gpx.Dataset):
     gp_prior = random_nnx_module(
         "gp",
@@ -226,12 +231,14 @@ def model(data: gpx.Dataset):
     prior_cov = predictions.covariance_matrix
 
     sigma = numpyro.sample("sigma", dist.HalfNormal(scale=1))
-    prior_cov = prior_cov+ sigma**2 * jnp.eye(data.n)
+    prior_cov = prior_cov + sigma**2 * jnp.eye(data.n)
 
     numpyro.sample(
         "likelihood",
         dist.MultivariateNormal(loc=prior_mean, covariance_matrix=prior_cov),
+        # obs=data.y.squeeze(),
     )
+    
 
 
 numpyro.render_model(
@@ -368,22 +375,28 @@ az.plot_trace(
     backend_kwargs={"figsize": (12, 9), "layout": "constrained"},
 );
 
+# %% [markdown]
+# # ---
+
 # %%
 name = "gp"
 nn_module = prior
 
+# %%
 graph_def, eager_params_state, eager_other_state = nnx.split(
     nn_module, nnx.Variable, nnx.Not(nnx.Variable)
 )
 
+# %%
 eager_params_state
-# %%
-
-samples = {"kernel.lengthscale": jnp.array([1.2, 4]), "kernel.variance": jnp.array(0.8), "mean_function.constant": 4.2}
 
 # %%
+eager_params_state_dict = nnx.to_pure_dict(eager_params_state)
 
-from flax.nnx.variablelib import VariableState
+eager_params_state
+
+
+# %%
 
 def dict_to_state(flat_dict, state_template):
     # Get a copy of the template structure
@@ -401,28 +414,21 @@ def dict_to_state(flat_dict, state_template):
             
         # Update the value
         last_part = parts[-1]
-        if isinstance(current[last_part], dict) and 'value' in current[last_part]:
-            # It's a VariableState - extract the type and other metadata
-            var_type = current[last_part]['type']
-            # Create a new VariableState with the updated value
-            current[last_part]['value'] = VariableState(value=value, type=var_type)
-        else:
-            # Regular value
-            current[last_part] = VariableState(value=value, type=type(value))
+        current[last_part] = value
     
     return nnx.State(result)
 
-# Convert our samples dictionary to a State object
-updated_state = dict_to_state(samples, eager_params_state)
 
-updated_state
+
 # %%
-
-# eager_params_state.replace_by_pure_dict(updated_state)
-
 updated_state= dict_to_state({k.split(f"{name}/")[1]: v for k, v in posterior_predictive_samples.items() if name in k}, eager_params_state)
 
 eager_params_state.replace_by_pure_dict(updated_state)
 
 eager_params_state
+
 # %%
+model = nnx.merge(graph_def, eager_params_state, eager_other_state)
+
+# %%
+model.predict(data.X)
