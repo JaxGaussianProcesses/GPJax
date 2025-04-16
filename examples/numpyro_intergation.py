@@ -367,3 +367,58 @@ az.plot_trace(
     var_names=["sigma", "gp/kernel.lengthscale", "gp/kernel.variance", "gp/mean_function.constant"],
     backend_kwargs={"figsize": (12, 9), "layout": "constrained"},
 );
+
+# %%
+name = "gp"
+nn_module = prior
+
+graph_def, eager_params_state, eager_other_state = nnx.split(
+    nn_module, nnx.Variable, nnx.Not(nnx.Variable)
+)
+
+eager_params_state
+# %%
+
+samples = {"kernel.lengthscale": jnp.array([1.2, 4]), "kernel.variance": jnp.array(0.8), "mean_function.constant": 4.2}
+
+# %%
+
+from flax.nnx.variablelib import VariableState
+
+def dict_to_state(flat_dict, state_template):
+    # Get a copy of the template structure
+    template_dict = nnx.to_pure_dict(state_template)
+    result = template_dict.copy()
+    
+    # Update values from the flat dictionary
+    for key, value in flat_dict.items():
+        parts = key.split('.')
+        
+        # Navigate to the parent dictionary
+        current = result
+        for part in parts[:-1]:
+            current = current[part]
+            
+        # Update the value
+        last_part = parts[-1]
+        if isinstance(current[last_part], dict) and 'value' in current[last_part]:
+            # It's a VariableState - extract the type and other metadata
+            var_type = current[last_part]['type']
+            # Create a new VariableState with the updated value
+            current[last_part]['value'] = VariableState(value=value, type=var_type)
+        else:
+            # Regular value
+            current[last_part] = VariableState(value=value, type=type(value))
+    
+    return nnx.State(result)
+
+# Convert our samples dictionary to a State object
+updated_state = dict_to_state(samples, eager_params_state)
+
+updated_state
+# %%
+
+eager_params_state.replace_by_pure_dict(updated_state)
+
+eager_params_state
+# %%
