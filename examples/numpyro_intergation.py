@@ -22,6 +22,7 @@ from flax import nnx
 from jax import random
 import jax.numpy as jnp
 import gpjax as gpx
+import jax
 
 import numpyro
 from numpyro.contrib.module import _update_params
@@ -236,7 +237,6 @@ def model(data: gpx.Dataset):
     numpyro.sample(
         "likelihood",
         dist.MultivariateNormal(loc=prior_mean, covariance_matrix=prior_cov),
-        # obs=data.y.squeeze(),
     )
     
 
@@ -375,29 +375,11 @@ az.plot_trace(
     backend_kwargs={"figsize": (12, 9), "layout": "constrained"},
 );
 
-# %% [markdown]
-# # ---
-
 # %%
-name = "gp"
-nn_module = prior
-
-# %%
-graph_def, eager_params_state, eager_other_state = nnx.split(
-    nn_module, nnx.Variable, nnx.Not(nnx.Variable)
-)
-
-# %%
-eager_params_state
-
-# %%
-eager_params_state_dict = nnx.to_pure_dict(eager_params_state)
-
-eager_params_state
+graph_def, eager_params_state, eager_other_state = nnx.split(prior, nnx.Variable, nnx.Not(nnx.Variable))
 
 
 # %%
-
 def dict_to_state(flat_dict, state_template):
     # Get a copy of the template structure
     template_dict = nnx.to_pure_dict(state_template)
@@ -421,14 +403,27 @@ def dict_to_state(flat_dict, state_template):
 
 
 # %%
-updated_state= dict_to_state({k.split(f"{name}/")[1]: v for k, v in posterior_predictive_samples.items() if name in k}, eager_params_state)
+name = "gp"
+posterior_samples_dict = {k.split(f"{name}/")[1]: v for k, v in posterior_predictive_samples.items() if name in k}
 
-eager_params_state.replace_by_pure_dict(updated_state)
+def f(dct):
+    updated_state = dict_to_state(dct, eager_params_state)
+    eager_params_state.replace_by_pure_dict(updated_state)
+    model = nnx.merge(graph_def, eager_params_state, eager_other_state)
+    return model.predict(data.X)
 
-eager_params_state
+
+posterior_predictive_distribution = jax.vmap(
+    f,
+    in_axes=(
+        {
+            "kernel.lengthscale": 0,
+            "kernel.variance": 0,
+            "mean_function.constant": 0,
+        },
+    ),
+)(posterior_samples_dict)
 
 # %%
-model = nnx.merge(graph_def, eager_params_state, eager_other_state)
-
-# %%
-model.predict(data.X)
+rng_key, rng_subkey = random.split(key=rng_key)
+posterior_predictive_distribution.sample(rng_subkey, (1,))
