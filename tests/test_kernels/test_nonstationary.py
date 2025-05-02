@@ -31,7 +31,7 @@ from gpjax.kernels.nonstationary import (
     Polynomial,
 )
 from gpjax.parameters import (
-    PositiveReal,
+    NonNegativeReal,
     Static,
 )
 
@@ -96,8 +96,8 @@ def test_init_override_paramtype(kernel_request):
             continue
         new_params[param] = Static(value)
 
-    k = kernel(**new_params, variance=PositiveReal(variance))
-    assert isinstance(k.variance, PositiveReal)
+    k = kernel(**new_params, variance=NonNegativeReal(variance))
+    assert isinstance(k.variance, NonNegativeReal)
 
     for param in params.keys():
         if param in ("degree", "order"):
@@ -112,7 +112,7 @@ def test_init_defaults(kernel: type[AbstractKernel]):
 
     # Check that the parameters are set correctly
     assert isinstance(k.compute_engine, type(AbstractKernelComputation()))
-    assert isinstance(k.variance, PositiveReal)
+    assert isinstance(k.variance, NonNegativeReal)
 
 
 @pytest.mark.parametrize("kernel", [k[0] for k in TESTED_KERNELS])
@@ -122,7 +122,7 @@ def test_init_variances(kernel: type[AbstractKernel], variance):
     k = kernel(variance=variance)
 
     # Check that the parameters are set correctly
-    assert isinstance(k.variance, PositiveReal)
+    assert isinstance(k.variance, NonNegativeReal)
     assert jnp.allclose(k.variance.value, jnp.asarray(variance))
 
     # Check that error is raised if variance is not valid
