@@ -25,7 +25,10 @@ from gpjax.kernels.computations import (
     AbstractKernelComputation,
     DenseKernelComputation,
 )
-from gpjax.parameters import PositiveReal
+from gpjax.parameters import (
+    NonNegativeReal,
+    PositiveReal,
+)
 from gpjax.typing import (
     Array,
     ScalarArray,
@@ -85,11 +88,11 @@ class StationaryKernel(AbstractKernel):
         if isinstance(variance, nnx.Variable):
             self.variance = variance
         else:
-            self.variance = PositiveReal(variance)
+            self.variance = NonNegativeReal(variance)
 
             # static typing
             if tp.TYPE_CHECKING:
-                self.variance = tp.cast(PositiveReal[ScalarFloat], self.variance)
+                self.variance = tp.cast(NonNegativeReal[ScalarFloat], self.variance)
 
     @property
     def spectral_density(self) -> npd.Normal | npd.StudentT:

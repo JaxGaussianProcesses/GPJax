@@ -7,6 +7,7 @@ import pytest
 from gpjax.parameters import (
     DEFAULT_BIJECTION,
     LowerTriangular,
+    NonNegativeReal,
     Parameter,
     PositiveReal,
     Real,
@@ -24,6 +25,8 @@ from gpjax.parameters import (
 @pytest.mark.parametrize(
     "param, value",
     [
+        (NonNegativeReal, 0.0),
+        (NonNegativeReal, 1.0),
         (PositiveReal, 1.0),
         (Real, 2.0),
         (SigmoidBounded, 0.5),
@@ -48,6 +51,7 @@ def test_transform(param, value):
 @pytest.mark.parametrize(
     "param, tag",
     [
+        (NonNegativeReal(0.0), "non_negative"),
         (PositiveReal(1.0), "positive"),
         (Real(2.0), "real"),
         (SigmoidBounded(0.5), "sigmoid"),

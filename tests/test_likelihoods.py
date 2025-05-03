@@ -52,8 +52,8 @@ def _compute_latent_dist(
     return latent_dist, latent_mean, latent_cov
 
 
-@pytest.mark.parametrize("n", [1, 2, 10])
-@pytest.mark.parametrize("obs_stddev", [0.1, 0.5, 1.0])
+@pytest.mark.parametrize("n", [1, 2, 10, 3])
+@pytest.mark.parametrize("obs_stddev", [0.1, 0.5, 1.0, 0.0])
 def test_gaussian_likelihood(n: int, obs_stddev: float):
     x = jnp.linspace(-3.0, 3.0).reshape(-1, 1)
     likelihood = Gaussian(num_datapoints=n, obs_stddev=obs_stddev)

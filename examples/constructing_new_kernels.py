@@ -33,7 +33,6 @@ from jaxtyping import (
     install_import_hook,
 )
 import matplotlib.pyplot as plt
-import numpyro.distributions as npd
 from numpyro.distributions import constraints
 import numpyro.distributions.transforms as npt
 
@@ -51,8 +50,6 @@ config.update("jax_enable_x64", True)
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
 
-
-tfb = tfp.bijectors
 
 # set the default style for plotting
 use_mpl_style()

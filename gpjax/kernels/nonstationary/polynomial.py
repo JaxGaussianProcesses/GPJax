@@ -23,7 +23,10 @@ from gpjax.kernels.computations import (
     AbstractKernelComputation,
     DenseKernelComputation,
 )
-from gpjax.parameters import PositiveReal
+from gpjax.parameters import (
+    NonNegativeReal,
+    PositiveReal,
+)
 from gpjax.typing import (
     Array,
     ScalarArray,
@@ -76,9 +79,9 @@ class Polynomial(AbstractKernel):
         if isinstance(variance, nnx.Variable):
             self.variance = variance
         else:
-            self.variance = PositiveReal(variance)
+            self.variance = NonNegativeReal(variance)
             if tp.TYPE_CHECKING:
-                self.variance = tp.cast(PositiveReal[ScalarArray], self.variance)
+                self.variance = tp.cast(NonNegativeReal[ScalarArray], self.variance)
 
         self.name = f"Polynomial (degree {self.degree})"
 

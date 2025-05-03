@@ -35,6 +35,7 @@ from gpjax.kernels.stationary import (
 )
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.parameters import (
+    NonNegativeReal,
     PositiveReal,
     Static,
 )
@@ -106,12 +107,12 @@ def test_init_override_paramtype(kernel_request):
     for param, value in params.items():
         new_params[param] = Static(value)
 
-    kwargs = {**new_params, "variance": PositiveReal(variance)}
+    kwargs = {**new_params, "variance": NonNegativeReal(variance)}
     if kernel != White:
         kwargs["lengthscale"] = PositiveReal(lengthscale)
 
     k = kernel(**kwargs)
-    assert isinstance(k.variance, PositiveReal)
+    assert isinstance(k.variance, NonNegativeReal)
 
     for param in params.keys():
         assert isinstance(getattr(k, param), Static)
@@ -124,7 +125,7 @@ def test_init_defaults(kernel: type[StationaryKernel]):
 
     # Check that the parameters are set correctly
     assert isinstance(k.compute_engine, type(AbstractKernelComputation()))
-    assert isinstance(k.variance, PositiveReal)
+    assert isinstance(k.variance, NonNegativeReal)
     assert isinstance(k.lengthscale, PositiveReal)
 
 
@@ -167,7 +168,7 @@ def test_init_variances(kernel: type[StationaryKernel], variance):
     k = kernel(variance=variance)
 
     # Check that the parameters are set correctly
-    assert isinstance(k.variance, PositiveReal)
+    assert isinstance(k.variance, NonNegativeReal)
     assert jnp.allclose(k.variance.value, jnp.asarray(variance))
 
     # Check that error is raised if variance is not valid
