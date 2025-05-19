@@ -19,16 +19,10 @@ from jax import config
 config.update("jax_enable_x64", True)
 
 
+import gpjax as gpx
 import jax.numpy as jnp
 import jax.random as jr
-from jaxtyping import (
-    Array,
-    Float,
-    Num,
-)
 import pytest
-
-import gpjax as gpx
 from gpjax.mean_functions import (
     AbstractMeanFunction,
     CombinationMeanFunction,
@@ -36,6 +30,11 @@ from gpjax.mean_functions import (
     Zero,
 )
 from gpjax.parameters import Static
+from jaxtyping import (
+    Array,
+    Float,
+    Num,
+)
 
 
 def test_abstract() -> None:
