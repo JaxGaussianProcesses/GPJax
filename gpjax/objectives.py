@@ -118,12 +118,14 @@ def conjugate_mll(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
     p = mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
 
     # Regularise by the log probs of the hyperparameters under their priors
+    graphdef, params, _ = nnx.split(posterior, Parameter, ...)
     regularisation = jax.tree.map(
-        lambda x: x.prior.log_prob(x.value),
-        posterior,
-        is_leaf=lambda x: isinstance(x, Parameter),
+        lambda x: x._prior.log_prob(x.value),
+        params,
+        is_leaf=lambda x: isinstance(x, nnx.VariableState),
     )
-    regularisation = jnp.sum(regularisation)
+    regularisation, _ = jax.tree.flatten(regularisation)
+    regularisation = jnp.sum(jnp.stack(regularisation))
 
     return p + regularisation
 
