@@ -114,8 +114,8 @@ def conjugate_mll(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
     Sigma = PSD(Sigma)
 
     # p(y | x, θ), where θ are the model hyperparameters:
-    mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
-    p = mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
+    mll_dist = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
+    log_mll = mll_dist.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
 
     # Regularise by the log probs of the hyperparameters under their priors
     graphdef, params, _ = nnx.split(posterior, Parameter, ...)
@@ -127,7 +127,7 @@ def conjugate_mll(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
     regularisation, _ = jax.tree.flatten(regularisation)
     regularisation = jnp.sum(jnp.stack(regularisation))
 
-    return p + regularisation
+    return log_mll + regularisation
 
 
 def conjugate_loocv(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
