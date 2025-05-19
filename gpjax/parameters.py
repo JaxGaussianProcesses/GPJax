@@ -1,11 +1,12 @@
 import typing as tp
 
-from flax import nnx
-from jax.experimental import checkify
 import jax.numpy as jnp
 import jax.tree_util as jtu
-from jax.typing import ArrayLike
+import numpyro.distributions as npd
 import numpyro.distributions.transforms as npt
+from flax import nnx
+from jax.experimental import checkify
+from jax.typing import ArrayLike
 
 from gpjax.numpyro_extras import FillTriangularTransform
 
@@ -75,11 +76,18 @@ class Parameter(nnx.Variable[T]):
 
     """
 
-    def __init__(self, value: T, tag: ParameterTag, **kwargs):
+    def __init__(
+        self,
+        value: T,
+        tag: ParameterTag,
+        prior: npd.Distribution = npd.Unit(log_factor=0.0),
+        **kwargs,
+    ):
         _check_is_arraylike(value)
 
         super().__init__(value=jnp.asarray(value), **kwargs)
         self._tag = tag
+        self._prior = prior
 
 
 class PositiveReal(Parameter[T]):

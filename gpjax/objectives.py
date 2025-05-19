@@ -1,5 +1,10 @@
 from typing import TypeVar
 
+import jax
+import jax.numpy as jnp
+import jax.scipy as jsp
+import numpyro.distributions as npd
+import typing_extensions as tpe
 from cola.annotations import PSD
 from cola.linalg.decompositions.decompositions import Cholesky
 from cola.linalg.inverse.inv import (
@@ -10,11 +15,7 @@ from cola.linalg.trace.diag_trace import diag
 from cola.ops.operators import I_like
 from flax import nnx
 from jax import vmap
-import jax.numpy as jnp
-import jax.scipy as jsp
 from jaxtyping import Float
-import numpyro.distributions as npd
-import typing_extensions as tpe
 
 from gpjax.dataset import Dataset
 from gpjax.distributions import GaussianDistribution
@@ -23,6 +24,7 @@ from gpjax.gps import (
     NonConjugatePosterior,
 )
 from gpjax.lower_cholesky import lower_cholesky
+from gpjax.parameters import Parameter
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -58,6 +60,13 @@ def conjugate_mll(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
         & \quad\left. -\log\lvert k(\mathbf{x}, \mathbf{x}')
         + \sigma^2\mathbf{I}_N\rvert - n\log 2\pi \right).
     \end{align}
+    ```
+
+    If any of the hyperparameters of the posterior have priors, then the marginal likelihood
+    will be regularised by the log-probability of the hyperparameters under their respective
+    priors, so that the output of this function is
+    ```math
+    \log p(\mathbf{y}) + \sum_\theta \log p(\theta).
     ```
 
     Example:
@@ -106,7 +115,17 @@ def conjugate_mll(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
 
     # p(y | x, θ), where θ are the model hyperparameters:
     mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
-    return mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
+    p = mll.log_prob(jnp.atleast_1d(y.squeeze())).squeeze()
+
+    # Regularise by the log probs of the hyperparameters under their priors
+    regularisation = jax.tree.map(
+        lambda x: x.prior.log_prob(x.value),
+        posterior,
+        is_leaf=lambda x: isinstance(x, Parameter),
+    )
+    regularisation = jnp.sum(regularisation)
+
+    return p + regularisation
 
 
 def conjugate_loocv(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
