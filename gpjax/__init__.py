@@ -37,10 +37,10 @@ from gpjax.fit import (
 )
 
 __license__ = "MIT"
-__description__ = "Didactic Gaussian processes in JAX"
+__description__ = "Gaussian processes in JAX and Flax"
 __url__ = "https://github.com/JaxGaussianProcesses/GPJax"
 __contributors__ = "https://github.com/JaxGaussianProcesses/GPJax/graphs/contributors"
-__version__ = "0.11.0"
+__version__ = "0.11.1"
 
 __all__ = [
     "base",
