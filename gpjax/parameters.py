@@ -82,6 +82,14 @@ class Parameter(nnx.Variable[T]):
         self._tag = tag
 
 
+class NonNegativeReal(Parameter[T]):
+    """Parameter that is non-negative."""
+
+    def __init__(self, value: T, tag: ParameterTag = "non_negative", **kwargs):
+        super().__init__(value=value, tag=tag, **kwargs)
+        _safe_assert(_check_is_non_negative, self.value)
+
+
 class PositiveReal(Parameter[T]):
     """Parameter that is strictly positive."""
 
@@ -143,6 +151,7 @@ class LowerTriangular(Parameter[T]):
 
 DEFAULT_BIJECTION = {
     "positive": npt.SoftplusTransform(),
+    "non_negative": npt.SoftplusTransform(),
     "real": npt.IdentityTransform(),
     "sigmoid": npt.SigmoidTransform(),
     "lower_triangular": FillTriangularTransform(),
@@ -162,6 +171,13 @@ def _check_is_arraylike(value: T) -> None:
         raise TypeError(
             f"Expected parameter value to be an array-like type. Got {value}."
         )
+
+
+@checkify.checkify
+def _check_is_non_negative(value):
+    checkify.check(
+        jnp.all(value >= 0), "value needs to be non-negative, got {value}", value=value
+    )
 
 
 @checkify.checkify

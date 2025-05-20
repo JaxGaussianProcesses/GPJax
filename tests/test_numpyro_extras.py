@@ -193,7 +193,7 @@ def test_inverse_non_square_error():
         # Extract dimensions
         dim1, dim2 = matrix.shape[-2:]
         # Use a simpler regex pattern that doesn't include parentheses
-        error_pattern = f"Input matrix must be square; got shape"
+        error_pattern = "Input matrix must be square; got shape"
         with pytest.raises(ValueError, match=error_pattern):
             ft.inv(matrix)
 
