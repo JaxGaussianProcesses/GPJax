@@ -1271,6 +1271,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#gpjax.fit.fit_lbfgs" class="md-nav__link">
+    <span class="md-ellipsis">
+      fit_lbfgs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#gpjax.fit.get_batch" class="md-nav__link">
     <span class="md-ellipsis">
       get_batch
@@ -2443,6 +2452,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#gpjax.fit.fit_lbfgs" class="md-nav__link">
+    <span class="md-ellipsis">
+      fit_lbfgs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#gpjax.fit.get_batch" class="md-nav__link">
     <span class="md-ellipsis">
       get_batch
@@ -2759,6 +2777,40 @@ to True.</p>
           </div>
         </li>
     </ul>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="gpjax.fit.fit_lbfgs" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">fit_lbfgs</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">fit_lbfgs</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">train_data</span><span class="p">,</span> <span class="n">params_bijection</span><span class="o">=</span><span class="n">DEFAULT_BIJECTION</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_linesearch_steps</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-05</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Train a Module model with respect to a supplied Objective function.</p>
+<p>Uses Optax's LBFGS implementation and a jax.lax.while loop.</p>
+<p>Args:
+     model: the model Module to be optimised.
+     objective: The objective function that we are optimising with
+         respect to.
+     train_data (Dataset): The training data to be used for the optimisation.
+     max_iters (int): The maximum number of optimisation steps to run. Defaults
+         to 500.
+     safe (bool): Whether to check the types of the inputs.
+     max_linesearch_steps (int): The maximum number of linesearch steps to use
+        for finding the stepsize.
+    gtol (float): Terminate the optimisation if the L2 norm of the gradient is
+        below this threshold.</p>
+<p>Returns:
+     A tuple comprising the optimised model and final loss.</p>
 
     </div>
 
