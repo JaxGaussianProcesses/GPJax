@@ -15,13 +15,13 @@
 
 import typing as tp
 
-from flax import nnx
 import jax
-from jax.flatten_util import ravel_pytree
 import jax.numpy as jnp
 import jax.random as jr
-from numpyro.distributions.transforms import Transform
 import optax as ox
+from flax import nnx
+from jax.flatten_util import ravel_pytree
+from numpyro.distributions.transforms import Transform
 from scipy.optimize import minimize
 
 from gpjax.dataset import Dataset
@@ -127,7 +127,6 @@ def fit(  # noqa: PLR0913
         _check_verbose(verbose)
 
     # Model state filtering
-
     graphdef, params, *static_state = nnx.split(model, Parameter, ...)
 
     # Parameters bijection to unconstrained space
@@ -251,6 +250,110 @@ def fit_scipy(  # noqa: PLR0913
     model = nnx.merge(graphdef, params, *static_state)
 
     return model, history
+
+
+def fit_lbfgs(
+    *,
+    model: Model,
+    objective: Objective,
+    train_data: Dataset,
+    params_bijection: tp.Union[dict[Parameter, Transform], None] = DEFAULT_BIJECTION,
+    max_iters: int = 100,
+    safe: bool = True,
+    max_linesearch_steps: int = 32,
+    gtol: float = 1e-5,
+) -> tuple[Model, jax.Array]:
+    r"""Train a Module model with respect to a supplied Objective function.
+
+    Uses Optax's LBFGS implementation and a jax.lax.while loop.
+
+     Args:
+         model: the model Module to be optimised.
+         objective: The objective function that we are optimising with
+             respect to.
+         train_data (Dataset): The training data to be used for the optimisation.
+         max_iters (int): The maximum number of optimisation steps to run. Defaults
+             to 500.
+         safe (bool): Whether to check the types of the inputs.
+         max_linesearch_steps (int): The maximum number of linesearch steps to use
+            for finding the stepsize.
+        gtol (float): Terminate the optimisation if the L2 norm of the gradient is
+            below this threshold.
+
+     Returns:
+         A tuple comprising the optimised model and final loss.
+    """
+    if safe:
+        # Check inputs
+        _check_model(model)
+        _check_train_data(train_data)
+        _check_num_iters(max_iters)
+
+    # Model state filtering
+    graphdef, params, *static_state = nnx.split(model, Parameter, ...)
+
+    # Parameters bijection to unconstrained space
+    if params_bijection is not None:
+        params = transform(params, params_bijection, inverse=True)
+
+    # Loss definition
+    def loss(params: nnx.State) -> ScalarFloat:
+        params = transform(params, params_bijection)
+        model = nnx.merge(graphdef, params, *static_state)
+        return objective(model, train_data)
+
+    # Initialise optimiser
+    optim = ox.lbfgs(
+        linesearch=ox.scale_by_zoom_linesearch(
+            max_linesearch_steps=max_linesearch_steps,
+            initial_guess_strategy="one",
+        )
+    )
+    opt_state = optim.init(params)
+    loss_value_and_grad = ox.value_and_grad_from_state(loss)
+
+    # Optimisation step.
+    def step(carry):
+        params, opt_state = carry
+
+        # Using optax's value_and_grad_from_state is more efficient given LBFGS uses a linesearch
+        # See https://optax.readthedocs.io/en/latest/api/utilities.html#optax.value_and_grad_from_state
+        loss_val, loss_gradient = loss_value_and_grad(params, state=opt_state)
+        updates, opt_state = optim.update(
+            loss_gradient,
+            opt_state,
+            params,
+            value=loss_val,
+            grad=loss_gradient,
+            value_fn=loss,
+        )
+        params = ox.apply_updates(params, updates)
+
+        return params, opt_state
+
+    def continue_fn(carry):
+        _, opt_state = carry
+        n = ox.tree_utils.tree_get(opt_state, "count")
+        g = ox.tree_utils.tree_get(opt_state, "grad")
+        g_l2_norm = ox.tree_utils.tree_l2_norm(g)
+        return (n == 0) | ((n < max_iters) & (g_l2_norm >= gtol))
+
+    # Optimisation loop
+    params, opt_state = jax.lax.while_loop(
+        continue_fn,
+        step,
+        (params, opt_state),
+    )
+    final_loss = ox.tree_utils.tree_get(opt_state, "value")
+
+    # Parameters bijection to constrained space
+    if params_bijection is not None:
+        params = transform(params, params_bijection)
+
+    # Reconstruct model
+    model = nnx.merge(graphdef, params, *static_state)
+
+    return model, final_loss
 
 
 def get_batch(train_data: Dataset, batch_size: int, key: KeyArray) -> Dataset:

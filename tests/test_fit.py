@@ -13,18 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 
-from beartype.typing import Any
-from flax import nnx
 import jax.numpy as jnp
 import jax.random as jr
-from jaxtyping import (
-    Float,
-    Num,
-)
 import optax as ox
 import pytest
 import scipy
-
+from beartype.typing import Any
+from flax import nnx
 from gpjax.dataset import Dataset
 from gpjax.fit import (
     _check_batch_size,
@@ -35,6 +30,7 @@ from gpjax.fit import (
     _check_train_data,
     _check_verbose,
     fit,
+    fit_lbfgs,
     fit_scipy,
     get_batch,
 )
@@ -58,6 +54,10 @@ from gpjax.parameters import (
 )
 from gpjax.typing import Array
 from gpjax.variational_families import VariationalGaussian
+from jaxtyping import (
+    Float,
+    Num,
+)
 
 
 def test_fit_simple() -> None:
@@ -149,6 +149,46 @@ def test_fit_scipy_simple():
     assert trained_model.bias.value == 1.0
 
 
+def test_fit_lbfgs_simple():
+    # Create dataset:
+    X = jnp.linspace(0.0, 10.0, 100).reshape(-1, 1)
+    y = 2.0 * X + 1.0 + 10 * jr.normal(jr.PRNGKey(0), X.shape).reshape(-1, 1)
+    D = Dataset(X, y)
+
+    # Define linear model:
+    class LinearModel(nnx.Module):
+        def __init__(self, weight: float, bias: float):
+            self.weight = PositiveReal(weight)
+            self.bias = Static(bias)
+
+        def __call__(self, x):
+            return self.weight.value * x + self.bias.value
+
+    model = LinearModel(weight=1.0, bias=1.0)
+
+    # Define loss function:
+    def mse(model, data):
+        pred = model(data.X)
+        return jnp.mean((pred - data.y) ** 2)
+
+    # Train with bfgs!
+    trained_model, final_loss = fit_lbfgs(
+        model=model,
+        objective=mse,
+        train_data=D,
+        max_iters=10,
+    )
+
+    # Ensure we return a model of the same class
+    assert isinstance(trained_model, LinearModel)
+
+    # Test reduction in loss:
+    assert mse(trained_model, D) < mse(model, D)
+
+    # Test stop_gradient on bias:
+    assert trained_model.bias.value == 1.0
+
+
 @pytest.mark.parametrize("n_data", [20])
 @pytest.mark.parametrize("verbose", [True, False])
 def test_fit_gp_regression(n_data: int, verbose: bool) -> None:
@@ -187,8 +227,7 @@ def test_fit_gp_regression(n_data: int, verbose: bool) -> None:
 
 
 @pytest.mark.parametrize("n_data", [20])
-@pytest.mark.parametrize("verbose", [True, False])
-def test_fit_scipy_gp_regression(n_data: int, verbose: bool) -> None:
+def test_fit_lbfgs_gp_regression(n_data: int) -> None:
     # Create dataset:
     key = jr.PRNGKey(123)
     x = jnp.sort(
@@ -203,19 +242,15 @@ def test_fit_scipy_gp_regression(n_data: int, verbose: bool) -> None:
     posterior = prior * likelihood
 
     # Train with BFGS!
-    trained_model_bfgs, history_bfgs = fit_scipy(
+    trained_model_bfgs, final_loss = fit_lbfgs(
         model=posterior,
         objective=conjugate_mll,
         train_data=D,
         max_iters=40,
-        verbose=verbose,
     )
 
     # Ensure the trained model is a Gaussian process posterior
     assert isinstance(trained_model_bfgs, ConjugatePosterior)
-
-    # Ensure we return a history_bfgs of the correct length
-    assert len(history_bfgs) > 2
 
     # Ensure we reduce the loss
     assert conjugate_mll(trained_model_bfgs, D) < conjugate_mll(posterior, D)

@@ -32,6 +32,7 @@ from gpjax.citation import cite
 from gpjax.dataset import Dataset
 from gpjax.fit import (
     fit,
+    fit_lbfgs,
     fit_scipy,
 )
 
@@ -56,5 +57,6 @@ __all__ = [
     "fit",
     "Module",
     "param_field",
+    "fit_lbfgs",
     "fit_scipy",
 ]
