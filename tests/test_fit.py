@@ -176,7 +176,7 @@ def test_fit_lbfgs_simple():
         model=model,
         objective=mse,
         train_data=D,
-        num_iters=10,
+        max_iters=10,
     )
 
     # Ensure we return a history of the correct length
@@ -249,7 +249,7 @@ def test_fit_lbfgs_gp_regression(n_data: int) -> None:
         model=posterior,
         objective=conjugate_mll,
         train_data=D,
-        num_iters=40,
+        max_iters=40,
     )
 
     # Ensure the trained model is a Gaussian process posterior
