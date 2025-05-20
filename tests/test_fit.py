@@ -172,15 +172,12 @@ def test_fit_lbfgs_simple():
         return jnp.mean((pred - data.y) ** 2)
 
     # Train with bfgs!
-    trained_model, hist = fit_lbfgs(
+    trained_model, final_loss = fit_lbfgs(
         model=model,
         objective=mse,
         train_data=D,
         max_iters=10,
     )
-
-    # Ensure we return a history of the correct length
-    assert len(hist) > 2
 
     # Ensure we return a model of the same class
     assert isinstance(trained_model, LinearModel)
@@ -245,7 +242,7 @@ def test_fit_lbfgs_gp_regression(n_data: int) -> None:
     posterior = prior * likelihood
 
     # Train with BFGS!
-    trained_model_bfgs, history_bfgs = fit_lbfgs(
+    trained_model_bfgs, final_loss = fit_lbfgs(
         model=posterior,
         objective=conjugate_mll,
         train_data=D,
@@ -254,9 +251,6 @@ def test_fit_lbfgs_gp_regression(n_data: int) -> None:
 
     # Ensure the trained model is a Gaussian process posterior
     assert isinstance(trained_model_bfgs, ConjugatePosterior)
-
-    # Ensure we return a history_bfgs of the correct length
-    assert len(history_bfgs) > 2
 
     # Ensure we reduce the loss
     assert conjugate_mll(trained_model_bfgs, D) < conjugate_mll(posterior, D)
